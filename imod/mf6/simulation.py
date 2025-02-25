@@ -21,13 +21,13 @@ import xugrid as xu
 import imod
 import imod.logging
 import imod.mf6.exchangebase
+from imod.common.interfaces.imodel import IModel
+from imod.common.interfaces.isimulation import ISimulation
 from imod.logging import LogLevel, logger, standard_log_decorator
 from imod.mf6.gwfgwf import GWFGWF
 from imod.mf6.gwfgwt import GWFGWT
 from imod.mf6.gwtgwt import GWTGWT
 from imod.mf6.ims import Solution, SolutionPresetModerate
-from imod.mf6.interfaces.imodel import IModel
-from imod.mf6.interfaces.isimulation import ISimulation
 from imod.mf6.model import Modflow6Model
 from imod.mf6.model_gwf import GroundwaterFlowModel
 from imod.mf6.model_gwt import GroundwaterTransportModel

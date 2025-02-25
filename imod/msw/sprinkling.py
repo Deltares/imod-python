@@ -4,8 +4,8 @@ import numpy as np
 import pandas as pd
 import xarray as xr
 
+from imod.common.interfaces.iregridpackage import IRegridPackage
 from imod.mf6.dis import StructuredDiscretization
-from imod.mf6.interfaces.iregridpackage import IRegridPackage
 from imod.mf6.mf6_wel_adapter import Mf6Wel
 from imod.msw.fixed_format import VariableMetaData
 from imod.msw.pkgbase import MetaSwapPackage

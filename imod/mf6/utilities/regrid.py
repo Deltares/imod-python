@@ -9,16 +9,16 @@ from fastcore.dispatch import typedispatch
 from xarray.core.utils import is_scalar
 from xugrid.regrid.regridder import BaseRegridder
 
+from imod.common.interfaces.ilinedatapackage import ILineDataPackage
+from imod.common.interfaces.imodel import IModel
+from imod.common.interfaces.ipackage import IPackage
+from imod.common.interfaces.ipointdatapackage import IPointDataPackage
+from imod.common.interfaces.iregridpackage import IRegridPackage
+from imod.common.interfaces.isimulation import ISimulation
 from imod.mf6.auxiliary_variables import (
     expand_transient_auxiliary_variables,
     remove_expanded_auxiliary_variables_from_dataset,
 )
-from imod.mf6.interfaces.ilinedatapackage import ILineDataPackage
-from imod.mf6.interfaces.imodel import IModel
-from imod.mf6.interfaces.ipackage import IPackage
-from imod.mf6.interfaces.ipointdatapackage import IPointDataPackage
-from imod.mf6.interfaces.iregridpackage import IRegridPackage
-from imod.mf6.interfaces.isimulation import ISimulation
 from imod.mf6.statusinfo import NestedStatusInfo
 from imod.mf6.utilities.clip import clip_by_grid
 from imod.mf6.utilities.package import _is_valid

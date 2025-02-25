@@ -1,7 +1,7 @@
 from abc import abstractmethod
 
-from imod.mf6.interfaces.idict import IDict
-from imod.mf6.interfaces.imodel import IModel
+from imod.common.interfaces.idict import IDict
+from imod.common.interfaces.imodel import IModel
 
 
 class ISimulation(IDict):

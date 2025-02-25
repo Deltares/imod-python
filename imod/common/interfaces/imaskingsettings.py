@@ -1,7 +1,7 @@
 import abc
 from typing import List
 
-from imod.mf6.interfaces.ipackage import IPackage
+from imod.common.interfaces.ipackage import IPackage
 
 
 class IMaskingSettings(IPackage, abc.ABC):

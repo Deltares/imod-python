@@ -1,7 +1,7 @@
 import abc
 from typing import Optional
 
-from imod.mf6.interfaces.ipackage import IPackage
+from imod.common.interfaces.ipackage import IPackage
 from imod.util.regrid_method_type import RegridMethodType
 
 

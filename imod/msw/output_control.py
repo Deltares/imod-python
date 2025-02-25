@@ -3,7 +3,7 @@ from typing import Any, Optional, TextIO
 
 import pandas as pd
 
-from imod.mf6.interfaces.iregridpackage import IRegridPackage
+from imod.common.interfaces.iregridpackage import IRegridPackage
 from imod.mf6.utilities.regrid import RegridderWeightsCache
 from imod.msw.fixed_format import VariableMetaData
 from imod.msw.pkgbase import MetaSwapPackage

@@ -9,8 +9,8 @@ import xugrid as xu
 from shapely.testing import assert_geometries_equal
 
 import imod
+from imod.common.interfaces.ipackagebase import IPackageBase
 from imod.mf6 import HorizontalFlowBarrierResistance
-from imod.mf6.interfaces.ipackagebase import IPackageBase
 from imod.mf6.utilities.clip import clip_by_grid
 from imod.mf6.utilities.grid import broadcast_to_full_domain
 

@@ -5,14 +5,14 @@ import xarray as xr
 from fastcore.dispatch import typedispatch
 from xarray.core.utils import is_scalar
 
+from imod.common.interfaces.imaskingsettings import IMaskingSettings
+from imod.common.interfaces.imodel import IModel
+from imod.common.interfaces.ipackage import IPackage
+from imod.common.interfaces.isimulation import ISimulation
 from imod.mf6.auxiliary_variables import (
     expand_transient_auxiliary_variables,
     remove_expanded_auxiliary_variables_from_dataset,
 )
-from imod.mf6.interfaces.imaskingsettings import IMaskingSettings
-from imod.mf6.interfaces.imodel import IModel
-from imod.mf6.interfaces.ipackage import IPackage
-from imod.mf6.interfaces.isimulation import ISimulation
 from imod.typing.grid import GridDataArray, get_spatial_dimension_names, is_same_domain
 
 

@@ -18,11 +18,11 @@ import xugrid as xu
 from jinja2 import Template
 
 import imod
+from imod.common.interfaces.imodel import IModel
 from imod.logging import LogLevel, logger, standard_log_decorator
 from imod.mf6.drn import Drainage
 from imod.mf6.ghb import GeneralHeadBoundary
 from imod.mf6.hfb import HorizontalFlowBarrierBase
-from imod.mf6.interfaces.imodel import IModel
 from imod.mf6.mf6_wel_adapter import Mf6Wel
 from imod.mf6.package import Package
 from imod.mf6.riv import River
