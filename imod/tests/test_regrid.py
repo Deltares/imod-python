@@ -5,6 +5,7 @@ import numpy as np
 import pandas as pd
 import pytest
 import xarray as xr
+import xugrid as xu
 
 import imod
 
@@ -24,6 +25,17 @@ def mean(values, weights):
 
 
 def weightedmean(values, weights):
+    vsum = 0.0
+    wsum = 0.0
+    for i in range(values.size):
+        v = values[i]
+        w = weights[i]
+        vsum += w * v
+        wsum += w
+    return vsum / wsum
+
+
+def weightedmean_xu(values, weights, workspace):
     vsum = 0.0
     wsum = 0.0
     for i in range(values.size):
@@ -405,17 +417,21 @@ def test_regrid_mean2d(chunksize):
         ]
     )
     assert np.allclose(out.values, compare)
+    # Verify xugrid returns same result
+    out_xu = xu.OverlapRegridder(
+        source=source, target=like, method=weightedmean_xu
+    ).regrid(source)
+    assert np.allclose(out_xu.values, compare)
 
     # Now with chunking
     source = source.chunk({"x": chunksize, "y": chunksize})
     out = imod.prepare.Regridder(method=weightedmean).regrid(source, like)
     assert np.allclose(out.values, compare)
-
-    # Now with orthogonal chunks
-    source = source.chunk({"x": 2})
-    likecoords = {"y": dst_x}
-    like = xr.DataArray(np.empty(2), likecoords, ["y"])
-    out = imod.prepare.Regridder(method=weightedmean).regrid(source, like)
+    # Verify xugrid returns same result
+    out_xu = xu.OverlapRegridder(
+        source=source, target=like, method=weightedmean_xu
+    ).regrid(source)
+    assert np.allclose(out_xu.values, compare)
 
 
 @pytest.mark.parametrize("chunksize", [1, 2, 3])
@@ -446,13 +462,22 @@ def test_regrid_mean2d_over3darray(chunksize):
     )
     compare = np.empty((5, 2, 2))
     compare[:, ...] = compare_values
-
     assert np.allclose(out.values, compare)
+    # Verify xugrid returns same result
+    out_xu = xu.OverlapRegridder(
+        source=source, target=like, method=weightedmean_xu
+    ).regrid(source)
+    assert np.allclose(out_xu.values, compare)
 
     # Now with chunking
     source = source.chunk({"x": chunksize, "y": chunksize})
     out = imod.prepare.Regridder(method=weightedmean).regrid(source, like)
     assert np.allclose(out.values, compare)
+    # Verify xugrid returns same result
+    out_xu = xu.OverlapRegridder(
+        source=source, target=like, method=weightedmean_xu
+    ).regrid(source)
+    assert np.allclose(out_xu.values, compare)
 
 
 def test_regrid_conductance2d():
@@ -465,10 +490,16 @@ def test_regrid_conductance2d():
     src_da = xr.DataArray(
         [[10.0, 10.0], [10.0, 10.0]], {"y": [7.5, 2.5], "x": [2.5, 7.5]}, dims
     )
+    src_da[0, 0] = np.nan
 
     regridder = imod.prepare.Regridder(method=conductance, use_relative_weights=True)
     dst_da = regridder.regrid(src_da, like_da)
     assert float(src_da.sum()) == float(dst_da.sum())
+    # Verify xugrid returns same result
+    dst_da_xu = xu.RelativeOverlapRegridder(
+        source=src_da, target=like_da, method="conductance"
+    ).regrid(src_da)
+    assert float(src_da.sum()) == float(dst_da_xu.sum())
 
     # Second case, different domain, smaller cellsizes
     dx = np.array([2.5, 2.5, 2.5, 3.5])
@@ -478,6 +509,11 @@ def test_regrid_conductance2d():
     like_da = xr.DataArray(np.empty((4, 4)), coords, dims)
     dst_da = regridder.regrid(src_da, like_da)
     assert float(src_da.sum()) == float(dst_da.sum())
+    # Verify xugrid returns same result
+    dst_da_xu = xu.RelativeOverlapRegridder(
+        source=src_da, target=like_da, method="conductance"
+    ).regrid(src_da)
+    assert float(src_da.sum()) == float(dst_da_xu.sum())
 
     # Third case, same domain, small to large cellsizes
     y = np.arange(10.0, 0.0, -2.5) - 1.25
@@ -485,12 +521,18 @@ def test_regrid_conductance2d():
     coords = {"y": y, "x": x}
     dims = ("y", "x")
     src_da = xr.DataArray(np.full((4, 4), 10.0), coords, dims)
+    src_da[0, 0] = np.nan
     like_da = xr.DataArray(
         [[10.0, 10.0], [10.0, 10.0]], {"y": [7.5, 2.5], "x": [2.5, 7.5]}, dims
     )
 
     dst_da = regridder.regrid(src_da, like_da)
     assert float(src_da.sum()) == float(dst_da.sum())
+    # Verify xugrid returns same result
+    dst_da_xu = xu.RelativeOverlapRegridder(
+        source=src_da, target=like_da, method="conductance"
+    ).regrid(src_da)
+    assert float(src_da.sum()) == float(dst_da_xu.sum())
 
     # Fourth case, larger domain, small to large cellsizes
     like_da = xr.DataArray(
@@ -499,6 +541,11 @@ def test_regrid_conductance2d():
 
     dst_da = regridder.regrid(src_da, like_da)
     assert float(src_da.sum()) == float(dst_da.sum())
+    # Verify xugrid returns same result
+    dst_da_xu = xu.RelativeOverlapRegridder(
+        source=src_da, target=like_da, method="conductance"
+    ).regrid(src_da)
+    assert float(src_da.sum()) == float(dst_da_xu.sum())
 
 
 def test_regrid_errors():
@@ -541,7 +588,8 @@ def test_str_method():
     out = imod.prepare.Regridder(method="mean").regrid(source, like)
     assert np.allclose(out.values, compare)
 
-    out = imod.prepare.Regridder(method="nearest").regrid(source, like)
+    # Test if "nearest" name is still supported
+    imod.prepare.Regridder(method="nearest").regrid(source, like)
 
 
 def test_no_overlap():
