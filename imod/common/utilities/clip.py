@@ -13,7 +13,7 @@ from imod.common.interfaces.ilinedatapackage import ILineDataPackage
 from imod.common.interfaces.ipackagebase import IPackageBase
 from imod.common.interfaces.ipointdatapackage import IPointDataPackage
 from imod.common.utilities.grid import get_active_domain_slice
-from imod.mf6.utilities.hfb import (
+from imod.common.utilities.hfb import (
     clipped_hfb_zlinestrings_to_zpolygons,
     hfb_zpolygons_to_zlinestrings,
 )

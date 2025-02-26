@@ -21,15 +21,15 @@ from imod.common.utilities.clip import (
     clip_line_gdf_by_grid,
 )
 from imod.common.utilities.grid import broadcast_to_full_domain
-from imod.logging import LogLevel, init_log_decorator, logger
-from imod.mf6.boundary_condition import BoundaryCondition
-from imod.mf6.mf6_hfb_adapter import Mf6HorizontalFlowBarrier
-from imod.mf6.package import Package
-from imod.mf6.utilities.hfb import (
+from imod.common.utilities.hfb import (
     _create_zlinestring_from_bound_df,
     _extract_hfb_bounds_from_zpolygons,
     _prepare_index_names,
 )
+from imod.logging import LogLevel, init_log_decorator, logger
+from imod.mf6.boundary_condition import BoundaryCondition
+from imod.mf6.mf6_hfb_adapter import Mf6HorizontalFlowBarrier
+from imod.mf6.package import Package
 from imod.mf6.validation_context import ValidationContext
 from imod.schemata import (
     DimsSchema,
