@@ -82,9 +82,9 @@ def test_simple_model_with_sprinkling(fixed_format_parser, svat_data):
             msw.CouplerMapping._metadata_dict,
         )
 
-    assert_equal(results["mod_id"], np.array([20, 8, 20, 14, 2, 8, 2, 5]))
-    assert_equal(results["svat"], np.array([1, 2, 3, 4, 1, 2, 3, 4]))
-    assert_equal(results["layer"], np.array([3, 1, 3, 2, 1, 1, 1, 1]))
+    assert_equal(results["mod_id"], np.array([20, 8, 20, 14, 2, 2, 5]))
+    assert_equal(results["svat"], np.array([1, 2, 3, 4, 1, 3, 4]))
+    assert_equal(results["layer"], np.array([3, 1, 3, 2, 1, 1, 1]))
 
 
 @parametrize_with_cases("svat_data", cases=[case_svat_data, case_svat_data__dask])
@@ -105,9 +105,9 @@ def test_simple_model_with_sprinkling_1_subunit(fixed_format_parser, svat_data):
             msw.CouplerMapping._metadata_dict,
         )
 
-    assert_equal(results["mod_id"], np.array([20, 8, 2, 8]))
-    assert_equal(results["svat"], np.array([1, 2, 1, 2]))
-    assert_equal(results["layer"], np.array([3, 1, 1, 1]))
+    assert_equal(results["mod_id"], np.array([20, 8, 2]))
+    assert_equal(results["svat"], np.array([1, 2, 1]))
+    assert_equal(results["layer"], np.array([3, 1, 1]))
 
 
 @parametrize_with_cases("svat_data", cases=[case_svat_data, case_svat_data__dask])
