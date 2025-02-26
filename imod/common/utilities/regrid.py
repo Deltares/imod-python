@@ -21,7 +21,7 @@ from imod.mf6.auxiliary_variables import (
     remove_expanded_auxiliary_variables_from_dataset,
 )
 from imod.mf6.utilities.clip import clip_by_grid
-from imod.mf6.utilities.package import _is_valid
+from imod.common.utilities.filter_values import is_valid
 from imod.schemata import ValidationError
 from imod.typing.grid import (
     GridDataArray,
@@ -69,7 +69,7 @@ def _regrid_array(
 
     # skip regridding for scalar arrays with no valid values (such as "None")
     scalar_da: bool = is_scalar(da)
-    if scalar_da and not _is_valid(da.values[()]):
+    if scalar_da and not is_valid(da.values[()]):
         return None
 
     # the dataarray might be a scalar. If it is, then it does not need regridding.

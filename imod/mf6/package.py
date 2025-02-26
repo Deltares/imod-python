@@ -29,7 +29,7 @@ from imod.mf6.pkgbase import (
     PackageBase,
 )
 from imod.mf6.utilities.mask import mask_package
-from imod.mf6.utilities.package import _is_valid
+from imod.common.utilities.filter_values import is_valid
 from imod.mf6.utilities.schemata import filter_schemata_dict
 from imod.mf6.validation import validation_pkg_error_message
 from imod.mf6.write_context import WriteContext
@@ -87,7 +87,7 @@ class Package(PackageBase, IPackage, abc.ABC):
 
     @staticmethod
     def _valid(value: Any) -> bool:
-        return _is_valid(value)
+        return is_valid(value)
 
     @staticmethod
     def _number_format(dtype: type):
