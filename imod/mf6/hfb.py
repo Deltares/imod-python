@@ -15,16 +15,16 @@ import xugrid as xu
 from fastcore.dispatch import typedispatch
 
 from imod.common.interfaces.ilinedatapackage import ILineDataPackage
-from imod.logging import LogLevel, init_log_decorator, logger
-from imod.mf6.boundary_condition import BoundaryCondition
-from imod.mf6.mf6_hfb_adapter import Mf6HorizontalFlowBarrier
-from imod.mf6.package import Package
 from imod.common.utilities.clip import (
     bounding_polygon_from_line_data_and_clip_box,
     clip_line_gdf_by_bounding_polygon,
     clip_line_gdf_by_grid,
 )
-from imod.mf6.utilities.grid import broadcast_to_full_domain
+from imod.common.utilities.grid import broadcast_to_full_domain
+from imod.logging import LogLevel, init_log_decorator, logger
+from imod.mf6.boundary_condition import BoundaryCondition
+from imod.mf6.mf6_hfb_adapter import Mf6HorizontalFlowBarrier
+from imod.mf6.package import Package
 from imod.mf6.utilities.hfb import (
     _create_zlinestring_from_bound_df,
     _extract_hfb_bounds_from_zpolygons,

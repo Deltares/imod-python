@@ -5,10 +5,10 @@ import numpy as np
 import pandas as pd
 import xarray as xr
 
+from imod.common.utilities.grid import get_active_domain_slice, to_cell_idx
 from imod.mf6.gwfgwf import GWFGWF
 from imod.mf6.gwtgwt import GWTGWT
 from imod.mf6.multimodel.modelsplitter import PartitionInfo
-from imod.mf6.utilities.grid import get_active_domain_slice, to_cell_idx
 from imod.typing import GridDataArray
 
 
