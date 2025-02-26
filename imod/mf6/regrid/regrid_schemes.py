@@ -5,7 +5,7 @@ from imod.common.utilities.regrid_method_type import (
     RegridMethodType,
     _RegridVarType,
 )
-from imod.util.regrid_method_type import (
+from imod.util.regrid import (
     RegridderType,
 )
 

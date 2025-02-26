@@ -12,7 +12,7 @@ from imod.tests.fixtures.mf6_small_models_fixture import (
     grid_data_structured,
     grid_data_unstructured,
 )
-from imod.util.regrid_method_type import RegridderType
+from imod.util.regrid import RegridderType
 
 
 def test_regrid_structured_simulation_to_structured_simulation(

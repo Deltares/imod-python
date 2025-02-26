@@ -31,7 +31,7 @@ from imod.typing.grid import (
     is_unstructured,
     ones_like,
 )
-from imod.util.regrid_method_type import (
+from imod.util.regrid import (
     RegridderType,
 )
 

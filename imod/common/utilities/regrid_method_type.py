@@ -3,7 +3,7 @@ from typing import ClassVar, Protocol, Tuple, TypeAlias
 from pydantic import ConfigDict
 from pydantic.dataclasses import dataclass
 
-from imod.util.regrid_method_type import RegridderType
+from imod.util.regrid import RegridderType
 
 
 class RegridMethodType(Protocol):

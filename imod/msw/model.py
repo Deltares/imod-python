@@ -37,7 +37,7 @@ from imod.msw.utilities.parse import read_para_sim
 from imod.msw.vegetation import AnnualCropFactors
 from imod.typing import Imod5DataDict
 from imod.util.dims import drop_layer_dim_cap_data
-from imod.util.regrid_method_type import RegridderType
+from imod.util.regrid import RegridderType
 
 REQUIRED_PACKAGES = (
     GridData,

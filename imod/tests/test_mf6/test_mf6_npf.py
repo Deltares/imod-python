@@ -9,7 +9,7 @@ import xarray as xr
 
 import imod
 from imod.schemata import ValidationError
-from imod.util.regrid_method_type import RegridderType
+from imod.util.regrid import RegridderType
 
 
 def test_render():
