@@ -23,7 +23,6 @@ FloPy nearly fully supports a list of models and software:
   
 imod supports (partially):
 
-* iMODFLOW
 * iMOD-WQ
 * MODFLOW6
 

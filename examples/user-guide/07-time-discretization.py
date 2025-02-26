@@ -14,7 +14,7 @@ functionality is activated with the ``create_time_discretization()`` method.
 #
 # To demonstrate the ``create_time_discretization()`` method, we first have to
 # create a Model object. In this case we'll use a Modflow 6 simulation, but the
-# ``imod.wq.SeawatModel`` and imod.flow.ImodflowModel also support this.
+# ``imod.wq.SeawatModel`` also supports this.
 #
 # .. note::
 #

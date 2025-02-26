@@ -3,7 +3,6 @@ from imod import (
     couplers,
     data,
     evaluate,
-    flow,
     mf6,
     msw,
     prepare,
