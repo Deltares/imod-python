@@ -19,7 +19,7 @@ from imod.logging import LogLevel, init_log_decorator, logger
 from imod.mf6.boundary_condition import BoundaryCondition
 from imod.mf6.mf6_hfb_adapter import Mf6HorizontalFlowBarrier
 from imod.mf6.package import Package
-from imod.mf6.utilities.clip import (
+from imod.common.utilities.clip import (
     bounding_polygon_from_line_data_and_clip_box,
     clip_line_gdf_by_bounding_polygon,
     clip_line_gdf_by_grid,
