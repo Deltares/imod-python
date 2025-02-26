@@ -8,9 +8,9 @@ import jinja2
 import numpy as np
 import xarray as xr
 
+from imod.common.utilities.regrid import RegridderWeightsCache
 from imod.mf6.dis import StructuredDiscretization
 from imod.mf6.mf6_wel_adapter import Mf6Wel
-from imod.mf6.utilities.regrid import RegridderWeightsCache
 from imod.msw.copy_files import FileCopier
 from imod.msw.coupler_mapping import CouplerMapping
 from imod.msw.grid_data import GridData

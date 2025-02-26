@@ -10,6 +10,7 @@ from numpy.testing import assert_array_equal
 from pytest_cases import parametrize_with_cases
 from shapely import Polygon, get_coordinates, linestrings
 
+from imod.common.utilities.regrid import RegridderWeightsCache
 from imod.mf6 import (
     HorizontalFlowBarrierHydraulicCharacteristic,
     HorizontalFlowBarrierMultiplier,
@@ -29,7 +30,6 @@ from imod.mf6.hfb import (
 from imod.mf6.ims import SolutionPresetSimple
 from imod.mf6.npf import NodePropertyFlow
 from imod.mf6.simulation import Modflow6Simulation
-from imod.mf6.utilities.regrid import RegridderWeightsCache
 from imod.prepare.hfb import (
     linestring_to_square_zpolygons,
     linestring_to_trapezoid_zpolygons,

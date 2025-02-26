@@ -2,7 +2,7 @@ import numpy as np
 import pytest
 import xarray as xr
 
-from imod.mf6.utilities.regrid import RegridderWeightsCache
+from imod.common.utilities.regrid import RegridderWeightsCache
 from imod.typing.grid import zeros_like
 
 

@@ -8,8 +8,8 @@ import xarray as xr
 import xugrid as xu
 
 import imod
+from imod.common.utilities.regrid import RegridderWeightsCache
 from imod.mf6.package import Package
-from imod.mf6.utilities.regrid import RegridderWeightsCache
 from imod.tests.fixtures.mf6_small_models_fixture import (
     grid_data_structured,
     grid_data_structured_layered,

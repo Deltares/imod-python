@@ -8,7 +8,7 @@ import pandas as pd
 import xarray as xr
 
 import imod
-from imod.mf6.utilities.regrid import RegridderWeightsCache
+from imod.common.utilities.regrid import RegridderWeightsCache
 from imod.msw.fixed_format import VariableMetaData
 from imod.msw.pkgbase import MetaSwapPackage
 from imod.msw.utilities.common import find_in_file_list

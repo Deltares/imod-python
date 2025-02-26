@@ -9,8 +9,8 @@ import pytest
 import xarray as xr
 
 import imod
+from imod.common.utilities.regrid import RegridderWeightsCache
 from imod.mf6.dis import StructuredDiscretization
-from imod.mf6.utilities.regrid import RegridderWeightsCache
 from imod.mf6.write_context import WriteContext
 from imod.schemata import ValidationError
 from imod.typing.grid import is_planar_grid, is_transient_data_grid, nan_like

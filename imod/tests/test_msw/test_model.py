@@ -7,7 +7,7 @@ from numpy.testing import assert_almost_equal, assert_equal
 from pytest_cases import parametrize_with_cases
 
 from imod import mf6, msw
-from imod.mf6.utilities.regrid import RegridderWeightsCache
+from imod.common.utilities.regrid import RegridderWeightsCache
 from imod.msw.copy_files import FileCopier
 from imod.msw.model import DEFAULT_SETTINGS
 from imod.msw.utilities.parse import read_para_sim

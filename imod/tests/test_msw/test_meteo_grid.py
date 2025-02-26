@@ -9,7 +9,7 @@ import pandas as pd
 import pytest
 from numpy.testing import assert_equal
 
-from imod.mf6.utilities.regrid import RegridderWeightsCache
+from imod.common.utilities.regrid import RegridderWeightsCache
 from imod.msw import MeteoGrid, MeteoGridCopy
 
 

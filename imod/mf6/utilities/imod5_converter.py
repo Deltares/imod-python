@@ -4,8 +4,8 @@ import numpy as np
 import pandas as pd
 import xarray as xr
 
+from imod.common.utilities.regrid import RegridderWeightsCache, _regrid_package_data
 from imod.mf6.package import Package
-from imod.mf6.utilities.regrid import RegridderWeightsCache, _regrid_package_data
 from imod.typing import GridDataDict, Imod5DataDict
 from imod.typing.grid import full_like
 from imod.util.dims import drop_layer_dim_cap_data

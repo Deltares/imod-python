@@ -15,6 +15,10 @@ import xugrid as xu
 
 import imod
 from imod.common.interfaces.ipackage import IPackage
+from imod.common.utilities.regrid import (
+    RegridderWeightsCache,
+    _regrid_like,
+)
 from imod.logging import standard_log_decorator
 from imod.mf6.auxiliary_variables import (
     get_variable_names,
@@ -26,10 +30,6 @@ from imod.mf6.pkgbase import (
 )
 from imod.mf6.utilities.mask import mask_package
 from imod.mf6.utilities.package import _is_valid
-from imod.mf6.utilities.regrid import (
-    RegridderWeightsCache,
-    _regrid_like,
-)
 from imod.mf6.utilities.schemata import filter_schemata_dict
 from imod.mf6.validation import validation_pkg_error_message
 from imod.mf6.write_context import WriteContext

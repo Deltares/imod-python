@@ -7,17 +7,17 @@ import numpy as np
 import imod
 from imod.common.interfaces.imaskingsettings import IMaskingSettings
 from imod.common.interfaces.iregridpackage import IRegridPackage
+from imod.common.utilities.regrid import (
+    RegridderWeightsCache,
+    _regrid_like,
+    _regrid_package_data,
+)
 from imod.logging import init_log_decorator, standard_log_decorator
 from imod.mf6.disv import VerticesDiscretization
 from imod.mf6.package import Package
 from imod.mf6.regrid.regrid_schemes import DiscretizationRegridMethod, RegridMethodType
 from imod.mf6.utilities.grid import create_smallest_target_grid
 from imod.mf6.utilities.imod5_converter import convert_ibound_to_idomain
-from imod.mf6.utilities.regrid import (
-    RegridderWeightsCache,
-    _regrid_like,
-    _regrid_package_data,
-)
 from imod.mf6.validation import DisBottomSchema
 from imod.schemata import (
     ActiveCellsConnectedSchema,

@@ -1,7 +1,7 @@
 import numpy as np
 import xarray as xr
 
-from imod.mf6.utilities.regrid import (
+from imod.common.utilities.regrid import (
     RegridderWeightsCache,
 )
 from imod.msw import AnnualCropFactors
