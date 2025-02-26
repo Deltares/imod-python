@@ -61,7 +61,8 @@ Changed
   ``scipy.sparse.linalg.cg`` as the backend. We've remove the support for the
   ``ibound`` argument, the ``iter1`` argument has been dropped, ``mxiter`` has
   been renamed to ``maxiter``, ``close`` has been renamed to ``rtol``.
-
+- Moved ``imod.mf6.utilities.regrid.RegridderWeightsCache`` to the
+  :class:`imod.util.regrid.RegridderWeightsCache`.
 
 Fixed
 ~~~~~
@@ -475,7 +476,7 @@ Changed
   :class:`imod.mf6.Solution` to match newer MODFLOW 6 releases.
 - Changed no_ptc from a bool to an option string in :class:`imod.mf6.Solution`.
 - Removed constructor arguments `source` and `target` from
-  :class:`imod.mf6.utilities.regrid.RegridderWeightsCache`, as they were not
+  ``imod.mf6.utilities.regrid.RegridderWeightsCache``, as they were not
   used.
 - :func:`imod.mf6.open_cbc` now returns arrays which contain np.nan for cells where 
   budget variables are not defined. Based on new budget output a disquisition between 

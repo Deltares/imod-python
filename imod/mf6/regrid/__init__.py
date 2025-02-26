@@ -1,3 +1,4 @@
+from imod.common.utilities.regrid_method_type import EmptyRegridMethod
 from imod.mf6.regrid.regrid_schemes import (
     ConstantHeadRegridMethod,
     DiscretizationRegridMethod,
@@ -13,4 +14,3 @@ from imod.mf6.regrid.regrid_schemes import (
     SpecificStorageRegridMethod,
     StorageCoefficientRegridMethod,
 )
-from imod.util.regrid_method_type import EmptyRegridMethod

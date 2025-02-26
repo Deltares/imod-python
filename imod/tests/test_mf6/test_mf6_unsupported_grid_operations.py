@@ -2,8 +2,8 @@ import numpy as np
 import pytest
 import xarray as xr
 
-from imod.mf6.utilities.regrid import RegridderWeightsCache
 from imod.typing.grid import zeros_like
+from imod.util.regrid import RegridderWeightsCache
 
 
 def finer_grid(grid):

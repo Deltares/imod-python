@@ -29,13 +29,13 @@ from imod.mf6.hfb import (
 from imod.mf6.ims import SolutionPresetSimple
 from imod.mf6.npf import NodePropertyFlow
 from imod.mf6.simulation import Modflow6Simulation
-from imod.mf6.utilities.regrid import RegridderWeightsCache
 from imod.prepare.hfb import (
     linestring_to_square_zpolygons,
     linestring_to_trapezoid_zpolygons,
 )
 from imod.tests.fixtures.flow_basic_fixture import BasicDisSettings
 from imod.typing.grid import nan_like, ones_like
+from imod.util.regrid import RegridderWeightsCache
 
 
 @pytest.mark.parametrize("dis", ["basic_unstructured_dis", "basic_dis"])

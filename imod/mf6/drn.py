@@ -5,16 +5,15 @@ from typing import Optional
 import numpy as np
 
 from imod.common.interfaces.iregridpackage import IRegridPackage
+from imod.common.utilities.regrid import (
+    _regrid_package_data,
+)
 from imod.logging import init_log_decorator, standard_log_decorator
 from imod.mf6.boundary_condition import BoundaryCondition
 from imod.mf6.dis import StructuredDiscretization
 from imod.mf6.disv import VerticesDiscretization
 from imod.mf6.npf import NodePropertyFlow
 from imod.mf6.regrid.regrid_schemes import DrainageRegridMethod
-from imod.mf6.utilities.regrid import (
-    RegridderWeightsCache,
-    _regrid_package_data,
-)
 from imod.mf6.validation import BOUNDARY_DIMS_SCHEMA, CONC_DIMS_SCHEMA
 from imod.prepare.cleanup import cleanup_drn
 from imod.prepare.topsystem.allocation import ALLOCATION_OPTION, allocate_drn_cells
@@ -37,6 +36,7 @@ from imod.schemata import (
 from imod.typing import GridDataArray
 from imod.typing.grid import enforce_dim_order, has_negative_layer, is_planar_grid
 from imod.util.expand_repetitions import expand_repetitions
+from imod.util.regrid import RegridderWeightsCache
 
 
 class Drainage(BoundaryCondition, IRegridPackage):

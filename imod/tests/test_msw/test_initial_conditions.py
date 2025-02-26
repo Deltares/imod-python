@@ -4,9 +4,6 @@ from pathlib import Path
 import numpy as np
 import pytest
 
-from imod.mf6.utilities.regrid import (
-    RegridderWeightsCache,
-)
 from imod.msw import (
     InitialConditionsEquilibrium,
     InitialConditionsPercolation,
@@ -14,6 +11,9 @@ from imod.msw import (
     InitialConditionsSavedState,
 )
 from imod.typing.grid import is_empty
+from imod.util.regrid import (
+    RegridderWeightsCache,
+)
 
 DUMMY_ARGS = None, None, None, None
 

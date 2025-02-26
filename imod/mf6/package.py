@@ -15,6 +15,11 @@ import xugrid as xu
 
 import imod
 from imod.common.interfaces.ipackage import IPackage
+from imod.common.utilities.regrid import (
+    _regrid_like,
+)
+from imod.common.utilities.regrid_method_type import EmptyRegridMethod, RegridMethodType
+from imod.common.utilities.value_filters import is_valid
 from imod.logging import standard_log_decorator
 from imod.mf6.auxiliary_variables import (
     get_variable_names,
@@ -25,11 +30,6 @@ from imod.mf6.pkgbase import (
     PackageBase,
 )
 from imod.mf6.utilities.mask import mask_package
-from imod.mf6.utilities.package import _is_valid
-from imod.mf6.utilities.regrid import (
-    RegridderWeightsCache,
-    _regrid_like,
-)
 from imod.mf6.utilities.schemata import filter_schemata_dict
 from imod.mf6.validation import validation_pkg_error_message
 from imod.mf6.write_context import WriteContext
@@ -40,7 +40,7 @@ from imod.schemata import (
     ValidationError,
 )
 from imod.typing import GridDataArray
-from imod.util.regrid_method_type import EmptyRegridMethod, RegridMethodType
+from imod.util.regrid import RegridderWeightsCache
 
 
 class Package(PackageBase, IPackage, abc.ABC):
@@ -87,7 +87,7 @@ class Package(PackageBase, IPackage, abc.ABC):
 
     @staticmethod
     def _valid(value: Any) -> bool:
-        return _is_valid(value)
+        return is_valid(value)
 
     @staticmethod
     def _number_format(dtype: type):

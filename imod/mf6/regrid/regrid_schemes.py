@@ -1,10 +1,12 @@
 from pydantic.dataclasses import dataclass
 
-from imod.util.regrid_method_type import (
+from imod.common.utilities.regrid_method_type import (
     _CONFIG,
-    RegridderType,
     RegridMethodType,
     _RegridVarType,
+)
+from imod.util.regrid import (
+    RegridderType,
 )
 
 
