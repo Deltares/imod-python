@@ -16,12 +16,12 @@ from imod.common.interfaces.iregridpackage import IRegridPackage
 from imod.common.interfaces.isimulation import ISimulation
 from imod.common.statusinfo import NestedStatusInfo
 from imod.common.utilities.regrid_method_type import EmptyRegridMethod, RegridMethodType
+from imod.common.utilities.value_filters import is_valid
 from imod.mf6.auxiliary_variables import (
     expand_transient_auxiliary_variables,
     remove_expanded_auxiliary_variables_from_dataset,
 )
 from imod.mf6.utilities.clip import clip_by_grid
-from imod.common.utilities.filter_values import is_valid
 from imod.schemata import ValidationError
 from imod.typing.grid import (
     GridDataArray,

@@ -1,4 +1,3 @@
-
 import numpy as np
 import xarray as xr
 
@@ -26,5 +25,3 @@ def get_repeat_stress(times) -> xr.DataArray:
         data=np.column_stack((keys, values)),
         dims=("repeat", "repeat_items"),
     )
-
-
