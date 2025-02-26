@@ -97,6 +97,10 @@ class CouplerMapping(MetaSwapPackage):
         dataframe = pd.DataFrame(
             data=data_dict, columns=list(self._metadata_dict.keys())
         )
+        # Drop duplicates, MetaSWAP does not support duplicate connections
+        dataframe = dataframe.drop_duplicates(
+            subset=["mod_id", "svat", "layer"], keep="first"
+        )
 
         self._check_range(dataframe)
 
