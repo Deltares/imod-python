@@ -10,7 +10,6 @@ from numpy.testing import assert_array_equal
 from pytest_cases import parametrize_with_cases
 from shapely import Polygon, get_coordinates, linestrings
 
-from imod.common.utilities.regrid import RegridderWeightsCache
 from imod.mf6 import (
     HorizontalFlowBarrierHydraulicCharacteristic,
     HorizontalFlowBarrierMultiplier,
@@ -36,6 +35,7 @@ from imod.prepare.hfb import (
 )
 from imod.tests.fixtures.flow_basic_fixture import BasicDisSettings
 from imod.typing.grid import nan_like, ones_like
+from imod.util.regrid import RegridderWeightsCache
 
 
 @pytest.mark.parametrize("dis", ["basic_unstructured_dis", "basic_dis"])

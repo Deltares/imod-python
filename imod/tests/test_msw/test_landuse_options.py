@@ -5,10 +5,10 @@ import numpy as np
 import xarray as xr
 from numpy.testing import assert_almost_equal, assert_equal
 
-from imod.common.utilities.regrid import (
+from imod.msw import LanduseOptions
+from imod.util.regrid import (
     RegridderWeightsCache,
 )
-from imod.msw import LanduseOptions
 
 
 def create_landuse_dict():

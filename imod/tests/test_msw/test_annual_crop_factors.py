@@ -1,10 +1,10 @@
 import numpy as np
 import xarray as xr
 
-from imod.common.utilities.regrid import (
+from imod.msw import AnnualCropFactors
+from imod.util.regrid import (
     RegridderWeightsCache,
 )
-from imod.msw import AnnualCropFactors
 
 
 def setup_cropfactors():

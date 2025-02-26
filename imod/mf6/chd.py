@@ -4,7 +4,7 @@ from typing import Optional
 import numpy as np
 
 from imod.common.interfaces.iregridpackage import IRegridPackage
-from imod.common.utilities.regrid import RegridderWeightsCache, _regrid_package_data
+from imod.common.utilities.regrid import _regrid_package_data
 from imod.logging import init_log_decorator
 from imod.logging.logging_decorators import standard_log_decorator
 from imod.mf6.boundary_condition import BoundaryCondition
@@ -23,6 +23,7 @@ from imod.schemata import (
     OtherCoordsSchema,
 )
 from imod.typing import GridDataArray
+from imod.util.regrid import RegridderWeightsCache
 
 
 class ConstantHead(BoundaryCondition, IRegridPackage):

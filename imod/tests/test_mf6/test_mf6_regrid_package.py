@@ -8,7 +8,6 @@ import xarray as xr
 import xugrid as xu
 
 import imod
-from imod.common.utilities.regrid import RegridderWeightsCache
 from imod.mf6.package import Package
 from imod.tests.fixtures.mf6_small_models_fixture import (
     grid_data_structured,
@@ -16,6 +15,7 @@ from imod.tests.fixtures.mf6_small_models_fixture import (
     grid_data_unstructured,
     grid_data_unstructured_layered,
 )
+from imod.util.regrid import RegridderWeightsCache
 
 
 def create_package_instances(is_structured: bool) -> List[Package]:

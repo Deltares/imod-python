@@ -1,8 +1,7 @@
-import abc
 import copy
 from collections import defaultdict
 from dataclasses import asdict
-from typing import Any, Dict, Optional, Tuple, Union
+from typing import Any, Optional, Union
 
 import xarray as xr
 from fastcore.dispatch import typedispatch
@@ -27,105 +26,13 @@ from imod.schemata import ValidationError
 from imod.typing.grid import (
     GridDataArray,
     GridDataset,
-    get_grid_geometry_hash,
     is_unstructured,
     ones_like,
 )
 from imod.util.regrid import (
     RegridderType,
+    RegridderWeightsCache,
 )
-
-HashRegridderMapping = Tuple[int, int, BaseRegridder]
-
-
-class RegridderWeightsCache:
-    """
-    This class stores any number of regridders that can regrid a single source
-    grid to a single target grid. By storing the regridders, we make sure the
-    regridders can be re-used for different arrays on the same grid. Regridders
-    are stored based on their type (`see these
-    docs<https://deltares.github.io/xugrid/examples/regridder_overview.html>`_)
-    and planar coordinates (x, y). This is important because computing the
-    regridding weights is a costly affair.
-    """
-
-    def __init__(
-        self,
-        max_cache_size: int = 6,
-    ) -> None:
-        self.regridder_instances: dict[
-            tuple[type[BaseRegridder], Optional[str]], BaseRegridder
-        ] = {}
-        self.weights_cache: Dict[HashRegridderMapping, GridDataArray] = {}
-        self.max_cache_size = max_cache_size
-
-    def __get_regridder_class(
-        self, regridder_type: RegridderType | BaseRegridder
-    ) -> type[BaseRegridder]:
-        if isinstance(regridder_type, abc.ABCMeta):
-            if not issubclass(regridder_type, BaseRegridder):
-                raise ValueError(
-                    "only derived types of BaseRegridder can be instantiated"
-                )
-            return regridder_type
-        elif isinstance(regridder_type, RegridderType):
-            return regridder_type.value
-
-        raise ValueError("invalid type for regridder")
-
-    def get_regridder(
-        self,
-        source_grid: GridDataArray,
-        target_grid: GridDataArray,
-        regridder_type: Union[RegridderType, BaseRegridder],
-        method: Optional[str] = None,
-    ) -> BaseRegridder:
-        """
-        returns a regridder of the specified type and with the specified method.
-        The desired type can be passed through the argument "regridder_type" as
-        an enumerator or as a class. The following two are equivalent:
-        instancesCollection.get_regridder(RegridderType.OVERLAP, "mean")
-        instancesCollection.get_regridder(xu.OverlapRegridder, "mean")
-
-
-        Parameters
-        ----------
-        regridder_type: RegridderType or regridder class
-            indicates the desired regridder type
-        method: str or None
-            indicates the method the regridder should apply
-
-        Returns
-        -------
-        a regridder of the specified characteristics
-        """
-        regridder_class = self.__get_regridder_class(regridder_type)
-
-        if "layer" not in source_grid.coords and "layer" in target_grid.coords:
-            target_grid = target_grid.drop_vars("layer")
-
-        source_hash = get_grid_geometry_hash(source_grid)
-        target_hash = get_grid_geometry_hash(target_grid)
-        key = (source_hash, target_hash, regridder_class)
-        if key not in self.weights_cache.keys():
-            if len(self.weights_cache) >= self.max_cache_size:
-                self.remove_first_regridder()
-            kwargs = {"source": source_grid, "target": target_grid}
-            if method is not None:
-                kwargs["method"] = method
-            regridder = regridder_class(**kwargs)
-            self.weights_cache[key] = regridder.weights
-        else:
-            kwargs = {"weights": self.weights_cache[key], "target": target_grid}
-            if method is not None:
-                kwargs["method"] = method
-            regridder = regridder_class.from_weights(**kwargs)
-
-        return regridder
-
-    def remove_first_regridder(self):
-        keys = list(self.weights_cache.keys())
-        self.weights_cache.pop(keys[0])
 
 
 def handle_extra_coords(coordname: str, target_grid: GridDataArray, variable_data: Any):

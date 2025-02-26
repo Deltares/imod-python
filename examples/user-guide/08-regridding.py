@@ -189,7 +189,7 @@ axes[1].set_ylabel("regridded")
 # Set up the input needed for custom regridding. Create a regridder
 # weight-cache. This object can (and should) be reused for all the packages that
 # undergo custom regridding at this stage.
-from imod.common.utilities.regrid import RegridderWeightsCache
+from imod.util.regrid import RegridderWeightsCache
 
 regrid_cache = RegridderWeightsCache()
 

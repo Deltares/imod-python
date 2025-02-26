@@ -7,7 +7,6 @@ from typing import Optional, cast
 import cftime
 import numpy as np
 
-from imod.common.utilities.regrid import RegridderWeightsCache
 from imod.common.utilities.regrid_method_type import RegridMethodType
 from imod.logging import init_log_decorator
 from imod.logging.logging_decorators import standard_log_decorator
@@ -42,6 +41,7 @@ from imod.prepare.topsystem.default_allocation_methods import (
 )
 from imod.typing import GridDataArray, StressPeriodTimesType
 from imod.typing.grid import zeros_like
+from imod.util.regrid import RegridderWeightsCache
 
 
 class GroundwaterFlowModel(Modflow6Model):

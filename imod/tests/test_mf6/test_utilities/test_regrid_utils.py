@@ -4,8 +4,9 @@ import pickle
 import pytest
 from xugrid import OverlapRegridder
 
-from imod.common.utilities.regrid import RegridderType, RegridderWeightsCache
+from imod.common.utilities.regrid import RegridderType
 from imod.mf6 import Dispersion
+from imod.util.regrid import RegridderWeightsCache
 
 
 def is_equal_regridder(instance_1, instance_2) -> bool:

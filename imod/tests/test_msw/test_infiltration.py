@@ -11,12 +11,12 @@ from numpy import nan
 from numpy.testing import assert_almost_equal, assert_equal
 from pytest_cases import case, parametrize_with_cases
 
-from imod.common.utilities.regrid import (
-    RegridderWeightsCache,
-)
 from imod.msw import Infiltration
 from imod.msw.fixed_format import format_fixed_width
 from imod.typing import GridDataDict
+from imod.util.regrid import (
+    RegridderWeightsCache,
+)
 
 
 @pytest.fixture(scope="function")

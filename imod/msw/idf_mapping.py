@@ -5,12 +5,13 @@ import numpy as np
 import xarray as xr
 
 from imod.common.interfaces.iregridpackage import IRegridPackage
-from imod.common.utilities.regrid import RegridderWeightsCache, _regrid_array
+from imod.common.utilities.regrid import _regrid_array
 from imod.common.utilities.regrid_method_type import RegridMethodType
 from imod.msw.fixed_format import VariableMetaData
 from imod.msw.pkgbase import MetaSwapPackage
 from imod.msw.regrid.regrid_schemes import IdfMappingRegridMethod
 from imod.typing import GridDataArray
+from imod.util.regrid import RegridderWeightsCache
 from imod.util.spatial import spatial_reference
 
 

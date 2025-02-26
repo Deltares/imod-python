@@ -7,7 +7,6 @@ import xarray as xr
 
 from imod.common.interfaces.iregridpackage import IRegridPackage
 from imod.common.utilities.regrid import (
-    RegridderWeightsCache,
     _regrid_package_data,
 )
 from imod.logging import init_log_decorator
@@ -28,6 +27,7 @@ from imod.schemata import (
 )
 from imod.typing import GridDataArray
 from imod.typing.grid import zeros_like
+from imod.util.regrid import RegridderWeightsCache
 
 
 def _dataarray_to_bool(griddataarray: GridDataArray) -> bool:

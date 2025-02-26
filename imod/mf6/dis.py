@@ -8,7 +8,6 @@ import imod
 from imod.common.interfaces.imaskingsettings import IMaskingSettings
 from imod.common.interfaces.iregridpackage import IRegridPackage
 from imod.common.utilities.regrid import (
-    RegridderWeightsCache,
     _regrid_like,
     _regrid_package_data,
 )
@@ -32,6 +31,7 @@ from imod.schemata import (
     ValidationError,
 )
 from imod.typing.grid import GridDataArray, is_unstructured
+from imod.util.regrid import RegridderWeightsCache
 
 
 class StructuredDiscretization(Package, IRegridPackage, IMaskingSettings):

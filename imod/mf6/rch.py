@@ -5,7 +5,7 @@ import numpy as np
 import xarray as xr
 
 from imod.common.interfaces.iregridpackage import IRegridPackage
-from imod.common.utilities.regrid import RegridderWeightsCache, _regrid_package_data
+from imod.common.utilities.regrid import _regrid_package_data
 from imod.logging import init_log_decorator
 from imod.mf6.boundary_condition import BoundaryCondition
 from imod.mf6.dis import StructuredDiscretization
@@ -35,6 +35,7 @@ from imod.typing.grid import (
     is_planar_grid,
 )
 from imod.util.dims import drop_layer_dim_cap_data
+from imod.util.regrid import RegridderWeightsCache
 
 
 class Recharge(BoundaryCondition, IRegridPackage):

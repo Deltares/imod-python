@@ -8,7 +8,6 @@ import jinja2
 import numpy as np
 import xarray as xr
 
-from imod.common.utilities.regrid import RegridderWeightsCache
 from imod.mf6.dis import StructuredDiscretization
 from imod.mf6.mf6_wel_adapter import Mf6Wel
 from imod.msw.copy_files import FileCopier
@@ -37,7 +36,7 @@ from imod.msw.utilities.parse import read_para_sim
 from imod.msw.vegetation import AnnualCropFactors
 from imod.typing import Imod5DataDict
 from imod.util.dims import drop_layer_dim_cap_data
-from imod.util.regrid import RegridderType
+from imod.util.regrid import RegridderType, RegridderWeightsCache
 
 REQUIRED_PACKAGES = (
     GridData,

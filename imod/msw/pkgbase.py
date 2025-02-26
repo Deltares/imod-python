@@ -8,7 +8,6 @@ import pandas as pd
 import xarray as xr
 
 from imod.common.utilities.regrid import (
-    RegridderWeightsCache,
     _regrid_like,
 )
 from imod.common.utilities.regrid_method_type import EmptyRegridMethod, RegridMethodType
@@ -17,6 +16,7 @@ from imod.mf6.mf6_wel_adapter import Mf6Wel
 from imod.msw.fixed_format import format_fixed_width
 from imod.typing import IntArray
 from imod.typing.grid import GridDataArray, GridDataset
+from imod.util.regrid import RegridderWeightsCache
 
 DataDictType: TypeAlias = dict[str, IntArray | int | str]
 

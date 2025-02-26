@@ -8,13 +8,13 @@ import pandas as pd
 import xarray as xr
 
 import imod
-from imod.common.utilities.regrid import RegridderWeightsCache
 from imod.common.utilities.regrid_method_type import RegridMethodType
 from imod.msw.fixed_format import VariableMetaData
 from imod.msw.pkgbase import MetaSwapPackage
 from imod.msw.utilities.common import find_in_file_list
 from imod.prepare import common
 from imod.typing import GridDataArray, Imod5DataDict, IntArray
+from imod.util.regrid import RegridderWeightsCache
 
 
 def _is_parsable_and_existing_path(potential_path: str, mete_grid_path: Path) -> bool:

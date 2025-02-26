@@ -6,11 +6,11 @@ import xarray as xr
 from numpy import nan
 from numpy.testing import assert_almost_equal, assert_equal
 
-from imod.common.utilities.regrid import (
-    RegridderWeightsCache,
-)
 from imod.msw import ScalingFactors
 from imod.typing.grid import ones_like
+from imod.util.regrid import (
+    RegridderWeightsCache,
+)
 
 
 def setup_scaling_factor_grids():

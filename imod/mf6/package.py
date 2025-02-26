@@ -16,7 +16,6 @@ import xugrid as xu
 import imod
 from imod.common.interfaces.ipackage import IPackage
 from imod.common.utilities.regrid import (
-    RegridderWeightsCache,
     _regrid_like,
 )
 from imod.common.utilities.regrid_method_type import EmptyRegridMethod, RegridMethodType
@@ -41,6 +40,7 @@ from imod.schemata import (
     ValidationError,
 )
 from imod.typing import GridDataArray
+from imod.util.regrid import RegridderWeightsCache
 
 
 class Package(PackageBase, IPackage, abc.ABC):

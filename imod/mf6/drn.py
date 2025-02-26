@@ -6,7 +6,6 @@ import numpy as np
 
 from imod.common.interfaces.iregridpackage import IRegridPackage
 from imod.common.utilities.regrid import (
-    RegridderWeightsCache,
     _regrid_package_data,
 )
 from imod.logging import init_log_decorator, standard_log_decorator
@@ -37,6 +36,7 @@ from imod.schemata import (
 from imod.typing import GridDataArray
 from imod.typing.grid import enforce_dim_order, has_negative_layer, is_planar_grid
 from imod.util.expand_repetitions import expand_repetitions
+from imod.util.regrid import RegridderWeightsCache
 
 
 class Drainage(BoundaryCondition, IRegridPackage):

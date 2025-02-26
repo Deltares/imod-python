@@ -6,9 +6,6 @@ import numpy as np
 
 from imod import logging
 from imod.common.interfaces.iregridpackage import IRegridPackage
-from imod.common.utilities.regrid import (
-    RegridderWeightsCache,
-)
 from imod.logging import init_log_decorator, standard_log_decorator
 from imod.mf6.boundary_condition import BoundaryCondition
 from imod.mf6.dis import StructuredDiscretization
@@ -46,6 +43,9 @@ from imod.typing.grid import (
     is_planar_grid,
 )
 from imod.util.expand_repetitions import expand_repetitions
+from imod.util.regrid import (
+    RegridderWeightsCache,
+)
 
 
 def set_repeat_stress_if_available(

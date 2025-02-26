@@ -20,7 +20,7 @@ from jinja2 import Template
 import imod
 from imod.common.interfaces.imodel import IModel
 from imod.common.statusinfo import NestedStatusInfo, StatusInfo, StatusInfoBase
-from imod.common.utilities.regrid import RegridderWeightsCache, _regrid_like
+from imod.common.utilities.regrid import _regrid_like
 from imod.logging import LogLevel, logger, standard_log_decorator
 from imod.mf6.drn import Drainage
 from imod.mf6.ghb import GeneralHeadBoundary
@@ -36,6 +36,7 @@ from imod.mf6.wel import GridAgnosticWell
 from imod.mf6.write_context import WriteContext
 from imod.schemata import ValidationError
 from imod.typing import GridDataArray
+from imod.util.regrid import RegridderWeightsCache
 
 HFB_PKGNAME = "hfb_merged"
 SUGGESTION_TEXT = (
