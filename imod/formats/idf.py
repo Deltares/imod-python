@@ -554,10 +554,10 @@ def save(path, a, nodata=1.0e20, pattern=None, dtype=np.float32):
     Write a xarray.DataArray to one or more IDF files
 
     If the DataArray only has ``y`` and ``x`` dimensions, a single IDF file is
-    written, like the ``imod.idf.write`` function. This function is more general
-    and also supports ``time`` and ``layer`` dimensions. It will split these up,
-    give them their own filename according to the conventions in
-    ``imod.util.path.compose``, and write them each.
+    written. This function is more general and also supports ``time`` and
+    ``layer`` dimensions. It will split these up, give them their own filename
+    according to the conventions in ``imod.util.path.compose``, and write them
+    each.
 
     Parameters
     ----------
