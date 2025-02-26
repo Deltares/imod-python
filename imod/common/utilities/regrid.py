@@ -16,6 +16,7 @@ from imod.common.interfaces.ipointdatapackage import IPointDataPackage
 from imod.common.interfaces.iregridpackage import IRegridPackage
 from imod.common.interfaces.isimulation import ISimulation
 from imod.common.statusinfo import NestedStatusInfo
+from imod.common.utilities.regrid_method_type import EmptyRegridMethod, RegridMethodType
 from imod.mf6.auxiliary_variables import (
     expand_transient_auxiliary_variables,
     remove_expanded_auxiliary_variables_from_dataset,
@@ -31,9 +32,7 @@ from imod.typing.grid import (
     ones_like,
 )
 from imod.util.regrid_method_type import (
-    EmptyRegridMethod,
     RegridderType,
-    RegridMethodType,
 )
 
 HashRegridderMapping = Tuple[int, int, BaseRegridder]

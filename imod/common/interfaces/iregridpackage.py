@@ -2,7 +2,7 @@ import abc
 from typing import Optional
 
 from imod.common.interfaces.ipackage import IPackage
-from imod.util.regrid_method_type import RegridMethodType
+from imod.common.utilities.regrid_method_type import RegridMethodType
 
 
 class IRegridPackage(IPackage, abc.ABC):

@@ -19,6 +19,7 @@ from imod.common.utilities.regrid import (
     RegridderWeightsCache,
     _regrid_like,
 )
+from imod.common.utilities.regrid_method_type import EmptyRegridMethod, RegridMethodType
 from imod.logging import standard_log_decorator
 from imod.mf6.auxiliary_variables import (
     get_variable_names,
@@ -40,7 +41,6 @@ from imod.schemata import (
     ValidationError,
 )
 from imod.typing import GridDataArray
-from imod.util.regrid_method_type import EmptyRegridMethod, RegridMethodType
 
 
 class Package(PackageBase, IPackage, abc.ABC):

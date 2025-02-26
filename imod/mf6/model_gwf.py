@@ -8,6 +8,7 @@ import cftime
 import numpy as np
 
 from imod.common.utilities.regrid import RegridderWeightsCache
+from imod.common.utilities.regrid_method_type import RegridMethodType
 from imod.logging import init_log_decorator
 from imod.logging.logging_decorators import standard_log_decorator
 from imod.mf6 import ConstantHead
@@ -28,7 +29,6 @@ from imod.mf6.regrid.regrid_schemes import (
     InitialConditionsRegridMethod,
     NodePropertyFlowRegridMethod,
     RechargeRegridMethod,
-    RegridMethodType,
     RiverRegridMethod,
     StorageCoefficientRegridMethod,
 )

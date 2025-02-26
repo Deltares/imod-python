@@ -5,11 +5,11 @@ import pandas as pd
 
 from imod.common.interfaces.iregridpackage import IRegridPackage
 from imod.common.utilities.regrid import RegridderWeightsCache
+from imod.common.utilities.regrid_method_type import RegridMethodType
 from imod.msw.fixed_format import VariableMetaData
 from imod.msw.pkgbase import MetaSwapPackage
 from imod.msw.timeutil import to_metaswap_timeformat
 from imod.typing import GridDataArray
-from imod.util.regrid_method_type import RegridMethodType
 
 
 # I did not use long variable names here (e.g. "precipitation"), as MetaSWAP
