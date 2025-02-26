@@ -4,11 +4,11 @@ from typing import Optional
 
 import numpy as np
 
+from imod.common.interfaces.iregridpackage import IRegridPackage
 from imod.logging import init_log_decorator, standard_log_decorator
 from imod.mf6.boundary_condition import BoundaryCondition
 from imod.mf6.dis import StructuredDiscretization
 from imod.mf6.disv import VerticesDiscretization
-from imod.mf6.interfaces.iregridpackage import IRegridPackage
 from imod.mf6.npf import NodePropertyFlow
 from imod.mf6.regrid.regrid_schemes import (
     GeneralHeadBoundaryRegridMethod,

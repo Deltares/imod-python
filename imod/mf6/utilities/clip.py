@@ -9,9 +9,9 @@ import xarray as xr
 import xugrid as xu
 from fastcore.dispatch import typedispatch
 
-from imod.mf6.interfaces.ilinedatapackage import ILineDataPackage
-from imod.mf6.interfaces.ipackagebase import IPackageBase
-from imod.mf6.interfaces.ipointdatapackage import IPointDataPackage
+from imod.common.interfaces.ilinedatapackage import ILineDataPackage
+from imod.common.interfaces.ipackagebase import IPackageBase
+from imod.common.interfaces.ipointdatapackage import IPointDataPackage
 from imod.mf6.utilities.grid import get_active_domain_slice
 from imod.mf6.utilities.hfb import (
     clipped_hfb_zlinestrings_to_zpolygons,

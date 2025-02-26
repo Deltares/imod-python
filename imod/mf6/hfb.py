@@ -14,9 +14,9 @@ import xarray as xr
 import xugrid as xu
 from fastcore.dispatch import typedispatch
 
+from imod.common.interfaces.ilinedatapackage import ILineDataPackage
 from imod.logging import LogLevel, init_log_decorator, logger
 from imod.mf6.boundary_condition import BoundaryCondition
-from imod.mf6.interfaces.ilinedatapackage import ILineDataPackage
 from imod.mf6.mf6_hfb_adapter import Mf6HorizontalFlowBarrier
 from imod.mf6.package import Package
 from imod.mf6.utilities.clip import (

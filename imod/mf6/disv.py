@@ -3,9 +3,9 @@ from typing import List
 import numpy as np
 import pandas as pd
 
+from imod.common.interfaces.imaskingsettings import IMaskingSettings
+from imod.common.interfaces.iregridpackage import IRegridPackage
 from imod.logging import init_log_decorator
-from imod.mf6.interfaces.imaskingsettings import IMaskingSettings
-from imod.mf6.interfaces.iregridpackage import IRegridPackage
 from imod.mf6.package import Package
 from imod.mf6.regrid.regrid_schemes import DiscretizationRegridMethod
 from imod.mf6.validation import DisBottomSchema

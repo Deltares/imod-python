@@ -3,7 +3,7 @@ from abc import abstractmethod
 import numpy as np
 from numpy.typing import NDArray
 
-from imod.mf6.interfaces.ipackagebase import IPackageBase
+from imod.common.interfaces.ipackagebase import IPackageBase
 
 
 class IPointDataPackage(IPackageBase):

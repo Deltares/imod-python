@@ -4,8 +4,8 @@ from typing import Any, Optional
 
 import numpy as np
 
+from imod.common.interfaces.iregridpackage import IRegridPackage
 from imod.logging import init_log_decorator
-from imod.mf6.interfaces.iregridpackage import IRegridPackage
 from imod.mf6.package import Package
 from imod.mf6.regrid.regrid_schemes import (
     InitialConditionsRegridMethod,

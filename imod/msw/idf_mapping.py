@@ -4,7 +4,7 @@ from typing import Optional
 import numpy as np
 import xarray as xr
 
-from imod.mf6.interfaces.iregridpackage import IRegridPackage
+from imod.common.interfaces.iregridpackage import IRegridPackage
 from imod.mf6.utilities.regrid import RegridderWeightsCache, _regrid_array
 from imod.msw.fixed_format import VariableMetaData
 from imod.msw.pkgbase import MetaSwapPackage

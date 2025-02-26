@@ -5,12 +5,12 @@ from typing import Optional, Tuple, cast
 import numpy as np
 
 from imod import logging
+from imod.common.interfaces.iregridpackage import IRegridPackage
 from imod.logging import init_log_decorator, standard_log_decorator
 from imod.mf6.boundary_condition import BoundaryCondition
 from imod.mf6.dis import StructuredDiscretization
 from imod.mf6.disv import VerticesDiscretization
 from imod.mf6.drn import Drainage
-from imod.mf6.interfaces.iregridpackage import IRegridPackage
 from imod.mf6.npf import NodePropertyFlow
 from imod.mf6.regrid.regrid_schemes import RiverRegridMethod
 from imod.mf6.utilities.imod5_converter import regrid_imod5_pkg_data

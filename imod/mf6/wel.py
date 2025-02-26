@@ -17,6 +17,7 @@ import xugrid as xu
 
 import imod
 import imod.mf6.utilities
+from imod.common.interfaces.ipointdatapackage import IPointDataPackage
 from imod.logging import init_log_decorator, logger
 from imod.logging.logging_decorators import standard_log_decorator
 from imod.logging.loglevel import LogLevel
@@ -26,7 +27,6 @@ from imod.mf6.boundary_condition import (
     DisStructuredBoundaryCondition,
     DisVerticesBoundaryCondition,
 )
-from imod.mf6.interfaces.ipointdatapackage import IPointDataPackage
 from imod.mf6.mf6_wel_adapter import Mf6Wel, concat_indices_to_cellid
 from imod.mf6.package import Package
 from imod.mf6.utilities.dataset import remove_inactive

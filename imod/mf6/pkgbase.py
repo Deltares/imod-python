@@ -9,7 +9,7 @@ import xugrid as xu
 from xarray.core.utils import is_scalar
 
 import imod
-from imod.mf6.interfaces.ipackagebase import IPackageBase
+from imod.common.interfaces.ipackagebase import IPackageBase
 from imod.typing.grid import (
     GridDataArray,
     GridDataset,

@@ -21,13 +21,14 @@ import xugrid as xu
 import imod
 import imod.logging
 import imod.mf6.exchangebase
+from imod.common.interfaces.imodel import IModel
+from imod.common.interfaces.isimulation import ISimulation
+from imod.common.statusinfo import NestedStatusInfo
 from imod.logging import LogLevel, logger, standard_log_decorator
 from imod.mf6.gwfgwf import GWFGWF
 from imod.mf6.gwfgwt import GWFGWT
 from imod.mf6.gwtgwt import GWTGWT
 from imod.mf6.ims import Solution, SolutionPresetModerate
-from imod.mf6.interfaces.imodel import IModel
-from imod.mf6.interfaces.isimulation import ISimulation
 from imod.mf6.model import Modflow6Model
 from imod.mf6.model_gwf import GroundwaterFlowModel
 from imod.mf6.model_gwt import GroundwaterTransportModel
@@ -40,7 +41,6 @@ from imod.mf6.out import open_cbc, open_conc, open_hds
 from imod.mf6.package import Package
 from imod.mf6.regrid.regrid_schemes import RegridMethodType
 from imod.mf6.ssm import SourceSinkMixing
-from imod.mf6.statusinfo import NestedStatusInfo
 from imod.mf6.utilities.mask import _mask_all_models
 from imod.mf6.utilities.regrid import _regrid_like
 from imod.mf6.validation_context import ValidationContext

@@ -1,8 +1,8 @@
 from abc import abstractmethod
 from typing import Optional, Tuple
 
-from imod.mf6.interfaces.idict import IDict
-from imod.mf6.statusinfo import StatusInfoBase
+from imod.common.interfaces.idict import IDict
+from imod.common.statusinfo import StatusInfoBase
 from imod.typing import GridDataArray
 
 
