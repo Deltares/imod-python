@@ -20,6 +20,7 @@ from imod.common.utilities.regrid import (
     _regrid_like,
 )
 from imod.common.utilities.regrid_method_type import EmptyRegridMethod, RegridMethodType
+from imod.common.utilities.schemata import filter_schemata_dict
 from imod.common.utilities.value_filters import is_valid
 from imod.logging import standard_log_decorator
 from imod.mf6.auxiliary_variables import (
@@ -32,7 +33,6 @@ from imod.mf6.pkgbase import (
     TRANSPORT_PACKAGES,
     PackageBase,
 )
-from imod.mf6.utilities.schemata import filter_schemata_dict
 from imod.mf6.validation import validation_pkg_error_message
 from imod.mf6.write_context import WriteContext
 from imod.schemata import (
