@@ -133,7 +133,7 @@ gwf_model["right_boundary"] = imod.mf6.GeneralHeadBoundary(
 
 # %%
 # ... and the constant flux condition.
-from imod.prepare.layer import create_layered_top
+from imod.prepare import create_layered_top
 
 screen_top = create_layered_top(bottom, top)
 

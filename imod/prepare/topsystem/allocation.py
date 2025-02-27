@@ -7,8 +7,8 @@ from typing import Optional
 
 import numpy as np
 
+from imod.common.utilities.layer import create_layered_top
 from imod.prepare.layer import (
-    create_layered_top,
     get_upper_active_grid_cells,
     get_upper_active_layer_number,
 )
