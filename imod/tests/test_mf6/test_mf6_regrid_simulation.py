@@ -6,13 +6,12 @@ import pytest
 import imod
 from imod.mf6 import VerticesDiscretization
 from imod.mf6.regrid.regrid_schemes import ConstantHeadRegridMethod
-from imod.mf6.utilities.regrid import RegridderWeightsCache
 from imod.tests.fixtures.mf6_modelrun_fixture import assert_simulation_can_run
 from imod.tests.fixtures.mf6_small_models_fixture import (
     grid_data_structured,
     grid_data_unstructured,
 )
-from imod.util.regrid_method_type import RegridderType
+from imod.util.regrid import RegridderType, RegridderWeightsCache
 
 
 def test_regrid_structured_simulation_to_structured_simulation(

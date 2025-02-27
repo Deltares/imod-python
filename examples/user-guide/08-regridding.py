@@ -189,7 +189,7 @@ axes[1].set_ylabel("regridded")
 # Set up the input needed for custom regridding. Create a regridder
 # weight-cache. This object can (and should) be reused for all the packages that
 # undergo custom regridding at this stage.
-from imod.mf6.utilities.regrid import RegridderWeightsCache
+from imod.util.regrid import RegridderWeightsCache
 
 regrid_cache = RegridderWeightsCache()
 
@@ -199,8 +199,8 @@ regrid_cache
 # Regrid the recharge package with a custom regridder. In this case we opt
 # for the centroid locator regridder. This regridder is similar to using a
 # "nearest neighbour" lookup.
+from imod.common.utilities.regrid import RegridderType
 from imod.mf6.regrid import RechargeRegridMethod
-from imod.mf6.utilities.regrid import RegridderType
 
 regridder_types = RechargeRegridMethod(rate=(RegridderType.CENTROIDLOCATOR,))
 

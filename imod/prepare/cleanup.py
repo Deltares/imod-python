@@ -6,8 +6,8 @@ from typing import Optional
 import pandas as pd
 import xarray as xr
 
+from imod.common.utilities.clip import clip_line_gdf_by_grid
 from imod.mf6.utilities.mask import mask_arrays
-from imod.prepare.hfb import clip_line_gdf_by_grid
 from imod.prepare.wells import locate_wells, validate_well_columnnames
 from imod.schemata import scalar_None
 from imod.typing import GeoDataFrameType, GridDataArray

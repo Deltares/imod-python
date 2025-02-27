@@ -1,7 +1,7 @@
 import pandas as pd
 import pytest
 
-from imod.util.hfb import _prepare_index_names
+from imod.common.utilities.line_data import _prepare_index_names
 
 
 def test_pandas_behavior_index_naming_expected():

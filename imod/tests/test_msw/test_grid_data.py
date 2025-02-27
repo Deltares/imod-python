@@ -12,9 +12,9 @@ from numpy.testing import assert_almost_equal, assert_equal
 from pytest_cases import case, parametrize_with_cases
 
 from imod.mf6.dis import StructuredDiscretization
-from imod.mf6.utilities.regrid import RegridderWeightsCache
 from imod.msw import GridData
 from imod.msw.fixed_format import format_fixed_width
+from imod.util.regrid import RegridderWeightsCache
 from imod.util.spatial import get_total_grid_area
 
 
@@ -279,6 +279,16 @@ def case_grid_data_two_subunits(
         coords=coords_planar
     )
     # fmt: on
+    return data
+
+
+@case(tags="two_subunit")
+def case_grid_data_two_subunits__dask(
+    coords_two_subunit: dict, coords_planar: dict
+) -> dict[str, xr.DataArray]:
+    data = case_grid_data_two_subunits(coords_two_subunit, coords_planar)
+    for key, values in data.items():
+        data[key] = values.chunk({"x": 3, "y": 1})
     return data
 
 

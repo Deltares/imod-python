@@ -4,6 +4,7 @@ import pytest
 from pydantic import ValidationError
 from pytest_cases import parametrize, parametrize_with_cases
 
+from imod.common.utilities.regrid import RegridderType
 from imod.mf6.regrid.regrid_schemes import (
     ConstantHeadRegridMethod,
     DiscretizationRegridMethod,
@@ -19,7 +20,6 @@ from imod.mf6.regrid.regrid_schemes import (
     SpecificStorageRegridMethod,
     StorageCoefficientRegridMethod,
 )
-from imod.mf6.utilities.regrid import RegridderType
 
 ALL_REGRID_METHODS = [
     ConstantHeadRegridMethod,

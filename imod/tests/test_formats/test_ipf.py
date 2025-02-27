@@ -102,7 +102,7 @@ def test_read_associated__itype1implicit(tmp_path):
     delim = " "
     with open(path, "w") as f:
         f.write(assoc_string.format(delim=delim))
-    df = ipf.read_associated(path, {"delim_whitespace": True})
+    df = ipf.read_associated(path, {"sep": r"\s+"})
     assert df.shape == (2, 2)
 
 
@@ -120,7 +120,7 @@ def test_read__comma(write_basic_ipf, tmp_path):
 def test_read__space(write_basic_ipf, tmp_path):
     path = tmp_path / "basic_space.ipf"
     write_basic_ipf(path, " ")
-    df = ipf.read(path, {"delim_whitespace": True})
+    df = ipf.read(path, {"sep": r"\s+"})
     assert isinstance(df, pd.DataFrame)
     assert list(df) == ["X", "Y", "Z", "City of Holland"]
     assert len(df) == 2

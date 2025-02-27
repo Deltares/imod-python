@@ -1,8 +1,8 @@
 import numpy as np
 import xarray as xr
 
+from imod.common.interfaces.iregridpackage import IRegridPackage
 from imod.mf6 import StructuredDiscretization
-from imod.mf6.interfaces.iregridpackage import IRegridPackage
 from imod.msw.fixed_format import VariableMetaData
 from imod.msw.pkgbase import MetaSwapPackage
 from imod.msw.regrid.regrid_schemes import GridDataRegridMethod
@@ -91,11 +91,14 @@ class GridData(MetaSwapPackage, IRegridPackage):
         active = self.dataset["active"]
 
         isactive = area.where(active).notnull()
+        svat = xr.full_like(area, fill_value=0, dtype=np.int64).rename("svat")
+        # Load into memory to avoid dask issue
+        # https://github.com/dask/dask/issues/11753
+        isactive.load()
+        svat.load()
 
         index = isactive.values.ravel()
-
-        svat = xr.full_like(area, fill_value=0, dtype=np.int64).rename("svat")
-        svat.values[isactive.values] = np.arange(1, index.sum() + 1)
+        svat.data[isactive.data] = np.arange(1, index.sum() + 1)
 
         return index, svat
 

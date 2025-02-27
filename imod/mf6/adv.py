@@ -11,7 +11,7 @@ robust alternative.
 
 from copy import deepcopy
 
-from imod.mf6.interfaces.iregridpackage import IRegridPackage
+from imod.common.interfaces.iregridpackage import IRegridPackage
 from imod.mf6.package import Package
 
 

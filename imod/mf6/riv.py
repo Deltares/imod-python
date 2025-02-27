@@ -5,18 +5,15 @@ from typing import Optional, Tuple, cast
 import numpy as np
 
 from imod import logging
+from imod.common.interfaces.iregridpackage import IRegridPackage
 from imod.logging import init_log_decorator, standard_log_decorator
 from imod.mf6.boundary_condition import BoundaryCondition
 from imod.mf6.dis import StructuredDiscretization
 from imod.mf6.disv import VerticesDiscretization
 from imod.mf6.drn import Drainage
-from imod.mf6.interfaces.iregridpackage import IRegridPackage
 from imod.mf6.npf import NodePropertyFlow
 from imod.mf6.regrid.regrid_schemes import RiverRegridMethod
 from imod.mf6.utilities.imod5_converter import regrid_imod5_pkg_data
-from imod.mf6.utilities.regrid import (
-    RegridderWeightsCache,
-)
 from imod.mf6.validation import BOUNDARY_DIMS_SCHEMA, CONC_DIMS_SCHEMA
 from imod.prepare.cleanup import AlignLevelsMode, align_interface_levels, cleanup_riv
 from imod.prepare.topsystem.allocation import ALLOCATION_OPTION, allocate_riv_cells
@@ -46,6 +43,9 @@ from imod.typing.grid import (
     is_planar_grid,
 )
 from imod.util.expand_repetitions import expand_repetitions
+from imod.util.regrid import (
+    RegridderWeightsCache,
+)
 
 
 def set_repeat_stress_if_available(

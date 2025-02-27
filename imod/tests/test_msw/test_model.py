@@ -7,9 +7,11 @@ from numpy.testing import assert_almost_equal, assert_equal
 from pytest_cases import parametrize_with_cases
 
 from imod import mf6, msw
-from imod.mf6.utilities.regrid import RegridderWeightsCache
+from imod.msw.copy_files import FileCopier
 from imod.msw.model import DEFAULT_SETTINGS
+from imod.msw.utilities.parse import read_para_sim
 from imod.typing import GridDataArray, Imod5DataDict
+from imod.util.regrid import RegridderWeightsCache
 
 
 def test_msw_model_write(msw_model, coupled_mf6_model, coupled_mf6wel, tmp_path):
@@ -20,6 +22,33 @@ def test_msw_model_write(msw_model, coupled_mf6_model, coupled_mf6wel, tmp_path)
 
     assert len(list(output_dir.rglob(r"*.inp"))) == 16
     assert len(list(output_dir.rglob(r"*.asc"))) == 4
+
+
+def test_msw_model_write_settings_roundtrip(msw_model, tmp_path):
+    # Arrange
+    output_dir = tmp_path / "metaswap"
+    output_dir.mkdir()
+    keys_to_drop = [
+        "iybg",
+        "tdbg",
+        "simgro_opt",
+        "idf_per",
+        "idf_dx",
+        "idf_dy",
+        "idf_ncol",
+        "idf_nrow",
+        "idf_xmin",
+        "idf_ymin",
+        "idf_nodata",
+    ]
+    # Act
+    msw_model._write_simulation_settings(output_dir)
+    # Assert
+    parasim_settings = read_para_sim(output_dir / "para_sim.inp")
+    for key in keys_to_drop:
+        parasim_settings.pop(key)
+
+    assert msw_model.simulation_settings == parasim_settings
 
 
 def test_get_starttime(msw_model):
@@ -68,6 +97,22 @@ def test_check_landuse_indices_in_lookup_options(msw_model):
 
     with pytest.raises(ValueError):
         msw_model._check_landuse_indices_in_lookup_options()
+
+
+def test_check_model(msw_model):
+    """
+    Test _model_checks method. Should raise error if validate = True and
+    FileCopier not present, else not.
+    """
+    msw_model.pop("grid")
+
+    msw_model._model_checks(validate=False)
+
+    with pytest.raises(ValueError):
+        msw_model._model_checks(validate=True)
+
+    msw_model["copy_files"] = FileCopier(["./test.txt"])
+    msw_model._model_checks(validate=True)
 
 
 def test_render_unsat_database_path(msw_model, tmp_path):
@@ -260,9 +305,9 @@ def test_import_from_imod5(
     assert not missing_keys
     for pkgname in grid_packages:
         # Test if all grid packages broadcasted to grid.
-        missing_dims = {"y", "x"} - set(model[pkgname].dataset.dims.keys())
+        missing_dims = {"y", "x"} - set(model[pkgname].dataset.sizes.keys())
         assert not missing_dims
-    assert "time" in model["time_oc"].dataset.dims.keys()
+    assert "time" in model["time_oc"].dataset.sizes.keys()
     assert len(model["meteo_grid"].dataset.dims) == 0
     assert ("scaling_factor" in model.keys()) == has_scaling_factor
 
@@ -288,7 +333,7 @@ def test_import_from_imod5_and_write(
     mf6_wel_pkg = well_pkg.to_mf6_pkg(
         active, dis_pkg["top"], dis_pkg["bottom"], npf_pkg["k"]
     )
-    model.write(modeldir, dis_pkg, mf6_wel_pkg, validate=False)
+    model.write(modeldir, dis_pkg, mf6_wel_pkg)
 
     # Assert
     expected_n_files = 13

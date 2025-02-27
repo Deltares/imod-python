@@ -1,11 +1,11 @@
 import numpy as np
 
+from imod.common.interfaces.iregridpackage import IRegridPackage
+from imod.common.utilities.regrid_method_type import EmptyRegridMethod, RegridMethodType
 from imod.logging import init_log_decorator, logger
 from imod.mf6 import GroundwaterFlowModel
 from imod.mf6.boundary_condition import BoundaryCondition
-from imod.mf6.interfaces.iregridpackage import IRegridPackage
 from imod.schemata import DTypeSchema
-from imod.util.regrid_method_type import EmptyRegridMethod, RegridMethodType
 
 
 def with_index_dim(array_like):

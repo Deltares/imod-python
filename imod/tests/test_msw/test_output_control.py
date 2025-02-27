@@ -88,7 +88,7 @@ def test_time_oc(fixed_format_parser):
             output_dir / TimeOutputControl._file_name, TimeOutputControl._metadata_dict
         )
 
-    assert_almost_equal(results["time_since_start_year"], np.array([1.0, 2.0, 3.0]))
+    assert_almost_equal(results["time_since_start_year"], np.array([0.0, 1.0, 2.0]))
     assert_equal(results["year"], [1971, 1971, 1971])
     assert_equal(results["option"], [7, 7, 7])
 

@@ -83,16 +83,16 @@ def test_render_int():
 def test_render_bool_fail():
     message = textwrap.dedent(
         """
-        * save_head
-        \t- No option succeeded:
-        \tdtype bool != <class 'numpy.integer'>
-        \tdtype bool != <U0
-        \tdtype bool != object
-        * save_budget
-        \t- No option succeeded:
-        \tdtype bool != <class 'numpy.integer'>
-        \tdtype bool != <U0
-        \tdtype bool != object"""
+        - save_head
+            - No option succeeded:
+            dtype bool != <class 'numpy.integer'>
+            dtype bool != <U0
+            dtype bool != object
+        - save_budget
+            - No option succeeded:
+            dtype bool != <class 'numpy.integer'>
+            dtype bool != <U0
+            dtype bool != object"""
     )
 
     with pytest.raises(ValidationError, match=re.escape(message)):

@@ -158,8 +158,9 @@ class SchemaUnion:
             except ValidationError as e:
                 errors.append(e)
 
+        ws = "\n    "
         if len(errors) == len(self.schemata):  # All schemata failed
-            message = "\n\t" + "\n\t".join(str(error) for error in errors)
+            message = f"{ws}" + f"{ws}".join(str(error) for error in errors)
             raise ValidationError(f"No option succeeded:{message}")
 
     def __or__(self, other):
@@ -236,7 +237,7 @@ class GeometryTypeSchema(BaseSchema):
         if not all(is_geometry_type):
             is_wrong_type = ~np.array(is_geometry_type)
             wrong_type_index = np.argwhere(is_wrong_type).ravel()
-            wrong_types = [o.type for o in obj.data.ravel()[is_wrong_type]]
+            wrong_types = [o.geom_type for o in obj.data.ravel()[is_wrong_type]]
             raise ValidationError(
                 f"Geometry not of expected type '{self.dtype}'. "
                 f"Got wrong types for geometry number {wrong_type_index}, namely {wrong_types}"

@@ -20,10 +20,10 @@ from .fixtures.flow_basic_unstructured_fixture import (
     basic_unstructured_dis,
     circle_dis,
 )
-from .fixtures.flow_example_fixture import imodflow_model
 from .fixtures.flow_transport_simulation_fixture import flow_transport_simulation
 from .fixtures.imod5_cap_data import (
     cap_data_sprinkling_grid,
+    cap_data_sprinkling_grid__big,
     cap_data_sprinkling_points,
 )
 from .fixtures.imod5_well_data import (
@@ -85,6 +85,7 @@ from .fixtures.mf6_twri_fixture import (
     twri_model,
     twri_model_hfb,
     twri_result,
+    twri_result_9_drn_in_1_cell,
 )
 from .fixtures.mf6_welltest_fixture import (
     mf6wel_test_data_stationary,

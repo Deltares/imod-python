@@ -19,6 +19,7 @@ import xarray as xr
 import xugrid as xu
 
 import imod
+from imod.common.statusinfo import NestedStatusInfo, StatusInfo
 from imod.logging import LoggerType, LogLevel
 from imod.mf6 import LayeredWell, Well
 from imod.mf6.model import Modflow6Model
@@ -30,7 +31,6 @@ from imod.mf6.regrid.regrid_schemes import (
     StorageCoefficientRegridMethod,
 )
 from imod.mf6.simulation import Modflow6Simulation
-from imod.mf6.statusinfo import NestedStatusInfo, StatusInfo
 from imod.prepare.topsystem.default_allocation_methods import (
     SimulationAllocationOptions,
     SimulationDistributingOptions,
@@ -390,9 +390,9 @@ class TestModflow6Simulation:
         expected_text = textwrap.dedent(
             """
             Simulation validation status:
-            \t* Model 1:
-            \t\t* Package 1:
-            \t\t\t* Some error"""
+                - Model 1:
+                    - Package 1:
+                        - Some error"""
         )
 
         pkg_status_info = StatusInfo("Package 1")

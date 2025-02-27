@@ -6,11 +6,11 @@ import xarray as xr
 from numpy import nan
 from numpy.testing import assert_almost_equal, assert_equal
 
-from imod.mf6.utilities.regrid import (
-    RegridderWeightsCache,
-)
 from imod.msw import Ponding
 from imod.typing import GridDataArray, GridDataDict
+from imod.util.regrid import (
+    RegridderWeightsCache,
+)
 
 
 def setup_ponding() -> tuple[GridDataDict, np.ndarray, GridDataArray]:

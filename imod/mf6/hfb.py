@@ -14,20 +14,26 @@ import xarray as xr
 import xugrid as xu
 from fastcore.dispatch import typedispatch
 
+from imod.common.interfaces.ilinedatapackage import ILineDataPackage
+from imod.common.utilities.clip import (
+    bounding_polygon_from_line_data_and_clip_box,
+    clip_line_gdf_by_bounding_polygon,
+    clip_line_gdf_by_grid,
+)
+from imod.common.utilities.grid import broadcast_to_full_domain
+from imod.common.utilities.line_data import (
+    _create_zbound_gdf_from_zbound_df,
+    _extract_zbounds_from_vertical_polygons,
+    _prepare_index_names,
+)
 from imod.logging import LogLevel, init_log_decorator, logger
 from imod.mf6.boundary_condition import BoundaryCondition
 from imod.mf6.dis import StructuredDiscretization
 from imod.mf6.disv import VerticesDiscretization
-from imod.mf6.interfaces.ilinedatapackage import ILineDataPackage
 from imod.mf6.mf6_hfb_adapter import Mf6HorizontalFlowBarrier
 from imod.mf6.package import Package
-from imod.mf6.utilities.clip import (
-    bounding_polygon_from_line_data_and_clip_box,
-)
-from imod.mf6.utilities.grid import broadcast_to_full_domain
 from imod.mf6.validation_context import ValidationContext
 from imod.prepare.cleanup import cleanup_hfb
-from imod.prepare.hfb import clip_line_gdf_by_bounding_polygon, clip_line_gdf_by_grid
 from imod.schemata import (
     DimsSchema,
     DTypeSchema,
@@ -38,11 +44,6 @@ from imod.schemata import (
 )
 from imod.typing import GeoDataFrameType, GridDataArray, LineStringType
 from imod.typing.grid import as_ugrid_dataarray, ones_like
-from imod.util.hfb import (
-    _create_zlinestring_from_bound_df,
-    _extract_hfb_bounds_from_zpolygons,
-    _prepare_index_names,
-)
 from imod.util.imports import MissingOptionalModule
 
 if TYPE_CHECKING:
@@ -74,9 +75,9 @@ NO_BARRIER_MSG = textwrap.dedent(
     """
     No barriers could be assigned to cell edges,
     this is caused by either one of the following:
-    \t- Barriers fall completely outside the model grid
-    \t- Barriers were assigned to the edge of the model domain
-    \t- Barriers were assigned to edges of inactive cells
+        - Barriers fall completely outside the model grid
+        - Barriers were assigned to the edge of the model domain
+        - Barriers were assigned to edges of inactive cells
     """
 )
 
@@ -286,7 +287,7 @@ def _extract_mean_hfb_bounds_from_dataframe(
     if not dataframe.geometry.has_z.all():
         raise TypeError("GeoDataFrame geometry has no z, which is required.")
 
-    lower, upper = _extract_hfb_bounds_from_zpolygons(dataframe)
+    lower, upper = _extract_zbounds_from_vertical_polygons(dataframe)
     # Compute means inbetween nodes.
     index_names = lower.index.names
     lower_mean = lower.groupby(index_names)["z"].mean()
@@ -402,7 +403,7 @@ def _prepare_barrier_dataset_for_mf6_adapter(dataset: xr.Dataset) -> xr.Dataset:
     # removes the layer as well.
     layer = dataset.coords["layer"].values
     # Drop leftover coordinate and reset cell_id.
-    dataset = dataset.drop_vars("edge_index").reset_coords()
+    dataset = dataset.drop_vars(("edge_index", "layer", "cell_id")).reset_coords()
     # Attach layer again
     dataset["layer"] = ("cell_id", layer)
     return dataset
@@ -915,8 +916,8 @@ class HorizontalFlowBarrierBase(BoundaryCondition, ILineDataPackage):
         )
         # Convert vertical polygon to linestring
         if not has_layer:
-            lower, _ = _extract_hfb_bounds_from_zpolygons(barrier_dataframe)
-            linestring = _create_zlinestring_from_bound_df(lower)
+            lower, _ = _extract_zbounds_from_vertical_polygons(barrier_dataframe)
+            linestring = _create_zbound_gdf_from_zbound_df(lower)
             barrier_dataframe["geometry"] = linestring["geometry"]
         # Clip barriers outside domain
         active = ones_like(idomain.sel(layer=1, drop=True))
@@ -978,8 +979,8 @@ class HorizontalFlowBarrierBase(BoundaryCondition, ILineDataPackage):
         ]
 
         return values.where(
-            (connected_cells_left.drop(face_dimension) > 0)
-            & (connected_cells_right.drop(face_dimension) > 0)
+            (connected_cells_left.drop_vars(face_dimension) > 0)
+            & (connected_cells_right.drop_vars(face_dimension) > 0)
         )
 
 

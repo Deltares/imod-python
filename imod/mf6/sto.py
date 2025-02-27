@@ -4,14 +4,14 @@ from typing import Any, Dict, Optional
 
 import numpy as np
 
+from imod.common.interfaces.iregridpackage import IRegridPackage
+from imod.common.utilities.regrid import _regrid_package_data
 from imod.logging import init_log_decorator
-from imod.mf6.interfaces.iregridpackage import IRegridPackage
 from imod.mf6.package import Package
 from imod.mf6.regrid.regrid_schemes import (
     SpecificStorageRegridMethod,
     StorageCoefficientRegridMethod,
 )
-from imod.mf6.utilities.regrid import RegridderWeightsCache, _regrid_package_data
 from imod.mf6.validation import PKG_DIMS_SCHEMA
 from imod.schemata import (
     AllCoordsValueSchema,
@@ -23,6 +23,7 @@ from imod.schemata import (
 )
 from imod.typing import GridDataArray
 from imod.typing.grid import zeros_like
+from imod.util.regrid import RegridderWeightsCache
 
 
 class Storage(Package):

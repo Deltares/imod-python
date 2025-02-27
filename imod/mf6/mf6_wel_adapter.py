@@ -18,8 +18,8 @@ import numpy as np
 import xarray as xr
 from numpy.typing import NDArray
 
+from imod.common.interfaces.ipackage import IPackage
 from imod.mf6.boundary_condition import BoundaryCondition
-from imod.mf6.interfaces.ipackage import IPackage
 from imod.schemata import DTypeSchema
 
 # FUTURE: There was an idea to autogenerate modflow 6 adapters.

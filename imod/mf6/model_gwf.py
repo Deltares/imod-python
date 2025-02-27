@@ -7,6 +7,7 @@ from typing import Optional, cast
 import cftime
 import numpy as np
 
+from imod.common.utilities.regrid_method_type import RegridMethodType
 from imod.logging import init_log_decorator
 from imod.logging.logging_decorators import standard_log_decorator
 from imod.mf6 import ConstantHead
@@ -27,14 +28,12 @@ from imod.mf6.regrid.regrid_schemes import (
     InitialConditionsRegridMethod,
     NodePropertyFlowRegridMethod,
     RechargeRegridMethod,
-    RegridMethodType,
     RiverRegridMethod,
     StorageCoefficientRegridMethod,
 )
 from imod.mf6.riv import River
 from imod.mf6.sto import StorageCoefficient
 from imod.mf6.utilities.chd_concat import concat_layered_chd_packages
-from imod.mf6.utilities.regrid import RegridderWeightsCache
 from imod.mf6.wel import LayeredWell, Well
 from imod.prepare.topsystem.default_allocation_methods import (
     SimulationAllocationOptions,
@@ -42,6 +41,7 @@ from imod.prepare.topsystem.default_allocation_methods import (
 )
 from imod.typing import GridDataArray, StressPeriodTimesType
 from imod.typing.grid import zeros_like
+from imod.util.regrid import RegridderWeightsCache
 
 
 class GroundwaterFlowModel(Modflow6Model):

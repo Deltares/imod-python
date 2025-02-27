@@ -17,6 +17,8 @@ import xugrid as xu
 
 import imod
 import imod.mf6.utilities
+from imod.common.interfaces.ipointdatapackage import IPointDataPackage
+from imod.common.utilities.grid import broadcast_to_full_domain
 from imod.logging import init_log_decorator, logger
 from imod.logging.logging_decorators import standard_log_decorator
 from imod.logging.loglevel import LogLevel
@@ -26,11 +28,9 @@ from imod.mf6.boundary_condition import (
     DisStructuredBoundaryCondition,
     DisVerticesBoundaryCondition,
 )
-from imod.mf6.interfaces.ipointdatapackage import IPointDataPackage
 from imod.mf6.mf6_wel_adapter import Mf6Wel, concat_indices_to_cellid
 from imod.mf6.package import Package
 from imod.mf6.utilities.dataset import remove_inactive
-from imod.mf6.utilities.grid import broadcast_to_full_domain
 from imod.mf6.utilities.imod5_converter import well_from_imod5_cap_data
 from imod.mf6.validation import validation_pkg_error_message
 from imod.mf6.validation_context import ValidationContext
@@ -531,12 +531,13 @@ class GridAgnosticWell(BoundaryCondition, IPointDataPackage, abc.ABC):
     def gather_filtered_well_ids(
         self, well_data_filtered: pd.DataFrame | xr.Dataset, well_data: pd.DataFrame
     ) -> list[str]:
-        filtered_well_ids = [
-            id
-            for id in well_data["id"].unique()
-            if id not in well_data_filtered["id"].values
-        ]
-        return filtered_well_ids
+        # Work around performance issue with xarray isin for large datasets.
+        if isinstance(well_data_filtered, xr.Dataset):
+            filtered_ids = well_data_filtered["id"].to_dataframe()["id"]
+        else:
+            filtered_ids = well_data_filtered["id"]
+        is_missing_id = ~well_data["id"].isin(filtered_ids.unique())
+        return well_data["id"].loc[is_missing_id].unique()
 
     def to_mf6_package_information(
         self, filtered_wells: list[str], reason_text: str
@@ -605,21 +606,20 @@ class GridAgnosticWell(BoundaryCondition, IPointDataPackage, abc.ABC):
         *Associated wells*
 
         Wells with timeseries in an associated textfile are processed as
-        follows:
+        follows.
 
-        - Wells are validated if the following requirements are met
-            * Associated well entries in projectfile are defined on either all
+        - Wells are validated if the following requirements are met:
+            - Associated well entries in projectfile are defined on either all
               timestamps or just the first
-            * Multiplication and addition factors need to remain constant through time
-            * Same associated well cannot be assigned to multiple layers
+            - Multiplication and addition factors need to remain constant through time
+            - Same associated well cannot be assigned to multiple layers
         - The dataframe of the first projectfile timestamp is selected
-        - Timeseries are processed based on the ``times`` argument of this
-          method:
-            * If ``times`` is a list of datetimes, rate timeseries are resampled
+        - Timeseries are processed based on the ``times`` argument of this method:
+            - If ``times`` is a list of datetimes, rate timeseries are resampled
               with a time weighted mean to the simulation times. When simulation
               times fall outside well timeseries range, the last rate is forward
               filled.
-            * If ``times = "steady-state"``, the simulation is assumed to be
+            - If ``times = "steady-state"``, the simulation is assumed to be
               "steady-state" and an average rate is computed from the
               timeseries.
         - Projectfile timestamps are not used. Even if assigned to a
@@ -876,7 +876,7 @@ class Well(GridAgnosticWell):
         }
         super().__init__(dict_dataset)
         # Set index as coordinate
-        index_coord = np.arange(self.dataset.dims["index"])
+        index_coord = np.arange(self.dataset.sizes["index"])
         self.dataset = self.dataset.assign_coords(index=index_coord)
         self._validate_init_schemata(validate)
 
@@ -953,7 +953,7 @@ class Well(GridAgnosticWell):
 
         # Initiate array of True with right shape to deal with case no spatial
         # selection needs to be done.
-        in_bounds = np.full(ds.dims["index"], True)
+        in_bounds = np.full(ds.sizes["index"], True)
         # Select all variables along "index" dimension
         in_bounds &= values_within_range(ds["x"], x_min, x_max)
         in_bounds &= values_within_range(ds["y"], y_min, y_max)
@@ -1253,7 +1253,7 @@ class LayeredWell(GridAgnosticWell):
         }
         super().__init__(dict_dataset)
         # Set index as coordinate
-        index_coord = np.arange(self.dataset.dims["index"])
+        index_coord = np.arange(self.dataset.sizes["index"])
         self.dataset = self.dataset.assign_coords(index=index_coord)
         self._validate_init_schemata(validate)
 
@@ -1306,7 +1306,7 @@ class LayeredWell(GridAgnosticWell):
 
         # Initiate array of True with right shape to deal with case no spatial
         # selection needs to be done.
-        in_bounds = np.full(ds.dims["index"], True)
+        in_bounds = np.full(ds.sizes["index"], True)
         # Select all variables along "index" dimension
         in_bounds &= values_within_range(ds["x"], x_min, x_max)
         in_bounds &= values_within_range(ds["y"], y_min, y_max)

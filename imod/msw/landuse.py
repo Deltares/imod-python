@@ -1,10 +1,9 @@
 from typing import Any, TextIO
 
-from imod.mf6.interfaces.iregridpackage import IRegridPackage
+from imod.common.interfaces.iregridpackage import IRegridPackage
+from imod.common.utilities.regrid_method_type import EmptyRegridMethod, RegridMethodType
 from imod.msw.fixed_format import VariableMetaData
 from imod.msw.pkgbase import MetaSwapPackage
-from imod.msw.regrid.regrid_schemes import RegridMethodType
-from imod.util.regrid_method_type import EmptyRegridMethod
 
 
 class LanduseOptions(MetaSwapPackage, IRegridPackage):

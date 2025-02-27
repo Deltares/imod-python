@@ -1,8 +1,8 @@
 import numpy as np
 
-from imod.mf6.utilities.regrid import RegridderWeightsCache
 from imod.msw.idf_mapping import IdfMapping
 from imod.tests.fixtures.msw_regrid_fixture import get_3x3_area, get_5x5_new_grid
+from imod.util.regrid import RegridderWeightsCache
 
 
 def test_idf_mapping_regrid():

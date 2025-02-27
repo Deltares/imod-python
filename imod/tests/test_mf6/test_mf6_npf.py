@@ -9,7 +9,7 @@ import xarray as xr
 
 import imod
 from imod.schemata import ValidationError
-from imod.util.regrid_method_type import RegridderType
+from imod.util.regrid import RegridderType
 
 
 def test_render():
@@ -102,8 +102,8 @@ def test_incompatible_setting():
 
     message = textwrap.dedent(
         """
-        * rhs_option
-        \t- Incompatible setting: xt3d_option should be True"""
+        - rhs_option
+            - Incompatible setting: xt3d_option should be True"""
     )
 
     with pytest.raises(ValidationError, match=re.escape(message)):
@@ -122,8 +122,8 @@ def test_incompatible_setting():
 
     message = textwrap.dedent(
         """
-        * alternative_cell_averaging
-        \t- Incompatible setting: xt3d_option should be False"""
+        - alternative_cell_averaging
+            - Incompatible setting: xt3d_option should be False"""
     )
 
     with pytest.raises(ValidationError, match=re.escape(message)):
@@ -155,12 +155,12 @@ def test_wrong_dim():
 
     message = textwrap.dedent(
         """
-        * icelltype
-        \t- No option succeeded:
-        \tdim mismatch: expected ('layer', 'y', 'x'), got ('time', 'layer')
-        \tdim mismatch: expected ('layer', '{face_dim}'), got ('time', 'layer')
-        \tdim mismatch: expected ('layer',), got ('time', 'layer')
-        \tdim mismatch: expected (), got ('time', 'layer')"""
+        - icelltype
+            - No option succeeded:
+            dim mismatch: expected ('layer', 'y', 'x'), got ('time', 'layer')
+            dim mismatch: expected ('layer', '{face_dim}'), got ('time', 'layer')
+            dim mismatch: expected ('layer',), got ('time', 'layer')
+            dim mismatch: expected (), got ('time', 'layer')"""
     )
 
     with pytest.raises(ValidationError, match=re.escape(message)):

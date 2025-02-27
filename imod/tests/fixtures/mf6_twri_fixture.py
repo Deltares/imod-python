@@ -1,3 +1,6 @@
+import os
+import textwrap
+
 import geopandas as gpd
 import numpy as np
 import pandas as pd
@@ -292,6 +295,52 @@ def twri_result(tmpdir_factory):
     modeldir = tmpdir_factory.mktemp("ex01-twri")
     simulation = make_twri_model()
     simulation.write(modeldir)
+    simulation.run()
+    return modeldir
+
+
+DRN_TEXT = textwrap.dedent(
+    """
+    begin options
+        print_input
+        print_flows
+        save_flows
+    end options
+
+    begin dimensions
+        maxbound 9
+    end dimensions
+
+    begin period 1
+        1 7 10 0.0 1.0
+        1 7 10 0.0 1.0
+        1 7 10 10.0 1.0
+        1 7 10 20.0 1.0
+        1 7 10 30.0 1.0
+        1 7 10 50.0 1.0
+        1 7 10 70.0 1.0
+        1 7 10 90.0 1.0
+        1 7 10 100.0 1.0
+    end period
+    """
+)
+
+
+@pytest.fixture(scope="function")
+def twri_result_9_drn_in_1_cell(tmpdir_factory):
+    """TWRI model with drains in the same cell, so to test open_cbc."""
+    # Using a tmpdir_factory is the canonical way of sharing a tempory pytest
+    # directory between different testing modules.
+    modeldir = tmpdir_factory.mktemp("ex01-twri-duplicate-cellvalue")
+    simulation = make_twri_model()
+    simulation.write(modeldir)
+
+    # Duplicate the cell value
+    drn_path = modeldir / "GWF_1" / "drn.drn"
+    os.remove(drn_path)
+    with open(drn_path, "w") as f:
+        f.write(DRN_TEXT)
+
     simulation.run()
     return modeldir
 

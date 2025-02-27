@@ -2,9 +2,9 @@ from typing import Optional
 
 import numpy as np
 
+from imod.common.interfaces.iregridpackage import IRegridPackage
 from imod.logging import init_log_decorator
 from imod.mf6.boundary_condition import BoundaryCondition
-from imod.mf6.interfaces.iregridpackage import IRegridPackage
 from imod.mf6.regrid.regrid_schemes import EvapotranspirationRegridMethod
 from imod.mf6.validation import BOUNDARY_DIMS_SCHEMA, CONC_DIMS_SCHEMA
 from imod.schemata import (
@@ -227,7 +227,7 @@ class Evapotranspiration(BoundaryCondition, IRegridPackage):
         options = super()._get_options(predefined_options, not_options=not_options)
         # Add amount of segments
         if "segment" in self.dataset.dims:
-            options["nseg"] = self.dataset.dims["segment"] + 1
+            options["nseg"] = self.dataset.sizes["segment"] + 1
         else:
             options["nseg"] = 1
         return options

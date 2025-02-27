@@ -13,12 +13,12 @@ import xugrid as xu
 from pytest_cases import parametrize, parametrize_with_cases
 
 import imod
+from imod.common.utilities.grid import broadcast_to_full_domain
 from imod.formats.prj.prj import open_projectfile_data
 from imod.logging.config import LoggerType
 from imod.logging.loglevel import LogLevel
 from imod.mf6.dis import StructuredDiscretization
 from imod.mf6.npf import NodePropertyFlow
-from imod.mf6.utilities.grid import broadcast_to_full_domain
 from imod.mf6.wel import LayeredWell, Well, derive_cellid_from_points
 from imod.mf6.write_context import WriteContext
 from imod.schemata import ValidationError
@@ -603,7 +603,7 @@ def test_clip_box__well_stationary(
         ds = wel.clip_box(**clip_box_args).dataset
 
         # Assert
-        assert dict(ds.dims) == expected_dims
+        assert dict(ds.sizes) == expected_dims
 
 
 @pytest.mark.parametrize(
@@ -637,7 +637,7 @@ def test_clip_box__layered_well_stationary(
         ds = wel.clip_box(**clip_box_args).dataset
 
         # Assert
-        assert dict(ds.dims) == expected_dims
+        assert dict(ds.sizes) == expected_dims
 
 
 @pytest.mark.parametrize(
@@ -655,28 +655,28 @@ def test_clip_box__high_lvl_transient(
     # Act & Assert
     # Test clipping x & y without specified time
     ds = wel.clip_box(x_min=52.0, x_max=76.0, y_max=67.0).dataset
-    assert dict(ds.dims) == {"index": 3, "time": 5, "species": 2}
+    assert dict(ds.sizes) == {"index": 3, "time": 5, "species": 2}
 
     # Test clipping with z
     ds = wel.clip_box(layer_max=2, top=top, bottom=bottom).dataset
-    assert dict(ds.dims) == {"index": 4, "time": 5, "species": 2}
+    assert dict(ds.sizes) == {"index": 4, "time": 5, "species": 2}
     ds = wel.clip_box(layer_min=5, top=top, bottom=bottom).dataset
-    assert dict(ds.dims) == {"index": 4, "time": 5, "species": 2}
+    assert dict(ds.sizes) == {"index": 4, "time": 5, "species": 2}
 
     # Test clipping with specified time
     timestr = "2000-01-03"
     ds = wel.clip_box(time_min=timestr).dataset
-    assert dict(ds.dims) == {"index": 8, "time": 3, "species": 2}
+    assert dict(ds.sizes) == {"index": 8, "time": 3, "species": 2}
 
     # Test clipping with specified time and spatial dimensions
     timestr = "2000-01-03"
     ds = wel.clip_box(x_min=52.0, x_max=76.0, y_max=67.0, time_min=timestr).dataset
-    assert dict(ds.dims) == {"index": 3, "time": 3, "species": 2}
+    assert dict(ds.sizes) == {"index": 3, "time": 3, "species": 2}
 
     # Test clipping with specified time inbetween timesteps
     timestr = "2000-01-03 18:00:00"
     ds = wel.clip_box(x_min=52.0, x_max=76.0, y_max=67.0, time_min=timestr).dataset
-    assert dict(ds.dims) == {"index": 3, "time": 3, "species": 2}
+    assert dict(ds.sizes) == {"index": 3, "time": 3, "species": 2}
     ds_first_time = ds.isel(time=0)
     assert ds_first_time.coords["time"] == np.datetime64(timestr)
     np.testing.assert_allclose(ds_first_time["rate"].values, np.array([3.0, 3.0, 3.0]))
@@ -1253,6 +1253,20 @@ def test_from_imod5_cap_data__grid(cap_data_sprinkling_grid):
     np.testing.assert_array_equal(ds["layer"].to_numpy(), expected_layer)
     np.testing.assert_array_equal(ds["x"].to_numpy(), expected_x)
     np.testing.assert_array_equal(ds["y"].to_numpy(), expected_y)
+
+
+@pytest.mark.timeout(300)
+def test_from_imod5_cap_data__big_grid(cap_data_sprinkling_grid__big):
+    """Test if performance is acceptable for large grids."""
+    # Arrange
+    bnd_2d = cap_data_sprinkling_grid__big["cap"]["boundary"]
+    layer = xr.DataArray([1, 1], coords={"layer": [1, 2]}, dims=["layer"])
+    bnd = layer * bnd_2d
+    # Act
+    well = LayeredWell.from_imod5_cap_data(cap_data_sprinkling_grid__big)
+    mf6_wel = well.to_mf6_pkg(bnd.astype(bool), bnd, bnd, bnd)
+    # Assert
+    assert mf6_wel.dataset.sizes["ncellid"] == bnd_2d.size
 
 
 def test_from_imod5_cap_data__points(cap_data_sprinkling_points):

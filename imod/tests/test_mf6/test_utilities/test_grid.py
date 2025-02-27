@@ -1,6 +1,6 @@
 import numpy as np
 
-from imod.mf6.utilities.grid import create_smallest_target_grid
+from imod.common.utilities.grid import create_smallest_target_grid
 from imod.util.spatial import empty_2d
 
 

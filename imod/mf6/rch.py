@@ -4,13 +4,13 @@ from typing import Optional, cast
 import numpy as np
 import xarray as xr
 
+from imod.common.interfaces.iregridpackage import IRegridPackage
+from imod.common.utilities.regrid import _regrid_package_data
 from imod.logging import init_log_decorator
 from imod.mf6.boundary_condition import BoundaryCondition
 from imod.mf6.dis import StructuredDiscretization
-from imod.mf6.interfaces.iregridpackage import IRegridPackage
 from imod.mf6.regrid.regrid_schemes import RechargeRegridMethod
 from imod.mf6.utilities.imod5_converter import convert_unit_rch_rate
-from imod.mf6.utilities.regrid import RegridderWeightsCache, _regrid_package_data
 from imod.mf6.validation import BOUNDARY_DIMS_SCHEMA, CONC_DIMS_SCHEMA
 from imod.msw.utilities.imod5_converter import (
     get_cell_area_from_imod5_data,
@@ -35,6 +35,7 @@ from imod.typing.grid import (
     is_planar_grid,
 )
 from imod.util.dims import drop_layer_dim_cap_data
+from imod.util.regrid import RegridderWeightsCache
 
 
 class Recharge(BoundaryCondition, IRegridPackage):
@@ -279,11 +280,8 @@ class Recharge(BoundaryCondition, IRegridPackage):
         active = msw_active.all
 
         data = {}
-        layer_da = xr.full_like(
-            target_dis.dataset.coords["layer"], np.nan, dtype=np.float64
-        )
-        layer_da.loc[{"layer": 1}] = 0.0
-        data["rate"] = layer_da.where(active)
+        zero_scalar = xr.DataArray(0.0, coords={"layer": 1})
+        data["rate"] = zero_scalar.where(active)
 
         return cls(**data, validate=True, fixed_cell=False)
 

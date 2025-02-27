@@ -2,6 +2,9 @@ from typing import List, NamedTuple
 
 import numpy as np
 
+from imod.common.interfaces.imodel import IModel
+from imod.common.utilities.clip import clip_by_grid
+from imod.common.utilities.grid import get_active_domain_slice
 from imod.logging import logger
 from imod.mf6.auxiliary_variables import (
     expand_transient_auxiliary_variables,
@@ -9,9 +12,6 @@ from imod.mf6.auxiliary_variables import (
 )
 from imod.mf6.boundary_condition import BoundaryCondition
 from imod.mf6.hfb import HorizontalFlowBarrierBase
-from imod.mf6.interfaces.imodel import IModel
-from imod.mf6.utilities.clip import clip_by_grid
-from imod.mf6.utilities.grid import get_active_domain_slice
 from imod.mf6.wel import Well
 from imod.typing import GridDataArray
 from imod.typing.grid import is_unstructured, ones_like

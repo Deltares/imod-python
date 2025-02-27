@@ -197,8 +197,8 @@ def test_check_layer(riv_data):
 
     message = textwrap.dedent(
         """
-        * stage
-        \t- coords has missing keys: {'layer'}"""
+        - stage
+            - coords has missing keys: {'layer'}"""
     )
 
     with pytest.raises(
@@ -227,12 +227,12 @@ def test_check_dimsize_zero():
 
     message = textwrap.dedent(
         """
-        * stage
-        \t- provided dimension layer with size 0
-        * conductance
-        \t- provided dimension layer with size 0
-        * bottom_elevation
-        \t- provided dimension layer with size 0"""
+        - stage
+            - provided dimension layer with size 0
+        - conductance
+            - provided dimension layer with size 0
+        - bottom_elevation
+            - provided dimension layer with size 0"""
     )
 
     with pytest.raises(ValidationError, match=re.escape(message)):
@@ -353,12 +353,12 @@ def test_check_dim_monotonicity():
 
     message = textwrap.dedent(
         """
-        * stage
-        \t- coord y which is not monotonically decreasing
-        * conductance
-        \t- coord y which is not monotonically decreasing
-        * bottom_elevation
-        \t- coord y which is not monotonically decreasing"""
+        - stage
+            - coord y which is not monotonically decreasing
+        - conductance
+            - coord y which is not monotonically decreasing
+        - bottom_elevation
+            - coord y which is not monotonically decreasing"""
     )
 
     with pytest.raises(ValidationError, match=re.escape(message)):
@@ -366,12 +366,12 @@ def test_check_dim_monotonicity():
 
     message = textwrap.dedent(
         """
-        * stage
-        \t- coord x which is not monotonically increasing
-        * conductance
-        \t- coord x which is not monotonically increasing
-        * bottom_elevation
-        \t- coord x which is not monotonically increasing"""
+        - stage
+            - coord x which is not monotonically increasing
+        - conductance
+            - coord x which is not monotonically increasing
+        - bottom_elevation
+            - coord x which is not monotonically increasing"""
     )
 
     with pytest.raises(ValidationError, match=re.escape(message)):
@@ -379,12 +379,12 @@ def test_check_dim_monotonicity():
 
     message = textwrap.dedent(
         """
-        * stage
-        \t- coord layer which is not monotonically increasing
-        * conductance
-        \t- coord layer which is not monotonically increasing
-        * bottom_elevation
-        \t- coord layer which is not monotonically increasing"""
+        - stage
+            - coord layer which is not monotonically increasing
+        - conductance
+            - coord layer which is not monotonically increasing
+        - bottom_elevation
+            - coord layer which is not monotonically increasing"""
     )
 
     with pytest.raises(ValidationError, match=re.escape(message)):
