@@ -15,6 +15,7 @@ import xugrid as xu
 
 import imod
 from imod.common.interfaces.ipackage import IPackage
+from imod.common.utilities.mask import mask_package
 from imod.common.utilities.regrid import (
     _regrid_like,
 )
@@ -31,7 +32,6 @@ from imod.mf6.pkgbase import (
     TRANSPORT_PACKAGES,
     PackageBase,
 )
-from imod.mf6.utilities.mask import mask_package
 from imod.mf6.utilities.schemata import filter_schemata_dict
 from imod.mf6.validation import validation_pkg_error_message
 from imod.mf6.write_context import WriteContext

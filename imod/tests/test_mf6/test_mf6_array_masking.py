@@ -1,7 +1,7 @@
 import numpy as np
 import xarray as xr
 
-from imod.mf6.utilities.mask import mask_arrays
+from imod.common.utilities.mask import mask_arrays
 
 
 def test_array_masking():
