@@ -99,19 +99,24 @@ Make sure the grids have the same spatial coordinates.
 Change cellsize (and extent)
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
+`xugrid <https://deltares.github.io/xugrid/examples/regridder_overview.html>`_
+allows regridding structured grids (next to regridding unstructured grids).
+
 Nearest neighbor:
 
 .. code-block:: python
 
-    regridder = imod.prepare.Regridder(source, destination, method="nearest")
-    out = regridder.regrid(source)
+    import xugrid as xu
+    regridder = xu.CentroidLocatorRegridder(source=source, target=like)
+    result = regridder.regrid(source)
     
 Area weighted mean:
 
 .. code-block:: python
 
-    regridder = imod.prepare.Regridder(source, destination, method="mean")
-    out = regridder.regrid(source)
+    import xugrid as xu
+    regridder = xu.OverlapRegridder(source=source, target=like, method="mean")
+    result = regridder.regrid(source)
     
 Change time resolution
 ~~~~~~~~~~~~~~~~~~~~~~
