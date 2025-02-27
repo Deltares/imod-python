@@ -21,7 +21,7 @@ from imod.common.utilities.clip import (
     clip_line_gdf_by_grid,
 )
 from imod.common.utilities.grid import broadcast_to_full_domain
-from imod.common.utilities.hfb import (
+from imod.common.utilities.line_data import (
     _create_zbound_gdf_from_zbound_df,
     _extract_zbounds_from_vertical_polygons,
     _prepare_index_names,
