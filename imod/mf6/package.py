@@ -22,7 +22,9 @@ from imod.common.utilities.regrid_method_type import EmptyRegridMethod, RegridMe
 from imod.common.utilities.value_filters import is_valid
 from imod.logging import standard_log_decorator
 from imod.mf6.auxiliary_variables import (
+    expand_transient_auxiliary_variables,
     get_variable_names,
+    remove_expanded_auxiliary_variables_from_dataset,
 )
 from imod.mf6.pkgbase import (
     EXCHANGE_PACKAGES,
@@ -624,7 +626,11 @@ class Package(PackageBase, IPackage, abc.ABC):
         similar to the one used in input argument "target_grid"
         """
         try:
+            if hasattr(self, "auxiliary_data_fields"):
+                remove_expanded_auxiliary_variables_from_dataset(self)
             result = _regrid_like(self, target_grid, regrid_cache, regridder_types)
+            if hasattr(self, "auxiliary_data_fields"):
+                expand_transient_auxiliary_variables(self)
         except ValueError as e:
             raise e
         except Exception:

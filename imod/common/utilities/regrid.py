@@ -18,10 +18,6 @@ from imod.common.statusinfo import NestedStatusInfo
 from imod.common.utilities.clip import clip_by_grid
 from imod.common.utilities.regrid_method_type import EmptyRegridMethod, RegridMethodType
 from imod.common.utilities.value_filters import is_valid
-from imod.mf6.auxiliary_variables import (
-    expand_transient_auxiliary_variables,
-    remove_expanded_auxiliary_variables_from_dataset,
-)
 from imod.schemata import ValidationError
 from imod.typing.grid import (
     GridDataArray,
@@ -240,9 +236,6 @@ def _regrid_like(
     if as_pkg_type is None:
         as_pkg_type = package.__class__
 
-    if hasattr(package, "auxiliary_data_fields"):
-        remove_expanded_auxiliary_variables_from_dataset(package)
-
     if regridder_types is None:
         regridder_types = package._regrid_method
 
@@ -254,9 +247,6 @@ def _regrid_like(
         regrid_cache,
         new_package_data=new_package_data,
     )
-
-    if hasattr(package, "auxiliary_data_fields"):
-        expand_transient_auxiliary_variables(package)
 
     return as_pkg_type(**new_package_data)
 
