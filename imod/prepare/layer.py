@@ -3,8 +3,8 @@ This module contains all kinds of utilities to work with layers.
 """
 
 from imod.typing import GridDataArray
-from imod.typing.grid import preserve_gridtype, zeros_like
-from imod.common.utilities.layer import create_layered_top
+from imod.typing.grid import preserve_gridtype
+
 
 @preserve_gridtype
 def get_upper_active_layer_number(active: GridDataArray) -> GridDataArray:

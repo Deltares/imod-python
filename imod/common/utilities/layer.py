@@ -1,6 +1,7 @@
 from imod.typing import GridDataArray
 from imod.typing.grid import zeros_like
 
+
 def create_layered_top(bottom: GridDataArray, top: GridDataArray) -> GridDataArray:
     """
     Create a top array with a layer dimension, from a top array with no layer
