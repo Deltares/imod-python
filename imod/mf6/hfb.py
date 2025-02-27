@@ -15,21 +15,21 @@ import xugrid as xu
 from fastcore.dispatch import typedispatch
 
 from imod.common.interfaces.ilinedatapackage import ILineDataPackage
-from imod.logging import LogLevel, init_log_decorator, logger
-from imod.mf6.boundary_condition import BoundaryCondition
-from imod.mf6.mf6_hfb_adapter import Mf6HorizontalFlowBarrier
-from imod.mf6.package import Package
-from imod.mf6.utilities.clip import (
+from imod.common.utilities.clip import (
     bounding_polygon_from_line_data_and_clip_box,
     clip_line_gdf_by_bounding_polygon,
     clip_line_gdf_by_grid,
 )
-from imod.mf6.utilities.grid import broadcast_to_full_domain
-from imod.mf6.utilities.hfb import (
-    _create_zlinestring_from_bound_df,
-    _extract_hfb_bounds_from_zpolygons,
+from imod.common.utilities.grid import broadcast_to_full_domain
+from imod.common.utilities.line_data import (
+    _create_zbound_gdf_from_zbound_df,
+    _extract_zbounds_from_vertical_polygons,
     _prepare_index_names,
 )
+from imod.logging import LogLevel, init_log_decorator, logger
+from imod.mf6.boundary_condition import BoundaryCondition
+from imod.mf6.mf6_hfb_adapter import Mf6HorizontalFlowBarrier
+from imod.mf6.package import Package
 from imod.mf6.validation_context import ValidationContext
 from imod.schemata import (
     DimsSchema,
@@ -284,7 +284,7 @@ def _extract_mean_hfb_bounds_from_dataframe(
     if not dataframe.geometry.has_z.all():
         raise TypeError("GeoDataFrame geometry has no z, which is required.")
 
-    lower, upper = _extract_hfb_bounds_from_zpolygons(dataframe)
+    lower, upper = _extract_zbounds_from_vertical_polygons(dataframe)
     # Compute means inbetween nodes.
     index_names = lower.index.names
     lower_mean = lower.groupby(index_names)["z"].mean()
@@ -888,8 +888,8 @@ class HorizontalFlowBarrierBase(BoundaryCondition, ILineDataPackage):
         )
         # Convert vertical polygon to linestring
         if not has_layer:
-            lower, _ = _extract_hfb_bounds_from_zpolygons(barrier_dataframe)
-            linestring = _create_zlinestring_from_bound_df(lower)
+            lower, _ = _extract_zbounds_from_vertical_polygons(barrier_dataframe)
+            linestring = _create_zbound_gdf_from_zbound_df(lower)
             barrier_dataframe["geometry"] = linestring["geometry"]
         # Clip barriers outside domain
         active = ones_like(idomain.sel(layer=1, drop=True))

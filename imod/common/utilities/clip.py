@@ -12,10 +12,10 @@ from fastcore.dispatch import typedispatch
 from imod.common.interfaces.ilinedatapackage import ILineDataPackage
 from imod.common.interfaces.ipackagebase import IPackageBase
 from imod.common.interfaces.ipointdatapackage import IPointDataPackage
-from imod.mf6.utilities.grid import get_active_domain_slice
-from imod.mf6.utilities.hfb import (
-    clipped_hfb_zlinestrings_to_zpolygons,
-    hfb_zpolygons_to_zlinestrings,
+from imod.common.utilities.grid import get_active_domain_slice
+from imod.common.utilities.line_data import (
+    clipped_zbound_linestrings_to_vertical_polygons,
+    vertical_polygons_to_zbound_linestrings,
 )
 from imod.typing import GeoDataFrameType, GridDataArray
 from imod.typing.grid import bounding_polygon, is_spatial_grid
@@ -151,9 +151,9 @@ def clip_line_gdf_by_bounding_polygon(
         # Shapely returns z linestrings when clipping our vertical z polygons.
         # To work around this convert polygons to zlinestrings to clip.
         # Consequently construct polygons from these clipped linestrings.
-        gdf_linestrings = hfb_zpolygons_to_zlinestrings(gdf)
+        gdf_linestrings = vertical_polygons_to_zbound_linestrings(gdf)
         clipped_linestrings = _clip_linestring(gdf_linestrings, bounding_gdf)
-        return clipped_hfb_zlinestrings_to_zpolygons(clipped_linestrings)
+        return clipped_zbound_linestrings_to_vertical_polygons(clipped_linestrings)
     else:
         return _clip_linestring(gdf, bounding_gdf)
 

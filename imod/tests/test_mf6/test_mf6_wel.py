@@ -13,12 +13,12 @@ import xugrid as xu
 from pytest_cases import parametrize, parametrize_with_cases
 
 import imod
+from imod.common.utilities.grid import broadcast_to_full_domain
 from imod.formats.prj.prj import open_projectfile_data
 from imod.logging.config import LoggerType
 from imod.logging.loglevel import LogLevel
 from imod.mf6.dis import StructuredDiscretization
 from imod.mf6.npf import NodePropertyFlow
-from imod.mf6.utilities.grid import broadcast_to_full_domain
 from imod.mf6.wel import LayeredWell, Well, derive_cellid_from_points
 from imod.mf6.write_context import WriteContext
 from imod.schemata import ValidationError

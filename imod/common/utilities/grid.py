@@ -25,7 +25,7 @@ def get_active_domain_slice(active: GridDataArray) -> DomainSlice:
         return {"y": y_slice, "x": x_slice}
 
     if isinstance(active, xu.UgridDataArray):
-        active_indices = np.where(active > 0)[0]
+        active_indices = np.nonzero(active.data > 0)[0]
         return {f"{active.ugrid.grid.face_dimension}": active_indices}
 
     raise TypeError(f"Unknown grid type {active}")
