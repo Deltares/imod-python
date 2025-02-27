@@ -9,10 +9,6 @@ from imod.common.interfaces.imaskingsettings import IMaskingSettings
 from imod.common.interfaces.imodel import IModel
 from imod.common.interfaces.ipackage import IPackage
 from imod.common.interfaces.isimulation import ISimulation
-from imod.mf6.auxiliary_variables import (
-    expand_transient_auxiliary_variables,
-    remove_expanded_auxiliary_variables_from_dataset,
-)
 from imod.typing.grid import GridDataArray, get_spatial_dimension_names, is_same_domain
 
 
@@ -61,8 +57,6 @@ def _mask_all_packages(
 
 def mask_package(package: IPackage, mask: GridDataArray) -> IPackage:
     masked = {}
-    if len(package.auxiliary_data_fields) > 0:
-        remove_expanded_auxiliary_variables_from_dataset(package)
 
     for var in package.dataset.data_vars.keys():
         if _skip_dataarray(package.dataset[var]) or _skip_variable(package, var):
@@ -70,8 +64,6 @@ def mask_package(package: IPackage, mask: GridDataArray) -> IPackage:
         else:
             masked[var] = _mask_spatial_var(package, var, mask)
 
-    if len(package.auxiliary_data_fields) > 0:
-        expand_transient_auxiliary_variables(package)
     return type(package)(**masked)
 
 
