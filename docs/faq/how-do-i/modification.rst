@@ -99,8 +99,9 @@ Make sure the grids have the same spatial coordinates.
 Change cellsize (and extent)
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-`xugrid <https://deltares.github.io/xugrid/examples/regridder_overview.html>`_
-allows regridding structured grids (next to regridding unstructured grids).
+`xugrid's regridding functionality
+<https://deltares.github.io/xugrid/examples/regridder_overview.html>`_ allows
+regridding structured grids (next to regridding unstructured grids).
 
 Nearest neighbor:
 
