@@ -22,8 +22,8 @@ from imod.common.utilities.clip import (
 )
 from imod.common.utilities.grid import broadcast_to_full_domain
 from imod.common.utilities.hfb import (
-    _create_zlinestring_from_bound_df,
-    _extract_hfb_bounds_from_zpolygons,
+    _create_zbound_gdf_from_zbound_df,
+    _extract_zbounds_from_vertical_polygons,
     _prepare_index_names,
 )
 from imod.logging import LogLevel, init_log_decorator, logger
@@ -284,7 +284,7 @@ def _extract_mean_hfb_bounds_from_dataframe(
     if not dataframe.geometry.has_z.all():
         raise TypeError("GeoDataFrame geometry has no z, which is required.")
 
-    lower, upper = _extract_hfb_bounds_from_zpolygons(dataframe)
+    lower, upper = _extract_zbounds_from_vertical_polygons(dataframe)
     # Compute means inbetween nodes.
     index_names = lower.index.names
     lower_mean = lower.groupby(index_names)["z"].mean()
@@ -888,8 +888,8 @@ class HorizontalFlowBarrierBase(BoundaryCondition, ILineDataPackage):
         )
         # Convert vertical polygon to linestring
         if not has_layer:
-            lower, _ = _extract_hfb_bounds_from_zpolygons(barrier_dataframe)
-            linestring = _create_zlinestring_from_bound_df(lower)
+            lower, _ = _extract_zbounds_from_vertical_polygons(barrier_dataframe)
+            linestring = _create_zbound_gdf_from_zbound_df(lower)
             barrier_dataframe["geometry"] = linestring["geometry"]
         # Clip barriers outside domain
         active = ones_like(idomain.sel(layer=1, drop=True))

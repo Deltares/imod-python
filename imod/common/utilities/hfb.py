@@ -19,7 +19,7 @@ except ImportError:
     shapely = MissingOptionalModule("shapely")
 
 
-def _create_zlinestring_from_bound_df(bound: pd.DataFrame) -> GeoDataFrameType:
+def _create_zbound_gdf_from_zbound_df(bound: pd.DataFrame) -> GeoDataFrameType:
     """Create geodataframe with linestring geometry from dataframe with bounds."""
     bound = _prepare_index_names(bound)
     # Make sure only x, y, z or x, y in columns
@@ -37,18 +37,20 @@ def _create_zlinestring_from_bound_df(bound: pd.DataFrame) -> GeoDataFrameType:
     ]
     index, linestrings = zip(*mapping_linestrings)
 
-    gdf = gpd.GeoDataFrame(
+    zbound_gdf = gpd.GeoDataFrame(
         linestrings, index=index, columns=["geometry"], geometry="geometry"
     )
-    gdf.index = gdf.index.set_names(index_names)
-    return gdf
+    zbound_gdf.index = zbound_gdf.index.set_names(index_names)
+    return zbound_gdf
 
 
-def _create_zpolygon_from_polygon_df(polygon_df: pd.DataFrame) -> GeoDataFrameType:
+def _create_vertical_polygon_from_vertices_df(
+    polygon_df: pd.DataFrame,
+) -> GeoDataFrameType:
     """
     Create geodataframe with polygon geometry from dataframe with polygon
-    nodes. The dataframe with nodes must have a multi-index with name ["index",
-    "parts"]
+    vertices. The dataframe with vertices must have a multi-index with name
+    ["index", "parts"]
     """
     index_names = ["index", "parts"]
     polygons = [
@@ -90,11 +92,11 @@ def _prepare_index_names(
     return dataframe
 
 
-def _extract_hfb_bounds_from_zpolygons(
+def _extract_zbounds_from_vertical_polygons(
     dataframe: GeoDataFrameType,
 ) -> Tuple[pd.DataFrame, pd.DataFrame]:
     """
-    Extract hfb bounds from dataframe. Requires dataframe geometry to be of type
+    Extract z bounds from dataframe. Requires dataframe geometry to be of type
     shapely "Z Polygon".
     """
     dataframe = _prepare_index_names(dataframe)
@@ -113,9 +115,11 @@ def _extract_hfb_bounds_from_zpolygons(
     return lower, upper
 
 
-def hfb_zpolygons_to_zlinestrings(dataframe: GeoDataFrameType) -> GeoDataFrameType:
+def vertical_polygons_to_zbound_linestrings(
+    dataframe: GeoDataFrameType,
+) -> GeoDataFrameType:
     """
-    Convert GeoDataFrame with zpolygons to zlinestrings.
+    Convert GeoDataFrame with vertical polygons to linestrings with z bounds.
 
     Paramaters
     ----------
@@ -128,12 +132,12 @@ def hfb_zpolygons_to_zlinestrings(dataframe: GeoDataFrameType) -> GeoDataFrameTy
         The multi-index denotes whether linestring designates "upper" or "lower"
         bound.
     """
-    lower, upper = _extract_hfb_bounds_from_zpolygons(dataframe)
+    lower, upper = _extract_zbounds_from_vertical_polygons(dataframe)
 
-    lower_gdf = _create_zlinestring_from_bound_df(lower)
-    upper_gdf = _create_zlinestring_from_bound_df(upper)
+    lower_gdf = _create_zbound_gdf_from_zbound_df(lower)
+    upper_gdf = _create_zbound_gdf_from_zbound_df(upper)
 
-    bounds_gdf = pd.concat(
+    zbounds_gdf = pd.concat(
         [lower_gdf, upper_gdf],
         keys=[
             "lower",
@@ -141,7 +145,7 @@ def hfb_zpolygons_to_zlinestrings(dataframe: GeoDataFrameType) -> GeoDataFrameTy
         ],
     )
 
-    return bounds_gdf
+    return zbounds_gdf
 
 
 def _flip_linestrings(df: pd.DataFrame) -> pd.DataFrame:
@@ -161,8 +165,8 @@ def _flip_linestrings(df: pd.DataFrame) -> pd.DataFrame:
     return df_sorted.reset_index(level=2, drop=True)
 
 
-def clipped_hfb_zlinestrings_to_zpolygons(
-    bounds_gdf: GeoSeriesType,
+def clipped_zbound_linestrings_to_vertical_polygons(
+    zbounds_gdf: GeoSeriesType,
 ) -> GeoDataFrameType:
     """
     Convert clipped zlinestrings provided with bounds_gdf to zpolygons
@@ -174,10 +178,10 @@ def clipped_hfb_zlinestrings_to_zpolygons(
         indicated by index "upper" and "lower".
     """
     # Empty Dataframe
-    if bounds_gdf.shape[0] == 0:
-        return bounds_gdf
+    if zbounds_gdf.shape[0] == 0:
+        return zbounds_gdf
 
-    coordinates = bounds_gdf.get_coordinates(include_z=True)
+    coordinates = zbounds_gdf.get_coordinates(include_z=True)
     # Sort index to ascending everywhere to be able to assign flip upper bound
     # linestrings without errors.
     coordinates = coordinates.sort_index(
@@ -188,4 +192,4 @@ def clipped_hfb_zlinestrings_to_zpolygons(
     # Drop index with "upper" and "lower" in it.
     coordinates = coordinates.reset_index(level=0, drop=True)
 
-    return _create_zpolygon_from_polygon_df(coordinates)
+    return _create_vertical_polygon_from_vertices_df(coordinates)
