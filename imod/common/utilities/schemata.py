@@ -29,11 +29,11 @@ def filter_schemata_dict(
     Prints ``{'stage': [<imod.schemata.AllNoDataSchema at 0x1b152b12aa0>]}``
     """
 
-    dict = {}
+    d = {}
     for key, schema_ls in schemata_dict.items():
         schema_match = [
             schema for schema in schema_ls if isinstance(schema, schema_types)
         ]
         if schema_match:
-            dict[key] = schema_match
-    return dict
+            d[key] = schema_match
+    return d
