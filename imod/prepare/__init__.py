@@ -13,6 +13,7 @@ cases, such as :class:`imod.prepare.Regridder`, these methods are optimized for
 speed by making use of the Numba compiler, to be able to regrid large datasets.
 """
 
+from imod.common.utilities.layer import create_layered_top
 from imod.prepare import hfb, spatial, subsoil, surface_water
 from imod.prepare.cleanup import cleanup_drn, cleanup_ghb, cleanup_riv, cleanup_wel
 from imod.prepare.hfb import (
@@ -20,7 +21,6 @@ from imod.prepare.hfb import (
     linestring_to_trapezoid_zpolygons,
 )
 from imod.prepare.layer import (
-    create_layered_top,
     get_lower_active_grid_cells,
     get_lower_active_layer_number,
     get_upper_active_grid_cells,

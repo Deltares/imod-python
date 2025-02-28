@@ -25,6 +25,10 @@ Added
   numbers to the first active layer.
 - :func:`imod.prepare.DISTRIBUTING_OPTION` got a new setting
   ``by_corrected_thickness``. This matches DISTRCOND=-1 in iMOD5.
+- :func:`imod.prepare.cleanup.cleanup_hfb` to clean up HFB geometries.
+- :meth:`imod.mf6.HorizontalFlowBarrierResistance.cleanup`,
+  :meth:`imod.mf6.SingleLayerHorizontalFlowBarrierResistance.cleanup`,
+  to clean up HFB geometries crossing inactive model cells.
 
 Changed
 ~~~~~~~

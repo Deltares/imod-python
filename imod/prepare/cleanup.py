@@ -6,10 +6,11 @@ from typing import Optional
 import pandas as pd
 import xarray as xr
 
+from imod.common.utilities.clip import clip_line_gdf_by_grid
 from imod.common.utilities.mask import mask_arrays
 from imod.prepare.wells import locate_wells, validate_well_columnnames
 from imod.schemata import scalar_None
-from imod.typing import GridDataArray
+from imod.typing import GeoDataFrameType, GridDataArray
 
 
 class AlignLevelsMode(Enum):
@@ -336,3 +337,31 @@ def cleanup_wel(
         cleaned_wells, minimum_thickness
     )
     return cleaned_wells
+
+
+def cleanup_hfb(
+    barrier: GeoDataFrameType, idomain_2d: GridDataArray
+) -> GeoDataFrameType:
+    """
+    Clean up HFB data, fixes some common mistakes causing ValidationErrors by
+    doing the following:
+
+    - Drop HFB segments outside active domain (idomain==1)
+
+    Parameters
+    ----------
+    barrier: geopandas.GeoDataFrame
+        GeoDataFrame with HFB data
+    idomain_2d: xarray.DataArray | xugrid.UgridDataArray
+        MODFLOW 6 model domain of a single layer. idomain==1 is considered active domain.
+
+    Returns
+    -------
+    geopandas.GeoDataFrame
+        Cleaned up GeoDataFrame with HFB data.
+    """
+
+    active = idomain_2d > 0
+    # Drop HFB cells outside active domain
+    clipped_barrier = clip_line_gdf_by_grid(barrier, active)
+    return clipped_barrier

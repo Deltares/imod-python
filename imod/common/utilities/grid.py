@@ -7,7 +7,7 @@ import xarray as xr
 import xugrid as xu
 
 import imod
-from imod.prepare.layer import create_layered_top
+from imod.common.utilities.layer import create_layered_top
 from imod.typing import GridDataArray
 from imod.typing.grid import zeros_like
 from imod.util.spatial import spatial_reference

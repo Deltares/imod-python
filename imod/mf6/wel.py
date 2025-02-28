@@ -19,6 +19,7 @@ import imod
 import imod.mf6.utilities
 from imod.common.interfaces.ipointdatapackage import IPointDataPackage
 from imod.common.utilities.grid import broadcast_to_full_domain
+from imod.common.utilities.layer import create_layered_top
 from imod.logging import init_log_decorator, logger
 from imod.logging.logging_decorators import standard_log_decorator
 from imod.logging.loglevel import LogLevel
@@ -37,7 +38,6 @@ from imod.mf6.validation_context import ValidationContext
 from imod.mf6.write_context import WriteContext
 from imod.prepare import assign_wells
 from imod.prepare.cleanup import cleanup_wel
-from imod.prepare.layer import create_layered_top
 from imod.schemata import (
     AllValueSchema,
     AnyNoDataSchema,
