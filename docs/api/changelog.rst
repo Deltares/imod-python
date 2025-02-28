@@ -9,15 +9,16 @@ The format is based on `Keep a Changelog`_, and this project adheres to
 [Unreleased]
 ------------
 
-From this release on, we recommend using `xugrids regridding utilities
+From this release on, we recommend using `xugrid's regridding utilities
 <https://deltares.github.io/xugrid/examples/regridder_overview.html>`_ for
 regridding individual grids instead of :class:`imod.prepare.Regridder`. Xugrid's
 regridders are tested to be about 10 times faster than
 :class:`imod.prepare.Regridder`. There is one small difference: xugrid's
-``xugrid.BaryCentricInterpolator`` considers points cell edges to be inside,
-whereas :class:`imod.prepare.Regridder` considers them to be outside. This
-difference is negligible for most applications, but might create slightly less
-``np.nan`` values than before.
+``xugrid.BaryCentricInterpolator`` considers sample points of the destination
+grid that lie on the source grid's cell edges to be inside, whereas
+:class:`imod.prepare.Regridder` considers them to be outside. This difference is
+negligible for most applications, but might create slightly fewer ``np.nan``
+values than before.
 
 Removed
 ~~~~~~~
