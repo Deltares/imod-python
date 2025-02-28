@@ -6,7 +6,7 @@ from typing import Any, Dict, Union
 import numpy as np
 
 from imod.common.interfaces.iregridpackage import IRegridPackage
-from imod.common.utilities.value_filters import is_dataarray_none
+from imod.common.utilities.value_filters import is_empty_dataarray
 from imod.logging import init_log_decorator
 from imod.mf6.package import Package
 from imod.mf6.write_context import WriteContext
@@ -94,10 +94,10 @@ class OutputControl(Package, IRegridPackage):
         validate: bool = True,
     ):
         save_concentration = (
-            None if is_dataarray_none(save_concentration) else save_concentration
+            None if is_empty_dataarray(save_concentration) else save_concentration
         )
-        save_head = None if is_dataarray_none(save_head) else save_head
-        save_budget = None if is_dataarray_none(save_budget) else save_budget
+        save_head = None if is_empty_dataarray(save_head) else save_head
+        save_budget = None if is_empty_dataarray(save_budget) else save_budget
 
         if save_head is not None and save_concentration is not None:
             raise ValueError("save_head and save_concentration cannot both be defined.")

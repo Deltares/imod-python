@@ -28,7 +28,7 @@ def is_valid(value: Any) -> bool:
         return True
 
 
-def is_dataarray_none(da: Any) -> bool:
+def is_empty_dataarray(da: Any) -> bool:
     return isinstance(da, xr.DataArray) and da.isnull().all().item()
 
 
