@@ -1,6 +1,10 @@
 from typing import Any
 
 import numpy as np
+import xarray as xr
+from xarray.core.utils import is_scalar
+
+from imod.typing import GridDataset
 
 
 def is_valid(value: Any) -> bool:
@@ -22,3 +26,12 @@ def is_valid(value: Any) -> bool:
         return False
     else:
         return True
+
+
+def is_empty_dataarray(da: Any) -> bool:
+    return isinstance(da, xr.DataArray) and da.isnull().all().item()
+
+
+def get_scalar_variables(ds: GridDataset) -> list[str]:
+    """Returns scalar variables in a dataset."""
+    return [var for var, arr in ds.variables.items() if is_scalar(arr)]

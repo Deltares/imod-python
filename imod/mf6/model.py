@@ -20,6 +20,7 @@ from jinja2 import Template
 import imod
 from imod.common.interfaces.imodel import IModel
 from imod.common.statusinfo import NestedStatusInfo, StatusInfo, StatusInfoBase
+from imod.common.utilities.mask import _mask_all_packages
 from imod.common.utilities.regrid import _regrid_like
 from imod.logging import LogLevel, logger, standard_log_decorator
 from imod.mf6.drn import Drainage
@@ -28,7 +29,6 @@ from imod.mf6.hfb import HorizontalFlowBarrierBase
 from imod.mf6.mf6_wel_adapter import Mf6Wel
 from imod.mf6.package import Package
 from imod.mf6.riv import River
-from imod.mf6.utilities.mask import _mask_all_packages
 from imod.mf6.utilities.mf6hfb import merge_hfb_packages
 from imod.mf6.validation import pkg_errors_to_status_info
 from imod.mf6.validation_context import ValidationContext

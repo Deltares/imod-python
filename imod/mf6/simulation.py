@@ -24,6 +24,7 @@ import imod.mf6.exchangebase
 from imod.common.interfaces.imodel import IModel
 from imod.common.interfaces.isimulation import ISimulation
 from imod.common.statusinfo import NestedStatusInfo
+from imod.common.utilities.mask import _mask_all_models
 from imod.common.utilities.regrid import _regrid_like
 from imod.common.utilities.regrid_method_type import RegridMethodType
 from imod.logging import LogLevel, logger, standard_log_decorator
@@ -42,7 +43,6 @@ from imod.mf6.multimodel.modelsplitter import create_partition_info, slice_model
 from imod.mf6.out import open_cbc, open_conc, open_hds
 from imod.mf6.package import Package
 from imod.mf6.ssm import SourceSinkMixing
-from imod.mf6.utilities.mask import _mask_all_models
 from imod.mf6.validation_context import ValidationContext
 from imod.mf6.write_context import WriteContext
 from imod.prepare.topsystem.default_allocation_methods import (

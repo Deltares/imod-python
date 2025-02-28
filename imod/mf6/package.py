@@ -5,7 +5,7 @@ import pathlib
 from collections import defaultdict
 from copy import deepcopy
 from pathlib import Path
-from typing import Any, Callable, Dict, List, Mapping, Optional, Tuple, Union
+from typing import Any, Callable, Dict, List, Mapping, Optional, Tuple, Union, cast
 
 import cftime
 import jinja2
@@ -15,10 +15,12 @@ import xugrid as xu
 
 import imod
 from imod.common.interfaces.ipackage import IPackage
+from imod.common.utilities.mask import mask_package
 from imod.common.utilities.regrid import (
     _regrid_like,
 )
 from imod.common.utilities.regrid_method_type import EmptyRegridMethod, RegridMethodType
+from imod.common.utilities.schemata import filter_schemata_dict
 from imod.common.utilities.value_filters import is_valid
 from imod.logging import standard_log_decorator
 from imod.mf6.auxiliary_variables import (
@@ -31,8 +33,6 @@ from imod.mf6.pkgbase import (
     TRANSPORT_PACKAGES,
     PackageBase,
 )
-from imod.mf6.utilities.mask import mask_package
-from imod.mf6.utilities.schemata import filter_schemata_dict
 from imod.mf6.validation import validation_pkg_error_message
 from imod.mf6.write_context import WriteContext
 from imod.schemata import (
@@ -575,8 +575,11 @@ class Package(PackageBase, IPackage, abc.ABC):
         masked: Package
             The package with part masked.
         """
-
-        return mask_package(self, mask)
+        result = cast(IPackage, deepcopy(self))
+        remove_expanded_auxiliary_variables_from_dataset(result)
+        result = mask_package(result, mask)
+        expand_transient_auxiliary_variables(result)
+        return result
 
     def regrid_like(
         self,
@@ -626,11 +629,10 @@ class Package(PackageBase, IPackage, abc.ABC):
         similar to the one used in input argument "target_grid"
         """
         try:
-            if hasattr(self, "auxiliary_data_fields"):
-                remove_expanded_auxiliary_variables_from_dataset(self)
-            result = _regrid_like(self, target_grid, regrid_cache, regridder_types)
-            if hasattr(self, "auxiliary_data_fields"):
-                expand_transient_auxiliary_variables(self)
+            result = deepcopy(self)
+            remove_expanded_auxiliary_variables_from_dataset(result)
+            result = _regrid_like(result, target_grid, regrid_cache, regridder_types)
+            expand_transient_auxiliary_variables(result)
         except ValueError as e:
             raise e
         except Exception:

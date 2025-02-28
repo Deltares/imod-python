@@ -1,7 +1,7 @@
 from pytest_cases import parametrize_with_cases
 
+from imod.common.utilities.schemata import filter_schemata_dict
 from imod.mf6.riv import River
-from imod.mf6.utilities.schemata import filter_schemata_dict
 from imod.schemata import AllNoDataSchema, IdentityNoDataSchema, IndexesSchema
 
 
