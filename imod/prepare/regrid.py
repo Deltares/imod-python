@@ -29,6 +29,7 @@ import textwrap
 import warnings
 from collections import namedtuple
 from typing import List, Sequence
+from deprecated.sphinx import deprecated
 
 import dask
 import numba
@@ -299,37 +300,28 @@ def _nd_regrid(src, dst, src_coords, dst_coords, iter_regrid, use_relative_weigh
 
 
 WARNING_MSG = textwrap.dedent(
-    """{name} is deprecated so we will remove it eventually. Use the
-    the regridder in ``xugrid`` instead, which is around 10 times faster. To
-    regrid a single array, see:
+    """
+    ``imod.prepare.Regridder`` is deprecated so we will remove it
+    eventually. Use the regridder in ``xugrid`` instead, which is around 10
+    times faster. It is as simple as:
+
+    >>> import xugrid as xu
+    >>> regridder = xu.OverlapRegridder(source=source, target=like, method="mean")
+    >>> result = regridder.regrid(source)
+
+    For more information, see:
     https://deltares.github.io/xugrid/examples/regridder_overview.html. To
-    regrid Modflow6 packages or entire simulations, see the iMOD Python user
-    guide:
+    regrid MODFLOW6 packages or entire MODFLOW6 simulations, see the iMOD
+    Python user guide:
     https://deltares.github.io/imod-python/user-guide/08-regridding.html.
     """
 )
 
-
+@deprecated(reason=WARNING_MSG)
 class Regridder(object):
     """
     Object to repeatedly regrid similar objects. Compiles once on first call,
     can then be repeatedly called without JIT compilation overhead.
-
-    .. caution::
-
-        ``imod.prepare.Regridder`` is deprecated so we will remove it
-        eventually. Use the regridder in ``xugrid`` instead, which is around 10
-        times faster. It is as simple as:
-
-        >>> import xugrid as xu
-        >>> regridder = xu.OverlapRegridder(source=source, target=like, method="mean")
-        >>> result = regridder.regrid(source)
-
-        For more information, see:
-        https://deltares.github.io/xugrid/examples/regridder_overview.html. To
-        regrid MODFLOW6 packages or entire MODFLOW6 simulations, see the iMOD
-        Python user guide:
-        https://deltares.github.io/imod-python/user-guide/08-regridding.html.
 
     Attributes
     ----------
@@ -398,10 +390,6 @@ class Regridder(object):
     def __init__(
         self, method, ndim_regrid=None, use_relative_weights=False, extra_overlap=0
     ):
-        warnings.warn(
-            WARNING_MSG.format(name=self.__class__.__name__),
-            DeprecationWarning,
-        )
 
         _method = common._get_method(method, common.METHODS)
         self.method = _method
