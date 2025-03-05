@@ -189,7 +189,7 @@ def test_disconnected_idomain(idomain_and_bottom):
 
 
 def test_misalignment(idomain_and_bottom):
-    """"Test misalignment of top and idomain throws error."""
+    """ "Test misalignment of top and idomain throws error."""
     idomain, bottom = idomain_and_bottom
 
     nrow = 15
@@ -209,7 +209,7 @@ def test_misalignment(idomain_and_bottom):
     x = np.arange(xmin, xmax, dx) + 0.5 * dx
     coords = {"y": y, "x": x}
     top = xr.DataArray(np.ones(shape, dtype=np.int8), coords=coords, dims=dims)
-    
+
     with pytest.raises(ValueError, match="align"):
         imod.mf6.StructuredDiscretization(top=top, bottom=bottom, idomain=idomain)
 
