@@ -88,3 +88,12 @@ def test_landuse_options_regrid(simple_2d_grid_with_subunits):
     assert np.all(
         regridded_land_use.dataset.coords["landuse_index"].values == np.array([1, 2, 3])
     )
+
+
+def test_landuse_options_clip_box():
+    options = create_landuse_dict()
+    lu_options = LanduseOptions(**options)
+
+    clipped = lu_options.clip_box(x_min=1.0, x_max=2.5, y_min=1.0, y_max=2.5)
+
+    assert lu_options.dataset.identical(clipped.dataset)
