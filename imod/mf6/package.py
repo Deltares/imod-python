@@ -599,22 +599,12 @@ class Package(PackageBase, IPackage, abc.ABC):
         attribute of the package. These defaults can be overridden using the
         input parameters of this function.
 
-        Examples
-        --------
-
-        To regrid the npf package with a non-default method for the k-field,
-        call regrid_like with these arguments:
-
-        >>> regridder_types = imod.mf6.regrid.NodePropertyFlowRegridMethod(k=(imod.RegridderType.OVERLAP, "mean"))
-        >>> new_npf = npf.regrid_like(like,  RegridderWeightsCache, regridder_types)
-
-
         Parameters
         ----------
         target_grid: xr.DataArray or xu.UgridDataArray
             a grid defined using the same discretization as the one we want to
             regrid the package to.
-        regrid_cache: RegridderWeightsCache, optional
+        regrid_cache: RegridderWeightsCache
             stores regridder weights for different regridders. Can be used to
             speed up regridding, if the same regridders are used several times
             for regridding different arrays.
@@ -623,10 +613,20 @@ class Package(PackageBase, IPackage, abc.ABC):
             specialization class of BaseRegridder) and function name (str) this
             dictionary can be used to override the default mapping method.
 
+        Examples
+        --------
+        To regrid the npf package with a non-default method for the k-field,
+        call ``regrid_like`` with these arguments:
+
+        >>> regridder_types = imod.mf6.regrid.NodePropertyFlowRegridMethod(k=(imod.RegridderType.OVERLAP, "mean"))
+        >>> regrid_cache = imod.util.regrid.RegridderWeightsCache()
+        >>> new_npf = npf.regrid_like(like, regrid_cache, regridder_types)
+
         Returns
         -------
-        a package with the same options as this package, and with all the data-arrays regridded to another discretization,
-        similar to the one used in input argument "target_grid"
+        A package with the same options as this package, and with all the
+        data-arrays regridded to another discretization, similar to the one used
+        in input argument "target_grid"
         """
         try:
             result = deepcopy(self)
