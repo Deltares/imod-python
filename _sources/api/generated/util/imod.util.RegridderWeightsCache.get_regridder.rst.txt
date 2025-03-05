@@ -1,0 +1,6 @@
+﻿imod.util.RegridderWeightsCache.get\_regridder
+==============================================
+
+.. currentmodule:: imod.util
+
+.. automethod:: RegridderWeightsCache.get_regridder

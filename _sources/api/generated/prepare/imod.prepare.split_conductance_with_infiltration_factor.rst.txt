@@ -1,0 +1,6 @@
+﻿imod.prepare.split\_conductance\_with\_infiltration\_factor
+===========================================================
+
+.. currentmodule:: imod.prepare
+
+.. autofunction:: split_conductance_with_infiltration_factor

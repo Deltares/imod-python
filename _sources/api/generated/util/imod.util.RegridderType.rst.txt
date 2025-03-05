@@ -1,0 +1,25 @@
+﻿imod.util.RegridderType
+=======================
+
+.. currentmodule:: imod.util
+
+.. autoclass:: RegridderType
+
+   
+   .. automethod:: __init__
+
+   
+   
+
+   
+   
+   .. rubric:: Attributes
+
+   .. autosummary::
+   
+      ~RegridderType.CENTROIDLOCATOR
+      ~RegridderType.BARYCENTRIC
+      ~RegridderType.OVERLAP
+      ~RegridderType.RELATIVEOVERLAP
+   
+   

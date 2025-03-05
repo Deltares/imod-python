@@ -1,6 +1,0 @@
-﻿imod.flow.ImodflowModel.create\_time\_discretization
-====================================================
-
-.. currentmodule:: imod.flow
-
-.. automethod:: ImodflowModel.create_time_discretization

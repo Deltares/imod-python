@@ -18,6 +18,7 @@
    .. autosummary::
    
       ~DISTRIBUTING_OPTION.by_corrected_transmissivity
+      ~DISTRIBUTING_OPTION.by_corrected_thickness
       ~DISTRIBUTING_OPTION.equally
       ~DISTRIBUTING_OPTION.by_crosscut_thickness
       ~DISTRIBUTING_OPTION.by_layer_thickness

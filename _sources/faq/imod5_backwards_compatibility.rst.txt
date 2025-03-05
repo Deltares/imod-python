@@ -18,6 +18,26 @@ Known issues
 - MetaSWAP's "flexible drainage" ("Peilgestuurde drainage" in Dutch) is not
   supported.
 - IPEST is not supported.
+- *Edge case*: When a well is located on the x-boundary of a cell in the model
+  grid, the well is placed by iMOD5 in the western cell, whereas iMOD Python
+  places the well in the eastern cell. This is because iMOD Python conforms to
+  GDAL in how it looks up points in a grid. The workaround is to move the well
+  slightly away from the boundary, by subtracting a small value from the
+  x-coordinate of the well (e.g. 0.1 mm).
+- There is a bug in iMOD5 in how the HFB's hydraulic characteristic is computed.
+  iMDO5 adds the background resistance of the aquifer to the HFB resistance when
+  writing the MODFLOW6 input files. The background resistance is already
+  accounted for by MODFLOW6 internally, so in practice this means the background
+  resistance is added twice. This is especially noticeable when a HFB intersects
+  a low permeable layer. The workaround in iMOD5 is to specify a negative HFB
+  factor in the projectfile, which makes iMOD5 to skip adding the background
+  resistance.
+- By specifying a negative HFB factor in the projectfile, the iMOD5
+  documentation mentions this will turn on the option to override a resistance
+  in between cells with the HFB resistance. This is NOT supported by MODFLOW6,
+  as MODFLOW6 always adds the background resistance to the HFB resistance to
+  compute the resistance inbetween cells.
+
 
 Notes
 -----
@@ -110,7 +130,7 @@ Here an overview of iMOD5 MODFLOW6 features:
     DRN,Align iMOD5 input grids ,:meth:`imod.mf6.Drainage.from_imod5_data`
     DRN,Regrid,:meth:`imod.mf6.Drainage.regrid_like`
     DRN,Clip,:meth:`imod.mf6.Drainage.clip_box`
-    RIV,Infiltration factors (IFF),":meth:`imod.mf6.River.from_imod5_data`, :meth:`imod.mf6.River.split_conductance`"
+    RIV,Infiltration factors (IFF),":meth:`imod.mf6.River.from_imod5_data`, :meth:`imod.prepare.split_conductance_with_infiltration_factor`"
     RIV,Auto placement (IDEFLAYER),":meth:`imod.mf6.River.from_imod5_data`, :func:`imod.prepare.allocate_riv_cells`"
     RIV,Distribute conductances (DISTRCOND),":meth:`imod.mf6.River.from_imod5_data`, :func:`imod.prepare.distribute_riv_conductance`"
     RIV,Cleanup,":meth:`imod.mf6.River.cleanup`, :func:`imod.prepare.cleanup_riv`"

@@ -1,6 +1,0 @@
-﻿imod.mf6.River.split\_conductance
-=================================
-
-.. currentmodule:: imod.mf6
-
-.. automethod:: River.split_conductance

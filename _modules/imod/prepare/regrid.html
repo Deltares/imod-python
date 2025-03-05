@@ -7,7 +7,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>imod.prepare.regrid &#8212; iMOD Python 1.0.0rc1 documentation</title>
+    <title>imod.prepare.regrid &#8212; iMOD Python 1.0.0rc2 documentation</title>
   
   
   
@@ -15,8 +15,8 @@
     document.documentElement.dataset.mode = localStorage.getItem("mode") || "light";
     document.documentElement.dataset.theme = localStorage.getItem("theme") || "light";
   </script>
-  <!-- 
-    this give us a css class that will be invisible only if js is disabled 
+  <!--
+    this give us a css class that will be invisible only if js is disabled
   -->
   <noscript>
     <style>
@@ -26,22 +26,22 @@
   </noscript>
   
   <!-- Loaded before other Sphinx assets -->
-  <link href="../../../_static/styles/theme.css?digest=26a4bc78f4c0ddb94549" rel="stylesheet" />
-<link href="../../../_static/styles/pydata-sphinx-theme.css?digest=26a4bc78f4c0ddb94549" rel="stylesheet" />
+  <link href="../../../_static/styles/theme.css?digest=8878045cc6db502f8baf" rel="stylesheet" />
+<link href="../../../_static/styles/pydata-sphinx-theme.css?digest=8878045cc6db502f8baf" rel="stylesheet" />
 
-    <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=fa44fd50" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=03e43079" />
     <link rel="stylesheet" type="text/css" href="../../../_static/sg_gallery.css?v=d2d258e8" />
     <link rel="stylesheet" type="text/css" href="../../../_static/sg_gallery-binder.css?v=f4aeca0c" />
     <link rel="stylesheet" type="text/css" href="../../../_static/sg_gallery-dataframe.css?v=2082cf3c" />
     <link rel="stylesheet" type="text/css" href="../../../_static/sg_gallery-rendered-html.css?v=1277b6f3" />
   
   <!-- So that users can add custom icons -->
-  <script src="../../../_static/scripts/fontawesome.js?digest=26a4bc78f4c0ddb94549"></script>
+  <script src="../../../_static/scripts/fontawesome.js?digest=8878045cc6db502f8baf"></script>
   <!-- Pre-loaded scripts that we'll load fully later -->
-  <link rel="preload" as="script" href="../../../_static/scripts/bootstrap.js?digest=26a4bc78f4c0ddb94549" />
-<link rel="preload" as="script" href="../../../_static/scripts/pydata-sphinx-theme.js?digest=26a4bc78f4c0ddb94549" />
+  <link rel="preload" as="script" href="../../../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
+<link rel="preload" as="script" href="../../../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
 
-    <script src="../../../_static/documentation_options.js?v=77c1c56c"></script>
+    <script src="../../../_static/documentation_options.js?v=40394f06"></script>
     <script src="../../../_static/doctools.js?v=9bcbadda"></script>
     <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script>DOCUMENTATION_OPTIONS.pagename = '_modules/imod/prepare/regrid';</script>
@@ -50,7 +50,7 @@
     <link rel="search" title="Search" href="../../../search.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
-  <meta name="docsearch:version" content="1.0.0rc1.dev" />
+  <meta name="docsearch:version" content="1.0.0rc2.dev" />
   </head>
   
   
@@ -114,8 +114,8 @@
     
     
     
-    <img src="../../../_static/imod-python-logo-light.svg" class="logo__image only-light" alt="iMOD Python 1.0.0rc1 documentation - Home"/>
-    <img src="../../../_static/imod-python-logo-dark.svg" class="logo__image only-dark pst-js-only" alt="iMOD Python 1.0.0rc1 documentation - Home"/>
+    <img src="../../../_static/imod-python-logo-light.svg" class="logo__image only-light" alt="iMOD Python 1.0.0rc2 documentation - Home"/>
+    <img src="../../../_static/imod-python-logo-dark.svg" class="logo__image only-dark pst-js-only" alt="iMOD Python 1.0.0rc2 documentation - Home"/>
   
   
 </a></div>
@@ -165,7 +165,9 @@
 </li>
 
             <li class="nav-item dropdown">
-                <button class="btn dropdown-toggle nav-item" type="button" data-bs-toggle="dropdown" aria-expanded="false" aria-controls="pst-nav-more-links">
+                <button class="btn dropdown-toggle nav-item" type="button"
+                data-bs-toggle="dropdown" aria-expanded="false"
+                aria-controls="pst-nav-more-links">
                     More
                 </button>
                 <ul id="pst-nav-more-links" class="dropdown-menu">
@@ -371,9 +373,14 @@
   
   
   <div class="sidebar-primary-items__end sidebar-primary__section">
+      <div class="sidebar-primary-item">
+<div id="ethical-ad-placement"
+      class="flat"
+      data-ea-publisher="readthedocs"
+      data-ea-type="readthedocs-sidebar"
+      data-ea-manual="true">
+</div></div>
   </div>
-  
-  <div id="rtd-footer-container"></div>
 
 
       </div>
@@ -447,17 +454,17 @@
 <span class="sd">The single aggregated value is then filled into the destination array (dst).</span>
 <span class="sd">&quot;&quot;&quot;</span>
 
-<span class="kn">import</span> <span class="nn">textwrap</span>
-<span class="kn">import</span> <span class="nn">warnings</span>
-<span class="kn">from</span> <span class="nn">collections</span> <span class="kn">import</span> <span class="n">namedtuple</span>
-<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">List</span><span class="p">,</span> <span class="n">Sequence</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">textwrap</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">warnings</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">collections</span><span class="w"> </span><span class="kn">import</span> <span class="n">namedtuple</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">List</span><span class="p">,</span> <span class="n">Sequence</span>
 
-<span class="kn">import</span> <span class="nn">dask</span>
-<span class="kn">import</span> <span class="nn">numba</span>
-<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
-<span class="kn">import</span> <span class="nn">xarray</span> <span class="k">as</span> <span class="nn">xr</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">dask</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">numba</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">xarray</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">xr</span>
 
-<span class="kn">from</span> <span class="nn">imod.prepare</span> <span class="kn">import</span> <span class="n">common</span><span class="p">,</span> <span class="n">interpolate</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">imod.prepare</span><span class="w"> </span><span class="kn">import</span> <span class="n">common</span><span class="p">,</span> <span class="n">interpolate</span>
 
 <span class="n">_RegridInfo</span> <span class="o">=</span> <span class="n">namedtuple</span><span class="p">(</span>
     <span class="s2">&quot;_RegridInfo&quot;</span><span class="p">,</span>
@@ -475,7 +482,7 @@
 
 
 <span class="nd">@numba</span><span class="o">.</span><span class="n">njit</span><span class="p">(</span><span class="n">cache</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-<span class="k">def</span> <span class="nf">_regrid_1d</span><span class="p">(</span><span class="n">src</span><span class="p">,</span> <span class="n">dst</span><span class="p">,</span> <span class="n">values</span><span class="p">,</span> <span class="n">weights</span><span class="p">,</span> <span class="n">method</span><span class="p">,</span> <span class="o">*</span><span class="n">inds_weights</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">_regrid_1d</span><span class="p">(</span><span class="n">src</span><span class="p">,</span> <span class="n">dst</span><span class="p">,</span> <span class="n">values</span><span class="p">,</span> <span class="n">weights</span><span class="p">,</span> <span class="n">method</span><span class="p">,</span> <span class="o">*</span><span class="n">inds_weights</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    numba compiled function to regrid in three dimensions</span>
 
@@ -514,7 +521,7 @@
 
 
 <span class="nd">@numba</span><span class="o">.</span><span class="n">njit</span><span class="p">(</span><span class="n">cache</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-<span class="k">def</span> <span class="nf">_regrid_2d</span><span class="p">(</span><span class="n">src</span><span class="p">,</span> <span class="n">dst</span><span class="p">,</span> <span class="n">values</span><span class="p">,</span> <span class="n">weights</span><span class="p">,</span> <span class="n">method</span><span class="p">,</span> <span class="o">*</span><span class="n">inds_weights</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">_regrid_2d</span><span class="p">(</span><span class="n">src</span><span class="p">,</span> <span class="n">dst</span><span class="p">,</span> <span class="n">values</span><span class="p">,</span> <span class="n">weights</span><span class="p">,</span> <span class="n">method</span><span class="p">,</span> <span class="o">*</span><span class="n">inds_weights</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    numba compiled function to regrid in three dimensions</span>
 
@@ -560,7 +567,7 @@
 
 
 <span class="nd">@numba</span><span class="o">.</span><span class="n">njit</span><span class="p">(</span><span class="n">cache</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-<span class="k">def</span> <span class="nf">_regrid_3d</span><span class="p">(</span><span class="n">src</span><span class="p">,</span> <span class="n">dst</span><span class="p">,</span> <span class="n">values</span><span class="p">,</span> <span class="n">weights</span><span class="p">,</span> <span class="n">method</span><span class="p">,</span> <span class="o">*</span><span class="n">inds_weights</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">_regrid_3d</span><span class="p">(</span><span class="n">src</span><span class="p">,</span> <span class="n">dst</span><span class="p">,</span> <span class="n">values</span><span class="p">,</span> <span class="n">weights</span><span class="p">,</span> <span class="n">method</span><span class="p">,</span> <span class="o">*</span><span class="n">inds_weights</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    numba compiled function to regrid in three dimensions</span>
 
@@ -622,7 +629,7 @@
 
 
 <span class="nd">@numba</span><span class="o">.</span><span class="n">njit</span>
-<span class="k">def</span> <span class="nf">_iter_regrid</span><span class="p">(</span><span class="n">iter_src</span><span class="p">,</span> <span class="n">iter_dst</span><span class="p">,</span> <span class="n">alloc_len</span><span class="p">,</span> <span class="n">regrid_function</span><span class="p">,</span> <span class="o">*</span><span class="n">inds_weights</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">_iter_regrid</span><span class="p">(</span><span class="n">iter_src</span><span class="p">,</span> <span class="n">iter_dst</span><span class="p">,</span> <span class="n">alloc_len</span><span class="p">,</span> <span class="n">regrid_function</span><span class="p">,</span> <span class="o">*</span><span class="n">inds_weights</span><span class="p">):</span>
     <span class="n">n_iter</span> <span class="o">=</span> <span class="n">iter_src</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
     <span class="c1"># Pre-allocate temporary storage arrays</span>
     <span class="n">values</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">alloc_len</span><span class="p">)</span>
@@ -634,7 +641,7 @@
     <span class="k">return</span> <span class="n">iter_dst</span>
 
 
-<span class="k">def</span> <span class="nf">_jit_regrid</span><span class="p">(</span><span class="n">jit_method</span><span class="p">,</span> <span class="n">ndim_regrid</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">_jit_regrid</span><span class="p">(</span><span class="n">jit_method</span><span class="p">,</span> <span class="n">ndim_regrid</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Compile a specific aggregation function using the compiled external method</span>
 <span class="sd">    Closure avoids numba overhead</span>
@@ -642,15 +649,15 @@
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="nd">@numba</span><span class="o">.</span><span class="n">njit</span>
-    <span class="k">def</span> <span class="nf">jit_regrid_1d</span><span class="p">(</span><span class="n">src</span><span class="p">,</span> <span class="n">dst</span><span class="p">,</span> <span class="n">values</span><span class="p">,</span> <span class="n">weights</span><span class="p">,</span> <span class="o">*</span><span class="n">inds_weights</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">jit_regrid_1d</span><span class="p">(</span><span class="n">src</span><span class="p">,</span> <span class="n">dst</span><span class="p">,</span> <span class="n">values</span><span class="p">,</span> <span class="n">weights</span><span class="p">,</span> <span class="o">*</span><span class="n">inds_weights</span><span class="p">):</span>
         <span class="k">return</span> <span class="n">_regrid_1d</span><span class="p">(</span><span class="n">src</span><span class="p">,</span> <span class="n">dst</span><span class="p">,</span> <span class="n">values</span><span class="p">,</span> <span class="n">weights</span><span class="p">,</span> <span class="n">jit_method</span><span class="p">,</span> <span class="o">*</span><span class="n">inds_weights</span><span class="p">)</span>
 
     <span class="nd">@numba</span><span class="o">.</span><span class="n">njit</span>
-    <span class="k">def</span> <span class="nf">jit_regrid_2d</span><span class="p">(</span><span class="n">src</span><span class="p">,</span> <span class="n">dst</span><span class="p">,</span> <span class="n">values</span><span class="p">,</span> <span class="n">weights</span><span class="p">,</span> <span class="o">*</span><span class="n">inds_weights</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">jit_regrid_2d</span><span class="p">(</span><span class="n">src</span><span class="p">,</span> <span class="n">dst</span><span class="p">,</span> <span class="n">values</span><span class="p">,</span> <span class="n">weights</span><span class="p">,</span> <span class="o">*</span><span class="n">inds_weights</span><span class="p">):</span>
         <span class="k">return</span> <span class="n">_regrid_2d</span><span class="p">(</span><span class="n">src</span><span class="p">,</span> <span class="n">dst</span><span class="p">,</span> <span class="n">values</span><span class="p">,</span> <span class="n">weights</span><span class="p">,</span> <span class="n">jit_method</span><span class="p">,</span> <span class="o">*</span><span class="n">inds_weights</span><span class="p">)</span>
 
     <span class="nd">@numba</span><span class="o">.</span><span class="n">njit</span>
-    <span class="k">def</span> <span class="nf">jit_regrid_3d</span><span class="p">(</span><span class="n">src</span><span class="p">,</span> <span class="n">dst</span><span class="p">,</span> <span class="n">values</span><span class="p">,</span> <span class="n">weights</span><span class="p">,</span> <span class="o">*</span><span class="n">inds_weights</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">jit_regrid_3d</span><span class="p">(</span><span class="n">src</span><span class="p">,</span> <span class="n">dst</span><span class="p">,</span> <span class="n">values</span><span class="p">,</span> <span class="n">weights</span><span class="p">,</span> <span class="o">*</span><span class="n">inds_weights</span><span class="p">):</span>
         <span class="k">return</span> <span class="n">_regrid_3d</span><span class="p">(</span><span class="n">src</span><span class="p">,</span> <span class="n">dst</span><span class="p">,</span> <span class="n">values</span><span class="p">,</span> <span class="n">weights</span><span class="p">,</span> <span class="n">jit_method</span><span class="p">,</span> <span class="o">*</span><span class="n">inds_weights</span><span class="p">)</span>
 
     <span class="k">if</span> <span class="n">ndim_regrid</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
@@ -665,7 +672,7 @@
     <span class="k">return</span> <span class="n">jit_regrid</span>
 
 
-<span class="k">def</span> <span class="nf">_make_regrid</span><span class="p">(</span><span class="n">method</span><span class="p">,</span> <span class="n">ndim_regrid</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">_make_regrid</span><span class="p">(</span><span class="n">method</span><span class="p">,</span> <span class="n">ndim_regrid</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Closure avoids numba overhead</span>
 <span class="sd">    https://numba.pydata.org/numba-doc/dev/user/faq.html#can-i-pass-a-function-as-an-argument-to-a-jitted-function</span>
@@ -677,13 +684,13 @@
 
     <span class="c1"># Finally, compile the iterating regrid method with the specific aggregation function</span>
     <span class="nd">@numba</span><span class="o">.</span><span class="n">njit</span>
-    <span class="k">def</span> <span class="nf">iter_regrid</span><span class="p">(</span><span class="n">iter_src</span><span class="p">,</span> <span class="n">iter_dst</span><span class="p">,</span> <span class="n">alloc_len</span><span class="p">,</span> <span class="o">*</span><span class="n">inds_weights</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">iter_regrid</span><span class="p">(</span><span class="n">iter_src</span><span class="p">,</span> <span class="n">iter_dst</span><span class="p">,</span> <span class="n">alloc_len</span><span class="p">,</span> <span class="o">*</span><span class="n">inds_weights</span><span class="p">):</span>
         <span class="k">return</span> <span class="n">_iter_regrid</span><span class="p">(</span><span class="n">iter_src</span><span class="p">,</span> <span class="n">iter_dst</span><span class="p">,</span> <span class="n">alloc_len</span><span class="p">,</span> <span class="n">jit_regrid</span><span class="p">,</span> <span class="o">*</span><span class="n">inds_weights</span><span class="p">)</span>
 
     <span class="k">return</span> <span class="n">iter_regrid</span>
 
 
-<span class="k">def</span> <span class="nf">_nd_regrid</span><span class="p">(</span><span class="n">src</span><span class="p">,</span> <span class="n">dst</span><span class="p">,</span> <span class="n">src_coords</span><span class="p">,</span> <span class="n">dst_coords</span><span class="p">,</span> <span class="n">iter_regrid</span><span class="p">,</span> <span class="n">use_relative_weights</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">_nd_regrid</span><span class="p">(</span><span class="n">src</span><span class="p">,</span> <span class="n">dst</span><span class="p">,</span> <span class="n">src_coords</span><span class="p">,</span> <span class="n">dst_coords</span><span class="p">,</span> <span class="n">iter_regrid</span><span class="p">,</span> <span class="n">use_relative_weights</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Regrids an ndarray up to maximum 3 dimensions.</span>
 <span class="sd">    Dimensionality of regridding is determined by the the length of src_coords</span>
@@ -721,21 +728,39 @@
 
 
 <span class="n">WARNING_MSG</span> <span class="o">=</span> <span class="n">textwrap</span><span class="o">.</span><span class="n">dedent</span><span class="p">(</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;{name} is deprecated and we plan to remove it in the</span>
-<span class="sd">    final v1.0 release. Use the regridder in xugrid instead. To regrid a single</span>
-<span class="sd">    array, see:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;{name} is deprecated so we will remove it eventually. Use the</span>
+<span class="sd">    the regridder in ``xugrid`` instead, which is around 10 times faster. To</span>
+<span class="sd">    regrid a single array, see:</span>
 <span class="sd">    https://deltares.github.io/xugrid/examples/regridder_overview.html. To</span>
-<span class="sd">    regrid Modflow6 packages or entire simulations, see the user guide:</span>
-<span class="sd">    https://deltares.github.io/imod-python/user-guide/08-regridding.html.&quot;&quot;&quot;</span>
+<span class="sd">    regrid Modflow6 packages or entire simulations, see the iMOD Python user</span>
+<span class="sd">    guide:</span>
+<span class="sd">    https://deltares.github.io/imod-python/user-guide/08-regridding.html.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
 <span class="p">)</span>
 
 
 <div class="viewcode-block" id="Regridder">
 <a class="viewcode-back" href="../../../api/generated/prepare/imod.prepare.Regridder.html#imod.prepare.Regridder">[docs]</a>
-<span class="k">class</span> <span class="nc">Regridder</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">Regridder</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Object to repeatedly regrid similar objects. Compiles once on first call,</span>
 <span class="sd">    can then be repeatedly called without JIT compilation overhead.</span>
+
+<span class="sd">    .. caution::</span>
+
+<span class="sd">        ``imod.prepare.Regridder`` is deprecated so we will remove it</span>
+<span class="sd">        eventually. Use the regridder in ``xugrid`` instead, which is around 10</span>
+<span class="sd">        times faster. It is as simple as:</span>
+
+<span class="sd">        &gt;&gt;&gt; import xugrid as xu</span>
+<span class="sd">        &gt;&gt;&gt; regridder = xu.OverlapRegridder(source=source, target=like, method=&quot;mean&quot;)</span>
+<span class="sd">        &gt;&gt;&gt; result = regridder.regrid(source)</span>
+
+<span class="sd">        For more information, see:</span>
+<span class="sd">        https://deltares.github.io/xugrid/examples/regridder_overview.html. To</span>
+<span class="sd">        regrid MODFLOW6 packages or entire MODFLOW6 simulations, see the iMOD</span>
+<span class="sd">        Python user guide:</span>
+<span class="sd">        https://deltares.github.io/imod-python/user-guide/08-regridding.html.</span>
 
 <span class="sd">    Attributes</span>
 <span class="sd">    ----------</span>
@@ -803,7 +828,7 @@
 
 <div class="viewcode-block" id="Regridder.__init__">
 <a class="viewcode-back" href="../../../api/generated/prepare/imod.prepare.Regridder.html#imod.prepare.Regridder.__init__">[docs]</a>
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span> <span class="n">method</span><span class="p">,</span> <span class="n">ndim_regrid</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">use_relative_weights</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">extra_overlap</span><span class="o">=</span><span class="mi">0</span>
     <span class="p">):</span>
         <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span>
@@ -823,11 +848,11 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">extra_overlap</span> <span class="o">=</span> <span class="n">extra_overlap</span></div>
 
 
-    <span class="k">def</span> <span class="nf">_make_regrid</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_make_regrid</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="n">iter_regrid</span> <span class="o">=</span> <span class="n">_make_regrid</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">method</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">ndim_regrid</span><span class="p">)</span>
         <span class="n">iter_interp</span> <span class="o">=</span> <span class="n">interpolate</span><span class="o">.</span><span class="n">_make_interp</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">ndim_regrid</span><span class="p">)</span>
 
-        <span class="k">def</span> <span class="nf">nd_regrid</span><span class="p">(</span><span class="n">src</span><span class="p">,</span> <span class="n">dst</span><span class="p">,</span> <span class="n">src_coords_regrid</span><span class="p">,</span> <span class="n">dst_coords_regrid</span><span class="p">):</span>
+        <span class="k">def</span><span class="w"> </span><span class="nf">nd_regrid</span><span class="p">(</span><span class="n">src</span><span class="p">,</span> <span class="n">dst</span><span class="p">,</span> <span class="n">src_coords_regrid</span><span class="p">,</span> <span class="n">dst_coords_regrid</span><span class="p">):</span>
             <span class="k">return</span> <span class="n">_nd_regrid</span><span class="p">(</span>
                 <span class="n">src</span><span class="p">,</span>
                 <span class="n">dst</span><span class="p">,</span>
@@ -837,7 +862,7 @@
                 <span class="bp">self</span><span class="o">.</span><span class="n">use_relative_weights</span><span class="p">,</span>
             <span class="p">)</span>
 
-        <span class="k">def</span> <span class="nf">nd_interp</span><span class="p">(</span><span class="n">src</span><span class="p">,</span> <span class="n">dst</span><span class="p">,</span> <span class="n">src_coords_regrid</span><span class="p">,</span> <span class="n">dst_coords_regrid</span><span class="p">):</span>
+        <span class="k">def</span><span class="w"> </span><span class="nf">nd_interp</span><span class="p">(</span><span class="n">src</span><span class="p">,</span> <span class="n">dst</span><span class="p">,</span> <span class="n">src_coords_regrid</span><span class="p">,</span> <span class="n">dst_coords_regrid</span><span class="p">):</span>
             <span class="k">return</span> <span class="n">interpolate</span><span class="o">.</span><span class="n">_nd_interp</span><span class="p">(</span>
                 <span class="n">src</span><span class="p">,</span> <span class="n">dst</span><span class="p">,</span> <span class="n">src_coords_regrid</span><span class="p">,</span> <span class="n">dst_coords_regrid</span><span class="p">,</span> <span class="n">iter_interp</span>
             <span class="p">)</span>
@@ -849,14 +874,14 @@
         <span class="k">else</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_nd_regrid</span> <span class="o">=</span> <span class="n">nd_regrid</span>
 
-    <span class="k">def</span> <span class="nf">_check_ndim_regrid</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">regrid_dims</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_check_ndim_regrid</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">regrid_dims</span><span class="p">):</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="nb">len</span><span class="p">(</span><span class="n">regrid_dims</span><span class="p">)</span> <span class="o">==</span> <span class="bp">self</span><span class="o">.</span><span class="n">ndim_regrid</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
                 <span class="s2">&quot;Number of dimensions to regrid does not match: &quot;</span>
                 <span class="sa">f</span><span class="s2">&quot;Regridder.ndim_regrid = </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">ndim_regrid</span><span class="si">}</span><span class="s2">&quot;</span>
             <span class="p">)</span>
 
-    <span class="k">def</span> <span class="nf">_prepare</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">regrid_dims</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_prepare</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">regrid_dims</span><span class="p">):</span>
         <span class="c1"># Create tailor made regridding function: take method and ndims into</span>
         <span class="c1"># account and call it</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">ndim_regrid</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
@@ -873,7 +898,7 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">_make_regrid</span><span class="p">()</span>
 
     <span class="nd">@staticmethod</span>
-    <span class="k">def</span> <span class="nf">_regrid_info</span><span class="p">(</span><span class="n">src</span><span class="p">,</span> <span class="n">like</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_regrid_info</span><span class="p">(</span><span class="n">src</span><span class="p">,</span> <span class="n">like</span><span class="p">):</span>
         <span class="c1"># Find coordinates that already match, and those that have to be</span>
         <span class="c1"># regridded, and those that exist in source but not in like (left</span>
         <span class="c1"># untouched)</span>
@@ -909,7 +934,7 @@
             <span class="n">dst_coords_regrid</span><span class="o">=</span><span class="n">dst_coords_regrid</span><span class="p">,</span>
         <span class="p">)</span>
 
-    <span class="k">def</span> <span class="nf">_regrid</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">src</span><span class="p">,</span> <span class="n">fill_value</span><span class="p">,</span> <span class="n">info</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_regrid</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">src</span><span class="p">,</span> <span class="n">fill_value</span><span class="p">,</span> <span class="n">info</span><span class="p">):</span>
         <span class="c1"># Allocate dst</span>
         <span class="n">dst</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">full</span><span class="p">(</span><span class="n">info</span><span class="o">.</span><span class="n">dst_shape</span><span class="p">,</span> <span class="n">fill_value</span><span class="p">)</span>
         <span class="c1"># No overlap whatsoever, early exit</span>
@@ -928,7 +953,7 @@
             <span class="p">)</span>
             <span class="k">return</span> <span class="n">dst</span>
 
-    <span class="k">def</span> <span class="nf">_delayed_regrid</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">src</span><span class="p">,</span> <span class="n">like</span><span class="p">,</span> <span class="n">fill_value</span><span class="p">,</span> <span class="n">info</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_delayed_regrid</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">src</span><span class="p">,</span> <span class="n">like</span><span class="p">,</span> <span class="n">fill_value</span><span class="p">,</span> <span class="n">info</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Deal with chunks in dimensions that will NOT be regridded.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
@@ -959,7 +984,7 @@
         <span class="n">data</span> <span class="o">=</span> <span class="n">dask</span><span class="o">.</span><span class="n">array</span><span class="o">.</span><span class="n">block</span><span class="p">(</span><span class="n">reshaped_collection</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">data</span>
 
-    <span class="k">def</span> <span class="nf">_chunked_regrid</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">src</span><span class="p">,</span> <span class="n">like</span><span class="p">,</span> <span class="n">fill_value</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_chunked_regrid</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">src</span><span class="p">,</span> <span class="n">like</span><span class="p">,</span> <span class="n">fill_value</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Deal with chunks in dimensions that will be regridded.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
@@ -1005,7 +1030,7 @@
         <span class="n">data</span> <span class="o">=</span> <span class="n">dask</span><span class="o">.</span><span class="n">array</span><span class="o">.</span><span class="n">block</span><span class="p">(</span><span class="n">reshaped_collection</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">data</span>
 
-    <span class="k">def</span> <span class="nf">regrid</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">source</span><span class="p">,</span> <span class="n">like</span><span class="p">,</span> <span class="n">fill_value</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">regrid</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">source</span><span class="p">,</span> <span class="n">like</span><span class="p">,</span> <span class="n">fill_value</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Regrid ``source`` along dimensions that ``source`` and ``like`` share.</span>
 <span class="sd">        These dimensions will be inferred the first time ``.regrid`` is called</span>
@@ -1110,8 +1135,8 @@
   </div>
   
   <!-- Scripts loaded after <body> so the DOM is not blocked -->
-  <script defer src="../../../_static/scripts/bootstrap.js?digest=26a4bc78f4c0ddb94549"></script>
-<script defer src="../../../_static/scripts/pydata-sphinx-theme.js?digest=26a4bc78f4c0ddb94549"></script>
+  <script defer src="../../../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf"></script>
+<script defer src="../../../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf"></script>
 
   <footer class="bd-footer">
 <div class="bd-footer__inner bd-page-width">
@@ -1131,7 +1156,7 @@
         <div class="footer-item">
 
   <p class="sphinx-version">
-    Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 8.1.3.
+    Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 8.2.1.
     <br/>
   </p>
 </div>
@@ -1144,7 +1169,8 @@
       
         <div class="footer-item">
 <p class="theme-version">
-  Built with the <a href="https://pydata-sphinx-theme.readthedocs.io/en/stable/index.html">PyData Sphinx Theme</a> 0.16.0.
+  <!-- # L10n: Setting the PST URL as an argument as this does not need to be localized -->
+  Built with the <a href="https://pydata-sphinx-theme.readthedocs.io/en/stable/index.html">PyData Sphinx Theme</a> 0.16.1.
 </p></div>
       
     </div>

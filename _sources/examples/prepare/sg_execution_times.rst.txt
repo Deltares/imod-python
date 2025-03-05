@@ -6,7 +6,7 @@
 
 Computation times
 =================
-**00:08.601** total execution time for 4 files **from examples\prepare**:
+**00:05.335** total execution time for 4 files **from examples\prepare**:
 
 .. container::
 
@@ -33,13 +33,13 @@ Computation times
      - Time
      - Mem (MB)
    * - :ref:`sphx_glr_examples_prepare_point_interpolation.py` (``point_interpolation.py``)
-     - 00:06.056
+     - 00:03.007
      - 0.0
    * - :ref:`sphx_glr_examples_prepare_reproject.py` (``reproject.py``)
-     - 00:01.047
+     - 00:00.875
      - 0.0
    * - :ref:`sphx_glr_examples_prepare_polygonize_raster.py` (``polygonize_raster.py``)
-     - 00:00.779
+     - 00:00.734
      - 0.0
    * - :ref:`sphx_glr_examples_prepare_rasterize_shp.py` (``rasterize_shp.py``)
      - 00:00.719

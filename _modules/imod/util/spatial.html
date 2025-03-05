@@ -7,7 +7,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>imod.util.spatial &#8212; iMOD Python 1.0.0rc1 documentation</title>
+    <title>imod.util.spatial &#8212; iMOD Python 1.0.0rc2 documentation</title>
   
   
   
@@ -15,8 +15,8 @@
     document.documentElement.dataset.mode = localStorage.getItem("mode") || "light";
     document.documentElement.dataset.theme = localStorage.getItem("theme") || "light";
   </script>
-  <!-- 
-    this give us a css class that will be invisible only if js is disabled 
+  <!--
+    this give us a css class that will be invisible only if js is disabled
   -->
   <noscript>
     <style>
@@ -26,22 +26,22 @@
   </noscript>
   
   <!-- Loaded before other Sphinx assets -->
-  <link href="../../../_static/styles/theme.css?digest=26a4bc78f4c0ddb94549" rel="stylesheet" />
-<link href="../../../_static/styles/pydata-sphinx-theme.css?digest=26a4bc78f4c0ddb94549" rel="stylesheet" />
+  <link href="../../../_static/styles/theme.css?digest=8878045cc6db502f8baf" rel="stylesheet" />
+<link href="../../../_static/styles/pydata-sphinx-theme.css?digest=8878045cc6db502f8baf" rel="stylesheet" />
 
-    <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=fa44fd50" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=03e43079" />
     <link rel="stylesheet" type="text/css" href="../../../_static/sg_gallery.css?v=d2d258e8" />
     <link rel="stylesheet" type="text/css" href="../../../_static/sg_gallery-binder.css?v=f4aeca0c" />
     <link rel="stylesheet" type="text/css" href="../../../_static/sg_gallery-dataframe.css?v=2082cf3c" />
     <link rel="stylesheet" type="text/css" href="../../../_static/sg_gallery-rendered-html.css?v=1277b6f3" />
   
   <!-- So that users can add custom icons -->
-  <script src="../../../_static/scripts/fontawesome.js?digest=26a4bc78f4c0ddb94549"></script>
+  <script src="../../../_static/scripts/fontawesome.js?digest=8878045cc6db502f8baf"></script>
   <!-- Pre-loaded scripts that we'll load fully later -->
-  <link rel="preload" as="script" href="../../../_static/scripts/bootstrap.js?digest=26a4bc78f4c0ddb94549" />
-<link rel="preload" as="script" href="../../../_static/scripts/pydata-sphinx-theme.js?digest=26a4bc78f4c0ddb94549" />
+  <link rel="preload" as="script" href="../../../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
+<link rel="preload" as="script" href="../../../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
 
-    <script src="../../../_static/documentation_options.js?v=77c1c56c"></script>
+    <script src="../../../_static/documentation_options.js?v=40394f06"></script>
     <script src="../../../_static/doctools.js?v=9bcbadda"></script>
     <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script>DOCUMENTATION_OPTIONS.pagename = '_modules/imod/util/spatial';</script>
@@ -50,7 +50,7 @@
     <link rel="search" title="Search" href="../../../search.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
-  <meta name="docsearch:version" content="1.0.0rc1.dev" />
+  <meta name="docsearch:version" content="1.0.0rc2.dev" />
   </head>
   
   
@@ -114,8 +114,8 @@
     
     
     
-    <img src="../../../_static/imod-python-logo-light.svg" class="logo__image only-light" alt="iMOD Python 1.0.0rc1 documentation - Home"/>
-    <img src="../../../_static/imod-python-logo-dark.svg" class="logo__image only-dark pst-js-only" alt="iMOD Python 1.0.0rc1 documentation - Home"/>
+    <img src="../../../_static/imod-python-logo-light.svg" class="logo__image only-light" alt="iMOD Python 1.0.0rc2 documentation - Home"/>
+    <img src="../../../_static/imod-python-logo-dark.svg" class="logo__image only-dark pst-js-only" alt="iMOD Python 1.0.0rc2 documentation - Home"/>
   
   
 </a></div>
@@ -165,7 +165,9 @@
 </li>
 
             <li class="nav-item dropdown">
-                <button class="btn dropdown-toggle nav-item" type="button" data-bs-toggle="dropdown" aria-expanded="false" aria-controls="pst-nav-more-links">
+                <button class="btn dropdown-toggle nav-item" type="button"
+                data-bs-toggle="dropdown" aria-expanded="false"
+                aria-controls="pst-nav-more-links">
                     More
                 </button>
                 <ul id="pst-nav-more-links" class="dropdown-menu">
@@ -371,9 +373,14 @@
   
   
   <div class="sidebar-primary-items__end sidebar-primary__section">
+      <div class="sidebar-primary-item">
+<div id="ethical-ad-placement"
+      class="flat"
+      data-ea-publisher="readthedocs"
+      data-ea-type="readthedocs-sidebar"
+      data-ea-manual="true">
+</div></div>
   </div>
-  
-  <div id="rtd-footer-container"></div>
 
 
       </div>
@@ -427,47 +434,47 @@
 <span class="sd">used internally, but are not private since they may be useful to users as well.</span>
 <span class="sd">&quot;&quot;&quot;</span>
 
-<span class="kn">import</span> <span class="nn">collections</span>
-<span class="kn">import</span> <span class="nn">re</span>
-<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">TYPE_CHECKING</span><span class="p">,</span> <span class="n">Any</span><span class="p">,</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">Sequence</span><span class="p">,</span> <span class="n">Tuple</span><span class="p">,</span> <span class="n">Union</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">collections</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">re</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">TYPE_CHECKING</span><span class="p">,</span> <span class="n">Any</span><span class="p">,</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">Sequence</span><span class="p">,</span> <span class="n">Tuple</span><span class="p">,</span> <span class="n">Union</span>
 
-<span class="kn">import</span> <span class="nn">affine</span>
-<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
-<span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
-<span class="kn">import</span> <span class="nn">xarray</span> <span class="k">as</span> <span class="nn">xr</span>
-<span class="kn">import</span> <span class="nn">xugrid</span> <span class="k">as</span> <span class="nn">xu</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">affine</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">pandas</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">pd</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">xarray</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">xr</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">xugrid</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">xu</span>
 
-<span class="kn">from</span> <span class="nn">imod.typing</span> <span class="kn">import</span> <span class="n">FloatArray</span><span class="p">,</span> <span class="n">GridDataset</span><span class="p">,</span> <span class="n">IntArray</span>
-<span class="kn">from</span> <span class="nn">imod.util.imports</span> <span class="kn">import</span> <span class="n">MissingOptionalModule</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">imod.typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">FloatArray</span><span class="p">,</span> <span class="n">GridDataset</span><span class="p">,</span> <span class="n">IntArray</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">imod.util.imports</span><span class="w"> </span><span class="kn">import</span> <span class="n">MissingOptionalModule</span>
 
 <span class="c1"># since rasterio, shapely, rioxarray, and geopandas are a big dependencies that are</span>
 <span class="c1"># sometimes hard to install and not always required, we made this an optional</span>
 <span class="c1"># dependency</span>
 <span class="k">try</span><span class="p">:</span>
-    <span class="kn">import</span> <span class="nn">rasterio</span>
+    <span class="kn">import</span><span class="w"> </span><span class="nn">rasterio</span>
 <span class="k">except</span> <span class="ne">ImportError</span><span class="p">:</span>
     <span class="n">rasterio</span> <span class="o">=</span> <span class="n">MissingOptionalModule</span><span class="p">(</span><span class="s2">&quot;rasterio&quot;</span><span class="p">)</span>
 
 <span class="k">try</span><span class="p">:</span>
-    <span class="kn">import</span> <span class="nn">shapely</span>
+    <span class="kn">import</span><span class="w"> </span><span class="nn">shapely</span>
 <span class="k">except</span> <span class="ne">ImportError</span><span class="p">:</span>
     <span class="n">shapely</span> <span class="o">=</span> <span class="n">MissingOptionalModule</span><span class="p">(</span><span class="s2">&quot;shapely&quot;</span><span class="p">)</span>
 
 <span class="k">if</span> <span class="n">TYPE_CHECKING</span><span class="p">:</span>
-    <span class="kn">import</span> <span class="nn">geopandas</span> <span class="k">as</span> <span class="nn">gpd</span>
+    <span class="kn">import</span><span class="w"> </span><span class="nn">geopandas</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">gpd</span>
 <span class="k">else</span><span class="p">:</span>
     <span class="k">try</span><span class="p">:</span>
-        <span class="kn">import</span> <span class="nn">geopandas</span> <span class="k">as</span> <span class="nn">gpd</span>
+        <span class="kn">import</span><span class="w"> </span><span class="nn">geopandas</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">gpd</span>
     <span class="k">except</span> <span class="ne">ImportError</span><span class="p">:</span>
         <span class="n">gpd</span> <span class="o">=</span> <span class="n">MissingOptionalModule</span><span class="p">(</span><span class="s2">&quot;geopandas&quot;</span><span class="p">)</span>
 
 <span class="k">try</span><span class="p">:</span>
-    <span class="kn">import</span> <span class="nn">rioxarray</span>
+    <span class="kn">import</span><span class="w"> </span><span class="nn">rioxarray</span>
 <span class="k">except</span> <span class="ne">ImportError</span><span class="p">:</span>
     <span class="n">rasterio</span> <span class="o">=</span> <span class="n">MissingOptionalModule</span><span class="p">(</span><span class="s2">&quot;rioxarray&quot;</span><span class="p">)</span>
 
 
-<span class="k">def</span> <span class="nf">_xycoords</span><span class="p">(</span><span class="n">bounds</span><span class="p">,</span> <span class="n">cellsizes</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]:</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">_xycoords</span><span class="p">(</span><span class="n">bounds</span><span class="p">,</span> <span class="n">cellsizes</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Based on bounds and cellsizes, construct coords with spatial information&quot;&quot;&quot;</span>
     <span class="c1"># unpack tuples</span>
     <span class="n">xmin</span><span class="p">,</span> <span class="n">xmax</span><span class="p">,</span> <span class="n">ymin</span><span class="p">,</span> <span class="n">ymax</span> <span class="o">=</span> <span class="n">bounds</span>
@@ -496,7 +503,7 @@
 
 <div class="viewcode-block" id="coord_reference">
 <a class="viewcode-back" href="../../../api/generated/util/imod.util.coord_reference.html#imod.util.coord_reference">[docs]</a>
-<span class="k">def</span> <span class="nf">coord_reference</span><span class="p">(</span><span class="n">da_coord</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="nb">float</span><span class="p">,</span> <span class="nb">float</span><span class="p">]:</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">coord_reference</span><span class="p">(</span><span class="n">da_coord</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="nb">float</span><span class="p">,</span> <span class="nb">float</span><span class="p">]:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Extracts dx, xmin, xmax for a coordinate DataArray, where x is any coordinate.</span>
 
@@ -564,7 +571,7 @@
 
 <div class="viewcode-block" id="spatial_reference">
 <a class="viewcode-back" href="../../../api/generated/util/imod.util.spatial_reference.html#imod.util.spatial_reference">[docs]</a>
-<span class="k">def</span> <span class="nf">spatial_reference</span><span class="p">(</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">spatial_reference</span><span class="p">(</span>
     <span class="n">a</span><span class="p">:</span> <span class="n">xr</span><span class="o">.</span><span class="n">DataArray</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="nb">float</span><span class="p">,</span> <span class="nb">float</span><span class="p">,</span> <span class="nb">float</span><span class="p">,</span> <span class="nb">float</span><span class="p">,</span> <span class="nb">float</span><span class="p">]:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
@@ -591,7 +598,7 @@
 
 <div class="viewcode-block" id="transform">
 <a class="viewcode-back" href="../../../api/generated/util/imod.util.transform.html#imod.util.transform">[docs]</a>
-<span class="k">def</span> <span class="nf">transform</span><span class="p">(</span><span class="n">a</span><span class="p">:</span> <span class="n">xr</span><span class="o">.</span><span class="n">DataArray</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">affine</span><span class="o">.</span><span class="n">Affine</span><span class="p">:</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">transform</span><span class="p">(</span><span class="n">a</span><span class="p">:</span> <span class="n">xr</span><span class="o">.</span><span class="n">DataArray</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">affine</span><span class="o">.</span><span class="n">Affine</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Extract the spatial reference information from the DataArray coordinates,</span>
 <span class="sd">    into an affine.Affine object for writing to e.g. rasterio supported formats.</span>
@@ -607,7 +614,7 @@
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">dx</span><span class="p">,</span> <span class="n">xmin</span><span class="p">,</span> <span class="n">_</span><span class="p">,</span> <span class="n">dy</span><span class="p">,</span> <span class="n">_</span><span class="p">,</span> <span class="n">ymax</span> <span class="o">=</span> <span class="n">spatial_reference</span><span class="p">(</span><span class="n">a</span><span class="p">)</span>
 
-    <span class="k">def</span> <span class="nf">equidistant</span><span class="p">(</span><span class="n">dx</span><span class="p">,</span> <span class="n">name</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">equidistant</span><span class="p">(</span><span class="n">dx</span><span class="p">,</span> <span class="n">name</span><span class="p">):</span>
         <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">dx</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">):</span>
             <span class="k">if</span> <span class="n">np</span><span class="o">.</span><span class="n">unique</span><span class="p">(</span><span class="n">dx</span><span class="p">)</span><span class="o">.</span><span class="n">size</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
                 <span class="k">return</span> <span class="n">dx</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
@@ -627,7 +634,7 @@
 
 
 
-<span class="k">def</span> <span class="nf">ugrid2d_data</span><span class="p">(</span><span class="n">da</span><span class="p">:</span> <span class="n">xr</span><span class="o">.</span><span class="n">DataArray</span><span class="p">,</span> <span class="n">face_dim</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">xr</span><span class="o">.</span><span class="n">DataArray</span><span class="p">:</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">ugrid2d_data</span><span class="p">(</span><span class="n">da</span><span class="p">:</span> <span class="n">xr</span><span class="o">.</span><span class="n">DataArray</span><span class="p">,</span> <span class="n">face_dim</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">xr</span><span class="o">.</span><span class="n">DataArray</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Reshape a structured (x, y) DataArray into unstructured (face) form.</span>
 <span class="sd">    Extra dimensions are maintained:</span>
@@ -654,7 +661,7 @@
     <span class="p">)</span>
 
 
-<span class="k">def</span> <span class="nf">unstack_dim_into_variable</span><span class="p">(</span><span class="n">dataset</span><span class="p">:</span> <span class="n">GridDataset</span><span class="p">,</span> <span class="n">dim</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">GridDataset</span><span class="p">:</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">unstack_dim_into_variable</span><span class="p">(</span><span class="n">dataset</span><span class="p">:</span> <span class="n">GridDataset</span><span class="p">,</span> <span class="n">dim</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">GridDataset</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Unstack each variable containing ``dim`` into separate variables.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
@@ -678,7 +685,7 @@
 
 <div class="viewcode-block" id="mdal_compliant_ugrid2d">
 <a class="viewcode-back" href="../../../api/generated/util/imod.util.mdal_compliant_ugrid2d.html#imod.util.mdal_compliant_ugrid2d">[docs]</a>
-<span class="k">def</span> <span class="nf">mdal_compliant_ugrid2d</span><span class="p">(</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">mdal_compliant_ugrid2d</span><span class="p">(</span>
     <span class="n">dataset</span><span class="p">:</span> <span class="n">xr</span><span class="o">.</span><span class="n">Dataset</span><span class="p">,</span> <span class="n">crs</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Any</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">xr</span><span class="o">.</span><span class="n">Dataset</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
@@ -761,7 +768,7 @@
 
 <div class="viewcode-block" id="from_mdal_compliant_ugrid2d">
 <a class="viewcode-back" href="../../../api/generated/util/imod.util.from_mdal_compliant_ugrid2d.html#imod.util.from_mdal_compliant_ugrid2d">[docs]</a>
-<span class="k">def</span> <span class="nf">from_mdal_compliant_ugrid2d</span><span class="p">(</span><span class="n">dataset</span><span class="p">:</span> <span class="n">xu</span><span class="o">.</span><span class="n">UgridDataset</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">xu</span><span class="o">.</span><span class="n">UgridDataset</span><span class="p">:</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">from_mdal_compliant_ugrid2d</span><span class="p">(</span><span class="n">dataset</span><span class="p">:</span> <span class="n">xu</span><span class="o">.</span><span class="n">UgridDataset</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">xu</span><span class="o">.</span><span class="n">UgridDataset</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Undo some of the changes of ``mdal_compliant_ugrid2d``: re-stack the</span>
 <span class="sd">    layers.</span>
@@ -816,7 +823,7 @@
 
 <div class="viewcode-block" id="to_ugrid2d">
 <a class="viewcode-back" href="../../../api/generated/util/imod.util.to_ugrid2d.html#imod.util.to_ugrid2d">[docs]</a>
-<span class="k">def</span> <span class="nf">to_ugrid2d</span><span class="p">(</span><span class="n">data</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">xr</span><span class="o">.</span><span class="n">DataArray</span><span class="p">,</span> <span class="n">xr</span><span class="o">.</span><span class="n">Dataset</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">xr</span><span class="o">.</span><span class="n">Dataset</span><span class="p">:</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">to_ugrid2d</span><span class="p">(</span><span class="n">data</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">xr</span><span class="o">.</span><span class="n">DataArray</span><span class="p">,</span> <span class="n">xr</span><span class="o">.</span><span class="n">Dataset</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">xr</span><span class="o">.</span><span class="n">Dataset</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Convert a structured DataArray or Dataset into its UGRID-2D quadrilateral</span>
 <span class="sd">    equivalent.</span>
@@ -857,7 +864,7 @@
 
 
 
-<span class="k">def</span> <span class="nf">gdal_compliant_grid</span><span class="p">(</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">gdal_compliant_grid</span><span class="p">(</span>
     <span class="n">data</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">xr</span><span class="o">.</span><span class="n">DataArray</span><span class="p">,</span> <span class="n">xr</span><span class="o">.</span><span class="n">Dataset</span><span class="p">],</span>
     <span class="n">crs</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Any</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Union</span><span class="p">[</span><span class="n">xr</span><span class="o">.</span><span class="n">DataArray</span><span class="p">,</span> <span class="n">xr</span><span class="o">.</span><span class="n">Dataset</span><span class="p">]:</span>
@@ -917,7 +924,7 @@
 
 <div class="viewcode-block" id="empty_2d">
 <a class="viewcode-back" href="../../../api/generated/util/imod.util.empty_2d.html#imod.util.empty_2d">[docs]</a>
-<span class="k">def</span> <span class="nf">empty_2d</span><span class="p">(</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">empty_2d</span><span class="p">(</span>
     <span class="n">dx</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="n">FloatArray</span><span class="p">],</span>
     <span class="n">xmin</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
     <span class="n">xmax</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
@@ -965,7 +972,7 @@
 
 <div class="viewcode-block" id="empty_3d">
 <a class="viewcode-back" href="../../../api/generated/util/imod.util.empty_3d.html#imod.util.empty_3d">[docs]</a>
-<span class="k">def</span> <span class="nf">empty_3d</span><span class="p">(</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">empty_3d</span><span class="p">(</span>
     <span class="n">dx</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="n">FloatArray</span><span class="p">],</span>
     <span class="n">xmin</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
     <span class="n">xmax</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
@@ -1020,7 +1027,7 @@
 
 <div class="viewcode-block" id="empty_2d_transient">
 <a class="viewcode-back" href="../../../api/generated/util/imod.util.empty_2d_transient.html#imod.util.empty_2d_transient">[docs]</a>
-<span class="k">def</span> <span class="nf">empty_2d_transient</span><span class="p">(</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">empty_2d_transient</span><span class="p">(</span>
     <span class="n">dx</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="n">FloatArray</span><span class="p">],</span>
     <span class="n">xmin</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
     <span class="n">xmax</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
@@ -1075,7 +1082,7 @@
 
 <div class="viewcode-block" id="empty_3d_transient">
 <a class="viewcode-back" href="../../../api/generated/util/imod.util.empty_3d_transient.html#imod.util.empty_3d_transient">[docs]</a>
-<span class="k">def</span> <span class="nf">empty_3d_transient</span><span class="p">(</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">empty_3d_transient</span><span class="p">(</span>
     <span class="n">dx</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="n">FloatArray</span><span class="p">],</span>
     <span class="n">xmin</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
     <span class="n">xmax</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
@@ -1132,21 +1139,21 @@
 
 
 
-<span class="k">def</span> <span class="nf">_layer</span><span class="p">(</span><span class="n">layer</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="n">Sequence</span><span class="p">[</span><span class="nb">int</span><span class="p">],</span> <span class="n">IntArray</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">IntArray</span><span class="p">:</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">_layer</span><span class="p">(</span><span class="n">layer</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="n">Sequence</span><span class="p">[</span><span class="nb">int</span><span class="p">],</span> <span class="n">IntArray</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">IntArray</span><span class="p">:</span>
     <span class="n">layer</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">atleast_1d</span><span class="p">(</span><span class="n">layer</span><span class="p">)</span>
     <span class="k">if</span> <span class="n">layer</span><span class="o">.</span><span class="n">ndim</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">:</span>
         <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;layer must be 1d&quot;</span><span class="p">)</span>
     <span class="k">return</span> <span class="n">layer</span>
 
 
-<span class="k">def</span> <span class="nf">_time</span><span class="p">(</span><span class="n">time</span><span class="p">:</span> <span class="n">Any</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Any</span><span class="p">:</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">_time</span><span class="p">(</span><span class="n">time</span><span class="p">:</span> <span class="n">Any</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Any</span><span class="p">:</span>
     <span class="n">time</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">atleast_1d</span><span class="p">(</span><span class="n">time</span><span class="p">)</span>
     <span class="k">if</span> <span class="n">time</span><span class="o">.</span><span class="n">ndim</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">:</span>
         <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;time must be 1d&quot;</span><span class="p">)</span>
     <span class="k">return</span> <span class="n">pd</span><span class="o">.</span><span class="n">to_datetime</span><span class="p">(</span><span class="n">time</span><span class="p">)</span>
 
 
-<span class="k">def</span> <span class="nf">is_divisor</span><span class="p">(</span><span class="n">numerator</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="n">FloatArray</span><span class="p">],</span> <span class="n">denominator</span><span class="p">:</span> <span class="nb">float</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">is_divisor</span><span class="p">(</span><span class="n">numerator</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="n">FloatArray</span><span class="p">],</span> <span class="n">denominator</span><span class="p">:</span> <span class="nb">float</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
@@ -1162,7 +1169,7 @@
     <span class="k">return</span> <span class="nb">bool</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">all</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">isclose</span><span class="p">(</span><span class="n">remainder</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">)</span> <span class="o">|</span> <span class="n">np</span><span class="o">.</span><span class="n">isclose</span><span class="p">(</span><span class="n">remainder</span><span class="p">,</span> <span class="n">denominator</span><span class="p">)))</span>
 
 
-<span class="k">def</span> <span class="nf">_polygonize</span><span class="p">(</span><span class="n">da</span><span class="p">:</span> <span class="n">xr</span><span class="o">.</span><span class="n">DataArray</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="s2">&quot;gpd.GeoDataFrame&quot;</span><span class="p">:</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">_polygonize</span><span class="p">(</span><span class="n">da</span><span class="p">:</span> <span class="n">xr</span><span class="o">.</span><span class="n">DataArray</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="s2">&quot;gpd.GeoDataFrame&quot;</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Polygonize a 2D-DataArray into a GeoDataFrame of polygons.</span>
 
@@ -1190,7 +1197,7 @@
     <span class="k">return</span> <span class="n">gdf</span>
 
 
-<span class="k">def</span> <span class="nf">get_total_grid_area</span><span class="p">(</span><span class="n">array</span><span class="p">:</span> <span class="n">xr</span><span class="o">.</span><span class="n">DataArray</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">get_total_grid_area</span><span class="p">(</span><span class="n">array</span><span class="p">:</span> <span class="n">xr</span><span class="o">.</span><span class="n">DataArray</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Returns the total area of all cells summed together in a 2d grid with x and</span>
 <span class="sd">    y coordinates</span>
@@ -1204,7 +1211,7 @@
     <span class="k">return</span> <span class="n">grid_area</span>
 
 
-<span class="k">def</span> <span class="nf">get_cell_area</span><span class="p">(</span><span class="n">array</span><span class="p">:</span> <span class="n">xr</span><span class="o">.</span><span class="n">DataArray</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">xr</span><span class="o">.</span><span class="n">DataArray</span><span class="p">:</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">get_cell_area</span><span class="p">(</span><span class="n">array</span><span class="p">:</span> <span class="n">xr</span><span class="o">.</span><span class="n">DataArray</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">xr</span><span class="o">.</span><span class="n">DataArray</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Returns a grid with in each cell the area of that cell. Implemented for 2d</span>
 <span class="sd">    grids (x, y, dx and dy coordinates)</span>
@@ -1262,8 +1269,8 @@
   </div>
   
   <!-- Scripts loaded after <body> so the DOM is not blocked -->
-  <script defer src="../../../_static/scripts/bootstrap.js?digest=26a4bc78f4c0ddb94549"></script>
-<script defer src="../../../_static/scripts/pydata-sphinx-theme.js?digest=26a4bc78f4c0ddb94549"></script>
+  <script defer src="../../../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf"></script>
+<script defer src="../../../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf"></script>
 
   <footer class="bd-footer">
 <div class="bd-footer__inner bd-page-width">
@@ -1283,7 +1290,7 @@
         <div class="footer-item">
 
   <p class="sphinx-version">
-    Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 8.1.3.
+    Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 8.2.1.
     <br/>
   </p>
 </div>
@@ -1296,7 +1303,8 @@
       
         <div class="footer-item">
 <p class="theme-version">
-  Built with the <a href="https://pydata-sphinx-theme.readthedocs.io/en/stable/index.html">PyData Sphinx Theme</a> 0.16.0.
+  <!-- # L10n: Setting the PST URL as an argument as this does not need to be localized -->
+  Built with the <a href="https://pydata-sphinx-theme.readthedocs.io/en/stable/index.html">PyData Sphinx Theme</a> 0.16.1.
 </p></div>
       
     </div>

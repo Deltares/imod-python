@@ -17,5 +17,6 @@ brings its own complexities. Consequently, this Frequently Asked Questions
    how-do-i/index
    python
    modeling
+   API-design
    known-issues
    imod5_backwards_compatibility

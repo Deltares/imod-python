@@ -112,7 +112,7 @@ Rasterrize the shapes
  .. code-block:: none
 
 
-    <matplotlib.image.AxesImage object at 0x0000017F84763B90>
+    <matplotlib.image.AxesImage object at 0x000002A05263CA50>
 
 
 
@@ -148,7 +148,7 @@ To rasterize on a different grid, create a dummy grid
  .. code-block:: none
 
 
-    <matplotlib.image.AxesImage object at 0x0000017F8AFAE090>
+    <matplotlib.image.AxesImage object at 0x000002A04B1406D0>
 
 
 

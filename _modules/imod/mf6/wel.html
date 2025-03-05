@@ -7,7 +7,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>imod.mf6.wel &#8212; iMOD Python 1.0.0rc1 documentation</title>
+    <title>imod.mf6.wel &#8212; iMOD Python 1.0.0rc2 documentation</title>
   
   
   
@@ -15,8 +15,8 @@
     document.documentElement.dataset.mode = localStorage.getItem("mode") || "light";
     document.documentElement.dataset.theme = localStorage.getItem("theme") || "light";
   </script>
-  <!-- 
-    this give us a css class that will be invisible only if js is disabled 
+  <!--
+    this give us a css class that will be invisible only if js is disabled
   -->
   <noscript>
     <style>
@@ -26,22 +26,22 @@
   </noscript>
   
   <!-- Loaded before other Sphinx assets -->
-  <link href="../../../_static/styles/theme.css?digest=26a4bc78f4c0ddb94549" rel="stylesheet" />
-<link href="../../../_static/styles/pydata-sphinx-theme.css?digest=26a4bc78f4c0ddb94549" rel="stylesheet" />
+  <link href="../../../_static/styles/theme.css?digest=8878045cc6db502f8baf" rel="stylesheet" />
+<link href="../../../_static/styles/pydata-sphinx-theme.css?digest=8878045cc6db502f8baf" rel="stylesheet" />
 
-    <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=fa44fd50" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=03e43079" />
     <link rel="stylesheet" type="text/css" href="../../../_static/sg_gallery.css?v=d2d258e8" />
     <link rel="stylesheet" type="text/css" href="../../../_static/sg_gallery-binder.css?v=f4aeca0c" />
     <link rel="stylesheet" type="text/css" href="../../../_static/sg_gallery-dataframe.css?v=2082cf3c" />
     <link rel="stylesheet" type="text/css" href="../../../_static/sg_gallery-rendered-html.css?v=1277b6f3" />
   
   <!-- So that users can add custom icons -->
-  <script src="../../../_static/scripts/fontawesome.js?digest=26a4bc78f4c0ddb94549"></script>
+  <script src="../../../_static/scripts/fontawesome.js?digest=8878045cc6db502f8baf"></script>
   <!-- Pre-loaded scripts that we'll load fully later -->
-  <link rel="preload" as="script" href="../../../_static/scripts/bootstrap.js?digest=26a4bc78f4c0ddb94549" />
-<link rel="preload" as="script" href="../../../_static/scripts/pydata-sphinx-theme.js?digest=26a4bc78f4c0ddb94549" />
+  <link rel="preload" as="script" href="../../../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
+<link rel="preload" as="script" href="../../../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
 
-    <script src="../../../_static/documentation_options.js?v=77c1c56c"></script>
+    <script src="../../../_static/documentation_options.js?v=40394f06"></script>
     <script src="../../../_static/doctools.js?v=9bcbadda"></script>
     <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script>DOCUMENTATION_OPTIONS.pagename = '_modules/imod/mf6/wel';</script>
@@ -50,7 +50,7 @@
     <link rel="search" title="Search" href="../../../search.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
-  <meta name="docsearch:version" content="1.0.0rc1.dev" />
+  <meta name="docsearch:version" content="1.0.0rc2.dev" />
   </head>
   
   
@@ -114,8 +114,8 @@
     
     
     
-    <img src="../../../_static/imod-python-logo-light.svg" class="logo__image only-light" alt="iMOD Python 1.0.0rc1 documentation - Home"/>
-    <img src="../../../_static/imod-python-logo-dark.svg" class="logo__image only-dark pst-js-only" alt="iMOD Python 1.0.0rc1 documentation - Home"/>
+    <img src="../../../_static/imod-python-logo-light.svg" class="logo__image only-light" alt="iMOD Python 1.0.0rc2 documentation - Home"/>
+    <img src="../../../_static/imod-python-logo-dark.svg" class="logo__image only-dark pst-js-only" alt="iMOD Python 1.0.0rc2 documentation - Home"/>
   
   
 </a></div>
@@ -165,7 +165,9 @@
 </li>
 
             <li class="nav-item dropdown">
-                <button class="btn dropdown-toggle nav-item" type="button" data-bs-toggle="dropdown" aria-expanded="false" aria-controls="pst-nav-more-links">
+                <button class="btn dropdown-toggle nav-item" type="button"
+                data-bs-toggle="dropdown" aria-expanded="false"
+                aria-controls="pst-nav-more-links">
                     More
                 </button>
                 <ul id="pst-nav-more-links" class="dropdown-menu">
@@ -371,9 +373,14 @@
   
   
   <div class="sidebar-primary-items__end sidebar-primary__section">
+      <div class="sidebar-primary-item">
+<div id="ethical-ad-placement"
+      class="flat"
+      data-ea-publisher="readthedocs"
+      data-ea-type="readthedocs-sidebar"
+      data-ea-manual="true">
+</div></div>
   </div>
-  
-  <div id="rtd-footer-container"></div>
 
 
       </div>
@@ -420,62 +427,63 @@
                 <article class="bd-article">
                   
   <h1>Source code for imod.mf6.wel</h1><div class="highlight"><pre>
-<span></span><span class="kn">from</span> <span class="nn">__future__</span> <span class="kn">import</span> <span class="n">annotations</span>
+<span></span><span class="kn">from</span><span class="w"> </span><span class="nn">__future__</span><span class="w"> </span><span class="kn">import</span> <span class="n">annotations</span>
 
-<span class="kn">import</span> <span class="nn">abc</span>
-<span class="kn">import</span> <span class="nn">itertools</span>
-<span class="kn">import</span> <span class="nn">textwrap</span>
-<span class="kn">import</span> <span class="nn">warnings</span>
-<span class="kn">from</span> <span class="nn">datetime</span> <span class="kn">import</span> <span class="n">datetime</span>
-<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Any</span><span class="p">,</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">Tuple</span><span class="p">,</span> <span class="n">Union</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">abc</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">itertools</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">textwrap</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">warnings</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">collections.abc</span><span class="w"> </span><span class="kn">import</span> <span class="n">Iterable</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">datetime</span><span class="w"> </span><span class="kn">import</span> <span class="n">datetime</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Any</span><span class="p">,</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">Tuple</span><span class="p">,</span> <span class="n">Union</span><span class="p">,</span> <span class="n">cast</span>
 
-<span class="kn">import</span> <span class="nn">cftime</span>
-<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
-<span class="kn">import</span> <span class="nn">numpy.typing</span> <span class="k">as</span> <span class="nn">npt</span>
-<span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
-<span class="kn">import</span> <span class="nn">xarray</span> <span class="k">as</span> <span class="nn">xr</span>
-<span class="kn">import</span> <span class="nn">xugrid</span> <span class="k">as</span> <span class="nn">xu</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">cftime</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">numpy.typing</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">npt</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">pandas</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">pd</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">xarray</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">xr</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">xugrid</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">xu</span>
 
-<span class="kn">import</span> <span class="nn">imod</span>
-<span class="kn">import</span> <span class="nn">imod.mf6.utilities</span>
-<span class="kn">from</span> <span class="nn">imod.logging</span> <span class="kn">import</span> <span class="n">init_log_decorator</span><span class="p">,</span> <span class="n">logger</span>
-<span class="kn">from</span> <span class="nn">imod.logging.logging_decorators</span> <span class="kn">import</span> <span class="n">standard_log_decorator</span>
-<span class="kn">from</span> <span class="nn">imod.logging.loglevel</span> <span class="kn">import</span> <span class="n">LogLevel</span>
-<span class="kn">from</span> <span class="nn">imod.mf6</span> <span class="kn">import</span> <span class="n">StructuredDiscretization</span><span class="p">,</span> <span class="n">VerticesDiscretization</span>
-<span class="kn">from</span> <span class="nn">imod.mf6.boundary_condition</span> <span class="kn">import</span> <span class="p">(</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">imod</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">imod.mf6.utilities</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">imod.common.interfaces.ipointdatapackage</span><span class="w"> </span><span class="kn">import</span> <span class="n">IPointDataPackage</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">imod.common.utilities.grid</span><span class="w"> </span><span class="kn">import</span> <span class="n">broadcast_to_full_domain</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">imod.common.utilities.layer</span><span class="w"> </span><span class="kn">import</span> <span class="n">create_layered_top</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">imod.logging</span><span class="w"> </span><span class="kn">import</span> <span class="n">init_log_decorator</span><span class="p">,</span> <span class="n">logger</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">imod.logging.logging_decorators</span><span class="w"> </span><span class="kn">import</span> <span class="n">standard_log_decorator</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">imod.logging.loglevel</span><span class="w"> </span><span class="kn">import</span> <span class="n">LogLevel</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">imod.mf6</span><span class="w"> </span><span class="kn">import</span> <span class="n">StructuredDiscretization</span><span class="p">,</span> <span class="n">VerticesDiscretization</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">imod.mf6.boundary_condition</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
     <span class="n">BoundaryCondition</span><span class="p">,</span>
     <span class="n">DisStructuredBoundaryCondition</span><span class="p">,</span>
     <span class="n">DisVerticesBoundaryCondition</span><span class="p">,</span>
 <span class="p">)</span>
-<span class="kn">from</span> <span class="nn">imod.mf6.interfaces.ipointdatapackage</span> <span class="kn">import</span> <span class="n">IPointDataPackage</span>
-<span class="kn">from</span> <span class="nn">imod.mf6.mf6_wel_adapter</span> <span class="kn">import</span> <span class="n">Mf6Wel</span><span class="p">,</span> <span class="n">concat_indices_to_cellid</span>
-<span class="kn">from</span> <span class="nn">imod.mf6.package</span> <span class="kn">import</span> <span class="n">Package</span>
-<span class="kn">from</span> <span class="nn">imod.mf6.utilities.dataset</span> <span class="kn">import</span> <span class="n">remove_inactive</span>
-<span class="kn">from</span> <span class="nn">imod.mf6.utilities.grid</span> <span class="kn">import</span> <span class="n">broadcast_to_full_domain</span>
-<span class="kn">from</span> <span class="nn">imod.mf6.utilities.imod5_converter</span> <span class="kn">import</span> <span class="n">well_from_imod5_cap_data</span>
-<span class="kn">from</span> <span class="nn">imod.mf6.validation</span> <span class="kn">import</span> <span class="n">validation_pkg_error_message</span>
-<span class="kn">from</span> <span class="nn">imod.mf6.validation_context</span> <span class="kn">import</span> <span class="n">ValidationContext</span>
-<span class="kn">from</span> <span class="nn">imod.mf6.write_context</span> <span class="kn">import</span> <span class="n">WriteContext</span>
-<span class="kn">from</span> <span class="nn">imod.prepare</span> <span class="kn">import</span> <span class="n">assign_wells</span>
-<span class="kn">from</span> <span class="nn">imod.prepare.cleanup</span> <span class="kn">import</span> <span class="n">cleanup_wel</span>
-<span class="kn">from</span> <span class="nn">imod.prepare.layer</span> <span class="kn">import</span> <span class="n">create_layered_top</span>
-<span class="kn">from</span> <span class="nn">imod.schemata</span> <span class="kn">import</span> <span class="p">(</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">imod.mf6.mf6_wel_adapter</span><span class="w"> </span><span class="kn">import</span> <span class="n">Mf6Wel</span><span class="p">,</span> <span class="n">concat_indices_to_cellid</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">imod.mf6.package</span><span class="w"> </span><span class="kn">import</span> <span class="n">Package</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">imod.mf6.utilities.dataset</span><span class="w"> </span><span class="kn">import</span> <span class="n">remove_inactive</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">imod.mf6.utilities.imod5_converter</span><span class="w"> </span><span class="kn">import</span> <span class="n">well_from_imod5_cap_data</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">imod.mf6.validation</span><span class="w"> </span><span class="kn">import</span> <span class="n">validation_pkg_error_message</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">imod.mf6.validation_context</span><span class="w"> </span><span class="kn">import</span> <span class="n">ValidationContext</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">imod.mf6.write_context</span><span class="w"> </span><span class="kn">import</span> <span class="n">WriteContext</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">imod.prepare</span><span class="w"> </span><span class="kn">import</span> <span class="n">assign_wells</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">imod.prepare.cleanup</span><span class="w"> </span><span class="kn">import</span> <span class="n">cleanup_wel</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">imod.schemata</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
     <span class="n">AllValueSchema</span><span class="p">,</span>
     <span class="n">AnyNoDataSchema</span><span class="p">,</span>
     <span class="n">DTypeSchema</span><span class="p">,</span>
     <span class="n">EmptyIndexesSchema</span><span class="p">,</span>
     <span class="n">ValidationError</span><span class="p">,</span>
 <span class="p">)</span>
-<span class="kn">from</span> <span class="nn">imod.select.points</span> <span class="kn">import</span> <span class="n">points_indices</span><span class="p">,</span> <span class="n">points_values</span>
-<span class="kn">from</span> <span class="nn">imod.typing</span> <span class="kn">import</span> <span class="n">GridDataArray</span><span class="p">,</span> <span class="n">Imod5DataDict</span>
-<span class="kn">from</span> <span class="nn">imod.typing.grid</span> <span class="kn">import</span> <span class="n">is_spatial_grid</span><span class="p">,</span> <span class="n">ones_like</span>
-<span class="kn">from</span> <span class="nn">imod.util.expand_repetitions</span> <span class="kn">import</span> <span class="n">resample_timeseries</span>
-<span class="kn">from</span> <span class="nn">imod.util.structured</span> <span class="kn">import</span> <span class="n">values_within_range</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">imod.select.points</span><span class="w"> </span><span class="kn">import</span> <span class="n">points_indices</span><span class="p">,</span> <span class="n">points_values</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">imod.typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">GridDataArray</span><span class="p">,</span> <span class="n">Imod5DataDict</span><span class="p">,</span> <span class="n">StressPeriodTimesType</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">imod.typing.grid</span><span class="w"> </span><span class="kn">import</span> <span class="n">is_spatial_grid</span><span class="p">,</span> <span class="n">ones_like</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">imod.util.expand_repetitions</span><span class="w"> </span><span class="kn">import</span> <span class="n">average_timeseries</span><span class="p">,</span> <span class="n">resample_timeseries</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">imod.util.structured</span><span class="w"> </span><span class="kn">import</span> <span class="n">values_within_range</span>
 
 <span class="n">ABSTRACT_METH_ERROR_MSG</span> <span class="o">=</span> <span class="s2">&quot;Method in abstract base class called&quot;</span>
 
 
-<span class="k">def</span> <span class="nf">_assign_dims</span><span class="p">(</span><span class="n">arg</span><span class="p">:</span> <span class="n">Any</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span> <span class="o">|</span> <span class="n">xr</span><span class="o">.</span><span class="n">DataArray</span><span class="p">:</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">_assign_dims</span><span class="p">(</span><span class="n">arg</span><span class="p">:</span> <span class="n">Any</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span> <span class="o">|</span> <span class="n">xr</span><span class="o">.</span><span class="n">DataArray</span><span class="p">:</span>
     <span class="n">is_da</span> <span class="o">=</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">arg</span><span class="p">,</span> <span class="n">xr</span><span class="o">.</span><span class="n">DataArray</span><span class="p">)</span>
     <span class="k">if</span> <span class="n">is_da</span> <span class="ow">and</span> <span class="s2">&quot;time&quot;</span> <span class="ow">in</span> <span class="n">arg</span><span class="o">.</span><span class="n">coords</span><span class="p">:</span>
         <span class="k">if</span> <span class="n">arg</span><span class="o">.</span><span class="n">ndim</span> <span class="o">!=</span> <span class="mi">2</span><span class="p">:</span>
@@ -492,24 +500,24 @@
         <span class="k">return</span> <span class="s2">&quot;index&quot;</span><span class="p">,</span> <span class="n">arg</span>
 
 
-<span class="k">def</span> <span class="nf">mask_2D</span><span class="p">(</span><span class="n">package</span><span class="p">:</span> <span class="n">GridAgnosticWell</span><span class="p">,</span> <span class="n">domain_2d</span><span class="p">:</span> <span class="n">GridDataArray</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">GridAgnosticWell</span><span class="p">:</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">mask_2D</span><span class="p">(</span><span class="n">package</span><span class="p">:</span> <span class="n">GridAgnosticWell</span><span class="p">,</span> <span class="n">domain_2d</span><span class="p">:</span> <span class="n">GridDataArray</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">GridAgnosticWell</span><span class="p">:</span>
     <span class="n">point_active</span> <span class="o">=</span> <span class="n">points_values</span><span class="p">(</span><span class="n">domain_2d</span><span class="p">,</span> <span class="n">x</span><span class="o">=</span><span class="n">package</span><span class="o">.</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="n">package</span><span class="o">.</span><span class="n">y</span><span class="p">)</span>
 
-    <span class="n">is_inside_exterior</span> <span class="o">=</span> <span class="n">point_active</span> <span class="o">==</span> <span class="mi">1</span>
+    <span class="n">is_inside_exterior</span> <span class="o">=</span> <span class="n">point_active</span> <span class="o">&gt;</span> <span class="mi">0</span>
     <span class="n">selection</span> <span class="o">=</span> <span class="n">package</span><span class="o">.</span><span class="n">dataset</span><span class="o">.</span><span class="n">loc</span><span class="p">[{</span><span class="s2">&quot;index&quot;</span><span class="p">:</span> <span class="n">is_inside_exterior</span><span class="p">}]</span>
 
     <span class="bp">cls</span> <span class="o">=</span> <span class="nb">type</span><span class="p">(</span><span class="n">package</span><span class="p">)</span>
     <span class="k">return</span> <span class="bp">cls</span><span class="o">.</span><span class="n">_from_dataset</span><span class="p">(</span><span class="n">selection</span><span class="p">)</span>
 
 
-<span class="k">def</span> <span class="nf">_df_groups_to_da_rates</span><span class="p">(</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">_df_groups_to_da_rates</span><span class="p">(</span>
     <span class="n">unique_well_groups</span><span class="p">:</span> <span class="n">pd</span><span class="o">.</span><span class="n">api</span><span class="o">.</span><span class="n">typing</span><span class="o">.</span><span class="n">DataFrameGroupBy</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">xr</span><span class="o">.</span><span class="n">DataArray</span><span class="p">:</span>
     <span class="c1"># Convert dataframes all groups to DataArrays</span>
     <span class="n">is_steady_state</span> <span class="o">=</span> <span class="s2">&quot;time&quot;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">unique_well_groups</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">columns</span>
     <span class="k">if</span> <span class="n">is_steady_state</span><span class="p">:</span>
         <span class="n">da_groups</span> <span class="o">=</span> <span class="p">[</span>
-            <span class="n">xr</span><span class="o">.</span><span class="n">DataArray</span><span class="p">(</span><span class="n">df_group</span><span class="p">[</span><span class="s2">&quot;rate&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span> <span class="k">for</span> <span class="n">df_group</span> <span class="ow">in</span> <span class="n">unique_well_groups</span>
+            <span class="n">xr</span><span class="o">.</span><span class="n">DataArray</span><span class="p">(</span><span class="n">df_group</span><span class="p">[</span><span class="s2">&quot;rate&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">sum</span><span class="p">())</span> <span class="k">for</span> <span class="n">df_group</span> <span class="ow">in</span> <span class="n">unique_well_groups</span>
         <span class="p">]</span>
     <span class="k">else</span><span class="p">:</span>
         <span class="n">da_groups</span> <span class="o">=</span> <span class="p">[</span>
@@ -518,6 +526,9 @@
             <span class="p">)</span>
             <span class="k">for</span> <span class="n">df_group</span> <span class="ow">in</span> <span class="n">unique_well_groups</span>
         <span class="p">]</span>
+        <span class="c1"># Groupby time and sum to aggregate wells with the exact same x, y, and</span>
+        <span class="c1"># filter top/bottom.</span>
+        <span class="n">da_groups</span> <span class="o">=</span> <span class="p">[</span><span class="n">da_group</span><span class="o">.</span><span class="n">groupby</span><span class="p">(</span><span class="s2">&quot;time&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span> <span class="k">for</span> <span class="n">da_group</span> <span class="ow">in</span> <span class="n">da_groups</span><span class="p">]</span>
     <span class="c1"># Assign index coordinates</span>
     <span class="n">da_groups</span> <span class="o">=</span> <span class="p">[</span>
         <span class="n">da_group</span><span class="o">.</span><span class="n">expand_dims</span><span class="p">(</span><span class="n">dim</span><span class="o">=</span><span class="s2">&quot;index&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">assign_coords</span><span class="p">(</span><span class="n">index</span><span class="o">=</span><span class="p">[</span><span class="n">i</span><span class="p">])</span>
@@ -527,28 +538,36 @@
     <span class="k">return</span> <span class="n">xr</span><span class="o">.</span><span class="n">concat</span><span class="p">(</span><span class="n">da_groups</span><span class="p">,</span> <span class="n">dim</span><span class="o">=</span><span class="s2">&quot;index&quot;</span><span class="p">)</span>
 
 
-<span class="k">def</span> <span class="nf">_prepare_well_rates_from_groups</span><span class="p">(</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">_prepare_well_rates_from_groups</span><span class="p">(</span>
     <span class="n">pkg_data</span><span class="p">:</span> <span class="nb">dict</span><span class="p">,</span>
     <span class="n">unique_well_groups</span><span class="p">:</span> <span class="n">pd</span><span class="o">.</span><span class="n">api</span><span class="o">.</span><span class="n">typing</span><span class="o">.</span><span class="n">DataFrameGroupBy</span><span class="p">,</span>
-    <span class="n">times</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="n">datetime</span><span class="p">],</span>
+    <span class="n">start_times</span><span class="p">:</span> <span class="n">StressPeriodTimesType</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">xr</span><span class="o">.</span><span class="n">DataArray</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Prepare well rates from dataframe groups, grouped by unique well locations.</span>
 <span class="sd">    Resample timeseries if ipf with associated text files.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">has_associated</span> <span class="o">=</span> <span class="n">pkg_data</span><span class="p">[</span><span class="s2">&quot;has_associated&quot;</span><span class="p">]</span>
-    <span class="n">start_times</span> <span class="o">=</span> <span class="n">times</span><span class="p">[:</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>  <span class="c1"># Starts stress periods.</span>
     <span class="k">if</span> <span class="n">has_associated</span><span class="p">:</span>
         <span class="c1"># Resample times per group</span>
         <span class="n">unique_well_groups</span> <span class="o">=</span> <span class="p">[</span>
-            <span class="n">resample_timeseries</span><span class="p">(</span><span class="n">df_group</span><span class="p">,</span> <span class="n">start_times</span><span class="p">)</span>
+            <span class="n">_process_timeseries</span><span class="p">(</span><span class="n">df_group</span><span class="p">,</span> <span class="n">start_times</span><span class="p">)</span>
             <span class="k">for</span> <span class="n">df_group</span> <span class="ow">in</span> <span class="n">unique_well_groups</span>
         <span class="p">]</span>
     <span class="k">return</span> <span class="n">_df_groups_to_da_rates</span><span class="p">(</span><span class="n">unique_well_groups</span><span class="p">)</span>
 
 
-<span class="k">def</span> <span class="nf">_prepare_df_ipf_associated</span><span class="p">(</span>
-    <span class="n">pkg_data</span><span class="p">:</span> <span class="nb">dict</span><span class="p">,</span> <span class="n">start_times</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="n">datetime</span><span class="p">],</span> <span class="n">all_well_times</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="n">datetime</span><span class="p">]</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">_process_timeseries</span><span class="p">(</span>
+    <span class="n">df_group</span><span class="p">:</span> <span class="n">pd</span><span class="o">.</span><span class="n">api</span><span class="o">.</span><span class="n">typing</span><span class="o">.</span><span class="n">DataFrameGroupBy</span><span class="p">,</span> <span class="n">start_times</span><span class="p">:</span> <span class="n">StressPeriodTimesType</span>
+<span class="p">):</span>
+    <span class="k">if</span> <span class="n">_is_steady_state</span><span class="p">(</span><span class="n">start_times</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">average_timeseries</span><span class="p">(</span><span class="n">df_group</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">resample_timeseries</span><span class="p">(</span><span class="n">df_group</span><span class="p">,</span> <span class="n">start_times</span><span class="p">)</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">_prepare_df_ipf_associated</span><span class="p">(</span>
+    <span class="n">pkg_data</span><span class="p">:</span> <span class="nb">dict</span><span class="p">,</span> <span class="n">all_well_times</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="n">datetime</span><span class="p">]</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Prepare dataframe for an ipf with associated timeseries in a textfile.&quot;&quot;&quot;</span>
     <span class="c1"># Validate if associated wells are assigned multiple layers, factors,</span>
@@ -576,8 +595,8 @@
     <span class="k">return</span> <span class="n">df</span>
 
 
-<span class="k">def</span> <span class="nf">_prepare_df_ipf_unassociated</span><span class="p">(</span>
-    <span class="n">pkg_data</span><span class="p">:</span> <span class="nb">dict</span><span class="p">,</span> <span class="n">start_times</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="n">datetime</span><span class="p">]</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">_prepare_df_ipf_unassociated</span><span class="p">(</span>
+    <span class="n">pkg_data</span><span class="p">:</span> <span class="nb">dict</span><span class="p">,</span> <span class="n">start_times</span><span class="p">:</span> <span class="n">StressPeriodTimesType</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Prepare dataframe for an ipf with no associated timeseries.&quot;&quot;&quot;</span>
     <span class="n">is_steady_state</span> <span class="o">=</span> <span class="nb">any</span><span class="p">(</span><span class="n">t</span> <span class="ow">is</span> <span class="kc">None</span> <span class="k">for</span> <span class="n">t</span> <span class="ow">in</span> <span class="n">pkg_data</span><span class="p">[</span><span class="s2">&quot;time&quot;</span><span class="p">])</span>
@@ -607,6 +626,10 @@
     <span class="n">da_multi</span> <span class="o">=</span> <span class="n">df_multi</span><span class="o">.</span><span class="n">to_xarray</span><span class="p">()</span>
     <span class="n">indexers</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;ipf_row&quot;</span><span class="p">:</span> <span class="n">ipf_row_index</span><span class="p">}</span>
     <span class="k">if</span> <span class="ow">not</span> <span class="n">is_steady_state</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">start_times</span> <span class="o">==</span> <span class="s2">&quot;steady-state&quot;</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+                <span class="s2">&quot;``start_times`` cannot be &#39;steady-state&#39; for transient wells without associated timeseries.&quot;</span>
+            <span class="p">)</span>
         <span class="n">indexers</span><span class="p">[</span><span class="s2">&quot;time&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">start_times</span>
     <span class="c1"># Multi-dimensional reindex, forward fill well locations, fill well rates</span>
     <span class="c1"># with 0.0.</span>
@@ -618,19 +641,18 @@
     <span class="k">return</span> <span class="n">df_out</span><span class="o">.</span><span class="n">reset_index</span><span class="p">()</span><span class="o">.</span><span class="n">drop</span><span class="p">(</span><span class="n">columns</span><span class="o">=</span><span class="s2">&quot;ipf_row&quot;</span><span class="p">)</span>
 
 
-<span class="k">def</span> <span class="nf">_unpack_package_data</span><span class="p">(</span>
-    <span class="n">pkg_data</span><span class="p">:</span> <span class="nb">dict</span><span class="p">,</span> <span class="n">times</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="n">datetime</span><span class="p">],</span> <span class="n">all_well_times</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="n">datetime</span><span class="p">]</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">_unpack_package_data</span><span class="p">(</span>
+    <span class="n">pkg_data</span><span class="p">:</span> <span class="nb">dict</span><span class="p">,</span> <span class="n">start_times</span><span class="p">:</span> <span class="n">StressPeriodTimesType</span><span class="p">,</span> <span class="n">all_well_times</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="n">datetime</span><span class="p">]</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Unpack package data to dataframe&quot;&quot;&quot;</span>
-    <span class="n">start_times</span> <span class="o">=</span> <span class="n">times</span><span class="p">[:</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>  <span class="c1"># Starts stress periods.</span>
     <span class="n">has_associated</span> <span class="o">=</span> <span class="n">pkg_data</span><span class="p">[</span><span class="s2">&quot;has_associated&quot;</span><span class="p">]</span>
     <span class="k">if</span> <span class="n">has_associated</span><span class="p">:</span>
-        <span class="k">return</span> <span class="n">_prepare_df_ipf_associated</span><span class="p">(</span><span class="n">pkg_data</span><span class="p">,</span> <span class="n">start_times</span><span class="p">,</span> <span class="n">all_well_times</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">_prepare_df_ipf_associated</span><span class="p">(</span><span class="n">pkg_data</span><span class="p">,</span> <span class="n">all_well_times</span><span class="p">)</span>
     <span class="k">else</span><span class="p">:</span>
         <span class="k">return</span> <span class="n">_prepare_df_ipf_unassociated</span><span class="p">(</span><span class="n">pkg_data</span><span class="p">,</span> <span class="n">start_times</span><span class="p">)</span>
 
 
-<span class="k">def</span> <span class="nf">get_all_imod5_prj_well_times</span><span class="p">(</span><span class="n">imod5_data</span><span class="p">:</span> <span class="nb">dict</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="n">datetime</span><span class="p">]:</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">get_all_imod5_prj_well_times</span><span class="p">(</span><span class="n">imod5_data</span><span class="p">:</span> <span class="nb">dict</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="n">datetime</span><span class="p">]:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Get all times a well data is defined on in a prj file&quot;&quot;&quot;</span>
     <span class="n">wel_keys</span> <span class="o">=</span> <span class="p">[</span><span class="n">key</span> <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">imod5_data</span><span class="o">.</span><span class="n">keys</span><span class="p">()</span> <span class="k">if</span> <span class="n">key</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s2">&quot;wel&quot;</span><span class="p">)]</span>
     <span class="n">wel_times_per_pkg</span> <span class="o">=</span> <span class="p">[</span><span class="n">imod5_data</span><span class="p">[</span><span class="n">wel_key</span><span class="p">][</span><span class="s2">&quot;time&quot;</span><span class="p">]</span> <span class="k">for</span> <span class="n">wel_key</span> <span class="ow">in</span> <span class="n">wel_keys</span><span class="p">]</span>
@@ -641,7 +663,7 @@
     <span class="k">return</span> <span class="nb">sorted</span><span class="p">(</span><span class="nb">set</span><span class="p">(</span><span class="n">wel_times_flat</span><span class="p">))</span>
 
 
-<span class="k">def</span> <span class="nf">derive_cellid_from_points</span><span class="p">(</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">derive_cellid_from_points</span><span class="p">(</span>
     <span class="n">dst_grid</span><span class="p">:</span> <span class="n">GridDataArray</span><span class="p">,</span>
     <span class="n">x</span><span class="p">:</span> <span class="nb">list</span><span class="p">,</span>
     <span class="n">y</span><span class="p">:</span> <span class="nb">list</span><span class="p">,</span>
@@ -709,7 +731,34 @@
     <span class="k">return</span> <span class="n">cellid</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">int</span><span class="p">)</span>
 
 
-<span class="k">class</span> <span class="nc">GridAgnosticWell</span><span class="p">(</span><span class="n">BoundaryCondition</span><span class="p">,</span> <span class="n">IPointDataPackage</span><span class="p">,</span> <span class="n">abc</span><span class="o">.</span><span class="n">ABC</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">_is_steady_state</span><span class="p">(</span><span class="n">times</span><span class="p">:</span> <span class="n">StressPeriodTimesType</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+    <span class="c1"># Shortcut when not string, to avoid ambigious bitwise &quot;and&quot; operation when</span>
+    <span class="c1"># its not.</span>
+    <span class="k">return</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">times</span><span class="p">,</span> <span class="nb">str</span><span class="p">)</span> <span class="ow">and</span> <span class="n">times</span> <span class="o">==</span> <span class="s2">&quot;steady-state&quot;</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">_is_iterable_of_datetimes</span><span class="p">(</span><span class="n">times</span><span class="p">:</span> <span class="n">StressPeriodTimesType</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+    <span class="k">return</span> <span class="p">(</span>
+        <span class="nb">isinstance</span><span class="p">(</span><span class="n">times</span><span class="p">,</span> <span class="n">Iterable</span><span class="p">)</span>
+        <span class="ow">and</span> <span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">times</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">)</span>
+        <span class="ow">and</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">times</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="p">(</span><span class="n">datetime</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">datetime64</span><span class="p">,</span> <span class="n">pd</span><span class="o">.</span><span class="n">Timestamp</span><span class="p">))</span>
+    <span class="p">)</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">_get_starttimes</span><span class="p">(</span>
+    <span class="n">times</span><span class="p">:</span> <span class="n">StressPeriodTimesType</span><span class="p">,</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">StressPeriodTimesType</span><span class="p">:</span>
+    <span class="k">if</span> <span class="n">_is_steady_state</span><span class="p">(</span><span class="n">times</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">times</span>
+    <span class="k">elif</span> <span class="n">_is_iterable_of_datetimes</span><span class="p">(</span><span class="n">times</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">cast</span><span class="p">(</span><span class="nb">list</span><span class="p">[</span><span class="n">datetime</span><span class="p">],</span> <span class="n">times</span><span class="p">[:</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+            <span class="s2">&quot;Only &#39;steady-state&#39; or a list of datetimes are supported for ``times``.&quot;</span>
+        <span class="p">)</span>
+
+
+<span class="k">class</span><span class="w"> </span><span class="nc">GridAgnosticWell</span><span class="p">(</span><span class="n">BoundaryCondition</span><span class="p">,</span> <span class="n">IPointDataPackage</span><span class="p">,</span> <span class="n">abc</span><span class="o">.</span><span class="n">ABC</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Abstract base class for grid agnostic wells</span>
 <span class="sd">    &quot;&quot;&quot;</span>
@@ -718,18 +767,18 @@
     <span class="n">_depth_colnames</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">tuple</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">type</span><span class="p">]]</span> <span class="o">=</span> <span class="p">[]</span>
 
     <span class="nd">@property</span>
-    <span class="k">def</span> <span class="nf">x</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">npt</span><span class="o">.</span><span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">]:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">x</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">npt</span><span class="o">.</span><span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">]:</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">dataset</span><span class="p">[</span><span class="s2">&quot;x&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">values</span>
 
     <span class="nd">@property</span>
-    <span class="k">def</span> <span class="nf">y</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">npt</span><span class="o">.</span><span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">]:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">y</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">npt</span><span class="o">.</span><span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">]:</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">dataset</span><span class="p">[</span><span class="s2">&quot;y&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">values</span>
 
     <span class="nd">@classmethod</span>
-    <span class="k">def</span> <span class="nf">is_grid_agnostic_package</span><span class="p">(</span><span class="bp">cls</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">is_grid_agnostic_package</span><span class="p">(</span><span class="bp">cls</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
         <span class="k">return</span> <span class="kc">True</span>
 
-    <span class="k">def</span> <span class="nf">_create_cellid</span><span class="p">(</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_create_cellid</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span> <span class="n">assigned_wells</span><span class="p">:</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">,</span> <span class="n">active</span><span class="p">:</span> <span class="n">xr</span><span class="o">.</span><span class="n">DataArray</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">GridDataArray</span><span class="p">:</span>
         <span class="n">like</span> <span class="o">=</span> <span class="n">ones_like</span><span class="p">(</span><span class="n">active</span><span class="p">)</span>
@@ -741,7 +790,7 @@
 
         <span class="k">return</span> <span class="n">derive_cellid_from_points</span><span class="p">(</span><span class="n">like</span><span class="p">,</span> <span class="o">**</span><span class="n">d_for_cellid</span><span class="p">)</span>
 
-    <span class="k">def</span> <span class="nf">_create_dataset_vars</span><span class="p">(</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_create_dataset_vars</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span> <span class="n">assigned_wells</span><span class="p">:</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">,</span> <span class="n">cellid</span><span class="p">:</span> <span class="n">xr</span><span class="o">.</span><span class="n">DataArray</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">xr</span><span class="o">.</span><span class="n">Dataset</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
@@ -766,7 +815,7 @@
 
         <span class="k">return</span> <span class="n">ds_vars</span>
 
-    <span class="k">def</span> <span class="nf">render</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">directory</span><span class="p">,</span> <span class="n">pkgname</span><span class="p">,</span> <span class="n">globaltimes</span><span class="p">,</span> <span class="n">binary</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">render</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">directory</span><span class="p">,</span> <span class="n">pkgname</span><span class="p">,</span> <span class="n">globaltimes</span><span class="p">,</span> <span class="n">binary</span><span class="p">):</span>
         <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span>
             <span class="n">textwrap</span><span class="o">.</span><span class="n">dedent</span><span class="p">(</span>
                 <span class="sa">f</span><span class="s2">&quot;&quot;&quot;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__name__</span><span class="si">}</span><span class="s2"> is a grid-agnostic package and does not</span>
@@ -775,7 +824,7 @@
             <span class="p">)</span>
         <span class="p">)</span>
 
-    <span class="k">def</span> <span class="nf">_write</span><span class="p">(</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_write</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">pkgname</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
         <span class="n">globaltimes</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">list</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">datetime64</span><span class="p">],</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">],</span>
@@ -785,7 +834,7 @@
             <span class="s2">&quot;To write a wel package first convert it to a MF6 well using to_mf6_pkg.&quot;</span>
         <span class="p">)</span>
 
-    <span class="k">def</span> <span class="nf">mask</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">domain</span><span class="p">:</span> <span class="n">GridDataArray</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">GridAgnosticWell</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">mask</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">domain</span><span class="p">:</span> <span class="n">GridDataArray</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">GridAgnosticWell</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Mask wells based on two-dimensional domain. For three-dimensional</span>
 <span class="sd">        masking: Wells falling in inactive cells are automatically removed in</span>
@@ -801,7 +850,7 @@
         <span class="p">)</span>
         <span class="k">return</span> <span class="n">mask_2D</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">domain_2d</span><span class="p">)</span>
 
-    <span class="k">def</span> <span class="nf">to_mf6_pkg</span><span class="p">(</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">to_mf6_pkg</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">active</span><span class="p">:</span> <span class="n">GridDataArray</span><span class="p">,</span>
         <span class="n">top</span><span class="p">:</span> <span class="n">GridDataArray</span><span class="p">,</span>
@@ -852,7 +901,7 @@
         <span class="p">)</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_to_mf6_pkg</span><span class="p">(</span><span class="n">active</span><span class="p">,</span> <span class="n">top</span><span class="p">,</span> <span class="n">bottom</span><span class="p">,</span> <span class="n">k</span><span class="p">,</span> <span class="n">validation_context</span><span class="p">)</span>
 
-    <span class="k">def</span> <span class="nf">_to_mf6_pkg</span><span class="p">(</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_to_mf6_pkg</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">active</span><span class="p">:</span> <span class="n">GridDataArray</span><span class="p">,</span>
         <span class="n">top</span><span class="p">:</span> <span class="n">GridDataArray</span><span class="p">,</span>
@@ -908,17 +957,18 @@
 
         <span class="k">return</span> <span class="n">Mf6Wel</span><span class="p">(</span><span class="o">**</span><span class="n">ds</span><span class="o">.</span><span class="n">data_vars</span><span class="p">)</span>
 
-    <span class="k">def</span> <span class="nf">gather_filtered_well_ids</span><span class="p">(</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">gather_filtered_well_ids</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span> <span class="n">well_data_filtered</span><span class="p">:</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span> <span class="o">|</span> <span class="n">xr</span><span class="o">.</span><span class="n">Dataset</span><span class="p">,</span> <span class="n">well_data</span><span class="p">:</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
-        <span class="n">filtered_well_ids</span> <span class="o">=</span> <span class="p">[</span>
-            <span class="nb">id</span>
-            <span class="k">for</span> <span class="nb">id</span> <span class="ow">in</span> <span class="n">well_data</span><span class="p">[</span><span class="s2">&quot;id&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">unique</span><span class="p">()</span>
-            <span class="k">if</span> <span class="nb">id</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">well_data_filtered</span><span class="p">[</span><span class="s2">&quot;id&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">values</span>
-        <span class="p">]</span>
-        <span class="k">return</span> <span class="n">filtered_well_ids</span>
+        <span class="c1"># Work around performance issue with xarray isin for large datasets.</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">well_data_filtered</span><span class="p">,</span> <span class="n">xr</span><span class="o">.</span><span class="n">Dataset</span><span class="p">):</span>
+            <span class="n">filtered_ids</span> <span class="o">=</span> <span class="n">well_data_filtered</span><span class="p">[</span><span class="s2">&quot;id&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">to_dataframe</span><span class="p">()[</span><span class="s2">&quot;id&quot;</span><span class="p">]</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">filtered_ids</span> <span class="o">=</span> <span class="n">well_data_filtered</span><span class="p">[</span><span class="s2">&quot;id&quot;</span><span class="p">]</span>
+        <span class="n">is_missing_id</span> <span class="o">=</span> <span class="o">~</span><span class="n">well_data</span><span class="p">[</span><span class="s2">&quot;id&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">isin</span><span class="p">(</span><span class="n">filtered_ids</span><span class="o">.</span><span class="n">unique</span><span class="p">())</span>
+        <span class="k">return</span> <span class="n">well_data</span><span class="p">[</span><span class="s2">&quot;id&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">is_missing_id</span><span class="p">]</span><span class="o">.</span><span class="n">unique</span><span class="p">()</span>
 
-    <span class="k">def</span> <span class="nf">to_mf6_package_information</span><span class="p">(</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">to_mf6_package_information</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span> <span class="n">filtered_wells</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span> <span class="n">reason_text</span><span class="p">:</span> <span class="nb">str</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
         <span class="n">message</span> <span class="o">=</span> <span class="n">textwrap</span><span class="o">.</span><span class="n">dedent</span><span class="p">(</span>
@@ -937,10 +987,10 @@
             <span class="n">message</span> <span class="o">+=</span> <span class="sa">f</span><span class="s2">&quot; id = </span><span class="si">{</span><span class="n">ids</span><span class="si">}</span><span class="s2"> x = </span><span class="si">{</span><span class="n">x</span><span class="si">}</span><span class="s2">  y = </span><span class="si">{</span><span class="n">y</span><span class="si">}</span><span class="s2"> </span><span class="se">\n</span><span class="s2">&quot;</span>
         <span class="k">return</span> <span class="n">message</span>
 
-    <span class="k">def</span> <span class="nf">_create_wells_df</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_create_wells_df</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">:</span>
         <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="n">ABSTRACT_METH_ERROR_MSG</span><span class="p">)</span>
 
-    <span class="k">def</span> <span class="nf">_assign_wells_to_layers</span><span class="p">(</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_assign_wells_to_layers</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">wells_df</span><span class="p">:</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">,</span>
         <span class="n">active</span><span class="p">:</span> <span class="n">GridDataArray</span><span class="p">,</span>
@@ -951,19 +1001,19 @@
         <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="n">ABSTRACT_METH_ERROR_MSG</span><span class="p">)</span>
 
     <span class="nd">@classmethod</span>
-    <span class="k">def</span> <span class="nf">_validate_imod5_depth_information</span><span class="p">(</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_validate_imod5_depth_information</span><span class="p">(</span>
         <span class="bp">cls</span><span class="p">,</span> <span class="n">key</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">pkg_data</span><span class="p">:</span> <span class="nb">dict</span><span class="p">,</span> <span class="n">df</span><span class="p">:</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
         <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="n">ABSTRACT_METH_ERROR_MSG</span><span class="p">)</span>
 
     <span class="nd">@classmethod</span>
-    <span class="k">def</span> <span class="nf">from_imod5_data</span><span class="p">(</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">from_imod5_data</span><span class="p">(</span>
         <span class="bp">cls</span><span class="p">,</span>
         <span class="n">key</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
         <span class="n">imod5_data</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">GridDataArray</span><span class="p">]],</span>
-        <span class="n">times</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="n">datetime</span><span class="p">],</span>
-        <span class="n">minimum_k</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.1</span><span class="p">,</span>
-        <span class="n">minimum_thickness</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.05</span><span class="p">,</span>
+        <span class="n">times</span><span class="p">:</span> <span class="n">StressPeriodTimesType</span><span class="p">,</span>
+        <span class="n">minimum_k</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.0</span><span class="p">,</span>
+        <span class="n">minimum_thickness</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.0</span><span class="p">,</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="s2">&quot;GridAgnosticWell&quot;</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Convert wells to imod5 data, loaded with</span>
@@ -985,18 +1035,22 @@
 <span class="sd">        *Associated wells*</span>
 
 <span class="sd">        Wells with timeseries in an associated textfile are processed as</span>
-<span class="sd">        follows:</span>
+<span class="sd">        follows.</span>
 
-<span class="sd">        - Wells are validated if the following requirements are met</span>
-<span class="sd">            * Associated well entries in projectfile are defined on either all</span>
+<span class="sd">        - Wells are validated if the following requirements are met:</span>
+<span class="sd">            - Associated well entries in projectfile are defined on either all</span>
 <span class="sd">              timestamps or just the first</span>
-<span class="sd">            * Multiplication and addition factors need to remain constant through time</span>
-<span class="sd">            * Same associated well cannot be assigned to multiple layers</span>
+<span class="sd">            - Multiplication and addition factors need to remain constant through time</span>
+<span class="sd">            - Same associated well cannot be assigned to multiple layers</span>
 <span class="sd">        - The dataframe of the first projectfile timestamp is selected</span>
-<span class="sd">        - Rate timeseries are resampled with a time weighted mean to the</span>
-<span class="sd">          simulation times.</span>
-<span class="sd">        - When simulation times fall outside well timeseries range, the last</span>
-<span class="sd">          rate is forward filled.</span>
+<span class="sd">        - Timeseries are processed based on the ``times`` argument of this method:</span>
+<span class="sd">            - If ``times`` is a list of datetimes, rate timeseries are resampled</span>
+<span class="sd">              with a time weighted mean to the simulation times. When simulation</span>
+<span class="sd">              times fall outside well timeseries range, the last rate is forward</span>
+<span class="sd">              filled.</span>
+<span class="sd">            - If ``times = &quot;steady-state&quot;``, the simulation is assumed to be</span>
+<span class="sd">              &quot;steady-state&quot; and an average rate is computed from the</span>
+<span class="sd">              timeseries.</span>
 <span class="sd">        - Projectfile timestamps are not used. Even if assigned to a</span>
 <span class="sd">          &quot;steady-state&quot; timestamp, the resulting dataset still uses simulation</span>
 <span class="sd">          times.</span>
@@ -1040,8 +1094,9 @@
 <span class="sd">        imod5_data: dict</span>
 <span class="sd">            iMOD5 data loaded from a projectfile with</span>
 <span class="sd">            :func:`imod.formats.prj.open_projectfile_data`</span>
-<span class="sd">        times: list</span>
-<span class="sd">            Simulation times</span>
+<span class="sd">        times: list[datetime] | Literal[&quot;steady-state&quot;]</span>
+<span class="sd">            Simulation times, a list of datetimes for transient simulations. Or</span>
+<span class="sd">            the string ``&quot;steady-state&quot;`` for steady-state simulations.</span>
 <span class="sd">        minimum_k: float, optional</span>
 <span class="sd">            On creating point wells, no point wells will be placed in cells with</span>
 <span class="sd">            a lower horizontal conductivity than this. Wells are placed when</span>
@@ -1051,10 +1106,12 @@
 <span class="sd">            a lower thickness than this. Wells are placed when ``to_mf6_pkg`` is</span>
 <span class="sd">            called.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
+
         <span class="n">pkg_data</span> <span class="o">=</span> <span class="n">imod5_data</span><span class="p">[</span><span class="n">key</span><span class="p">]</span>
         <span class="n">all_well_times</span> <span class="o">=</span> <span class="n">get_all_imod5_prj_well_times</span><span class="p">(</span><span class="n">imod5_data</span><span class="p">)</span>
 
-        <span class="n">df</span> <span class="o">=</span> <span class="n">_unpack_package_data</span><span class="p">(</span><span class="n">pkg_data</span><span class="p">,</span> <span class="n">times</span><span class="p">,</span> <span class="n">all_well_times</span><span class="p">)</span>
+        <span class="n">start_times</span> <span class="o">=</span> <span class="n">_get_starttimes</span><span class="p">(</span><span class="n">times</span><span class="p">)</span>  <span class="c1"># Starts stress periods.</span>
+        <span class="n">df</span> <span class="o">=</span> <span class="n">_unpack_package_data</span><span class="p">(</span><span class="n">pkg_data</span><span class="p">,</span> <span class="n">start_times</span><span class="p">,</span> <span class="n">all_well_times</span><span class="p">)</span>
         <span class="bp">cls</span><span class="o">.</span><span class="n">_validate_imod5_depth_information</span><span class="p">(</span><span class="n">key</span><span class="p">,</span> <span class="n">pkg_data</span><span class="p">,</span> <span class="n">df</span><span class="p">)</span>
 
         <span class="c1"># Groupby unique wells, to get dataframes per time.</span>
@@ -1072,7 +1129,7 @@
             <span class="k">for</span> <span class="p">(</span><span class="n">var</span><span class="p">,</span> <span class="n">dtype</span><span class="p">),</span> <span class="n">value</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">varnames</span><span class="p">,</span> <span class="n">index_values</span><span class="p">)</span>
         <span class="p">}</span>
         <span class="n">cls_input</span><span class="p">[</span><span class="s2">&quot;rate&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">_prepare_well_rates_from_groups</span><span class="p">(</span>
-            <span class="n">pkg_data</span><span class="p">,</span> <span class="n">unique_well_groups</span><span class="p">,</span> <span class="n">times</span>
+            <span class="n">pkg_data</span><span class="p">,</span> <span class="n">unique_well_groups</span><span class="p">,</span> <span class="n">start_times</span>
         <span class="p">)</span>
         <span class="n">cls_input</span><span class="p">[</span><span class="s2">&quot;minimum_k&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">minimum_k</span>
         <span class="n">cls_input</span><span class="p">[</span><span class="s2">&quot;minimum_thickness&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">minimum_thickness</span>
@@ -1082,7 +1139,7 @@
 
 <div class="viewcode-block" id="Well">
 <a class="viewcode-back" href="../../../api/generated/mf6/imod.mf6.Well.html#imod.mf6.Well">[docs]</a>
-<span class="k">class</span> <span class="nc">Well</span><span class="p">(</span><span class="n">GridAgnosticWell</span><span class="p">):</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">Well</span><span class="p">(</span><span class="n">GridAgnosticWell</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Agnostic WEL package, which accepts x, y and a top and bottom of the well screens.</span>
 
@@ -1118,9 +1175,11 @@
 <span class="sd">        assign an identifier code to each well. if not provided, one will be generated</span>
 <span class="sd">        Must be convertible to string, and unique entries.</span>
 <span class="sd">    minimum_k: float, optional</span>
-<span class="sd">        on creating point wells, no point wells will be placed in cells with a lower horizontal conductivity than this</span>
+<span class="sd">        on allocating wells to the model, no filter segments will be placed in</span>
+<span class="sd">        cells with a smaller horizontal conductivity than this. Defaults to 0.0.</span>
 <span class="sd">    minimum_thickness: float, optional</span>
-<span class="sd">        on creating point wells, no point wells will be placed in cells with a lower thickness than this</span>
+<span class="sd">        on allocating wells to the model, no filter segments will be placed in</span>
+<span class="sd">        cells with a smaller thickness than this. Defaults to 0.0</span>
 <span class="sd">    print_input: ({True, False}, optional)</span>
 <span class="sd">        keyword to indicate that the list of well information will be written to</span>
 <span class="sd">        the listing file immediately after it is read.</span>
@@ -1205,7 +1264,7 @@
 <div class="viewcode-block" id="Well.__init__">
 <a class="viewcode-back" href="../../../api/generated/mf6/imod.mf6.Well.html#imod.mf6.Well.__init__">[docs]</a>
     <span class="nd">@init_log_decorator</span><span class="p">()</span>
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">x</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span> <span class="o">|</span> <span class="nb">list</span><span class="p">[</span><span class="nb">float</span><span class="p">],</span>
         <span class="n">y</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span> <span class="o">|</span> <span class="nb">list</span><span class="p">[</span><span class="nb">float</span><span class="p">],</span>
@@ -1215,8 +1274,8 @@
         <span class="n">concentration</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">list</span><span class="p">[</span><span class="nb">float</span><span class="p">]</span> <span class="o">|</span> <span class="n">xr</span><span class="o">.</span><span class="n">DataArray</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
         <span class="n">concentration_boundary_type</span><span class="o">=</span><span class="s2">&quot;aux&quot;</span><span class="p">,</span>
         <span class="nb">id</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">list</span><span class="p">[</span><span class="n">Any</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-        <span class="n">minimum_k</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.1</span><span class="p">,</span>
-        <span class="n">minimum_thickness</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.05</span><span class="p">,</span>
+        <span class="n">minimum_k</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.0</span><span class="p">,</span>
+        <span class="n">minimum_thickness</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.0</span><span class="p">,</span>
         <span class="n">print_input</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
         <span class="n">print_flows</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
         <span class="n">save_flows</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
@@ -1250,14 +1309,14 @@
         <span class="p">}</span>
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">dict_dataset</span><span class="p">)</span>
         <span class="c1"># Set index as coordinate</span>
-        <span class="n">index_coord</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">dataset</span><span class="o">.</span><span class="n">dims</span><span class="p">[</span><span class="s2">&quot;index&quot;</span><span class="p">])</span>
+        <span class="n">index_coord</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">dataset</span><span class="o">.</span><span class="n">sizes</span><span class="p">[</span><span class="s2">&quot;index&quot;</span><span class="p">])</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">dataset</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">dataset</span><span class="o">.</span><span class="n">assign_coords</span><span class="p">(</span><span class="n">index</span><span class="o">=</span><span class="n">index_coord</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_validate_init_schemata</span><span class="p">(</span><span class="n">validate</span><span class="p">)</span></div>
 
 
 <div class="viewcode-block" id="Well.clip_box">
 <a class="viewcode-back" href="../../../api/generated/mf6/imod.mf6.Well.clip_box.html#imod.mf6.Well.clip_box">[docs]</a>
-    <span class="k">def</span> <span class="nf">clip_box</span><span class="p">(</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">clip_box</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">time_min</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">cftime</span><span class="o">.</span><span class="n">datetime</span> <span class="o">|</span> <span class="n">np</span><span class="o">.</span><span class="n">datetime64</span> <span class="o">|</span> <span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
         <span class="n">time_max</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">cftime</span><span class="o">.</span><span class="n">datetime</span> <span class="o">|</span> <span class="n">np</span><span class="o">.</span><span class="n">datetime64</span> <span class="o">|</span> <span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
@@ -1330,7 +1389,7 @@
 
         <span class="c1"># Initiate array of True with right shape to deal with case no spatial</span>
         <span class="c1"># selection needs to be done.</span>
-        <span class="n">in_bounds</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">full</span><span class="p">(</span><span class="n">ds</span><span class="o">.</span><span class="n">dims</span><span class="p">[</span><span class="s2">&quot;index&quot;</span><span class="p">],</span> <span class="kc">True</span><span class="p">)</span>
+        <span class="n">in_bounds</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">full</span><span class="p">(</span><span class="n">ds</span><span class="o">.</span><span class="n">sizes</span><span class="p">[</span><span class="s2">&quot;index&quot;</span><span class="p">],</span> <span class="kc">True</span><span class="p">)</span>
         <span class="c1"># Select all variables along &quot;index&quot; dimension</span>
         <span class="n">in_bounds</span> <span class="o">&amp;=</span> <span class="n">values_within_range</span><span class="p">(</span><span class="n">ds</span><span class="p">[</span><span class="s2">&quot;x&quot;</span><span class="p">],</span> <span class="n">x_min</span><span class="p">,</span> <span class="n">x_max</span><span class="p">)</span>
         <span class="n">in_bounds</span> <span class="o">&amp;=</span> <span class="n">values_within_range</span><span class="p">(</span><span class="n">ds</span><span class="p">[</span><span class="s2">&quot;y&quot;</span><span class="p">],</span> <span class="n">y_min</span><span class="p">,</span> <span class="n">y_max</span><span class="p">)</span>
@@ -1345,7 +1404,7 @@
 
 
     <span class="nd">@staticmethod</span>
-    <span class="k">def</span> <span class="nf">_find_well_value_at_layer</span><span class="p">(</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_find_well_value_at_layer</span><span class="p">(</span>
         <span class="n">well_dataset</span><span class="p">:</span> <span class="n">xr</span><span class="o">.</span><span class="n">Dataset</span><span class="p">,</span> <span class="n">grid</span><span class="p">:</span> <span class="n">GridDataArray</span><span class="p">,</span> <span class="n">layer</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span>
     <span class="p">):</span>
         <span class="n">value</span> <span class="o">=</span> <span class="kc">None</span> <span class="k">if</span> <span class="n">layer</span> <span class="ow">is</span> <span class="kc">None</span> <span class="k">else</span> <span class="n">grid</span><span class="o">.</span><span class="n">isel</span><span class="p">(</span><span class="n">layer</span><span class="o">=</span><span class="n">layer</span><span class="p">)</span>
@@ -1361,7 +1420,7 @@
 
         <span class="k">return</span> <span class="n">value</span>
 
-    <span class="k">def</span> <span class="nf">_create_wells_df</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_create_wells_df</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">:</span>
         <span class="n">wells_df</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">dataset</span><span class="o">.</span><span class="n">to_dataframe</span><span class="p">()</span>
         <span class="n">wells_df</span> <span class="o">=</span> <span class="n">wells_df</span><span class="o">.</span><span class="n">rename</span><span class="p">(</span>
             <span class="n">columns</span><span class="o">=</span><span class="p">{</span>
@@ -1373,11 +1432,11 @@
         <span class="k">return</span> <span class="n">wells_df</span>
 
     <span class="nd">@standard_log_decorator</span><span class="p">()</span>
-    <span class="k">def</span> <span class="nf">_validate</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">schemata</span><span class="p">:</span> <span class="nb">dict</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">list</span><span class="p">[</span><span class="n">ValidationError</span><span class="p">]]:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_validate</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">schemata</span><span class="p">:</span> <span class="nb">dict</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">list</span><span class="p">[</span><span class="n">ValidationError</span><span class="p">]]:</span>
         <span class="n">kwargs</span><span class="p">[</span><span class="s2">&quot;screen_top&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">dataset</span><span class="p">[</span><span class="s2">&quot;screen_top&quot;</span><span class="p">]</span>
         <span class="k">return</span> <span class="n">Package</span><span class="o">.</span><span class="n">_validate</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">schemata</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
 
-    <span class="k">def</span> <span class="nf">_assign_wells_to_layers</span><span class="p">(</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_assign_wells_to_layers</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">wells_df</span><span class="p">:</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">,</span>
         <span class="n">active</span><span class="p">:</span> <span class="n">GridDataArray</span><span class="p">,</span>
@@ -1412,7 +1471,7 @@
         <span class="k">return</span> <span class="n">assigned_wells</span>
 
     <span class="nd">@classmethod</span>
-    <span class="k">def</span> <span class="nf">_validate_imod5_depth_information</span><span class="p">(</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_validate_imod5_depth_information</span><span class="p">(</span>
         <span class="bp">cls</span><span class="p">,</span> <span class="n">key</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">pkg_data</span><span class="p">:</span> <span class="nb">dict</span><span class="p">,</span> <span class="n">df</span><span class="p">:</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
         <span class="k">if</span> <span class="s2">&quot;layer&quot;</span> <span class="ow">in</span> <span class="n">pkg_data</span><span class="o">.</span><span class="n">keys</span><span class="p">()</span> <span class="ow">and</span> <span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">any</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">pkg_data</span><span class="p">[</span><span class="s2">&quot;layer&quot;</span><span class="p">])</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">)):</span>
@@ -1441,7 +1500,7 @@
 <div class="viewcode-block" id="Well.cleanup">
 <a class="viewcode-back" href="../../../api/generated/mf6/imod.mf6.Well.cleanup.html#imod.mf6.Well.cleanup">[docs]</a>
     <span class="nd">@standard_log_decorator</span><span class="p">()</span>
-    <span class="k">def</span> <span class="nf">cleanup</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">dis</span><span class="p">:</span> <span class="n">StructuredDiscretization</span> <span class="o">|</span> <span class="n">VerticesDiscretization</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">cleanup</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">dis</span><span class="p">:</span> <span class="n">StructuredDiscretization</span> <span class="o">|</span> <span class="n">VerticesDiscretization</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Clean up package inplace. This method calls</span>
 <span class="sd">        :func:`imod.prepare.cleanup_wel`, see documentation of that</span>
@@ -1483,7 +1542,7 @@
 
 <div class="viewcode-block" id="LayeredWell">
 <a class="viewcode-back" href="../../../api/generated/mf6/imod.mf6.LayeredWell.html#imod.mf6.LayeredWell">[docs]</a>
-<span class="k">class</span> <span class="nc">LayeredWell</span><span class="p">(</span><span class="n">GridAgnosticWell</span><span class="p">):</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">LayeredWell</span><span class="p">(</span><span class="n">GridAgnosticWell</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Agnostic WEL package, which accepts x, y and layers.</span>
 
@@ -1518,9 +1577,11 @@
 <span class="sd">        assign an identifier code to each well. if not provided, one will be generated</span>
 <span class="sd">        Must be convertible to string, and unique entries.</span>
 <span class="sd">    minimum_k: float, optional</span>
-<span class="sd">        on creating point wells, no point wells will be placed in cells with a lower horizontal conductivity than this</span>
+<span class="sd">        on allocating wells to model cells, no wells will be placed in cells</span>
+<span class="sd">        with a lower horizontal conductivity than this. Defaults to 0.0.</span>
 <span class="sd">    minimum_thickness: float, optional</span>
-<span class="sd">        on creating point wells, no point wells will be placed in cells with a lower thickness than this</span>
+<span class="sd">        on allocating wells to model cells, no wells will be placed in cells</span>
+<span class="sd">        with a lower thickness than this. Defaults to 0.0.</span>
 <span class="sd">    print_input: ({True, False}, optional)</span>
 <span class="sd">        keyword to indicate that the list of well information will be written to</span>
 <span class="sd">        the listing file immediately after it is read.</span>
@@ -1594,7 +1655,7 @@
 <div class="viewcode-block" id="LayeredWell.__init__">
 <a class="viewcode-back" href="../../../api/generated/mf6/imod.mf6.LayeredWell.html#imod.mf6.LayeredWell.__init__">[docs]</a>
     <span class="nd">@init_log_decorator</span><span class="p">()</span>
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">x</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span> <span class="o">|</span> <span class="nb">list</span><span class="p">[</span><span class="nb">float</span><span class="p">],</span>
         <span class="n">y</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span> <span class="o">|</span> <span class="nb">list</span><span class="p">[</span><span class="nb">float</span><span class="p">],</span>
@@ -1603,8 +1664,8 @@
         <span class="n">concentration</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">list</span><span class="p">[</span><span class="nb">float</span><span class="p">]</span> <span class="o">|</span> <span class="n">xr</span><span class="o">.</span><span class="n">DataArray</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
         <span class="n">concentration_boundary_type</span><span class="o">=</span><span class="s2">&quot;aux&quot;</span><span class="p">,</span>
         <span class="nb">id</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">list</span><span class="p">[</span><span class="n">Any</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-        <span class="n">minimum_k</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.1</span><span class="p">,</span>
-        <span class="n">minimum_thickness</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">1.0</span><span class="p">,</span>
+        <span class="n">minimum_k</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.0</span><span class="p">,</span>
+        <span class="n">minimum_thickness</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.0</span><span class="p">,</span>
         <span class="n">print_input</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
         <span class="n">print_flows</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
         <span class="n">save_flows</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
@@ -1637,14 +1698,14 @@
         <span class="p">}</span>
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">dict_dataset</span><span class="p">)</span>
         <span class="c1"># Set index as coordinate</span>
-        <span class="n">index_coord</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">dataset</span><span class="o">.</span><span class="n">dims</span><span class="p">[</span><span class="s2">&quot;index&quot;</span><span class="p">])</span>
+        <span class="n">index_coord</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">dataset</span><span class="o">.</span><span class="n">sizes</span><span class="p">[</span><span class="s2">&quot;index&quot;</span><span class="p">])</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">dataset</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">dataset</span><span class="o">.</span><span class="n">assign_coords</span><span class="p">(</span><span class="n">index</span><span class="o">=</span><span class="n">index_coord</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_validate_init_schemata</span><span class="p">(</span><span class="n">validate</span><span class="p">)</span></div>
 
 
 <div class="viewcode-block" id="LayeredWell.clip_box">
 <a class="viewcode-back" href="../../../api/generated/mf6/imod.mf6.LayeredWell.clip_box.html#imod.mf6.LayeredWell.clip_box">[docs]</a>
-    <span class="k">def</span> <span class="nf">clip_box</span><span class="p">(</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">clip_box</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">time_min</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">cftime</span><span class="o">.</span><span class="n">datetime</span> <span class="o">|</span> <span class="n">np</span><span class="o">.</span><span class="n">datetime64</span> <span class="o">|</span> <span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
         <span class="n">time_max</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">cftime</span><span class="o">.</span><span class="n">datetime</span> <span class="o">|</span> <span class="n">np</span><span class="o">.</span><span class="n">datetime64</span> <span class="o">|</span> <span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
@@ -1693,7 +1754,7 @@
 
         <span class="c1"># Initiate array of True with right shape to deal with case no spatial</span>
         <span class="c1"># selection needs to be done.</span>
-        <span class="n">in_bounds</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">full</span><span class="p">(</span><span class="n">ds</span><span class="o">.</span><span class="n">dims</span><span class="p">[</span><span class="s2">&quot;index&quot;</span><span class="p">],</span> <span class="kc">True</span><span class="p">)</span>
+        <span class="n">in_bounds</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">full</span><span class="p">(</span><span class="n">ds</span><span class="o">.</span><span class="n">sizes</span><span class="p">[</span><span class="s2">&quot;index&quot;</span><span class="p">],</span> <span class="kc">True</span><span class="p">)</span>
         <span class="c1"># Select all variables along &quot;index&quot; dimension</span>
         <span class="n">in_bounds</span> <span class="o">&amp;=</span> <span class="n">values_within_range</span><span class="p">(</span><span class="n">ds</span><span class="p">[</span><span class="s2">&quot;x&quot;</span><span class="p">],</span> <span class="n">x_min</span><span class="p">,</span> <span class="n">x_max</span><span class="p">)</span>
         <span class="n">in_bounds</span> <span class="o">&amp;=</span> <span class="n">values_within_range</span><span class="p">(</span><span class="n">ds</span><span class="p">[</span><span class="s2">&quot;y&quot;</span><span class="p">],</span> <span class="n">y_min</span><span class="p">,</span> <span class="n">y_max</span><span class="p">)</span>
@@ -1704,10 +1765,10 @@
         <span class="k">return</span> <span class="n">new</span></div>
 
 
-    <span class="k">def</span> <span class="nf">_create_wells_df</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_create_wells_df</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">:</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">dataset</span><span class="o">.</span><span class="n">to_dataframe</span><span class="p">()</span>
 
-    <span class="k">def</span> <span class="nf">_assign_wells_to_layers</span><span class="p">(</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_assign_wells_to_layers</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">wells_df</span><span class="p">:</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">,</span>
         <span class="n">active</span><span class="p">:</span> <span class="n">GridDataArray</span><span class="p">,</span>
@@ -1718,7 +1779,7 @@
         <span class="k">return</span> <span class="n">wells_df</span>
 
     <span class="nd">@classmethod</span>
-    <span class="k">def</span> <span class="nf">_validate_imod5_depth_information</span><span class="p">(</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_validate_imod5_depth_information</span><span class="p">(</span>
         <span class="bp">cls</span><span class="p">,</span> <span class="n">key</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">pkg_data</span><span class="p">:</span> <span class="nb">dict</span><span class="p">,</span> <span class="n">df</span><span class="p">:</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
         <span class="k">if</span> <span class="n">np</span><span class="o">.</span><span class="n">any</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">pkg_data</span><span class="p">[</span><span class="s2">&quot;layer&quot;</span><span class="p">])</span> <span class="o">==</span> <span class="mi">0</span><span class="p">):</span>
@@ -1744,7 +1805,7 @@
 <div class="viewcode-block" id="LayeredWell.from_imod5_cap_data">
 <a class="viewcode-back" href="../../../api/generated/mf6/imod.mf6.LayeredWell.from_imod5_cap_data.html#imod.mf6.LayeredWell.from_imod5_cap_data">[docs]</a>
     <span class="nd">@classmethod</span>
-    <span class="k">def</span> <span class="nf">from_imod5_cap_data</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">imod5_data</span><span class="p">:</span> <span class="n">Imod5DataDict</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">from_imod5_cap_data</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">imod5_data</span><span class="p">:</span> <span class="n">Imod5DataDict</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Create LayeredWell from imod5_data in &quot;cap&quot; package. Abstraction data</span>
 <span class="sd">        for sprinkling is defined in iMOD5 either with grids (IDF) or points</span>
@@ -1790,7 +1851,7 @@
 
 <div class="viewcode-block" id="WellDisStructured">
 <a class="viewcode-back" href="../../../api/generated/mf6/imod.mf6.WellDisStructured.html#imod.mf6.WellDisStructured">[docs]</a>
-<span class="k">class</span> <span class="nc">WellDisStructured</span><span class="p">(</span><span class="n">DisStructuredBoundaryCondition</span><span class="p">):</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">WellDisStructured</span><span class="p">(</span><span class="n">DisStructuredBoundaryCondition</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    WEL package for structured discretization (DIS) models .</span>
 <span class="sd">    Any number of WEL Packages can be specified for a single groundwater flow model.</span>
@@ -1867,7 +1928,7 @@
 <div class="viewcode-block" id="WellDisStructured.__init__">
 <a class="viewcode-back" href="../../../api/generated/mf6/imod.mf6.WellDisStructured.html#imod.mf6.WellDisStructured.__init__">[docs]</a>
     <span class="nd">@init_log_decorator</span><span class="p">()</span>
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">layer</span><span class="p">,</span>
         <span class="n">row</span><span class="p">,</span>
@@ -1905,7 +1966,7 @@
         <span class="p">)</span></div>
 
 
-    <span class="k">def</span> <span class="nf">clip_box</span><span class="p">(</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">clip_box</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">time_min</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">cftime</span><span class="o">.</span><span class="n">datetime</span> <span class="o">|</span> <span class="n">np</span><span class="o">.</span><span class="n">datetime64</span> <span class="o">|</span> <span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
         <span class="n">time_max</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">cftime</span><span class="o">.</span><span class="n">datetime</span> <span class="o">|</span> <span class="n">np</span><span class="o">.</span><span class="n">datetime64</span> <span class="o">|</span> <span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
@@ -1968,7 +2029,7 @@
 
 <div class="viewcode-block" id="WellDisVertices">
 <a class="viewcode-back" href="../../../api/generated/mf6/imod.mf6.WellDisVertices.html#imod.mf6.WellDisVertices">[docs]</a>
-<span class="k">class</span> <span class="nc">WellDisVertices</span><span class="p">(</span><span class="n">DisVerticesBoundaryCondition</span><span class="p">):</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">WellDisVertices</span><span class="p">(</span><span class="n">DisVerticesBoundaryCondition</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    WEL package for discretization by vertices (DISV) models. Any number of WEL</span>
 <span class="sd">    Packages can be specified for a single groundwater flow model.</span>
@@ -2032,7 +2093,7 @@
 <div class="viewcode-block" id="WellDisVertices.__init__">
 <a class="viewcode-back" href="../../../api/generated/mf6/imod.mf6.WellDisVertices.html#imod.mf6.WellDisVertices.__init__">[docs]</a>
     <span class="nd">@init_log_decorator</span><span class="p">()</span>
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">layer</span><span class="p">,</span>
         <span class="n">cell2d</span><span class="p">,</span>
@@ -2066,7 +2127,7 @@
         <span class="p">)</span></div>
 
 
-    <span class="k">def</span> <span class="nf">clip_box</span><span class="p">(</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">clip_box</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">time_min</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">cftime</span><span class="o">.</span><span class="n">datetime</span> <span class="o">|</span> <span class="n">np</span><span class="o">.</span><span class="n">datetime64</span> <span class="o">|</span> <span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
         <span class="n">time_max</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">cftime</span><span class="o">.</span><span class="n">datetime</span> <span class="o">|</span> <span class="n">np</span><span class="o">.</span><span class="n">datetime64</span> <span class="o">|</span> <span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
@@ -2154,8 +2215,8 @@
   </div>
   
   <!-- Scripts loaded after <body> so the DOM is not blocked -->
-  <script defer src="../../../_static/scripts/bootstrap.js?digest=26a4bc78f4c0ddb94549"></script>
-<script defer src="../../../_static/scripts/pydata-sphinx-theme.js?digest=26a4bc78f4c0ddb94549"></script>
+  <script defer src="../../../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf"></script>
+<script defer src="../../../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf"></script>
 
   <footer class="bd-footer">
 <div class="bd-footer__inner bd-page-width">
@@ -2175,7 +2236,7 @@
         <div class="footer-item">
 
   <p class="sphinx-version">
-    Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 8.1.3.
+    Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 8.2.1.
     <br/>
   </p>
 </div>
@@ -2188,7 +2249,8 @@
       
         <div class="footer-item">
 <p class="theme-version">
-  Built with the <a href="https://pydata-sphinx-theme.readthedocs.io/en/stable/index.html">PyData Sphinx Theme</a> 0.16.0.
+  <!-- # L10n: Setting the PST URL as an argument as this does not need to be localized -->
+  Built with the <a href="https://pydata-sphinx-theme.readthedocs.io/en/stable/index.html">PyData Sphinx Theme</a> 0.16.1.
 </p></div>
       
     </div>

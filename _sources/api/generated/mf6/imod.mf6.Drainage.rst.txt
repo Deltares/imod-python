@@ -14,6 +14,7 @@
    .. autosummary::
    
       ~Drainage.__init__
+      ~Drainage.allocate_and_distribute_planar_data
       ~Drainage.cleanup
       ~Drainage.clip_box
       ~Drainage.copy

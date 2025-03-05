@@ -1,0 +1,23 @@
+﻿imod.util.RegridderWeightsCache
+===============================
+
+.. currentmodule:: imod.util
+
+.. autoclass:: RegridderWeightsCache
+
+   
+   .. automethod:: __init__
+
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      ~RegridderWeightsCache.__init__
+      ~RegridderWeightsCache.get_regridder
+   
+   
+
+   
+   
+   

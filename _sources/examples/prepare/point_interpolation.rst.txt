@@ -409,7 +409,7 @@ heads.
  .. code-block:: none
 
 
-    <matplotlib.image.AxesImage object at 0x0000017F8B76C790>
+    <matplotlib.image.AxesImage object at 0x000002A04D6A0190>
 
 
 
@@ -428,7 +428,7 @@ and the closing criteria.
 
 
     interpolated_heads = imod.prepare.laplace_interpolate(
-        heads_grid, close=0.001, mxiter=150, iter1=100
+        heads_grid, atol=0.001, maxiter=150
     )
 
     # Plotting the interpolation results
@@ -449,22 +449,19 @@ and the closing criteria.
  .. code-block:: none
 
 
-    <matplotlib.image.AxesImage object at 0x0000017F890F2610>
+    <matplotlib.image.AxesImage object at 0x000002A04B5C1F50>
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 109-117
+.. GENERATED FROM PYTHON SOURCE LINES 109-114
 
 It might be nice to have the locations of the boreholes plotted together with
 the interpolation, so that we can better judge the quality of the
 interpolation.
 
-One way to show this is to derive a grid with whether a cell contains an
-observation. Consequently we can plot this as an overlay, setting cells
-without an observation as transparent. ``imshow`` accepts a matrix with alpha
-values as well, which allows us to set transparency per cell.
+We can use the `plt.scatter` function to plot the borehole locations on top.
 
-.. GENERATED FROM PYTHON SOURCE LINES 117-131
+.. GENERATED FROM PYTHON SOURCE LINES 114-126
 
 .. code-block:: Python
 
@@ -476,11 +473,9 @@ values as well, which allows us to set transparency per cell.
     # Plot the interpolation results
     interpolated_heads.plot.imshow(ax=ax)
 
-    # We'll plot on the same axis with transparency to use ``is_observation``
-    # as overlay.
-    is_observation.plot.imshow(
-        ax=ax, add_colorbar=False, cmap="gray_r", alpha=is_observation.values
-    )
+    # Plot the borehole locations on top
+    plt.scatter(x=mean_heads_in_grid["x"], y=mean_heads_in_grid["y"], color="black", s=5)
+
 
 
 
@@ -496,14 +491,14 @@ values as well, which allows us to set transparency per cell.
  .. code-block:: none
 
 
-    <matplotlib.image.AxesImage object at 0x0000017F893EA450>
+    <matplotlib.collections.PathCollection object at 0x000002A04D3F1150>
 
 
 
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** (0 minutes 6.056 seconds)
+   **Total running time of the script:** (0 minutes 3.007 seconds)
 
 
 .. _sphx_glr_download_examples_prepare_point_interpolation.py:

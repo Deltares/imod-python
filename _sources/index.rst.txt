@@ -31,7 +31,6 @@ We currently support the following MODFLOW-based models:
   UZF)
 * `iMOD-WQ`_ (:doc:`api/wq`), which integrates SEAWAT (density-dependent
   groundwater flow) and MT3DMS (multi-species reactive transport calculations)
-* `iMODFLOW`_ (:doc:`api/flow`)
 
 Development currently focuses on supporting more Modflow 6 functionalities. 
 
@@ -82,5 +81,4 @@ Issues: https://github.com/Deltares/imod-python/issues
 .. _netCDF: https://www.unidata.ucar.edu/software/netcdf/
 .. _Snakemake: https://snakemake.readthedocs.io/en/stable/
 .. _USGS MODFLOW 6: https://www.usgs.gov/software/modflow-6-usgs-modular-hydrologic-model
-.. _iMODFLOW: https://oss.deltares.nl/web/imod
 .. _iMOD-WQ: https://oss.deltares.nl/web/imod

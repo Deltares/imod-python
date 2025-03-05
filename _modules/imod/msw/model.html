@@ -7,7 +7,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>imod.msw.model &#8212; iMOD Python 1.0.0rc1 documentation</title>
+    <title>imod.msw.model &#8212; iMOD Python 1.0.0rc2 documentation</title>
   
   
   
@@ -15,8 +15,8 @@
     document.documentElement.dataset.mode = localStorage.getItem("mode") || "light";
     document.documentElement.dataset.theme = localStorage.getItem("theme") || "light";
   </script>
-  <!-- 
-    this give us a css class that will be invisible only if js is disabled 
+  <!--
+    this give us a css class that will be invisible only if js is disabled
   -->
   <noscript>
     <style>
@@ -26,22 +26,22 @@
   </noscript>
   
   <!-- Loaded before other Sphinx assets -->
-  <link href="../../../_static/styles/theme.css?digest=26a4bc78f4c0ddb94549" rel="stylesheet" />
-<link href="../../../_static/styles/pydata-sphinx-theme.css?digest=26a4bc78f4c0ddb94549" rel="stylesheet" />
+  <link href="../../../_static/styles/theme.css?digest=8878045cc6db502f8baf" rel="stylesheet" />
+<link href="../../../_static/styles/pydata-sphinx-theme.css?digest=8878045cc6db502f8baf" rel="stylesheet" />
 
-    <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=fa44fd50" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=03e43079" />
     <link rel="stylesheet" type="text/css" href="../../../_static/sg_gallery.css?v=d2d258e8" />
     <link rel="stylesheet" type="text/css" href="../../../_static/sg_gallery-binder.css?v=f4aeca0c" />
     <link rel="stylesheet" type="text/css" href="../../../_static/sg_gallery-dataframe.css?v=2082cf3c" />
     <link rel="stylesheet" type="text/css" href="../../../_static/sg_gallery-rendered-html.css?v=1277b6f3" />
   
   <!-- So that users can add custom icons -->
-  <script src="../../../_static/scripts/fontawesome.js?digest=26a4bc78f4c0ddb94549"></script>
+  <script src="../../../_static/scripts/fontawesome.js?digest=8878045cc6db502f8baf"></script>
   <!-- Pre-loaded scripts that we'll load fully later -->
-  <link rel="preload" as="script" href="../../../_static/scripts/bootstrap.js?digest=26a4bc78f4c0ddb94549" />
-<link rel="preload" as="script" href="../../../_static/scripts/pydata-sphinx-theme.js?digest=26a4bc78f4c0ddb94549" />
+  <link rel="preload" as="script" href="../../../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
+<link rel="preload" as="script" href="../../../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
 
-    <script src="../../../_static/documentation_options.js?v=77c1c56c"></script>
+    <script src="../../../_static/documentation_options.js?v=40394f06"></script>
     <script src="../../../_static/doctools.js?v=9bcbadda"></script>
     <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script>DOCUMENTATION_OPTIONS.pagename = '_modules/imod/msw/model';</script>
@@ -50,7 +50,7 @@
     <link rel="search" title="Search" href="../../../search.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
-  <meta name="docsearch:version" content="1.0.0rc1.dev" />
+  <meta name="docsearch:version" content="1.0.0rc2.dev" />
   </head>
   
   
@@ -114,8 +114,8 @@
     
     
     
-    <img src="../../../_static/imod-python-logo-light.svg" class="logo__image only-light" alt="iMOD Python 1.0.0rc1 documentation - Home"/>
-    <img src="../../../_static/imod-python-logo-dark.svg" class="logo__image only-dark pst-js-only" alt="iMOD Python 1.0.0rc1 documentation - Home"/>
+    <img src="../../../_static/imod-python-logo-light.svg" class="logo__image only-light" alt="iMOD Python 1.0.0rc2 documentation - Home"/>
+    <img src="../../../_static/imod-python-logo-dark.svg" class="logo__image only-dark pst-js-only" alt="iMOD Python 1.0.0rc2 documentation - Home"/>
   
   
 </a></div>
@@ -165,7 +165,9 @@
 </li>
 
             <li class="nav-item dropdown">
-                <button class="btn dropdown-toggle nav-item" type="button" data-bs-toggle="dropdown" aria-expanded="false" aria-controls="pst-nav-more-links">
+                <button class="btn dropdown-toggle nav-item" type="button"
+                data-bs-toggle="dropdown" aria-expanded="false"
+                aria-controls="pst-nav-more-links">
                     More
                 </button>
                 <ul id="pst-nav-more-links" class="dropdown-menu">
@@ -371,9 +373,14 @@
   
   
   <div class="sidebar-primary-items__end sidebar-primary__section">
+      <div class="sidebar-primary-item">
+<div id="ethical-ad-placement"
+      class="flat"
+      data-ea-publisher="readthedocs"
+      data-ea-type="readthedocs-sidebar"
+      data-ea-manual="true">
+</div></div>
   </div>
-  
-  <div id="rtd-footer-container"></div>
 
 
       </div>
@@ -420,46 +427,45 @@
                 <article class="bd-article">
                   
   <h1>Source code for imod.msw.model</h1><div class="highlight"><pre>
-<span></span><span class="kn">import</span> <span class="nn">collections</span>
-<span class="kn">from</span> <span class="nn">copy</span> <span class="kn">import</span> <span class="n">copy</span>
-<span class="kn">from</span> <span class="nn">datetime</span> <span class="kn">import</span> <span class="n">datetime</span>
-<span class="kn">from</span> <span class="nn">pathlib</span> <span class="kn">import</span> <span class="n">Path</span>
-<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Any</span><span class="p">,</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">Tuple</span><span class="p">,</span> <span class="n">Union</span><span class="p">,</span> <span class="n">cast</span>
+<span></span><span class="kn">import</span><span class="w"> </span><span class="nn">collections</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">copy</span><span class="w"> </span><span class="kn">import</span> <span class="n">copy</span><span class="p">,</span> <span class="n">deepcopy</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">datetime</span><span class="w"> </span><span class="kn">import</span> <span class="n">datetime</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">pathlib</span><span class="w"> </span><span class="kn">import</span> <span class="n">Path</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Any</span><span class="p">,</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">Tuple</span><span class="p">,</span> <span class="n">Union</span><span class="p">,</span> <span class="n">cast</span>
 
-<span class="kn">import</span> <span class="nn">jinja2</span>
-<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
-<span class="kn">import</span> <span class="nn">xarray</span> <span class="k">as</span> <span class="nn">xr</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">jinja2</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">xarray</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">xr</span>
 
-<span class="kn">from</span> <span class="nn">imod.mf6.dis</span> <span class="kn">import</span> <span class="n">StructuredDiscretization</span>
-<span class="kn">from</span> <span class="nn">imod.mf6.mf6_wel_adapter</span> <span class="kn">import</span> <span class="n">Mf6Wel</span>
-<span class="kn">from</span> <span class="nn">imod.mf6.utilities.regrid</span> <span class="kn">import</span> <span class="n">RegridderWeightsCache</span>
-<span class="kn">from</span> <span class="nn">imod.msw.copy_files</span> <span class="kn">import</span> <span class="n">FileCopier</span>
-<span class="kn">from</span> <span class="nn">imod.msw.coupler_mapping</span> <span class="kn">import</span> <span class="n">CouplerMapping</span>
-<span class="kn">from</span> <span class="nn">imod.msw.grid_data</span> <span class="kn">import</span> <span class="n">GridData</span>
-<span class="kn">from</span> <span class="nn">imod.msw.idf_mapping</span> <span class="kn">import</span> <span class="n">IdfMapping</span>
-<span class="kn">from</span> <span class="nn">imod.msw.infiltration</span> <span class="kn">import</span> <span class="n">Infiltration</span>
-<span class="kn">from</span> <span class="nn">imod.msw.initial_conditions</span> <span class="kn">import</span> <span class="p">(</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">imod.mf6.dis</span><span class="w"> </span><span class="kn">import</span> <span class="n">StructuredDiscretization</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">imod.mf6.mf6_wel_adapter</span><span class="w"> </span><span class="kn">import</span> <span class="n">Mf6Wel</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">imod.msw.copy_files</span><span class="w"> </span><span class="kn">import</span> <span class="n">FileCopier</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">imod.msw.coupler_mapping</span><span class="w"> </span><span class="kn">import</span> <span class="n">CouplerMapping</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">imod.msw.grid_data</span><span class="w"> </span><span class="kn">import</span> <span class="n">GridData</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">imod.msw.idf_mapping</span><span class="w"> </span><span class="kn">import</span> <span class="n">IdfMapping</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">imod.msw.infiltration</span><span class="w"> </span><span class="kn">import</span> <span class="n">Infiltration</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">imod.msw.initial_conditions</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
     <span class="n">InitialConditionsEquilibrium</span><span class="p">,</span>
     <span class="n">InitialConditionsPercolation</span><span class="p">,</span>
     <span class="n">InitialConditionsRootzonePressureHead</span><span class="p">,</span>
     <span class="n">InitialConditionsSavedState</span><span class="p">,</span>
 <span class="p">)</span>
-<span class="kn">from</span> <span class="nn">imod.msw.landuse</span> <span class="kn">import</span> <span class="n">LanduseOptions</span>
-<span class="kn">from</span> <span class="nn">imod.msw.meteo_grid</span> <span class="kn">import</span> <span class="n">MeteoGrid</span><span class="p">,</span> <span class="n">MeteoGridCopy</span>
-<span class="kn">from</span> <span class="nn">imod.msw.meteo_mapping</span> <span class="kn">import</span> <span class="n">EvapotranspirationMapping</span><span class="p">,</span> <span class="n">PrecipitationMapping</span>
-<span class="kn">from</span> <span class="nn">imod.msw.output_control</span> <span class="kn">import</span> <span class="n">TimeOutputControl</span>
-<span class="kn">from</span> <span class="nn">imod.msw.ponding</span> <span class="kn">import</span> <span class="n">Ponding</span>
-<span class="kn">from</span> <span class="nn">imod.msw.scaling_factors</span> <span class="kn">import</span> <span class="n">ScalingFactors</span>
-<span class="kn">from</span> <span class="nn">imod.msw.sprinkling</span> <span class="kn">import</span> <span class="n">Sprinkling</span>
-<span class="kn">from</span> <span class="nn">imod.msw.timeutil</span> <span class="kn">import</span> <span class="n">to_metaswap_timeformat</span>
-<span class="kn">from</span> <span class="nn">imod.msw.utilities.common</span> <span class="kn">import</span> <span class="n">find_in_file_list</span>
-<span class="kn">from</span> <span class="nn">imod.msw.utilities.imod5_converter</span> <span class="kn">import</span> <span class="n">has_active_scaling_factor</span>
-<span class="kn">from</span> <span class="nn">imod.msw.utilities.mask</span> <span class="kn">import</span> <span class="n">MaskValues</span><span class="p">,</span> <span class="n">mask_and_broadcast_cap_data</span>
-<span class="kn">from</span> <span class="nn">imod.msw.utilities.parse</span> <span class="kn">import</span> <span class="n">read_para_sim</span>
-<span class="kn">from</span> <span class="nn">imod.msw.utilities.select</span> <span class="kn">import</span> <span class="n">drop_layer_dim_cap_data</span>
-<span class="kn">from</span> <span class="nn">imod.msw.vegetation</span> <span class="kn">import</span> <span class="n">AnnualCropFactors</span>
-<span class="kn">from</span> <span class="nn">imod.typing</span> <span class="kn">import</span> <span class="n">Imod5DataDict</span>
-<span class="kn">from</span> <span class="nn">imod.util.regrid_method_type</span> <span class="kn">import</span> <span class="n">RegridderType</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">imod.msw.landuse</span><span class="w"> </span><span class="kn">import</span> <span class="n">LanduseOptions</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">imod.msw.meteo_grid</span><span class="w"> </span><span class="kn">import</span> <span class="n">MeteoGrid</span><span class="p">,</span> <span class="n">MeteoGridCopy</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">imod.msw.meteo_mapping</span><span class="w"> </span><span class="kn">import</span> <span class="n">EvapotranspirationMapping</span><span class="p">,</span> <span class="n">PrecipitationMapping</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">imod.msw.output_control</span><span class="w"> </span><span class="kn">import</span> <span class="n">TimeOutputControl</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">imod.msw.ponding</span><span class="w"> </span><span class="kn">import</span> <span class="n">Ponding</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">imod.msw.scaling_factors</span><span class="w"> </span><span class="kn">import</span> <span class="n">ScalingFactors</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">imod.msw.sprinkling</span><span class="w"> </span><span class="kn">import</span> <span class="n">Sprinkling</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">imod.msw.timeutil</span><span class="w"> </span><span class="kn">import</span> <span class="n">to_metaswap_timeformat</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">imod.msw.utilities.common</span><span class="w"> </span><span class="kn">import</span> <span class="n">find_in_file_list</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">imod.msw.utilities.imod5_converter</span><span class="w"> </span><span class="kn">import</span> <span class="n">has_active_scaling_factor</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">imod.msw.utilities.mask</span><span class="w"> </span><span class="kn">import</span> <span class="n">MaskValues</span><span class="p">,</span> <span class="n">mask_and_broadcast_cap_data</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">imod.msw.utilities.parse</span><span class="w"> </span><span class="kn">import</span> <span class="n">read_para_sim</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">imod.msw.vegetation</span><span class="w"> </span><span class="kn">import</span> <span class="n">AnnualCropFactors</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">imod.typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Imod5DataDict</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">imod.util.dims</span><span class="w"> </span><span class="kn">import</span> <span class="n">drop_layer_dim_cap_data</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">imod.util.regrid</span><span class="w"> </span><span class="kn">import</span> <span class="n">RegridderType</span><span class="p">,</span> <span class="n">RegridderWeightsCache</span>
 
 <span class="n">REQUIRED_PACKAGES</span> <span class="o">=</span> <span class="p">(</span>
     <span class="n">GridData</span><span class="p">,</span>
@@ -481,7 +487,7 @@
     <span class="n">InitialConditionsSavedState</span><span class="p">,</span>
 <span class="p">)</span>
 
-<span class="n">DEFAULT_SETTINGS</span> <span class="o">=</span> <span class="p">{</span>
+<span class="n">DEFAULT_SETTINGS</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span>
     <span class="s2">&quot;vegetation_mdl&quot;</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span>
     <span class="s2">&quot;evapotranspiration_mdl&quot;</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span>
     <span class="s2">&quot;saltstress_mdl&quot;</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span>
@@ -504,19 +510,19 @@
 <span class="p">}</span>
 
 
-<span class="k">class</span> <span class="nc">Model</span><span class="p">(</span><span class="n">collections</span><span class="o">.</span><span class="n">UserDict</span><span class="p">):</span>
-    <span class="k">def</span> <span class="fm">__setitem__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">,</span> <span class="n">value</span><span class="p">):</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">Model</span><span class="p">(</span><span class="n">collections</span><span class="o">.</span><span class="n">UserDict</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__setitem__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">,</span> <span class="n">value</span><span class="p">):</span>
         <span class="c1"># TODO: Add packagecheck</span>
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__setitem__</span><span class="p">(</span><span class="n">key</span><span class="p">,</span> <span class="n">value</span><span class="p">)</span>
 
-    <span class="k">def</span> <span class="nf">update</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">update</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
         <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="nb">dict</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
             <span class="bp">self</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="o">=</span> <span class="n">v</span>
 
 
 <div class="viewcode-block" id="MetaSwapModel">
 <a class="viewcode-back" href="../../../api/generated/msw/imod.msw.MetaSwapModel.html#imod.msw.MetaSwapModel">[docs]</a>
-<span class="k">class</span> <span class="nc">MetaSwapModel</span><span class="p">(</span><span class="n">Model</span><span class="p">):</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">MetaSwapModel</span><span class="p">(</span><span class="n">Model</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Contains data and writes consistent model input files</span>
 
@@ -531,14 +537,12 @@
     <span class="n">_file_name</span> <span class="o">=</span> <span class="s2">&quot;para_sim.inp&quot;</span>
 
     <span class="n">_template</span> <span class="o">=</span> <span class="n">jinja2</span><span class="o">.</span><span class="n">Template</span><span class="p">(</span>
-        <span class="s2">&quot;{</span><span class="si">%f</span><span class="s2">or setting, value in settings.items()%}&quot;</span>
-        <span class="s2">&quot;{{setting}} = {{value}}</span><span class="se">\n</span><span class="s2">&quot;</span>
-        <span class="s2">&quot;{</span><span class="si">%e</span><span class="s2">ndfor%}&quot;</span>
+        <span class="s2">&quot;{</span><span class="si">%f</span><span class="s2">or setting, value in settings.items()%}{{setting}} = {{value}}</span><span class="se">\n</span><span class="s2">{</span><span class="si">%e</span><span class="s2">ndfor%}&quot;</span>
     <span class="p">)</span>
 
 <div class="viewcode-block" id="MetaSwapModel.__init__">
 <a class="viewcode-back" href="../../../api/generated/msw/imod.msw.MetaSwapModel.html#imod.msw.MetaSwapModel.__init__">[docs]</a>
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">unsaturated_database</span><span class="p">:</span> <span class="n">Path</span> <span class="o">|</span> <span class="nb">str</span><span class="p">,</span>
         <span class="n">settings</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
@@ -550,12 +554,10 @@
         <span class="k">else</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">simulation_settings</span> <span class="o">=</span> <span class="n">settings</span>
 
-        <span class="bp">self</span><span class="o">.</span><span class="n">simulation_settings</span><span class="p">[</span><span class="s2">&quot;unsa_svat_path&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">_render_unsaturated_database_path</span><span class="p">(</span><span class="n">unsaturated_database</span><span class="p">)</span>
-        <span class="p">)</span></div>
+        <span class="bp">self</span><span class="o">.</span><span class="n">simulation_settings</span><span class="p">[</span><span class="s2">&quot;unsa_svat_path&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">unsaturated_database</span></div>
 
 
-    <span class="k">def</span> <span class="nf">_render_unsaturated_database_path</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">unsaturated_database</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Path</span><span class="p">]):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_render_unsaturated_database_path</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">unsaturated_database</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Path</span><span class="p">]):</span>
         <span class="c1"># Force to Path object</span>
         <span class="n">unsaturated_database</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="n">unsaturated_database</span><span class="p">)</span>
 
@@ -566,9 +568,10 @@
             <span class="c1"># TODO: Test if this is how MetaSWAP accepts relative paths</span>
             <span class="k">return</span> <span class="sa">f</span><span class="s1">&#39;&quot;$</span><span class="si">{</span><span class="n">unsaturated_database</span><span class="si">}</span><span class="se">\\</span><span class="s1">&quot;&#39;</span>
 
-    <span class="k">def</span> <span class="nf">_check_required_packages</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_check_required_packages</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
         <span class="n">pkg_types_included</span> <span class="o">=</span> <span class="p">{</span><span class="nb">type</span><span class="p">(</span><span class="n">pkg</span><span class="p">)</span> <span class="k">for</span> <span class="n">pkg</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">values</span><span class="p">()}</span>
-        <span class="n">missing_packages</span> <span class="o">=</span> <span class="nb">set</span><span class="p">(</span><span class="n">REQUIRED_PACKAGES</span><span class="p">)</span> <span class="o">-</span> <span class="n">pkg_types_included</span>
+        <span class="n">required_packages_set</span> <span class="o">=</span> <span class="n">cast</span><span class="p">(</span><span class="nb">set</span><span class="p">[</span><span class="nb">type</span><span class="p">[</span><span class="n">Any</span><span class="p">]],</span> <span class="nb">set</span><span class="p">(</span><span class="n">REQUIRED_PACKAGES</span><span class="p">))</span>
+        <span class="n">missing_packages</span> <span class="o">=</span> <span class="n">required_packages_set</span> <span class="o">-</span> <span class="n">pkg_types_included</span>
         <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">missing_packages</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
                 <span class="sa">f</span><span class="s2">&quot;Missing the following required packages: </span><span class="si">{</span><span class="n">missing_packages</span><span class="si">}</span><span class="s2">&quot;</span>
@@ -586,7 +589,7 @@
                 <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">initial_condition_set</span><span class="si">}</span><span class="s2">&quot;</span>
             <span class="p">)</span>
 
-    <span class="k">def</span> <span class="nf">_check_landuse_indices_in_lookup_options</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_check_landuse_indices_in_lookup_options</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="n">grid_key</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_pkg_key</span><span class="p">(</span><span class="n">GridData</span><span class="p">)</span>
         <span class="n">landuse_options_key</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_pkg_key</span><span class="p">(</span><span class="n">LanduseOptions</span><span class="p">)</span>
 
@@ -603,7 +606,7 @@
                 <span class="sa">f</span><span class="s2">&quot;were not in LanduseOptions: </span><span class="si">{</span><span class="n">missing_indices</span><span class="si">}</span><span class="s2">&quot;</span>
             <span class="p">)</span>
 
-    <span class="k">def</span> <span class="nf">_check_vegetation_indices_in_annual_crop_factors</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_check_vegetation_indices_in_annual_crop_factors</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="n">landuse_options_key</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_pkg_key</span><span class="p">(</span><span class="n">LanduseOptions</span><span class="p">)</span>
         <span class="n">annual_crop_factors_key</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_pkg_key</span><span class="p">(</span><span class="n">AnnualCropFactors</span><span class="p">)</span>
 
@@ -622,7 +625,11 @@
                 <span class="sa">f</span><span class="s2">&quot;which were not in AnnualCropGrowth: </span><span class="si">{</span><span class="n">missing_indices</span><span class="si">}</span><span class="s2">&quot;</span>
             <span class="p">)</span>
 
-    <span class="k">def</span> <span class="nf">_get_starttime</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">has_file_copier</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+        <span class="n">pkg_types_included</span> <span class="o">=</span> <span class="p">{</span><span class="nb">type</span><span class="p">(</span><span class="n">pkg</span><span class="p">)</span> <span class="k">for</span> <span class="n">pkg</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">values</span><span class="p">()}</span>
+        <span class="k">return</span> <span class="n">FileCopier</span> <span class="ow">in</span> <span class="n">pkg_types_included</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_get_starttime</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Loop over all packages to get the minimum time.</span>
 
@@ -645,7 +652,7 @@
 
         <span class="k">return</span> <span class="n">year</span><span class="p">,</span> <span class="n">time_since_start_year</span>
 
-    <span class="k">def</span> <span class="nf">_get_pkg_key</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">pkg_type</span><span class="p">:</span> <span class="nb">type</span><span class="p">,</span> <span class="n">optional_package</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_get_pkg_key</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">pkg_type</span><span class="p">:</span> <span class="nb">type</span><span class="p">,</span> <span class="n">optional_package</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">):</span>
         <span class="k">for</span> <span class="n">pkg_key</span><span class="p">,</span> <span class="n">pkg</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
             <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">pkg</span><span class="p">,</span> <span class="n">pkg_type</span><span class="p">):</span>
                 <span class="k">return</span> <span class="n">pkg_key</span>
@@ -653,9 +660,45 @@
         <span class="k">if</span> <span class="ow">not</span> <span class="n">optional_package</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">KeyError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Could not find package of type: </span><span class="si">{</span><span class="n">pkg_type</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
 
+    <span class="k">def</span><span class="w"> </span><span class="nf">_model_checks</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">validate</span><span class="p">:</span> <span class="nb">bool</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">validate</span> <span class="ow">and</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">has_file_copier</span><span class="p">():</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_check_required_packages</span><span class="p">()</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_check_vegetation_indices_in_annual_crop_factors</span><span class="p">()</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_check_landuse_indices_in_lookup_options</span><span class="p">()</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_write_simulation_settings</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">directory</span><span class="p">:</span> <span class="n">Path</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Write simulation settings to para_sim.inp.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        directory: Path or str</span>
+<span class="sd">            directory to write model in.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">simulation_settings</span> <span class="o">=</span> <span class="n">deepcopy</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">simulation_settings</span><span class="p">)</span>
+
+        <span class="c1"># Add time settings</span>
+        <span class="n">year</span><span class="p">,</span> <span class="n">time_since_start_year</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_starttime</span><span class="p">()</span>
+
+        <span class="n">simulation_settings</span><span class="p">[</span><span class="s2">&quot;iybg&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">year</span>
+        <span class="n">simulation_settings</span><span class="p">[</span><span class="s2">&quot;tdbg&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">time_since_start_year</span>
+
+        <span class="c1"># Add IdfMapping settings</span>
+        <span class="n">idf_key</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_pkg_key</span><span class="p">(</span><span class="n">IdfMapping</span><span class="p">)</span>
+        <span class="n">simulation_settings</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="bp">self</span><span class="p">[</span><span class="n">idf_key</span><span class="p">]</span><span class="o">.</span><span class="n">get_output_settings</span><span class="p">())</span>
+
+        <span class="n">simulation_settings</span><span class="p">[</span><span class="s2">&quot;unsa_svat_path&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_render_unsaturated_database_path</span><span class="p">(</span>
+            <span class="n">simulation_settings</span><span class="p">[</span><span class="s2">&quot;unsa_svat_path&quot;</span><span class="p">]</span>
+        <span class="p">)</span>
+
+        <span class="n">filename</span> <span class="o">=</span> <span class="n">directory</span> <span class="o">/</span> <span class="bp">self</span><span class="o">.</span><span class="n">_file_name</span>
+        <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">filename</span><span class="p">,</span> <span class="s2">&quot;w&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+            <span class="n">rendered</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_template</span><span class="o">.</span><span class="n">render</span><span class="p">(</span><span class="n">settings</span><span class="o">=</span><span class="n">simulation_settings</span><span class="p">)</span>
+            <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">rendered</span><span class="p">)</span>
+
 <div class="viewcode-block" id="MetaSwapModel.write">
 <a class="viewcode-back" href="../../../api/generated/msw/imod.msw.MetaSwapModel.write.html#imod.msw.MetaSwapModel.write">[docs]</a>
-    <span class="k">def</span> <span class="nf">write</span><span class="p">(</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">write</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">directory</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Path</span><span class="p">],</span>
         <span class="n">mf6_dis</span><span class="p">:</span> <span class="n">StructuredDiscretization</span><span class="p">,</span>
@@ -672,29 +715,14 @@
 <span class="sd">        &quot;&quot;&quot;</span>
 
         <span class="c1"># Model checks</span>
-        <span class="k">if</span> <span class="n">validate</span><span class="p">:</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">_check_required_packages</span><span class="p">()</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">_check_vegetation_indices_in_annual_crop_factors</span><span class="p">()</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">_check_landuse_indices_in_lookup_options</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_model_checks</span><span class="p">(</span><span class="n">validate</span><span class="p">)</span>
 
         <span class="c1"># Force to Path</span>
         <span class="n">directory</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="n">directory</span><span class="p">)</span>
         <span class="n">directory</span><span class="o">.</span><span class="n">mkdir</span><span class="p">(</span><span class="n">exist_ok</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">parents</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 
-        <span class="c1"># Add time settings</span>
-        <span class="n">year</span><span class="p">,</span> <span class="n">time_since_start_year</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_starttime</span><span class="p">()</span>
-
-        <span class="bp">self</span><span class="o">.</span><span class="n">simulation_settings</span><span class="p">[</span><span class="s2">&quot;iybg&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">year</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">simulation_settings</span><span class="p">[</span><span class="s2">&quot;tdbg&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">time_since_start_year</span>
-
-        <span class="c1"># Add IdfMapping settings</span>
-        <span class="n">idf_key</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_pkg_key</span><span class="p">(</span><span class="n">IdfMapping</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">simulation_settings</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="bp">self</span><span class="p">[</span><span class="n">idf_key</span><span class="p">]</span><span class="o">.</span><span class="n">get_output_settings</span><span class="p">())</span>
-
-        <span class="n">filename</span> <span class="o">=</span> <span class="n">directory</span> <span class="o">/</span> <span class="bp">self</span><span class="o">.</span><span class="n">_file_name</span>
-        <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">filename</span><span class="p">,</span> <span class="s2">&quot;w&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
-            <span class="n">rendered</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_template</span><span class="o">.</span><span class="n">render</span><span class="p">(</span><span class="n">settings</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">simulation_settings</span><span class="p">)</span>
-            <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">rendered</span><span class="p">)</span>
+        <span class="c1"># Write simulation settings</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_write_simulation_settings</span><span class="p">(</span><span class="n">directory</span><span class="p">)</span>
 
         <span class="c1"># Get index and svat</span>
         <span class="n">grid_key</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_pkg_key</span><span class="p">(</span><span class="n">GridData</span><span class="p">)</span>
@@ -707,7 +735,7 @@
 
 <div class="viewcode-block" id="MetaSwapModel.regrid_like">
 <a class="viewcode-back" href="../../../api/generated/msw/imod.msw.MetaSwapModel.regrid_like.html#imod.msw.MetaSwapModel.regrid_like">[docs]</a>
-    <span class="k">def</span> <span class="nf">regrid_like</span><span class="p">(</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">regrid_like</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">mf6_regridded_dis</span><span class="p">:</span> <span class="n">StructuredDiscretization</span><span class="p">,</span>
         <span class="n">regrid_context</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">RegridderWeightsCache</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
@@ -742,7 +770,7 @@
 <div class="viewcode-block" id="MetaSwapModel.from_imod5_data">
 <a class="viewcode-back" href="../../../api/generated/msw/imod.msw.MetaSwapModel.from_imod5_data.html#imod.msw.MetaSwapModel.from_imod5_data">[docs]</a>
     <span class="nd">@classmethod</span>
-    <span class="k">def</span> <span class="nf">from_imod5_data</span><span class="p">(</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">from_imod5_data</span><span class="p">(</span>
         <span class="bp">cls</span><span class="p">,</span>
         <span class="n">imod5_data</span><span class="p">:</span> <span class="n">Imod5DataDict</span><span class="p">,</span>
         <span class="n">target_dis</span><span class="p">:</span> <span class="n">StructuredDiscretization</span><span class="p">,</span>
@@ -834,8 +862,8 @@
   </div>
   
   <!-- Scripts loaded after <body> so the DOM is not blocked -->
-  <script defer src="../../../_static/scripts/bootstrap.js?digest=26a4bc78f4c0ddb94549"></script>
-<script defer src="../../../_static/scripts/pydata-sphinx-theme.js?digest=26a4bc78f4c0ddb94549"></script>
+  <script defer src="../../../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf"></script>
+<script defer src="../../../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf"></script>
 
   <footer class="bd-footer">
 <div class="bd-footer__inner bd-page-width">
@@ -855,7 +883,7 @@
         <div class="footer-item">
 
   <p class="sphinx-version">
-    Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 8.1.3.
+    Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 8.2.1.
     <br/>
   </p>
 </div>
@@ -868,7 +896,8 @@
       
         <div class="footer-item">
 <p class="theme-version">
-  Built with the <a href="https://pydata-sphinx-theme.readthedocs.io/en/stable/index.html">PyData Sphinx Theme</a> 0.16.0.
+  <!-- # L10n: Setting the PST URL as an argument as this does not need to be localized -->
+  Built with the <a href="https://pydata-sphinx-theme.readthedocs.io/en/stable/index.html">PyData Sphinx Theme</a> 0.16.1.
 </p></div>
       
     </div>

@@ -7,7 +7,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>imod.prepare.spatial &#8212; iMOD Python 1.0.0rc1 documentation</title>
+    <title>imod.prepare.spatial &#8212; iMOD Python 1.0.0rc2 documentation</title>
   
   
   
@@ -15,8 +15,8 @@
     document.documentElement.dataset.mode = localStorage.getItem("mode") || "light";
     document.documentElement.dataset.theme = localStorage.getItem("theme") || "light";
   </script>
-  <!-- 
-    this give us a css class that will be invisible only if js is disabled 
+  <!--
+    this give us a css class that will be invisible only if js is disabled
   -->
   <noscript>
     <style>
@@ -26,22 +26,22 @@
   </noscript>
   
   <!-- Loaded before other Sphinx assets -->
-  <link href="../../../_static/styles/theme.css?digest=26a4bc78f4c0ddb94549" rel="stylesheet" />
-<link href="../../../_static/styles/pydata-sphinx-theme.css?digest=26a4bc78f4c0ddb94549" rel="stylesheet" />
+  <link href="../../../_static/styles/theme.css?digest=8878045cc6db502f8baf" rel="stylesheet" />
+<link href="../../../_static/styles/pydata-sphinx-theme.css?digest=8878045cc6db502f8baf" rel="stylesheet" />
 
-    <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=fa44fd50" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=03e43079" />
     <link rel="stylesheet" type="text/css" href="../../../_static/sg_gallery.css?v=d2d258e8" />
     <link rel="stylesheet" type="text/css" href="../../../_static/sg_gallery-binder.css?v=f4aeca0c" />
     <link rel="stylesheet" type="text/css" href="../../../_static/sg_gallery-dataframe.css?v=2082cf3c" />
     <link rel="stylesheet" type="text/css" href="../../../_static/sg_gallery-rendered-html.css?v=1277b6f3" />
   
   <!-- So that users can add custom icons -->
-  <script src="../../../_static/scripts/fontawesome.js?digest=26a4bc78f4c0ddb94549"></script>
+  <script src="../../../_static/scripts/fontawesome.js?digest=8878045cc6db502f8baf"></script>
   <!-- Pre-loaded scripts that we'll load fully later -->
-  <link rel="preload" as="script" href="../../../_static/scripts/bootstrap.js?digest=26a4bc78f4c0ddb94549" />
-<link rel="preload" as="script" href="../../../_static/scripts/pydata-sphinx-theme.js?digest=26a4bc78f4c0ddb94549" />
+  <link rel="preload" as="script" href="../../../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
+<link rel="preload" as="script" href="../../../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
 
-    <script src="../../../_static/documentation_options.js?v=77c1c56c"></script>
+    <script src="../../../_static/documentation_options.js?v=40394f06"></script>
     <script src="../../../_static/doctools.js?v=9bcbadda"></script>
     <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script>DOCUMENTATION_OPTIONS.pagename = '_modules/imod/prepare/spatial';</script>
@@ -50,7 +50,7 @@
     <link rel="search" title="Search" href="../../../search.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
-  <meta name="docsearch:version" content="1.0.0rc1.dev" />
+  <meta name="docsearch:version" content="1.0.0rc2.dev" />
   </head>
   
   
@@ -114,8 +114,8 @@
     
     
     
-    <img src="../../../_static/imod-python-logo-light.svg" class="logo__image only-light" alt="iMOD Python 1.0.0rc1 documentation - Home"/>
-    <img src="../../../_static/imod-python-logo-dark.svg" class="logo__image only-dark pst-js-only" alt="iMOD Python 1.0.0rc1 documentation - Home"/>
+    <img src="../../../_static/imod-python-logo-light.svg" class="logo__image only-light" alt="iMOD Python 1.0.0rc2 documentation - Home"/>
+    <img src="../../../_static/imod-python-logo-dark.svg" class="logo__image only-dark pst-js-only" alt="iMOD Python 1.0.0rc2 documentation - Home"/>
   
   
 </a></div>
@@ -165,7 +165,9 @@
 </li>
 
             <li class="nav-item dropdown">
-                <button class="btn dropdown-toggle nav-item" type="button" data-bs-toggle="dropdown" aria-expanded="false" aria-controls="pst-nav-more-links">
+                <button class="btn dropdown-toggle nav-item" type="button"
+                data-bs-toggle="dropdown" aria-expanded="false"
+                aria-controls="pst-nav-more-links">
                     More
                 </button>
                 <ul id="pst-nav-more-links" class="dropdown-menu">
@@ -371,9 +373,14 @@
   
   
   <div class="sidebar-primary-items__end sidebar-primary__section">
+      <div class="sidebar-primary-item">
+<div id="ethical-ad-placement"
+      class="flat"
+      data-ea-publisher="readthedocs"
+      data-ea-type="readthedocs-sidebar"
+      data-ea-manual="true">
+</div></div>
   </div>
-  
-  <div id="rtd-footer-container"></div>
 
 
       </div>
@@ -420,36 +427,38 @@
                 <article class="bd-article">
                   
   <h1>Source code for imod.prepare.spatial</h1><div class="highlight"><pre>
-<span></span><span class="kn">import</span> <span class="nn">pathlib</span>
-<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">TYPE_CHECKING</span><span class="p">,</span> <span class="n">Callable</span><span class="p">,</span> <span class="n">Iterable</span><span class="p">,</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">Union</span>
+<span></span><span class="kn">import</span><span class="w"> </span><span class="nn">pathlib</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">TYPE_CHECKING</span><span class="p">,</span> <span class="n">Callable</span><span class="p">,</span> <span class="n">Iterable</span><span class="p">,</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">Union</span><span class="p">,</span> <span class="n">cast</span>
 
-<span class="kn">import</span> <span class="nn">dask</span>
-<span class="kn">import</span> <span class="nn">numba</span>
-<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
-<span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
-<span class="kn">import</span> <span class="nn">scipy.ndimage</span>
-<span class="kn">import</span> <span class="nn">xarray</span> <span class="k">as</span> <span class="nn">xr</span>
-<span class="kn">from</span> <span class="nn">numpy.typing</span> <span class="kn">import</span> <span class="n">DTypeLike</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">dask</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">numba</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">pandas</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">pd</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">scipy.ndimage</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">xarray</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">xr</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">numpy.typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">DTypeLike</span>
 
-<span class="kn">import</span> <span class="nn">imod</span>
-<span class="kn">from</span> <span class="nn">imod.prepare</span> <span class="kn">import</span> <span class="n">common</span><span class="p">,</span> <span class="n">pcg</span>
-<span class="kn">from</span> <span class="nn">imod.util.imports</span> <span class="kn">import</span> <span class="n">MissingOptionalModule</span>
-<span class="kn">from</span> <span class="nn">imod.util.spatial</span> <span class="kn">import</span> <span class="n">_polygonize</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">imod</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">imod.prepare</span><span class="w"> </span><span class="kn">import</span> <span class="n">common</span><span class="p">,</span> <span class="n">laplace</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">imod.util.imports</span><span class="w"> </span><span class="kn">import</span> <span class="n">MissingOptionalModule</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">imod.util.spatial</span><span class="w"> </span><span class="kn">import</span> <span class="n">_polygonize</span>
 
 <span class="c1"># since rasterio is a big dependency that is sometimes hard to install</span>
 <span class="c1"># and not always required, we made this an optional dependency</span>
 <span class="k">try</span><span class="p">:</span>
-    <span class="kn">import</span> <span class="nn">rasterio</span>
-    <span class="kn">import</span> <span class="nn">rasterio.features</span>
-    <span class="kn">import</span> <span class="nn">rasterio.warp</span>
+    <span class="kn">import</span><span class="w"> </span><span class="nn">rasterio</span>
+    <span class="kn">import</span><span class="w"> </span><span class="nn">rasterio.features</span>
+    <span class="kn">import</span><span class="w"> </span><span class="nn">rasterio.warp</span>
 <span class="k">except</span> <span class="ne">ImportError</span><span class="p">:</span>
     <span class="n">rasterio</span> <span class="o">=</span> <span class="n">MissingOptionalModule</span><span class="p">(</span><span class="s2">&quot;rasterio&quot;</span><span class="p">)</span>
 
 <span class="k">if</span> <span class="n">TYPE_CHECKING</span><span class="p">:</span>
-    <span class="kn">import</span> <span class="nn">geopandas</span> <span class="k">as</span> <span class="nn">gpd</span>
+    <span class="kn">import</span><span class="w"> </span><span class="nn">geopandas</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">gpd</span>
 
 
-<span class="k">def</span> <span class="nf">round_extent</span><span class="p">(</span><span class="n">extent</span><span class="p">,</span> <span class="n">cellsize</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">round_extent</span><span class="p">(</span>
+    <span class="n">extent</span><span class="p">:</span> <span class="nb">tuple</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="nb">float</span><span class="p">,</span> <span class="nb">float</span><span class="p">,</span> <span class="nb">float</span><span class="p">],</span> <span class="n">cellsize</span><span class="p">:</span> <span class="nb">float</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">tuple</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="nb">float</span><span class="p">,</span> <span class="nb">float</span><span class="p">,</span> <span class="nb">float</span><span class="p">]:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Increases the extent until all sides lie on a coordinate</span>
 <span class="sd">    divisible by cellsize.&quot;&quot;&quot;</span>
     <span class="n">xmin</span><span class="p">,</span> <span class="n">ymin</span><span class="p">,</span> <span class="n">xmax</span><span class="p">,</span> <span class="n">ymax</span> <span class="o">=</span> <span class="n">extent</span>
@@ -460,7 +469,7 @@
     <span class="k">return</span> <span class="n">xmin</span><span class="p">,</span> <span class="n">ymin</span><span class="p">,</span> <span class="n">xmax</span><span class="p">,</span> <span class="n">ymax</span>
 
 
-<span class="k">def</span> <span class="nf">round_z</span><span class="p">(</span><span class="n">z_extent</span><span class="p">,</span> <span class="n">dz</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">round_z</span><span class="p">(</span><span class="n">z_extent</span><span class="p">:</span> <span class="nb">tuple</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="nb">float</span><span class="p">],</span> <span class="n">dz</span><span class="p">:</span> <span class="nb">float</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Increases the extent until all sides lie on a coordinate</span>
 <span class="sd">    divisible by dz.&quot;&quot;&quot;</span>
     <span class="n">zmin</span><span class="p">,</span> <span class="n">zmax</span> <span class="o">=</span> <span class="n">z_extent</span>
@@ -469,7 +478,7 @@
     <span class="k">return</span> <span class="n">zmin</span><span class="p">,</span> <span class="n">zmax</span>
 
 
-<span class="k">def</span> <span class="nf">_fill_np</span><span class="p">(</span><span class="n">data</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">_fill_np</span><span class="p">(</span><span class="n">data</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">:</span>
     <span class="n">nodata</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">isnan</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
     <span class="k">if</span> <span class="ow">not</span> <span class="n">nodata</span><span class="o">.</span><span class="n">any</span><span class="p">():</span>
         <span class="k">return</span> <span class="n">data</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
@@ -484,7 +493,7 @@
 
 <div class="viewcode-block" id="fill">
 <a class="viewcode-back" href="../../../api/generated/prepare/imod.prepare.fill.html#imod.prepare.fill">[docs]</a>
-<span class="k">def</span> <span class="nf">fill</span><span class="p">(</span><span class="n">da</span><span class="p">,</span> <span class="n">dims</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">fill</span><span class="p">(</span><span class="n">da</span><span class="p">:</span> <span class="n">xr</span><span class="o">.</span><span class="n">DataArray</span><span class="p">,</span> <span class="n">dims</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">tuple</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="o">...</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">xr</span><span class="o">.</span><span class="n">DataArray</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Fill in NaNs using basic nearest neighbour interpolation.</span>
 
@@ -543,107 +552,82 @@
 
 <div class="viewcode-block" id="laplace_interpolate">
 <a class="viewcode-back" href="../../../api/generated/prepare/imod.prepare.laplace_interpolate.html#imod.prepare.laplace_interpolate">[docs]</a>
-<span class="k">def</span> <span class="nf">laplace_interpolate</span><span class="p">(</span>
-    <span class="n">source</span><span class="p">,</span> <span class="n">ibound</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">close</span><span class="o">=</span><span class="mf">0.01</span><span class="p">,</span> <span class="n">mxiter</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span> <span class="n">iter1</span><span class="o">=</span><span class="mi">50</span><span class="p">,</span> <span class="n">relax</span><span class="o">=</span><span class="mf">0.98</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">laplace_interpolate</span><span class="p">(</span>
+    <span class="n">source</span><span class="p">:</span> <span class="n">xr</span><span class="o">.</span><span class="n">DataArray</span><span class="p">,</span>
+    <span class="n">dims</span><span class="p">:</span> <span class="nb">tuple</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="o">...</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="s2">&quot;y&quot;</span><span class="p">,</span> <span class="s2">&quot;x&quot;</span><span class="p">),</span>
+    <span class="n">direct</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
+    <span class="n">delta</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.0</span><span class="p">,</span>
+    <span class="n">relax</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.97</span><span class="p">,</span>
+    <span class="n">atol</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.0</span><span class="p">,</span>
+    <span class="n">rtol</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">1.0e-5</span><span class="p">,</span>
+    <span class="n">maxiter</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">500</span><span class="p">,</span>
 <span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Fills gaps in `source` by interpolating from existing values using Laplace</span>
-<span class="sd">    interpolation.</span>
+<span class="sd">    Fills gaps in ``source`` (NaN values) by interpolating from existing values</span>
+<span class="sd">    using Laplace interpolation.</span>
 
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
-<span class="sd">    source : xr.DataArray of floats with dims (y, x)</span>
+<span class="sd">    source : xr.DataArray of floats</span>
 <span class="sd">        Data values to interpolate.</span>
-<span class="sd">    ibound : xr.DataArray of bool with dims (y, x)</span>
-<span class="sd">        Precomputed array which marks where to interpolate.</span>
-<span class="sd">    close : float</span>
-<span class="sd">        Closure criteration of iterative solver. Should be one to two orders</span>
-<span class="sd">        of magnitude smaller than desired accuracy.</span>
-<span class="sd">    mxiter : int</span>
-<span class="sd">        Outer iterations of iterative solver.</span>
-<span class="sd">    iter1 : int</span>
-<span class="sd">        Inner iterations of iterative solver. Should not exceed 50.</span>
-<span class="sd">    relax : float</span>
-<span class="sd">        Iterative solver relaxation parameter. Should be between 0 and 1.</span>
+<span class="sd">    dims: sequence of str, default is ``(&quot;y&quot;, &quot;x&quot;)``.</span>
+<span class="sd">        Dimensions along which to search for nearest neighbors. For example,</span>
+<span class="sd">        (&quot;y&quot;, &quot;x&quot;) will perform 2D interpolation in the horizontal plane, while</span>
+<span class="sd">        (&quot;layer&quot;, &quot;y&quot;, &quot;x&quot;) will perform 3D interpolation including the</span>
+<span class="sd">        vertical dimension.</span>
+<span class="sd">    direct: bool, optional, default ``False``</span>
+<span class="sd">        Whether to use a direct or an iterative solver or a conjugate gradient</span>
+<span class="sd">        solver. Direct method provides an exact answer, but are unsuitable</span>
+<span class="sd">        for large problems (&gt; 10 000 unknowns).</span>
+<span class="sd">    delta: float, default 0.0.</span>
+<span class="sd">        ILU0 preconditioner non-diagonally dominant correction.</span>
+<span class="sd">    relax: float, default 0.97.</span>
+<span class="sd">        Modified ILU0 preconditioner relaxation factor.</span>
+<span class="sd">    rtol: float, optional, default 1.0e-5.</span>
+<span class="sd">        Convergence tolerance for ``scipy.sparse.linalg.cg``.</span>
+<span class="sd">    atol: float, optional, default 0.0.</span>
+<span class="sd">        Convergence tolerance for ``scipy.sparse.linalg.cg``.</span>
+<span class="sd">    maxiter: int, default 500.</span>
+<span class="sd">        Maximum number of iterations for ``scipy.sparse.linalg.cg``.</span>
 
 <span class="sd">    Returns</span>
 <span class="sd">    -------</span>
-<span class="sd">    interpolated : xr.DataArray with dims (y, x)</span>
-<span class="sd">        source, with interpolated values where ibound equals 1</span>
+<span class="sd">    interpolated : xr.DataArray</span>
+<span class="sd">        source, with interpolated values.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="n">solver</span> <span class="o">=</span> <span class="n">pcg</span><span class="o">.</span><span class="n">PreconditionedConjugateGradientSolver</span><span class="p">(</span>
-        <span class="n">close</span><span class="p">,</span> <span class="n">close</span> <span class="o">*</span> <span class="mf">1.0e6</span><span class="p">,</span> <span class="n">mxiter</span><span class="p">,</span> <span class="n">iter1</span><span class="p">,</span> <span class="n">relax</span>
-    <span class="p">)</span>
-
-    <span class="k">if</span> <span class="ow">not</span> <span class="n">source</span><span class="o">.</span><span class="n">dims</span> <span class="o">==</span> <span class="p">(</span><span class="s2">&quot;y&quot;</span><span class="p">,</span> <span class="s2">&quot;x&quot;</span><span class="p">):</span>
-        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;source dims must be (&quot;y&quot;, &quot;x&quot;)&#39;</span><span class="p">)</span>
-
-    <span class="c1"># expand dims to make 3d</span>
-    <span class="n">source3d</span> <span class="o">=</span> <span class="n">source</span><span class="o">.</span><span class="n">expand_dims</span><span class="p">(</span><span class="s2">&quot;layer&quot;</span><span class="p">)</span>
-    <span class="k">if</span> <span class="n">ibound</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-        <span class="n">iboundv</span> <span class="o">=</span> <span class="n">xr</span><span class="o">.</span><span class="n">full_like</span><span class="p">(</span><span class="n">source3d</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">int32</span><span class="p">)</span><span class="o">.</span><span class="n">values</span>
-    <span class="k">else</span><span class="p">:</span>
-        <span class="k">if</span> <span class="ow">not</span> <span class="n">ibound</span><span class="o">.</span><span class="n">dims</span> <span class="o">==</span> <span class="p">(</span><span class="s2">&quot;y&quot;</span><span class="p">,</span> <span class="s2">&quot;x&quot;</span><span class="p">):</span>
-            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;ibound dims must be (&quot;y&quot;, &quot;x&quot;)&#39;</span><span class="p">)</span>
-        <span class="k">if</span> <span class="ow">not</span> <span class="n">ibound</span><span class="o">.</span><span class="n">shape</span> <span class="o">==</span> <span class="n">source</span><span class="o">.</span><span class="n">shape</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;ibound and source must have the same shape&quot;</span><span class="p">)</span>
-        <span class="n">iboundv</span> <span class="o">=</span> <span class="n">ibound</span><span class="o">.</span><span class="n">expand_dims</span><span class="p">(</span><span class="s2">&quot;layer&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">int32</span><span class="p">)</span><span class="o">.</span><span class="n">values</span>
-
-    <span class="n">has_data</span> <span class="o">=</span> <span class="n">source3d</span><span class="o">.</span><span class="n">notnull</span><span class="p">()</span><span class="o">.</span><span class="n">values</span>
-    <span class="n">iboundv</span><span class="p">[</span><span class="n">has_data</span><span class="p">]</span> <span class="o">=</span> <span class="o">-</span><span class="mi">1</span>
-    <span class="n">hnew</span> <span class="o">=</span> <span class="n">source3d</span><span class="o">.</span><span class="n">fillna</span><span class="p">(</span><span class="mf">0.0</span><span class="p">)</span><span class="o">.</span><span class="n">values</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span>
-        <span class="n">np</span><span class="o">.</span><span class="n">float64</span>
-    <span class="p">)</span>  <span class="c1"># Set start interpolated estimate to 0.0</span>
-
-    <span class="n">shape</span> <span class="o">=</span> <span class="n">iboundv</span><span class="o">.</span><span class="n">shape</span>
-    <span class="n">nlay</span><span class="p">,</span> <span class="n">nrow</span><span class="p">,</span> <span class="n">ncol</span> <span class="o">=</span> <span class="n">shape</span>
-    <span class="n">nodes</span> <span class="o">=</span> <span class="n">nlay</span> <span class="o">*</span> <span class="n">nrow</span> <span class="o">*</span> <span class="n">ncol</span>
-    <span class="c1"># Allocate work arrays</span>
-    <span class="c1"># Not really used now, but might come in handy to implements weights</span>
-    <span class="n">cc</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">ones</span><span class="p">(</span><span class="n">shape</span><span class="p">)</span>
-    <span class="n">cr</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">ones</span><span class="p">(</span><span class="n">shape</span><span class="p">)</span>
-    <span class="n">cv</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">ones</span><span class="p">(</span><span class="n">shape</span><span class="p">)</span>
-    <span class="n">rhs</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">shape</span><span class="p">)</span>
-    <span class="n">hcof</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">shape</span><span class="p">)</span>
-    <span class="c1"># Solver work arrays</span>
-    <span class="n">res</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">nodes</span><span class="p">)</span>
-    <span class="n">cd</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">nodes</span><span class="p">)</span>
-    <span class="n">v</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">nodes</span><span class="p">)</span>
-    <span class="n">ss</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">nodes</span><span class="p">)</span>
-    <span class="n">p</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">nodes</span><span class="p">)</span>
-
-    <span class="c1"># Picard iteration</span>
-    <span class="n">converged</span> <span class="o">=</span> <span class="kc">False</span>
-    <span class="n">outer_iteration</span> <span class="o">=</span> <span class="mi">0</span>
-    <span class="k">while</span> <span class="ow">not</span> <span class="n">converged</span> <span class="ow">and</span> <span class="n">outer_iteration</span> <span class="o">&lt;</span> <span class="n">mxiter</span><span class="p">:</span>
-        <span class="c1"># Mutates hnew</span>
-        <span class="n">converged</span> <span class="o">=</span> <span class="n">solver</span><span class="o">.</span><span class="n">solve</span><span class="p">(</span>
-            <span class="n">hnew</span><span class="o">=</span><span class="n">hnew</span><span class="p">,</span>
-            <span class="n">cc</span><span class="o">=</span><span class="n">cc</span><span class="p">,</span>
-            <span class="n">cr</span><span class="o">=</span><span class="n">cr</span><span class="p">,</span>
-            <span class="n">cv</span><span class="o">=</span><span class="n">cv</span><span class="p">,</span>
-            <span class="n">ibound</span><span class="o">=</span><span class="n">iboundv</span><span class="p">,</span>
-            <span class="n">rhs</span><span class="o">=</span><span class="n">rhs</span><span class="p">,</span>
-            <span class="n">hcof</span><span class="o">=</span><span class="n">hcof</span><span class="p">,</span>
-            <span class="n">res</span><span class="o">=</span><span class="n">res</span><span class="p">,</span>
-            <span class="n">cd</span><span class="o">=</span><span class="n">cd</span><span class="p">,</span>
-            <span class="n">v</span><span class="o">=</span><span class="n">v</span><span class="p">,</span>
-            <span class="n">ss</span><span class="o">=</span><span class="n">ss</span><span class="p">,</span>
-            <span class="n">p</span><span class="o">=</span><span class="n">p</span><span class="p">,</span>
-        <span class="p">)</span>
-        <span class="n">outer_iteration</span> <span class="o">+=</span> <span class="mi">1</span>
-    <span class="k">else</span><span class="p">:</span>
-        <span class="k">if</span> <span class="ow">not</span> <span class="n">converged</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="s2">&quot;Failed to converge&quot;</span><span class="p">)</span>
-
-    <span class="n">hnew</span><span class="p">[</span><span class="n">iboundv</span> <span class="o">==</span> <span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span>
-    <span class="k">return</span> <span class="n">source</span><span class="o">.</span><span class="n">copy</span><span class="p">(</span><span class="n">data</span><span class="o">=</span><span class="n">hnew</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span></div>
+    <span class="n">missing_dims</span> <span class="o">=</span> <span class="nb">set</span><span class="p">(</span><span class="n">dims</span><span class="p">)</span> <span class="o">-</span> <span class="nb">set</span><span class="p">(</span><span class="n">cast</span><span class="p">(</span><span class="nb">tuple</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="o">...</span><span class="p">],</span> <span class="n">source</span><span class="o">.</span><span class="n">dims</span><span class="p">))</span>
+    <span class="k">if</span> <span class="n">missing_dims</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Dimensions not in source: </span><span class="si">{</span><span class="n">missing_dims</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+    <span class="c1"># Ensure order matches the order in source.</span>
+    <span class="n">dims</span> <span class="o">=</span> <span class="nb">tuple</span><span class="p">(</span><span class="n">cast</span><span class="p">(</span><span class="nb">str</span><span class="p">,</span> <span class="n">dim</span><span class="p">)</span> <span class="k">for</span> <span class="n">dim</span> <span class="ow">in</span> <span class="n">source</span><span class="o">.</span><span class="n">dims</span> <span class="k">if</span> <span class="n">dim</span> <span class="ow">in</span> <span class="n">dims</span><span class="p">)</span>
+    <span class="n">shape</span> <span class="o">=</span> <span class="nb">tuple</span><span class="p">(</span><span class="n">source</span><span class="o">.</span><span class="n">sizes</span><span class="p">[</span><span class="n">d</span><span class="p">]</span> <span class="k">for</span> <span class="n">d</span> <span class="ow">in</span> <span class="n">dims</span><span class="p">)</span>
+    <span class="n">connectivity</span> <span class="o">=</span> <span class="n">laplace</span><span class="o">.</span><span class="n">_build_connectivity</span><span class="p">(</span><span class="n">shape</span><span class="p">)</span>
+    <span class="n">arr</span> <span class="o">=</span> <span class="n">xr</span><span class="o">.</span><span class="n">apply_ufunc</span><span class="p">(</span>
+        <span class="n">laplace</span><span class="o">.</span><span class="n">_interpolate</span><span class="p">,</span>
+        <span class="n">source</span><span class="p">,</span>
+        <span class="n">input_core_dims</span><span class="o">=</span><span class="p">[</span><span class="n">dims</span><span class="p">],</span>
+        <span class="n">output_core_dims</span><span class="o">=</span><span class="p">[</span><span class="n">dims</span><span class="p">],</span>
+        <span class="n">output_dtypes</span><span class="o">=</span><span class="p">[</span><span class="n">source</span><span class="o">.</span><span class="n">dtype</span><span class="p">],</span>
+        <span class="n">dask</span><span class="o">=</span><span class="s2">&quot;parallelized&quot;</span><span class="p">,</span>
+        <span class="n">vectorize</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+        <span class="n">keep_attrs</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+        <span class="n">kwargs</span><span class="o">=</span><span class="p">{</span>
+            <span class="s2">&quot;connectivity&quot;</span><span class="p">:</span> <span class="n">connectivity</span><span class="p">,</span>
+            <span class="s2">&quot;direct&quot;</span><span class="p">:</span> <span class="n">direct</span><span class="p">,</span>
+            <span class="s2">&quot;delta&quot;</span><span class="p">:</span> <span class="n">delta</span><span class="p">,</span>
+            <span class="s2">&quot;relax&quot;</span><span class="p">:</span> <span class="n">relax</span><span class="p">,</span>
+            <span class="s2">&quot;atol&quot;</span><span class="p">:</span> <span class="n">atol</span><span class="p">,</span>
+            <span class="s2">&quot;rtol&quot;</span><span class="p">:</span> <span class="n">rtol</span><span class="p">,</span>
+            <span class="s2">&quot;maxiter&quot;</span><span class="p">:</span> <span class="n">maxiter</span><span class="p">,</span>
+        <span class="p">},</span>
+    <span class="p">)</span><span class="o">.</span><span class="n">transpose</span><span class="p">(</span><span class="o">*</span><span class="n">source</span><span class="o">.</span><span class="n">dims</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">arr</span></div>
 
 
 
 <div class="viewcode-block" id="rasterize">
 <a class="viewcode-back" href="../../../api/generated/prepare/imod.prepare.rasterize.html#imod.prepare.rasterize">[docs]</a>
-<span class="k">def</span> <span class="nf">rasterize</span><span class="p">(</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">rasterize</span><span class="p">(</span>
     <span class="n">geodataframe</span><span class="p">:</span> <span class="s2">&quot;gpd.GeoDataFrame&quot;</span><span class="p">,</span>
     <span class="n">like</span><span class="p">:</span> <span class="n">xr</span><span class="o">.</span><span class="n">DataArray</span><span class="p">,</span>
     <span class="n">column</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span> <span class="o">|</span> <span class="nb">int</span> <span class="o">|</span> <span class="nb">float</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
@@ -708,7 +692,7 @@
 
 <div class="viewcode-block" id="polygonize">
 <a class="viewcode-back" href="../../../api/generated/prepare/imod.prepare.polygonize.html#imod.prepare.polygonize">[docs]</a>
-<span class="k">def</span> <span class="nf">polygonize</span><span class="p">(</span><span class="n">da</span><span class="p">:</span> <span class="n">xr</span><span class="o">.</span><span class="n">DataArray</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="s2">&quot;gpd.GeoDataFrame&quot;</span><span class="p">:</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">polygonize</span><span class="p">(</span><span class="n">da</span><span class="p">:</span> <span class="n">xr</span><span class="o">.</span><span class="n">DataArray</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="s2">&quot;gpd.GeoDataFrame&quot;</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Polygonize a 2D-DataArray into a GeoDataFrame of polygons.</span>
 
@@ -724,7 +708,7 @@
 
 
 
-<span class="k">def</span> <span class="nf">_handle_dtype</span><span class="p">(</span><span class="n">dtype</span><span class="p">,</span> <span class="n">nodata</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">_handle_dtype</span><span class="p">(</span><span class="n">dtype</span><span class="p">,</span> <span class="n">nodata</span><span class="p">):</span>
     <span class="c1"># Largely taken from rasterio.dtypes</span>
     <span class="c1"># https://github.com/mapbox/rasterio/blob/master/rasterio/dtypes.py</span>
     <span class="c1"># Not supported:</span>
@@ -752,7 +736,7 @@
         <span class="s2">&quot;int64&quot;</span><span class="p">:</span> <span class="p">(</span><span class="o">-</span><span class="mi">9223372036854775808</span><span class="p">,</span> <span class="mi">9223372036854775807</span><span class="p">),</span>
     <span class="p">}</span>
 
-    <span class="k">def</span> <span class="nf">format_invalid</span><span class="p">(</span><span class="n">str_dtype</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">format_invalid</span><span class="p">(</span><span class="n">str_dtype</span><span class="p">):</span>
         <span class="n">str_dtypes</span> <span class="o">=</span> <span class="n">dtype_mapping</span><span class="o">.</span><span class="n">keys</span><span class="p">()</span>
         <span class="k">return</span> <span class="s2">&quot;Invalid dtype: </span><span class="si">{0}</span><span class="s2">, must be one of: </span><span class="si">{1}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
             <span class="n">str_dtype</span><span class="p">,</span> <span class="s2">&quot;, &quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">str_dtypes</span><span class="p">)</span>
@@ -780,7 +764,7 @@
 
 <div class="viewcode-block" id="gdal_rasterize">
 <a class="viewcode-back" href="../../../api/generated/prepare/imod.prepare.gdal_rasterize.html#imod.prepare.gdal_rasterize">[docs]</a>
-<span class="k">def</span> <span class="nf">gdal_rasterize</span><span class="p">(</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">gdal_rasterize</span><span class="p">(</span>
     <span class="n">path</span><span class="p">,</span>
     <span class="n">column</span><span class="p">,</span>
     <span class="n">like</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
@@ -822,7 +806,7 @@
 <span class="sd">    -------</span>
 <span class="sd">    rasterized : xr.DataArray</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="kn">from</span> <span class="nn">osgeo</span> <span class="kn">import</span> <span class="n">gdal</span><span class="p">,</span> <span class="n">ogr</span>
+    <span class="kn">from</span><span class="w"> </span><span class="nn">osgeo</span><span class="w"> </span><span class="kn">import</span> <span class="n">gdal</span><span class="p">,</span> <span class="n">ogr</span>
 
     <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="n">pathlib</span><span class="o">.</span><span class="n">Path</span><span class="p">):</span>
         <span class="n">p</span> <span class="o">=</span> <span class="n">path</span>
@@ -843,13 +827,13 @@
     <span class="n">gdal</span><span class="o">.</span><span class="n">UseExceptions</span><span class="p">()</span>
 
     <span class="c1"># An attempt at decent errors</span>
-    <span class="k">class</span> <span class="nc">GdalErrorHandler</span><span class="p">:</span>
-        <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">class</span><span class="w"> </span><span class="nc">GdalErrorHandler</span><span class="p">:</span>
+        <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">err_level</span> <span class="o">=</span> <span class="n">gdal</span><span class="o">.</span><span class="n">CE_None</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">err_no</span> <span class="o">=</span> <span class="mi">0</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">err_msg</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
 
-        <span class="k">def</span> <span class="nf">handler</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">err_level</span><span class="p">,</span> <span class="n">err_no</span><span class="p">,</span> <span class="n">err_msg</span><span class="p">):</span>
+        <span class="k">def</span><span class="w"> </span><span class="nf">handler</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">err_level</span><span class="p">,</span> <span class="n">err_no</span><span class="p">,</span> <span class="n">err_msg</span><span class="p">):</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">err_level</span> <span class="o">=</span> <span class="n">err_level</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">err_no</span> <span class="o">=</span> <span class="n">err_no</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">err_msg</span> <span class="o">=</span> <span class="n">err_msg</span>
@@ -906,7 +890,7 @@
 
 
 <span class="nd">@numba</span><span class="o">.</span><span class="n">njit</span><span class="p">(</span><span class="n">cache</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-<span class="k">def</span> <span class="nf">_cell_count</span><span class="p">(</span><span class="n">src</span><span class="p">,</span> <span class="n">values</span><span class="p">,</span> <span class="n">frequencies</span><span class="p">,</span> <span class="n">nodata</span><span class="p">,</span> <span class="o">*</span><span class="n">inds_weights</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">_cell_count</span><span class="p">(</span><span class="n">src</span><span class="p">,</span> <span class="n">values</span><span class="p">,</span> <span class="n">frequencies</span><span class="p">,</span> <span class="n">nodata</span><span class="p">,</span> <span class="o">*</span><span class="n">inds_weights</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    numba compiled function to count the number of src cells occuring in the dst</span>
 <span class="sd">    cells.</span>
@@ -999,7 +983,7 @@
     <span class="k">return</span> <span class="n">row_i_arr</span><span class="p">,</span> <span class="n">col_i_arr</span><span class="p">,</span> <span class="n">value_arr</span><span class="p">,</span> <span class="n">count_arr</span>
 
 
-<span class="k">def</span> <span class="nf">_celltable</span><span class="p">(</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">_celltable</span><span class="p">(</span>
     <span class="n">path</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="n">pathlib</span><span class="o">.</span><span class="n">Path</span><span class="p">,</span>
     <span class="n">column</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
     <span class="n">resolution</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
@@ -1086,7 +1070,7 @@
     <span class="k">return</span> <span class="n">df</span>
 
 
-<span class="k">def</span> <span class="nf">_create_chunks</span><span class="p">(</span><span class="n">like</span><span class="p">,</span> <span class="n">resolution</span><span class="p">,</span> <span class="n">chunksize</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">_create_chunks</span><span class="p">(</span><span class="n">like</span><span class="p">,</span> <span class="n">resolution</span><span class="p">,</span> <span class="n">chunksize</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Cuts data into chunksize by chunksize.</span>
 
@@ -1135,7 +1119,7 @@
 
 <div class="viewcode-block" id="celltable">
 <a class="viewcode-back" href="../../../api/generated/prepare/imod.prepare.celltable.html#imod.prepare.celltable">[docs]</a>
-<span class="k">def</span> <span class="nf">celltable</span><span class="p">(</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">celltable</span><span class="p">(</span>
     <span class="n">path</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="n">pathlib</span><span class="o">.</span><span class="n">Path</span><span class="p">,</span>
     <span class="n">column</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
     <span class="n">resolution</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
@@ -1266,7 +1250,7 @@
 
 
 <span class="nd">@numba</span><span class="o">.</span><span class="n">njit</span>
-<span class="k">def</span> <span class="nf">_burn_cells</span><span class="p">(</span><span class="n">raster</span><span class="p">,</span> <span class="n">rows</span><span class="p">,</span> <span class="n">cols</span><span class="p">,</span> <span class="n">values</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">_burn_cells</span><span class="p">(</span><span class="n">raster</span><span class="p">,</span> <span class="n">rows</span><span class="p">,</span> <span class="n">cols</span><span class="p">,</span> <span class="n">values</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Burn values of sparse COO-matrix into raster.</span>
 <span class="sd">    rows, cols, and values form a sparse matrix in coordinate format (COO)</span>
@@ -1290,7 +1274,7 @@
 
 <div class="viewcode-block" id="rasterize_celltable">
 <a class="viewcode-back" href="../../../api/generated/prepare/imod.prepare.rasterize_celltable.html#imod.prepare.rasterize_celltable">[docs]</a>
-<span class="k">def</span> <span class="nf">rasterize_celltable</span><span class="p">(</span><span class="n">table</span><span class="p">,</span> <span class="n">column</span><span class="p">,</span> <span class="n">like</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">rasterize_celltable</span><span class="p">(</span><span class="n">table</span><span class="p">,</span> <span class="n">column</span><span class="p">,</span> <span class="n">like</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Rasterizes a table, such as produced by ``imod.prepare.spatial.celltable``.</span>
 <span class="sd">    Before rasterization, multiple values should be grouped and aggregated per</span>
@@ -1317,7 +1301,7 @@
 
 
 
-<span class="k">def</span> <span class="nf">_zonal_aggregate_raster</span><span class="p">(</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">_zonal_aggregate_raster</span><span class="p">(</span>
     <span class="n">path</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">pathlib</span><span class="o">.</span><span class="n">Path</span><span class="p">],</span>
     <span class="n">column</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
     <span class="n">resolution</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
@@ -1375,7 +1359,7 @@
     <span class="k">return</span> <span class="n">result</span>
 
 
-<span class="k">def</span> <span class="nf">_zonal_aggregate_polygons</span><span class="p">(</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">_zonal_aggregate_polygons</span><span class="p">(</span>
     <span class="n">path_a</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">pathlib</span><span class="o">.</span><span class="n">Path</span><span class="p">],</span>
     <span class="n">path_b</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">pathlib</span><span class="o">.</span><span class="n">Path</span><span class="p">],</span>
     <span class="n">column_a</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
@@ -1428,7 +1412,7 @@
 
 <div class="viewcode-block" id="zonal_aggregate_raster">
 <a class="viewcode-back" href="../../../api/generated/prepare/imod.prepare.zonal_aggregate_raster.html#imod.prepare.zonal_aggregate_raster">[docs]</a>
-<span class="k">def</span> <span class="nf">zonal_aggregate_raster</span><span class="p">(</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">zonal_aggregate_raster</span><span class="p">(</span>
     <span class="n">path</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">pathlib</span><span class="o">.</span><span class="n">Path</span><span class="p">,</span> <span class="nb">str</span><span class="p">],</span>
     <span class="n">column</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
     <span class="n">raster</span><span class="p">:</span> <span class="n">xr</span><span class="o">.</span><span class="n">DataArray</span><span class="p">,</span>
@@ -1512,7 +1496,7 @@
 
 <div class="viewcode-block" id="zonal_aggregate_polygons">
 <a class="viewcode-back" href="../../../api/generated/prepare/imod.prepare.zonal_aggregate_polygons.html#imod.prepare.zonal_aggregate_polygons">[docs]</a>
-<span class="k">def</span> <span class="nf">zonal_aggregate_polygons</span><span class="p">(</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">zonal_aggregate_polygons</span><span class="p">(</span>
     <span class="n">path_a</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">pathlib</span><span class="o">.</span><span class="n">Path</span><span class="p">,</span> <span class="nb">str</span><span class="p">],</span>
     <span class="n">path_b</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">pathlib</span><span class="o">.</span><span class="n">Path</span><span class="p">,</span> <span class="nb">str</span><span class="p">],</span>
     <span class="n">column_a</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
@@ -1597,8 +1581,8 @@
   </div>
   
   <!-- Scripts loaded after <body> so the DOM is not blocked -->
-  <script defer src="../../../_static/scripts/bootstrap.js?digest=26a4bc78f4c0ddb94549"></script>
-<script defer src="../../../_static/scripts/pydata-sphinx-theme.js?digest=26a4bc78f4c0ddb94549"></script>
+  <script defer src="../../../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf"></script>
+<script defer src="../../../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf"></script>
 
   <footer class="bd-footer">
 <div class="bd-footer__inner bd-page-width">
@@ -1618,7 +1602,7 @@
         <div class="footer-item">
 
   <p class="sphinx-version">
-    Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 8.1.3.
+    Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 8.2.1.
     <br/>
   </p>
 </div>
@@ -1631,7 +1615,8 @@
       
         <div class="footer-item">
 <p class="theme-version">
-  Built with the <a href="https://pydata-sphinx-theme.readthedocs.io/en/stable/index.html">PyData Sphinx Theme</a> 0.16.0.
+  <!-- # L10n: Setting the PST URL as an argument as this does not need to be localized -->
+  Built with the <a href="https://pydata-sphinx-theme.readthedocs.io/en/stable/index.html">PyData Sphinx Theme</a> 0.16.1.
 </p></div>
       
     </div>
