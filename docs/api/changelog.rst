@@ -6,8 +6,8 @@ All notable changes to this project will be documented in this file.
 The format is based on `Keep a Changelog`_, and this project adheres to
 `Semantic Versioning`_.
 
-[Unreleased]
-------------
+[1.0.0rc2] - 2025-03-05
+-----------------------
 
 From this release on, we recommend using `xugrid's regridding utilities
 <https://deltares.github.io/xugrid/examples/regridder_overview.html>`_ for
