@@ -257,6 +257,21 @@ def test_regrid(infiltration_data):
     assert_almost_equal(regridded.dataset.coords["y"].values, y)
 
 
+@parametrize_with_cases("infiltration_data", cases=".")
+def test_clip_box(infiltration_data):
+    infiltration = Infiltration(**infiltration_data)
+    infiltration_selected = infiltration.clip_box(
+        x_min=1.0, x_max=2.5, y_min=1.0, y_max=2.5
+    )
+
+    expected = infiltration_data["upward_resistance"].sel(
+        x=slice(1.0, 2.5), y=slice(2.5, 1.0)
+    )
+    xr.testing.assert_allclose(
+        infiltration_selected.dataset["upward_resistance"], expected
+    )
+
+
 @parametrize_with_cases("data_infiltration", cases=".")
 def test_from_imod5_data(data_infiltration):
     expected_pkg = Infiltration(**data_infiltration)

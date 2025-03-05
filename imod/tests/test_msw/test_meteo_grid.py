@@ -7,6 +7,7 @@ from pathlib import Path
 import numpy as np
 import pandas as pd
 import pytest
+import xarray as xr
 from numpy.testing import assert_equal
 
 from imod.msw import MeteoGrid, MeteoGridCopy
@@ -70,6 +71,22 @@ def test_regrid_meteo(meteo_grids, simple_2d_grid_with_subunits):
 
     assert np.all(regridded_ponding.dataset["x"].values == new_grid["x"].values)
     assert np.all(regridded_ponding.dataset["y"].values == new_grid["y"].values)
+
+
+def test_clip_box__spatial(meteo_grids):
+    meteo = MeteoGrid(*meteo_grids)
+    meteo_selected = meteo.clip_box(x_min=1.0, x_max=2.5, y_min=1.0, y_max=2.5)
+    expected = meteo_grids[0].sel(x=slice(1.0, 2.5), y=slice(1.0, 2.5))
+    xr.testing.assert_allclose(meteo_selected.dataset["precipitation"], expected)
+
+
+def test_clip_box__time(meteo_grids):
+    meteo = MeteoGrid(*meteo_grids)
+    time_min = None
+    time_max = "2000-01-01"
+    meteo_selected = meteo.clip_box(time_min=time_min, time_max=time_max)
+    expected = meteo_grids[0].sel(time=slice(time_min, time_max))
+    xr.testing.assert_allclose(meteo_selected.dataset["precipitation"], expected)
 
 
 def setup_written_meteo_grids(meteo_grids, tmp_path) -> Path:

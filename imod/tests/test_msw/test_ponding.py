@@ -109,6 +109,15 @@ def test_regrid_ponding(simple_2d_grid_with_subunits):
     assert np.all(regridded_ponding.dataset["y"].values == new_grid["y"].values)
 
 
+def test_clip_box():
+    data_ponding, _, _ = setup_ponding()
+    ponding = Ponding(**data_ponding)
+    ponding_selected = ponding.clip_box(x_min=1.0, x_max=2.5, y_min=1.0, y_max=2.5)
+
+    expected = data_ponding["ponding_depth"].sel(x=slice(1.0, 2.5), y=slice(2.5, 1.0))
+    xr.testing.assert_allclose(ponding_selected.dataset["ponding_depth"], expected)
+
+
 def test_from_imod5_data():
     data_ponding, _, _ = setup_ponding()
     expected_ponding = Ponding(**data_ponding)
