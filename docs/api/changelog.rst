@@ -40,6 +40,9 @@ Added
 - :meth:`imod.mf6.HorizontalFlowBarrierResistance.cleanup`,
   :meth:`imod.mf6.SingleLayerHorizontalFlowBarrierResistance.cleanup`,
   to clean up HFB geometries crossing inactive model cells.
+- :class:`imod.util.RegridderWeightsCache` to store regridder weights for
+  regridding multiple times.
+- :class:`imod.util.RegridderType` to specify regridder types.
 
 Changed
 ~~~~~~~
