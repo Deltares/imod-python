@@ -115,6 +115,24 @@ def test_check_model(msw_model):
     msw_model._model_checks(validate=True)
 
 
+def test_clip_box(msw_model):
+    clipped_model = msw_model.clip_box(x_min=1.0, x_max=2.5, y_min=1.0, y_max=2.5)
+
+    for pkg in clipped_model.values():
+        coords = pkg.dataset.coords
+        if "x" in coords:
+            assert coords["x"].min() >= 1.0
+            assert coords["x"].max() <= 2.5
+        if "y" in coords:
+            assert coords["y"].min() >= 1.0
+            assert coords["y"].max() <= 2.5
+
+    # Assert simulations settings are copied
+    model_settings = msw_model.simulation_settings
+    clipped_settings = clipped_model.simulation_settings
+    assert clipped_settings == model_settings
+
+
 def test_render_unsat_database_path(msw_model, tmp_path):
     rel_path = msw_model._render_unsaturated_database_path("./unsat_database")
 
@@ -340,3 +358,40 @@ def test_import_from_imod5_and_write(
     if has_scaling_factor:
         expected_n_files += 1
     assert len(list(modeldir.rglob(r"*.inp"))) == expected_n_files
+
+
+@parametrize_with_cases("imod5_data, has_scaling_factor", cases=Imod5DataCases)
+def test_import_from_imod5_and_clip(
+    imod5_data: Imod5DataDict,
+    has_scaling_factor: bool,
+    meteo_grids: tuple[GridDataArray],
+    coupled_mf6_model: mf6.Modflow6Simulation,
+    tmp_path: Path,
+):
+    # Arrange
+    imod5_data["extra"] = setup_extra_files(meteo_grids, tmp_path)
+    times = coupled_mf6_model["time_discretization"].dataset.coords["time"]
+    dis_pkg = coupled_mf6_model["GWF_1"]["dis"]
+    # Act
+    model = msw.MetaSwapModel.from_imod5_data(imod5_data, dis_pkg, times)
+    clipped_model = model.clip_box(x_min=1.0, x_max=2.5, y_min=1.0, y_max=2.5)
+
+    # Assert all packages present
+    model_keys = set(model.keys())
+    clipped_keys = set(clipped_model.keys())
+    assert model_keys == clipped_keys
+
+    # Assert model clipped
+    for pkg in clipped_model.values():
+        coords = pkg.dataset.coords
+        if "x" in coords:
+            assert coords["x"].min() >= 1.0
+            assert coords["x"].max() <= 2.5
+        if "y" in coords:
+            assert coords["y"].min() >= 1.0
+            assert coords["y"].max() <= 2.5
+
+    # Assert simulations settings are copied
+    model_settings = model.simulation_settings
+    clipped_settings = clipped_model.simulation_settings
+    assert clipped_settings == model_settings

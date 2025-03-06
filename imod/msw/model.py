@@ -4,6 +4,7 @@ from datetime import datetime
 from pathlib import Path
 from typing import Any, Optional, Tuple, Union, cast
 
+import cftime
 import jinja2
 import numpy as np
 import xarray as xr
@@ -326,6 +327,56 @@ class MetaSwapModel(Model):
             regridded_model[mod2svat_name] = CouplerMapping()
 
         return regridded_model
+
+    def clip_box(
+        self,
+        time_min: Optional[cftime.datetime | np.datetime64 | str] = None,
+        time_max: Optional[cftime.datetime | np.datetime64 | str] = None,
+        x_min: Optional[float] = None,
+        x_max: Optional[float] = None,
+        y_min: Optional[float] = None,
+        y_max: Optional[float] = None,
+    ) -> "MetaSwapModel":
+        """
+        Clip a model by a bounding box (time, y, x).
+
+        Slicing intervals may be half-bounded, by providing None:
+
+        * To select 500.0 <= x <= 1000.0:
+          ``clip_box(x_min=500.0, x_max=1000.0)``.
+        * To select x <= 1000.0: ``clip_box(x_min=None, x_max=1000.0)``
+          or ``clip_box(x_max=1000.0)``.
+        * To select x >= 500.0: ``clip_box(x_min = 500.0, x_max=None.0)``
+          or ``clip_box(x_min=1000.0)``.
+
+        Parameters
+        ----------
+        time_min: optional
+        time_max: optional
+        x_min: optional, float
+        x_max: optional, float
+        y_min: optional, float
+        y_max: optional, float
+
+        Returns
+        -------
+        MetaSwapModel
+            Clipped model.
+        """
+        settings = deepcopy(self.simulation_settings)
+        unsa_svat_path = settings.pop("unsa_svat_path")
+
+        clipped = type(self)(unsa_svat_path, settings)
+        for key, pkg in self.items():
+            clipped[key] = pkg.clip_box(
+                time_min=time_min,
+                time_max=time_max,
+                x_min=x_min,
+                x_max=x_max,
+                y_min=y_min,
+                y_max=y_max,
+            )
+        return clipped
 
     @classmethod
     def from_imod5_data(
