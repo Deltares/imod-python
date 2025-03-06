@@ -208,18 +208,20 @@ def clip_time_indexer(
 
     # If the first time matches exactly, xarray will have done thing we
     # wanted and our work with the time dimension is finished.
-    if (time_start is not None) and (time_start != first_time):
-        # If the first time is before the original time, we need to
-        # backfill; otherwise, we need to ffill the first timestamp.
-        if time_start < time[0]:
-            method = "bfill"
-        else:
-            method = "ffill"
-        # Index with a list rather than a scalar to preserve the time
-        # dimension.
-        first = original.sel(time=[time_start], method=method)
-        first["time"] = [time_start]
-        indexer = xr.concat([first, indexer], dim="time")
+    if (time_start is None) or (time_start == first_time):
+        return indexer
+
+    # If the first time is before the original time, we need to
+    # backfill; otherwise, we need to ffill the first timestamp.
+    if time_start < time[0]:
+        method = "bfill"
+    else:
+        method = "ffill"
+    # Index with a list rather than a scalar to preserve the time
+    # dimension.
+    first = original.sel(time=[time_start], method=method)
+    first["time"] = [time_start]
+    indexer = xr.concat([first, indexer], dim="time")
 
     return indexer
 
