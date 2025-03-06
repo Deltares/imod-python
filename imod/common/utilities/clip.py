@@ -3,6 +3,7 @@ from __future__ import annotations
 from copy import deepcopy
 from typing import TYPE_CHECKING, Optional
 
+import cftime
 import numpy as np
 import pandas as pd
 import xarray as xr
@@ -17,7 +18,7 @@ from imod.common.utilities.line_data import (
     clipped_zbound_linestrings_to_vertical_polygons,
     vertical_polygons_to_zbound_linestrings,
 )
-from imod.typing import GeoDataFrameType, GridDataArray
+from imod.typing import GeoDataFrameType, GridDataArray, GridDataset
 from imod.typing.grid import bounding_polygon, is_spatial_grid
 from imod.util.imports import MissingOptionalModule
 
@@ -181,3 +182,88 @@ def bounding_polygon_from_line_data_and_clip_box(
     bbox = shapely.box(x_min, y_min, x_max, y_max)
     dummy_value = 0
     return gpd.GeoDataFrame([dummy_value], geometry=[bbox])
+
+
+def clip_time_indexer(
+    time: np.ndarray,
+    time_start: Optional[cftime.datetime | np.datetime64 | str] = None,
+    time_end: Optional[cftime.datetime | np.datetime64 | str] = None,
+):
+    """
+    Return indices which can be used to select a time slice from a
+    DataArray or Dataset.
+    """
+    original = xr.DataArray(
+        data=np.arange(time.size),
+        coords={"time": time},
+        dims=("time",),
+    )
+    indexer = original.sel(time=slice(time_start, time_end))
+
+    # The selection might return a 0-sized dimension.
+    if indexer.size > 0:
+        first_time = indexer["time"].values[0]
+    else:
+        first_time = None
+
+    # If the first time matches exactly, xarray will have done thing we
+    # wanted and our work with the time dimension is finished.
+    if (time_start is None) or (time_start == first_time):
+        return indexer
+
+    # If the first time is before the original time, we need to
+    # backfill; otherwise, we need to ffill the first timestamp.
+    if time_start < time[0]:
+        method = "bfill"
+    else:
+        method = "ffill"
+    # Index with a list rather than a scalar to preserve the time
+    # dimension.
+    first = original.sel(time=[time_start], method=method)
+    first["time"] = [time_start]
+    indexer = xr.concat([first, indexer], dim="time")
+
+    return indexer
+
+
+def clip_spatial_box(
+    dataset: GridDataset,
+    x_min: Optional[float] = None,
+    x_max: Optional[float] = None,
+    y_min: Optional[float] = None,
+    y_max: Optional[float] = None,
+):
+    """
+    Clip a spatial dataset by a bounding box.
+    """
+    selection = dataset
+    x_slice = slice(x_min, x_max)
+    y_slice = slice(y_min, y_max)
+    if isinstance(selection, xu.UgridDataset):
+        selection = selection.ugrid.sel(x=x_slice, y=y_slice)
+    elif ("x" in selection.coords) and ("y" in selection.coords):
+        if selection.indexes["y"].is_monotonic_decreasing:
+            y_slice = slice(y_max, y_min)
+        selection = selection.sel(x=x_slice, y=y_slice)
+    return selection
+
+
+def clip_layer_slice(
+    dataset: GridDataset,
+    layer_min: Optional[int] = None,
+    layer_max: Optional[int] = None,
+):
+    """
+    Clip a dataset by a layer slice.
+    """
+    selection = dataset
+    if "layer" in selection.coords:
+        layer_slice = slice(layer_min, layer_max)
+        # Cannot select if it's not a dimension!
+        if "layer" not in selection.dims:
+            selection = (
+                selection.expand_dims("layer").sel(layer=layer_slice).squeeze("layer")
+            )
+        else:
+            selection = selection.sel(layer=layer_slice)
+    return selection

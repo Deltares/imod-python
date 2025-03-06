@@ -65,6 +65,14 @@ def get_index(svat_data):
     return (svat_data != 0).data.ravel()
 
 
+def test_clip_box():
+    # Act
+    copyfiles = msw.CouplerMapping()
+    clipped = copyfiles.clip_box(x_min=1.0, x_max=2.5, y_min=1.0, y_max=2.5)
+    # Arrange
+    assert copyfiles.dataset.identical(clipped.dataset)
+
+
 @parametrize_with_cases("svat_data", cases=[case_svat_data, case_svat_data__dask])
 def test_simple_model_with_sprinkling(fixed_format_parser, svat_data):
     index = get_index(svat_data)

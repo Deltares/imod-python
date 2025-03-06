@@ -42,6 +42,14 @@ def test_initial_conditions_equilibrium_regrid(simple_2d_grid_with_subunits):
     assert is_empty(regridded.dataset)
 
 
+def test_initial_conditions_equilibrium_clip_box():
+    ic = InitialConditionsEquilibrium()
+
+    clipped = ic.clip_box(x_min=1.0, x_max=2.5, y_min=1.0, y_max=2.5)
+
+    assert ic.dataset.identical(clipped.dataset)
+
+
 def test_initial_conditions_percolation():
     ic = InitialConditionsPercolation()
 
@@ -65,6 +73,14 @@ def test_initial_conditions_percolation_regrid(simple_2d_grid_with_subunits):
     assert is_empty(regridded.dataset)
 
 
+def test_initial_conditions_percolation_clip_box():
+    ic = InitialConditionsPercolation()
+
+    clipped = ic.clip_box(x_min=1.0, x_max=2.5, y_min=1.0, y_max=2.5)
+
+    assert ic.dataset.identical(clipped.dataset)
+
+
 def test_initial_conditions_rootzone_pressure_head():
     ic = InitialConditionsRootzonePressureHead(2.2)
 
@@ -86,6 +102,14 @@ def test_initial_conditions_rootzone_regrid(simple_2d_grid_with_subunits):
     regrid_context = RegridderWeightsCache()
     regridded = ic.regrid_like(new_grid, regrid_context)
     np.testing.assert_almost_equal(regridded.dataset["initial_pF"], 2.2)
+
+
+def test_initial_conditions_rootzone_clip_box():
+    ic = InitialConditionsRootzonePressureHead(2.2)
+
+    clipped = ic.clip_box(x_min=1.0, x_max=2.5, y_min=1.0, y_max=2.5)
+
+    assert ic.dataset.identical(clipped.dataset)
 
 
 def test_initial_conditions_saved_state():
@@ -116,3 +140,11 @@ def test_initial_conditions_saved_state_regrid():
         ic = InitialConditionsSavedState(output_dir / "foo.out")
 
         assert not ic.is_regridding_supported()
+
+
+def test_initial_conditions_saved_state_clip_box():
+    with tempfile.TemporaryDirectory() as output_dir:
+        output_dir = Path(output_dir)
+        ic = InitialConditionsSavedState(output_dir / "foo.out")
+
+        assert not ic.is_clipping_supported()

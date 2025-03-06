@@ -45,6 +45,15 @@ def test_copyfile_init(src_files):
 
 
 @parametrize_with_cases("src_files", cases=".")
+def test_clip_box(src_files):
+    # Act
+    copyfiles = FileCopier(src_files)
+    clipped = copyfiles.clip_box(x_min=1.0, x_max=2.5, y_min=1.0, y_max=2.5)
+    # Arrange
+    assert copyfiles.dataset.identical(clipped.dataset)
+
+
+@parametrize_with_cases("src_files", cases=".")
 def test_copyfile_write(src_files, tmp_path):
     # Arrange
     expected_filenames = {f.name for f in src_files}

@@ -3,10 +3,12 @@ from copy import deepcopy
 from pathlib import Path
 from typing import Any, Optional, TextIO, TypeAlias, Union
 
+import cftime
 import numpy as np
 import pandas as pd
 import xarray as xr
 
+from imod.common.utilities.clip import clip_spatial_box, clip_time_indexer
 from imod.common.utilities.regrid import (
     _regrid_like,
 )
@@ -17,6 +19,7 @@ from imod.msw.fixed_format import format_fixed_width
 from imod.typing import IntArray
 from imod.typing.grid import GridDataArray, GridDataset
 from imod.util.regrid import RegridderWeightsCache
+from imod.util.time import to_datetime_internal
 
 DataDictType: TypeAlias = dict[str, IntArray | int | str]
 
@@ -238,8 +241,85 @@ class MetaSwapPackage(abc.ABC):
             raise ValueError(f"package could not be regridded:{e}")
         return result
 
+    def __to_datetime(
+        self, time: Optional[cftime.datetime | np.datetime64 | str], use_cftime: bool
+    ):
+        """
+        Helper function that converts to datetime, except when None.
+        """
+        if time is None:
+            return time
+        else:
+            return to_datetime_internal(time, use_cftime)
+
+    def clip_box(
+        self,
+        time_min: Optional[cftime.datetime | np.datetime64 | str] = None,
+        time_max: Optional[cftime.datetime | np.datetime64 | str] = None,
+        x_min: Optional[float] = None,
+        x_max: Optional[float] = None,
+        y_min: Optional[float] = None,
+        y_max: Optional[float] = None,
+    ) -> "MetaSwapPackage":
+        """
+        Clip a package by a bounding box (time, layer, y, x).
+
+        Slicing intervals may be half-bounded, by providing None:
+
+        * To select 500.0 <= x <= 1000.0:
+          ``clip_box(x_min=500.0, x_max=1000.0)``.
+        * To select x <= 1000.0: ``clip_box(x_min=None, x_max=1000.0)``
+          or ``clip_box(x_max=1000.0)``.
+        * To select x >= 500.0: ``clip_box(x_min = 500.0, x_max=None.0)``
+          or ``clip_box(x_min=1000.0)``.
+
+        Parameters
+        ----------
+        time_min: optional
+        time_max: optional
+        x_min: optional, float
+        x_max: optional, float
+        y_min: optional, float
+        y_max: optional, float
+
+        Returns
+        -------
+        clipped: Package
+        """
+        if not self.is_clipping_supported():
+            raise ValueError("this package does not support clipping.")
+
+        selection = self.dataset
+        if "time" in selection:
+            time = selection["time"].values
+            use_cftime = isinstance(time[0], cftime.datetime)
+            time_start = self.__to_datetime(time_min, use_cftime)
+            time_end = self.__to_datetime(time_max, use_cftime)
+
+            indexer = clip_time_indexer(
+                time=time,
+                time_start=time_start,
+                time_end=time_end,
+            )
+
+            selection = selection.drop_vars("time").isel(time=indexer)
+
+        selection = clip_spatial_box(
+            selection,
+            x_min=x_min,
+            x_max=x_max,
+            y_min=y_min,
+            y_max=y_max,
+        )
+
+        cls = type(self)
+        return cls._from_dataset(selection)
+
     def get_regrid_methods(self) -> RegridMethodType:
         return deepcopy(self._regrid_method)
 
     def from_imod5_data(self, *args, **kwargs):
         raise NotImplementedError("Method not implemented for this package.")
+
+    def is_clipping_supported(self) -> bool:
+        return True

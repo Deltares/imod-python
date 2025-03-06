@@ -116,6 +116,20 @@ def test_regrid_scaling_factor(simple_2d_grid_with_subunits):
     assert np.all(regridded_scaling_factor.dataset["y"].values == new_grid["y"].values)
 
 
+def test_clip_box():
+    scale, depth_perched_water_table, _, _ = setup_scaling_factor_grids()
+
+    scaling_factors = ScalingFactors(
+        scale_soil_moisture=scale,
+        scale_hydraulic_conductivity=scale,
+        scale_pressure_head=scale,
+        depth_perched_water_table=depth_perched_water_table,
+    )
+    clipped = scaling_factors.clip_box(x_min=1.0, x_max=2.5, y_min=1.0, y_max=2.5)
+    expected = scale.sel(x=slice(1.0, 2.5), y=slice(2.5, 1.0))
+    xr.testing.assert_allclose(clipped.dataset["scale_soil_moisture"], expected)
+
+
 def test_from_imod5_data(fixed_format_parser):
     scale, depth_perched_water_table, index, svat = setup_scaling_factor_grids()
 

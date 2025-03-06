@@ -15,6 +15,11 @@ import xugrid as xu
 
 import imod
 from imod.common.interfaces.ipackage import IPackage
+from imod.common.utilities.clip import (
+    clip_layer_slice,
+    clip_spatial_box,
+    clip_time_indexer,
+)
 from imod.common.utilities.mask import mask_package
 from imod.common.utilities.regrid import (
     _regrid_like,
@@ -412,43 +417,9 @@ class Package(PackageBase, IPackage, abc.ABC):
         )
         return indexer, repeat_stress
 
-    @staticmethod
-    def _clip_time_indexer(
-        time,
-        time_start,
-        time_end,
+    def __to_datetime(
+        self, time: Optional[cftime.datetime | np.datetime64 | str], use_cftime: bool
     ):
-        original = xr.DataArray(
-            data=np.arange(time.size),
-            coords={"time": time},
-            dims=("time",),
-        )
-        indexer = original.sel(time=slice(time_start, time_end))
-
-        # The selection might return a 0-sized dimension.
-        if indexer.size > 0:
-            first_time = indexer["time"].values[0]
-        else:
-            first_time = None
-
-        # If the first time matches exactly, xarray will have done thing we
-        # wanted and our work with the time dimension is finished.
-        if (time_start is not None) and (time_start != first_time):
-            # If the first time is before the original time, we need to
-            # backfill; otherwise, we need to ffill the first timestamp.
-            if time_start < time[0]:
-                method = "bfill"
-            else:
-                method = "ffill"
-            # Index with a list rather than a scalar to preserve the time
-            # dimension.
-            first = original.sel(time=[time_start], method=method)
-            first["time"] = [time_start]
-            indexer = xr.concat([first, indexer], dim="time")
-
-        return indexer
-
-    def __to_datetime(self, time, use_cftime):
         """
         Helper function that converts to datetime, except when None.
         """
@@ -511,7 +482,7 @@ class Package(PackageBase, IPackage, abc.ABC):
             time_start = self.__to_datetime(time_min, use_cftime)
             time_end = self.__to_datetime(time_max, use_cftime)
 
-            indexer = self._clip_time_indexer(
+            indexer = clip_time_indexer(
                 time=time,
                 time_start=time_start,
                 time_end=time_end,
@@ -532,26 +503,17 @@ class Package(PackageBase, IPackage, abc.ABC):
 
             selection = selection.drop_vars("time").isel(time=indexer)
 
-        if "layer" in selection.coords:
-            layer_slice = slice(layer_min, layer_max)
-            # Cannot select if it's not a dimension!
-            if "layer" not in selection.dims:
-                selection = (
-                    selection.expand_dims("layer")
-                    .sel(layer=layer_slice)
-                    .squeeze("layer")
-                )
-            else:
-                selection = selection.sel(layer=layer_slice)
+        selection = clip_layer_slice(
+            selection, layer_min=layer_min, layer_max=layer_max
+        )
 
-        x_slice = slice(x_min, x_max)
-        y_slice = slice(y_min, y_max)
-        if isinstance(selection, xu.UgridDataset):
-            selection = selection.ugrid.sel(x=x_slice, y=y_slice)
-        elif ("x" in selection.coords) and ("y" in selection.coords):
-            if selection.indexes["y"].is_monotonic_decreasing:
-                y_slice = slice(y_max, y_min)
-            selection = selection.sel(x=x_slice, y=y_slice)
+        selection = clip_spatial_box(
+            selection,
+            x_min=x_min,
+            x_max=x_max,
+            y_min=y_min,
+            y_max=y_max,
+        )
 
         cls = type(self)
         return cls._from_dataset(selection)

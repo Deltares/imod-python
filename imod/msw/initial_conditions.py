@@ -113,3 +113,6 @@ class InitialConditionsSavedState(MetaSwapPackage):
 
     def is_regridding_supported(self) -> bool:
         return False
+
+    def is_clipping_supported(self) -> bool:
+        return False
