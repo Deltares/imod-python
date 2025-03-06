@@ -188,6 +188,32 @@ def test_disconnected_idomain(idomain_and_bottom):
         assert var == "idomain"
 
 
+def test_misalignment(idomain_and_bottom):
+    """ "Test misalignment of top and idomain throws error."""
+    idomain, bottom = idomain_and_bottom
+
+    nrow = 15
+    ncol = 15
+    shape = (nrow, ncol)
+
+    dx = 5000.0
+    dy = -5000.0
+    offset = dx * ncol + dx
+    xmin = offset
+    xmax = offset + dx * ncol
+    ymin = offset
+    ymax = offset + abs(dy) * nrow
+    dims = ("y", "x")
+
+    y = np.arange(ymax, ymin, dy) + 0.5 * dy
+    x = np.arange(xmin, xmax, dx) + 0.5 * dx
+    coords = {"y": y, "x": x}
+    top = xr.DataArray(np.ones(shape, dtype=np.int8), coords=coords, dims=dims)
+
+    with pytest.raises(ValueError, match="align"):
+        imod.mf6.StructuredDiscretization(top=top, bottom=bottom, idomain=idomain)
+
+
 def test_write_ascii_griddata_2d_3d(idomain_and_bottom, tmp_path):
     idomain, bottom = idomain_and_bottom
     top = xr.full_like(idomain.isel(layer=0), 200.0, dtype=float)
