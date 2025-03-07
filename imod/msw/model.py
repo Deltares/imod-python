@@ -8,6 +8,7 @@ import jinja2
 import numpy as np
 import xarray as xr
 
+from imod.common.utilities.value_filters import enforce_scalar
 from imod.mf6.dis import StructuredDiscretization
 from imod.mf6.mf6_wel_adapter import Mf6Wel
 from imod.msw.copy_files import FileCopier
@@ -213,8 +214,8 @@ class MetaSwapModel(Model):
 
         year, time_since_start_year = to_metaswap_timeformat([starttime])
 
-        year = int(year.values)
-        time_since_start_year = float(time_since_start_year.values)
+        year = int(enforce_scalar(year.values))
+        time_since_start_year = float(enforce_scalar(time_since_start_year.values))
 
         return year, time_since_start_year
 
