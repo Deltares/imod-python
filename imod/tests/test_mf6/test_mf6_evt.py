@@ -130,7 +130,7 @@ def test_get_bin_ds__no_segments(
     bin_ds = evt._get_bin_ds()
 
     # Assert
-    expected_dims = {"time": 3, "layer": 3, "y": 15, "x": 15}
+    expected_sizes = {"time": 3, "layer": 3, "y": 15, "x": 15}
     expected_variables = [
         "surface",
         "rate",
@@ -139,7 +139,7 @@ def test_get_bin_ds__no_segments(
         "proportion_rate",
     ]
 
-    assert bin_ds.dims == expected_dims
+    assert bin_ds.sizes == expected_sizes
     assert list(bin_ds.keys()) == expected_variables
 
 
@@ -168,7 +168,7 @@ def test_get_bin_ds__with_segments(
     bin_ds = evt._get_bin_ds()
 
     # Assert
-    expected_dims = {"time": 3, "layer": 3, "y": 15, "x": 15}
+    expected_sizes = {"time": 3, "layer": 3, "y": 15, "x": 15}
     expected_variables = [
         "surface",
         "rate",
@@ -181,7 +181,7 @@ def test_get_bin_ds__with_segments(
         "proportion_rate_segment_3",
     ]
 
-    assert bin_ds.dims == expected_dims
+    assert bin_ds.sizes == expected_sizes
     assert list(bin_ds.keys()) == expected_variables
 
 

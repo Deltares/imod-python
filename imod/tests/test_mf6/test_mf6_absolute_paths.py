@@ -19,7 +19,7 @@ def uzf_test_data():
     dims = ("layer", "y", "x")
 
     nper = 4
-    time = pd.date_range("2018-01-01", periods=nper, freq="H")
+    time = pd.date_range("2018-01-01", periods=nper, freq="h")
     layer = np.arange(1, nlay + 1)
     y = np.arange(ymax, ymin, dy) + 0.5 * dy
     x = np.arange(xmin, xmax, dx) + 0.5 * dx
