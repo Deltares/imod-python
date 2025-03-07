@@ -51,7 +51,7 @@ object BuildPackage : BuildType({
             dockerImage = "%DockerContainer%:%DockerVersion%"
             dockerImagePlatform = ScriptBuildStep.ImagePlatform.Windows
             dockerRunParameters = """--cpus=4 --memory=16g"""
-            dockerPull = true
+            dockerPull = false
         }
     }
 
@@ -94,7 +94,7 @@ object BuildPages : BuildType({
             dockerImage = "%DockerContainer%:%DockerVersion%"
             dockerImagePlatform = ScriptBuildStep.ImagePlatform.Windows
             dockerRunParameters = """--cpus=8 --memory=32g"""
-            dockerPull = true
+            dockerPull = false
         }
     }
 
@@ -170,7 +170,7 @@ object CreateGitHubRelease : BuildType({
                 """.trimIndent()
             }
             param("plugin.docker.imagePlatform", "windows")
-            param("plugin.docker.pull.enabled", "true")
+            param("plugin.docker.pull.enabled", "false")
             param("plugin.docker.imageId", "%DockerContainer%:%DockerVersion%")
             param("plugin.docker.run.parameters", "--cpus=4 --memory=16g")
         }
@@ -221,7 +221,7 @@ object DeployPackage : BuildType({
             dockerImage = "%DockerContainer%:%DockerVersion%"
             dockerImagePlatform = ScriptBuildStep.ImagePlatform.Windows
             dockerRunParameters = """--cpus=4 --memory=16g"""
-            dockerPull = true
+            dockerPull = false
         }
     }
 
@@ -305,7 +305,7 @@ object DeployPages : BuildType({
             dockerImage = "%DockerContainer%:%DockerVersion%"
             dockerImagePlatform = ScriptBuildStep.ImagePlatform.Windows
             dockerRunParameters = """--cpus=4 --memory=16g"""
-            dockerPull = true
+            dockerPull = false
         }
     }
 

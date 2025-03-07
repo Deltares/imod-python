@@ -37,7 +37,7 @@ object UnitTestsTemplate : Template({
             dockerImage = "%DockerContainer%:%DockerVersion%"
             dockerImagePlatform = ScriptBuildStep.ImagePlatform.Windows
             dockerRunParameters = """--cpus=8 --memory=32g"""
-            dockerPull = true
+            dockerPull = false
         }
         powerShell {
             name = "Extract coverage statistics"
@@ -59,7 +59,7 @@ object UnitTestsTemplate : Template({
             }
             param("plugin.docker.imagePlatform", "windows")
             param("plugin.docker.imageId", "%DockerContainer%:%DockerVersion%")
-            param("plugin.docker.pull.enabled", "true")
+            param("plugin.docker.pull.enabled", "false")
         }
     }
 

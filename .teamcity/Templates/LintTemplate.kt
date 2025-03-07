@@ -29,7 +29,7 @@ object LintTemplate : Template({
             dockerImage = "%DockerContainer%:%DockerVersion%"
             dockerImagePlatform = ScriptBuildStep.ImagePlatform.Windows
             dockerRunParameters = """--cpus=4 --memory=16g"""
-            dockerPull = true
+            dockerPull = false
         }
     }
 
