@@ -285,9 +285,9 @@ def _to_datetime(
 
 def clip_repeat_stress(
     repeat_stress: xr.DataArray,
-    time,
-    time_start,
-    time_end,
+    time: np.ndarray,
+    time_start: Optional[cftime.datetime | np.datetime64 | str] = None,
+    time_end: Optional[cftime.datetime | np.datetime64 | str] = None,
 ):
     """
     Selection may remove the original data which are repeated.
