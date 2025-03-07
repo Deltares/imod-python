@@ -8,7 +8,7 @@ import numpy as np
 import pandas as pd
 import xarray as xr
 
-from imod.common.utilities.clip import clip_spatial_box, clip_time_indexer
+from imod.common.utilities.clip import clip_spatial_box, clip_time_slice
 from imod.common.utilities.regrid import (
     _regrid_like,
 )
@@ -19,7 +19,6 @@ from imod.msw.fixed_format import format_fixed_width
 from imod.typing import IntArray
 from imod.typing.grid import GridDataArray, GridDataset
 from imod.util.regrid import RegridderWeightsCache
-from imod.util.time import to_datetime_internal
 
 DataDictType: TypeAlias = dict[str, IntArray | int | str]
 
@@ -241,17 +240,6 @@ class MetaSwapPackage(abc.ABC):
             raise ValueError(f"package could not be regridded:{e}")
         return result
 
-    def __to_datetime(
-        self, time: Optional[cftime.datetime | np.datetime64 | str], use_cftime: bool
-    ):
-        """
-        Helper function that converts to datetime, except when None.
-        """
-        if time is None:
-            return time
-        else:
-            return to_datetime_internal(time, use_cftime)
-
     def clip_box(
         self,
         time_min: Optional[cftime.datetime | np.datetime64 | str] = None,
@@ -290,20 +278,7 @@ class MetaSwapPackage(abc.ABC):
             raise ValueError("this package does not support clipping.")
 
         selection = self.dataset
-        if "time" in selection:
-            time = selection["time"].values
-            use_cftime = isinstance(time[0], cftime.datetime)
-            time_start = self.__to_datetime(time_min, use_cftime)
-            time_end = self.__to_datetime(time_max, use_cftime)
-
-            indexer = clip_time_indexer(
-                time=time,
-                time_start=time_start,
-                time_end=time_end,
-            )
-
-            selection = selection.drop_vars("time").isel(time=indexer)
-
+        selection = clip_time_slice(selection, time_min=time_min, time_max=time_max)
         selection = clip_spatial_box(
             selection,
             x_min=x_min,

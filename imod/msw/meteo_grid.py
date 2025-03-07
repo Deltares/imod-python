@@ -204,6 +204,10 @@ class MeteoGridCopy(MetaSwapPackage, IRegridPackage):
     PrecipitationMapping and EvapotranspirationMapping are required as well to
     specify meteorological information to MetaSWAP.
 
+    This is useful for large meteorological datasets, for which a
+    ``mete_grid.inp`` already has been generated, which is common in existing
+    iMOD5 model databases.
+
     Parameters
     ----------
     path: Path to mete_grid.inp file

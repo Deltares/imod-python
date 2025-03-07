@@ -162,7 +162,7 @@ An overview of the support for iMOD5's MetaSWAP features:
     iMOD5 pkg, MetaSWAP file, functionality,iMOD Python function/method
     *Model*,``para_sim.inp``,From grids (IDF),:meth:`imod.msw.MetaSwapModel.from_imod5_data`
     *Model*,,Regrid,:meth:`imod.msw.MetaSwapModel.regrid_like`
-    *Model*,,Clip,
+    *Model*,,Clip,:meth:`imod.msw.MetaSwapModel.clip_box`
     *Model*,``mod2svat.inp``,Coupling,":meth:`imod.msw.MetaSwapModel.from_imod5_data`, :class:`imod.msw.CouplerMapping`"
     *Model*,``idf_svat.ipn``,IDF output,":meth:`imod.msw.MetaSwapModel.from_imod5_data`, :class:`imod.msw.IdfMapping`"
     CAP,``area_svat.inp``,Grid Data,:meth:`imod.msw.GridData.from_imod5_data`

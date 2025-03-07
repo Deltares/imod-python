@@ -6,6 +6,15 @@ All notable changes to this project will be documented in this file.
 The format is based on `Keep a Changelog`_, and this project adheres to
 `Semantic Versioning`_.
 
+[Unreleased]
+------------
+
+Added
+~~~~~
+
+- :meth:`imod.msw.MetaSwapModel.clip_box` to clip MetaSWAP models.
+
+
 [1.0.0rc2] - 2025-03-05
 -----------------------
 

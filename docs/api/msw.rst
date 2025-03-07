@@ -43,3 +43,4 @@ MetaSWAP
     MetaSwapModel.write
     MetaSwapModel.from_imod5_data
     MetaSwapModel.regrid_like
+    MetaSwapModel.clip_box

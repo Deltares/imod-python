@@ -13,12 +13,11 @@ import numpy as np
 import xarray as xr
 import xugrid as xu
 
-import imod
 from imod.common.interfaces.ipackage import IPackage
 from imod.common.utilities.clip import (
     clip_layer_slice,
     clip_spatial_box,
-    clip_time_indexer,
+    clip_time_slice,
 )
 from imod.common.utilities.mask import mask_package
 from imod.common.utilities.regrid import (
@@ -376,58 +375,6 @@ class Package(PackageBase, IPackage, abc.ABC):
         # All state should be contained in the dataset.
         return type(self)(**self.dataset.copy().to_dict())
 
-    @staticmethod
-    def _clip_repeat_stress(
-        repeat_stress: xr.DataArray,
-        time,
-        time_start,
-        time_end,
-    ):
-        """
-        Selection may remove the original data which are repeated.
-        These should be re-inserted at the first occuring "key".
-        Next, remove these keys as they've been "promoted" to regular
-        timestamps with data.
-        """
-        # First, "pop" and filter.
-        keys, values = repeat_stress.values.T
-        keep = (keys >= time_start) & (keys <= time_end)
-        new_keys = keys[keep]
-        new_values = values[keep]
-        # Now detect which "value" entries have gone missing
-        insert_values, index = np.unique(new_values, return_index=True)
-        insert_keys = new_keys[index]
-        # Setup indexer
-        indexer = xr.DataArray(
-            data=np.arange(time.size),
-            coords={"time": time},
-            dims=("time",),
-        ).sel(time=insert_values)
-        indexer["time"] = insert_keys
-
-        # Update the key-value pairs. Discard keys that have been "promoted".
-        keep = np.isin(new_keys, insert_keys, assume_unique=True, invert=True)
-        new_keys = new_keys[keep]
-        new_values = new_values[keep]
-        # Set the values to their new source.
-        new_values = insert_keys[np.searchsorted(insert_values, new_values)]
-        repeat_stress = xr.DataArray(
-            data=np.column_stack((new_keys, new_values)),
-            dims=("repeat", "repeat_items"),
-        )
-        return indexer, repeat_stress
-
-    def __to_datetime(
-        self, time: Optional[cftime.datetime | np.datetime64 | str], use_cftime: bool
-    ):
-        """
-        Helper function that converts to datetime, except when None.
-        """
-        if time is None:
-            return time
-        else:
-            return imod.util.time.to_datetime_internal(time, use_cftime)
-
     def clip_box(
         self,
         time_min: Optional[cftime.datetime | np.datetime64 | str] = None,
@@ -476,37 +423,10 @@ class Package(PackageBase, IPackage, abc.ABC):
             raise ValueError("this package does not support clipping.")
 
         selection = self.dataset
-        if "time" in selection:
-            time = selection["time"].values
-            use_cftime = isinstance(time[0], cftime.datetime)
-            time_start = self.__to_datetime(time_min, use_cftime)
-            time_end = self.__to_datetime(time_max, use_cftime)
-
-            indexer = clip_time_indexer(
-                time=time,
-                time_start=time_start,
-                time_end=time_end,
-            )
-
-            if "repeat_stress" in selection.data_vars and self._valid(
-                selection["repeat_stress"].values[()]
-            ):
-                repeat_indexer, repeat_stress = self._clip_repeat_stress(
-                    repeat_stress=selection["repeat_stress"],
-                    time=time,
-                    time_start=time_start,
-                    time_end=time_end,
-                )
-                selection = selection.drop_vars("repeat_stress")
-                selection["repeat_stress"] = repeat_stress
-                indexer = repeat_indexer.combine_first(indexer).astype(int)
-
-            selection = selection.drop_vars("time").isel(time=indexer)
-
+        selection = clip_time_slice(selection, time_min=time_min, time_max=time_max)
         selection = clip_layer_slice(
             selection, layer_min=layer_min, layer_max=layer_max
         )
-
         selection = clip_spatial_box(
             selection,
             x_min=x_min,
