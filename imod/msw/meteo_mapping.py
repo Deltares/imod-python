@@ -73,10 +73,9 @@ class MeteoMapping(MetaSwapPackage):
     new packages.
     """
 
-    meteo: GridDataArray
-
-    def __init__(self):
+    def __init__(self, meteo_grid: GridDataArray):
         super().__init__()
+        self.meteo = meteo_grid
 
     def _render(
         self,
@@ -155,7 +154,7 @@ class MeteoMapping(MetaSwapPackage):
         y_max: Optional[float] = None,
     ):
         """Clip meteo grid to a box defined by time and space."""
-        selection = self.meteo
+        selection = self.meteo.to_dataset(name="meteo") # Force to dataset
         selection = clip_time_slice(selection, time_min=time_min, time_max=time_max)
         selection = clip_spatial_box(
             selection,
@@ -166,7 +165,7 @@ class MeteoMapping(MetaSwapPackage):
         )
 
         cls = type(self)
-        return cls(selection)
+        return cls(selection["meteo"])
 
 
 class PrecipitationMapping(MeteoMapping):
@@ -197,8 +196,7 @@ class PrecipitationMapping(MeteoMapping):
         self,
         precipitation: xr.DataArray,
     ):
-        super().__init__()
-        self.meteo = precipitation
+        super().__init__(precipitation)
 
     @classmethod
     def from_imod5_data(cls, imod5_data: Imod5DataDict) -> "PrecipitationMapping":
@@ -255,8 +253,7 @@ class EvapotranspirationMapping(MeteoMapping):
         self,
         evapotranspiration: xr.DataArray,
     ):
-        super().__init__()
-        self.meteo = evapotranspiration
+        super().__init__(evapotranspiration)
 
     @classmethod
     def from_imod5_data(cls, imod5_data: Imod5DataDict) -> "EvapotranspirationMapping":
