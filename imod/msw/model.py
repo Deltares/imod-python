@@ -24,7 +24,11 @@ from imod.msw.initial_conditions import (
 )
 from imod.msw.landuse import LanduseOptions
 from imod.msw.meteo_grid import MeteoGrid, MeteoGridCopy
-from imod.msw.meteo_mapping import EvapotranspirationMapping, PrecipitationMapping
+from imod.msw.meteo_mapping import (
+    EvapotranspirationMapping,
+    MeteoMapping,
+    PrecipitationMapping,
+)
 from imod.msw.output_control import TimeOutputControl
 from imod.msw.ponding import Ponding
 from imod.msw.scaling_factors import ScalingFactors
@@ -338,7 +342,13 @@ class MetaSwapModel(Model):
         y_max: Optional[float] = None,
     ) -> "MetaSwapModel":
         """
-        Clip a model by a bounding box (time, y, x).
+        Clip a model by a bounding box (time, y, x). If a package of type
+        :class:`imod.msw.MeteoGridCopy` is present, packages of type
+        :class:`imod.msw.PrecipitationMapping` and
+        :class:`imod.msw.EvapotranspirationMapping` will not be clipped.
+        Otherwise incorrect mappings to meteo grids referenced in
+        ``mete_grid.inp`` copied by :class:`imod.msw.MeteoGridCopy` would be
+        computed.
 
         Slicing intervals may be half-bounded, by providing None:
 
@@ -366,8 +376,14 @@ class MetaSwapModel(Model):
         settings = deepcopy(self.simulation_settings)
         unsa_svat_path = settings.pop("unsa_svat_path")
 
+        has_meteogrid_copy = MeteoGridCopy in [type(pkg) for pkg in self.values()]
         clipped = type(self)(unsa_svat_path, settings)
         for key, pkg in self.items():
+            # Skip clipping MeteoMapping if MeteoGridCopy is present, as meteo
+            # grid is independent of model grid and we do not want to perform
+            # transformations on meteo data in this case.
+            if has_meteogrid_copy and isinstance(pkg, MeteoMapping):
+                clipped[key] = deepcopy(pkg)
             clipped[key] = pkg.clip_box(
                 time_min=time_min,
                 time_max=time_max,
