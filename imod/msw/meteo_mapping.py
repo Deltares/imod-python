@@ -3,11 +3,13 @@ from pathlib import Path
 from textwrap import dedent
 from typing import Any, Optional, TextIO
 
+import cftime
 import numpy as np
 import pandas as pd
 import xarray as xr
 
 import imod
+from imod.common.utilities.clip import clip_spatial_box, clip_time_slice
 from imod.common.utilities.regrid_method_type import RegridMethodType
 from imod.msw.fixed_format import VariableMetaData
 from imod.msw.pkgbase import MetaSwapPackage
@@ -142,6 +144,29 @@ class MeteoMapping(MetaSwapPackage):
         regridder_types: Optional[RegridMethodType] = None,
     ):
         return deepcopy(self)
+
+    def clip_box(
+        self,
+        time_min: Optional[cftime.datetime | np.datetime64 | str] = None,
+        time_max: Optional[cftime.datetime | np.datetime64 | str] = None,
+        x_min: Optional[float] = None,
+        x_max: Optional[float] = None,
+        y_min: Optional[float] = None,
+        y_max: Optional[float] = None,
+    ):
+        """Clip meteo grid to a box defined by time and space."""
+        selection = self.meteo
+        selection = clip_time_slice(selection, time_min=time_min, time_max=time_max)
+        selection = clip_spatial_box(
+            selection,
+            x_min=x_min,
+            x_max=x_max,
+            y_min=y_min,
+            y_max=y_max,
+        )
+
+        cls = type(self)
+        return cls(selection)
 
 
 class PrecipitationMapping(MeteoMapping):
