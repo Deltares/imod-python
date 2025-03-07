@@ -36,7 +36,6 @@ def test_partition_1d_happy_flow():
     ]
 
 
-@pytest.mark.usefixtures("circle_model")
 def test_partition_2d_unstructured(circle_model):
     for nr_partitions in range(1, 20):
         label_array = get_label_array(circle_model, nr_partitions)
@@ -51,7 +50,6 @@ def test_partition_2d_unstructured(circle_model):
         assert min(unique) == 0
 
 
-@pytest.mark.usefixtures("twri_model")
 def test_partition_2d_structured(twri_model):
     # We skip a few partition numbers which would give an error. This would
     # happen if the number of partitions in the x or y direction would result in

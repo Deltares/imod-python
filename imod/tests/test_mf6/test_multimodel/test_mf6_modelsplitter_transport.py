@@ -33,7 +33,6 @@ def test_slice_model_structured(flow_transport_simulation: Modflow6Simulation):
             assert package_name in list(submodel.keys())
 
 
-@pytest.mark.usefixtures("flow_transport_simulation")
 def test_split_dump(
     tmp_path: Path,
     flow_transport_simulation: Modflow6Simulation,
@@ -62,7 +61,6 @@ def test_split_dump(
     assert len(diff.right_only) == 0
 
 
-@pytest.mark.usefixtures("flow_transport_simulation")
 def test_split_flow_and_transport_model(
     tmp_path: Path, flow_transport_simulation: Modflow6Simulation
 ):
@@ -118,7 +116,6 @@ def test_split_flow_and_transport_model(
     assert_simulation_can_run(new_simulation, tmp_path)
 
 
-@pytest.mark.usefixtures("flow_transport_simulation")
 def test_split_flow_and_transport_model_evaluate_output(
     tmp_path: Path, flow_transport_simulation: Modflow6Simulation
 ):
@@ -161,7 +158,6 @@ def test_split_flow_and_transport_model_evaluate_output(
     )
 
 
-@pytest.mark.usefixtures("flow_transport_simulation")
 def test_split_flow_and_transport_model_evaluate_output_with_species(
     tmp_path: Path, flow_transport_simulation: Modflow6Simulation
 ):
@@ -200,7 +196,6 @@ def test_split_flow_and_transport_model_evaluate_output_with_species(
     )
 
 
-@pytest.mark.usefixtures("flow_transport_simulation")
 @pytest.mark.parametrize("advection_scheme", ["TVD", "upstream", "central"])
 @pytest.mark.parametrize("dsp_xt3d_off", [True, False])
 def test_split_flow_and_transport_settings(

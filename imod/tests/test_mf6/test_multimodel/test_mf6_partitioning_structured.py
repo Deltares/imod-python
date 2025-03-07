@@ -18,7 +18,6 @@ from imod.prepare.hfb import (
 from imod.typing.grid import zeros_like
 
 
-@pytest.mark.usefixtures("transient_twri_model")
 @pytest.fixture(scope="function")
 def idomain_top(transient_twri_model):
     idomain = transient_twri_model["GWF_1"].domain
@@ -203,7 +202,6 @@ class HorizontalFlowBarrierCases:
         )
 
 
-@pytest.mark.usefixtures("transient_twri_model")
 @parametrize_with_cases("partition_array", cases=PartitionArrayCases)
 def test_partitioning_structured(
     tmp_path: Path,
@@ -239,7 +237,6 @@ def test_partitioning_structured(
     )
 
 
-@pytest.mark.usefixtures("transient_twri_model")
 @parametrize_with_cases(
     "partition_array", cases=PartitionArrayCases, glob="*four_squares"
 )
@@ -264,7 +261,6 @@ def test_split_dump(
     assert len(diff.right_only) == 0
 
 
-@pytest.mark.usefixtures("transient_twri_model")
 @parametrize_with_cases("partition_array", cases=PartitionArrayCases.case_four_squares)
 def test_partitioning_write_after_split(
     tmp_path: Path,
@@ -287,7 +283,6 @@ def test_partitioning_write_after_split(
     assert len(diff.right_only) == 0
 
 
-@pytest.mark.usefixtures("transient_twri_model")
 @parametrize_with_cases("partition_array", cases=PartitionArrayCases)
 def test_partitioning_structured_with_inactive_cells(
     tmp_path: Path,
@@ -337,7 +332,6 @@ def test_partitioning_structured_with_inactive_cells(
     )
 
 
-@pytest.mark.usefixtures("transient_twri_model")
 @parametrize_with_cases("partition_array", cases=PartitionArrayCases)
 def test_partitioning_structured_with_vpt_cells(
     tmp_path: Path,
@@ -389,7 +383,6 @@ def test_partitioning_structured_with_vpt_cells(
     )
 
 
-@pytest.mark.usefixtures("transient_twri_model")
 @parametrize_with_cases(
     "partition_array", cases=PartitionArrayCases, has_tag="intrusion"
 )
@@ -464,7 +457,6 @@ def test_partitioning_structured_geometry_auxiliary_variables(
     )
 
 
-@pytest.mark.usefixtures("transient_twri_model")
 @parametrize_with_cases("partition_array", cases=PartitionArrayCases)
 @parametrize_with_cases("well", cases=WellCases)
 def test_partitioning_structured_one_high_level_well(
@@ -526,7 +518,6 @@ def is_expected_hfb_partition_combination_fail(current_cases):
     return False
 
 
-@pytest.mark.usefixtures("transient_twri_model")
 @parametrize_with_cases("partition_array", cases=PartitionArrayCases)
 @parametrize_with_cases("hfb", cases=HorizontalFlowBarrierCases)
 def test_partitioning_structured_hfb(

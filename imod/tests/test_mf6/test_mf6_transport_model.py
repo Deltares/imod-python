@@ -80,7 +80,6 @@ def test_assign_flow_discretization(basic_dis, concentration_fc):
     assert isinstance(tpt_model["dis"], imod.mf6.StructuredDiscretization)
 
 
-@pytest.mark.usefixtures("twri_model")
 def test_flowmodel_validation(twri_model):
     # initialize transport with a flow model without concentration data
     flow_model = twri_model["GWF_1"]
@@ -88,7 +87,6 @@ def test_flowmodel_validation(twri_model):
         imod.mf6.SourceSinkMixing.from_flow_model(flow_model, "salinity")
 
 
-@pytest.mark.usefixtures("flow_transport_simulation")
 def test_transport_concentration_loading(tmp_path, flow_transport_simulation):
     flow_transport_simulation.write(tmp_path)
     flow_transport_simulation.run()
@@ -106,7 +104,6 @@ def test_transport_concentration_loading(tmp_path, flow_transport_simulation):
     assert conc_time.coords["time"].dtype == np.dtype("datetime64[ns]")
 
 
-@pytest.mark.usefixtures("flow_transport_simulation")
 def test_transport_balance_loading(tmp_path, flow_transport_simulation):
     flow_transport_simulation.write(tmp_path)
     flow_transport_simulation.run()
@@ -132,7 +129,6 @@ def test_transport_balance_loading(tmp_path, flow_transport_simulation):
     )
 
 
-@pytest.mark.usefixtures("flow_transport_simulation")
 def test_transport_output_wrong_species(tmp_path, flow_transport_simulation):
     flow_transport_simulation.write(tmp_path)
     flow_transport_simulation.run()

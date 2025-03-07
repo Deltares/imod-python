@@ -64,7 +64,6 @@ def sample_gwfgwf_unstructured():
 
 
 class TestGwfgwf:
-    @pytest.mark.usefixtures("sample_gwfgwf_structured")
     def test_render_exchange_file_structured(
         self, sample_gwfgwf_structured: imod.mf6.GWFGWF, tmp_path: Path
     ):
@@ -98,7 +97,6 @@ class TestGwfgwf:
         actual = remove_comment_lines(actual)
         assert actual == expected
 
-    @pytest.mark.usefixtures("sample_gwfgwf_unstructured")
     def test_render_exchange_file_unstructured(
         self, sample_gwfgwf_unstructured: imod.mf6.GWFGWF, tmp_path: Path
     ):
@@ -133,7 +131,6 @@ class TestGwfgwf:
         actual = remove_comment_lines(actual)
         assert actual == expected
 
-    @pytest.mark.usefixtures("sample_gwfgwf_structured")
     def test_error_clip(self, sample_gwfgwf_structured: imod.mf6.GWFGWF):
         # test error
         with pytest.raises(NotImplementedError):

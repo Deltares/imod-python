@@ -14,7 +14,6 @@ from imod.schemata import ValidationError
 from imod.typing.grid import ones_like
 
 
-@pytest.mark.usefixtures("twri_model")
 def test_dis_render(twri_model, tmp_path):
     simulation = twri_model
     dis = simulation["GWF_1"]["dis"]
@@ -63,7 +62,6 @@ def test_dis_render(twri_model, tmp_path):
     assert (tmp_path / "dis" / "idomain.bin").is_file()
 
 
-@pytest.mark.usefixtures("twri_model")
 def test_chd_render(twri_model, tmp_path):
     simulation = twri_model
     globaltimes = simulation["time_discretization"]["time"].values
@@ -100,7 +98,6 @@ def test_chd_render(twri_model, tmp_path):
     assert (tmp_path / "chd" / "chd.bin").is_file()
 
 
-@pytest.mark.usefixtures("twri_model")
 def test_drn_render(twri_model, tmp_path):
     simulation = twri_model
     globaltimes = simulation["time_discretization"]["time"].values
@@ -137,7 +134,6 @@ def test_drn_render(twri_model, tmp_path):
     assert (tmp_path / "drn" / "drn.bin").is_file()
 
 
-@pytest.mark.usefixtures("twri_model")
 def test_ic_render(twri_model, tmp_path):
     simulation = twri_model
     ic = simulation["GWF_1"]["ic"]
@@ -164,7 +160,6 @@ def test_ic_render(twri_model, tmp_path):
     assert (tmp_path / "ic.ic").is_file()
 
 
-@pytest.mark.usefixtures("twri_model")
 def test_npf_render(twri_model, tmp_path):
     simulation = twri_model
     npf = simulation["GWF_1"]["npf"]
@@ -201,7 +196,6 @@ def test_npf_render(twri_model, tmp_path):
     assert (tmp_path / "npf.npf").is_file()
 
 
-@pytest.mark.usefixtures("twri_model")
 def test_oc_render(twri_model, tmp_path):
     simulation = twri_model
     globaltimes = simulation["time_discretization"]["time"].values
@@ -247,7 +241,6 @@ def test_oc_render(twri_model, tmp_path):
     assert actual == expected
 
 
-@pytest.mark.usefixtures("twri_model")
 def test_rch_render(twri_model, tmp_path):
     simulation = twri_model
     globaltimes = simulation["time_discretization"]["time"].values
@@ -310,7 +303,6 @@ def test_wel_render(twri_model, tmp_path):
     assert (tmp_path / "GWF_1/wel" / "wel.bin").is_file()
 
 
-@pytest.mark.usefixtures("twri_model")
 def test_solver_render(twri_model, tmp_path):
     simulation = twri_model
     solver = simulation["solver"]
@@ -346,7 +338,6 @@ def test_solver_render(twri_model, tmp_path):
     assert (tmp_path / "solver.ims").is_file()
 
 
-@pytest.mark.usefixtures("twri_model")
 def test_gwfmodel_render(twri_model, tmp_path):
     simulation = twri_model
     globaltimes = simulation["time_discretization"]["time"].values
@@ -380,7 +371,6 @@ def test_gwfmodel_render(twri_model, tmp_path):
     assert (tmp_path / "GWF_1").is_dir()
 
 
-@pytest.mark.usefixtures("twri_model")
 def test_simulation_render(twri_model):
     simulation = twri_model
     write_context = WriteContext(".")
@@ -411,7 +401,6 @@ def test_simulation_render(twri_model):
     assert actual == expected
 
 
-@pytest.mark.usefixtures("twri_model")
 @pytest.mark.skipif(sys.version_info < (3, 7), reason="capture_output added in 3.7")
 def test_simulation_write_and_run(twri_model, tmp_path):
     simulation = twri_model
@@ -446,7 +435,6 @@ def test_simulation_write_and_run(twri_model, tmp_path):
     assert np.allclose(meanhead_layer, mean_answer)
 
 
-@pytest.mark.usefixtures("transient_twri_model")
 @pytest.mark.skipif(sys.version_info < (3, 7), reason="capture_output added in 3.7")
 def test_simulation_write_storage(transient_twri_model, tmp_path):
     simulation = transient_twri_model
@@ -471,7 +459,6 @@ def test_simulation_write_storage(transient_twri_model, tmp_path):
     np.testing.assert_allclose(meanflux_layer.values, mean_answer, rtol=2e-7)
 
 
-@pytest.mark.usefixtures("transient_twri_model")
 @pytest.mark.skipif(sys.version_info < (3, 7), reason="capture_output added in 3.7")
 def test_simulation_wrong_dtype(transient_twri_model, tmp_path):
     simulation = transient_twri_model
@@ -487,7 +474,6 @@ def test_simulation_wrong_dtype(transient_twri_model, tmp_path):
         simulation.write(modeldir, binary=True)
 
 
-@pytest.mark.usefixtures("transient_twri_model")
 @pytest.mark.skipif(sys.version_info < (3, 7), reason="capture_output added in 3.7")
 def test_simulation_validate_false(transient_twri_model, tmp_path):
     simulation = transient_twri_model
@@ -501,7 +487,6 @@ def test_simulation_validate_false(transient_twri_model, tmp_path):
     simulation.write(modeldir, binary=True, validate=False)
 
 
-@pytest.mark.usefixtures("twri_model")
 @pytest.mark.skipif(sys.version_info < (3, 7), reason="capture_output added in 3.7")
 def test_simulation_write_errors(twri_model, tmp_path):
     simulation = twri_model
@@ -514,7 +499,6 @@ def test_simulation_write_errors(twri_model, tmp_path):
         simulation.write(modeldir, binary=True)
 
 
-@pytest.mark.usefixtures("transient_twri_model")
 @pytest.mark.skipif(sys.version_info < (3, 7), reason="capture_output added in 3.7")
 def test_slice_and_run(transient_twri_model, tmp_path):
     # TODO: bring back well once slicing is implemented...
@@ -534,7 +518,6 @@ def test_slice_and_run(transient_twri_model, tmp_path):
     simulation.run()
 
 
-@pytest.mark.usefixtures("transient_twri_model")
 @pytest.mark.skipif(sys.version_info < (3, 7), reason="capture_output added in 3.7")
 def test_slice_and_run_with_state(transient_twri_model, tmp_path):
     # TODO: bring back well once slicing is implemented...
@@ -565,7 +548,6 @@ def test_slice_and_run_with_state(transient_twri_model, tmp_path):
     assert (np_array == 1.23).sum() == 33
 
 
-@pytest.mark.usefixtures("transient_twri_model")
 @pytest.mark.skipif(sys.version_info < (3, 7), reason="capture_output added in 3.7")
 def test_slice_and_run_purge_empty_package(transient_twri_model, tmp_path):
     # TODO: bring back well once slicing is implemented...

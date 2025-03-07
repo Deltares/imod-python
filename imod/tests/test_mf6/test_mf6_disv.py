@@ -32,7 +32,7 @@ def idomain_and_bottom():
     coords = {"layer": layer, "y": y, "x": x}
     idomain = xr.DataArray(np.ones(shape, dtype=np.int8), coords=coords, dims=dims)
     bottom = xr.DataArray([-200.0, -350.0, -450.0], {"layer": layer}, ("layer",))
-    idomain = xu.UgridDataArray.from_structured(idomain)
+    idomain = xu.UgridDataArray.from_structured2d(idomain)
 
     return idomain, bottom
 

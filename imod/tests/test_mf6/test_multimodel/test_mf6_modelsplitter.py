@@ -1,12 +1,10 @@
 import numpy as np
-import pytest
 
 from imod.mf6.multimodel.modelsplitter import create_partition_info, slice_model
 from imod.tests.fixtures.mf6_modelrun_fixture import assert_simulation_can_run
 from imod.typing.grid import zeros_like
 
 
-@pytest.mark.usefixtures("twri_model")
 def test_slice_model_structured(twri_model):
     """
     Create a sub model array for the twri model.
@@ -42,7 +40,6 @@ def test_slice_model_structured(twri_model):
         assert label_counts[submodel_label] == active_count.values
 
 
-@pytest.mark.usefixtures("circle_model")
 def test_slice_model_unstructured(circle_model):
     """
     Create a sub model array for the circle model.
@@ -74,7 +71,6 @@ def test_slice_model_unstructured(circle_model):
         assert label_counts[submodel_label] == active_count.values
 
 
-@pytest.mark.usefixtures("flow_transport_simulation")
 def test_slice_model_with_auxiliary_variables(tmp_path, flow_transport_simulation):
     flow_simulation = flow_transport_simulation
     flow_simulation.pop("tpt_a")

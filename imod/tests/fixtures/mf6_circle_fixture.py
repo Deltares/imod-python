@@ -167,7 +167,6 @@ def circle_model():
     return make_circle_model()
 
 
-@pytest.mark.usefixtures("circle_model")
 @pytest.fixture(scope="session")
 def circle_result(tmpdir_factory):
     # Using a tmpdir_factory is the canonical way of sharing a tempory pytest
@@ -218,7 +217,6 @@ def circle_model_evt():
     return make_circle_model_evt()
 
 
-@pytest.mark.usefixtures("circle_model_evt")
 @pytest.fixture(scope="session")
 def circle_result_evt(tmpdir_factory):
     # Using a tmpdir_factory is the canonical way of sharing a tempory pytest
@@ -252,7 +250,6 @@ def circle_result_sto(tmpdir_factory):
     return modeldir
 
 
-@pytest.mark.usefixtures("circle_model_evt")
 @pytest.fixture(scope="function")
 def circle_partitioned():
     simulation = make_circle_model_evt()

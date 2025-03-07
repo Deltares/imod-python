@@ -17,7 +17,7 @@ def uzf_model():
     # Create discretication
     shape = nlay, nrow, ncol = 7, 9, 9
     nper = 48
-    time = pd.date_range("2018-01-01", periods=nper, freq="H")
+    time = pd.date_range("2018-01-01", periods=nper, freq="h")
 
     dx = 1000.0
     dy = -1000.0

@@ -237,7 +237,6 @@ def test_3d_singelayer():
     assert isinstance(struct_array, np.ndarray)
 
 
-@pytest.mark.usefixtures("concentration_fc", "elevation_fc", "conductance_fc")
 def test_render_concentration(
     concentration_fc,
     elevation_fc,
@@ -286,7 +285,6 @@ def test_render_concentration(
     assert actual == expected
 
 
-@pytest.mark.usefixtures("elevation_fc", "conductance_fc")
 def test_repeat_stress(
     elevation_fc,
     conductance_fc,
@@ -360,7 +358,6 @@ def test_repeat_stress(
     assert actual == expected
 
 
-@pytest.mark.usefixtures("elevation_fc", "conductance_fc")
 def test_repeat_stress_old_style(
     elevation_fc,
     conductance_fc,

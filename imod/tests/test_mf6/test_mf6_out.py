@@ -1,13 +1,11 @@
 import dask
 import numpy as np
-import pytest
 import xarray as xr
 import xugrid as xu
 
 import imod
 
 
-@pytest.mark.usefixtures("twri_result")
 def test_read_disgrb(twri_result):
     modeldir = twri_result
     with imod.util.cd(modeldir):
@@ -43,7 +41,6 @@ def test_read_disgrb(twri_result):
         assert isinstance(grb["top"], xr.DataArray)
 
 
-@pytest.mark.usefixtures("twri_result", "twri_model")
 def test_open_hds(twri_result, twri_model):
     model = twri_model["GWF_1"]
     modeldir = twri_result
@@ -57,7 +54,6 @@ def test_open_hds(twri_result, twri_model):
         assert isinstance(head.data, dask.array.Array)  # rather than numpy array
 
 
-@pytest.mark.usefixtures("twri_result")
 def test_read_cbc_headers(twri_result):
     modeldir = twri_result
     with imod.util.cd(modeldir):
@@ -74,7 +70,6 @@ def test_read_cbc_headers(twri_result):
         assert isinstance(headers["chd_chd"][0], imod.mf6.out.cbc.Imeth6Header)
 
 
-@pytest.mark.usefixtures("transient_twri_result")
 def test_read_cbc_headers__transient(transient_twri_result):
     modeldir = transient_twri_result
     with imod.util.cd(modeldir):
@@ -353,7 +348,6 @@ def test_disv_indices():
     np.testing.assert_array_equal(horizontal, expected_horizontal)
 
 
-@pytest.mark.usefixtures("twri_result")
 def test_open_cbc__dis(twri_result):
     modeldir = twri_result
     with imod.util.cd(modeldir):
@@ -406,7 +400,6 @@ def test_open_cbc__dis_multi_drn_1_cell(twri_result_9_drn_in_1_cell):
         np.testing.assert_approx_equal(actual_value, -24.7, significant=1)
 
 
-@pytest.mark.usefixtures("transient_twri_result")
 def test_open_cbc__dis_transient(transient_twri_result):
     modeldir = transient_twri_result
     with imod.util.cd(modeldir):
@@ -430,7 +423,6 @@ def test_open_cbc__dis_transient(transient_twri_result):
             array.load()
 
 
-@pytest.mark.usefixtures("transient_twri_result")
 def test_open_cbc__dis_datetime(transient_twri_result):
     modeldir = transient_twri_result
     with imod.util.cd(modeldir):
@@ -445,7 +437,6 @@ def test_open_cbc__dis_datetime(transient_twri_result):
         assert array.coords["time"].dtype == np.dtype("datetime64[ns]")
 
 
-@pytest.mark.usefixtures("transient_unconfined_twri_result")
 def test_open_cbc__dis_transient_unconfined(transient_unconfined_twri_result):
     modeldir = transient_unconfined_twri_result
     with imod.util.cd(modeldir):
@@ -474,7 +465,6 @@ def test_open_cbc__dis_transient_unconfined(transient_unconfined_twri_result):
             array.load()
 
 
-@pytest.mark.usefixtures("circle_result")
 def test_open_cbc__disv(circle_result):
     modeldir = circle_result
     with imod.util.cd(modeldir):
@@ -501,7 +491,6 @@ def test_open_cbc__disv(circle_result):
             array.load()
 
 
-@pytest.mark.usefixtures("circle_result")
 def test_open_cbc__disv_datetime(circle_result):
     modeldir = circle_result
     with imod.util.cd(modeldir):
@@ -516,7 +505,6 @@ def test_open_cbc__disv_datetime(circle_result):
         assert array.coords["time"].dtype == np.dtype("datetime64[ns]")
 
 
-@pytest.mark.usefixtures("circle_result_sto")
 def test_open_cbc__disv_sto(circle_result_sto):
     """With saved storage fluxes, which are saved as METH1"""
     modeldir = circle_result_sto

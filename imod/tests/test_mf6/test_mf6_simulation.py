@@ -50,32 +50,26 @@ def roundtrip(simulation, tmpdir_factory, name):
     assert isinstance(back, imod.mf6.Modflow6Simulation)
 
 
-@pytest.mark.usefixtures("twri_model")
 def test_twri_roundtrip(twri_model, tmpdir_factory):
     roundtrip(twri_model, tmpdir_factory, "twri")
 
 
-@pytest.mark.usefixtures("twri_model_hfb")
 def test_twri_hfb_roundtrip(twri_model_hfb, tmpdir_factory):
     roundtrip(twri_model_hfb, tmpdir_factory, "twri")
 
 
-@pytest.mark.usefixtures("transient_twri_model")
 def test_twri_transient_roundtrip(transient_twri_model, tmpdir_factory):
     roundtrip(transient_twri_model, tmpdir_factory, "twri_transient")
 
 
-@pytest.mark.usefixtures("twri_disv_model")
 def test_twri_disv_roundtrip(twri_disv_model, tmpdir_factory):
     roundtrip(twri_disv_model, tmpdir_factory, "twri_disv")
 
 
-@pytest.mark.usefixtures("circle_model")
 def test_circle_roundtrip(circle_model, tmpdir_factory):
     roundtrip(circle_model, tmpdir_factory, "circle")
 
 
-@pytest.mark.usefixtures("twri_model")
 def test_dump_version_number__version_written(twri_model, tmpdir_factory):
     # Arrange
     tmp_path = tmpdir_factory.mktemp("twri")
@@ -88,7 +82,6 @@ def test_dump_version_number__version_written(twri_model, tmpdir_factory):
     assert toml_content["version"]["imod-python"] == imod.__version__
 
 
-@pytest.mark.usefixtures("twri_model")
 def test_from_file_version_logged__version_in_dumped(twri_model, tmpdir_factory):
     """
     Tested if a warning is thrown when there is a mismatch between version
@@ -123,7 +116,6 @@ def test_from_file_version_logged__version_in_dumped(twri_model, tmpdir_factory)
         assert "iMOD Python version in dumped simulation: 0.0.0" in log
 
 
-@pytest.mark.usefixtures("twri_model")
 def test_from_file_version_logged__no_version_in_dumped(twri_model, tmpdir_factory):
     """
     Tested if a warning is thrown when there is a mismatch between version
@@ -158,7 +150,6 @@ def test_from_file_version_logged__no_version_in_dumped(twri_model, tmpdir_facto
         assert "No iMOD Python version information found in dumped simulation." in log
 
 
-@pytest.mark.usefixtures("twri_model")
 def test_twri_gdal(twri_model, tmpdir_factory):
     """
     Test of dumping a structured model with a CRS results in the necessary
@@ -174,7 +165,6 @@ def test_twri_gdal(twri_model, tmpdir_factory):
     assert crs == "EPSG:28992"
 
 
-@pytest.mark.usefixtures("twri_disv_model")
 def test_twri_disv_mdal_compliant_semi_roundtrip(twri_disv_model, tmpdir_factory):
     """
     Test if dumping an unstructured model with mdal_compliant=True also results
@@ -192,7 +182,6 @@ def test_twri_disv_mdal_compliant_semi_roundtrip(twri_disv_model, tmpdir_factory
     assert len(ds.data_vars) == 3
 
 
-@pytest.mark.usefixtures("circle_model")
 def test_simulation_open_head(circle_model, tmp_path):
     simulation = circle_model
 
@@ -220,7 +209,6 @@ def test_simulation_open_head(circle_model, tmp_path):
     assert str(head.coords["time"].values[()][0]) == "2013-04-29T22:00:00.000000000"
 
 
-@pytest.mark.usefixtures("circle_model")
 def test_simulation_open_head_relative_path(circle_model, tmp_path):
     simulation = circle_model
 
@@ -240,7 +228,6 @@ def test_simulation_open_head_relative_path(circle_model, tmp_path):
     assert head.shape == (52, 2, 216)
 
 
-@pytest.mark.usefixtures("circle_model")
 def test_simulation_open_flow_budget(circle_model, tmp_path):
     simulation = circle_model
 
@@ -279,7 +266,6 @@ def test_write_circle_model_twice(circle_model, tmp_path):
     assert len(diff.right_only) == 0
 
 
-@pytest.mark.usefixtures("circle_model")
 def test_simulation_open_concentration_fail(circle_model, tmp_path):
     """No transport model is assigned, so should throw error when opening concentrations"""
     simulation = circle_model
@@ -331,7 +317,6 @@ def setup_simulation():
     return simulation
 
 
-@pytest.mark.usefixtures("transient_twri_model")
 @pytest.fixture(scope="function")
 def split_transient_twri_model(transient_twri_model):
     active = transient_twri_model["GWF_1"].domain.sel(layer=1)
@@ -465,7 +450,6 @@ class TestModflow6Simulation:
                 y_min=grid_y_min, y_max=grid_y_max / 2
             )
 
-    @pytest.mark.usefixtures("transient_twri_model")
     def test_exchanges_in_simulation_file(self, transient_twri_model, tmp_path):
         # Arrange
         active = transient_twri_model["GWF_1"].domain.sel(layer=1)
@@ -502,7 +486,6 @@ class TestModflow6Simulation:
             namfile_content = mfsim_nam.read()
         assert expected_exchanges_block in namfile_content
 
-    @pytest.mark.usefixtures("transient_twri_model")
     def test_write_exchanges(
         self, transient_twri_model, sample_gwfgwf_structured, tmp_path
     ):
@@ -516,7 +499,6 @@ class TestModflow6Simulation:
         _, filename, _, _ = sample_gwfgwf_structured.get_specification()
         assert Path.exists(tmp_path / filename)
 
-    @pytest.mark.usefixtures("split_transient_twri_model")
     def test_prevent_split_after_split(
         self,
         split_transient_twri_model,
@@ -528,7 +510,6 @@ class TestModflow6Simulation:
         with pytest.raises(RuntimeError):
             _ = split_simulation.split(None)
 
-    @pytest.mark.usefixtures("split_transient_twri_model")
     def test_prevent_clip_box_after_split(
         self,
         split_transient_twri_model,
@@ -544,7 +525,6 @@ class TestModflow6Simulation:
         # test  making a deepcopy will not crash
         _ = deepcopy(split_transient_twri_model)
 
-    @pytest.mark.usefixtures("split_transient_twri_model")
     def test_prevent_regrid_like_after_split(
         self,
         split_transient_twri_model,
@@ -566,7 +546,6 @@ def compare_submodel_partition_info(first: PartitionInfo, second: PartitionInfo)
 
 
 @pytest.mark.unittest_jit
-@pytest.mark.usefixtures("imod5_dataset")
 def test_import_from_imod5(imod5_dataset, tmp_path):
     imod5_data = imod5_dataset[0]
     period_data = imod5_dataset[1]
@@ -600,7 +579,6 @@ def test_import_from_imod5(imod5_dataset, tmp_path):
 
 
 @pytest.mark.unittest_jit
-@pytest.mark.usefixtures("imod5_dataset")
 def test_from_imod5__has_cap_data(imod5_dataset):
     imod5_data = deepcopy(imod5_dataset[0])
     period_data = imod5_dataset[1]
@@ -631,7 +609,6 @@ def test_from_imod5__has_cap_data(imod5_dataset):
 
 
 @pytest.mark.unittest_jit
-@pytest.mark.usefixtures("imod5_dataset")
 def test_from_imod5__strict_well_validation_set(imod5_dataset):
     imod5_data = imod5_dataset[0]
     period_data = imod5_dataset[1]
@@ -650,7 +627,6 @@ def test_from_imod5__strict_well_validation_set(imod5_dataset):
 
 
 @pytest.mark.unittest_jit
-@pytest.mark.usefixtures("imod5_dataset")
 def test_import_from_imod5__correct_well_type(imod5_dataset):
     # Unpack
     imod5_data = imod5_dataset[0]
@@ -681,7 +657,6 @@ def test_import_from_imod5__correct_well_type(imod5_dataset):
 
 
 @pytest.mark.unittest_jit
-@pytest.mark.usefixtures("imod5_dataset")
 def test_import_from_imod5__well_steady_state(imod5_dataset):
     # Unpack
     imod5_data = imod5_dataset[0]
@@ -713,7 +688,6 @@ def test_import_from_imod5__well_steady_state(imod5_dataset):
 
 
 @pytest.mark.unittest_jit
-@pytest.mark.usefixtures("imod5_dataset")
 def test_import_from_imod5__nonstandard_regridding(imod5_dataset, tmp_path):
     imod5_data = imod5_dataset[0]
     period_data = imod5_dataset[1]
@@ -749,7 +723,6 @@ def test_import_from_imod5__nonstandard_regridding(imod5_dataset, tmp_path):
 
 
 @pytest.mark.unittest_jit
-@pytest.mark.usefixtures("imod5_dataset")
 def test_import_from_imod5_no_storage_no_recharge(imod5_dataset, tmp_path):
     # this test imports an imod5 simulation, but it has no recharge and no storage package.
     imod5_data = imod5_dataset[0]

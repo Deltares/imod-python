@@ -25,14 +25,6 @@ def test_render_simple():
     assert actual == expected
 
 
-@pytest.mark.usefixtures(
-    "porosity_fc",
-    "decay_fc",
-    "decay_sorbed_fc",
-    "bulk_density_fc",
-    "distcoef_fc",
-    "sp2_fc",
-)
 def test_render_first_order_decay(
     porosity_fc, decay_fc, decay_sorbed_fc, bulk_density_fc, distcoef_fc, sp2_fc
 ):

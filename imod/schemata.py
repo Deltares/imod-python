@@ -299,7 +299,7 @@ class EmptyIndexesSchema(BaseSchema):
         # Remove face dim from list to validate, as it has no ``indexes``
         # attribute.
         if isinstance(obj, xu.UgridDataArray):
-            ugrid_dims = obj.ugrid.grid.dimensions
+            ugrid_dims = obj.ugrid.grid.sizes.keys()
             dims_to_validate = [
                 dim for dim in dims_to_validate if dim not in ugrid_dims
             ]
