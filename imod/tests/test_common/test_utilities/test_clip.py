@@ -11,10 +11,9 @@ from shapely.testing import assert_geometries_equal
 
 import imod
 from imod.common.interfaces.ipackagebase import IPackageBase
-from imod.common.utilities.clip import clip_by_grid, clip_time_indexer
+from imod.common.utilities.clip import clip_by_grid, clip_time_indexer, clip_repeat_stress
 from imod.common.utilities.grid import broadcast_to_full_domain
 from imod.mf6 import HorizontalFlowBarrierResistance
-from imod.mf6.package import Package
 
 
 @pytest.fixture(scope="function")
@@ -387,7 +386,7 @@ def test_clip_repeat_stress__all_repeats(dataset):
         time_start=time_start,
         time_end=time_end,
     )
-    repeat_indexer, repeat_stress = Package._clip_repeat_stress(
+    repeat_indexer, repeat_stress = clip_repeat_stress(
         repeat_stress=dataset["repeat_stress"],
         time=time,
         time_start=time_start,
@@ -422,7 +421,7 @@ def test_clip_repeat_stress__some_repeats(dataset2):
         time_start=time_start,
         time_end=time_end,
     )
-    repeat_indexer, repeat_stress = Package._clip_repeat_stress(
+    repeat_indexer, repeat_stress = clip_repeat_stress(
         repeat_stress=dataset["repeat_stress"],
         time=time,
         time_start=time_start,
