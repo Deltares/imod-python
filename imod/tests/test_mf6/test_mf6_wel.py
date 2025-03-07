@@ -988,7 +988,6 @@ def test_render__concentration_dis_vertices_transient(well_test_data_transient):
 
 
 @parametrize("wel_class", [Well, LayeredWell])
-@pytest.mark.usefixtures("imod5_dataset")
 def test_import_and_convert_to_mf6(imod5_dataset, tmp_path, wel_class):
     data = imod5_dataset[0]
     target_dis = StructuredDiscretization.from_imod5_data(data)
@@ -1020,7 +1019,6 @@ def test_import_and_convert_to_mf6(imod5_dataset, tmp_path, wel_class):
 
 
 @parametrize("wel_class", [Well, LayeredWell])
-@pytest.mark.usefixtures("imod5_dataset")
 def test_import__as_steady_state(imod5_dataset, wel_class):
     data = imod5_dataset[0]
     times = "steady-state"
@@ -1033,7 +1031,6 @@ def test_import__as_steady_state(imod5_dataset, wel_class):
 
 
 @parametrize("wel_class", [Well])
-@pytest.mark.usefixtures("imod5_dataset")
 def test_import_and_cleanup(imod5_dataset, wel_class: Well):
     data = imod5_dataset[0]
     target_dis = StructuredDiscretization.from_imod5_data(data)
@@ -1053,7 +1050,6 @@ def test_import_and_cleanup(imod5_dataset, wel_class: Well):
 
 
 @parametrize("wel_class", [Well, LayeredWell])
-@pytest.mark.usefixtures("well_simple_import_prj__steady_state")
 def test_import_simple_wells__steady_state(
     well_simple_import_prj__steady_state, wel_class
 ):
@@ -1074,7 +1070,6 @@ def test_import_simple_wells__steady_state(
 
 
 @parametrize("wel_class", [Well, LayeredWell])
-@pytest.mark.usefixtures("well_simple_import_prj__transient")
 def test_import_simple_wells__transient(well_simple_import_prj__transient, wel_class):
     imod5dict, _ = open_projectfile_data(well_simple_import_prj__transient)
     # Set layer to 1, to avoid validation error.
@@ -1100,7 +1095,6 @@ def test_import_simple_wells__transient(well_simple_import_prj__transient, wel_c
 
 
 @parametrize("wel_class", [Well, LayeredWell])
-@pytest.mark.usefixtures("well_regular_import_prj")
 def test_import_multiple_wells(well_regular_import_prj, wel_class):
     imod5dict, _ = open_projectfile_data(well_regular_import_prj)
     times = [
@@ -1126,7 +1120,6 @@ def test_import_multiple_wells(well_regular_import_prj, wel_class):
 
 
 @parametrize("wel_class", [Well, LayeredWell])
-@pytest.mark.usefixtures("well_duplication_import_prj")
 def test_import_from_imod5_with_duplication(well_duplication_import_prj, wel_class):
     imod5dict, _ = open_projectfile_data(well_duplication_import_prj)
     times = [
@@ -1152,7 +1145,6 @@ def test_import_from_imod5_with_duplication(well_duplication_import_prj, wel_cla
 
 
 @pytest.mark.parametrize("layer", [0, 1])
-@pytest.mark.usefixtures("well_regular_import_prj")
 def test_logmessage_for_layer_assignment_import_imod5(
     tmp_path, well_regular_import_prj, layer
 ):
@@ -1193,7 +1185,6 @@ def test_logmessage_for_layer_assignment_import_imod5(
 
 
 @pytest.mark.parametrize("remove", ["filt_top", "filt_bot", None])
-@pytest.mark.usefixtures("well_regular_import_prj")
 def test_logmessage_for_missing_filter_settings(
     tmp_path, well_regular_import_prj, remove
 ):

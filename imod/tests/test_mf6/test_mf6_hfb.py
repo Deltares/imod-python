@@ -714,7 +714,6 @@ def test_set_options(print_input, parameterizable_basic_dis):
     assert mf6_package.dataset["print_input"].values[()] == print_input
 
 
-@pytest.mark.usefixtures("imod5_dataset")
 def test_hfb_from_imod5(imod5_dataset, tmp_path):
     imod5_data = imod5_dataset[0]
     target_dis = StructuredDiscretization.from_imod5_data(imod5_data)
@@ -731,7 +730,6 @@ def test_hfb_from_imod5(imod5_dataset, tmp_path):
     assert list(np.unique(hfb_package["layer"].values)) == [7]
 
 
-@pytest.mark.usefixtures("structured_flow_model")
 def test_snap_to_grid_and_aggregate(structured_flow_model):
     idomain = structured_flow_model["dis"]["idomain"]
     grid2d = xu.Ugrid2d.from_structured(idomain)
@@ -766,7 +764,6 @@ def test_snap_to_grid_and_aggregate(structured_flow_model):
     np.testing.assert_array_equal(edge_index, argwhere_summed_expected)
 
 
-@pytest.mark.usefixtures("structured_flow_model")
 def test_combine_linestrings(structured_flow_model):
     dis = structured_flow_model["dis"]
     top, bottom, idomain = (
@@ -802,7 +799,6 @@ def test_combine_linestrings(structured_flow_model):
     xr.testing.assert_equal(mf6_hfb_single.dataset, mf6_hfb_triple.dataset)
 
 
-@pytest.mark.usefixtures("structured_flow_model")
 def test_run_multiple_hfbs(tmp_path, structured_flow_model):
     # Single layered model
     structured_flow_model = structured_flow_model.clip_box(layer_max=1)

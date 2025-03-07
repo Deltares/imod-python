@@ -13,7 +13,6 @@ from imod.mf6.validation_context import ValidationContext
 from imod.mf6.write_context import WriteContext
 
 
-@pytest.mark.usefixtures("circle_model")
 @pytest.mark.skipif(sys.version_info < (3, 7), reason="capture_output added in 3.7")
 def test_simulation_write_and_run(circle_model, tmp_path):
     imod.logging.configure(
@@ -53,7 +52,6 @@ def test_simulation_write_and_run(circle_model, tmp_path):
     assert head.shape == (52, 2, 216)
 
 
-@pytest.mark.usefixtures("circle_model")
 def test_gwfmodel_render(circle_model, tmp_path):
     simulation = circle_model
     globaltimes = simulation["time_discretization"]["time"].values
@@ -85,7 +83,6 @@ def test_gwfmodel_render(circle_model, tmp_path):
     assert (tmp_path / "GWF_1").is_dir()
 
 
-@pytest.mark.usefixtures("circle_model_evt")
 @pytest.mark.skipif(sys.version_info < (3, 7), reason="capture_output added in 3.7")
 def test_simulation_write_and_run_evt(circle_model_evt, tmp_path):
     simulation = circle_model_evt
@@ -107,7 +104,6 @@ def test_simulation_write_and_run_evt(circle_model_evt, tmp_path):
     assert head.shape == (52, 2, 216)
 
 
-@pytest.mark.usefixtures("circle_model_evt")
 def test_gwfmodel_render_evt(circle_model_evt, tmp_path):
     simulation = circle_model_evt
     globaltimes = simulation["time_discretization"]["time"].values

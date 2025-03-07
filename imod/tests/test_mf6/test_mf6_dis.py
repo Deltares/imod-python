@@ -237,7 +237,6 @@ def test_write_ascii_griddata_2d_3d(idomain_and_bottom, tmp_path):
     assert len(bottom_content) == 1
 
 
-@pytest.mark.usefixtures("imod5_dataset")
 def test_from_imod5_data__idomain_values(imod5_dataset):
     imod5_data = imod5_dataset[0]
 
@@ -251,7 +250,6 @@ def test_from_imod5_data__idomain_values(imod5_dataset):
     assert (dis["idomain"] == 2).sum() == 688329
 
 
-@pytest.mark.usefixtures("imod5_dataset")
 def test_from_imod5_data__grid_extent(imod5_dataset):
     imod5_data = imod5_dataset[0]
 
@@ -270,7 +268,6 @@ def test_from_imod5_data__grid_extent(imod5_dataset):
     assert dis.dataset.coords["x"].max() == 199287.5
 
 
-@pytest.mark.usefixtures("imod5_dataset")
 def test_from_imod5_data__write(imod5_dataset, tmp_path):
     directory = tmp_path / "dis_griddata"
     directory.mkdir()

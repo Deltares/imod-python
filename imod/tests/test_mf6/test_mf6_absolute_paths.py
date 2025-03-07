@@ -47,7 +47,6 @@ def uzf_test_data():
     return d
 
 
-@pytest.mark.usefixtures("circle_model")
 def test_simulation_writes_full_paths_if_requested(circle_model, tmp_path):
     simulation = circle_model
     sim_dir = tmp_path / "circle"

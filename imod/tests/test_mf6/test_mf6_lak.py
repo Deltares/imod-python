@@ -2,7 +2,6 @@ import textwrap
 
 import numpy as np
 import pandas as pd
-import pytest
 import xarray as xr
 import xugrid as xu
 
@@ -17,7 +16,6 @@ from imod.mf6.lak import (
 )
 
 
-@pytest.mark.usefixtures("naardermeer", "ijsselmeer")
 def test_alternative_constructor(naardermeer, ijsselmeer):
     outlet1 = OutletManning("Naardermeer", "IJsselmeer", 23.0, 24.0, 25.0, 26.0)
     outlet2 = OutletManning("IJsselmeer", "Naardermeer", 27.0, 28.0, 29.0, 30.0)

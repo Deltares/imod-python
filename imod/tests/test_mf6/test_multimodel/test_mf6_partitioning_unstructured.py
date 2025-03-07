@@ -14,7 +14,6 @@ from imod.prepare.hfb import linestring_to_square_zpolygons
 from imod.typing.grid import ones_like, zeros_like
 
 
-@pytest.mark.usefixtures("circle_model")
 @pytest.fixture(scope="function")
 def idomain_top(circle_model):
     idomain = circle_model["GWF_1"].domain
@@ -157,7 +156,6 @@ def is_expected_hfb_partition_combination_fail(current_cases):
     return False
 
 
-@pytest.mark.usefixtures("circle_model")
 @parametrize_with_cases("partition_array", cases=PartitionArrayCases)
 def test_partitioning_unstructured(
     tmp_path: Path, circle_model: Modflow6Simulation, partition_array: xu.UgridDataArray
@@ -197,7 +195,6 @@ def test_partitioning_unstructured(
         )
 
 
-@pytest.mark.usefixtures("circle_model")
 @pytest.mark.parametrize("inactivity_marker", [0, -1])
 @parametrize_with_cases("partition_array", cases=PartitionArrayCases)
 def test_partitioning_unstructured_with_inactive_cells(
@@ -250,7 +247,6 @@ def test_partitioning_unstructured_with_inactive_cells(
     )
 
 
-@pytest.mark.usefixtures("circle_model")
 def test_partitioning_unstructured_voronoi_conversion(
     tmp_path: Path,
     circle_model: Modflow6Simulation,
@@ -307,7 +303,6 @@ def test_partitioning_unstructured_voronoi_conversion(
     )
 
 
-@pytest.mark.usefixtures("circle_model")
 @parametrize_with_cases("partition_array", cases=PartitionArrayCases)
 @parametrize_with_cases("hfb", cases=HorizontalFlowBarrierCases)
 def test_partitioning_unstructured_hfb(
@@ -363,7 +358,6 @@ def test_partitioning_unstructured_hfb(
         )
 
 
-@pytest.mark.usefixtures("circle_model")
 @parametrize_with_cases("partition_array", cases=PartitionArrayCases)
 @parametrize_with_cases("well", cases=WellCases)
 def test_partitioning_unstructured_with_well(
@@ -450,7 +444,6 @@ def get_exchange_masks(actual_flow_budget, expected_flow_budget):
     return is_exchange_cell, is_exchange_edge
 
 
-@pytest.mark.usefixtures("circle_model_transport")
 @parametrize_with_cases("partition_array", cases=PartitionArrayCases)
 def test_partition_transport(
     tmp_path: Path,
@@ -503,7 +496,6 @@ def test_partition_transport(
         )
 
 
-@pytest.mark.usefixtures("circle_model_transport_multispecies_variable_density")
 @parametrize_with_cases("partition_array", cases=PartitionArrayCases)
 def test_partition_transport_multispecies(
     tmp_path: Path,
@@ -580,7 +572,6 @@ def test_partition_transport_multispecies(
         )
 
 
-@pytest.mark.usefixtures("circle_model")
 def test_slice_model_twice(tmp_path, circle_model):
     flow_model = circle_model["GWF_1"]
     active = flow_model.domain

@@ -95,7 +95,6 @@ def roundtrip(model, tmp_path):
     assert isinstance(back, type(model))
 
 
-@pytest.mark.usefixtures("circle_model")
 def test_circle_roundtrip(circle_model, tmp_path):
     roundtrip(circle_model["GWF_1"], tmp_path)
 

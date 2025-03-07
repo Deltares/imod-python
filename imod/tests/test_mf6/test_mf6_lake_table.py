@@ -1,12 +1,9 @@
 import textwrap
 
-import pytest
-
 import imod.tests.fixtures.mf6_lake_package_fixture as mf_lake
 from imod.mf6.lak import Lake
 
 
-@pytest.mark.usefixtures("naardermeer", "ijsselmeer")
 def test_mf6_write_number_tables(naardermeer, ijsselmeer, tmp_path):
     lake_package_2lakes = Lake.from_lakes_and_outlets(
         [naardermeer(has_lake_table=True), ijsselmeer(has_lake_table=True)]
