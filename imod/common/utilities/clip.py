@@ -329,6 +329,7 @@ def clip_time_slice(
     time_min: Optional[cftime.datetime | np.datetime64 | str] = None,
     time_max: Optional[cftime.datetime | np.datetime64 | str] = None,
 ):
+    """Clip time slice from dataset, account for repeat stress if present."""
     selection = dataset
     if "time" in selection:
         time = selection["time"].values
