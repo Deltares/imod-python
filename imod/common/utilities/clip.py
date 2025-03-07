@@ -18,9 +18,11 @@ from imod.common.utilities.line_data import (
     clipped_zbound_linestrings_to_vertical_polygons,
     vertical_polygons_to_zbound_linestrings,
 )
+from imod.common.utilities.value_filters import is_valid
 from imod.typing import GeoDataFrameType, GridDataArray, GridDataset
 from imod.typing.grid import bounding_polygon, is_spatial_grid
 from imod.util.imports import MissingOptionalModule
+from imod.util.time import to_datetime_internal
 
 if TYPE_CHECKING:
     import geopandas as gpd
@@ -266,4 +268,92 @@ def clip_layer_slice(
             )
         else:
             selection = selection.sel(layer=layer_slice)
+    return selection
+
+
+def _to_datetime(
+    time: Optional[cftime.datetime | np.datetime64 | str], use_cftime: bool
+):
+    """
+    Helper function that converts to datetime, except when None.
+    """
+    if time is None:
+        return time
+    else:
+        return to_datetime_internal(time, use_cftime)
+
+
+def clip_repeat_stress(
+    repeat_stress: xr.DataArray,
+    time,
+    time_start,
+    time_end,
+):
+    """
+    Selection may remove the original data which are repeated.
+    These should be re-inserted at the first occuring "key".
+    Next, remove these keys as they've been "promoted" to regular
+    timestamps with data.
+    """
+    # First, "pop" and filter.
+    keys, values = repeat_stress.values.T
+    keep = (keys >= time_start) & (keys <= time_end)
+    new_keys = keys[keep]
+    new_values = values[keep]
+    # Now detect which "value" entries have gone missing
+    insert_values, index = np.unique(new_values, return_index=True)
+    insert_keys = new_keys[index]
+    # Setup indexer
+    indexer = xr.DataArray(
+        data=np.arange(time.size),
+        coords={"time": time},
+        dims=("time",),
+    ).sel(time=insert_values)
+    indexer["time"] = insert_keys
+
+    # Update the key-value pairs. Discard keys that have been "promoted".
+    keep = np.isin(new_keys, insert_keys, assume_unique=True, invert=True)
+    new_keys = new_keys[keep]
+    new_values = new_values[keep]
+    # Set the values to their new source.
+    new_values = insert_keys[np.searchsorted(insert_values, new_values)]
+    repeat_stress = xr.DataArray(
+        data=np.column_stack((new_keys, new_values)),
+        dims=("repeat", "repeat_items"),
+    )
+    return indexer, repeat_stress
+
+
+def clip_time_slice(
+    dataset: GridDataset,
+    time_min: Optional[cftime.datetime | np.datetime64 | str] = None,
+    time_max: Optional[cftime.datetime | np.datetime64 | str] = None,
+):
+    selection = dataset
+    if "time" in selection:
+        time = selection["time"].values
+        use_cftime = isinstance(time[0], cftime.datetime)
+        time_start = _to_datetime(time_min, use_cftime)
+        time_end = _to_datetime(time_max, use_cftime)
+
+        indexer = clip_time_indexer(
+            time=time,
+            time_start=time_start,
+            time_end=time_end,
+        )
+
+        if "repeat_stress" in selection.data_vars and is_valid(
+            selection["repeat_stress"].values[()]
+        ):
+            repeat_indexer, repeat_stress = clip_repeat_stress(
+                repeat_stress=selection["repeat_stress"],
+                time=time,
+                time_start=time_start,
+                time_end=time_end,
+            )
+            selection = selection.drop_vars("repeat_stress")
+            selection["repeat_stress"] = repeat_stress
+            indexer = repeat_indexer.combine_first(indexer).astype(int)
+
+        selection = selection.drop_vars("time").isel(time=indexer)
     return selection
