@@ -147,7 +147,7 @@ def test_clip_by_grid_with_line_data_package__unstructured(
     # Arrange
     idomain, _, _ = basic_dis
     active = idomain.sel(layer=1, drop=True)
-    active_uda = xu.UgridDataArray.from_structured(active)
+    active_uda = xu.UgridDataArray.from_structured2d(active)
 
     # Act
     hfb_clipped = clip_by_grid(horizontal_flow_barrier, active_uda)
@@ -212,7 +212,7 @@ def test_clip_by_grid__unstructured_grid_full(
     idomain, _, _ = basic_dis
     active = idomain.sel(layer=1, drop=True)
     wel = imod.mf6.Well(*well_high_lvl_test_data_stationary, print_flows=True)
-    active_ugrid = xu.UgridDataArray.from_structured(active)
+    active_ugrid = xu.UgridDataArray.from_structured2d(active)
 
     # Act
     wel_clipped = clip_by_grid(wel, active_ugrid)
@@ -234,7 +234,7 @@ def test_clip_by_grid__unstructured_grid_clipped(
     wel = imod.mf6.Well(*well_high_lvl_test_data_stationary, print_flows=True)
     # Clip grid so that xmax is set to 70.0 instead of 90.0
     active_selected = active.sel(x=slice(None, 70.0))
-    active_ugrid = xu.UgridDataArray.from_structured(active_selected)
+    active_ugrid = xu.UgridDataArray.from_structured2d(active_selected)
 
     # Act
     wel_clipped = clip_by_grid(wel, active_ugrid)

@@ -66,7 +66,7 @@ def riv_dict():
 
 
 def make_dict_unstructured(d):
-    return {key: xu.UgridDataArray.from_structured(value) for key, value in d.items()}
+    return {key: xu.UgridDataArray.from_structured2d(value) for key, value in d.items()}
 
 
 class RivCases:

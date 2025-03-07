@@ -524,8 +524,8 @@ class ClipBoxCases:
     def case_clip_top_is_non_layered_unstructuredgrid(parameterizable_basic_dis):
         idomain, top, bottom = parameterizable_basic_dis
         top, bottom = broadcast_to_full_domain(idomain, top, bottom)
-        top = xu.UgridDataArray.from_structured(top)
-        bottom = xu.UgridDataArray.from_structured(bottom)
+        top = xu.UgridDataArray.from_structured2d(top)
+        bottom = xu.UgridDataArray.from_structured2d(bottom)
 
         top = top.isel(layer=0).drop_vars("layer")
 
@@ -538,8 +538,8 @@ class ClipBoxCases:
     def case_clip_top_is_layered_unstructuredgrid(parameterizable_basic_dis):
         idomain, top, bottom = parameterizable_basic_dis
         top, bottom = broadcast_to_full_domain(idomain, top, bottom)
-        top = xu.UgridDataArray.from_structured(top)
-        bottom = xu.UgridDataArray.from_structured(bottom)
+        top = xu.UgridDataArray.from_structured2d(top)
+        bottom = xu.UgridDataArray.from_structured2d(bottom)
 
         clip_arguments = {"layer_max": 2, "bottom": bottom, "top": top}
 

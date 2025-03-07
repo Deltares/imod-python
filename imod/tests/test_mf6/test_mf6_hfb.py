@@ -99,7 +99,7 @@ def test_to_mf6_creates_mf6_adapter_init(
     grid = (
         idomain.ugrid.grid
         if isinstance(idomain, xu.UgridDataArray)
-        else xu.UgridDataArray.from_structured(idomain).ugrid.grid
+        else xu.UgridDataArray.from_structured2d(idomain).ugrid.grid
     )
 
     expected_barrier_values = xr.DataArray(
@@ -228,7 +228,7 @@ def test_to_mf6_creates_mf6_adapter_layered(
     grid = (
         idomain.ugrid.grid
         if isinstance(idomain, xu.UgridDataArray)
-        else xu.UgridDataArray.from_structured(idomain).ugrid.grid
+        else xu.UgridDataArray.from_structured2d(idomain).ugrid.grid
     )
 
     data = np.full((idomain.coords["layer"].size, edge_index.size), fill_value=np.nan)
