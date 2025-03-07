@@ -12,6 +12,7 @@ from imod.msw.model import DEFAULT_SETTINGS
 from imod.msw.utilities.parse import read_para_sim
 from imod.typing import GridDataArray, Imod5DataDict
 from imod.util.regrid import RegridderWeightsCache
+from imod.msw.meteo_mapping import MeteoMapping
 
 
 def test_msw_model_write(msw_model, coupled_mf6_model, coupled_mf6wel, tmp_path):
@@ -119,7 +120,10 @@ def test_clip_box(msw_model):
     clipped_model = msw_model.clip_box(x_min=1.0, x_max=2.5, y_min=1.0, y_max=2.5)
 
     for pkg in clipped_model.values():
-        coords = pkg.dataset.coords
+        if isinstance(pkg, MeteoMapping):
+            coords = pkg.meteo.coords
+        else:
+            coords = pkg.dataset.coords
         if "x" in coords:
             assert coords["x"].min() >= 1.0
             assert coords["x"].max() <= 2.5

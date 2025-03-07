@@ -384,14 +384,15 @@ class MetaSwapModel(Model):
             # transformations on meteo data in this case.
             if has_meteogrid_copy and isinstance(pkg, MeteoMapping):
                 clipped[key] = deepcopy(pkg)
-            clipped[key] = pkg.clip_box(
-                time_min=time_min,
-                time_max=time_max,
-                x_min=x_min,
-                x_max=x_max,
-                y_min=y_min,
-                y_max=y_max,
-            )
+            else:
+                clipped[key] = pkg.clip_box(
+                    time_min=time_min,
+                    time_max=time_max,
+                    x_min=x_min,
+                    x_max=x_max,
+                    y_min=y_min,
+                    y_max=y_max,
+                )
         return clipped
 
     @classmethod

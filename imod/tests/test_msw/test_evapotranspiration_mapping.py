@@ -129,9 +129,27 @@ def test_evapotranspiration_mapping_out_of_bound(svat_index):
         with pytest.raises(ValueError):
             evapotranspiration_mapping.write(output_dir, index, svat, None, None)
 
+def test_evapotranspiration_mapping_clip():
+    # Arrange
+    x = [-0.5, 1.5, 3.5]
+    y = [4.5, 2.5, 0.5]
+    subunit = [0, 1]
+    dx = 2.0
+    dy = -2.0
+    x_max = 2.0
+    y_max = 3.0
+    evapotranspiration = create_meteo_grid(x, y, subunit, dx, dy)
+    # Act
+    evapotranspiration_mapping = msw.PrecipitationMapping(evapotranspiration)
+    clipped = evapotranspiration_mapping.clip_box(x_max=x_max, y_max=y_max)
+    # Assert
+    actual_meteo = clipped.meteo
+    assert actual_meteo.x.max().values[()] <= x_max
+    assert actual_meteo.y.max().values[()] <= y_max
+
 
 def setup_meteo_grid(datadir):
-    """Setup precipitation grid and write mete_grid.inp"""
+    """Setup evapotranspiration grid and write mete_grid.inp"""
     # Arrange
     x = [-0.5, 1.5, 3.5]
     y = [4.5, 2.5, 0.5]
@@ -142,11 +160,11 @@ def setup_meteo_grid(datadir):
     time = [np.datetime64(t) for t in ["2001-01-01", "2001-01-02", "2001-01-03"]]
     time_da = xr.DataArray([1.0, 1.0, 1.0], coords={"time": time})
 
-    precipitation = create_meteo_grid(x, y, subunit, dx, dy).isel(subunit=0, drop=True)
-    precipitation_times = time_da * precipitation
-    mete_grid = msw.MeteoGrid(precipitation_times, precipitation_times)
+    evapotranspiration = create_meteo_grid(x, y, subunit, dx, dy).isel(subunit=0, drop=True)
+    evapotranspiration_times = time_da * evapotranspiration
+    mete_grid = msw.MeteoGrid(evapotranspiration_times, evapotranspiration_times)
     mete_grid.write(datadir)
-    return precipitation
+    return evapotranspiration
 
 
 class MeteGridCases:

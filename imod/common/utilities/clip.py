@@ -331,7 +331,7 @@ def clip_time_slice(
 ):
     """Clip time slice from dataset, account for repeat stress if present."""
     selection = dataset
-    if "time" in selection:
+    if "time" in selection.coords:
         time = selection["time"].values
         use_cftime = isinstance(time[0], cftime.datetime)
         time_start = _to_datetime(time_min, use_cftime)

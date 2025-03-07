@@ -157,6 +157,25 @@ def test_precipitation_mapping_out_of_bound(svat_index):
             precipitation_mapping.write(output_dir, index, svat, None, None)
 
 
+def test_precipitation_mapping_clip():
+    # Arrange
+    x = [-0.5, 1.5, 3.5]
+    y = [4.5, 2.5, 0.5]
+    subunit = [0, 1]
+    dx = 2.0
+    dy = -2.0
+    x_max = 2.0
+    y_max = 3.0
+    precipitation = create_meteo_grid(x, y, subunit, dx, dy)
+    # Act
+    precipitation_mapping = msw.PrecipitationMapping(precipitation)
+    clipped = precipitation_mapping.clip_box(x_max=x_max, y_max=y_max)
+    # Assert
+    actual_meteo = clipped.meteo
+    assert actual_meteo.x.max().values[()] <= x_max
+    assert actual_meteo.y.max().values[()] <= y_max
+
+
 def setup_meteo_grid(datadir):
     """Setup precipitation grid and write mete_grid.inp"""
     # Arrange
