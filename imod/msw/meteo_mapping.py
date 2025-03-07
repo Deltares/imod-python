@@ -154,7 +154,7 @@ class MeteoMapping(MetaSwapPackage):
         y_max: Optional[float] = None,
     ):
         """Clip meteo grid to a box defined by time and space."""
-        selection = self.meteo.to_dataset(name="meteo") # Force to dataset
+        selection = self.meteo.to_dataset(name="meteo")  # Force to dataset
         selection = clip_time_slice(selection, time_min=time_min, time_max=time_max)
         selection = clip_spatial_box(
             selection,

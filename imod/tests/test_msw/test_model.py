@@ -8,11 +8,11 @@ from pytest_cases import parametrize_with_cases
 
 from imod import mf6, msw
 from imod.msw.copy_files import FileCopier
+from imod.msw.meteo_mapping import MeteoMapping
 from imod.msw.model import DEFAULT_SETTINGS
 from imod.msw.utilities.parse import read_para_sim
 from imod.typing import GridDataArray, Imod5DataDict
 from imod.util.regrid import RegridderWeightsCache
-from imod.msw.meteo_mapping import MeteoMapping
 
 
 def test_msw_model_write(msw_model, coupled_mf6_model, coupled_mf6wel, tmp_path):

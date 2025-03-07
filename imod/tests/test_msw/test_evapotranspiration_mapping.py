@@ -129,6 +129,7 @@ def test_evapotranspiration_mapping_out_of_bound(svat_index):
         with pytest.raises(ValueError):
             evapotranspiration_mapping.write(output_dir, index, svat, None, None)
 
+
 def test_evapotranspiration_mapping_clip():
     # Arrange
     x = [-0.5, 1.5, 3.5]
@@ -160,7 +161,9 @@ def setup_meteo_grid(datadir):
     time = [np.datetime64(t) for t in ["2001-01-01", "2001-01-02", "2001-01-03"]]
     time_da = xr.DataArray([1.0, 1.0, 1.0], coords={"time": time})
 
-    evapotranspiration = create_meteo_grid(x, y, subunit, dx, dy).isel(subunit=0, drop=True)
+    evapotranspiration = create_meteo_grid(x, y, subunit, dx, dy).isel(
+        subunit=0, drop=True
+    )
     evapotranspiration_times = time_da * evapotranspiration
     mete_grid = msw.MeteoGrid(evapotranspiration_times, evapotranspiration_times)
     mete_grid.write(datadir)
