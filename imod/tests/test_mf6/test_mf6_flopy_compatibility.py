@@ -6,7 +6,6 @@ import pytest
 from imod.mf6 import Modflow6Simulation
 
 
-@pytest.mark.usefixtures("twri_model")
 @pytest.mark.parametrize("absolute_paths", [True])
 def test_readable_by_flopy(
     twri_model: Modflow6Simulation, tmp_path: Path, absolute_paths
@@ -31,7 +30,6 @@ def test_readable_by_flopy(
     assert len(flopy_sim_result) == 2
 
 
-@pytest.mark.usefixtures("twri_model")
 @pytest.mark.parametrize("absolute_paths", [True, False])
 def test_readable_by_mf6(
     twri_model: Modflow6Simulation, tmp_path: Path, absolute_paths

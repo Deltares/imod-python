@@ -7,6 +7,7 @@ import dask
 import numpy as np
 import xarray as xr
 
+from imod.common.utilities.value_filters import enforce_scalar
 from imod.util import nested_dict, spatial, time
 
 
@@ -113,6 +114,8 @@ def _scalar_z_coord(coords, tops, bots):
     top = np.unique(tops)
     bot = np.unique(bots)
     if top.size == bot.size == 1:
+        top = enforce_scalar(top)
+        bot = enforce_scalar(bot)
         dz = top - bot
         z = top - 0.5 * dz
         coords["dz"] = float(dz)  # cast from array

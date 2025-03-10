@@ -29,7 +29,6 @@ def save_and_load(tmp_path: Path, ugrid: UnstructuredData) -> xu.UgridDataset:
     return ugrid
 
 
-@pytest.mark.usefixtures("circle_model")
 @pytest.fixture(scope="function")
 def idomain_top(circle_model):
     idomain = circle_model["GWF_1"].domain
@@ -84,7 +83,6 @@ class PartitionArrayCases:
         return three_parts
 
 
-@pytest.mark.usefixtures("circle_model")
 @parametrize_with_cases("partition_array", cases=PartitionArrayCases)
 def test_specific_discharge_results(
     tmp_path: Path, circle_model: Modflow6Simulation, partition_array: xu.UgridDataArray

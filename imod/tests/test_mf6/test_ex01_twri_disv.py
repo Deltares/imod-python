@@ -7,7 +7,6 @@ import xugrid as xu
 import imod
 
 
-@pytest.mark.usefixtures("twri_disv_model")
 @pytest.mark.skipif(sys.version_info < (3, 7), reason="capture_output added in 3.7")
 def test_simulation_write_and_run(twri_disv_model, tmp_path):
     simulation = twri_disv_model
@@ -32,7 +31,6 @@ def test_simulation_write_and_run(twri_disv_model, tmp_path):
     assert np.allclose(meanhead_layer, mean_answer)
 
 
-@pytest.mark.usefixtures("transient_twri_model")
 @pytest.mark.skipif(sys.version_info < (3, 7), reason="capture_output added in 3.7")
 def test_slice_and_run(twri_disv_model, tmp_path):
     # TODO: bring back well once slicing is implemented...

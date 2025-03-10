@@ -14,6 +14,7 @@ from imod.mf6.drn import Drainage
 from imod.mf6.npf import NodePropertyFlow
 from imod.mf6.regrid.regrid_schemes import RiverRegridMethod
 from imod.mf6.utilities.imod5_converter import regrid_imod5_pkg_data
+from imod.mf6.utilities.package import get_repeat_stress
 from imod.mf6.validation import BOUNDARY_DIMS_SCHEMA, CONC_DIMS_SCHEMA
 from imod.prepare.cleanup import AlignLevelsMode, align_interface_levels, cleanup_riv
 from imod.prepare.topsystem.allocation import ALLOCATION_OPTION, allocate_riv_cells
@@ -57,9 +58,8 @@ def set_repeat_stress_if_available(
     """Set repeat stress for optional package if repeat is not None."""
     if repeat is not None:
         if optional_package is not None:
-            optional_package.set_repeat_stress(
-                expand_repetitions(repeat, time_min, time_max)
-            )
+            times = expand_repetitions(repeat, time_min, time_max)
+            optional_package.dataset["repeat_stress"] = get_repeat_stress(times)
 
 
 def mask_package__drop_if_empty(

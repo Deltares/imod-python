@@ -35,3 +35,10 @@ def is_empty_dataarray(da: Any) -> bool:
 def get_scalar_variables(ds: GridDataset) -> list[str]:
     """Returns scalar variables in a dataset."""
     return [var for var, arr in ds.variables.items() if is_scalar(arr)]
+
+
+def enforce_scalar(a: np.ndarray) -> np.ndarray:
+    """Enforce scalar value from array."""
+    if a.size == 1:
+        return a.item()
+    return ValueError(f"Array has size {a.size}, expected size 1.")

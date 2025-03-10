@@ -9,13 +9,6 @@ import imod
 from imod.schemata import ValidationError
 
 
-@pytest.mark.usefixtures(
-    "rate_fc",
-    "elevation_fc",
-    "concentration_fc",
-    "proportion_rate_fc",
-    "proportion_depth_fc",
-)
 def test_render(
     rate_fc, elevation_fc, concentration_fc, proportion_rate_fc, proportion_depth_fc
 ):
@@ -68,12 +61,6 @@ def test_render(
     assert actual == expected
 
 
-@pytest.mark.usefixtures(
-    "rate_fc",
-    "elevation_fc",
-    "proportion_rate_fc",
-    "proportion_depth_fc",
-)
 def test_get_options__no_segments(
     rate_fc, elevation_fc, proportion_rate_fc, proportion_depth_fc
 ):
@@ -96,12 +83,6 @@ def test_get_options__no_segments(
     assert options["nseg"] == 1
 
 
-@pytest.mark.usefixtures(
-    "rate_fc",
-    "elevation_fc",
-    "proportion_rate_fc",
-    "proportion_depth_fc",
-)
 def test_get_options__with_segments(
     rate_fc, elevation_fc, proportion_rate_fc, proportion_depth_fc
 ):
@@ -133,12 +114,6 @@ def test_get_options__with_segments(
     assert options["nseg"] == 4
 
 
-@pytest.mark.usefixtures(
-    "rate_fc",
-    "elevation_fc",
-    "proportion_rate_fc",
-    "proportion_depth_fc",
-)
 def test_get_bin_ds__no_segments(
     rate_fc, elevation_fc, proportion_rate_fc, proportion_depth_fc
 ):
@@ -155,7 +130,7 @@ def test_get_bin_ds__no_segments(
     bin_ds = evt._get_bin_ds()
 
     # Assert
-    expected_dims = {"time": 3, "layer": 3, "y": 15, "x": 15}
+    expected_sizes = {"time": 3, "layer": 3, "y": 15, "x": 15}
     expected_variables = [
         "surface",
         "rate",
@@ -164,16 +139,10 @@ def test_get_bin_ds__no_segments(
         "proportion_rate",
     ]
 
-    assert bin_ds.dims == expected_dims
+    assert bin_ds.sizes == expected_sizes
     assert list(bin_ds.keys()) == expected_variables
 
 
-@pytest.mark.usefixtures(
-    "rate_fc",
-    "elevation_fc",
-    "proportion_rate_fc",
-    "proportion_depth_fc",
-)
 def test_get_bin_ds__with_segments(
     rate_fc, elevation_fc, proportion_rate_fc, proportion_depth_fc
 ):
@@ -199,7 +168,7 @@ def test_get_bin_ds__with_segments(
     bin_ds = evt._get_bin_ds()
 
     # Assert
-    expected_dims = {"time": 3, "layer": 3, "y": 15, "x": 15}
+    expected_sizes = {"time": 3, "layer": 3, "y": 15, "x": 15}
     expected_variables = [
         "surface",
         "rate",
@@ -212,16 +181,10 @@ def test_get_bin_ds__with_segments(
         "proportion_rate_segment_3",
     ]
 
-    assert bin_ds.dims == expected_dims
+    assert bin_ds.sizes == expected_sizes
     assert list(bin_ds.keys()) == expected_variables
 
 
-@pytest.mark.usefixtures(
-    "rate_fc",
-    "elevation_fc",
-    "proportion_rate_fc",
-    "proportion_depth_fc",
-)
 def test_wrong_dim_order(
     rate_fc, elevation_fc, proportion_rate_fc, proportion_depth_fc
 ):
