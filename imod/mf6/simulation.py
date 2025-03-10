@@ -619,7 +619,6 @@ class Modflow6Simulation(collections.UserDict, ISimulation):
             raise RuntimeError(
                 f"Unexpected error when opening {output} for {modelnames}"
             )
-        return
 
     def _open_single_output(
         self, modelnames: list[str], output: str, **settings
@@ -908,7 +907,7 @@ class Modflow6Simulation(collections.UserDict, ISimulation):
             elif key in ["gwtgwf_exchanges", "split_exchanges"]:
                 toml_content[key] = collections.defaultdict(list)
                 for exchange_package in self[key]:
-                    exchange_type, filename, _, _ = exchange_package.get_specification()
+                    _, filename, _, _ = exchange_package.get_specification()
                     exchange_class_short = type(exchange_package).__name__
                     path = f"{filename}.nc"
                     exchange_package.dataset.to_netcdf(directory / path)
@@ -921,8 +920,6 @@ class Modflow6Simulation(collections.UserDict, ISimulation):
 
         with open(directory / f"{self.name}.toml", "wb") as f:
             tomli_w.dump(toml_content, f)
-
-        return
 
     @staticmethod
     @standard_log_decorator()
