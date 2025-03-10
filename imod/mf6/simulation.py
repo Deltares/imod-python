@@ -131,6 +131,7 @@ class Modflow6Simulation(collections.UserDict, ISimulation):
         )
         self.create_time_discretization(additional_times=times)
 
+    @standard_log_decorator()
     def create_time_discretization(self, additional_times, validate: bool = True):
         """
         Collect all unique times from model packages and additional given
@@ -337,6 +338,7 @@ class Modflow6Simulation(collections.UserDict, ISimulation):
 
         self.directory = directory
 
+    @standard_log_decorator()
     def run(self, mf6path: Union[str, Path] = "mf6") -> None:
         """
         Run Modflow 6 simulation. This method runs a subprocess calling
@@ -369,6 +371,7 @@ class Modflow6Simulation(collections.UserDict, ISimulation):
                     f"{result.returncode}, and error message:\n\n{result.stdout.decode()} "
                 )
 
+    @standard_log_decorator()
     def open_head(
         self,
         dry_nan: bool = False,
@@ -427,6 +430,7 @@ class Modflow6Simulation(collections.UserDict, ISimulation):
             time_unit=time_unit,
         )
 
+    @standard_log_decorator()
     def open_transport_budget(
         self,
         species_ls: Optional[list[str]] = None,
@@ -466,6 +470,7 @@ class Modflow6Simulation(collections.UserDict, ISimulation):
             flowja=False,
         )
 
+    @standard_log_decorator()
     def open_flow_budget(
         self,
         flowja: bool = False,
@@ -535,6 +540,7 @@ class Modflow6Simulation(collections.UserDict, ISimulation):
             merge_to_dataset=True,
         )
 
+    @standard_log_decorator()
     def open_concentration(
         self,
         species_ls: Optional[list[str]] = None,
@@ -919,6 +925,7 @@ class Modflow6Simulation(collections.UserDict, ISimulation):
         return
 
     @staticmethod
+    @standard_log_decorator()
     def from_file(toml_path):
         classes = {
             item_cls.__name__: item_cls
@@ -980,6 +987,7 @@ class Modflow6Simulation(collections.UserDict, ISimulation):
     def get_models(self):
         return {k: v for k, v in self.items() if isinstance(v, Modflow6Model)}
 
+    @standard_log_decorator()
     def clip_box(
         self,
         time_min: Optional[cftime.datetime | np.datetime64 | str] = None,
@@ -1069,6 +1077,7 @@ class Modflow6Simulation(collections.UserDict, ISimulation):
                 raise ValueError(f"object of type {type(value)} cannot be clipped.")
         return clipped
 
+    @standard_log_decorator()
     def split(self, submodel_labels: GridDataArray) -> Modflow6Simulation:
         """
         Split a simulation in different partitions using a submodel_labels array.
@@ -1150,6 +1159,7 @@ class Modflow6Simulation(collections.UserDict, ISimulation):
         new_simulation._filter_inactive_cells_from_exchanges()
         return new_simulation
 
+    @standard_log_decorator()
     def regrid_like(
         self,
         regridded_simulation_name: str,
@@ -1328,6 +1338,7 @@ class Modflow6Simulation(collections.UserDict, ISimulation):
         flow_models = self.get_models_of_type("gwf6")
         return len(flow_models) == 1
 
+    @standard_log_decorator()
     def mask_all_models(
         self,
         mask: GridDataArray,
