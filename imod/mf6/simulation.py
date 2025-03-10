@@ -1452,7 +1452,7 @@ class Modflow6Simulation(collections.UserDict, ISimulation):
         simulation._validation_context.strict_hfb_validation = False
 
         # import GWF model,
-        groundwaterFlowModel = GroundwaterFlowModel.from_imod5_data(
+        gwf_model = GroundwaterFlowModel.from_imod5_data(
             imod5_data,
             period_data,
             times,
@@ -1460,7 +1460,7 @@ class Modflow6Simulation(collections.UserDict, ISimulation):
             distributing_options,
             regridder_types,
         )
-        simulation["imported_model"] = groundwaterFlowModel
+        simulation["imported_model"] = gwf_model
 
         # generate ims package
         solution = SolutionPresetModerate(
