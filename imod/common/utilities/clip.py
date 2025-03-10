@@ -294,15 +294,29 @@ def clip_repeat_stress(
     These should be re-inserted at the first occuring "key".
     Next, remove these keys as they've been "promoted" to regular
     timestamps with data.
+
+    Say repeat_stress is:
+        keys       : values
+        2001-01-01 : 2000-01-01
+        2002-01-01 : 2000-01-01
+        2003-01-01 : 2000-01-01
+
+    And time_start = 2001-01-01, time_end = None
+
+    This function returns:
+        keys       : values
+        2002-01-01 : 2001-01-01
+        2003-01-01 : 2001-01-01
     """
     # First, "pop" and filter.
     keys, values = repeat_stress.values.T
-    keep = (keys >= time_start) & (keys <= time_end)
-    new_keys = keys[keep]
-    new_values = values[keep]
-    # Now detect which "value" entries have gone missing
-    insert_values, index = np.unique(new_values, return_index=True)
-    insert_keys = new_keys[index]
+    within_time_slice = (keys >= time_start) & (keys <= time_end)
+    clipped_keys = keys[within_time_slice]
+    clipped_values = values[within_time_slice]
+    # Now account for "value" entries that have been clipped off, these should
+    # be updated in the end to ``insert_keys``.
+    insert_values, index = np.unique(clipped_values, return_index=True)
+    insert_keys = clipped_keys[index]
     # Setup indexer
     indexer = xr.DataArray(
         data=np.arange(time.size),
@@ -311,14 +325,16 @@ def clip_repeat_stress(
     ).sel(time=insert_values)
     indexer["time"] = insert_keys
 
-    # Update the key-value pairs. Discard keys that have been "promoted".
-    keep = np.isin(new_keys, insert_keys, assume_unique=True, invert=True)
-    new_keys = new_keys[keep]
-    new_values = new_values[keep]
-    # Set the values to their new source.
-    new_values = insert_keys[np.searchsorted(insert_values, new_values)]
+    # Update the key-value pairs. Discard keys that have been "promoted" to
+    # values.
+    not_promoted = np.isin(clipped_keys, insert_keys, assume_unique=True, invert=True)
+    not_promoted_keys = clipped_keys[not_promoted]
+    not_promoted_values = clipped_values[not_promoted]
+    # Promote the values to their new source.
+    to_promote = np.searchsorted(insert_values, not_promoted_values)
+    promoted_values = insert_keys[to_promote]
     repeat_stress = xr.DataArray(
-        data=np.column_stack((new_keys, new_values)),
+        data=np.column_stack((not_promoted_keys, promoted_values)),
         dims=("repeat", "repeat_items"),
     )
     return indexer, repeat_stress
