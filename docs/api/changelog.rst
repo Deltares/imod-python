@@ -13,7 +13,7 @@ Added
 ~~~~~
 
 - :meth:`imod.msw.MetaSwapModel.clip_box` to clip MetaSWAP models.
-
+- Methods of class :class:`imod.mf6.Modflow6Simulation` can now be logged.
 
 [1.0.0rc2] - 2025-03-05
 -----------------------
