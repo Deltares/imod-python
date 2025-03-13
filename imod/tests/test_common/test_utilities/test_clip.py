@@ -402,6 +402,10 @@ def test_clip_repeat_stress__all_repeats(dataset):
     values = repeat_stress.loc[:, 1]
     actual = dataset.drop_vars("time").isel(time=indexer)
     assert actual["time"].size == 12
+    # Assert
+    np.testing.assert_array_equal(actual.coords["time"].dt.year, np.repeat([2005], repeats=12))
+    np.testing.assert_array_equal(actual.coords["time"].dt.month, np.arange(1, 13))
+    np.testing.assert_array_equal(actual.coords["time"].dt.day, np.ones(12))
     assert np.array_equal(keys.dt.year, np.repeat([2006, 2007, 2008], repeats=12))
     assert np.array_equal(keys.dt.month, values.dt.month)
     assert np.isin(values, actual["time"]).all()
@@ -436,9 +440,94 @@ def test_clip_repeat_stress__some_repeats(dataset2):
     keys = repeat_stress.loc[:, 0]
     values = repeat_stress.loc[:, 1]
     actual = dataset.drop_vars("time").isel(time=indexer)
+    # Assert
+    np.testing.assert_array_equal(actual.coords["time"].dt.year, np.repeat([2005], repeats=15))
+    np.testing.assert_array_equal(actual.coords["time"].dt.month, np.array([1, 1, 2, 2, 3, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12]))
+    np.testing.assert_array_equal(actual.coords["time"].dt.day, np.array([1, 15, 1, 15, 1, 15, 1, 1, 1, 1, 1, 1, 1, 1, 1]))
     assert np.array_equal(
         actual["multiplier"], [1, 13, 2, 14, 3, 15, 4, 5, 6, 7, 8, 9, 10, 11, 12]
     )
     assert np.array_equal(keys.dt.year, np.repeat([2006, 2007, 2008], repeats=12))
+    assert np.array_equal(keys.dt.month, values.dt.month)
+    assert np.isin(values, actual["time"]).all()
+
+
+def test_clip_repeat_stress__no_end(dataset2):
+    dataset = dataset2.copy()
+    keys = pd.date_range("2001-01-01", "2009-12-01", freq="MS")
+    values = np.tile(dataset["time"][:12], reps=9)
+    dataset["repeat_stress"] = xr.DataArray(
+        data=np.column_stack((keys, values)),
+        dims=("repeat", "repeat_items"),
+    )
+
+    time = dataset["time"].values
+    time_start = imod.util.time.to_datetime_internal("2005-01-01", False)
+    time_end = None
+
+    indexer = clip_time_indexer(
+        time=dataset["time"].values,
+        time_start=time_start,
+        time_end=time_end,
+    )
+    repeat_indexer, repeat_stress = clip_repeat_stress(
+        repeat_stress=dataset["repeat_stress"],
+        time=time,
+        time_start=time_start,
+        time_end=time_end,
+    )
+    indexer = repeat_indexer.combine_first(indexer).astype(int)
+
+    keys = repeat_stress.loc[:, 0]
+    values = repeat_stress.loc[:, 1]
+    actual = dataset.drop_vars("time").isel(time=indexer)
+    np.testing.assert_array_equal(actual.coords["time"].dt.year, np.repeat([2005], repeats=15))
+    np.testing.assert_array_equal(actual.coords["time"].dt.month, np.array([1, 1, 2, 2, 3, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12]))
+    np.testing.assert_array_equal(actual.coords["time"].dt.day, np.array([1, 15, 1, 15, 1, 15, 1, 1, 1, 1, 1, 1, 1, 1, 1]))
+    assert np.array_equal(
+        actual["multiplier"], [1, 13, 2, 14, 3, 15, 4, 5, 6, 7, 8, 9, 10, 11, 12]
+    )
+    assert np.array_equal(keys.dt.year, np.repeat([2006, 2007, 2008, 2009], repeats=12))
+    assert np.array_equal(keys.dt.month, values.dt.month)
+    assert np.isin(values, actual["time"]).all()
+
+
+def test_clip_repeat_stress__no_start_no_end(dataset2):
+    dataset = dataset2.copy()
+    keys = pd.date_range("2001-01-01", "2009-12-01", freq="MS")
+    values = np.tile(dataset["time"][:12], reps=9)
+    dataset["repeat_stress"] = xr.DataArray(
+        data=np.column_stack((keys, values)),
+        dims=("repeat", "repeat_items"),
+    )
+
+    time = dataset["time"].values
+    time_start = None
+    time_end = None
+
+    indexer = clip_time_indexer(
+        time=dataset["time"].values,
+        time_start=time_start,
+        time_end=time_end,
+    )
+    repeat_indexer, repeat_stress = clip_repeat_stress(
+        repeat_stress=dataset["repeat_stress"],
+        time=time,
+        time_start=time_start,
+        time_end=time_end,
+    )
+    indexer = repeat_indexer.combine_first(indexer).astype(int)
+
+    keys = repeat_stress.loc[:, 0]
+    values = repeat_stress.loc[:, 1]
+    actual = dataset.drop_vars("time").isel(time=indexer)
+    # Assert
+    assert dataset.coords["time"].equals(actual.coords["time"])
+    assert np.array_equal(
+        actual["multiplier"], np.arange(1, 16)
+    )
+    assert np.array_equal(
+        keys.dt.year, np.repeat(np.arange(9) + 2001, repeats=12)
+    )
     assert np.array_equal(keys.dt.month, values.dt.month)
     assert np.isin(values, actual["time"]).all()
