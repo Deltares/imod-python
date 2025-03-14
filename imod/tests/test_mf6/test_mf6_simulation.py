@@ -17,6 +17,7 @@ import tomli
 import tomli_w
 import xarray as xr
 import xugrid as xu
+from pytest_cases import parametrize_with_cases
 
 import imod
 from imod.common.statusinfo import NestedStatusInfo, StatusInfo
@@ -192,13 +193,11 @@ def test_simulation_open_head(circle_model, tmp_path):
     modeldir = tmp_path / "circle"
     simulation.write(modeldir)
     simulation.run()
+    head = simulation.open_head()
 
-    # open heads without time conversion
-    head_notime = simulation.open_head()
-
-    assert isinstance(head_notime, xu.UgridDataArray)
-    assert head_notime.dims == ("time", "layer", "mesh2d_nFaces")
-    assert head_notime.shape == (52, 2, 216)
+    assert isinstance(head, xu.UgridDataArray)
+    assert head.dims == ("time", "layer", "mesh2d_nFaces")
+    assert head.shape == (52, 2, 216)
 
     # open heads with time conversion.
     head = simulation.open_head(
@@ -209,23 +208,30 @@ def test_simulation_open_head(circle_model, tmp_path):
     assert str(head.coords["time"].values[()][0]) == "2013-04-29T22:00:00.000000000"
 
 
-def test_simulation_open_head_relative_path(circle_model, tmp_path):
+class PathCases:
+    def case_absolute_path(self, tmp_path):
+        return tmp_path.resolve() / "absolute"
+
+    def case_relative_path(self):
+        return Path(".") / "relative"
+
+    def case_space_path(self, tmp_path):
+        return tmp_path / "dir with spaces"
+
+
+@parametrize_with_cases("path", cases=PathCases)
+def test_simulation_write_run_open__different_paths(circle_model, tmp_path, path):
     simulation = circle_model
 
-    # Should throw error when model not run yet.
-    with pytest.raises(RuntimeError):
-        simulation.open_head()
-
-    # Temporarily change directory to tmp_path
+    # Temporarily change directory to tmp_path (for relative path)
     with imod.util.cd(tmp_path):
-        modeldir = Path(".") / "circle"
-        simulation.write(modeldir)
+        path.mkdir(parents=True, exist_ok=True)
+        simulation.write(path)
         simulation.run()
         head = simulation.open_head()
-
-    assert isinstance(head, xu.UgridDataArray)
-    assert head.dims == ("time", "layer", "mesh2d_nFaces")
-    assert head.shape == (52, 2, 216)
+        # Assert not an empty array is returned
+        assert isinstance(head, xu.UgridDataArray)
+        assert head.shape == (52, 2, 216)
 
 
 def test_simulation_open_flow_budget(circle_model, tmp_path):
