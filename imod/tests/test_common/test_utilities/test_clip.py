@@ -295,7 +295,10 @@ def dataset():
 
 
 @pytest.fixture(scope="function")
-def dataset2():
+def dataset_time_outlying():
+    """
+    Dataset with time coordinates with 3 outlying timestamps.
+    """
     dataset = xr.Dataset()
     time = np.concatenate(
         [
@@ -372,7 +375,13 @@ def test_clip_time_indexer__within(dataset):
     assert indexer.equals(expected)
 
 
-def test_clip_repeat_stress__all_repeats(dataset):
+def test_clip_repeat_stress__all_repeats_promoted(dataset):
+    """
+    Test where all repeat values should be promoted to new dates. The repeat
+    stress range is from 2001-01-01 to 2009-12-01. The repeated values range
+    from 2000-01-01 to 2000-12-01. After clipping, the values should be promoted
+    to 2005-01-01 to 2005-12-01.
+    """
     dataset = dataset.copy()
     keys = pd.date_range("2001-01-01", "2009-12-01", freq="MS")
     values = np.tile(dataset["time"], reps=9)
@@ -386,7 +395,7 @@ def test_clip_repeat_stress__all_repeats(dataset):
     time_end = imod.util.time.to_datetime_internal("2008-12-01", False)
 
     indexer = clip_time_indexer(
-        time=dataset["time"].values,
+        time=time,
         time_start=time_start,
         time_end=time_end,
     )
@@ -401,20 +410,26 @@ def test_clip_repeat_stress__all_repeats(dataset):
     keys = repeat_stress.loc[:, 0]
     values = repeat_stress.loc[:, 1]
     actual = dataset.drop_vars("time").isel(time=indexer)
-    assert actual["time"].size == 12
+    time_actual = actual.coords["time"]
     # Assert
-    np.testing.assert_array_equal(
-        actual.coords["time"].dt.year, np.repeat([2005], repeats=12)
-    )
-    np.testing.assert_array_equal(actual.coords["time"].dt.month, np.arange(1, 13))
-    np.testing.assert_array_equal(actual.coords["time"].dt.day, np.ones(12))
+    assert time_actual.size == 12
+    np.testing.assert_array_equal(time_actual.dt.year, np.repeat([2005], repeats=12))
+    np.testing.assert_array_equal(time_actual.dt.month, np.arange(1, 13))
+    np.testing.assert_array_equal(time_actual.dt.day, np.ones(12))
     assert np.array_equal(keys.dt.year, np.repeat([2006, 2007, 2008], repeats=12))
     assert np.array_equal(keys.dt.month, values.dt.month)
-    assert np.isin(values, actual["time"]).all()
+    assert np.isin(values, time_actual).all()
 
 
-def test_clip_repeat_stress__some_repeats(dataset2):
-    dataset = dataset2.copy()
+def test_clip_repeat_stress__some_repeats_promoted(dataset_time_outlying):
+    """
+    Test where some repeat values should be promoted to new dates. The repeat
+    stress range is from 2001-01-01 to 2009-12-01. The repeated values range
+    from 2000-01-01 to 2000-12-01, plus 2005-01-15, 2005-02-15, 2005-03-15.
+    After clipping, the values in 2000 should be promoted to the year 2005. The
+    three prior values in 2005 should be preserved.
+    """
+    dataset = dataset_time_outlying.copy()
     keys = pd.date_range("2001-01-01", "2009-12-01", freq="MS")
     values = np.tile(dataset["time"][:12], reps=9)
     dataset["repeat_stress"] = xr.DataArray(
@@ -462,8 +477,16 @@ def test_clip_repeat_stress__some_repeats(dataset2):
     assert np.isin(values, actual["time"]).all()
 
 
-def test_clip_repeat_stress__no_end(dataset2):
-    dataset = dataset2.copy()
+def test_clip_repeat_stress__no_end(dataset_time_outlying):
+    """
+    Test where no time_end is specified. Some repeat values should be promoted
+    to new dates. The repeat stress range is from 2001-01-01 to 2009-12-01. The
+    repeated values range from 2000-01-01 to 2000-12-01, plus 2005-01-15,
+    2005-02-15, 2005-03-15. After clipping, the values in 2000 should be
+    promoted to the year 2005. The three prior values in 2005 should be
+    preserved.
+    """
+    dataset = dataset_time_outlying.copy()
     keys = pd.date_range("2001-01-01", "2009-12-01", freq="MS")
     values = np.tile(dataset["time"][:12], reps=9)
     dataset["repeat_stress"] = xr.DataArray(
@@ -510,8 +533,12 @@ def test_clip_repeat_stress__no_end(dataset2):
     assert np.isin(values, actual["time"]).all()
 
 
-def test_clip_repeat_stress__no_start_no_end(dataset2):
-    dataset = dataset2.copy()
+def test_clip_repeat_stress__no_start_no_end(dataset_time_outlying):
+    """
+    Test where no time_start and no time_end is specified. Dataset should stay
+    the same.
+    """
+    dataset = dataset_time_outlying.copy()
     keys = pd.date_range("2001-01-01", "2009-12-01", freq="MS")
     values = np.tile(dataset["time"][:12], reps=9)
     dataset["repeat_stress"] = xr.DataArray(
