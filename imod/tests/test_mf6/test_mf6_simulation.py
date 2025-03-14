@@ -183,6 +183,31 @@ def test_twri_disv_mdal_compliant_semi_roundtrip(twri_disv_model, tmpdir_factory
     assert len(ds.data_vars) == 3
 
 
+def test_simulation_open_head(circle_model, tmp_path):
+    simulation = circle_model
+
+    # Should throw error when model not run yet.
+    with pytest.raises(RuntimeError):
+        simulation.open_head()
+
+    modeldir = tmp_path / "circle"
+    simulation.write(modeldir)
+    simulation.run()
+    head = simulation.open_head()
+
+    assert isinstance(head, xu.UgridDataArray)
+    assert head.dims == ("time", "layer", "mesh2d_nFaces")
+    assert head.shape == (52, 2, 216)
+
+    # open heads with time conversion.
+    head = simulation.open_head(
+        simulation_start_time=datetime(2013, 3, 11, 22, 0, 0), time_unit="w"
+    )
+    assert head.dims == ("time", "layer", "mesh2d_nFaces")
+    assert head.shape == (52, 2, 216)
+    assert str(head.coords["time"].values[()][0]) == "2013-04-29T22:00:00.000000000"
+
+
 class PathCases:
     def case_absolute_path(self, tmp_path):
         return tmp_path.resolve() / "absolute"
@@ -195,12 +220,8 @@ class PathCases:
 
 
 @parametrize_with_cases("path", cases=PathCases)
-def test_simulation_open_head(circle_model, tmp_path, path):
+def test_simulation_write_run_open__different_paths(circle_model, tmp_path, path):
     simulation = circle_model
-
-    # Should throw error when model not run yet.
-    with pytest.raises(RuntimeError):
-        simulation.open_head()
 
     # Temporarily change directory to tmp_path (for relative path)
     with imod.util.cd(tmp_path):
@@ -208,18 +229,9 @@ def test_simulation_open_head(circle_model, tmp_path, path):
         simulation.write(path)
         simulation.run()
         head = simulation.open_head()
-
+        # Assert not an empty array is returned
         assert isinstance(head, xu.UgridDataArray)
-        assert head.dims == ("time", "layer", "mesh2d_nFaces")
         assert head.shape == (52, 2, 216)
-
-        # open heads with time conversion.
-        head = simulation.open_head(
-            simulation_start_time=datetime(2013, 3, 11, 22, 0, 0), time_unit="w"
-        )
-        assert head.dims == ("time", "layer", "mesh2d_nFaces")
-        assert head.shape == (52, 2, 216)
-        assert str(head.coords["time"].values[()][0]) == "2013-04-29T22:00:00.000000000"
 
 
 def test_simulation_open_flow_budget(circle_model, tmp_path):
