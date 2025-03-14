@@ -283,6 +283,22 @@ def _to_datetime(
         return to_datetime_internal(time, use_cftime)
 
 
+def _is_within_timeslice(
+    keys: np.ndarray,
+    time_start: Optional[cftime.datetime | np.datetime64 | str] = None,
+    time_end: Optional[cftime.datetime | np.datetime64 | str] = None,
+) -> np.ndarray:
+    """
+    Return a boolean array indicating whether the keys are within the time slice.
+    """
+    within_time_slice = np.ones(keys.size, dtype=bool)
+    if time_start is not None:
+        within_time_slice &= keys >= time_start
+    if time_end is not None:
+        within_time_slice &= keys <= time_end
+    return within_time_slice
+
+
 def clip_repeat_stress(
     repeat_stress: xr.DataArray,
     time: np.ndarray,
@@ -310,9 +326,15 @@ def clip_repeat_stress(
     """
     # First, "pop" and filter.
     keys, values = repeat_stress.values.T
-    within_time_slice = (keys >= time_start) & (keys <= time_end)
-    clipped_keys = keys[within_time_slice]
-    clipped_values = values[within_time_slice]
+    # Prepend unique values to keys to account for "value" entries
+    # that need to be clipped off.
+    unique_values = np.unique(values)
+    prepended_keys = np.concatenate((unique_values, keys))
+    prepended_values = np.concatenate((unique_values, values))
+    # Clip timeslice
+    within_time_slice = _is_within_timeslice(prepended_keys, time_start, time_end)
+    clipped_keys = prepended_keys[within_time_slice]
+    clipped_values = prepended_values[within_time_slice]
     # Now account for "value" entries that have been clipped off, these should
     # be updated in the end to ``insert_keys``.
     insert_values, index = np.unique(clipped_values, return_index=True)

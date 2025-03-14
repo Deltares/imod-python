@@ -15,6 +15,15 @@ Added
 - :meth:`imod.msw.MetaSwapModel.clip_box` to clip MetaSWAP models.
 - Methods of class :class:`imod.mf6.Modflow6Simulation` can now be logged.
 
+Fixed
+~~~~~
+
+- Fixed bug where :meth:`imod.mf6.River.clip_box`,
+  :meth:`imod.mf6.Drainage.clip_box`, and
+  :meth:`imod.mf6.GeneralHeadBoundary.clip_box` threw an error when
+  ``time_start`` or ``time_end`` were set to ``None`` and a ``"repeat_stress"``
+  was included in the dataset.
+
 [1.0.0rc2] - 2025-03-05
 -----------------------
 
