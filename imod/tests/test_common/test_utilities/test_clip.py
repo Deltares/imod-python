@@ -382,6 +382,7 @@ def test_clip_repeat_stress__all_repeats_promoted(dataset):
     from 2000-01-01 to 2000-12-01. After clipping, the values should be promoted
     to 2005-01-01 to 2005-12-01.
     """
+    # Arrange
     dataset = dataset.copy()
     keys = pd.date_range("2001-01-01", "2009-12-01", freq="MS")
     values = np.tile(dataset["time"], reps=9)
@@ -393,7 +394,7 @@ def test_clip_repeat_stress__all_repeats_promoted(dataset):
     time = dataset["time"].values
     time_start = imod.util.time.to_datetime_internal("2005-01-01", False)
     time_end = imod.util.time.to_datetime_internal("2008-12-01", False)
-
+    # Act
     indexer = clip_time_indexer(
         time=time,
         time_start=time_start,
@@ -406,7 +407,6 @@ def test_clip_repeat_stress__all_repeats_promoted(dataset):
         time_end=time_end,
     )
     indexer = repeat_indexer.combine_first(indexer).astype(int)
-
     keys = repeat_stress.loc[:, 0]
     values = repeat_stress.loc[:, 1]
     actual = dataset.drop_vars("time").isel(time=indexer)
@@ -429,6 +429,7 @@ def test_clip_repeat_stress__some_repeats_promoted(dataset_time_outlying):
     After clipping, the values in 2000 should be promoted to the year 2005. The
     three prior values in 2005 should be preserved.
     """
+    # Arrange
     dataset = dataset_time_outlying.copy()
     keys = pd.date_range("2001-01-01", "2009-12-01", freq="MS")
     values = np.tile(dataset["time"][:12], reps=9)
@@ -440,7 +441,7 @@ def test_clip_repeat_stress__some_repeats_promoted(dataset_time_outlying):
     time = dataset["time"].values
     time_start = imod.util.time.to_datetime_internal("2005-01-01", False)
     time_end = imod.util.time.to_datetime_internal("2008-12-01", False)
-
+    # Act
     indexer = clip_time_indexer(
         time=dataset["time"].values,
         time_start=time_start,
@@ -453,12 +454,11 @@ def test_clip_repeat_stress__some_repeats_promoted(dataset_time_outlying):
         time_end=time_end,
     )
     indexer = repeat_indexer.combine_first(indexer).astype(int)
-
     keys = repeat_stress.loc[:, 0]
     values = repeat_stress.loc[:, 1]
     actual = dataset.drop_vars("time").isel(time=indexer)
-    time_actual = actual.coords["time"]
     # Assert
+    time_actual = actual.coords["time"]
     np.testing.assert_array_equal(time_actual.dt.year, np.repeat([2005], repeats=15))
     np.testing.assert_array_equal(
         time_actual.dt.month,
@@ -485,6 +485,7 @@ def test_clip_repeat_stress__no_end(dataset_time_outlying):
     promoted to the year 2005. The three prior values in 2005 should be
     preserved.
     """
+    # Arrange
     dataset = dataset_time_outlying.copy()
     keys = pd.date_range("2001-01-01", "2009-12-01", freq="MS")
     values = np.tile(dataset["time"][:12], reps=9)
@@ -496,7 +497,7 @@ def test_clip_repeat_stress__no_end(dataset_time_outlying):
     time = dataset["time"].values
     time_start = imod.util.time.to_datetime_internal("2005-01-01", False)
     time_end = None
-
+    # Act
     indexer = clip_time_indexer(
         time=dataset["time"].values,
         time_start=time_start,
@@ -509,10 +510,10 @@ def test_clip_repeat_stress__no_end(dataset_time_outlying):
         time_end=time_end,
     )
     indexer = repeat_indexer.combine_first(indexer).astype(int)
-
     keys = repeat_stress.loc[:, 0]
     values = repeat_stress.loc[:, 1]
     actual = dataset.drop_vars("time").isel(time=indexer)
+    # Assert
     time_actual = actual.coords["time"]
     np.testing.assert_array_equal(time_actual.dt.year, np.repeat([2005], repeats=15))
     np.testing.assert_array_equal(
@@ -536,6 +537,7 @@ def test_clip_repeat_stress__no_start_no_end(dataset_time_outlying):
     Test where no time_start and no time_end is specified. Dataset should stay
     the same.
     """
+    # Arrange
     dataset = dataset_time_outlying.copy()
     keys = pd.date_range("2001-01-01", "2009-12-01", freq="MS")
     values = np.tile(dataset["time"][:12], reps=9)
@@ -547,7 +549,7 @@ def test_clip_repeat_stress__no_start_no_end(dataset_time_outlying):
     time = dataset["time"].values
     time_start = None
     time_end = None
-
+    # Act
     indexer = clip_time_indexer(
         time=dataset["time"].values,
         time_start=time_start,
@@ -560,7 +562,6 @@ def test_clip_repeat_stress__no_start_no_end(dataset_time_outlying):
         time_end=time_end,
     )
     indexer = repeat_indexer.combine_first(indexer).astype(int)
-
     keys = repeat_stress.loc[:, 0]
     values = repeat_stress.loc[:, 1]
     actual = dataset.drop_vars("time").isel(time=indexer)
