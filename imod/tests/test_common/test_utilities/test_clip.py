@@ -457,16 +457,15 @@ def test_clip_repeat_stress__some_repeats_promoted(dataset_time_outlying):
     keys = repeat_stress.loc[:, 0]
     values = repeat_stress.loc[:, 1]
     actual = dataset.drop_vars("time").isel(time=indexer)
+    time_actual = actual.coords["time"]
     # Assert
+    np.testing.assert_array_equal(time_actual.dt.year, np.repeat([2005], repeats=15))
     np.testing.assert_array_equal(
-        actual.coords["time"].dt.year, np.repeat([2005], repeats=15)
-    )
-    np.testing.assert_array_equal(
-        actual.coords["time"].dt.month,
+        time_actual.dt.month,
         np.array([1, 1, 2, 2, 3, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12]),
     )
     np.testing.assert_array_equal(
-        actual.coords["time"].dt.day,
+        time_actual.dt.day,
         np.array([1, 15, 1, 15, 1, 15, 1, 1, 1, 1, 1, 1, 1, 1, 1]),
     )
     assert np.array_equal(
@@ -474,7 +473,7 @@ def test_clip_repeat_stress__some_repeats_promoted(dataset_time_outlying):
     )
     assert np.array_equal(keys.dt.year, np.repeat([2006, 2007, 2008], repeats=12))
     assert np.array_equal(keys.dt.month, values.dt.month)
-    assert np.isin(values, actual["time"]).all()
+    assert np.isin(values, time_actual).all()
 
 
 def test_clip_repeat_stress__no_end(dataset_time_outlying):
@@ -514,15 +513,14 @@ def test_clip_repeat_stress__no_end(dataset_time_outlying):
     keys = repeat_stress.loc[:, 0]
     values = repeat_stress.loc[:, 1]
     actual = dataset.drop_vars("time").isel(time=indexer)
+    time_actual = actual.coords["time"]
+    np.testing.assert_array_equal(time_actual.dt.year, np.repeat([2005], repeats=15))
     np.testing.assert_array_equal(
-        actual.coords["time"].dt.year, np.repeat([2005], repeats=15)
-    )
-    np.testing.assert_array_equal(
-        actual.coords["time"].dt.month,
+        time_actual.dt.month,
         np.array([1, 1, 2, 2, 3, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12]),
     )
     np.testing.assert_array_equal(
-        actual.coords["time"].dt.day,
+        time_actual.dt.day,
         np.array([1, 15, 1, 15, 1, 15, 1, 1, 1, 1, 1, 1, 1, 1, 1]),
     )
     assert np.array_equal(
@@ -530,7 +528,7 @@ def test_clip_repeat_stress__no_end(dataset_time_outlying):
     )
     assert np.array_equal(keys.dt.year, np.repeat([2006, 2007, 2008, 2009], repeats=12))
     assert np.array_equal(keys.dt.month, values.dt.month)
-    assert np.isin(values, actual["time"]).all()
+    assert np.isin(values, time_actual).all()
 
 
 def test_clip_repeat_stress__no_start_no_end(dataset_time_outlying):
