@@ -70,7 +70,7 @@ def _read_ipf(path, kwargs=None) -> Tuple[pd.DataFrame, int, str]:
 
 
 def _read(path, kwargs=None, assoc_kwargs=None):
-    """
+    r"""
     Read one IPF file to a single pandas.DataFrame, including associated (TXT) files.
 
     Parameters
@@ -123,7 +123,7 @@ def _read(path, kwargs=None, assoc_kwargs=None):
 
 
 def read_associated(path, kwargs={}):
-    """
+    r"""
     Read an IPF associated file (TXT).
 
     Parameters
@@ -239,7 +239,7 @@ def read_associated(path, kwargs={}):
 
 
 def read(path, kwargs={}, assoc_kwargs={}):
-    """
+    r"""
     Read one or more IPF files to a single pandas.DataFrame, including associated
     (TXT) files.
 
