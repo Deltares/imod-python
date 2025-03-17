@@ -145,7 +145,7 @@ def _derive_connected_cell_ids(
     edge_index :
         The indices of the edges from which the connected cell ids are computed
 
-    Returns 
+    Returns
     -------
     xr.Dataset :
         A dataset containing the cell_id1 and cell_id2 data variables. The cell
