@@ -145,10 +145,11 @@ def _derive_connected_cell_ids(
     edge_index :
         The indices of the edges from which the connected cell ids are computed
 
-    Returns A dataset containing the cell_id1 and cell_id2 data variables. The  cell dimensions are stored in the
-    cell_dims coordinates.
+    Returns
     -------
-
+    xr.Dataset :
+        A dataset containing the cell_id1 and cell_id2 data variables. The cell
+        dimensions are stored in the cell_dims coordinates.
     """
     edge_faces = grid.edge_face_connectivity
     cell2d = edge_faces[edge_index]

@@ -116,7 +116,7 @@ def _line_to_trapezoid_zpolygon(
     zt: Tuple[float, float],
     zb: Tuple[float, float],
 ) -> PolygonType:
-    """
+    r"""
     Creates polygon as follows::
 
         xy0,zt0
@@ -146,7 +146,7 @@ def linestring_to_trapezoid_zpolygons(
     barrier_ztop: List[float],
     barrier_zbottom: List[float],
 ) -> List[PolygonType]:
-    """
+    r"""
     Create trapezoid vertical polygons from linestrings, with a varying ztop and
     zbottom over the line. These are shaped as follows::
 
