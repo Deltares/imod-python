@@ -87,6 +87,28 @@ def clip_by_grid(  # noqa: F811
     cls = type(package)
     return cls._from_dataset(selection)
 
+@dispatch  # type: ignore[no-redef, misc]
+def clip_by_grid(package: ILineDataPackage, active: xr.DataArray) -> ILineDataPackage:  # noqa: F811
+    """Clip LineDataPackage outside structured grid."""
+    clipped_line_data = clip_line_gdf_by_grid(package.line_data, active)
+
+    # Create new instance
+    clipped_package = deepcopy(package)
+    clipped_package.line_data = clipped_line_data
+    return clipped_package
+
+# For some reason the plum dispatching finds "active: GridDataArray" ambiguous
+# and raises an error if this is not duplicated.
+@dispatch  # type: ignore[no-redef, misc]
+def clip_by_grid(package: ILineDataPackage, active: xu.UgridDataArray) -> ILineDataPackage:  # noqa: F811
+    """Clip LineDataPackage outside unstructured grid."""
+    clipped_line_data = clip_line_gdf_by_grid(package.line_data, active)
+
+    # Create new instance
+    clipped_package = deepcopy(package)
+    clipped_package.line_data = clipped_line_data
+    return clipped_package
+
 
 def _filter_inactive_cells(package, active):
     if package.is_grid_agnostic_package():
@@ -105,17 +127,6 @@ def _filter_inactive_cells(package, active):
                 package.dataset[var] = package.dataset[var].where(
                     active > 0, other=other
                 )
-
-
-@dispatch  # type: ignore[no-redef, misc]
-def clip_by_grid(package: ILineDataPackage, active: GridDataArray) -> ILineDataPackage:  # noqa: F811
-    """Clip LineDataPackage outside unstructured/structured grid."""
-    clipped_line_data = clip_line_gdf_by_grid(package.line_data, active)
-
-    # Create new instance
-    clipped_package = deepcopy(package)
-    clipped_package.line_data = clipped_line_data
-    return clipped_package
 
 
 def _clip_linestring(
