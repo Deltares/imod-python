@@ -1,7 +1,7 @@
 import pickle
 import textwrap
 from functools import wraps
-from typing import Callable, Mapping, ParamSpec, Sequence, TypeVar, cast
+from typing import Callable, Mapping, ParamSpec, Sequence, TypeVar, cast, Any
 
 import numpy as np
 import xarray as xr
@@ -62,6 +62,10 @@ def is_unstructured(grid: xu.UgridDataArray | xu.UgridDataset) -> bool:
 
 @dispatch  # type: ignore[no-redef]
 def is_unstructured(grid: xr.DataArray | xr.Dataset) -> bool:  # noqa: F811
+    return False
+
+@dispatch  # type: ignore[no-redef]
+def is_unstructured(grid: Any) -> bool:  # noqa: F811
     return False
 
 
@@ -278,7 +282,7 @@ def is_spatial_grid(array: xu.UgridDataArray | xu.UgridDataset) -> bool:  # noqa
 
 
 @dispatch  # type: ignore[no-redef]
-def is_spatial_grid(_: object) -> bool:  # noqa: F811
+def is_spatial_grid(_: Any) -> bool:  # noqa: F811
     return False
 
 
@@ -293,7 +297,7 @@ def is_equal(array1: xr.DataArray, array2: xr.DataArray) -> bool:  # noqa: F811
 
 
 @dispatch  # type: ignore[no-redef]
-def is_equal(array1: object, array2: object) -> bool:  # noqa: F811
+def is_equal(array1: Any, array2: Any) -> bool:  # noqa: F811
     return False
 
 
@@ -310,7 +314,7 @@ def is_same_domain(grid1: xr.DataArray, grid2: xr.DataArray) -> bool:  # noqa: F
 
 
 @dispatch  # type: ignore[no-redef]
-def is_same_domain(grid1: object, grid2: object) -> bool:  # noqa: F811
+def is_same_domain(grid1: Any, grid2: Any) -> bool:  # noqa: F811
     return False
 
 
@@ -326,19 +330,19 @@ def get_spatial_dimension_names(grid: xu.UgridDataArray) -> list[str]:  # noqa: 
 
 
 @dispatch  # type: ignore[no-redef]
-def get_spatial_dimension_names(grid: object) -> list[str]:  # noqa: F811
+def get_spatial_dimension_names(grid: Any) -> list[str]:  # noqa: F811
     return []
 
 
 @dispatch
-def get_grid_geometry_hash(grid: xr.DataArray) -> int:
+def get_grid_geometry_hash(grid: xr.DataArray) -> tuple[int, int]:
     hash_x = hash(pickle.dumps(grid["x"].values))
     hash_y = hash(pickle.dumps(grid["y"].values))
     return (hash_x, hash_y)
 
 
 @dispatch  # type: ignore[no-redef]
-def get_grid_geometry_hash(grid: xu.UgridDataArray) -> int:  # noqa: F811
+def get_grid_geometry_hash(grid: xu.UgridDataArray) -> tuple[int, int, Any]:  # noqa: F811
     hash_x = hash(pickle.dumps(grid.ugrid.grid.node_x))
     hash_y = hash(pickle.dumps(grid.ugrid.grid.node_y))
     hash_connectivity = hash(pickle.dumps(grid.ugrid.grid.node_face_connectivity))
@@ -346,7 +350,7 @@ def get_grid_geometry_hash(grid: xu.UgridDataArray) -> int:  # noqa: F811
 
 
 @dispatch  # type: ignore[no-redef]
-def get_grid_geometry_hash(grid: object) -> int:  # noqa: F811
+def get_grid_geometry_hash(grid: Any) -> tuple[int, int]:  # noqa: F811
     raise ValueError("get_grid_geometry_hash not supported for this object.")
 
 
@@ -364,6 +368,10 @@ def enforce_dim_order(grid: xu.UgridDataArray) -> xu.UgridDataArray:  # noqa: F8
         "species", "time", "layer", face_dimension, missing_dims="ignore"
     )
 
+@dispatch
+def enforce_dim_order(grid: Any) -> xr.DataArray:
+    """Enforce dimension order to iMOD Python standard"""
+    raise TypeError(f"Function doesn't support type {type(grid)}")
 
 def _as_ugrid_dataarray_with_topology(
     obj: GridDataArray, topology: xu.Ugrid2d
@@ -409,12 +417,12 @@ def preserve_gridtype(func: Callable[P, T]) -> Callable[P, T]:
 
 
 @dispatch
-def is_empty(object: xr.Dataset) -> bool:
-    return len(object.keys()) == 0
+def is_empty(obj: xr.Dataset) -> bool:
+    return len(obj.keys()) == 0
 
 
 @dispatch  # type: ignore[no-redef]
-def is_empty(object: object) -> bool:  # noqa: F811
+def is_empty(obj: Any) -> bool:  # noqa: F811
     return False
 
 
@@ -522,5 +530,5 @@ def as_ugrid_dataarray(grid: xu.UgridDataArray) -> xu.UgridDataArray:  # noqa: F
 
 
 @dispatch  # type: ignore[no-redef]
-def as_ugrid_dataarray(grid: object) -> xu.UgridDataArray:  # noqa: F811
+def as_ugrid_dataarray(grid: Any) -> xu.UgridDataArray:  # noqa: F811
     raise TypeError(f"Function doesn't support type {type(grid)}")
