@@ -38,7 +38,7 @@ class GWFGWF(ExchangeBase):
         angldegx: Optional[xr.DataArray] = None,
         cdist: Optional[xr.DataArray] = None,
     ):
-        ihc = xr.ones_like(cl1, dtype=int)
+        ihc = ones_like(cl1, dtype=int)
         dict_dataset = {
             "cell_id1": cell_id1,
             "cell_id2": cell_id2,
