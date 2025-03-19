@@ -94,12 +94,7 @@ def clip_by_grid(  # noqa: F811
 @dispatch  # type: ignore[no-redef, misc]
 def clip_by_grid(package: ILineDataPackage, active: xr.DataArray) -> ILineDataPackage:  # noqa: F811
     """Clip LineDataPackage outside structured grid."""
-    clipped_line_data = clip_line_gdf_by_grid(package.line_data, active)
-
-    # Create new instance
-    clipped_package = deepcopy(package)
-    clipped_package.line_data = clipped_line_data
-    return clipped_package
+    return _clip_by_grid_line_data(package, active)
 
 
 # For some reason the plum dispatching finds "active: GridDataArray" ambiguous
@@ -109,6 +104,12 @@ def clip_by_grid(  # noqa: F811
     package: ILineDataPackage, active: xu.UgridDataArray
 ) -> ILineDataPackage:
     """Clip LineDataPackage outside unstructured grid."""
+    return _clip_by_grid_line_data(package, active)
+
+
+def _clip_by_grid_line_data(
+    package: ILineDataPackage, active: GridDataArray
+) -> ILineDataPackage:
     clipped_line_data = clip_line_gdf_by_grid(package.line_data, active)
 
     # Create new instance
