@@ -4,7 +4,7 @@ from dataclasses import asdict
 from typing import Any, Optional, Union
 
 import xarray as xr
-from fastcore.dispatch import typedispatch
+from plum import dispatch
 from xarray.core.utils import is_scalar
 from xugrid.regrid.regridder import BaseRegridder
 
@@ -174,7 +174,7 @@ def _get_unique_regridder_types(model: IModel) -> defaultdict[RegridderType, lis
     return methods
 
 
-@typedispatch
+@dispatch
 def _regrid_like(
     package: IRegridPackage,
     target_grid: GridDataArray,
@@ -251,7 +251,7 @@ def _regrid_like(
     return as_pkg_type(**new_package_data)
 
 
-@typedispatch  # type: ignore[no-redef]
+@dispatch  # type: ignore[no-redef]
 def _regrid_like(
     model: IModel,
     target_grid: GridDataArray,
@@ -321,7 +321,7 @@ def _regrid_like(
     return new_model
 
 
-@typedispatch  # type: ignore[no-redef]
+@dispatch  # type: ignore[no-redef]
 def _regrid_like(
     simulation: ISimulation,
     regridded_simulation_name: str,
@@ -381,7 +381,7 @@ def _regrid_like(
     return result
 
 
-@typedispatch  # type: ignore[no-redef]
+@dispatch  # type: ignore[no-redef]
 def _regrid_like(
     package: ILineDataPackage, target_grid: GridDataArray, *_
 ) -> ILineDataPackage:
@@ -393,7 +393,7 @@ def _regrid_like(
     return clip_by_grid(package, target_grid)
 
 
-@typedispatch  # type: ignore[no-redef]
+@dispatch  # type: ignore[no-redef]
 def _regrid_like(
     package: IPointDataPackage, target_grid: GridDataArray, *_
 ) -> IPointDataPackage:
@@ -406,7 +406,7 @@ def _regrid_like(
     return clip_by_grid(package, target_grid_2d)
 
 
-@typedispatch  # type: ignore[no-redef]
+@dispatch  # type: ignore[no-redef]
 def _regrid_like(package: object, target_grid: GridDataArray, *_) -> None:
     raise TypeError("this object cannot be regridded")
 

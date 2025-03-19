@@ -4,7 +4,7 @@ from typing import List, Tuple
 
 import xarray as xr
 import xugrid as xu
-from fastcore.dispatch import typedispatch
+from plum import dispatch
 
 from imod.mf6.simulation import Modflow6Simulation
 from imod.typing import GridDataArray
@@ -31,7 +31,7 @@ def get_label_array(simulation: Modflow6Simulation, npartitions: int) -> GridDat
     return _partition_idomain(idomain_top, npartitions)
 
 
-@typedispatch
+@dispatch
 def _partition_idomain(
     idomain_grid: xu.UgridDataArray, npartitions: int
 ) -> GridDataArray:
@@ -43,7 +43,7 @@ def _partition_idomain(
     return labels
 
 
-@typedispatch  # type: ignore[no-redef]
+@dispatch  # type: ignore[no-redef]
 def _partition_idomain(idomain_grid: xr.DataArray, npartitions: int) -> GridDataArray:
     """
     Create a label array for structured grids by creating rectangular

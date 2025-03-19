@@ -3,7 +3,7 @@ from typing import List
 import numpy as np
 import xarray as xr
 import xugrid as xu
-from fastcore.dispatch import typedispatch
+from plum import dispatch
 from scipy.ndimage import binary_dilation
 
 from imod.mf6.validation import BOUNDARY_DIMS_SCHEMA
@@ -44,14 +44,14 @@ def grid_boundary_xy(grid: GridDataArray) -> GridDataArray:
     return _grid_boundary_xy(grid)
 
 
-@typedispatch
+@dispatch
 def _grid_boundary_xy(grid: object) -> None:
     raise TypeError(
         f"Grid should be of type DataArray or UgridDataArray, got type {type(grid)}"
     )
 
 
-@typedispatch  # type: ignore [no-redef]
+@dispatch  # type: ignore [no-redef]
 def _grid_boundary_xy(grid: xr.DataArray) -> xr.DataArray:
     _validate_grid(grid)
     like_2d = _reduce_grid_except_dims(grid, ["x", "y"])
@@ -60,7 +60,7 @@ def _grid_boundary_xy(grid: xr.DataArray) -> xr.DataArray:
     return boundary_grid
 
 
-@typedispatch  # type: ignore [no-redef]
+@dispatch  # type: ignore [no-redef]
 def _grid_boundary_xy(grid: xu.UgridDataArray) -> xu.UgridDataArray:
     _validate_grid(grid)
     like_2d = _reduce_grid_except_dims(grid, [grid.grid.face_dimension])

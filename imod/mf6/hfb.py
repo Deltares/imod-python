@@ -12,7 +12,7 @@ import numpy.typing as npt
 import pandas as pd
 import xarray as xr
 import xugrid as xu
-from fastcore.dispatch import typedispatch
+from plum import dispatch
 
 from imod.common.interfaces.ilinedatapackage import ILineDataPackage
 from imod.common.utilities.clip import (
@@ -82,7 +82,7 @@ NO_BARRIER_MSG = textwrap.dedent(
 )
 
 
-@typedispatch
+@dispatch
 def _derive_connected_cell_ids(
     idomain: xr.DataArray, grid: xu.Ugrid2d, edge_index: np.ndarray
 ) -> xr.Dataset:
@@ -131,7 +131,7 @@ def _derive_connected_cell_ids(
     return cell_ids
 
 
-@typedispatch  # type: ignore[no-redef]
+@dispatch  # type: ignore[no-redef]
 def _derive_connected_cell_ids(
     _: xu.UgridDataArray, grid: xu.Ugrid2d, edge_index: np.ndarray
 ) -> xr.Dataset:
