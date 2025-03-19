@@ -1,15 +1,18 @@
 import pickle
 import textwrap
 from functools import wraps
-from typing import Callable, Mapping, ParamSpec, Sequence, TypeVar, cast, Any
+from typing import Any, Callable, Mapping, ParamSpec, Sequence, TypeVar, cast
 
 import numpy as np
 import xarray as xr
 import xugrid as xu
-from plum import dispatch
+from plum import Dispatcher
 
 from imod.typing import GeoDataFrameType, GridDataArray, GridDataset, structured
 from imod.util.spatial import _polygonize
+
+# create dispatcher instance to limit scope of typedispatching
+dispatch = Dispatcher()
 
 T = TypeVar("T")
 P = ParamSpec("P")
@@ -63,6 +66,7 @@ def is_unstructured(grid: xu.UgridDataArray | xu.UgridDataset) -> bool:
 @dispatch  # type: ignore[no-redef]
 def is_unstructured(grid: xr.DataArray | xr.Dataset) -> bool:  # noqa: F811
     return False
+
 
 @dispatch  # type: ignore[no-redef]
 def is_unstructured(grid: Any) -> bool:  # noqa: F811
@@ -368,14 +372,17 @@ def enforce_dim_order(grid: xu.UgridDataArray) -> xu.UgridDataArray:  # noqa: F8
         "species", "time", "layer", face_dimension, missing_dims="ignore"
     )
 
+
 @dispatch  # type: ignore[no-redef]
-def enforce_dim_order(grid: None) -> None:
+def enforce_dim_order(grid: None) -> None:  # noqa: F811
     return grid
 
-@dispatch
-def enforce_dim_order(grid: Any) -> xr.DataArray:
+
+@dispatch  # type: ignore[no-redef]
+def enforce_dim_order(grid: Any) -> xr.DataArray:  # noqa: F811
     """Enforce dimension order to iMOD Python standard"""
     raise TypeError(f"Function doesn't support type {type(grid)}")
+
 
 def _as_ugrid_dataarray_with_topology(
     obj: GridDataArray, topology: xu.Ugrid2d

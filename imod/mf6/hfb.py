@@ -12,7 +12,7 @@ import numpy.typing as npt
 import pandas as pd
 import xarray as xr
 import xugrid as xu
-from plum import dispatch
+from plum import Dispatcher
 
 from imod.common.interfaces.ilinedatapackage import ILineDataPackage
 from imod.common.utilities.clip import (
@@ -70,6 +70,9 @@ else:
         shapely = MissingOptionalModule("shapely")
         _POLYGON = ""
         _LINESTRING = ""
+
+# create dispatcher instance to limit scope of typedispatching
+dispatch = Dispatcher()
 
 NO_BARRIER_MSG = textwrap.dedent(
     """

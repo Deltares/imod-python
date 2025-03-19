@@ -8,7 +8,7 @@ import numpy as np
 import pandas as pd
 import xarray as xr
 import xugrid as xu
-from plum import dispatch
+from plum import Dispatcher
 
 from imod.common.interfaces.ilinedatapackage import ILineDataPackage
 from imod.common.interfaces.ipackagebase import IPackageBase
@@ -36,6 +36,9 @@ try:
     import shapely
 except ImportError:
     shapely = MissingOptionalModule("shapely")
+
+# create dispatcher instance to limit scope of typedispatching
+dispatch = Dispatcher()
 
 
 @dispatch
@@ -87,6 +90,7 @@ def clip_by_grid(  # noqa: F811
     cls = type(package)
     return cls._from_dataset(selection)
 
+
 @dispatch  # type: ignore[no-redef, misc]
 def clip_by_grid(package: ILineDataPackage, active: xr.DataArray) -> ILineDataPackage:  # noqa: F811
     """Clip LineDataPackage outside structured grid."""
@@ -97,10 +101,13 @@ def clip_by_grid(package: ILineDataPackage, active: xr.DataArray) -> ILineDataPa
     clipped_package.line_data = clipped_line_data
     return clipped_package
 
+
 # For some reason the plum dispatching finds "active: GridDataArray" ambiguous
 # and raises an error if this is not duplicated.
 @dispatch  # type: ignore[no-redef, misc]
-def clip_by_grid(package: ILineDataPackage, active: xu.UgridDataArray) -> ILineDataPackage:  # noqa: F811
+def clip_by_grid(  # noqa: F811
+    package: ILineDataPackage, active: xu.UgridDataArray
+) -> ILineDataPackage:
     """Clip LineDataPackage outside unstructured grid."""
     clipped_line_data = clip_line_gdf_by_grid(package.line_data, active)
 

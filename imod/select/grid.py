@@ -3,12 +3,15 @@ from typing import List
 import numpy as np
 import xarray as xr
 import xugrid as xu
-from plum import dispatch
+from plum import Dispatcher
 from scipy.ndimage import binary_dilation
 
 from imod.mf6.validation import BOUNDARY_DIMS_SCHEMA
 from imod.schemata import DTypeSchema
 from imod.typing import GridDataArray
+
+# create dispatcher instance to limit scope of typedispatching
+dispatch = Dispatcher()
 
 
 def _reduce_grid_except_dims(

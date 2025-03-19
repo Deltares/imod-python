@@ -4,7 +4,7 @@ from dataclasses import asdict
 from typing import Any, Optional, Union
 
 import xarray as xr
-from plum import dispatch
+from plum import Dispatcher
 from xarray.core.utils import is_scalar
 from xugrid.regrid.regridder import BaseRegridder
 
@@ -29,6 +29,9 @@ from imod.util.regrid import (
     RegridderType,
     RegridderWeightsCache,
 )
+
+# create dispatcher instance to limit scope of typedispatching
+dispatch = Dispatcher()
 
 
 def handle_extra_coords(coordname: str, target_grid: GridDataArray, variable_data: Any):

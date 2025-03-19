@@ -4,10 +4,13 @@ from typing import List, Tuple
 
 import xarray as xr
 import xugrid as xu
-from plum import dispatch
+from plum import Dispatcher
 
 from imod.mf6.simulation import Modflow6Simulation
 from imod.typing import GridDataArray
+
+# create dispatcher instance to limit scope of typedispatching
+dispatch = Dispatcher()
 
 
 def get_label_array(simulation: Modflow6Simulation, npartitions: int) -> GridDataArray:
