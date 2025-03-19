@@ -368,6 +368,10 @@ def enforce_dim_order(grid: xu.UgridDataArray) -> xu.UgridDataArray:  # noqa: F8
         "species", "time", "layer", face_dimension, missing_dims="ignore"
     )
 
+@dispatch  # type: ignore[no-redef]
+def enforce_dim_order(grid: None) -> None:
+    return grid
+
 @dispatch
 def enforce_dim_order(grid: Any) -> xr.DataArray:
     """Enforce dimension order to iMOD Python standard"""
