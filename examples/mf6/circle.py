@@ -179,7 +179,7 @@ head
 
 # %%
 # For a DISV MODFLOW6 model, the heads are returned as a UgridDataArray.  While
-# all layers are timesteps are available, they are only loaded into memory as
+# all layers and timesteps are available, they are only loaded into memory as
 # needed.
 #
 # We may also open the cell-by-cell flows (.cbc) file.
@@ -231,7 +231,7 @@ ax.set_aspect(1)
 # We may also quickly setup a smaller model. We'll select half of the original
 # domain. To set up the boundary conditions on the clipped edges you can provide
 # a states_for_boundary dictionary. In this case we add the head values of the
-# computed full domain simulation as the clipped boundary values
+# computed full domain simulation as the clipped boundary values.
 
 states_for_boundary = {
     "GWF_1": head.compute(),
@@ -250,7 +250,7 @@ half_simulation.run()
 head = half_simulation.open_head()
 
 # %%
-# Let's add constant head boundaries together and plot them
+# Let's add constant head boundaries together and plot them.
 
 half_simulation_constant_head = half_simulation["GWF_1"]["chd"]["head"]
 
