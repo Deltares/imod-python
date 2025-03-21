@@ -31,7 +31,7 @@ represented by a General Head Boundary package.
 
 # %%
 # We'll start with the usual imports. As this is a simple (synthetic)
-# structured model, we can make due with few packages.
+# structured model, we can make do with few packages.
 
 import numpy as np
 import pandas as pd
@@ -193,7 +193,7 @@ gwt_model["oc"] = imod.mf6.OutputControl(save_concentration="last", save_budget=
 gwt_model["dis"] = gwf_model["dis"]
 
 # %%
-# now let's define a simulation using the flow and transport models.
+# Now let's define a simulation using the flow and transport models.
 
 # Attach it to a simulation
 simulation = imod.mf6.Modflow6Simulation("henry")
