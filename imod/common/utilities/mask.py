@@ -2,7 +2,7 @@ import numbers
 
 import numpy as np
 import xarray as xr
-from fastcore.dispatch import typedispatch
+from plum import Dispatcher
 from xarray.core.utils import is_scalar
 
 from imod.common.interfaces.imaskingsettings import IMaskingSettings
@@ -10,6 +10,9 @@ from imod.common.interfaces.imodel import IModel
 from imod.common.interfaces.ipackage import IPackage
 from imod.common.interfaces.isimulation import ISimulation
 from imod.typing.grid import GridDataArray, get_spatial_dimension_names, is_same_domain
+
+# create dispatcher instance to limit scope of typedispatching
+dispatch = Dispatcher()
 
 
 def _mask_all_models(
@@ -81,12 +84,12 @@ def _skip_dataarray(da: GridDataArray) -> bool:
     return False
 
 
-@typedispatch
+@dispatch
 def _skip_variable(package: IPackage, var: str) -> bool:
     return False
 
 
-@typedispatch  # type: ignore [no-redef]
+@dispatch  # type: ignore [no-redef]
 def _skip_variable(package: IMaskingSettings, var: str) -> bool:
     return var in package.skip_variables
 

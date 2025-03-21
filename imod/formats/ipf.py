@@ -221,7 +221,7 @@ def read_associated(path, kwargs={}):
             itype_kwargs["dtype"] = {colnames[0]: np.float64}
         elif itype == 3:  # cpt
             # all columns must be numeric
-            itype_kwargs["dtype"] = {colname: np.float64 for colname in colnames}
+            itype_kwargs["dtype"] = dict.fromkeys(colnames, np.float64)
         elif itype == 4:  # 3D borehole
             # enforce first 3 columns are float
             itype_kwargs["dtype"] = {
