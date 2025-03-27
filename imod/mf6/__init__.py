@@ -49,6 +49,7 @@ from imod.mf6.out import (
 )
 from imod.mf6.rch import Recharge
 from imod.mf6.riv import River
+from imod.mf6.sfr import StreamFlowRouting
 from imod.mf6.simulation import Modflow6Simulation
 from imod.mf6.src import MassSourceLoading
 from imod.mf6.ssm import SourceSinkMixing
