@@ -612,9 +612,8 @@ class StreamFlowRouting(BoundaryCondition):
             "print_input": self.dataset["print_input"].item(),
             "print_flows": self.dataset["print_flows"].item(),
             "save_flows": self.dataset["save_flows"].item(),
-            # TODO:
-            # "budget_fileout": self.dataset["budget_fileout"].item(),
-            # "budgetcsv_fileout": self.dataset["budgetcsv_fileout"].item(),
+            "budget_fileout": self.dataset["budget_fileout"].item(),
+            "budgetcsv_fileout": self.dataset["budgetcsv_fileout"].item(),
             "stage_fileout": self.dataset["stage_fileout"].item(),
             "nreaches": self.dataset.ugrid.grid.n_edge,
         }
