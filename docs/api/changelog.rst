@@ -40,6 +40,8 @@ Added
 - :meth:`imod.mf6.HorizontalFlowBarrierResistance.cleanup`,
   :meth:`imod.mf6.SingleLayerHorizontalFlowBarrierResistance.cleanup`,
   to clean up HFB geometries crossing inactive model cells.
+- :func:``imod.prepare.cleanup.cleanup_layered_wel` to clean up wells assigned
+  to layers.
 
 Changed
 ~~~~~~~
