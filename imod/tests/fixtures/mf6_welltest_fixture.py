@@ -10,18 +10,22 @@ def mf6wel_test_data_stationary():
         [
             [1, 1, 9],
             [1, 2, 9],
+            [1, 3, 9],
             [1, 1, 8],
             [1, 2, 8],
-            [2, 3, 7],
+            [1, 3, 8],
             [2, 4, 7],
-            [2, 3, 6],
+            [2, 5, 7],
+            [2, 6, 7],
             [2, 4, 6],
+            [2, 5, 6],
+            [2, 6, 6],
         ],
     )
-    coords = {"ncellid": np.arange(8) + 1, "dim_cellid": ["layer", "row", "column"]}
+    coords = {"ncellid": np.arange(12) + 1, "dim_cellid": ["layer", "row", "column"]}
     cellid = xr.DataArray(cellid_values, coords=coords, dims=("ncellid", "dim_cellid"))
     rate = xr.DataArray(
-        [1.0] * 8, coords={"ncellid": np.arange(8) + 1}, dims=("ncellid",)
+        [1.0] * 12, coords={"ncellid": np.arange(12) + 1}, dims=("ncellid",)
     )
     return cellid, rate
 
@@ -32,18 +36,22 @@ def mf6wel_test_data_transient():
         [
             [1, 1, 9],
             [1, 2, 9],
+            [1, 3, 9],
             [1, 1, 8],
             [1, 2, 8],
-            [2, 3, 7],
+            [1, 3, 8],
             [2, 4, 7],
-            [2, 3, 6],
+            [2, 5, 7],
+            [2, 6, 7],
             [2, 4, 6],
+            [2, 5, 6],
+            [2, 6, 6],
         ],
     )
-    coords = {"ncellid": np.arange(8) + 1, "dim_cellid": ["layer", "row", "column"]}
+    coords = {"ncellid": np.arange(12) + 1, "dim_cellid": ["layer", "row", "column"]}
     cellid = xr.DataArray(cellid_values, coords=coords, dims=("ncellid", "dim_cellid"))
 
-    rate = [1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0]
+    rate = [1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0]
 
     globaltimes = pd.date_range("2000-01-01", "2000-01-06")
     weltimes = globaltimes[:-1]
@@ -52,7 +60,7 @@ def mf6wel_test_data_transient():
         np.arange(len(weltimes)) + 1, coords={"time": weltimes}, dims=("time",)
     )
     rate_cells = xr.DataArray(
-        rate, coords={"ncellid": np.arange(8) + 1}, dims=("ncellid",)
+        rate, coords={"ncellid": np.arange(12) + 1}, dims=("ncellid",)
     )
     rate_wel = rate_time * rate_cells
 
@@ -61,13 +69,26 @@ def mf6wel_test_data_transient():
 
 @pytest.fixture(scope="session")
 def well_high_lvl_test_data_stationary():
-    screen_top = [0.0, 0.0, 0.0, 0.0, -6.0, -6.0, -6.0, -6.0]
-    screen_bottom = [-2.0, -2.0, -2.0, -2.0, -20.0, -20.0, -20.0, -20.0]
+    screen_top = [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, -6.0, -6.0, -6.0, -6.0, -6.0, -6.0]
+    screen_bottom = [
+        -2.0,
+        -2.0,
+        -2.0,
+        -2.0,
+        -2.0,
+        -2.0,
+        -20.0,
+        -20.0,
+        -20.0,
+        -20.0,
+        -20.0,
+        -20.0,
+    ]
     # fmt: off
-    y = [83.0, 77.0, 82.0, 71.0, 62.0, 52.0, 66.0, 59.0]
-    x = [81.0, 82.0, 75.0, 77.0, 68.0, 64.0, 52.0, 51.0]
+    y = [83.0, 77.0, 66.0, 82.0, 71.0, 61.0, 59.0, 44.0, 33.0, 52.0, 41.0, 38.0]
+    x = [81.0, 82.0, 88.0, 75.0, 77.0, 71.0, 68.0, 64.0, 61.0, 52.0, 51.0, 59.0]
     # fmt: on
-    rate = [1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0]
+    rate = [1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0]
     rate_wel = xr.DataArray(rate, dims=("index",))
 
     da_species = xr.DataArray(
@@ -83,13 +104,26 @@ def well_high_lvl_test_data_stationary():
 
 @pytest.fixture(scope="session")
 def well_high_lvl_test_data_transient():
-    screen_top = [0.0, 0.0, 0.0, 0.0, -6.0, -6.0, -6.0, -6.0]
-    screen_bottom = [-2.0, -2.0, -2.0, -2.0, -20.0, -20.0, -20.0, -20.0]
+    screen_top = [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, -6.0, -6.0, -6.0, -6.0, -6.0, -6.0]
+    screen_bottom = [
+        -2.0,
+        -2.0,
+        -2.0,
+        -2.0,
+        -2.0,
+        -2.0,
+        -20.0,
+        -20.0,
+        -20.0,
+        -20.0,
+        -20.0,
+        -20.0,
+    ]
     # fmt: off
-    y = [83.0, 77.0, 82.0, 71.0, 62.0, 52.0, 66.0, 59.0]
-    x = [81.0, 82.0, 75.0, 77.0, 68.0, 64.0, 52.0, 51.0]
+    y = [83.0, 77.0, 66.0, 82.0, 71.0, 61.0, 59.0, 44.0, 33.0, 52.0, 41.0, 38.0]
+    x = [81.0, 82.0, 88.0, 75.0, 77.0, 71.0, 68.0, 64.0, 61.0, 52.0, 51.0, 59.0]
     # fmt: on
-    rate = [1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0]
+    rate = [1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0]
 
     globaltimes = pd.date_range("2000-01-01", "2000-01-06")
     weltimes = globaltimes[:-1]

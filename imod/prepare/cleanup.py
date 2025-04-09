@@ -287,6 +287,38 @@ def _set_ultrathin_filters_to_point_filters(
     return cleaned_wells
 
 
+def cleanup_wel_layered(
+    wells: pd.DataFrame, top: GridDataArray, bottom: GridDataArray
+) -> pd.DataFrame:
+    """
+    Clean up dataframe with wells, fixes some common mistakes in the following
+    order:
+
+    1. Wells outside grid bounds are dropped
+
+    Parameters
+    ----------
+    wells: pandas.Dataframe
+        Dataframe with wells to be cleaned up. Requires columns ``"x", "y",
+        "id"``
+    top: xarray.DataArray | xugrid.UgridDataArray
+        Grid with model top
+    bottom: xarray.DataArray | xugrid.UgridDataArray
+        Grid with model bottoms
+
+    Returns
+    -------
+    pandas.DataFrame
+        Cleaned well dataframe.
+    """
+    validate_well_columnnames(wells, names={"x", "y", "id"})
+
+    cleaned_wells, xy_top_series, xy_base_series = _locate_wells_in_bounds(
+        wells, top, bottom
+    )
+    return cleaned_wells
+
+
 def cleanup_wel(
     wells: pd.DataFrame,
     top: GridDataArray,
