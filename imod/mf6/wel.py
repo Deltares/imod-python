@@ -978,27 +978,12 @@ class Well(GridAgnosticWell):
 
         ds = new.dataset
 
-        z_max = self._find_well_value_at_layer(ds, top, layer_max)
-        z_min = self._find_well_value_at_layer(ds, bottom, layer_min)
+        z_max, in_bounds_z_max = self._find_well_value_at_layer(ds, top, layer_max)
+        z_min, in_bounds_z_min = self._find_well_value_at_layer(ds, bottom, layer_min)
 
-        if (z_max is not None) or (z_min is not None):
-            in_bounds_z_max = None
-            in_bounds_z_min = None
-            if (z_max is not None) and (is_spatial_grid(top)):
-                in_bounds_z_max = np.full(ds.sizes["index"], False)
-                in_bounds_z_max[z_max["index"]] = True
-                z_max = z_max.drop_vars(lambda x: x.coords)
-            if (z_min is not None) and (is_spatial_grid(bottom)):
-                in_bounds_z_min = np.full(ds.sizes["index"], False)
-                in_bounds_z_min[z_min["index"]] = True
-                z_min = z_min.drop_vars(lambda x: x.coords)
-            if (in_bounds_z_max is not None) or (in_bounds_z_min is not None):
-                in_bounds = np.full(ds.sizes["index"], False)
-                if in_bounds_z_max is not None:
-                    in_bounds = in_bounds | in_bounds_z_max
-                if in_bounds_z_min is not None:
-                    in_bounds = in_bounds | in_bounds_z_min
-                ds = ds.loc[{"index": in_bounds}]
+        # Prior to the actual clipping of z_max/z_min, replace the dataset in case a
+        # spatial selection needs to be done when a spatial grid is present (top/bottom).
+        ds = ds.loc[{"index": in_bounds_z_max & in_bounds_z_min}]
 
         if z_max is not None:
             ds["screen_top"] = ds["screen_top"].clip(None, z_max)
@@ -1034,8 +1019,13 @@ class Well(GridAgnosticWell):
                 y=well_dataset["y"].values,
                 out_of_bounds="ignore",
             )
+            in_bounds = np.full(well_dataset.sizes["index"], False)
+            in_bounds[value["index"]] = True
+            value = value.drop_vars(lambda x: x.coords)
+        else:
+            in_bounds = np.full(well_dataset.sizes["index"], True)
 
-        return value
+        return value, in_bounds
 
     def _create_wells_df(self) -> pd.DataFrame:
         wells_df = self.dataset.to_dataframe()

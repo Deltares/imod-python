@@ -135,6 +135,9 @@ Fixed
   :class:`imod.msw.CouplerMapping` as MetaSWAP cannot handle this.
 - Sorting issue in :func:`imod.prepare.assign_wells`. This could cause
   :class:`imod.mf6.Well` to assign wells to the wrong cells.
+- Fixed crash upon calling :meth:`imod.mf6.Well.clip_box` when the top/bottom
+  arguments are specified. This could cause :class:`imod.mf6.Well` to crash
+  when wells are located outside the extent of the layer model.
 
 
 [1.0.0rc1] - 2024-12-20
