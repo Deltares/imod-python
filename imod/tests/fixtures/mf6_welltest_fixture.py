@@ -6,6 +6,10 @@ import xarray as xr
 
 @pytest.fixture(scope="session")
 def mf6wel_test_data_stationary():
+    """
+    Note that 10 or more wells (here: 12 wells) are required to cover testing when
+    (string) IDs are assigned.
+    """
     cellid_values = np.array(
         [
             [1, 1, 9],
@@ -32,6 +36,10 @@ def mf6wel_test_data_stationary():
 
 @pytest.fixture(scope="session")
 def mf6wel_test_data_transient():
+    """
+    Note that 10 or more wells (here: 12 wells) are required to cover testing when
+    (string) IDs are assigned.
+    """
     cellid_values = np.array(
         [
             [1, 1, 9],
@@ -69,6 +77,10 @@ def mf6wel_test_data_transient():
 
 @pytest.fixture(scope="session")
 def well_high_lvl_test_data_stationary():
+    """
+    Note that 10 or more wells (here: 12 wells) are required to cover testing when
+    (string) IDs are assigned.
+    """
     screen_top = [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, -6.0, -6.0, -6.0, -6.0, -6.0, -6.0]
     screen_bottom = [
         -2.0,
@@ -104,6 +116,10 @@ def well_high_lvl_test_data_stationary():
 
 @pytest.fixture(scope="session")
 def well_high_lvl_test_data_transient():
+    """
+    Note that 10 or more wells (here: 12 wells) are required to cover testing when
+    (string) IDs are assigned.
+    """
     screen_top = [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, -6.0, -6.0, -6.0, -6.0, -6.0, -6.0]
     screen_bottom = [
         -2.0,
@@ -147,6 +163,10 @@ def well_high_lvl_test_data_transient():
 
 @pytest.fixture(scope="session")
 def well_test_data_stationary():
+    """
+    Note that 10 or more wells (here: 12 wells) are required to cover testing when
+    (string) IDs are assigned.
+    """
     layer = np.array([3, 2, 2, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1])
     row = np.array([5, 4, 6, 9, 9, 9, 9, 11, 11, 11, 11, 13, 13, 13, 13])
     column = np.array([11, 6, 12, 8, 10, 12, 14, 8, 10, 12, 14, 8, 10, 12, 14])
@@ -159,6 +179,10 @@ def well_test_data_stationary():
 
 @pytest.fixture(scope="session")
 def well_test_data_transient():
+    """
+    Note that 10 or more wells (here: 12 wells) are required to cover testing when
+    (string) IDs are assigned.
+    """
     layer = np.array([3, 2, 2, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1])
     row = np.array([5, 4, 6, 9, 9, 9, 9, 11, 11, 11, 11, 13, 13, 13, 13])
     column = np.array([11, 6, 12, 8, 10, 12, 14, 8, 10, 12, 14, 8, 10, 12, 14])
