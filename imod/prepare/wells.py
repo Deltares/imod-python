@@ -97,7 +97,7 @@ def locate_wells(
 
     # Default to a xy_k value of 1.0: weigh every layer equally.
     xy_k: float | GridDataArray = 1.0
-    first = wells.groupby("id").first()
+    first = wells.groupby("id", sort=False).first()
     x = first["x"].to_numpy()
     y = first["y"].to_numpy()
 
@@ -193,7 +193,7 @@ def assign_wells(
         wells, top, bottom, k, validate
     )
     wells_in_bounds = wells.set_index("id").loc[id_in_bounds].reset_index()
-    first = wells_in_bounds.groupby("id").first()
+    first = wells_in_bounds.groupby("id", sort=False).first()
     overlap = compute_overlap(first, xy_top, xy_bottom)
 
     if isinstance(xy_k, (xr.DataArray, xu.UgridDataArray)):
