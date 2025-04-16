@@ -34,7 +34,7 @@ object ExamplesTemplate : Template({
             dockerImage = "%DockerContainer%:%DockerVersion%"
             dockerImagePlatform = ScriptBuildStep.ImagePlatform.Windows
             dockerRunParameters = """--cpus=8 --memory=32g"""
-            dockerPull = true
+            dockerPull = false
         }
     }
 

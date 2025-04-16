@@ -3,11 +3,12 @@ from __future__ import annotations
 from copy import deepcopy
 from typing import TYPE_CHECKING, Optional
 
+import cftime
 import numpy as np
 import pandas as pd
 import xarray as xr
 import xugrid as xu
-from fastcore.dispatch import typedispatch
+from plum import Dispatcher
 
 from imod.common.interfaces.ilinedatapackage import ILineDataPackage
 from imod.common.interfaces.ipackagebase import IPackageBase
@@ -17,9 +18,11 @@ from imod.common.utilities.line_data import (
     clipped_zbound_linestrings_to_vertical_polygons,
     vertical_polygons_to_zbound_linestrings,
 )
-from imod.typing import GeoDataFrameType, GridDataArray
+from imod.common.utilities.value_filters import is_valid
+from imod.typing import GeoDataFrameType, GridDataArray, GridDataset
 from imod.typing.grid import bounding_polygon, is_spatial_grid
 from imod.util.imports import MissingOptionalModule
+from imod.util.time import to_datetime_internal
 
 if TYPE_CHECKING:
     import geopandas as gpd
@@ -34,15 +37,18 @@ try:
 except ImportError:
     shapely = MissingOptionalModule("shapely")
 
+# create dispatcher instance to limit scope of typedispatching
+dispatch = Dispatcher()
 
-@typedispatch
+
+@dispatch
 def clip_by_grid(_: object, grid: object) -> None:
     raise TypeError(
         f"'grid' should be of type xr.DataArray, xu.Ugrid2d or xu.UgridDataArray, got {type(grid)}"
     )
 
 
-@typedispatch  # type: ignore[no-redef]
+@dispatch  # type: ignore[no-redef]
 def clip_by_grid(package: IPackageBase, active: xr.DataArray) -> IPackageBase:  # noqa: F811
     domain_slice = get_active_domain_slice(active)
     x_min, x_max = domain_slice["x"].start, domain_slice["x"].stop
@@ -57,7 +63,7 @@ def clip_by_grid(package: IPackageBase, active: xr.DataArray) -> IPackageBase:  
     return clipped_package
 
 
-@typedispatch  # type: ignore[no-redef]
+@dispatch  # type: ignore[no-redef]
 def clip_by_grid(package: IPackageBase, active: xu.UgridDataArray) -> IPackageBase:  # noqa: F811
     domain_slice = get_active_domain_slice(active)
 
@@ -67,7 +73,7 @@ def clip_by_grid(package: IPackageBase, active: xu.UgridDataArray) -> IPackageBa
     return cls._from_dataset(clipped_dataset)
 
 
-@typedispatch  # type: ignore[no-redef]
+@dispatch  # type: ignore[no-redef]
 def clip_by_grid(  # noqa: F811
     package: IPointDataPackage, active: xu.UgridDataArray
 ) -> IPointDataPackage:
@@ -83,6 +89,33 @@ def clip_by_grid(  # noqa: F811
 
     cls = type(package)
     return cls._from_dataset(selection)
+
+
+@dispatch  # type: ignore[no-redef, misc]
+def clip_by_grid(package: ILineDataPackage, active: xr.DataArray) -> ILineDataPackage:  # noqa: F811
+    """Clip LineDataPackage outside structured grid."""
+    return _clip_by_grid_line_data(package, active)
+
+
+# For some reason the plum dispatching finds "active: GridDataArray" ambiguous
+# and raises an error if this is not duplicated.
+@dispatch  # type: ignore[no-redef, misc]
+def clip_by_grid(  # noqa: F811
+    package: ILineDataPackage, active: xu.UgridDataArray
+) -> ILineDataPackage:
+    """Clip LineDataPackage outside unstructured grid."""
+    return _clip_by_grid_line_data(package, active)
+
+
+def _clip_by_grid_line_data(
+    package: ILineDataPackage, active: GridDataArray
+) -> ILineDataPackage:
+    clipped_line_data = clip_line_gdf_by_grid(package.line_data, active)
+
+    # Create new instance
+    clipped_package = deepcopy(package)
+    clipped_package.line_data = clipped_line_data
+    return clipped_package
 
 
 def _filter_inactive_cells(package, active):
@@ -102,17 +135,6 @@ def _filter_inactive_cells(package, active):
                 package.dataset[var] = package.dataset[var].where(
                     active > 0, other=other
                 )
-
-
-@typedispatch  # type: ignore[no-redef, misc]
-def clip_by_grid(package: ILineDataPackage, active: GridDataArray) -> ILineDataPackage:  # noqa: F811
-    """Clip LineDataPackage outside unstructured/structured grid."""
-    clipped_line_data = clip_line_gdf_by_grid(package.line_data, active)
-
-    # Create new instance
-    clipped_package = deepcopy(package)
-    clipped_package.line_data = clipped_line_data
-    return clipped_package
 
 
 def _clip_linestring(
@@ -181,3 +203,215 @@ def bounding_polygon_from_line_data_and_clip_box(
     bbox = shapely.box(x_min, y_min, x_max, y_max)
     dummy_value = 0
     return gpd.GeoDataFrame([dummy_value], geometry=[bbox])
+
+
+def clip_time_indexer(
+    time: np.ndarray,
+    time_start: Optional[cftime.datetime | np.datetime64 | str] = None,
+    time_end: Optional[cftime.datetime | np.datetime64 | str] = None,
+):
+    """
+    Return indices which can be used to select a time slice from a
+    DataArray or Dataset.
+    """
+    original = xr.DataArray(
+        data=np.arange(time.size),
+        coords={"time": time},
+        dims=("time",),
+    )
+    indexer = original.sel(time=slice(time_start, time_end))
+
+    # The selection might return a 0-sized dimension.
+    if indexer.size > 0:
+        first_time = indexer["time"].values[0]
+    else:
+        first_time = None
+
+    # If the first time matches exactly, xarray will have done thing we
+    # wanted and our work with the time dimension is finished.
+    if (time_start is None) or (time_start == first_time):
+        return indexer
+
+    # If the first time is before the original time, we need to
+    # backfill; otherwise, we need to ffill the first timestamp.
+    if time_start < time[0]:
+        method = "bfill"
+    else:
+        method = "ffill"
+    # Index with a list rather than a scalar to preserve the time
+    # dimension.
+    first = original.sel(time=[time_start], method=method)
+    first["time"] = [time_start]
+    indexer = xr.concat([first, indexer], dim="time")
+
+    return indexer
+
+
+def clip_spatial_box(
+    dataset: GridDataset,
+    x_min: Optional[float] = None,
+    x_max: Optional[float] = None,
+    y_min: Optional[float] = None,
+    y_max: Optional[float] = None,
+):
+    """
+    Clip a spatial dataset by a bounding box.
+    """
+    selection = dataset
+    x_slice = slice(x_min, x_max)
+    y_slice = slice(y_min, y_max)
+    if isinstance(selection, xu.UgridDataset):
+        selection = selection.ugrid.sel(x=x_slice, y=y_slice)
+    elif ("x" in selection.coords) and ("y" in selection.coords):
+        if selection.indexes["y"].is_monotonic_decreasing:
+            y_slice = slice(y_max, y_min)
+        selection = selection.sel(x=x_slice, y=y_slice)
+    return selection
+
+
+def clip_layer_slice(
+    dataset: GridDataset,
+    layer_min: Optional[int] = None,
+    layer_max: Optional[int] = None,
+):
+    """
+    Clip a dataset by a layer slice.
+    """
+    selection = dataset
+    if "layer" in selection.coords:
+        layer_slice = slice(layer_min, layer_max)
+        # Cannot select if it's not a dimension!
+        if "layer" not in selection.dims:
+            selection = (
+                selection.expand_dims("layer").sel(layer=layer_slice).squeeze("layer")
+            )
+        else:
+            selection = selection.sel(layer=layer_slice)
+    return selection
+
+
+def _to_datetime(
+    time: Optional[cftime.datetime | np.datetime64 | str], use_cftime: bool
+):
+    """
+    Helper function that converts to datetime, except when None.
+    """
+    if time is None:
+        return time
+    else:
+        return to_datetime_internal(time, use_cftime)
+
+
+def _is_within_timeslice(
+    keys: np.ndarray,
+    time_start: Optional[cftime.datetime | np.datetime64 | str] = None,
+    time_end: Optional[cftime.datetime | np.datetime64 | str] = None,
+) -> np.ndarray:
+    """
+    Return a boolean array indicating whether the keys are within the time slice.
+    """
+    within_time_slice = np.ones(keys.size, dtype=bool)
+    if time_start is not None:
+        within_time_slice &= keys >= time_start
+    if time_end is not None:
+        within_time_slice &= keys <= time_end
+    return within_time_slice
+
+
+def clip_repeat_stress(
+    repeat_stress: xr.DataArray,
+    time: np.ndarray,
+    time_start: Optional[cftime.datetime | np.datetime64 | str] = None,
+    time_end: Optional[cftime.datetime | np.datetime64 | str] = None,
+):
+    """
+    Selection may remove the original data which are repeated.
+    These should be re-inserted at the first occuring "key".
+    Next, remove these keys as they've been "promoted" to regular
+    timestamps with data.
+
+    Say repeat_stress is:
+        keys       : values
+        2001-01-01 : 2000-01-01
+        2002-01-01 : 2000-01-01
+        2003-01-01 : 2000-01-01
+
+    And time_start = 2001-01-01, time_end = None
+
+    This function returns:
+        keys       : values
+        2002-01-01 : 2001-01-01
+        2003-01-01 : 2001-01-01
+    """
+    # First, "pop" and filter.
+    keys, values = repeat_stress.values.T
+    # Prepend unique values to keys to account for "value" entries
+    # that need to be clipped off.
+    unique_values = np.unique(values)
+    prepended_keys = np.concatenate((unique_values, keys))
+    prepended_values = np.concatenate((unique_values, values))
+    # Clip timeslice
+    within_time_slice = _is_within_timeslice(prepended_keys, time_start, time_end)
+    clipped_keys = prepended_keys[within_time_slice]
+    clipped_values = prepended_values[within_time_slice]
+    # Now account for "value" entries that have been clipped off, these should
+    # be updated in the end to ``insert_keys``.
+    insert_values, index = np.unique(clipped_values, return_index=True)
+    insert_keys = clipped_keys[index]
+    # Setup indexer
+    indexer = xr.DataArray(
+        data=np.arange(time.size),
+        coords={"time": time},
+        dims=("time",),
+    ).sel(time=insert_values)
+    indexer["time"] = insert_keys
+
+    # Update the key-value pairs. Discard keys that have been "promoted" to
+    # values.
+    not_promoted = np.isin(clipped_keys, insert_keys, assume_unique=True, invert=True)
+    not_promoted_keys = clipped_keys[not_promoted]
+    not_promoted_values = clipped_values[not_promoted]
+    # Promote the values to their new source.
+    to_promote = np.searchsorted(insert_values, not_promoted_values)
+    promoted_values = insert_keys[to_promote]
+    repeat_stress = xr.DataArray(
+        data=np.column_stack((not_promoted_keys, promoted_values)),
+        dims=("repeat", "repeat_items"),
+    )
+    return indexer, repeat_stress
+
+
+def clip_time_slice(
+    dataset: GridDataset,
+    time_min: Optional[cftime.datetime | np.datetime64 | str] = None,
+    time_max: Optional[cftime.datetime | np.datetime64 | str] = None,
+):
+    """Clip time slice from dataset, account for repeat stress if present."""
+    selection = dataset
+    if "time" in selection.coords:
+        time = selection["time"].values
+        use_cftime = isinstance(time[0], cftime.datetime)
+        time_start = _to_datetime(time_min, use_cftime)
+        time_end = _to_datetime(time_max, use_cftime)
+
+        indexer = clip_time_indexer(
+            time=time,
+            time_start=time_start,
+            time_end=time_end,
+        )
+
+        if "repeat_stress" in selection.data_vars and is_valid(
+            selection["repeat_stress"].values[()]
+        ):
+            repeat_indexer, repeat_stress = clip_repeat_stress(
+                repeat_stress=selection["repeat_stress"],
+                time=time,
+                time_start=time_start,
+                time_end=time_end,
+            )
+            selection = selection.drop_vars("repeat_stress")
+            selection["repeat_stress"] = repeat_stress
+            indexer = repeat_indexer.combine_first(indexer).astype(int)
+
+        selection = selection.drop_vars("time").isel(time=indexer)
+    return selection

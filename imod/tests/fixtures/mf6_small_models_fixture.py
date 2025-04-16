@@ -56,7 +56,7 @@ def grid_data_unstructured(
     This function creates a dataarray with scalar values for a grid of configurable cell size.
     First a regular grid is constructed and then this is converted to an ugrid dataarray.
     """
-    return xu.UgridDataArray.from_structured(
+    return xu.UgridDataArray.from_structured2d(
         grid_data_structured(dtype, value, cellsize)
     )
 
@@ -68,7 +68,7 @@ def grid_data_unstructured_layered(
     This function creates a dataarray with scalar values for a grid of configurable cell size. The values are
     multiplied with the layer index. First a regular grid is constructed and then this is converted to an ugrid dataarray.
     """
-    return xu.UgridDataArray.from_structured(
+    return xu.UgridDataArray.from_structured2d(
         grid_data_structured_layered(dtype, value, cellsize)
     )
 

@@ -12,7 +12,7 @@ import numpy.typing as npt
 import pandas as pd
 import xarray as xr
 import xugrid as xu
-from fastcore.dispatch import typedispatch
+from plum import Dispatcher
 
 from imod.common.interfaces.ilinedatapackage import ILineDataPackage
 from imod.common.utilities.clip import (
@@ -71,6 +71,9 @@ else:
         _POLYGON = ""
         _LINESTRING = ""
 
+# create dispatcher instance to limit scope of typedispatching
+dispatch = Dispatcher()
+
 NO_BARRIER_MSG = textwrap.dedent(
     """
     No barriers could be assigned to cell edges,
@@ -82,7 +85,7 @@ NO_BARRIER_MSG = textwrap.dedent(
 )
 
 
-@typedispatch
+@dispatch
 def _derive_connected_cell_ids(
     idomain: xr.DataArray, grid: xu.Ugrid2d, edge_index: np.ndarray
 ) -> xr.Dataset:
@@ -131,7 +134,7 @@ def _derive_connected_cell_ids(
     return cell_ids
 
 
-@typedispatch  # type: ignore[no-redef]
+@dispatch  # type: ignore[no-redef]
 def _derive_connected_cell_ids(
     _: xu.UgridDataArray, grid: xu.Ugrid2d, edge_index: np.ndarray
 ) -> xr.Dataset:
@@ -145,10 +148,11 @@ def _derive_connected_cell_ids(
     edge_index :
         The indices of the edges from which the connected cell ids are computed
 
-    Returns A dataset containing the cell_id1 and cell_id2 data variables. The  cell dimensions are stored in the
-    cell_dims coordinates.
+    Returns
     -------
-
+    xr.Dataset :
+        A dataset containing the cell_id1 and cell_id2 data variables. The cell
+        dimensions are stored in the cell_dims coordinates.
     """
     edge_faces = grid.edge_face_connectivity
     cell2d = edge_faces[edge_index]

@@ -11,10 +11,23 @@ from imod.typing.grid import get_grid_geometry_hash
 
 class RegridderType(Enum):
     """
-    Enumerator referring to regridder types in ``xugrid``.
-    These can be used safely in scripts, remaining backwards compatible for
-    when it is decided to rename regridders in ``xugrid``. For an explanation
-    what each regridder type does, we refer to the `xugrid documentation <https://deltares.github.io/xugrid/examples/regridder_overview.html>`_
+    Enumerator referring to regridder types in ``xugrid``. These can be used
+    safely in scripts, remaining backwards compatible for when it is decided to
+    rename regridders in ``xugrid``. For an explanation what each regridder type
+    does, we refer to the `xugrid documentation
+    <https://deltares.github.io/xugrid/examples/regridder_overview.html>`_
+
+    Examples
+    --------
+    You can use this as follows:
+
+    >>> regridder = RegridderType.OVERLAP(source, target, method="mean")
+    >>> result = regridder.regrid(uda)
+
+    This is equivalent to:
+
+    >>> regridder = xu.OverlapRegridder(source, target, method="mean")
+    >>> result = regridder.regrid(uda)
     """
 
     CENTROIDLOCATOR = xu.CentroidLocatorRegridder
@@ -32,9 +45,46 @@ class RegridderWeightsCache:
     grid to a single target grid. By storing the regridders, we make sure the
     regridders can be re-used for different arrays on the same grid. Regridders
     are stored based on their type (`see these
-    docs<https://deltares.github.io/xugrid/examples/regridder_overview.html>`_)
+    docs <https://deltares.github.io/xugrid/examples/regridder_overview.html>`_)
     and planar coordinates (x, y). This is important because computing the
     regridding weights is a costly affair.
+
+    Parameters
+    ----------
+    max_cache_size: int
+        The maximum number of regridders that can be stored in the cache. If
+        the cache is full, the oldest regridder will be removed.
+
+    Examples
+    --------
+    Different method, regridder weights are reused.
+
+    >>> cache = imod.util.RegridderWeightsCache()
+    >>> regridder1 = cache.get_regridder(source, target, RegridderType.OVERLAP, "mean")
+    >>> regridder2 = cache.get_regridder(source, target, RegridderType.OVERLAP, "mode")
+    >>> print(cache.weights_cache)
+
+    Different regridder type, different regridder weights.
+
+    >>> cache = imod.util.RegridderWeightsCache()
+    >>> regridder1 = cache.get_regridder(source, target, RegridderType.OVERLAP, "mean")
+    >>> regridder2 = cache.get_regridder(source, target, RegridderType.RELATIVEOVERLAP, "mean")
+    >>> print(cache.weights_cache)
+
+    Different source geometries, different regridder weights.
+
+    >>> cache = imod.util.RegridderWeightsCache()
+    >>> regridder1 = cache.get_regridder(source_xy1, target, RegridderType.OVERLAP, "mean")
+    >>> regridder2 = cache.get_regridder(source_xy2, target, RegridderType.OVERLAP, "mean")
+    >>> print(cache.weights_cache)
+
+    Different source grids with same geometry, regridder weights are reused.
+
+    >>> cache = imod.util.RegridderWeightsCache()
+    >>> source2 = xr.ones_like(source)
+    >>> regridder1 = cache.get_regridder(source, target, RegridderType.OVERLAP, "mean")
+    >>> regridder2 = cache.get_regridder(source2, target, RegridderType.OVERLAP, "mean")
+    >>> print(cache.weights_cache)
     """
 
     def __init__(
@@ -69,12 +119,12 @@ class RegridderWeightsCache:
         method: Optional[str] = None,
     ) -> BaseRegridder:
         """
-        returns a regridder of the specified type and with the specified method.
+        Returns a regridder of the specified type and with the specified method.
         The desired type can be passed through the argument "regridder_type" as
         an enumerator or as a class. The following two are equivalent:
-        instancesCollection.get_regridder(RegridderType.OVERLAP, "mean")
-        instancesCollection.get_regridder(xu.OverlapRegridder, "mean")
 
+        >>> cache.get_regridder(RegridderType.OVERLAP, "mean")
+        >>> cache.get_regridder(xu.OverlapRegridder, "mean")
 
         Parameters
         ----------
@@ -97,7 +147,7 @@ class RegridderWeightsCache:
         key = (source_hash, target_hash, regridder_class)
         if key not in self.weights_cache.keys():
             if len(self.weights_cache) >= self.max_cache_size:
-                self.remove_first_regridder()
+                self._remove_first_regridder()
             kwargs = {"source": source_grid, "target": target_grid}
             if method is not None:
                 kwargs["method"] = method
@@ -111,6 +161,6 @@ class RegridderWeightsCache:
 
         return regridder
 
-    def remove_first_regridder(self):
+    def _remove_first_regridder(self):
         keys = list(self.weights_cache.keys())
         self.weights_cache.pop(keys[0])

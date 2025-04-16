@@ -573,8 +573,8 @@ def _create_dataarray_from_paths(
     if isinstance(factor, xr.DataArray):
         missing_dims = set(factor.dims) - set(da.dims)
         if missing_dims:
-            factor = factor.isel({d: 0 for d in missing_dims}, drop=True)
-            addition = addition.isel({d: 0 for d in missing_dims}, drop=True)
+            factor = factor.isel(dict.fromkeys(missing_dims, 0), drop=True)
+            addition = addition.isel(dict.fromkeys(missing_dims, 0), drop=True)
 
     return da * factor + addition
 

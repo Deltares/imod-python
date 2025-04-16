@@ -1,4 +1,4 @@
-from typing import ClassVar, Protocol, Tuple, TypeAlias
+from typing import ClassVar, Protocol, Tuple, TypeAlias, runtime_checkable
 
 from pydantic import ConfigDict
 from pydantic.dataclasses import dataclass
@@ -6,6 +6,7 @@ from pydantic.dataclasses import dataclass
 from imod.util.regrid import RegridderType
 
 
+@runtime_checkable
 class RegridMethodType(Protocol):
     # Work around that type annotation is a bit hard on dataclasses, as they
     # don't expose a class interface.

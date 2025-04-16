@@ -13,8 +13,12 @@ import numpy as np
 import xarray as xr
 import xugrid as xu
 
-import imod
 from imod.common.interfaces.ipackage import IPackage
+from imod.common.utilities.clip import (
+    clip_layer_slice,
+    clip_spatial_box,
+    clip_time_slice,
+)
 from imod.common.utilities.mask import mask_package
 from imod.common.utilities.regrid import (
     _regrid_like,
@@ -371,92 +375,6 @@ class Package(PackageBase, IPackage, abc.ABC):
         # All state should be contained in the dataset.
         return type(self)(**self.dataset.copy().to_dict())
 
-    @staticmethod
-    def _clip_repeat_stress(
-        repeat_stress: xr.DataArray,
-        time,
-        time_start,
-        time_end,
-    ):
-        """
-        Selection may remove the original data which are repeated.
-        These should be re-inserted at the first occuring "key".
-        Next, remove these keys as they've been "promoted" to regular
-        timestamps with data.
-        """
-        # First, "pop" and filter.
-        keys, values = repeat_stress.values.T
-        keep = (keys >= time_start) & (keys <= time_end)
-        new_keys = keys[keep]
-        new_values = values[keep]
-        # Now detect which "value" entries have gone missing
-        insert_values, index = np.unique(new_values, return_index=True)
-        insert_keys = new_keys[index]
-        # Setup indexer
-        indexer = xr.DataArray(
-            data=np.arange(time.size),
-            coords={"time": time},
-            dims=("time",),
-        ).sel(time=insert_values)
-        indexer["time"] = insert_keys
-
-        # Update the key-value pairs. Discard keys that have been "promoted".
-        keep = np.isin(new_keys, insert_keys, assume_unique=True, invert=True)
-        new_keys = new_keys[keep]
-        new_values = new_values[keep]
-        # Set the values to their new source.
-        new_values = insert_keys[np.searchsorted(insert_values, new_values)]
-        repeat_stress = xr.DataArray(
-            data=np.column_stack((new_keys, new_values)),
-            dims=("repeat", "repeat_items"),
-        )
-        return indexer, repeat_stress
-
-    @staticmethod
-    def _clip_time_indexer(
-        time,
-        time_start,
-        time_end,
-    ):
-        original = xr.DataArray(
-            data=np.arange(time.size),
-            coords={"time": time},
-            dims=("time",),
-        )
-        indexer = original.sel(time=slice(time_start, time_end))
-
-        # The selection might return a 0-sized dimension.
-        if indexer.size > 0:
-            first_time = indexer["time"].values[0]
-        else:
-            first_time = None
-
-        # If the first time matches exactly, xarray will have done thing we
-        # wanted and our work with the time dimension is finished.
-        if (time_start is not None) and (time_start != first_time):
-            # If the first time is before the original time, we need to
-            # backfill; otherwise, we need to ffill the first timestamp.
-            if time_start < time[0]:
-                method = "bfill"
-            else:
-                method = "ffill"
-            # Index with a list rather than a scalar to preserve the time
-            # dimension.
-            first = original.sel(time=[time_start], method=method)
-            first["time"] = [time_start]
-            indexer = xr.concat([first, indexer], dim="time")
-
-        return indexer
-
-    def __to_datetime(self, time, use_cftime):
-        """
-        Helper function that converts to datetime, except when None.
-        """
-        if time is None:
-            return time
-        else:
-            return imod.util.time.to_datetime_internal(time, use_cftime)
-
     def clip_box(
         self,
         time_min: Optional[cftime.datetime | np.datetime64 | str] = None,
@@ -505,53 +423,17 @@ class Package(PackageBase, IPackage, abc.ABC):
             raise ValueError("this package does not support clipping.")
 
         selection = self.dataset
-        if "time" in selection:
-            time = selection["time"].values
-            use_cftime = isinstance(time[0], cftime.datetime)
-            time_start = self.__to_datetime(time_min, use_cftime)
-            time_end = self.__to_datetime(time_max, use_cftime)
-
-            indexer = self._clip_time_indexer(
-                time=time,
-                time_start=time_start,
-                time_end=time_end,
-            )
-
-            if "repeat_stress" in selection.data_vars and self._valid(
-                selection["repeat_stress"].values[()]
-            ):
-                repeat_indexer, repeat_stress = self._clip_repeat_stress(
-                    repeat_stress=selection["repeat_stress"],
-                    time=time,
-                    time_start=time_start,
-                    time_end=time_end,
-                )
-                selection = selection.drop_vars("repeat_stress")
-                selection["repeat_stress"] = repeat_stress
-                indexer = repeat_indexer.combine_first(indexer).astype(int)
-
-            selection = selection.drop_vars("time").isel(time=indexer)
-
-        if "layer" in selection.coords:
-            layer_slice = slice(layer_min, layer_max)
-            # Cannot select if it's not a dimension!
-            if "layer" not in selection.dims:
-                selection = (
-                    selection.expand_dims("layer")
-                    .sel(layer=layer_slice)
-                    .squeeze("layer")
-                )
-            else:
-                selection = selection.sel(layer=layer_slice)
-
-        x_slice = slice(x_min, x_max)
-        y_slice = slice(y_min, y_max)
-        if isinstance(selection, xu.UgridDataset):
-            selection = selection.ugrid.sel(x=x_slice, y=y_slice)
-        elif ("x" in selection.coords) and ("y" in selection.coords):
-            if selection.indexes["y"].is_monotonic_decreasing:
-                y_slice = slice(y_max, y_min)
-            selection = selection.sel(x=x_slice, y=y_slice)
+        selection = clip_time_slice(selection, time_min=time_min, time_max=time_max)
+        selection = clip_layer_slice(
+            selection, layer_min=layer_min, layer_max=layer_max
+        )
+        selection = clip_spatial_box(
+            selection,
+            x_min=x_min,
+            x_max=x_max,
+            y_min=y_min,
+            y_max=y_max,
+        )
 
         cls = type(self)
         return cls._from_dataset(selection)
@@ -599,22 +481,12 @@ class Package(PackageBase, IPackage, abc.ABC):
         attribute of the package. These defaults can be overridden using the
         input parameters of this function.
 
-        Examples
-        --------
-
-        To regrid the npf package with a non-default method for the k-field,
-        call regrid_like with these arguments:
-
-        >>> regridder_types = imod.mf6.regrid.NodePropertyFlowRegridMethod(k=(imod.RegridderType.OVERLAP, "mean"))
-        >>> new_npf = npf.regrid_like(like,  RegridderWeightsCache, regridder_types)
-
-
         Parameters
         ----------
         target_grid: xr.DataArray or xu.UgridDataArray
             a grid defined using the same discretization as the one we want to
             regrid the package to.
-        regrid_cache: RegridderWeightsCache, optional
+        regrid_cache: RegridderWeightsCache
             stores regridder weights for different regridders. Can be used to
             speed up regridding, if the same regridders are used several times
             for regridding different arrays.
@@ -623,10 +495,20 @@ class Package(PackageBase, IPackage, abc.ABC):
             specialization class of BaseRegridder) and function name (str) this
             dictionary can be used to override the default mapping method.
 
+        Examples
+        --------
+        To regrid the npf package with a non-default method for the k-field,
+        call ``regrid_like`` with these arguments:
+
+        >>> regridder_types = imod.mf6.regrid.NodePropertyFlowRegridMethod(k=(imod.RegridderType.OVERLAP, "mean"))
+        >>> regrid_cache = imod.util.regrid.RegridderWeightsCache()
+        >>> new_npf = npf.regrid_like(like, regrid_cache, regridder_types)
+
         Returns
         -------
-        a package with the same options as this package, and with all the data-arrays regridded to another discretization,
-        similar to the one used in input argument "target_grid"
+        A package with the same options as this package, and with all the
+        data-arrays regridded to another discretization, similar to the one used
+        in input argument "target_grid"
         """
         try:
             result = deepcopy(self)

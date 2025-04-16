@@ -66,7 +66,7 @@ def riv_dict():
 
 
 def make_dict_unstructured(d):
-    return {key: xu.UgridDataArray.from_structured(value) for key, value in d.items()}
+    return {key: xu.UgridDataArray.from_structured2d(value) for key, value in d.items()}
 
 
 class RivCases:
@@ -401,7 +401,6 @@ def test_validate_false():
     imod.mf6.River(validate=False, **riv_ds.sel(layer=slice(None, None, -1)))
 
 
-@pytest.mark.usefixtures("concentration_fc")
 def test_render_concentration(concentration_fc):
     riv_ds = xr.merge([riv_dict()])
 
@@ -434,7 +433,6 @@ def test_render_concentration(concentration_fc):
     assert actual == expected
 
 
-@pytest.mark.usefixtures("concentration_fc")
 def test_write_concentration_period_data(concentration_fc):
     globaltimes = [np.datetime64("2000-01-01")]
     concentration_fc[:] = 2
@@ -458,7 +456,6 @@ def test_write_concentration_period_data(concentration_fc):
             )  # the number 2 is in the concentration data, and in the cell indices.
 
 
-@pytest.mark.usefixtures("imod5_dataset")
 def test_import_river_from_imod5(imod5_dataset, tmp_path):
     imod5_data = imod5_dataset[0]
     period_data = imod5_dataset[1]
@@ -499,7 +496,6 @@ def test_import_river_from_imod5(imod5_dataset, tmp_path):
     assert len(errors) == 0
 
 
-@pytest.mark.usefixtures("imod5_dataset")
 def test_import_river_from_imod5__negative_layer(imod5_dataset, tmp_path):
     # Arrange
     imod5_data = imod5_dataset[0]
@@ -572,7 +568,6 @@ def test_import_river_from_imod5__negative_layer(imod5_dataset, tmp_path):
     imod5_data["riv-1"] = original_riv_1
 
 
-@pytest.mark.usefixtures("imod5_dataset")
 def test_import_river_from_imod5__infiltration_factors(imod5_dataset):
     imod5_data = imod5_dataset[0]
     period_data = imod5_dataset[1]
@@ -622,7 +617,6 @@ def test_import_river_from_imod5__infiltration_factors(imod5_dataset):
     imod5_data["riv-1"]["infiltration_factor"] = original_infiltration_factor
 
 
-@pytest.mark.usefixtures("imod5_dataset_periods")
 def test_import_river_from_imod5__period_data(imod5_dataset_periods, tmp_path):
     imod5_data = imod5_dataset_periods[0]
     imod5_periods = imod5_dataset_periods[1]

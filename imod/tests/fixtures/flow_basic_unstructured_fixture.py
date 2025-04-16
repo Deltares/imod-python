@@ -9,7 +9,7 @@ import imod
 @pytest.fixture(scope="function")
 def basic_unstructured_dis(basic_dis):
     idomain, top, bottom = basic_dis
-    idomain_ugrid = xu.UgridDataArray.from_structured(idomain)
+    idomain_ugrid = xu.UgridDataArray.from_structured2d(idomain)
     top_mf6 = top.sel(layer=1)  # Top for modlfow 6 shouldn't contain layer dim
 
     return idomain_ugrid, top_mf6, bottom
@@ -18,7 +18,7 @@ def basic_unstructured_dis(basic_dis):
 @pytest.fixture(scope="function")
 def basic_disv__topsystem(basic_dis__topsystem):
     ibound, top, bottom = basic_dis__topsystem
-    idomain_ugrid = xu.UgridDataArray.from_structured(ibound)
+    idomain_ugrid = xu.UgridDataArray.from_structured2d(ibound)
 
     return idomain_ugrid, top, bottom
 

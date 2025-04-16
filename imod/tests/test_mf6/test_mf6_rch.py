@@ -198,7 +198,6 @@ def test_transient_no_layer_dim(rch_dict_transient):
     assert actual == expected
 
 
-@pytest.mark.usefixtures("concentration_fc", "rate_fc")
 def test_render_concentration(concentration_fc, rate_fc):
     rch = imod.mf6.Recharge(
         rate=rate_fc,
@@ -280,7 +279,6 @@ def test_validate_false():
     imod.mf6.Recharge(rate=0.001, validate=False)
 
 
-@pytest.mark.usefixtures("rate_fc", "concentration_fc")
 def test_write_concentration_period_data(rate_fc, concentration_fc):
     globaltimes = np.array(
         [
@@ -330,7 +328,6 @@ def test_clip_box(rch_dict):
     assert selection["rate"].shape == (1, 1)
 
 
-@pytest.mark.usefixtures("imod5_dataset")
 def test_planar_rch_from_imod5_constant(imod5_dataset, tmp_path):
     data = deepcopy(imod5_dataset[0])
     target_discretization = StructuredDiscretization.from_imod5_data(data)
@@ -356,7 +353,6 @@ def test_planar_rch_from_imod5_constant(imod5_dataset, tmp_path):
     data["rch"]["rate"]["layer"].values[0] = 1
 
 
-@pytest.mark.usefixtures("imod5_dataset")
 def test_planar_rch_from_imod5_transient(imod5_dataset, tmp_path):
     data = deepcopy(imod5_dataset[0])
     target_discretization = StructuredDiscretization.from_imod5_data(data)
@@ -387,7 +383,6 @@ def test_planar_rch_from_imod5_transient(imod5_dataset, tmp_path):
     assert "maxbound 33856" in rendered_rch
 
 
-@pytest.mark.usefixtures("imod5_dataset")
 def test_non_planar_rch_from_imod5_constant(imod5_dataset, tmp_path):
     data = deepcopy(imod5_dataset[0])
     target_discretization = StructuredDiscretization.from_imod5_data(data)
@@ -425,7 +420,6 @@ def test_non_planar_rch_from_imod5_constant(imod5_dataset, tmp_path):
     data["rch"]["rate"] = original_rch
 
 
-@pytest.mark.usefixtures("imod5_dataset")
 def test_non_planar_rch_from_imod5_transient(imod5_dataset, tmp_path):
     data = deepcopy(imod5_dataset[0])
     target_discretization = StructuredDiscretization.from_imod5_data(data)
@@ -458,7 +452,6 @@ def test_non_planar_rch_from_imod5_transient(imod5_dataset, tmp_path):
     assert "maxbound 33856" in rendered_rch
 
 
-@pytest.mark.usefixtures("imod5_dataset")
 def test_from_imod5_cap_data(imod5_dataset):
     # Arrange
     data = deepcopy(imod5_dataset[0])

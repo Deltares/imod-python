@@ -188,6 +188,32 @@ def test_disconnected_idomain(idomain_and_bottom):
         assert var == "idomain"
 
 
+def test_misalignment(idomain_and_bottom):
+    """ "Test misalignment of top and idomain throws error."""
+    idomain, bottom = idomain_and_bottom
+
+    nrow = 15
+    ncol = 15
+    shape = (nrow, ncol)
+
+    dx = 5000.0
+    dy = -5000.0
+    offset = dx * ncol + dx
+    xmin = offset
+    xmax = offset + dx * ncol
+    ymin = offset
+    ymax = offset + abs(dy) * nrow
+    dims = ("y", "x")
+
+    y = np.arange(ymax, ymin, dy) + 0.5 * dy
+    x = np.arange(xmin, xmax, dx) + 0.5 * dx
+    coords = {"y": y, "x": x}
+    top = xr.DataArray(np.ones(shape, dtype=np.int8), coords=coords, dims=dims)
+
+    with pytest.raises(ValueError, match="align"):
+        imod.mf6.StructuredDiscretization(top=top, bottom=bottom, idomain=idomain)
+
+
 def test_write_ascii_griddata_2d_3d(idomain_and_bottom, tmp_path):
     idomain, bottom = idomain_and_bottom
     top = xr.full_like(idomain.isel(layer=0), 200.0, dtype=float)
@@ -211,7 +237,6 @@ def test_write_ascii_griddata_2d_3d(idomain_and_bottom, tmp_path):
     assert len(bottom_content) == 1
 
 
-@pytest.mark.usefixtures("imod5_dataset")
 def test_from_imod5_data__idomain_values(imod5_dataset):
     imod5_data = imod5_dataset[0]
 
@@ -225,7 +250,6 @@ def test_from_imod5_data__idomain_values(imod5_dataset):
     assert (dis["idomain"] == 2).sum() == 688329
 
 
-@pytest.mark.usefixtures("imod5_dataset")
 def test_from_imod5_data__grid_extent(imod5_dataset):
     imod5_data = imod5_dataset[0]
 
@@ -244,7 +268,6 @@ def test_from_imod5_data__grid_extent(imod5_dataset):
     assert dis.dataset.coords["x"].max() == 199287.5
 
 
-@pytest.mark.usefixtures("imod5_dataset")
 def test_from_imod5_data__write(imod5_dataset, tmp_path):
     directory = tmp_path / "dis_griddata"
     directory.mkdir()

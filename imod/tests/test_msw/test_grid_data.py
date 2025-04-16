@@ -450,6 +450,16 @@ def test_non_equidistant(grid_data_dict: dict[str, xr.DataArray]):
 
 
 @parametrize_with_cases("grid_data_dict", cases=".")
+def test_clip_box(grid_data_dict: dict[str, xr.DataArray]):
+    grid_data = GridData(**grid_data_dict)
+
+    grid_data_selected = grid_data.clip_box(x_min=1.0, x_max=2.5, y_min=1.0, y_max=2.5)
+
+    expected_area = grid_data_dict["area"].sel(x=slice(1.0, 2.5), y=slice(2.5, 1.0))
+    xr.testing.assert_allclose(grid_data_selected.dataset["area"], expected_area)
+
+
+@parametrize_with_cases("grid_data_dict", cases=".")
 def test_from_imod5_data(grid_data_dict: dict[str, xr.DataArray]):
     cap_data = {}
     cap_data["wetted_area"] = 1 - grid_data_dict["area"].sum(dim="subunit")

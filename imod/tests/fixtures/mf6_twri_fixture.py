@@ -287,7 +287,6 @@ def transient_unconfined_twri_model():
     return simulation
 
 
-@pytest.mark.usefixtures("twri_model")
 @pytest.fixture(scope="function")
 def twri_result(tmpdir_factory):
     # Using a tmpdir_factory is the canonical way of sharing a tempory pytest
@@ -345,7 +344,6 @@ def twri_result_9_drn_in_1_cell(tmpdir_factory):
     return modeldir
 
 
-@pytest.mark.usefixtures("transient_twri_model")
 @pytest.fixture(scope="function")
 def transient_twri_result(tmpdir_factory, transient_twri_model):
     # Using a tmpdir_factory is the canonical way of sharing a tempory pytest
@@ -357,7 +355,6 @@ def transient_twri_result(tmpdir_factory, transient_twri_model):
     return modeldir
 
 
-@pytest.mark.usefixtures("transient_unconfined_twri_model")
 @pytest.fixture(scope="function")
 def transient_unconfined_twri_result(tmpdir_factory, transient_unconfined_twri_model):
     # Using a tmpdir_factory is the canonical way of sharing a tempory pytest
@@ -369,7 +366,6 @@ def transient_unconfined_twri_result(tmpdir_factory, transient_unconfined_twri_m
     return modeldir
 
 
-@pytest.mark.usefixtures("transient_twri_model")
 @pytest.fixture(scope="function")
 def split_transient_twri_model(transient_twri_model):
     active = transient_twri_model["GWF_1"].domain.sel(layer=1)

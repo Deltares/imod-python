@@ -81,7 +81,6 @@ def test_regridded_simulation_has_required_packages(
     assert isinstance(new_simulation["flow"], imod.mf6.GroundwaterFlowModel)
 
 
-@pytest.mark.usefixtures("circle_model")
 def test_regrid_with_custom_method(circle_model):
     simulation = circle_model
     idomain = circle_model["GWF_1"].domain

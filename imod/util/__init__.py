@@ -9,6 +9,7 @@ import warnings
 
 from imod.util.context import cd, ignore_warnings, print_if_error
 from imod.util.path import temporary_directory
+from imod.util.regrid import RegridderType, RegridderWeightsCache
 from imod.util.spatial import (
     coord_reference,
     empty_2d,

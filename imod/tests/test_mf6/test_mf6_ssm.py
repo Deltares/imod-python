@@ -9,7 +9,6 @@ from imod.mf6.ssm import SourceSinkMixing
 from imod.schemata import ValidationError
 
 
-@pytest.mark.usefixtures("flow_model_with_concentration")
 def test_transport_model_rendering(flow_model_with_concentration):
     directory = pathlib.Path("mymodel")
     globaltimes = np.array(["2000-01-01"], dtype="datetime64[ns]")
@@ -28,7 +27,6 @@ def test_transport_model_rendering(flow_model_with_concentration):
     assert actual == expected
 
 
-@pytest.mark.usefixtures("flow_model_with_concentration")
 def test_transport_model_multi_bcs_rendering(flow_model_with_concentration):
     directory = pathlib.Path("mymodel")
     globaltimes = np.array(["2000-01-01"], dtype="datetime64[ns]")
@@ -51,7 +49,6 @@ def test_transport_model_multi_bcs_rendering(flow_model_with_concentration):
     assert actual == expected
 
 
-@pytest.mark.usefixtures("flow_model_with_concentration")
 def test_transport_model_rendering_settings(flow_model_with_concentration):
     directory = pathlib.Path("mymodel")
     globaltimes = np.array(["2000-01-01"], dtype="datetime64[ns]")

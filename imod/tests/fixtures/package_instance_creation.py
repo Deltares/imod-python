@@ -309,9 +309,9 @@ GRIDLESS_PACKAGES = [
 def create_exchange_package() -> list[GWFGWF]:
     cell_id1 = xr.DataArray([[1, 1], [2, 1], [3, 1]])
     cell_id2 = xr.DataArray([[1, 2], [2, 2], [3, 2]])
-    layer = np.array([12, 13, 14])
-    cl1 = np.ones(len(cell_id1))
-    cl2 = np.ones(len(cell_id1))
+    layer = xr.DataArray(np.array([12, 13, 14]))
+    cl1 = xr.DataArray(np.ones(len(cell_id1)))
+    cl2 = xr.DataArray(np.ones(len(cell_id1)))
     hwva = cl1 + cl2
 
     return [

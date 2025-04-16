@@ -70,7 +70,7 @@ def _read_ipf(path, kwargs=None) -> Tuple[pd.DataFrame, int, str]:
 
 
 def _read(path, kwargs=None, assoc_kwargs=None):
-    """
+    r"""
     Read one IPF file to a single pandas.DataFrame, including associated (TXT) files.
 
     Parameters
@@ -123,7 +123,7 @@ def _read(path, kwargs=None, assoc_kwargs=None):
 
 
 def read_associated(path, kwargs={}):
-    """
+    r"""
     Read an IPF associated file (TXT).
 
     Parameters
@@ -221,7 +221,7 @@ def read_associated(path, kwargs={}):
             itype_kwargs["dtype"] = {colnames[0]: np.float64}
         elif itype == 3:  # cpt
             # all columns must be numeric
-            itype_kwargs["dtype"] = {colname: np.float64 for colname in colnames}
+            itype_kwargs["dtype"] = dict.fromkeys(colnames, np.float64)
         elif itype == 4:  # 3D borehole
             # enforce first 3 columns are float
             itype_kwargs["dtype"] = {
@@ -239,7 +239,7 @@ def read_associated(path, kwargs={}):
 
 
 def read(path, kwargs={}, assoc_kwargs={}):
-    """
+    r"""
     Read one or more IPF files to a single pandas.DataFrame, including associated
     (TXT) files.
 

@@ -13,7 +13,6 @@ from imod.mf6.utilities.mf6hfb import merge_hfb_packages
 from imod.prepare.hfb import linestring_to_square_zpolygons
 
 
-@pytest.mark.usefixtures("structured_flow_model")
 @pytest.fixture(scope="function")
 def modellayers_single_layer(structured_flow_model):
     model = structured_flow_model.clip_box(layer_max=1)
@@ -29,7 +28,6 @@ def modellayers_single_layer(structured_flow_model):
     }
 
 
-@pytest.mark.usefixtures("structured_flow_model")
 @pytest.fixture(scope="function")
 def modellayers(structured_flow_model):
     model = structured_flow_model

@@ -195,7 +195,6 @@ def test_write_concentration_period_data(head_fc, concentration_fc):
             )  # the number 2 is in the concentration data, and in the cell indices.
 
 
-@pytest.mark.usefixtures("imod5_dataset")
 def test_from_imod5(imod5_dataset, tmp_path):
     imod5_data = imod5_dataset[0]
 
@@ -216,7 +215,6 @@ def test_from_imod5(imod5_dataset, tmp_path):
     chd3.write("chd3", [1], tmp_path, use_binary=False)
 
 
-@pytest.mark.usefixtures("imod5_dataset")
 def test_from_imod5_shd(imod5_dataset, tmp_path):
     imod5_data = imod5_dataset[0]
 
@@ -236,7 +234,6 @@ def test_from_imod5_shd(imod5_dataset, tmp_path):
 
 @pytest.mark.unittest_jit
 @pytest.mark.parametrize("remove_merged_packages", [True, False])
-@pytest.mark.usefixtures("imod5_dataset")
 def test_concatenate_chd(imod5_dataset, tmp_path, remove_merged_packages):
     # Arrange
     imod5_data = imod5_dataset[0]
