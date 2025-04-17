@@ -73,6 +73,15 @@ def test_render(head):
     assert actual == expected
 
 
+def test_copy(head):
+    chd = imod.mf6.ConstantHead(
+        head, print_input=True, print_flows=True, save_flows=True
+    )
+    chd2 = chd.copy()
+    assert isinstance(chd2, ConstantHead)
+    assert chd2.dataset.equals(chd.dataset)
+
+
 def test_from_file(head, tmp_path):
     directory = pathlib.Path("mymodel")
     globaltimes = np.array(["2000-01-01"], dtype="datetime64[ns]")

@@ -76,6 +76,15 @@ def test_render(idomain_and_bottom):
     assert actual == expected
 
 
+def test_copy(idomain_and_bottom):
+    idomain, bottom = idomain_and_bottom
+
+    dis = imod.mf6.StructuredDiscretization(top=200.0, bottom=bottom, idomain=idomain)
+    dis2 = dis.copy()
+    assert isinstance(dis2, imod.mf6.StructuredDiscretization)
+    assert dis2.dataset.equals(dis.dataset)
+
+
 def test_wrong_dtype(idomain_and_bottom):
     idomain, bottom = idomain_and_bottom
 

@@ -26,6 +26,7 @@ Fixed
   :meth:`imod.mf6.GeneralHeadBoundary.clip_box` threw an error when
   ``time_start`` or ``time_end`` were set to ``None`` and a ``"repeat_stress"``
   was included in the dataset.
+- Fixed bug where :meth:`imod.mf6.package.copy` threw an error.
 - Sorting issue in :func:`imod.prepare.assign_wells`. This could cause
   :class:`imod.mf6.Well` to assign wells to the wrong cells.
 - Fixed crash upon calling :meth:`imod.mf6.Well.clip_box` when the top/bottom
