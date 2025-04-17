@@ -79,6 +79,14 @@ def test_wrong_dtype(idomain_and_bottom):
         )
 
 
+def test_copy(idomain_and_bottom):
+    idomain, bottom = idomain_and_bottom
+    disv = imod.mf6.VerticesDiscretization(top=200.0, bottom=bottom, idomain=idomain)
+    disv2 = disv.copy()
+    assert isinstance(disv2, imod.mf6.VerticesDiscretization)
+    assert disv2.dataset.equals(disv.dataset)
+
+
 def test_zero_thickness_validation(idomain_and_bottom):
     idomain, bottom = idomain_and_bottom
     # Create a bottom array that has constant value of -1 across all layers, so
