@@ -202,7 +202,7 @@ def test_clip_by_grid__structured_grid_clipped(
 
     # Assert
     assert isinstance(wel_clipped, imod.mf6.Well)
-    assert wel_clipped.dataset["rate"].shape == (4,)
+    assert wel_clipped.dataset["rate"].shape == (6,)
     # Test if options are copied
     assert wel_clipped.dataset["print_flows"] == wel.dataset["print_flows"]
 
@@ -244,7 +244,7 @@ def test_clip_by_grid__unstructured_grid_clipped(
 
     # Assert
     assert isinstance(wel_clipped, imod.mf6.Well)
-    assert wel_clipped.dataset["rate"].shape == (4,)
+    assert wel_clipped.dataset["rate"].shape == (6,)
     # Test if options are copied
     assert wel_clipped.dataset["print_flows"] == wel.dataset["print_flows"]
 

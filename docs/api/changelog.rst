@@ -14,6 +14,9 @@ Added
 
 - :meth:`imod.msw.MetaSwapModel.clip_box` to clip MetaSWAP models.
 - Methods of class :class:`imod.mf6.Modflow6Simulation` can now be logged.
+- :func:``imod.prepare.cleanup.cleanup_layered_wel` to clean up wells assigned
+  to layers.
+
 
 Fixed
 ~~~~~
@@ -24,6 +27,11 @@ Fixed
   ``time_start`` or ``time_end`` were set to ``None`` and a ``"repeat_stress"``
   was included in the dataset.
 - Fixed bug where :meth:`imod.mf6.package.copy` threw an error.
+- Sorting issue in :func:`imod.prepare.assign_wells`. This could cause
+  :class:`imod.mf6.Well` to assign wells to the wrong cells.
+- Fixed crash upon calling :meth:`imod.mf6.Well.clip_box` when the top/bottom
+  arguments are specified. This could cause :class:`imod.mf6.Well` to crash
+  when wells are located outside the extent of the layer model.
 
 
 [1.0.0rc2] - 2025-03-05

@@ -6,7 +6,7 @@ import textwrap
 import warnings
 from collections.abc import Iterable
 from datetime import datetime
-from typing import Any, Optional, Tuple, Union, cast
+from typing import Any, Callable, Optional, Tuple, Union, cast
 
 import cftime
 import numpy as np
@@ -37,7 +37,7 @@ from imod.mf6.validation import validation_pkg_error_message
 from imod.mf6.validation_context import ValidationContext
 from imod.mf6.write_context import WriteContext
 from imod.prepare import assign_wells
-from imod.prepare.cleanup import cleanup_wel
+from imod.prepare.cleanup import cleanup_wel, cleanup_wel_layered
 from imod.schemata import (
     AllValueSchema,
     AnyNoDataSchema,
@@ -707,6 +707,41 @@ class GridAgnosticWell(BoundaryCondition, IPointDataPackage, abc.ABC):
 
         return cls(**cls_input)
 
+    def _cleanup(
+        self,
+        dis: StructuredDiscretization | VerticesDiscretization,
+        cleanup_func: Callable,
+        **cleanup_kwargs,
+    ) -> None:
+        # Top and bottom should be forced to grids with a x, y coordinates
+        top, bottom = broadcast_to_full_domain(**dict(dis.dataset.data_vars))
+        # Collect point variable datanames
+        point_varnames = list(self._write_schemata.keys())
+        if "concentration" not in self.dataset.keys():
+            point_varnames.remove("concentration")
+        point_varnames.append("id")
+        # Create dataset with purely point locations
+        point_ds = self.dataset[point_varnames]
+        # Take first item of irrelevant dimensions
+        point_ds = point_ds.isel(time=0, species=0, drop=True, missing_dims="ignore")
+        # Cleanup well dataframe
+        wells = point_ds.to_dataframe()
+        cleaned_wells = cleanup_func(wells, top.isel(layer=0), bottom, **cleanup_kwargs)
+        # Select with ids in cleaned dataframe to drop points outside grid.
+        well_ids = cleaned_wells.index
+        dataset_cleaned = self.dataset.swap_dims({"index": "id"}).sel(id=well_ids)
+        # Assign adjusted screen top and bottom
+        if "screen_top" in cleaned_wells:
+            dataset_cleaned["screen_top"] = cleaned_wells["screen_top"]
+        if "screen_bottom" in cleaned_wells:
+            dataset_cleaned["screen_bottom"] = cleaned_wells["screen_bottom"]
+        # Ensure dtype of id is preserved
+        id_type = self.dataset["id"].dtype
+        dataset_cleaned = dataset_cleaned.swap_dims({"id": "index"}).reset_coords("id")
+        dataset_cleaned["id"] = dataset_cleaned["id"].astype(id_type)
+        # Override dataset
+        self.dataset = dataset_cleaned
+
 
 class Well(GridAgnosticWell):
     """
@@ -943,8 +978,12 @@ class Well(GridAgnosticWell):
 
         ds = new.dataset
 
-        z_max = self._find_well_value_at_layer(ds, top, layer_max)
-        z_min = self._find_well_value_at_layer(ds, bottom, layer_min)
+        z_max, in_bounds_z_max = self._find_well_value_at_layer(ds, top, layer_max)
+        z_min, in_bounds_z_min = self._find_well_value_at_layer(ds, bottom, layer_min)
+
+        # Prior to the actual clipping of z_max/z_min, replace the dataset in case a
+        # spatial selection needs to be done when a spatial grid is present (top/bottom).
+        ds = ds.loc[{"index": in_bounds_z_max & in_bounds_z_min}]
 
         if z_max is not None:
             ds["screen_top"] = ds["screen_top"].clip(None, z_max)
@@ -979,9 +1018,14 @@ class Well(GridAgnosticWell):
                 x=well_dataset["x"].values,
                 y=well_dataset["y"].values,
                 out_of_bounds="ignore",
-            ).drop_vars(lambda x: x.coords)
+            )
+            in_bounds = np.full(well_dataset.sizes["index"], False)
+            in_bounds[value["index"]] = True
+            value = value.drop_vars(lambda x: x.coords)
+        else:
+            in_bounds = np.full(well_dataset.sizes["index"], True)
 
-        return value
+        return value, in_bounds
 
     def _create_wells_df(self) -> pd.DataFrame:
         wells_df = self.dataset.to_dataframe()
@@ -1070,33 +1114,8 @@ class Well(GridAgnosticWell):
         dis: imod.mf6.StructuredDiscretization | imod.mf6.VerticesDiscretization
             Model discretization package.
         """
-        # Top and bottom should be forced to grids with a x, y coordinates
-        top, bottom = broadcast_to_full_domain(**dict(dis.dataset.data_vars))
-        # Collect point variable datanames
-        point_varnames = list(self._write_schemata.keys())
-        if "concentration" not in self.dataset.keys():
-            point_varnames.remove("concentration")
-        point_varnames.append("id")
-        # Create dataset with purely point locations
-        point_ds = self.dataset[point_varnames]
-        # Take first item of irrelevant dimensions
-        point_ds = point_ds.isel(time=0, species=0, drop=True, missing_dims="ignore")
-        # Cleanup well dataframe
-        wells = point_ds.to_dataframe()
         minimum_thickness = float(self.dataset["minimum_thickness"])
-        cleaned_wells = cleanup_wel(wells, top.isel(layer=0), bottom, minimum_thickness)
-        # Select with ids in cleaned dataframe to drop points outside grid.
-        well_ids = cleaned_wells.index
-        dataset_cleaned = self.dataset.swap_dims({"index": "id"}).sel(id=well_ids)
-        # Assign adjusted screen top and bottom
-        dataset_cleaned["screen_top"] = cleaned_wells["screen_top"]
-        dataset_cleaned["screen_bottom"] = cleaned_wells["screen_bottom"]
-        # Ensure dtype of id is preserved
-        id_type = self.dataset["id"].dtype
-        dataset_cleaned = dataset_cleaned.swap_dims({"id": "index"}).reset_coords("id")
-        dataset_cleaned["id"] = dataset_cleaned["id"].astype(id_type)
-        # Override dataset
-        self.dataset = dataset_cleaned
+        self._cleanup(dis, cleanup_wel, minimum_thickness=minimum_thickness)
 
 
 class LayeredWell(GridAgnosticWell):
@@ -1394,6 +1413,18 @@ class LayeredWell(GridAgnosticWell):
         """
         data = well_from_imod5_cap_data(imod5_data)
         return cls(**data)  # type: ignore
+
+    @standard_log_decorator()
+    def cleanup(self, dis: StructuredDiscretization | VerticesDiscretization):
+        """
+        Clean up package inplace. This method calls
+        :func:`imod.prepare.cleanup_wel_layered`, see documentation of that
+        function for details on cleanup.
+
+        dis: imod.mf6.StructuredDiscretization | imod.mf6.VerticesDiscretization
+            Model discretization package.
+        """
+        self._cleanup(dis, cleanup_wel_layered)
 
 
 class WellDisStructured(DisStructuredBoundaryCondition):

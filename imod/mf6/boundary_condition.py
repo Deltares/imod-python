@@ -127,8 +127,7 @@ class BoundaryCondition(Package, abc.ABC):
         fields = struct_array.dtype.fields
         fmt = [self._number_format(field[0]) for field in fields.values()]
         header = " ".join(list(fields.keys()))
-        with open(outpath, "w") as f:
-            np.savetxt(fname=f, X=struct_array, fmt=fmt, header=header)
+        np.savetxt(fname=outpath, X=struct_array, fmt=fmt, header=header)
 
     def _write_datafile(self, outpath, ds, binary):
         """
@@ -183,7 +182,9 @@ class BoundaryCondition(Package, abc.ABC):
 
         return recarr
 
-    def _period_paths(self, directory, pkgname, globaltimes, bin_ds, binary):
+    def _period_paths(
+        self, directory: pathlib.Path | str, pkgname: str, globaltimes, bin_ds, binary
+    ):
         directory = pathlib.Path(directory) / pkgname
 
         if binary:
@@ -191,10 +192,12 @@ class BoundaryCondition(Package, abc.ABC):
         else:
             ext = "dat"
 
-        periods = {}
+        periods: dict[np.int64, str] = {}
+        # Force to np.int64 for mypy and numpy >= 2.2.4
+        one = np.int64(1)
         if "time" in bin_ds:  # one of bin_ds has time
             package_times = bin_ds.coords["time"].values
-            starts = np.searchsorted(globaltimes, package_times) + 1
+            starts = np.searchsorted(globaltimes, package_times) + one
             for i, start in enumerate(starts):
                 path = directory / f"{self._pkg_id}-{i}.{ext}"
                 periods[start] = path.as_posix()
@@ -203,15 +206,15 @@ class BoundaryCondition(Package, abc.ABC):
             if repeat_stress is not None and repeat_stress.values[()] is not None:
                 keys = repeat_stress.isel(repeat_items=0).values
                 values = repeat_stress.isel(repeat_items=1).values
-                repeat_starts = np.searchsorted(globaltimes, keys) + 1
-                values_index = np.searchsorted(globaltimes, values) + 1
-                for i, start in zip(values_index, repeat_starts):
-                    periods[start] = periods[i]
+                repeat_starts = np.searchsorted(globaltimes, keys) + one
+                values_index = np.searchsorted(globaltimes, values) + one
+                for j, start_repeat in zip(values_index, repeat_starts):
+                    periods[start_repeat] = periods[j]
                 # Now make sure the periods are sorted by key.
                 periods = dict(sorted(periods.items()))
         else:
             path = directory / f"{self._pkg_id}.{ext}"
-            periods[1] = path.as_posix()
+            periods[one] = path.as_posix()
 
         return periods
 
