@@ -14,9 +14,11 @@
    .. autosummary::
    
       ~Infiltration.__init__
+      ~Infiltration.clip_box
       ~Infiltration.from_imod5_data
       ~Infiltration.get_non_grid_data
       ~Infiltration.get_regrid_methods
+      ~Infiltration.is_clipping_supported
       ~Infiltration.is_regridding_supported
       ~Infiltration.isel
       ~Infiltration.regrid_like

@@ -14,9 +14,11 @@
    .. autosummary::
    
       ~AnnualCropFactors.__init__
+      ~AnnualCropFactors.clip_box
       ~AnnualCropFactors.from_imod5_data
       ~AnnualCropFactors.get_non_grid_data
       ~AnnualCropFactors.get_regrid_methods
+      ~AnnualCropFactors.is_clipping_supported
       ~AnnualCropFactors.is_regridding_supported
       ~AnnualCropFactors.isel
       ~AnnualCropFactors.regrid_like

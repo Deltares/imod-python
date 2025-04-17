@@ -14,10 +14,12 @@
    .. autosummary::
    
       ~GridData.__init__
+      ~GridData.clip_box
       ~GridData.from_imod5_data
       ~GridData.generate_index_array
       ~GridData.get_non_grid_data
       ~GridData.get_regrid_methods
+      ~GridData.is_clipping_supported
       ~GridData.is_regridding_supported
       ~GridData.isel
       ~GridData.regrid_like

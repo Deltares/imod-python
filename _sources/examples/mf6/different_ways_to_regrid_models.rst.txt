@@ -35,8 +35,8 @@ regridding method for the horizontal conductivity field
 
 .. GENERATED FROM PYTHON SOURCE LINES 20-22
 
-We'll start with the usual imports. As this is an simple (synthetic)
-structured model, we can make due with few packages.
+We'll start with the usual imports. As this is a simple (synthetic)
+structured model, we can make do with few packages.
 
 .. GENERATED FROM PYTHON SOURCE LINES 22-32
 
@@ -61,7 +61,7 @@ structured model, we can make due with few packages.
 
 .. GENERATED FROM PYTHON SOURCE LINES 33-35
 
-Now we create the twri simulation itself. It yields a simulation of a flow problem, with a grid of 3 layers and 15 cells in both x and y directions.
+Now we create the TWRI simulation itself. It yields a simulation of a flow problem, with a grid of 3 layers and 15 cells in both x and y directions.
 To better illustrate the regridding, we replace the K field with a lognormal random K field. The original k-field is a constant per layer.
 
 .. GENERATED FROM PYTHON SOURCE LINES 35-42
@@ -107,15 +107,15 @@ Let's plot the k-field. This is going to be the input for the regridder, and the
  .. code-block:: none
 
 
-    <matplotlib.collections.QuadMesh object at 0x000002A04C44B850>
+    <matplotlib.collections.QuadMesh object at 0x000001568E6CD110>
 
 
 
 .. GENERATED FROM PYTHON SOURCE LINES 48-51
 
 Now we create a new grid for this simulation. It has 3 layers,  45 rows and 20 columns.
-The length of the domain is slightly different from the input grid. That had a coordinate difference between the first and last cellcentre on the
-x axis and y axis of  15*5000 = 75000 on both axes, but the new grid that is  75020 on the x axis and  75015 on the y axis
+The length of the domain is slightly different from the input grid. That had a coordinate difference between the first and last cell centre on the
+x axis and y axis of  15*5000 = 75000 on both axes, but the new grid that is  75020 on the x axis and  75015 on the y axis.
 
 .. GENERATED FROM PYTHON SOURCE LINES 51-71
 
@@ -150,7 +150,7 @@ x axis and y axis of  15*5000 = 75000 on both axes, but the new grid that is  75
 
 .. GENERATED FROM PYTHON SOURCE LINES 72-76
 
-A first way to regrid the twri model is to regrid the whole simulation object. This is the most straightforward method,
+A first way to regrid the TWRI model is to regrid the whole simulation object. This is the most straightforward method,
 and it uses default regridding methods for each input field. To see which ones are used, look at the _regrid_method
 class attribute of the relevant package. For example the _regrid_method attribute  of the NodePropertyFlow package
 specifies that field "k" uses an OVERLAP regridder in combination with the averaging function "geometric_mean".
@@ -193,13 +193,13 @@ Let's plot the k-field. This is the regridded output, and it should should somew
  .. code-block:: none
 
 
-    <matplotlib.collections.QuadMesh object at 0x000002A04BDE2410>
+    <matplotlib.collections.QuadMesh object at 0x00000156937EB810>
 
 
 
 .. GENERATED FROM PYTHON SOURCE LINES 84-85
 
-A second way to regrid  twri  is to regrid the groundwater flow model.
+A second way to regrid TWRI is to regrid the groundwater flow model.
 
 .. GENERATED FROM PYTHON SOURCE LINES 85-94
 
@@ -228,7 +228,7 @@ A second way to regrid  twri  is to regrid the groundwater flow model.
  .. code-block:: none
 
 
-    <matplotlib.collections.QuadMesh object at 0x000002A04BE40DD0>
+    <matplotlib.collections.QuadMesh object at 0x0000015693796110>
 
 
 
@@ -274,14 +274,14 @@ because initializing a regridder is costly.
  .. code-block:: none
 
 
-    <matplotlib.collections.QuadMesh object at 0x000002A04BE95890>
+    <matplotlib.collections.QuadMesh object at 0x0000015692DB7F10>
 
 
 
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** (0 minutes 19.250 seconds)
+   **Total running time of the script:** (0 minutes 19.484 seconds)
 
 
 .. _sphx_glr_download_examples_mf6_different_ways_to_regrid_models.py:

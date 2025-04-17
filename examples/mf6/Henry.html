@@ -8,7 +8,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>Henry &#8212; iMOD Python 1.0.0rc2 documentation</title>
+    <title>Henry &#8212; iMOD Python 1.0.0rc3 documentation</title>
   
   
   
@@ -42,7 +42,7 @@
   <link rel="preload" as="script" href="../../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
 <link rel="preload" as="script" href="../../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
 
-    <script src="../../_static/documentation_options.js?v=40394f06"></script>
+    <script src="../../_static/documentation_options.js?v=e441cb1f"></script>
     <script src="../../_static/doctools.js?v=9bcbadda"></script>
     <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script>DOCUMENTATION_OPTIONS.pagename = 'examples/mf6/Henry';</script>
@@ -53,7 +53,7 @@
     <link rel="prev" title="MODFLOW6" href="index.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
-  <meta name="docsearch:version" content="1.0.0rc2.dev" />
+  <meta name="docsearch:version" content="1.0.0rc3.dev" />
   </head>
   
   
@@ -117,8 +117,8 @@
     
     
     
-    <img src="../../_static/imod-python-logo-light.svg" class="logo__image only-light" alt="iMOD Python 1.0.0rc2 documentation - Home"/>
-    <img src="../../_static/imod-python-logo-dark.svg" class="logo__image only-dark pst-js-only" alt="iMOD Python 1.0.0rc2 documentation - Home"/>
+    <img src="../../_static/imod-python-logo-light.svg" class="logo__image only-light" alt="iMOD Python 1.0.0rc3 documentation - Home"/>
+    <img src="../../_static/imod-python-logo-dark.svg" class="logo__image only-dark pst-js-only" alt="iMOD Python 1.0.0rc3 documentation - Home"/>
   
   
 </a></div>
@@ -530,7 +530,7 @@ represented by a General Head Boundary package.</p>
 </pre></div>
 </div>
 <p>We’ll start with the usual imports. As this is a simple (synthetic)
-structured model, we can make due with few packages.</p>
+structured model, we can make do with few packages.</p>
 <div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">pandas</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">pd</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">xarray</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">xr</span>
@@ -686,7 +686,7 @@ provided in the flow model.</p>
 <span class="n">gwt_model</span><span class="p">[</span><span class="s2">&quot;dis&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">gwf_model</span><span class="p">[</span><span class="s2">&quot;dis&quot;</span><span class="p">]</span>
 </pre></div>
 </div>
-<p>now let’s define a simulation using the flow and transport models.</p>
+<p>Now let’s define a simulation using the flow and transport models.</p>
 <div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="c1"># Attach it to a simulation</span>
 <span class="n">simulation</span> <span class="o">=</span> <span class="n">imod</span><span class="o">.</span><span class="n">mf6</span><span class="o">.</span><span class="n">Modflow6Simulation</span><span class="p">(</span><span class="s2">&quot;henry&quot;</span><span class="p">)</span>
 
@@ -767,7 +767,7 @@ describes how to add it to yours.</p>
 <div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="n">head</span><span class="o">.</span><span class="n">isel</span><span class="p">(</span><span class="n">y</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">time</span><span class="o">=-</span><span class="mi">1</span><span class="p">)</span><span class="o">.</span><span class="n">plot</span><span class="o">.</span><span class="n">contourf</span><span class="p">(</span><span class="n">yincrease</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
 </pre></div>
 </div>
-<img src="../../_images/sphx_glr_Henry_001.png" srcset="../../_images/sphx_glr_Henry_001.png" alt="y = 0.5, dx = 0.025, dy = -1.0, time = 0.5" class = "sphx-glr-single-img"/><div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>&lt;matplotlib.contour.QuadContourSet object at 0x000002A053388310&gt;
+<img src="../../_images/sphx_glr_Henry_001.png" srcset="../../_images/sphx_glr_Henry_001.png" alt="y = 0.5, dx = 0.025, dy = -1.0, time = 0.5" class = "sphx-glr-single-img"/><div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>&lt;matplotlib.contour.QuadContourSet object at 0x000001569A15FAD0&gt;
 </pre></div>
 </div>
 <p>We can check the concentration to see that a fresh-saline interface has been
@@ -775,10 +775,10 @@ formed:</p>
 <div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="n">conc</span><span class="o">.</span><span class="n">isel</span><span class="p">(</span><span class="n">y</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">time</span><span class="o">=-</span><span class="mi">1</span><span class="p">)</span><span class="o">.</span><span class="n">plot</span><span class="o">.</span><span class="n">contourf</span><span class="p">(</span><span class="n">yincrease</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">cmap</span><span class="o">=</span><span class="s2">&quot;RdYlBu_r&quot;</span><span class="p">)</span>
 </pre></div>
 </div>
-<img src="../../_images/sphx_glr_Henry_002.png" srcset="../../_images/sphx_glr_Henry_002.png" alt="y = 0.5, dx = 0.025, dy = -1.0, time = 0.5" class = "sphx-glr-single-img"/><div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>&lt;matplotlib.contour.QuadContourSet object at 0x000002A04CB0C810&gt;
+<img src="../../_images/sphx_glr_Henry_002.png" srcset="../../_images/sphx_glr_Henry_002.png" alt="y = 0.5, dx = 0.025, dy = -1.0, time = 0.5" class = "sphx-glr-single-img"/><div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>&lt;matplotlib.contour.QuadContourSet object at 0x000001569A004C50&gt;
 </pre></div>
 </div>
-<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> (1 minutes 3.438 seconds)</p>
+<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> (0 minutes 59.257 seconds)</p>
 <div class="sphx-glr-footer sphx-glr-footer-example docutils container" id="sphx-glr-download-examples-mf6-henry-py">
 <div class="sphx-glr-download sphx-glr-download-jupyter docutils container">
 <p><a class="reference download internal" download="" href="../../_downloads/2a9f5616bdf35c8e78b3214ec7e10034/Henry.ipynb"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Jupyter</span> <span class="pre">notebook:</span> <span class="pre">Henry.ipynb</span></code></a></p>
@@ -890,7 +890,7 @@ formed:</p>
         <div class="footer-item">
 
   <p class="sphinx-version">
-    Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 8.2.1.
+    Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 8.2.3.
     <br/>
   </p>
 </div>

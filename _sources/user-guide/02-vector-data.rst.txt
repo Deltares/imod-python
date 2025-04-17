@@ -545,7 +545,7 @@ intersections, spatial joins, or plotting.
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** (0 minutes 1.753 seconds)
+   **Total running time of the script:** (0 minutes 1.288 seconds)
 
 
 .. _sphx_glr_download_user-guide_02-vector-data.py:

@@ -7,7 +7,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>imod.msw.model &#8212; iMOD Python 1.0.0rc2 documentation</title>
+    <title>imod.msw.model &#8212; iMOD Python 1.0.0rc3 documentation</title>
   
   
   
@@ -41,7 +41,7 @@
   <link rel="preload" as="script" href="../../../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
 <link rel="preload" as="script" href="../../../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
 
-    <script src="../../../_static/documentation_options.js?v=40394f06"></script>
+    <script src="../../../_static/documentation_options.js?v=e441cb1f"></script>
     <script src="../../../_static/doctools.js?v=9bcbadda"></script>
     <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script>DOCUMENTATION_OPTIONS.pagename = '_modules/imod/msw/model';</script>
@@ -50,7 +50,7 @@
     <link rel="search" title="Search" href="../../../search.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
-  <meta name="docsearch:version" content="1.0.0rc2.dev" />
+  <meta name="docsearch:version" content="1.0.0rc3.dev" />
   </head>
   
   
@@ -114,8 +114,8 @@
     
     
     
-    <img src="../../../_static/imod-python-logo-light.svg" class="logo__image only-light" alt="iMOD Python 1.0.0rc2 documentation - Home"/>
-    <img src="../../../_static/imod-python-logo-dark.svg" class="logo__image only-dark pst-js-only" alt="iMOD Python 1.0.0rc2 documentation - Home"/>
+    <img src="../../../_static/imod-python-logo-light.svg" class="logo__image only-light" alt="iMOD Python 1.0.0rc3 documentation - Home"/>
+    <img src="../../../_static/imod-python-logo-dark.svg" class="logo__image only-dark pst-js-only" alt="iMOD Python 1.0.0rc3 documentation - Home"/>
   
   
 </a></div>
@@ -433,10 +433,12 @@
 <span class="kn">from</span><span class="w"> </span><span class="nn">pathlib</span><span class="w"> </span><span class="kn">import</span> <span class="n">Path</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Any</span><span class="p">,</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">Tuple</span><span class="p">,</span> <span class="n">Union</span><span class="p">,</span> <span class="n">cast</span>
 
+<span class="kn">import</span><span class="w"> </span><span class="nn">cftime</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">jinja2</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">xarray</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">xr</span>
 
+<span class="kn">from</span><span class="w"> </span><span class="nn">imod.common.utilities.value_filters</span><span class="w"> </span><span class="kn">import</span> <span class="n">enforce_scalar</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">imod.mf6.dis</span><span class="w"> </span><span class="kn">import</span> <span class="n">StructuredDiscretization</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">imod.mf6.mf6_wel_adapter</span><span class="w"> </span><span class="kn">import</span> <span class="n">Mf6Wel</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">imod.msw.copy_files</span><span class="w"> </span><span class="kn">import</span> <span class="n">FileCopier</span>
@@ -452,7 +454,11 @@
 <span class="p">)</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">imod.msw.landuse</span><span class="w"> </span><span class="kn">import</span> <span class="n">LanduseOptions</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">imod.msw.meteo_grid</span><span class="w"> </span><span class="kn">import</span> <span class="n">MeteoGrid</span><span class="p">,</span> <span class="n">MeteoGridCopy</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">imod.msw.meteo_mapping</span><span class="w"> </span><span class="kn">import</span> <span class="n">EvapotranspirationMapping</span><span class="p">,</span> <span class="n">PrecipitationMapping</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">imod.msw.meteo_mapping</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
+    <span class="n">EvapotranspirationMapping</span><span class="p">,</span>
+    <span class="n">MeteoMapping</span><span class="p">,</span>
+    <span class="n">PrecipitationMapping</span><span class="p">,</span>
+<span class="p">)</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">imod.msw.output_control</span><span class="w"> </span><span class="kn">import</span> <span class="n">TimeOutputControl</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">imod.msw.ponding</span><span class="w"> </span><span class="kn">import</span> <span class="n">Ponding</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">imod.msw.scaling_factors</span><span class="w"> </span><span class="kn">import</span> <span class="n">ScalingFactors</span>
@@ -647,8 +653,8 @@
 
         <span class="n">year</span><span class="p">,</span> <span class="n">time_since_start_year</span> <span class="o">=</span> <span class="n">to_metaswap_timeformat</span><span class="p">([</span><span class="n">starttime</span><span class="p">])</span>
 
-        <span class="n">year</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">year</span><span class="o">.</span><span class="n">values</span><span class="p">)</span>
-        <span class="n">time_since_start_year</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">time_since_start_year</span><span class="o">.</span><span class="n">values</span><span class="p">)</span>
+        <span class="n">year</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">enforce_scalar</span><span class="p">(</span><span class="n">year</span><span class="o">.</span><span class="n">values</span><span class="p">))</span>
+        <span class="n">time_since_start_year</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">enforce_scalar</span><span class="p">(</span><span class="n">time_since_start_year</span><span class="o">.</span><span class="n">values</span><span class="p">))</span>
 
         <span class="k">return</span> <span class="n">year</span><span class="p">,</span> <span class="n">time_since_start_year</span>
 
@@ -767,6 +773,72 @@
         <span class="k">return</span> <span class="n">regridded_model</span></div>
 
 
+<div class="viewcode-block" id="MetaSwapModel.clip_box">
+<a class="viewcode-back" href="../../../api/generated/msw/imod.msw.MetaSwapModel.clip_box.html#imod.msw.MetaSwapModel.clip_box">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">clip_box</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">time_min</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">cftime</span><span class="o">.</span><span class="n">datetime</span> <span class="o">|</span> <span class="n">np</span><span class="o">.</span><span class="n">datetime64</span> <span class="o">|</span> <span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">time_max</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">cftime</span><span class="o">.</span><span class="n">datetime</span> <span class="o">|</span> <span class="n">np</span><span class="o">.</span><span class="n">datetime64</span> <span class="o">|</span> <span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">x_min</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">float</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">x_max</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">float</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">y_min</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">float</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">y_max</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">float</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="s2">&quot;MetaSwapModel&quot;</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Clip a model by a bounding box (time, y, x). If a package of type</span>
+<span class="sd">        :class:`imod.msw.MeteoGridCopy` is present, packages of type</span>
+<span class="sd">        :class:`imod.msw.PrecipitationMapping` and</span>
+<span class="sd">        :class:`imod.msw.EvapotranspirationMapping` will not be clipped.</span>
+<span class="sd">        Otherwise incorrect mappings to meteo grids referenced in</span>
+<span class="sd">        ``mete_grid.inp`` copied by :class:`imod.msw.MeteoGridCopy` would be</span>
+<span class="sd">        computed.</span>
+
+<span class="sd">        Slicing intervals may be half-bounded, by providing None:</span>
+
+<span class="sd">        * To select 500.0 &lt;= x &lt;= 1000.0:</span>
+<span class="sd">          ``clip_box(x_min=500.0, x_max=1000.0)``.</span>
+<span class="sd">        * To select x &lt;= 1000.0: ``clip_box(x_min=None, x_max=1000.0)``</span>
+<span class="sd">          or ``clip_box(x_max=1000.0)``.</span>
+<span class="sd">        * To select x &gt;= 500.0: ``clip_box(x_min = 500.0, x_max=None.0)``</span>
+<span class="sd">          or ``clip_box(x_min=1000.0)``.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        time_min: optional</span>
+<span class="sd">        time_max: optional</span>
+<span class="sd">        x_min: optional, float</span>
+<span class="sd">        x_max: optional, float</span>
+<span class="sd">        y_min: optional, float</span>
+<span class="sd">        y_max: optional, float</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        MetaSwapModel</span>
+<span class="sd">            Clipped model.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">settings</span> <span class="o">=</span> <span class="n">deepcopy</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">simulation_settings</span><span class="p">)</span>
+        <span class="n">unsa_svat_path</span> <span class="o">=</span> <span class="n">settings</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s2">&quot;unsa_svat_path&quot;</span><span class="p">)</span>
+
+        <span class="n">has_meteogrid_copy</span> <span class="o">=</span> <span class="n">MeteoGridCopy</span> <span class="ow">in</span> <span class="p">[</span><span class="nb">type</span><span class="p">(</span><span class="n">pkg</span><span class="p">)</span> <span class="k">for</span> <span class="n">pkg</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">values</span><span class="p">()]</span>
+        <span class="n">clipped</span> <span class="o">=</span> <span class="nb">type</span><span class="p">(</span><span class="bp">self</span><span class="p">)(</span><span class="n">unsa_svat_path</span><span class="p">,</span> <span class="n">settings</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">key</span><span class="p">,</span> <span class="n">pkg</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+            <span class="c1"># Skip clipping MeteoMapping if MeteoGridCopy is present, as meteo</span>
+            <span class="c1"># grid is independent of model grid and we do not want to perform</span>
+            <span class="c1"># transformations on meteo data in this case.</span>
+            <span class="k">if</span> <span class="n">has_meteogrid_copy</span> <span class="ow">and</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">pkg</span><span class="p">,</span> <span class="n">MeteoMapping</span><span class="p">):</span>
+                <span class="n">clipped</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="n">deepcopy</span><span class="p">(</span><span class="n">pkg</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">clipped</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="n">pkg</span><span class="o">.</span><span class="n">clip_box</span><span class="p">(</span>
+                    <span class="n">time_min</span><span class="o">=</span><span class="n">time_min</span><span class="p">,</span>
+                    <span class="n">time_max</span><span class="o">=</span><span class="n">time_max</span><span class="p">,</span>
+                    <span class="n">x_min</span><span class="o">=</span><span class="n">x_min</span><span class="p">,</span>
+                    <span class="n">x_max</span><span class="o">=</span><span class="n">x_max</span><span class="p">,</span>
+                    <span class="n">y_min</span><span class="o">=</span><span class="n">y_min</span><span class="p">,</span>
+                    <span class="n">y_max</span><span class="o">=</span><span class="n">y_max</span><span class="p">,</span>
+                <span class="p">)</span>
+        <span class="k">return</span> <span class="n">clipped</span></div>
+
+
 <div class="viewcode-block" id="MetaSwapModel.from_imod5_data">
 <a class="viewcode-back" href="../../../api/generated/msw/imod.msw.MetaSwapModel.from_imod5_data.html#imod.msw.MetaSwapModel.from_imod5_data">[docs]</a>
     <span class="nd">@classmethod</span>
@@ -883,7 +955,7 @@
         <div class="footer-item">
 
   <p class="sphinx-version">
-    Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 8.2.1.
+    Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 8.2.3.
     <br/>
   </p>
 </div>

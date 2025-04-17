@@ -14,9 +14,11 @@
    .. autosummary::
    
       ~InitialConditionsEquilibrium.__init__
+      ~InitialConditionsEquilibrium.clip_box
       ~InitialConditionsEquilibrium.from_imod5_data
       ~InitialConditionsEquilibrium.get_non_grid_data
       ~InitialConditionsEquilibrium.get_regrid_methods
+      ~InitialConditionsEquilibrium.is_clipping_supported
       ~InitialConditionsEquilibrium.is_regridding_supported
       ~InitialConditionsEquilibrium.isel
       ~InitialConditionsEquilibrium.regrid_like

@@ -14,9 +14,11 @@
    .. autosummary::
    
       ~InitialConditionsPercolation.__init__
+      ~InitialConditionsPercolation.clip_box
       ~InitialConditionsPercolation.from_imod5_data
       ~InitialConditionsPercolation.get_non_grid_data
       ~InitialConditionsPercolation.get_regrid_methods
+      ~InitialConditionsPercolation.is_clipping_supported
       ~InitialConditionsPercolation.is_regridding_supported
       ~InitialConditionsPercolation.isel
       ~InitialConditionsPercolation.regrid_like

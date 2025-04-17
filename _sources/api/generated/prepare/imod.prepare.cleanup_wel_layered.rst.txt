@@ -1,0 +1,6 @@
+﻿imod.prepare.cleanup\_wel\_layered
+==================================
+
+.. currentmodule:: imod.prepare
+
+.. autofunction:: cleanup_wel_layered

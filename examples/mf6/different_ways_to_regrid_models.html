@@ -8,7 +8,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>Different ways to regrid models &#8212; iMOD Python 1.0.0rc2 documentation</title>
+    <title>Different ways to regrid models &#8212; iMOD Python 1.0.0rc3 documentation</title>
   
   
   
@@ -42,7 +42,7 @@
   <link rel="preload" as="script" href="../../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
 <link rel="preload" as="script" href="../../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
 
-    <script src="../../_static/documentation_options.js?v=40394f06"></script>
+    <script src="../../_static/documentation_options.js?v=e441cb1f"></script>
     <script src="../../_static/doctools.js?v=9bcbadda"></script>
     <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script>DOCUMENTATION_OPTIONS.pagename = 'examples/mf6/different_ways_to_regrid_models';</script>
@@ -53,7 +53,7 @@
     <link rel="prev" title="Freshwater lens (circle)" href="circle_transport.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
-  <meta name="docsearch:version" content="1.0.0rc2.dev" />
+  <meta name="docsearch:version" content="1.0.0rc3.dev" />
   </head>
   
   
@@ -117,8 +117,8 @@
     
     
     
-    <img src="../../_static/imod-python-logo-light.svg" class="logo__image only-light" alt="iMOD Python 1.0.0rc2 documentation - Home"/>
-    <img src="../../_static/imod-python-logo-dark.svg" class="logo__image only-dark pst-js-only" alt="iMOD Python 1.0.0rc2 documentation - Home"/>
+    <img src="../../_static/imod-python-logo-light.svg" class="logo__image only-light" alt="iMOD Python 1.0.0rc3 documentation - Home"/>
+    <img src="../../_static/imod-python-logo-dark.svg" class="logo__image only-dark pst-js-only" alt="iMOD Python 1.0.0rc3 documentation - Home"/>
   
   
 </a></div>
@@ -513,8 +513,8 @@ default regridding methods for each field in each package
 ** second, we show how a model within a simulation can be regridded, also using default regridding methods
 ** third, we show how regridding can be done package per package. We illustrate that for one package, and we use a non-default
 regridding method for the horizontal conductivity field</p>
-<p>We’ll start with the usual imports. As this is an simple (synthetic)
-structured model, we can make due with few packages.</p>
+<p>We’ll start with the usual imports. As this is a simple (synthetic)
+structured model, we can make do with few packages.</p>
 <div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">matplotlib.pyplot</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">plt</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">xarray</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">xr</span>
@@ -525,7 +525,7 @@ structured model, we can make due with few packages.</p>
 <span class="kn">from</span><span class="w"> </span><span class="nn">imod.util.regrid</span><span class="w"> </span><span class="kn">import</span> <span class="n">RegridderWeightsCache</span>
 </pre></div>
 </div>
-<p>Now we create the twri simulation itself. It yields a simulation of a flow problem, with a grid of 3 layers and 15 cells in both x and y directions.
+<p>Now we create the TWRI simulation itself. It yields a simulation of a flow problem, with a grid of 3 layers and 15 cells in both x and y directions.
 To better illustrate the regridding, we replace the K field with a lognormal random K field. The original k-field is a constant per layer.</p>
 <div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="n">simulation</span> <span class="o">=</span> <span class="n">create_twri_simulation</span><span class="p">()</span>
 
@@ -540,12 +540,12 @@ To better illustrate the regridding, we replace the K field with a lognormal ran
 <span class="n">heterogeneous_k</span><span class="o">.</span><span class="n">sel</span><span class="p">(</span><span class="n">layer</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">y</span><span class="o">=</span><span class="s2">&quot;y&quot;</span><span class="p">,</span> <span class="n">yincrease</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="n">ax</span><span class="p">)</span>
 </pre></div>
 </div>
-<img src="../../_images/sphx_glr_different_ways_to_regrid_models_001.png" srcset="../../_images/sphx_glr_different_ways_to_regrid_models_001.png" alt="layer = 1, dx = 5e+03, dy = -5e+03" class = "sphx-glr-single-img"/><div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>&lt;matplotlib.collections.QuadMesh object at 0x000002A04C44B850&gt;
+<img src="../../_images/sphx_glr_different_ways_to_regrid_models_001.png" srcset="../../_images/sphx_glr_different_ways_to_regrid_models_001.png" alt="layer = 1, dx = 5e+03, dy = -5e+03" class = "sphx-glr-single-img"/><div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>&lt;matplotlib.collections.QuadMesh object at 0x000001568E6CD110&gt;
 </pre></div>
 </div>
 <p>Now we create a new grid for this simulation. It has 3 layers,  45 rows and 20 columns.
-The length of the domain is slightly different from the input grid. That had a coordinate difference between the first and last cellcentre on the
-x axis and y axis of  15*5000 = 75000 on both axes, but the new grid that is  75020 on the x axis and  75015 on the y axis</p>
+The length of the domain is slightly different from the input grid. That had a coordinate difference between the first and last cell centre on the
+x axis and y axis of  15*5000 = 75000 on both axes, but the new grid that is  75020 on the x axis and  75015 on the y axis.</p>
 <div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="n">nlay</span> <span class="o">=</span> <span class="mi">3</span>
 <span class="n">nrow</span> <span class="o">=</span> <span class="mi">21</span>
 <span class="n">ncol</span> <span class="o">=</span> <span class="mi">12</span>
@@ -566,7 +566,7 @@ x axis and y axis of  15*5000 = 75000 on both axes, but the new grid that is  75
 <span class="n">target_grid</span> <span class="o">=</span> <span class="n">xr</span><span class="o">.</span><span class="n">DataArray</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">ones</span><span class="p">(</span><span class="n">shape</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">int</span><span class="p">),</span> <span class="n">coords</span><span class="o">=</span><span class="n">coords</span><span class="p">,</span> <span class="n">dims</span><span class="o">=</span><span class="n">dims</span><span class="p">)</span>
 </pre></div>
 </div>
-<p>A first way to regrid the twri model is to regrid the whole simulation object. This is the most straightforward method,
+<p>A first way to regrid the TWRI model is to regrid the whole simulation object. This is the most straightforward method,
 and it uses default regridding methods for each input field. To see which ones are used, look at the _regrid_method
 class attribute of the relevant package. For example the _regrid_method attribute  of the NodePropertyFlow package
 specifies that field “k” uses an OVERLAP regridder in combination with the averaging function “geometric_mean”.</p>
@@ -579,10 +579,10 @@ specifies that field “k” uses an OVERLAP regridder in combination with the a
 <span class="n">regridded_k_1</span><span class="o">.</span><span class="n">sel</span><span class="p">(</span><span class="n">layer</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">y</span><span class="o">=</span><span class="s2">&quot;y&quot;</span><span class="p">,</span> <span class="n">yincrease</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="n">ax</span><span class="p">)</span>
 </pre></div>
 </div>
-<img src="../../_images/sphx_glr_different_ways_to_regrid_models_002.png" srcset="../../_images/sphx_glr_different_ways_to_regrid_models_002.png" alt="layer = 1, dx = 6251, dy = -3572" class = "sphx-glr-single-img"/><div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>&lt;matplotlib.collections.QuadMesh object at 0x000002A04BDE2410&gt;
+<img src="../../_images/sphx_glr_different_ways_to_regrid_models_002.png" srcset="../../_images/sphx_glr_different_ways_to_regrid_models_002.png" alt="layer = 1, dx = 6251, dy = -3572" class = "sphx-glr-single-img"/><div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>&lt;matplotlib.collections.QuadMesh object at 0x00000156937EB810&gt;
 </pre></div>
 </div>
-<p>A second way to regrid  twri  is to regrid the groundwater flow model.</p>
+<p>A second way to regrid TWRI is to regrid the groundwater flow model.</p>
 <div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="n">model</span> <span class="o">=</span> <span class="n">simulation</span><span class="p">[</span><span class="s2">&quot;GWF_1&quot;</span><span class="p">]</span>
 <span class="n">new_model</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">regrid_like</span><span class="p">(</span><span class="n">target_grid</span><span class="p">)</span>
 
@@ -591,7 +591,7 @@ specifies that field “k” uses an OVERLAP regridder in combination with the a
 <span class="n">regridded_k_2</span><span class="o">.</span><span class="n">sel</span><span class="p">(</span><span class="n">layer</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">y</span><span class="o">=</span><span class="s2">&quot;y&quot;</span><span class="p">,</span> <span class="n">yincrease</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="n">ax</span><span class="p">)</span>
 </pre></div>
 </div>
-<img src="../../_images/sphx_glr_different_ways_to_regrid_models_003.png" srcset="../../_images/sphx_glr_different_ways_to_regrid_models_003.png" alt="layer = 1, dx = 6251, dy = -3572" class = "sphx-glr-single-img"/><div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>&lt;matplotlib.collections.QuadMesh object at 0x000002A04BE40DD0&gt;
+<img src="../../_images/sphx_glr_different_ways_to_regrid_models_003.png" srcset="../../_images/sphx_glr_different_ways_to_regrid_models_003.png" alt="layer = 1, dx = 6251, dy = -3572" class = "sphx-glr-single-img"/><div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>&lt;matplotlib.collections.QuadMesh object at 0x0000015693796110&gt;
 </pre></div>
 </div>
 <p>regridding method as well. in this example we’ll regrid the npf package
@@ -615,10 +615,10 @@ because initializing a regridder is costly.</p>
 <span class="n">regridded_k_3</span><span class="o">.</span><span class="n">sel</span><span class="p">(</span><span class="n">layer</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">y</span><span class="o">=</span><span class="s2">&quot;y&quot;</span><span class="p">,</span> <span class="n">yincrease</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="n">ax</span><span class="p">)</span>
 </pre></div>
 </div>
-<img src="../../_images/sphx_glr_different_ways_to_regrid_models_004.png" srcset="../../_images/sphx_glr_different_ways_to_regrid_models_004.png" alt="layer = 1, dx = 6251, dy = -3572" class = "sphx-glr-single-img"/><div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>&lt;matplotlib.collections.QuadMesh object at 0x000002A04BE95890&gt;
+<img src="../../_images/sphx_glr_different_ways_to_regrid_models_004.png" srcset="../../_images/sphx_glr_different_ways_to_regrid_models_004.png" alt="layer = 1, dx = 6251, dy = -3572" class = "sphx-glr-single-img"/><div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>&lt;matplotlib.collections.QuadMesh object at 0x0000015692DB7F10&gt;
 </pre></div>
 </div>
-<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> (0 minutes 19.250 seconds)</p>
+<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> (0 minutes 19.484 seconds)</p>
 <div class="sphx-glr-footer sphx-glr-footer-example docutils container" id="sphx-glr-download-examples-mf6-different-ways-to-regrid-models-py">
 <div class="sphx-glr-download sphx-glr-download-jupyter docutils container">
 <p><a class="reference download internal" download="" href="../../_downloads/f256ac396944cfb800f53ea6e7935675/different_ways_to_regrid_models.ipynb"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Jupyter</span> <span class="pre">notebook:</span> <span class="pre">different_ways_to_regrid_models.ipynb</span></code></a></p>
@@ -715,7 +715,7 @@ because initializing a regridder is costly.</p>
         <div class="footer-item">
 
   <p class="sphinx-version">
-    Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 8.2.1.
+    Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 8.2.3.
     <br/>
   </p>
 </div>

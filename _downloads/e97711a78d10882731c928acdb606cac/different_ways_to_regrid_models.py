@@ -17,8 +17,8 @@ regridding method for the horizontal conductivity field
 """
 
 # %%
-# We'll start with the usual imports. As this is an simple (synthetic)
-# structured model, we can make due with few packages.
+# We'll start with the usual imports. As this is a simple (synthetic)
+# structured model, we can make do with few packages.
 
 import matplotlib.pyplot as plt
 import numpy as np
@@ -30,7 +30,7 @@ from imod.mf6.regrid import NodePropertyFlowRegridMethod
 from imod.util.regrid import RegridderWeightsCache
 
 # %%
-# Now we create the twri simulation itself. It yields a simulation of a flow problem, with a grid of 3 layers and 15 cells in both x and y directions.
+# Now we create the TWRI simulation itself. It yields a simulation of a flow problem, with a grid of 3 layers and 15 cells in both x and y directions.
 # To better illustrate the regridding, we replace the K field with a lognormal random K field. The original k-field is a constant per layer.
 simulation = create_twri_simulation()
 
@@ -46,8 +46,8 @@ heterogeneous_k.sel(layer=1).plot(y="y", yincrease=False, ax=ax)
 
 # %%
 # Now we create a new grid for this simulation. It has 3 layers,  45 rows and 20 columns.
-# The length of the domain is slightly different from the input grid. That had a coordinate difference between the first and last cellcentre on the
-# x axis and y axis of  15*5000 = 75000 on both axes, but the new grid that is  75020 on the x axis and  75015 on the y axis
+# The length of the domain is slightly different from the input grid. That had a coordinate difference between the first and last cell centre on the
+# x axis and y axis of  15*5000 = 75000 on both axes, but the new grid that is  75020 on the x axis and  75015 on the y axis.
 
 nlay = 3
 nrow = 21
@@ -69,7 +69,7 @@ coords = {"layer": layer, "y": y, "x": x, "dx": dx, "dy": dy}
 target_grid = xr.DataArray(np.ones(shape, dtype=int), coords=coords, dims=dims)
 
 # %%
-# A first way to regrid the twri model is to regrid the whole simulation object. This is the most straightforward method,
+# A first way to regrid the TWRI model is to regrid the whole simulation object. This is the most straightforward method,
 # and it uses default regridding methods for each input field. To see which ones are used, look at the _regrid_method
 # class attribute of the relevant package. For example the _regrid_method attribute  of the NodePropertyFlow package
 # specifies that field "k" uses an OVERLAP regridder in combination with the averaging function "geometric_mean".
@@ -81,7 +81,7 @@ regridded_k_1 = new_simulation["GWF_1"]["npf"]["k"]
 fig, ax = plt.subplots()
 regridded_k_1.sel(layer=1).plot(y="y", yincrease=False, ax=ax)
 # %%
-# A second way to regrid  twri  is to regrid the groundwater flow model.
+# A second way to regrid TWRI is to regrid the groundwater flow model.
 
 model = simulation["GWF_1"]
 new_model = model.regrid_like(target_grid)

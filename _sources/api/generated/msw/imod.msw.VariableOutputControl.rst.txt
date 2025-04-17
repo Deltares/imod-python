@@ -14,9 +14,11 @@
    .. autosummary::
    
       ~VariableOutputControl.__init__
+      ~VariableOutputControl.clip_box
       ~VariableOutputControl.from_imod5_data
       ~VariableOutputControl.get_non_grid_data
       ~VariableOutputControl.get_regrid_methods
+      ~VariableOutputControl.is_clipping_supported
       ~VariableOutputControl.is_regridding_supported
       ~VariableOutputControl.isel
       ~VariableOutputControl.regrid_like

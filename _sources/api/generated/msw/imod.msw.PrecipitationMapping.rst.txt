@@ -14,10 +14,12 @@
    .. autosummary::
    
       ~PrecipitationMapping.__init__
+      ~PrecipitationMapping.clip_box
       ~PrecipitationMapping.from_imod5_data
       ~PrecipitationMapping.get_non_grid_data
       ~PrecipitationMapping.get_regrid_methods
       ~PrecipitationMapping.grid_mapping
+      ~PrecipitationMapping.is_clipping_supported
       ~PrecipitationMapping.is_regridding_supported
       ~PrecipitationMapping.isel
       ~PrecipitationMapping.regrid_like
@@ -35,6 +37,5 @@
    
       ~PrecipitationMapping.auxiliary_data_fields
       ~PrecipitationMapping.dataset
-      ~PrecipitationMapping.meteo
    
    

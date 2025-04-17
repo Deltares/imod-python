@@ -409,7 +409,7 @@ heads.
  .. code-block:: none
 
 
-    <matplotlib.image.AxesImage object at 0x000002A04D6A0190>
+    <matplotlib.image.AxesImage object at 0x000001568E1109D0>
 
 
 
@@ -449,7 +449,7 @@ and the closing criteria.
  .. code-block:: none
 
 
-    <matplotlib.image.AxesImage object at 0x000002A04B5C1F50>
+    <matplotlib.image.AxesImage object at 0x000001568FFAE090>
 
 
 
@@ -491,14 +491,14 @@ We can use the `plt.scatter` function to plot the borehole locations on top.
  .. code-block:: none
 
 
-    <matplotlib.collections.PathCollection object at 0x000002A04D3F1150>
+    <matplotlib.collections.PathCollection object at 0x00000156901512D0>
 
 
 
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** (0 minutes 3.007 seconds)
+   **Total running time of the script:** (0 minutes 3.044 seconds)
 
 
 .. _sphx_glr_download_examples_prepare_point_interpolation.py:

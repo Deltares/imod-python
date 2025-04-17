@@ -147,7 +147,7 @@ Set up ibound, which sets where active cells are `(ibound = 1.0)`
  .. code-block:: none
 
 
-    <matplotlib.collections.QuadMesh object at 0x000002A053808950>
+    <matplotlib.collections.QuadMesh object at 0x0000015692268B90>
 
 
 
@@ -186,7 +186,7 @@ that is: ``bnd[index] = -1```
  .. code-block:: none
 
 
-    <matplotlib.collections.QuadMesh object at 0x000002A04D195890>
+    <matplotlib.collections.QuadMesh object at 0x000001569E345A50>
 
 
 
@@ -229,7 +229,7 @@ in the solute transport model are active, inactive or constant.
  .. code-block:: none
 
 
-    <matplotlib.collections.QuadMesh object at 0x000002A04A3A5ED0>
+    <matplotlib.collections.QuadMesh object at 0x00000156951ECC90>
 
 
 
@@ -275,7 +275,7 @@ Define the starting concentration
  .. code-block:: none
 
 
-    <matplotlib.collections.QuadMesh object at 0x000002A05650D890>
+    <matplotlib.collections.QuadMesh object at 0x000001568DA85590>
 
 
 
@@ -387,7 +387,7 @@ plot results as follows:
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** (0 minutes 1.922 seconds)
+   **Total running time of the script:** (0 minutes 2.687 seconds)
 
 
 .. _sphx_glr_download_examples_imod-wq_Elder.py:

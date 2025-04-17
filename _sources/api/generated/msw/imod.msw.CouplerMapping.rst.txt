@@ -14,9 +14,11 @@
    .. autosummary::
    
       ~CouplerMapping.__init__
+      ~CouplerMapping.clip_box
       ~CouplerMapping.from_imod5_data
       ~CouplerMapping.get_non_grid_data
       ~CouplerMapping.get_regrid_methods
+      ~CouplerMapping.is_clipping_supported
       ~CouplerMapping.is_regridding_supported
       ~CouplerMapping.isel
       ~CouplerMapping.regrid_like

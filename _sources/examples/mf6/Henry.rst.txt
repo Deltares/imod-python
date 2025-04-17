@@ -62,7 +62,7 @@ represented by a General Head Boundary package.
 .. GENERATED FROM PYTHON SOURCE LINES 33-35
 
 We'll start with the usual imports. As this is a simple (synthetic)
-structured model, we can make due with few packages.
+structured model, we can make do with few packages.
 
 .. GENERATED FROM PYTHON SOURCE LINES 35-42
 
@@ -315,7 +315,7 @@ provided in the flow model.
 
 .. GENERATED FROM PYTHON SOURCE LINES 196-197
 
-now let's define a simulation using the flow and transport models.
+Now let's define a simulation using the flow and transport models.
 
 .. GENERATED FROM PYTHON SOURCE LINES 197-204
 
@@ -497,7 +497,7 @@ Visualize the results
  .. code-block:: none
 
 
-    <matplotlib.contour.QuadContourSet object at 0x000002A053388310>
+    <matplotlib.contour.QuadContourSet object at 0x000001569A15FAD0>
 
 
 
@@ -527,14 +527,14 @@ formed:
  .. code-block:: none
 
 
-    <matplotlib.contour.QuadContourSet object at 0x000002A04CB0C810>
+    <matplotlib.contour.QuadContourSet object at 0x000001569A004C50>
 
 
 
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** (1 minutes 3.438 seconds)
+   **Total running time of the script:** (0 minutes 59.257 seconds)
 
 
 .. _sphx_glr_download_examples_mf6_Henry.py:
