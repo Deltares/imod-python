@@ -1,6 +1,6 @@
 import warnings
 from copy import deepcopy
-from typing import Optional
+from typing import Optional, cast
 
 import numpy as np
 import xarray as xr
@@ -40,7 +40,8 @@ def _dataarray_to_bool(griddataarray: GridDataArray) -> bool:
     if griddataarray.values.dtype != bool:
         raise ValueError("DataArray is not a boolean")
 
-    return griddataarray.values.item()
+    bool_value = cast(bool, griddataarray.values.item())
+    return bool_value
 
 
 class NodePropertyFlow(Package, IRegridPackage):

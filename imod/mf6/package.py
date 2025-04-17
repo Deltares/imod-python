@@ -171,18 +171,17 @@ class Package(PackageBase, IPackage, abc.ABC):
             da.values.flatten().astype(dtype).tofile(f)
 
     def write_text_griddata(self, outpath, da, dtype):
-        with open(outpath, "w") as f:
-            # Note: reshaping here avoids writing newlines after every number.
-            # This dumps all the values in a single row rather than a single
-            # column. This is to be preferred, since editors can easily
-            # "reshape" a long row with "word wrap"; they cannot as easily
-            # ignore newlines.
-            fmt = self._number_format(dtype)
-            data = da.values
-            if data.ndim > 2:
-                np.savetxt(fname=f, X=da.values.reshape((1, -1)), fmt=fmt)
-            else:
-                np.savetxt(fname=f, X=da.values, fmt=fmt)
+        # Note: reshaping here avoids writing newlines after every number.
+        # This dumps all the values in a single row rather than a single
+        # column. This is to be preferred, since editors can easily
+        # "reshape" a long row with "word wrap"; they cannot as easily
+        # ignore newlines.
+        fmt = self._number_format(dtype)
+        data = da.values
+        if data.ndim > 2:
+            np.savetxt(fname=outpath, X=data.reshape((1, -1)), fmt=fmt)
+        else:
+            np.savetxt(fname=outpath, X=data, fmt=fmt)
 
     def _get_render_dictionary(
         self,

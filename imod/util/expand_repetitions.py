@@ -33,7 +33,7 @@ def expand_repetitions(
     value is the "value". For the "key" datetime, the data of the "value"
     datetime will be used.
     """
-    expanded = {}
+    expanded: dict[np.datetime64, np.datetime64] = {}
     for year, date in itertools.product(
         range(time_min.year, time_max.year + 1),
         repeat_stress,
