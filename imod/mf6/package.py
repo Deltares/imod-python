@@ -373,7 +373,7 @@ class Package(PackageBase, IPackage, abc.ABC):
 
     def copy(self) -> Any:
         # All state should be contained in the dataset.
-        return type(self)(**self.dataset.copy())
+        return type(self)(**self.dataset.copy().data_vars)
 
     def clip_box(
         self,
