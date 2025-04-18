@@ -49,10 +49,12 @@ create grid-based model packages.
   layer_template = xr.DataArray([1, 1, 1], dims=('layer',), coords={'layer': [1, 2, 3]})
   idomain = layer_template * xr.ones_like(elevation).astype(int)
   # Compute bottom elevations of model layers
-  layer_thickness = xr.DataArray([1.0, 2.0, 1.0], dims=('layer',), coords={'layer': [1, 2, 3]})
+  layer_thickness = xr.DataArray([10.0, 20.0, 10.0], dims=('layer',), coords={'layer': [1, 2, 3]})
   bottom = elevation - layer_thickness.cumsum(dim='layer')
   # Create MODFLOW 6 DIS package
-  dis_pkg = imod.mf6.StructuredDiscretization(idomain=idomain, top=elevation, bottom=bottom)
+  dis_pkg = imod.mf6.StructuredDiscretization(
+      idomain=idomain, top=elevation, bottom=bottom.transpose("layer", "y", "x")
+  )
 
 
 2\. Assign wells based on data at hand, instead of the model grid
@@ -64,11 +66,11 @@ layer, row and column:
 .. code-block:: python
 
   screen_top = [0.0, 0.0]
-  screen_bottom = [-2.0, -1.0]
-  y = [83.0, 77.0]
-  x = [81.0, 82.0]
+  screen_bottom = [-4.0, -10.0]
+  x = [150_200.0, 160_800.0]
+  y = [450_300.0, 460_200.0]
   # Create transient well package
-  weltimes = pd.date_range("2000-01-01", "2000-01-03")
+  weltimes = pd.date_range("2000-01-01", "2000-01-03", freq="2D")
   rate = xr.DataArray([[0.5, 1.0], [2.5, 3.0]], coords={"time": weltimes}, dims=("time","index"))
   wel_pkg = imod.mf6.Well(x=x, y=y, rate=rate, screen_top=screen_top, screen_bottom=screen_bottom)
 
@@ -79,8 +81,11 @@ writing the entire simulation, you can use the following command:
 
 .. code-block:: python
 
+  # Wells have been distributed across two model layers based on screen depths.
   wel_mf6_pkg = wel_pkg.to_mf6(idomain, top, bottom, k=1.0)
-  print(wel_mf6_pkg)
+  print(wel_mf6_pkg["cellid"])
+  # Well rates have been distributed based on screen overlap
+  print(wel_mf6_pkg["rate"])
 
 
 3\. Utilities to assign 2D river grids to 3D model layers
@@ -97,7 +102,7 @@ across layers.
 --------------------------------------------------------------------------
 
 MODFLOW6 requires that all stress periods are defined in the time discretization
-package. However, usually boundary conditions are defined at insconsistent
+package. However, usually boundary conditions are defined at inconsistent
 times. iMOD Python can help you to create a time discretization package that is
 consistent, based on all the unique times assigned to the boundary conditions.
 
@@ -107,10 +112,9 @@ consistent, based on all the unique times assigned to the boundary conditions.
 
   simulation = imod.mf6.Modflow6Simulation("example")
   simulation["gwf"] = imod.mf6.GroundwaterFlowModel()
+  simulation["gwf"]["dis"] = dis_pkg
   simulation["gwf"]["wel"] = wel_pkg
-  simulation.create_time_discretization(
-      additional_times=["2000-01-02", "2000-01-04"]
-  )
+  simulation.create_time_discretization(additional_times=["2000-01-07"])
   # Note that timesteps in well package are also inserted in the time
   # discretization
   print(simulation["time_discretization"].dataset)
@@ -139,7 +143,7 @@ average.
 
 .. code-block:: python
 
-  sim_clipped = simulation.clip_box(xmin=10_000, xmax=20_000, ymin=10_000, ymax=20_000)
+  sim_clipped = simulation.clip_box(x_min=125_000, x_max=175_000, y_min=425_000, y_max=475_000)
 
 7\. Performant writing of MODFLOW6 models
 -----------------------------------------
