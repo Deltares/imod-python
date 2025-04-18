@@ -20,17 +20,3 @@ iMOD5 Backwards compatibility
 
 For a detailed description of known issues with iMOD5 backwards compatibility,
 see :doc:`imod5_backwards_compatibility`.
-
-
-Python versions
----------------
-
-iMOD Python v1.0b0 is tested to work with Python versions:
-
-* 3.10
-* 3.11
-* 3.12
-
-Confirmed to not work (yet):
-
-* 3.13
