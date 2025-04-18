@@ -105,7 +105,8 @@ sim_regridded = simulation.regrid_like("regridded", new_unstructured_grid)
 print(sim_regridded["gwf"]["dis"])
 
 # %%
-# Clip models to a bounding box.
+# To reduce the size of your model, you can clip it to a bounding box. This is
+# useful for example when you want to create a smaller model for testing purposes.
 
 sim_clipped = simulation.clip_box(x_min=125_000, x_max=175_000, y_min=425_000, y_max=475_000)
 
