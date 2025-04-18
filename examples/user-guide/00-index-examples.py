@@ -2,7 +2,7 @@
 # Let's first create some raster data to work with. 
 import xugrid as xu
 import xarray as xr
-import numpy as np
+import imod
 
 elevation_uda = xu.data.elevation_nl()
 
@@ -13,7 +13,6 @@ part = elevation_uda.ugrid.sel(
 
 # %%
 # Make structured grid
-import imod
 resolution = 500.0
 xmin, ymin, xmax, ymax = part.ugrid.grid.bounds
 structured_grid = imod.util.empty_2d(resolution, xmin, xmax, resolution, ymin, ymax)
@@ -25,7 +24,6 @@ interpolated_elevation.plot.imshow()
 
 # %%
 # Save to GeoTIFF
-import imod
 import rioxarray
 
 # Create a temporary directory to store the data
@@ -38,7 +36,6 @@ interpolated_elevation.rio.to_raster(tmp_dir / "elevation.tif")
 # and `xugrid`_ arrays, for structured and unstructured grids respectively, to
 # create grid-based model packages. 
 
-import imod
 # Open Geotiff with elevation data as xarray DataArray
 elevation = imod.rasterio.open(tmp_dir / "elevation.tif")
 elevation.load()
