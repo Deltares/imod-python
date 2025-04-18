@@ -13,29 +13,15 @@ part = elevation_uda.ugrid.sel(
 
 # %%
 # Make structured grid
+import imod
 resolution = 500.0
 xmin, ymin, xmax, ymax = part.ugrid.grid.bounds
-d = abs(resolution)
-xmin = np.floor(xmin / d) * d
-xmax = np.ceil(xmax / d) * d
-ymin = np.floor(ymin / d) * d
-ymax = np.ceil(ymax / d) * d
-x = np.arange(xmin + 0.5 * d, xmax, d)
-y = np.arange(ymax - 0.5 * d, ymin, -d)
-
-grid = xr.DataArray(
-    data=np.zeros((len(y), len(x))),
-    dims=("y", "x"),
-    coords={
-        "x": x,
-        "y": y,
-    },
-)
+structured_grid = imod.util.empty_2d(resolution, xmin, xmax, resolution, ymin, ymax)
 # Interpolate
-regridder = xu.BarycentricInterpolator(part, grid)
-interpolated = regridder.regrid(part)
+regridder = xu.BarycentricInterpolator(part, structured_grid)
+interpolated_elevation = regridder.regrid(part)
 # Plot
-interpolated.plot.imshow()
+interpolated_elevation.plot.imshow()
 
 # %%
 # Save to GeoTIFF
@@ -45,7 +31,7 @@ import rioxarray
 # Create a temporary directory to store the data
 tmp_dir = imod.util.path.temporary_directory()
 tmp_dir.mkdir(parents=True, exist_ok=True)
-interpolated.rio.to_raster(tmp_dir / "elevation.tif")
+interpolated_elevation.rio.to_raster(tmp_dir / "elevation.tif")
 
 # %%
 # Seamlessly integrate your GIS rasters or meshes with MODFLOW6, by using `xarray`_
@@ -121,7 +107,6 @@ print(sim_regridded["gwf"]["dis"])
 # %%
 # Clip models to a bounding box.
 
-simulation["gwf"]["dis"] = dis_pkg
 sim_clipped = simulation.clip_box(x_min=125_000, x_max=175_000, y_min=425_000, y_max=475_000)
 
 # %%
