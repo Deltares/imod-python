@@ -6,6 +6,17 @@ All notable changes to this project will be documented in this file.
 The format is based on `Keep a Changelog`_, and this project adheres to
 `Semantic Versioning`_.
 
+[Unreleased]
+------------
+
+Fixed
+~~~~~
+
+- Upon providing an unexpected coordinate in the mask or regridding grid,
+  :meth:`imod.mf6.Modflow6Simulation.regrid_like` and
+  :meth:`imod.mf6.Modflow6Simulation.mask` now present the unexpected
+  coordinates in the error message.
+
 [1.0.0rc3] - 2025-04-17
 -----------------------
 
