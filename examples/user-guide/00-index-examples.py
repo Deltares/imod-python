@@ -1,7 +1,8 @@
 # %%
-# Let's first create some raster data to work with. 
-import xugrid as xu
+# Let's first create some raster data to work with.
 import xarray as xr
+import xugrid as xu
+
 import imod
 
 elevation_uda = xu.data.elevation_nl()
@@ -9,8 +10,7 @@ elevation_uda = xu.data.elevation_nl()
 elevation_uda = elevation_uda.drop_vars(["mesh2d_face_x", "mesh2d_face_y"])
 
 part = elevation_uda.ugrid.sel(
-    x=slice(100_000.0, 200_000.0),
-    y=slice(400_000.0, 500_000.0)
+    x=slice(100_000.0, 200_000.0), y=slice(400_000.0, 500_000.0)
 )
 
 # %%
@@ -26,7 +26,6 @@ interpolated_elevation.plot.imshow()
 
 # %%
 # Save to GeoTIFF
-import rioxarray
 
 # Create a temporary directory to store the data
 tmp_dir = imod.util.path.temporary_directory()
@@ -36,17 +35,19 @@ interpolated_elevation.rio.to_raster(tmp_dir / "elevation.tif")
 # %%
 # Seamlessly integrate your GIS rasters or meshes with MODFLOW6, by using `xarray`_
 # and `xugrid`_ arrays, for structured and unstructured grids respectively, to
-# create grid-based model packages. 
+# create grid-based model packages.
 
 # Open Geotiff with elevation data as xarray DataArray
 elevation = imod.rasterio.open(tmp_dir / "elevation.tif")
 elevation.load()
 # Create idomain grid
-layer_template = xr.DataArray([1, 1, 1], dims=('layer',), coords={'layer': [1, 2, 3]})
+layer_template = xr.DataArray([1, 1, 1], dims=("layer",), coords={"layer": [1, 2, 3]})
 idomain = layer_template * xr.ones_like(elevation).astype(int)
 # Compute bottom elevations of model layers
-layer_thickness = xr.DataArray([10.0, 20.0, 10.0], dims=('layer',), coords={'layer': [1, 2, 3]})
-bottom = elevation - layer_thickness.cumsum(dim='layer')
+layer_thickness = xr.DataArray(
+    [10.0, 20.0, 10.0], dims=("layer",), coords={"layer": [1, 2, 3]}
+)
+bottom = elevation - layer_thickness.cumsum(dim="layer")
 # Create MODFLOW 6 DIS package
 dis_pkg = imod.mf6.StructuredDiscretization(
     idomain=idomain, top=elevation, bottom=bottom.transpose("layer", "y", "x")
@@ -63,8 +64,12 @@ x = [150_200.0, 160_800.0]
 y = [450_300.0, 460_200.0]
 # Create transient well package, rates every 2 days
 weltimes = pd.date_range("2000-01-01", "2000-01-03", freq="2D")
-rate = xr.DataArray([[0.5, 1.0], [2.5, 3.0]], coords={"time": weltimes}, dims=("time","index"))
-wel_pkg = imod.mf6.Well(x=x, y=y, screen_top=screen_top, screen_bottom=screen_bottom, rate=rate)
+rate = xr.DataArray(
+    [[0.5, 1.0], [2.5, 3.0]], coords={"time": weltimes}, dims=("time", "index")
+)
+wel_pkg = imod.mf6.Well(
+    x=x, y=y, screen_top=screen_top, screen_bottom=screen_bottom, rate=rate
+)
 # iMOD Python will take care of the rest and assign the wells to the correct model
 # layers upon writing the model. It will furthermore distribute well rates based
 # on transmissivities. To verify how wells will be assigned to model layers before
@@ -107,6 +112,8 @@ print(sim_regridded["gwf"]["dis"])
 # To reduce the size of your model, you can clip it to a bounding box. This is
 # useful for example when you want to create a smaller model for testing purposes.
 
-sim_clipped = simulation.clip_box(x_min=125_000, x_max=175_000, y_min=425_000, y_max=475_000)
+sim_clipped = simulation.clip_box(
+    x_min=125_000, x_max=175_000, y_min=425_000, y_max=475_000
+)
 
 # %%
