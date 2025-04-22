@@ -43,7 +43,7 @@ class PackageGroup(collections.UserDict, abc.ABC):
     def max_n_sinkssources(self):
         return sum(pkg._ssm_cellcount for pkg in self.values())
 
-    def render(self, directory, globaltimes, nlayer, nrow, ncol):
+    def render(self, directory, globaltimes, nlayer, nrow, ncol, quote=False):
         d = {}
         d["n_systems"] = len(self.keys())
         d["n_max_active"] = sum(
@@ -63,15 +63,19 @@ class PackageGroup(collections.UserDict, abc.ABC):
                     globaltimes=globaltimes,
                     system_index=system_index,
                     nlayer=nlayer,
+                    quote=quote,
                 )
             )
         return "".join(content)
 
-    def render_ssm(self, directory, globaltimes, nlayer):
+    def render_ssm(self, directory, globaltimes, nlayer, quote=False):
         # Only render for the first system, that has concentrations defined.
         key = self.first_key
         return self[key]._render_ssm(
-            directory.joinpath(key), globaltimes, nlayer=nlayer
+            directory.joinpath(key),
+            globaltimes,
+            nlayer=nlayer,
+            quote=quote,
         )
 
 

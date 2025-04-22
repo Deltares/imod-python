@@ -143,10 +143,13 @@ class Package(abc.ABC):
                 self._replace_keyword(d, key)
         return self._template.format(**d)
 
-    def _compose_path(self, d, pattern=None):
+    def _compose_path(self, d, pattern=None, quote: bool = False):
         # d : dict
         # pattern : string or re.pattern
-        return imod.util.path.compose(d, pattern).as_posix()
+        string_path = imod.util.path.compose(d, pattern).as_posix()
+        if quote:
+            string_path = '"' + string_path + '"'
+        return string_path
 
     def _compress_idflayers(self, values, range_path):
         """
@@ -178,7 +181,14 @@ class Package(abc.ABC):
         return compressed
 
     def _compose_values_layer(
-        self, varname, directory, nlayer, time=None, da=None, compress=True
+        self,
+        varname,
+        directory,
+        nlayer,
+        time=None,
+        da=None,
+        compress=True,
+        quote: bool = False,
     ):
         """
         Composes paths to files, or gets the appropriate scalar value for
@@ -199,6 +209,8 @@ class Package(abc.ABC):
         compress : boolean
             Whether or not to compress the layers using the imod-wq macros.
             Should be disabled for time-dependent input.
+        quote: boolean
+            Whether to place a path in double quotes.
 
         Returns
         -------
@@ -239,9 +251,11 @@ class Package(abc.ABC):
                 if hasattr(self, "_ssm_layers"):
                     for layer in self._ssm_layers:
                         d["layer"] = layer
-                        values[layer] = self._compose_path(d, pattern=pattern)
+                        values[layer] = self._compose_path(
+                            d, pattern=pattern, quote=quote
+                        )
                 else:
-                    values["?"] = self._compose_path(d, pattern=pattern)
+                    values["?"] = self._compose_path(d, pattern=pattern, quote=quote)
             else:
                 # Special case concentration
                 # Using "?" results in too many sinks and sources according to imod-wq.
@@ -257,7 +271,7 @@ class Package(abc.ABC):
             for layer in np.atleast_1d(da.coords["layer"].values):
                 if idf:
                     d["layer"] = layer
-                    values[layer] = self._compose_path(d, pattern=pattern)
+                    values[layer] = self._compose_path(d, pattern=pattern, quote=quote)
                 else:
                     if "layer" in da.dims:
                         values[layer] = da.sel(layer=layer).values[()]
@@ -269,13 +283,13 @@ class Package(abc.ABC):
             if idf and da["layer"].size == nlayer:
                 # Compose does not accept non-integers, so use 0, then replace
                 d["layer"] = 0
-                token_path = imod.util.path.compose(d, pattern=pattern).as_posix()
+                token_path = self._compose_path(d, pattern=pattern, quote=quote)
                 token_path = token_path.replace("_l0", "_l$")
                 values = {"$": token_path}
             elif idf and compress:
                 # Compose does not accept non-integers, so use 0, then replace
                 d["layer"] = 0
-                range_path = imod.util.path.compose(d, pattern=pattern).as_posix()
+                range_path = self._compose_path(d, pattern=pattern, quote=quote)
                 range_path = range_path.replace("_l0", "_l:")
                 values = self._compress_idflayers(values, range_path)
             elif compress:
@@ -443,7 +457,7 @@ class BoundaryCondition(Package, abc.ABC):
             self.dataset[varname].attrs["stress_repeats"] = d
 
     def _compose_values_timelayer(
-        self, varname, globaltimes, directory, nlayer, da=None
+        self, varname, globaltimes, directory, nlayer, da=None, quote: bool = False
     ):
         """
         Composes paths to files, or gets the appropriate scalar value for
@@ -467,6 +481,8 @@ class BoundaryCondition(Package, abc.ABC):
         da : xr.DataArray, optional
             In some cases fetching the DataArray by varname is not desired.
             It can be passed directly via this optional argument.
+        quote: bool
+            Whether to place a path in double quotes.
 
         Returns
         -------
@@ -510,6 +526,7 @@ class BoundaryCondition(Package, abc.ABC):
                     time=time,
                     da=da,
                     compress=compress,
+                    quote=quote,
                 )
 
         else:
@@ -571,7 +588,7 @@ class BoundaryCondition(Package, abc.ABC):
 
         return nmax
 
-    def _render(self, directory, globaltimes, system_index, nlayer):
+    def _render(self, directory, globaltimes, system_index, nlayer, quote=False):
         """
         Parameters
         ----------
@@ -588,6 +605,8 @@ class BoundaryCondition(Package, abc.ABC):
             BoundaryCondition object.
             Note that MT3DMS does not fully support multiple systems, and only
             the first system can act as source of species.
+        quote:
+            Whether to place paths in double quotes.
 
         Returns
         -------
@@ -604,14 +623,18 @@ class BoundaryCondition(Package, abc.ABC):
             if varname == "concentration":
                 continue
             dicts[varname] = self._compose_values_timelayer(
-                varname, globaltimes, directory, nlayer=nlayer
+                varname,
+                globaltimes,
+                directory,
+                nlayer=nlayer,
+                quote=quote,
             )
 
         d["dicts"] = dicts
 
         return self._template.render(d)
 
-    def _render_ssm(self, directory, globaltimes, nlayer):
+    def _render_ssm(self, directory, globaltimes, nlayer, quote=False):
         """
         Parameters
         ----------
@@ -622,6 +645,8 @@ class BoundaryCondition(Package, abc.ABC):
             Holds the global times, i.e. the combined unique times of
             every boundary condition that are used to define the stress
             periods.
+        quote: bool
+            Whether to place paths in double quotes.
 
         Returns
         -------
@@ -642,6 +667,7 @@ class BoundaryCondition(Package, abc.ABC):
                     globaltimes=globaltimes,
                     directory=directory,
                     nlayer=nlayer,
+                    quote=quote,
                 )
         else:
             concentration = {
@@ -651,6 +677,7 @@ class BoundaryCondition(Package, abc.ABC):
                     globaltimes=globaltimes,
                     directory=directory,
                     nlayer=nlayer,
+                    quote=quote,
                 )
             }
         d["concentration"] = concentration

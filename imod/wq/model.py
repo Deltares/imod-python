@@ -428,7 +428,7 @@ class SeawatModel(Model):
         d["start_date"] = start_date
         return self._gen_template.render(d)
 
-    def _render_pkg(self, key, directory, globaltimes, nlayer):
+    def _render_pkg(self, key, directory, globaltimes, nlayer, quote=False):
         """
         Rendering method for straightforward packages
         """
@@ -441,31 +441,34 @@ class SeawatModel(Model):
             else:
                 raise ValueError(f"No {key} package provided.")
         return self[pkgkey]._render(
-            directory=directory / pkgkey, globaltimes=globaltimes, nlayer=nlayer
+            directory=directory / pkgkey,
+            globaltimes=globaltimes,
+            nlayer=nlayer,
+            quote=quote,
         )
 
-    def _render_dis(self, directory, globaltimes, nlayer):
+    def _render_dis(self, directory, globaltimes, nlayer, quote=False):
         baskey = self._get_pkgkey("bas6")
         diskey = self._get_pkgkey("dis")
         bas_content = self[baskey]._render_dis(
-            directory=directory.joinpath(baskey), nlayer=nlayer
+            directory=directory.joinpath(baskey), nlayer=nlayer, quote=quote
         )
         dis_content = self[diskey]._render(globaltimes=globaltimes)
         return bas_content + dis_content
 
-    def _render_groups(self, directory, globaltimes):
+    def _render_groups(self, directory, globaltimes, quote=False):
         baskey = self._get_pkgkey("bas6")
         nlayer, nrow, ncol = self[baskey]["ibound"].shape
         package_groups = self._group()
         content = "\n\n".join(
             [
-                group.render(directory, globaltimes, nlayer, nrow, ncol)
+                group.render(directory, globaltimes, nlayer, nrow, ncol, quote=quote)
                 for group in package_groups
             ]
         )
         ssm_content = "".join(
             [
-                group.render_ssm(directory, globaltimes, nlayer)
+                group.render_ssm(directory, globaltimes, nlayer, quote=quote)
                 for group in package_groups
             ]
         )
@@ -488,7 +491,7 @@ class SeawatModel(Model):
             self[pksfkey]._compute_load_balance_weight(self[baskey]["ibound"])
             return self[pksfkey]._render(directory=directory.joinpath(pksfkey))
 
-    def _render_btn(self, directory, globaltimes, nlayer):
+    def _render_btn(self, directory, globaltimes, nlayer, quote=False):
         baskey = self._get_pkgkey("bas6")
         btnkey = self._get_pkgkey("btn")
         diskey = self._get_pkgkey("dis")
@@ -497,7 +500,7 @@ class SeawatModel(Model):
         if btnkey is None:
             raise ValueError("No BasicTransport package provided.")
         btn_content = self[btnkey]._render(
-            directory=directory.joinpath(btnkey), nlayer=nlayer
+            directory=directory.joinpath(btnkey), nlayer=nlayer, quote=quote
         )
         dis_content = self[diskey]._render_btn(globaltimes=globaltimes)
         return btn_content + dis_content
@@ -516,12 +519,15 @@ class SeawatModel(Model):
             self[pkstkey]._compute_load_balance_weight(self[baskey]["ibound"])
             return self[pkstkey]._render(directory=directory / pkstkey)
 
-    def _render_ssm_rch_evt_mal_tvc(self, directory, globaltimes, nlayer):
+    def _render_ssm_rch_evt_mal_tvc(self, directory, globaltimes, nlayer, quote: False):
         out = ""
         for key, pkg in self.items():
             if pkg._pkg_id in ("rch", "evt", "mal", "tvc"):
                 out += pkg._render_ssm(
-                    directory=directory / key, globaltimes=globaltimes, nlayer=nlayer
+                    directory=directory / key,
+                    globaltimes=globaltimes,
+                    nlayer=nlayer,
+                    quote=quote,
                 )
         return out
 
@@ -546,7 +552,7 @@ class SeawatModel(Model):
 
         return n_extra
 
-    def render(self, directory, result_dir, writehelp):
+    def render(self, directory, result_dir, writehelp, quote=False):
         """
         Render the runfile as a string, package by package.
         """
@@ -566,26 +572,30 @@ class SeawatModel(Model):
         )
         content.append(
             self._render_dis(
-                directory=directory, globaltimes=globaltimes, nlayer=nlayer
+                directory=directory, globaltimes=globaltimes, nlayer=nlayer, quote=quote
             )
         )
         # Modflow
         for key in ("bas6", "oc", "lpf", "rch", "evt"):
             content.append(
                 self._render_pkg(
-                    key=key, directory=directory, globaltimes=globaltimes, nlayer=nlayer
+                    key=key,
+                    directory=directory,
+                    globaltimes=globaltimes,
+                    nlayer=nlayer,
+                    quote=quote,
                 )
             )
 
         # multi-system package group: chd, drn, ghb, riv, wel
         modflowcontent, ssm_content, n_sinkssources = self._render_groups(
-            directory=directory, globaltimes=globaltimes
+            directory=directory, globaltimes=globaltimes, quote=quote
         )
         # Add recharge to sinks and sources
         n_sinkssources += self._bas_btn_rch_evt_mal_tvc_sinkssources()
         # Add recharge, mass loading, time varying constant concentration to ssm_content
         ssm_content += self._render_ssm_rch_evt_mal_tvc(
-            directory=directory, globaltimes=globaltimes, nlayer=nlayer
+            directory=directory, globaltimes=globaltimes, nlayer=nlayer, quote=quote
         )
 
         # Wrap up modflow part
@@ -604,7 +614,7 @@ class SeawatModel(Model):
 
         content.append(
             self._render_btn(
-                directory=directory, globaltimes=globaltimes, nlayer=nlayer
+                directory=directory, globaltimes=globaltimes, nlayer=nlayer, quote=quote
             )
         )
         for key in ("vdf", "adv", "dsp"):
@@ -636,7 +646,11 @@ class SeawatModel(Model):
         # to the individual packages.
 
     def write(
-        self, directory=pathlib.Path("."), result_dir=None, resultdir_is_workdir=False
+        self,
+        directory=pathlib.Path("."),
+        result_dir=None,
+        resultdir_is_workdir=False,
+        quote_paths=False,
     ):
         """
         Writes model input files.
@@ -657,6 +671,8 @@ class SeawatModel(Model):
             directory. Because iMOD-wq generates a number of files in its working
             directory, it may be advantageous to set the working directory to
             a different path than the runfile location.
+        quote_paths:
+            Whether to surround paths by double quotes.
 
         Returns
         -------
@@ -717,7 +733,10 @@ class SeawatModel(Model):
         self._delete_empty_packages(verbose=True)
 
         runfile_content = self.render(
-            directory=render_dir, result_dir=result_dir, writehelp=False
+            directory=render_dir,
+            result_dir=result_dir,
+            writehelp=False,
+            quote=quote_paths,
         )
 
         # Start writing

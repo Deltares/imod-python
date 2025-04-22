@@ -120,7 +120,9 @@ class Well(BoundaryCondition):
         self._ssm_cellcount = nmax
         return nmax
 
-    def _compose_values_layer(self, directory, nlayer, name, time=None, compress=True):
+    def _compose_values_layer(
+        self, directory, nlayer, name, time=None, compress=True, quote=False
+    ):
         values = {}
         d = {"directory": directory, "name": name, "extension": ".ipf"}
 
@@ -129,9 +131,9 @@ class Well(BoundaryCondition):
                 for layer in np.unique(self.dataset["layer"]):
                     layer = int(layer)
                     d["layer"] = layer
-                    values[layer] = self._compose_path(d)
+                    values[layer] = self._compose_path(d, quote=quote)
             else:
-                values["$"] = self._compose_path(d)
+                values["$"] = self._compose_path(d, quote=quote)
 
         else:
             d["time"] = time
@@ -141,36 +143,43 @@ class Well(BoundaryCondition):
                 select = np.argwhere((self.dataset["time"] == time).values)
                 for layer in np.unique(self.dataset["layer"].values[select]):
                     d["layer"] = layer
-                    values[layer] = self._compose_path(d)
+                    values[layer] = self._compose_path(d, quote=quote)
             else:
-                values["?"] = self._compose_path(d)
+                values["?"] = self._compose_path(d, quote=quote)
 
         if "layer" in self.dataset:
             # Compose does not accept non-integers, so use 0, then replace
             d["layer"] = 0
             if np.unique(self.dataset["layer"].values).size == nlayer:
-                token_path = imod.util.path.compose(d).as_posix()
+                token_path = self._compose_path(d, quote=quote)
                 token_path = token_path.replace("_l0", "_l$")
                 values = {"$": token_path}
             elif compress:
-                range_path = imod.util.path.compose(d).as_posix()
+                range_path = self._compose_path(d, quote=quote)
                 range_path = range_path.replace("_l0", "_l:")
-                # TODO: temporarily disable until imod-wq is fixed
                 values = self._compress_idflayers(values, range_path)
 
         return values
 
-    def _compose_values_time(self, directory, name, globaltimes, nlayer):
+    def _compose_values_time(self, directory, name, globaltimes, nlayer, quote: bool):
         # TODO: rename to _compose_values_timelayer?
-        values = {"?": self._compose_values_layer(directory, nlayer=nlayer, name=name)}
+        values = {
+            "?": self._compose_values_layer(
+                directory, nlayer=nlayer, name=name, quote=quote
+            )
+        }
         return values
 
-    def _render(self, directory, globaltimes, system_index, nlayer):
+    def _render(
+        self, directory, globaltimes, system_index, nlayer, quote: bool = False
+    ):
         d = {"system_index": system_index}
-        d["wels"] = self._compose_values_time(directory, "rate", globaltimes, nlayer)
+        d["wels"] = self._compose_values_time(
+            directory, "rate", globaltimes, nlayer, quote
+        )
         return self._template.render(d)
 
-    def _render_ssm(self, directory, globaltimes, nlayer):
+    def _render_ssm(self, directory, globaltimes, nlayer, quote: bool = False):
         if "concentration" in self.dataset.data_vars:
             d = {"pkg_id": self._pkg_id}
             name = "concentration"
@@ -178,12 +187,16 @@ class Well(BoundaryCondition):
                 concentration = {}
                 for species in self.dataset["concentration"]["species"].values:
                     concentration[species] = self._compose_values_time(
-                        directory, f"{name}_c{species}", globaltimes, nlayer=nlayer
+                        directory,
+                        f"{name}_c{species}",
+                        globaltimes,
+                        nlayer=nlayer,
+                        quote=quote,
                     )
             else:
                 concentration = {
                     1: self._compose_values_time(
-                        directory, name, globaltimes, nlayer=nlayer
+                        directory, name, globaltimes, nlayer=nlayer, quote=quote
                     )
                 }
             d["concentration"] = concentration

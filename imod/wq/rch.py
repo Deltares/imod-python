@@ -26,7 +26,7 @@ class Recharge(BoundaryCondition, abc.ABC):
         "    {%- endfor -%}"
     )
 
-    def _render(self, directory, globaltimes, nlayer, *args, **kwargs):
+    def _render(self, directory, globaltimes, nlayer, quote=False, *args, **kwargs):
         d = {
             "mapping": self._mapping,
             "save_budget": self.dataset["save_budget"].values,
@@ -37,7 +37,7 @@ class Recharge(BoundaryCondition, abc.ABC):
         dicts = {}
         for _, name in self._mapping:
             dicts[name] = self._compose_values_timelayer(
-                name, globaltimes, directory, nlayer=nlayer
+                name, globaltimes, directory, nlayer=nlayer, quote=quote
             )
         d["dicts"] = dicts
 

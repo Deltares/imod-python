@@ -82,18 +82,20 @@ class BasicFlow(Package):
                 f" got instead {dims}"
             )
 
-    def _render(self, directory, nlayer, *args, **kwargs):
+    def _render(self, directory, nlayer, quote=False, *args, **kwargs):
         """
         Renders part of runfile that ends up under [bas] section.
         """
         d = {}
         for varname in ("ibound", "starting_head"):
-            d[varname] = self._compose_values_layer(varname, directory, nlayer)
+            d[varname] = self._compose_values_layer(
+                varname, directory, nlayer, quote=quote
+            )
         d["inactive_head"] = self["inactive_head"].values
 
         return self._template.render(d)
 
-    def _compose_top(self, directory):
+    def _compose_top(self, directory, quote=False):
         """
         Composes paths to file, or gets the appropriate scalar value for
         a top of model domain.
@@ -110,7 +112,7 @@ class BasicFlow(Package):
             d["name"] = "top"
             d["directory"] = directory
             d["extension"] = ".idf"
-            value = self._compose_path(d)
+            value = self._compose_path(d, quote=quote)
         else:
             if not da.shape == ():
                 raise ValueError("Top should either be 2d or a scalar value")
@@ -133,13 +135,15 @@ class BasicFlow(Package):
                 d[f"{s}:{e}"] = value
         return d
 
-    def _render_dis(self, directory, nlayer):
+    def _render_dis(self, directory, nlayer, quote=False):
         """
         Renders part of runfile that ends up under [dis] section.
         """
         d = {}
-        d["top"] = self._compose_top(directory)
-        d["bottom"] = self._compose_values_layer("bottom", directory, nlayer)
+        d["top"] = self._compose_top(directory, quote=quote)
+        d["bottom"] = self._compose_values_layer(
+            "bottom", directory, nlayer, quote=quote
+        )
         d["nlay"], d["nrow"], d["ncol"] = self["ibound"].shape
         # TODO: check dx > 0, dy < 0?
         if "dx" not in self.dataset or "dy" not in self.dataset:  # assume equidistant
