@@ -5,6 +5,8 @@ import xarray as xr
 import imod
 
 elevation_uda = xu.data.elevation_nl()
+# Drop unnecessary coords. These are also stored in elevation_uda.ugrid.grid
+elevation_uda = elevation_uda.drop_vars(["mesh2d_face_x", "mesh2d_face_y"])
 
 part = elevation_uda.ugrid.sel(
     x=slice(100_000.0, 200_000.0),
