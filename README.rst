@@ -11,7 +11,7 @@ The ``imod`` Python package is an open source project to make working with
 MODFLOW groundwater models in Python easier. It builds on top of popular
 packages such as `xarray`_, `pandas`_, `geopandas`_, `dask`_,  and `rasterio`_
 to provide a versatile toolset for working with large groundwater modeling
-data:
+data. Some of its core functionalities are:
 
 * Preparing and modifying data from a variety of GIS, scientific, and MODFLOW
   file formats;
@@ -43,14 +43,18 @@ create grid-based model packages.
 .. code-block:: python
 
   import imod
+
   # Open Geotiff with elevation data as xarray DataArray
   elevation = imod.rasterio.open("elevation.tif")
+
   # Create idomain grid
   layer_template = xr.DataArray([1, 1, 1], dims=('layer',), coords={'layer': [1, 2, 3]})
   idomain = layer_template * xr.ones_like(elevation).astype(int)
+
   # Compute bottom elevations of model layers
   layer_thickness = xr.DataArray([10.0, 20.0, 10.0], dims=('layer',), coords={'layer': [1, 2, 3]})
   bottom = elevation - layer_thickness.cumsum(dim='layer')
+
   # Create MODFLOW 6 DIS package
   dis_pkg = imod.mf6.StructuredDiscretization(
       idomain=idomain, top=elevation, bottom=bottom.transpose("layer", "y", "x")
@@ -65,18 +69,25 @@ layer, row and column:
 
 .. code-block:: python
 
-  screen_top = [0.0, 0.0]
-  screen_bottom = [-4.0, -10.0]
+  # Specify well locations
   x = [150_200.0, 160_800.0]
   y = [450_300.0, 460_200.0]
-  # Create transient well package
+  # Specify well screen depths
+  screen_top = [0.0, 0.0]
+  screen_bottom = [-4.0, -10.0]
+
+  # Specify flow rate, which changes over time.
   weltimes = pd.date_range("2000-01-01", "2000-01-03", freq="2D")
-  rate = xr.DataArray([[0.5, 1.0], [2.5, 3.0]], coords={"time": weltimes}, dims=("time","index"))
+  well_rates_period1 = [0.5, 1.0]
+  well_rates_period2 =  [2.5, 3.0]
+  rate = xr.DataArray([well_rates_period1, well_rates_period2], coords={"time": weltimes}, dims=("time","index"))
+
+  # Now construct the Well package
   wel_pkg = imod.mf6.Well(x=x, y=y, rate=rate, screen_top=screen_top, screen_bottom=screen_bottom)
 
 iMOD Python will take care of the rest and assign the wells to the correct model
 layers upon writing the model. It will furthermore distribute well rates based
-on transmissivities. To verify how wells will be assigned to model layers before
+on transmissivities. To verify how wells will be assigned to MODFLOW6 cells before
 writing the entire simulation, you can use the following command:
 
 .. code-block:: python
@@ -84,6 +95,7 @@ writing the entire simulation, you can use the following command:
   # Wells have been distributed across two model layers based on screen depths.
   wel_mf6_pkg = wel_pkg.to_mf6(idomain, top, bottom, k=1.0)
   print(wel_mf6_pkg["cellid"])
+
   # Well rates have been distributed based on screen overlap
   print(wel_mf6_pkg["rate"])
 
@@ -110,11 +122,17 @@ consistent, based on all the unique times assigned to the boundary conditions.
 
 .. code-block:: python
 
+  # First add the packages to the simulation. NOTE: To get a functional model,
+  # more packages are needed than these two.
   simulation = imod.mf6.Modflow6Simulation("example")
   simulation["gwf"] = imod.mf6.GroundwaterFlowModel()
   simulation["gwf"]["dis"] = dis_pkg
   simulation["gwf"]["wel"] = wel_pkg
+
+  # Create a time discretization based on the times assigned to the packages.
+  # Specify the end time of the simulation as one of the additional_times
   simulation.create_time_discretization(additional_times=["2000-01-07"])
+
   # Note that timesteps in well package are also inserted in the time
   # discretization
   print(simulation["time_discretization"].dataset)
@@ -148,6 +166,18 @@ useful for example when you want to create a smaller model for testing purposes.
 
   sim_clipped = simulation.clip_box(x_min=125_000, x_max=175_000, y_min=425_000, y_max=475_000)
 
+You can even provide states for the model, which will be set on the model boundaries of the clipped model.
+
+.. code-block:: python
+
+  # Create a grid of zero, which will be used to set as heads at the boundary
+  head_for_boundary = xr.zeros_like(idomain, dtype=float)
+  states_for_boundary = {"gwf": head_for_boundary}
+
+  sim_clipped = simulation.clip_box(
+      x_min=125_000, x_max=175_000, y_min=425_000, y_max=475_000, states_for_boundary=states_for_boundary
+  )
+
 7\. Performant writing of MODFLOW6 models
 -----------------------------------------
 
@@ -160,6 +190,26 @@ memory, using `dask`_ arrays.
 
 *NOTE:* We don't hate Flopy, nor seek its demise. iMOD developers also
 contribute and aid in the development of Flopy.
+
+8\. Import your iMOD5 models
+----------------------------
+
+Models made with `iMOD5`_ can be imported into iMOD Python, provided that they are
+defined in a projectfile.
+
+.. code-block:: python
+
+  # Open projectfile data
+  imod5_data, period_data = imod.formats.prj.open_projectfile_data("path/to/projectfile.prj")
+
+  # Specify times for the simulation, this will be used to resample iMOD5 wells
+  # to and to set the time discretization
+  times = [np.datetime64("2000-01-01"), np.datetime64("2000-01-02"), np.datetime64("2000-01-03")]
+  
+  # Create a simulation object
+  simulation = imod.mf6.Modflow6Simulation.from_imod5_data(imod5_data, period_data, times)
+
+`See this page for a full list of supported iMO5 functionalities. <https://deltares.github.io/imod-python/faq/imod5_backwards_compatibility.html>`_
 
 Why not ``imod``?
 =================
@@ -210,4 +260,5 @@ Issues: https://github.com/Deltares/imod-python/issues
 .. _netCDF: https://www.unidata.ucar.edu/software/netcdf/
 .. _USGS MODFLOW 6: https://www.usgs.gov/software/modflow-6-usgs-modular-hydrologic-model
 .. _iMOD-WQ: https://oss.deltares.nl/web/imod
+.. _iMOD5: https://oss.deltares.nl/web/imod
 .. _Flopy: https://flopy.readthedocs.io/en/latest/
