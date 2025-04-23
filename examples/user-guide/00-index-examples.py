@@ -46,6 +46,8 @@ elevation.load()
 # Create idomain grid
 layer_template = xr.DataArray([1, 1, 1], dims=("layer",), coords={"layer": [1, 2, 3]})
 idomain = layer_template * xr.ones_like(elevation).astype(int)
+# Deactivate cells with NoData
+idomain = idomain.where(elevation.notnull(), 0)
 
 # Compute bottom elevations of model layers
 layer_thickness = xr.DataArray(
@@ -133,8 +135,8 @@ sim_clipped = simulation.clip_box(
 # %% 
 # You can even provide states for the model, which will be set on the model
 # boundaries of the clipped model. Create a grid of zeros, which will be used to
-# set as heads at the boundary
-head_for_boundary = xr.zeros_like(idomain, dtype=float)
+# set as heads at the boundaries of clipped parts.
+head_for_boundary = xr.zeros_like(idomain, dtype=float).where(idomain > 0)
 states_for_boundary = {"gwf": head_for_boundary}
 
 sim_clipped = simulation.clip_box(
