@@ -171,7 +171,8 @@ You can even provide states for the model, which will be set on the model bounda
 
 .. code-block:: python
 
-  # Create a grid of zeros, which will be used to set as heads at the boundary
+  # Create a grid of zeros, which will be used to
+  # set as heads at the boundaries of clipped parts.
   head_for_boundary = xr.zeros_like(idomain, dtype=float)
   states_for_boundary = {"gwf": head_for_boundary}
 
