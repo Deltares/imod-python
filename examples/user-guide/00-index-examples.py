@@ -76,11 +76,17 @@ screen_bottom = [-4.0, -10.0]
 # Specify flow rate, which changes over time.
 weltimes = pd.date_range("2000-01-01", "2000-01-03", freq="2D")
 well_rates_period1 = [0.5, 1.0]
-well_rates_period2 =  [2.5, 3.0]
-rate = xr.DataArray([well_rates_period1, well_rates_period2], coords={"time": weltimes}, dims=("time","index"))
+well_rates_period2 = [2.5, 3.0]
+rate = xr.DataArray(
+    [well_rates_period1, well_rates_period2],
+    coords={"time": weltimes},
+    dims=("time", "index"),
+)
 
 # Now construct the Well package
-wel_pkg = imod.mf6.Well(x=x, y=y, rate=rate, screen_top=screen_top, screen_bottom=screen_bottom)
+wel_pkg = imod.mf6.Well(
+    x=x, y=y, rate=rate, screen_top=screen_top, screen_bottom=screen_bottom
+)
 
 # iMOD Python will take care of the rest and assign the wells to the correct model
 # layers upon writing the model. It will furthermore distribute well rates based
@@ -132,7 +138,7 @@ print(sim_regridded["gwf"]["dis"])
 sim_clipped = simulation.clip_box(
     x_min=125_000, x_max=175_000, y_min=425_000, y_max=475_000
 )
-# %% 
+# %%
 # You can even provide states for the model, which will be set on the model
 # boundaries of the clipped model. Create a grid of zeros, which will be used to
 # set as heads at the boundaries of clipped parts.
@@ -140,7 +146,11 @@ head_for_boundary = xr.zeros_like(idomain, dtype=float).where(idomain > 0)
 states_for_boundary = {"gwf": head_for_boundary}
 
 sim_clipped = simulation.clip_box(
-    x_min=125_000, x_max=175_000, y_min=425_000, y_max=475_000, states_for_boundary=states_for_boundary
+    x_min=125_000,
+    x_max=175_000,
+    y_min=425_000,
+    y_max=475_000,
+    states_for_boundary=states_for_boundary,
 )
 
 # Notice that a Constant Head (CHD) package has been created for the clipped
