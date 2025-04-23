@@ -75,6 +75,7 @@ layer, row and column:
   # Specify well locations
   x = [150_200.0, 160_800.0]
   y = [450_300.0, 460_200.0]
+
   # Specify well screen depths
   screen_top = [0.0, 0.0]
   screen_bottom = [-4.0, -10.0]
@@ -173,13 +174,17 @@ You can even provide states for the model, which will be set on the model bounda
 
 .. code-block:: python
 
-  # Create a grid of zero, which will be used to set as heads at the boundary
+  # Create a grid of zeros, which will be used to set as heads at the boundary
   head_for_boundary = xr.zeros_like(idomain, dtype=float)
   states_for_boundary = {"gwf": head_for_boundary}
 
   sim_clipped = simulation.clip_box(
       x_min=125_000, x_max=175_000, y_min=425_000, y_max=475_000, states_for_boundary=states_for_boundary
   )
+
+  # Notice that a Constant Head (CHD) package has been created for the clipped
+  # model.
+  print(sim_clipped["gwf"])
 
 7\. Performant writing of MODFLOW6 models
 -----------------------------------------
