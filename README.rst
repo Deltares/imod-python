@@ -11,24 +11,24 @@ The ``imod`` Python package is an open source project to make working with
 MODFLOW groundwater models in Python easier. It builds on top of popular
 packages such as `xarray`_, `pandas`_, `geopandas`_, `dask`_,  and `rasterio`_
 to provide a versatile toolset for working with large groundwater modeling
-data. Some of its core functionalities are:
+datasets. Some of its core functionalities are:
 
 * Preparing and modifying data from a variety of GIS, scientific, and MODFLOW
   file formats;
 * Regridding, clipping, masking, and splitting MODFLOW6 models;
 * Fast writing of data to MODFLOW-based models;
-* Selecting and evaluating for e.g. time series comparison or water budgets;
+* Selecting and evaluating, e.g. for time series comparison or water budgets;
 * Visualizing cross sections, time series, or 3D animations.
 
 We currently support the following MODFLOW-based kernels:
 
 * `USGS MODFLOW 6`_, structured (DIS) and discretization by vertices (DISV)
-  grids only, and not all advanced stress packages (only LAK and UZF)
+  grids only. Not all advanced stress packages are supported (only LAK and UZF)
 * `iMOD-WQ`_, which integrates SEAWAT (density-dependent
   groundwater flow) and MT3DMS (multi-species reactive transport calculations)
 
 Development currently focuses on supporting more Modflow 6 functionalities.
-iMOD-WQ is sunset and will not be further developed.
+iMOD-WQ has been sunset and will no longer be developed.
 
 Why ``imod``?
 =============
@@ -37,7 +37,7 @@ Why ``imod``?
 -------------------------------------------
 
 Seamlessly integrate your GIS rasters or meshes with MODFLOW6, by using `xarray`_
-and `xugrid`_ arrays, for structured and unstructured grids respectively, to
+and `xugrid`_ arrays, for structured and unstructured grids, respectively, to
 create grid-based model packages. 
 
 .. code-block:: python
@@ -218,8 +218,8 @@ Why not ``imod``?
 ---------------------------------------------
 
 If you are not interested in deriving models from spatial data, but just want to
-allocate boundary conditions based on layer, row, column numbers, or want to
-create a model of a 2D cross-section: You are better off using `Flopy`_.
+allocate boundary conditions based on layer, row, column numbers, or create a
+model of a 2D cross-section: You are better off using `Flopy`_.
 
 2\. Not all MODFLOW6 features are supported
 -------------------------------------------
@@ -235,11 +235,11 @@ Currently, we don't support the following MODFLOW6 features:
 - Water mover (MVR) package
 - Particle tracking (PRT)
 
-Most of these features can be implemented with a bit of work, but we haven't
+Most of these features can be implemented with some effort, but we have not
 prioritized them yet. The exceptions are the DISU package and the timeseries
-files, which would require a lot of work on our backend to support, so we will
-probably not support these two features in the foreseeable future. If you need
-any of the other features, feel free to open an issue on our GitHub page. 
+files, which would require significant work to our backend. As a result, we will
+likely not support these two features in the foreseeable future. If you need any of the
+other features, feel free to open an issue on our GitHub page.
 
 Additional links
 ================
