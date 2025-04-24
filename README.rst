@@ -15,7 +15,7 @@ datasets. Some of its core functionalities are:
 
 * Preparing and modifying data from a variety of GIS, scientific, and MODFLOW
   file formats;
-* Regridding, clipping, masking, and splitting MODFLOW6 models;
+* Regridding, clipping, masking, and splitting MODFLOW 6 models;
 * Fast writing of data to MODFLOW-based models;
 * Selecting and evaluating, e.g. for time series comparison or water budgets;
 * Visualizing cross sections, time series, or 3D animations.
@@ -27,7 +27,7 @@ We currently support the following MODFLOW-based kernels:
 * `iMOD-WQ`_, which integrates SEAWAT (density-dependent
   groundwater flow) and MT3DMS (multi-species reactive transport calculations)
 
-Development currently focuses on supporting more Modflow 6 functionalities.
+Development currently focuses on supporting more MODFLOW 6 functionalities.
 iMOD-WQ has been sunset and will no longer be developed.
 
 Why ``imod``?
@@ -36,7 +36,7 @@ Why ``imod``?
 1\. Easily create grid-based model packages
 -------------------------------------------
 
-Seamlessly integrate your GIS rasters or meshes with MODFLOW6, by using `xarray`_
+Seamlessly integrate your GIS rasters or meshes with MODFLOW 6, by using `xarray`_
 and `xugrid`_ arrays, for structured and unstructured grids, respectively, to
 create grid-based model packages. 
 
@@ -88,7 +88,7 @@ layer, row and column:
 
 iMOD Python will take care of the rest and assign the wells to the correct model
 layers upon writing the model. It will furthermore distribute well rates based
-on transmissivities. To verify how wells will be assigned to MODFLOW6 cells before
+on transmissivities. To verify how wells will be assigned to MODFLOW 6 cells before
 writing the entire simulation, you can use the following command:
 
 .. code-block:: python
@@ -114,7 +114,7 @@ across layers.
 4\. Create stress periods based on times assigned to boundary conditions
 --------------------------------------------------------------------------
 
-MODFLOW6 requires that all stress periods are defined in the time discretization
+MODFLOW 6 requires that all stress periods are defined in the time discretization
 package. However, usually boundary conditions are defined at inconsistent
 times. iMOD Python can help you to create a time discretization package that is
 consistent, based on all the unique times assigned to the boundary conditions.
@@ -139,10 +139,10 @@ consistent, based on all the unique times assigned to the boundary conditions.
   print(simulation["time_discretization"].dataset)
 
 
-5\. Regridding MODFLOW6 models to different grids
--------------------------------------------------
+5\. Regridding MODFLOW 6 models to different grids
+--------------------------------------------------
 
-Regrid MODFLOW6 models to different grids, even from structured to unstructured
+Regrid MODFLOW 6 models to different grids, even from structured to unstructured
 grids. iMOD Python takes care of properly scaling the input parameters. You can
 also configure scaling methods yourself for each input parameter, for example
 when you want to upscale drainage elevations with the minimum instead of the
@@ -157,8 +157,8 @@ average.
 
 `See further explanation here <https://deltares.github.io/imod-python/user-guide/08-regridding.html>`_
 
-6\. Clip MODFLOW6 models to a bounding box
-------------------------------------------
+6\. Clip MODFLOW 6 models to a bounding box
+-------------------------------------------
 
 To reduce the size of your model, you can clip it to a bounding box. This is
 useful for example when you want to create a smaller model for testing purposes.
@@ -184,10 +184,10 @@ You can even provide states for the model, which will be set on the model bounda
   # model.
   print(sim_clipped["gwf"])
 
-7\. Performant writing of MODFLOW6 models
------------------------------------------
+7\. Performant writing of MODFLOW 6 models
+------------------------------------------
 
-iMOD Python efficiently writes MODFLOW6 models to disk, especially large models.
+iMOD Python efficiently writes MODFLOW 6 models to disk, especially large models.
 Tests we have conducted for the Dutch National Groundwater Model (LHM) show that
 iMOD Python can write a model with 21.84 million cells 5 to 60 times faster (for
 respectively 1 and 365 stress periods) than the alternative `Flopy`_ package. 
@@ -227,10 +227,10 @@ If you are not interested in deriving models from spatial data, but just want to
 allocate boundary conditions based on layer, row, column numbers, or create a
 model of a 2D cross-section: You are better off using `Flopy`_.
 
-2\. Not all MODFLOW6 features are supported
--------------------------------------------
+2\. Not all MODFLOW 6 features are supported
+--------------------------------------------
 
-Currently, we don't support the following MODFLOW6 features:
+Currently, we don't support the following MODFLOW 6 features:
 
 - timeseries files
 - DISU package
