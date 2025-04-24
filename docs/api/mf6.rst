@@ -1,6 +1,6 @@
 .. currentmodule:: imod.mf6
 
-MODFLOW6
+MODFLOW 6
 ========
 
 Read Output
