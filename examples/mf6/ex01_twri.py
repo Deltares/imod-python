@@ -2,7 +2,7 @@
 TWRI
 ====
 
-This example has been converted from the `MODFLOW6 Example problems`_.  See the
+This example has been converted from the `MODFLOW 6 Example problems`_.  See the
 `description`_ and the `notebook`_ which uses `FloPy`_ to setup the model.
 
 This example is a modified version of the original MODFLOW example
@@ -15,7 +15,7 @@ explicitly simulated, to an equivalent three-dimensional problem.
 In overview, we'll set the following steps:
 
     * Create a structured grid for a rectangular geometry.
-    * Create the xarray DataArrays containg the MODFLOW6 parameters.
+    * Create the xarray DataArrays containg the MODFLOW 6 parameters.
     * Feed these arrays into the imod mf6 classes.
     * Write to modflow6 files.
     * Run the model.
@@ -189,7 +189,7 @@ simulation.write(modeldir)
 # .. note::
 #
 #   The following lines assume the ``mf6`` executable is available on your PATH.
-#   :ref:`The Modflow 6 examples introduction <mf6-introduction>` shortly
+#   :ref:`The MODFLOW 6 examples introduction <mf6-introduction>` shortly
 #   describes how to add it to yours.
 
 simulation.run()
@@ -213,7 +213,7 @@ head.isel(layer=0, time=0).plot.contourf()
 
 
 # %%
-# .. _MODFLOW6 example problems: https://github.com/MODFLOW-USGS/modflow6-examples
+# .. _MODFLOW 6 example problems: https://github.com/MODFLOW-USGS/modflow6-examples
 # .. _description: https://modflow6-examples.readthedocs.io/en/master/_examples/ex-gwf-twri.html
 # .. _notebook: https://github.com/MODFLOW-USGS/modflow6-examples/blob/develop/scripts/ex-gwf-twri.py
 # .. _Techniques of Water-Resources Investigation: https://pubs.usgs.gov/twri/twri7-c1/

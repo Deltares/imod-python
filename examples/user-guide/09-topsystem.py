@@ -6,7 +6,7 @@ iMOD Python has multiple features to help you define the topsystem of the
 groundwater system. With "topsystem" we mean all forcings which act on the top
 of the groundwater system. These are usually either meteorological
 (precipitation & evapotranspiration) or hydrological (rivers, ditches, lakes,
-sea) in nature. In MODFLOW6 these are usually simulated with the DRN, RIV, GHB,
+sea) in nature. In MODFLOW 6 these are usually simulated with the DRN, RIV, GHB,
 and RCH package. This data is usually provided as planar grids (x, y) without
 any vertical dimension. This user guide will show you how to allocate these
 forcings across model layers to grid cells and how to distribute conductances
@@ -404,10 +404,10 @@ plt.tight_layout()
 # layer.
 
 # %%
-# MODFLOW6 package
+# MODFLOW 6 package
 # ----------------
 #
-# The data created can now be used to create a MODFLOW6 package. To construct 3D
+# The data created can now be used to create a MODFLOW 6 package. To construct 3D
 # grids from planar grids for the stages, we can utilize xarrays broadcasting:
 from imod.typing.grid import enforce_dim_order
 

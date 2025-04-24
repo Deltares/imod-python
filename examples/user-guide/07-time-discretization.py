@@ -13,7 +13,7 @@ functionality is activated with the ``create_time_discretization()`` method.
 # ------
 #
 # To demonstrate the ``create_time_discretization()`` method, we first have to
-# create a Model object. In this case we'll use a Modflow 6 simulation, but the
+# create a Model object. In this case we'll use a MODFLOW 6 simulation, but the
 # ``imod.wq.SeawatModel`` also supports this.
 #
 # .. note::
@@ -21,7 +21,7 @@ functionality is activated with the ``create_time_discretization()`` method.
 #    The simulation created in this example misses some mandatory packes, so is
 #    not able to write a functional simulation. It is purely intended to describe
 #    the workings of the ``time_discretization`` method. For a fully functional
-#    Modflow 6 model, see the examples in :ref:`mf6-introduction`.
+#    MODFLOW 6 model, see the examples in :ref:`mf6-introduction`.
 #
 # Wel'll start off with the usual imports:
 

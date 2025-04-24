@@ -216,10 +216,10 @@ gwf_simulation.write(tmp_dir)
 #
 # Great! The model was succesfully written!
 #
-# Cleaning data without a MODFLOW6 simulation
+# Cleaning data without a MODFLOW 6 simulation
 # -------------------------------------------
 #
-# There might be situations where you do not have a MODFLOW6 simulation or River
+# There might be situations where you do not have a MODFLOW 6 simulation or River
 # package at hand, and you still want to clean up your river grids. In this
 # case, you can use the :func:`imod.prepare.cleanup_riv` function. This function
 # requires you to to separately provide your grids and returns a dictionary of
