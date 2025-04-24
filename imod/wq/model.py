@@ -519,7 +519,7 @@ class SeawatModel(Model):
             self[pkstkey]._compute_load_balance_weight(self[baskey]["ibound"])
             return self[pkstkey]._render(directory=directory / pkstkey)
 
-    def _render_ssm_rch_evt_mal_tvc(self, directory, globaltimes, nlayer, quote: False):
+    def _render_ssm_rch_evt_mal_tvc(self, directory, globaltimes, nlayer, quote=False):
         out = ""
         for key, pkg in self.items():
             if pkg._pkg_id in ("rch", "evt", "mal", "tvc"):
