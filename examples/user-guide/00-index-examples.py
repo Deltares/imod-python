@@ -35,7 +35,7 @@ tmp_dir.mkdir(parents=True, exist_ok=True)
 interpolated_elevation.rio.to_raster(tmp_dir / "elevation.tif")
 
 # %%
-# Seamlessly integrate your GIS rasters or meshes with MODFLOW6, by using `xarray`_
+# Seamlessly integrate your GIS rasters or meshes with MODFLOW 6, by using `xarray`_
 # and `xugrid`_ arrays, for structured and unstructured grids respectively, to
 # create grid-based model packages.
 
@@ -101,7 +101,7 @@ print(wel_mf6_pkg["cellid"])
 print(wel_mf6_pkg["rate"])
 
 # %%
-# MODFLOW6 requires that all stress periods are defined in the time discretization
+# MODFLOW 6 requires that all stress periods are defined in the time discretization
 # package. However, usually boundary conditions are defined at insconsistent
 # times. iMOD Python can help you to create a time discretization package that is
 # consistent, based on all the unique times assigned to the boundary conditions.
@@ -120,7 +120,7 @@ simulation.create_time_discretization(additional_times=["2000-01-07"])
 print(simulation["time_discretization"].dataset)
 
 # %%
-# Regrid MODFLOW6 models to different grids, even from structured to unstructured
+# Regrid MODFLOW 6 models to different grids, even from structured to unstructured
 # grids. iMOD Python takes care of properly scaling the input parameters. You can
 # also configure scaling methods yourself for each input parameter, for example
 # when you want to upscale drainage elevations with the minimum instead of the

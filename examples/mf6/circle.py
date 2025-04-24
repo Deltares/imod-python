@@ -8,7 +8,7 @@ model using the ``imod`` package and associated packages.
 In overview, we'll set the following steps:
 
     * Create a triangular mesh for a disk geometry.
-    * Create the xugrid UgridDataArrays containg the MODFLOW6 parameters.
+    * Create the xugrid UgridDataArrays containg the MODFLOW 6 parameters.
     * Feed these arrays into the imod mf6 classes.
     * Write to modflow6 files.
     * Run the model.
@@ -162,7 +162,7 @@ simulation.write(modeldir)
 # .. note::
 #
 #   The following lines assume the ``mf6`` executable is available on your PATH.
-#   :ref:`The Modflow 6 examples introduction <mf6-introduction>` shortly
+#   :ref:`The MODFLOW 6 examples introduction <mf6-introduction>` shortly
 #   describes how to add it to yours.
 
 simulation.run()
@@ -178,7 +178,7 @@ head = simulation.open_head()
 head
 
 # %%
-# For a DISV MODFLOW6 model, the heads are returned as a UgridDataArray.  While
+# For a DISV MODFLOW 6 model, the heads are returned as a UgridDataArray.  While
 # all layers and timesteps are available, they are only loaded into memory as
 # needed.
 #

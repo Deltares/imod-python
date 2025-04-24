@@ -1,10 +1,10 @@
 Known Issues
 ============
 
-Modflow 6 versions
+MODFLOW 6 versions
 ------------------
 
-iMOD Python is tested to work with Modflow 6 versions:
+iMOD Python is tested to work with MODFLOW 6 versions:
 
 * All 6.2, 6.3 versions
 * 6.4.0, 6.4.2

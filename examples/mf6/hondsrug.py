@@ -5,7 +5,7 @@ Regional model
 This example shows a simplified script for building a groundwater model in the
 northeast of the Netherlands. A primary feature of this area is an ice-pushed
 ridge called the Hondsrug. This examples demonstrates modifying external data
-for use in a MODFLOW6 model.
+for use in a MODFLOW 6 model.
 
 In overview, the model features:
 
@@ -50,7 +50,7 @@ layermodel = imod.data.hondsrug_layermodel()
 # Make sure that the idomain is provided as integers
 idomain = layermodel["idomain"].astype(int)
 
-# We only need to provide the data for the top as a 2D array. Modflow 6 will
+# We only need to provide the data for the top as a 2D array. MODFLOW 6 will
 # compare the top against the uppermost active bottom cell.
 top = layermodel["top"].max(dim="layer")
 
@@ -264,7 +264,7 @@ gwf_model["chd"] = imod.mf6.ConstantHead(
 # slicing the area to the model's miminum and maximum dimensions.
 #
 # Note that the meteorological data has mm/d as unit and
-# this has to be converted to m/d for Modflow 6.
+# this has to be converted to m/d for MODFLOW 6.
 
 xmin = 230_000.0
 xmax = 257_000.0
@@ -606,7 +606,7 @@ simulation.create_time_discretization(
 # .. note::
 #
 #   The following lines assume the ``mf6`` executable is available on your PATH.
-#   :ref:`The Modflow 6 examples introduction <mf6-introduction>` shortly
+#   :ref:`The MODFLOW 6 examples introduction <mf6-introduction>` shortly
 #   describes how to add it to yours.
 
 modeldir = imod.util.temporary_directory()
@@ -665,7 +665,7 @@ hds.sel(layer=slice(3, 5)).mean(dim="layer").isel(time=3).plot(ax=ax)
 # Assign dates to head
 # --------------------
 #
-# MODFLOW6 has no concept of a calendar, so the output is not labelled only
+# MODFLOW 6 has no concept of a calendar, so the output is not labelled only
 # in terms of "time since start" in floating point numbers. For this model
 # the time unit is days and we can assign a date coordinate as follows:
 

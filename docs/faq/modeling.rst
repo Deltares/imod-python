@@ -94,16 +94,16 @@ at the water table, where air is replaced by water.
     In the BCF package of older MODFLOW versions, storage can only be
     configured via the storage coefficient values; in the LPF package, storage
     can only be configured via specific storage values. In MODFLOW2005's LPF
-    package and MODFLOW6's NPF package, storage values are read as **specific**
+    package and MODFLOW 6's NPF package, storage values are read as **specific**
     storage by default and will be multiplied by layer thickness by MODFLOW
     internally.  By using a "STORAGECOEFFICIENT" option, MODFLOW will read the
     values as storativity instead. In LPF and NPF, specific yield is a separate
     parameter (and will only be used if there are convertible layers).
     
-MODFLOW6
+MODFLOW 6
 --------
 
-Use a river infiltration factor in MODFLOW6
+Use a river infiltration factor in MODFLOW 6
 *******************************************
     
 .. |m-1| replace:: m\ :sup:`-1`\

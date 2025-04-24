@@ -51,7 +51,7 @@ values than before.
 Removed
 ~~~~~~~
 - ``imod.flow`` module has been removed for generating iMODFLOW models. Use
-  ``imod.mf6`` instead to generate MODFLOW6 models.
+  ``imod.mf6`` instead to generate MODFLOW 6 models.
 
 Added
 ~~~~~
@@ -79,7 +79,7 @@ Changed
   zero layer numbers to grid coordinates.
 - In :class:`imod.mf6.StructuredDiscretization`, IDOMAIN can now respectively be
   > 0 to indicate an active cell and <0 to indicate a vertical passthrough cell,
-  consistent with MODFLOW6. Previously this could only be indicated with 1 and
+  consistent with MODFLOW 6. Previously this could only be indicated with 1 and
   -1.
 - :meth:`imod.mf6.Well.from_imod5_data` and
   :meth:`imod.mf6.LayeredWell.from_imod5_data` now also accept the argument
@@ -93,7 +93,7 @@ Changed
   :func:`imod.prepare.wells.assign_wells`, :meth:`imod.mf6.Well.from_imod5_data`
   and :meth:`imod.mf6.LayeredWell.from_imod5_data` now have default values for
   ``minimum_thickness`` and ``minimum_k`` set to 0.0.
-- When intitating a MODFLOW6 package with a ``layer`` coordinate with
+- When intitating a MODFLOW 6 package with a ``layer`` coordinate with
   values <= 0, iMOD Python will throw an error.
 - :class:`imod.mf6.HorizontalFlowBarrierResistance`,
   :class:`imod.mf6.HorizontalFlowBarrierSingleLayerResistance` and other HFB now
@@ -183,7 +183,7 @@ Added
   :class:`imod.mf6.LayeredWell` package from iMOD5 data in the CAP package (for
   MetaSWAP). Currently only griddata (IDF) is supported.
 - :meth:`imod.mf6.Recharge.from_imod5_cap_data` to construct a recharge package
-  for coupling a MODFLOW6 model to MetaSWAP.
+  for coupling a MODFLOW 6 model to MetaSWAP.
 - :meth:`imod.msw.MetaSwapModel.from_imod5_data` to construct a MetaSWAP model
   from data in an iMOD5 projectfile.
 - :meth:`imod.msw.MetaSwapModel.write` has a ``validate`` argument, which can be
@@ -242,7 +242,7 @@ Changed
   We plan to remove this object in the final 1.0 release. `Use the xugrid
   regridder to regrid individual grids instead.
   <https://deltares.github.io/xugrid/examples/regridder_overview.html>`_ To
-  regrid entire MODFLOW6 packages or simulations, `see the user guide here.
+  regrid entire MODFLOW 6 packages or simulations, `see the user guide here.
   <https://deltares.github.io/imod-python/user-guide/08-regridding.html>`_.
 
 [0.18.1] - 2024-11-20
@@ -343,7 +343,7 @@ Changed
 - :func:`imod.prepare.fill` now takes a ``dims`` argument instead of ``by``,
   and will fill over N dimensions. Secondly, the function no longer takes
   an ``invalid`` argument, but instead always treats NaNs as missing.
-- Reverted the need for providing WriteContext objects to MODFLOW6 Model and
+- Reverted the need for providing WriteContext objects to MODFLOW 6 Model and
   Package objects' ``write`` method. These now use similar arguments to the
   :meth:`imod.mf6.Modflow6Simulation.write` method.
 - :class:`imod.msw.CouplingMapping`, :class:`imod.msw.Sprinkling`,
@@ -387,7 +387,7 @@ Added
   definitely will fail.
 - :meth:`imod.msw.MetaSwapModel.regrid_like` to regrid MetaSWAP models.
 - :meth:`imod.mf6.GroundwaterFlowModel.prepare_wel_for_mf6` to prepare wells for
-  MODFLOW6, for debugging purposes.
+  MODFLOW 6, for debugging purposes.
 
 Removed
 ~~~~~~~
@@ -634,7 +634,7 @@ Fixed
 - Packages and boundary conditions in the ``imod.mf6`` module will now throw an
   error upon initialization if coordinate labels are inconsistent amongst
   variables
-- Improved performance for merging structured multimodel Modflow 6 output
+- Improved performance for merging structured multimodel MODFLOW 6 output
 - Bug where :func:`imod.formats.idf.open_subdomains` did not properly support custom
   patterns
 - Added missing validation for ``concentration`` for :class:`imod.mf6.Drainage` and
@@ -741,7 +741,7 @@ Changed
   imod-environment-dev.yml file (containing additional packages for developers).
 - Changed the way :class:`imod.mf6.Modflow6Simulation`,
   :class:`imod.mf6.GroundwaterFlowModel`,
-  :class:`imod.mf6.GroundwaterTransportModel`, and Modflow 6 packages are
+  :class:`imod.mf6.GroundwaterTransportModel`, and MODFLOW 6 packages are
   represented while printing.
 - The grid-agnostic packages :meth:`imod.mf6.Well.regrid_like` and
   :meth:`imod.mf6.HorizontalFlowBarrier.regrid_like` now return a clip with the
@@ -806,14 +806,14 @@ Removed
 Changed
 ~~~~~~~
 
-- TWRI Modflow 6 example uses the grid-agnostic :class:`imod.mf6.Well`
+- TWRI MODFLOW 6 example uses the grid-agnostic :class:`imod.mf6.Well`
   package instead of the :class:`imod.mf6.WellDisStructured` package.
 
 Fixed
 ~~~~~
 
 - :class:`imod.mf6.HorizontalFlowBarrier` would write to a binary file by
-  default. However, the current version of Modflow 6 does not support this.
+  default. However, the current version of MODFLOW 6 does not support this.
   Therefore, this class now always writes to text file.
 
 
@@ -909,13 +909,13 @@ Added
 
 - :class:`imod.mf6.OutputControl` now takes parameters ``head_file``,
   ``concentration_file``, and ``budget_file`` to specify where to store
-  MODFLOW6 output files.
+  MODFLOW 6 output files.
 - :func:`imod.util.spatial.from_mdal_compliant_ugrid2d` to "restack" the variables that
   have have been "unstacked" in :func:`imod.util.spatial.mdal_compliant_ugrid2d`.
 - Added support for the Modflow6 Lake package
 - :func:`imod.select.points_in_bounds`, :func:`imod.select.points_indices`,
   :func:`imod.select.points_values` now support unstructured grids.
-- Added support for the Modflow 6 Lake package: :class:`imod.mf6.Lake`,
+- Added support for the MODFLOW 6 Lake package: :class:`imod.mf6.Lake`,
   :class:`imod.mf6.LakeData`, :class:`imod.mf6.OutletManning`, :class:`OutletSpecified`,
   :class:`OutletWeir`. See the examples for an application of the Lake package.
 - :meth:`imod.mf6.simulation.Modflow6Simulation.dump` now supports dumping to MDAL compliant
@@ -976,7 +976,7 @@ Added
 
 - Added an extra optional argument in
   :meth:`imod.couplers.metamod.MetaMod.write` named ``modflow6_write_kwargs``,
-  which can be used to provide keyword arguments to the writing of the Modflow 6
+  which can be used to provide keyword arguments to the writing of the MODFLOW 6
   Simulation.
 
 Fixed
@@ -992,7 +992,7 @@ Fixed
 ~~~~~
 
 - :meth:`imod.mf6.Modflow6Simulation.write` with ``binary=False`` no longer
-  results in invalid MODFLOW6 input for 2D grid data, such as DIS top.
+  results in invalid MODFLOW 6 input for 2D grid data, such as DIS top.
 - ``imod.flow.ImodflowModel.write`` no longer writes incorrect project
   files for non-grid values with a time and layer dimension.
 - :func:`imod.evaluate.interpolate_value_boundaries`: Fix edge case when
@@ -1071,7 +1071,7 @@ Changed
   which models should be solved in a single numerical solution. This is
   required to simulate groundwater flow and transport as they should be
   in separate solutions.
-- When writing MODFLOW6 input option blocks, a NaN value is now recognized as
+- When writing MODFLOW 6 input option blocks, a NaN value is now recognized as
   an alternative to None (and the entry will not be included in the options
   block).
 
@@ -1144,7 +1144,7 @@ Added
 -  :meth:`imod.wq.SeawatModel.to_netcdf` has been added to write all model
    packages to netCDF files.
 -  :func:`imod.mf6.open_cbc` has been added to read the budget data of
-   structured (DIS) MODFLOW6 models. The data is read lazily into xarray
+   structured (DIS) MODFLOW 6 models. The data is read lazily into xarray
    DataArrays per timestep.
 -  :func:`imod.visualize.streamfunction` and :func:`imod.visualize.quiver`
    were added to plot a 2D representation of the groundwater flow field using
@@ -1170,8 +1170,8 @@ Added
 -  Added ``imod.flow.ImodflowModel`` to write to model iMODFLOW project
    file.
 -  :meth:`imod.mf6.Modflow6Simulation.write` now has a ``binary`` keyword. When set
-   to ``False``, all MODFLOW6 input is written to text rather than binary files.
--  Added :class:`imod.mf6.DiscretizationVertices` to write MODFLOW6 DISV model
+   to ``False``, all MODFLOW 6 input is written to text rather than binary files.
+-  Added :class:`imod.mf6.DiscretizationVertices` to write MODFLOW 6 DISV model
    input.
 -  Packages for :class:`imod.mf6.GroundwaterFlowModel` will now accept
    :class:`xugrid.UgridDataArray` objects for (DISV) unstructured grids, next to
@@ -1188,7 +1188,7 @@ Added
 -  :meth:`imod.mf6.Modflow6Simulation.run` has been added to more easily run a model,
    especially in examples and tests.
 -  :func:`imod.mf6.open_cbc` and :func:`imod.mf6.open_hds` will automatically
-   return a ``xugrid.UgridDataArray`` for MODFLOW6 DISV model output.
+   return a ``xugrid.UgridDataArray`` for MODFLOW 6 DISV model output.
 
 Changed
 ~~~~~~~
@@ -1209,7 +1209,7 @@ Changed
    packages now contain an internal (xarray) Dataset, rather than inheriting
    from the xarray Dataset.
 -  :class:`imod.mf6.SpecificStorage` or :class:`imod.mf6.StorageCoefficient` is
-   now mandatory for every MODFLOW6 model to avoid accidental steady-state
+   now mandatory for every MODFLOW 6 model to avoid accidental steady-state
    configuration.
 
 Removed
@@ -1339,7 +1339,7 @@ Added
 -  64-bit IDF files can be opened :meth:`imod.idf.open`
 -  64-bit IDF files can be written using :meth:`imod.idf.save` and (:meth:`imod.idf.write`) using keyword ``dtype=np.float64``
 -  ``sel`` and ``isel`` methods to ``SeawatModel`` to support taking out a subdomain
--  Docstrings for the Modflow 6 classes in :mod:`imod.mf6`
+-  Docstrings for the MODFLOW 6 classes in :mod:`imod.mf6`
 -  :meth:`imod.select.upper_active_layer` function to get the upper active layer from ibound ``xr.DataArray``
 
 Changed
@@ -1359,7 +1359,7 @@ Fixed
 Added
 ~~~~~
 -  Laplace grid interpolation :meth:`imod.prepare.laplace_interpolate`
--  Experimental Modflow 6 structured model write support :mod:`imod.mf6`
+-  Experimental MODFLOW 6 structured model write support :mod:`imod.mf6`
 -  More supported visualizations :mod:`imod.visualize`
 -  More extensive reading and writing of GDAL raster in :mod:`imod.rasterio`
 
