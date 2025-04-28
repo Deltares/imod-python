@@ -6,6 +6,15 @@ All notable changes to this project will be documented in this file.
 The format is based on `Keep a Changelog`_, and this project adheres to
 `Semantic Versioning`_.
 
+[Unreleased]
+------------
+
+Changed
+~~~~~~~
+
+- :meth:`imod.wq.SeawatModel.write` now throws an error if trying to write in a
+  directory with a space in the path. (iMOD-WQ does not support this.)
+
 [1.0.0rc3] - 2025-04-17
 -----------------------
 
