@@ -1,4 +1,4 @@
-from typing import List
+from typing import List, Any
 
 import numpy as np
 import pandas as pd
@@ -104,7 +104,7 @@ class VerticesDiscretization(Package, IRegridPackage, IMaskingSettings):
 
     def render(self, directory, pkgname, globaltimes, binary):
         disdirectory = directory / pkgname
-        d = {}
+        d: dict[str, Any] = {}
         grid = self.dataset.ugrid.grid
         d["xorigin"] = 0.0
         d["yorigin"] = 0.0
