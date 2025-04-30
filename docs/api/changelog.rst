@@ -16,6 +16,9 @@ Fixed
   :meth:`imod.mf6.Modflow6Simulation.regrid_like` and
   :meth:`imod.mf6.Modflow6Simulation.mask` now present the unexpected
   coordinates in the error message.
+- :class:`imod.mf6.VerticesDiscretization` now correctly sets the ``xorigins``
+  and ``yorigins`` options in the ``.disv`` file. Incorrect origins cause issues
+  when splitting models and computing with XT3D on the exchanges.
 
 Changed
 ~~~~~~~
