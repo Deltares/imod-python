@@ -22,9 +22,9 @@ def idomain_and_bottom():
 
     dx = 5000.0
     dy = -5000.0
-    xmin = 0.0
+    xmin = 10_000.0
     xmax = dx * ncol
-    ymin = 0.0
+    ymin = 10_000.0
     ymax = abs(dy) * nrow
     dims = ("layer", "y", "x")
 
@@ -47,8 +47,8 @@ def test_render(idomain_and_bottom):
     expected = textwrap.dedent(
         """\
         begin options
-          xorigin 0.0
-          yorigin 0.0
+          xorigin 10000.0
+          yorigin 10000.0
         end options
 
         begin dimensions
