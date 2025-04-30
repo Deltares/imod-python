@@ -106,8 +106,8 @@ class VerticesDiscretization(Package, IRegridPackage, IMaskingSettings):
         disdirectory = directory / pkgname
         d = {}
         grid = self.dataset.ugrid.grid
-        d["xorigin"] = grid.node_x.min()
-        d["yorigin"] = grid.node_y.min()
+        d["xorigin"] = 0.0
+        d["yorigin"] = 0.0
         d["nlay"] = self.dataset["idomain"].coords["layer"].size
         facedim = grid.face_dimension
         d["ncpl"] = self.dataset["idomain"].coords[facedim].size
