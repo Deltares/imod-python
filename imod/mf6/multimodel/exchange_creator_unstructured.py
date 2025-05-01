@@ -118,7 +118,7 @@ class ExchangeCreator_Unstructured(ExchangeCreator):
                 join="inner",
                 fill_value=np.nan,
                 compat="override",
-            )["idomain"]
+            )["label"]
 
             model_id = submodel_partition_info.id
             global_to_local_idx[model_id] = pd.DataFrame(

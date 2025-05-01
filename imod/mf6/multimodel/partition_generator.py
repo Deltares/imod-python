@@ -1,6 +1,5 @@
 import copy
-from math import sqrt
-from typing import List, Tuple
+from typing import Optional
 
 import xarray as xr
 import xugrid as xu
@@ -8,12 +7,29 @@ from plum import Dispatcher
 
 from imod.mf6.simulation import Modflow6Simulation
 from imod.typing import GridDataArray
+from imod.typing.grid import as_ugrid_dataarray
 
 # create dispatcher instance to limit scope of typedispatching
 dispatch = Dispatcher()
 
 
-def get_label_array(simulation: Modflow6Simulation, npartitions: int) -> GridDataArray:
+def _validate_weights(idomain: GridDataArray, weights: GridDataArray) -> None:
+    idomain_top = copy.deepcopy(idomain.isel(layer=0))
+    if not isinstance(weights, type(idomain)):
+        raise TypeError(
+            f"weights should be of type {type(idomain)}, but is of type {type(weights)}"
+        )
+    if idomain_top.sizes != weights.sizes:
+        raise ValueError(
+            f"Weights do not have the appropriate size. Expected {idomain_top.sizes}, got {weights.sizes}"
+        )
+
+
+def get_label_array(
+    simulation: Modflow6Simulation,
+    npartitions: int,
+    weights: Optional[GridDataArray] = None,
+) -> GridDataArray:
     """
     Returns a label array: a 2d array with a similar size to the top layer of
     idomain. Every array element is the partition number to which the column of
@@ -29,112 +45,37 @@ def get_label_array(simulation: Modflow6Simulation, npartitions: int) -> GridDat
 
     flowmodel = list(gwf_models.values())[0]
     idomain = flowmodel.domain
-    idomain_top = copy.deepcopy(idomain.isel(layer=0))
 
-    return _partition_idomain(idomain_top, npartitions)
+    if weights is None:
+        weights = (idomain > 0).sum(dim="layer").astype(int)
+    else:
+        _validate_weights(idomain, weights)
+
+    return _partition_idomain(weights, npartitions)
 
 
 @dispatch
-def _partition_idomain(
-    idomain_grid: xu.UgridDataArray, npartitions: int
-) -> GridDataArray:
+def _partition_idomain(weights: xu.UgridDataArray, npartitions: int) -> GridDataArray:
     """
-    Create a label array for unstructured grids using xugrid and, though it, Metis.
+    Create a label array for unstructured grids using PyMetis.
     """
-    labels = idomain_grid.ugrid.grid.label_partitions(n_part=npartitions)
-    labels = labels.rename("idomain")
+    labels = weights.ugrid.label_partitions(n_part=npartitions)
+    labels = labels.rename("label")
     return labels
 
 
 @dispatch  # type: ignore[no-redef]
-def _partition_idomain(idomain_grid: xr.DataArray, npartitions: int) -> GridDataArray:
+def _partition_idomain(weights: xr.DataArray, npartitions: int) -> GridDataArray:
     """
-    Create a label array for structured grids by creating rectangular
-    partitions. It factors the requested number of partitions into the two
-    factors closest to the square root. The axis with the most gridbblocks will
-    be split into the largest number of partitions.
+    Convert to UgridDataArray to use xugrid to call PyMetis to create a label
+    array for structured grids. Call as_ugrid_dataarray to used cached results
+    of ``Ugrid2d.from_structured`` if available, to save some costly
+    conversions.
     """
-
-    # get axis sizes
-    x_axis_size = idomain_grid.shape[0]
-    y_axis_size = idomain_grid.shape[1]
-
-    smallest_factor, largest_factor = _mid_size_factors(npartitions)
-    if x_axis_size < y_axis_size:
-        nr_partitions_x, nr_partitions_y = smallest_factor, largest_factor
-    else:
-        nr_partitions_y, nr_partitions_x = smallest_factor, largest_factor
-
-    x_partition = _partition_1d(nr_partitions_x, x_axis_size)
-    y_partition = _partition_1d(nr_partitions_y, y_axis_size)
-
-    ipartition = -1
-    for ipartx in x_partition:
-        start_x, stop_x = ipartx
-        for iparty in y_partition:
-            start_y, stop_y = iparty
-            ipartition = ipartition + 1
-            idomain_grid.values[start_x : stop_x + 1, start_y : stop_y + 1] = ipartition
-    return idomain_grid
-
-
-def _partition_1d(nr_partitions: int, axis_size: int) -> List[Tuple]:
-    """
-    Returns tuples with start and stop positions of partitions when partitioning
-    an axis of length nr_indices into nr_partitions. Partitions need to be at
-    least 3 gridblocks in size. If this cannot be done, it throws an error. When
-    the number of gridblocks on the axis is not divisible by the number of
-    partitions, then any leftover cells are added in the last partition. For
-    example if we partition an axis of 25 cells into 3 partitions, then the
-    number of cells per partition will be 8 for the first 2 partitions,but the
-    last partition will contain 9 cells.
-    """
-
-    # validate input
-    if nr_partitions <= 0:
-        raise ValueError(
-            "error while partitioning an axis. Create at least 1 partition"
-        )
-    if axis_size <= 0:
-        raise ValueError(
-            "error while partitioning an axis. Axis sized should be positive"
-        )
-
-    # quick exit if 1 partition is requested
-    if nr_partitions == 1:
-        return [(0, axis_size - 1)]
-
-    # compute partition size. round fractions down.
-    cells_per_partition = int(axis_size / nr_partitions)
-    if cells_per_partition < 3:
-        raise ValueError(
-            "error while partitioning an axis. The number of partitions is too large, We should have at least 3 gridblocks in a partition along any axis."
-        )
-
-    # fill the partitions up to the penultimate.
-    partitions = [
-        (i * cells_per_partition, i * cells_per_partition + cells_per_partition - 1)
-        for i in range(nr_partitions - 1)
-    ]
-
-    # now set the lat partition up to the end of the axis
-    final = partitions[-1][1]
-    partitions.append((final + 1, axis_size - 1))
-    return partitions
-
-
-def _mid_size_factors(number_partitions: int) -> Tuple[int, int]:
-    """
-    Returns the 2 factors of an integer that are closest to the square root
-    (smallest first). Calling it on 27 would return 3 and 7; calling it on 25
-    would return 5 fand 5, calling it on 13 would return 1 and 13.
-    """
-
-    factor = int(sqrt(number_partitions))
-    while factor > 0:
-        if number_partitions % factor == 0:
-            break
-        else:
-            factor -= 1
-
-    return factor, int(number_partitions / factor)
+    weights_uda = as_ugrid_dataarray(weights)
+    labels_uda = weights_uda.ugrid.label_partitions(n_part=npartitions)
+    dim = labels_uda.ugrid.grid.core_dimension
+    labels = labels_uda.ugrid.rasterize_like(weights).astype(int)
+    labels = labels.drop_vars(dim)
+    labels = labels.rename("label")
+    return labels
