@@ -102,7 +102,7 @@ class VerticesDiscretization(Package, IRegridPackage, IMaskingSettings):
         super().__init__(dict_dataset)
         self._validate_init_schemata(validate)
 
-    def render(self, directory, pkgname, globaltimes, binary):
+    def _get_render_dictionary(self, directory, pkgname, globaltimes, binary):
         disdirectory = directory / pkgname
         d: dict[str, Any] = {}
         grid = self.dataset.ugrid.grid
@@ -122,7 +122,7 @@ class VerticesDiscretization(Package, IRegridPackage, IMaskingSettings):
         d["idomain_layered"], d["idomain"] = self._compose_values(
             self["idomain"], disdirectory, "idomain", binary=binary
         )
-        return self._template.render(d)
+        return d
 
     def _verts_dataframe(self) -> pd.DataFrame:
         grid = self.dataset.ugrid.grid
