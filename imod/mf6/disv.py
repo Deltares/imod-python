@@ -1,3 +1,4 @@
+from pathlib import Path
 from typing import Any, List
 
 import numpy as np
@@ -146,14 +147,8 @@ class VerticesDiscretization(Package, IRegridPackage, IMaskingSettings):
             )
         return df
 
-    def write_blockfile(self, pkgname, globaltimes, write_context: WriteContext):
-        dir_for_render = write_context.get_formatted_write_directory()
-        content = self.render(
-            dir_for_render, pkgname, globaltimes, write_context.use_binary
-        )
-        filename = write_context.write_directory / f"{pkgname}.{self._pkg_id}"
-        with open(filename, "w") as f:
-            f.write(content)
+    def _append_vertices_and_cell2d(self, filename: Path | str) -> None:
+        with open(filename, "a") as f:
             f.write("\n\n")
 
             f.write("begin vertices\n")
@@ -167,6 +162,14 @@ class VerticesDiscretization(Package, IRegridPackage, IMaskingSettings):
                 f, header=False, sep=" ", lineterminator="\n"
             )
             f.write("end cell2d\n")
+
+        return
+
+    def write_blockfile(self, pkgname, globaltimes, write_context: WriteContext):
+        super().write_blockfile(pkgname, globaltimes, write_context)
+        filename = write_context.write_directory / f"{pkgname}.{self._pkg_id}"
+        self._append_vertices_and_cell2d(filename)
+
         return
 
     def _validate(self, schemata, **kwargs):
