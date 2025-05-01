@@ -21,9 +21,9 @@ def idomain_and_bottom():
     dx = 5000.0
     dy = -5000.0
     xmin = 10_000.0
-    xmax = dx * ncol
+    xmax = dx * ncol + xmin
     ymin = 10_000.0
-    ymax = abs(dy) * nrow
+    ymax = abs(dy) * nrow + ymin
     dims = ("layer", "y", "x")
 
     layer = np.array([1, 2, 3])
