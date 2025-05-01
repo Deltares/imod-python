@@ -491,6 +491,39 @@ def test_open_cbc__disv(circle_result):
             array.load()
 
 
+def test_open_cbc__disv_offset(circle_result__offset_origins):
+    modeldir = circle_result__offset_origins
+    with imod.util.cd(modeldir):
+        cbc = imod.mf6.open_cbc("GWF_1/GWF_1.cbc", "GWF_1/disv.disv.grb")
+        assert isinstance(cbc, dict)
+        assert sorted(cbc.keys()) == [
+            "chd_chd",
+            "flow-horizontal-face",
+            "flow-horizontal-face-x",
+            "flow-horizontal-face-y",
+            "flow-lower-face",
+        ]
+        for key, array in cbc.items():
+            if key in ("chd_chd", "flow-lower-face"):
+                assert array.shape == (52, 2, 216)
+                assert array.dims[-1] == array.ugrid.grid.face_dimension
+            else:
+                assert array.shape == (52, 2, 342)
+                assert array.dims[-1] == array.ugrid.grid.edge_dimension
+            assert isinstance(array, xu.UgridDataArray)
+            assert isinstance(array.data, dask.array.Array)
+
+            # Test if no errors are thrown if the array is loaded into memory
+            array.load()
+            # Test if offset of 10_000 is applied correctly
+            xy_vertices = array.ugrid.grid.get_coordinates("mesh2d_nNodes")
+            xy_faces = array.ugrid.grid.get_coordinates("mesh2d_nFaces")
+            assert np.max(xy_vertices) <= 11_000
+            assert np.min(xy_vertices) >= 9_000
+            assert np.max(xy_faces) <= 11_000
+            assert np.min(xy_faces) >= 9_000
+
+
 def test_open_cbc__disv_datetime(circle_result):
     modeldir = circle_result
     with imod.util.cd(modeldir):
