@@ -16,6 +16,17 @@ Fixed
   :meth:`imod.mf6.Modflow6Simulation.regrid_like` and
   :meth:`imod.mf6.Modflow6Simulation.mask` now present the unexpected
   coordinates in the error message.
+- :class:`imod.mf6.VerticesDiscretization` now correctly sets the ``xorigins``
+  and ``yorigins`` options in the ``.disv`` file. Incorrect origins cause issues
+  when splitting models and computing with XT3D on the exchanges.
+- :func:`imod.mf6.open_cbc` and :func:`imod.mf6.open_head` now account for
+  xorigins and yorigins for models ran with
+  :class:`imod.mf6.VerticesDiscretization`. **WARNING**: Given that these were
+  set incorrectly in previous versions of iMOD Python (see previous item in this
+  list), this means that reading MODFLOW6 DISV output of models generated with a
+  previous version of iMOD Python will result in a grid with an erroneous
+  offset. You can work around this by creating the model again with this
+  version of iMOD Python or newer.
 
 Changed
 ~~~~~~~
@@ -308,9 +319,9 @@ Fixed
   would be snapped to the same cell edge. These are now summed.
 - Improve performance validation upon Package initialization
 - Improve performance writing ``HorizontalFlowBarrier`` objects
-- `imod.mf6.open_cbc` failing with ``flowja=False`` on budget output for
+- :func:`imod.mf6.open_cbc` failing with ``flowja=False`` on budget output for
   DISV models if the model contained inactive cells.
-- `imod.mf6.open_cbc` now works for 2D and 1D models.
+- :func:`imod.mf6.open_cbc` now works for 2D and 1D models.
 - :func:`imod.prepare.fill` previously assigned to the result of an xarray
   ``.sel`` operation. This might not work for dask backed data and has been
   addressed.

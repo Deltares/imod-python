@@ -1,3 +1,4 @@
+import textwrap
 from filecmp import dircmp
 from pathlib import Path
 
@@ -193,6 +194,34 @@ def test_partitioning_unstructured(
             rtol=0.3,
             atol=3e-3,
         )
+
+
+@parametrize_with_cases("partition_array", cases=PartitionArrayCases)
+def test_partitioning_disv_origins(
+    tmp_path: Path, circle_model: Modflow6Simulation, partition_array: xu.UgridDataArray
+):
+    """
+    Verify if the disv origin is set correctly in the partitioned simulation.
+    MODFLOW6 uses this when computing with XT3D on the exchanges between
+    submodels.
+    """
+    simulation = circle_model
+    split_simulation = simulation.split(partition_array)
+    split_simulation.write(tmp_path, binary=False)
+
+    modelnames = split_simulation.get_models_of_type("gwf6").keys()
+    for modelname in modelnames:
+        pkg = split_simulation[modelname]["disv"]
+        actual = pkg.render(tmp_path, "dis", None, True)
+        expected = textwrap.dedent(
+            """\
+            begin options
+              xorigin 0.0
+              yorigin 0.0
+            end options
+            """
+        )
+        assert expected in actual
 
 
 @pytest.mark.parametrize("inactivity_marker", [0, -1])

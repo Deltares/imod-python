@@ -1,4 +1,5 @@
 import copy
+from pathlib import Path
 
 import numpy as np
 import pandas as pd
@@ -174,6 +175,31 @@ def circle_result(tmpdir_factory):
     modeldir = tmpdir_factory.mktemp("circle")
     simulation = make_circle_model()
     simulation.write(modeldir)
+    simulation.run()
+    return modeldir
+
+
+@pytest.fixture(scope="session")
+def circle_result__offset_origins(tmpdir_factory):
+    # Using a tmpdir_factory is the canonical way of sharing a tempory pytest
+    # directory between different testing modules.
+    modeldir = tmpdir_factory.mktemp("circle")
+    simulation = make_circle_model()
+    simulation.write(modeldir)
+    gwf_dir = Path(modeldir) / "GWF_1"
+    # Custom rendering of the disv package to offset the origin
+    disv_pkg = simulation["GWF_1"]["disv"]
+    render_dict = disv_pkg._get_render_dictionary(gwf_dir, "disv", None, True)
+    # Original grid ranges from -1000.0 to 1000.0, shift to 9000.0 to 11000.0
+    render_dict["xorigin"] = 10000.0
+    render_dict["yorigin"] = 10000.0
+    rendered = disv_pkg._template.render(render_dict)
+    filename = gwf_dir / "disv.disv"
+    with open(filename, "w") as f:
+        f.write(rendered)
+    # Append vertices and cell2d data to the block file
+    disv_pkg._append_vertices_and_cell2d(filename)
+    # Run
     simulation.run()
     return modeldir
 
