@@ -34,6 +34,8 @@ Fixed
   previous version of iMOD Python will result in a grid with an erroneous
   offset. You can work around this by creating the model again with this
   version of iMOD Python or newer.
+- :meth:`imod.mf6.Modflow6Simulation.split` supports label array with a
+  different name than ``"idomain"``.
 
 Changed
 ~~~~~~~
@@ -49,8 +51,6 @@ Changed
   often than not perfectly rectangular in shape.
 - :func:`imod.prepare.create_partition_labels` now returns a griddata with the
   name ``"label"`` instead of ``"idomain"``.
-- :meth:`imod.mf6.Modflow6Simulation.split` now expects griddata with the name
-  ``"label"`` instead of ``"idomain"``.
 
 
 [1.0.0rc3] - 2025-04-17
