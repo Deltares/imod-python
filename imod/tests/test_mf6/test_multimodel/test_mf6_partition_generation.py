@@ -1,45 +1,21 @@
 import numpy as np
 import pytest
+import xarray as xr
+import xugrid as xu
 
-from imod.mf6.multimodel.partition_generator import _partition_1d, get_label_array
-
-
-def test_partition_1d_errors():
-    # test for errors if the mean partition size is less than 3 gridblocks (only acceptable if 1 partition is asked)
-    with pytest.raises(ValueError):
-        _partition_1d(nr_partitions=4, axis_size=10)
-
-    # test for errors if 0 partitions are requested
-    with pytest.raises(ValueError):
-        _partition_1d(nr_partitions=0, axis_size=10)
+from imod.mf6.multimodel.partition_generator import get_label_array
+from imod.prepare.partition import create_partition_labels
 
 
-def test_partition_1d_partition_short_axis():
-    assert _partition_1d(nr_partitions=1, axis_size=1) == [(0, 0)]
-
-
-def test_partition_1d_happy_flow():
-    assert _partition_1d(nr_partitions=3, axis_size=10) == [(0, 2), (3, 5), (6, 9)]
-    assert _partition_1d(nr_partitions=2, axis_size=10) == [(0, 4), (5, 9)]
-    assert _partition_1d(nr_partitions=1, axis_size=10) == [(0, 9)]
-    assert _partition_1d(nr_partitions=4, axis_size=15) == [
-        (0, 2),
-        (3, 5),
-        (6, 8),
-        (9, 14),
-    ]
-    assert _partition_1d(nr_partitions=4, axis_size=16) == [
-        (0, 3),
-        (4, 7),
-        (8, 11),
-        (12, 15),
-    ]
+def test_get_label_array_deprecated(circle_model):
+    with pytest.warns(DeprecationWarning):
+        get_label_array(circle_model, 2)
 
 
 def test_partition_2d_unstructured(circle_model):
     for nr_partitions in range(1, 20):
-        label_array = get_label_array(circle_model, nr_partitions)
-
+        label_array = create_partition_labels(circle_model, nr_partitions)
+        assert isinstance(label_array, xu.UgridDataArray)
         # check that the labes up to nr_partitions -1 appear in the label array, and not any others
         unique, counts = np.unique(label_array, return_counts=True)
         assert np.all(
@@ -48,6 +24,26 @@ def test_partition_2d_unstructured(circle_model):
         assert len(unique) == nr_partitions
         assert max(unique) == nr_partitions - 1
         assert min(unique) == 0
+        assert np.issubdtype(label_array.dtype, np.integer)
+        assert label_array.name == "label"
+
+
+def test_partition_2d_unstructured_with_weights(circle_model):
+    weights = circle_model["GWF_1"].domain.isel(layer=0).copy()
+    weights[:50] = 10
+    for nr_partitions in range(2, 20):
+        label_array = create_partition_labels(circle_model, nr_partitions, weights)
+        assert isinstance(label_array, xu.UgridDataArray)
+        # check that the labes up to nr_partitions -1 appear in the label array, and not any others
+        unique, counts = np.unique(label_array, return_counts=True)
+        assert len(unique) == nr_partitions
+        assert max(unique) == nr_partitions - 1
+        assert min(unique) == 0
+        assert (
+            np.unique(counts).size != 1
+        )  # Partitions should have different number of cells
+        assert np.issubdtype(label_array.dtype, np.integer)
+        assert label_array.name == "label"
 
 
 def test_partition_2d_structured(twri_model):
@@ -60,8 +56,8 @@ def test_partition_2d_structured(twri_model):
     # split as 2 and 4 partitions on x and y and would work.
     partition_numbers = [1, 2, 3, 4, 5, 6, 8, 9, 10, 12, 15, 16, 20]
     for nr_partitions in partition_numbers:
-        label_array = get_label_array(twri_model, nr_partitions)
-
+        label_array = create_partition_labels(twri_model, nr_partitions)
+        assert isinstance(label_array, xr.DataArray)
         unique, counts = np.unique(label_array, return_counts=True)
         # Check that the labes up to nr_partitions -1 appear in the label array, and not any others
         assert np.all(
@@ -70,3 +66,31 @@ def test_partition_2d_structured(twri_model):
         assert len(unique) == nr_partitions
         assert max(unique) == nr_partitions - 1
         assert min(unique) == 0
+        assert np.issubdtype(label_array.dtype, np.integer)
+        assert label_array.name == "label"
+
+
+def test_partition_2d_structured_with_weights(twri_model):
+    # We skip a few partition numbers which would give an error. This would
+    # happen if the number of partitions in the x or y direction would result in
+    # less then 3 gridblocks per partition. For example if we ask for 7
+    # partitions it would result in splitting the 15x15 domain in 7 partitions
+    # on 1 axis and 1 on the other axis. That would give 15/7 = 2 gridblocks per
+    # partition along one of the axis However asking for 8 partitions would be
+    # split as 2 and 4 partitions on x and y and would work.
+    weights = twri_model["GWF_1"].domain.isel(layer=0).copy()
+    weights[:5, :5] = 10
+    partition_numbers = [2, 3, 4, 5, 6, 8, 9, 10, 12, 15, 16, 20]
+    for nr_partitions in partition_numbers:
+        label_array = create_partition_labels(twri_model, nr_partitions, weights)
+        assert isinstance(label_array, xr.DataArray)
+        unique, counts = np.unique(label_array, return_counts=True)
+        # Check that the labes up to nr_partitions -1 appear in the label array, and not any others
+        assert len(unique) == nr_partitions
+        assert max(unique) == nr_partitions - 1
+        assert min(unique) == 0
+        assert (
+            np.unique(counts).size != 1
+        )  # Partitions should have different number of cells
+        assert np.issubdtype(label_array.dtype, np.integer)
+        assert label_array.name == "label"

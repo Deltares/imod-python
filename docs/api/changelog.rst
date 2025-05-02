@@ -9,6 +9,13 @@ The format is based on `Keep a Changelog`_, and this project adheres to
 [Unreleased]
 ------------
 
+Added
+~~~~~
+
+- Added ``weights`` argument to :func:`imod.prepare.create_partition_labels` to
+  weigh how the simulation should be partioned. Areas with higher weights will
+  result in smaller partions.
+
 Fixed
 ~~~~~
 
@@ -27,12 +34,24 @@ Fixed
   previous version of iMOD Python will result in a grid with an erroneous
   offset. You can work around this by creating the model again with this
   version of iMOD Python or newer.
+- :meth:`imod.mf6.Modflow6Simulation.split` supports label array with a
+  different name than ``"idomain"``.
 
 Changed
 ~~~~~~~
 
 - :meth:`imod.wq.SeawatModel.write` now throws an error if trying to write in a
   directory with a space in the path. (iMOD-WQ does not support this.)
+- `imod.mf6.multimodel.partition_generator.get_label_array` moved to
+  :func:`imod.prepare.create_partition_labels`.
+- :func:`imod.prepare.create_partition_labels` structured grids are now
+  partioned by METIS instead (just like already was the case for unstructured
+  grids). This results in more balanced partitions for grids with non-square
+  domains or lots of inactive cells. Downside is that the partitions are more
+  often than not perfectly rectangular in shape.
+- :func:`imod.prepare.create_partition_labels` now returns a griddata with the
+  name ``"label"`` instead of ``"idomain"``.
+
 
 [1.0.0rc3] - 2025-04-17
 -----------------------
@@ -42,7 +61,7 @@ Added
 
 - :meth:`imod.msw.MetaSwapModel.clip_box` to clip MetaSWAP models.
 - Methods of class :class:`imod.mf6.Modflow6Simulation` can now be logged.
-- :func:``imod.prepare.cleanup.cleanup_layered_wel` to clean up wells assigned
+- :func:`imod.prepare.cleanup.cleanup_layered_wel` to clean up wells assigned
   to layers.
 
 
