@@ -3,7 +3,6 @@ from typing import Optional
 from warnings import warn
 
 from imod.mf6.simulation import Modflow6Simulation
-from imod.prepare.partition import create_partition_labels
 from imod.typing import GridDataArray
 
 
@@ -15,6 +14,8 @@ def get_label_array(
     """
     To preserve backwards compatibility for older training scripts.
     """
+
+    from imod.prepare.partition import create_partition_labels
 
     msg = textwrap.dedent(
         """get_label_array is deprecated, the function has been moved and

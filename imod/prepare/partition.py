@@ -5,7 +5,7 @@ import xarray as xr
 import xugrid as xu
 from plum import Dispatcher
 
-from imod.mf6.simulation import Modflow6Simulation
+from imod.common.interfaces.isimulation import ISimulation
 from imod.typing import GridDataArray
 from imod.typing.grid import as_ugrid_dataarray
 
@@ -53,7 +53,7 @@ def _partition_idomain(weights: xr.DataArray, npartitions: int) -> GridDataArray
 
 
 def create_partition_labels(
-    simulation: Modflow6Simulation,
+    simulation: ISimulation,
     npartitions: int,
     weights: Optional[GridDataArray] = None,
 ) -> GridDataArray:
