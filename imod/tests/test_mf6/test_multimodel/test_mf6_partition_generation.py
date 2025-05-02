@@ -2,12 +2,12 @@ import numpy as np
 import xarray as xr
 import xugrid as xu
 
-from imod.mf6.multimodel.partition_generator import get_label_array
+from imod.prepare.partition import create_partition_labels
 
 
 def test_partition_2d_unstructured(circle_model):
     for nr_partitions in range(1, 20):
-        label_array = get_label_array(circle_model, nr_partitions)
+        label_array = create_partition_labels(circle_model, nr_partitions)
         assert isinstance(label_array, xu.UgridDataArray)
         # check that the labes up to nr_partitions -1 appear in the label array, and not any others
         unique, counts = np.unique(label_array, return_counts=True)
@@ -25,7 +25,7 @@ def test_partition_2d_unstructured_with_weights(circle_model):
     weights = circle_model["GWF_1"].domain.isel(layer=0).copy()
     weights[:50] = 10
     for nr_partitions in range(2, 20):
-        label_array = get_label_array(circle_model, nr_partitions, weights)
+        label_array = create_partition_labels(circle_model, nr_partitions, weights)
         assert isinstance(label_array, xu.UgridDataArray)
         # check that the labes up to nr_partitions -1 appear in the label array, and not any others
         unique, counts = np.unique(label_array, return_counts=True)
@@ -49,7 +49,7 @@ def test_partition_2d_structured(twri_model):
     # split as 2 and 4 partitions on x and y and would work.
     partition_numbers = [1, 2, 3, 4, 5, 6, 8, 9, 10, 12, 15, 16, 20]
     for nr_partitions in partition_numbers:
-        label_array = get_label_array(twri_model, nr_partitions)
+        label_array = create_partition_labels(twri_model, nr_partitions)
         assert isinstance(label_array, xr.DataArray)
         unique, counts = np.unique(label_array, return_counts=True)
         # Check that the labes up to nr_partitions -1 appear in the label array, and not any others
@@ -75,7 +75,7 @@ def test_partition_2d_structured_with_weights(twri_model):
     weights[:5, :5] = 10
     partition_numbers = [2, 3, 4, 5, 6, 8, 9, 10, 12, 15, 16, 20]
     for nr_partitions in partition_numbers:
-        label_array = get_label_array(twri_model, nr_partitions, weights)
+        label_array = create_partition_labels(twri_model, nr_partitions, weights)
         assert isinstance(label_array, xr.DataArray)
         unique, counts = np.unique(label_array, return_counts=True)
         # Check that the labes up to nr_partitions -1 appear in the label array, and not any others

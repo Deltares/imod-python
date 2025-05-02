@@ -7,7 +7,7 @@ import pytest
 import xarray as xr
 
 import imod
-from imod.mf6.multimodel.partition_generator import get_label_array
+from imod.prepare.partition import create_partition_labels
 
 
 def remove_comment_lines(textblock: str) -> str:
@@ -143,7 +143,7 @@ def test_option_newton_propagated(circle_model, newton_option, tmp_path):
     circle_model["GWF_1"].set_newton(newton_option)
 
     # split original model
-    label_array = get_label_array(circle_model, 3)
+    label_array = create_partition_labels(circle_model, 3)
     split_simulation = circle_model.split(label_array)
 
     # check that the created exchagnes have the same newton option
@@ -159,7 +159,7 @@ def test_option_xt3d_propagated(circle_model, xt3d_option, tmp_path):
     circle_model["GWF_1"]["npf"].set_xt3d_option(xt3d_option, is_rhs=xt3d_option)
 
     # split original model
-    label_array = get_label_array(circle_model, 3)
+    label_array = create_partition_labels(circle_model, 3)
     split_simulation = circle_model.split(label_array)
 
     # check that the created exchanges have the same newton option
@@ -175,7 +175,7 @@ def test_option_variablecv_propagated(circle_model, variablecv_option: bool, tmp
     circle_model["GWF_1"]["npf"]["variable_vertical_conductance"] = variablecv_option
 
     # split original model
-    label_array = get_label_array(circle_model, 3)
+    label_array = create_partition_labels(circle_model, 3)
     split_simulation = circle_model.split(label_array)
 
     # check that the created exchanges have the same variablecv option
@@ -192,7 +192,7 @@ def test_option_dewatered_propagated(circle_model, dewatered_option: bool, tmp_p
     circle_model["GWF_1"]["npf"]["dewatered"] = dewatered_option
 
     # split original model
-    label_array = get_label_array(circle_model, 3)
+    label_array = create_partition_labels(circle_model, 3)
     split_simulation = circle_model.split(label_array)
 
     # check that the created exchanges have the same dewatered option
@@ -209,7 +209,7 @@ def test_save_flows_propagated(circle_model, budget_option: bool, tmp_path):
         circle_model["GWF_1"]["oc"].dataset["save_budget"] = None
 
     # split original model
-    label_array = get_label_array(circle_model, 3)
+    label_array = create_partition_labels(circle_model, 3)
     split_simulation = circle_model.split(label_array)
 
     # check that the created exchanges have the same dewatered option

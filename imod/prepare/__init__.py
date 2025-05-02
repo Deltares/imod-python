@@ -33,6 +33,7 @@ from imod.prepare.layer import (
     get_upper_active_layer_number,
 )
 from imod.prepare.layerregrid import LayerRegridder
+from imod.prepare.partition import create_partition_labels
 from imod.prepare.regrid import Regridder
 from imod.prepare.reproject import reproject
 from imod.prepare.spatial import (
