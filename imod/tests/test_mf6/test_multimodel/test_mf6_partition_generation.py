@@ -1,8 +1,15 @@
 import numpy as np
+import pytest
 import xarray as xr
 import xugrid as xu
 
+from imod.mf6.multimodel.partition_generator import get_label_array
 from imod.prepare.partition import create_partition_labels
+
+
+def test_get_label_array_deprecated(circle_model):
+    with pytest.warns(DeprecationWarning):
+        get_label_array(circle_model, 2)
 
 
 def test_partition_2d_unstructured(circle_model):
