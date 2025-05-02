@@ -100,8 +100,10 @@ class ExchangeCreator_Unstructured(ExchangeCreator):
         cls, partition_info: List[PartitionInfo], global_cell_indices: GridDataArray
     ) -> Dict[int, pd.DataFrame]:
         global_to_local_idx = {}
+        global_cell_indices = global_cell_indices.rename("label")
         for submodel_partition_info in partition_info:
             local_cell_indices = cls._get_local_cell_indices(submodel_partition_info)
+            local_cell_indices = local_cell_indices.rename("label")
 
             global_cell_indices_partition = global_cell_indices.where(
                 submodel_partition_info.active_domain > 0
