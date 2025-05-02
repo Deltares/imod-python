@@ -47,6 +47,10 @@ Changed
   grids). This results in more balanced partitions for grids with non-square
   domains or lots of inactive cells. Downside is that the partitions are more
   often than not perfectly rectangular in shape.
+- :func:`imod.prepare.create_partition_labels` now returns a griddata with the
+  name ``"label"`` instead of ``"idomain"``.
+- :meth:`imod.mf6.Modflow6Simulation.split` now expects griddata with the name
+  ``"label"`` instead of ``"idomain"``.
 
 
 [1.0.0rc3] - 2025-04-17
