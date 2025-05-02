@@ -50,12 +50,21 @@ number_partitions = 16
 submodel_labels = create_partition_labels(gwf_simulation, number_partitions)
 
 # %%
-# plot the partitioning array. It shows how the model will be partitioned.
+# This label array determines how the model will be split. `METIS
+# <https://github.com/KarypisLab/METIS/blob/master/manual/manual.pdf>`_ is used
+# in the background to partition models, which is the cause of the imperfect
+# rectangular shapes. By default, partitions are weighted by the number of active cells
+# across the layer dimension.
+
 fig, ax = plt.subplots()
 submodel_labels.plot(ax=ax)
 ax.set_title("hondsrug partitioning geometry")
 
+# %%
+# Let's split the simulation into 16 submodels.
 split_simulation = gwf_simulation.split(submodel_labels)
+
+split_simulation
 
 # %%
 # Now we  write and run the partitioned model
