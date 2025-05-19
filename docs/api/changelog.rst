@@ -36,6 +36,8 @@ Fixed
   version of iMOD Python or newer.
 - :meth:`imod.mf6.Modflow6Simulation.split` supports label array with a
   different name than ``"idomain"``.
+- :class:`imod.msw.IdfMapping` swapped order of y_grid and x_grid in dictionary
+  for writing the correct order of coordinates in idf_svat.inp.
 
 Changed
 ~~~~~~~
