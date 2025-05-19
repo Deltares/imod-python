@@ -72,7 +72,12 @@ def test_adv_boundary_class_attributes(pkg_class):
     check_attributes(pkg_class)
 
 
-@pytest.mark.parametrize("instance", ALL_PACKAGE_INSTANCES)
+def _idname(instance):
+    """Get the idname of the instance."""
+    return type(instance)
+
+
+@pytest.mark.parametrize("instance", ALL_PACKAGE_INSTANCES, ids=_idname)
 def test_render_twice(instance, tmp_path):
     globaltimes = [np.datetime64("2000-01-01")]
     modeldir = tmp_path / "testdir"
@@ -96,7 +101,7 @@ def test_render_twice(instance, tmp_path):
     assert text1 == text2
 
 
-@pytest.mark.parametrize("instance", ALL_PACKAGE_INSTANCES)
+@pytest.mark.parametrize("instance", ALL_PACKAGE_INSTANCES, ids=_idname)
 def test_save_and_load(instance, tmp_path):
     pkg_class = type(instance)
     path = tmp_path / f"{instance._pkg_id}.nc"
@@ -105,13 +110,13 @@ def test_save_and_load(instance, tmp_path):
     assert instance.dataset.equals(back.dataset)
 
 
-@pytest.mark.parametrize("instance", ALL_PACKAGE_INSTANCES)
+@pytest.mark.parametrize("instance", ALL_PACKAGE_INSTANCES, ids=_idname)
 def test_repr(instance):
     assert isinstance(instance.__repr__(), str)
     assert isinstance(instance._repr_html_(), str)
 
 
-@pytest.mark.parametrize("instance", ALL_PACKAGE_INSTANCES)
+@pytest.mark.parametrize("instance", ALL_PACKAGE_INSTANCES, ids=_idname)
 def test_from_dataset(instance):
     pkg_class = type(instance)
     ds = instance.dataset
