@@ -36,6 +36,8 @@ Fixed
   version of iMOD Python or newer.
 - :meth:`imod.mf6.Modflow6Simulation.split` supports label array with a
   different name than ``"idomain"``.
+- :func:`imod.formats.prj._parse_extrablock` now supports the usage of relative
+  paths.
 
 Changed
 ~~~~~~~
