@@ -399,13 +399,30 @@ def test_parse_pcgblock():
         prj._parse_pcgblock(lines)
 
 
-def test__parse_block():
+def test__parse_block__header_error():
     lines = prj._LineIterator([["1", "(bla)", "1"]])
     content = {}
     with pytest.raises(
         ValueError, match=re.escape("Failed to recognize header keyword: (bla)")
     ):
         prj._parse_block(lines, content)
+
+
+def test__parse_blockline__path_resolved():
+    lines = prj._LineIterator(
+        [["1", "2", "1", "1.0", "0.0", "-999.99", "./ibound.idf"]]
+    )
+    parsed = prj._parse_blockline(lines, "2000-01-01 00:00:00")
+    # Resolved paths are always absolute
+    assert parsed["path"].is_absolute()
+
+
+def test__parse_extrablock__path_resolved():
+    lines = prj._LineIterator(["./ibound.idf", "./para_sim.inp"])
+    n = 2
+    parsed = prj._parse_extrablock(lines, n)
+    # Resolved paths are always absolute
+    assert all(i.is_absolute() for i in parsed["paths"][0])
 
 
 def test__parse_periodsblock():
