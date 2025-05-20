@@ -1,3 +1,4 @@
+import numpy as np
 import pytest
 import xarray as xr
 
@@ -19,8 +20,12 @@ def fixed_format_parser():
                 for varname, metadata in metadata_dict.items():
                     # Take first part of line
                     value = line[: metadata.column_width]
+                    # Check if value is empty
+                    if value[-2:] == '""':
+                        converted_value = np.nan
                     # Convert to correct type
-                    converted_value = metadata.dtype(value)
+                    else:
+                        converted_value = metadata.dtype(value)
                     # Add to results
                     results[varname].append(converted_value)
                     # Truncate line
