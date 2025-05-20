@@ -27,12 +27,12 @@ class IdfMapping(MetaSwapPackage, IRegridPackage):
         "svat": VariableMetaData(10, 1, 9999999, int),
         "rows": VariableMetaData(10, 1, 9999999, int),
         "columns": VariableMetaData(10, 1, 9999999, int),
-        "y_grid": VariableMetaData(15, -9999999.0, 9999999.0, float),
         "x_grid": VariableMetaData(15, -9999999.0, 9999999.0, float),
+        "y_grid": VariableMetaData(15, -9999999.0, 9999999.0, float),
     }
 
     _with_subunit = ()
-    _without_subunit = ("rows", "columns", "y_grid", "x_grid")
+    _without_subunit = ("rows", "columns", "x_grid", "y_grid")
     _to_fill = ()
 
     _regrid_method = IdfMappingRegridMethod()

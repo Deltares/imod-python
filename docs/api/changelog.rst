@@ -38,6 +38,8 @@ Fixed
   different name than ``"idomain"``.
 - :func:`imod.msw.MetaSwapModel.from_imod5_data` now supports the usage of
   relative paths for the extra files block.
+- :class:`imod.msw.IdfMapping` swapped order of y_grid and x_grid in dictionary
+  for writing the correct order of coordinates in idf_svat.inp.
 
 Changed
 ~~~~~~~
