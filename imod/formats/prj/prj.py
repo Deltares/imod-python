@@ -330,7 +330,9 @@ def _parse_capblock(
 
 def _parse_extrablock(lines: _LineIterator, n: int) -> Dict[str, List[str]]:
     """Parse the MetaSWAP "extra files" block"""
-    return {"paths": [next(lines) for _ in range(n)]}
+    content = {"paths": [next(lines) for _ in range(n)]}
+    content["paths"] = [[Path(x[0]).resolve()] for x in content["paths"]]
+    return content
 
 
 def _parse_timeblock(
