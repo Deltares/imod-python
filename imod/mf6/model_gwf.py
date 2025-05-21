@@ -103,7 +103,8 @@ class GroundwaterFlowModel(Modflow6Model):
         under_relaxation: bool = False,
         validate: bool = True,
     ):
-        options = {
+        super().__init__()
+        self._options = {
             "listing_file": listing_file,
             "print_input": print_input,
             "print_flows": print_flows,
@@ -111,7 +112,6 @@ class GroundwaterFlowModel(Modflow6Model):
             "newton": newton,
             "under_relaxation": under_relaxation,
         }
-        super().__init__(options=options)
         self._validate_init_schemata_options(validate)
 
     def clip_box(

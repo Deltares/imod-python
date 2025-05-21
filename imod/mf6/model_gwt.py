@@ -53,11 +53,11 @@ class GroundwaterTransportModel(Modflow6Model):
         save_flows: bool = False,
         validate: bool = True,
     ):
-        options = {
+        super().__init__()
+        self._options = {
             "listing_file": listing_file,
             "print_input": print_input,
             "print_flows": print_flows,
             "save_flows": save_flows,
         }
-        super().__init__(options=options)
         self._validate_init_schemata_options(validate)

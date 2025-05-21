@@ -49,13 +49,16 @@ def pkg_has_cleanup(pkg: Package):
     return any(isinstance(pkg, pkgtype) for pkgtype in PKGTYPES_WITH_CLEANUP)
 
 
-def concatenate_schemata(schemata1: dict[list], schemata2: dict[list]) -> dict[list]:
+def concatenate_schemata(
+    schemata1: SchemataDict, schemata2: SchemataDict
+) -> SchemataDict:
     schemata = deepcopy(schemata1)
     for key, value in schemata2.items():
         if key not in schemata.keys():
             schemata[key] = value
         else:
-            schemata[key] += value
+            # Force to list to be able to concatenate
+            schemata[key] = list(schemata[key]) + list(value)
     return schemata
 
 
@@ -71,9 +74,9 @@ class Modflow6Model(collections.UserDict, IModel, abc.ABC):
         env = jinja2.Environment(loader=loader, keep_trailing_newline=True)
         return env.get_template(name)
 
-    def __init__(self, options: dict):
+    def __init__(self):
         collections.UserDict.__init__(self)
-        self._options = options
+        self._options = {}
 
     @standard_log_decorator()
     def _validate_options(
