@@ -42,7 +42,7 @@ from imod.mf6.write_context import WriteContext
 from imod.schemata import (
     AllNoDataSchema,
     EmptyIndexesSchema,
-    SchemaType,
+    SchemataDict,
     ValidationError,
 )
 from imod.typing import GridDataArray
@@ -63,8 +63,8 @@ class Package(PackageBase, IPackage, abc.ABC):
     """
 
     _pkg_id = ""
-    _init_schemata: dict[str, list[SchemaType] | Tuple[SchemaType, ...]] = {}
-    _write_schemata: dict[str, list[SchemaType] | Tuple[SchemaType, ...]] = {}
+    _init_schemata: SchemataDict = {}
+    _write_schemata: SchemataDict = {}
     _keyword_map: dict[str, str] = {}
     _regrid_method: RegridMethodType = EmptyRegridMethod()
     _template: jinja2.Template
