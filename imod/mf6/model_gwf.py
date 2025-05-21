@@ -39,6 +39,7 @@ from imod.prepare.topsystem.default_allocation_methods import (
     SimulationAllocationOptions,
     SimulationDistributingOptions,
 )
+from imod.schemata import TypeSchema
 from imod.typing import GridDataArray, StressPeriodTimesType
 from imod.typing.grid import zeros_like
 from imod.util.regrid import RegridderWeightsCache
@@ -82,6 +83,15 @@ class GroundwaterFlowModel(Modflow6Model):
     _model_id = "gwf6"
     _template = Modflow6Model._initialize_template("gwf-nam.j2")
 
+    _init_schemata = {
+        "listing_file": [TypeSchema(str)],
+        "print_input": [TypeSchema(bool)],
+        "print_flows": [TypeSchema(bool)],
+        "save_flows": [TypeSchema(bool)],
+        "newton": [TypeSchema(bool)],
+        "under_relaxation": [TypeSchema(bool)],
+    }
+
     @init_log_decorator()
     def __init__(
         self,
@@ -91,9 +101,9 @@ class GroundwaterFlowModel(Modflow6Model):
         save_flows: bool = False,
         newton: bool = False,
         under_relaxation: bool = False,
+        validate: bool = True,
     ):
-        super().__init__()
-        self._options = {
+        options = {
             "listing_file": listing_file,
             "print_input": print_input,
             "print_flows": print_flows,
@@ -101,6 +111,8 @@ class GroundwaterFlowModel(Modflow6Model):
             "newton": newton,
             "under_relaxation": under_relaxation,
         }
+        super().__init__(options=options)
+        self._validate_init_schemata_options(validate)
 
     def clip_box(
         self,
