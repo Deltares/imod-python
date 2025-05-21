@@ -432,3 +432,38 @@ def test_get_domain_geometry(structured_flow_model: GroundwaterFlowModel):
     assert np.all(np.isin(top.values, [10.0]))
     assert np.all(np.isin(bottom.values, [-1.0, -2.0, -3.0]))
     assert np.all(np.isin(idomain.values, [2]))
+
+
+def test_model_options_validation(
+    structured_flow_model: GroundwaterFlowModel,
+):
+    # Act
+    status = structured_flow_model.validate("modelname")
+    # Assert
+    assert not status.has_errors()
+
+    # Arrange
+    structured_flow_model._options["newton"] = 1
+    # Act
+    status = structured_flow_model.validate("modelname")
+    # Assert
+    assert status.has_errors()
+
+
+def test_model_init_validation(
+    structured_flow_model: GroundwaterFlowModel,
+):
+    # Act
+    structured_flow_model._validate_init_schemata_options(
+        validate=True,
+    )
+    # Arrange
+    structured_flow_model._options["newton"] = 1
+    # Act
+    structured_flow_model._validate_init_schemata_options(
+        validate=False,
+    )
+    with pytest.raises(ValidationError):
+        structured_flow_model._validate_init_schemata_options(
+            validate=True,
+        )
