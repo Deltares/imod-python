@@ -30,11 +30,11 @@ from imod.mf6.mf6_wel_adapter import Mf6Wel
 from imod.mf6.package import Package
 from imod.mf6.riv import River
 from imod.mf6.utilities.mf6hfb import merge_hfb_packages
-from imod.mf6.validation import pkg_errors_to_status_info
+from imod.mf6.validation import pkg_errors_to_status_info, validation_pkg_error_message
 from imod.mf6.validation_context import ValidationContext
 from imod.mf6.wel import GridAgnosticWell
 from imod.mf6.write_context import WriteContext
-from imod.schemata import ValidationError
+from imod.schemata import SchemataDict, ValidationError
 from imod.typing import GridDataArray
 from imod.util.regrid import RegridderWeightsCache
 
@@ -49,8 +49,19 @@ def pkg_has_cleanup(pkg: Package):
     return any(isinstance(pkg, pkgtype) for pkgtype in PKGTYPES_WITH_CLEANUP)
 
 
+def concatenate_schemata(schemata1: dict[list], schemata2: dict[list]) -> dict[list]:
+    schemata = deepcopy(schemata1)
+    for key, value in schemata2.items():
+        if key not in schemata.keys():
+            schemata[key] = value
+        else:
+            schemata[key] += value
+    return schemata
+
+
 class Modflow6Model(collections.UserDict, IModel, abc.ABC):
     _mandatory_packages: tuple[str, ...] = ()
+    _init_schemata: SchemataDict = {}
     _model_id: Optional[str] = None
     _template: Template
 
@@ -60,12 +71,38 @@ class Modflow6Model(collections.UserDict, IModel, abc.ABC):
         env = jinja2.Environment(loader=loader, keep_trailing_newline=True)
         return env.get_template(name)
 
-    def __init__(self, **kwargs):
+    def __init__(self, options: dict):
         collections.UserDict.__init__(self)
-        for k, v in kwargs.items():
-            self[k] = v
+        self._options = options
 
-        self._options = {}
+    @standard_log_decorator()
+    def _validate_options(
+        self, schemata: dict, **kwargs
+    ) -> dict[str, list[ValidationError]]:
+        errors = collections.defaultdict(list)
+        for variable, var_schemata in schemata.items():
+            for schema in var_schemata:
+                if variable in self._options.keys():
+                    try:
+                        schema.validate(self._options[variable], **kwargs)
+                    except ValidationError as e:
+                        errors[variable].append(e)
+        return errors
+
+    def _validate_init_schemata_options(self, validate: bool):
+        """
+        Run the "cheap" schema validations.
+
+        The expensive validations are run during writing. Some are only
+        available then: e.g. idomain to determine active part of domain.
+        """
+        if not validate:
+            return
+        errors = self._validate_options(self._init_schemata)
+        if len(errors) > 0:
+            message = validation_pkg_error_message(errors)
+            raise ValidationError(message)
+        return
 
     def __setitem__(self, key, value):
         if len(key) > 16:
@@ -227,6 +264,12 @@ class Modflow6Model(collections.UserDict, IModel, abc.ABC):
         bottom = dis["bottom"]
 
         model_status_info = NestedStatusInfo(f"{model_name} model")
+        # Check model options
+        option_errors = self._validate_options(self._init_schemata)
+        model_status_info.add(
+            pkg_errors_to_status_info("model options", option_errors, None)
+        )
+        # Validate packages
         for pkg_name, pkg in self.items():
             # Check for all schemata when writing. Types and dimensions
             # may have been changed after initialization...
@@ -235,12 +278,7 @@ class Modflow6Model(collections.UserDict, IModel, abc.ABC):
                 continue  # some packages can be skipped
 
             # Concatenate write and init schemata.
-            schemata = deepcopy(pkg._init_schemata)
-            for key, value in pkg._write_schemata.items():
-                if key not in schemata.keys():
-                    schemata[key] = value
-                else:
-                    schemata[key] += value
+            schemata = concatenate_schemata(pkg._init_schemata, pkg._write_schemata)
 
             pkg_errors = pkg._validate(
                 schemata=schemata,
