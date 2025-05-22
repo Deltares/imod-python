@@ -23,7 +23,9 @@ from imod.common.utilities.mask import _mask_all_packages
 from imod.common.utilities.regrid import _regrid_like
 from imod.common.utilities.schemata import (
     concatenate_schemata_dicts,
+    pkg_errors_to_status_info,
     validate_schemata_dict,
+    validation_pkg_error_message,
 )
 from imod.logging import LogLevel, logger, standard_log_decorator
 from imod.mf6.drn import Drainage
@@ -33,7 +35,6 @@ from imod.mf6.mf6_wel_adapter import Mf6Wel
 from imod.mf6.package import Package
 from imod.mf6.riv import River
 from imod.mf6.utilities.mf6hfb import merge_hfb_packages
-from imod.mf6.validation import pkg_errors_to_status_info, validation_pkg_error_message
 from imod.mf6.validation_context import ValidationContext
 from imod.mf6.wel import GridAgnosticWell
 from imod.mf6.write_context import WriteContext
