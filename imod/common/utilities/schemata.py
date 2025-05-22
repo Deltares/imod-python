@@ -1,7 +1,7 @@
 from collections import defaultdict
 from collections.abc import Mapping
 from copy import deepcopy
-from typing import Optional
+from typing import Any, Optional, Protocol
 
 from imod.common.statusinfo import NestedStatusInfo, StatusInfo, StatusInfoBase
 from imod.schemata import BaseSchema, SchemataDict, ValidationError
@@ -62,7 +62,7 @@ def concatenate_schemata_dicts(
 
 
 def validate_schemata_dict(
-    schemata: SchemataDict, data: Mapping, **kwargs
+    schemata: SchemataDict, data: Mapping, **kwargs: Any
 ) -> dict[str, list[ValidationError]]:
     """
     Validate a data mapping against a schemata dictionary. Returns a dictionary
@@ -80,7 +80,7 @@ def validate_schemata_dict(
     return errors
 
 
-def validation_pkg_error_message(pkg_errors):
+def validation_pkg_error_message(pkg_errors: dict[str, list[ValidationError]]) -> str:
     messages = []
     for var, var_errors in pkg_errors.items():
         messages.append(f"- {var}")
@@ -103,12 +103,32 @@ def pkg_errors_to_status_info(
     return pkg_status_info
 
 
+class ValidateFuncProtocol(Protocol):
+    """
+    Protocol for a method that validates a schemata dictionary, showing the
+    call signature of this method.
+    """
+    def __call__(
+        self, schemata: SchemataDict, **kwargs: Any
+    ) -> dict[str, list[ValidationError]]: ...
+
+
 def validate_with_error_message(
-    validate: bool, schemata: SchemataDict, data: Mapping
+    validate_func: ValidateFuncProtocol,
+    validate: bool,
+    schemata: SchemataDict,
+    **kwargs: Any,
 ) -> None:
+    """
+    Validate a validation function and create a validation error message if
+    necessary. The validate_func is provided as an argument to allow providing
+    overloaded methods. The validate_func should call validate_schemata_dict
+    with a datatype of the object.
+    """
+
     if not validate:
         return
-    errors = validate_schemata_dict(schemata, data)
+    errors = validate_func(schemata, **kwargs)
     if len(errors) > 0:
         message = validation_pkg_error_message(errors)
         raise ValidationError(message)

@@ -75,7 +75,6 @@ class Modflow6Model(collections.UserDict, IModel, abc.ABC):
     ) -> dict[str, list[ValidationError]]:
         return validate_schemata_dict(schemata, self._options, **kwargs)
 
-    @standard_log_decorator()
     def validate_init_schemata_options(self, validate: bool) -> None:
         """
         Run the "cheap" schema validations.
@@ -83,7 +82,9 @@ class Modflow6Model(collections.UserDict, IModel, abc.ABC):
         The expensive validations are run during writing. Some are only
         available then: e.g. idomain to determine active part of domain.
         """
-        validate_with_error_message(validate, self._init_schemata, self._options)
+        validate_with_error_message(
+            self.validate_options, validate, self._init_schemata
+        )
 
     def __setitem__(self, key, value):
         if len(key) > 16:

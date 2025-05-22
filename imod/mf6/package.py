@@ -347,15 +347,16 @@ class Package(PackageBase, IPackage, abc.ABC):
         allnodata_errors = self._validate(allnodata_schemata)
         return len(allnodata_errors) > 0
 
-    @standard_log_decorator()
-    def _validate_init_schemata(self, validate: bool) -> None:
+    def _validate_init_schemata(self, validate: bool, **kwargs) -> None:
         """
         Run the "cheap" schema validations.
 
         The expensive validations are run during writing. Some are only
         available then: e.g. idomain to determine active part of domain.
         """
-        validate_with_error_message(validate, self._init_schemata, self.dataset)
+        validate_with_error_message(
+            self._validate, validate, self._init_schemata, **kwargs
+        )
 
     def copy(self) -> Any:
         # All state should be contained in the dataset.
