@@ -4,7 +4,6 @@ import abc
 import collections
 import inspect
 import pathlib
-from copy import deepcopy
 from pathlib import Path
 from typing import Any, List, Optional, Tuple, Union
 
@@ -22,6 +21,10 @@ from imod.common.interfaces.imodel import IModel
 from imod.common.statusinfo import NestedStatusInfo, StatusInfo, StatusInfoBase
 from imod.common.utilities.mask import _mask_all_packages
 from imod.common.utilities.regrid import _regrid_like
+from imod.common.utilities.schemata import (
+    concatenate_schemata_dicts,
+    validate_schemata_dict,
+)
 from imod.logging import LogLevel, logger, standard_log_decorator
 from imod.mf6.drn import Drainage
 from imod.mf6.ghb import GeneralHeadBoundary
@@ -49,19 +52,6 @@ def pkg_has_cleanup(pkg: Package):
     return any(isinstance(pkg, pkgtype) for pkgtype in PKGTYPES_WITH_CLEANUP)
 
 
-def concatenate_schemata(
-    schemata1: SchemataDict, schemata2: SchemataDict
-) -> SchemataDict:
-    schemata = deepcopy(schemata1)
-    for key, value in schemata2.items():
-        if key not in schemata.keys():
-            schemata[key] = value
-        else:
-            # Force to list to be able to concatenate
-            schemata[key] = list(schemata[key]) + list(value)
-    return schemata
-
-
 class Modflow6Model(collections.UserDict, IModel, abc.ABC):
     _mandatory_packages: tuple[str, ...] = ()
     _init_schemata: SchemataDict = {}
@@ -79,18 +69,10 @@ class Modflow6Model(collections.UserDict, IModel, abc.ABC):
         self._options = {}
 
     @standard_log_decorator()
-    def _validate_options(
+    def validate_options(
         self, schemata: dict, **kwargs
     ) -> dict[str, list[ValidationError]]:
-        errors = collections.defaultdict(list)
-        for variable, var_schemata in schemata.items():
-            for schema in var_schemata:
-                if variable in self._options.keys():
-                    try:
-                        schema.validate(self._options[variable], **kwargs)
-                    except ValidationError as e:
-                        errors[variable].append(e)
-        return errors
+        return validate_schemata_dict(schemata, self._options, **kwargs)
 
     def _validate_init_schemata_options(self, validate: bool):
         """
@@ -101,7 +83,7 @@ class Modflow6Model(collections.UserDict, IModel, abc.ABC):
         """
         if not validate:
             return
-        errors = self._validate_options(self._init_schemata)
+        errors = self.validate_options(self._init_schemata)
         if len(errors) > 0:
             message = validation_pkg_error_message(errors)
             raise ValidationError(message)
@@ -268,7 +250,7 @@ class Modflow6Model(collections.UserDict, IModel, abc.ABC):
 
         model_status_info = NestedStatusInfo(f"{model_name} model")
         # Check model options
-        option_errors = self._validate_options(self._init_schemata)
+        option_errors = self.validate_options(self._init_schemata)
         model_status_info.add(
             pkg_errors_to_status_info("model options", option_errors, None)
         )
@@ -281,7 +263,9 @@ class Modflow6Model(collections.UserDict, IModel, abc.ABC):
                 continue  # some packages can be skipped
 
             # Concatenate write and init schemata.
-            schemata = concatenate_schemata(pkg._init_schemata, pkg._write_schemata)
+            schemata = concatenate_schemata_dicts(
+                pkg._init_schemata, pkg._write_schemata
+            )
 
             pkg_errors = pkg._validate(
                 schemata=schemata,

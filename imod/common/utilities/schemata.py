@@ -1,10 +1,13 @@
+from collections import defaultdict
+from collections.abc import Mapping
+from copy import deepcopy
 from typing import Tuple
 
-from imod.schemata import BaseSchema
+from imod.schemata import BaseSchema, SchemataDict, ValidationError
 
 
 def filter_schemata_dict(
-    schemata_dict: dict[str, list[BaseSchema] | Tuple[BaseSchema, ...]],
+    schemata_dict: SchemataDict,
     schema_types: tuple[type[BaseSchema], ...],
 ) -> dict[str, list[BaseSchema]]:
     """
@@ -37,3 +40,40 @@ def filter_schemata_dict(
         if schema_match:
             d[key] = schema_match
     return d
+
+
+def concatenate_schemata_dicts(
+    schemata1: SchemataDict, schemata2: SchemataDict
+) -> SchemataDict:
+    """
+    Concatenate two schemata dictionaries. If a key is present in both
+    dictionaries, the values are concatenated into a list. If a key is only
+    present in one dictionary, it is added to the new dictionary as is.
+    """
+    schemata = deepcopy(schemata1)
+    for key, value in schemata2.items():
+        if key not in schemata.keys():
+            schemata[key] = value
+        else:
+            # Force to list to be able to concatenate
+            schemata[key] = list(schemata[key]) + list(value)
+    return schemata
+
+
+def validate_schemata_dict(
+    schemata: SchemataDict, data: Mapping, **kwargs
+) -> dict[str, list[ValidationError]]:
+    """
+    Validate a data mapping against a schemata dictionary. Returns a dictionary
+    of errors for each variable in the schemata dictionary. The errors are
+    stored in a list for each variable.
+    """
+    errors = defaultdict(list)
+    for variable, var_schemata in schemata.items():
+        for schema in var_schemata:
+            if variable in data.keys():
+                try:
+                    schema.validate(data[variable], **kwargs)
+                except ValidationError as e:
+                    errors[variable].append(e)
+    return errors

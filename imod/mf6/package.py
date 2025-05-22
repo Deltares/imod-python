@@ -2,7 +2,6 @@ from __future__ import annotations
 
 import abc
 import pathlib
-from collections import defaultdict
 from copy import deepcopy
 from pathlib import Path
 from typing import Any, Callable, Dict, List, Mapping, Optional, Tuple, Union, cast
@@ -24,7 +23,7 @@ from imod.common.utilities.regrid import (
     _regrid_like,
 )
 from imod.common.utilities.regrid_method_type import EmptyRegridMethod, RegridMethodType
-from imod.common.utilities.schemata import filter_schemata_dict
+from imod.common.utilities.schemata import filter_schemata_dict, validate_schemata_dict
 from imod.common.utilities.value_filters import is_valid
 from imod.logging import standard_log_decorator
 from imod.mf6.auxiliary_variables import (
@@ -326,17 +325,7 @@ class Package(PackageBase, IPackage, abc.ABC):
 
     @standard_log_decorator()
     def _validate(self, schemata: dict, **kwargs) -> dict[str, list[ValidationError]]:
-        errors = defaultdict(list)
-        for variable, var_schemata in schemata.items():
-            for schema in var_schemata:
-                if (
-                    variable in self.dataset.keys()
-                ):  # concentration only added to dataset if specified
-                    try:
-                        schema.validate(self.dataset[variable], **kwargs)
-                    except ValidationError as e:
-                        errors[variable].append(e)
-        return errors
+        return validate_schemata_dict(schemata, self.dataset, **kwargs)
 
     def is_empty(self) -> bool:
         """
