@@ -1,7 +1,6 @@
 from collections import defaultdict
 from collections.abc import Mapping
 from copy import deepcopy
-from typing import Tuple
 
 from imod.schemata import BaseSchema, SchemataDict, ValidationError
 
