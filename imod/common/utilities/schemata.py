@@ -106,7 +106,7 @@ def pkg_errors_to_status_info(
 class ValidateFuncProtocol(Protocol):
     """
     Protocol for a method that validates a schemata dictionary, showing the
-    call signature of this method.
+    call signature the method is expected to have.
     """
 
     def __call__(
