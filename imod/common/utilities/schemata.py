@@ -108,6 +108,7 @@ class ValidateFuncProtocol(Protocol):
     Protocol for a method that validates a schemata dictionary, showing the
     call signature of this method.
     """
+
     def __call__(
         self, schemata: SchemataDict, **kwargs: Any
     ) -> dict[str, list[ValidationError]]: ...
