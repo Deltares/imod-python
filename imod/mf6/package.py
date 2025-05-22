@@ -26,7 +26,7 @@ from imod.common.utilities.regrid_method_type import EmptyRegridMethod, RegridMe
 from imod.common.utilities.schemata import (
     filter_schemata_dict,
     validate_schemata_dict,
-    validation_pkg_error_message,
+    validate_with_error_message,
 )
 from imod.common.utilities.value_filters import is_valid
 from imod.logging import standard_log_decorator
@@ -347,20 +347,15 @@ class Package(PackageBase, IPackage, abc.ABC):
         allnodata_errors = self._validate(allnodata_schemata)
         return len(allnodata_errors) > 0
 
-    def _validate_init_schemata(self, validate: bool):
+    @standard_log_decorator()
+    def _validate_init_schemata(self, validate: bool) -> None:
         """
         Run the "cheap" schema validations.
 
         The expensive validations are run during writing. Some are only
         available then: e.g. idomain to determine active part of domain.
         """
-        if not validate:
-            return
-        errors = self._validate(self._init_schemata)
-        if len(errors) > 0:
-            message = validation_pkg_error_message(errors)
-            raise ValidationError(message)
-        return
+        validate_with_error_message(validate, self._init_schemata, self.dataset)
 
     def copy(self) -> Any:
         # All state should be contained in the dataset.

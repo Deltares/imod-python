@@ -25,7 +25,7 @@ from imod.common.utilities.schemata import (
     concatenate_schemata_dicts,
     pkg_errors_to_status_info,
     validate_schemata_dict,
-    validation_pkg_error_message,
+    validate_with_error_message,
 )
 from imod.logging import LogLevel, logger, standard_log_decorator
 from imod.mf6.drn import Drainage
@@ -75,20 +75,15 @@ class Modflow6Model(collections.UserDict, IModel, abc.ABC):
     ) -> dict[str, list[ValidationError]]:
         return validate_schemata_dict(schemata, self._options, **kwargs)
 
-    def _validate_init_schemata_options(self, validate: bool):
+    @standard_log_decorator()
+    def validate_init_schemata_options(self, validate: bool) -> None:
         """
         Run the "cheap" schema validations.
 
         The expensive validations are run during writing. Some are only
         available then: e.g. idomain to determine active part of domain.
         """
-        if not validate:
-            return
-        errors = self.validate_options(self._init_schemata)
-        if len(errors) > 0:
-            message = validation_pkg_error_message(errors)
-            raise ValidationError(message)
-        return
+        validate_with_error_message(validate, self._init_schemata, self._options)
 
     def __setitem__(self, key, value):
         if len(key) > 16:

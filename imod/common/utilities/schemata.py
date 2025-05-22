@@ -101,3 +101,15 @@ def pkg_errors_to_status_info(
         pkg_status_info.add(var_status_info)
     pkg_status_info.set_footer_text(footer_text)
     return pkg_status_info
+
+
+def validate_with_error_message(
+    validate: bool, schemata: SchemataDict, data: Mapping
+) -> None:
+    if not validate:
+        return
+    errors = validate_schemata_dict(schemata, data)
+    if len(errors) > 0:
+        message = validation_pkg_error_message(errors)
+        raise ValidationError(message)
+    return

@@ -112,7 +112,7 @@ class GroundwaterFlowModel(Modflow6Model):
             "newton": newton,
             "under_relaxation": under_relaxation,
         }
-        self._validate_init_schemata_options(validate)
+        self.validate_init_schemata_options(validate)
 
     def clip_box(
         self,
