@@ -104,7 +104,7 @@ class TestModel:
         # Arrange.
         tmp_path = tmpdir_factory.mktemp("TestSimulation")
         model_name = "Test model"
-        model = Modflow6Model(options={"newton": True})
+        model = Modflow6Model()
         # create write context
         validation_context = ValidationContext()
         write_context = WriteContext(tmp_path)
@@ -132,7 +132,7 @@ class TestModel:
         # Arrange.
         tmp_path = tmpdir_factory.mktemp("TestSimulation")
         model_name = "Test model"
-        model = Modflow6Model(options={"newton": True})
+        model = Modflow6Model()
         # create write context
         validation_context = ValidationContext()
         write_context = WriteContext(tmp_path)
@@ -155,7 +155,7 @@ class TestModel:
         # Arrange.
         tmp_path = tmpdir_factory.mktemp("TestSimulation")
         model_name = "Test model"
-        model = Modflow6Model(options={"newton": True})
+        model = Modflow6Model()
         # create write context
         validation_context = ValidationContext()
         write_context = WriteContext(tmp_path)
@@ -189,7 +189,7 @@ class TestModel:
         validation_context = ValidationContext()
         write_context = WriteContext(simulation_directory=tmp_path)
 
-        model = Modflow6Model(options={"newton": True})
+        model = Modflow6Model()
 
         discretization_mock = MagicMock(spec_set=Package)
         discretization_mock._pkg_id = "dis"
