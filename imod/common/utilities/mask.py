@@ -81,7 +81,7 @@ def _skip_dataarray(da: GridDataArray) -> bool:
     if len(da.dims) == 0 or set(da.coords).issubset(["layer"]):
         return True
 
-    if is_scalar(da.values[()]):
+    if is_scalar(da):
         return True
 
     spatial_dims = ["x", "y", "mesh2d_nFaces", "layer"]
