@@ -2,7 +2,6 @@ from pathlib import Path
 from typing import Union
 
 import numpy as np
-import pandas as pd
 
 from imod.mf6.package import Package
 
@@ -60,26 +59,23 @@ class ExchangeBase(Package):
         d = Package._get_render_dictionary(
             self, directory, pkgname, globaltimes, binary
         )
+        column_order = []
+        ds = self.dataset.copy()
+        index_dim = self.dataset["layer"].dims[0]
+        for i in [1, 2]:
+            column_order.append(f"layer{i}")
+            ds[f"layer{i}"] = (index_dim, self.dataset["layer"].data)
+            cell_id_dim = self.dataset[f"cell_id{i}"].dims[1]
+            # length of cell_dims is 1 for unstructured and 2 for structured
+            for j in range(self.dataset.sizes[cell_id_dim]):
+                varname = f"cell_id{i}_{j + 1}"
+                column_order.append(varname)
+                ds[varname] = (index_dim, self.dataset[f"cell_id{i}"].data[:, j])
 
-        datablock = pd.DataFrame()
-        datablock["layer1"] = self.dataset["layer"].values[:]
-
-        # If the grid is structured, the cell_id arrays will have both a row and a column dimension,
-        # but if it is unstructured, it will have only a cellid dimension
-        is_structured = len(self.dataset["cell_id1"].shape) > 1
-        is_structured = is_structured and self.dataset["cell_id1"].shape[1] > 1
-
-        datablock["cell_id1_1"] = self.dataset["cell_id1"].values[:, 0]
-        if is_structured:
-            datablock["cell_id1_2"] = self.dataset["cell_id1"].values[:, 1]
-        datablock["layer2"] = self.dataset["layer"].values[:]
-        datablock["cell_id2_1"] = self.dataset["cell_id2"].values[:, 0]
-        if is_structured:
-            datablock["cell_id2_2"] = self.dataset["cell_id2"].values[:, 1]
-
-        for key in ["ihc", "cl1", "cl2", "hwva", "angldegx", "cdist"]:
-            if key in self.dataset.keys():
-                datablock[key] = self.dataset[key].values[:]
-
+        all_geometric_vars = ["ihc", "cl1", "cl2", "hwva", "angldegx", "cdist"]
+        for var in all_geometric_vars:
+            if var in ds.data_vars:
+                column_order.append(var)
+        datablock = ds[column_order].to_dataframe()
         d["datablock"] = datablock.to_string(index=False, header=False)
         return template.render(d)
