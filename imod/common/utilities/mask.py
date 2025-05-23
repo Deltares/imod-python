@@ -9,7 +9,12 @@ from imod.common.interfaces.imaskingsettings import IMaskingSettings
 from imod.common.interfaces.imodel import IModel
 from imod.common.interfaces.ipackage import IPackage
 from imod.common.interfaces.isimulation import ISimulation
-from imod.typing.grid import GridDataArray, get_spatial_dimension_names, is_same_domain
+from imod.typing.grid import (
+    GridDataArray,
+    get_spatial_dimension_names,
+    is_same_domain,
+    is_spatial_grid,
+)
 
 # create dispatcher instance to limit scope of typedispatching
 dispatch = Dispatcher()
@@ -84,8 +89,7 @@ def _skip_dataarray(da: GridDataArray) -> bool:
     if is_scalar(da):
         return True
 
-    spatial_dims = ["x", "y", "mesh2d_nFaces", "layer"]
-    if not np.any([coord in spatial_dims for coord in da.coords]):
+    if not is_spatial_grid(da) and ("layer" not in da.dims):
         return True
 
     return False
