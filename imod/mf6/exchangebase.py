@@ -2,6 +2,7 @@ from pathlib import Path
 from typing import Union
 
 import numpy as np
+import xarray as xr
 
 from imod.mf6.package import Package
 
@@ -59,23 +60,23 @@ class ExchangeBase(Package):
         d = Package._get_render_dictionary(
             self, directory, pkgname, globaltimes, binary
         )
-        column_order = []
-        ds = self.dataset.copy()
+        vars_to_render = {}
         index_dim = self.dataset["layer"].dims[0]
         for i in [1, 2]:
-            column_order.append(f"layer{i}")
-            ds[f"layer{i}"] = (index_dim, self.dataset["layer"].data)
+            vars_to_render[f"layer{i}"] = (index_dim, self.dataset["layer"].data)
             cell_id_dim = self.dataset[f"cell_id{i}"].dims[1]
-            # length of cell_dims is 1 for unstructured and 2 for structured
+            # length of cell_id_dims is 1 for unstructured and 2 for structured
             for j in range(self.dataset.sizes[cell_id_dim]):
                 varname = f"cell_id{i}_{j + 1}"
-                column_order.append(varname)
-                ds[varname] = (index_dim, self.dataset[f"cell_id{i}"].data[:, j])
+                vars_to_render[varname] = (
+                    index_dim,
+                    self.dataset[f"cell_id{i}"].data[:, j],
+                )
 
         all_geometric_vars = ["ihc", "cl1", "cl2", "hwva", "angldegx", "cdist"]
         for var in all_geometric_vars:
-            if var in ds.data_vars:
-                column_order.append(var)
-        datablock = ds[column_order].to_dataframe()
+            if var in self.dataset.data_vars:
+                vars_to_render[var] = (index_dim, self.dataset[var].data)
+        datablock = xr.merge([vars_to_render], join="exact").to_dataframe()
         d["datablock"] = datablock.to_string(index=False, header=False)
         return template.render(d)
