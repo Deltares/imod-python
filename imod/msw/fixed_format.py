@@ -15,11 +15,15 @@ class VariableMetaData:
 
 
 def format_fixed_width(value, metadata):
-    if metadata.dtype == str:
+    if value == "":
+        col_width = metadata.column_width - 2
+        format_string = "{:" + f"{col_width}" + '}""'
+        return format_string.format(value)
+    if metadata.dtype is str:
         format_string = "{:" + f"{metadata.column_width}" + "}"
-    elif metadata.dtype == int:
+    elif metadata.dtype is int:
         format_string = "{:" + f"{metadata.column_width}d" + "}"
-    elif metadata.dtype == float:
+    elif metadata.dtype is float:
         whole_number_digits = len(str(int(abs(value))))
         decimal_number_width = max(0, metadata.column_width - whole_number_digits - 2)
         format_string = "{:" + f"{metadata.column_width}.{decimal_number_width}f" + "}"

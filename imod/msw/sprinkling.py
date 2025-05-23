@@ -136,7 +136,11 @@ class Sprinkling(MetaSwapPackage, IRegridPackage):
         well_row = well_cellid.sel(dim_cellid="row").data - 1
         well_column = well_cellid.sel(dim_cellid="column").data - 1
 
-        max_rate_per_svat = self.dataset["max_abstraction_groundwater"].where(svat > 0)
+        max_rate = (
+            self.dataset["max_abstraction_groundwater"]
+            + self.dataset["max_abstraction_surfacewater"]
+        )
+        max_rate_per_svat = max_rate.where(svat > 0)
         well_layer_per_svat = xr.full_like(max_rate_per_svat, np.nan)
         well_layer_per_svat.values[:, well_row, well_column] = well_layer
 
@@ -165,6 +169,10 @@ class Sprinkling(MetaSwapPackage, IRegridPackage):
         )
 
         self._check_range(dataframe)
+
+        for var in self._with_subunit:
+            s = dataframe[var]
+            dataframe[var] = s.where(s > 0.0).fillna("")
 
         return self.write_dataframe_fixed_width(file, dataframe)
 
