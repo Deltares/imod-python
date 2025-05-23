@@ -40,6 +40,8 @@ Fixed
   relative paths for the extra files block.
 - :class:`imod.msw.IdfMapping` swapped order of y_grid and x_grid in dictionary
   for writing the correct order of coordinates in idf_svat.inp.
+- Improved performance of :meth:`imod.mf6.Modflow6Simulation.split` and
+  :meth:`imod.mf6.Modflow6Simulation.mask` when using dask.
 
 Changed
 ~~~~~~~
