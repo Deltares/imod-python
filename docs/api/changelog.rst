@@ -55,7 +55,10 @@ Changed
   often than not perfectly rectangular in shape.
 - :func:`imod.prepare.create_partition_labels` now returns a griddata with the
   name ``"label"`` instead of ``"idomain"``.
-
+- Upon providing the wrong type to one of the options of
+  :class:`imod.mf6.GroundwaterFlowModel`,
+  :class:`imod.mf6.GroundwaterTransportModel`, this will throw a
+  ``ValidationError`` upon initialization and writing.
 
 [1.0.0rc3] - 2025-04-17
 -----------------------

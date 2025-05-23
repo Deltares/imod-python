@@ -42,6 +42,7 @@ from typing import (
     Optional,
     Sequence,
     Tuple,
+    Type,
     TypeAlias,
     Union,
 )
@@ -135,6 +136,7 @@ class BaseSchema(abc.ABC):
 
 
 SchemaType: TypeAlias = BaseSchema
+SchemataDict: TypeAlias = dict[str, list[SchemaType] | Tuple[SchemaType, ...]]
 
 
 class SchemaUnion:
@@ -218,6 +220,26 @@ class DTypeSchema(BaseSchema):
 
         if not np.issubdtype(obj.dtype, self.dtype):
             raise ValidationError(f"dtype {obj.dtype} != {self.dtype}")
+
+
+class TypeSchema(BaseSchema):
+    def __init__(self, dtype: Type) -> None:
+        """
+        Validate type, used for model options instead of GridDataArrays.
+
+        Parameters
+        ----------
+        dtype : type
+            Type of the DataArray.
+        """
+        self.dtype = dtype
+
+    def validate(self, obj: Any, **kwargs) -> None:
+        if obj is None:
+            return
+
+        if not isinstance(obj, self.dtype):
+            raise ValidationError(f"type {type(obj)} != {self.dtype}")
 
 
 class GeometryTypeSchema(BaseSchema):

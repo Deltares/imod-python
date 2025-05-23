@@ -20,6 +20,7 @@ import imod.mf6.utilities
 from imod.common.interfaces.ipointdatapackage import IPointDataPackage
 from imod.common.utilities.grid import broadcast_to_full_domain
 from imod.common.utilities.layer import create_layered_top
+from imod.common.utilities.schemata import validation_pkg_error_message
 from imod.logging import init_log_decorator, logger
 from imod.logging.logging_decorators import standard_log_decorator
 from imod.logging.loglevel import LogLevel
@@ -33,7 +34,6 @@ from imod.mf6.mf6_wel_adapter import Mf6Wel, concat_indices_to_cellid
 from imod.mf6.package import Package
 from imod.mf6.utilities.dataset import remove_inactive
 from imod.mf6.utilities.imod5_converter import well_from_imod5_cap_data
-from imod.mf6.validation import validation_pkg_error_message
 from imod.mf6.validation_context import ValidationContext
 from imod.mf6.write_context import WriteContext
 from imod.prepare import assign_wells

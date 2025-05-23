@@ -4,6 +4,7 @@ from typing import Optional
 
 from imod.logging import init_log_decorator
 from imod.mf6.model import Modflow6Model
+from imod.schemata import TypeSchema
 
 
 class GroundwaterTransportModel(Modflow6Model):
@@ -36,6 +37,13 @@ class GroundwaterTransportModel(Modflow6Model):
     _model_id = "gwt6"
     _template = Modflow6Model._initialize_template("gwt-nam.j2")
 
+    _init_schemata = {
+        "listing_file": [TypeSchema(str)],
+        "print_input": [TypeSchema(bool)],
+        "print_flows": [TypeSchema(bool)],
+        "save_flows": [TypeSchema(bool)],
+    }
+
     @init_log_decorator()
     def __init__(
         self,
@@ -43,6 +51,7 @@ class GroundwaterTransportModel(Modflow6Model):
         print_input: bool = False,
         print_flows: bool = False,
         save_flows: bool = False,
+        validate: bool = True,
     ):
         super().__init__()
         self._options = {
@@ -51,3 +60,4 @@ class GroundwaterTransportModel(Modflow6Model):
             "print_flows": print_flows,
             "save_flows": save_flows,
         }
+        self.validate_init_schemata_options(validate)
