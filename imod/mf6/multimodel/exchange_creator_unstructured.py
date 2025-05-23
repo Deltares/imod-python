@@ -39,8 +39,8 @@ class ExchangeCreator_Unstructured(ExchangeCreator):
         face1 = edge_face_connectivity[self._connected_cell_edge_indices, 0]
         face2 = edge_face_connectivity[self._connected_cell_edge_indices, 1]
 
-        label_of_face1 = self._submodel_labels.values[face1]
-        label_of_face2 = self._submodel_labels.values[face2]
+        label_of_face1 = self._submodel_labels.data[face1]
+        label_of_face2 = self._submodel_labels.data[face2]
 
         connected_cell_info = pd.DataFrame(
             {
@@ -139,8 +139,8 @@ class ExchangeCreator_Unstructured(ExchangeCreator):
         face1 = edge_face_connectivity[:, 0]
         face2 = edge_face_connectivity[:, 1]
 
-        label_of_face1 = submodel_labels.values[face1]
-        label_of_face2 = submodel_labels.values[face2]
+        label_of_face1 = submodel_labels.data[face1]
+        label_of_face2 = submodel_labels.data[face2]
 
         is_internal_edge = label_of_face1 - label_of_face2 == 0
         is_external_boundary_edge = np.any((face1 == -1, face2 == -1), axis=0)
