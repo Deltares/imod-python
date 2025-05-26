@@ -54,6 +54,5 @@ Criteria for user acceptance tests of the 1.0 release are:
   done in a reasonable amount of time and should not be much slower than iMOD5.
   This is subjective, but we aim for less than 5 minutes for the LHM model with
   1 timestep.
-*
-
+* Are there large differences in memory usage compared to iMOD5? 
 
