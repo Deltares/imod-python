@@ -551,7 +551,7 @@ def test_cleanup(dis, well_high_lvl_test_data_transient):
     wel = imod.mf6.Well(*well_high_lvl_test_data_transient)
     ds_original = wel.dataset.copy()
 
-    dis_pkg_type, top, bottom, idomain = dis
+    dis_pkg_type, idomain, top, bottom = dis
     if "layer" in top.dims:
         top = top.isel(layer=0, drop=True)
     deep_offset = 100.0
