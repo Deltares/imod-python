@@ -23,7 +23,13 @@ from imod.prepare.topsystem.default_allocation_methods import (
     SimulationDistributingOptions,
 )
 from imod.schemata import ValidationError
-from imod.typing.grid import has_negative_layer, is_planar_grid, ones_like, zeros_like
+from imod.typing.grid import (
+    enforce_dim_order,
+    has_negative_layer,
+    is_planar_grid,
+    ones_like,
+    zeros_like,
+)
 
 TYPE_DIS_PKG = {
     xu.UgridDataArray: VerticesDiscretization,
@@ -110,6 +116,58 @@ def test_render(riv_data):
 
         begin period 1
           open/close mymodel/river/riv.bin (binary)
+        end period
+        """
+    )
+    assert actual == expected
+
+
+@parametrize_with_cases("riv_data", cases=RivCases)
+def test_render_repeat_stress(riv_data):
+    """
+    Test that rendering a river with a repeated stress period does not raise an error.
+    """
+    globaltimes = [
+        np.datetime64("2000-01-01"),
+        np.datetime64("2000-01-02"),
+        np.datetime64("2000-01-03"),
+        np.datetime64("2000-01-04"),
+    ]
+    time_da = xr.DataArray([1, 2], dims=["time"], coords={"time": globaltimes[:2]})
+
+    riv_data["stage"] = enforce_dim_order(riv_data["stage"] * time_da)
+    riv_data["conductance"] = enforce_dim_order(riv_data["conductance"] * time_da)
+    riv_data["bottom_elevation"] = enforce_dim_order(
+        riv_data["bottom_elevation"] * time_da
+    )
+    repeat_stress = {
+        globaltimes[2]: globaltimes[0],
+        globaltimes[3]: globaltimes[1],
+    }
+    river = imod.mf6.River(repeat_stress=repeat_stress, **riv_data)
+    directory = pathlib.Path("mymodel")
+    actual = river.render(directory, "river", globaltimes, True)
+
+    expected = textwrap.dedent(
+        """\
+        begin options
+        end options
+
+        begin dimensions
+          maxbound 16
+        end dimensions
+
+        begin period 1
+          open/close mymodel/river/riv-0.bin (binary)
+        end period
+        begin period 2
+          open/close mymodel/river/riv-1.bin (binary)
+        end period
+        begin period 3
+          open/close mymodel/river/riv-0.bin (binary)
+        end period
+        begin period 4
+          open/close mymodel/river/riv-1.bin (binary)
         end period
         """
     )
