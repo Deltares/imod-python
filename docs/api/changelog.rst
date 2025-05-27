@@ -38,6 +38,9 @@ Fixed
   different name than ``"idomain"``.
 - :func:`imod.msw.MetaSwapModel.from_imod5_data` now supports the usage of
   relative paths for the extra files block.
+- Bug in :meth:`imod.msw.Sprinkling.write` where MetaSWAP svats with surface
+  water sprinkling and no groundwater sprinkling activated were not written to
+  ``scap_svat.inp``.
 
 Changed
 ~~~~~~~
