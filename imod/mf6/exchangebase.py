@@ -62,19 +62,18 @@ class ExchangeBase(Package):
         )
         vars_to_render = {}
         index_dim = self.dataset["layer"].dims[0]
+        # process both cells stradeling a connection
         for i in [1, 2]:
-            vars_to_render[f"layer{i}"] = (index_dim, self.dataset["layer"].data)
-            cell_id_dim = self.dataset[f"cell_id{i}"].dims[1]
             # length of cell_id_dims is 1 for unstructured and 2 for structured
-            for j in range(self.dataset.sizes[cell_id_dim]):
-                varname = f"cell_id{i}_{j + 1}"
-                vars_to_render[varname] = (
-                    index_dim,
-                    self.dataset[f"cell_id{i}"].data[:, j],
-                )
+            is_structured = self.dataset[f"cell_id{i}"].dims[1] == 1
+            cellid_data = self.dataset[f"cell_id{i}"].data
+            vars_to_render[f"layer{i}"] = (index_dim, self.dataset["layer"].data)
+            vars_to_render[f"cell_id{i}_1"] = (index_dim, cellid_data[:, 0])
+            if is_structured:
+                vars_to_render[f"cell_id{i}_2"] = (index_dim, cellid_data[:, 1])
 
-        all_geometric_vars = ["ihc", "cl1", "cl2", "hwva", "angldegx", "cdist"]
-        for var in all_geometric_vars:
+        geometric_vars = ["ihc", "cl1", "cl2", "hwva", "angldegx", "cdist"]
+        for var in geometric_vars:
             if var in self.dataset.data_vars:
                 vars_to_render[var] = (index_dim, self.dataset[var].data)
         datablock = xr.merge([vars_to_render], join="exact").to_dataframe()
