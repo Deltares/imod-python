@@ -41,6 +41,11 @@ Fixed
 - Bug in :meth:`imod.msw.Sprinkling.write` where MetaSWAP svats with surface
   water sprinkling and no groundwater sprinkling activated were not written to
   ``scap_svat.inp``.
+- :class:`imod.msw.IdfMapping` swapped order of y_grid and x_grid in dictionary
+  for writing the correct order of coordinates in idf_svat.inp.
+- Fixed bug in :meth:`imod.mf6.Well.cleanup` and
+  :meth:`imod.mf6.LayeredWell.cleanup` which caused an error when called with an
+  unstructured discretization.
 
 Changed
 ~~~~~~~
@@ -56,7 +61,10 @@ Changed
   often than not perfectly rectangular in shape.
 - :func:`imod.prepare.create_partition_labels` now returns a griddata with the
   name ``"label"`` instead of ``"idomain"``.
-
+- Upon providing the wrong type to one of the options of
+  :class:`imod.mf6.GroundwaterFlowModel`,
+  :class:`imod.mf6.GroundwaterTransportModel`, this will throw a
+  ``ValidationError`` upon initialization and writing.
 
 [1.0.0rc3] - 2025-04-17
 -----------------------

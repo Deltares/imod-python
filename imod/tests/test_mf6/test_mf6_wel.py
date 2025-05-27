@@ -23,6 +23,7 @@ from imod.mf6.wel import LayeredWell, Well, derive_cellid_from_points
 from imod.mf6.write_context import WriteContext
 from imod.schemata import ValidationError
 from imod.tests.fixtures.flow_basic_fixture import BasicDisSettings
+from imod.typing.grid import ones_like
 
 times = [
     datetime(1981, 11, 30),
@@ -32,6 +33,23 @@ times = [
     datetime(1982, 3, 31),
     datetime(1982, 4, 30),
 ]
+
+
+class BasicGridCases:
+    @staticmethod
+    def case_structured(basic_dis):
+        idomain, top, bottom = basic_dis
+        return (
+            imod.mf6.StructuredDiscretization,
+            idomain,
+            top,
+            bottom,
+        )
+
+    @staticmethod
+    def case_unstructured(basic_unstructured_dis):
+        idomain, top, bottom = basic_unstructured_dis
+        return imod.mf6.VerticesDiscretization, idomain, top, bottom
 
 
 class GridAgnosticWellCases:
@@ -330,12 +348,13 @@ def test_to_mf6_pkg__validate_filter_top(well_high_lvl_test_data_stationary):
     )
 
 
+@parametrize_with_cases("dis", cases=BasicGridCases)
 def test_to_mf6_pkg__logging_with_message(
-    tmp_path, basic_dis, well_high_lvl_test_data_transient
+    tmp_path, dis, well_high_lvl_test_data_transient
 ):
     # Arrange
     logfile_path = tmp_path / "logfile.txt"
-    idomain, top, bottom = basic_dis
+    _, idomain, top, bottom = dis
     modified_well_fixture = list(well_high_lvl_test_data_transient)
 
     # create an idomain where layer 1 is active and layer 2 and 3 are inactive.
@@ -343,8 +362,8 @@ def test_to_mf6_pkg__logging_with_message(
     # so only wells that have a filter top above -5 will end up in the simulation
     active = idomain == 1
 
-    active.loc[1, :, :] = True
-    active.loc[2:, :, :] = False
+    active.loc[1, ...] = True
+    active.loc[2:, ...] = False
 
     # modify the well filter top and filter bottoms so that
     # well 0 is not placed
@@ -393,7 +412,7 @@ def test_to_mf6_pkg__logging_with_message(
 
         wel = imod.mf6.Well(*modified_well_fixture)
 
-        k = xr.ones_like(idomain)
+        k = ones_like(idomain)
         _ = wel.to_mf6_pkg(active, top, bottom, k)
 
     # the wells that were fully or partially placed should not appear in the log message
@@ -415,15 +434,16 @@ def test_to_mf6_pkg__logging_with_message(
         assert "id = 11 x" in log
 
 
+@parametrize_with_cases("dis", cases=BasicGridCases)
 def test_to_mf6_pkg__logging_without_message(
-    tmp_path, basic_dis, well_high_lvl_test_data_transient
+    tmp_path, dis, well_high_lvl_test_data_transient
 ):
     # This test activates logging, and then converts a high level well package to
     # an MF6 package, in such a way that all the wells can be placed.
     # Logging is active, and the log file should not include the "Some wells were not placed"
     # message
     logfile_path = tmp_path / "logfile.txt"
-    idomain, top, bottom = basic_dis
+    _, idomain, top, bottom = dis
 
     with open(logfile_path, "w") as sys.stdout:
         imod.logging.configure(
@@ -435,10 +455,10 @@ def test_to_mf6_pkg__logging_without_message(
 
         wel = imod.mf6.Well(*well_high_lvl_test_data_transient)
         active = idomain == 1
-        k = xr.ones_like(idomain)
+        k = ones_like(idomain)
 
-        active.loc[1, :, :] = True
-        active.loc[2:, :, :] = True
+        active.loc[1, ...] = True
+        active.loc[2:, ...] = True
 
         # Act
         _ = wel.to_mf6_pkg(active, top, bottom, k)
@@ -448,32 +468,36 @@ def test_to_mf6_pkg__logging_without_message(
         assert "Some wells were not placed" not in log
 
 
-def test_to_mf6_pkg__error_on_all_wells_removed(
-    basic_dis, well_high_lvl_test_data_transient
-):
+@parametrize_with_cases("dis", cases=BasicGridCases)
+def test_to_mf6_pkg__error_on_all_wells_removed(dis, well_high_lvl_test_data_transient):
     """Drop all wells, then run to_mf6_pkg"""
-    idomain, top, bottom = basic_dis
+    _, idomain, top, bottom = dis
 
     wel = imod.mf6.Well(*well_high_lvl_test_data_transient)
     wel.dataset = wel.dataset.drop_sel(index=wel.dataset["index"])
     active = idomain == 1
-    k = xr.ones_like(idomain)
+    k = ones_like(idomain)
 
     with pytest.raises(ValidationError, match="No wells were assigned in package"):
         wel.to_mf6_pkg(active, top, bottom, k)
 
 
-def test_to_mf6_pkg__error_on_well_removal(
-    basic_dis, well_high_lvl_test_data_transient
-):
+@parametrize_with_cases("dis", cases=BasicGridCases)
+def test_to_mf6_pkg__error_on_well_removal(dis, well_high_lvl_test_data_transient):
     """Set k values at well location x=81 to 1e-3, causing it to be dropped.
     Should throw error if error_on_well_removal = True"""
-    idomain, top, bottom = basic_dis
+    dis_pkg_type, idomain, top, bottom = dis
 
     wel = imod.mf6.Well(minimum_k=0.9, *well_high_lvl_test_data_transient)
     active = idomain == 1
-    k = xr.ones_like(idomain)
-    k.loc[{"x": 85.0}] = 1e-3
+    k = ones_like(idomain).astype(float)
+    # Set k values at well location x=81 to 1e-3, causing it to be dropped.
+    if dis_pkg_type is imod.mf6.VerticesDiscretization:
+        dim = k.ugrid.grid.face_dimension
+        indices = k.sel(layer=1).ugrid.sel(x=85.0).coords[dim].data
+        k.loc[{dim: indices}] = 1e-3
+    else:
+        k.loc[{"x": 85.0}] = 1e-3
 
     with pytest.raises(ValidationError, match="x = 81"):
         wel.to_mf6_pkg(active, top, bottom, k, strict_well_validation=True)
@@ -521,17 +545,18 @@ def test_is_empty(well_high_lvl_test_data_transient):
     assert wel_empty.is_empty()
 
 
-def test_cleanup(basic_dis, well_high_lvl_test_data_transient):
+@parametrize_with_cases("dis", cases=BasicGridCases)
+def test_cleanup(dis, well_high_lvl_test_data_transient):
     # Arrange
     wel = imod.mf6.Well(*well_high_lvl_test_data_transient)
     ds_original = wel.dataset.copy()
-    idomain, top, bottom = basic_dis
-    top = top.isel(layer=0, drop=True)
+
+    dis_pkg_type, idomain, top, bottom = dis
+    if "layer" in top.dims:
+        top = top.isel(layer=0, drop=True)
     deep_offset = 100.0
-    dis_normal = imod.mf6.StructuredDiscretization(top, bottom, idomain)
-    dis_deep = imod.mf6.StructuredDiscretization(
-        top - deep_offset, bottom - deep_offset, idomain
-    )
+    dis_normal = dis_pkg_type(top, bottom, idomain)
+    dis_deep = dis_pkg_type(top - deep_offset, bottom - deep_offset, idomain)
 
     # Nothing to be cleaned up with default discretization
     wel.cleanup(dis_normal)
