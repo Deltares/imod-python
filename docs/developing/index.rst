@@ -35,6 +35,7 @@ in-depth description.
    ci
    releasing
    docker
+   test-plan
 
 .. _Contributing to xarray guide: https://xarray.pydata.org/en/latest/contributing.html
 .. _pages: https://github.com/Deltares/imod-python/issues
