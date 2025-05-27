@@ -65,7 +65,8 @@ class ExchangeBase(Package):
         # process both cells stradeling a connection
         for i in [1, 2]:
             # length of cell_id_dims is 1 for unstructured and 2 for structured
-            is_structured = self.dataset[f"cell_id{i}"].sizes[f"cell_dims{i}"] == 2
+            sizes = self.dataset[f"cell_id{i}"].sizes
+            is_structured = list(sizes.values())[1] == 2
             cellid_data = self.dataset[f"cell_id{i}"].data
             vars_to_render[f"layer{i}_1"] = (index_dim, self.dataset["layer"].data)
             vars_to_render[f"cell_id{i}_1"] = (index_dim, cellid_data[:, 0])
