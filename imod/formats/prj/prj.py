@@ -1052,7 +1052,7 @@ def open_projectfile_data(path: FilePath) -> tuple[dict[str, Any], dict[str, Any
         # Set the year of a repeat date to 1899: this ensures it falls outside
         # of the iMOD calendar. Collisions are then always avoided.
         periods = {
-            key: _process_time(time, yearfirst=False).replace(year=1899)
+            key.lower(): _process_time(time, yearfirst=False).replace(year=1899)
             for key, time in periods_block.items()
         }
 

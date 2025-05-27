@@ -50,6 +50,8 @@ Fixed
 - Fixed bug in :meth:`imod.mf6.Well.cleanup` and
   :meth:`imod.mf6.LayeredWell.cleanup` which caused an error when called with an
   unstructured discretization.
+- Fixed bug in :func:`imod.formats.prj.open_projectfile_data` which caused an
+  error when a periods keyword was used having an upper case.
 
 Changed
 ~~~~~~~

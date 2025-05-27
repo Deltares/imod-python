@@ -82,10 +82,10 @@ PRJ_TEMPLATE = textwrap.dedent(
     1900-01-01
     001,001
         1,2, 001, 1.0, 0.0, -999.9900,"{basepath}/rch.idf",
-    summer
+    SUMMER
     001,001
         1,2, 001, 1.0, 0.0, -999.9900,"{basepath}/rch.idf",
-    winter
+    WINTER
     001,001
         1,2, 001, 1.0, 0.0, -999.9900,"{basepath}/rch.idf",
 
@@ -109,9 +109,9 @@ PRJ_TEMPLATE = textwrap.dedent(
         QERROR=  0.1000000
 
     Periods
-    summer
+    SUMMER
     01-04-1900 00:00:00
-    winter
+    WINTER
     01-10-1900 00:00:00
 
     Species
