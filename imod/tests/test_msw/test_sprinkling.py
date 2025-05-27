@@ -272,11 +272,11 @@ def test_simple_model_inconsistent_active_capacity(fixed_format_parser):
     assert_equal(results["svat"], np.array([1, 2, 4]))
     assert_almost_equal(
         results["max_abstraction_groundwater"],
-        np.array([100.0, nan, 200.0]),
+        np.array([100.0, 0.0, 200.0]),
     )
     assert_almost_equal(
         results["max_abstraction_surfacewater"],
-        np.array([nan, 300.0, 200.0]),
+        np.array([0.0, 300.0, 200.0]),
     )
     assert_equal(results["layer"], np.array([3, 1, 2]))
     assert_equal(results["svat_groundwater"], np.array([1, 2, 4]))

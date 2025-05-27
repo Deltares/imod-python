@@ -170,10 +170,6 @@ class Sprinkling(MetaSwapPackage, IRegridPackage):
 
         self._check_range(dataframe)
 
-        for var in self._with_subunit:
-            s = dataframe[var]
-            dataframe[var] = s.where(s > 0.0).fillna("")
-
         return self.write_dataframe_fixed_width(file, dataframe)
 
     @classmethod
