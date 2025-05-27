@@ -71,6 +71,10 @@ class BoundaryCondition(Package, abc.ABC):
     """
 
     def __init__(self, allargs: Mapping[str, GridDataArray | float | int | bool | str]):
+        if "repeat_stress" in allargs.keys() and isinstance(
+            allargs["repeat_stress"], dict
+        ):
+            allargs["repeat_stress"] = get_repeat_stress(allargs["repeat_stress"])  # type: ignore
         super().__init__(allargs)
         if "concentration" in allargs.keys() and allargs["concentration"] is None:
             # Remove vars inplace
