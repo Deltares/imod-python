@@ -70,7 +70,7 @@ class ExchangeBase(Package):
             vars_to_render[f"layer{i}_1"] = (index_dim, self.dataset["layer"].data)
             vars_to_render[f"cell_id{i}_1"] = (index_dim, cellid_data[:, 0])
             if is_structured:
-                vars_to_render[f"layer{i}_2"] = vars_to_render[f"layer{i}_1"].copy()
+                vars_to_render[f"layer{i}_2"] = (index_dim, self.dataset["layer"].data)
                 vars_to_render[f"cell_id{i}_2"] = (index_dim, cellid_data[:, 1])
 
         geometric_vars = ["ihc", "cl1", "cl2", "hwva", "angldegx", "cdist"]
