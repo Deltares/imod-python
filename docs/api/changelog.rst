@@ -43,6 +43,10 @@ Fixed
   ``scap_svat.inp``.
 - :class:`imod.msw.IdfMapping` swapped order of y_grid and x_grid in dictionary
   for writing the correct order of coordinates in idf_svat.inp.
+- Improved performance of :meth:`imod.mf6.Modflow6Simulation.split` and
+  :meth:`imod.mf6.Modflow6Simulation.mask` when using dask.
+- Fixed bug in :meth:`imod.mf6.Modflow6Simulation.mask` for unstructured grids
+  with a spatial dimension that differs from the default ``"mesh2d_nFaces"``.
 - Fixed bug in :meth:`imod.mf6.Well.cleanup` and
   :meth:`imod.mf6.LayeredWell.cleanup` which caused an error when called with an
   unstructured discretization.

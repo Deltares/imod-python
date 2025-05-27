@@ -1250,7 +1250,7 @@ class Modflow6Simulation(collections.UserDict, ISimulation):
                 "x": id.sel({f"cell_dims{i}": f"column_{i}"}),
             }
         exchange_domain = domain.isel(exchange_cells)
-        active_exchange_domain = exchange_domain.where(exchange_domain.values > 0)
+        active_exchange_domain = exchange_domain.where(exchange_domain > 0)
         active_exchange_domain = active_exchange_domain.dropna("index")
         ex.dataset = ex.dataset.sel(index=active_exchange_domain["index"])
 
