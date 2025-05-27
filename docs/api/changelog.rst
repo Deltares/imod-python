@@ -67,6 +67,9 @@ Changed
   :class:`imod.mf6.GroundwaterFlowModel`,
   :class:`imod.mf6.GroundwaterTransportModel`, this will throw a
   ``ValidationError`` upon initialization and writing.
+- You can now also provide ``repeat_stress`` as dictionary to imod.mf6
+  boundary conditions, such as :class:`imod.mf6.River`, :class:`imod.mf6.Drainage`, and
+  :class:`imod.mf6.GeneralHeadBoundary`.
 
 [1.0.0rc3] - 2025-04-17
 -----------------------
