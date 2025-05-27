@@ -67,9 +67,10 @@ class ExchangeBase(Package):
             # length of cell_id_dims is 1 for unstructured and 2 for structured
             is_structured = self.dataset[f"cell_id{i}"].dims[1] == 1
             cellid_data = self.dataset[f"cell_id{i}"].data
-            vars_to_render[f"layer{i}"] = (index_dim, self.dataset["layer"].data)
+            vars_to_render[f"layer{i}_1"] = (index_dim, self.dataset["layer"].data)
             vars_to_render[f"cell_id{i}_1"] = (index_dim, cellid_data[:, 0])
             if is_structured:
+                vars_to_render[f"layer{i}_2"] = vars_to_render[f"layer{i}_1"].copy()
                 vars_to_render[f"cell_id{i}_2"] = (index_dim, cellid_data[:, 1])
 
         geometric_vars = ["ihc", "cl1", "cl2", "hwva", "angldegx", "cdist"]
