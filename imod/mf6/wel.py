@@ -713,8 +713,10 @@ class GridAgnosticWell(BoundaryCondition, IPointDataPackage, abc.ABC):
         cleanup_func: Callable,
         **cleanup_kwargs,
     ) -> None:
+        # Work around mypy error, .data_vars cannot be used with xu.UgridDataset
+        dict_to_broadcast: dict[str, GridDataArray] = dict(**dis.dataset)  # type: ignore
         # Top and bottom should be forced to grids with a x, y coordinates
-        top, bottom = broadcast_to_full_domain(**dict(dis.dataset.data_vars))
+        top, bottom = broadcast_to_full_domain(**dict_to_broadcast)
         # Collect point variable datanames
         point_varnames = list(self._write_schemata.keys())
         if "concentration" not in self.dataset.keys():
