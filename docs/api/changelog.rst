@@ -40,6 +40,9 @@ Fixed
   relative paths for the extra files block.
 - :class:`imod.msw.IdfMapping` swapped order of y_grid and x_grid in dictionary
   for writing the correct order of coordinates in idf_svat.inp.
+- Fixed bug in :meth:`imod.mf6.Well.cleanup` and
+  :meth:`imod.mf6.LayeredWell.cleanup` which caused an error when called with an
+  unstructured discretization.
 
 Changed
 ~~~~~~~
