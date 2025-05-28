@@ -128,17 +128,21 @@ def test_render_repeat_stress(riv_data):
     Test that rendering a river with a repeated stress period does not raise an error.
     """
     globaltimes = [
-        np.datetime64("2000-01-01"),
-        np.datetime64("2000-01-02"),
-        np.datetime64("2000-01-03"),
-        np.datetime64("2000-01-04"),
+        np.datetime64("2000-04-01"),
+        np.datetime64("2000-10-01"),
+        np.datetime64("2001-04-01"),
+        np.datetime64("2001-10-01"),
     ]
-    time_da = xr.DataArray([1, 2], dims=["time"], coords={"time": globaltimes[:2]})
 
-    riv_data["stage"] = enforce_dim_order(riv_data["stage"] * time_da)
-    riv_data["conductance"] = enforce_dim_order(riv_data["conductance"] * time_da)
+    seasonal_factors = [0.8, 1.2]
+    seasonal_da = xr.DataArray(
+        seasonal_factors, dims=["time"], coords={"time": globaltimes[:2]}
+    )
+
+    riv_data["stage"] = enforce_dim_order(riv_data["stage"] * seasonal_da)
+    riv_data["conductance"] = enforce_dim_order(riv_data["conductance"] * seasonal_da)
     riv_data["bottom_elevation"] = enforce_dim_order(
-        riv_data["bottom_elevation"] * time_da
+        riv_data["bottom_elevation"] * seasonal_da
     )
     repeat_stress = {
         globaltimes[2]: globaltimes[0],
