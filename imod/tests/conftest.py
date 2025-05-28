@@ -3,6 +3,7 @@ import pytest
 from .fixtures.backward_compatibility_fixture import (
     imod5_dataset,
     imod5_dataset_periods,
+    imod5_dataset_transient,
 )
 from .fixtures.flow_basic_fixture import (
     basic_dis,
