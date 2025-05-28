@@ -1,10 +1,24 @@
+"""
+Funcionality showcase
+=====================
+
+This contains the examples that were part of the README. These showcase some
+nice features of iMOD Python.
+"""
+
 # %%
-# Let's first create some raster data to work with.
+# Data to work with examples
+# --------------------------
+#
+# First, we'll create some toy data to work with in the examples below. Let's
+# start with some raster data to work with.
 import xarray as xr
 import xugrid as xu
 
 import imod
 
+# Let's load some example elevation data which is shipped with xugrid. This is a
+# 2D unstructured grid with elevation data.
 elevation_uda = xu.data.elevation_nl()
 # Drop unnecessary coords. These coords are also stored in elevation_uda.ugrid.grid
 elevation_uda = elevation_uda.drop_vars(["mesh2d_face_x", "mesh2d_face_y"])
@@ -35,9 +49,12 @@ tmp_dir.mkdir(parents=True, exist_ok=True)
 interpolated_elevation.rio.to_raster(tmp_dir / "elevation.tif")
 
 # %%
-# Seamlessly integrate your GIS rasters or meshes with MODFLOW 6, by using `xarray`_
-# and `xugrid`_ arrays, for structured and unstructured grids respectively, to
-# create grid-based model packages.
+# 1\. Easily create grid-based model packages
+# -------------------------------------------
+#
+# Seamlessly integrate your GIS rasters or meshes with MODFLOW 6, by using
+# xarray and xugrid arrays, for structured and unstructured grids respectively,
+# to create grid-based model packages.
 
 # Open Geotiff with elevation data as xarray DataArray
 elevation = imod.rasterio.open(tmp_dir / "elevation.tif")
@@ -61,6 +78,9 @@ dis_pkg = imod.mf6.StructuredDiscretization(
 )
 
 # %%
+# 2\. Assign wells based on data at hand, instead of the model grid
+# -----------------------------------------------------------------
+# 
 # Assign wells based on x, y coordinates and filter screen depths, instead of
 # layer, row and column:
 import pandas as pd
@@ -101,6 +121,20 @@ print(wel_mf6_pkg["cellid"])
 print(wel_mf6_pkg["rate"])
 
 # %%
+# 3\. Utilities to assign 2D river grids to 3D model layers
+# ---------------------------------------------------------
+# 
+# A common problem in groundwater modeling is to assign 2D river or drain grids to
+# 3D model layers. iMOD Python has utilities to do this, supporting all kinds of
+# different methods. Furthermore, it can help you distribute the conductance
+# across layers.
+# 
+# `See examples here <https://deltares.github.io/imod-python/user-guide/09-topsystem.html>`_
+
+# %%
+# 4\. Create stress periods based on times assigned to boundary conditions
+# --------------------------------------------------------------------------
+#
 # MODFLOW 6 requires that all stress periods are defined in the time discretization
 # package. However, usually boundary conditions are defined at insconsistent
 # times. iMOD Python can help you to create a time discretization package that is
@@ -120,6 +154,9 @@ simulation.create_time_discretization(additional_times=["2000-01-07"])
 print(simulation["time_discretization"].dataset)
 
 # %%
+# 5\. Regridding MODFLOW 6 models to different grids
+# --------------------------------------------------
+#
 # Regrid MODFLOW 6 models to different grids, even from structured to unstructured
 # grids. iMOD Python takes care of properly scaling the input parameters. You can
 # also configure scaling methods yourself for each input parameter, for example
@@ -133,6 +170,9 @@ sim_regridded = simulation.regrid_like("regridded", new_unstructured_grid)
 print(sim_regridded["gwf"]["dis"])
 
 # %%
+# 6\. Clip MODFLOW 6 models to a bounding box
+# -------------------------------------------
+#
 # To reduce the size of your model, you can clip it to a bounding box. This is
 # useful for example when you want to create a smaller model for testing purposes.
 sim_clipped = simulation.clip_box(
