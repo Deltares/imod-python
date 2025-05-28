@@ -723,3 +723,42 @@ def test_import_river_from_imod5__period_data(imod5_dataset_periods, tmp_path):
         bottom=target_dis.dataset["bottom"],
     )
     assert len(errors) == 0
+
+
+def test_import_river_from_imod5__transient_data(imod5_dataset_transient, tmp_path):
+    """
+    Test if importing a river from an IMOD5 dataset with transient data works
+    correctly and that the time data is clipped to the specified time range.    
+    """
+    imod5_data = imod5_dataset_transient[0]
+    imod5_periods = imod5_dataset_transient[1]
+    target_dis = StructuredDiscretization.from_imod5_data(imod5_data, validate=False)
+    grid = target_dis.dataset["idomain"]
+    target_npf = NodePropertyFlow.from_imod5_data(imod5_data, grid)
+
+    original_infiltration_factor = imod5_data["riv-1"]["infiltration_factor"]
+    imod5_data["riv-1"]["infiltration_factor"] = ones_like(original_infiltration_factor)
+
+    (riv, drn) = imod.mf6.River.from_imod5_data(
+        "riv-1",
+        imod5_data,
+        imod5_periods,
+        target_dis,
+        target_npf,
+        datetime(2000, 4, 1),
+        datetime(2010, 1, 1),
+        ALLOCATION_OPTION.stage_to_riv_bot_drn_above,
+        SimulationDistributingOptions.riv,
+        regridder_types=None,
+    )
+
+    assert riv is not None
+    assert drn is not None
+
+    riv_time = riv.dataset.coords["time"].data
+    drn_time = drn.dataset.coords["time"].data
+    assert riv_time[0] == np.datetime64("2000-04-01")
+    assert riv_time[-1] == np.datetime64("2003-01-01")
+    assert drn_time[0] == np.datetime64("2000-04-01")
+    assert drn_time[-1] == np.datetime64("2003-01-01")
+

@@ -515,6 +515,11 @@ class River(BoundaryCondition, IRegridPackage):
             allocation_drn_data,
             infiltration_drn_data,
         )
+        # Clip the river package to the time range of the simulation and ensure
+        # time is forward filled.
+        river_package = river_package.clip_box(time_min=time_min, time_max=time_max)
+        drainage_package = drainage_package.clip_box(time_min=time_min, time_max=time_max)
+        # Mask the river and drainage packages to drop empty data.
         optional_river_package = cast(
             Optional[River], mask_package__drop_if_empty(river_package)
         )
