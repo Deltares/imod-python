@@ -357,6 +357,17 @@ def test_repeat_stress(
     actual = drn.render(directory, "drn", globaltimes, False)
     assert actual == expected
 
+    drn = imod.mf6.Drainage(
+        elevation=elevation_fc,
+        conductance=conductance_fc,
+        repeat_stress={
+            globaltimes[3]: globaltimes[0],
+            globaltimes[4]: globaltimes[1],
+        },
+    )
+    actual = drn.render(directory, "drn", globaltimes, False)
+    assert actual == expected
+
 
 def test_repeat_stress_old_style(
     elevation_fc,
