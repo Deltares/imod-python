@@ -66,7 +66,7 @@ Criteria for user acceptance tests of the 1.0 release are:
   for the LHM model with 1 timestep on a machine with 32 GB RAM on a single
   core.
 * The conversion of the transient LHM model run of 40 years on a daily timestep
-  (140K timesteps) should be possible without memory overflow.
+  (140K stress-periods) should be possible without memory overflow.
 
 Manual checks
 *************
@@ -82,7 +82,9 @@ Manual checks
   pixi run export-qgis
 
 - Work through the tutorial material here and verify it is up to date:
-  https://deltares.github.io/iMOD-Documentation/
+  https://deltares.github.io/iMOD-Documentation/ . If it is not, open an issue
+  on `iMOD Documentation repository Github
+  <https://github.com/Deltares/iMOD-Documentation/issues>`_ .
 
 Documentation
 *************
