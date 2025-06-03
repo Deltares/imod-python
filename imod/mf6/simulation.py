@@ -198,7 +198,7 @@ class Modflow6Simulation(collections.UserDict, ISimulation):
         # np.unique also sorts
         times = np.unique(np.hstack(times))
 
-        duration = imod.util.time.timestep_duration(times, self.use_cftime)  # type: ignore
+        duration = imod.util.time.timestep_duration(times, self.use_cftime)
         # Generate time discretization, just rely on default arguments
         # Probably won't be used that much anyway?
         timestep_duration = xr.DataArray(
