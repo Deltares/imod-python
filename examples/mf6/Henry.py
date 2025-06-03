@@ -10,7 +10,7 @@ In overview, we'll set the following steps:
     * Create a suitable 2d (x, z) grid.
     * Create a groundwater flow model, with variable density.
     * Create a solute transport model.
-    * Combine these models into a single MODFLOW6 simulation.
+    * Combine these models into a single MODFLOW 6 simulation.
     * Write to modflow6 files.
     * Run the model.
     * Open the results back into xarray DataArrays.
@@ -257,7 +257,7 @@ simulation.write(modeldir, binary=False)
 # .. note::
 #
 #   The following lines assume the ``mf6`` executable is available on your PATH.
-#   :ref:`The Modflow 6 examples introduction <mf6-introduction>` shortly
+#   :ref:`The MODFLOW 6 examples introduction <mf6-introduction>` shortly
 #   describes how to add it to yours.
 
 simulation.run()

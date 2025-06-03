@@ -4,7 +4,6 @@ import abc
 import collections
 import inspect
 import pathlib
-from copy import deepcopy
 from pathlib import Path
 from typing import Any, List, Optional, Tuple, Union
 
@@ -22,6 +21,12 @@ from imod.common.interfaces.imodel import IModel
 from imod.common.statusinfo import NestedStatusInfo, StatusInfo, StatusInfoBase
 from imod.common.utilities.mask import _mask_all_packages
 from imod.common.utilities.regrid import _regrid_like
+from imod.common.utilities.schemata import (
+    concatenate_schemata_dicts,
+    pkg_errors_to_status_info,
+    validate_schemata_dict,
+    validate_with_error_message,
+)
 from imod.logging import LogLevel, logger, standard_log_decorator
 from imod.mf6.drn import Drainage
 from imod.mf6.ghb import GeneralHeadBoundary
@@ -30,11 +35,10 @@ from imod.mf6.mf6_wel_adapter import Mf6Wel
 from imod.mf6.package import Package
 from imod.mf6.riv import River
 from imod.mf6.utilities.mf6hfb import merge_hfb_packages
-from imod.mf6.validation import pkg_errors_to_status_info
 from imod.mf6.validation_context import ValidationContext
 from imod.mf6.wel import GridAgnosticWell
 from imod.mf6.write_context import WriteContext
-from imod.schemata import ValidationError
+from imod.schemata import SchemataDict, ValidationError
 from imod.typing import GridDataArray
 from imod.util.regrid import RegridderWeightsCache
 
@@ -51,6 +55,7 @@ def pkg_has_cleanup(pkg: Package):
 
 class Modflow6Model(collections.UserDict, IModel, abc.ABC):
     _mandatory_packages: tuple[str, ...] = ()
+    _init_schemata: SchemataDict = {}
     _model_id: Optional[str] = None
     _template: Template
 
@@ -60,12 +65,26 @@ class Modflow6Model(collections.UserDict, IModel, abc.ABC):
         env = jinja2.Environment(loader=loader, keep_trailing_newline=True)
         return env.get_template(name)
 
-    def __init__(self, **kwargs):
+    def __init__(self):
         collections.UserDict.__init__(self)
-        for k, v in kwargs.items():
-            self[k] = v
-
         self._options = {}
+
+    @standard_log_decorator()
+    def validate_options(
+        self, schemata: dict, **kwargs
+    ) -> dict[str, list[ValidationError]]:
+        return validate_schemata_dict(schemata, self._options, **kwargs)
+
+    def validate_init_schemata_options(self, validate: bool) -> None:
+        """
+        Run the "cheap" schema validations.
+
+        The expensive validations are run during writing. Some are only
+        available then: e.g. idomain to determine active part of domain.
+        """
+        validate_with_error_message(
+            self.validate_options, validate, self._init_schemata
+        )
 
     def __setitem__(self, key, value):
         if len(key) > 16:
@@ -227,6 +246,12 @@ class Modflow6Model(collections.UserDict, IModel, abc.ABC):
         bottom = dis["bottom"]
 
         model_status_info = NestedStatusInfo(f"{model_name} model")
+        # Check model options
+        option_errors = self.validate_options(self._init_schemata)
+        model_status_info.add(
+            pkg_errors_to_status_info("model options", option_errors, None)
+        )
+        # Validate packages
         for pkg_name, pkg in self.items():
             # Check for all schemata when writing. Types and dimensions
             # may have been changed after initialization...
@@ -235,12 +260,9 @@ class Modflow6Model(collections.UserDict, IModel, abc.ABC):
                 continue  # some packages can be skipped
 
             # Concatenate write and init schemata.
-            schemata = deepcopy(pkg._init_schemata)
-            for key, value in pkg._write_schemata.items():
-                if key not in schemata.keys():
-                    schemata[key] = value
-                else:
-                    schemata[key] += value
+            schemata = concatenate_schemata_dicts(
+                pkg._init_schemata, pkg._write_schemata
+            )
 
             pkg_errors = pkg._validate(
                 schemata=schemata,

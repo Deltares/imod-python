@@ -198,7 +198,7 @@ class Modflow6Simulation(collections.UserDict, ISimulation):
         # np.unique also sorts
         times = np.unique(np.hstack(times))
 
-        duration = imod.util.time.timestep_duration(times, self.use_cftime)  # type: ignore
+        duration = imod.util.time.timestep_duration(times, self.use_cftime)
         # Generate time discretization, just rely on default arguments
         # Probably won't be used that much anyway?
         timestep_duration = xr.DataArray(
@@ -1250,7 +1250,7 @@ class Modflow6Simulation(collections.UserDict, ISimulation):
                 "x": id.sel({f"cell_dims{i}": f"column_{i}"}),
             }
         exchange_domain = domain.isel(exchange_cells)
-        active_exchange_domain = exchange_domain.where(exchange_domain.values > 0)
+        active_exchange_domain = exchange_domain.where(exchange_domain > 0)
         active_exchange_domain = active_exchange_domain.dropna("index")
         ex.dataset = ex.dataset.sel(index=active_exchange_domain["index"])
 

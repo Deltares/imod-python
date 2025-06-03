@@ -330,7 +330,9 @@ def _parse_capblock(
 
 def _parse_extrablock(lines: _LineIterator, n: int) -> Dict[str, List[str]]:
     """Parse the MetaSWAP "extra files" block"""
-    return {"paths": [next(lines) for _ in range(n)]}
+    content = {"paths": [next(lines) for _ in range(n)]}
+    content["paths"] = [[Path(x[0]).resolve()] for x in content["paths"]]
+    return content
 
 
 def _parse_timeblock(
@@ -1050,7 +1052,7 @@ def open_projectfile_data(path: FilePath) -> tuple[dict[str, Any], dict[str, Any
         # Set the year of a repeat date to 1899: this ensures it falls outside
         # of the iMOD calendar. Collisions are then always avoided.
         periods = {
-            key: _process_time(time, yearfirst=False).replace(year=1899)
+            key.lower(): _process_time(time, yearfirst=False).replace(year=1899)
             for key, time in periods_block.items()
         }
 

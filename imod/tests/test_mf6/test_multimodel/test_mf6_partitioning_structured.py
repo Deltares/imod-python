@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import textwrap
 from filecmp import dircmp
 from pathlib import Path
 
@@ -235,6 +236,40 @@ def test_partitioning_structured(
     np.testing.assert_allclose(
         head["head"].values, original_head.values, rtol=1e-4, atol=1e-4
     )
+
+
+@parametrize_with_cases("partition_array", cases=PartitionArrayCases)
+def test_partitioning_dis_origins(
+    tmp_path: Path,
+    transient_twri_model: Modflow6Simulation,
+    partition_array: xr.DataArray,
+):
+    """
+    Verify if the dis origin is set correctly in the partitioned simulation.
+    MODFLOW6 uses this when computing with XT3D on the exchanges between
+    submodels.
+    """
+    simulation = transient_twri_model
+    # Partition the simulation, run it, and save the (merged) results
+    split_simulation = simulation.split(partition_array)
+    split_simulation.write(tmp_path, binary=False)
+    modelnames = split_simulation.get_models_of_type("gwf6").keys()
+    for modelname in modelnames:
+        pkg = split_simulation[modelname]["dis"]
+        x = pkg.dataset["idomain"].coords["x"]
+        y = pkg.dataset["idomain"].coords["y"]
+        _, xmin, _ = imod.util.spatial.coord_reference(x)
+        _, ymin, _ = imod.util.spatial.coord_reference(y)
+        actual = pkg.render(tmp_path, "dis", None, True)
+        expected = textwrap.dedent(
+            f"""\
+            begin options
+              xorigin {xmin}
+              yorigin {ymin}
+            end options
+            """
+        )
+        assert expected in actual
 
 
 @parametrize_with_cases(

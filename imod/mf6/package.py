@@ -2,7 +2,6 @@ from __future__ import annotations
 
 import abc
 import pathlib
-from collections import defaultdict
 from copy import deepcopy
 from pathlib import Path
 from typing import Any, Callable, Dict, List, Mapping, Optional, Tuple, Union, cast
@@ -24,7 +23,11 @@ from imod.common.utilities.regrid import (
     _regrid_like,
 )
 from imod.common.utilities.regrid_method_type import EmptyRegridMethod, RegridMethodType
-from imod.common.utilities.schemata import filter_schemata_dict
+from imod.common.utilities.schemata import (
+    filter_schemata_dict,
+    validate_schemata_dict,
+    validate_with_error_message,
+)
 from imod.common.utilities.value_filters import is_valid
 from imod.logging import standard_log_decorator
 from imod.mf6.auxiliary_variables import (
@@ -37,12 +40,11 @@ from imod.mf6.pkgbase import (
     TRANSPORT_PACKAGES,
     PackageBase,
 )
-from imod.mf6.validation import validation_pkg_error_message
 from imod.mf6.write_context import WriteContext
 from imod.schemata import (
     AllNoDataSchema,
     EmptyIndexesSchema,
-    SchemaType,
+    SchemataDict,
     ValidationError,
 )
 from imod.typing import GridDataArray
@@ -63,8 +65,8 @@ class Package(PackageBase, IPackage, abc.ABC):
     """
 
     _pkg_id = ""
-    _init_schemata: dict[str, list[SchemaType] | Tuple[SchemaType, ...]] = {}
-    _write_schemata: dict[str, list[SchemaType] | Tuple[SchemaType, ...]] = {}
+    _init_schemata: SchemataDict = {}
+    _write_schemata: SchemataDict = {}
     _keyword_map: dict[str, str] = {}
     _regrid_method: RegridMethodType = EmptyRegridMethod()
     _template: jinja2.Template
@@ -326,17 +328,7 @@ class Package(PackageBase, IPackage, abc.ABC):
 
     @standard_log_decorator()
     def _validate(self, schemata: dict, **kwargs) -> dict[str, list[ValidationError]]:
-        errors = defaultdict(list)
-        for variable, var_schemata in schemata.items():
-            for schema in var_schemata:
-                if (
-                    variable in self.dataset.keys()
-                ):  # concentration only added to dataset if specified
-                    try:
-                        schema.validate(self.dataset[variable], **kwargs)
-                    except ValidationError as e:
-                        errors[variable].append(e)
-        return errors
+        return validate_schemata_dict(schemata, self.dataset, **kwargs)
 
     def is_empty(self) -> bool:
         """
@@ -355,20 +347,16 @@ class Package(PackageBase, IPackage, abc.ABC):
         allnodata_errors = self._validate(allnodata_schemata)
         return len(allnodata_errors) > 0
 
-    def _validate_init_schemata(self, validate: bool):
+    def _validate_init_schemata(self, validate: bool, **kwargs) -> None:
         """
         Run the "cheap" schema validations.
 
         The expensive validations are run during writing. Some are only
         available then: e.g. idomain to determine active part of domain.
         """
-        if not validate:
-            return
-        errors = self._validate(self._init_schemata)
-        if len(errors) > 0:
-            message = validation_pkg_error_message(errors)
-            raise ValidationError(message)
-        return
+        validate_with_error_message(
+            self._validate, validate, self._init_schemata, **kwargs
+        )
 
     def copy(self) -> Any:
         # All state should be contained in the dataset.

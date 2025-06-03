@@ -2,7 +2,7 @@ from pathlib import Path
 from typing import Union
 
 import numpy as np
-import pandas as pd
+import xarray as xr
 
 from imod.mf6.package import Package
 
@@ -60,26 +60,23 @@ class ExchangeBase(Package):
         d = Package._get_render_dictionary(
             self, directory, pkgname, globaltimes, binary
         )
+        vars_to_render = {}
+        index_dim = self.dataset["layer"].dims[0]
+        # process both cells stradeling a connection
+        for i in [1, 2]:
+            # length of cell_id_dims is 1 for unstructured and 2 for structured
+            sizes = self.dataset[f"cell_id{i}"].sizes
+            is_structured = list(sizes.values())[1] == 2
+            cellid_data = self.dataset[f"cell_id{i}"].data
+            vars_to_render[f"layer{i}_1"] = (index_dim, self.dataset["layer"].data)
+            vars_to_render[f"cell_id{i}_1"] = (index_dim, cellid_data[:, 0])
+            if is_structured:
+                vars_to_render[f"cell_id{i}_2"] = (index_dim, cellid_data[:, 1])
 
-        datablock = pd.DataFrame()
-        datablock["layer1"] = self.dataset["layer"].values[:]
-
-        # If the grid is structured, the cell_id arrays will have both a row and a column dimension,
-        # but if it is unstructured, it will have only a cellid dimension
-        is_structured = len(self.dataset["cell_id1"].shape) > 1
-        is_structured = is_structured and self.dataset["cell_id1"].shape[1] > 1
-
-        datablock["cell_id1_1"] = self.dataset["cell_id1"].values[:, 0]
-        if is_structured:
-            datablock["cell_id1_2"] = self.dataset["cell_id1"].values[:, 1]
-        datablock["layer2"] = self.dataset["layer"].values[:]
-        datablock["cell_id2_1"] = self.dataset["cell_id2"].values[:, 0]
-        if is_structured:
-            datablock["cell_id2_2"] = self.dataset["cell_id2"].values[:, 1]
-
-        for key in ["ihc", "cl1", "cl2", "hwva", "angldegx", "cdist"]:
-            if key in self.dataset.keys():
-                datablock[key] = self.dataset[key].values[:]
-
+        geometric_vars = ["ihc", "cl1", "cl2", "hwva", "angldegx", "cdist"]
+        for var in geometric_vars:
+            if var in self.dataset.data_vars:
+                vars_to_render[var] = (index_dim, self.dataset[var].data)
+        datablock = xr.merge([vars_to_render], join="exact").to_dataframe()
         d["datablock"] = datablock.to_string(index=False, header=False)
         return template.render(d)

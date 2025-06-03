@@ -41,6 +41,7 @@ from .fixtures.mf6_circle_fixture import (
     circle_model_transport_multispecies_variable_density,
     circle_partitioned,
     circle_result,
+    circle_result__offset_origins,
     circle_result_evt,
     circle_result_sto,
 )

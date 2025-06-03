@@ -9,20 +9,38 @@ from imod.common.interfaces.imaskingsettings import IMaskingSettings
 from imod.common.interfaces.imodel import IModel
 from imod.common.interfaces.ipackage import IPackage
 from imod.common.interfaces.isimulation import ISimulation
-from imod.typing.grid import GridDataArray, get_spatial_dimension_names, is_same_domain
+from imod.typing.grid import (
+    GridDataArray,
+    get_spatial_dimension_names,
+    is_same_domain,
+    is_spatial_grid,
+)
 
 # create dispatcher instance to limit scope of typedispatching
 dispatch = Dispatcher()
+
+
+def _validate_coords_mask(mask: GridDataArray) -> None:
+    """
+    Validate that the coordinates of the mask are valid.
+    """
+    spatial_dimension_names = get_spatial_dimension_names(mask)
+    # Add any additional dimensions that are not part of the spatial dimensions.
+    # These are dimensions that are returned by xugrid
+    additional_dimension_names = ["dx", "dy"]
+    dimension_names = spatial_dimension_names + additional_dimension_names
+    unexpected_coords = set(mask.coords) - set(dimension_names)
+    if len(unexpected_coords) > 0:
+        raise ValueError(
+            f"Unexpected coordinates in masking domain: {unexpected_coords}"
+        )
 
 
 def _mask_all_models(
     simulation: ISimulation,
     mask: GridDataArray,
 ):
-    spatial_dims = get_spatial_dimension_names(mask)
-    if any(coord not in spatial_dims for coord in mask.coords):
-        raise ValueError("unexpected coordinate dimension in masking domain")
-
+    _validate_coords_mask(mask)
     if simulation.is_split():
         raise ValueError(
             "masking can only be applied to simulations that have not been split. Apply masking before splitting."
@@ -46,13 +64,7 @@ def _mask_all_packages(
     model: IModel,
     mask: GridDataArray,
 ):
-    spatial_dimension_names = get_spatial_dimension_names(mask)
-    # Add any additional dimensions that are not part of the spatial dimensions. These are dimensions that are returned by xugrid
-    additional_dimension_names = ["dx", "dy"]
-    dimension_names = spatial_dimension_names + additional_dimension_names
-    if any(coord not in dimension_names for coord in mask.coords):
-        raise ValueError("unexpected coordinate dimension in masking domain")
-
+    _validate_coords_mask(mask)
     for pkgname, pkg in model.items():
         model[pkgname] = pkg.mask(mask)
     model.purge_empty_packages()
@@ -74,11 +86,10 @@ def _skip_dataarray(da: GridDataArray) -> bool:
     if len(da.dims) == 0 or set(da.coords).issubset(["layer"]):
         return True
 
-    if is_scalar(da.values[()]):
+    if is_scalar(da):
         return True
 
-    spatial_dims = ["x", "y", "mesh2d_nFaces", "layer"]
-    if not np.any([coord in spatial_dims for coord in da.coords]):
+    if not is_spatial_grid(da) and ("layer" not in da.dims):
         return True
 
     return False

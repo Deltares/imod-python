@@ -635,6 +635,14 @@ class SeawatModel(Model):
         # If more complex dependencies do show up, probably push methods down
         # to the individual packages.
 
+    @staticmethod
+    def _validate_space_in_path(path):
+        """
+        Check if there are spaces in the path. If so, raise a ValueError.
+        """
+        if " " in str(path):
+            raise ValueError(f"Spaces in directory names are not allowed: {path}.")
+
     def write(
         self, directory=pathlib.Path("."), result_dir=None, resultdir_is_workdir=False
     ):
@@ -679,6 +687,10 @@ class SeawatModel(Model):
             result_dir = pathlib.Path("results")
         else:
             result_dir = pathlib.Path(result_dir)
+
+        # Validate no spaces in directories
+        self._validate_space_in_path(directory)
+        self._validate_space_in_path(result_dir)
 
         # Create directories if necessary
         directory.mkdir(exist_ok=True, parents=True)

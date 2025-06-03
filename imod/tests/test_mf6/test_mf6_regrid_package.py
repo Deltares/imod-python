@@ -145,15 +145,11 @@ def test_regrid_unstructured():
 
     new_idomain = new_packages[0].dataset["icelltype"]
     for new_package in new_packages:
-        # TODO github-398: package write validation crashes for VerticesDiscretization so we skip that one
-        if not isinstance(new_package, imod.mf6.VerticesDiscretization):
-            errors = new_package._validate(
-                new_package._write_schemata,
-                idomain=new_idomain,
-            )
-            assert len(errors) == 0
-        else:
-            continue
+        errors = new_package._validate(
+            new_package._write_schemata,
+            idomain=new_idomain,
+        )
+        assert len(errors) == 0
 
 
 def test_regrid_structured_missing_dx_and_dy():
