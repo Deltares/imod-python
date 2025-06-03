@@ -10,6 +10,7 @@ from imod.logging.logging_decorators import standard_log_decorator
 from imod.mf6.boundary_condition import BoundaryCondition
 from imod.mf6.dis import StructuredDiscretization
 from imod.mf6.regrid.regrid_schemes import ConstantHeadRegridMethod
+from imod.mf6.utilities.imod5_converter import chd_cells_from_imod5_data
 from imod.mf6.validation import BOUNDARY_DIMS_SCHEMA, CONC_DIMS_SCHEMA
 from imod.schemata import (
     AllCoordsValueSchema,
@@ -273,22 +274,11 @@ class ConstantHead(BoundaryCondition, IRegridPackage):
 
         data = {"head": head, "ibound": ibound}
 
-        regridded_package_data = _regrid_package_data(
+        regridded_pkg_data = _regrid_package_data(
             data, target_idomain, regridder_types, regrid_cache, {}
         )
-        head = regridded_package_data["head"]
-        ibound = regridded_package_data["ibound"]
-
-        # select locations where ibound < 0
-        head = head.where(ibound < 0)
-
-        # select locations where idomain > 0
-        head = head.where(target_idomain > 0)
-
-        regridded_package_data["head"] = head
-        regridded_package_data.pop("ibound")
-
-        return cls(**regridded_package_data, validate=True)
+        chd_pkg_data = chd_cells_from_imod5_data(regridded_pkg_data, target_idomain)
+        return cls(**chd_pkg_data, validate=True)
 
     @classmethod
     def get_regrid_methods(cls) -> ConstantHeadRegridMethod:
