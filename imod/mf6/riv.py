@@ -80,7 +80,9 @@ def clip_time_if_package(
     time_max: datetime,
 ) -> Optional[BoundaryCondition]:
     if package is not None:
-        package = package.clip_box(time_min=time_min, time_max=time_max)
+        package = cast(
+            BoundaryCondition, package.clip_box(time_min=time_min, time_max=time_max)
+        )
     return package
 
 
@@ -526,10 +528,9 @@ class River(BoundaryCondition, IRegridPackage):
             infiltration_drn_data,
         )
         # Mask the river and drainage packages to drop empty data.
-        optional_riv_pkg = cast(Optional[River], mask_package__drop_if_empty(riv_pkg))
-        optional_drn_pkg = cast(
-            Optional[Drainage], mask_package__drop_if_empty(drn_pkg)
-        )
+        optional_riv_pkg = mask_package__drop_if_empty(riv_pkg)
+        optional_drn_pkg = mask_package__drop_if_empty(drn_pkg)
+
         # Account for periods with repeat stresses.
         repeat = period_data.get(key)
         set_repeat_stress_if_available(repeat, time_min, time_max, optional_riv_pkg)
@@ -538,6 +539,10 @@ class River(BoundaryCondition, IRegridPackage):
         # time is forward filled.
         optional_riv_pkg = clip_time_if_package(optional_riv_pkg, time_min, time_max)
         optional_drn_pkg = clip_time_if_package(optional_drn_pkg, time_min, time_max)
+
+        # Cast for mypy checks
+        optional_riv_pkg = cast(Optional[River], optional_riv_pkg)
+        optional_drn_pkg = cast(Optional[Drainage], optional_drn_pkg)
 
         return (optional_riv_pkg, optional_drn_pkg)
 
