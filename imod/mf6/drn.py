@@ -14,7 +14,7 @@ from imod.mf6.dis import StructuredDiscretization
 from imod.mf6.disv import VerticesDiscretization
 from imod.mf6.npf import NodePropertyFlow
 from imod.mf6.regrid.regrid_schemes import DrainageRegridMethod
-from imod.mf6.utilities.package import get_repeat_stress
+from imod.mf6.utilities.package import set_repeat_stress_if_available
 from imod.mf6.validation import BOUNDARY_DIMS_SCHEMA, CONC_DIMS_SCHEMA
 from imod.prepare.cleanup import cleanup_drn
 from imod.prepare.topsystem.allocation import ALLOCATION_OPTION, allocate_drn_cells
@@ -36,7 +36,6 @@ from imod.schemata import (
 )
 from imod.typing import GridDataArray
 from imod.typing.grid import enforce_dim_order, has_negative_layer, is_planar_grid
-from imod.util.expand_repetitions import expand_repetitions
 from imod.util.regrid import RegridderWeightsCache
 
 
@@ -342,9 +341,11 @@ class Drainage(BoundaryCondition, IRegridPackage):
 
         drn = Drainage(**regridded_package_data, validate=True)
         repeat = period_data.get(key)
-        if repeat is not None:
-            times = expand_repetitions(repeat, time_min, time_max)
-            drn.dataset["repeat_stress"] = get_repeat_stress(times)
+        set_repeat_stress_if_available(repeat, time_min, time_max, drn)
+        # Clip the drain package to the time range of the simulation and ensure
+        # time is forward filled.
+        drn = drn.clip_box(time_min=time_min, time_max=time_max)
+
         return drn
 
     @classmethod
