@@ -74,6 +74,16 @@ def mask_package__drop_if_empty(
     return package.mask(mask) if np.any(mask) else None
 
 
+def clip_time_if_package(
+    package: Optional[BoundaryCondition],
+    time_min: datetime,
+    time_max: datetime,
+) -> Optional[BoundaryCondition]:
+    if package is not None:
+        package = package.clip_box(time_min=time_min, time_max=time_max)
+    return package
+
+
 def rise_bottom_elevation_if_needed(
     bottom_elevation: GridDataArray, bottom: GridDataArray
 ) -> GridDataArray:
@@ -510,32 +520,26 @@ class River(BoundaryCondition, IRegridPackage):
         regridded_riv_pkg_data, infiltration_drn_data = _separate_infiltration_data(
             regridded_riv_pkg_data, infiltration_factor
         )
-        river_package = River(**regridded_riv_pkg_data, validate=True)
-        drainage_package = _create_drain_from_leftover_riv_imod5_data(
+        riv_pkg = River(**regridded_riv_pkg_data, validate=True)
+        drn_pkg = _create_drain_from_leftover_riv_imod5_data(
             allocation_drn_data,
             infiltration_drn_data,
         )
-        # Clip the river package to the time range of the simulation and ensure
-        # time is forward filled.
-        river_package = river_package.clip_box(time_min=time_min, time_max=time_max)
-        drainage_package = drainage_package.clip_box(time_min=time_min, time_max=time_max)
         # Mask the river and drainage packages to drop empty data.
-        optional_river_package = cast(
-            Optional[River], mask_package__drop_if_empty(river_package)
-        )
-        optional_drainage_package = cast(
-            Optional[Drainage], mask_package__drop_if_empty(drainage_package)
+        optional_riv_pkg = cast(Optional[River], mask_package__drop_if_empty(riv_pkg))
+        optional_drn_pkg = cast(
+            Optional[Drainage], mask_package__drop_if_empty(drn_pkg)
         )
         # Account for periods with repeat stresses.
         repeat = period_data.get(key)
-        set_repeat_stress_if_available(
-            repeat, time_min, time_max, optional_river_package
-        )
-        set_repeat_stress_if_available(
-            repeat, time_min, time_max, optional_drainage_package
-        )
+        set_repeat_stress_if_available(repeat, time_min, time_max, optional_riv_pkg)
+        set_repeat_stress_if_available(repeat, time_min, time_max, optional_drn_pkg)
+        # Clip the river package to the time range of the simulation and ensure
+        # time is forward filled.
+        optional_riv_pkg = clip_time_if_package(optional_riv_pkg, time_min, time_max)
+        optional_drn_pkg = clip_time_if_package(optional_drn_pkg, time_min, time_max)
 
-        return (optional_river_package, optional_drainage_package)
+        return (optional_riv_pkg, optional_drn_pkg)
 
     @classmethod
     def get_regrid_methods(cls) -> RiverRegridMethod:
