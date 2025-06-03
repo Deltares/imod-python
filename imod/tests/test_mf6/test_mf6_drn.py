@@ -546,6 +546,19 @@ def test_from_imod5(
 
     assert isinstance(drn_2, imod.mf6.Drainage)
 
+    drn_time = drn_2.dataset.coords["time"].data
+    expected_times = np.array(
+        [
+            np.datetime64("2002-02-02"),
+            np.datetime64("2002-04-01"),
+            np.datetime64("2002-10-01"),
+        ]
+    )
+    np.testing.assert_array_equal(drn_time, expected_times)
+    drn_repeat_stress = drn_2.dataset["repeat_stress"].data
+    assert np.all(drn_repeat_stress[:, 1][::2] == np.datetime64("2002-04-01"))
+    assert np.all(drn_repeat_stress[:, 1][1::2] == np.datetime64("2002-10-01"))
+
     pkg_errors = drn_2._validate(
         schemata=drn_2._write_schemata,
         idomain=target_dis["idomain"],
