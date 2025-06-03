@@ -1,6 +1,7 @@
 import pathlib
 import tempfile
 import textwrap
+from datetime import datetime
 
 import numpy as np
 import pytest
@@ -206,13 +207,17 @@ def test_write_concentration_period_data(head_fc, concentration_fc):
 
 def test_from_imod5(imod5_dataset, tmp_path):
     imod5_data = imod5_dataset[0]
+    period_data = imod5_dataset[1]
 
     target_dis = StructuredDiscretization.from_imod5_data(imod5_data)
 
     chd3 = imod.mf6.ConstantHead.from_imod5_data(
         "chd-3",
         imod5_data,
-        target_dis,
+        period_data,
+        target_dis=target_dis,
+        time_min=datetime(2002, 2, 2),
+        time_max=datetime(2022, 2, 2),
         regridder_types=None,
     )
 
@@ -226,11 +231,13 @@ def test_from_imod5(imod5_dataset, tmp_path):
 
 def test_from_imod5_shd(imod5_dataset, tmp_path):
     imod5_data = imod5_dataset[0]
+    period_data = imod5_dataset[1]
 
     target_dis = StructuredDiscretization.from_imod5_data(imod5_data)
 
     chd_shd = imod.mf6.ConstantHead.from_imod5_shd_data(
         imod5_data,
+        period_data,
         target_dis,
         regridder_types=None,
     )

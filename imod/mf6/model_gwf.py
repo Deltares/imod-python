@@ -426,6 +426,7 @@ class GroundwaterFlowModel(Modflow6Model):
         if len(chd_keys) == 0:
             result["chd_from_shd"] = ConstantHead.from_imod5_shd_data(
                 imod5_data,
+                period_data,
                 dis_pkg,
                 cast(ConstantHeadRegridMethod, regridder_types.get("chd_from_shd")),
                 regrid_cache,
@@ -436,7 +437,10 @@ class GroundwaterFlowModel(Modflow6Model):
                 chd_packages[chd_key] = ConstantHead.from_imod5_data(
                     chd_key,
                     imod5_data,
+                    period_data,
                     dis_pkg,
+                    times[0],
+                    times[-1],
                     cast(ConstantHeadRegridMethod, regridder_types.get(chd_key)),
                     regrid_cache,
                 )

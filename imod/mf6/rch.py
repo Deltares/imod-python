@@ -1,4 +1,5 @@
 from copy import deepcopy
+from datetime import datetime
 from typing import Optional, cast
 
 import numpy as np
@@ -11,6 +12,7 @@ from imod.mf6.boundary_condition import BoundaryCondition
 from imod.mf6.dis import StructuredDiscretization
 from imod.mf6.regrid.regrid_schemes import RechargeRegridMethod
 from imod.mf6.utilities.imod5_converter import convert_unit_rch_rate
+from imod.mf6.utilities.package import set_repeat_stress_if_available
 from imod.mf6.validation import BOUNDARY_DIMS_SCHEMA, CONC_DIMS_SCHEMA
 from imod.msw.utilities.imod5_converter import (
     get_cell_area_from_imod5_data,
@@ -211,7 +213,10 @@ class Recharge(BoundaryCondition, IRegridPackage):
     def from_imod5_data(
         cls,
         imod5_data: dict[str, dict[str, GridDataArray]],
+        period_data: dict[str, list[datetime]],
         target_dis: StructuredDiscretization,
+        time_min: datetime,
+        time_max: datetime,
         regridder_types: Optional[RechargeRegridMethod] = None,
         regrid_cache: RegridderWeightsCache = RegridderWeightsCache(),
     ) -> "Recharge":
@@ -228,9 +233,16 @@ class Recharge(BoundaryCondition, IRegridPackage):
         imod5_data: dict
             Dictionary with iMOD5 data. This can be constructed from the
             :func:`imod.formats.prj.open_projectfile_data` method.
+        period_data: dict
+            Dictionary with iMOD5 period data. This can be constructed from the
+            :func:`imod.formats.prj.open_projectfile_data` method.
         target_dis: GridDataArray
             The discretization package for the simulation. Its grid does not
             need to be identical to one of the input grids.
+        time_min: datetime
+            Begin-time of the simulation. Used for expanding period data.
+        time_max: datetime
+            End-time of the simulation. Used for expanding period data.
         regridder_types: RechargeRegridMethod, optional
             Optional dataclass with regridder types for a specific variable.
             Use this to override default regridding methods.
@@ -259,8 +271,13 @@ class Recharge(BoundaryCondition, IRegridPackage):
         if is_planar_grid(regridded_package_data["rate"]):
             layered_data = cls.allocate_planar_data(regridded_package_data, target_dis)
             regridded_package_data.update(layered_data)
-
-        return cls(**regridded_package_data, validate=True, fixed_cell=False)
+        rch = cls(**regridded_package_data, validate=True, fixed_cell=False)
+        repeat = period_data.get("rch")
+        set_repeat_stress_if_available(repeat, time_min, time_max, rch)
+        # Clip the rch package to the time range of the simulation and ensure
+        # time is forward filled.
+        rch = rch.clip_box(time_min=time_min, time_max=time_max)
+        return rch
 
     @classmethod
     def from_imod5_cap_data(
