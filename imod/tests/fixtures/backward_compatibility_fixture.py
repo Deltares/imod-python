@@ -1,6 +1,7 @@
+from copy import deepcopy
 from datetime import datetime
-from zipfile import ZipFile
 from typing import Any
+from zipfile import ZipFile
 
 import pytest
 import xarray as xr
@@ -8,8 +9,6 @@ import xarray as xr
 import imod
 from imod.data.sample_data import REGISTRY
 from imod.formats.prj.prj import open_projectfile_data
-
-from copy import deepcopy
 
 
 @pytest.fixture(scope="module")
@@ -74,10 +73,8 @@ def imod5_dataset_transient(imod5_dataset):
         datetime(2002, 1, 1),
         datetime(2003, 1, 1),
     ]
-    time_da = xr.DataArray(
-        time_factors, dims=["time"], coords={"time": time}
-    )
-    
+    time_da = xr.DataArray(time_factors, dims=["time"], coords={"time": time})
+
     for pkgname in grid_data.keys():
         if pkgname[:3] in ["riv", "drn", "ghb"]:
             for varname, vardata in grid_data[pkgname].items():
