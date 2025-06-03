@@ -1,5 +1,5 @@
 from copy import deepcopy
-from typing import Optional, cast
+from typing import Optional
 
 import numpy as np
 import xarray as xr
@@ -29,7 +29,7 @@ from imod.schemata import (
     IndexesSchema,
     OtherCoordsSchema,
 )
-from imod.typing import GridDataArray, GridDataDict, Imod5DataDict
+from imod.typing import GridDataArray, Imod5DataDict
 from imod.typing.grid import (
     enforce_dim_order,
     is_planar_grid,
@@ -274,7 +274,7 @@ class Recharge(BoundaryCondition, IRegridPackage):
         used to couple MODFLOW6 to MetaSWAP models. Active cells will have a
         recharge rate of 0.0.
         """
-        cap_data = cast(GridDataDict, drop_layer_dim_cap_data(imod5_data)["cap"])
+        cap_data = drop_layer_dim_cap_data(imod5_data)["cap"]
 
         msw_area = get_cell_area_from_imod5_data(cap_data)
         msw_active = is_msw_active_cell(target_dis, cap_data, msw_area)
