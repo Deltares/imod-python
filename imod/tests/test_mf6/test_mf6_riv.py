@@ -706,10 +706,6 @@ def test_import_river_from_imod5__period_data(imod5_dataset_periods, tmp_path):
     assert riv is not None
     assert drn is not None
 
-    write_context = WriteContext(simulation_directory=tmp_path)
-    riv._write("riv", globaltimes, write_context)
-    drn._write("drn", globaltimes, write_context)
-
     errors = riv._validate(
         imod.mf6.River._write_schemata,
         idomain=target_dis.dataset["idomain"],
@@ -724,11 +720,34 @@ def test_import_river_from_imod5__period_data(imod5_dataset_periods, tmp_path):
     )
     assert len(errors) == 0
 
+    riv_time = riv.dataset.coords["time"].data
+    drn_time = drn.dataset.coords["time"].data
+    expected_times = np.array(
+        [
+            np.datetime64("2002-02-02"),
+            np.datetime64("2002-04-01"),
+            np.datetime64("2002-10-01"),
+        ]
+    )
+    np.testing.assert_array_equal(riv_time, expected_times)
+    np.testing.assert_array_equal(drn_time, expected_times)
+
+    riv_repeat_stress = riv.dataset["repeat_stress"].data
+    drn_repeat_stress = drn.dataset["repeat_stress"].data
+    assert np.all(riv_repeat_stress[:, 1][::2] == np.datetime64("2002-04-01"))
+    assert np.all(riv_repeat_stress[:, 1][1::2] == np.datetime64("2002-10-01"))
+    assert np.all(drn_repeat_stress[:, 1][::2] == np.datetime64("2002-04-01"))
+    assert np.all(drn_repeat_stress[:, 1][1::2] == np.datetime64("2002-10-01"))
+
+    write_context = WriteContext(simulation_directory=tmp_path)
+    riv._write("riv", globaltimes, write_context)
+    drn._write("drn", globaltimes, write_context)
+
 
 def test_import_river_from_imod5__transient_data(imod5_dataset_transient, tmp_path):
     """
     Test if importing a river from an IMOD5 dataset with transient data works
-    correctly and that the time data is clipped to the specified time range.    
+    correctly and that the time data is clipped to the specified time range.
     """
     imod5_data = imod5_dataset_transient[0]
     imod5_periods = imod5_dataset_transient[1]
@@ -761,4 +780,3 @@ def test_import_river_from_imod5__transient_data(imod5_dataset_transient, tmp_pa
     assert riv_time[-1] == np.datetime64("2003-01-01")
     assert drn_time[0] == np.datetime64("2000-04-01")
     assert drn_time[-1] == np.datetime64("2003-01-01")
-
