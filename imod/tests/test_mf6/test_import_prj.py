@@ -1,19 +1,13 @@
 import sys
 from textwrap import dedent
-from zipfile import ZipFile
 
 import numpy as np
 from numpy.testing import assert_allclose
 
 import imod
-from imod.data.sample_data import create_pooch_registry, load_pooch_registry
 from imod.formats.prj import open_projectfile_data
 from imod.logging.config import LoggerType
 from imod.logging.loglevel import LogLevel
-
-registry = create_pooch_registry()
-registry = load_pooch_registry(registry)
-fname_model = registry.fetch("iMOD5_model.zip")
 
 
 def snippet_constant_kh(factor: float, addition: float, init: float):
@@ -26,8 +20,7 @@ def snippet_constant_kh(factor: float, addition: float, init: float):
 
 
 def test_import_constants(tmp_path):
-    with ZipFile(fname_model) as archive:
-        archive.extractall(tmp_path)
+    _ = imod.data.imod5_projectfile_data(tmp_path)
 
     projects_file = tmp_path / "iMOD5_model_pooch" / "iMOD5_model.prj"
 
@@ -64,8 +57,7 @@ def snippet_idf_import_kh(factor: float, addition: float):
 
 
 def test_import_idf(tmp_path):
-    with ZipFile(fname_model) as archive:
-        archive.extractall(tmp_path)
+    _ = imod.data.imod5_projectfile_data(tmp_path)
 
     projects_file = tmp_path / "iMOD5_model_pooch" / "iMOD5_model.prj"
 
@@ -107,8 +99,7 @@ def snippet_idf_import_transient(
 
 
 def test_import_idf_transient(tmp_path):
-    with ZipFile(fname_model) as archive:
-        archive.extractall(tmp_path)
+    _ = imod.data.imod5_projectfile_data(tmp_path)
 
     projects_file = tmp_path / "iMOD5_model_pooch" / "iMOD5_model.prj"
 
@@ -137,8 +128,7 @@ def snippet_gen_import_hfb(factor: float, addition: float):
 
 
 def test_import_gen(tmp_path):
-    with ZipFile(fname_model) as archive:
-        archive.extractall(tmp_path)
+    _ = imod.data.imod5_projectfile_data(tmp_path)
 
     projects_file = tmp_path / "iMOD5_model_pooch" / "iMOD5_model.prj"
 
@@ -165,8 +155,7 @@ def snippet_gen_import_ipf(
 
 
 def test_import_ipf(tmp_path):
-    with ZipFile(fname_model) as archive:
-        archive.extractall(tmp_path)
+    _ = imod.data.imod5_projectfile_data(tmp_path)
 
     projects_file = tmp_path / "iMOD5_model_pooch" / "iMOD5_model.prj"
 
@@ -217,8 +206,7 @@ def test_import_ipf(tmp_path):
 
 
 def test_import_ipf_unique_id_and_logging(tmp_path):
-    with ZipFile(fname_model) as archive:
-        archive.extractall(tmp_path)
+    _ = imod.data.imod5_projectfile_data(tmp_path)
 
     logfile_path = tmp_path / "logfile.txt"
 
@@ -282,8 +270,7 @@ def snippet_boundary_condition(factor: float, addition: float):
 
 
 def test_import_idf_boundary_condition(tmp_path):
-    with ZipFile(fname_model) as archive:
-        archive.extractall(tmp_path)
+    _ = imod.data.imod5_projectfile_data(tmp_path)
 
     projects_file = tmp_path / "iMOD5_model_pooch" / "iMOD5_model.prj"
 
@@ -320,8 +307,7 @@ def snippet_idf_without_layer_dim(factor: float, addition: float):
 
 
 def test_import_no_layer(tmp_path):
-    with ZipFile(fname_model) as archive:
-        archive.extractall(tmp_path)
+    _ = imod.data.imod5_projectfile_data(tmp_path)
 
     projects_file = tmp_path / "iMOD5_model_pooch" / "iMOD5_model.prj"
 
