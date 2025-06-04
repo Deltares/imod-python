@@ -1,4 +1,5 @@
 from copy import deepcopy
+from datetime import datetime
 from typing import Optional
 
 import numpy as np
@@ -10,6 +11,8 @@ from imod.logging.logging_decorators import standard_log_decorator
 from imod.mf6.boundary_condition import BoundaryCondition
 from imod.mf6.dis import StructuredDiscretization
 from imod.mf6.regrid.regrid_schemes import ConstantHeadRegridMethod
+from imod.mf6.utilities.imod5_converter import chd_cells_from_imod5_data
+from imod.mf6.utilities.package import set_repeat_stress_if_available
 from imod.mf6.validation import BOUNDARY_DIMS_SCHEMA, CONC_DIMS_SCHEMA
 from imod.schemata import (
     AllCoordsValueSchema,
@@ -160,7 +163,10 @@ class ConstantHead(BoundaryCondition, IRegridPackage):
         cls,
         key: str,
         imod5_data: dict[str, dict[str, GridDataArray]],
+        period_data: dict[str, list[datetime]],
         target_dis: StructuredDiscretization,
+        time_min: datetime,
+        time_max: datetime,
         regridder_types: Optional[ConstantHeadRegridMethod] = None,
         regrid_cache: RegridderWeightsCache = RegridderWeightsCache(),
     ) -> "ConstantHead":
@@ -178,8 +184,6 @@ class ConstantHead(BoundaryCondition, IRegridPackage):
         The creation of a chd package from shd data should only be done if no chd
         packages at all are present in the imod5_data
 
-
-
         Parameters
         ----------
         key: str
@@ -188,21 +192,35 @@ class ConstantHead(BoundaryCondition, IRegridPackage):
         imod5_data: dict
             Dictionary with iMOD5 data. This can be constructed from the
             :func:`imod.formats.prj.open_projectfile_data` method.
+        period_data: dict
+            Dictionary with iMOD5 period data. This can be constructed from the
+            :func:`imod.formats.prj.open_projectfile_data` method.
         target_dis:  StructuredDiscretization package
             The grid that should be used for the new package. Does not
             need to be identical to one of the input grids.
+        time_min: datetime
+            Begin-time of the simulation. Used for expanding period data.
+        time_max: datetime
+            End-time of the simulation. Used for expanding period data.
         regridder_types: RegridMethodType, optional
             Optional dataclass with regridder types for a specific variable.
             Use this to override default regridding methods.
+        regrid_cache: RegridderWeightsCache, optional
+            stores regridder weights for different regridders. Can be used to speed up regridding,
+            if the same regridders are used several times for regridding different arrays.
 
         Returns
         -------
         A list of Modflow 6 ConstantHead packages.
         """
         return cls._from_head_data(
+            key,
             imod5_data[key]["head"],
             imod5_data["bnd"]["ibound"],
+            period_data,
             target_dis,
+            time_min,
+            time_max,
             regridder_types,
             regrid_cache,
         )
@@ -212,6 +230,7 @@ class ConstantHead(BoundaryCondition, IRegridPackage):
     def from_imod5_shd_data(
         cls,
         imod5_data: dict[str, dict[str, GridDataArray]],
+        period_data: dict[str, list[datetime]],
         target_dis: StructuredDiscretization,
         regridder_types: Optional[ConstantHeadRegridMethod] = None,
         regrid_cache: RegridderWeightsCache = RegridderWeightsCache(),
@@ -235,6 +254,9 @@ class ConstantHead(BoundaryCondition, IRegridPackage):
         imod5_data: dict
             Dictionary with iMOD5 data. This can be constructed from the
             :func:`imod.formats.prj.open_projectfile_data` method.
+        period_data: dict
+            Dictionary with iMOD5 period data. This can be constructed from the
+            :func:`imod.formats.prj.open_projectfile_data` method.
         target_dis:  StructuredDiscretization package
             The grid that should be used for the new package. Does not
             need to be identical to one of the input grids.
@@ -250,19 +272,25 @@ class ConstantHead(BoundaryCondition, IRegridPackage):
         A  Modflow 6 ConstantHead package.
         """
         return cls._from_head_data(
+            "shd",
             imod5_data["shd"]["head"],
             imod5_data["bnd"]["ibound"],
+            period_data,
             target_dis,
-            regridder_types,
-            regrid_cache,
+            regridder_types=regridder_types,
+            regrid_cache=regrid_cache,
         )
 
     @classmethod
     def _from_head_data(
         cls,
+        key: str,
         head: GridDataArray,
         ibound: GridDataArray,
+        period_data: dict[str, list[datetime]],
         target_dis: StructuredDiscretization,
+        time_min: Optional[datetime] = None,
+        time_max: Optional[datetime] = None,
         regridder_types: Optional[ConstantHeadRegridMethod] = None,
         regrid_cache: RegridderWeightsCache = RegridderWeightsCache(),
     ) -> "ConstantHead":
@@ -273,22 +301,19 @@ class ConstantHead(BoundaryCondition, IRegridPackage):
 
         data = {"head": head, "ibound": ibound}
 
-        regridded_package_data = _regrid_package_data(
+        regridded_pkg_data = _regrid_package_data(
             data, target_idomain, regridder_types, regrid_cache, {}
         )
-        head = regridded_package_data["head"]
-        ibound = regridded_package_data["ibound"]
+        chd_pkg_data = chd_cells_from_imod5_data(regridded_pkg_data, target_idomain)
+        chd = cls(**chd_pkg_data, validate=True)
+        if time_min is not None and time_max is not None:
+            repeat = period_data.get(key)
+            set_repeat_stress_if_available(repeat, time_min, time_max, chd)
+            # Clip the drain package to the time range of the simulation and ensure
+            # time is forward filled.
+            chd = chd.clip_box(time_min=time_min, time_max=time_max)
 
-        # select locations where ibound < 0
-        head = head.where(ibound < 0)
-
-        # select locations where idomain > 0
-        head = head.where(target_idomain > 0)
-
-        regridded_package_data["head"] = head
-        regridded_package_data.pop("ibound")
-
-        return cls(**regridded_package_data, validate=True)
+        return chd
 
     @classmethod
     def get_regrid_methods(cls) -> ConstantHeadRegridMethod:

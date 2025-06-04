@@ -1,5 +1,5 @@
 from pathlib import Path
-from typing import Optional, Union
+from typing import Optional, Self, Union
 
 import cftime
 import numpy as np
@@ -91,7 +91,7 @@ class GWFGWF(ExchangeBase):
         y_max: Optional[float] = None,
         top: Optional[GridDataArray] = None,
         bottom: Optional[GridDataArray] = None,
-    ) -> Package:
+    ) -> Self:
         raise NotImplementedError("this package cannot be clipped")
 
     def render(

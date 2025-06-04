@@ -4,7 +4,18 @@ import abc
 import pathlib
 from copy import deepcopy
 from pathlib import Path
-from typing import Any, Callable, Dict, List, Mapping, Optional, Tuple, Union, cast
+from typing import (
+    Any,
+    Callable,
+    Dict,
+    List,
+    Mapping,
+    Optional,
+    Self,
+    Tuple,
+    Union,
+    cast,
+)
 
 import cftime
 import jinja2
@@ -375,7 +386,7 @@ class Package(PackageBase, IPackage, abc.ABC):
         y_max: Optional[float] = None,
         top: Optional[GridDataArray] = None,
         bottom: Optional[GridDataArray] = None,
-    ) -> Package:
+    ) -> Self:
         """
         Clip a package by a bounding box (time, layer, y, x).
 
