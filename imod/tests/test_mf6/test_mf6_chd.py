@@ -253,6 +253,7 @@ def test_from_imod5_shd(imod5_dataset, tmp_path):
 def test_concatenate_chd(imod5_dataset, tmp_path, remove_merged_packages):
     # Arrange
     imod5_data = imod5_dataset[0]
+    period_data = imod5_dataset[1]
 
     target_dis = StructuredDiscretization.from_imod5_data(imod5_data)
     chd_packages = {}
@@ -263,7 +264,10 @@ def test_concatenate_chd(imod5_dataset, tmp_path, remove_merged_packages):
         chd_packages[key] = imod.mf6.ConstantHead.from_imod5_data(
             key,
             imod5_data,
+            period_data,
             target_dis,
+            time_min=datetime(2000, 1, 1),
+            time_max=datetime(2020, 1, 1),
         )
 
     # import a few chd packages per layer but store them under another key
@@ -273,7 +277,10 @@ def test_concatenate_chd(imod5_dataset, tmp_path, remove_merged_packages):
         chd_packages[other_key] = imod.mf6.ConstantHead.from_imod5_data(
             key,
             imod5_data,
+            period_data,
             target_dis,
+            time_min=datetime(2000, 1, 1),
+            time_max=datetime(2020, 1, 1),
         )
 
     # Act
