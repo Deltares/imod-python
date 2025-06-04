@@ -4,7 +4,7 @@ import textwrap
 import typing
 from copy import deepcopy
 from enum import Enum
-from typing import TYPE_CHECKING, Any, Dict, List, Optional, Tuple
+from typing import TYPE_CHECKING, Any, Dict, List, Optional, Self, Tuple
 
 import cftime
 import numpy as np
@@ -831,7 +831,7 @@ class HorizontalFlowBarrierBase(BoundaryCondition, ILineDataPackage):
         y_max: Optional[float] = None,
         top: Optional[GridDataArray] = None,
         bottom: Optional[GridDataArray] = None,
-    ) -> "HorizontalFlowBarrierBase":
+    ) -> Self:
         """
         Clip a package by a bounding box (time, layer, y, x).
 

@@ -1,5 +1,7 @@
 from datetime import datetime
 
+import numpy as np
+
 import imod
 from imod.mf6.dis import StructuredDiscretization
 from imod.mf6.npf import NodePropertyFlow
@@ -29,6 +31,19 @@ def test_from_imod5_non_planar(imod5_dataset_periods, tmp_path):
     )
 
     assert isinstance(ghb, imod.mf6.GeneralHeadBoundary)
+
+    ghb_time = ghb.dataset.coords["time"].data
+    expected_times = np.array(
+        [
+            np.datetime64("2002-02-02"),
+            np.datetime64("2002-04-01"),
+            np.datetime64("2002-10-01"),
+        ]
+    )
+    np.testing.assert_array_equal(ghb_time, expected_times)
+    ghb_repeat_stress = ghb.dataset["repeat_stress"].data
+    assert np.all(ghb_repeat_stress[:, 1][::2] == np.datetime64("2002-04-01"))
+    assert np.all(ghb_repeat_stress[:, 1][1::2] == np.datetime64("2002-10-01"))
 
     # write the packages for write validation
     write_context = WriteContext(simulation_directory=tmp_path, use_binary=False)
@@ -60,6 +75,19 @@ def test_from_imod5_planar(imod5_dataset_periods, tmp_path):
     )
 
     assert isinstance(ghb, imod.mf6.GeneralHeadBoundary)
+
+    ghb_time = ghb.dataset.coords["time"].data
+    expected_times = np.array(
+        [
+            np.datetime64("2002-02-02"),
+            np.datetime64("2002-04-01"),
+            np.datetime64("2002-10-01"),
+        ]
+    )
+    np.testing.assert_array_equal(ghb_time, expected_times)
+    ghb_repeat_stress = ghb.dataset["repeat_stress"].data
+    assert np.all(ghb_repeat_stress[:, 1][::2] == np.datetime64("2002-04-01"))
+    assert np.all(ghb_repeat_stress[:, 1][1::2] == np.datetime64("2002-10-01"))
 
     # write the packages for write validation
     write_context = WriteContext(simulation_directory=tmp_path, use_binary=False)

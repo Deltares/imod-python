@@ -74,6 +74,17 @@ Changed
 - You can now also provide ``repeat_stress`` as dictionary to imod.mf6
   boundary conditions, such as :class:`imod.mf6.River`, :class:`imod.mf6.Drainage`, and
   :class:`imod.mf6.GeneralHeadBoundary`.
+- :meth:`imod.mf6.ConstantHead.from_imod5_data`,
+  :meth:`imod.mf6.GeneralHeadBoundary.from_imod5_data`,
+  :meth:`imod.mf6.River.from_imod5_data`,
+  :meth:`imod.mf6.Recharge.from_imod5_data`, and
+  :meth:`imod.mf6.Drainage.from_imod5_data` now forward fill data over time,
+  instead of clipping, when selecting a start time that is inbetween two data
+  records. 
+- :meth:`imod.mf6.ConstantHead.from_imod5_data` and
+  :meth:`imod.mf6.Recharge.from_imod5_data` got extra arguments for
+  ``period_data``, ``time_min`` and ``time_max``.
+
 
 [1.0.0rc3] - 2025-04-17
 -----------------------

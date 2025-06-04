@@ -1,4 +1,6 @@
+from copy import deepcopy
 from datetime import datetime
+from typing import Any
 from zipfile import ZipFile
 
 import pytest
@@ -35,7 +37,7 @@ def _load_imod5_data_in_memory(imod5_data):
 
 
 @pytest.fixture(scope="module")
-def imod5_dataset_periods() -> tuple[dict[str, any], dict[str, list[datetime]]]:
+def imod5_dataset_periods() -> tuple[dict[str, Any], dict[str, list[datetime]]]:
     tmp_path = imod.util.temporary_directory()
     fname_model = REGISTRY.fetch("iMOD5_model.zip")
 
@@ -56,6 +58,29 @@ def imod5_dataset_periods() -> tuple[dict[str, any], dict[str, list[datetime]]]:
     ibound = grid_data["bnd"]["ibound"]
     ibound = ibound.where(ibound <= 0, 1)
     grid_data["bnd"]["ibound"] = ibound
+    return grid_data, period_data
+
+
+@pytest.fixture(scope="module")
+def imod5_dataset_transient(imod5_dataset):
+    grid_data, period_data = imod5_dataset
+    grid_data = deepcopy(grid_data)
+
+    time_factors = [0.5, 0.75, 1.0, 1.25]
+    time = [
+        datetime(2000, 1, 1),
+        datetime(2001, 1, 1),
+        datetime(2002, 1, 1),
+        datetime(2003, 1, 1),
+    ]
+    time_da = xr.DataArray(time_factors, dims=["time"], coords={"time": time})
+
+    for pkgname in grid_data.keys():
+        if pkgname[:3] in ["riv", "drn", "ghb"]:
+            for varname, vardata in grid_data[pkgname].items():
+                if isinstance(vardata, xr.DataArray):
+                    grid_data[pkgname][varname] = time_da * vardata
+
     return grid_data, period_data
 
 
