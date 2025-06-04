@@ -1,5 +1,5 @@
 from copy import deepcopy
-from typing import Optional
+from typing import Optional, Self
 
 import cftime
 import numpy as np
@@ -36,7 +36,7 @@ class GWFGWT(ExchangeBase):
         y_max: Optional[float] = None,
         top: Optional[GridDataArray] = None,
         bottom: Optional[GridDataArray] = None,
-    ) -> Package:
+    ) -> Self:
         """
         The GWF-GWT exchange does not have any spatial coordinates that can be clipped.
         """

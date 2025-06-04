@@ -66,9 +66,7 @@ def clip_time_if_package(
     time_max: datetime,
 ) -> Optional[BoundaryCondition]:
     if package is not None:
-        package = cast(
-            BoundaryCondition, package.clip_box(time_min=time_min, time_max=time_max)
-        )
+        package = package.clip_box(time_min=time_min, time_max=time_max)
     return package
 
 

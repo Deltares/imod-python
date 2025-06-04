@@ -6,7 +6,7 @@ import textwrap
 import warnings
 from collections.abc import Iterable
 from datetime import datetime
-from typing import Any, Callable, Optional, Tuple, Union, cast
+from typing import Any, Callable, Optional, Self, Tuple, Union, cast
 
 import cftime
 import numpy as np
@@ -930,7 +930,7 @@ class Well(GridAgnosticWell):
         y_max: Optional[float] = None,
         top: Optional[GridDataArray] = None,
         bottom: Optional[GridDataArray] = None,
-    ) -> Package:
+    ) -> Self:
         """
         Clip a package by a bounding box (time, layer, y, x).
 
@@ -1292,7 +1292,7 @@ class LayeredWell(GridAgnosticWell):
         y_max: Optional[float] = None,
         top: Optional[GridDataArray] = None,
         bottom: Optional[GridDataArray] = None,
-    ) -> Package:
+    ) -> Self:
         """
         Clip a package by a bounding box (time, layer, y, x).
 
@@ -1555,7 +1555,7 @@ class WellDisStructured(DisStructuredBoundaryCondition):
         y_max: Optional[float] = None,
         top: Optional[GridDataArray] = None,
         bottom: Optional[GridDataArray] = None,
-    ) -> Package:
+    ) -> Self:
         """
         Clip a package by a bounding box (time, layer, y, x).
 
@@ -1710,7 +1710,7 @@ class WellDisVertices(DisVerticesBoundaryCondition):
         y_max: Optional[float] = None,
         top: Optional[GridDataArray] = None,
         bottom: Optional[GridDataArray] = None,
-    ) -> Package:
+    ) -> Self:
         """
         Clip a package by a bounding box (time, layer, y, x).
 
