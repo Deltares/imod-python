@@ -6,7 +6,7 @@ import textwrap
 import warnings
 from collections.abc import Iterable
 from datetime import datetime
-from typing import Any, Callable, Optional, Self, Tuple, Union, cast
+from typing import Any, Callable, Optional, Self, Sequence, Tuple, Union, cast
 
 import cftime
 import numpy as np
@@ -16,7 +16,6 @@ import xarray as xr
 import xugrid as xu
 
 import imod
-import imod.mf6.utilities
 from imod.common.interfaces.ipointdatapackage import IPointDataPackage
 from imod.common.utilities.grid import broadcast_to_full_domain
 from imod.common.utilities.layer import create_layered_top
@@ -82,7 +81,7 @@ def mask_2D(package: GridAgnosticWell, domain_2d: GridDataArray) -> GridAgnostic
 
 
 def _df_groups_to_da_rates(
-    unique_well_groups: pd.api.typing.DataFrameGroupBy,
+    unique_well_groups: Sequence[pd.api.typing.DataFrameGroupBy],
 ) -> xr.DataArray:
     # Convert dataframes all groups to DataArrays
     columns = list(unique_well_groups[0].columns)
@@ -93,15 +92,14 @@ def _df_groups_to_da_rates(
         index_names = ["time", "index"]
     else:
         index_names = ["index"]
-    
+    # Unset multi-index, then set index to index_names
     df_temp = gb_and_summed.reset_index().set_index(index_names)
     return df_temp["rate"].to_xarray()
 
 
-
 def _prepare_well_rates_from_groups(
     pkg_data: dict,
-    unique_well_groups: pd.api.typing.DataFrameGroupBy,
+    unique_well_groups: Sequence[pd.api.typing.DataFrameGroupBy],
     start_times: StressPeriodTimesType,
 ) -> xr.DataArray:
     """
@@ -680,11 +678,11 @@ class GridAgnosticWell(BoundaryCondition, IPointDataPackage, abc.ABC):
         # Associated wells need additional grouping by id
         if pkg_data["has_associated"]:
             colnames_group.append("id")
-        wel_index, unique_well_groups = zip(*df.groupby(colnames_group))
+        wel_index, well_groups_untagged = zip(*df.groupby(colnames_group))
         # Explictly sign an index to each group, so that the
         # DataArray of rates can be created with a unique index.
         unique_well_groups = [
-            group.assign(index=i) for i, group in enumerate(unique_well_groups)
+            group.assign(index=i) for i, group in enumerate(well_groups_untagged)
         ]
         # Unpack wel indices by zipping
         varnames = [("x", float), ("y", float)] + cls._depth_colnames
