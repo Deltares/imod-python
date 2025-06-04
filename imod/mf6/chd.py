@@ -289,8 +289,8 @@ class ConstantHead(BoundaryCondition, IRegridPackage):
         ibound: GridDataArray,
         period_data: dict[str, list[datetime]],
         target_dis: StructuredDiscretization,
-        time_min: datetime = None,
-        time_max: datetime = None,
+        time_min: Optional[datetime] = None,
+        time_max: Optional[datetime] = None,
         regridder_types: Optional[ConstantHeadRegridMethod] = None,
         regrid_cache: RegridderWeightsCache = RegridderWeightsCache(),
     ) -> "ConstantHead":
@@ -306,11 +306,12 @@ class ConstantHead(BoundaryCondition, IRegridPackage):
         )
         chd_pkg_data = chd_cells_from_imod5_data(regridded_pkg_data, target_idomain)
         chd = cls(**chd_pkg_data, validate=True)
-        repeat = period_data.get(key)
-        set_repeat_stress_if_available(repeat, time_min, time_max, chd)
-        # Clip the drain package to the time range of the simulation and ensure
-        # time is forward filled.
-        chd = chd.clip_box(time_min=time_min, time_max=time_max)
+        if time_min is not None and time_max is not None:
+            repeat = period_data.get(key)
+            set_repeat_stress_if_available(repeat, time_min, time_max, chd)
+            # Clip the drain package to the time range of the simulation and ensure
+            # time is forward filled.
+            chd = chd.clip_box(time_min=time_min, time_max=time_max)
 
         return chd
 
