@@ -1,4 +1,4 @@
-from typing import Optional, Union, cast
+from typing import Optional, Union
 
 import numpy as np
 import pandas as pd
@@ -107,7 +107,7 @@ def well_from_imod5_cap_data(imod5_data: Imod5DataDict) -> dict[str, np.ndarray]
         capacity is already defined in the point data. This is an ``n:1``
         mapping: multiple grid cells can map to one well.
     """
-    cap_data = cast(GridDataDict, drop_layer_dim_cap_data(imod5_data)["cap"])
+    cap_data = drop_layer_dim_cap_data(imod5_data)["cap"]
 
     if isinstance(cap_data["artificial_recharge_layer"], pd.DataFrame):
         return _well_from_imod5_cap_point_data(cap_data)
