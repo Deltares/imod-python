@@ -312,7 +312,10 @@ class GroundwaterFlowModel(Modflow6Model):
         if "rch" in imod5_data.keys():
             result["rch"] = Recharge.from_imod5_data(
                 imod5_data,
+                period_data,
                 dis_pkg,
+                times[0],
+                times[-1],
                 cast(RechargeRegridMethod, regridder_types.get("rch")),
                 regrid_cache,
             )
