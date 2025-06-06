@@ -1,10 +1,15 @@
 import numpy as np
+import pytest
 import xarray as xr
 import xugrid as xu
 from pytest_cases import parametrize_with_cases
 from xarray.tests import raise_if_dask_computes
 
-from imod.common.utilities.mask import _skip_dataarray, mask_arrays
+from imod.common.utilities.mask import (
+    _skip_dataarray,
+    broadcast_and_mask_arrays,
+    mask_arrays,
+)
 from imod.tests.fixtures.package_instance_creation import get_grid_da
 
 
@@ -82,3 +87,24 @@ def test_array_masking(arrays):
     array2_1d[0] = 1
     assert np.all(~np.isnan(array1_1d))
     assert np.all(~np.isnan(array2_1d))
+
+
+def test_broadcast_and_mask_arrays():
+    array1, array2 = create_structured_arrays()
+    layer = [1, 2]
+    scalar_array = xr.DataArray([1.0, 1.0], coords={"layer": layer}, dims=("layer",))
+    # Test broadcasting and masking with two arrays with the same shape
+    result1 = broadcast_and_mask_arrays({"array1": array1, "array2": array2})
+    xr.testing.assert_equal(
+        result1["array1"], array2
+    )  # Masking turns array1 into array2
+    xr.testing.assert_equal(result1["array2"], array2)
+    # Test broadcasting and masking with one array and a scalar array
+    result2 = broadcast_and_mask_arrays(
+        {"array1": array1, "not_a_scalar_array": scalar_array}
+    )
+    xr.testing.assert_equal(result2["array1"], array1)
+    xr.testing.assert_identical(result2["not_a_scalar_array"], array1)
+    # No grid should result in a ValueError
+    with pytest.raises(ValueError):
+        broadcast_and_mask_arrays({"array1": scalar_array, "array2": scalar_array})
