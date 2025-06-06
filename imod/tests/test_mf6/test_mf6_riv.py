@@ -679,6 +679,40 @@ def test_import_river_from_imod5__infiltration_factors(imod5_dataset):
     imod5_data["riv-1"]["infiltration_factor"] = original_infiltration_factor
 
 
+def test_import_river_from_imod5__constant(imod5_dataset):
+    """Test importing river with a constant infiltration factor."""
+    imod5_data = imod5_dataset[0]
+    period_data = imod5_dataset[1]
+    target_dis = StructuredDiscretization.from_imod5_data(imod5_data)
+    grid = target_dis.dataset["idomain"]
+    target_npf = NodePropertyFlow.from_imod5_data(imod5_data, grid)
+
+    original_infiltration_factor = imod5_data["riv-1"]["infiltration_factor"]
+    layer = original_infiltration_factor.coords["layer"]
+    imod5_data["riv-1"]["infiltration_factor"] = xr.DataArray(
+        [1.0], coords={"layer": layer}, dims=("layer",)
+    )
+
+    (riv, drn) = imod.mf6.River.from_imod5_data(
+        "riv-1",
+        imod5_data,
+        period_data,
+        target_dis,
+        target_npf,
+        time_min=datetime(2000, 1, 1),
+        time_max=datetime(2002, 1, 1),
+        allocation_option=ALLOCATION_OPTION.at_elevation,
+        distributing_option=DISTRIBUTING_OPTION.by_crosscut_thickness,
+        regridder_types=None,
+    )
+
+    assert riv is not None
+    assert drn is None
+
+    # teardown
+    imod5_data["riv-1"]["infiltration_factor"] = original_infiltration_factor
+
+
 def test_import_river_from_imod5__period_data(imod5_dataset_periods, tmp_path):
     imod5_data = imod5_dataset_periods[0]
     imod5_periods = imod5_dataset_periods[1]
@@ -744,7 +778,7 @@ def test_import_river_from_imod5__period_data(imod5_dataset_periods, tmp_path):
     drn._write("drn", globaltimes, write_context)
 
 
-def test_import_river_from_imod5__transient_data(imod5_dataset_transient, tmp_path):
+def test_import_river_from_imod5__transient_data(imod5_dataset_transient):
     """
     Test if importing a river from an IMOD5 dataset with transient data works
     correctly and that the time data is clipped to the specified time range.
