@@ -1,5 +1,4 @@
 import numpy as np
-import pytest_cases
 import xarray as xr
 import xugrid as xu
 from pytest_cases import parametrize_with_cases
@@ -63,7 +62,7 @@ class MaskArrayCases:
         return ugrid1, ugrid2
 
 
-@pytest_cases.parametrize_with_cases(
+@parametrize_with_cases(
     "arrays",
     cases=MaskArrayCases,
 )
