@@ -78,6 +78,8 @@ def test_cleanup__align_nodata(riv_data: dict, dis_data: dict, cleanup_func: Cal
     data_cleaned = cleanup_func(**dis_dict, **data_dict)
     # Assert
     for key in data_cleaned.keys():
+        # Test if xu.UgridDataArray not demoted to xr.DataArray
+        assert type(data_cleaned[key]) == type(data_dict[key])
         np.testing.assert_equal(_first(data_cleaned[key][idx]), np.nan)
 
 
