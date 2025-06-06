@@ -55,7 +55,8 @@ Fixed
 - :meth:`imod.mf6.River.from_imod5_data`,
   :meth:`imod.mf6.Drainage.from_imod5_data`,
   :meth:`imod.mf6.GeneralHeadBoundary.from_imod5_data` can now deal with
-  constant values for variables. One variable still needs to be a grid.
+  constant values for variables. One variable per package still needs to be a
+  grid.
 
 Changed
 ~~~~~~~
