@@ -1,6 +1,5 @@
 import numbers
 
-import numpy as np
 import xarray as xr
 from plum import Dispatcher
 from xarray.core.utils import is_scalar
@@ -11,13 +10,12 @@ from imod.common.interfaces.ipackage import IPackage
 from imod.common.interfaces.isimulation import ISimulation
 from imod.typing.grid import (
     GridDataArray,
+    concat,
     get_spatial_dimension_names,
     is_same_domain,
     is_spatial_grid,
-    concat,
+    notnull,
 )
-from imod.typing.grid import notnull
-
 
 # create dispatcher instance to limit scope of typedispatching
 dispatch = Dispatcher()
@@ -159,14 +157,16 @@ def mask_arrays(arrays: dict[str, GridDataArray]) -> dict[str, GridDataArray]:
     return arrays_masked
 
 
-def broadcast_and_mask_arrays(arrays: dict[str, xr.DataArray]) -> dict[str, xr.DataArray]:
+def broadcast_and_mask_arrays(
+    arrays: dict[str, xr.DataArray],
+) -> dict[str, xr.DataArray]:
     """
     This function takes a dictionary of xr.DataArrays and broadcasts them to the same shape.
     It then masks the arrays with np.nan values where any of the arrays have np.nan values.
     """
     # Broadcast arrays to the same shape
     broadcasted_arrays = xr.broadcast(*arrays.values())
-    broadcasted_arrays = {key: array for key, array in zip(arrays.keys(), broadcasted_arrays)}
+    broadcasted_arrays = dict(zip(arrays.keys(), broadcasted_arrays))
 
     # Mask arrays with np.nan values
     return mask_arrays(broadcasted_arrays)

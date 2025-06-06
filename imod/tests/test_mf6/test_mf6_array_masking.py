@@ -1,8 +1,7 @@
 import numpy as np
+import pytest_cases
 import xarray as xr
 import xugrid as xu
-import pytest
-import pytest_cases
 
 from imod.common.utilities.mask import mask_arrays
 
@@ -35,6 +34,7 @@ def case_unstructured_arrays() -> tuple[xu.UgridDataArray, xu.UgridDataArray]:
 
     return ugrid1, ugrid2
 
+
 @pytest_cases.parametrize_with_cases(
     "arrays",
     cases=".",
@@ -43,7 +43,7 @@ def test_array_masking(arrays):
     array1, array2 = arrays
 
     masked_arrays = mask_arrays({"array1": array1, "array2": array2})
-    
+
     # element first element should be nan in both arrays
     array1_1d = masked_arrays["array1"].values.ravel()
     array2_1d = masked_arrays["array2"].values.ravel()
