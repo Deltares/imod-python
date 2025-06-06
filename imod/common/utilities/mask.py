@@ -14,7 +14,10 @@ from imod.typing.grid import (
     get_spatial_dimension_names,
     is_same_domain,
     is_spatial_grid,
+    concat,
 )
+from imod.typing.grid import notnull
+
 
 # create dispatcher instance to limit scope of typedispatching
 dispatch = Dispatcher()
@@ -142,15 +145,28 @@ def _adjust_mask_for_unlayered_data(
     return array_mask
 
 
-def mask_arrays(arrays: dict[str, xr.DataArray]) -> dict[str, xr.DataArray]:
+def mask_arrays(arrays: dict[str, GridDataArray]) -> dict[str, GridDataArray]:
     """
     This function takes a dictionary of xr.DataArrays. The arrays are assumed to have the same
     coordinates. When a np.nan value is found in any array, the other arrays are also
     set to np.nan at the same coordinates.
     """
-    masks = [xr.DataArray(~np.isnan(array)) for array in arrays.values()]
+    masks = [notnull(array) for array in arrays.values()]
     # Get total mask across all arrays
-    total_mask = xr.concat(masks[:], dim="arrays").all("arrays")
+    total_mask = concat(masks, dim="arrays").all("arrays")
     # Mask arrays with total mask
     arrays_masked = {key: array.where(total_mask) for key, array in arrays.items()}
     return arrays_masked
+
+
+def broadcast_and_mask_arrays(arrays: dict[str, xr.DataArray]) -> dict[str, xr.DataArray]:
+    """
+    This function takes a dictionary of xr.DataArrays and broadcasts them to the same shape.
+    It then masks the arrays with np.nan values where any of the arrays have np.nan values.
+    """
+    # Broadcast arrays to the same shape
+    broadcasted_arrays = xr.broadcast(*arrays.values())
+    broadcasted_arrays = {key: array for key, array in zip(arrays.keys(), broadcasted_arrays)}
+
+    # Mask arrays with np.nan values
+    return mask_arrays(broadcasted_arrays)
