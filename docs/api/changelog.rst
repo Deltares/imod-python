@@ -52,6 +52,11 @@ Fixed
   unstructured discretization.
 - Fixed bug in :func:`imod.formats.prj.open_projectfile_data` which caused an
   error when a periods keyword was used having an upper case.
+- :meth:`imod.mf6.River.from_imod5_data`,
+  :meth:`imod.mf6.Drainage.from_imod5_data`,
+  :meth:`imod.mf6.GeneralHeadBoundary.from_imod5_data` can now deal with
+  constant values for variables. One variable per package still needs to be a
+  grid.
 
 Changed
 ~~~~~~~

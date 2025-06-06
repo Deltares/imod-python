@@ -571,6 +571,51 @@ def test_from_imod5(
     drn_2._write("mydrn", [1], write_context)
 
 
+@parametrize_with_cases(
+    ["allocation_setting", "distribution_setting"], cases=AllocationSettings
+)
+def test_from_imod5__with_constant(
+    imod5_dataset_periods, tmp_path, allocation_setting, distribution_setting
+):
+    period_data = imod5_dataset_periods[1]
+    imod5_dataset = imod5_dataset_periods[0]
+
+    target_dis = StructuredDiscretization.from_imod5_data(imod5_dataset, validate=False)
+    target_npf = NodePropertyFlow.from_imod5_data(
+        imod5_dataset, target_dis.dataset["idomain"]
+    )
+
+    original_drn_2 = imod5_dataset["drn-2"].copy()
+    imod5_dataset["drn-2"]["elevation"] = xr.DataArray(
+        [0.0], dims=("layer",), coords={"layer": [0]}
+    )
+
+    drn_2 = imod.mf6.Drainage.from_imod5_data(
+        "drn-2",
+        imod5_dataset,
+        period_data,
+        target_dis,
+        target_npf,
+        allocation_option=allocation_setting,
+        distributing_option=distribution_setting,
+        time_min=datetime(2002, 2, 2),
+        time_max=datetime(2022, 2, 2),
+        regridder_types=None,
+    )
+
+    assert isinstance(drn_2, imod.mf6.Drainage)
+
+    pkg_errors = drn_2._validate(
+        schemata=drn_2._write_schemata,
+        idomain=target_dis["idomain"],
+        bottom=target_dis["bottom"],
+    )
+    assert len(pkg_errors) == 0
+
+    # Tear down
+    imod5_dataset["drn-2"] = original_drn_2
+
+
 def test_from_imod5__negative_layer(imod5_dataset_periods, tmp_path):
     period_data = imod5_dataset_periods[1]
     imod5_dataset = imod5_dataset_periods[0]

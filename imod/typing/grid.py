@@ -543,3 +543,13 @@ def as_ugrid_dataarray(grid: xu.UgridDataArray) -> xu.UgridDataArray:  # noqa: F
 @dispatch  # type: ignore[no-redef]
 def as_ugrid_dataarray(grid: Any) -> xu.UgridDataArray:  # noqa: F811
     raise TypeError(f"Function doesn't support type {type(grid)}")
+
+
+def notnull(obj: GridDataArray) -> GridDataArray:
+    """
+    Helper function; does the same as xr.DataArray.notnull. This function is to
+    avoid an issue where xr.DataArray.notnull() returns ordinary numpy arrays
+    for instances of xu.UgridDataArray.
+    """
+
+    return cast(GridDataArray, ~np.isnan(obj))
