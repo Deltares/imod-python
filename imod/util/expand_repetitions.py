@@ -104,7 +104,7 @@ def resample_timeseries(
     # The entries before the start of the well timeseries do not have data yet,
     # so we fill them in here. Keep rate to zero and pad the location columns with
     # the first entry.
-    location_columns = ["x", "y", "id", "filt_top", "filt_bot"]
+    location_columns = ["x", "y", "id", "filt_top", "filt_bot", "index"]
     time_before_start_input = (
         intermediate_df["time"].values < well_rate["time"].values[0]
     )

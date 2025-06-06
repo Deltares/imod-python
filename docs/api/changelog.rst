@@ -52,6 +52,9 @@ Fixed
   unstructured discretization.
 - Fixed bug in :func:`imod.formats.prj.open_projectfile_data` which caused an
   error when a periods keyword was used having an upper case.
+- Poor performance of :meth:`imod.mf6.Well.from_imod5_data` and
+  :meth:`imod.mf6.LayeredWell.from_imod5_data` when the ``imod5_data`` contained
+  a well system with a large number of wells (>10k).
 
 Changed
 ~~~~~~~
