@@ -1,8 +1,11 @@
+import numpy as np
+import pytest_cases
 import xarray as xr
+import xugrid as xu
 from pytest_cases import parametrize_with_cases
 from xarray.tests import raise_if_dask_computes
 
-from imod.common.utilities.mask import _skip_dataarray
+from imod.common.utilities.mask import _skip_dataarray, mask_arrays
 from imod.tests.fixtures.package_instance_creation import get_grid_da
 
 
@@ -29,3 +32,54 @@ class DataArrayCases:
 def test_skip_dataarray(da, expected):
     with raise_if_dask_computes():
         assert _skip_dataarray(da) is expected
+
+
+def create_structured_arrays() -> tuple[xr.DataArray, xr.DataArray]:
+    x = [1]
+    y = [1, 2, 3]
+    layer = [1, 2]
+    coords = {"layer": layer, "y": y, "x": x, "dx": 1, "dy": 1}
+    dims = ("layer", "y", "x")
+
+    array1 = xr.DataArray([[[1], [1], [1]], [[1], [1], [1]]], coords=coords, dims=dims)
+    array2 = xr.DataArray(
+        [[[np.nan], [1], [1]], [[1], [1], [1]]], coords=coords, dims=dims
+    )
+
+    return array1, array2
+
+
+class MaskArrayCases:
+    def case_structured(self):
+        return create_structured_arrays()
+
+    def case_unstructured(self):
+        array1, array2 = create_structured_arrays()
+
+        # Convert to unstructured arrays
+        ugrid1 = xu.UgridDataArray.from_structured2d(array1)
+        ugrid2 = xu.UgridDataArray.from_structured2d(array2)
+
+        return ugrid1, ugrid2
+
+
+@pytest_cases.parametrize_with_cases(
+    "arrays",
+    cases=MaskArrayCases,
+)
+def test_array_masking(arrays):
+    array1, array2 = arrays
+
+    masked_arrays = mask_arrays({"array1": array1, "array2": array2})
+
+    # element first element should be nan in both arrays
+    array1_1d = masked_arrays["array1"].values.ravel()
+    array2_1d = masked_arrays["array2"].values.ravel()
+    assert np.isnan(array1_1d[0])
+    assert np.isnan(array2_1d[0])
+
+    # there should be only 1 nan in both arrays
+    array1_1d[0] = 1
+    array2_1d[0] = 1
+    assert np.all(~np.isnan(array1_1d))
+    assert np.all(~np.isnan(array2_1d))
