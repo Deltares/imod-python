@@ -27,6 +27,7 @@ from imod.common.statusinfo import NestedStatusInfo
 from imod.common.utilities.mask import _mask_all_models
 from imod.common.utilities.regrid import _regrid_like
 from imod.common.utilities.regrid_method_type import RegridMethodType
+from imod.common.utilities.version import prepend_content_with_version_info
 from imod.logging import LogLevel, logger, standard_log_decorator
 from imod.mf6.gwfgwf import GWFGWF
 from imod.mf6.gwfgwt import GWFGWT
@@ -291,6 +292,7 @@ class Modflow6Simulation(collections.UserDict, ISimulation):
 
         # Write simulation namefile
         mfsim_content = self.render(write_context)
+        mfsim_content = prepend_content_with_version_info(mfsim_content)
         mfsim_path = directory / "mfsim.nam"
         with open(mfsim_path, "w") as f:
             f.write(mfsim_content)

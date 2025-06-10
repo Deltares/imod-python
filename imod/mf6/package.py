@@ -40,6 +40,7 @@ from imod.common.utilities.schemata import (
     validate_with_error_message,
 )
 from imod.common.utilities.value_filters import is_valid
+from imod.common.utilities.version import prepend_content_with_version_info
 from imod.logging import standard_log_decorator
 from imod.mf6.auxiliary_variables import (
     expand_transient_auxiliary_variables,
@@ -144,6 +145,7 @@ class Package(PackageBase, IPackage, abc.ABC):
             globaltimes=globaltimes,
             binary=write_context.use_binary,
         )
+        content = prepend_content_with_version_info(content)
         filename = write_context.write_directory / f"{pkgname}.{self._pkg_id}"
         with open(filename, "w") as f:
             f.write(content)
