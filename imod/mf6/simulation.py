@@ -19,6 +19,7 @@ import xarray as xr
 import xugrid as xu
 
 import imod
+from imod.common.utilities.version import log_versions
 import imod.logging
 import imod.mf6.exchangebase
 from imod.common.interfaces.imodel import IModel
@@ -28,7 +29,7 @@ from imod.common.utilities.mask import _mask_all_models
 from imod.common.utilities.regrid import _regrid_like
 from imod.common.utilities.regrid_method_type import RegridMethodType
 from imod.common.utilities.version import prepend_content_with_version_info
-from imod.logging import LogLevel, logger, standard_log_decorator
+from imod.logging import standard_log_decorator
 from imod.mf6.gwfgwf import GWFGWF
 from imod.mf6.gwfgwt import GWFGWT
 from imod.mf6.gwtgwt import GWTGWT
@@ -86,22 +87,6 @@ def get_packages(simulation: Modflow6Simulation) -> dict[str, Package]:
         for pkg_name, pkg in simulation.items()
         if isinstance(pkg, Package)
     }
-
-
-def log_versions(version_saved: Optional[dict[str, str]]) -> None:
-    logger.log(
-        LogLevel.INFO, f"iMOD Python version in current environment: {imod.__version__}"
-    )
-    if version_saved:
-        version_msg = (
-            f"iMOD Python version in dumped simulation: {version_saved['imod-python']}"
-        )
-    else:
-        version_msg = "No iMOD Python version information found in dumped simulation."
-    logger.log(
-        LogLevel.INFO,
-        version_msg,
-    )
 
 
 class Modflow6Simulation(collections.UserDict, ISimulation):
