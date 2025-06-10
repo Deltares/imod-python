@@ -1,7 +1,8 @@
+from typing import Optional
+
 import imod
 from imod.logging import LogLevel, logger
 
-from typing import Optional
 
 def get_version() -> str:
     """
@@ -36,9 +37,7 @@ def prepend_content_with_version_info(content: str) -> str:
 
 def log_versions(version_saved: Optional[dict[str, str]]) -> None:
     version = get_version()
-    logger.log(
-        LogLevel.INFO, f"iMOD Python version in current environment: {version}"
-    )
+    logger.log(LogLevel.INFO, f"iMOD Python version in current environment: {version}")
     if version_saved:
         version_msg = (
             f"iMOD Python version in dumped simulation: {version_saved['imod-python']}"
