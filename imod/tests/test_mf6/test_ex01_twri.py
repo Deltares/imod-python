@@ -12,6 +12,7 @@ from imod.mf6.validation_context import ValidationContext
 from imod.mf6.write_context import WriteContext
 from imod.schemata import ValidationError
 from imod.typing.grid import ones_like
+from imod.common.utilities.version import get_version
 
 
 def test_dis_render(twri_model, tmp_path):
@@ -283,8 +284,11 @@ def test_wel_render(twri_model, tmp_path):
     with open(wel_path, "r") as wel_file:
         actual = wel_file.read()
 
+    version = get_version()
     expected = textwrap.dedent(
-        """\
+        f"""\
+            # File written with iMOD Python version: {version}
+
             begin options
               save_flows
             end options
