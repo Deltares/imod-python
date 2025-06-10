@@ -19,7 +19,6 @@ import xarray as xr
 import xugrid as xu
 
 import imod
-from imod.common.utilities.version import log_versions
 import imod.logging
 import imod.mf6.exchangebase
 from imod.common.interfaces.imodel import IModel
@@ -28,7 +27,11 @@ from imod.common.statusinfo import NestedStatusInfo
 from imod.common.utilities.mask import _mask_all_models
 from imod.common.utilities.regrid import _regrid_like
 from imod.common.utilities.regrid_method_type import RegridMethodType
-from imod.common.utilities.version import prepend_content_with_version_info
+from imod.common.utilities.version import (
+    get_version,
+    log_versions,
+    prepend_content_with_version_info,
+)
 from imod.logging import standard_log_decorator
 from imod.mf6.gwfgwf import GWFGWF
 from imod.mf6.gwfgwt import GWFGWT
@@ -880,7 +883,8 @@ class Modflow6Simulation(collections.UserDict, ISimulation):
 
         toml_content: DefaultDict[str, dict] = collections.defaultdict(dict)
         # Dump version number
-        toml_content["version"] = {"imod-python": imod.__version__}
+        version = get_version()
+        toml_content["version"] = {"imod-python": version}
         # Dump models and exchanges
         for key, value in self.items():
             cls_name = type(value).__name__
