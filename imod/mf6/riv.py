@@ -6,6 +6,7 @@ import numpy as np
 
 from imod import logging
 from imod.common.interfaces.iregridpackage import IRegridPackage
+from imod.common.utilities.mask import broadcast_and_mask_arrays
 from imod.logging import init_log_decorator, standard_log_decorator
 from imod.mf6.boundary_condition import BoundaryCondition
 from imod.mf6.dis import StructuredDiscretization
@@ -478,11 +479,12 @@ class River(BoundaryCondition, IRegridPackage):
         regridded_riv_pkg_data = regrid_imod5_pkg_data(
             River, data, target_dis, regridder_types, regrid_cache
         )
+        regridded_riv_pkg_data = broadcast_and_mask_arrays(regridded_riv_pkg_data)
         # Pop infiltration_factor to avoid unnecessarily allocating and
         # distributing it.
         infiltration_factor = regridded_riv_pkg_data.pop("infiltration_factor")
         # Allocate and distribute planar data if the grid is planar
-        is_planar_xy = is_planar_grid(data["conductance"])
+        is_planar_xy = is_planar_grid(regridded_riv_pkg_data["conductance"])
         allocation_drn_data: GridDataDict = {}
         if is_planar_xy:
             # allocate and distribute planar data

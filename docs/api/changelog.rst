@@ -55,6 +55,11 @@ Fixed
 - Poor performance of :meth:`imod.mf6.Well.from_imod5_data` and
   :meth:`imod.mf6.LayeredWell.from_imod5_data` when the ``imod5_data`` contained
   a well system with a large number of wells (>10k).
+- :meth:`imod.mf6.River.from_imod5_data`,
+  :meth:`imod.mf6.Drainage.from_imod5_data`,
+  :meth:`imod.mf6.GeneralHeadBoundary.from_imod5_data` can now deal with
+  constant values for variables. One variable per package still needs to be a
+  grid.
 
 Changed
 ~~~~~~~

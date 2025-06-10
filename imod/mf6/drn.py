@@ -5,6 +5,7 @@ from typing import Optional
 import numpy as np
 
 from imod.common.interfaces.iregridpackage import IRegridPackage
+from imod.common.utilities.mask import broadcast_and_mask_arrays
 from imod.common.utilities.regrid import (
     _regrid_package_data,
 )
@@ -320,7 +321,6 @@ class Drainage(BoundaryCondition, IRegridPackage):
             "elevation": imod5_data[key]["elevation"],
             "conductance": imod5_data[key]["conductance"],
         }
-        is_planar = is_planar_grid(data["elevation"])
 
         if regridder_types is None:
             regridder_types = Drainage.get_regrid_methods()
@@ -328,7 +328,8 @@ class Drainage(BoundaryCondition, IRegridPackage):
         regridded_package_data = _regrid_package_data(
             data, target_idomain, regridder_types, regrid_cache, {}
         )
-
+        regridded_package_data = broadcast_and_mask_arrays(regridded_package_data)
+        is_planar = is_planar_grid(regridded_package_data["elevation"])
         if is_planar:
             layered_data = cls.allocate_and_distribute_planar_data(
                 regridded_package_data,
