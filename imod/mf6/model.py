@@ -27,6 +27,7 @@ from imod.common.utilities.schemata import (
     validate_schemata_dict,
     validate_with_error_message,
 )
+from imod.common.utilities.version import prepend_content_with_version_info
 from imod.logging import LogLevel, logger, standard_log_decorator
 from imod.mf6.drn import Drainage
 from imod.mf6.ghb import GeneralHeadBoundary
@@ -399,6 +400,7 @@ class Modflow6Model(collections.UserDict, IModel, abc.ABC):
 
         # write model namefile
         namefile_content = self.render(modelname, write_context)
+        namefile_content = prepend_content_with_version_info(namefile_content)
         namefile_path = modeldirectory / f"{modelname}.nam"
         with open(namefile_path, "w") as f:
             f.write(namefile_content)

@@ -10,6 +10,7 @@ from pytest_cases import parametrize_with_cases
 
 import imod
 import imod.mf6.drn
+from imod.common.utilities.version import get_version
 from imod.logging import LoggerType, LogLevel
 from imod.mf6.dis import StructuredDiscretization
 from imod.mf6.npf import NodePropertyFlow
@@ -104,8 +105,11 @@ def test_write(drainage, tmp_path):
     write_context = WriteContext(simulation_directory=tmp_path, use_binary=True)
     drn._write("mydrn", [1], write_context)
 
+    version = get_version()
     block_expected = textwrap.dedent(
-        """\
+        f"""\
+        # File written with iMOD Python version: {version}
+
         begin options
         end options
 
