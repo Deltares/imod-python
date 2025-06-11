@@ -60,6 +60,8 @@ Fixed
   :meth:`imod.mf6.GeneralHeadBoundary.from_imod5_data` can now deal with
   constant values for variables. One variable per package still needs to be a
   grid.
+- Bug fix in :meth:`imod.mf6.Package.get_non_grid_data' for repeated stress,
+  e.g., occurring when cleaning up a package.
 
 Changed
 ~~~~~~~
@@ -88,7 +90,7 @@ Changed
   :meth:`imod.mf6.Recharge.from_imod5_data`, and
   :meth:`imod.mf6.Drainage.from_imod5_data` now forward fill data over time,
   instead of clipping, when selecting a start time that is inbetween two data
-  records. 
+  records.
 - :meth:`imod.mf6.ConstantHead.from_imod5_data` and
   :meth:`imod.mf6.Recharge.from_imod5_data` got extra arguments for
   ``period_data``, ``time_min`` and ``time_max``.
