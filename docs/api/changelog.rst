@@ -15,6 +15,8 @@ Added
 - Added ``weights`` argument to :func:`imod.prepare.create_partition_labels` to
   weigh how the simulation should be partioned. Areas with higher weights will
   result in smaller partions.
+- iMOD Python version is now written in a comment line to MODFLOW6 and
+  MetaSWAP's ``para_sim.inp`` files. This is useful for debugging purposes.
 
 Fixed
 ~~~~~
