@@ -267,9 +267,7 @@ class MetaSwapModel(Model):
         filename = directory / self._file_name
         rendered = self._template.render(settings=simulation_settings)
         # Prepend version information
-        rendered = prepend_content_with_version_info(
-            rendered, comment_char="*", n_newlines=1
-        )
+        rendered = prepend_content_with_version_info(rendered, comment_char="*")
         with open(filename, "w") as f:
             f.write(rendered)
 

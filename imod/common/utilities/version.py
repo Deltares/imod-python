@@ -19,7 +19,8 @@ def get_version() -> str:
 
 
 def prepend_content_with_version_info(
-    content: str, comment_char="#", n_newlines=2
+    content: str,
+    comment_char="#",
 ) -> str:
     """
     Prepends file content with comment with iMOD Python version information.
@@ -30,8 +31,6 @@ def prepend_content_with_version_info(
         The file content to prepended.
     comment_char: str, optional
         The character used for comments in the file. Defaults to "#".
-    n_newlines: int, optional
-        The number of newlines to add after the version comment. Defaults to 2.
 
     Returns
     -------
@@ -39,10 +38,9 @@ def prepend_content_with_version_info(
         Content prepended with the version information.
     """
     version = get_version()
-    newlines = "\n" * n_newlines
     line_text = "File written with iMOD Python version"
 
-    return f"{comment_char} {line_text}: {version}{newlines}{content}"
+    return f"{comment_char} {line_text}: {version}\n\n{content}"
 
 
 def log_versions(version_saved: Optional[dict[str, str]]) -> None:
