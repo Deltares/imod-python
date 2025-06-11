@@ -1,3 +1,4 @@
+from copy import deepcopy
 from datetime import datetime
 
 import numpy as np
@@ -51,6 +52,29 @@ def test_from_imod5_non_planar(imod5_dataset_periods, tmp_path):
     ghb._write("ghb", [1], write_context)
 
 
+def test_from_imod5_and_cleanup_non_planar(imod5_dataset_periods, tmp_path):
+    period_data = imod5_dataset_periods[1]
+    imod5_dataset = imod5_dataset_periods[0]
+    target_dis = StructuredDiscretization.from_imod5_data(imod5_dataset, validate=False)
+    target_npf = NodePropertyFlow.from_imod5_data(
+        imod5_dataset, target_dis.dataset["idomain"]
+    )
+
+    ghb = imod.mf6.GeneralHeadBoundary.from_imod5_data(
+        "ghb",
+        imod5_dataset,
+        period_data,
+        target_dis,
+        target_npf,
+        time_min=datetime(2002, 2, 2),
+        time_max=datetime(2022, 2, 2),
+        allocation_option=ALLOCATION_OPTION.at_elevation,
+        distributing_option=DISTRIBUTING_OPTION.by_crosscut_thickness,
+    )
+
+    ghb.cleanup(target_dis)
+
+
 def test_from_imod5_constant(imod5_dataset_periods, tmp_path):
     period_data = imod5_dataset_periods[1]
     imod5_dataset = imod5_dataset_periods[0]
@@ -94,6 +118,32 @@ def test_from_imod5_constant(imod5_dataset_periods, tmp_path):
     ghb._write("ghb", [1], write_context)
 
 
+def test_from_imod5_and_cleanup_constant(imod5_dataset_periods, tmp_path):
+    period_data = imod5_dataset_periods[1]
+    imod5_dataset = imod5_dataset_periods[0]
+    target_dis = StructuredDiscretization.from_imod5_data(imod5_dataset, validate=False)
+    target_npf = NodePropertyFlow.from_imod5_data(
+        imod5_dataset, target_dis.dataset["idomain"]
+    )
+    layer = imod5_dataset["ghb"]["conductance"].coords["layer"].data
+    imod5_dataset["ghb"]["conductance"] = xr.DataArray(
+        [1.0], coords={"layer": layer}, dims=("layer",)
+    )
+    ghb = imod.mf6.GeneralHeadBoundary.from_imod5_data(
+        "ghb",
+        imod5_dataset,
+        period_data,
+        target_dis,
+        target_npf,
+        time_min=datetime(2002, 2, 2),
+        time_max=datetime(2022, 2, 2),
+        allocation_option=ALLOCATION_OPTION.at_elevation,
+        distributing_option=DISTRIBUTING_OPTION.by_crosscut_thickness,
+    )
+
+    ghb.cleanup(target_dis)
+
+
 def test_from_imod5_planar(imod5_dataset_periods, tmp_path):
     period_data = imod5_dataset_periods[1]
     imod5_dataset = imod5_dataset_periods[0]
@@ -101,6 +151,8 @@ def test_from_imod5_planar(imod5_dataset_periods, tmp_path):
     target_npf = NodePropertyFlow.from_imod5_data(
         imod5_dataset, target_dis.dataset["idomain"]
     )
+
+    original_ghb = deepcopy(imod5_dataset["ghb"])
     imod5_dataset["ghb"]["conductance"] = imod5_dataset["ghb"][
         "conductance"
     ].assign_coords({"layer": [0]})
@@ -136,3 +188,38 @@ def test_from_imod5_planar(imod5_dataset_periods, tmp_path):
     # write the packages for write validation
     write_context = WriteContext(simulation_directory=tmp_path, use_binary=False)
     ghb._write("ghb", [1], write_context)
+
+    # teardown
+    imod5_dataset["ghb"] = original_ghb
+
+
+def test_from_imod5_and_cleanup_planar(imod5_dataset_periods, tmp_path):
+    period_data = imod5_dataset_periods[1]
+    imod5_dataset = imod5_dataset_periods[0]
+    target_dis = StructuredDiscretization.from_imod5_data(imod5_dataset, validate=False)
+    target_npf = NodePropertyFlow.from_imod5_data(
+        imod5_dataset, target_dis.dataset["idomain"]
+    )
+
+    original_ghb = deepcopy(imod5_dataset["ghb"])
+    imod5_dataset["ghb"]["conductance"] = imod5_dataset["ghb"][
+        "conductance"
+    ].assign_coords({"layer": [0]})
+    imod5_dataset["ghb"]["head"] = imod5_dataset["ghb"]["head"].isel({"layer": 0})
+
+    ghb = imod.mf6.GeneralHeadBoundary.from_imod5_data(
+        "ghb",
+        imod5_dataset,
+        period_data,
+        target_dis,
+        target_npf,
+        time_min=datetime(2002, 2, 2),
+        time_max=datetime(2022, 2, 2),
+        allocation_option=ALLOCATION_OPTION.at_elevation,
+        distributing_option=DISTRIBUTING_OPTION.by_layer_thickness,
+    )
+
+    ghb.cleanup(target_dis)
+
+    # teardown
+    imod5_dataset["ghb"] = original_ghb
