@@ -94,6 +94,10 @@ Changed
 - :meth:`imod.mf6.ConstantHead.from_imod5_data` and
   :meth:`imod.mf6.Recharge.from_imod5_data` got extra arguments for
   ``period_data``, ``time_min`` and ``time_max``.
+- :func:`imod.prepare.read_imod_legend` now also returns the labels as an extra
+  argument. Update your code by changing 
+  ``colors, levels = read_imod_legend(...)`` to 
+  ``colors, levels, labels = read_imod_legend(...)``.
 
 
 [1.0.0rc3] - 2025-04-17
