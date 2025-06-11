@@ -10,6 +10,7 @@ import numpy as np
 import xarray as xr
 
 from imod.common.utilities.value_filters import enforce_scalar
+from imod.common.utilities.version import prepend_content_with_version_info
 from imod.mf6.dis import StructuredDiscretization
 from imod.mf6.mf6_wel_adapter import Mf6Wel
 from imod.msw.copy_files import FileCopier
@@ -264,8 +265,12 @@ class MetaSwapModel(Model):
         )
 
         filename = directory / self._file_name
+        rendered = self._template.render(settings=simulation_settings)
+        # Prepend version information
+        rendered = prepend_content_with_version_info(
+            rendered, comment_char="*", n_newlines=1
+        )
         with open(filename, "w") as f:
-            rendered = self._template.render(settings=simulation_settings)
             f.write(rendered)
 
     def write(
