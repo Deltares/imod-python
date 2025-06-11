@@ -13,7 +13,7 @@ Functional tests
 ----------------
 
 The functional tests are run as part of the CI pipeline, and consist of
-unittests and short examples which will be containted in the documentation. They
+unittests and short examples which will be contained in the documentation. They
 can be run locally by running the following commands in the root of the
 repository:
 
@@ -25,6 +25,24 @@ repository:
 These tests are run automatically on every push to the repository, and on every
 pull request. They will therefore presumably work as they are run regularly, but
 a final check can't harm anyway.
+
+Some extra edge cases are not covered by the functional tests, and these should be
+checked manually before a release. These are:
+
+- Installing iMOD Python and running tests in a folder with curly braces ``{}``
+  in the name, like is unavoidable on the Windows Computational Facilities
+  (WCF). 
+- Installing iMOD Python with the iMODforge distribution on a machine
+  disconnected from the internet, like Deltares' LHM server. Examples that use
+  the ``imod.data`` module here will not work, as these require an internet
+  connection to download the data.
+- Installing iMOD Python on a machine that runs on a different operating system
+  than Windows, than which is what iMOD Python is mostly developend and used on.
+
+If these edge cases fail, they should be documented in the
+:doc:`../faq/known-issues` page with a workaround (if possible), and an issue
+should be opened on `GitHub <https://github.com/Deltares/imod-python/issues>`_ .
+
 
 User acceptance tests
 ---------------------
@@ -68,7 +86,8 @@ Criteria for user acceptance tests of the 1.0 release are:
   for the LHM model with 1 timestep on a machine with 32 GB RAM on a single
   core.
 * The conversion of the transient LHM model run of 40 years on a daily timestep
-  (140K stress-periods) should be possible without memory overflow.
+  (140K stress-periods) should run without memory overflow on a machine with 32
+  GB and write a model within 30 minutes.
 
 Manual checks
 *************
@@ -76,8 +95,9 @@ Manual checks
 - Run the pixi task written below. This will export data to a UGRID NetCDF and
   save it under the name <......>. Open QGIS. Click "Layers" > "Add Layer" >
   "Add mesh". Insert the path <......> in the text box. This will import the
-  mesh. Verify if the mesh is rendered properly, if not open an issue on `GitHub
-  <https://github.com/Deltares/imod-python/issues>`_ .
+  mesh. Verify if the mesh is rendered in two dimensions, and not as a single
+  line of cells. If not open an issue on `GitHub
+  <https://github.com/Deltares/imod-python/issues>`_ . 
   
 .. code-block:: console
 
