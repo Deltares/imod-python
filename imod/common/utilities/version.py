@@ -6,7 +6,9 @@ from imod.logging import LogLevel, logger
 
 def get_version() -> str:
     """
-    Returns the version of the iMOD Python package.
+    Returns the version of the iMOD Python package. This now is a trivial
+    function, but it can be later expanded to also include git hashes with a
+    package like setuptools-scm or hash-vcs.
 
     Returns
     -------
@@ -16,7 +18,9 @@ def get_version() -> str:
     return imod.__version__
 
 
-def prepend_content_with_version_info(content: str) -> str:
+def prepend_content_with_version_info(
+    content: str, comment_char="#", n_newlines=2
+) -> str:
     """
     Prepends file content with comment with iMOD Python version information.
 
@@ -24,6 +28,10 @@ def prepend_content_with_version_info(content: str) -> str:
     ----------
     content: str
         The file content to prepended.
+    comment_char: str, optional
+        The character used for comments in the file. Defaults to "#".
+    n_newlines: int, optional
+        The number of newlines to add after the version comment. Defaults to 2.
 
     Returns
     -------
@@ -31,8 +39,10 @@ def prepend_content_with_version_info(content: str) -> str:
         Content prepended with the version information.
     """
     version = get_version()
+    newlines = "\n" * n_newlines
+    line_text = "File written with iMOD Python version"
 
-    return f"# File written with iMOD Python version: {version}\n\n{content}"
+    return f"{comment_char} {line_text}: {version}{newlines}{content}"
 
 
 def log_versions(version_saved: Optional[dict[str, str]]) -> None:
