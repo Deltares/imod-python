@@ -1066,15 +1066,30 @@ class Modflow6Simulation(collections.UserDict, ISimulation):
         return clipped
 
     @standard_log_decorator()
-    def split(self, submodel_labels: GridDataArray) -> Modflow6Simulation:
+    def split(
+        self, submodel_labels: GridDataArray, ignore_time_purge_empty: bool = False
+    ) -> Modflow6Simulation:
         """
-        Split a simulation in different partitions using a submodel_labels array.
+        Split a simulation in different partitions using a submodel_labels
+        array.
 
-        The submodel_labels array defines how a simulation will be split. The array should have the same topology as
-        the domain being split i.e. similar shape as a layer in the domain. The values in the array indicate to
-        which partition a cell belongs. The values should be zero or greater.
+        Parameters
+        ----------
+        submodel_labels: xr.DataArray or xu.UgridDataArray
+            A grid that defines how the simulation will be split. The array
+            should have the same topology as the domain being split, i.e.
+            similar shape as a layer in the domain. The values in the array
+            indicate to which partition a cell belongs. The values should be
+            zero or greater.
+        ignore_time_purge_empty: bool, default False
+            If True, the first timestep is selected to validate. This increases
+            performance for packages with a time dimensions over which changes
+            of cell activity are not expected. Default is False, which means the
+            time dimension is not dropped.
 
-        The method return a new simulation containing all the split models and packages
+        Returns
+        -------
+        A new simulation containing all the split models and packages
         """
         if self.is_split():
             raise RuntimeError(
@@ -1123,6 +1138,9 @@ class Modflow6Simulation(collections.UserDict, ISimulation):
                 new_model_name = f"{model_name}_{submodel_partition_info.id}"
                 new_simulation[new_model_name] = slice_model(
                     submodel_partition_info, model
+                )
+                new_simulation[new_model_name].purge_empty_packages(
+                    ignore_time=ignore_time_purge_empty
                 )
                 new_simulation[solution_name].add_model_to_solution(new_model_name)
 

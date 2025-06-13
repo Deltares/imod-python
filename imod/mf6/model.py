@@ -713,13 +713,20 @@ class Modflow6Model(collections.UserDict, IModel, abc.ABC):
 
         _mask_all_packages(self, mask)
 
-    def purge_empty_packages(self, model_name: Optional[str] = "") -> None:
+    def purge_empty_packages(
+        self, model_name: Optional[str] = "", ignore_time: bool = False
+    ) -> None:
         """
         This function removes empty packages from the model.
         """
         empty_packages = [
-            package_name for package_name, package in self.items() if package.is_empty()
+            package_name
+            for package_name, package in self.items()
+            if package.is_empty(ignore_time=ignore_time)
         ]
+        logger.info(
+            f"packages: {empty_packages} removed in {model_name}, because all empty"
+        )
         for package_name in empty_packages:
             self.pop(package_name)
 

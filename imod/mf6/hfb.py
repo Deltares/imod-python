@@ -693,8 +693,18 @@ class HorizontalFlowBarrierBase(BoundaryCondition, ILineDataPackage):
 
         return self._to_mf6_pkg(idomain, top, bottom, k, validation_context)
 
-    def is_empty(self) -> bool:
-        if super().is_empty():
+    def is_empty(self, ignore_time: bool = False) -> bool:
+        """
+        Returns True if the package is empty, that is if it contains only
+        no-data values.
+
+        Parameters
+        ----------
+        ignore_time: bool, optional
+            If True, the time dimension is dropped before validation. Irrelevant
+            for this package as it doesn't support a time dimension.
+        """
+        if super().is_empty(ignore_time=ignore_time):
             return True
 
         linestrings = self.dataset["geometry"]

@@ -10,7 +10,7 @@ from imod.schemata import BaseSchema, SchemataDict, ValidationError
 def filter_schemata_dict(
     schemata_dict: SchemataDict,
     schema_types: tuple[type[BaseSchema], ...],
-) -> dict[str, list[BaseSchema]]:
+) -> SchemataDict:
     """
     Filter schemata dict with a tuple of schema types. Keys which do not have
     provided types in their corresponding schema list are dropped. The schema

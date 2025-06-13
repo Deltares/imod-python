@@ -17,6 +17,10 @@ Added
   result in smaller partions.
 - iMOD Python version is now written in a comment line to MODFLOW6 and
   MetaSWAP's ``para_sim.inp`` files. This is useful for debugging purposes.
+- Added option ``ignore_time_purge_empty`` to
+  :class:`imod.mf6.Modflow6Simulation.split` to consider a package empty if its
+  first times step is all nodata. This can save a lot of time splitting
+  transient models.
 
 Fixed
 ~~~~~
@@ -62,6 +66,9 @@ Fixed
   :meth:`imod.mf6.GeneralHeadBoundary.from_imod5_data` can now deal with
   constant values for variables. One variable per package still needs to be a
   grid.
+- fix bug where an error was thrown in :class:`imod.mf6.Well` when an entry had
+  to be filtered and its ``id`` didn't match the index.
+
 
 Changed
 ~~~~~~~

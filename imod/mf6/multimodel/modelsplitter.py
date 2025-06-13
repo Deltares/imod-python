@@ -1,17 +1,17 @@
-from typing import List, NamedTuple
+from typing import List, NamedTuple, Optional
 
 import numpy as np
 
 from imod.common.interfaces.imodel import IModel
 from imod.common.utilities.clip import clip_by_grid
 from imod.common.utilities.grid import get_active_domain_slice
-from imod.logging import logger
 from imod.mf6.auxiliary_variables import (
     expand_transient_auxiliary_variables,
     remove_expanded_auxiliary_variables_from_dataset,
 )
 from imod.mf6.boundary_condition import BoundaryCondition
 from imod.mf6.hfb import HorizontalFlowBarrierBase
+from imod.mf6.package import Package
 from imod.mf6.wel import Well
 from imod.typing import GridDataArray
 from imod.typing.grid import is_unstructured, ones_like
@@ -64,10 +64,27 @@ def _validate_submodel_label_array(submodel_labels: GridDataArray) -> None:
         )
 
 
+def mask_if_structured(
+    package: Package,
+    active_domain: GridDataArray,
+) -> Optional[Package]:
+    """
+    Masks the package if it is structured. If the package is unstructured, it
+    returns the package unchanged.
+    """
+    if is_unstructured(active_domain):
+        masked_package = package
+    else:
+        masked_package = package.mask(active_domain)
+
+    return masked_package
+
+
 def slice_model(partition_info: PartitionInfo, model: IModel) -> IModel:
     """
-    This function slices a Modflow6Model. A sliced model is a model that consists of packages of the original model
-    that are sliced using the domain_slice. A domain_slice can be created using the
+    This function slices a Modflow6Model. A sliced model is a model that
+    consists of packages of the original model that are sliced using the
+    domain_slice. A domain_slice can be created using the
     :func:`imod.mf6.modelsplitter.create_domain_slices` function.
     """
     modelclass = type(model)
@@ -96,17 +113,10 @@ def slice_model(partition_info: PartitionInfo, model: IModel) -> IModel:
             remove_expanded_auxiliary_variables_from_dataset(package)
 
         sliced_package = clip_by_grid(package, partition_info.active_domain)
-
-        sliced_package = sliced_package.mask(new_idomain)
-        # The masking can result in packages with AllNoData.Therefore we'll have
-        # to drop these packages.
-        if not sliced_package.is_empty():
+        maybe_masked_package = mask_if_structured(sliced_package, new_idomain)
+        if maybe_masked_package is not None:
             new_model[pkg_name] = sliced_package
-        else:
-            logger.info(
-                f"package {pkg_name} removed in partition {partition_info.id}, because all empty"
-            )
 
         if isinstance(package, BoundaryCondition):
-            expand_transient_auxiliary_variables(package)
+            expand_transient_auxiliary_variables(sliced_package)
     return new_model

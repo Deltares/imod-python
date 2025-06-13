@@ -1,5 +1,4 @@
 from copy import deepcopy
-from pathlib import Path
 from unittest import mock
 from unittest.mock import MagicMock
 
@@ -20,6 +19,7 @@ from imod.mf6.package import Package
 from imod.mf6.validation_context import ValidationContext
 from imod.mf6.write_context import WriteContext
 from imod.schemata import ValidationError
+from imod.typing.grid import concat, nan_like
 
 
 # Duplicate from test_mf6_dis.py
@@ -334,7 +334,6 @@ class TestGroundwaterFlowModel:
 
 
 def test_purge_empty_package(
-    tmp_path: Path,
     unstructured_flow_model: GroundwaterFlowModel,
 ):
     # test that purging leaves the non-empty packages in place
@@ -363,6 +362,26 @@ def test_purge_empty_package(
     unstructured_flow_model["hfb"] = imod.mf6.HorizontalFlowBarrierResistance(geometry)
     unstructured_flow_model.purge_empty_packages()
     assert original_nr_packages == len(unstructured_flow_model.items())
+
+
+def test_purge_empty_package__ignore_time(
+    unstructured_flow_model: GroundwaterFlowModel,
+):
+    # Arrange
+    rch = unstructured_flow_model["rch"]
+    empty = nan_like(rch.dataset["rate"])
+    transient_rate = concat([empty, rch.dataset["rate"]], dim="time")
+    time_coords = [np.datetime64("2000-01-01"), np.datetime64("2001-01-01")]
+    transient_rate = transient_rate.assign_coords(time=time_coords)
+    rch.dataset["rate"] = transient_rate
+
+    # Act
+    original_nr_packages = len(unstructured_flow_model.items())
+    unstructured_flow_model.purge_empty_packages(ignore_time=False)
+    assert original_nr_packages == len(unstructured_flow_model.items())
+
+    unstructured_flow_model.purge_empty_packages(ignore_time=True)
+    assert (original_nr_packages - 1) == len(unstructured_flow_model.items())
 
 
 def test_deepcopy(
