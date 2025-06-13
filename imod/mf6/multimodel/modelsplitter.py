@@ -118,5 +118,5 @@ def slice_model(partition_info: PartitionInfo, model: IModel) -> IModel:
             new_model[pkg_name] = sliced_package
 
         if isinstance(package, BoundaryCondition):
-            expand_transient_auxiliary_variables(package)
+            expand_transient_auxiliary_variables(sliced_package)
     return new_model
