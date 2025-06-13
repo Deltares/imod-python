@@ -2,11 +2,9 @@ from typing import List, NamedTuple, Optional
 
 import numpy as np
 
-from imod.common.interfaces.ilinedatapackage import ILineDataPackage
 from imod.common.interfaces.imodel import IModel
 from imod.common.utilities.clip import clip_by_grid
 from imod.common.utilities.grid import get_active_domain_slice
-from imod.logging import logger
 from imod.mf6.auxiliary_variables import (
     expand_transient_auxiliary_variables,
     remove_expanded_auxiliary_variables_from_dataset,
@@ -67,7 +65,8 @@ def _validate_submodel_label_array(submodel_labels: GridDataArray) -> None:
 
 
 def mask_if_structured(
-    package: Package, active_domain: GridDataArray, pkg_name: str
+    package: Package,
+    active_domain: GridDataArray,
 ) -> Optional[Package]:
     """
     Masks the package if it is structured. If the package is unstructured, it
@@ -78,23 +77,14 @@ def mask_if_structured(
     else:
         masked_package = package.mask(active_domain)
 
-    # The masking can result in packages with AllNoData, same for the clipping
-    # of the HFB packages. Therefore we'll have to drop these packages. The
-    # calls to is_empty() are not very efficient, so avoid them if not
-    # necessary.
-    check_empty = isinstance(masked_package, ILineDataPackage) or not is_unstructured(
-        active_domain
-    )
-    if check_empty and masked_package.is_empty():
-        logger.info(f"package {pkg_name} removed in partition, because all empty")
-        return None
     return masked_package
 
 
 def slice_model(partition_info: PartitionInfo, model: IModel) -> IModel:
     """
-    This function slices a Modflow6Model. A sliced model is a model that consists of packages of the original model
-    that are sliced using the domain_slice. A domain_slice can be created using the
+    This function slices a Modflow6Model. A sliced model is a model that
+    consists of packages of the original model that are sliced using the
+    domain_slice. A domain_slice can be created using the
     :func:`imod.mf6.modelsplitter.create_domain_slices` function.
     """
     modelclass = type(model)
@@ -123,7 +113,7 @@ def slice_model(partition_info: PartitionInfo, model: IModel) -> IModel:
             remove_expanded_auxiliary_variables_from_dataset(package)
 
         sliced_package = clip_by_grid(package, partition_info.active_domain)
-        maybe_masked_package = mask_if_structured(sliced_package, new_idomain, pkg_name)
+        maybe_masked_package = mask_if_structured(sliced_package, new_idomain)
         if maybe_masked_package is not None:
             new_model[pkg_name] = sliced_package
 
