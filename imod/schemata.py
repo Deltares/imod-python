@@ -654,7 +654,7 @@ class AllNoDataSchema(NoDataSchema):
 
     def validate(self, obj: GridDataArray, **kwargs) -> None:
         valid = self.is_notnull(obj)
-        if valid.all():
+        if ~valid.any():
             raise ValidationError("all nodata")
 
 
@@ -665,7 +665,7 @@ class AnyNoDataSchema(NoDataSchema):
 
     def validate(self, obj: GridDataArray, **kwargs) -> None:
         valid = self.is_notnull(obj)
-        if valid.any():
+        if ~valid.all():
             raise ValidationError("found a nodata value")
 
 
