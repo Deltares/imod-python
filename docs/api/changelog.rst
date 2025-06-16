@@ -68,6 +68,8 @@ Fixed
   grid.
 - fix bug where an error was thrown in :class:`imod.mf6.Well` when an entry had
   to be filtered and its ``id`` didn't match the index.
+- Improved performance of :class:`imod.mf6.Modflow6Simulation.split` for
+  structured models, as unnecessary masking is avoided.
 
 
 Changed

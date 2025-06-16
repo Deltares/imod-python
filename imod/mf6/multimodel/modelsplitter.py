@@ -64,22 +64,6 @@ def _validate_submodel_label_array(submodel_labels: GridDataArray) -> None:
         )
 
 
-def mask_if_structured(
-    package: Package,
-    active_domain: GridDataArray,
-) -> Optional[Package]:
-    """
-    Masks the package if it is structured. If the package is unstructured, it
-    returns the package unchanged.
-    """
-    if is_unstructured(active_domain):
-        masked_package = package
-    else:
-        masked_package = package.mask(active_domain)
-
-    return masked_package
-
-
 def slice_model(partition_info: PartitionInfo, model: IModel) -> IModel:
     """
     This function slices a Modflow6Model. A sliced model is a model that
@@ -89,32 +73,13 @@ def slice_model(partition_info: PartitionInfo, model: IModel) -> IModel:
     """
     modelclass = type(model)
     new_model = modelclass(**model.options)
-    domain_slice2d = get_active_domain_slice(partition_info.active_domain)
-    if is_unstructured(model.domain):
-        new_idomain = model.domain.sel(domain_slice2d)
-    else:
-        # store the original layer dimension
-        layer = model.domain.layer
-
-        sliced_domain_2D = partition_info.active_domain.sel(domain_slice2d)
-        # drop the dimensions we don't need from the 2D domain slice. It may have a single
-        # layer so we drop that as well
-        sliced_domain_2D = sliced_domain_2D.drop_vars(
-            ["dx", "dy", "layer"], errors="ignore"
-        )
-        # create the desired coodinates: the original layer dimension,and the x/y coordinates of the slice.
-        coords = dict(layer=layer, **sliced_domain_2D.coords)
-
-        # the new idomain is the selection on our coodinates and only the part active in sliced_domain_2D
-        new_idomain = model.domain.sel(coords).where(sliced_domain_2D, other=0)
 
     for pkg_name, package in model.items():
         if isinstance(package, BoundaryCondition):
             remove_expanded_auxiliary_variables_from_dataset(package)
 
         sliced_package = clip_by_grid(package, partition_info.active_domain)
-        maybe_masked_package = mask_if_structured(sliced_package, new_idomain)
-        if maybe_masked_package is not None:
+        if sliced_package is not None:
             new_model[pkg_name] = sliced_package
 
         if isinstance(package, BoundaryCondition):
