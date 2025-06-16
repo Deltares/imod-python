@@ -1,20 +1,18 @@
-from typing import List, NamedTuple, Optional
+from typing import List, NamedTuple
 
 import numpy as np
 
 from imod.common.interfaces.imodel import IModel
 from imod.common.utilities.clip import clip_by_grid
-from imod.common.utilities.grid import get_active_domain_slice
 from imod.mf6.auxiliary_variables import (
     expand_transient_auxiliary_variables,
     remove_expanded_auxiliary_variables_from_dataset,
 )
 from imod.mf6.boundary_condition import BoundaryCondition
 from imod.mf6.hfb import HorizontalFlowBarrierBase
-from imod.mf6.package import Package
 from imod.mf6.wel import Well
 from imod.typing import GridDataArray
-from imod.typing.grid import is_unstructured, ones_like
+from imod.typing.grid import ones_like
 
 HIGH_LEVEL_PKGS = (HorizontalFlowBarrierBase, Well)
 
