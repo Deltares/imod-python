@@ -60,8 +60,7 @@ Fixed
   :meth:`imod.mf6.GeneralHeadBoundary.from_imod5_data` can now deal with
   constant values for variables. One variable per package still needs to be a
   grid.
-- Bug fix in :meth:`imod.mf6.Package.get_non_grid_data' for repeated stress,
-  e.g., occurring when cleaning up a package.
+- Fix bug where an error was thrown in ``get_non_grid_data`` when calling the ``.cleanup`` and ``regrid_like`` methods on a boundary condition package with a repeated stress. For example, :meth:`imod.mf6.River.cleanup` or :meth:`imod.mf6.River.regrid_like`.
 
 Changed
 ~~~~~~~
