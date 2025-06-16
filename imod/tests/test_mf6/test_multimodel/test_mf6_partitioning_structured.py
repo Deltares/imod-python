@@ -202,6 +202,7 @@ class HorizontalFlowBarrierCases:
             },
         )
 
+
 @parametrize_with_cases("partition_array", cases=PartitionArrayCases)
 def test_partitioning_structured__masking(
     transient_twri_model: Modflow6Simulation,
