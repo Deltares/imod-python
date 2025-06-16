@@ -202,6 +202,26 @@ class HorizontalFlowBarrierCases:
             },
         )
 
+@parametrize_with_cases("partition_array", cases=PartitionArrayCases)
+def test_partitioning_structured__masking(
+    transient_twri_model: Modflow6Simulation,
+    partition_array: xr.DataArray,
+):
+    simulation = transient_twri_model
+    # Act
+    # Partition the simulation
+    split_simulation = simulation.split(partition_array)
+    # Assert
+    # Check if the partitioned simulation has the correct number of models
+    modelnames = split_simulation.get_models_of_type("gwf6").keys()
+    unique_partitions = np.unique(partition_array)
+    assert len(modelnames) == len(unique_partitions)
+
+    for partition_nr, modelname in zip(unique_partitions, modelnames):
+        is_partition = partition_array == partition_nr
+        model_active = split_simulation[modelname].domain == 1
+        assert np.all(is_partition == model_active)
+
 
 @parametrize_with_cases("partition_array", cases=PartitionArrayCases)
 def test_partitioning_structured(
