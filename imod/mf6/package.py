@@ -554,9 +554,13 @@ class Package(PackageBase, IPackage, abc.ABC):
         ):
             all_non_grid_data.remove(name)
 
-        if "repeat_stress" in all_non_grid_data:
-            result["repeat_stress"] = self.dataset["repeat_stress"]
-            all_non_grid_data.remove("repeat_stress")
+        name = "repeat_stress"
+        if name in all_non_grid_data:
+            if "repeat" in self.dataset[name].dims:
+                result[name] = self.dataset[name]
+            else:
+                result[name] = self.dataset[name].values[()]
+            all_non_grid_data.remove(name)
 
         for name in all_non_grid_data:
             if "time" in self.dataset[name].coords:
