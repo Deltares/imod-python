@@ -343,9 +343,18 @@ class Package(PackageBase, IPackage, abc.ABC):
     def _validate(self, schemata: dict, **kwargs) -> dict[str, list[ValidationError]]:
         return validate_schemata_dict(schemata, self.dataset, **kwargs)
 
-    def is_empty(self) -> bool:
+    def is_empty(self, ignore_time: bool = False) -> bool:
         """
-        Returns True if the package is empty- for example if it contains only no-data values.
+        Returns True if the package is empty, that is if it contains only
+        no-data values.
+
+        Parameters
+        ----------
+        ignore_time: bool, optional
+            If True, the first timestep is selected to validate. This increases
+            performance for packages with a time dimensions over which changes
+            of cell activity are not expected. Default is False, which means the
+            time dimension is not dropped.
         """
 
         # Create schemata dict only containing the
@@ -354,10 +363,12 @@ class Package(PackageBase, IPackage, abc.ABC):
         allnodata_schemata = filter_schemata_dict(
             self._write_schemata, (AllNoDataSchema, EmptyIndexesSchema)
         )
-
+        ds = self.dataset
+        if ignore_time:
+            ds = self.dataset.isel(time=0, drop=True, missing_dims="ignore")
         # Find if packages throws ValidationError for AllNoDataSchema or
         # EmptyIndexesSchema.
-        allnodata_errors = self._validate(allnodata_schemata)
+        allnodata_errors = validate_schemata_dict(allnodata_schemata, ds)
         return len(allnodata_errors) > 0
 
     def _validate_init_schemata(self, validate: bool, **kwargs) -> None:
