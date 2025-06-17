@@ -52,6 +52,7 @@ from imod.mf6.pkgbase import (
     TRANSPORT_PACKAGES,
     PackageBase,
 )
+from imod.mf6.validation_context import ValidationContext, trim_time_dimension
 from imod.mf6.write_context import WriteContext
 from imod.schemata import (
     AllNoDataSchema,
@@ -341,7 +342,8 @@ class Package(PackageBase, IPackage, abc.ABC):
 
     @standard_log_decorator()
     def _validate(self, schemata: dict, **kwargs) -> dict[str, list[ValidationError]]:
-        return validate_schemata_dict(schemata, self.dataset, **kwargs)
+        ds = trim_time_dimension(self.dataset, **kwargs)
+        return validate_schemata_dict(schemata, ds, **kwargs)
 
     def is_empty(self, ignore_time: bool = False) -> bool:
         """
