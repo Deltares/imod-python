@@ -778,6 +778,30 @@ def test_import_river_from_imod5__period_data(imod5_dataset_periods, tmp_path):
     drn._write("drn", globaltimes, write_context)
 
 
+def test_import_river_from_imod5_and_cleanup__period_data(imod5_dataset_periods):
+    imod5_data = imod5_dataset_periods[0]
+    imod5_periods = imod5_dataset_periods[1]
+    target_dis = StructuredDiscretization.from_imod5_data(imod5_data, validate=False)
+    grid = target_dis.dataset["idomain"]
+    target_npf = NodePropertyFlow.from_imod5_data(imod5_data, grid)
+
+    (riv, drn) = imod.mf6.River.from_imod5_data(
+        "riv-1",
+        imod5_data,
+        imod5_periods,
+        target_dis,
+        target_npf,
+        datetime(2002, 2, 2),
+        datetime(2022, 2, 2),
+        ALLOCATION_OPTION.stage_to_riv_bot_drn_above,
+        SimulationDistributingOptions.riv,
+        regridder_types=None,
+    )
+
+    riv.cleanup(target_dis)
+    drn.cleanup(target_dis)
+
+
 def test_import_river_from_imod5__transient_data(imod5_dataset_transient):
     """
     Test if importing a river from an IMOD5 dataset with transient data works
