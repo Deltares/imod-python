@@ -233,7 +233,9 @@ class Modflow6Model(collections.UserDict, IModel, abc.ABC):
         return npf["k"]
 
     @standard_log_decorator()
-    def validate(self, validation_context: ValidationContext, model_name: str = "") -> StatusInfoBase:
+    def validate(
+        self, validation_context: ValidationContext, model_name: str = ""
+    ) -> StatusInfoBase:
         try:
             diskey = self._get_diskey()
         except Exception as e:

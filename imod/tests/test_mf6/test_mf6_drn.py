@@ -685,6 +685,7 @@ def test_from_imod5_and_cleanup__with_constant(
     # Teardown
     imod5_dataset["drn-2"] = original_drn_2
 
+
 def test_from_imod5__negative_layer(imod5_dataset_periods, tmp_path):
     period_data = imod5_dataset_periods[1]
     imod5_dataset = imod5_dataset_periods[0]

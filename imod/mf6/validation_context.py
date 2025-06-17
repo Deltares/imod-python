@@ -1,4 +1,5 @@
 from dataclasses import dataclass
+
 from imod.typing import GridDataset
 
 
@@ -10,9 +11,7 @@ class ValidationContext:
     ignore_time_no_data: bool = False
 
 
-def trim_time_dimension(
-    ds: GridDataset, **kwargs
-) -> GridDataset:
+def trim_time_dimension(ds: GridDataset, **kwargs) -> GridDataset:
     """
     Prepare object for validation, drop time dimension if
     ignore_time_no_data is set in validation context.

@@ -52,7 +52,7 @@ from imod.mf6.pkgbase import (
     TRANSPORT_PACKAGES,
     PackageBase,
 )
-from imod.mf6.validation_context import ValidationContext, trim_time_dimension
+from imod.mf6.validation_context import trim_time_dimension
 from imod.mf6.write_context import WriteContext
 from imod.schemata import (
     AllNoDataSchema,
