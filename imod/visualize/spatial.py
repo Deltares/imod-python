@@ -16,7 +16,9 @@ except ImportError:
     ctx = MissingOptionalModule("contextily")
 
 
-def read_imod_legend(path):
+def read_imod_legend(
+    path: str | pathlib.Path,
+) -> tuple[list[str], list[float], list[str]]:
     """
     Parameters
     ----------
@@ -28,6 +30,8 @@ def read_imod_legend(path):
     colors : List of hex colors of length N.
     levels : List of floats of length N-1. These are the boundaries between
         the legend colors/classes.
+    labels : List of strings of length N. These are the labels for the
+        legend colors/classes.
     """
 
     # Read file. Do not rely the headers in the leg file.
@@ -37,8 +41,8 @@ def read_imod_legend(path):
             header=1,
             sep=sep,
             index_col=False,
-            usecols=[0, 1, 2, 3, 4],
-            names=["upper", "lower", "red", "green", "blue"],
+            usecols=[0, 1, 2, 3, 4, 5],
+            names=["upper", "lower", "red", "green", "blue", "labels"],
         )
 
     # Try both comma and whitespace separated
@@ -53,8 +57,9 @@ def read_imod_legend(path):
     green = legend["green"]
     colors = [f"#{r:02x}{g:02x}{b:02x}" for r, g, b in zip(red, green, blue)][::-1]
     levels = list(legend["lower"])[::-1][1:]
+    labels = list(legend["labels"])[::-1]
 
-    return colors, levels
+    return colors, levels, labels
 
 
 def _crs2string(crs):

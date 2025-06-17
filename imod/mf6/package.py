@@ -40,6 +40,7 @@ from imod.common.utilities.schemata import (
     validate_with_error_message,
 )
 from imod.common.utilities.value_filters import is_valid
+from imod.common.utilities.version import prepend_content_with_version_info
 from imod.logging import standard_log_decorator
 from imod.mf6.auxiliary_variables import (
     expand_transient_auxiliary_variables,
@@ -144,6 +145,7 @@ class Package(PackageBase, IPackage, abc.ABC):
             globaltimes=globaltimes,
             binary=write_context.use_binary,
         )
+        content = prepend_content_with_version_info(content)
         filename = write_context.write_directory / f"{pkgname}.{self._pkg_id}"
         with open(filename, "w") as f:
             f.write(content)
@@ -341,9 +343,18 @@ class Package(PackageBase, IPackage, abc.ABC):
     def _validate(self, schemata: dict, **kwargs) -> dict[str, list[ValidationError]]:
         return validate_schemata_dict(schemata, self.dataset, **kwargs)
 
-    def is_empty(self) -> bool:
+    def is_empty(self, ignore_time: bool = False) -> bool:
         """
-        Returns True if the package is empty- for example if it contains only no-data values.
+        Returns True if the package is empty, that is if it contains only
+        no-data values.
+
+        Parameters
+        ----------
+        ignore_time: bool, optional
+            If True, the first timestep is selected to validate. This increases
+            performance for packages with a time dimensions over which changes
+            of cell activity are not expected. Default is False, which means the
+            time dimension is not dropped.
         """
 
         # Create schemata dict only containing the
@@ -352,10 +363,12 @@ class Package(PackageBase, IPackage, abc.ABC):
         allnodata_schemata = filter_schemata_dict(
             self._write_schemata, (AllNoDataSchema, EmptyIndexesSchema)
         )
-
+        ds = self.dataset
+        if ignore_time:
+            ds = self.dataset.isel(time=0, drop=True, missing_dims="ignore")
         # Find if packages throws ValidationError for AllNoDataSchema or
         # EmptyIndexesSchema.
-        allnodata_errors = self._validate(allnodata_schemata)
+        allnodata_errors = validate_schemata_dict(allnodata_schemata, ds)
         return len(allnodata_errors) > 0
 
     def _validate_init_schemata(self, validate: bool, **kwargs) -> None:

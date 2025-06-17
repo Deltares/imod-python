@@ -27,6 +27,7 @@ from imod.common.utilities.schemata import (
     validate_schemata_dict,
     validate_with_error_message,
 )
+from imod.common.utilities.version import prepend_content_with_version_info
 from imod.logging import LogLevel, logger, standard_log_decorator
 from imod.mf6.drn import Drainage
 from imod.mf6.ghb import GeneralHeadBoundary
@@ -399,6 +400,7 @@ class Modflow6Model(collections.UserDict, IModel, abc.ABC):
 
         # write model namefile
         namefile_content = self.render(modelname, write_context)
+        namefile_content = prepend_content_with_version_info(namefile_content)
         namefile_path = modeldirectory / f"{modelname}.nam"
         with open(namefile_path, "w") as f:
             f.write(namefile_content)
@@ -711,13 +713,20 @@ class Modflow6Model(collections.UserDict, IModel, abc.ABC):
 
         _mask_all_packages(self, mask)
 
-    def purge_empty_packages(self, model_name: Optional[str] = "") -> None:
+    def purge_empty_packages(
+        self, model_name: Optional[str] = "", ignore_time: bool = False
+    ) -> None:
         """
         This function removes empty packages from the model.
         """
         empty_packages = [
-            package_name for package_name, package in self.items() if package.is_empty()
+            package_name
+            for package_name, package in self.items()
+            if package.is_empty(ignore_time=ignore_time)
         ]
+        logger.info(
+            f"packages: {empty_packages} removed in {model_name}, because all empty"
+        )
         for package_name in empty_packages:
             self.pop(package_name)
 

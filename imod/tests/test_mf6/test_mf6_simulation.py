@@ -21,6 +21,7 @@ from pytest_cases import parametrize_with_cases
 
 import imod
 from imod.common.statusinfo import NestedStatusInfo, StatusInfo
+from imod.common.utilities.version import get_version
 from imod.logging import LoggerType, LogLevel
 from imod.mf6 import LayeredWell, Well
 from imod.mf6.model import Modflow6Model
@@ -80,7 +81,7 @@ def test_dump_version_number__version_written(twri_model, tmpdir_factory):
     toml_path = tmp_path / f"{twri_model.name}.toml"
     with open(toml_path, "rb") as f:
         toml_content = tomli.load(f)
-    assert toml_content["version"]["imod-python"] == imod.__version__
+    assert toml_content["version"]["imod-python"] == get_version()
 
 
 def test_from_file_version_logged__version_in_dumped(twri_model, tmpdir_factory):

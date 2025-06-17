@@ -27,7 +27,12 @@ from imod.common.statusinfo import NestedStatusInfo
 from imod.common.utilities.mask import _mask_all_models
 from imod.common.utilities.regrid import _regrid_like
 from imod.common.utilities.regrid_method_type import RegridMethodType
-from imod.logging import LogLevel, logger, standard_log_decorator
+from imod.common.utilities.version import (
+    get_version,
+    log_versions,
+    prepend_content_with_version_info,
+)
+from imod.logging import standard_log_decorator
 from imod.mf6.gwfgwf import GWFGWF
 from imod.mf6.gwfgwt import GWFGWT
 from imod.mf6.gwtgwt import GWTGWT
@@ -85,22 +90,6 @@ def get_packages(simulation: Modflow6Simulation) -> dict[str, Package]:
         for pkg_name, pkg in simulation.items()
         if isinstance(pkg, Package)
     }
-
-
-def log_versions(version_saved: Optional[dict[str, str]]) -> None:
-    logger.log(
-        LogLevel.INFO, f"iMOD Python version in current environment: {imod.__version__}"
-    )
-    if version_saved:
-        version_msg = (
-            f"iMOD Python version in dumped simulation: {version_saved['imod-python']}"
-        )
-    else:
-        version_msg = "No iMOD Python version information found in dumped simulation."
-    logger.log(
-        LogLevel.INFO,
-        version_msg,
-    )
 
 
 class Modflow6Simulation(collections.UserDict, ISimulation):
@@ -291,6 +280,7 @@ class Modflow6Simulation(collections.UserDict, ISimulation):
 
         # Write simulation namefile
         mfsim_content = self.render(write_context)
+        mfsim_content = prepend_content_with_version_info(mfsim_content)
         mfsim_path = directory / "mfsim.nam"
         with open(mfsim_path, "w") as f:
             f.write(mfsim_content)
@@ -893,7 +883,8 @@ class Modflow6Simulation(collections.UserDict, ISimulation):
 
         toml_content: DefaultDict[str, dict] = collections.defaultdict(dict)
         # Dump version number
-        toml_content["version"] = {"imod-python": imod.__version__}
+        version = get_version()
+        toml_content["version"] = {"imod-python": version}
         # Dump models and exchanges
         for key, value in self.items():
             cls_name = type(value).__name__
@@ -1075,15 +1066,30 @@ class Modflow6Simulation(collections.UserDict, ISimulation):
         return clipped
 
     @standard_log_decorator()
-    def split(self, submodel_labels: GridDataArray) -> Modflow6Simulation:
+    def split(
+        self, submodel_labels: GridDataArray, ignore_time_purge_empty: bool = False
+    ) -> Modflow6Simulation:
         """
-        Split a simulation in different partitions using a submodel_labels array.
+        Split a simulation in different partitions using a submodel_labels
+        array.
 
-        The submodel_labels array defines how a simulation will be split. The array should have the same topology as
-        the domain being split i.e. similar shape as a layer in the domain. The values in the array indicate to
-        which partition a cell belongs. The values should be zero or greater.
+        Parameters
+        ----------
+        submodel_labels: xr.DataArray or xu.UgridDataArray
+            A grid that defines how the simulation will be split. The array
+            should have the same topology as the domain being split, i.e.
+            similar shape as a layer in the domain. The values in the array
+            indicate to which partition a cell belongs. The values should be
+            zero or greater.
+        ignore_time_purge_empty: bool, default False
+            If True, the first timestep is selected to validate. This increases
+            performance for packages with a time dimensions over which changes
+            of cell activity are not expected. Default is False, which means the
+            time dimension is not dropped.
 
-        The method return a new simulation containing all the split models and packages
+        Returns
+        -------
+        A new simulation containing all the split models and packages
         """
         if self.is_split():
             raise RuntimeError(
@@ -1132,6 +1138,9 @@ class Modflow6Simulation(collections.UserDict, ISimulation):
                 new_model_name = f"{model_name}_{submodel_partition_info.id}"
                 new_simulation[new_model_name] = slice_model(
                     submodel_partition_info, model
+                )
+                new_simulation[new_model_name].purge_empty_packages(
+                    ignore_time=ignore_time_purge_empty
                 )
                 new_simulation[solution_name].add_model_to_solution(new_model_name)
 

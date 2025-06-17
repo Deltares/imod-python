@@ -315,7 +315,6 @@ def _regrid_like(
     output_domain = handle_extra_coords("dx", target_grid, output_domain)
     output_domain = handle_extra_coords("dy", target_grid, output_domain)
     new_model.mask_all_packages(output_domain)
-    new_model.purge_empty_packages()
     if validate:
         status_info = NestedStatusInfo("Model validation status")
         status_info.add(new_model.validate("Regridded model"))

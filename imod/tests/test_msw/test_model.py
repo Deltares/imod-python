@@ -45,7 +45,13 @@ def test_msw_model_write_settings_roundtrip(msw_model, tmp_path):
     # Act
     msw_model._write_simulation_settings(output_dir)
     # Assert
-    parasim_settings = read_para_sim(output_dir / "para_sim.inp")
+    # Test first line of the file contains version information
+    filename = output_dir / "para_sim.inp"
+    with open(filename, "r") as f:
+        lines = f.readlines()
+    assert lines[0].startswith("* File written with iMOD Python version:")
+
+    parasim_settings = read_para_sim(filename)
     for key in keys_to_drop:
         parasim_settings.pop(key)
 

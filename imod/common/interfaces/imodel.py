@@ -16,7 +16,9 @@ class IModel(IDict):
         raise NotImplementedError
 
     @abstractmethod
-    def purge_empty_packages(self, model_name: Optional[str] = "") -> None:
+    def purge_empty_packages(
+        self, model_name: Optional[str] = "", ignore_time: bool = False
+    ) -> None:
         raise NotImplementedError
 
     @abstractmethod
