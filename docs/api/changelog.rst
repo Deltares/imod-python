@@ -66,7 +66,11 @@ Fixed
   :meth:`imod.mf6.GeneralHeadBoundary.from_imod5_data` can now deal with
   constant values for variables. One variable per package still needs to be a
   grid.
-- fix bug where an error was thrown in :class:`imod.mf6.Well` when an entry had
+- Fix bug where an error was thrown in ``get_non_grid_data`` when calling the
+  ``.cleanup`` and ``regrid_like`` methods on a boundary condition package with
+  a repeated stress. For example, :meth:`imod.mf6.River.cleanup` or
+  :meth:`imod.mf6.River.regrid_like`.
+- Fix bug where an error was thrown in :class:`imod.mf6.Well` when an entry had
   to be filtered and its ``id`` didn't match the index.
 - Improved performance of :class:`imod.mf6.Modflow6Simulation.split` for
   structured models, as unnecessary masking is avoided.
@@ -99,7 +103,7 @@ Changed
   :meth:`imod.mf6.Recharge.from_imod5_data`, and
   :meth:`imod.mf6.Drainage.from_imod5_data` now forward fill data over time,
   instead of clipping, when selecting a start time that is inbetween two data
-  records. 
+  records.
 - :meth:`imod.mf6.ConstantHead.from_imod5_data` and
   :meth:`imod.mf6.Recharge.from_imod5_data` got extra arguments for
   ``period_data``, ``time_min`` and ``time_max``.
