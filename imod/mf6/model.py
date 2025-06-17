@@ -233,7 +233,7 @@ class Modflow6Model(collections.UserDict, IModel, abc.ABC):
         return npf["k"]
 
     @standard_log_decorator()
-    def validate(self, model_name: str = "") -> StatusInfoBase:
+    def validate(self, validation_context: ValidationContext, model_name: str = "") -> StatusInfoBase:
         try:
             diskey = self._get_diskey()
         except Exception as e:
@@ -269,6 +269,7 @@ class Modflow6Model(collections.UserDict, IModel, abc.ABC):
                 schemata=schemata,
                 idomain=idomain,
                 bottom=bottom,
+                validation_context=validation_context,
             )
             if len(pkg_errors) > 0:
                 footer = SUGGESTION_TEXT if pkg_has_cleanup(pkg) else None
@@ -394,7 +395,7 @@ class Modflow6Model(collections.UserDict, IModel, abc.ABC):
         modeldirectory = workdir / modelname
         Path(modeldirectory).mkdir(exist_ok=True, parents=True)
         if validate_context.validate:
-            model_status_info = self.validate(modelname)
+            model_status_info = self.validate(modelname, validate_context)
             if model_status_info.has_errors():
                 return model_status_info
 

@@ -635,7 +635,24 @@ class UniqueValuesSchema(BaseSchema):
             )
 
 
-class NoDataSchema(BaseSchema):
+class ObjectPreparationMixin():
+    def trim_time_dimension(
+        self, obj: GridDataArray, **kwargs
+    ) -> GridDataArray:
+        """
+        Prepare object for validation, drop time dimension if
+        ignore_time_no_data is set in validation context.
+        """
+        if "validation_context" in kwargs:
+            validation_context = kwargs["validation_context"]
+            if validation_context.ignore_time_no_data:
+                # If ignore_time_no_data is set, we can ignore time dimension
+                if "time" in obj.dims:
+                    return obj.isel(time=0)
+        return obj
+
+
+class NoDataSchema(BaseSchema, ObjectPreparationMixin):
     def __init__(
         self,
         is_notnull: Union[Callable, Tuple[str, Any]] = notnull,
@@ -653,6 +670,7 @@ class AllNoDataSchema(NoDataSchema):
     """
 
     def validate(self, obj: GridDataArray, **kwargs) -> None:
+        obj = self.trim_time_dimension(obj, **kwargs)
         valid = self.is_notnull(obj)
         if ~valid.any():
             raise ValidationError("all nodata")
@@ -664,12 +682,13 @@ class AnyNoDataSchema(NoDataSchema):
     """
 
     def validate(self, obj: GridDataArray, **kwargs) -> None:
+        obj = self.trim_time_dimension(obj, **kwargs)
         valid = self.is_notnull(obj)
         if ~valid.all():
             raise ValidationError("found a nodata value")
 
 
-class NoDataComparisonSchema(BaseSchema):
+class NoDataComparisonSchema(BaseSchema, ObjectPreparationMixin):
     """
     Base class for IdentityNoDataSchema and AllInsideNoDataSchema.
     """
@@ -706,6 +725,8 @@ class IdentityNoDataSchema(NoDataComparisonSchema):
 
     def validate(self, obj: GridDataArray, **kwargs) -> None:
         other_obj = kwargs[self.other]
+        obj = self.trim_time_dimension(obj, **kwargs)
+        other_obj = self.trim_time_dimension(other_obj, **kwargs)
 
         # Only test if object has all dimensions in other object.
         missing_dims = set(other_obj.dims) - set(obj.dims)
@@ -724,6 +745,9 @@ class AllInsideNoDataSchema(NoDataComparisonSchema):
 
     def validate(self, obj: GridDataArray, **kwargs) -> None:
         other_obj = kwargs[self.other]
+        obj = self.trim_time_dimension(obj, **kwargs)
+        other_obj = self.trim_time_dimension(other_obj, **kwargs)
+        
         valid = self.is_notnull(obj)
         other_valid = self.is_other_notnull(other_obj)
 
