@@ -80,7 +80,7 @@ Here an overview of iMOD5 files supported:
     Open legend file (.leg),:func:`imod.visualize.read_imod_legend`,
 
 MODFLOW 6
---------
+---------
 
 Here an overview of iMOD5 MODFLOW 6 features:
 

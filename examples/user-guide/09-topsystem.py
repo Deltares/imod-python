@@ -405,7 +405,7 @@ plt.tight_layout()
 
 # %%
 # MODFLOW 6 package
-# ----------------
+# -----------------
 #
 # The data created can now be used to create a MODFLOW 6 package. To construct 3D
 # grids from planar grids for the stages, we can utilize xarrays broadcasting:
