@@ -52,7 +52,7 @@ from imod.mf6.pkgbase import (
     TRANSPORT_PACKAGES,
     PackageBase,
 )
-from imod.mf6.validation_settings import ValidationContext, trim_time_dimension
+from imod.mf6.validation_settings import ValidationSettings, trim_time_dimension
 from imod.mf6.write_context import WriteContext
 from imod.schemata import (
     AllNoDataSchema,
@@ -365,7 +365,7 @@ class Package(PackageBase, IPackage, abc.ABC):
         allnodata_schemata = filter_schemata_dict(
             self._write_schemata, (AllNoDataSchema, EmptyIndexesSchema)
         )
-        validation_context = ValidationContext(ignore_time=ignore_time)
+        validation_context = ValidationSettings(ignore_time=ignore_time)
         ds = trim_time_dimension(self.dataset, validation_context=validation_context)
         # Find if packages throws ValidationError for AllNoDataSchema or
         # EmptyIndexesSchema.

@@ -16,7 +16,7 @@ from imod.mf6.mf6_wel_adapter import Mf6Wel
 from imod.mf6.model import Modflow6Model
 from imod.mf6.model_gwf import GroundwaterFlowModel
 from imod.mf6.package import Package
-from imod.mf6.validation_settings import ValidationContext
+from imod.mf6.validation_settings import ValidationSettings
 from imod.mf6.write_context import WriteContext
 from imod.schemata import ValidationError
 from imod.typing.grid import concat, nan_like
@@ -106,7 +106,7 @@ class TestModel:
         model_name = "Test model"
         model = Modflow6Model()
         # create write context
-        validation_context = ValidationContext()
+        validation_context = ValidationSettings()
         write_context = WriteContext(tmp_path)
 
         discretization_mock = MagicMock(spec_set=Package)
@@ -134,7 +134,7 @@ class TestModel:
         model_name = "Test model"
         model = Modflow6Model()
         # create write context
-        validation_context = ValidationContext()
+        validation_context = ValidationSettings()
         write_context = WriteContext(tmp_path)
 
         template_mock = MagicMock(spec_set=Template)
@@ -157,7 +157,7 @@ class TestModel:
         model_name = "Test model"
         model = Modflow6Model()
         # create write context
-        validation_context = ValidationContext()
+        validation_context = ValidationSettings()
         write_context = WriteContext(tmp_path)
 
         discretization_mock = MagicMock(spec_set=Package)
@@ -186,7 +186,7 @@ class TestModel:
         # Arrange.
         tmp_path = tmpdir_factory.mktemp("TestSimulation")
         model_name = "Test model"
-        validation_context = ValidationContext()
+        validation_context = ValidationSettings()
         write_context = WriteContext(simulation_directory=tmp_path)
 
         model = Modflow6Model()

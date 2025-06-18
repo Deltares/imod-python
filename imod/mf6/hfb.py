@@ -32,7 +32,7 @@ from imod.mf6.dis import StructuredDiscretization
 from imod.mf6.disv import VerticesDiscretization
 from imod.mf6.mf6_hfb_adapter import Mf6HorizontalFlowBarrier
 from imod.mf6.package import Package
-from imod.mf6.validation_settings import ValidationContext
+from imod.mf6.validation_settings import ValidationSettings
 from imod.prepare.cleanup import cleanup_hfb
 from imod.schemata import (
     DimsSchema,
@@ -644,7 +644,7 @@ class HorizontalFlowBarrierBase(BoundaryCondition, ILineDataPackage):
         top: GridDataArray,
         bottom: GridDataArray,
         k: GridDataArray,
-        validation_context: ValidationContext,
+        validation_context: ValidationSettings,
     ) -> Mf6HorizontalFlowBarrier:
         barrier_dataset = self._to_connected_cells_dataset(
             idomain, top, bottom, k, validation_context.strict_hfb_validation
@@ -687,7 +687,7 @@ class HorizontalFlowBarrierBase(BoundaryCondition, ILineDataPackage):
         Mf6HorizontalFlowBarrier
             Low level representation of the HFB package as MODFLOW 6 expects it.
         """
-        validation_context = ValidationContext(
+        validation_context = ValidationSettings(
             validate=validate, strict_hfb_validation=strict_hfb_validation
         )
 

@@ -9,7 +9,7 @@ import xugrid as xu
 
 import imod
 from imod.logging import LoggerType, LogLevel
-from imod.mf6.validation_settings import ValidationContext
+from imod.mf6.validation_settings import ValidationSettings
 from imod.mf6.write_context import WriteContext
 
 
@@ -76,7 +76,7 @@ def test_gwfmodel_render(circle_model, tmp_path):
             """
     )
     assert actual == expected
-    validation_context = ValidationContext(True)
+    validation_context = ValidationSettings(True)
     write_context2 = WriteContext(tmp_path)
     gwfmodel._write("GWF_1", globaltimes, write_context2, validation_context)
     assert (tmp_path / "GWF_1" / "GWF_1.nam").is_file()
@@ -129,7 +129,7 @@ def test_gwfmodel_render_evt(circle_model_evt, tmp_path):
             """
     )
     assert actual == expected
-    validation_context = ValidationContext(True)
+    validation_context = ValidationSettings(True)
     write_context2 = WriteContext(tmp_path)
     gwfmodel._write("GWF_1", globaltimes, write_context2, validation_context)
     assert (tmp_path / "GWF_1" / "GWF_1.nam").is_file()
