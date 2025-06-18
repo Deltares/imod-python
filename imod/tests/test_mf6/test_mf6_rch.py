@@ -297,7 +297,7 @@ def test_ignore_time_validation():
     x = rng.random((10000, 3, 1000, 1000), chunks=(1, -1, -1, -1))
     rate = xr.DataArray(x, coords=idomain.coords, dims=("time", "layer", "y", "x"))
     rch = imod.mf6.Recharge(rate=rate, validate=False)
-    validation_context = ValidationContext(ignore_time_no_data=True)
+    validation_context = ValidationContext(ignore_time=True)
     # Act
     rch._validate(
         schemata=rch._write_schemata,
