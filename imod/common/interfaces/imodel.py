@@ -3,7 +3,7 @@ from typing import Optional, Tuple
 
 from imod.common.interfaces.idict import IDict
 from imod.common.statusinfo import StatusInfoBase
-from imod.mf6.validation_context import ValidationContext
+from imod.mf6.validation_settings import ValidationContext
 from imod.typing import GridDataArray
 
 

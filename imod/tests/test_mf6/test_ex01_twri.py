@@ -9,7 +9,7 @@ import xarray as xr
 
 import imod
 from imod.common.utilities.version import get_version
-from imod.mf6.validation_context import ValidationContext
+from imod.mf6.validation_settings import ValidationContext
 from imod.mf6.write_context import WriteContext
 from imod.schemata import ValidationError
 from imod.typing.grid import ones_like

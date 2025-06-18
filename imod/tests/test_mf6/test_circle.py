@@ -9,7 +9,7 @@ import xugrid as xu
 
 import imod
 from imod.logging import LoggerType, LogLevel
-from imod.mf6.validation_context import ValidationContext
+from imod.mf6.validation_settings import ValidationContext
 from imod.mf6.write_context import WriteContext
 
 

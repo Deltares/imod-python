@@ -32,7 +32,7 @@ from imod.mf6.dis import StructuredDiscretization
 from imod.mf6.disv import VerticesDiscretization
 from imod.mf6.mf6_hfb_adapter import Mf6HorizontalFlowBarrier
 from imod.mf6.package import Package
-from imod.mf6.validation_context import ValidationContext
+from imod.mf6.validation_settings import ValidationContext
 from imod.prepare.cleanup import cleanup_hfb
 from imod.schemata import (
     DimsSchema,

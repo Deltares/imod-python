@@ -18,7 +18,7 @@ from imod.common.statusinfo import NestedStatusInfo
 from imod.common.utilities.clip import clip_by_grid
 from imod.common.utilities.regrid_method_type import EmptyRegridMethod, RegridMethodType
 from imod.common.utilities.value_filters import is_valid
-from imod.mf6.validation_context import ValidationContext
+from imod.mf6.validation_settings import ValidationContext
 from imod.schemata import ValidationError
 from imod.typing.grid import (
     GridDataArray,

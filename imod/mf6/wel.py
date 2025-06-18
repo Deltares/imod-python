@@ -33,7 +33,7 @@ from imod.mf6.mf6_wel_adapter import Mf6Wel, concat_indices_to_cellid
 from imod.mf6.package import Package
 from imod.mf6.utilities.dataset import remove_inactive
 from imod.mf6.utilities.imod5_converter import well_from_imod5_cap_data
-from imod.mf6.validation_context import ValidationContext
+from imod.mf6.validation_settings import ValidationContext
 from imod.mf6.write_context import WriteContext
 from imod.prepare import assign_wells
 from imod.prepare.cleanup import cleanup_wel, cleanup_wel_layered

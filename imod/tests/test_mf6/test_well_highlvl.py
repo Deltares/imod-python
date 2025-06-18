@@ -12,7 +12,7 @@ import imod.tests
 import imod.tests.fixtures
 import imod.tests.fixtures.mf6_circle_fixture
 import imod.tests.fixtures.mf6_twri_fixture
-from imod.mf6.validation_context import ValidationContext
+from imod.mf6.validation_settings import ValidationContext
 from imod.mf6.write_context import WriteContext
 from imod.schemata import ValidationError
 from imod.tests.fixtures.mf6_small_models_fixture import (

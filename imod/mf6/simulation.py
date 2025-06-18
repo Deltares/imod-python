@@ -48,7 +48,7 @@ from imod.mf6.multimodel.modelsplitter import create_partition_info, slice_model
 from imod.mf6.out import open_cbc, open_conc, open_hds
 from imod.mf6.package import Package
 from imod.mf6.ssm import SourceSinkMixing
-from imod.mf6.validation_context import ValidationContext
+from imod.mf6.validation_settings import ValidationContext
 from imod.mf6.write_context import WriteContext
 from imod.prepare.topsystem.default_allocation_methods import (
     SimulationAllocationOptions,

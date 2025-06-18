@@ -10,7 +10,7 @@ import xarray as xr
 
 import imod
 from imod.logging import LoggerType, LogLevel, standard_log_decorator
-from imod.mf6.validation_context import ValidationContext
+from imod.mf6.validation_settings import ValidationContext
 from imod.mf6.write_context import WriteContext
 
 out = StringIO()

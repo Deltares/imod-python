@@ -12,7 +12,7 @@ import xarray as xr
 
 import imod
 from imod.mf6.dis import StructuredDiscretization
-from imod.mf6.validation_context import ValidationContext
+from imod.mf6.validation_settings import ValidationContext
 from imod.mf6.write_context import WriteContext
 from imod.schemata import ValidationError
 from imod.typing.grid import is_planar_grid, is_transient_data_grid, nan_like

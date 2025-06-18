@@ -36,7 +36,7 @@ from imod.mf6.mf6_wel_adapter import Mf6Wel
 from imod.mf6.package import Package
 from imod.mf6.riv import River
 from imod.mf6.utilities.mf6hfb import merge_hfb_packages
-from imod.mf6.validation_context import ValidationContext
+from imod.mf6.validation_settings import ValidationContext
 from imod.mf6.wel import GridAgnosticWell
 from imod.mf6.write_context import WriteContext
 from imod.schemata import SchemataDict, ValidationError
