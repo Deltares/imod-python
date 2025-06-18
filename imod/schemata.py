@@ -724,6 +724,7 @@ class AllInsideNoDataSchema(NoDataComparisonSchema):
 
     def validate(self, obj: GridDataArray, **kwargs) -> None:
         other_obj = kwargs[self.other]
+
         valid = self.is_notnull(obj)
         other_valid = self.is_other_notnull(other_obj)
 

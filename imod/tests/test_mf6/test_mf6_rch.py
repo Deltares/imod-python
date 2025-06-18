@@ -5,12 +5,14 @@ import textwrap
 from copy import deepcopy
 from datetime import datetime
 
+import dask
 import numpy as np
 import pytest
 import xarray as xr
 
 import imod
 from imod.mf6.dis import StructuredDiscretization
+from imod.mf6.validation_context import ValidationContext
 from imod.mf6.write_context import WriteContext
 from imod.schemata import ValidationError
 from imod.typing.grid import is_planar_grid, is_transient_data_grid, nan_like
@@ -278,6 +280,31 @@ def test_scalar():
 
 def test_validate_false():
     imod.mf6.Recharge(rate=0.001, validate=False)
+
+
+@pytest.mark.timeout(10, method="thread")
+def test_ignore_time_validation():
+    # Create a large recharge dataset with a time dimension. This is to test the
+    # performance of the validation when ignore_time_no_data is True.
+    rng = dask.array.random.default_rng()
+    layer = [1, 2, 3]
+    template = imod.util.empty_3d(1.0, 0.0, 1000.0, 1.0, 0.0, 1000.0, layer)
+    idomain = xr.ones_like(template, dtype=np.int32)
+    layer_bottom = xr.DataArray(
+        [0.0, -10.0, -20.0], coords={"layer": layer}, dims=["layer"]
+    )
+    bottom = layer_bottom * idomain
+    x = rng.random((10000, 3, 1000, 1000), chunks=(1, -1, -1, -1))
+    rate = xr.DataArray(x, coords=idomain.coords, dims=("time", "layer", "y", "x"))
+    rch = imod.mf6.Recharge(rate=rate, validate=False)
+    validation_context = ValidationContext(ignore_time=True)
+    # Act
+    rch._validate(
+        schemata=rch._write_schemata,
+        idomain=idomain,
+        bottom=bottom,
+        validation_context=validation_context,
+    )
 
 
 def test_write_concentration_period_data(rate_fc, concentration_fc):

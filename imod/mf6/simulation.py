@@ -1067,7 +1067,9 @@ class Modflow6Simulation(collections.UserDict, ISimulation):
 
     @standard_log_decorator()
     def split(
-        self, submodel_labels: GridDataArray, ignore_time_purge_empty: bool = False
+        self,
+        submodel_labels: GridDataArray,
+        ignore_time_purge_empty: Optional[bool] = None,
     ) -> Modflow6Simulation:
         """
         Split a simulation in different partitions using a submodel_labels
@@ -1081,11 +1083,11 @@ class Modflow6Simulation(collections.UserDict, ISimulation):
             similar shape as a layer in the domain. The values in the array
             indicate to which partition a cell belongs. The values should be
             zero or greater.
-        ignore_time_purge_empty: bool, default False
-            If True, the first timestep is selected to validate. This increases
+        ignore_time_purge_empty: bool, default None
+            If True, only the first timestep is validated. This increases
             performance for packages with a time dimensions over which changes
-            of cell activity are not expected. Default is False, which means the
-            time dimension is not dropped.
+            of cell activity are not expected. If None, the value of the
+            validation context is of the simulation is used.
 
         Returns
         -------
@@ -1100,6 +1102,9 @@ class Modflow6Simulation(collections.UserDict, ISimulation):
             raise ValueError(
                 "splitting of simulations with more (or less) than 1 flow model currently not supported."
             )
+        if ignore_time_purge_empty is None:
+            ignore_time_purge_empty = self._validation_context.ignore_time
+
         transport_models = self.get_models_of_type("gwt6")
         flow_models = self.get_models_of_type("gwf6")
         if not any(flow_models) and not any(transport_models):

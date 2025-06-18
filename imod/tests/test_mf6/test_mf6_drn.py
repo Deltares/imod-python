@@ -682,6 +682,8 @@ def test_from_imod5_and_cleanup__with_constant(
     )
 
     drn_2.cleanup(target_dis)
+    # Teardown
+    imod5_dataset["drn-2"] = original_drn_2
 
 
 def test_from_imod5__negative_layer(imod5_dataset_periods, tmp_path):
@@ -782,3 +784,8 @@ def test_from_imod5_and_cleanup__negative_layer(imod5_dataset_periods, tmp_path)
     )
 
     drn_negative_layer.cleanup(target_dis)
+
+    assert drn_negative_layer.dataset.identical(drn_reference.dataset)
+
+    # Teardown
+    imod5_dataset["drn-2"] = original_drn_2

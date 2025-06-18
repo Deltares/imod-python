@@ -233,7 +233,14 @@ class Modflow6Model(collections.UserDict, IModel, abc.ABC):
         return npf["k"]
 
     @standard_log_decorator()
-    def validate(self, model_name: str = "") -> StatusInfoBase:
+    def validate(
+        self,
+        model_name: str = "",
+        validation_context: Optional[ValidationContext] = None,
+    ) -> StatusInfoBase:
+        if validation_context is None:
+            validation_context = ValidationContext(validate=True)
+
         try:
             diskey = self._get_diskey()
         except Exception as e:
@@ -269,6 +276,7 @@ class Modflow6Model(collections.UserDict, IModel, abc.ABC):
                 schemata=schemata,
                 idomain=idomain,
                 bottom=bottom,
+                validation_context=validation_context,
             )
             if len(pkg_errors) > 0:
                 footer = SUGGESTION_TEXT if pkg_has_cleanup(pkg) else None
@@ -394,7 +402,7 @@ class Modflow6Model(collections.UserDict, IModel, abc.ABC):
         modeldirectory = workdir / modelname
         Path(modeldirectory).mkdir(exist_ok=True, parents=True)
         if validate_context.validate:
-            model_status_info = self.validate(modelname)
+            model_status_info = self.validate(modelname, validate_context)
             if model_status_info.has_errors():
                 return model_status_info
 
@@ -491,8 +499,9 @@ class Modflow6Model(collections.UserDict, IModel, abc.ABC):
         """
         modeldirectory = pathlib.Path(directory) / modelname
         modeldirectory.mkdir(exist_ok=True, parents=True)
-        if validate:
-            statusinfo = self.validate()
+        validation_context = ValidationContext(validate=validate)
+        if validation_context.validate:
+            statusinfo = self.validate(modelname, validation_context)
             if statusinfo.has_errors():
                 raise ValidationError(statusinfo.to_string())
 
