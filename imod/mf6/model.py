@@ -234,8 +234,13 @@ class Modflow6Model(collections.UserDict, IModel, abc.ABC):
 
     @standard_log_decorator()
     def validate(
-        self, validation_context: ValidationContext, model_name: str = ""
+        self,
+        model_name: str = "",
+        validation_context: Optional[ValidationContext] = None,
     ) -> StatusInfoBase:
+        if validation_context is None:
+            validation_context = ValidationContext(validate=True)
+
         try:
             diskey = self._get_diskey()
         except Exception as e:
@@ -494,8 +499,9 @@ class Modflow6Model(collections.UserDict, IModel, abc.ABC):
         """
         modeldirectory = pathlib.Path(directory) / modelname
         modeldirectory.mkdir(exist_ok=True, parents=True)
-        if validate:
-            statusinfo = self.validate()
+        validation_context = ValidationContext(validate=validate)
+        if validation_context.validate:
+            statusinfo = self.validate(modelname, validation_context)
             if statusinfo.has_errors():
                 raise ValidationError(statusinfo.to_string())
 

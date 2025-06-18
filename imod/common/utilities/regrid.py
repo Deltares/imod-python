@@ -317,9 +317,9 @@ def _regrid_like(
     output_domain = handle_extra_coords("dy", target_grid, output_domain)
     new_model.mask_all_packages(output_domain)
     if validate:
-        validation_context = ValidationContext()
+        validation_context = ValidationContext(validate=validate)
         status_info = NestedStatusInfo("Model validation status")
-        status_info.add(new_model.validate(validation_context, "Regridded model"))
+        status_info.add(new_model.validate("Regridded model", validation_context))
         if status_info.has_errors():
             raise ValidationError("\n" + status_info.to_string())
     return new_model

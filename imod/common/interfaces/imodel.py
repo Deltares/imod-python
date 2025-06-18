@@ -24,7 +24,9 @@ class IModel(IDict):
 
     @abstractmethod
     def validate(
-        self, validation_context: ValidationContext, model_name: str = ""
+        self,
+        model_name: str = "",
+        validation_context: Optional[ValidationContext] = None,
     ) -> StatusInfoBase:
         raise NotImplementedError
 
