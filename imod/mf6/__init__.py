@@ -57,3 +57,4 @@ from imod.mf6.timedis import TimeDiscretization
 from imod.mf6.uzf import UnsaturatedZoneFlow
 from imod.mf6.wel import LayeredWell, Well, WellDisStructured, WellDisVertices
 from imod.mf6.write_context import WriteContext
+from imod.mf6.validation_settings import ValidationSettings

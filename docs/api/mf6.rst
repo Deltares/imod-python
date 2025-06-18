@@ -68,6 +68,7 @@ Model settings
     SolutionPresetSimple
     SolutionPresetModerate
     SolutionPresetComplex
+    ValidationSettings
 
 Flow Packages
 -------------

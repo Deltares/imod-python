@@ -124,8 +124,8 @@ class Modflow6Simulation(collections.UserDict, ISimulation):
     >>> validation_settings = imod.mf6.ValidationSettings(ignore_time=True)
     >>> simulation = imod.mf6.Modflow6Simulation("example_simulation", validation_settings)
 
-    See :doc:`../api/generated/mf6/imod.mf6.ValidationSettings.rst` for
-    information on how to configure validation settings.
+    See :class:`imod.mf6.ValidationSettings` for information on how to configure
+    validation settings.
     """
 
     def _initialize_template(self):
