@@ -53,14 +53,14 @@ try:
 except ImportError:
     pass
 
-if GEOPANDAS_AVAILABLE:
+if TYPE_CHECKING or GEOPANDAS_AVAILABLE:
     GeoDataFrameType: TypeAlias = gpd.GeoDataFrame
     GeoSeriesType: TypeAlias = gpd.GeoSeries
 else:
     GeoDataFrameType = TypeVar("GeoDataFrameType")
     GeoSeriesType = TypeVar("GeoSeriesType")
 
-if SHAPELY_AVAILABLE:
+if TYPE_CHECKING or SHAPELY_AVAILABLE:
     PolygonType: TypeAlias = shapely.Polygon
     LineStringType: TypeAlias = shapely.LineString
 else:
