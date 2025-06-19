@@ -11,7 +11,7 @@ from imod.logging.loglevel import LogLevel
 
 
 def snippet_constant_kh(factor: float, addition: float, init: float):
-    return dedent(f"""\
+    return dedent(rf"""\
         0001,(KHV),1, Horizontal Permeability
         001,2
         1,1,1,{factor},{addition},{init}   >>> (KHV) Horizontal Permeability (IDF) <<<
@@ -48,7 +48,7 @@ def test_import_constants(tmp_path):
 
 
 def snippet_idf_import_kh(factor: float, addition: float):
-    return dedent(f"""\
+    return dedent(rf"""\
         0001,(KHV),1, Horizontal Permeability
         001,2
         1,1,1,{factor},{addition},-999.99, '.\Database\KHV\VERSION_1\IPEST_KHV_L1.IDF' >>> (KHV) Horizontal Permeability (IDF) <<<
@@ -87,7 +87,7 @@ def test_import_idf(tmp_path):
 def snippet_idf_import_transient(
     factor1: float, addition1: float, factor2: float, addition2: float
 ):
-    return dedent(f"""\
+    return dedent(rf"""\
         0002, (chd), 1, ConstantHead, ['head']
         2018-01-01 00:00:00                  
         001, 001
@@ -119,7 +119,7 @@ def test_import_idf_transient(tmp_path):
 
 
 def snippet_gen_import_hfb(factor: float, addition: float):
-    return dedent(f"""\
+    return dedent(rf"""\
         0001,(HFB),1, Horizontal Flow Barrier
         001,2
         1,2, 003,{factor},{addition},  -999.9900    ,'.\Database\HFB\VERSION_1\IBV2_HOOFDBREUKEN_BX.GEN' >>> (HFB) Horizontal Barrier Flow (GEN) <<<
@@ -144,7 +144,7 @@ def test_import_gen(tmp_path):
 def snippet_gen_import_ipf(
     factor1: float, addition1: float, factor2: float, addition2: float
 ):
-    return dedent(f"""\
+    return dedent(rf"""\
         0001,(WEL),1, Wells
         STEADY-STATE
         001,003
@@ -260,7 +260,7 @@ def test_import_ipf_unique_id_and_logging(tmp_path):
 
 
 def snippet_boundary_condition(factor: float, addition: float):
-    return dedent(f"""\
+    return dedent(rf"""\
         0001,(CHD),1, Constant Head
         STEADY-STATE
         001,2
@@ -295,7 +295,7 @@ def test_import_idf_boundary_condition(tmp_path):
 
 
 def snippet_idf_without_layer_dim(factor: float, addition: float):
-    return dedent(f"""\
+    return dedent(rf"""\
         0001,(RIV),1, Rivers
         STEADY-STATE
         004,001

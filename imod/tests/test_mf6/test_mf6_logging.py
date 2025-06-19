@@ -15,7 +15,7 @@ from imod.mf6.write_context import WriteContext
 
 out = StringIO()
 simple_real_number_regexp = (
-    "[0-9]*\.?[0-9]*"  # regexp for a real number without a sign and without exponents
+    r"[0-9]*\.?[0-9]*"  # regexp for a real number without a sign and without exponents
 )
 
 

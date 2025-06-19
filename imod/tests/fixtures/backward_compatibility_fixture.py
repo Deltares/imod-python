@@ -84,7 +84,7 @@ def imod5_dataset_transient(imod5_dataset):
     return grid_data, period_data
 
 
-period_prj = """\
+period_prj = r"""\
 0001,(BND),1, Boundary Condition
 001,37
 1,2,1,1.0,0.0,-999.99, '.\Database\BND\VERSION_1\IBOUND_L1.IDF' >>> (BND) Boundary Settings (IDF) <<<

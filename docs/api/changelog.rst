@@ -77,6 +77,7 @@ Fixed
   to be filtered and its ``id`` didn't match the index.
 - Improved performance of :class:`imod.mf6.Modflow6Simulation.split` for
   structured models, as unnecessary masking is avoided.
+- Fixed warning thrown by type dispatcher about ``~GeoDataFrameType``
 
 
 Changed

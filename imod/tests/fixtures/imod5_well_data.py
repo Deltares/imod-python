@@ -55,8 +55,8 @@ def projectfile_string(tmp_path, time_header="2000-01-01 00:00:00"):
     0001,(WEL),1, Wells,[WRA]
     {time_header}
     001,002
-    1,2, 000,   1.000000    ,   0.000000    ,  -999.9900    ,'{tmp_path}\ipf1.ipf'
-    1,2, 000,   1.000000    ,   0.000000    ,  -999.9900    ,'{tmp_path}\ipf2.ipf'
+    1,2, 000,   1.000000    ,   0.000000    ,  -999.9900    ,'{tmp_path}\\ipf1.ipf'
+    1,2, 000,   1.000000    ,   0.000000    ,  -999.9900    ,'{tmp_path}\\ipf2.ipf'
     """
     )
 
