@@ -9,7 +9,7 @@ import xarray as xr
 
 import imod
 from imod.common.utilities.version import get_version
-from imod.mf6.validation_context import ValidationContext
+from imod.mf6.validation_settings import ValidationSettings
 from imod.mf6.write_context import WriteContext
 from imod.schemata import ValidationError
 from imod.typing.grid import ones_like
@@ -347,7 +347,7 @@ def test_gwfmodel_render(twri_model, tmp_path):
     globaltimes = simulation["time_discretization"]["time"].values
     gwfmodel = simulation["GWF_1"]
     path = Path(tmp_path.stem).as_posix()
-    validation_context = ValidationContext(tmp_path)
+    validation_context = ValidationSettings(tmp_path)
     write_context = WriteContext(tmp_path)
     actual = gwfmodel.render(path, write_context)
     expected = textwrap.dedent(

@@ -36,7 +36,7 @@ from imod.mf6.mf6_wel_adapter import Mf6Wel
 from imod.mf6.package import Package
 from imod.mf6.riv import River
 from imod.mf6.utilities.mf6hfb import merge_hfb_packages
-from imod.mf6.validation_context import ValidationContext
+from imod.mf6.validation_settings import ValidationSettings
 from imod.mf6.wel import GridAgnosticWell
 from imod.mf6.write_context import WriteContext
 from imod.schemata import SchemataDict, ValidationError
@@ -236,10 +236,10 @@ class Modflow6Model(collections.UserDict, IModel, abc.ABC):
     def validate(
         self,
         model_name: str = "",
-        validation_context: Optional[ValidationContext] = None,
+        validation_context: Optional[ValidationSettings] = None,
     ) -> StatusInfoBase:
         if validation_context is None:
-            validation_context = ValidationContext(validate=True)
+            validation_context = ValidationSettings(validate=True)
 
         try:
             diskey = self._get_diskey()
@@ -315,14 +315,14 @@ class Modflow6Model(collections.UserDict, IModel, abc.ABC):
             Direct representation of MODFLOW6 WEL package, with 'cellid'
             indicating layer, row columns.
         """
-        validate_context = ValidationContext(
+        validate_context = ValidationSettings(
             validate=validate, strict_well_validation=strict_well_validation
         )
         return self._prepare_wel_for_mf6(pkgname, validate_context)
 
     @standard_log_decorator()
     def _prepare_wel_for_mf6(
-        self, pkgname: str, validate_context: ValidationContext
+        self, pkgname: str, validate_context: ValidationSettings
     ) -> Mf6Wel:
         pkg = self[pkgname]
         if not isinstance(pkg, GridAgnosticWell):
@@ -376,7 +376,7 @@ class Modflow6Model(collections.UserDict, IModel, abc.ABC):
             ``ValidationError``.
         """
         write_context = WriteContext(Path(directory), use_binary, use_absolute_paths)
-        validate_context = ValidationContext(validate, validate, validate)
+        validate_context = ValidationSettings(validate, validate, validate)
 
         status_info = self._write(
             modelname, globaltimes, write_context, validate_context
@@ -391,7 +391,7 @@ class Modflow6Model(collections.UserDict, IModel, abc.ABC):
         modelname: str,
         globaltimes: Union[list[np.datetime64], np.ndarray],
         write_context: WriteContext,
-        validate_context: ValidationContext,
+        validate_context: ValidationSettings,
     ) -> StatusInfoBase:
         """
         Write model namefile
@@ -499,7 +499,7 @@ class Modflow6Model(collections.UserDict, IModel, abc.ABC):
         """
         modeldirectory = pathlib.Path(directory) / modelname
         modeldirectory.mkdir(exist_ok=True, parents=True)
-        validation_context = ValidationContext(validate=validate)
+        validation_context = ValidationSettings(validate=validate)
         if validation_context.validate:
             statusinfo = self.validate(modelname, validation_context)
             if statusinfo.has_errors():

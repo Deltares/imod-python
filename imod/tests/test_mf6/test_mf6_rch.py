@@ -12,7 +12,7 @@ import xarray as xr
 
 import imod
 from imod.mf6.dis import StructuredDiscretization
-from imod.mf6.validation_context import ValidationContext
+from imod.mf6.validation_settings import ValidationSettings
 from imod.mf6.write_context import WriteContext
 from imod.schemata import ValidationError
 from imod.typing.grid import is_planar_grid, is_transient_data_grid, nan_like
@@ -297,7 +297,7 @@ def test_ignore_time_validation():
     x = rng.random((10000, 3, 1000, 1000), chunks=(1, -1, -1, -1))
     rate = xr.DataArray(x, coords=idomain.coords, dims=("time", "layer", "y", "x"))
     rch = imod.mf6.Recharge(rate=rate, validate=False)
-    validation_context = ValidationContext(ignore_time=True)
+    validation_context = ValidationSettings(ignore_time=True)
     # Act
     rch._validate(
         schemata=rch._write_schemata,

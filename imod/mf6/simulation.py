@@ -48,7 +48,7 @@ from imod.mf6.multimodel.modelsplitter import create_partition_info, slice_model
 from imod.mf6.out import open_cbc, open_conc, open_hds
 from imod.mf6.package import Package
 from imod.mf6.ssm import SourceSinkMixing
-from imod.mf6.validation_context import ValidationContext
+from imod.mf6.validation_settings import ValidationSettings
 from imod.mf6.write_context import WriteContext
 from imod.prepare.topsystem.default_allocation_methods import (
     SimulationAllocationOptions,
@@ -93,17 +93,59 @@ def get_packages(simulation: Modflow6Simulation) -> dict[str, Package]:
 
 
 class Modflow6Simulation(collections.UserDict, ISimulation):
+    """
+    Modflow6Simulation is a class that represents a Modflow 6 simulation. It
+    contains data on simulation timing, models that are present in the
+    simulation, how models exchange information, and how models are solved.
+    More information can be found here:
+    https://water.usgs.gov/water-resources/software/MODFLOW-6/mf6io_6.4.2.pdf#page=20
+
+    Parameters
+    ----------
+    name: str
+        Name of the simulation. This is used to create the simulation name file
+        and the directory in which the simulation is written.
+    validation_settings: ValidationSettings, optional
+        Settings for validation of the simulation. If not provided, default
+        settings are used. These settings can be used to control whether the
+        simulation is validated at write time, and whether strict validation
+        rules are applied.
+
+    Examples
+    --------
+    Create a Modflow 6 simulation and add a groundwater flow model to it:
+
+    >>> import imod
+    >>> simulation = imod.mf6.Modflow6Simulation("example_simulation")
+    >>> simulation["GWF"] = imod.mf6.GroundwaterFlowModel()
+
+    You can configure the validation settings for the simulation as follows:
+
+    >>> validation_settings = imod.mf6.ValidationSettings(ignore_time=True)
+    >>> simulation = imod.mf6.Modflow6Simulation("example_simulation", validation_settings)
+
+    See :class:`imod.mf6.ValidationSettings` for information on how to configure
+    validation settings. Configuring :class:`imod.mf6.ValidationSettings` can
+    help performance or reduce the strictness of validation for some packages,
+    namely the Well and HFB packages.
+    """
+
     def _initialize_template(self):
         loader = jinja2.PackageLoader("imod", "templates/mf6")
         env = jinja2.Environment(loader=loader, keep_trailing_newline=True)
         self._template = env.get_template("sim-nam.j2")
 
-    def __init__(self, name):
+    def __init__(
+        self, name: str, validation_settings: Optional[ValidationSettings] = None
+    ):
         super().__init__()
         self.name = name
         self.directory = None
         self._initialize_template()
-        self._validation_context = ValidationContext()
+        if validation_settings is None:
+            self._validation_context = ValidationSettings()
+        else:
+            self._validation_context = validation_settings
 
     def __setitem__(self, key, value):
         super().__setitem__(key, value)

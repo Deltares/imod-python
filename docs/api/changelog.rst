@@ -21,6 +21,9 @@ Added
   :class:`imod.mf6.Modflow6Simulation.split` to consider a package empty if its
   first times step is all nodata. This can save a lot of time splitting
   transient models.
+- Add :class:`imod.mf6.ValidationSettings` to specify validation settings for
+  MODFLOW 6 simulations. You can provide it to the
+  :class:`imod.mf6.Modflow6Simulation` constructor.
 
 Fixed
 ~~~~~

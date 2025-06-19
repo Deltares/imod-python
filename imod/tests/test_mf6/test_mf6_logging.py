@@ -10,7 +10,7 @@ import xarray as xr
 
 import imod
 from imod.logging import LoggerType, LogLevel, standard_log_decorator
-from imod.mf6.validation_context import ValidationContext
+from imod.mf6.validation_settings import ValidationSettings
 from imod.mf6.write_context import WriteContext
 
 out = StringIO()
@@ -81,7 +81,7 @@ def test_write_model_is_logged(
     # arrange
     logfile_path = tmp_path / "logfile.txt"
     transport_model = flow_transport_simulation["tpt_c"]
-    validation_context = ValidationContext()
+    validation_context = ValidationSettings()
     write_context = WriteContext(simulation_directory=tmp_path, use_binary=True)
     globaltimes = np.array(
         [

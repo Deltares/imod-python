@@ -101,10 +101,10 @@ at the water table, where air is replaced by water.
     parameter (and will only be used if there are convertible layers).
     
 MODFLOW 6
---------
+---------
 
 Use a river infiltration factor in MODFLOW 6
-*******************************************
+********************************************
     
 .. |m-1| replace:: m\ :sup:`-1`\
 .. |m2| replace:: m\ :sup:`2`\

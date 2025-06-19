@@ -3,7 +3,7 @@ from typing import Optional, Tuple
 
 from imod.common.interfaces.idict import IDict
 from imod.common.statusinfo import StatusInfoBase
-from imod.mf6.validation_context import ValidationContext
+from imod.mf6.validation_settings import ValidationSettings
 from imod.typing import GridDataArray
 
 
@@ -26,7 +26,7 @@ class IModel(IDict):
     def validate(
         self,
         model_name: str = "",
-        validation_context: Optional[ValidationContext] = None,
+        validation_context: Optional[ValidationSettings] = None,
     ) -> StatusInfoBase:
         raise NotImplementedError
 

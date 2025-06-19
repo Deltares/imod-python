@@ -18,7 +18,7 @@ from imod.common.statusinfo import NestedStatusInfo
 from imod.common.utilities.clip import clip_by_grid
 from imod.common.utilities.regrid_method_type import EmptyRegridMethod, RegridMethodType
 from imod.common.utilities.value_filters import is_valid
-from imod.mf6.validation_context import ValidationContext
+from imod.mf6.validation_settings import ValidationSettings
 from imod.schemata import ValidationError
 from imod.typing.grid import (
     GridDataArray,
@@ -317,7 +317,7 @@ def _regrid_like(
     output_domain = handle_extra_coords("dy", target_grid, output_domain)
     new_model.mask_all_packages(output_domain)
     if validate:
-        validation_context = ValidationContext(validate=validate)
+        validation_context = ValidationSettings(validate=validate)
         status_info = NestedStatusInfo("Model validation status")
         status_info.add(new_model.validate("Regridded model", validation_context))
         if status_info.has_errors():

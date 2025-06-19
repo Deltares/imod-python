@@ -1,3 +1,13 @@
+"""
+Quick start
+===========
+
+These are the examples in the index page of the iMOD Python user guide. The
+examples are used to demonstrate the features of iMOD Python and how to use
+them. This file is meant to test if the index page is working correctly and to
+provide a quick overview of the examples available in the user guide.
+"""
+
 # %%
 # Let's first create some raster data to work with.
 import xarray as xr
@@ -156,5 +166,9 @@ sim_clipped = simulation.clip_box(
 # Notice that a Constant Head (CHD) package has been created for the clipped
 # model.
 print(sim_clipped["gwf"])
+
+# %%
+# .. _xarray: http://xarray.pydata.org/
+# .. _xugrid: https://deltares.github.io/xugrid/
 
 # %%
