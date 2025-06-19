@@ -7,17 +7,21 @@ from imod.typing import GridDataset
 @dataclass
 class ValidationSettings:
     """
-    Validation settings for MF6 model validation.
+    Validation settings for MF6 model validation. Configuring
+    :class:`imod.mf6.ValidationSettings` can help performance or reduce the
+    strictness of validation for some packages, namely the Well and HFB package.
 
     Parameters
     ----------
-    validate: bool
+    validate: bool, default=True
         Whether to perform validation.
-    strict_well_validation: bool
-        Whether to enforce strict validation for wells.
-    strict_hfb_validation: bool
-        Whether to enforce strict validation for HFBs.
-    ignore_time: bool
+    strict_well_validation: bool, default=True
+        Whether to enforce strict validation for wells. If set to False, faulty
+        wells are automatically removed during the writing process.
+    strict_hfb_validation: bool, default=True
+        Whether to enforce strict validation for HFBs. If set to False, faulty
+        HFBs are automatically removed during the writing process.
+    ignore_time: bool, default=False
         If True, ignore time dimension in validation. Instead, select first
         timestep of dataset. This can save a lot of time during writing when the
         time dimension is not relevant for the validation process. Especially

@@ -125,7 +125,9 @@ class Modflow6Simulation(collections.UserDict, ISimulation):
     >>> simulation = imod.mf6.Modflow6Simulation("example_simulation", validation_settings)
 
     See :class:`imod.mf6.ValidationSettings` for information on how to configure
-    validation settings.
+    validation settings. Configuring :class:`imod.mf6.ValidationSettings` can
+    help performance or reduce the strictness of validation for some packages,
+    namely the Well and HFB packages.
     """
 
     def _initialize_template(self):
