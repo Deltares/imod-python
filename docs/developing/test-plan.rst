@@ -138,7 +138,7 @@ QGIS export
    terminal in the text box. ``{path_printed_in_terminal}/hondsrug_MDAL/riv.nc``
    This will import the mesh. 
 6. Verify if the mesh is rendered in two dimensions, and not as a single
-   line of cells. If not, open an issue on `GitHub
+   line of cells. If not, `open an issue on GitHub
    <https://github.com/Deltares/imod-python/issues>`_ . 
 
 Tutorial
@@ -161,7 +161,7 @@ the repository:
   pixi run docs
 
 Check if the documentation builds without errors and warnings. If there are
-errors or warnings, fix them before releasing in a pull request on `Github
+errors or warnings, fix them before releasing in `a pull request on Github
 <https://github.com/Deltares/imod-python/pulls>`_ . Next, check if the
 documentation pages are rendered correctly and if the information on them is not
 outdated. You can do this by opening the HTML files in the ``docs/_build/html``.
