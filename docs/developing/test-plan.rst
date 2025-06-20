@@ -26,18 +26,44 @@ These tests are run automatically on every push to the repository, and on every
 pull request. They will therefore presumably work as they are run regularly, but
 a final check can't harm anyway.
 
-Some extra edge cases are not covered by the functional tests, and these should be
+Some extra edge cases are not covered by the CI, and these should be
 checked manually before a release. These are:
 
 - Installing iMOD Python and running tests in a folder with curly braces ``{}``
   in the name, like is unavoidable on the Windows Computational Facilities
   (WCF). 
+
+  .. code-block:: console
+  
+    mkdir "{WCF}"
+    cd "{WCF}"
+    git clone https://github.com/Deltares/imod-python.git
+    cd imod-python
+    pixi run tests
+
 - Installing iMOD Python with the iMODforge distribution on a machine
   disconnected from the internet, like Deltares' LHM server. Examples that use
   the ``imod.data`` module here will not work, as these require an internet
-  connection to download the data.
+  connection to download the data. Therefore we'll run test an example that
+  doesn't require internet connection. Install the `iMODforge distribution
+  <https://deltares.github.io/iMOD-Documentation/deltaforge_install.html>`_
+  Mext, open the ``iMODforge prompt``. Copy `the TWRI example
+  <https://github.com/Deltares/imod-python/blob/master/examples/mf6/ex01_twri.py>`_
+  and run the following command to test if the example works:
+
+  .. code-block:: console
+
+    python ``ex01_twri.py``
+
 - Installing iMOD Python on a machine that runs on a different operating system
-  than Windows, than which is what iMOD Python is mostly developend and used on.
+  than Windows, which is the OS iMOD Python is developed and mostly used on.
+  Call the following and see if the tests run without errors:
+
+  .. code-block:: console
+
+    git clone https://github.com/Deltares/imod-python.git
+    cd imod-python
+    pixi run tests
 
 If these edge cases fail, they should be documented in the
 :doc:`../faq/known-issues` page with a workaround (if possible), and an issue
@@ -92,21 +118,37 @@ Criteria for user acceptance tests of the 1.0 release are:
 Manual checks
 *************
 
-- Run the pixi task written below. This will export data to a UGRID NetCDF and
-  save it under the name <......>. Open QGIS. Click "Layers" > "Add Layer" >
-  "Add mesh". Insert the path <......> in the text box. This will import the
-  mesh. Verify if the mesh is rendered in two dimensions, and not as a single
-  line of cells. If not open an issue on `GitHub
+QGIS export
+^^^^^^^^^^^
+
+- Run the pixi task written: 
+
+  .. code-block:: console
+
+    pixi run export_qgis
+
+  This will export a simulation to a TOML file and a set of UGRID netCDFs twice,
+  once for a model with a structured grid, once for a model with an unstructured
+  grid. The location of the exported files will be printed in the terminal.
+- `Download the latest version of QGIS <https://qgis.org/download/>`_.
+- Open QGIS.
+- Set the coordinate reference system (CRS) of the project to EPSG:28992, the
+  same CRS as the exported files.
+- Click ``"Layers" > "Add Layer" > "Add mesh"``. Insert the path printed in the
+  terminal in the text box. ``{path_printed_in_terminal}/hondsrug_MDAL/riv.nc``
+  This will import the mesh. 
+- Verify if the mesh is rendered in two dimensions, and not as a single
+  line of cells. If not, open an issue on `GitHub
   <https://github.com/Deltares/imod-python/issues>`_ . 
-  
-.. code-block:: console
 
-  pixi run export-qgis
+Tutorial
+^^^^^^^^
 
-- Work through the tutorial material here and verify it is up to date:
-  https://deltares.github.io/iMOD-Documentation/ . If it is not, open an issue
-  on `iMOD Documentation repository Github
-  <https://github.com/Deltares/iMOD-Documentation/issues>`_ .
+- `Work through the tutorial material here
+  <https://deltares.github.io/iMOD-Documentation/>`_ .
+- Run each jupyter notebook and assure it runs without errors.
+- If there are any errors, open an issue on `iMOD Documentation repository
+  Github <https://github.com/Deltares/iMOD-Documentation/issues>`_ .
 
 Documentation
 *************
