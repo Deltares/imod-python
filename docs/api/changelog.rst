@@ -78,7 +78,8 @@ Fixed
 - Improved performance of :class:`imod.mf6.Modflow6Simulation.split` for
   structured models, as unnecessary masking is avoided.
 - Fixed warning thrown by type dispatcher about ``~GeoDataFrameType``
-
+- Fixed bug where variables in a package with only a ``"layer"`` coordinate
+  could not be regridded or masked.
 
 Changed
 ~~~~~~~

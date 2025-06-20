@@ -84,7 +84,7 @@ def mask_package(package: IPackage, mask: GridDataArray) -> IPackage:
 
 
 def _skip_dataarray(da: GridDataArray) -> bool:
-    if len(da.dims) == 0 or set(da.coords).issubset(["layer"]):
+    if len(da.dims) == 0 or set(da.dims).issubset(["layer", "time"]):
         return True
 
     if is_scalar(da):
