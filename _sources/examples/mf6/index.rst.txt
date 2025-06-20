@@ -2,16 +2,16 @@
 
 .. _mf6-introduction:
 
-MODFLOW6
-========
+MODFLOW 6
+=========
 
-These examples demonstrate how to use imod to build MODFLOW6 models.
+These examples demonstrate how to use imod to build MODFLOW 6 models.
 
 .. attention:: 
 
-    The examples expect you to have added the Modflow 6 executable to your PATH.
+    The examples expect you to have added the MODFLOW 6 executable to your PATH.
     If you have not done this yet:
-    First, `download the latest Modflow 6 executables here. <https://water.usgs.gov/water-resources/software/MODFLOW-6/>`_
+    First, `download the latest MODFLOW 6 executables here. <https://water.usgs.gov/water-resources/software/MODFLOW-6/>`_
     Next, follow the following instructions to add the executable to your PATH on Windows 10:
 
     1. Press the Start key on your keyboard.
@@ -124,7 +124,7 @@ These examples demonstrate how to use imod to build MODFLOW6 models.
 
 .. raw:: html
 
-    <div class="sphx-glr-thumbcontainer" tooltip="This example has been converted from the `MODFLOW6 Example problems`_.  See the `description`_ and the `notebook`_ which uses `FloPy`_ to setup the model.">
+    <div class="sphx-glr-thumbcontainer" tooltip="This example has been converted from the `MODFLOW 6 Example problems`_.  See the `description`_ and the `notebook`_ which uses `FloPy`_ to setup the model.">
 
 .. only:: html
 
@@ -141,7 +141,7 @@ These examples demonstrate how to use imod to build MODFLOW6 models.
 
 .. raw:: html
 
-    <div class="sphx-glr-thumbcontainer" tooltip="This example is taken from the MODFLOW6 Examples, number 35.">
+    <div class="sphx-glr-thumbcontainer" tooltip="This example is taken from the MODFLOW 6 Examples, number 35.">
 
 .. only:: html
 
@@ -175,7 +175,7 @@ These examples demonstrate how to use imod to build MODFLOW6 models.
 
 .. raw:: html
 
-    <div class="sphx-glr-thumbcontainer" tooltip="This example shows a simplified script for building a groundwater model in the northeast of the Netherlands. A primary feature of this area is an ice-pushed ridge called the Hondsrug. This examples demonstrates modifying external data for use in a MODFLOW6 model.">
+    <div class="sphx-glr-thumbcontainer" tooltip="This example shows a simplified script for building a groundwater model in the northeast of the Netherlands. A primary feature of this area is an ice-pushed ridge called the Hondsrug. This examples demonstrates modifying external data for use in a MODFLOW 6 model.">
 
 .. only:: html
 

@@ -7,7 +7,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>imod.mf6.riv &#8212; iMOD Python 1.0.0rc3 documentation</title>
+    <title>imod.mf6.riv &#8212; iMOD Python 1.0.0rc4 documentation</title>
   
   
   
@@ -41,7 +41,7 @@
   <link rel="preload" as="script" href="../../../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
 <link rel="preload" as="script" href="../../../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
 
-    <script src="../../../_static/documentation_options.js?v=e441cb1f"></script>
+    <script src="../../../_static/documentation_options.js?v=2fc85bd2"></script>
     <script src="../../../_static/doctools.js?v=9bcbadda"></script>
     <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script>DOCUMENTATION_OPTIONS.pagename = '_modules/imod/mf6/riv';</script>
@@ -50,7 +50,7 @@
     <link rel="search" title="Search" href="../../../search.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
-  <meta name="docsearch:version" content="1.0.0rc3.dev" />
+  <meta name="docsearch:version" content="1.0.0rc4.dev" />
   </head>
   
   
@@ -114,8 +114,8 @@
     
     
     
-    <img src="../../../_static/imod-python-logo-light.svg" class="logo__image only-light" alt="iMOD Python 1.0.0rc3 documentation - Home"/>
-    <img src="../../../_static/imod-python-logo-dark.svg" class="logo__image only-dark pst-js-only" alt="iMOD Python 1.0.0rc3 documentation - Home"/>
+    <img src="../../../_static/imod-python-logo-light.svg" class="logo__image only-light" alt="iMOD Python 1.0.0rc4 documentation - Home"/>
+    <img src="../../../_static/imod-python-logo-dark.svg" class="logo__image only-dark pst-js-only" alt="iMOD Python 1.0.0rc4 documentation - Home"/>
   
   
 </a></div>
@@ -435,6 +435,7 @@
 
 <span class="kn">from</span><span class="w"> </span><span class="nn">imod</span><span class="w"> </span><span class="kn">import</span> <span class="n">logging</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">imod.common.interfaces.iregridpackage</span><span class="w"> </span><span class="kn">import</span> <span class="n">IRegridPackage</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">imod.common.utilities.mask</span><span class="w"> </span><span class="kn">import</span> <span class="n">broadcast_and_mask_arrays</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">imod.logging</span><span class="w"> </span><span class="kn">import</span> <span class="n">init_log_decorator</span><span class="p">,</span> <span class="n">standard_log_decorator</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">imod.mf6.boundary_condition</span><span class="w"> </span><span class="kn">import</span> <span class="n">BoundaryCondition</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">imod.mf6.dis</span><span class="w"> </span><span class="kn">import</span> <span class="n">StructuredDiscretization</span>
@@ -443,7 +444,7 @@
 <span class="kn">from</span><span class="w"> </span><span class="nn">imod.mf6.npf</span><span class="w"> </span><span class="kn">import</span> <span class="n">NodePropertyFlow</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">imod.mf6.regrid.regrid_schemes</span><span class="w"> </span><span class="kn">import</span> <span class="n">RiverRegridMethod</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">imod.mf6.utilities.imod5_converter</span><span class="w"> </span><span class="kn">import</span> <span class="n">regrid_imod5_pkg_data</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">imod.mf6.utilities.package</span><span class="w"> </span><span class="kn">import</span> <span class="n">get_repeat_stress</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">imod.mf6.utilities.package</span><span class="w"> </span><span class="kn">import</span> <span class="n">set_repeat_stress_if_available</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">imod.mf6.validation</span><span class="w"> </span><span class="kn">import</span> <span class="n">BOUNDARY_DIMS_SCHEMA</span><span class="p">,</span> <span class="n">CONC_DIMS_SCHEMA</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">imod.prepare.cleanup</span><span class="w"> </span><span class="kn">import</span> <span class="n">AlignLevelsMode</span><span class="p">,</span> <span class="n">align_interface_levels</span><span class="p">,</span> <span class="n">cleanup_riv</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">imod.prepare.topsystem.allocation</span><span class="w"> </span><span class="kn">import</span> <span class="n">ALLOCATION_OPTION</span><span class="p">,</span> <span class="n">allocate_riv_cells</span>
@@ -472,23 +473,9 @@
     <span class="n">has_negative_layer</span><span class="p">,</span>
     <span class="n">is_planar_grid</span><span class="p">,</span>
 <span class="p">)</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">imod.util.expand_repetitions</span><span class="w"> </span><span class="kn">import</span> <span class="n">expand_repetitions</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">imod.util.regrid</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
     <span class="n">RegridderWeightsCache</span><span class="p">,</span>
 <span class="p">)</span>
-
-
-<span class="k">def</span><span class="w"> </span><span class="nf">set_repeat_stress_if_available</span><span class="p">(</span>
-    <span class="n">repeat</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">list</span><span class="p">[</span><span class="n">datetime</span><span class="p">]],</span>
-    <span class="n">time_min</span><span class="p">:</span> <span class="n">datetime</span><span class="p">,</span>
-    <span class="n">time_max</span><span class="p">:</span> <span class="n">datetime</span><span class="p">,</span>
-    <span class="n">optional_package</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">BoundaryCondition</span><span class="p">],</span>
-<span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Set repeat stress for optional package if repeat is not None.&quot;&quot;&quot;</span>
-    <span class="k">if</span> <span class="n">repeat</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-        <span class="k">if</span> <span class="n">optional_package</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="n">times</span> <span class="o">=</span> <span class="n">expand_repetitions</span><span class="p">(</span><span class="n">repeat</span><span class="p">,</span> <span class="n">time_min</span><span class="p">,</span> <span class="n">time_max</span><span class="p">)</span>
-            <span class="n">optional_package</span><span class="o">.</span><span class="n">dataset</span><span class="p">[</span><span class="s2">&quot;repeat_stress&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">get_repeat_stress</span><span class="p">(</span><span class="n">times</span><span class="p">)</span>
 
 
 <span class="k">def</span><span class="w"> </span><span class="nf">mask_package__drop_if_empty</span><span class="p">(</span>
@@ -501,6 +488,16 @@
     <span class="c1"># remove River package if its mask is False everywhere</span>
     <span class="n">mask</span> <span class="o">=</span> <span class="o">~</span><span class="n">np</span><span class="o">.</span><span class="n">isnan</span><span class="p">(</span><span class="n">package</span><span class="p">[</span><span class="s2">&quot;conductance&quot;</span><span class="p">])</span>
     <span class="k">return</span> <span class="n">package</span><span class="o">.</span><span class="n">mask</span><span class="p">(</span><span class="n">mask</span><span class="p">)</span> <span class="k">if</span> <span class="n">np</span><span class="o">.</span><span class="n">any</span><span class="p">(</span><span class="n">mask</span><span class="p">)</span> <span class="k">else</span> <span class="kc">None</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">clip_time_if_package</span><span class="p">(</span>
+    <span class="n">package</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">BoundaryCondition</span><span class="p">],</span>
+    <span class="n">time_min</span><span class="p">:</span> <span class="n">datetime</span><span class="p">,</span>
+    <span class="n">time_max</span><span class="p">:</span> <span class="n">datetime</span><span class="p">,</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Optional</span><span class="p">[</span><span class="n">BoundaryCondition</span><span class="p">]:</span>
+    <span class="k">if</span> <span class="n">package</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">package</span> <span class="o">=</span> <span class="n">package</span><span class="o">.</span><span class="n">clip_box</span><span class="p">(</span><span class="n">time_min</span><span class="o">=</span><span class="n">time_min</span><span class="p">,</span> <span class="n">time_max</span><span class="o">=</span><span class="n">time_max</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">package</span>
 
 
 <span class="k">def</span><span class="w"> </span><span class="nf">rise_bottom_elevation_if_needed</span><span class="p">(</span>
@@ -616,14 +613,15 @@
 <span class="sd">        Flag to indicate whether the package should be validated upon</span>
 <span class="sd">        initialization. This raises a ValidationError if package input is</span>
 <span class="sd">        provided in the wrong manner. Defaults to True.</span>
-<span class="sd">    repeat_stress: Optional[xr.DataArray] of datetimes</span>
+<span class="sd">    repeat_stress: dict or xr.DataArray of datetimes, optional</span>
 <span class="sd">        Used to repeat data for e.g. repeating stress periods such as</span>
-<span class="sd">        seasonality without duplicating the values. The DataArray should have</span>
-<span class="sd">        dimensions ``(&quot;repeat&quot;, &quot;repeat_items&quot;)``. The ``repeat_items``</span>
-<span class="sd">        dimension should have size 2: the first value is the &quot;key&quot;, the second</span>
-<span class="sd">        value is the &quot;value&quot;. For the &quot;key&quot; datetime, the data of the &quot;value&quot;</span>
-<span class="sd">        datetime will be used. Can also be set with a dictionary using the</span>
-<span class="sd">        ``set_repeat_stress`` method.</span>
+<span class="sd">        seasonality without duplicating the values. If provided as dict, it</span>
+<span class="sd">        should map new dates to old dates present in the dataset.</span>
+<span class="sd">        ``{&quot;2001-04-01&quot;: &quot;2000-04-01&quot;, &quot;2001-10-01&quot;: &quot;2000-10-01&quot;}`` if provided</span>
+<span class="sd">        as DataArray, it should have dimensions ``(&quot;repeat&quot;, &quot;repeat_items&quot;)``.</span>
+<span class="sd">        The ``repeat_items`` dimension should have size 2: the first value is</span>
+<span class="sd">        the &quot;key&quot;, the second value is the &quot;value&quot;. For the &quot;key&quot; datetime, the</span>
+<span class="sd">        data of the &quot;value&quot; datetime will be used.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="n">_pkg_id</span> <span class="o">=</span> <span class="s2">&quot;riv&quot;</span>
@@ -920,11 +918,12 @@
         <span class="n">regridded_riv_pkg_data</span> <span class="o">=</span> <span class="n">regrid_imod5_pkg_data</span><span class="p">(</span>
             <span class="n">River</span><span class="p">,</span> <span class="n">data</span><span class="p">,</span> <span class="n">target_dis</span><span class="p">,</span> <span class="n">regridder_types</span><span class="p">,</span> <span class="n">regrid_cache</span>
         <span class="p">)</span>
+        <span class="n">regridded_riv_pkg_data</span> <span class="o">=</span> <span class="n">broadcast_and_mask_arrays</span><span class="p">(</span><span class="n">regridded_riv_pkg_data</span><span class="p">)</span>
         <span class="c1"># Pop infiltration_factor to avoid unnecessarily allocating and</span>
         <span class="c1"># distributing it.</span>
         <span class="n">infiltration_factor</span> <span class="o">=</span> <span class="n">regridded_riv_pkg_data</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s2">&quot;infiltration_factor&quot;</span><span class="p">)</span>
         <span class="c1"># Allocate and distribute planar data if the grid is planar</span>
-        <span class="n">is_planar_xy</span> <span class="o">=</span> <span class="n">is_planar_grid</span><span class="p">(</span><span class="n">data</span><span class="p">[</span><span class="s2">&quot;conductance&quot;</span><span class="p">])</span>
+        <span class="n">is_planar_xy</span> <span class="o">=</span> <span class="n">is_planar_grid</span><span class="p">(</span><span class="n">regridded_riv_pkg_data</span><span class="p">[</span><span class="s2">&quot;conductance&quot;</span><span class="p">])</span>
         <span class="n">allocation_drn_data</span><span class="p">:</span> <span class="n">GridDataDict</span> <span class="o">=</span> <span class="p">{}</span>
         <span class="k">if</span> <span class="n">is_planar_xy</span><span class="p">:</span>
             <span class="c1"># allocate and distribute planar data</span>
@@ -948,27 +947,29 @@
         <span class="n">regridded_riv_pkg_data</span><span class="p">,</span> <span class="n">infiltration_drn_data</span> <span class="o">=</span> <span class="n">_separate_infiltration_data</span><span class="p">(</span>
             <span class="n">regridded_riv_pkg_data</span><span class="p">,</span> <span class="n">infiltration_factor</span>
         <span class="p">)</span>
-        <span class="n">river_package</span> <span class="o">=</span> <span class="n">River</span><span class="p">(</span><span class="o">**</span><span class="n">regridded_riv_pkg_data</span><span class="p">,</span> <span class="n">validate</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-        <span class="n">drainage_package</span> <span class="o">=</span> <span class="n">_create_drain_from_leftover_riv_imod5_data</span><span class="p">(</span>
+        <span class="n">riv_pkg</span> <span class="o">=</span> <span class="n">River</span><span class="p">(</span><span class="o">**</span><span class="n">regridded_riv_pkg_data</span><span class="p">,</span> <span class="n">validate</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+        <span class="n">drn_pkg</span> <span class="o">=</span> <span class="n">_create_drain_from_leftover_riv_imod5_data</span><span class="p">(</span>
             <span class="n">allocation_drn_data</span><span class="p">,</span>
             <span class="n">infiltration_drn_data</span><span class="p">,</span>
         <span class="p">)</span>
-        <span class="n">optional_river_package</span> <span class="o">=</span> <span class="n">cast</span><span class="p">(</span>
-            <span class="n">Optional</span><span class="p">[</span><span class="n">River</span><span class="p">],</span> <span class="n">mask_package__drop_if_empty</span><span class="p">(</span><span class="n">river_package</span><span class="p">)</span>
-        <span class="p">)</span>
-        <span class="n">optional_drainage_package</span> <span class="o">=</span> <span class="n">cast</span><span class="p">(</span>
-            <span class="n">Optional</span><span class="p">[</span><span class="n">Drainage</span><span class="p">],</span> <span class="n">mask_package__drop_if_empty</span><span class="p">(</span><span class="n">drainage_package</span><span class="p">)</span>
-        <span class="p">)</span>
+        <span class="c1"># Mask the river and drainage packages to drop empty data.</span>
+        <span class="n">optional_riv_pkg</span> <span class="o">=</span> <span class="n">mask_package__drop_if_empty</span><span class="p">(</span><span class="n">riv_pkg</span><span class="p">)</span>
+        <span class="n">optional_drn_pkg</span> <span class="o">=</span> <span class="n">mask_package__drop_if_empty</span><span class="p">(</span><span class="n">drn_pkg</span><span class="p">)</span>
+
         <span class="c1"># Account for periods with repeat stresses.</span>
         <span class="n">repeat</span> <span class="o">=</span> <span class="n">period_data</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">key</span><span class="p">)</span>
-        <span class="n">set_repeat_stress_if_available</span><span class="p">(</span>
-            <span class="n">repeat</span><span class="p">,</span> <span class="n">time_min</span><span class="p">,</span> <span class="n">time_max</span><span class="p">,</span> <span class="n">optional_river_package</span>
-        <span class="p">)</span>
-        <span class="n">set_repeat_stress_if_available</span><span class="p">(</span>
-            <span class="n">repeat</span><span class="p">,</span> <span class="n">time_min</span><span class="p">,</span> <span class="n">time_max</span><span class="p">,</span> <span class="n">optional_drainage_package</span>
-        <span class="p">)</span>
+        <span class="n">set_repeat_stress_if_available</span><span class="p">(</span><span class="n">repeat</span><span class="p">,</span> <span class="n">time_min</span><span class="p">,</span> <span class="n">time_max</span><span class="p">,</span> <span class="n">optional_riv_pkg</span><span class="p">)</span>
+        <span class="n">set_repeat_stress_if_available</span><span class="p">(</span><span class="n">repeat</span><span class="p">,</span> <span class="n">time_min</span><span class="p">,</span> <span class="n">time_max</span><span class="p">,</span> <span class="n">optional_drn_pkg</span><span class="p">)</span>
+        <span class="c1"># Clip the river package to the time range of the simulation and ensure</span>
+        <span class="c1"># time is forward filled.</span>
+        <span class="n">optional_riv_pkg</span> <span class="o">=</span> <span class="n">clip_time_if_package</span><span class="p">(</span><span class="n">optional_riv_pkg</span><span class="p">,</span> <span class="n">time_min</span><span class="p">,</span> <span class="n">time_max</span><span class="p">)</span>
+        <span class="n">optional_drn_pkg</span> <span class="o">=</span> <span class="n">clip_time_if_package</span><span class="p">(</span><span class="n">optional_drn_pkg</span><span class="p">,</span> <span class="n">time_min</span><span class="p">,</span> <span class="n">time_max</span><span class="p">)</span>
 
-        <span class="k">return</span> <span class="p">(</span><span class="n">optional_river_package</span><span class="p">,</span> <span class="n">optional_drainage_package</span><span class="p">)</span></div>
+        <span class="c1"># Cast for mypy checks</span>
+        <span class="n">optional_riv_pkg</span> <span class="o">=</span> <span class="n">cast</span><span class="p">(</span><span class="n">Optional</span><span class="p">[</span><span class="n">River</span><span class="p">],</span> <span class="n">optional_riv_pkg</span><span class="p">)</span>
+        <span class="n">optional_drn_pkg</span> <span class="o">=</span> <span class="n">cast</span><span class="p">(</span><span class="n">Optional</span><span class="p">[</span><span class="n">Drainage</span><span class="p">],</span> <span class="n">optional_drn_pkg</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="p">(</span><span class="n">optional_riv_pkg</span><span class="p">,</span> <span class="n">optional_drn_pkg</span><span class="p">)</span></div>
 
 
     <span class="nd">@classmethod</span>

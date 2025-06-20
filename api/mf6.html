@@ -8,7 +8,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>MODFLOW6 &#8212; iMOD Python 1.0.0rc3 documentation</title>
+    <title>MODFLOW 6 &#8212; iMOD Python 1.0.0rc4 documentation</title>
   
   
   
@@ -42,7 +42,7 @@
   <link rel="preload" as="script" href="../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
 <link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
 
-    <script src="../_static/documentation_options.js?v=e441cb1f"></script>
+    <script src="../_static/documentation_options.js?v=2fc85bd2"></script>
     <script src="../_static/doctools.js?v=9bcbadda"></script>
     <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script>DOCUMENTATION_OPTIONS.pagename = 'api/mf6';</script>
@@ -53,7 +53,7 @@
     <link rel="prev" title="imod.logging.pythonlogger.PythonLogger" href="generated/logging/imod.logging.pythonlogger.PythonLogger.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
-  <meta name="docsearch:version" content="1.0.0rc3.dev" />
+  <meta name="docsearch:version" content="1.0.0rc4.dev" />
   </head>
   
   
@@ -117,8 +117,8 @@
     
     
     
-    <img src="../_static/imod-python-logo-light.svg" class="logo__image only-light" alt="iMOD Python 1.0.0rc3 documentation - Home"/>
-    <img src="../_static/imod-python-logo-dark.svg" class="logo__image only-dark pst-js-only" alt="iMOD Python 1.0.0rc3 documentation - Home"/>
+    <img src="../_static/imod-python-logo-light.svg" class="logo__image only-light" alt="iMOD Python 1.0.0rc4 documentation - Home"/>
+    <img src="../_static/imod-python-logo-dark.svg" class="logo__image only-dark pst-js-only" alt="iMOD Python 1.0.0rc4 documentation - Home"/>
   
   
 </a></div>
@@ -446,6 +446,7 @@
 <li class="toctree-l2"><a class="reference internal" href="generated/prepare/imod.prepare.cleanup_riv.html">imod.prepare.cleanup_riv</a></li>
 <li class="toctree-l2"><a class="reference internal" href="generated/prepare/imod.prepare.cleanup_wel.html">imod.prepare.cleanup_wel</a></li>
 <li class="toctree-l2"><a class="reference internal" href="generated/prepare/imod.prepare.cleanup_wel_layered.html">imod.prepare.cleanup_wel_layered</a></li>
+<li class="toctree-l2"><a class="reference internal" href="generated/prepare/imod.prepare.create_partition_labels.html">imod.prepare.create_partition_labels</a></li>
 </ul>
 </details></li>
 <li class="toctree-l1 has-children"><a class="reference internal" href="select.html">Select points and cross sections</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
@@ -546,7 +547,7 @@
 </details></li>
 </ul>
 </details></li>
-<li class="toctree-l1 current active has-children"><a class="current reference internal" href="#">MODFLOW6</a><details open="open"><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l1 current active has-children"><a class="current reference internal" href="#">MODFLOW 6</a><details open="open"><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
 <li class="toctree-l2"><a class="reference internal" href="generated/mf6/imod.mf6.open_hds.html">imod.mf6.open_hds</a></li>
 <li class="toctree-l2"><a class="reference internal" href="generated/mf6/imod.mf6.open_cbc.html">imod.mf6.open_cbc</a></li>
 <li class="toctree-l2"><a class="reference internal" href="generated/mf6/imod.mf6.read_cbc_headers.html">imod.mf6.read_cbc_headers</a></li>
@@ -585,6 +586,7 @@
 <li class="toctree-l2"><a class="reference internal" href="generated/mf6/imod.mf6.SolutionPresetSimple.html">imod.mf6.SolutionPresetSimple</a></li>
 <li class="toctree-l2"><a class="reference internal" href="generated/mf6/imod.mf6.SolutionPresetModerate.html">imod.mf6.SolutionPresetModerate</a></li>
 <li class="toctree-l2"><a class="reference internal" href="generated/mf6/imod.mf6.SolutionPresetComplex.html">imod.mf6.SolutionPresetComplex</a></li>
+<li class="toctree-l2"><a class="reference internal" href="generated/mf6/imod.mf6.ValidationSettings.html">imod.mf6.ValidationSettings</a></li>
 <li class="toctree-l2"><a class="reference internal" href="generated/mf6/imod.mf6.ApiPackage.html">imod.mf6.ApiPackage</a></li>
 <li class="toctree-l2"><a class="reference internal" href="generated/mf6/imod.mf6.Buoyancy.html">imod.mf6.Buoyancy</a></li>
 <li class="toctree-l2"><a class="reference internal" href="generated/mf6/imod.mf6.ConstantHead.html">imod.mf6.ConstantHead</a></li>
@@ -804,7 +806,7 @@
     
     <li class="breadcrumb-item"><a href="index.html" class="nav-link">API Reference</a></li>
     
-    <li class="breadcrumb-item active" aria-current="page"><span class="ellipsis">MODFLOW6</span></li>
+    <li class="breadcrumb-item active" aria-current="page"><span class="ellipsis">MODFLOW 6</span></li>
   </ul>
 </nav>
 </div>
@@ -821,8 +823,8 @@
 <div id="searchbox"></div>
                 <article class="bd-article">
                   
-  <section id="modflow6">
-<h1>MODFLOW6<a class="headerlink" href="#modflow6" title="Link to this heading">#</a></h1>
+  <section id="modflow-6">
+<h1>MODFLOW 6<a class="headerlink" href="#modflow-6" title="Link to this heading">#</a></h1>
 <section id="read-output">
 <h2>Read Output<a class="headerlink" href="#read-output" title="Link to this heading">#</a></h2>
 <div class="pst-scrollable-table-container"><table class="autosummary longtable table">
@@ -847,8 +849,8 @@
 <h2>Model objects &amp; methods<a class="headerlink" href="#model-objects-methods" title="Link to this heading">#</a></h2>
 <div class="pst-scrollable-table-container"><table class="autosummary longtable table">
 <tbody>
-<tr class="row-odd"><td><p><a class="reference internal" href="generated/mf6/imod.mf6.Modflow6Simulation.html#imod.mf6.Modflow6Simulation" title="imod.mf6.Modflow6Simulation"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Modflow6Simulation</span></code></a>(name)</p></td>
-<td><p></p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="generated/mf6/imod.mf6.Modflow6Simulation.html#imod.mf6.Modflow6Simulation" title="imod.mf6.Modflow6Simulation"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Modflow6Simulation</span></code></a>(name[, validation_settings])</p></td>
+<td><p>Modflow6Simulation is a class that represents a Modflow 6 simulation.</p></td>
 </tr>
 <tr class="row-even"><td><p><a class="reference internal" href="generated/mf6/imod.mf6.Modflow6Simulation.create_time_discretization.html#imod.mf6.Modflow6Simulation.create_time_discretization" title="imod.mf6.Modflow6Simulation.create_time_discretization"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Modflow6Simulation.create_time_discretization</span></code></a>(...)</p></td>
 <td><p>Collect all unique times from model packages and additional given <cite>times</cite>.</p></td>
@@ -880,7 +882,7 @@
 <tr class="row-odd"><td><p><a class="reference internal" href="generated/mf6/imod.mf6.Modflow6Simulation.clip_box.html#imod.mf6.Modflow6Simulation.clip_box" title="imod.mf6.Modflow6Simulation.clip_box"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Modflow6Simulation.clip_box</span></code></a>([time_min, ...])</p></td>
 <td><p>Clip a simulation by a bounding box (time, layer, y, x).</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="generated/mf6/imod.mf6.Modflow6Simulation.split.html#imod.mf6.Modflow6Simulation.split" title="imod.mf6.Modflow6Simulation.split"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Modflow6Simulation.split</span></code></a>(submodel_labels)</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="generated/mf6/imod.mf6.Modflow6Simulation.split.html#imod.mf6.Modflow6Simulation.split" title="imod.mf6.Modflow6Simulation.split"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Modflow6Simulation.split</span></code></a>(submodel_labels[, ...])</p></td>
 <td><p>Split a simulation in different partitions using a submodel_labels array.</p></td>
 </tr>
 <tr class="row-odd"><td><p><a class="reference internal" href="generated/mf6/imod.mf6.Modflow6Simulation.regrid_like.html#imod.mf6.Modflow6Simulation.regrid_like" title="imod.mf6.Modflow6Simulation.regrid_like"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Modflow6Simulation.regrid_like</span></code></a>(...[, validate])</p></td>
@@ -964,6 +966,9 @@
 </tr>
 <tr class="row-odd"><td><p><a class="reference internal" href="generated/mf6/imod.mf6.SolutionPresetComplex.html#imod.mf6.SolutionPresetComplex" title="imod.mf6.SolutionPresetComplex"><code class="xref py py-obj docutils literal notranslate"><span class="pre">SolutionPresetComplex</span></code></a>(modelnames[, ...])</p></td>
 <td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="generated/mf6/imod.mf6.ValidationSettings.html#imod.mf6.ValidationSettings" title="imod.mf6.ValidationSettings"><code class="xref py py-obj docutils literal notranslate"><span class="pre">ValidationSettings</span></code></a>([validate, ...])</p></td>
+<td><p>Validation settings for MF6 model validation.</p></td>
 </tr>
 </tbody>
 </table>
@@ -1120,7 +1125,7 @@
 <tr class="row-odd"><td><p><a class="reference internal" href="generated/mf6/imod.mf6.Recharge.html#imod.mf6.Recharge" title="imod.mf6.Recharge"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Recharge</span></code></a>(*_, **__)</p></td>
 <td><p>Recharge Package.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="generated/mf6/imod.mf6.Recharge.from_imod5_data.html#imod.mf6.Recharge.from_imod5_data" title="imod.mf6.Recharge.from_imod5_data"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Recharge.from_imod5_data</span></code></a>(imod5_data, target_dis)</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="generated/mf6/imod.mf6.Recharge.from_imod5_data.html#imod.mf6.Recharge.from_imod5_data" title="imod.mf6.Recharge.from_imod5_data"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Recharge.from_imod5_data</span></code></a>(imod5_data, ...[, ...])</p></td>
 <td><p>Construct an rch-package from iMOD5 data, loaded with the <a class="reference internal" href="generated/io/imod.formats.prj.open_projectfile_data.html#imod.formats.prj.open_projectfile_data" title="imod.formats.prj.open_projectfile_data"><code class="xref py py-func docutils literal notranslate"><span class="pre">imod.formats.prj.open_projectfile_data()</span></code></a> function.</p></td>
 </tr>
 <tr class="row-odd"><td><p><a class="reference internal" href="generated/mf6/imod.mf6.Recharge.from_imod5_cap_data.html#imod.mf6.Recharge.from_imod5_cap_data" title="imod.mf6.Recharge.from_imod5_cap_data"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Recharge.from_imod5_cap_data</span></code></a>(imod5_data, ...)</p></td>
@@ -1387,7 +1392,7 @@
   </div>
   <nav class="bd-toc-nav page-toc" aria-labelledby="pst-page-navigation-heading-2">
     <ul class="visible nav section-nav flex-column">
-<li class="toc-h1 nav-item toc-entry"><a class="reference internal nav-link" href="#">MODFLOW6</a><ul class="visible nav section-nav flex-column">
+<li class="toc-h1 nav-item toc-entry"><a class="reference internal nav-link" href="#">MODFLOW 6</a><ul class="visible nav section-nav flex-column">
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#read-output">Read Output</a></li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#model-objects-methods">Model objects &amp; methods</a></li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#discretization">Discretization</a></li>

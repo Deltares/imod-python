@@ -52,6 +52,23 @@ structures. Secondly, it will demonstrate how a modeling workflow is set up.
 
 .. raw:: html
 
+    <div class="sphx-glr-thumbcontainer" tooltip="These are the examples in the index page of the iMOD Python user guide. The examples are used to demonstrate the features of iMOD Python and how to use them. This file is meant to test if the index page is working correctly and to provide a quick overview of the examples available in the user guide.">
+
+.. only:: html
+
+  .. image:: /user-guide/images/thumb/sphx_glr_00-index-examples_thumb.png
+    :alt:
+
+  :ref:`sphx_glr_user-guide_00-index-examples.py`
+
+.. raw:: html
+
+      <div class="sphx-glr-thumbnail-title">Quick start</div>
+    </div>
+
+
+.. raw:: html
+
     <div class="sphx-glr-thumbcontainer" tooltip="Geospatial data primarily comes in two forms: raster data and vector data. This guide focuses on the first.">
 
 .. only:: html
@@ -103,7 +120,7 @@ structures. Secondly, it will demonstrate how a modeling workflow is set up.
 
 .. raw:: html
 
-    <div class="sphx-glr-thumbcontainer" tooltip="MODFLOW6 supports unstructured grids. Unlike raster data, the connectivity of unstructured grids is irregular. This means that the number of neighboring cells is not constant; for structured grids, every cell has 4 neighbors (in 2D), or 6 neighbors (in 3D).">
+    <div class="sphx-glr-thumbcontainer" tooltip="MODFLOW 6 supports unstructured grids. Unlike raster data, the connectivity of unstructured grids is irregular. This means that the number of neighboring cells is not constant; for structured grids, every cell has 4 neighbors (in 2D), or 6 neighbors (in 3D).">
 
 .. only:: html
 
@@ -171,7 +188,7 @@ structures. Secondly, it will demonstrate how a modeling workflow is set up.
 
 .. raw:: html
 
-    <div class="sphx-glr-thumbcontainer" tooltip="iMOD Python has multiple features to help you define the topsystem of the groundwater system. With &quot;topsystem&quot; we mean all forcings which act on the top of the groundwater system. These are usually either meteorological (precipitation &amp; evapotranspiration) or hydrological (rivers, ditches, lakes, sea) in nature. In MODFLOW6 these are usually simulated with the DRN, RIV, GHB, and RCH package. This data is usually provided as planar grids (x, y) without any vertical dimension. This user guide will show you how to allocate these forcings across model layers to grid cells and how to distribute conductances for Robin-like boundary conditions (RIV, DRN, GHB) over model layers. We will demonstrate this with the RIV package, as this package supports all options for allocating cells and distributing conductances. A subset of options are available for the DRN, GHB, and RCH packages.">
+    <div class="sphx-glr-thumbcontainer" tooltip="iMOD Python has multiple features to help you define the topsystem of the groundwater system. With &quot;topsystem&quot; we mean all forcings which act on the top of the groundwater system. These are usually either meteorological (precipitation &amp; evapotranspiration) or hydrological (rivers, ditches, lakes, sea) in nature. In MODFLOW 6 these are usually simulated with the DRN, RIV, GHB, and RCH package. This data is usually provided as planar grids (x, y) without any vertical dimension. This user guide will show you how to allocate these forcings across model layers to grid cells and how to distribute conductances for Robin-like boundary conditions (RIV, DRN, GHB) over model layers. We will demonstrate this with the RIV package, as this package supports all options for allocating cells and distributing conductances. A subset of options are available for the DRN, GHB, and RCH packages.">
 
 .. only:: html
 
@@ -213,6 +230,7 @@ structures. Secondly, it will demonstrate how a modeling workflow is set up.
 .. toctree::
    :hidden:
 
+   /user-guide/00-index-examples
    /user-guide/01-raster-data
    /user-guide/02-vector-data
    /user-guide/03-timeseries-data

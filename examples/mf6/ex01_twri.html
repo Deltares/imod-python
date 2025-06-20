@@ -8,7 +8,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>TWRI &#8212; iMOD Python 1.0.0rc3 documentation</title>
+    <title>TWRI &#8212; iMOD Python 1.0.0rc4 documentation</title>
   
   
   
@@ -42,7 +42,7 @@
   <link rel="preload" as="script" href="../../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
 <link rel="preload" as="script" href="../../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
 
-    <script src="../../_static/documentation_options.js?v=e441cb1f"></script>
+    <script src="../../_static/documentation_options.js?v=2fc85bd2"></script>
     <script src="../../_static/doctools.js?v=9bcbadda"></script>
     <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script>DOCUMENTATION_OPTIONS.pagename = 'examples/mf6/ex01_twri';</script>
@@ -53,7 +53,7 @@
     <link rel="prev" title="Different ways to regrid models" href="different_ways_to_regrid_models.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
-  <meta name="docsearch:version" content="1.0.0rc3.dev" />
+  <meta name="docsearch:version" content="1.0.0rc4.dev" />
   </head>
   
   
@@ -117,8 +117,8 @@
     
     
     
-    <img src="../../_static/imod-python-logo-light.svg" class="logo__image only-light" alt="iMOD Python 1.0.0rc3 documentation - Home"/>
-    <img src="../../_static/imod-python-logo-dark.svg" class="logo__image only-dark pst-js-only" alt="iMOD Python 1.0.0rc3 documentation - Home"/>
+    <img src="../../_static/imod-python-logo-light.svg" class="logo__image only-light" alt="iMOD Python 1.0.0rc4 documentation - Home"/>
+    <img src="../../_static/imod-python-logo-dark.svg" class="logo__image only-dark pst-js-only" alt="iMOD Python 1.0.0rc4 documentation - Home"/>
   
   
 </a></div>
@@ -382,7 +382,7 @@
      aria-label="Section Navigation">
   <p class="bd-links__title" role="heading" aria-level="1">Section Navigation</p>
   <div class="bd-toc-item navbar-nav"><ul class="current nav bd-sidenav">
-<li class="toctree-l1 current active has-children"><a class="reference internal" href="index.html">MODFLOW6</a><details open="open"><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul class="current">
+<li class="toctree-l1 current active has-children"><a class="reference internal" href="index.html">MODFLOW 6</a><details open="open"><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul class="current">
 <li class="toctree-l2"><a class="reference internal" href="Henry.html">Henry</a></li>
 <li class="toctree-l2"><a class="reference internal" href="circle.html">Circle</a></li>
 <li class="toctree-l2"><a class="reference internal" href="circle_partitioned.html">Circle partitioned</a></li>
@@ -477,7 +477,7 @@
     <li class="breadcrumb-item"><a href="../index.html" class="nav-link">Examples</a></li>
     
     
-    <li class="breadcrumb-item"><a href="index.html" class="nav-link">MODFLOW6</a></li>
+    <li class="breadcrumb-item"><a href="index.html" class="nav-link">MODFLOW 6</a></li>
     
     <li class="breadcrumb-item active" aria-current="page"><span class="ellipsis">TWRI</span></li>
   </ul>
@@ -503,7 +503,7 @@ to download the full example code.</p>
 </div>
 <section class="sphx-glr-example-title" id="twri">
 <span id="sphx-glr-examples-mf6-ex01-twri-py"></span><h1>TWRI<a class="headerlink" href="#twri" title="Link to this heading">#</a></h1>
-<p>This example has been converted from the <a class="reference external" href="https://github.com/MODFLOW-USGS/modflow6-examples">MODFLOW6 Example problems</a>.  See the
+<p>This example has been converted from the <a class="reference external" href="https://github.com/MODFLOW-USGS/modflow6-examples">MODFLOW 6 Example problems</a>.  See the
 <a class="reference external" href="https://modflow6-examples.readthedocs.io/en/master/_examples/ex-gwf-twri.html">description</a> and the <a class="reference external" href="https://github.com/MODFLOW-USGS/modflow6-examples/blob/develop/scripts/ex-gwf-twri.py">notebook</a> which uses <a class="reference external" href="https://github.com/modflowpy/flopy">FloPy</a> to setup the model.</p>
 <p>This example is a modified version of the original MODFLOW example
 (”<a class="reference external" href="https://pubs.usgs.gov/twri/twri7-c1/">Techniques of Water-Resources Investigation</a>” (TWRI)) described in
@@ -515,7 +515,7 @@ explicitly simulated, to an equivalent three-dimensional problem.</p>
 <blockquote>
 <div><ul class="simple">
 <li><p>Create a structured grid for a rectangular geometry.</p></li>
-<li><p>Create the xarray DataArrays containg the MODFLOW6 parameters.</p></li>
+<li><p>Create the xarray DataArrays containg the MODFLOW 6 parameters.</p></li>
 <li><p>Feed these arrays into the imod mf6 classes.</p></li>
 <li><p>Write to modflow6 files.</p></li>
 <li><p>Run the model.</p></li>
@@ -682,7 +682,7 @@ conditions are added in the form of the familiar MODFLOW packages.</p>
 <div class="admonition note">
 <p class="admonition-title">Note</p>
 <p>The following lines assume the <code class="docutils literal notranslate"><span class="pre">mf6</span></code> executable is available on your PATH.
-<a class="reference internal" href="index.html#mf6-introduction"><span class="std std-ref">The Modflow 6 examples introduction</span></a> shortly
+<a class="reference internal" href="index.html#mf6-introduction"><span class="std std-ref">The MODFLOW 6 examples introduction</span></a> shortly
 describes how to add it to yours.</p>
 </div>
 <div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="n">simulation</span><span class="o">.</span><span class="n">run</span><span class="p">()</span>
@@ -704,10 +704,10 @@ describes how to add it to yours.</p>
 <div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="n">head</span><span class="o">.</span><span class="n">isel</span><span class="p">(</span><span class="n">layer</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">time</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span><span class="o">.</span><span class="n">plot</span><span class="o">.</span><span class="n">contourf</span><span class="p">()</span>
 </pre></div>
 </div>
-<img src="../../_images/sphx_glr_ex01_twri_001.png" srcset="../../_images/sphx_glr_ex01_twri_001.png" alt="dx = 5e+03, dy = -5e+03, layer = 1, time = 1.0" class = "sphx-glr-single-img"/><div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>&lt;matplotlib.contour.QuadContourSet object at 0x0000015692DBA5D0&gt;
+<img src="../../_images/sphx_glr_ex01_twri_001.png" srcset="../../_images/sphx_glr_ex01_twri_001.png" alt="dx = 5e+03, dy = -5e+03, layer = 1, time = 1.0" class = "sphx-glr-single-img"/><div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>&lt;matplotlib.contour.QuadContourSet object at 0x0000016F446B9280&gt;
 </pre></div>
 </div>
-<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> (0 minutes 0.596 seconds)</p>
+<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> (0 minutes 0.548 seconds)</p>
 <div class="sphx-glr-footer sphx-glr-footer-example docutils container" id="sphx-glr-download-examples-mf6-ex01-twri-py">
 <div class="sphx-glr-download sphx-glr-download-jupyter docutils container">
 <p><a class="reference download internal" download="" href="../../_downloads/681b883c10207ac5224f2aa7813cff9b/ex01_twri.ipynb"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Jupyter</span> <span class="pre">notebook:</span> <span class="pre">ex01_twri.ipynb</span></code></a></p>

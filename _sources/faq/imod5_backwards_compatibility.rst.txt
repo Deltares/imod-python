@@ -10,8 +10,6 @@ issueboard <https://github.com/Deltares/imod-python/issues>`_.
 Known issues
 ------------
 
-- Constants are only supported for the CAP package. For other packages, the
-  constants will cause an error.
 - ISG files cannot be read directly. The workaround is to rasterize the ISG
   files to IDF files using the iMOD5 BATCH function ISGGRID.
 - MetaSWAP sprinkling wells defined as IPF files are not supported.
@@ -26,16 +24,16 @@ Known issues
   x-coordinate of the well (e.g. 0.1 mm).
 - There is a bug in iMOD5 in how the HFB's hydraulic characteristic is computed.
   iMDO5 adds the background resistance of the aquifer to the HFB resistance when
-  writing the MODFLOW6 input files. The background resistance is already
-  accounted for by MODFLOW6 internally, so in practice this means the background
+  writing the MODFLOW 6 input files. The background resistance is already
+  accounted for by MODFLOW 6 internally, so in practice this means the background
   resistance is added twice. This is especially noticeable when a HFB intersects
   a low permeable layer. The workaround in iMOD5 is to specify a negative HFB
   factor in the projectfile, which makes iMOD5 to skip adding the background
   resistance.
 - By specifying a negative HFB factor in the projectfile, the iMOD5
   documentation mentions this will turn on the option to override a resistance
-  in between cells with the HFB resistance. This is NOT supported by MODFLOW6,
-  as MODFLOW6 always adds the background resistance to the HFB resistance to
+  in between cells with the HFB resistance. This is NOT supported by MODFLOW 6,
+  as MODFLOW 6 always adds the background resistance to the HFB resistance to
   compute the resistance inbetween cells.
 
 
@@ -50,8 +48,8 @@ Notes
 - When importing models with the ANI package, make sure to activate the "XT3D"
   in the NodePropertyFlow package of the model.
 - Solver settings (PCG) are NOT imported from iMOD5, instead a solver settings
-  preset from MODFLOW6 ("Moderate") is set. This is because the solvers between
-  iMODLFOW and MODFLOW6 are different. You are advised to test settings
+  preset from MODFLOW 6 ("Moderate") is set. This is because the solvers between
+  iMODLFOW and MODFLOW 6 are different. You are advised to test settings
   yourself.
 - The imported iMOD5 discretization for the model is created by taking the
   smallest grid and finest resolution amongst the TOP, BOT, and BND grids. This
@@ -81,10 +79,10 @@ Here an overview of iMOD5 files supported:
     Open raster data (.asc),:func:`imod.formats.rasterio.open`,
     Open legend file (.leg),:func:`imod.visualize.read_imod_legend`,
 
-MODFLOW6
---------
+MODFLOW 6
+---------
 
-Here an overview of iMOD5 MODFLOW6 features:
+Here an overview of iMOD5 MODFLOW 6 features:
 
 .. csv-table::
    :header-rows: 1
@@ -101,7 +99,7 @@ Here an overview of iMOD5 MODFLOW6 features:
     "BND, TOP, BOT",Clip,:meth:`imod.mf6.StructuredDiscretization.clip_box`
     "BND, SHD",set constant heads starting head (IBOUND = -1),:meth:`imod.mf6.ConstantHead.from_imod5_shd_data`
     "BND, CHD",set constant heads (IBOUND = -1),:meth:`imod.mf6.ConstantHead.from_imod5_data`
-    "KDW, VCW, KVV, THK",Quasi-3D permeability from grid (IDF),Quasi-3D is only supported by MODFLOW2005. MODFLOW6 requires fully 3D.
+    "KDW, VCW, KVV, THK",Quasi-3D permeability from grid (IDF),Quasi-3D is only supported by MODFLOW2005. MODFLOW 6 requires fully 3D.
     "KHV, KVA",3D permeability from grid (IDF),:meth:`imod.mf6.NodePropertyFlow.from_imod5_data`
     ANI,Set horizontal anistropy ,:meth:`imod.mf6.NodePropertyFlow.from_imod5_data`
     "KHV, KVA, ANI",Align iMOD5 input grids,:meth:`imod.mf6.NodePropertyFlow.from_imod5_data`

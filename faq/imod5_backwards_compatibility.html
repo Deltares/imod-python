@@ -8,7 +8,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>iMOD5 backwards compatibility &#8212; iMOD Python 1.0.0rc3 documentation</title>
+    <title>iMOD5 backwards compatibility &#8212; iMOD Python 1.0.0rc4 documentation</title>
   
   
   
@@ -42,7 +42,7 @@
   <link rel="preload" as="script" href="../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
 <link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
 
-    <script src="../_static/documentation_options.js?v=e441cb1f"></script>
+    <script src="../_static/documentation_options.js?v=2fc85bd2"></script>
     <script src="../_static/doctools.js?v=9bcbadda"></script>
     <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script>DOCUMENTATION_OPTIONS.pagename = 'faq/imod5_backwards_compatibility';</script>
@@ -53,7 +53,7 @@
     <link rel="prev" title="Known Issues" href="known-issues.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
-  <meta name="docsearch:version" content="1.0.0rc3.dev" />
+  <meta name="docsearch:version" content="1.0.0rc4.dev" />
   </head>
   
   
@@ -117,8 +117,8 @@
     
     
     
-    <img src="../_static/imod-python-logo-light.svg" class="logo__image only-light" alt="iMOD Python 1.0.0rc3 documentation - Home"/>
-    <img src="../_static/imod-python-logo-dark.svg" class="logo__image only-dark pst-js-only" alt="iMOD Python 1.0.0rc3 documentation - Home"/>
+    <img src="../_static/imod-python-logo-light.svg" class="logo__image only-light" alt="iMOD Python 1.0.0rc4 documentation - Home"/>
+    <img src="../_static/imod-python-logo-dark.svg" class="logo__image only-dark pst-js-only" alt="iMOD Python 1.0.0rc4 documentation - Home"/>
   
   
 </a></div>
@@ -459,8 +459,6 @@ issueboard</a>.</p>
 <section id="known-issues">
 <h2>Known issues<a class="headerlink" href="#known-issues" title="Link to this heading">#</a></h2>
 <ul class="simple">
-<li><p>Constants are only supported for the CAP package. For other packages, the
-constants will cause an error.</p></li>
 <li><p>ISG files cannot be read directly. The workaround is to rasterize the ISG
 files to IDF files using the iMOD5 BATCH function ISGGRID.</p></li>
 <li><p>MetaSWAP sprinkling wells defined as IPF files are not supported.</p></li>
@@ -475,16 +473,16 @@ slightly away from the boundary, by subtracting a small value from the
 x-coordinate of the well (e.g. 0.1 mm).</p></li>
 <li><p>There is a bug in iMOD5 in how the HFB’s hydraulic characteristic is computed.
 iMDO5 adds the background resistance of the aquifer to the HFB resistance when
-writing the MODFLOW6 input files. The background resistance is already
-accounted for by MODFLOW6 internally, so in practice this means the background
+writing the MODFLOW 6 input files. The background resistance is already
+accounted for by MODFLOW 6 internally, so in practice this means the background
 resistance is added twice. This is especially noticeable when a HFB intersects
 a low permeable layer. The workaround in iMOD5 is to specify a negative HFB
 factor in the projectfile, which makes iMOD5 to skip adding the background
 resistance.</p></li>
 <li><p>By specifying a negative HFB factor in the projectfile, the iMOD5
 documentation mentions this will turn on the option to override a resistance
-in between cells with the HFB resistance. This is NOT supported by MODFLOW6,
-as MODFLOW6 always adds the background resistance to the HFB resistance to
+in between cells with the HFB resistance. This is NOT supported by MODFLOW 6,
+as MODFLOW 6 always adds the background resistance to the HFB resistance to
 compute the resistance inbetween cells.</p></li>
 </ul>
 </section>
@@ -499,8 +497,8 @@ fact that the STO package is mandatory in iMOD Python. A workaround is to add a
 <li><p>When importing models with the ANI package, make sure to activate the “XT3D”
 in the NodePropertyFlow package of the model.</p></li>
 <li><p>Solver settings (PCG) are NOT imported from iMOD5, instead a solver settings
-preset from MODFLOW6 (“Moderate”) is set. This is because the solvers between
-iMODLFOW and MODFLOW6 are different. You are advised to test settings
+preset from MODFLOW 6 (“Moderate”) is set. This is because the solvers between
+iMODLFOW and MODFLOW 6 are different. You are advised to test settings
 yourself.</p></li>
 <li><p>The imported iMOD5 discretization for the model is created by taking the
 smallest grid and finest resolution amongst the TOP, BOT, and BND grids. This
@@ -568,9 +566,9 @@ have a very fine resolution in one of these packages.</p></li>
 </table>
 </div>
 </section>
-<section id="modflow6">
-<h2>MODFLOW6<a class="headerlink" href="#modflow6" title="Link to this heading">#</a></h2>
-<p>Here an overview of iMOD5 MODFLOW6 features:</p>
+<section id="modflow-6">
+<h2>MODFLOW 6<a class="headerlink" href="#modflow-6" title="Link to this heading">#</a></h2>
+<p>Here an overview of iMOD5 MODFLOW 6 features:</p>
 <div class="pst-scrollable-table-container"><table class="table">
 <thead>
 <tr class="row-odd"><th class="head"><p>iMOD5 pkg</p></th>
@@ -625,7 +623,7 @@ have a very fine resolution in one of these packages.</p></li>
 </tr>
 <tr class="row-odd"><td><p>KDW, VCW, KVV, THK</p></td>
 <td><p>Quasi-3D permeability from grid (IDF)</p></td>
-<td><p>Quasi-3D is only supported by MODFLOW2005. MODFLOW6 requires fully 3D.</p></td>
+<td><p>Quasi-3D is only supported by MODFLOW2005. MODFLOW 6 requires fully 3D.</p></td>
 </tr>
 <tr class="row-even"><td><p>KHV, KVA</p></td>
 <td><p>3D permeability from grid (IDF)</p></td>
@@ -1035,7 +1033,7 @@ your data, see our iMOD Viewer</a>.</p>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#known-issues">Known issues</a></li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#notes">Notes</a></li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#files">Files</a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#modflow6">MODFLOW6</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#modflow-6">MODFLOW 6</a></li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#metaswap">MetaSWAP</a></li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#postprocessing">Postprocessing</a></li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#visualization">Visualization</a></li>

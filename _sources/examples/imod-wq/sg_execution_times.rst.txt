@@ -6,7 +6,7 @@
 
 Computation times
 =================
-**00:10.453** total execution time for 6 files **from examples\imod-wq**:
+**00:08.396** total execution time for 6 files **from examples\imod-wq**:
 
 .. container::
 
@@ -33,20 +33,20 @@ Computation times
      - Time
      - Mem (MB)
    * - :ref:`sphx_glr_examples_imod-wq_Hydrocoin.py` (``Hydrocoin.py``)
-     - 00:03.656
+     - 00:02.990
      - 0.0
    * - :ref:`sphx_glr_examples_imod-wq_Elder.py` (``Elder.py``)
-     - 00:02.687
+     - 00:02.031
      - 0.0
    * - :ref:`sphx_glr_examples_imod-wq_VerticalInterface.py` (``VerticalInterface.py``)
-     - 00:01.359
+     - 00:01.125
      - 0.0
    * - :ref:`sphx_glr_examples_imod-wq_SaltwaterPocket.py` (``SaltwaterPocket.py``)
-     - 00:01.172
+     - 00:00.984
      - 0.0
    * - :ref:`sphx_glr_examples_imod-wq_FreshwaterLens.py` (``FreshwaterLens.py``)
-     - 00:00.906
+     - 00:00.766
      - 0.0
    * - :ref:`sphx_glr_examples_imod-wq_Henry-wq.py` (``Henry-wq.py``)
-     - 00:00.672
+     - 00:00.500
      - 0.0

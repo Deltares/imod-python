@@ -47,7 +47,7 @@ Systems; Documentation and User's Guide
     import xarray as xr
 
     import imod
-    from imod.mf6.multimodel.partition_generator import get_label_array
+    from imod.prepare.partition import create_partition_labels
     from imod.typing.grid import nan_like, zeros_like
 
 
@@ -297,33 +297,71 @@ Finally create 365 time steps of 1 day each.
 To split the model in 4 partitions, we must create a label array.
 We use the utility function  ``get_label_array`` for that.
 
-.. GENERATED FROM PYTHON SOURCE LINES 190-196
+.. GENERATED FROM PYTHON SOURCE LINES 190-195
 
 .. code-block:: Python
 
 
-    label_array = get_label_array(simulation, 4)
+    label_array = create_partition_labels(simulation, 4)
     fig, ax = plt.subplots()
     label_array.plot(ax=ax)
+
+
+
+
+.. image-sg:: /examples/mf6/images/sphx_glr_transport_2d_001.png
+   :alt: transport 2d
+   :srcset: /examples/mf6/images/sphx_glr_transport_2d_001.png
+   :class: sphx-glr-single-img
+
+
+.. rst-class:: sphx-glr-script-out
+
+ .. code-block:: none
+
+
+    <matplotlib.collections.QuadMesh object at 0x0000016F4465B8F0>
+
+
+
+.. GENERATED FROM PYTHON SOURCE LINES 196-201
+
+This label array determines how the model will be split. `METIS
+<https://github.com/KarypisLab/METIS/blob/master/manual/manual.pdf>`_ is used
+in the background to partition models, which is the cause of the imperfect
+rectangular shapes. Let's split the simulation into 4 submodels. The label
+array is used to define the partitioning.
+
+.. GENERATED FROM PYTHON SOURCE LINES 201-202
+
+.. code-block:: Python
 
     split_simulation = simulation.split(label_array)
 
 
 
-.. image-sg:: /examples/mf6/images/sphx_glr_transport_2d_001.png
-   :alt: layer = 1, dx = 10.0, dy = -10.0
-   :srcset: /examples/mf6/images/sphx_glr_transport_2d_001.png
-   :class: sphx-glr-single-img
+
+.. rst-class:: sphx-glr-script-out
+
+ .. code-block:: none
+
+    C:\buildagent\work\4b9080cbb3354582\imod-python\.pixi\envs\default\Lib\site-packages\xarray\core\duck_array_ops.py:253: RuntimeWarning: invalid value encountered in cast
+      return data.astype(dtype, **kwargs)
+    C:\buildagent\work\4b9080cbb3354582\imod-python\.pixi\envs\default\Lib\site-packages\xarray\core\duck_array_ops.py:253: RuntimeWarning: invalid value encountered in cast
+      return data.astype(dtype, **kwargs)
+    C:\buildagent\work\4b9080cbb3354582\imod-python\.pixi\envs\default\Lib\site-packages\xarray\core\duck_array_ops.py:253: RuntimeWarning: invalid value encountered in cast
+      return data.astype(dtype, **kwargs)
+    C:\buildagent\work\4b9080cbb3354582\imod-python\.pixi\envs\default\Lib\site-packages\xarray\core\duck_array_ops.py:253: RuntimeWarning: invalid value encountered in cast
+      return data.astype(dtype, **kwargs)
 
 
 
 
-
-.. GENERATED FROM PYTHON SOURCE LINES 197-198
+.. GENERATED FROM PYTHON SOURCE LINES 203-204
 
 Run the unsplit model and load the simulation results.
 
-.. GENERATED FROM PYTHON SOURCE LINES 198-201
+.. GENERATED FROM PYTHON SOURCE LINES 204-207
 
 .. code-block:: Python
 
@@ -337,11 +375,11 @@ Run the unsplit model and load the simulation results.
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 202-203
+.. GENERATED FROM PYTHON SOURCE LINES 208-209
 
 Run the split model and load the simulation results.
 
-.. GENERATED FROM PYTHON SOURCE LINES 203-210
+.. GENERATED FROM PYTHON SOURCE LINES 209-216
 
 .. code-block:: Python
 
@@ -366,16 +404,16 @@ Run the split model and load the simulation results.
  .. code-block:: none
 
 
-    <matplotlib.contour.QuadContourSet object at 0x000001568F5E9ED0>
+    <matplotlib.contour.QuadContourSet object at 0x0000016F3FEEB770>
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 211-213
+.. GENERATED FROM PYTHON SOURCE LINES 217-219
 
 Compute the difference between the split and unsplit simulation results for transport at the
 end of the simulation, and print them
 
-.. GENERATED FROM PYTHON SOURCE LINES 213-216
+.. GENERATED FROM PYTHON SOURCE LINES 219-222
 
 .. code-block:: Python
 
@@ -396,14 +434,14 @@ end of the simulation, and print them
  .. code-block:: none
 
 
-    <matplotlib.contour.QuadContourSet object at 0x00000156951CC2D0>
+    <matplotlib.contour.QuadContourSet object at 0x0000016F3BD31DF0>
 
 
 
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** (0 minutes 57.104 seconds)
+   **Total running time of the script:** (1 minutes 16.141 seconds)
 
 
 .. _sphx_glr_download_examples_mf6_transport_2d.py:

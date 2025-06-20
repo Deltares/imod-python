@@ -7,7 +7,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>imod.mf6.wel &#8212; iMOD Python 1.0.0rc3 documentation</title>
+    <title>imod.mf6.wel &#8212; iMOD Python 1.0.0rc4 documentation</title>
   
   
   
@@ -41,7 +41,7 @@
   <link rel="preload" as="script" href="../../../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
 <link rel="preload" as="script" href="../../../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
 
-    <script src="../../../_static/documentation_options.js?v=e441cb1f"></script>
+    <script src="../../../_static/documentation_options.js?v=2fc85bd2"></script>
     <script src="../../../_static/doctools.js?v=9bcbadda"></script>
     <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script>DOCUMENTATION_OPTIONS.pagename = '_modules/imod/mf6/wel';</script>
@@ -50,7 +50,7 @@
     <link rel="search" title="Search" href="../../../search.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
-  <meta name="docsearch:version" content="1.0.0rc3.dev" />
+  <meta name="docsearch:version" content="1.0.0rc4.dev" />
   </head>
   
   
@@ -114,8 +114,8 @@
     
     
     
-    <img src="../../../_static/imod-python-logo-light.svg" class="logo__image only-light" alt="iMOD Python 1.0.0rc3 documentation - Home"/>
-    <img src="../../../_static/imod-python-logo-dark.svg" class="logo__image only-dark pst-js-only" alt="iMOD Python 1.0.0rc3 documentation - Home"/>
+    <img src="../../../_static/imod-python-logo-light.svg" class="logo__image only-light" alt="iMOD Python 1.0.0rc4 documentation - Home"/>
+    <img src="../../../_static/imod-python-logo-dark.svg" class="logo__image only-dark pst-js-only" alt="iMOD Python 1.0.0rc4 documentation - Home"/>
   
   
 </a></div>
@@ -435,7 +435,7 @@
 <span class="kn">import</span><span class="w"> </span><span class="nn">warnings</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">collections.abc</span><span class="w"> </span><span class="kn">import</span> <span class="n">Iterable</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">datetime</span><span class="w"> </span><span class="kn">import</span> <span class="n">datetime</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Any</span><span class="p">,</span> <span class="n">Callable</span><span class="p">,</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">Tuple</span><span class="p">,</span> <span class="n">Union</span><span class="p">,</span> <span class="n">cast</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Any</span><span class="p">,</span> <span class="n">Callable</span><span class="p">,</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">Self</span><span class="p">,</span> <span class="n">Sequence</span><span class="p">,</span> <span class="n">Tuple</span><span class="p">,</span> <span class="n">Union</span><span class="p">,</span> <span class="n">cast</span>
 
 <span class="kn">import</span><span class="w"> </span><span class="nn">cftime</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
@@ -445,10 +445,10 @@
 <span class="kn">import</span><span class="w"> </span><span class="nn">xugrid</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">xu</span>
 
 <span class="kn">import</span><span class="w"> </span><span class="nn">imod</span>
-<span class="kn">import</span><span class="w"> </span><span class="nn">imod.mf6.utilities</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">imod.common.interfaces.ipointdatapackage</span><span class="w"> </span><span class="kn">import</span> <span class="n">IPointDataPackage</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">imod.common.utilities.grid</span><span class="w"> </span><span class="kn">import</span> <span class="n">broadcast_to_full_domain</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">imod.common.utilities.layer</span><span class="w"> </span><span class="kn">import</span> <span class="n">create_layered_top</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">imod.common.utilities.schemata</span><span class="w"> </span><span class="kn">import</span> <span class="n">validation_pkg_error_message</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">imod.logging</span><span class="w"> </span><span class="kn">import</span> <span class="n">init_log_decorator</span><span class="p">,</span> <span class="n">logger</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">imod.logging.logging_decorators</span><span class="w"> </span><span class="kn">import</span> <span class="n">standard_log_decorator</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">imod.logging.loglevel</span><span class="w"> </span><span class="kn">import</span> <span class="n">LogLevel</span>
@@ -462,8 +462,7 @@
 <span class="kn">from</span><span class="w"> </span><span class="nn">imod.mf6.package</span><span class="w"> </span><span class="kn">import</span> <span class="n">Package</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">imod.mf6.utilities.dataset</span><span class="w"> </span><span class="kn">import</span> <span class="n">remove_inactive</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">imod.mf6.utilities.imod5_converter</span><span class="w"> </span><span class="kn">import</span> <span class="n">well_from_imod5_cap_data</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">imod.mf6.validation</span><span class="w"> </span><span class="kn">import</span> <span class="n">validation_pkg_error_message</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">imod.mf6.validation_context</span><span class="w"> </span><span class="kn">import</span> <span class="n">ValidationContext</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">imod.mf6.validation_settings</span><span class="w"> </span><span class="kn">import</span> <span class="n">ValidationSettings</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">imod.mf6.write_context</span><span class="w"> </span><span class="kn">import</span> <span class="n">WriteContext</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">imod.prepare</span><span class="w"> </span><span class="kn">import</span> <span class="n">assign_wells</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">imod.prepare.cleanup</span><span class="w"> </span><span class="kn">import</span> <span class="n">cleanup_wel</span><span class="p">,</span> <span class="n">cleanup_wel_layered</span>
@@ -511,36 +510,25 @@
 
 
 <span class="k">def</span><span class="w"> </span><span class="nf">_df_groups_to_da_rates</span><span class="p">(</span>
-    <span class="n">unique_well_groups</span><span class="p">:</span> <span class="n">pd</span><span class="o">.</span><span class="n">api</span><span class="o">.</span><span class="n">typing</span><span class="o">.</span><span class="n">DataFrameGroupBy</span><span class="p">,</span>
+    <span class="n">unique_well_groups</span><span class="p">:</span> <span class="n">Sequence</span><span class="p">[</span><span class="n">pd</span><span class="o">.</span><span class="n">api</span><span class="o">.</span><span class="n">typing</span><span class="o">.</span><span class="n">DataFrameGroupBy</span><span class="p">],</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">xr</span><span class="o">.</span><span class="n">DataArray</span><span class="p">:</span>
     <span class="c1"># Convert dataframes all groups to DataArrays</span>
-    <span class="n">is_steady_state</span> <span class="o">=</span> <span class="s2">&quot;time&quot;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">unique_well_groups</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">columns</span>
-    <span class="k">if</span> <span class="n">is_steady_state</span><span class="p">:</span>
-        <span class="n">da_groups</span> <span class="o">=</span> <span class="p">[</span>
-            <span class="n">xr</span><span class="o">.</span><span class="n">DataArray</span><span class="p">(</span><span class="n">df_group</span><span class="p">[</span><span class="s2">&quot;rate&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">sum</span><span class="p">())</span> <span class="k">for</span> <span class="n">df_group</span> <span class="ow">in</span> <span class="n">unique_well_groups</span>
-        <span class="p">]</span>
+    <span class="n">columns</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">unique_well_groups</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">columns</span><span class="p">)</span>
+    <span class="n">columns</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="s2">&quot;rate&quot;</span><span class="p">)</span>
+    <span class="n">is_transient</span> <span class="o">=</span> <span class="s2">&quot;time&quot;</span> <span class="ow">in</span> <span class="n">columns</span>
+    <span class="n">gb_and_summed</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">concat</span><span class="p">(</span><span class="n">unique_well_groups</span><span class="p">)</span><span class="o">.</span><span class="n">groupby</span><span class="p">(</span><span class="n">columns</span><span class="p">)</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span>
+    <span class="k">if</span> <span class="n">is_transient</span><span class="p">:</span>
+        <span class="n">index_names</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;time&quot;</span><span class="p">,</span> <span class="s2">&quot;index&quot;</span><span class="p">]</span>
     <span class="k">else</span><span class="p">:</span>
-        <span class="n">da_groups</span> <span class="o">=</span> <span class="p">[</span>
-            <span class="n">xr</span><span class="o">.</span><span class="n">DataArray</span><span class="p">(</span>
-                <span class="n">df_group</span><span class="p">[</span><span class="s2">&quot;rate&quot;</span><span class="p">],</span> <span class="n">dims</span><span class="o">=</span><span class="p">(</span><span class="s2">&quot;time&quot;</span><span class="p">),</span> <span class="n">coords</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;time&quot;</span><span class="p">:</span> <span class="n">df_group</span><span class="p">[</span><span class="s2">&quot;time&quot;</span><span class="p">]}</span>
-            <span class="p">)</span>
-            <span class="k">for</span> <span class="n">df_group</span> <span class="ow">in</span> <span class="n">unique_well_groups</span>
-        <span class="p">]</span>
-        <span class="c1"># Groupby time and sum to aggregate wells with the exact same x, y, and</span>
-        <span class="c1"># filter top/bottom.</span>
-        <span class="n">da_groups</span> <span class="o">=</span> <span class="p">[</span><span class="n">da_group</span><span class="o">.</span><span class="n">groupby</span><span class="p">(</span><span class="s2">&quot;time&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span> <span class="k">for</span> <span class="n">da_group</span> <span class="ow">in</span> <span class="n">da_groups</span><span class="p">]</span>
-    <span class="c1"># Assign index coordinates</span>
-    <span class="n">da_groups</span> <span class="o">=</span> <span class="p">[</span>
-        <span class="n">da_group</span><span class="o">.</span><span class="n">expand_dims</span><span class="p">(</span><span class="n">dim</span><span class="o">=</span><span class="s2">&quot;index&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">assign_coords</span><span class="p">(</span><span class="n">index</span><span class="o">=</span><span class="p">[</span><span class="n">i</span><span class="p">])</span>
-        <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">da_group</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">da_groups</span><span class="p">)</span>
-    <span class="p">]</span>
-    <span class="c1"># Concatenate datarrays along index dimension</span>
-    <span class="k">return</span> <span class="n">xr</span><span class="o">.</span><span class="n">concat</span><span class="p">(</span><span class="n">da_groups</span><span class="p">,</span> <span class="n">dim</span><span class="o">=</span><span class="s2">&quot;index&quot;</span><span class="p">)</span>
+        <span class="n">index_names</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;index&quot;</span><span class="p">]</span>
+    <span class="c1"># Unset multi-index, then set index to index_names</span>
+    <span class="n">df_temp</span> <span class="o">=</span> <span class="n">gb_and_summed</span><span class="o">.</span><span class="n">reset_index</span><span class="p">()</span><span class="o">.</span><span class="n">set_index</span><span class="p">(</span><span class="n">index_names</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">df_temp</span><span class="p">[</span><span class="s2">&quot;rate&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">to_xarray</span><span class="p">()</span>
 
 
 <span class="k">def</span><span class="w"> </span><span class="nf">_prepare_well_rates_from_groups</span><span class="p">(</span>
     <span class="n">pkg_data</span><span class="p">:</span> <span class="nb">dict</span><span class="p">,</span>
-    <span class="n">unique_well_groups</span><span class="p">:</span> <span class="n">pd</span><span class="o">.</span><span class="n">api</span><span class="o">.</span><span class="n">typing</span><span class="o">.</span><span class="n">DataFrameGroupBy</span><span class="p">,</span>
+    <span class="n">unique_well_groups</span><span class="p">:</span> <span class="n">Sequence</span><span class="p">[</span><span class="n">pd</span><span class="o">.</span><span class="n">api</span><span class="o">.</span><span class="n">typing</span><span class="o">.</span><span class="n">DataFrameGroupBy</span><span class="p">],</span>
     <span class="n">start_times</span><span class="p">:</span> <span class="n">StressPeriodTimesType</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">xr</span><span class="o">.</span><span class="n">DataArray</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
@@ -896,7 +884,7 @@
 <span class="sd">        Mf6Wel</span>
 <span class="sd">            Object with wells as list based input.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="n">validation_context</span> <span class="o">=</span> <span class="n">ValidationContext</span><span class="p">(</span>
+        <span class="n">validation_context</span> <span class="o">=</span> <span class="n">ValidationSettings</span><span class="p">(</span>
             <span class="n">validate</span><span class="o">=</span><span class="n">validate</span><span class="p">,</span> <span class="n">strict_well_validation</span><span class="o">=</span><span class="n">strict_well_validation</span>
         <span class="p">)</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_to_mf6_pkg</span><span class="p">(</span><span class="n">active</span><span class="p">,</span> <span class="n">top</span><span class="p">,</span> <span class="n">bottom</span><span class="p">,</span> <span class="n">k</span><span class="p">,</span> <span class="n">validation_context</span><span class="p">)</span>
@@ -907,7 +895,7 @@
         <span class="n">top</span><span class="p">:</span> <span class="n">GridDataArray</span><span class="p">,</span>
         <span class="n">bottom</span><span class="p">:</span> <span class="n">GridDataArray</span><span class="p">,</span>
         <span class="n">k</span><span class="p">:</span> <span class="n">GridDataArray</span><span class="p">,</span>
-        <span class="n">validation_context</span><span class="p">:</span> <span class="n">ValidationContext</span><span class="p">,</span>
+        <span class="n">validation_context</span><span class="p">:</span> <span class="n">ValidationSettings</span><span class="p">,</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Mf6Wel</span><span class="p">:</span>
         <span class="k">if</span> <span class="n">validation_context</span><span class="o">.</span><span class="n">validate</span><span class="p">:</span>
             <span class="n">errors</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_validate</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_write_schemata</span><span class="p">)</span>
@@ -938,7 +926,7 @@
         <span class="n">ds</span><span class="p">[</span><span class="s2">&quot;cellid&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_create_cellid</span><span class="p">(</span><span class="n">assigned_wells</span><span class="p">,</span> <span class="n">active</span><span class="p">)</span>
 
         <span class="n">ds_vars</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_create_dataset_vars</span><span class="p">(</span><span class="n">assigned_wells</span><span class="p">,</span> <span class="n">ds</span><span class="p">[</span><span class="s2">&quot;cellid&quot;</span><span class="p">])</span>
-        <span class="n">ds</span> <span class="o">=</span> <span class="n">ds</span><span class="o">.</span><span class="n">assign</span><span class="p">(</span><span class="o">**</span><span class="n">ds_vars</span><span class="o">.</span><span class="n">data_vars</span><span class="p">)</span>
+        <span class="n">ds</span> <span class="o">=</span> <span class="n">ds</span><span class="o">.</span><span class="n">assign</span><span class="p">(</span><span class="o">**</span><span class="n">ds_vars</span><span class="o">.</span><span class="n">data_vars</span><span class="p">)</span>  <span class="c1"># type: ignore[arg-type]</span>
 
         <span class="n">ds</span> <span class="o">=</span> <span class="n">remove_inactive</span><span class="p">(</span><span class="n">ds</span><span class="p">,</span> <span class="n">active</span><span class="p">)</span>
         <span class="n">ds</span><span class="p">[</span><span class="s2">&quot;save_flows&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="p">[</span><span class="s2">&quot;save_flows&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">values</span><span class="p">[()]</span>
@@ -955,7 +943,7 @@
 
         <span class="n">ds</span> <span class="o">=</span> <span class="n">ds</span><span class="o">.</span><span class="n">drop_vars</span><span class="p">(</span><span class="s2">&quot;id&quot;</span><span class="p">)</span>
 
-        <span class="k">return</span> <span class="n">Mf6Wel</span><span class="p">(</span><span class="o">**</span><span class="n">ds</span><span class="o">.</span><span class="n">data_vars</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">Mf6Wel</span><span class="p">(</span><span class="o">**</span><span class="n">ds</span><span class="o">.</span><span class="n">data_vars</span><span class="p">)</span>  <span class="c1"># type: ignore[arg-type]</span>
 
     <span class="k">def</span><span class="w"> </span><span class="nf">gather_filtered_well_ids</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span> <span class="n">well_data_filtered</span><span class="p">:</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span> <span class="o">|</span> <span class="n">xr</span><span class="o">.</span><span class="n">Dataset</span><span class="p">,</span> <span class="n">well_data</span><span class="p">:</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span>
@@ -980,10 +968,11 @@
         <span class="k">else</span><span class="p">:</span>
             <span class="n">message</span> <span class="o">+=</span> <span class="s2">&quot; The first 10 unplaced wells are: </span><span class="se">\n</span><span class="s2">&quot;</span>
 
+        <span class="n">is_filtered</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">dataset</span><span class="p">[</span><span class="s2">&quot;id&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">isin</span><span class="p">([</span><span class="n">filtered_wells</span><span class="p">])</span>
         <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">min</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">filtered_wells</span><span class="p">))):</span>
             <span class="n">ids</span> <span class="o">=</span> <span class="n">filtered_wells</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
-            <span class="n">x</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">dataset</span><span class="p">[</span><span class="s2">&quot;x&quot;</span><span class="p">][</span><span class="nb">int</span><span class="p">(</span><span class="n">filtered_wells</span><span class="p">[</span><span class="n">i</span><span class="p">])]</span><span class="o">.</span><span class="n">values</span><span class="p">[()]</span>
-            <span class="n">y</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">dataset</span><span class="p">[</span><span class="s2">&quot;y&quot;</span><span class="p">][</span><span class="nb">int</span><span class="p">(</span><span class="n">filtered_wells</span><span class="p">[</span><span class="n">i</span><span class="p">])]</span><span class="o">.</span><span class="n">values</span><span class="p">[()]</span>
+            <span class="n">x</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">dataset</span><span class="p">[</span><span class="s2">&quot;x&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">data</span><span class="p">[</span><span class="n">is_filtered</span><span class="p">][</span><span class="n">i</span><span class="p">]</span>
+            <span class="n">y</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">dataset</span><span class="p">[</span><span class="s2">&quot;y&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">data</span><span class="p">[</span><span class="n">is_filtered</span><span class="p">][</span><span class="n">i</span><span class="p">]</span>
             <span class="n">message</span> <span class="o">+=</span> <span class="sa">f</span><span class="s2">&quot; id = </span><span class="si">{</span><span class="n">ids</span><span class="si">}</span><span class="s2"> x = </span><span class="si">{</span><span class="n">x</span><span class="si">}</span><span class="s2">  y = </span><span class="si">{</span><span class="n">y</span><span class="si">}</span><span class="s2"> </span><span class="se">\n</span><span class="s2">&quot;</span>
         <span class="k">return</span> <span class="n">message</span>
 
@@ -1119,8 +1108,12 @@
         <span class="c1"># Associated wells need additional grouping by id</span>
         <span class="k">if</span> <span class="n">pkg_data</span><span class="p">[</span><span class="s2">&quot;has_associated&quot;</span><span class="p">]:</span>
             <span class="n">colnames_group</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s2">&quot;id&quot;</span><span class="p">)</span>
-        <span class="n">wel_index</span><span class="p">,</span> <span class="n">unique_well_groups</span> <span class="o">=</span> <span class="nb">zip</span><span class="p">(</span><span class="o">*</span><span class="n">df</span><span class="o">.</span><span class="n">groupby</span><span class="p">(</span><span class="n">colnames_group</span><span class="p">))</span>
-
+        <span class="n">wel_index</span><span class="p">,</span> <span class="n">well_groups_untagged</span> <span class="o">=</span> <span class="nb">zip</span><span class="p">(</span><span class="o">*</span><span class="n">df</span><span class="o">.</span><span class="n">groupby</span><span class="p">(</span><span class="n">colnames_group</span><span class="p">))</span>
+        <span class="c1"># Explictly sign an index to each group, so that the</span>
+        <span class="c1"># DataArray of rates can be created with a unique index.</span>
+        <span class="n">unique_well_groups</span> <span class="o">=</span> <span class="p">[</span>
+            <span class="n">group</span><span class="o">.</span><span class="n">assign</span><span class="p">(</span><span class="n">index</span><span class="o">=</span><span class="n">i</span><span class="p">)</span> <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">group</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">well_groups_untagged</span><span class="p">)</span>
+        <span class="p">]</span>
         <span class="c1"># Unpack wel indices by zipping</span>
         <span class="n">varnames</span> <span class="o">=</span> <span class="p">[(</span><span class="s2">&quot;x&quot;</span><span class="p">,</span> <span class="nb">float</span><span class="p">),</span> <span class="p">(</span><span class="s2">&quot;y&quot;</span><span class="p">,</span> <span class="nb">float</span><span class="p">)]</span> <span class="o">+</span> <span class="bp">cls</span><span class="o">.</span><span class="n">_depth_colnames</span>
         <span class="n">index_values</span> <span class="o">=</span> <span class="nb">zip</span><span class="p">(</span><span class="o">*</span><span class="n">wel_index</span><span class="p">)</span>
@@ -1142,8 +1135,10 @@
         <span class="n">cleanup_func</span><span class="p">:</span> <span class="n">Callable</span><span class="p">,</span>
         <span class="o">**</span><span class="n">cleanup_kwargs</span><span class="p">,</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="c1"># Work around mypy error, .data_vars cannot be used with xu.UgridDataset</span>
+        <span class="n">dict_to_broadcast</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">GridDataArray</span><span class="p">]</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="o">**</span><span class="n">dis</span><span class="o">.</span><span class="n">dataset</span><span class="p">)</span>  <span class="c1"># type: ignore</span>
         <span class="c1"># Top and bottom should be forced to grids with a x, y coordinates</span>
-        <span class="n">top</span><span class="p">,</span> <span class="n">bottom</span> <span class="o">=</span> <span class="n">broadcast_to_full_domain</span><span class="p">(</span><span class="o">**</span><span class="nb">dict</span><span class="p">(</span><span class="n">dis</span><span class="o">.</span><span class="n">dataset</span><span class="o">.</span><span class="n">data_vars</span><span class="p">))</span>
+        <span class="n">top</span><span class="p">,</span> <span class="n">bottom</span> <span class="o">=</span> <span class="n">broadcast_to_full_domain</span><span class="p">(</span><span class="o">**</span><span class="n">dict_to_broadcast</span><span class="p">)</span>
         <span class="c1"># Collect point variable datanames</span>
         <span class="n">point_varnames</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_write_schemata</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span>
         <span class="k">if</span> <span class="s2">&quot;concentration&quot;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">dataset</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
@@ -1236,14 +1231,15 @@
 <span class="sd">        Flag to indicate whether the package should be validated upon</span>
 <span class="sd">        initialization. This raises a ValidationError if package input is</span>
 <span class="sd">        provided in the wrong manner. Defaults to True.</span>
-<span class="sd">    repeat_stress: Optional[xr.DataArray] of datetimes</span>
+<span class="sd">    repeat_stress: dict or xr.DataArray of datetimes, optional</span>
 <span class="sd">        Used to repeat data for e.g. repeating stress periods such as</span>
-<span class="sd">        seasonality without duplicating the values. The DataArray should have</span>
-<span class="sd">        dimensions ``(&quot;repeat&quot;, &quot;repeat_items&quot;)``. The ``repeat_items``</span>
-<span class="sd">        dimension should have size 2: the first value is the &quot;key&quot;, the second</span>
-<span class="sd">        value is the &quot;value&quot;. For the &quot;key&quot; datetime, the data of the &quot;value&quot;</span>
-<span class="sd">        datetime will be used. Can also be set with a dictionary using the</span>
-<span class="sd">        ``set_repeat_stress`` method.</span>
+<span class="sd">        seasonality without duplicating the values. If provided as dict, it</span>
+<span class="sd">        should map new dates to old dates present in the dataset.</span>
+<span class="sd">        ``{&quot;2001-04-01&quot;: &quot;2000-04-01&quot;, &quot;2001-10-01&quot;: &quot;2000-10-01&quot;}`` if provided</span>
+<span class="sd">        as DataArray, it should have dimensions ``(&quot;repeat&quot;, &quot;repeat_items&quot;)``.</span>
+<span class="sd">        The ``repeat_items`` dimension should have size 2: the first value is</span>
+<span class="sd">        the &quot;key&quot;, the second value is the &quot;value&quot;. For the &quot;key&quot; datetime, the</span>
+<span class="sd">        data of the &quot;value&quot; datetime will be used.</span>
 
 <span class="sd">    Examples</span>
 <span class="sd">    ---------</span>
@@ -1363,7 +1359,7 @@
         <span class="n">y_max</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">float</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
         <span class="n">top</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">GridDataArray</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
         <span class="n">bottom</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">GridDataArray</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Package</span><span class="p">:</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Self</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Clip a package by a bounding box (time, layer, y, x).</span>
 
@@ -1622,14 +1618,15 @@
 <span class="sd">        Flag to indicate whether the package should be validated upon</span>
 <span class="sd">        initialization. This raises a ValidationError if package input is</span>
 <span class="sd">        provided in the wrong manner. Defaults to True.</span>
-<span class="sd">    repeat_stress: Optional[xr.DataArray] of datetimes</span>
+<span class="sd">    repeat_stress: dict or xr.DataArray of datetimes, optional</span>
 <span class="sd">        Used to repeat data for e.g. repeating stress periods such as</span>
-<span class="sd">        seasonality without duplicating the values. The DataArray should have</span>
-<span class="sd">        dimensions ``(&quot;repeat&quot;, &quot;repeat_items&quot;)``. The ``repeat_items``</span>
-<span class="sd">        dimension should have size 2: the first value is the &quot;key&quot;, the second</span>
-<span class="sd">        value is the &quot;value&quot;. For the &quot;key&quot; datetime, the data of the &quot;value&quot;</span>
-<span class="sd">        datetime will be used. Can also be set with a dictionary using the</span>
-<span class="sd">        ``set_repeat_stress`` method.</span>
+<span class="sd">        seasonality without duplicating the values. If provided as dict, it</span>
+<span class="sd">        should map new dates to old dates present in the dataset.</span>
+<span class="sd">        ``{&quot;2001-04-01&quot;: &quot;2000-04-01&quot;, &quot;2001-10-01&quot;: &quot;2000-10-01&quot;}`` if provided</span>
+<span class="sd">        as DataArray, it should have dimensions ``(&quot;repeat&quot;, &quot;repeat_items&quot;)``.</span>
+<span class="sd">        The ``repeat_items`` dimension should have size 2: the first value is</span>
+<span class="sd">        the &quot;key&quot;, the second value is the &quot;value&quot;. For the &quot;key&quot; datetime, the</span>
+<span class="sd">        data of the &quot;value&quot; datetime will be used.</span>
 
 <span class="sd">    Examples</span>
 <span class="sd">    ---------</span>
@@ -1736,7 +1733,7 @@
         <span class="n">y_max</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">float</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
         <span class="n">top</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">GridDataArray</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
         <span class="n">bottom</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">GridDataArray</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Package</span><span class="p">:</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Self</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Clip a package by a bounding box (time, layer, y, x).</span>
 
@@ -2009,7 +2006,7 @@
         <span class="n">y_max</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">float</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
         <span class="n">top</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">GridDataArray</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
         <span class="n">bottom</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">GridDataArray</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Package</span><span class="p">:</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Self</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Clip a package by a bounding box (time, layer, y, x).</span>
 
@@ -2170,7 +2167,7 @@
         <span class="n">y_max</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">float</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
         <span class="n">top</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">GridDataArray</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
         <span class="n">bottom</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">GridDataArray</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Package</span><span class="p">:</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Self</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Clip a package by a bounding box (time, layer, y, x).</span>
 

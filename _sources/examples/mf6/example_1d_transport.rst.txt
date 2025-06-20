@@ -21,7 +21,7 @@
 1D Solute Transport Benchmarks
 ==============================
 
-This example is taken from the MODFLOW6 Examples, number 35.
+This example is taken from the MODFLOW 6 Examples, number 35.
 
 As explained there, the setup is a simple 1d homogeneous aquifer with a steady
 state flow field of constant velocity. The benchmark consists of four transport
@@ -358,14 +358,14 @@ species.
  .. code-block:: none
 
 
-    [<matplotlib.lines.Line2D object at 0x00000156937B0950>, <matplotlib.lines.Line2D object at 0x000001568E4E1010>, <matplotlib.lines.Line2D object at 0x00000156961EC790>, <matplotlib.lines.Line2D object at 0x00000156961EC590>]
+    [<matplotlib.lines.Line2D object at 0x0000016F44052CF0>, <matplotlib.lines.Line2D object at 0x0000016F44052C60>, <matplotlib.lines.Line2D object at 0x0000016F43FB5BB0>, <matplotlib.lines.Line2D object at 0x0000016F44052C00>]
 
 
 
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** (0 minutes 3.559 seconds)
+   **Total running time of the script:** (0 minutes 3.091 seconds)
 
 
 .. _sphx_glr_download_examples_mf6_example_1d_transport.py:

@@ -8,7 +8,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>Henry &#8212; iMOD Python 1.0.0rc3 documentation</title>
+    <title>Henry &#8212; iMOD Python 1.0.0rc4 documentation</title>
   
   
   
@@ -42,7 +42,7 @@
   <link rel="preload" as="script" href="../../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
 <link rel="preload" as="script" href="../../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
 
-    <script src="../../_static/documentation_options.js?v=e441cb1f"></script>
+    <script src="../../_static/documentation_options.js?v=2fc85bd2"></script>
     <script src="../../_static/doctools.js?v=9bcbadda"></script>
     <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script>DOCUMENTATION_OPTIONS.pagename = 'examples/mf6/Henry';</script>
@@ -50,10 +50,10 @@
     <link rel="index" title="Index" href="../../genindex.html" />
     <link rel="search" title="Search" href="../../search.html" />
     <link rel="next" title="Circle" href="circle.html" />
-    <link rel="prev" title="MODFLOW6" href="index.html" />
+    <link rel="prev" title="MODFLOW 6" href="index.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
-  <meta name="docsearch:version" content="1.0.0rc3.dev" />
+  <meta name="docsearch:version" content="1.0.0rc4.dev" />
   </head>
   
   
@@ -117,8 +117,8 @@
     
     
     
-    <img src="../../_static/imod-python-logo-light.svg" class="logo__image only-light" alt="iMOD Python 1.0.0rc3 documentation - Home"/>
-    <img src="../../_static/imod-python-logo-dark.svg" class="logo__image only-dark pst-js-only" alt="iMOD Python 1.0.0rc3 documentation - Home"/>
+    <img src="../../_static/imod-python-logo-light.svg" class="logo__image only-light" alt="iMOD Python 1.0.0rc4 documentation - Home"/>
+    <img src="../../_static/imod-python-logo-dark.svg" class="logo__image only-dark pst-js-only" alt="iMOD Python 1.0.0rc4 documentation - Home"/>
   
   
 </a></div>
@@ -382,7 +382,7 @@
      aria-label="Section Navigation">
   <p class="bd-links__title" role="heading" aria-level="1">Section Navigation</p>
   <div class="bd-toc-item navbar-nav"><ul class="current nav bd-sidenav">
-<li class="toctree-l1 current active has-children"><a class="reference internal" href="index.html">MODFLOW6</a><details open="open"><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul class="current">
+<li class="toctree-l1 current active has-children"><a class="reference internal" href="index.html">MODFLOW 6</a><details open="open"><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul class="current">
 <li class="toctree-l2 current active"><a class="current reference internal" href="#">Henry</a></li>
 <li class="toctree-l2"><a class="reference internal" href="circle.html">Circle</a></li>
 <li class="toctree-l2"><a class="reference internal" href="circle_partitioned.html">Circle partitioned</a></li>
@@ -477,7 +477,7 @@
     <li class="breadcrumb-item"><a href="../index.html" class="nav-link">Examples</a></li>
     
     
-    <li class="breadcrumb-item"><a href="index.html" class="nav-link">MODFLOW6</a></li>
+    <li class="breadcrumb-item"><a href="index.html" class="nav-link">MODFLOW 6</a></li>
     
     <li class="breadcrumb-item active" aria-current="page"><span class="ellipsis">Henry</span></li>
   </ul>
@@ -511,7 +511,7 @@ transport model using the <code class="docutils literal notranslate"><span class
 <li><p>Create a suitable 2d (x, z) grid.</p></li>
 <li><p>Create a groundwater flow model, with variable density.</p></li>
 <li><p>Create a solute transport model.</p></li>
-<li><p>Combine these models into a single MODFLOW6 simulation.</p></li>
+<li><p>Combine these models into a single MODFLOW 6 simulation.</p></li>
 <li><p>Write to modflow6 files.</p></li>
 <li><p>Run the model.</p></li>
 <li><p>Open the results back into xarray DataArrays.</p></li>
@@ -746,7 +746,7 @@ units from the flow model.</p>
 <div class="admonition note">
 <p class="admonition-title">Note</p>
 <p>The following lines assume the <code class="docutils literal notranslate"><span class="pre">mf6</span></code> executable is available on your PATH.
-<a class="reference internal" href="index.html#mf6-introduction"><span class="std std-ref">The Modflow 6 examples introduction</span></a> shortly
+<a class="reference internal" href="index.html#mf6-introduction"><span class="std std-ref">The MODFLOW 6 examples introduction</span></a> shortly
 describes how to add it to yours.</p>
 </div>
 <div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="n">simulation</span><span class="o">.</span><span class="n">run</span><span class="p">()</span>
@@ -767,7 +767,7 @@ describes how to add it to yours.</p>
 <div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="n">head</span><span class="o">.</span><span class="n">isel</span><span class="p">(</span><span class="n">y</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">time</span><span class="o">=-</span><span class="mi">1</span><span class="p">)</span><span class="o">.</span><span class="n">plot</span><span class="o">.</span><span class="n">contourf</span><span class="p">(</span><span class="n">yincrease</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
 </pre></div>
 </div>
-<img src="../../_images/sphx_glr_Henry_001.png" srcset="../../_images/sphx_glr_Henry_001.png" alt="y = 0.5, dx = 0.025, dy = -1.0, time = 0.5" class = "sphx-glr-single-img"/><div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>&lt;matplotlib.contour.QuadContourSet object at 0x000001569A15FAD0&gt;
+<img src="../../_images/sphx_glr_Henry_001.png" srcset="../../_images/sphx_glr_Henry_001.png" alt="y = 0.5, dx = 0.025, dy = -1.0, time = 0.5" class = "sphx-glr-single-img"/><div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>&lt;matplotlib.contour.QuadContourSet object at 0x0000016F3FDA2F60&gt;
 </pre></div>
 </div>
 <p>We can check the concentration to see that a fresh-saline interface has been
@@ -775,10 +775,10 @@ formed:</p>
 <div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="n">conc</span><span class="o">.</span><span class="n">isel</span><span class="p">(</span><span class="n">y</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">time</span><span class="o">=-</span><span class="mi">1</span><span class="p">)</span><span class="o">.</span><span class="n">plot</span><span class="o">.</span><span class="n">contourf</span><span class="p">(</span><span class="n">yincrease</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">cmap</span><span class="o">=</span><span class="s2">&quot;RdYlBu_r&quot;</span><span class="p">)</span>
 </pre></div>
 </div>
-<img src="../../_images/sphx_glr_Henry_002.png" srcset="../../_images/sphx_glr_Henry_002.png" alt="y = 0.5, dx = 0.025, dy = -1.0, time = 0.5" class = "sphx-glr-single-img"/><div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>&lt;matplotlib.contour.QuadContourSet object at 0x000001569A004C50&gt;
+<img src="../../_images/sphx_glr_Henry_002.png" srcset="../../_images/sphx_glr_Henry_002.png" alt="y = 0.5, dx = 0.025, dy = -1.0, time = 0.5" class = "sphx-glr-single-img"/><div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>&lt;matplotlib.contour.QuadContourSet object at 0x0000016F3FD4D7C0&gt;
 </pre></div>
 </div>
-<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> (0 minutes 59.257 seconds)</p>
+<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> (0 minutes 58.243 seconds)</p>
 <div class="sphx-glr-footer sphx-glr-footer-example docutils container" id="sphx-glr-download-examples-mf6-henry-py">
 <div class="sphx-glr-download sphx-glr-download-jupyter docutils container">
 <p><a class="reference download internal" download="" href="../../_downloads/2a9f5616bdf35c8e78b3214ec7e10034/Henry.ipynb"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Jupyter</span> <span class="pre">notebook:</span> <span class="pre">Henry.ipynb</span></code></a></p>
@@ -810,7 +810,7 @@ formed:</p>
       <i class="fa-solid fa-angle-left"></i>
       <div class="prev-next-info">
         <p class="prev-next-subtitle">previous</p>
-        <p class="prev-next-title">MODFLOW6</p>
+        <p class="prev-next-title">MODFLOW 6</p>
       </div>
     </a>
     <a class="right-next"

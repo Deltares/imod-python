@@ -1,0 +1,6 @@
+﻿imod.prepare.create\_partition\_labels
+======================================
+
+.. currentmodule:: imod.prepare
+
+.. autofunction:: create_partition_labels

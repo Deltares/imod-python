@@ -29,21 +29,21 @@ Install beta release
 To install a beta release with pixi::
 
   pixi config prepend default-channels "conda-forge/label/imod_rc"
-  pixi add imod=1.0.0rc3
+  pixi add imod=1.0.0rc4
 
 Or with conda::
 
-  conda install -c conda-forge/label/imod_rc -c conda-forge imod=1.0.0rc3
+  conda install -c conda-forge/label/imod_rc -c conda-forge imod=1.0.0rc4
 
 Or with pip::
 
-  pip install --pre imod=1.0.0rc3
+  pip install --pre imod=1.0.0rc4
 
 
 Which Python?
 -------------
 
-You'll need **Python 3.10, 3.11, or 3.12**. 
+You'll need **Python 3.10, 3.11, 3.12, or 3.13**. 
 
 The recommended way to install Python depends on your experience: Are you new to
 the Python packaging ecosystem or already got experience with it? If you already

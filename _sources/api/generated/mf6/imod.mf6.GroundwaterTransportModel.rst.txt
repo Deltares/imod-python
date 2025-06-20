@@ -38,6 +38,8 @@
       ~GroundwaterTransportModel.setdefault
       ~GroundwaterTransportModel.update
       ~GroundwaterTransportModel.validate
+      ~GroundwaterTransportModel.validate_init_schemata_options
+      ~GroundwaterTransportModel.validate_options
       ~GroundwaterTransportModel.values
       ~GroundwaterTransportModel.write
    

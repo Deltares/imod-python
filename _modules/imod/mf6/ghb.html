@@ -7,7 +7,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>imod.mf6.ghb &#8212; iMOD Python 1.0.0rc3 documentation</title>
+    <title>imod.mf6.ghb &#8212; iMOD Python 1.0.0rc4 documentation</title>
   
   
   
@@ -41,7 +41,7 @@
   <link rel="preload" as="script" href="../../../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
 <link rel="preload" as="script" href="../../../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
 
-    <script src="../../../_static/documentation_options.js?v=e441cb1f"></script>
+    <script src="../../../_static/documentation_options.js?v=2fc85bd2"></script>
     <script src="../../../_static/doctools.js?v=9bcbadda"></script>
     <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script>DOCUMENTATION_OPTIONS.pagename = '_modules/imod/mf6/ghb';</script>
@@ -50,7 +50,7 @@
     <link rel="search" title="Search" href="../../../search.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
-  <meta name="docsearch:version" content="1.0.0rc3.dev" />
+  <meta name="docsearch:version" content="1.0.0rc4.dev" />
   </head>
   
   
@@ -114,8 +114,8 @@
     
     
     
-    <img src="../../../_static/imod-python-logo-light.svg" class="logo__image only-light" alt="iMOD Python 1.0.0rc3 documentation - Home"/>
-    <img src="../../../_static/imod-python-logo-dark.svg" class="logo__image only-dark pst-js-only" alt="iMOD Python 1.0.0rc3 documentation - Home"/>
+    <img src="../../../_static/imod-python-logo-light.svg" class="logo__image only-light" alt="iMOD Python 1.0.0rc4 documentation - Home"/>
+    <img src="../../../_static/imod-python-logo-dark.svg" class="logo__image only-dark pst-js-only" alt="iMOD Python 1.0.0rc4 documentation - Home"/>
   
   
 </a></div>
@@ -434,6 +434,7 @@
 <span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
 
 <span class="kn">from</span><span class="w"> </span><span class="nn">imod.common.interfaces.iregridpackage</span><span class="w"> </span><span class="kn">import</span> <span class="n">IRegridPackage</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">imod.common.utilities.mask</span><span class="w"> </span><span class="kn">import</span> <span class="n">broadcast_and_mask_arrays</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">imod.common.utilities.regrid</span><span class="w"> </span><span class="kn">import</span> <span class="n">_regrid_package_data</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">imod.common.utilities.regrid_method_type</span><span class="w"> </span><span class="kn">import</span> <span class="n">RegridMethodType</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">imod.logging</span><span class="w"> </span><span class="kn">import</span> <span class="n">init_log_decorator</span><span class="p">,</span> <span class="n">standard_log_decorator</span>
@@ -444,7 +445,7 @@
 <span class="kn">from</span><span class="w"> </span><span class="nn">imod.mf6.regrid.regrid_schemes</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
     <span class="n">GeneralHeadBoundaryRegridMethod</span><span class="p">,</span>
 <span class="p">)</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">imod.mf6.utilities.package</span><span class="w"> </span><span class="kn">import</span> <span class="n">get_repeat_stress</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">imod.mf6.utilities.package</span><span class="w"> </span><span class="kn">import</span> <span class="n">set_repeat_stress_if_available</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">imod.mf6.validation</span><span class="w"> </span><span class="kn">import</span> <span class="n">BOUNDARY_DIMS_SCHEMA</span><span class="p">,</span> <span class="n">CONC_DIMS_SCHEMA</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">imod.prepare.cleanup</span><span class="w"> </span><span class="kn">import</span> <span class="n">cleanup_ghb</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">imod.prepare.topsystem.allocation</span><span class="w"> </span><span class="kn">import</span> <span class="n">ALLOCATION_OPTION</span><span class="p">,</span> <span class="n">allocate_ghb_cells</span>
@@ -466,7 +467,6 @@
 <span class="p">)</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">imod.typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">GridDataArray</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">imod.typing.grid</span><span class="w"> </span><span class="kn">import</span> <span class="n">enforce_dim_order</span><span class="p">,</span> <span class="n">has_negative_layer</span><span class="p">,</span> <span class="n">is_planar_grid</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">imod.util.expand_repetitions</span><span class="w"> </span><span class="kn">import</span> <span class="n">expand_repetitions</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">imod.util.regrid</span><span class="w"> </span><span class="kn">import</span> <span class="n">RegridderWeightsCache</span>
 
 
@@ -512,14 +512,15 @@
 <span class="sd">        Flag to indicate whether the package should be validated upon</span>
 <span class="sd">        initialization. This raises a ValidationError if package input is</span>
 <span class="sd">        provided in the wrong manner. Defaults to True.</span>
-<span class="sd">    repeat_stress: Optional[xr.DataArray] of datetimes</span>
+<span class="sd">    repeat_stress: dict or xr.DataArray of datetimes, optional</span>
 <span class="sd">        Used to repeat data for e.g. repeating stress periods such as</span>
-<span class="sd">        seasonality without duplicating the values. The DataArray should have</span>
-<span class="sd">        dimensions ``(&quot;repeat&quot;, &quot;repeat_items&quot;)``. The ``repeat_items``</span>
-<span class="sd">        dimension should have size 2: the first value is the &quot;key&quot;, the second</span>
-<span class="sd">        value is the &quot;value&quot;. For the &quot;key&quot; datetime, the data of the &quot;value&quot;</span>
-<span class="sd">        datetime will be used. Can also be set with a dictionary using the</span>
-<span class="sd">        ``set_repeat_stress`` method.</span>
+<span class="sd">        seasonality without duplicating the values. If provided as dict, it</span>
+<span class="sd">        should map new dates to old dates present in the dataset.</span>
+<span class="sd">        ``{&quot;2001-04-01&quot;: &quot;2000-04-01&quot;, &quot;2001-10-01&quot;: &quot;2000-10-01&quot;}`` if provided</span>
+<span class="sd">        as DataArray, it should have dimensions ``(&quot;repeat&quot;, &quot;repeat_items&quot;)``.</span>
+<span class="sd">        The ``repeat_items`` dimension should have size 2: the first value is</span>
+<span class="sd">        the &quot;key&quot;, the second value is the &quot;value&quot;. For the &quot;key&quot; datetime, the</span>
+<span class="sd">        data of the &quot;value&quot; datetime will be used.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="n">_pkg_id</span> <span class="o">=</span> <span class="s2">&quot;ghb&quot;</span>
@@ -760,14 +761,14 @@
             <span class="s2">&quot;head&quot;</span><span class="p">:</span> <span class="n">imod5_data</span><span class="p">[</span><span class="n">key</span><span class="p">][</span><span class="s2">&quot;head&quot;</span><span class="p">],</span>
             <span class="s2">&quot;conductance&quot;</span><span class="p">:</span> <span class="n">imod5_data</span><span class="p">[</span><span class="n">key</span><span class="p">][</span><span class="s2">&quot;conductance&quot;</span><span class="p">],</span>
         <span class="p">}</span>
-        <span class="n">is_planar</span> <span class="o">=</span> <span class="n">is_planar_grid</span><span class="p">(</span><span class="n">data</span><span class="p">[</span><span class="s2">&quot;conductance&quot;</span><span class="p">])</span>
-
         <span class="k">if</span> <span class="n">regridder_types</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="n">regridder_types</span> <span class="o">=</span> <span class="n">GeneralHeadBoundaryRegridMethod</span><span class="p">()</span>
 
         <span class="n">regridded_package_data</span> <span class="o">=</span> <span class="n">_regrid_package_data</span><span class="p">(</span>
             <span class="n">data</span><span class="p">,</span> <span class="n">idomain</span><span class="p">,</span> <span class="n">regridder_types</span><span class="p">,</span> <span class="n">regrid_cache</span><span class="p">,</span> <span class="p">{}</span>
         <span class="p">)</span>
+        <span class="n">regridded_package_data</span> <span class="o">=</span> <span class="n">broadcast_and_mask_arrays</span><span class="p">(</span><span class="n">regridded_package_data</span><span class="p">)</span>
+        <span class="n">is_planar</span> <span class="o">=</span> <span class="n">is_planar_grid</span><span class="p">(</span><span class="n">regridded_package_data</span><span class="p">[</span><span class="s2">&quot;conductance&quot;</span><span class="p">])</span>
         <span class="k">if</span> <span class="n">is_planar</span><span class="p">:</span>
             <span class="n">layered_data</span> <span class="o">=</span> <span class="bp">cls</span><span class="o">.</span><span class="n">allocate_and_distribute_planar_data</span><span class="p">(</span>
                 <span class="n">regridded_package_data</span><span class="p">,</span>
@@ -780,9 +781,10 @@
 
         <span class="n">ghb</span> <span class="o">=</span> <span class="n">GeneralHeadBoundary</span><span class="p">(</span><span class="o">**</span><span class="n">regridded_package_data</span><span class="p">,</span> <span class="n">validate</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
         <span class="n">repeat</span> <span class="o">=</span> <span class="n">period_data</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">key</span><span class="p">)</span>
-        <span class="k">if</span> <span class="n">repeat</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="n">times</span> <span class="o">=</span> <span class="n">expand_repetitions</span><span class="p">(</span><span class="n">repeat</span><span class="p">,</span> <span class="n">time_min</span><span class="p">,</span> <span class="n">time_max</span><span class="p">)</span>
-            <span class="n">ghb</span><span class="o">.</span><span class="n">dataset</span><span class="p">[</span><span class="s2">&quot;repeat_stress&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">get_repeat_stress</span><span class="p">(</span><span class="n">times</span><span class="p">)</span>
+        <span class="n">set_repeat_stress_if_available</span><span class="p">(</span><span class="n">repeat</span><span class="p">,</span> <span class="n">time_min</span><span class="p">,</span> <span class="n">time_max</span><span class="p">,</span> <span class="n">ghb</span><span class="p">)</span>
+        <span class="c1"># Clip the ghb package to the time range of the simulation and ensure</span>
+        <span class="c1"># time is forward filled.</span>
+        <span class="n">ghb</span> <span class="o">=</span> <span class="n">ghb</span><span class="o">.</span><span class="n">clip_box</span><span class="p">(</span><span class="n">time_min</span><span class="o">=</span><span class="n">time_min</span><span class="p">,</span> <span class="n">time_max</span><span class="o">=</span><span class="n">time_max</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">ghb</span></div>
 
 

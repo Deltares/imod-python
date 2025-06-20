@@ -41,6 +41,8 @@
       ~GroundwaterFlowModel.update
       ~GroundwaterFlowModel.update_buoyancy_package
       ~GroundwaterFlowModel.validate
+      ~GroundwaterFlowModel.validate_init_schemata_options
+      ~GroundwaterFlowModel.validate_options
       ~GroundwaterFlowModel.values
       ~GroundwaterFlowModel.write
    

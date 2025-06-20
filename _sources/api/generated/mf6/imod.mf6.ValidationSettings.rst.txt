@@ -1,0 +1,31 @@
+﻿imod.mf6.ValidationSettings
+===========================
+
+.. currentmodule:: imod.mf6
+
+.. autoclass:: ValidationSettings
+
+   
+   .. automethod:: __init__
+
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      ~ValidationSettings.__init__
+   
+   
+
+   
+   
+   .. rubric:: Attributes
+
+   .. autosummary::
+   
+      ~ValidationSettings.ignore_time
+      ~ValidationSettings.strict_hfb_validation
+      ~ValidationSettings.strict_well_validation
+      ~ValidationSettings.validate
+   
+   

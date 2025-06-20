@@ -8,7 +8,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>imod.visualize.read_imod_legend &#8212; iMOD Python 1.0.0rc3 documentation</title>
+    <title>imod.visualize.read_imod_legend &#8212; iMOD Python 1.0.0rc4 documentation</title>
   
   
   
@@ -42,7 +42,7 @@
   <link rel="preload" as="script" href="../../../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
 <link rel="preload" as="script" href="../../../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
 
-    <script src="../../../_static/documentation_options.js?v=e441cb1f"></script>
+    <script src="../../../_static/documentation_options.js?v=2fc85bd2"></script>
     <script src="../../../_static/doctools.js?v=9bcbadda"></script>
     <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script>DOCUMENTATION_OPTIONS.pagename = 'api/generated/visualize/imod.visualize.read_imod_legend';</script>
@@ -53,7 +53,7 @@
     <link rel="prev" title="imod.visualize.imshow_topview" href="imod.visualize.imshow_topview.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
-  <meta name="docsearch:version" content="1.0.0rc3.dev" />
+  <meta name="docsearch:version" content="1.0.0rc4.dev" />
   </head>
   
   
@@ -117,8 +117,8 @@
     
     
     
-    <img src="../../../_static/imod-python-logo-light.svg" class="logo__image only-light" alt="iMOD Python 1.0.0rc3 documentation - Home"/>
-    <img src="../../../_static/imod-python-logo-dark.svg" class="logo__image only-dark pst-js-only" alt="iMOD Python 1.0.0rc3 documentation - Home"/>
+    <img src="../../../_static/imod-python-logo-light.svg" class="logo__image only-light" alt="iMOD Python 1.0.0rc4 documentation - Home"/>
+    <img src="../../../_static/imod-python-logo-dark.svg" class="logo__image only-dark pst-js-only" alt="iMOD Python 1.0.0rc4 documentation - Home"/>
   
   
 </a></div>
@@ -446,6 +446,7 @@
 <li class="toctree-l2"><a class="reference internal" href="../prepare/imod.prepare.cleanup_riv.html">imod.prepare.cleanup_riv</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../prepare/imod.prepare.cleanup_wel.html">imod.prepare.cleanup_wel</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../prepare/imod.prepare.cleanup_wel_layered.html">imod.prepare.cleanup_wel_layered</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../prepare/imod.prepare.create_partition_labels.html">imod.prepare.create_partition_labels</a></li>
 </ul>
 </details></li>
 <li class="toctree-l1 has-children"><a class="reference internal" href="../../select.html">Select points and cross sections</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
@@ -546,7 +547,7 @@
 </details></li>
 </ul>
 </details></li>
-<li class="toctree-l1 has-children"><a class="reference internal" href="../../mf6.html">MODFLOW6</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../../mf6.html">MODFLOW 6</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
 <li class="toctree-l2"><a class="reference internal" href="../mf6/imod.mf6.open_hds.html">imod.mf6.open_hds</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../mf6/imod.mf6.open_cbc.html">imod.mf6.open_cbc</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../mf6/imod.mf6.read_cbc_headers.html">imod.mf6.read_cbc_headers</a></li>
@@ -585,6 +586,7 @@
 <li class="toctree-l2"><a class="reference internal" href="../mf6/imod.mf6.SolutionPresetSimple.html">imod.mf6.SolutionPresetSimple</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../mf6/imod.mf6.SolutionPresetModerate.html">imod.mf6.SolutionPresetModerate</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../mf6/imod.mf6.SolutionPresetComplex.html">imod.mf6.SolutionPresetComplex</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../mf6/imod.mf6.ValidationSettings.html">imod.mf6.ValidationSettings</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../mf6/imod.mf6.ApiPackage.html">imod.mf6.ApiPackage</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../mf6/imod.mf6.Buoyancy.html">imod.mf6.Buoyancy</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../mf6/imod.mf6.ConstantHead.html">imod.mf6.ConstantHead</a></li>
@@ -828,7 +830,7 @@
 <h1>imod.visualize.read_imod_legend<a class="headerlink" href="#imod-visualize-read-imod-legend" title="Link to this heading">#</a></h1>
 <dl class="py function">
 <dt class="sig sig-object py" id="imod.visualize.read_imod_legend">
-<span class="sig-prename descclassname"><span class="pre">imod.visualize.</span></span><span class="sig-name descname"><span class="pre">read_imod_legend</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">path</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/imod/visualize/spatial.html#read_imod_legend"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#imod.visualize.read_imod_legend" title="Link to this definition">#</a></dt>
+<span class="sig-prename descclassname"><span class="pre">imod.visualize.</span></span><span class="sig-name descname"><span class="pre">read_imod_legend</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">path</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">Path</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">float</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="../../../_modules/imod/visualize/spatial.html#read_imod_legend"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#imod.visualize.read_imod_legend" title="Link to this definition">#</a></dt>
 <dd><dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><p><strong>path</strong> (<em>str</em>) – Path to iMOD .leg file.</p>
@@ -837,6 +839,7 @@
 <dd class="field-even"><p><ul class="simple">
 <li><p><strong>colors</strong> (<em>List of hex colors of length N.</em>)</p></li>
 <li><p><strong>levels</strong> (<em>List of floats of length N-1. These are the boundaries between</em>) – the legend colors/classes.</p></li>
+<li><p><strong>labels</strong> (<em>List of strings of length N. These are the labels for the</em>) – legend colors/classes.</p></li>
 </ul>
 </p>
 </dd>

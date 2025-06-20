@@ -2,7 +2,7 @@
 1D Solute Transport Benchmarks
 ==============================
 
-This example is taken from the MODFLOW6 Examples, number 35.
+This example is taken from the MODFLOW 6 Examples, number 35.
 
 As explained there, the setup is a simple 1d homogeneous aquifer with a steady
 state flow field of constant velocity. The benchmark consists of four transport

@@ -8,7 +8,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>Circle &#8212; iMOD Python 1.0.0rc3 documentation</title>
+    <title>Circle &#8212; iMOD Python 1.0.0rc4 documentation</title>
   
   
   
@@ -42,7 +42,7 @@
   <link rel="preload" as="script" href="../../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
 <link rel="preload" as="script" href="../../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
 
-    <script src="../../_static/documentation_options.js?v=e441cb1f"></script>
+    <script src="../../_static/documentation_options.js?v=2fc85bd2"></script>
     <script src="../../_static/doctools.js?v=9bcbadda"></script>
     <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script>DOCUMENTATION_OPTIONS.pagename = 'examples/mf6/circle';</script>
@@ -53,7 +53,7 @@
     <link rel="prev" title="Henry" href="Henry.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
-  <meta name="docsearch:version" content="1.0.0rc3.dev" />
+  <meta name="docsearch:version" content="1.0.0rc4.dev" />
   </head>
   
   
@@ -117,8 +117,8 @@
     
     
     
-    <img src="../../_static/imod-python-logo-light.svg" class="logo__image only-light" alt="iMOD Python 1.0.0rc3 documentation - Home"/>
-    <img src="../../_static/imod-python-logo-dark.svg" class="logo__image only-dark pst-js-only" alt="iMOD Python 1.0.0rc3 documentation - Home"/>
+    <img src="../../_static/imod-python-logo-light.svg" class="logo__image only-light" alt="iMOD Python 1.0.0rc4 documentation - Home"/>
+    <img src="../../_static/imod-python-logo-dark.svg" class="logo__image only-dark pst-js-only" alt="iMOD Python 1.0.0rc4 documentation - Home"/>
   
   
 </a></div>
@@ -382,7 +382,7 @@
      aria-label="Section Navigation">
   <p class="bd-links__title" role="heading" aria-level="1">Section Navigation</p>
   <div class="bd-toc-item navbar-nav"><ul class="current nav bd-sidenav">
-<li class="toctree-l1 current active has-children"><a class="reference internal" href="index.html">MODFLOW6</a><details open="open"><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul class="current">
+<li class="toctree-l1 current active has-children"><a class="reference internal" href="index.html">MODFLOW 6</a><details open="open"><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul class="current">
 <li class="toctree-l2"><a class="reference internal" href="Henry.html">Henry</a></li>
 <li class="toctree-l2 current active"><a class="current reference internal" href="#">Circle</a></li>
 <li class="toctree-l2"><a class="reference internal" href="circle_partitioned.html">Circle partitioned</a></li>
@@ -477,7 +477,7 @@
     <li class="breadcrumb-item"><a href="../index.html" class="nav-link">Examples</a></li>
     
     
-    <li class="breadcrumb-item"><a href="index.html" class="nav-link">MODFLOW6</a></li>
+    <li class="breadcrumb-item"><a href="index.html" class="nav-link">MODFLOW 6</a></li>
     
     <li class="breadcrumb-item active" aria-current="page"><span class="ellipsis">Circle</span></li>
   </ul>
@@ -509,7 +509,7 @@ model using the <code class="docutils literal notranslate"><span class="pre">imo
 <blockquote>
 <div><ul class="simple">
 <li><p>Create a triangular mesh for a disk geometry.</p></li>
-<li><p>Create the xugrid UgridDataArrays containg the MODFLOW6 parameters.</p></li>
+<li><p>Create the xugrid UgridDataArrays containg the MODFLOW 6 parameters.</p></li>
 <li><p>Feed these arrays into the imod mf6 classes.</p></li>
 <li><p>Write to modflow6 files.</p></li>
 <li><p>Run the model.</p></li>
@@ -669,7 +669,7 @@ conditions are added in the form of the familiar MODFLOW packages.</p>
 <div class="admonition note">
 <p class="admonition-title">Note</p>
 <p>The following lines assume the <code class="docutils literal notranslate"><span class="pre">mf6</span></code> executable is available on your PATH.
-<a class="reference internal" href="index.html#mf6-introduction"><span class="std std-ref">The Modflow 6 examples introduction</span></a> shortly
+<a class="reference internal" href="index.html#mf6-introduction"><span class="std std-ref">The MODFLOW 6 examples introduction</span></a> shortly
 describes how to add it to yours.</p>
 </div>
 <div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="n">simulation</span><span class="o">.</span><span class="n">run</span><span class="p">()</span>
@@ -705,28 +705,76 @@ describes how to add it to yours.</p>
  */
 
 :root {
-  --xr-font-color0: var(--jp-content-font-color0, rgba(0, 0, 0, 1));
-  --xr-font-color2: var(--jp-content-font-color2, rgba(0, 0, 0, 0.54));
-  --xr-font-color3: var(--jp-content-font-color3, rgba(0, 0, 0, 0.38));
-  --xr-border-color: var(--jp-border-color2, #e0e0e0);
-  --xr-disabled-color: var(--jp-layout-color3, #bdbdbd);
-  --xr-background-color: var(--jp-layout-color0, white);
-  --xr-background-color-row-even: var(--jp-layout-color1, white);
-  --xr-background-color-row-odd: var(--jp-layout-color2, #eeeeee);
+  --xr-font-color0: var(
+    --jp-content-font-color0,
+    var(--pst-color-text-base rgba(0, 0, 0, 1))
+  );
+  --xr-font-color2: var(
+    --jp-content-font-color2,
+    var(--pst-color-text-base, rgba(0, 0, 0, 0.54))
+  );
+  --xr-font-color3: var(
+    --jp-content-font-color3,
+    var(--pst-color-text-base, rgba(0, 0, 0, 0.38))
+  );
+  --xr-border-color: var(
+    --jp-border-color2,
+    hsl(from var(--pst-color-on-background, white) h s calc(l - 10))
+  );
+  --xr-disabled-color: var(
+    --jp-layout-color3,
+    hsl(from var(--pst-color-on-background, white) h s calc(l - 40))
+  );
+  --xr-background-color: var(
+    --jp-layout-color0,
+    var(--pst-color-on-background, white)
+  );
+  --xr-background-color-row-even: var(
+    --jp-layout-color1,
+    hsl(from var(--pst-color-on-background, white) h s calc(l - 5))
+  );
+  --xr-background-color-row-odd: var(
+    --jp-layout-color2,
+    hsl(from var(--pst-color-on-background, white) h s calc(l - 15))
+  );
 }
 
 html[theme="dark"],
 html[data-theme="dark"],
 body[data-theme="dark"],
 body.vscode-dark {
-  --xr-font-color0: rgba(255, 255, 255, 1);
-  --xr-font-color2: rgba(255, 255, 255, 0.54);
-  --xr-font-color3: rgba(255, 255, 255, 0.38);
-  --xr-border-color: #1f1f1f;
-  --xr-disabled-color: #515151;
-  --xr-background-color: #111111;
-  --xr-background-color-row-even: #111111;
-  --xr-background-color-row-odd: #313131;
+  --xr-font-color0: var(
+    --jp-content-font-color0,
+    var(--pst-color-text-base, rgba(255, 255, 255, 1))
+  );
+  --xr-font-color2: var(
+    --jp-content-font-color2,
+    var(--pst-color-text-base, rgba(255, 255, 255, 0.54))
+  );
+  --xr-font-color3: var(
+    --jp-content-font-color3,
+    var(--pst-color-text-base, rgba(255, 255, 255, 0.38))
+  );
+  --xr-border-color: var(
+    --jp-border-color2,
+    hsl(from var(--pst-color-on-background, #111111) h s calc(l + 10))
+  );
+  --xr-disabled-color: var(
+    --jp-layout-color3,
+    hsl(from var(--pst-color-on-background, #111111) h s calc(l + 40))
+  );
+  --xr-background-color: var(
+    --jp-layout-color0,
+    var(--pst-color-on-background, #111111)
+  );
+  --xr-background-color-row-even: var(
+    --jp-layout-color1,
+    hsl(from var(--pst-color-on-background, #111111) h s calc(l + 5))
+  );
+  --xr-background-color-row-odd: var(
+    --jp-layout-color2,
+    hsl(from var(--pst-color-on-background, #111111) h s calc(l + 15))
+  );
 }
 
 .xr-wrap {
@@ -782,6 +830,7 @@ body.vscode-dark {
 
 .xr-section-item input + label {
   color: var(--xr-disabled-color);
+  border: 2px solid transparent !important;
 }
 
 .xr-section-item input:enabled + label {
@@ -790,7 +839,7 @@ body.vscode-dark {
 }
 
 .xr-section-item input:focus + label {
-  border: 2px solid var(--xr-font-color0);
+  border: 2px solid var(--xr-font-color0) !important;
 }
 
 .xr-section-item input:enabled + label:hover {
@@ -922,7 +971,9 @@ body.vscode-dark {
 .xr-var-item label,
 .xr-var-item > .xr-var-name span {
   background-color: var(--xr-background-color-row-even);
+  border-color: var(--xr-background-color-row-odd);
   margin-bottom: 0;
+  padding-top: 2px;
 }
 
 .xr-var-item > .xr-var-name:hover span {
@@ -933,6 +984,7 @@ body.vscode-dark {
 .xr-var-list > li:nth-child(odd) > label,
 .xr-var-list > li:nth-child(odd) > .xr-var-name span {
   background-color: var(--xr-background-color-row-odd);
+  border-color: var(--xr-background-color-row-even);
 }
 
 .xr-var-name {
@@ -982,8 +1034,15 @@ body.vscode-dark {
 .xr-var-data,
 .xr-index-data {
   display: none;
-  background-color: var(--xr-background-color) !important;
-  padding-bottom: 5px !important;
+  border-top: 2px dotted var(--xr-background-color);
+  padding-bottom: 20px !important;
+  padding-top: 10px !important;
+}
+
+.xr-var-attrs-in + label,
+.xr-var-data-in + label,
+.xr-index-data-in + label {
+  padding: 0 1px;
 }
 
 .xr-var-attrs-in:checked ~ .xr-var-attrs,
@@ -994,6 +1053,12 @@ body.vscode-dark {
 
 .xr-var-data > table {
   float: right;
+}
+
+.xr-var-data > pre,
+.xr-index-data > pre,
+.xr-var-data > table > tbody > tr {
+  background-color: transparent !important;
 }
 
 .xr-var-name span,
@@ -1055,12 +1120,20 @@ dl.xr-attrs {
   stroke: currentColor;
   fill: currentColor;
 }
+
+.xr-var-attrs-in:checked + label > .xr-icon-file-text2,
+.xr-var-data-in:checked + label > .xr-icon-database,
+.xr-index-data-in:checked + label > .xr-icon-database {
+  color: var(--xr-font-color0);
+  filter: drop-shadow(1px 1px 5px var(--xr-font-color2));
+  stroke-width: 0.8px;
+}
 </style><pre class='xr-text-repr-fallback'>&lt;xarray.DataArray &#x27;head&#x27; (time: 1, layer: 2, mesh2d_nFaces: 216)&gt; Size: 3kB
 dask.array&lt;stack, shape=(1, 2, 216), dtype=float64, chunksize=(1, 2, 216), chunktype=numpy.ndarray&gt;
 Coordinates:
   * layer          (layer) int64 16B 1 2
   * time           (time) float64 8B 1.0
-  * mesh2d_nFaces  (mesh2d_nFaces) int64 2kB 0 1 2 3 4 5 ... 211 212 213 214 215</pre><div class='xr-wrap' style='display:none'><div class='xr-header'><div class='xr-obj-type'>xarray.DataArray</div><div class='xr-array-name'>'head'</div><ul class='xr-dim-list'><li><span class='xr-has-index'>time</span>: 1</li><li><span class='xr-has-index'>layer</span>: 2</li><li><span class='xr-has-index'>mesh2d_nFaces</span>: 216</li></ul></div><ul class='xr-sections'><li class='xr-section-item'><div class='xr-array-wrap'><input id='section-cb4fce32-6bdb-4c3d-86e9-163d64223cb0' class='xr-array-in' type='checkbox' checked><label for='section-cb4fce32-6bdb-4c3d-86e9-163d64223cb0' title='Show/hide data repr'><svg class='icon xr-icon-database'><use xlink:href='#icon-database'></use></svg></label><div class='xr-array-preview xr-preview'><span>dask.array&lt;chunksize=(1, 2, 216), meta=np.ndarray&gt;</span></div><div class='xr-array-data'><table>
+  * mesh2d_nFaces  (mesh2d_nFaces) int64 2kB 0 1 2 3 4 5 ... 211 212 213 214 215</pre><div class='xr-wrap' style='display:none'><div class='xr-header'><div class='xr-obj-type'>xarray.DataArray</div><div class='xr-array-name'>'head'</div><ul class='xr-dim-list'><li><span class='xr-has-index'>time</span>: 1</li><li><span class='xr-has-index'>layer</span>: 2</li><li><span class='xr-has-index'>mesh2d_nFaces</span>: 216</li></ul></div><ul class='xr-sections'><li class='xr-section-item'><div class='xr-array-wrap'><input id='section-41964f2a-cd93-4759-b9b6-aa2a6747db96' class='xr-array-in' type='checkbox' checked><label for='section-41964f2a-cd93-4759-b9b6-aa2a6747db96' title='Show/hide data repr'><svg class='icon xr-icon-database'><use xlink:href='#icon-database'></use></svg></label><div class='xr-array-preview xr-preview'><span>dask.array&lt;chunksize=(1, 2, 216), meta=np.ndarray&gt;</span></div><div class='xr-array-data'><table>
     <tr>
         <td>
             <table style="border-collapse: collapse;">
@@ -1138,10 +1211,10 @@ Coordinates:
 </svg>
         </td>
     </tr>
-</table></div></div></li><li class='xr-section-item'><input id='section-3b02378b-dff6-4b9a-9b90-c1f5d582d591' class='xr-section-summary-in' type='checkbox'  checked><label for='section-3b02378b-dff6-4b9a-9b90-c1f5d582d591' class='xr-section-summary' >Coordinates: <span>(3)</span></label><div class='xr-section-inline-details'></div><div class='xr-section-details'><ul class='xr-var-list'><li class='xr-var-item'><div class='xr-var-name'><span class='xr-has-index'>layer</span></div><div class='xr-var-dims'>(layer)</div><div class='xr-var-dtype'>int64</div><div class='xr-var-preview xr-preview'>1 2</div><input id='attrs-b3238f58-21c8-4b38-b475-cab3849d68dd' class='xr-var-attrs-in' type='checkbox' disabled><label for='attrs-b3238f58-21c8-4b38-b475-cab3849d68dd' title='Show/Hide attributes'><svg class='icon xr-icon-file-text2'><use xlink:href='#icon-file-text2'></use></svg></label><input id='data-889804d5-fe09-46ed-b2d9-2b3cdb87b26b' class='xr-var-data-in' type='checkbox'><label for='data-889804d5-fe09-46ed-b2d9-2b3cdb87b26b' title='Show/Hide data repr'><svg class='icon xr-icon-database'><use xlink:href='#icon-database'></use></svg></label><div class='xr-var-attrs'><dl class='xr-attrs'></dl></div><div class='xr-var-data'><pre>array([1, 2])</pre></div></li><li class='xr-var-item'><div class='xr-var-name'><span class='xr-has-index'>time</span></div><div class='xr-var-dims'>(time)</div><div class='xr-var-dtype'>float64</div><div class='xr-var-preview xr-preview'>1.0</div><input id='attrs-29ca73bf-8204-4249-a9b7-6b5d7aade667' class='xr-var-attrs-in' type='checkbox' disabled><label for='attrs-29ca73bf-8204-4249-a9b7-6b5d7aade667' title='Show/Hide attributes'><svg class='icon xr-icon-file-text2'><use xlink:href='#icon-file-text2'></use></svg></label><input id='data-4665da25-396e-45db-bd68-26a7c1c86861' class='xr-var-data-in' type='checkbox'><label for='data-4665da25-396e-45db-bd68-26a7c1c86861' title='Show/Hide data repr'><svg class='icon xr-icon-database'><use xlink:href='#icon-database'></use></svg></label><div class='xr-var-attrs'><dl class='xr-attrs'></dl></div><div class='xr-var-data'><pre>array([1.])</pre></div></li><li class='xr-var-item'><div class='xr-var-name'><span class='xr-has-index'>mesh2d_nFaces</span></div><div class='xr-var-dims'>(mesh2d_nFaces)</div><div class='xr-var-dtype'>int64</div><div class='xr-var-preview xr-preview'>0 1 2 3 4 5 ... 211 212 213 214 215</div><input id='attrs-e693bbc5-ab02-4c28-b860-0cd4b91376f2' class='xr-var-attrs-in' type='checkbox' disabled><label for='attrs-e693bbc5-ab02-4c28-b860-0cd4b91376f2' title='Show/Hide attributes'><svg class='icon xr-icon-file-text2'><use xlink:href='#icon-file-text2'></use></svg></label><input id='data-129516c4-ad9b-459a-ad59-e716a89080fe' class='xr-var-data-in' type='checkbox'><label for='data-129516c4-ad9b-459a-ad59-e716a89080fe' title='Show/Hide data repr'><svg class='icon xr-icon-database'><use xlink:href='#icon-database'></use></svg></label><div class='xr-var-attrs'><dl class='xr-attrs'></dl></div><div class='xr-var-data'><pre>array([  0,   1,   2, ..., 213, 214, 215], shape=(216,))</pre></div></li></ul></div></li><li class='xr-section-item'><input id='section-086ce92b-cac2-4417-97e2-90dd6a757b10' class='xr-section-summary-in' type='checkbox'  ><label for='section-086ce92b-cac2-4417-97e2-90dd6a757b10' class='xr-section-summary' >Indexes: <span>(3)</span></label><div class='xr-section-inline-details'></div><div class='xr-section-details'><ul class='xr-var-list'><li class='xr-var-item'><div class='xr-index-name'><div>layer</div></div><div class='xr-index-preview'>PandasIndex</div><input type='checkbox' disabled/><label></label><input id='index-ede0b13b-61cb-49f2-9047-ebe810ed939b' class='xr-index-data-in' type='checkbox'/><label for='index-ede0b13b-61cb-49f2-9047-ebe810ed939b' title='Show/Hide index repr'><svg class='icon xr-icon-database'><use xlink:href='#icon-database'></use></svg></label><div class='xr-index-data'><pre>PandasIndex(Index([1, 2], dtype=&#x27;int64&#x27;, name=&#x27;layer&#x27;))</pre></div></li><li class='xr-var-item'><div class='xr-index-name'><div>time</div></div><div class='xr-index-preview'>PandasIndex</div><input type='checkbox' disabled/><label></label><input id='index-6314d1b9-656c-49c2-be23-79f9c0e36461' class='xr-index-data-in' type='checkbox'/><label for='index-6314d1b9-656c-49c2-be23-79f9c0e36461' title='Show/Hide index repr'><svg class='icon xr-icon-database'><use xlink:href='#icon-database'></use></svg></label><div class='xr-index-data'><pre>PandasIndex(Index([1.0], dtype=&#x27;float64&#x27;, name=&#x27;time&#x27;))</pre></div></li><li class='xr-var-item'><div class='xr-index-name'><div>mesh2d_nFaces</div></div><div class='xr-index-preview'>PandasIndex</div><input type='checkbox' disabled/><label></label><input id='index-37afad2d-6dc2-4665-b29d-47d64e3f39be' class='xr-index-data-in' type='checkbox'/><label for='index-37afad2d-6dc2-4665-b29d-47d64e3f39be' title='Show/Hide index repr'><svg class='icon xr-icon-database'><use xlink:href='#icon-database'></use></svg></label><div class='xr-index-data'><pre>PandasIndex(RangeIndex(start=0, stop=216, step=1, name=&#x27;mesh2d_nFaces&#x27;))</pre></div></li></ul></div></li><li class='xr-section-item'><input id='section-5c6c49f7-3c12-4b31-b538-64365d25509c' class='xr-section-summary-in' type='checkbox' disabled ><label for='section-5c6c49f7-3c12-4b31-b538-64365d25509c' class='xr-section-summary'  title='Expand/collapse section'>Attributes: <span>(0)</span></label><div class='xr-section-inline-details'></div><div class='xr-section-details'><dl class='xr-attrs'></dl></div></li></ul></div></div>
+</table></div></div></li><li class='xr-section-item'><input id='section-8455b047-628f-4aa3-a908-834cd99db510' class='xr-section-summary-in' type='checkbox'  checked><label for='section-8455b047-628f-4aa3-a908-834cd99db510' class='xr-section-summary' >Coordinates: <span>(3)</span></label><div class='xr-section-inline-details'></div><div class='xr-section-details'><ul class='xr-var-list'><li class='xr-var-item'><div class='xr-var-name'><span class='xr-has-index'>layer</span></div><div class='xr-var-dims'>(layer)</div><div class='xr-var-dtype'>int64</div><div class='xr-var-preview xr-preview'>1 2</div><input id='attrs-b9c9592e-c8ef-44f9-bbaf-af1156438591' class='xr-var-attrs-in' type='checkbox' disabled><label for='attrs-b9c9592e-c8ef-44f9-bbaf-af1156438591' title='Show/Hide attributes'><svg class='icon xr-icon-file-text2'><use xlink:href='#icon-file-text2'></use></svg></label><input id='data-49a7ac2c-7195-4835-902d-e26409081106' class='xr-var-data-in' type='checkbox'><label for='data-49a7ac2c-7195-4835-902d-e26409081106' title='Show/Hide data repr'><svg class='icon xr-icon-database'><use xlink:href='#icon-database'></use></svg></label><div class='xr-var-attrs'><dl class='xr-attrs'></dl></div><div class='xr-var-data'><pre>array([1, 2])</pre></div></li><li class='xr-var-item'><div class='xr-var-name'><span class='xr-has-index'>time</span></div><div class='xr-var-dims'>(time)</div><div class='xr-var-dtype'>float64</div><div class='xr-var-preview xr-preview'>1.0</div><input id='attrs-9e423328-2e88-4071-a37a-9f0e90a4f1dc' class='xr-var-attrs-in' type='checkbox' disabled><label for='attrs-9e423328-2e88-4071-a37a-9f0e90a4f1dc' title='Show/Hide attributes'><svg class='icon xr-icon-file-text2'><use xlink:href='#icon-file-text2'></use></svg></label><input id='data-251e91a2-72fa-4b6f-9084-8269fc3ae302' class='xr-var-data-in' type='checkbox'><label for='data-251e91a2-72fa-4b6f-9084-8269fc3ae302' title='Show/Hide data repr'><svg class='icon xr-icon-database'><use xlink:href='#icon-database'></use></svg></label><div class='xr-var-attrs'><dl class='xr-attrs'></dl></div><div class='xr-var-data'><pre>array([1.])</pre></div></li><li class='xr-var-item'><div class='xr-var-name'><span class='xr-has-index'>mesh2d_nFaces</span></div><div class='xr-var-dims'>(mesh2d_nFaces)</div><div class='xr-var-dtype'>int64</div><div class='xr-var-preview xr-preview'>0 1 2 3 4 5 ... 211 212 213 214 215</div><input id='attrs-ad7ab05f-679d-4dc4-8d07-2488e15a1404' class='xr-var-attrs-in' type='checkbox' disabled><label for='attrs-ad7ab05f-679d-4dc4-8d07-2488e15a1404' title='Show/Hide attributes'><svg class='icon xr-icon-file-text2'><use xlink:href='#icon-file-text2'></use></svg></label><input id='data-c3390d05-cccb-472a-a0aa-7390399fe151' class='xr-var-data-in' type='checkbox'><label for='data-c3390d05-cccb-472a-a0aa-7390399fe151' title='Show/Hide data repr'><svg class='icon xr-icon-database'><use xlink:href='#icon-database'></use></svg></label><div class='xr-var-attrs'><dl class='xr-attrs'></dl></div><div class='xr-var-data'><pre>array([  0,   1,   2, ..., 213, 214, 215], shape=(216,))</pre></div></li></ul></div></li><li class='xr-section-item'><input id='section-ed8311e1-c9ac-4022-a354-13384ef64304' class='xr-section-summary-in' type='checkbox'  ><label for='section-ed8311e1-c9ac-4022-a354-13384ef64304' class='xr-section-summary' >Indexes: <span>(3)</span></label><div class='xr-section-inline-details'></div><div class='xr-section-details'><ul class='xr-var-list'><li class='xr-var-item'><div class='xr-index-name'><div>layer</div></div><div class='xr-index-preview'>PandasIndex</div><input type='checkbox' disabled/><label></label><input id='index-0813d142-3f23-4468-8c0e-43bea984201e' class='xr-index-data-in' type='checkbox'/><label for='index-0813d142-3f23-4468-8c0e-43bea984201e' title='Show/Hide index repr'><svg class='icon xr-icon-database'><use xlink:href='#icon-database'></use></svg></label><div class='xr-index-data'><pre>PandasIndex(Index([1, 2], dtype=&#x27;int64&#x27;, name=&#x27;layer&#x27;))</pre></div></li><li class='xr-var-item'><div class='xr-index-name'><div>time</div></div><div class='xr-index-preview'>PandasIndex</div><input type='checkbox' disabled/><label></label><input id='index-61b00620-c322-4e5a-a660-f99782ca6e6e' class='xr-index-data-in' type='checkbox'/><label for='index-61b00620-c322-4e5a-a660-f99782ca6e6e' title='Show/Hide index repr'><svg class='icon xr-icon-database'><use xlink:href='#icon-database'></use></svg></label><div class='xr-index-data'><pre>PandasIndex(Index([1.0], dtype=&#x27;float64&#x27;, name=&#x27;time&#x27;))</pre></div></li><li class='xr-var-item'><div class='xr-index-name'><div>mesh2d_nFaces</div></div><div class='xr-index-preview'>PandasIndex</div><input type='checkbox' disabled/><label></label><input id='index-4cfc47bb-5ab8-4103-b323-273ed0e57903' class='xr-index-data-in' type='checkbox'/><label for='index-4cfc47bb-5ab8-4103-b323-273ed0e57903' title='Show/Hide index repr'><svg class='icon xr-icon-database'><use xlink:href='#icon-database'></use></svg></label><div class='xr-index-data'><pre>PandasIndex(RangeIndex(start=0, stop=216, step=1, name=&#x27;mesh2d_nFaces&#x27;))</pre></div></li></ul></div></li><li class='xr-section-item'><input id='section-251cb883-817d-4332-8e6c-b56ee1c1ccf4' class='xr-section-summary-in' type='checkbox' disabled ><label for='section-251cb883-817d-4332-8e6c-b56ee1c1ccf4' class='xr-section-summary'  title='Expand/collapse section'>Attributes: <span>(0)</span></label><div class='xr-section-inline-details'></div><div class='xr-section-details'><dl class='xr-attrs'></dl></div></li></ul></div></div>
 </div>
 <br />
-<br /><p>For a DISV MODFLOW6 model, the heads are returned as a UgridDataArray.  While
+<br /><p>For a DISV MODFLOW 6 model, the heads are returned as a UgridDataArray.  While
 all layers and timesteps are available, they are only loaded into memory as
 needed.</p>
 <p>We may also open the cell-by-cell flows (.cbc) file.</p>
@@ -1242,7 +1315,7 @@ computed full domain simulation as the clipped boundary values.</p>
 <span class="n">ax</span><span class="o">.</span><span class="n">set_aspect</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
 </pre></div>
 </div>
-<img src="../../_images/sphx_glr_circle_005.png" srcset="../../_images/sphx_glr_circle_005.png" alt="layer = 1, time = 1.0" class = "sphx-glr-single-img"/><p class="sphx-glr-timing"><strong>Total running time of the script:</strong> (0 minutes 1.949 seconds)</p>
+<img src="../../_images/sphx_glr_circle_005.png" srcset="../../_images/sphx_glr_circle_005.png" alt="layer = 1, time = 1.0" class = "sphx-glr-single-img"/><p class="sphx-glr-timing"><strong>Total running time of the script:</strong> (0 minutes 1.748 seconds)</p>
 <div class="sphx-glr-footer sphx-glr-footer-example docutils container" id="sphx-glr-download-examples-mf6-circle-py">
 <div class="sphx-glr-download sphx-glr-download-jupyter docutils container">
 <p><a class="reference download internal" download="" href="../../_downloads/da54a35e0f5ea1b64348acc4b0a1abde/circle.ipynb"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Jupyter</span> <span class="pre">notebook:</span> <span class="pre">circle.ipynb</span></code></a></p>

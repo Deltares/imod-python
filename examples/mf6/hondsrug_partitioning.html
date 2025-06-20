@@ -8,7 +8,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>Partitioning a regional model &#8212; iMOD Python 1.0.0rc3 documentation</title>
+    <title>Partitioning a regional model &#8212; iMOD Python 1.0.0rc4 documentation</title>
   
   
   
@@ -42,7 +42,7 @@
   <link rel="preload" as="script" href="../../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
 <link rel="preload" as="script" href="../../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
 
-    <script src="../../_static/documentation_options.js?v=e441cb1f"></script>
+    <script src="../../_static/documentation_options.js?v=2fc85bd2"></script>
     <script src="../../_static/doctools.js?v=9bcbadda"></script>
     <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script>DOCUMENTATION_OPTIONS.pagename = 'examples/mf6/hondsrug_partitioning';</script>
@@ -53,7 +53,7 @@
     <link rel="prev" title="Regional model" href="hondsrug.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
-  <meta name="docsearch:version" content="1.0.0rc3.dev" />
+  <meta name="docsearch:version" content="1.0.0rc4.dev" />
   </head>
   
   
@@ -117,8 +117,8 @@
     
     
     
-    <img src="../../_static/imod-python-logo-light.svg" class="logo__image only-light" alt="iMOD Python 1.0.0rc3 documentation - Home"/>
-    <img src="../../_static/imod-python-logo-dark.svg" class="logo__image only-dark pst-js-only" alt="iMOD Python 1.0.0rc3 documentation - Home"/>
+    <img src="../../_static/imod-python-logo-light.svg" class="logo__image only-light" alt="iMOD Python 1.0.0rc4 documentation - Home"/>
+    <img src="../../_static/imod-python-logo-dark.svg" class="logo__image only-dark pst-js-only" alt="iMOD Python 1.0.0rc4 documentation - Home"/>
   
   
 </a></div>
@@ -382,7 +382,7 @@
      aria-label="Section Navigation">
   <p class="bd-links__title" role="heading" aria-level="1">Section Navigation</p>
   <div class="bd-toc-item navbar-nav"><ul class="current nav bd-sidenav">
-<li class="toctree-l1 current active has-children"><a class="reference internal" href="index.html">MODFLOW6</a><details open="open"><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul class="current">
+<li class="toctree-l1 current active has-children"><a class="reference internal" href="index.html">MODFLOW 6</a><details open="open"><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul class="current">
 <li class="toctree-l2"><a class="reference internal" href="Henry.html">Henry</a></li>
 <li class="toctree-l2"><a class="reference internal" href="circle.html">Circle</a></li>
 <li class="toctree-l2"><a class="reference internal" href="circle_partitioned.html">Circle partitioned</a></li>
@@ -477,7 +477,7 @@
     <li class="breadcrumb-item"><a href="../index.html" class="nav-link">Examples</a></li>
     
     
-    <li class="breadcrumb-item"><a href="index.html" class="nav-link">MODFLOW6</a></li>
+    <li class="breadcrumb-item"><a href="index.html" class="nav-link">MODFLOW 6</a></li>
     
     <li class="breadcrumb-item active" aria-current="page"><span class="ellipsis">Partitioning a regional model</span></li>
   </ul>
@@ -514,7 +514,7 @@ comparison.</p>
 <div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">matplotlib.pyplot</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">plt</span>
 
 <span class="kn">import</span><span class="w"> </span><span class="nn">imod</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">imod.mf6.multimodel.partition_generator</span><span class="w"> </span><span class="kn">import</span> <span class="n">get_label_array</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">imod.prepare.partition</span><span class="w"> </span><span class="kn">import</span> <span class="n">create_partition_labels</span>
 </pre></div>
 </div>
 <p>Obtain the simulation, write it, run it, and plot some heads.
@@ -549,18 +549,63 @@ results are similar).</p>
 <p>Now we partition the Hondsrug model</p>
 <div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="n">idomain</span> <span class="o">=</span> <span class="n">gwf_simulation</span><span class="p">[</span><span class="s2">&quot;GWF&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">domain</span>
 <span class="n">number_partitions</span> <span class="o">=</span> <span class="mi">16</span>
-<span class="n">submodel_labels</span> <span class="o">=</span> <span class="n">get_label_array</span><span class="p">(</span><span class="n">gwf_simulation</span><span class="p">,</span> <span class="n">number_partitions</span><span class="p">)</span>
+<span class="n">submodel_labels</span> <span class="o">=</span> <span class="n">create_partition_labels</span><span class="p">(</span><span class="n">gwf_simulation</span><span class="p">,</span> <span class="n">number_partitions</span><span class="p">)</span>
 </pre></div>
 </div>
-<p>plot the partitioning array. It shows how the model will be partitioned.</p>
+<p>This label array determines how the model will be split. <a class="reference external" href="https://github.com/KarypisLab/METIS/blob/master/manual/manual.pdf">METIS</a> is used
+in the background to partition models, which is the cause of the imperfect
+rectangular shapes. By default, partitions are weighted by the number of active cells
+across the layer dimension.</p>
 <div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="n">fig</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">()</span>
 <span class="n">submodel_labels</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">ax</span><span class="o">=</span><span class="n">ax</span><span class="p">)</span>
 <span class="n">ax</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="s2">&quot;hondsrug partitioning geometry&quot;</span><span class="p">)</span>
-
-<span class="n">split_simulation</span> <span class="o">=</span> <span class="n">gwf_simulation</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="n">submodel_labels</span><span class="p">)</span>
 </pre></div>
 </div>
-<img src="../../_images/sphx_glr_hondsrug_partitioning_002.png" srcset="../../_images/sphx_glr_hondsrug_partitioning_002.png" alt="hondsrug partitioning geometry" class = "sphx-glr-single-img"/><p>Now we  write and run the partitioned model</p>
+<img src="../../_images/sphx_glr_hondsrug_partitioning_002.png" srcset="../../_images/sphx_glr_hondsrug_partitioning_002.png" alt="hondsrug partitioning geometry" class = "sphx-glr-single-img"/><div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>Text(0.5, 1.0, &#39;hondsrug partitioning geometry&#39;)
+</pre></div>
+</div>
+<p>Let’s split the simulation into 16 submodels.</p>
+<div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="n">split_simulation</span> <span class="o">=</span> <span class="n">gwf_simulation</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="n">submodel_labels</span><span class="p">)</span>
+
+<span class="n">split_simulation</span>
+</pre></div>
+</div>
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>C:\buildagent\work\4b9080cbb3354582\imod-python\.pixi\envs\default\Lib\site-packages\xarray\core\duck_array_ops.py:253: RuntimeWarning: invalid value encountered in cast
+  return data.astype(dtype, **kwargs)
+C:\buildagent\work\4b9080cbb3354582\imod-python\.pixi\envs\default\Lib\site-packages\xarray\core\duck_array_ops.py:253: RuntimeWarning: invalid value encountered in cast
+  return data.astype(dtype, **kwargs)
+C:\buildagent\work\4b9080cbb3354582\imod-python\.pixi\envs\default\Lib\site-packages\xarray\core\duck_array_ops.py:253: RuntimeWarning: invalid value encountered in cast
+  return data.astype(dtype, **kwargs)
+C:\buildagent\work\4b9080cbb3354582\imod-python\.pixi\envs\default\Lib\site-packages\xarray\core\duck_array_ops.py:253: RuntimeWarning: invalid value encountered in cast
+  return data.astype(dtype, **kwargs)
+
+Modflow6Simulation(
+    name=&#39;mf6-hondsrug-example_partioned&#39;,
+    directory=None
+){
+    &#39;solver&#39;: Solution,
+    &#39;time_discretization&#39;: TimeDiscretization,
+    &#39;GWF_0&#39;: GroundwaterFlowModel,
+    &#39;GWF_1&#39;: GroundwaterFlowModel,
+    &#39;GWF_2&#39;: GroundwaterFlowModel,
+    &#39;GWF_3&#39;: GroundwaterFlowModel,
+    &#39;GWF_4&#39;: GroundwaterFlowModel,
+    &#39;GWF_5&#39;: GroundwaterFlowModel,
+    &#39;GWF_6&#39;: GroundwaterFlowModel,
+    &#39;GWF_7&#39;: GroundwaterFlowModel,
+    &#39;GWF_8&#39;: GroundwaterFlowModel,
+    &#39;GWF_9&#39;: GroundwaterFlowModel,
+    &#39;GWF_10&#39;: GroundwaterFlowModel,
+    &#39;GWF_11&#39;: GroundwaterFlowModel,
+    &#39;GWF_12&#39;: GroundwaterFlowModel,
+    &#39;GWF_13&#39;: GroundwaterFlowModel,
+    &#39;GWF_14&#39;: GroundwaterFlowModel,
+    &#39;GWF_15&#39;: GroundwaterFlowModel,
+    &#39;split_exchanges&#39;: list,
+}
+</pre></div>
+</div>
+<p>Now we  write and run the partitioned model</p>
 <div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="n">split_modeldir</span> <span class="o">=</span> <span class="n">tmpdir</span> <span class="o">/</span> <span class="s2">&quot;split&quot;</span>
 
 <span class="n">split_simulation</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">split_modeldir</span><span class="p">)</span>
@@ -587,7 +632,7 @@ results are similar).</p>
 <div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>Text(0.5, 1.0, &#39;hondsrug diff &#39;)
 </pre></div>
 </div>
-<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> (4 minutes 51.433 seconds)</p>
+<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> (4 minutes 23.188 seconds)</p>
 <div class="sphx-glr-footer sphx-glr-footer-example docutils container" id="sphx-glr-download-examples-mf6-hondsrug-partitioning-py">
 <div class="sphx-glr-download sphx-glr-download-jupyter docutils container">
 <p><a class="reference download internal" download="" href="../../_downloads/c36f338498698f0b51edf3b5cbb2ebe2/hondsrug_partitioning.ipynb"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Jupyter</span> <span class="pre">notebook:</span> <span class="pre">hondsrug_partitioning.ipynb</span></code></a></p>

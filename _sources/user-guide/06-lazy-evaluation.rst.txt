@@ -247,7 +247,7 @@ Delayed computation and (i)MODFLOW files
 ----------------------------------------
 
 The input and output functions in the imod package have been written to work
-with xarray's delayed evaluation. This means that opening IDFs or MODFLOW6
+with xarray's delayed evaluation. This means that opening IDFs or MODFLOW 6
 will not load the data from the files into memory until they are needed.
 
 Let's grab some example results, store them in a temporarily directory, and
@@ -502,7 +502,7 @@ outside of VSCode.
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** (0 minutes 3.484 seconds)
+   **Total running time of the script:** (0 minutes 3.417 seconds)
 
 
 .. _sphx_glr_download_user-guide_06-lazy-evaluation.py:
