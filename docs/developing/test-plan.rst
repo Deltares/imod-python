@@ -121,34 +121,34 @@ Manual checks
 QGIS export
 ^^^^^^^^^^^
 
-- Run the pixi task written: 
+1. Run the pixi task written: 
 
-  .. code-block:: console
+   .. code-block:: console
 
-    pixi run export_qgis
+     pixi run export_qgis
 
-  This will export a simulation to a TOML file and a set of UGRID netCDFs twice,
-  once for a model with a structured grid, once for a model with an unstructured
-  grid. The location of the exported files will be printed in the terminal.
-- `Download the latest version of QGIS <https://qgis.org/download/>`_.
-- Open QGIS.
-- Set the coordinate reference system (CRS) of the project to EPSG:28992, the
-  same CRS as the exported files.
-- Click ``"Layers" > "Add Layer" > "Add mesh"``. Insert the path printed in the
-  terminal in the text box. ``{path_printed_in_terminal}/hondsrug_MDAL/riv.nc``
-  This will import the mesh. 
-- Verify if the mesh is rendered in two dimensions, and not as a single
-  line of cells. If not, open an issue on `GitHub
-  <https://github.com/Deltares/imod-python/issues>`_ . 
+   This will export a simulation to a TOML file and a set of UGRID netCDFs twice,
+   once for a model with a structured grid, once for a model with an unstructured
+   grid. The location of the exported files will be printed in the terminal.
+2. `Download the latest version of QGIS <https://qgis.org/download/>`_.
+3. Open QGIS.
+4. Set the coordinate reference system (CRS) of the project to EPSG:28992, the
+   same CRS as the exported files.
+5. Click ``"Layers" > "Add Layer" > "Add mesh"``. Insert the path printed in the
+   terminal in the text box. ``{path_printed_in_terminal}/hondsrug_MDAL/riv.nc``
+   This will import the mesh. 
+6. Verify if the mesh is rendered in two dimensions, and not as a single
+   line of cells. If not, open an issue on `GitHub
+   <https://github.com/Deltares/imod-python/issues>`_ . 
 
 Tutorial
 ^^^^^^^^
 
-- `Work through the tutorial material here
-  <https://deltares.github.io/iMOD-Documentation/>`_ .
-- Run each jupyter notebook and assure it runs without errors.
-- If there are any errors, open an issue on `iMOD Documentation repository
-  Github <https://github.com/Deltares/iMOD-Documentation/issues>`_ .
+1. `Open the tutorial material here
+   <https://deltares.github.io/iMOD-Documentation/tutorial_Hondsrug.html/>`_ .
+2. Run each jupyter notebook and assure it runs without errors.
+3. If there are any errors, open an issue on `iMOD Documentation repository
+   Github <https://github.com/Deltares/iMOD-Documentation/issues>`_ .
 
 Documentation
 *************
