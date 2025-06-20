@@ -1,4 +1,4 @@
-from typing import Optional, Union, cast
+from typing import Optional, Union
 
 import numpy as np
 import pandas as pd
@@ -7,7 +7,7 @@ import xarray as xr
 from imod.common.utilities.regrid import _regrid_package_data
 from imod.common.utilities.regrid_method_type import RegridMethodType
 from imod.mf6.package import Package
-from imod.typing import GridDataDict, Imod5DataDict
+from imod.typing import GridDataArray, GridDataDict, Imod5DataDict
 from imod.typing.grid import full_like
 from imod.util.dims import drop_layer_dim_cap_data
 from imod.util.regrid import RegridderWeightsCache
@@ -107,7 +107,7 @@ def well_from_imod5_cap_data(imod5_data: Imod5DataDict) -> dict[str, np.ndarray]
         capacity is already defined in the point data. This is an ``n:1``
         mapping: multiple grid cells can map to one well.
     """
-    cap_data = cast(GridDataDict, drop_layer_dim_cap_data(imod5_data)["cap"])
+    cap_data = drop_layer_dim_cap_data(imod5_data)["cap"]
 
     if isinstance(cap_data["artificial_recharge_layer"], pd.DataFrame):
         return _well_from_imod5_cap_point_data(cap_data)
@@ -136,3 +136,18 @@ def regrid_imod5_pkg_data(
         imod5_pkg_data, target_idomain, regridder_types, regrid_cache, {}
     )
     return regridded_pkg_data
+
+
+def chd_cells_from_imod5_data(
+    imod5_pkg_data: GridDataDict, target_idomain: GridDataArray
+) -> GridDataDict:
+    head = imod5_pkg_data["head"]
+    ibound = imod5_pkg_data["ibound"]
+
+    # select locations where ibound < 0
+    head = head.where(ibound < 0)
+
+    # select locations where idomain > 0
+    head = head.where(target_idomain > 0)
+
+    return {"head": head}

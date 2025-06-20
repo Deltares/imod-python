@@ -6,6 +6,7 @@ import numpy as np
 
 from imod import logging
 from imod.common.interfaces.iregridpackage import IRegridPackage
+from imod.common.utilities.mask import broadcast_and_mask_arrays
 from imod.logging import init_log_decorator, standard_log_decorator
 from imod.mf6.boundary_condition import BoundaryCondition
 from imod.mf6.dis import StructuredDiscretization
@@ -14,7 +15,7 @@ from imod.mf6.drn import Drainage
 from imod.mf6.npf import NodePropertyFlow
 from imod.mf6.regrid.regrid_schemes import RiverRegridMethod
 from imod.mf6.utilities.imod5_converter import regrid_imod5_pkg_data
-from imod.mf6.utilities.package import get_repeat_stress
+from imod.mf6.utilities.package import set_repeat_stress_if_available
 from imod.mf6.validation import BOUNDARY_DIMS_SCHEMA, CONC_DIMS_SCHEMA
 from imod.prepare.cleanup import AlignLevelsMode, align_interface_levels, cleanup_riv
 from imod.prepare.topsystem.allocation import ALLOCATION_OPTION, allocate_riv_cells
@@ -43,23 +44,9 @@ from imod.typing.grid import (
     has_negative_layer,
     is_planar_grid,
 )
-from imod.util.expand_repetitions import expand_repetitions
 from imod.util.regrid import (
     RegridderWeightsCache,
 )
-
-
-def set_repeat_stress_if_available(
-    repeat: Optional[list[datetime]],
-    time_min: datetime,
-    time_max: datetime,
-    optional_package: Optional[BoundaryCondition],
-) -> None:
-    """Set repeat stress for optional package if repeat is not None."""
-    if repeat is not None:
-        if optional_package is not None:
-            times = expand_repetitions(repeat, time_min, time_max)
-            optional_package.dataset["repeat_stress"] = get_repeat_stress(times)
 
 
 def mask_package__drop_if_empty(
@@ -72,6 +59,16 @@ def mask_package__drop_if_empty(
     # remove River package if its mask is False everywhere
     mask = ~np.isnan(package["conductance"])
     return package.mask(mask) if np.any(mask) else None
+
+
+def clip_time_if_package(
+    package: Optional[BoundaryCondition],
+    time_min: datetime,
+    time_max: datetime,
+) -> Optional[BoundaryCondition]:
+    if package is not None:
+        package = package.clip_box(time_min=time_min, time_max=time_max)
+    return package
 
 
 def rise_bottom_elevation_if_needed(
@@ -185,14 +182,15 @@ class River(BoundaryCondition, IRegridPackage):
         Flag to indicate whether the package should be validated upon
         initialization. This raises a ValidationError if package input is
         provided in the wrong manner. Defaults to True.
-    repeat_stress: Optional[xr.DataArray] of datetimes
+    repeat_stress: dict or xr.DataArray of datetimes, optional
         Used to repeat data for e.g. repeating stress periods such as
-        seasonality without duplicating the values. The DataArray should have
-        dimensions ``("repeat", "repeat_items")``. The ``repeat_items``
-        dimension should have size 2: the first value is the "key", the second
-        value is the "value". For the "key" datetime, the data of the "value"
-        datetime will be used. Can also be set with a dictionary using the
-        ``set_repeat_stress`` method.
+        seasonality without duplicating the values. If provided as dict, it
+        should map new dates to old dates present in the dataset.
+        ``{"2001-04-01": "2000-04-01", "2001-10-01": "2000-10-01"}`` if provided
+        as DataArray, it should have dimensions ``("repeat", "repeat_items")``.
+        The ``repeat_items`` dimension should have size 2: the first value is
+        the "key", the second value is the "value". For the "key" datetime, the
+        data of the "value" datetime will be used.
     """
 
     _pkg_id = "riv"
@@ -481,11 +479,12 @@ class River(BoundaryCondition, IRegridPackage):
         regridded_riv_pkg_data = regrid_imod5_pkg_data(
             River, data, target_dis, regridder_types, regrid_cache
         )
+        regridded_riv_pkg_data = broadcast_and_mask_arrays(regridded_riv_pkg_data)
         # Pop infiltration_factor to avoid unnecessarily allocating and
         # distributing it.
         infiltration_factor = regridded_riv_pkg_data.pop("infiltration_factor")
         # Allocate and distribute planar data if the grid is planar
-        is_planar_xy = is_planar_grid(data["conductance"])
+        is_planar_xy = is_planar_grid(regridded_riv_pkg_data["conductance"])
         allocation_drn_data: GridDataDict = {}
         if is_planar_xy:
             # allocate and distribute planar data
@@ -509,27 +508,29 @@ class River(BoundaryCondition, IRegridPackage):
         regridded_riv_pkg_data, infiltration_drn_data = _separate_infiltration_data(
             regridded_riv_pkg_data, infiltration_factor
         )
-        river_package = River(**regridded_riv_pkg_data, validate=True)
-        drainage_package = _create_drain_from_leftover_riv_imod5_data(
+        riv_pkg = River(**regridded_riv_pkg_data, validate=True)
+        drn_pkg = _create_drain_from_leftover_riv_imod5_data(
             allocation_drn_data,
             infiltration_drn_data,
         )
-        optional_river_package = cast(
-            Optional[River], mask_package__drop_if_empty(river_package)
-        )
-        optional_drainage_package = cast(
-            Optional[Drainage], mask_package__drop_if_empty(drainage_package)
-        )
+        # Mask the river and drainage packages to drop empty data.
+        optional_riv_pkg = mask_package__drop_if_empty(riv_pkg)
+        optional_drn_pkg = mask_package__drop_if_empty(drn_pkg)
+
         # Account for periods with repeat stresses.
         repeat = period_data.get(key)
-        set_repeat_stress_if_available(
-            repeat, time_min, time_max, optional_river_package
-        )
-        set_repeat_stress_if_available(
-            repeat, time_min, time_max, optional_drainage_package
-        )
+        set_repeat_stress_if_available(repeat, time_min, time_max, optional_riv_pkg)
+        set_repeat_stress_if_available(repeat, time_min, time_max, optional_drn_pkg)
+        # Clip the river package to the time range of the simulation and ensure
+        # time is forward filled.
+        optional_riv_pkg = clip_time_if_package(optional_riv_pkg, time_min, time_max)
+        optional_drn_pkg = clip_time_if_package(optional_drn_pkg, time_min, time_max)
 
-        return (optional_river_package, optional_drainage_package)
+        # Cast for mypy checks
+        optional_riv_pkg = cast(Optional[River], optional_riv_pkg)
+        optional_drn_pkg = cast(Optional[Drainage], optional_drn_pkg)
+
+        return (optional_riv_pkg, optional_drn_pkg)
 
     @classmethod
     def get_regrid_methods(cls) -> RiverRegridMethod:

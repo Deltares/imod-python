@@ -23,7 +23,13 @@ from imod.prepare.topsystem.default_allocation_methods import (
     SimulationDistributingOptions,
 )
 from imod.schemata import ValidationError
-from imod.typing.grid import has_negative_layer, is_planar_grid, ones_like, zeros_like
+from imod.typing.grid import (
+    enforce_dim_order,
+    has_negative_layer,
+    is_planar_grid,
+    ones_like,
+    zeros_like,
+)
 
 TYPE_DIS_PKG = {
     xu.UgridDataArray: VerticesDiscretization,
@@ -110,6 +116,62 @@ def test_render(riv_data):
 
         begin period 1
           open/close mymodel/river/riv.bin (binary)
+        end period
+        """
+    )
+    assert actual == expected
+
+
+@parametrize_with_cases("riv_data", cases=RivCases)
+def test_render_repeat_stress(riv_data):
+    """
+    Test that rendering a river with a repeated stress period does not raise an error.
+    """
+    globaltimes = [
+        np.datetime64("2000-04-01"),
+        np.datetime64("2000-10-01"),
+        np.datetime64("2001-04-01"),
+        np.datetime64("2001-10-01"),
+    ]
+
+    seasonal_factors = [0.8, 1.2]
+    seasonal_da = xr.DataArray(
+        seasonal_factors, dims=["time"], coords={"time": globaltimes[:2]}
+    )
+
+    riv_data["stage"] = enforce_dim_order(riv_data["stage"] * seasonal_da)
+    riv_data["conductance"] = enforce_dim_order(riv_data["conductance"] * seasonal_da)
+    riv_data["bottom_elevation"] = enforce_dim_order(
+        riv_data["bottom_elevation"] * seasonal_da
+    )
+    repeat_stress = {
+        globaltimes[2]: globaltimes[0],
+        globaltimes[3]: globaltimes[1],
+    }
+    river = imod.mf6.River(repeat_stress=repeat_stress, **riv_data)
+    directory = pathlib.Path("mymodel")
+    actual = river.render(directory, "river", globaltimes, True)
+
+    expected = textwrap.dedent(
+        """\
+        begin options
+        end options
+
+        begin dimensions
+          maxbound 16
+        end dimensions
+
+        begin period 1
+          open/close mymodel/river/riv-0.bin (binary)
+        end period
+        begin period 2
+          open/close mymodel/river/riv-1.bin (binary)
+        end period
+        begin period 3
+          open/close mymodel/river/riv-0.bin (binary)
+        end period
+        begin period 4
+          open/close mymodel/river/riv-1.bin (binary)
         end period
         """
     )
@@ -617,6 +679,40 @@ def test_import_river_from_imod5__infiltration_factors(imod5_dataset):
     imod5_data["riv-1"]["infiltration_factor"] = original_infiltration_factor
 
 
+def test_import_river_from_imod5__constant(imod5_dataset):
+    """Test importing river with a constant infiltration factor."""
+    imod5_data = imod5_dataset[0]
+    period_data = imod5_dataset[1]
+    target_dis = StructuredDiscretization.from_imod5_data(imod5_data)
+    grid = target_dis.dataset["idomain"]
+    target_npf = NodePropertyFlow.from_imod5_data(imod5_data, grid)
+
+    original_infiltration_factor = imod5_data["riv-1"]["infiltration_factor"]
+    layer = original_infiltration_factor.coords["layer"]
+    imod5_data["riv-1"]["infiltration_factor"] = xr.DataArray(
+        [1.0], coords={"layer": layer}, dims=("layer",)
+    )
+
+    (riv, drn) = imod.mf6.River.from_imod5_data(
+        "riv-1",
+        imod5_data,
+        period_data,
+        target_dis,
+        target_npf,
+        time_min=datetime(2000, 1, 1),
+        time_max=datetime(2002, 1, 1),
+        allocation_option=ALLOCATION_OPTION.at_elevation,
+        distributing_option=DISTRIBUTING_OPTION.by_crosscut_thickness,
+        regridder_types=None,
+    )
+
+    assert riv is not None
+    assert drn is None
+
+    # teardown
+    imod5_data["riv-1"]["infiltration_factor"] = original_infiltration_factor
+
+
 def test_import_river_from_imod5__period_data(imod5_dataset_periods, tmp_path):
     imod5_data = imod5_dataset_periods[0]
     imod5_periods = imod5_dataset_periods[1]
@@ -644,10 +740,6 @@ def test_import_river_from_imod5__period_data(imod5_dataset_periods, tmp_path):
     assert riv is not None
     assert drn is not None
 
-    write_context = WriteContext(simulation_directory=tmp_path)
-    riv._write("riv", globaltimes, write_context)
-    drn._write("drn", globaltimes, write_context)
-
     errors = riv._validate(
         imod.mf6.River._write_schemata,
         idomain=target_dis.dataset["idomain"],
@@ -661,3 +753,88 @@ def test_import_river_from_imod5__period_data(imod5_dataset_periods, tmp_path):
         bottom=target_dis.dataset["bottom"],
     )
     assert len(errors) == 0
+
+    riv_time = riv.dataset.coords["time"].data
+    drn_time = drn.dataset.coords["time"].data
+    expected_times = np.array(
+        [
+            np.datetime64("2002-02-02"),
+            np.datetime64("2002-04-01"),
+            np.datetime64("2002-10-01"),
+        ]
+    )
+    np.testing.assert_array_equal(riv_time, expected_times)
+    np.testing.assert_array_equal(drn_time, expected_times)
+
+    riv_repeat_stress = riv.dataset["repeat_stress"].data
+    drn_repeat_stress = drn.dataset["repeat_stress"].data
+    assert np.all(riv_repeat_stress[:, 1][::2] == np.datetime64("2002-04-01"))
+    assert np.all(riv_repeat_stress[:, 1][1::2] == np.datetime64("2002-10-01"))
+    assert np.all(drn_repeat_stress[:, 1][::2] == np.datetime64("2002-04-01"))
+    assert np.all(drn_repeat_stress[:, 1][1::2] == np.datetime64("2002-10-01"))
+
+    write_context = WriteContext(simulation_directory=tmp_path)
+    riv._write("riv", globaltimes, write_context)
+    drn._write("drn", globaltimes, write_context)
+
+
+def test_import_river_from_imod5_and_cleanup__period_data(imod5_dataset_periods):
+    imod5_data = imod5_dataset_periods[0]
+    imod5_periods = imod5_dataset_periods[1]
+    target_dis = StructuredDiscretization.from_imod5_data(imod5_data, validate=False)
+    grid = target_dis.dataset["idomain"]
+    target_npf = NodePropertyFlow.from_imod5_data(imod5_data, grid)
+
+    (riv, drn) = imod.mf6.River.from_imod5_data(
+        "riv-1",
+        imod5_data,
+        imod5_periods,
+        target_dis,
+        target_npf,
+        datetime(2002, 2, 2),
+        datetime(2022, 2, 2),
+        ALLOCATION_OPTION.stage_to_riv_bot_drn_above,
+        SimulationDistributingOptions.riv,
+        regridder_types=None,
+    )
+
+    riv.cleanup(target_dis)
+    drn.cleanup(target_dis)
+
+
+def test_import_river_from_imod5__transient_data(imod5_dataset_transient):
+    """
+    Test if importing a river from an IMOD5 dataset with transient data works
+    correctly and that the time data is clipped to the specified time range.
+    """
+    imod5_data = imod5_dataset_transient[0]
+    imod5_periods = imod5_dataset_transient[1]
+    target_dis = StructuredDiscretization.from_imod5_data(imod5_data, validate=False)
+    grid = target_dis.dataset["idomain"]
+    target_npf = NodePropertyFlow.from_imod5_data(imod5_data, grid)
+
+    original_infiltration_factor = imod5_data["riv-1"]["infiltration_factor"]
+    imod5_data["riv-1"]["infiltration_factor"] = ones_like(original_infiltration_factor)
+
+    (riv, drn) = imod.mf6.River.from_imod5_data(
+        "riv-1",
+        imod5_data,
+        imod5_periods,
+        target_dis,
+        target_npf,
+        datetime(2000, 4, 1),
+        datetime(2010, 1, 1),
+        ALLOCATION_OPTION.stage_to_riv_bot_drn_above,
+        SimulationDistributingOptions.riv,
+        regridder_types=None,
+    )
+
+    assert riv is not None
+    assert drn is not None
+
+    riv_time = riv.dataset.coords["time"].data
+    drn_time = drn.dataset.coords["time"].data
+    assert riv_time[0] == np.datetime64("2000-04-01")
+    assert riv_time[-1] == np.datetime64("2003-01-01")
+    assert drn_time[0] == np.datetime64("2000-04-01")
+    assert drn_time[-1] == np.datetime64("2003-01-01")

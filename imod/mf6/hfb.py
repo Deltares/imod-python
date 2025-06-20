@@ -4,7 +4,7 @@ import textwrap
 import typing
 from copy import deepcopy
 from enum import Enum
-from typing import TYPE_CHECKING, Any, Dict, List, Optional, Tuple
+from typing import TYPE_CHECKING, Any, Dict, List, Optional, Self, Tuple
 
 import cftime
 import numpy as np
@@ -32,7 +32,7 @@ from imod.mf6.dis import StructuredDiscretization
 from imod.mf6.disv import VerticesDiscretization
 from imod.mf6.mf6_hfb_adapter import Mf6HorizontalFlowBarrier
 from imod.mf6.package import Package
-from imod.mf6.validation_context import ValidationContext
+from imod.mf6.validation_settings import ValidationSettings
 from imod.prepare.cleanup import cleanup_hfb
 from imod.schemata import (
     DimsSchema,
@@ -644,7 +644,7 @@ class HorizontalFlowBarrierBase(BoundaryCondition, ILineDataPackage):
         top: GridDataArray,
         bottom: GridDataArray,
         k: GridDataArray,
-        validation_context: ValidationContext,
+        validation_context: ValidationSettings,
     ) -> Mf6HorizontalFlowBarrier:
         barrier_dataset = self._to_connected_cells_dataset(
             idomain, top, bottom, k, validation_context.strict_hfb_validation
@@ -687,14 +687,24 @@ class HorizontalFlowBarrierBase(BoundaryCondition, ILineDataPackage):
         Mf6HorizontalFlowBarrier
             Low level representation of the HFB package as MODFLOW 6 expects it.
         """
-        validation_context = ValidationContext(
+        validation_context = ValidationSettings(
             validate=validate, strict_hfb_validation=strict_hfb_validation
         )
 
         return self._to_mf6_pkg(idomain, top, bottom, k, validation_context)
 
-    def is_empty(self) -> bool:
-        if super().is_empty():
+    def is_empty(self, ignore_time: bool = False) -> bool:
+        """
+        Returns True if the package is empty, that is if it contains only
+        no-data values.
+
+        Parameters
+        ----------
+        ignore_time: bool, optional
+            If True, the time dimension is dropped before validation. Irrelevant
+            for this package as it doesn't support a time dimension.
+        """
+        if super().is_empty(ignore_time=ignore_time):
             return True
 
         linestrings = self.dataset["geometry"]
@@ -831,7 +841,7 @@ class HorizontalFlowBarrierBase(BoundaryCondition, ILineDataPackage):
         y_max: Optional[float] = None,
         top: Optional[GridDataArray] = None,
         bottom: Optional[GridDataArray] = None,
-    ) -> "HorizontalFlowBarrierBase":
+    ) -> Self:
         """
         Clip a package by a bounding box (time, layer, y, x).
 

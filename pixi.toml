@@ -31,7 +31,7 @@ unittests_njit = { cmd = [
     "NUMBA_DISABLE_JIT=1",
     "pytest",
     "-n", "auto",
-    "-m", "not example and not user_acceptance and not unittest_jit",
+    "-m", "not example and not user_acceptance and not unittest_jit and not qgis_export",
     "--cache-clear",
     "--verbose",
     "--junitxml=unittest_report.xml",
@@ -57,7 +57,6 @@ user_acceptance = { cmd = [
     "--verbose",
     "--junitxml=user_acceptance_report.xml",
 ], depends-on = ["install"], cwd = "imod/tests", env = { IMOD_DATA_DIR = ".imod_data" } }
-
 examples = { cmd = [
     "pytest",
     "-n", "auto",
@@ -65,6 +64,13 @@ examples = { cmd = [
     "--cache-clear",
     "--verbose",
     "--junitxml=examples_report.xml",
+], depends-on = ["install"], cwd = "imod/tests", env = { IMOD_DATA_DIR = ".imod_data" } }
+qgis_export ={ cmd = [
+    "pytest", "-s",
+    "-m", "qgis_export",
+    "--cache-clear",
+    "--verbose",
+    "--junitxml=qgis_export_report.xml",
 ], depends-on = ["install"], cwd = "imod/tests", env = { IMOD_DATA_DIR = ".imod_data" } }
 
 [dependencies]
@@ -102,11 +108,11 @@ pymetis = "*"
 pyproj = "*"
 pytest = "*"
 pytest-benchmark = "*"
-pytest-cases = "*"
+pytest-cases = ">=3.9.1"
 pytest-cov = "*"
 pytest-dotenv = "*"
 pytest-xdist = "*"
-python = "3.11.*"
+python = "3.12.*"
 python-build = "*"
 python-graphviz = "*"
 pyvista = "*"
@@ -125,7 +131,7 @@ toolz = "*"
 tqdm = "*"
 twine = "*"
 vtk = { version = ">=9.0", build = "*qt*" }
-xarray = "=2025.03.0"
+xarray = "!=2025.04.0" # Issue with xarray 2025.04.0 and rendering HFBs
 xugrid = ">=0.14.0"
 zarr = "*"
 pytest-timeout = ">=2.3.1,<3"

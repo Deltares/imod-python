@@ -6,7 +6,7 @@ import textwrap
 import warnings
 from collections.abc import Iterable
 from datetime import datetime
-from typing import Any, Callable, Optional, Tuple, Union, cast
+from typing import Any, Callable, Optional, Self, Sequence, Tuple, Union, cast
 
 import cftime
 import numpy as np
@@ -16,7 +16,6 @@ import xarray as xr
 import xugrid as xu
 
 import imod
-import imod.mf6.utilities
 from imod.common.interfaces.ipointdatapackage import IPointDataPackage
 from imod.common.utilities.grid import broadcast_to_full_domain
 from imod.common.utilities.layer import create_layered_top
@@ -34,7 +33,7 @@ from imod.mf6.mf6_wel_adapter import Mf6Wel, concat_indices_to_cellid
 from imod.mf6.package import Package
 from imod.mf6.utilities.dataset import remove_inactive
 from imod.mf6.utilities.imod5_converter import well_from_imod5_cap_data
-from imod.mf6.validation_context import ValidationContext
+from imod.mf6.validation_settings import ValidationSettings
 from imod.mf6.write_context import WriteContext
 from imod.prepare import assign_wells
 from imod.prepare.cleanup import cleanup_wel, cleanup_wel_layered
@@ -82,36 +81,25 @@ def mask_2D(package: GridAgnosticWell, domain_2d: GridDataArray) -> GridAgnostic
 
 
 def _df_groups_to_da_rates(
-    unique_well_groups: pd.api.typing.DataFrameGroupBy,
+    unique_well_groups: Sequence[pd.api.typing.DataFrameGroupBy],
 ) -> xr.DataArray:
     # Convert dataframes all groups to DataArrays
-    is_steady_state = "time" not in unique_well_groups[0].columns
-    if is_steady_state:
-        da_groups = [
-            xr.DataArray(df_group["rate"].sum()) for df_group in unique_well_groups
-        ]
+    columns = list(unique_well_groups[0].columns)
+    columns.remove("rate")
+    is_transient = "time" in columns
+    gb_and_summed = pd.concat(unique_well_groups).groupby(columns).sum()
+    if is_transient:
+        index_names = ["time", "index"]
     else:
-        da_groups = [
-            xr.DataArray(
-                df_group["rate"], dims=("time"), coords={"time": df_group["time"]}
-            )
-            for df_group in unique_well_groups
-        ]
-        # Groupby time and sum to aggregate wells with the exact same x, y, and
-        # filter top/bottom.
-        da_groups = [da_group.groupby("time").sum() for da_group in da_groups]
-    # Assign index coordinates
-    da_groups = [
-        da_group.expand_dims(dim="index").assign_coords(index=[i])
-        for i, da_group in enumerate(da_groups)
-    ]
-    # Concatenate datarrays along index dimension
-    return xr.concat(da_groups, dim="index")
+        index_names = ["index"]
+    # Unset multi-index, then set index to index_names
+    df_temp = gb_and_summed.reset_index().set_index(index_names)
+    return df_temp["rate"].to_xarray()
 
 
 def _prepare_well_rates_from_groups(
     pkg_data: dict,
-    unique_well_groups: pd.api.typing.DataFrameGroupBy,
+    unique_well_groups: Sequence[pd.api.typing.DataFrameGroupBy],
     start_times: StressPeriodTimesType,
 ) -> xr.DataArray:
     """
@@ -467,7 +455,7 @@ class GridAgnosticWell(BoundaryCondition, IPointDataPackage, abc.ABC):
         Mf6Wel
             Object with wells as list based input.
         """
-        validation_context = ValidationContext(
+        validation_context = ValidationSettings(
             validate=validate, strict_well_validation=strict_well_validation
         )
         return self._to_mf6_pkg(active, top, bottom, k, validation_context)
@@ -478,7 +466,7 @@ class GridAgnosticWell(BoundaryCondition, IPointDataPackage, abc.ABC):
         top: GridDataArray,
         bottom: GridDataArray,
         k: GridDataArray,
-        validation_context: ValidationContext,
+        validation_context: ValidationSettings,
     ) -> Mf6Wel:
         if validation_context.validate:
             errors = self._validate(self._write_schemata)
@@ -509,7 +497,7 @@ class GridAgnosticWell(BoundaryCondition, IPointDataPackage, abc.ABC):
         ds["cellid"] = self._create_cellid(assigned_wells, active)
 
         ds_vars = self._create_dataset_vars(assigned_wells, ds["cellid"])
-        ds = ds.assign(**ds_vars.data_vars)
+        ds = ds.assign(**ds_vars.data_vars)  # type: ignore[arg-type]
 
         ds = remove_inactive(ds, active)
         ds["save_flows"] = self["save_flows"].values[()]
@@ -526,7 +514,7 @@ class GridAgnosticWell(BoundaryCondition, IPointDataPackage, abc.ABC):
 
         ds = ds.drop_vars("id")
 
-        return Mf6Wel(**ds.data_vars)
+        return Mf6Wel(**ds.data_vars)  # type: ignore[arg-type]
 
     def gather_filtered_well_ids(
         self, well_data_filtered: pd.DataFrame | xr.Dataset, well_data: pd.DataFrame
@@ -551,10 +539,11 @@ class GridAgnosticWell(BoundaryCondition, IPointDataPackage, abc.ABC):
         else:
             message += " The first 10 unplaced wells are: \n"
 
+        is_filtered = self.dataset["id"].isin([filtered_wells])
         for i in range(min(10, len(filtered_wells))):
             ids = filtered_wells[i]
-            x = self.dataset["x"][int(filtered_wells[i])].values[()]
-            y = self.dataset["y"][int(filtered_wells[i])].values[()]
+            x = self.dataset["x"].data[is_filtered][i]
+            y = self.dataset["y"].data[is_filtered][i]
             message += f" id = {ids} x = {x}  y = {y} \n"
         return message
 
@@ -690,8 +679,12 @@ class GridAgnosticWell(BoundaryCondition, IPointDataPackage, abc.ABC):
         # Associated wells need additional grouping by id
         if pkg_data["has_associated"]:
             colnames_group.append("id")
-        wel_index, unique_well_groups = zip(*df.groupby(colnames_group))
-
+        wel_index, well_groups_untagged = zip(*df.groupby(colnames_group))
+        # Explictly sign an index to each group, so that the
+        # DataArray of rates can be created with a unique index.
+        unique_well_groups = [
+            group.assign(index=i) for i, group in enumerate(well_groups_untagged)
+        ]
         # Unpack wel indices by zipping
         varnames = [("x", float), ("y", float)] + cls._depth_colnames
         index_values = zip(*wel_index)
@@ -713,8 +706,10 @@ class GridAgnosticWell(BoundaryCondition, IPointDataPackage, abc.ABC):
         cleanup_func: Callable,
         **cleanup_kwargs,
     ) -> None:
+        # Work around mypy error, .data_vars cannot be used with xu.UgridDataset
+        dict_to_broadcast: dict[str, GridDataArray] = dict(**dis.dataset)  # type: ignore
         # Top and bottom should be forced to grids with a x, y coordinates
-        top, bottom = broadcast_to_full_domain(**dict(dis.dataset.data_vars))
+        top, bottom = broadcast_to_full_domain(**dict_to_broadcast)
         # Collect point variable datanames
         point_varnames = list(self._write_schemata.keys())
         if "concentration" not in self.dataset.keys():
@@ -805,14 +800,15 @@ class Well(GridAgnosticWell):
         Flag to indicate whether the package should be validated upon
         initialization. This raises a ValidationError if package input is
         provided in the wrong manner. Defaults to True.
-    repeat_stress: Optional[xr.DataArray] of datetimes
+    repeat_stress: dict or xr.DataArray of datetimes, optional
         Used to repeat data for e.g. repeating stress periods such as
-        seasonality without duplicating the values. The DataArray should have
-        dimensions ``("repeat", "repeat_items")``. The ``repeat_items``
-        dimension should have size 2: the first value is the "key", the second
-        value is the "value". For the "key" datetime, the data of the "value"
-        datetime will be used. Can also be set with a dictionary using the
-        ``set_repeat_stress`` method.
+        seasonality without duplicating the values. If provided as dict, it
+        should map new dates to old dates present in the dataset.
+        ``{"2001-04-01": "2000-04-01", "2001-10-01": "2000-10-01"}`` if provided
+        as DataArray, it should have dimensions ``("repeat", "repeat_items")``.
+        The ``repeat_items`` dimension should have size 2: the first value is
+        the "key", the second value is the "value". For the "key" datetime, the
+        data of the "value" datetime will be used.
 
     Examples
     ---------
@@ -927,7 +923,7 @@ class Well(GridAgnosticWell):
         y_max: Optional[float] = None,
         top: Optional[GridDataArray] = None,
         bottom: Optional[GridDataArray] = None,
-    ) -> Package:
+    ) -> Self:
         """
         Clip a package by a bounding box (time, layer, y, x).
 
@@ -1179,14 +1175,15 @@ class LayeredWell(GridAgnosticWell):
         Flag to indicate whether the package should be validated upon
         initialization. This raises a ValidationError if package input is
         provided in the wrong manner. Defaults to True.
-    repeat_stress: Optional[xr.DataArray] of datetimes
+    repeat_stress: dict or xr.DataArray of datetimes, optional
         Used to repeat data for e.g. repeating stress periods such as
-        seasonality without duplicating the values. The DataArray should have
-        dimensions ``("repeat", "repeat_items")``. The ``repeat_items``
-        dimension should have size 2: the first value is the "key", the second
-        value is the "value". For the "key" datetime, the data of the "value"
-        datetime will be used. Can also be set with a dictionary using the
-        ``set_repeat_stress`` method.
+        seasonality without duplicating the values. If provided as dict, it
+        should map new dates to old dates present in the dataset.
+        ``{"2001-04-01": "2000-04-01", "2001-10-01": "2000-10-01"}`` if provided
+        as DataArray, it should have dimensions ``("repeat", "repeat_items")``.
+        The ``repeat_items`` dimension should have size 2: the first value is
+        the "key", the second value is the "value". For the "key" datetime, the
+        data of the "value" datetime will be used.
 
     Examples
     ---------
@@ -1288,7 +1285,7 @@ class LayeredWell(GridAgnosticWell):
         y_max: Optional[float] = None,
         top: Optional[GridDataArray] = None,
         bottom: Optional[GridDataArray] = None,
-    ) -> Package:
+    ) -> Self:
         """
         Clip a package by a bounding box (time, layer, y, x).
 
@@ -1551,7 +1548,7 @@ class WellDisStructured(DisStructuredBoundaryCondition):
         y_max: Optional[float] = None,
         top: Optional[GridDataArray] = None,
         bottom: Optional[GridDataArray] = None,
-    ) -> Package:
+    ) -> Self:
         """
         Clip a package by a bounding box (time, layer, y, x).
 
@@ -1706,7 +1703,7 @@ class WellDisVertices(DisVerticesBoundaryCondition):
         y_max: Optional[float] = None,
         top: Optional[GridDataArray] = None,
         bottom: Optional[GridDataArray] = None,
-    ) -> Package:
+    ) -> Self:
         """
         Clip a package by a bounding box (time, layer, y, x).
 

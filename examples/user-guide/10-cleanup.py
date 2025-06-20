@@ -217,7 +217,7 @@ gwf_simulation.write(tmp_dir)
 # Great! The model was succesfully written!
 #
 # Cleaning data without a MODFLOW 6 simulation
-# -------------------------------------------
+# --------------------------------------------
 #
 # There might be situations where you do not have a MODFLOW 6 simulation or River
 # package at hand, and you still want to clean up your river grids. In this

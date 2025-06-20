@@ -71,6 +71,13 @@ class BoundaryCondition(Package, abc.ABC):
     """
 
     def __init__(self, allargs: Mapping[str, GridDataArray | float | int | bool | str]):
+        # Convert repeat_stress in dict to a xr.DataArray in the right shape if
+        # necessary, which is required to merge it into the dataset.
+        if "repeat_stress" in allargs.keys() and isinstance(
+            allargs["repeat_stress"], dict
+        ):
+            allargs["repeat_stress"] = get_repeat_stress(allargs["repeat_stress"])  # type: ignore
+        # Call the Package constructor, this merges the arguments into a dataset.
         super().__init__(allargs)
         if "concentration" in allargs.keys() and allargs["concentration"] is None:
             # Remove vars inplace

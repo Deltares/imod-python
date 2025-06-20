@@ -1,23 +1,17 @@
 import sys
 from textwrap import dedent
-from zipfile import ZipFile
 
 import numpy as np
 from numpy.testing import assert_allclose
 
 import imod
-from imod.data.sample_data import create_pooch_registry, load_pooch_registry
 from imod.formats.prj import open_projectfile_data
 from imod.logging.config import LoggerType
 from imod.logging.loglevel import LogLevel
 
-registry = create_pooch_registry()
-registry = load_pooch_registry(registry)
-fname_model = registry.fetch("iMOD5_model.zip")
-
 
 def snippet_constant_kh(factor: float, addition: float, init: float):
-    return dedent(f"""\
+    return dedent(rf"""\
         0001,(KHV),1, Horizontal Permeability
         001,2
         1,1,1,{factor},{addition},{init}   >>> (KHV) Horizontal Permeability (IDF) <<<
@@ -26,8 +20,7 @@ def snippet_constant_kh(factor: float, addition: float, init: float):
 
 
 def test_import_constants(tmp_path):
-    with ZipFile(fname_model) as archive:
-        archive.extractall(tmp_path)
+    _ = imod.data.imod5_projectfile_data(tmp_path)
 
     projects_file = tmp_path / "iMOD5_model_pooch" / "iMOD5_model.prj"
 
@@ -55,7 +48,7 @@ def test_import_constants(tmp_path):
 
 
 def snippet_idf_import_kh(factor: float, addition: float):
-    return dedent(f"""\
+    return dedent(rf"""\
         0001,(KHV),1, Horizontal Permeability
         001,2
         1,1,1,{factor},{addition},-999.99, '.\Database\KHV\VERSION_1\IPEST_KHV_L1.IDF' >>> (KHV) Horizontal Permeability (IDF) <<<
@@ -64,8 +57,7 @@ def snippet_idf_import_kh(factor: float, addition: float):
 
 
 def test_import_idf(tmp_path):
-    with ZipFile(fname_model) as archive:
-        archive.extractall(tmp_path)
+    _ = imod.data.imod5_projectfile_data(tmp_path)
 
     projects_file = tmp_path / "iMOD5_model_pooch" / "iMOD5_model.prj"
 
@@ -95,7 +87,7 @@ def test_import_idf(tmp_path):
 def snippet_idf_import_transient(
     factor1: float, addition1: float, factor2: float, addition2: float
 ):
-    return dedent(f"""\
+    return dedent(rf"""\
         0002, (chd), 1, ConstantHead, ['head']
         2018-01-01 00:00:00                  
         001, 001
@@ -107,8 +99,7 @@ def snippet_idf_import_transient(
 
 
 def test_import_idf_transient(tmp_path):
-    with ZipFile(fname_model) as archive:
-        archive.extractall(tmp_path)
+    _ = imod.data.imod5_projectfile_data(tmp_path)
 
     projects_file = tmp_path / "iMOD5_model_pooch" / "iMOD5_model.prj"
 
@@ -128,7 +119,7 @@ def test_import_idf_transient(tmp_path):
 
 
 def snippet_gen_import_hfb(factor: float, addition: float):
-    return dedent(f"""\
+    return dedent(rf"""\
         0001,(HFB),1, Horizontal Flow Barrier
         001,2
         1,2, 003,{factor},{addition},  -999.9900    ,'.\Database\HFB\VERSION_1\IBV2_HOOFDBREUKEN_BX.GEN' >>> (HFB) Horizontal Barrier Flow (GEN) <<<
@@ -137,8 +128,7 @@ def snippet_gen_import_hfb(factor: float, addition: float):
 
 
 def test_import_gen(tmp_path):
-    with ZipFile(fname_model) as archive:
-        archive.extractall(tmp_path)
+    _ = imod.data.imod5_projectfile_data(tmp_path)
 
     projects_file = tmp_path / "iMOD5_model_pooch" / "iMOD5_model.prj"
 
@@ -154,7 +144,7 @@ def test_import_gen(tmp_path):
 def snippet_gen_import_ipf(
     factor1: float, addition1: float, factor2: float, addition2: float
 ):
-    return dedent(f"""\
+    return dedent(rf"""\
         0001,(WEL),1, Wells
         STEADY-STATE
         001,003
@@ -165,8 +155,7 @@ def snippet_gen_import_ipf(
 
 
 def test_import_ipf(tmp_path):
-    with ZipFile(fname_model) as archive:
-        archive.extractall(tmp_path)
+    _ = imod.data.imod5_projectfile_data(tmp_path)
 
     projects_file = tmp_path / "iMOD5_model_pooch" / "iMOD5_model.prj"
 
@@ -217,8 +206,7 @@ def test_import_ipf(tmp_path):
 
 
 def test_import_ipf_unique_id_and_logging(tmp_path):
-    with ZipFile(fname_model) as archive:
-        archive.extractall(tmp_path)
+    _ = imod.data.imod5_projectfile_data(tmp_path)
 
     logfile_path = tmp_path / "logfile.txt"
 
@@ -272,7 +260,7 @@ def test_import_ipf_unique_id_and_logging(tmp_path):
 
 
 def snippet_boundary_condition(factor: float, addition: float):
-    return dedent(f"""\
+    return dedent(rf"""\
         0001,(CHD),1, Constant Head
         STEADY-STATE
         001,2
@@ -282,8 +270,7 @@ def snippet_boundary_condition(factor: float, addition: float):
 
 
 def test_import_idf_boundary_condition(tmp_path):
-    with ZipFile(fname_model) as archive:
-        archive.extractall(tmp_path)
+    _ = imod.data.imod5_projectfile_data(tmp_path)
 
     projects_file = tmp_path / "iMOD5_model_pooch" / "iMOD5_model.prj"
 
@@ -308,7 +295,7 @@ def test_import_idf_boundary_condition(tmp_path):
 
 
 def snippet_idf_without_layer_dim(factor: float, addition: float):
-    return dedent(f"""\
+    return dedent(rf"""\
         0001,(RIV),1, Rivers
         STEADY-STATE
         004,001
@@ -320,8 +307,7 @@ def snippet_idf_without_layer_dim(factor: float, addition: float):
 
 
 def test_import_no_layer(tmp_path):
-    with ZipFile(fname_model) as archive:
-        archive.extractall(tmp_path)
+    _ = imod.data.imod5_projectfile_data(tmp_path)
 
     projects_file = tmp_path / "iMOD5_model_pooch" / "iMOD5_model.prj"
 

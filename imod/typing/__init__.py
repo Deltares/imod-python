@@ -37,17 +37,32 @@ class Imod5DataDict(TypedDict, total=False):
     extra: dict[str, list[str]]
 
 
-# Types for optional dependencies.
-if TYPE_CHECKING:
+GEOPANDAS_AVAILABLE = False
+try:
     import geopandas as gpd
+
+    GEOPANDAS_AVAILABLE = True
+except ImportError:
+    pass
+
+SHAPELY_AVAILABLE = False
+try:
     import shapely
 
+    SHAPELY_AVAILABLE = True
+except ImportError:
+    pass
+
+if TYPE_CHECKING or GEOPANDAS_AVAILABLE:
     GeoDataFrameType: TypeAlias = gpd.GeoDataFrame
     GeoSeriesType: TypeAlias = gpd.GeoSeries
-    PolygonType: TypeAlias = shapely.Polygon
-    LineStringType: TypeAlias = shapely.LineString
 else:
     GeoDataFrameType = TypeVar("GeoDataFrameType")
     GeoSeriesType = TypeVar("GeoSeriesType")
+
+if TYPE_CHECKING or SHAPELY_AVAILABLE:
+    PolygonType: TypeAlias = shapely.Polygon
+    LineStringType: TypeAlias = shapely.LineString
+else:
     PolygonType = TypeVar("PolygonType")
     LineStringType = TypeVar("LineStringType")

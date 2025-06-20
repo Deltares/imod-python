@@ -15,6 +15,15 @@ Added
 - Added ``weights`` argument to :func:`imod.prepare.create_partition_labels` to
   weigh how the simulation should be partioned. Areas with higher weights will
   result in smaller partions.
+- iMOD Python version is now written in a comment line to MODFLOW6 and
+  MetaSWAP's ``para_sim.inp`` files. This is useful for debugging purposes.
+- Added option ``ignore_time_purge_empty`` to
+  :class:`imod.mf6.Modflow6Simulation.split` to consider a package empty if its
+  first times step is all nodata. This can save a lot of time splitting
+  transient models.
+- Add :class:`imod.mf6.ValidationSettings` to specify validation settings for
+  MODFLOW 6 simulations. You can provide it to the
+  :class:`imod.mf6.Modflow6Simulation` constructor.
 
 Fixed
 ~~~~~
@@ -38,8 +47,39 @@ Fixed
   different name than ``"idomain"``.
 - :func:`imod.msw.MetaSwapModel.from_imod5_data` now supports the usage of
   relative paths for the extra files block.
+- Bug in :meth:`imod.msw.Sprinkling.write` where MetaSWAP svats with surface
+  water sprinkling and no groundwater sprinkling activated were not written to
+  ``scap_svat.inp``.
 - :class:`imod.msw.IdfMapping` swapped order of y_grid and x_grid in dictionary
   for writing the correct order of coordinates in idf_svat.inp.
+- Improved performance of :meth:`imod.mf6.Modflow6Simulation.split` and
+  :meth:`imod.mf6.Modflow6Simulation.mask` when using dask.
+- Fixed bug in :meth:`imod.mf6.Modflow6Simulation.mask` for unstructured grids
+  with a spatial dimension that differs from the default ``"mesh2d_nFaces"``.
+- Fixed bug in :meth:`imod.mf6.Well.cleanup` and
+  :meth:`imod.mf6.LayeredWell.cleanup` which caused an error when called with an
+  unstructured discretization.
+- Fixed bug in :func:`imod.formats.prj.open_projectfile_data` which caused an
+  error when a periods keyword was used having an upper case.
+- Poor performance of :meth:`imod.mf6.Well.from_imod5_data` and
+  :meth:`imod.mf6.LayeredWell.from_imod5_data` when the ``imod5_data`` contained
+  a well system with a large number of wells (>10k).
+- :meth:`imod.mf6.River.from_imod5_data`,
+  :meth:`imod.mf6.Drainage.from_imod5_data`,
+  :meth:`imod.mf6.GeneralHeadBoundary.from_imod5_data` can now deal with
+  constant values for variables. One variable per package still needs to be a
+  grid.
+- Fix bug where an error was thrown in ``get_non_grid_data`` when calling the
+  ``.cleanup`` and ``regrid_like`` methods on a boundary condition package with
+  a repeated stress. For example, :meth:`imod.mf6.River.cleanup` or
+  :meth:`imod.mf6.River.regrid_like`.
+- Fix bug where an error was thrown in :class:`imod.mf6.Well` when an entry had
+  to be filtered and its ``id`` didn't match the index.
+- Improved performance of :class:`imod.mf6.Modflow6Simulation.split` for
+  structured models, as unnecessary masking is avoided.
+- Fixed warning thrown by type dispatcher about ``~GeoDataFrameType``
+- Fixed bug where variables in a package with only a ``"layer"`` coordinate
+  could not be regridded or masked.
 
 Changed
 ~~~~~~~
@@ -59,6 +99,24 @@ Changed
   :class:`imod.mf6.GroundwaterFlowModel`,
   :class:`imod.mf6.GroundwaterTransportModel`, this will throw a
   ``ValidationError`` upon initialization and writing.
+- You can now also provide ``repeat_stress`` as dictionary to imod.mf6
+  boundary conditions, such as :class:`imod.mf6.River`, :class:`imod.mf6.Drainage`, and
+  :class:`imod.mf6.GeneralHeadBoundary`.
+- :meth:`imod.mf6.ConstantHead.from_imod5_data`,
+  :meth:`imod.mf6.GeneralHeadBoundary.from_imod5_data`,
+  :meth:`imod.mf6.River.from_imod5_data`,
+  :meth:`imod.mf6.Recharge.from_imod5_data`, and
+  :meth:`imod.mf6.Drainage.from_imod5_data` now forward fill data over time,
+  instead of clipping, when selecting a start time that is inbetween two data
+  records.
+- :meth:`imod.mf6.ConstantHead.from_imod5_data` and
+  :meth:`imod.mf6.Recharge.from_imod5_data` got extra arguments for
+  ``period_data``, ``time_min`` and ``time_max``.
+- :func:`imod.prepare.read_imod_legend` now also returns the labels as an extra
+  argument. Update your code by changing 
+  ``colors, levels = read_imod_legend(...)`` to 
+  ``colors, levels, labels = read_imod_legend(...)``.
+
 
 [1.0.0rc3] - 2025-04-17
 -----------------------

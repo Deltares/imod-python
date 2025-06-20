@@ -54,6 +54,7 @@ import xugrid as xu
 from numpy.typing import DTypeLike  # noqa: F401
 
 from imod.typing import GridDataArray, ScalarAsDataArray
+from imod.typing.grid import notnull
 from imod.util.imports import MissingOptionalModule
 
 if TYPE_CHECKING:
@@ -634,20 +635,10 @@ class UniqueValuesSchema(BaseSchema):
             )
 
 
-def _notnull(obj):
-    """
-    Helper function; does the same as xr.DataArray.notnull. This function is to
-    avoid an issue where xr.DataArray.notnull() returns ordinary numpy arrays
-    for instances of xu.UgridDataArray.
-    """
-
-    return ~np.isnan(obj)
-
-
 class NoDataSchema(BaseSchema):
     def __init__(
         self,
-        is_notnull: Union[Callable, Tuple[str, Any]] = _notnull,
+        is_notnull: Union[Callable, Tuple[str, Any]] = notnull,
     ):
         if isinstance(is_notnull, tuple):
             op, value = is_notnull
@@ -686,8 +677,8 @@ class NoDataComparisonSchema(BaseSchema):
     def __init__(
         self,
         other: str,
-        is_notnull: Union[Callable, Tuple[str, Any]] = _notnull,
-        is_other_notnull: Union[Callable, Tuple[str, Any]] = _notnull,
+        is_notnull: Union[Callable, Tuple[str, Any]] = notnull,
+        is_other_notnull: Union[Callable, Tuple[str, Any]] = notnull,
     ):
         self.other = other
         if isinstance(is_notnull, tuple):
@@ -733,6 +724,7 @@ class AllInsideNoDataSchema(NoDataComparisonSchema):
 
     def validate(self, obj: GridDataArray, **kwargs) -> None:
         other_obj = kwargs[self.other]
+
         valid = self.is_notnull(obj)
         other_valid = self.is_other_notnull(other_obj)
 
@@ -755,7 +747,7 @@ class ActiveCellsConnectedSchema(BaseSchema):
 
     def __init__(
         self,
-        is_notnull: Union[Callable, Tuple[str, Any]] = _notnull,
+        is_notnull: Union[Callable, Tuple[str, Any]] = notnull,
     ):
         if isinstance(is_notnull, tuple):
             op, value = is_notnull

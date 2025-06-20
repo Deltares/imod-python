@@ -27,6 +27,7 @@ from imod.common.utilities.schemata import (
     validate_schemata_dict,
     validate_with_error_message,
 )
+from imod.common.utilities.version import prepend_content_with_version_info
 from imod.logging import LogLevel, logger, standard_log_decorator
 from imod.mf6.drn import Drainage
 from imod.mf6.ghb import GeneralHeadBoundary
@@ -35,7 +36,7 @@ from imod.mf6.mf6_wel_adapter import Mf6Wel
 from imod.mf6.package import Package
 from imod.mf6.riv import River
 from imod.mf6.utilities.mf6hfb import merge_hfb_packages
-from imod.mf6.validation_context import ValidationContext
+from imod.mf6.validation_settings import ValidationSettings
 from imod.mf6.wel import GridAgnosticWell
 from imod.mf6.write_context import WriteContext
 from imod.schemata import SchemataDict, ValidationError
@@ -232,7 +233,14 @@ class Modflow6Model(collections.UserDict, IModel, abc.ABC):
         return npf["k"]
 
     @standard_log_decorator()
-    def validate(self, model_name: str = "") -> StatusInfoBase:
+    def validate(
+        self,
+        model_name: str = "",
+        validation_context: Optional[ValidationSettings] = None,
+    ) -> StatusInfoBase:
+        if validation_context is None:
+            validation_context = ValidationSettings(validate=True)
+
         try:
             diskey = self._get_diskey()
         except Exception as e:
@@ -268,6 +276,7 @@ class Modflow6Model(collections.UserDict, IModel, abc.ABC):
                 schemata=schemata,
                 idomain=idomain,
                 bottom=bottom,
+                validation_context=validation_context,
             )
             if len(pkg_errors) > 0:
                 footer = SUGGESTION_TEXT if pkg_has_cleanup(pkg) else None
@@ -306,14 +315,14 @@ class Modflow6Model(collections.UserDict, IModel, abc.ABC):
             Direct representation of MODFLOW6 WEL package, with 'cellid'
             indicating layer, row columns.
         """
-        validate_context = ValidationContext(
+        validate_context = ValidationSettings(
             validate=validate, strict_well_validation=strict_well_validation
         )
         return self._prepare_wel_for_mf6(pkgname, validate_context)
 
     @standard_log_decorator()
     def _prepare_wel_for_mf6(
-        self, pkgname: str, validate_context: ValidationContext
+        self, pkgname: str, validate_context: ValidationSettings
     ) -> Mf6Wel:
         pkg = self[pkgname]
         if not isinstance(pkg, GridAgnosticWell):
@@ -367,7 +376,7 @@ class Modflow6Model(collections.UserDict, IModel, abc.ABC):
             ``ValidationError``.
         """
         write_context = WriteContext(Path(directory), use_binary, use_absolute_paths)
-        validate_context = ValidationContext(validate, validate, validate)
+        validate_context = ValidationSettings(validate, validate, validate)
 
         status_info = self._write(
             modelname, globaltimes, write_context, validate_context
@@ -382,7 +391,7 @@ class Modflow6Model(collections.UserDict, IModel, abc.ABC):
         modelname: str,
         globaltimes: Union[list[np.datetime64], np.ndarray],
         write_context: WriteContext,
-        validate_context: ValidationContext,
+        validate_context: ValidationSettings,
     ) -> StatusInfoBase:
         """
         Write model namefile
@@ -393,12 +402,13 @@ class Modflow6Model(collections.UserDict, IModel, abc.ABC):
         modeldirectory = workdir / modelname
         Path(modeldirectory).mkdir(exist_ok=True, parents=True)
         if validate_context.validate:
-            model_status_info = self.validate(modelname)
+            model_status_info = self.validate(modelname, validate_context)
             if model_status_info.has_errors():
                 return model_status_info
 
         # write model namefile
         namefile_content = self.render(modelname, write_context)
+        namefile_content = prepend_content_with_version_info(namefile_content)
         namefile_path = modeldirectory / f"{modelname}.nam"
         with open(namefile_path, "w") as f:
             f.write(namefile_content)
@@ -489,8 +499,9 @@ class Modflow6Model(collections.UserDict, IModel, abc.ABC):
         """
         modeldirectory = pathlib.Path(directory) / modelname
         modeldirectory.mkdir(exist_ok=True, parents=True)
-        if validate:
-            statusinfo = self.validate()
+        validation_context = ValidationSettings(validate=validate)
+        if validation_context.validate:
+            statusinfo = self.validate(modelname, validation_context)
             if statusinfo.has_errors():
                 raise ValidationError(statusinfo.to_string())
 
@@ -711,13 +722,20 @@ class Modflow6Model(collections.UserDict, IModel, abc.ABC):
 
         _mask_all_packages(self, mask)
 
-    def purge_empty_packages(self, model_name: Optional[str] = "") -> None:
+    def purge_empty_packages(
+        self, model_name: Optional[str] = "", ignore_time: bool = False
+    ) -> None:
         """
         This function removes empty packages from the model.
         """
         empty_packages = [
-            package_name for package_name, package in self.items() if package.is_empty()
+            package_name
+            for package_name, package in self.items()
+            if package.is_empty(ignore_time=ignore_time)
         ]
+        logger.info(
+            f"packages: {empty_packages} removed in {model_name}, because all empty"
+        )
         for package_name in empty_packages:
             self.pop(package_name)
 

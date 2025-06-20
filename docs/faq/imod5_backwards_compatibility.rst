@@ -10,8 +10,6 @@ issueboard <https://github.com/Deltares/imod-python/issues>`_.
 Known issues
 ------------
 
-- Constants are only supported for the CAP package. For other packages, the
-  constants will cause an error.
 - ISG files cannot be read directly. The workaround is to rasterize the ISG
   files to IDF files using the iMOD5 BATCH function ISGGRID.
 - MetaSWAP sprinkling wells defined as IPF files are not supported.
@@ -82,7 +80,7 @@ Here an overview of iMOD5 files supported:
     Open legend file (.leg),:func:`imod.visualize.read_imod_legend`,
 
 MODFLOW 6
---------
+---------
 
 Here an overview of iMOD5 MODFLOW 6 features:
 

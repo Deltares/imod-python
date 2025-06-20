@@ -1,14 +1,29 @@
 import pickle
 import textwrap
 from functools import wraps
-from typing import Any, Callable, Mapping, ParamSpec, Sequence, TypeVar, cast
+from typing import (
+    TYPE_CHECKING,
+    Any,
+    Callable,
+    Mapping,
+    ParamSpec,
+    Sequence,
+    TypeVar,
+    cast,
+)
 
 import numpy as np
 import xarray as xr
 import xugrid as xu
 from plum import Dispatcher
 
-from imod.typing import GeoDataFrameType, GridDataArray, GridDataset, structured
+from imod.typing import (
+    GeoDataFrameType,
+    GridDataArray,
+    GridDataset,
+    structured,
+)
+from imod.util.imports import MissingOptionalModule
 from imod.util.spatial import _polygonize
 
 # create dispatcher instance to limit scope of typedispatching
@@ -16,6 +31,14 @@ dispatch = Dispatcher()
 
 T = TypeVar("T")
 P = ParamSpec("P")
+
+if TYPE_CHECKING:
+    import geopandas as gpd
+else:
+    try:
+        import geopandas as gpd
+    except ImportError:
+        gpd = MissingOptionalModule("geopandas")
 
 
 @dispatch
@@ -260,8 +283,9 @@ def bounding_polygon(active: xu.UgridDataArray) -> GeoDataFrameType:  # noqa: F8
     active_indices = np.where(active > 0)[0]
     domain_slice = {f"{active.ugrid.grid.face_dimension}": active_indices}
     active_clipped = active.isel(domain_slice, missing_dims="ignore")
-
-    return active_clipped.ugrid.grid.bounding_polygon()
+    polygon = active_clipped.ugrid.grid.bounding_polygon()
+    dummy_value = 0
+    return gpd.GeoDataFrame([dummy_value], geometry=[polygon])
 
 
 @dispatch
@@ -543,3 +567,13 @@ def as_ugrid_dataarray(grid: xu.UgridDataArray) -> xu.UgridDataArray:  # noqa: F
 @dispatch  # type: ignore[no-redef]
 def as_ugrid_dataarray(grid: Any) -> xu.UgridDataArray:  # noqa: F811
     raise TypeError(f"Function doesn't support type {type(grid)}")
+
+
+def notnull(obj: GridDataArray) -> GridDataArray:
+    """
+    Helper function; does the same as xr.DataArray.notnull. This function is to
+    avoid an issue where xr.DataArray.notnull() returns ordinary numpy arrays
+    for instances of xu.UgridDataArray.
+    """
+
+    return cast(GridDataArray, ~np.isnan(obj))
