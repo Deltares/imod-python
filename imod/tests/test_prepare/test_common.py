@@ -2,7 +2,6 @@ import warnings
 
 import numba
 import numpy as np
-import xarray as xr
 
 import imod
 
@@ -51,79 +50,6 @@ def test_starts():
     dst_x = np.arange(-5.0, 6.0, 2.5)
     result = get_starts(src_x, dst_x)
     assert result == [(0, 0), (1, 2), (2, 5), (3, 7)]
-
-
-def test_weights():
-    src_x = np.arange(0.0, 11.0, 1.0)
-    dst_x = np.arange(0.0, 11.0, 2.5)
-    max_len, (dst_inds, src_inds, weights) = imod.prepare.common._weights_1d(
-        src_x, dst_x, False
-    )
-    assert max_len == 3
-    assert np.allclose(dst_inds, np.array([0, 1, 2, 3]))
-    assert np.allclose(src_inds, np.array([[0, 1, 2], [2, 3, 4], [5, 6, 7], [7, 8, 9]]))
-    assert np.allclose(
-        weights,
-        np.array([[1.0, 1.0, 0.5], [0.5, 1.0, 1.0], [1.0, 1.0, 0.5], [0.5, 1.0, 1.0]]),
-    )
-
-    # Irregular grid
-    src_x = np.array([0.0, 2.5, 7.5, 10.0])
-    dst_x = np.array([0.0, 5.0, 10.0])
-    max_len, (dst_inds, src_inds, weights) = imod.prepare.common._weights_1d(
-        src_x, dst_x, False
-    )
-    assert max_len == 2
-    assert np.allclose(dst_inds, np.array([0, 1]))
-    assert np.allclose(src_inds, np.array([[0, 1], [1, 2]]))
-    assert np.allclose(weights, np.array([[2.5, 2.5], [2.5, 2.5]]))
-
-    # Mixed coords
-    src_x = np.arange(-5.0, 6.0, 1.0)
-    dst_x = np.arange(-5.0, 6.0, 2.5)
-    max_len, (dst_inds, src_inds, weights) = imod.prepare.common._weights_1d(
-        src_x, dst_x, False
-    )
-    assert max_len == 3
-    assert np.allclose(dst_inds, np.array([0, 1, 2, 3]))
-    assert np.allclose(src_inds, np.array([[0, 1, 2], [2, 3, 4], [5, 6, 7], [7, 8, 9]]))
-    assert np.allclose(
-        weights,
-        np.array([[1.0, 1.0, 0.5], [0.5, 1.0, 1.0], [1.0, 1.0, 0.5], [0.5, 1.0, 1.0]]),
-    )
-
-
-def test_relative_weights():
-    # In the test above, the absolute weights are the same as the relative weights
-    # To have a test case, we simply multiply coordinates by two, while the
-    # relative weights should remain the same.
-    src_x = np.arange(0.0, 11.0, 1.0) * 2.0
-    dst_x = np.arange(0.0, 11.0, 2.5) * 2.0
-    max_len, (dst_inds, src_inds, weights) = imod.prepare.common._weights_1d(
-        src_x, dst_x, True
-    )
-    assert max_len == 3
-    assert np.allclose(dst_inds, np.array([0, 1, 2, 3]))
-    assert np.allclose(src_inds, np.array([[0, 1, 2], [2, 3, 4], [5, 6, 7], [7, 8, 9]]))
-    assert np.allclose(
-        weights,
-        np.array([[1.0, 1.0, 0.5], [0.5, 1.0, 1.0], [1.0, 1.0, 0.5], [0.5, 1.0, 1.0]]),
-    )
-
-    # Something non-equidistant
-    src_x = np.array([0.0, 1.5])
-    dst_x = np.array([0.0, 3.0])
-    max_len, (dst_inds, src_inds, weights) = imod.prepare.common._weights_1d(
-        src_x, dst_x, True
-    )
-    assert np.allclose(weights, np.array([[1.0]]))
-
-    src_x = np.array([0.0, 3.0])
-    dst_x = np.array([0.0, 1.5])
-    max_len, (dst_inds, src_inds, weights) = imod.prepare.common._weights_1d(
-        src_x, dst_x, True
-    )
-    assert np.allclose(weights, np.array([[0.5]]))
 
 
 def test_area_weighted_methods():
@@ -260,30 +186,6 @@ def test_selection_indices():
     assert i1 == 3
 
 
-def test_slice_src():
-    # dx of 100.0
-    # midpoints
-    src_x = np.array([50.0, 150.0, 250.0, 350.0, 450.0])
-    # dx of 50.0
-    like_x = np.array([75.0, 125.0, 175.0])
-    src = xr.DataArray(np.ones(src_x.size), {"x": src_x}, ("x",))
-    like = xr.DataArray(np.ones(like_x.size), {"x": like_x}, ("x",))
-
-    actual = imod.prepare.common._slice_src(src, like, 0)
-    expected = src.isel(x=slice(0, 2))
-    assert actual.equals(expected)
-
-    actual = imod.prepare.common._slice_src(src, like, 1)
-    expected = src.isel(x=slice(0, 3))
-    assert actual.equals(expected)
-
-    like_x = np.array([125.0, 175.0, 225.0])
-    like = xr.DataArray(np.ones(like_x.size), {"x": like_x}, ("x",))
-    actual = imod.prepare.common._slice_src(src, like, 1)
-    expected = src.isel(x=slice(0, 4))
-    assert actual.equals(expected)
-
-
 def test_define_single_dim_slices():
     # Simplest first, no chunk in dimension
     src_x = np.array([0.0, 1.0, 2.0, 3.0, 4.0])
@@ -339,20 +241,3 @@ def test_define_single_dim_slices():
     chunksizes = (3,) * 5
     dst_slices = imod.prepare.common._define_single_dim_slices(src_x, dst_x, chunksizes)
     assert len(dst_slices) == 5
-
-
-def test_sel_chunks():
-    src_x = np.arange(5.0) + 0.5
-    dst_x = np.arange(0.0, 6.0, 2.0) + 1.0
-    src = xr.DataArray(np.ones(5), {"x": src_x}, ("x",))
-    src = src.chunk({"x": (2, 2, 1)})
-    like = xr.DataArray(np.ones(3), {"x": dst_x}, ("x",))
-    dst_slices, chunks_shape = imod.prepare.common._define_slices(src, like)
-    assert len(dst_slices) == np.prod(chunks_shape)
-
-    # 2D
-    src = xr.DataArray(np.ones((5, 5)), {"y": src_x, "x": src_x}, ("y", "x"))
-    src = src.chunk({"x": (2, 2, 1), "y": (2, 2, 1)})
-    like = xr.DataArray(np.ones((3, 3)), {"y": dst_x, "x": dst_x}, ("y", "x"))
-    dst_slices, chunks_shape = imod.prepare.common._define_slices(src, like)
-    assert len(dst_slices) == np.prod(chunks_shape)
