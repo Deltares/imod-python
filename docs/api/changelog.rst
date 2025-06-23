@@ -6,6 +6,19 @@ All notable changes to this project will be documented in this file.
 The format is based on `Keep a Changelog`_, and this project adheres to
 `Semantic Versioning`_.
 
+[Unreleased]
+------------
+
+Removed
+~~~~~~~
+
+- Removed ``imod.mf6.WellDisStructured`` and
+  ``imod.mf6.WellDisVertices``. Use :class:`imod.mf6.Well` and
+  :class:`imod.mf6.LayeredWell` instead. The :class:`imod.mf6.Well` package can
+  be used to specify wells with filters, :class:`imod.mf6.LayeredWell` directly
+  to layers.
+
+
 [1.0.0rc4] - 2025-06-20
 -----------------------
 
@@ -466,7 +479,7 @@ Changed
   objects.
 - :class:`imod.msw.CouplingMapping` and :class:`imod.msw.Sprinkling` now take
   the :class:`imod.mf6.mf6_wel_adapter.Mf6Wel` as well argument instead of the
-  deprecated :class:`imod.mf6.WellDisStructured`.
+  deprecated ``imod.mf6.WellDisStructured``.
 
 
 Added
@@ -919,7 +932,7 @@ Changed
 ~~~~~~~
 
 - TWRI MODFLOW 6 example uses the grid-agnostic :class:`imod.mf6.Well`
-  package instead of the :class:`imod.mf6.WellDisStructured` package.
+  package instead of the ``imod.mf6.WellDisStructured`` package.
 
 Fixed
 ~~~~~
@@ -1288,8 +1301,8 @@ Added
 -  Packages for :class:`imod.mf6.GroundwaterFlowModel` will now accept
    :class:`xugrid.UgridDataArray` objects for (DISV) unstructured grids, next to
    :class:`xarray.DataArray` objects for structured (DIS) grids.
--  Transient wells are now supported in :class:`imod.mf6.WellDisStructured` and
-   :class:`imod.mf6.WellDisVertices`.
+-  Transient wells are now supported in ``imod.mf6.WellDisStructured`` and
+   ``imod.mf6.WellDisVertices``.
 -  :func:`imod.util.to_ugrid2d` has been added to convert a (structured) xarray
    DataArray or Dataset to a quadrilateral UGRID dataset.
 -  Functions created to create empty DataArrays with greater ease:
@@ -1311,7 +1324,7 @@ Changed
 -  Datetime columns in IPF associated files (via
    :func:`imod.ipf.write_assoc`) will not be placed within quotes, as this can
    break certain iMOD batch functions.
--  :class:`imod.mf6.Well` has been renamed into :class:`imod.mf6.WellDisStructured`.
+-  :class:`imod.mf6.Well` has been renamed into ``imod.mf6.WellDisStructured``.
 -  :meth:`imod.mf6.GroundwaterFlowModel.write` will now write package names
    into the simulation namefile.
 -  :func:`imod.mf6.open_cbc` will now return a dictionary with keys
