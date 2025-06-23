@@ -171,14 +171,6 @@ def _read(path, headersize, nrow, ncol, nodata, dtype):
         return a
 
 
-def read(path, use_cftime=False, pattern=None):
-    warnings.warn(
-        "The imod.rasterio.read() function is deprecated. Instead use imod.rasterio.open().",
-        FutureWarning,
-    )
-    return open(path, use_cftime=False, pattern=None).load()
-
-
 def open(path, use_cftime=False, pattern=None):
     r"""
     Open one or more GDAL supported raster files as an xarray.DataArray.
