@@ -1474,8 +1474,8 @@ Added
 Changed
 ~~~~~~~
 
--  :func:`imod.idf.read` is deprecated, use :mod:`imod.idf.open` instead
--  :func:`imod.rasterio.read` is deprecated, use :mod:`imod.rasterio.open` instead
+-  ``imod.idf.read`` is deprecated, use :func:`imod.idf.open` instead
+-  ``imod.rasterio.read`` is deprecated, use :func:`imod.rasterio.open` instead
 
 Fixed
 ~~~~~
