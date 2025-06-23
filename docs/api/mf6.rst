@@ -163,8 +163,7 @@ Flow Packages
     Well.regrid_like
     Well.to_mf6_pkg
     Well.clip_box
-    WellDisStructured
-    WellDisVertices
+
 
 Transport Packages
 ------------------

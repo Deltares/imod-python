@@ -2,7 +2,7 @@ import abc
 import pathlib
 import warnings
 from copy import copy, deepcopy
-from typing import List, Mapping, Optional, Tuple, Union
+from typing import Mapping, Optional, Union
 
 import numpy as np
 import xarray as xr
@@ -375,37 +375,3 @@ class AdvancedBoundaryCondition(BoundaryCondition, abc.ABC):
     @abc.abstractmethod
     def fill_stress_perioddata(self):
         raise NotImplementedError
-
-
-class DisStructuredBoundaryCondition(BoundaryCondition):
-    def _to_struct_array(self, arrdict, layer):
-        spec: List[Tuple[str, np.int32 | np.float64]] = []
-        for key in arrdict:
-            if key in ["layer", "row", "column"]:
-                spec.append((key, np.int32))  # type: ignore[arg-type]
-            else:
-                spec.append((key, np.float64))  # type: ignore[arg-type]
-
-        sparse_dtype = np.dtype(spec)
-        nrow = next(iter(arrdict.values())).size
-        recarr = np.empty(nrow, dtype=sparse_dtype)
-        for key, arr in arrdict.items():
-            recarr[key] = arr
-        return recarr
-
-
-class DisVerticesBoundaryCondition(BoundaryCondition):
-    def _to_struct_array(self, arrdict, layer):
-        spec = []
-        for key in arrdict:
-            if key in ["layer", "cell2d"]:
-                spec.append((key, np.int32))
-            else:
-                spec.append((key, np.float64))  # type: ignore[arg-type]
-
-        sparse_dtype = np.dtype(spec)
-        nrow = next(iter(arrdict.values())).size
-        recarr = np.empty(nrow, dtype=sparse_dtype)
-        for key, arr in arrdict.items():
-            recarr[key] = arr
-        return recarr
