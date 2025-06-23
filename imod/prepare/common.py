@@ -12,8 +12,6 @@ import cftime
 import numba
 import numpy as np
 
-import imod
-
 
 @numba.njit
 def _starts(src_x, dst_x):
@@ -39,92 +37,6 @@ def _starts(src_x, dst_x):
             else:
                 j += 1
         i += 1
-
-
-def _weights_1d(src_x, dst_x, use_relative_weights=False):
-    """
-    Calculate regridding weights and indices for a single dimension
-
-    Parameters
-    ----------
-    src_x : np.array
-        vertex coordinates of source
-    dst_x: np.array
-        vertex coordinates of destination
-
-    Returns
-    -------
-    max_len : int
-        maximum number of source cells to a single destination cell for this
-        dimension
-    dst_inds : list of int
-        destination cell index
-    src_inds: list of list of int
-        source cell index, per destination index
-    weights : list of list of float
-        weight of source cell, per destination index
-    """
-    max_len = 0
-    dst_inds = []
-    src_inds = []
-    weights = []
-    rel_weights = []
-
-    # i is index of dst
-    # j is index of src
-    for i, j in _starts(src_x, dst_x):
-        dst_x0 = dst_x[i]
-        dst_x1 = dst_x[i + 1]
-
-        _inds = []
-        _weights = []
-        _rel_weights = []
-        has_value = False
-        while j < src_x.size - 1:
-            src_x0 = src_x[j]
-            src_x1 = src_x[j + 1]
-            overlap = _overlap((dst_x0, dst_x1), (src_x0, src_x1))
-            # No longer any overlap, continue to next dst cell
-            if overlap == 0:
-                break
-            else:
-                has_value = True
-                _inds.append(j)
-                _weights.append(overlap)
-                relative_overlap = overlap / (src_x1 - src_x0)
-                _rel_weights.append(relative_overlap)
-                j += 1
-        if has_value:
-            dst_inds.append(i)
-            src_inds.append(_inds)
-            weights.append(_weights)
-            rel_weights.append(_rel_weights)
-            # Save max number of source cells
-            # So we know how much to pre-allocate later on
-            inds_len = len(_inds)
-            if inds_len > max_len:
-                max_len = inds_len
-
-    # Convert all output to numpy arrays
-    # numba does NOT like arrays or lists in tuples
-    # Compilation time goes through the roof
-    nrow = len(dst_inds)
-    ncol = max_len
-    np_dst_inds = np.array(dst_inds)
-
-    np_src_inds = np.full((nrow, ncol), -1)
-    for i in range(nrow):
-        for j, ind in enumerate(src_inds[i]):
-            np_src_inds[i, j] = ind
-
-    np_weights = np.full((nrow, ncol), 0.0)
-    if use_relative_weights:
-        weights = rel_weights
-    for i in range(nrow):
-        for j, ind in enumerate(weights[i]):
-            np_weights[i, j] = ind
-
-    return max_len, (np_dst_inds, np_src_inds, np_weights)
 
 
 def _reshape(src, dst, ndim_regrid):
@@ -242,23 +154,6 @@ def _selection_indices(src_x, xmin, xmax, extra_overlap):
     return i0, i1
 
 
-def _slice_src(src, like, extra_overlap):
-    """
-    Make sure src matches dst in dims that do not have to be regridded
-    """
-    matching_dims, regrid_dims, _ = _match_dims(src, like)
-    dims = matching_dims + regrid_dims
-
-    slices = {}
-    for dim in dims:
-        # Generate vertices
-        src_x = _coord(src, dim)
-        _, xmin, xmax = imod.util.spatial.coord_reference(like[dim])
-        i0, i1 = _selection_indices(src_x, xmin, xmax, extra_overlap)
-        slices[dim] = slice(i0, i1)
-    return src.isel(slices)
-
-
 def _dst_coords(src, like, dims_from_src, dims_from_like):
     """
     Gather destination coordinates
@@ -291,34 +186,6 @@ def _check_monotonic(dxs, dim):
     # use xor to check if one or the other
     if not ((dxs > 0.0).all() ^ (dxs < 0.0).all()):
         raise ValueError(f"{dim} is not only increasing or only decreasing")
-
-
-def _set_cellsizes(da, dims):
-    for dim in dims:
-        dx_string = f"d{dim}"
-        if dx_string not in da.coords:
-            dx, _, _ = imod.util.spatial.coord_reference(da.coords[dim])
-            dx_a = (
-                np.full(da.coords[dim].size, dx) if isinstance(dx, (int, float)) else dx
-            )
-            da = da.assign_coords({dx_string: (dim, dx_a)})
-
-    return da
-
-
-def _set_scalar_cellsizes(da):
-    for dim in da.dims:
-        dx_string = f"d{dim}"
-        if dx_string in da.coords:
-            dx = da.coords[dx_string]
-            # Ensure no leftover coordinates in scalar
-            if dx.ndim == 0:  # Catch case where dx already is a scalar
-                dx_scalar = dx.values[()]
-            else:
-                dx_scalar = dx.values[0]
-            if np.allclose(dx, dx_scalar):
-                da = da.assign_coords({dx_string: dx_scalar})
-    return da
 
 
 def _coord(da, dim):
@@ -393,50 +260,6 @@ def _define_single_dim_slices(src_x, dst_x, chunksizes):
     # (otherwise, the slice would be empty)
     dst_slices = [slice(s, e) for s, e in zip(dst_i[:-1], dst_i[1:]) if s != e]
     return dst_slices
-
-
-def _define_slices(src, like):
-    """
-    Defines the slices for every dimension, based on the chunks that are
-    present within src.
-
-    First, we get a single list of chunks per dimension.
-    Next, these are expanded into an N-dimensional array, equal to the number
-    of dimensions that have chunks.
-    Finally, these arrays are ravelled, and stacked for easier iteration.
-    """
-    dst_dim_slices = []
-    dst_chunks_shape = []
-    for dim, chunksizes in zip(src.dims, src.chunks):
-        if dim in like.dims:
-            dst_slices = _define_single_dim_slices(
-                _coord(src, dim), _coord(like, dim), chunksizes
-            )
-            dst_dim_slices.append(dst_slices)
-            dst_chunks_shape.append(len(dst_slices))
-
-    dst_expanded_slices = np.stack(
-        [a.ravel() for a in np.meshgrid(*dst_dim_slices, indexing="ij")], axis=-1
-    )
-    return dst_expanded_slices, dst_chunks_shape
-
-
-def _sel_chunks(da, dims, expanded_slices):
-    """
-    Using the slices created with the functions above, use xarray's index
-    selection methods to create a list of "like" DataArrays which are used
-    to inform the regridding. During the regrid() call of the
-    imod.prepare.Regridder object, data from the input array is selected,
-    ideally one chunk at time, or 2 ** ndim_chunks if there is overlap
-    required due to cellsize differences.
-    """
-    das = []
-    for dim_slices in expanded_slices:
-        slice_dict = {}
-        for dim, dim_slice in zip(dims, dim_slices):
-            slice_dict[dim] = dim_slice
-        das.append(da.isel(**slice_dict))
-    return das
 
 
 def _get_method(method, methods):

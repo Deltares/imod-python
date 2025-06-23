@@ -32,6 +32,8 @@ Removed
   :meth:`imod.wq.SeawatModel.create_time_discretization` instead.
 - Removed ``imod.util.round_extent``, use :func:`imod.prepare.round_extent`
   instead.
+- Removed :class:`imod.prepare.Regridder`. Use the `xugrid regridder
+  <https://deltares.github.io/xugrid/examples/regridder_overview.html>`_ instead.
 
 
 [1.0.0rc4] - 2025-06-20
