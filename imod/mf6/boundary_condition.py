@@ -1,6 +1,5 @@
 import abc
 import pathlib
-import warnings
 from copy import copy, deepcopy
 from typing import Mapping, Optional, Union
 

@@ -3,7 +3,6 @@ from __future__ import annotations
 import collections
 import pathlib
 import subprocess
-import warnings
 from copy import deepcopy
 from datetime import datetime
 from pathlib import Path
