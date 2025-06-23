@@ -19,6 +19,7 @@ Removed
   to layers.
 - Removed ``imod.mf6.multimodel.partition_generator.get_label_array``, use
   :func:`imod.prepare.create_partition_labels` instead.
+- Removed ``imod.idf.read`` use :func:`imod.idf.open` instead.
 
 
 

@@ -131,43 +131,6 @@ def _read(path, headersize, nrow, ncol, nodata, dtype):
     return array_io.reading._to_nan(a, nodata)
 
 
-def read(path, pattern=None):
-    """
-    Read a single IDF file to a numpy.ndarray
-
-    Parameters
-    ----------
-    path : str or Path
-        Path to the IDF file to be read
-    pattern : str, regex pattern, optional
-        If the filenames do match default naming conventions of
-        {name}_{time}_l{layer}, a custom pattern can be defined here either
-        as a string, or as a compiled regular expression pattern. Please refer
-        to the examples for ``imod.idf.open``.
-
-    Returns
-    -------
-    numpy.ndarray
-        A float numpy.ndarray with shape (nrow, ncol) of the values
-        in the IDF file. On opening all nodata values are changed
-        to NaN in the numpy.ndarray.
-    dict
-        A dict with all metadata.
-    """
-    warnings.warn(
-        "The idf.read() function is deprecated. To get a numpy array of an IDF, "
-        "use instead: imod.idf.open(path).values",
-        FutureWarning,
-    )
-    attrs = header(path, pattern)
-    headersize = attrs.pop("headersize")
-    nrow = attrs.pop("nrow")
-    ncol = attrs.pop("ncol")
-    nodata = attrs.pop("nodata")
-    dtype = attrs.pop("dtype")
-    return _read(path, headersize, nrow, ncol, nodata, dtype), attrs
-
-
 # Open IDFs for multiple times and/or layers into one DataArray
 def open(path, use_cftime=False, pattern=None):
     r"""
