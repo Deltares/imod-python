@@ -154,14 +154,6 @@ class Modflow6Simulation(collections.UserDict, ISimulation):
         for k, v in dict(*args, **kwargs).items():
             self[k] = v
 
-    def time_discretization(self, times):
-        warnings.warn(
-            f"{self.__class__.__name__}.time_discretization() is deprecated. "
-            f"In the future call {self.__class__.__name__}.create_time_discretization().",
-            DeprecationWarning,
-        )
-        self.create_time_discretization(additional_times=times)
-
     @standard_log_decorator()
     def create_time_discretization(self, additional_times, validate: bool = True):
         """

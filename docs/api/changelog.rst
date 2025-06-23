@@ -26,6 +26,10 @@ Removed
   use ``alternative_cell_averaging`` instead.
 - Removed ``set_repeat_stress`` method from boundary condition packages like
   :class:`imod.mf6.River`. Use ``repeat_stress`` argument instead.
+- Removed ``time_discretization`` method from
+  :class:`imod.mf6.Modflow6Simulation` and :class:`imod.wq.SeawatModel`. Use
+  :meth:`imod.mf6.Modflow6Simulation.create_time_discretization` and
+  :meth:`imod.wq.SeawatModel.create_time_discretization` instead.
 
 
 [1.0.0rc4] - 2025-06-20
