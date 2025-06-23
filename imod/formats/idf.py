@@ -8,7 +8,6 @@ The primary functions to use are :func:`imod.idf.open` and
 import glob
 import pathlib
 import struct
-import warnings
 from collections import defaultdict
 from collections.abc import Iterable
 from pathlib import Path

@@ -7,7 +7,6 @@ Currently only :func:`imod.rasterio.write` is implemented.
 """
 
 import pathlib
-import warnings
 from typing import Dict
 
 import numpy as np
