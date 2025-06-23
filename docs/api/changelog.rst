@@ -17,6 +17,9 @@ Removed
   :class:`imod.mf6.LayeredWell` instead. The :class:`imod.mf6.Well` package can
   be used to specify wells with filters, :class:`imod.mf6.LayeredWell` directly
   to layers.
+- Removed ``imod.mf6.multimodel.partition_generator.get_label_array``, use
+  :func:`imod.prepare.create_partition_labels` instead.
+
 
 
 [1.0.0rc4] - 2025-06-20
