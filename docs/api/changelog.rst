@@ -21,6 +21,8 @@ Removed
   :func:`imod.prepare.create_partition_labels` instead.
 - Removed ``imod.idf.read`` use :func:`imod.idf.open` instead.
 - Removed ``imod.rasterio.read`` use :func:`imod.rasterio.open` instead.
+- Removed ``head`` argument for :class:`imod.mf6.InitialConditions`, use ``start``
+  instead.
 
 
 [1.0.0rc4] - 2025-06-20
