@@ -27,18 +27,3 @@ from imod.util.spatial import (
 from imod.util.structured import replace, values_within_range, where
 from imod.util.time import to_datetime
 
-
-def round_extent(extent, cellsize):
-    """
-    This function is to preserve the imod.util.round_extent() namespace. Please
-    refer to the new location in the future: imod.prepare.spatial.roundextent.
-    """
-    # Import locally to avoid circular imports
-    from imod.prepare.spatial import round_extent
-
-    warnings.warn(
-        "Use of `imod.util.round_extent` is deprecated, please use the new "
-        "location `imod.prepare.spatial.round_extent`",
-        DeprecationWarning,
-    )
-    return round_extent(extent, cellsize)

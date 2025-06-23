@@ -30,6 +30,8 @@ Removed
   :class:`imod.mf6.Modflow6Simulation` and :class:`imod.wq.SeawatModel`. Use
   :meth:`imod.mf6.Modflow6Simulation.create_time_discretization` and
   :meth:`imod.wq.SeawatModel.create_time_discretization` instead.
+- Removed ``imod.util.round_extent``, use :func:`imod.prepare.round_extent`
+  instead.
 
 
 [1.0.0rc4] - 2025-06-20
