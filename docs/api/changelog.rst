@@ -24,6 +24,8 @@ Removed
   ``start`` instead.
 - Removed ``cell_averaging`` argument for :class:`imod.mf6.NodePropertyFlow`,
   use ``alternative_cell_averaging`` instead.
+- Removed ``set_repeat_stress`` method from boundary condition packages like
+  :class:`imod.mf6.River`. Use ``repeat_stress`` argument instead.
 
 
 [1.0.0rc4] - 2025-06-20
@@ -1173,7 +1175,7 @@ Fixed
 - :meth:`imod.prepare.LayerRegridder.regrid` will now correctly skip values
   if ``top_source`` or ``bottom_source`` are NaN.
 - :func:`imod.gen.write` no longer errors on dataframes with empty columns.
-- :func:`imod.mf6.BoundaryCondition.set_repeat_stress` reinstated. This is
+- ``imod.mf6.BoundaryCondition.set_repeat_stress`` reinstated. This is
   a temporary measure, it gives a deprecation warning.
 
 Changed
