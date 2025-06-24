@@ -1,6 +1,5 @@
 import abc
 import pathlib
-import warnings
 from copy import copy, deepcopy
 from typing import Mapping, Optional, Union
 
@@ -85,34 +84,6 @@ class BoundaryCondition(Package, abc.ABC):
             del self.dataset["concentration_boundary_type"]
         else:
             expand_transient_auxiliary_variables(self)
-
-    def set_repeat_stress(self, times: dict[np.datetime64, np.datetime64]) -> None:
-        """
-        Set repeat stresses: re-use data of earlier periods.
-
-        Parameters
-        ----------
-        times: Dict of datetime-like to datetime-like.
-            The data of the value datetime is used for the key datetime.
-        """
-        warnings.warn(
-            f"""{self.__class__.__name__}.set_repeat_stress(...) is deprecated.
-            In the future, add repeat stresses as constructor parameters. An
-            object containing them can be created using 'get_repeat_stress', as
-            follows:
-
-            from imod.mf6.utilities.package_utils import get_repeat_stress
-
-            repeat_stress = get_repeat_stress(repeat_periods) # args before provided to River.set_repeat_stress
-            riv = imod.mf6.River(..., repeat_stress=repeat_stress)
-
-            Note that the location of get_repeat_stress (imod.mf6.utilities.package_utils)
-            may change in the future
-            """,
-            DeprecationWarning,
-        )
-
-        self.dataset["repeat_stress"] = get_repeat_stress(times)
 
     def _max_active_n(self):
         """

@@ -373,63 +373,6 @@ def test_repeat_stress(
     assert actual == expected
 
 
-def test_repeat_stress_old_style(
-    elevation_fc,
-    conductance_fc,
-):
-    directory = pathlib.Path("mymodel")
-    globaltimes = np.array(
-        [
-            "2000-01-01",
-            "2000-01-02",
-            "2000-01-03",
-            "2000-01-04",
-            "2000-01-05",
-        ],
-        dtype="datetime64[ns]",
-    )
-
-    expected = textwrap.dedent(
-        """\
-        begin options
-        end options
-
-        begin dimensions
-          maxbound 2
-        end dimensions
-
-        begin period 1
-          open/close mymodel/drn/drn-0.dat
-        end period
-        begin period 2
-          open/close mymodel/drn/drn-1.dat
-        end period
-        begin period 3
-          open/close mymodel/drn/drn-2.dat
-        end period
-        begin period 4
-          open/close mymodel/drn/drn-0.dat
-        end period
-        begin period 5
-          open/close mymodel/drn/drn-1.dat
-        end period
-        """
-    )
-
-    drn = imod.mf6.Drainage(
-        elevation=elevation_fc,
-        conductance=conductance_fc,
-    )
-    drn.set_repeat_stress(
-        times={
-            globaltimes[3]: globaltimes[0],
-            globaltimes[4]: globaltimes[1],
-        }
-    )
-    actual = drn.render(directory, "drn", globaltimes, False)
-    assert actual == expected
-
-
 def test_clip_box(drainage):
     drn = imod.mf6.Drainage(**drainage)
 

@@ -1,4 +1,3 @@
-import warnings
 from copy import deepcopy
 from typing import Optional, cast
 
@@ -374,7 +373,6 @@ class NodePropertyFlow(Package, IRegridPackage):
         angle1=None,
         angle2=None,
         angle3=None,
-        cell_averaging=None,
         alternative_cell_averaging=None,
         save_flows=False,
         starting_head_as_confined_thickness=False,
@@ -395,12 +393,6 @@ class NodePropertyFlow(Package, IRegridPackage):
                 "rewet_layer, rewet_factor, rewet_iterations, and rewet_method should"
                 " all be left at a default value of None if rewet is False."
             )
-        if cell_averaging is not None:
-            warnings.warn(
-                "Use of `cell_averaging` is deprecated, please use `alternative_cell_averaging` instead",
-                DeprecationWarning,
-            )
-            alternative_cell_averaging = cell_averaging
 
         dict_dataset = {
             "icelltype": icelltype,

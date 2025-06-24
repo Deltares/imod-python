@@ -286,16 +286,6 @@ def test_render_storage_coefficient_save_flows(sy_layered, convertible):
     assert actual == expected
 
 
-def test_storage_deprecation_warning(sy_layered, convertible):
-    with pytest.raises(NotImplementedError):
-        imod.mf6.Storage(
-            specific_storage=0.0003,
-            specific_yield=sy_layered,
-            transient=True,
-            convertible=convertible,
-        )
-
-
 def test_wrong_dtype_sc(sy_layered, convertible):
     with pytest.raises(ValidationError):
         imod.mf6.StorageCoefficient(

@@ -12,11 +12,28 @@ The format is based on `Keep a Changelog`_, and this project adheres to
 Removed
 ~~~~~~~
 
-- Removed ``imod.mf6.WellDisStructured`` and
-  ``imod.mf6.WellDisVertices``. Use :class:`imod.mf6.Well` and
-  :class:`imod.mf6.LayeredWell` instead. The :class:`imod.mf6.Well` package can
-  be used to specify wells with filters, :class:`imod.mf6.LayeredWell` directly
-  to layers.
+- Removed ``imod.mf6.WellDisStructured`` and ``imod.mf6.WellDisVertices``. Use
+  :class:`imod.mf6.Well` and :class:`imod.mf6.LayeredWell` instead. The
+  :class:`imod.mf6.Well` package can be used to specify wells with filters,
+  :class:`imod.mf6.LayeredWell` directly to layers.
+- Removed ``imod.mf6.multimodel.partition_generator.get_label_array``, use
+  :func:`imod.prepare.create_partition_labels` instead.
+- Removed ``imod.idf.read`` use :func:`imod.idf.open` instead.
+- Removed ``imod.rasterio.read`` use :func:`imod.rasterio.open` instead.
+- Removed ``head`` argument for :class:`imod.mf6.InitialConditions`, use
+  ``start`` instead.
+- Removed ``cell_averaging`` argument for :class:`imod.mf6.NodePropertyFlow`,
+  use ``alternative_cell_averaging`` instead.
+- Removed ``set_repeat_stress`` method from boundary condition packages like
+  :class:`imod.mf6.River`. Use ``repeat_stress`` argument instead.
+- Removed ``time_discretization`` method from
+  :class:`imod.mf6.Modflow6Simulation` and :class:`imod.wq.SeawatModel`. Use
+  :meth:`imod.mf6.Modflow6Simulation.create_time_discretization` and
+  :meth:`imod.wq.SeawatModel.create_time_discretization` instead.
+- Removed ``imod.util.round_extent``, use :func:`imod.prepare.round_extent`
+  instead.
+- Removed :class:`imod.prepare.Regridder`. Use the `xugrid regridder
+  <https://deltares.github.io/xugrid/examples/regridder_overview.html>`_ instead.
 
 
 [1.0.0rc4] - 2025-06-20
@@ -1166,7 +1183,7 @@ Fixed
 - :meth:`imod.prepare.LayerRegridder.regrid` will now correctly skip values
   if ``top_source`` or ``bottom_source`` are NaN.
 - :func:`imod.gen.write` no longer errors on dataframes with empty columns.
-- :func:`imod.mf6.BoundaryCondition.set_repeat_stress` reinstated. This is
+- ``imod.mf6.BoundaryCondition.set_repeat_stress`` reinstated. This is
   a temporary measure, it gives a deprecation warning.
 
 Changed
@@ -1470,8 +1487,8 @@ Added
 Changed
 ~~~~~~~
 
--  :func:`imod.idf.read` is deprecated, use :mod:`imod.idf.open` instead
--  :func:`imod.rasterio.read` is deprecated, use :mod:`imod.rasterio.open` instead
+-  ``imod.idf.read`` is deprecated, use :func:`imod.idf.open` instead
+-  ``imod.rasterio.read`` is deprecated, use :func:`imod.rasterio.open` instead
 
 Fixed
 ~~~~~
