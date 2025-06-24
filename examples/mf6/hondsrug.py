@@ -360,18 +360,21 @@ rch_ss = rch_ss.assign_coords(time=starttime_steady)
 rch_ss_trans = xr.concat([rch_ss, rch_trans_yr], dim="time")
 rch_ss_trans
 
-# %%
-# The data obtained from KNMI has different grid dimensions
-# than the one considered in this example. To fix this,
-# imod-python includes the option
-# :doc:`/api/generated/prepare/imod.prepare.Regridder`,
-# which modifies the original grid dimensions to a different one.
-# It is also possible to define the regridding method such as
-# ``nearest``, ``multilinear``, ``mean``, among others.
-# In this case, ``mean`` was selected and the 2d template (like_2d)
-# was used as reference, as this is the geometry to be considered in the model.
+# %% 
+# The data obtained from KNMI has different grid dimensions than the one
+# considered in this example. To fix this, we'll have to regrid the data to the
+# model grid. ``xugrid`` has `Regridder functionality that allows to regrid data
+# with different methods.
+# <https://deltares.github.io/xugrid/examples/regridder_overview.html>`_ It is
+# also possible to define the regridding method such as ``nearest``,
+# ``multilinear``, ``mean``, among others. In this case, ``mean`` was selected
+# and the 2d template (like_2d) was used as reference, as this is the geometry
+# to be considered in the model.
 
-rch_ss_trans = imod.prepare.Regridder(method="mean").regrid(rch_ss_trans, like_2d)
+import xugrid as xu
+
+regridder = xu.OverlapRegridder(rch_ss, like_2d, method="mean")
+rch_ss_trans = regridder.regrid(rch_ss_trans)
 rch_ss_trans
 
 # %%
