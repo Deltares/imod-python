@@ -360,7 +360,7 @@ rch_ss = rch_ss.assign_coords(time=starttime_steady)
 rch_ss_trans = xr.concat([rch_ss, rch_trans_yr], dim="time")
 rch_ss_trans
 
-# %% 
+# %%
 # The data obtained from KNMI has different grid dimensions than the one
 # considered in this example. To fix this, we'll have to regrid the data to the
 # model grid. ``xugrid`` has `Regridder functionality that allows to regrid data
