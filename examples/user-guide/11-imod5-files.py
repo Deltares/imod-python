@@ -6,6 +6,9 @@ This example demonstrates how to work with iMOD5 files in Python using the
 `imod` package. It shows how to save, read, and manipulate iMOD5 files,
 including handling temporary directories and glob patterns for file selection.
 
+For a full explenation of the iMOD5 file formats, see the `iMOD5 documentation
+<https://oss.deltares.nl/documents/d/imod/imod_user_manual_v5_6_1#page=747>`_.
+
 For a full overview of the supported iMOD5 features in iMOD Python, see
 :doc:`../faq/imod5_backwards_compatibility`.
 
@@ -41,17 +44,18 @@ top
 # Note that this DataArray has three dimensions: layer, y, x.
 #
 # Let's create a temporary directory to store our IDF files.
+
 tmpdir = imod.util.temporary_directory()
-idf_dir = tmpdir / "idf"
 
 # %%
 #
 # As mentioned before, one IDF can only store data in two dimensions: y and x.
 # iMOD Python therefore will save a 3D dataset to multiple IDF files. The layer
-# index is stored in the file name, as the ``_L*`` suffix. iMOD Python will take
+# index is stored in the file name, as the ``_l*`` suffix. iMOD Python will take
 # the last part in the provided path as the name. We therefore end our path with
 # ``top``.
 
+idf_dir = tmpdir / "idf"
 imod.idf.save(idf_dir / "top", top)
 
 # %%
@@ -104,7 +108,7 @@ heads
 
 # %%
 #
-# We can plot a timeseries for one specific observation point, for example the
+# Let's plot a timeseries for one specific observation point, for example the
 # observation point with ID "B12A1745001".
 
 head_selected = heads.loc[heads["id"] == "B12A1745001"]
@@ -123,17 +127,16 @@ imod.ipf.save(ipf_dir / "heads", heads, itype=1)
 
 # %%
 #
-# The IPF files are now stored in the temporary directory. We'll list them as
-# follows:
+# The IPF files are now stored in the temporary directory. Let's print a list of
+# files:
 
 ipf_files = list(ipf_dir.glob("*"))
 ipf_files
 
 # %%
 #
-# Notice that all timeseries for each observation point are stored in a single
-# textfile. We can read the IPF file and accompanying text files back into a
-# DataFrame.
+# Notice that timeseries are stored in a single textfile per observation point.
+# We can read the IPF file and accompanying text files back into a DataFrame.
 
 reloaded_heads = imod.ipf.read(ipf_dir / "heads.ipf")
 reloaded_heads
@@ -158,7 +161,7 @@ ls
 
 # %%
 #
-# We now have a geometry, but there is no data associated with it yet. We can
+# We now have a geometry, but there is no data associated with it yet. Let's
 # create a GeoDataFrame with some data to associate with the line.
 
 import geopandas as gpd
@@ -180,7 +183,7 @@ imod.gen.write(
 
 # %%
 #
-# You can see that the file is saved in the specified directory.
+# Let's check that the file is saved in the specified directory.
 
 gen_files = list(gen_dir.glob("*"))
 gen_files
@@ -217,12 +220,6 @@ imod.gen.write(
 )
 
 # %%
-# This breaks for some reason?
-
-# reloaded_gdf = imod.gen.read(gen_dir / "barrier_3d.gen")
-# reloaded_gdf
-
-# %%
 #
 # 1D Network (ISG)
 # ----------------
@@ -239,9 +236,59 @@ imod.gen.write(
 # Legend files (LEG)
 # ------------------
 #
-# iMOD5 uses LEG files to store legend information for plotting.
+# iMOD5 uses LEG files to store legend information for plotting. For example,
+# the following LEG file defines a color legend for groundwater surface levels:
 
-# INSERT LEGEND FILE AND EXAMPLE HERE
+legend_str = """\
+24,1,1,1,1,1,1,1
+UPPERBND,LOWERBND,IRED,IGREEN,IBLUE,DOMAIN
+200.0000,10.00000,75,0,0,"> 10.0 m"
+10.00000,6.000000,115,0,0,"6.0-10.0 m"
+6.000000,4.000000,166,0,0,"4.0-6.0 m"
+4.000000,3.800000,191,0,0,"3.8-4.0 m"
+3.800000,3.600000,217,0,0,"3.6-3.8 m"
+3.600000,3.400000,237,0,0,"3.4-3.6 m"
+3.400000,3.200000,255,42,0,"3.2-3.4 m"
+3.200000,3.000000,255,85,0,"3.0-3.2 m"
+3.000000,2.800000,254,115,0,"2.8-3.0 m"
+2.800000,2.600000,254,140,0,"2.6-2.8 m"
+2.600000,2.400000,254,170,0,"2.4-2.6 m"
+2.400000,2.200000,254,191,10,"2.2-2.4 m"
+2.200000,2.000000,254,196,20,"2.0-2.2 m"
+2.000000,1.800000,254,221,51,"1.8-2.0 m"
+1.800000,1.600000,254,255,0,"1.6-1.8 m"
+1.600000,1.400000,254,255,115,"1.4-1.6 m"
+1.400000,1.200000,255,255,190,"1.2-1.4 m"
+1.200000,1.000000,209,255,115,"1.0-1.2 m"
+1.000000,0.8000000,163,255,115,"0.8-1.0 m"
+0.8000000,0.6000000,85,255,0,"0.6-0.8 m"
+0.6000000,0.4000000,76,230,0,"0.4-0.6 m"
+0.4000000,0.2000000,56,168,0,"0.2-0.4 m"
+0.2000000,0.000000,38,115,0,"0.0-0.2 m"
+0.000000,-200.0000,0,77,168,"<0.0 m"
+"""
+
+# %%
+#
+# Let's write this string to a file in our temporary directory.
+
+legend_dir = tmpdir / "leg"
+legend_dir.mkdir(exist_ok=True)
+legend_path = legend_dir / "GWS_surface_level.leg"
+with open(legend_path, "w") as f:
+    f.write(legend_str)
+
+# %%
+#
+# We can read the LEG file using the `imod.visualize.read_imod_legend` function.
+
+colors, levels, labels = imod.visualize.read_imod_legend(legend_path)
+
+# %%
+# We can now use these colors and levels to plot a surface. In this case, we
+# will plot the top layer of our layermodel.
+
+imod.visualize.plot_map(top.sel(layer=1), colors=colors, levels=levels)
 
 # %%
 #
