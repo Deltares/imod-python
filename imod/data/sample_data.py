@@ -167,6 +167,18 @@ def imod5_projectfile_data(path: Union[str, Path]) -> dict:
     return iMOD5_model
 
 
+def fetch_imod5_model(path: Union[str, Path]) -> Path:
+    """
+    Fetches the iMOD5 project file from the registry and returns its path.
+    """
+    lock = FileLock(REGISTRY.path / "iMOD5_model.zip.lock")
+    with lock:
+        _ = REGISTRY.fetch("iMOD5_model.zip", processor=Unzip(extract_dir=path))
+        model_dir = Path(path) / "iMOD5_model_pooch"
+
+    return model_dir
+
+
 def hondsrug_simulation(path: Union[str, Path]) -> Modflow6Simulation:
     lock = FileLock(REGISTRY.path / "hondsrug-simulation.zip.lock")
     with lock:

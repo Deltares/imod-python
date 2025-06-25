@@ -3,6 +3,7 @@ from .sample_data import (
     ahn,
     circle,
     colleagues_river_data,
+    fetch_imod5_model,
     fluxes,
     head_observations,
     hondsrug_crosssection,
