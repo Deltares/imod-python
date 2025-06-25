@@ -1,6 +1,6 @@
 """
-Reading and writing with iMOD5 files in Python
-==============================================
+Reading and writing iMOD5 files in Python
+=========================================
 
 This example demonstrates how to work with iMOD5 files in Python using the
 `imod` package. It shows how to save, read, and manipulate iMOD5 files,
@@ -23,7 +23,7 @@ For a full overview of the supported iMOD5 features in iMOD Python, see
 # raster data. The `imod.idf` module provides functions to read and write IDF
 # files. One IDF can only store data in two dimensions: y and x. It is similar
 # to GeoTIFF in this regard.
-
+#
 # We'll start off with some example data to work with. Let's load a layer model
 # with geological layers.
 
@@ -61,9 +61,10 @@ imod.idf.save(idf_dir / "top", top)
 # %%
 # The IDF files are now stored in the temporary directory. We can list them
 # using the `glob` method, which allows us to use wildcards to match file names
+from pprint import pprint
 
 idf_files = list(idf_dir.glob("*"))
-idf_files
+pprint(idf_files)
 
 # %%
 #
@@ -131,7 +132,7 @@ imod.ipf.save(ipf_dir / "heads", heads, itype=1)
 # files:
 
 ipf_files = list(ipf_dir.glob("*"))
-ipf_files
+pprint(ipf_files)
 
 # %%
 #
@@ -186,7 +187,7 @@ imod.gen.write(
 # Let's check that the file is saved in the specified directory.
 
 gen_files = list(gen_dir.glob("*"))
-gen_files
+pprint(gen_files)
 
 # %%
 #
@@ -297,4 +298,6 @@ imod.visualize.plot_map(top.sel(layer=1), colors=colors, levels=levels)
 #
 # iMOD5 uses PRJ files to store project information, basically the model
 # definition. `See the example for a full overview of importing a model from a
-# projectfile into a MODFLOW6 model <INSERT LINK HERE>`_.
+# projectfile into a MODFLOW6 model <INSERT LINK HERE>`_. We'll show here how to
+# open a projectfile here and convert the data to a MODFLOW 6 model.
+#
