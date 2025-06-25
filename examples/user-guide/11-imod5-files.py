@@ -171,7 +171,8 @@ gdf = gpd.GeoDataFrame([100.0], geometry=[ls], columns=["resistance"])
 
 # %%
 #
-# We can save this line data to a GEN file with the `imod.gen.write` function.
+# We can save this line data to a GEN file with the
+# :doc:`/api/generated/io/imod.formats.gen.write` function.
 
 gen_dir = tmpdir / "gen"
 # We'll have to create the directory first, as it does not exist yet.
@@ -232,7 +233,6 @@ imod.gen.write(
 # Given its complexity, ISG is not yet supported in iMOD Python. The workaround
 # is to rasterize the ISGfiles to IDF files using the iMOD5 BATCH function
 # ISGGRID.
-# %%
 #
 # Legend files (LEG)
 # ------------------
@@ -281,7 +281,8 @@ with open(legend_path, "w") as f:
 
 # %%
 #
-# We can read the LEG file using the `imod.visualize.read_imod_legend` function.
+# We can read the LEG file using the
+# :doc:`/api/generated/visualize/imod.visualize.read_imod_legend` function.
 
 colors, levels, labels = imod.visualize.read_imod_legend(legend_path)
 
