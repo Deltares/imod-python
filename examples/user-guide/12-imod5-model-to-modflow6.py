@@ -187,7 +187,7 @@ head_structured = mf6_sim.open_head()
 # grid. Let's first load a triangular grid.
 
 # TODO: Add this to the artifacts
-path_grid = r"c:\Users\engelen\projects_wdir\imod-python\examples\hondsrug_unstructured\triangular_grid.nc"
+path_grid = r"c:\Users\engelen\projects_wdir\imod-python\examples\hondsrug_unstructured\triangular_grid_2.nc"
 
 import xugrid as xu
 triangular_grid = xu.open_dataarray(path_grid).ugrid.grid
@@ -196,9 +196,18 @@ triangular_grid.plot()
 
 # %%
 #
-# That looks more exciting than the rectangular grid we had before. You
-# can see there is refinement around some of the streams.
-#
+# That looks more exciting than the rectangular grid we had before. You can see
+# there is refinement around some of the streams and especially around
+# horizontal flow barriers. We haven't looked at horizontal flow barriers yet,
+# so let's plot them on top of the triangular mesh.
+
+import matplotlib.pyplot as plt
+fig, ax = plt.subplots()
+triangular_grid.plot(ax=ax, color="lightgrey", edgecolor="black")
+gwf_model["hfb-25"].line_data.plot(ax=ax, color="blue", linewidth=2)
+gwf_model["hfb-26"].line_data.plot(ax=ax, color="blue", linewidth=2)
+
+# %%
 # However, this grid is triangular, which has the disadvantage that the connections
 # between cell centers are not orthogonal to the cell edges, which can lead to
 # mass balance errors. xugrid has a method to convert this triangular grid
@@ -217,7 +226,7 @@ voronoi_grid.plot()
 import xarray as xr
 import numpy as np
 
-data = xr.DataArray(np.ones(voronoi_grid .sizes["mesh2d_nFaces"]), dims=["mesh2d_nFaces"])
+data = xr.DataArray(np.ones(voronoi_grid.sizes["mesh2d_nFaces"]), dims=["mesh2d_nFaces"])
 voronoi_uda = xu.UgridDataArray(data, voronoi_grid )
 
 mf6_unstructured = mf6_sim.regrid_like("unstructured_example", voronoi_uda, validate=False)
@@ -335,7 +344,8 @@ head_structured_upscaled = regridder.regrid(head_structured)
 # %%
 #
 # Compute the difference between the upscaled structured head and the
-# unstructured head. This should be close to zero, as the upscaling is done
+# unstructured head. A zero difference means the regridding was perfect. We can
+# see around the western fault that the regridding caused some differences.
 
 diff = head_structured_upscaled - head_unstructured
 diff.isel(time=-1).mean(dim="layer").ugrid.plot()
