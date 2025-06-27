@@ -6,7 +6,7 @@ This example demonstrates how to work with iMOD5 files in Python using the
 `imod` package. It shows how to save, read, and manipulate iMOD5 files,
 including handling temporary directories and glob patterns for file selection.
 
-For a full explenation of the iMOD5 file formats, see the `iMOD5 documentation
+For a full explanation of the iMOD5 file formats, see the `iMOD5 documentation
 <https://oss.deltares.nl/documents/d/imod/imod_user_manual_v5_6_1#page=747>`_.
 
 For a full overview of the supported iMOD5 features in iMOD Python, see
@@ -50,10 +50,10 @@ tmpdir = imod.util.temporary_directory()
 # %%
 #
 # As mentioned before, one IDF can only store data in two dimensions: y and x.
-# iMOD Python therefore will save a 3D dataset to multiple IDF files. The layer
+# iMOD Python therefore will save a 3D dataset as multiple IDF files. The layer
 # index is stored in the file name, as the ``_l*`` suffix. iMOD Python will take
-# the last part in the provided path as the name. We therefore end our path with
-# ``top``.
+# the last part of the provided path as the name. We therefore end our path with
+# ``top``. This will result in files named ``top_l1.idf``, ``top_l2.idf``, etc.
 
 idf_dir = tmpdir / "idf"
 imod.idf.save(idf_dir / "top", top)
@@ -80,10 +80,10 @@ reloaded_top
 
 # %%
 #
-# Note that the representation of the DataArray showed differs from the previous
-# representation. This is because the DataArray is lazily loaded as a dask
-# array, which means that the data is not actually loaded into memory until it
-# is accessed. For example when plotting or saving data. This allows for more
+# Note that the reloaded DataArray is represented differently than the original
+# DataArray. This is because the DataArray is lazily loaded as a dask array,
+# which means that the data is not actually loaded into memory until it is
+# accessed. For example when plotting or saving data. This allows for more
 # efficient memory usage, especially when working with large datasets. See the
 # :doc:`06-lazy-evaluation` for more information.
 #
@@ -226,7 +226,7 @@ imod.gen.write(
 # 1D Network (ISG)
 # ----------------
 #
-# iMOD5 stores store 1D networks in ISG files, which is a binary format for
+# iMOD5 stores store 1D networks in ISG files, which is a binary format
 # primarily for surface water datasets. It supports all kinds of extra features
 # such as associated bathymetries and weirs.
 #
