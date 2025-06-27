@@ -201,11 +201,11 @@ triangular_grid.plot()
 # horizontal flow barriers. We haven't looked at horizontal flow barriers yet,
 # so let's plot them on top of the triangular mesh.
 
-import matplotlib.pyplot as plt
-fig, ax = plt.subplots()
-triangular_grid.plot(ax=ax, color="lightgrey", edgecolor="black")
-gwf_model["hfb-25"].line_data.plot(ax=ax, color="blue", linewidth=2)
-gwf_model["hfb-26"].line_data.plot(ax=ax, color="blue", linewidth=2)
+# import matplotlib.pyplot as plt
+# fig, ax = plt.subplots()
+# triangular_grid.plot(ax=ax, color="lightgrey", edgecolor="black")
+# gwf_model["hfb-25"].line_data.plot(ax=ax, color="blue", linewidth=2)
+# gwf_model["hfb-26"].line_data.plot(ax=ax, color="blue", linewidth=2)
 
 # %%
 # However, this grid is triangular, which has the disadvantage that the connections
@@ -220,7 +220,7 @@ voronoi_grid.plot()
 # %%
 #
 # Now that we have a Voronoi grid, we can regrid the MODFLOW 6 simulation to this
-# grid.
+# grid. 
 
 # Workaround for bug where iMOD Python doesn't recognice Ugrid2D, only UgridDataArray
 import xarray as xr
@@ -259,7 +259,41 @@ with imod.util.print_if_error(ValidationError):
 # schematization. There currently is no direct method to do this, but we can
 # reallocate the river dataset with the following function.
 
-def reallocate_river(river_ds, dis, npf, allocation_option, distributing_option):
+def reallocate_river(river, dis, npf, allocation_option, distributing_option):
+    """
+    Reallocates river data across layers in place. Aggregate river data to
+    planar data first, by taking the mean across layers for the stage and bottom
+    elevation, and the sum for the conductance. Consequently allocate and
+    distribute the planar data to the provided model layer schematization.
+
+    Parameters
+    ----------
+    river_ds : River
+        The river package to reallocate.
+    dis : StructuredDiscretization | VerticesDiscretization
+        The discretization of the model to which the river data should be
+        reallocated.
+    npf : NodePropertyFlow
+        The node property flow package of the model to which the river
+        conductance should be distributed (if applicable).
+    allocation_option : ALLOCATION_OPTION
+        The allocation option to use for the reallocation.
+    distributing_option : DISTRIBUTING_OPTION
+        The distributing option to use for the reallocation.
+    """
+    river_ds = river.dataset
+    aggr_dict = {
+        "stage": np.nanmean, "conductance": np.nansum, "bottom_elevation": np.nanmean
+    }
+    planar_data = {key: river_ds[key].reduce(func, dim="layer") for key, func in aggr_dict.items()}
+    riv_dict, _ = imod.mf6.River.allocate_and_distribute_planar_data(
+        planar_data, dis, npf, allocation_option, distributing_option
+    )
+    # .update for some reason requires the dimensions to be specified.    
+    riv_dict = {key: (da.dims, da) for key, da in riv_dict.items()}
+    river_ds.update(riv_dict)
+
+def reallocate_drain(drain, dis, npf, allocation_option, distributing_option):
     """
     Reallocates river data in place. Aggregate river data to planar data first,
     by taking the mean across layers for the stage and bottom elevation, and the
@@ -268,7 +302,7 @@ def reallocate_river(river_ds, dis, npf, allocation_option, distributing_option)
 
     Parameters
     ----------
-    river_ds : xarray.Dataset
+    drain : Drainage
         The river dataset to reallocate.
     dis : StructuredDiscretization | VerticesDiscretization
         The discretization of the model to which the river data should be
@@ -281,16 +315,18 @@ def reallocate_river(river_ds, dis, npf, allocation_option, distributing_option)
     distributing_option : DISTRIBUTING_OPTION
         The distributing option to use for the reallocation.
     """
+    drain_ds = drain.dataset
     aggr_dict = {
-        "stage": np.nanmean, "conductance": np.nansum, "bottom_elevation": np.nanmean
+        "elevation": np.nanmean, "conductance": np.nansum
     }
-    planar_data = {key: river_ds[key].reduce(func, dim="layer") for key, func in aggr_dict.items()}
-    riv_dict, _ = imod.mf6.River.allocate_and_distribute_planar_data(
+    planar_data = {key: drain_ds[key].reduce(func, dim="layer") for key, func in aggr_dict.items()}
+    drn_dict = imod.mf6.Drainage.allocate_and_distribute_planar_data(
         planar_data, dis, npf, allocation_option, distributing_option
     )
     # .update for some reason requires the dimensions to be specified.    
-    riv_dict = {key: (da.dims, da) for key, da in riv_dict.items()}
-    river_ds.update(riv_dict)
+    drn_dict = {key: (da.dims, da) for key, da in drn_dict.items()}
+    drain_ds.update(drn_dict)
+
 
 from imod.prepare import ALLOCATION_OPTION, DISTRIBUTING_OPTION
 
@@ -298,12 +334,17 @@ gwf_unstructured = mf6_unstructured["imported_model"]
 dis = gwf_unstructured["dis"]
 npf = gwf_unstructured["npf"]
 
-args =  (dis, npf, ALLOCATION_OPTION.stage_to_riv_bot, DISTRIBUTING_OPTION.by_corrected_transmissivity)
-reallocate_river(gwf_unstructured["riv-1riv"].dataset, *args)
-reallocate_river(gwf_unstructured["riv-2riv"].dataset, *args)
+riv_args = (dis, npf, ALLOCATION_OPTION.stage_to_riv_bot, DISTRIBUTING_OPTION.by_corrected_transmissivity)
+drn_args = (dis, npf, ALLOCATION_OPTION.at_elevation, DISTRIBUTING_OPTION.by_corrected_transmissivity)
+reallocate_river(gwf_unstructured["riv-1riv"], *riv_args)
+reallocate_river(gwf_unstructured["riv-2riv"], *riv_args)
+reallocate_drain(gwf_unstructured["riv-1drn"], *drn_args)
+reallocate_drain(gwf_unstructured["riv-2drn"], *drn_args)
 
 gwf_unstructured["riv-1riv"].cleanup(dis)
 gwf_unstructured["riv-2riv"].cleanup(dis)
+gwf_unstructured["riv-1drn"].cleanup(dis)
+gwf_unstructured["riv-2drn"].cleanup(dis)
 
 # %%
 #
@@ -351,5 +392,17 @@ head_structured_upscaled = regridder.regrid(head_structured)
 diff = head_structured_upscaled - head_unstructured
 diff.isel(time=-1).mean(dim="layer").ugrid.plot()
 
+# %%
+#
+# Let's also plot the standard deviation of the difference. This shows that
+# variations in difference are also mostly around the western fault.
+
+diff.isel(time=-1).std(dim="layer").ugrid.plot()
+
+# %%
+#
+# EXERCISE: Download this file as a script or Jupyter notebook, remove all HFB
+# packages and re-run the example. Investigate if differences are still as large
+# as they were.
 
 # %%
