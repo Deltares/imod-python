@@ -14,7 +14,7 @@ import imod
 tmpdir = imod.util.temporary_directory()
 
 # %%
-# 
+#
 #
 # Fetching an iMOD5 model
 # -----------------------
@@ -28,8 +28,8 @@ prj_dir.mkdir(exist_ok=True, parents=True)
 
 model_dir = imod.data.fetch_imod5_model(prj_dir)
 
-# %% 
-# 
+# %%
+#
 # Let's view the model directory. It contains the project file and
 # accompanying model contents.
 
@@ -38,24 +38,24 @@ from pprint import pprint
 imod_dir_contents = list(model_dir.glob("*"))
 pprint(imod_dir_contents)
 
-# %% 
-# 
+# %%
+#
 # The directory contains a project file and a database folder.
 # This database contains all the IDF, IPF, and GEN files that make up the
 # spatial model input.
-# 
+#
 # Let's look at the projectfile contents. Read the projectfile as follows:
 
 prj_path = model_dir / "iMOD5_model.prj"
 prj_content = imod.prj.read_projectfile(prj_path)
 pprint(prj_content)
 
-# %% 
-# 
+# %%
+#
 # This contains all the projectfile contents in a dictionary, which is quite a
 # lot of information. This is too much to go through in detail. We can also open
 # all data that the projectfile points to, using the
-# :doc:`/api/generated/io/imod.formats.prj.open_projectfile` function.
+# :doc:`/api/generated/io/imod.prj.open_projectfile_data` function.
 
 imod5_data, period_data = imod.prj.open_projectfile_data(prj_path)
 imod5_data
@@ -77,13 +77,14 @@ imod5_data["riv-1"]["stage"].isel(layer=0, drop=True).plot.imshow()
 #
 # This is nice enough, but we want to convert this iMOD5 model to a MODFLOW 6
 # model. We can do this using
-# :doc:`/api/generated/imod.mf6.simulation.Modflow6Simulation.from_imod5_data`
+# :doc:`/api/generated/mf6/imod.mf6.Modflow6Simulation.from_imod5_data`
 # method. Next to the iMOD5 data and period data, we also need to provide the
 # times. These will be used to resample the asynchronous well timeseries data to
 # these times. Let's therefore first create a list of times, we can use pandas
 # for this:
 
 import pandas as pd
+
 times = pd.date_range(start="2020-01-01", periods=10, freq="MS")
 times
 
@@ -118,20 +119,20 @@ mf6_sim["ims"]
 #
 # By default, the iMOD5 model rasters will not be directly loaded into memory,
 # but instead will be lazily loaded. Read more about this in the
-# :doc:`/06-lazy-evaluation` documentation.
-# 
+# :doc:`06-lazy-evaluation` documentation.
+#
 # By default the data is chunked per raster file, which is a chunk per layer,
 # per timestep. Usually this is not optimal, as this creates many small chunks.
 # The discretization (DIS) package and node property flow (NPF) package are used
 # frequently during the validation process, so it saves us a lot of waiting time
 # if we load these into memory.
-# 
+#
 gwf_model = mf6_sim["imported_model"]
 gwf_model["dis"].dataset.load()
 gwf_model["npf"].dataset.load()
 
 # %%
-# 
+#
 # This has a inner_dvclose of 0.001 instead of 0.01, which is a lot stricter: a
 # numerical error of 1 mm is only allowed by the solver, instead of 1 cm.
 #
@@ -146,7 +147,7 @@ with imod.util.print_if_error(ValueError):
     mf6_sim.write(mf6_dir)  # Attention: this will fail!
 
 # %%
-# 
+#
 # We are still missing output control, as the projectfile does not contain this
 # information. For this example, we'll only save the last head of each stress period.
 
@@ -160,8 +161,8 @@ from imod.schemata import ValidationError
 with imod.util.print_if_error(ValidationError):
     mf6_sim.write(mf6_dir)  # Attention: this will fail!
 
-# %% 
-# 
+# %%
+#
 # Argh! The simulation still fails to write. In general, iMOD Python is a lot
 # stricter with writing model data than iMOD5. iMOD Python forces users to
 # conciously clean up their models, whereas iMOD5 cleans data under the hood.
@@ -197,6 +198,7 @@ triangular_grid.plot()
 # so let's plot them on top of the triangular mesh.
 
 import matplotlib.pyplot as plt
+
 fig, ax = plt.subplots()
 triangular_grid.plot(ax=ax, color="lightgrey", edgecolor="black")
 gwf_model["hfb-25"].line_data.plot(ax=ax, color="blue", linewidth=2)
@@ -215,16 +217,21 @@ voronoi_grid.plot()
 # %%
 #
 # Now that we have a Voronoi grid, we can regrid the MODFLOW 6 simulation to this
-# grid. 
+# grid.
 
 # Workaround for bug where iMOD Python doesn't recognice Ugrid2D, only UgridDataArray
-import xarray as xr
 import numpy as np
+import xarray as xr
+import xugrid as xu
 
-data = xr.DataArray(np.ones(voronoi_grid.sizes["mesh2d_nFaces"]), dims=["mesh2d_nFaces"])
-voronoi_uda = xu.UgridDataArray(data, voronoi_grid )
+data = xr.DataArray(
+    np.ones(voronoi_grid.sizes["mesh2d_nFaces"]), dims=["mesh2d_nFaces"]
+)
+voronoi_uda = xu.UgridDataArray(data, voronoi_grid)
 
-mf6_unstructured = mf6_sim.regrid_like("unstructured_example", voronoi_uda, validate=False)
+mf6_unstructured = mf6_sim.regrid_like(
+    "unstructured_example", voronoi_uda, validate=False
+)
 mf6_unstructured
 
 # %%
@@ -233,7 +240,7 @@ mf6_unstructured
 
 mf6_unstructured["imported_model"]["riv-1riv"]["stage"].isel(layer=0).ugrid.plot()
 
-# %% 
+# %%
 # Let's try to write this to a temporary directory. **Spoiler alert**: this will
 # fail.
 mf6_dir = tmpdir / "mf6_unstructured"
@@ -241,7 +248,7 @@ mf6_dir = tmpdir / "mf6_unstructured"
 # Ignore this "with" statement, it is to catch the error and render the
 # documentation without error.
 with imod.util.print_if_error(ValidationError):
-    mf6_unstructured.write(mf6_dir) # Attention: this will fail!
+    mf6_unstructured.write(mf6_dir)  # Attention: this will fail!
 
 # %%
 #
@@ -253,6 +260,7 @@ with imod.util.print_if_error(ValidationError):
 # We therefore need to reallocate the river data to the new model layer
 # schematization. There currently is no direct method to do this, but we can
 # reallocate the river dataset with the following function.
+
 
 def reallocate_river(river, dis, npf, allocation_option, distributing_option):
     """
@@ -278,15 +286,20 @@ def reallocate_river(river, dis, npf, allocation_option, distributing_option):
     """
     river_ds = river.dataset
     aggr_dict = {
-        "stage": np.nanmean, "conductance": np.nansum, "bottom_elevation": np.nanmean
+        "stage": np.nanmean,
+        "conductance": np.nansum,
+        "bottom_elevation": np.nanmean,
     }
-    planar_data = {key: river_ds[key].reduce(func, dim="layer") for key, func in aggr_dict.items()}
+    planar_data = {
+        key: river_ds[key].reduce(func, dim="layer") for key, func in aggr_dict.items()
+    }
     riv_dict, _ = imod.mf6.River.allocate_and_distribute_planar_data(
         planar_data, dis, npf, allocation_option, distributing_option
     )
-    # .update for some reason requires the dimensions to be specified.    
+    # .update for some reason requires the dimensions to be specified.
     riv_dict = {key: (da.dims, da) for key, da in riv_dict.items()}
     river_ds.update(riv_dict)
+
 
 def reallocate_drain(drain, dis, npf, allocation_option, distributing_option):
     """
@@ -311,14 +324,14 @@ def reallocate_drain(drain, dis, npf, allocation_option, distributing_option):
         The distributing option to use for the reallocation.
     """
     drain_ds = drain.dataset
-    aggr_dict = {
-        "elevation": np.nanmean, "conductance": np.nansum
+    aggr_dict = {"elevation": np.nanmean, "conductance": np.nansum}
+    planar_data = {
+        key: drain_ds[key].reduce(func, dim="layer") for key, func in aggr_dict.items()
     }
-    planar_data = {key: drain_ds[key].reduce(func, dim="layer") for key, func in aggr_dict.items()}
     drn_dict = imod.mf6.Drainage.allocate_and_distribute_planar_data(
         planar_data, dis, npf, allocation_option, distributing_option
     )
-    # .update for some reason requires the dimensions to be specified.    
+    # .update for some reason requires the dimensions to be specified.
     drn_dict = {key: (da.dims, da) for key, da in drn_dict.items()}
     drain_ds.update(drn_dict)
 
@@ -329,8 +342,18 @@ gwf_unstructured = mf6_unstructured["imported_model"]
 dis = gwf_unstructured["dis"]
 npf = gwf_unstructured["npf"]
 
-riv_args = (dis, npf, ALLOCATION_OPTION.stage_to_riv_bot, DISTRIBUTING_OPTION.by_corrected_transmissivity)
-drn_args = (dis, npf, ALLOCATION_OPTION.at_elevation, DISTRIBUTING_OPTION.by_corrected_transmissivity)
+riv_args = (
+    dis,
+    npf,
+    ALLOCATION_OPTION.stage_to_riv_bot,
+    DISTRIBUTING_OPTION.by_corrected_transmissivity,
+)
+drn_args = (
+    dis,
+    npf,
+    ALLOCATION_OPTION.at_elevation,
+    DISTRIBUTING_OPTION.by_corrected_transmissivity,
+)
 reallocate_river(gwf_unstructured["riv-1riv"], *riv_args)
 reallocate_river(gwf_unstructured["riv-2riv"], *riv_args)
 reallocate_drain(gwf_unstructured["riv-1drn"], *drn_args)
@@ -351,7 +374,7 @@ gwf_unstructured["riv-2drn"].cleanup(dis)
 
 from imod.mf6 import ValidationSettings
 
-mf6_unstructured._validation_context=ValidationSettings(strict_hfb_validation=False)
+mf6_unstructured._validation_context = ValidationSettings(strict_hfb_validation=False)
 
 # %%
 #
