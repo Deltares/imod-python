@@ -21,8 +21,10 @@ pypi-publish = { cmd = "rm --recursive --force dist && python -m build && twine 
 # Lint and format tasks
 format = "ruff check --fix .; ruff format ."
 lint = "ruff check . ; ruff format --check ."
-mypy_lint = { cmd ="mypy", depends-on = ["install"]}
-mypy_report = { cmd ="mypy | mypy2junit > mypy-report.xml", depends-on = ["install"]}
+mypy_lint = { cmd = "mypy", depends-on = ["install"] }
+mypy_report = { cmd = "mypy | mypy2junit > mypy-report.xml", depends-on = [
+    "install",
+] }
 
 # Tests tasks
 tests = { depends-on = ["unittests", "examples"] }
@@ -30,48 +32,67 @@ unittests = { depends-on = ["unittests_njit", "unittests_jit"] }
 unittests_njit = { cmd = [
     "NUMBA_DISABLE_JIT=1",
     "pytest",
-    "-n", "auto",
-    "-m", "not example and not user_acceptance and not unittest_jit and not qgis_export",
+    "-n",
+    "auto",
+    "-m",
+    "not example and not user_acceptance and not unittest_jit and not qgis_export",
     "--cache-clear",
     "--verbose",
     "--junitxml=unittest_report.xml",
     "--cov=imod",
     "--cov-report=term",
     "--cov-report=html:coverage",
-    "--cov-config=.coveragerc"
-], depends-on = ["install"], cwd = "imod/tests" }
+    "--cov-config=.coveragerc",
+], depends-on = [
+    "install",
+], cwd = "imod/tests" }
 unittests_jit = { cmd = [
     "pytest",
-    "-n", "auto",
-    "-m", "unittest_jit",
+    "-n",
+    "auto",
+    "-m",
+    "unittest_jit",
     "--cache-clear",
     "--verbose",
     "--junitxml=unittest_jit_report.xml",
-], depends-on = ["install"], cwd = "imod/tests" }
+], depends-on = [
+    "install",
+], cwd = "imod/tests" }
 # User acceptance tests, only works when paths to models are located on local
 # drive and are specified in a .env file.
 user_acceptance = { cmd = [
     "pytest",
-    "-m", "user_acceptance",
+    "-m",
+    "user_acceptance",
     "--cache-clear",
     "--verbose",
     "--junitxml=user_acceptance_report.xml",
-], depends-on = ["install"], cwd = "imod/tests", env = { IMOD_DATA_DIR = ".imod_data" } }
+], depends-on = [
+    "install",
+], cwd = "imod/tests", env = { IMOD_DATA_DIR = ".imod_data" } }
 examples = { cmd = [
     "pytest",
-    "-n", "auto",
-    "-m", "example",
+    "-n",
+    "auto",
+    "-m",
+    "example",
     "--cache-clear",
     "--verbose",
     "--junitxml=examples_report.xml",
-], depends-on = ["install"], cwd = "imod/tests", env = { IMOD_DATA_DIR = ".imod_data" } }
-qgis_export ={ cmd = [
-    "pytest", "-s",
-    "-m", "qgis_export",
+], depends-on = [
+    "install",
+], cwd = "imod/tests", env = { IMOD_DATA_DIR = ".imod_data" } }
+qgis_export = { cmd = [
+    "pytest",
+    "-s",
+    "-m",
+    "qgis_export",
     "--cache-clear",
     "--verbose",
     "--junitxml=qgis_export_report.xml",
-], depends-on = ["install"], cwd = "imod/tests", env = { IMOD_DATA_DIR = ".imod_data" } }
+], depends-on = [
+    "install",
+], cwd = "imod/tests", env = { IMOD_DATA_DIR = ".imod_data" } }
 
 [dependencies]
 affine = "*"
@@ -131,13 +152,14 @@ toolz = "*"
 tqdm = "*"
 twine = "*"
 vtk = { version = ">=9.0", build = "*qt*" }
-xarray = "!=2025.04.0" # Issue with xarray 2025.04.0 and rendering HFBs
+xarray = "!=2025.04.0"                      # Issue with xarray 2025.04.0 and rendering HFBs
 xugrid = ">=0.14.0"
 zarr = "*"
 pytest-timeout = ">=2.3.1,<3"
 
 [pypi-dependencies]
 mypy2junit = "*"
+flopy4 = { git = "https://github.com/modflowpy/pyphoenix-project.git", branch = "develop" }
 
 [feature.interactive.dependencies]
 ipykernel = "*"
@@ -167,8 +189,10 @@ update = "pixi update --json | pixi-diff-to-markdown > diff.md"
 test_import = { cmd = [
     "python",
     "-c",
-    "import imod"
-], depends-on = ["install_with_deps"]}
+    "import imod",
+], depends-on = [
+    "install_with_deps",
+] }
 install_with_deps = "python -m pip install --editable ."
 
 [environments]
