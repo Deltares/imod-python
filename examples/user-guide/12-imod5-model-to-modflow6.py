@@ -344,10 +344,12 @@ head_structured_upscaled = regridder.regrid(head_structured)
 # %%
 #
 # Compute the difference between the upscaled structured head and the
-# unstructured head. A zero difference means the regridding was perfect. We can
-# see around the western fault that the regridding caused some differences.
+# unstructured head. A zero difference means the regridding didn't result in any
+# differences. We can see around the western fault that the regridding caused
+# differences.
 
 diff = head_structured_upscaled - head_unstructured
 diff.isel(time=-1).mean(dim="layer").ugrid.plot()
+
 
 # %%
