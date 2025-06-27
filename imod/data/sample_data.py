@@ -178,6 +178,7 @@ def fetch_imod5_model(path: Union[str, Path]) -> Path:
 
     return model_dir
 
+
 def lhm_clip_triangular_grid() -> xr.Dataset:
     """
     Fetches the triangular grid LHM clip dataset from the registry and returns
@@ -190,6 +191,7 @@ def lhm_clip_triangular_grid() -> xr.Dataset:
         triangular_grid = xu.open_dataarray(fname).ugrid.grid
 
     return triangular_grid
+
 
 def hondsrug_simulation(path: Union[str, Path]) -> Modflow6Simulation:
     lock = FileLock(REGISTRY.path / "hondsrug-simulation.zip.lock")
