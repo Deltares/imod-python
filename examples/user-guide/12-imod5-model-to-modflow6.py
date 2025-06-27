@@ -186,12 +186,7 @@ head_structured = mf6_sim.open_head()
 # Now that we have a MODFLOW 6 simulation, we can regrid it to an unstructured
 # grid. Let's first load a triangular grid.
 
-# TODO: Add this to the artifacts
-path_grid = r"c:\Users\engelen\projects_wdir\imod-python\examples\hondsrug_unstructured\triangular_grid_2.nc"
-
-import xugrid as xu
-triangular_grid = xu.open_dataarray(path_grid).ugrid.grid
-
+triangular_grid = imod.data.lhm_clip_triangular_grid()
 triangular_grid.plot()
 
 # %%
@@ -201,11 +196,11 @@ triangular_grid.plot()
 # horizontal flow barriers. We haven't looked at horizontal flow barriers yet,
 # so let's plot them on top of the triangular mesh.
 
-# import matplotlib.pyplot as plt
-# fig, ax = plt.subplots()
-# triangular_grid.plot(ax=ax, color="lightgrey", edgecolor="black")
-# gwf_model["hfb-25"].line_data.plot(ax=ax, color="blue", linewidth=2)
-# gwf_model["hfb-26"].line_data.plot(ax=ax, color="blue", linewidth=2)
+import matplotlib.pyplot as plt
+fig, ax = plt.subplots()
+triangular_grid.plot(ax=ax, color="lightgrey", edgecolor="black")
+gwf_model["hfb-25"].line_data.plot(ax=ax, color="blue", linewidth=2)
+gwf_model["hfb-26"].line_data.plot(ax=ax, color="blue", linewidth=2)
 
 # %%
 # However, this grid is triangular, which has the disadvantage that the connections

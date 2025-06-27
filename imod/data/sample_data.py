@@ -178,6 +178,18 @@ def fetch_imod5_model(path: Union[str, Path]) -> Path:
 
     return model_dir
 
+def lhm_clip_triangular_grid() -> xr.Dataset:
+    """
+    Fetches the triangular grid LHM clip dataset from the registry and returns
+    it as an xarray Dataset. This dataset has been generated with pandamesh in
+    this script: https://github.com/Deltares-research/create_mesh_LHM_clipout
+    """
+    lock = FileLock(REGISTRY.path / "triangular_grid_LHM_clip.nc.lock")
+    with lock:
+        fname = REGISTRY.fetch("triangular_grid_LHM_clip.nc")
+        triangular_grid = xu.open_dataarray(fname).ugrid.grid
+
+    return triangular_grid
 
 def hondsrug_simulation(path: Union[str, Path]) -> Modflow6Simulation:
     lock = FileLock(REGISTRY.path / "hondsrug-simulation.zip.lock")
