@@ -182,6 +182,8 @@ mf6_sim.write(mf6_dir)
 
 mf6_sim.run()
 head_structured = mf6_sim.open_head()
+# Plot the head of the last stress period at layer 5.
+head_structured.isel(time=-1).sel(layer=5).plot.imshow()
 
 # %%
 # Now that we have a MODFLOW 6 simulation, we can regrid it to an unstructured
@@ -388,6 +390,8 @@ mf6_unstructured.write(mf6_dir)
 
 mf6_unstructured.run()
 head_unstructured = mf6_unstructured.open_head()
+# Plot the head of the last stress period at layer 5.
+head_unstructured.isel(time=-1).sel(layer=5).ugrid.plot()
 
 # %%
 #
