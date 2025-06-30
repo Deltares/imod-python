@@ -80,11 +80,16 @@ imod5_data["riv-1"]["stage"].isel(layer=0, drop=True).plot.imshow()
 #
 # This is nice enough, but we want to convert this iMOD5 model to a MODFLOW 6
 # model. We can do this using
-# :doc:`/api/generated/mf6/imod.mf6.Modflow6Simulation.from_imod5_data`
-# method. Next to the iMOD5 data and period data, we also need to provide the
-# times. These will be used to resample the asynchronous well timeseries data to
-# these times. Let's therefore first create a list of times, we can use pandas
-# for this:
+# :doc:`/api/generated/mf6/imod.mf6.Modflow6Simulation.from_imod5_data` method.
+# Next to the iMOD5 data and period data, we also need to provide the times.
+# These will be used to resample the asynchronous well timeseries data to these
+# times. For instance, well 1 in the iMOD5 database can have rates specified on
+# a daily basis, whereas well 2 is specified on a few days in the year. Say the
+# user wants to run a model on a monthly basis, this will require resampling
+# these rate timeseries to make them consistent with the simulation timesteps.
+# Let's therefore first create a list of times which will be the simulation's
+# timesteps, we can use pandas for this. "MS" stands for "month start",
+# meaning the first day of each month.
 
 import pandas as pd
 
@@ -242,7 +247,7 @@ voronoi_grid.plot()
 # Now that we have a Voronoi grid, we can regrid the MODFLOW 6 simulation to this
 # grid.
 
-# Workaround for bug where iMOD Python doesn't recognice Ugrid2D, only UgridDataArray
+# Workaround for bug where iMOD Python doesn't recognize Ugrid2D, only UgridDataArray
 import numpy as np
 import xarray as xr
 import xugrid as xu
@@ -268,8 +273,8 @@ mf6_unstructured["imported_model"]["riv-1riv"]["stage"].isel(layer=0).ugrid.plot
 # Writing the unstructured model: in more fits and starts
 # -------------------------------------------------------
 #
-# Let's try to write this to a temporary directory. **Spoiler alert**: this will
-# fail.
+# Let's try to write this to a temporary directory. **Spoiler alert**: Like
+# before, this will fail.
 
 mf6_dir = tmpdir / "mf6_unstructured"
 
