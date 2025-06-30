@@ -207,3 +207,48 @@ your data, see our iMOD Viewer
     Streamplot,:func:`imod.visualize.streamfunction`
     Water balance,:func:`imod.visualize.waterbalance_barchart`
     3D plot,:class:`imod.visualize.GridAnimation3D`
+
+iMOD BATCH glossary
+-------------------
+
+Here is a glossary of the iMOD5 BATCH functions and their arguments, and which
+iMOD Python argument for a function to look for.
+
+RUNFILE
+*******
+
+The RUNFILE BATCH function is used in iMOD5 to create a MODFLOW 6 runfile or
+namfile from an iMOD5 projectfile. The following table lists the arguments of
+the function and a pointer to the equivalent iMOD Python function and argument
+of this function.
+
+.. csv-table::
+   :header-rows: 1
+   :stub-columns: 1
+
+   BATCH argument, description, iMOD Python, argument
+   PRJFILE_IN, Name of a projectfile that need to be used to create a runfile specified by RUNFILE_OUT or a namfile specified by NAMFILE_OUT e.g. PRJFILE_IN=D:\PRJFILES\MODEL.PRJ., :func:`imod.formats.prj.open_projectfile_data`, ``path``
+   NAMFILE_OUT, Name of a nam-file that will be created e.g. NAMFILE_OUT=D:\NAMFILES\MODEL.NAM, :meth:`imod.mf6.Modflow6Simulation.write`, ``directory``
+   ISS, Type of time configuration to be added to the RUNFILE or NAMFILE; for transient enter ISS=1 and for steady state enter ISS=0., :class:`imod.mf6.StorageCoefficient`, ``transient``
+   SDATE, Starting date of the simulation in yyyymmddhhmmss, :meth:`imod.mf6.Modflow6Simulation.from_imod5_data`, ``times``
+   EDATE, End date of the simulation in yyyymmddhhmmss, :meth:`imod.mf6.Modflow6Simulation.from_imod5_data`, ``times``
+   ITT, Time interval category, :meth:`imod.mf6.Modflow6Simulation.from_imod5_data`, ``times``
+   IDT, Time interval of the time steps corresponding to the chosen time interval category ITT e.g. IDT=7 to denote the 7 days whenever ITT=3, :meth:`imod.mf6.Modflow6Simulation.from_imod5_data`, ``times``
+   ISTEADY, ISTEADY=1 to include an initial steady-state time step to the model. This will add packages with the time stamp STEADY-STATE to the first stress-period of your model., :class:`imod.mf6.StorageCoefficient`, ``transient``
+   NSTEP, Number time step within each stress period, :class:`imod.mf6.TimeDiscretization`, ``n_timesteps``
+   NMULT, Multiplication factor in which the step size of each subsequent time step will increase, :class:`imod.mf6.TimeDiscretization`, ``timestep_multiplier``
+   INFFCT, Use this keyword to generate two RIV-elements to compensate for a given infiltration factor, :meth:`imod.mf6.River.from_imod5_data`, 
+   IDEFLAYER, Assign river-elements to model layers, :meth:`imod.mf6.River.from_imod5_data`, ``allocation_option``
+   DISTRCOND, Distribute conductances over the river-elements, :meth:`imod.mf6.River.from_imod5_data`, ``distributing_option``
+   NEWTON, "Use Newton-Raphson formulation for groundwater flow between connected, convertible groundwater cells", :class:`imod.mf6.GroundwaterFlowModel`, ``newton_raphson``
+   UNCONFINED, Include unconfined conditions for model layers, :class:`imod.mf6.NodePropertyFlow`, ``icelltype``
+   DEFUNCONF, Specify spatially whether the UNCONFINED configuration needs to be applied, :class:`imod.mf6.NodePropertyFlow`, ``icelltype``
+   THICKSTRT, Minimal thickness of an aquifer which becomes in active in case the given starting head is below that level, :class:`imod.mf6.NodePropertyFlow`, ``starting_head_as_confined_thickness``
+   SPECIFIC-STORAGE, Denote that specific storage is entered in the PRJ file instead of storage coefficients, :class:`imod.mf6.SpecificStorage`, 
+   WINDOW, "Specify a window (X1,Y1,X2,Y2) for which the constructed RUNFILE will be clipped", :meth:`imod.mf6.Modflow6Simulation.clip_box`, "``x_min``, ``x_max``, ``y_min``, ``y_max``"
+   CELLSIZE, Specify a cell size to be used, :meth:`imod.mf6.Modflow6Simulation.regrid_like`, ``target_grid``
+   APPLYCHD, Specify APPLYCHD=1 to insert constant head boundary conditions around the model, :meth:`imod.mf6.Modflow6Simulation.clip_box`, ``states_for_boundary``
+   MIXELM, Advection scheme, ":class:`imod.mf6.AdvectionTVD`, :class:`imod.mf6.AdvectionUpstream`, :class:`imod.mf6.AdvectionCentral`", 
+   NADVFD, Weighting scheme Finite-difference, ":class:`imod.mf6.AdvectionUpstream`, :class:`imod.mf6.AdvectionCentral`", 
+   ISOLVE, Start a simulation after generating a RUNFILE or NAMFILE, :meth:`imod.mf6.Modflow6Simulation.run`, 
+   MODFLOW6, MODFLOW 6 executable, :meth:`imod.mf6.Modflow6Simulation.run`, ``mf6path``
