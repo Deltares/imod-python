@@ -4,17 +4,15 @@ Working with iMOD5 models in MODFLOW 6
 
 This example shows how to work with iMOD5 models in MODFLOW 6. It demonstrates
 how to convert an iMOD5 model to a MODFLOW 6 model using the `imod` package. The
-example fetches an iMOD5 model, converts it to a MODFLOW 6 model, and saves it
-to a temporary directory.
+example fetches an iMOD5 model, converts it to a MODFLOW 6 model, regrids it to
+an unstructured grid, and compares differences in output between the structured
+and unstructured grids.
 
 """
 
 import imod
 
-tmpdir = imod.util.temporary_directory()
-
 # %%
-#
 #
 # Fetching an iMOD5 model
 # -----------------------
@@ -22,6 +20,8 @@ tmpdir = imod.util.temporary_directory()
 # Let's start by fetching the example data
 # from the `imod.data` module. This will download a project file and
 # accompanying data files to a temporary directory.
+
+tmpdir = imod.util.temporary_directory()
 
 prj_dir = tmpdir / "prj"
 prj_dir.mkdir(exist_ok=True, parents=True)
@@ -75,6 +75,9 @@ imod5_data["riv-1"]["stage"].isel(layer=0, drop=True).plot.imshow()
 
 # %%
 #
+# Converting iMOD5 model to MODFLOW 6
+# -----------------------------------
+#
 # This is nice enough, but we want to convert this iMOD5 model to a MODFLOW 6
 # model. We can do this using
 # :doc:`/api/generated/mf6/imod.mf6.Modflow6Simulation.from_imod5_data`
@@ -102,7 +105,12 @@ mf6_sim
 
 # %%
 #
-# At the moment the MODFLOW 6 simulation has quite loose solver settings:
+# Improving the solver settings
+# -----------------------------
+#
+# At the moment the MODFLOW 6 simulation has quite loose solver settings. Most
+# notably, the ``inner_dvclose`` is set to 0.01, which means that the solver
+# allows a numerical error of 1 cm in the head values. This is quite loose.
 
 mf6_sim["ims"]
 
@@ -110,12 +118,17 @@ mf6_sim["ims"]
 #
 # This is because by default an iMOD5 model is imported with a
 # SolutionPresetModerate, which is quite loose. Let's set a stricter solver
-# setting preset, by setting it to SolutionPresetSimple.
+# setting preset, by setting it to SolutionPresetSimple. This has a
+# ``inner_dvclose`` of 0.001, which allows a numerical error of 1 mm in the head
+# values.
 
 mf6_sim["ims"] = imod.mf6.SolutionPresetSimple(["imported_model"])
 mf6_sim["ims"]
 
 # %%
+#
+# A note on performance
+# ---------------------
 #
 # By default, the iMOD5 model rasters will not be directly loaded into memory,
 # but instead will be lazily loaded. Read more about this in the
@@ -133,8 +146,8 @@ gwf_model["npf"].dataset.load()
 
 # %%
 #
-# This has a inner_dvclose of 0.001 instead of 0.01, which is a lot stricter: a
-# numerical error of 1 mm is only allowed by the solver, instead of 1 cm.
+# Writing the structured model: in fits and starts
+# ------------------------------------------------
 #
 # Let's try to write this simulation. **spoiler alert**: this will fail, because
 # we still have to configure some packages.
@@ -165,7 +178,7 @@ with imod.util.print_if_error(ValidationError):
 #
 # Argh! The simulation still fails to write. In general, iMOD Python is a lot
 # stricter with writing model data than iMOD5. iMOD Python forces users to
-# conciously clean up their models, whereas iMOD5 cleans data under the hood.
+# conciously clean up their models, whereas iMOD5 cleaned data under the hood.
 # The error message states that the nodata is not aligned with idomain. This
 # means there are k values and ic values specified at inactive locations, or
 # vice versa. Let's try if masking the data works. This will remove all inactive
@@ -178,6 +191,9 @@ mf6_sim.write(mf6_dir)
 
 # %%
 #
+# Running the structured model
+# ----------------------------
+#
 # Let's run the simulation and open the head data.
 
 mf6_sim.run()
@@ -186,6 +202,10 @@ head_structured = mf6_sim.open_head()
 head_structured.isel(time=-1).sel(layer=5).plot.imshow()
 
 # %%
+# 
+# Regridding the structured model to an unstructured grid
+# -------------------------------------------------------
+#
 # Now that we have a MODFLOW 6 simulation, we can regrid it to an unstructured
 # grid. Let's first load a triangular grid.
 
@@ -207,6 +227,7 @@ gwf_model["hfb-25"].line_data.plot(ax=ax, color="blue", linewidth=2)
 gwf_model["hfb-26"].line_data.plot(ax=ax, color="blue", linewidth=2)
 
 # %%
+#
 # However, this grid is triangular, which has the disadvantage that the connections
 # between cell centers are not orthogonal to the cell edges, which can lead to
 # mass balance errors. xugrid has a method to convert this triangular grid
@@ -243,8 +264,13 @@ mf6_unstructured
 mf6_unstructured["imported_model"]["riv-1riv"]["stage"].isel(layer=0).ugrid.plot()
 
 # %%
+#
+# Writing the unstructured model: in more fits and starts
+# -------------------------------------------------------
+#
 # Let's try to write this to a temporary directory. **Spoiler alert**: this will
 # fail.
+
 mf6_dir = tmpdir / "mf6_unstructured"
 
 # Ignore this "with" statement, it is to catch the error and render the
@@ -386,6 +412,9 @@ mf6_unstructured.write(mf6_dir)
 
 # %%
 #
+# Running the unstructured model
+# ------------------------------
+#
 # Let's run the unstructured model and open the head data.
 
 mf6_unstructured.run()
@@ -394,6 +423,9 @@ head_unstructured = mf6_unstructured.open_head()
 head_unstructured.isel(time=-1).sel(layer=5).ugrid.plot()
 
 # %%
+#
+# Comparing differences in output
+# -------------------------------
 #
 # Let's upscale the structured head data to the unstructured grid. This is done
 # using the `OverlapRegridder from the xugrid package
