@@ -207,7 +207,7 @@ head_structured = mf6_sim.open_head()
 head_structured.isel(time=-1).sel(layer=5).plot.imshow()
 
 # %%
-# 
+#
 # Regridding the structured model to an unstructured grid
 # -------------------------------------------------------
 #
