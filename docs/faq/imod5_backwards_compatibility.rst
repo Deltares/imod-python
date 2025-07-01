@@ -227,8 +227,8 @@ of this function.
    :stub-columns: 1
 
    BATCH argument, description, iMOD Python, argument
-   PRJFILE_IN, Name of a projectfile that need to be used to create a runfile specified by RUNFILE_OUT or a namfile specified by NAMFILE_OUT e.g. PRJFILE_IN=D:\PRJFILES\MODEL.PRJ., :func:`imod.formats.prj.open_projectfile_data`, ``path``
-   NAMFILE_OUT, Name of a nam-file that will be created e.g. NAMFILE_OUT=D:\NAMFILES\MODEL.NAM, :meth:`imod.mf6.Modflow6Simulation.write`, ``directory``
+   PRJFILE_IN, Name of a projectfile that need to be used to create a runfile specified by RUNFILE_OUT or a namfile specified by NAMFILE_OUT, :func:`imod.formats.prj.open_projectfile_data`, ``path``
+   NAMFILE_OUT, Name of a namfile that will be created, :meth:`imod.mf6.Modflow6Simulation.write`, ``directory``
    ISS, Type of time configuration to be added to the RUNFILE or NAMFILE; for transient enter ISS=1 and for steady state enter ISS=0., :class:`imod.mf6.StorageCoefficient`, ``transient``
    SDATE, Starting date of the simulation in yyyymmddhhmmss, :meth:`imod.mf6.Modflow6Simulation.from_imod5_data`, ``times``
    EDATE, End date of the simulation in yyyymmddhhmmss, :meth:`imod.mf6.Modflow6Simulation.from_imod5_data`, ``times``
