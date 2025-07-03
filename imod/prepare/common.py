@@ -8,11 +8,8 @@ values.
 
 from typing import Any
 
-import cftime
 import numba
 import numpy as np
-
-import imod
 
 
 @numba.njit
@@ -127,35 +124,6 @@ def _weights_1d(src_x, dst_x, use_relative_weights=False):
     return max_len, (np_dst_inds, np_src_inds, np_weights)
 
 
-def _reshape(src, dst, ndim_regrid):
-    """
-    If ndim > ndim_regrid, the non regridding dimension are combined into
-    a single dimension, so we can use a single loop, irrespective of the
-    total number of dimensions.
-    (The alternative is pre-writing N for-loops for every N dimension we
-    intend to support.)
-    If ndims == ndim_regrid, all dimensions will be used in regridding
-    in that case no looping over other dimensions is required and we add
-    a dummy dimension here so there's something to iterate over.
-    """
-    src_shape = src.shape
-    dst_shape = dst.shape
-    ndim = len(src_shape)
-
-    if ndim == ndim_regrid:
-        n_iter = 1
-    else:
-        n_iter = int(np.prod(src_shape[:-ndim_regrid]))
-
-    src_itershape = (n_iter, *src_shape[-ndim_regrid:])
-    dst_itershape = (n_iter, *dst_shape[-ndim_regrid:])
-
-    iter_src = np.reshape(src, src_itershape)
-    iter_dst = np.reshape(dst, dst_itershape)
-
-    return iter_src, iter_dst
-
-
 def _is_subset(a1, a2):
     if np.isin(a2, a1).all():
         # This means all are present
@@ -170,60 +138,6 @@ def _is_subset(a1, a2):
     return False
 
 
-def _match_dims(src, like):
-    """
-    Parameters
-    ----------
-    source : xr.DataArray
-        The source DataArray to be regridded
-    like : xr.DataArray
-        Example DataArray that shows what the resampled result should look like
-        in terms of coordinates. `source` is regridded along dimensions of `like`
-        that have the same name, but have different values.
-
-    Returns
-    -------
-    matching_dims, regrid_dims, add_dims : tuple of lists
-        matching_dims: dimensions along which the coordinates match exactly
-        regrid_dims: dimensions along which source will be regridded
-        add_dims: dimensions that are not present in like
-
-    """
-    # TODO: deal with different extent?
-    # Do another check if not identical
-    # Check if subset or superset?
-    matching_dims = []
-    regrid_dims = []
-    add_dims = []
-    for dim in src.dims:
-        if dim not in like.dims:
-            add_dims.append(dim)
-        elif src[dim].size == 0:  # zero overlap
-            regrid_dims.append(dim)
-        else:
-            try:
-                a1 = _coord(src, dim)
-                a2 = _coord(like, dim)
-                if np.array_equal(a1, a2) or _is_subset(a1, a2):
-                    matching_dims.append(dim)
-                else:
-                    regrid_dims.append(dim)
-            except TypeError:
-                first_type = type(like[dim].values[0])
-                if issubclass(first_type, (cftime.datetime, np.datetime64)):
-                    raise RuntimeError(
-                        "cannot regrid over datetime dimensions. "
-                        "Use xarray.Dataset.resample() instead"
-                    )
-
-    ndim_regrid = len(regrid_dims)
-    # Check number of dimension to regrid
-    if ndim_regrid > 3:
-        raise NotImplementedError("cannot regrid over more than three dimensions")
-
-    return matching_dims, regrid_dims, add_dims
-
-
 def _increasing_dims(da, dims):
     flip_dims = []
     for dim in dims:
@@ -233,92 +147,10 @@ def _increasing_dims(da, dims):
     return da, flip_dims
 
 
-def _selection_indices(src_x, xmin, xmax, extra_overlap):
-    """Left-inclusive"""
-    # Extra overlap is needed, for example with (multi)linear interpolation
-    # We simply enlarge the slice at the start and at the end.
-    i0 = max(0, np.searchsorted(src_x, xmin, side="right") - 1 - extra_overlap)
-    i1 = np.searchsorted(src_x, xmax, side="left") + extra_overlap
-    return i0, i1
-
-
-def _slice_src(src, like, extra_overlap):
-    """
-    Make sure src matches dst in dims that do not have to be regridded
-    """
-    matching_dims, regrid_dims, _ = _match_dims(src, like)
-    dims = matching_dims + regrid_dims
-
-    slices = {}
-    for dim in dims:
-        # Generate vertices
-        src_x = _coord(src, dim)
-        _, xmin, xmax = imod.util.spatial.coord_reference(like[dim])
-        i0, i1 = _selection_indices(src_x, xmin, xmax, extra_overlap)
-        slices[dim] = slice(i0, i1)
-    return src.isel(slices)
-
-
-def _dst_coords(src, like, dims_from_src, dims_from_like):
-    """
-    Gather destination coordinates
-    """
-
-    dst_da_coords = {}
-    dst_shape = []
-    # TODO: do some more checking, more robust handling
-    like_coords = dict(like.coords)
-    for dim in dims_from_src:
-        try:
-            like_coords.pop(dim)
-        except KeyError:
-            pass
-        dst_da_coords[dim] = src[dim].values
-        dst_shape.append(src[dim].size)
-    for dim in dims_from_like:
-        try:
-            like_coords.pop(dim)
-        except KeyError:
-            pass
-        dst_da_coords[dim] = like[dim].values
-        dst_shape.append(like[dim].size)
-
-    dst_da_coords.update(like_coords)
-    return dst_da_coords, dst_shape
-
-
 def _check_monotonic(dxs, dim):
     # use xor to check if one or the other
     if not ((dxs > 0.0).all() ^ (dxs < 0.0).all()):
         raise ValueError(f"{dim} is not only increasing or only decreasing")
-
-
-def _set_cellsizes(da, dims):
-    for dim in dims:
-        dx_string = f"d{dim}"
-        if dx_string not in da.coords:
-            dx, _, _ = imod.util.spatial.coord_reference(da.coords[dim])
-            dx_a = (
-                np.full(da.coords[dim].size, dx) if isinstance(dx, (int, float)) else dx
-            )
-            da = da.assign_coords({dx_string: (dim, dx_a)})
-
-    return da
-
-
-def _set_scalar_cellsizes(da):
-    for dim in da.dims:
-        dx_string = f"d{dim}"
-        if dx_string in da.coords:
-            dx = da.coords[dx_string]
-            # Ensure no leftover coordinates in scalar
-            if dx.ndim == 0:  # Catch case where dx already is a scalar
-                dx_scalar = dx.values[()]
-            else:
-                dx_scalar = dx.values[0]
-            if np.allclose(dx, dx_scalar):
-                da = da.assign_coords({dx_string: dx_scalar})
-    return da
 
 
 def _coord(da, dim):
@@ -366,77 +198,6 @@ def _coord(da, dim):
     x = np.full(dxs.size + 1, x0)
     x[1:] += np.cumsum(dxs)
     return x
-
-
-def _define_single_dim_slices(src_x, dst_x, chunksizes):
-    n = len(chunksizes)
-    if not n > 0:
-        raise ValueError("n must be larger than zero")
-    if n == 1:
-        return [slice(None, None)]
-
-    chunk_indices = np.full(n + 1, 0)
-    chunk_indices[1:] = np.cumsum(chunksizes)
-    # Find locations to cut.
-    src_chunk_x = src_x[chunk_indices]
-    if dst_x[0] < src_chunk_x[0]:
-        src_chunk_x[0] = dst_x[0]
-    if dst_x[-1] > src_chunk_x[-1]:
-        src_chunk_x[-1] = dst_x[-1]
-    # Destinations should NOT have any overlap
-    # Sources may have overlap
-    # We find the most suitable places to cut.
-    dst_i = np.searchsorted(dst_x, src_chunk_x, "left")
-    dst_i[dst_i > dst_x.size - 1] = dst_x.size - 1
-
-    # Create slices, but only if start and end are different
-    # (otherwise, the slice would be empty)
-    dst_slices = [slice(s, e) for s, e in zip(dst_i[:-1], dst_i[1:]) if s != e]
-    return dst_slices
-
-
-def _define_slices(src, like):
-    """
-    Defines the slices for every dimension, based on the chunks that are
-    present within src.
-
-    First, we get a single list of chunks per dimension.
-    Next, these are expanded into an N-dimensional array, equal to the number
-    of dimensions that have chunks.
-    Finally, these arrays are ravelled, and stacked for easier iteration.
-    """
-    dst_dim_slices = []
-    dst_chunks_shape = []
-    for dim, chunksizes in zip(src.dims, src.chunks):
-        if dim in like.dims:
-            dst_slices = _define_single_dim_slices(
-                _coord(src, dim), _coord(like, dim), chunksizes
-            )
-            dst_dim_slices.append(dst_slices)
-            dst_chunks_shape.append(len(dst_slices))
-
-    dst_expanded_slices = np.stack(
-        [a.ravel() for a in np.meshgrid(*dst_dim_slices, indexing="ij")], axis=-1
-    )
-    return dst_expanded_slices, dst_chunks_shape
-
-
-def _sel_chunks(da, dims, expanded_slices):
-    """
-    Using the slices created with the functions above, use xarray's index
-    selection methods to create a list of "like" DataArrays which are used
-    to inform the regridding. During the regrid() call of the
-    imod.prepare.Regridder object, data from the input array is selected,
-    ideally one chunk at time, or 2 ** ndim_chunks if there is overlap
-    required due to cellsize differences.
-    """
-    das = []
-    for dim_slices in expanded_slices:
-        slice_dict = {}
-        for dim, dim_slice in zip(dims, dim_slices):
-            slice_dict[dim] = dim_slice
-        das.append(da.isel(**slice_dict))
-    return das
 
 
 def _get_method(method, methods):

@@ -1,5 +1,6 @@
 from copy import deepcopy
-from typing import Optional, cast
+from datetime import datetime
+from typing import Optional
 
 import numpy as np
 import xarray as xr
@@ -11,6 +12,7 @@ from imod.mf6.boundary_condition import BoundaryCondition
 from imod.mf6.dis import StructuredDiscretization
 from imod.mf6.regrid.regrid_schemes import RechargeRegridMethod
 from imod.mf6.utilities.imod5_converter import convert_unit_rch_rate
+from imod.mf6.utilities.package import set_repeat_stress_if_available
 from imod.mf6.validation import BOUNDARY_DIMS_SCHEMA, CONC_DIMS_SCHEMA
 from imod.msw.utilities.imod5_converter import (
     get_cell_area_from_imod5_data,
@@ -29,7 +31,7 @@ from imod.schemata import (
     IndexesSchema,
     OtherCoordsSchema,
 )
-from imod.typing import GridDataArray, GridDataDict, Imod5DataDict
+from imod.typing import GridDataArray, Imod5DataDict
 from imod.typing.grid import (
     enforce_dim_order,
     is_planar_grid,
@@ -78,14 +80,15 @@ class Recharge(BoundaryCondition, IRegridPackage):
         Flag to indicate whether the package should be validated upon
         initialization. This raises a ValidationError if package input is
         provided in the wrong manner. Defaults to True.
-    repeat_stress: Optional[xr.DataArray] of datetimes
+    repeat_stress: dict or xr.DataArray of datetimes, optional
         Used to repeat data for e.g. repeating stress periods such as
-        seasonality without duplicating the values. The DataArray should have
-        dimensions ``("repeat", "repeat_items")``. The ``repeat_items``
-        dimension should have size 2: the first value is the "key", the second
-        value is the "value". For the "key" datetime, the data of the "value"
-        datetime will be used. Can also be set with a dictionary using the
-        ``set_repeat_stress`` method.
+        seasonality without duplicating the values. If provided as dict, it
+        should map new dates to old dates present in the dataset.
+        ``{"2001-04-01": "2000-04-01", "2001-10-01": "2000-10-01"}`` if provided
+        as DataArray, it should have dimensions ``("repeat", "repeat_items")``.
+        The ``repeat_items`` dimension should have size 2: the first value is
+        the "key", the second value is the "value". For the "key" datetime, the
+        data of the "value" datetime will be used.
     fixed_cell: ({True, False}, optional)
         indicates that recharge will not be reassigned to a cell underlying the
         cell specified in the list if the specified cell is inactive.
@@ -210,7 +213,10 @@ class Recharge(BoundaryCondition, IRegridPackage):
     def from_imod5_data(
         cls,
         imod5_data: dict[str, dict[str, GridDataArray]],
+        period_data: dict[str, list[datetime]],
         target_dis: StructuredDiscretization,
+        time_min: datetime,
+        time_max: datetime,
         regridder_types: Optional[RechargeRegridMethod] = None,
         regrid_cache: RegridderWeightsCache = RegridderWeightsCache(),
     ) -> "Recharge":
@@ -227,9 +233,16 @@ class Recharge(BoundaryCondition, IRegridPackage):
         imod5_data: dict
             Dictionary with iMOD5 data. This can be constructed from the
             :func:`imod.formats.prj.open_projectfile_data` method.
+        period_data: dict
+            Dictionary with iMOD5 period data. This can be constructed from the
+            :func:`imod.formats.prj.open_projectfile_data` method.
         target_dis: GridDataArray
             The discretization package for the simulation. Its grid does not
             need to be identical to one of the input grids.
+        time_min: datetime
+            Begin-time of the simulation. Used for expanding period data.
+        time_max: datetime
+            End-time of the simulation. Used for expanding period data.
         regridder_types: RechargeRegridMethod, optional
             Optional dataclass with regridder types for a specific variable.
             Use this to override default regridding methods.
@@ -258,8 +271,13 @@ class Recharge(BoundaryCondition, IRegridPackage):
         if is_planar_grid(regridded_package_data["rate"]):
             layered_data = cls.allocate_planar_data(regridded_package_data, target_dis)
             regridded_package_data.update(layered_data)
-
-        return cls(**regridded_package_data, validate=True, fixed_cell=False)
+        rch = cls(**regridded_package_data, validate=True, fixed_cell=False)
+        repeat = period_data.get("rch")
+        set_repeat_stress_if_available(repeat, time_min, time_max, rch)
+        # Clip the rch package to the time range of the simulation and ensure
+        # time is forward filled.
+        rch = rch.clip_box(time_min=time_min, time_max=time_max)
+        return rch
 
     @classmethod
     def from_imod5_cap_data(
@@ -273,7 +291,7 @@ class Recharge(BoundaryCondition, IRegridPackage):
         used to couple MODFLOW6 to MetaSWAP models. Active cells will have a
         recharge rate of 0.0.
         """
-        cap_data = cast(GridDataDict, drop_layer_dim_cap_data(imod5_data)["cap"])
+        cap_data = drop_layer_dim_cap_data(imod5_data)["cap"]
 
         msw_area = get_cell_area_from_imod5_data(cap_data)
         msw_active = is_msw_active_cell(target_dis, cap_data, msw_area)

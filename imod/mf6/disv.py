@@ -1,4 +1,5 @@
-from typing import List
+from pathlib import Path
+from typing import Any, List
 
 import numpy as np
 import pandas as pd
@@ -102,12 +103,12 @@ class VerticesDiscretization(Package, IRegridPackage, IMaskingSettings):
         super().__init__(dict_dataset)
         self._validate_init_schemata(validate)
 
-    def render(self, directory, pkgname, globaltimes, binary):
+    def _get_render_dictionary(self, directory, pkgname, globaltimes, binary):
         disdirectory = directory / pkgname
-        d = {}
+        d: dict[str, Any] = {}
         grid = self.dataset.ugrid.grid
-        d["xorigin"] = grid.node_x.min()
-        d["yorigin"] = grid.node_y.min()
+        d["xorigin"] = 0.0
+        d["yorigin"] = 0.0
         d["nlay"] = self.dataset["idomain"].coords["layer"].size
         facedim = grid.face_dimension
         d["ncpl"] = self.dataset["idomain"].coords[facedim].size
@@ -122,7 +123,7 @@ class VerticesDiscretization(Package, IRegridPackage, IMaskingSettings):
         d["idomain_layered"], d["idomain"] = self._compose_values(
             self["idomain"], disdirectory, "idomain", binary=binary
         )
-        return self._template.render(d)
+        return d
 
     def _verts_dataframe(self) -> pd.DataFrame:
         grid = self.dataset.ugrid.grid
@@ -147,14 +148,8 @@ class VerticesDiscretization(Package, IRegridPackage, IMaskingSettings):
             )
         return df
 
-    def write_blockfile(self, pkgname, globaltimes, write_context: WriteContext):
-        dir_for_render = write_context.get_formatted_write_directory()
-        content = self.render(
-            dir_for_render, pkgname, globaltimes, write_context.use_binary
-        )
-        filename = write_context.write_directory / f"{pkgname}.{self._pkg_id}"
-        with open(filename, "w") as f:
-            f.write(content)
+    def _append_vertices_and_cell2d(self, filename: Path | str) -> None:
+        with open(filename, "a") as f:
             f.write("\n\n")
 
             f.write("begin vertices\n")
@@ -168,6 +163,14 @@ class VerticesDiscretization(Package, IRegridPackage, IMaskingSettings):
                 f, header=False, sep=" ", lineterminator="\n"
             )
             f.write("end cell2d\n")
+
+        return
+
+    def write_blockfile(self, pkgname, globaltimes, write_context: WriteContext):
+        super().write_blockfile(pkgname, globaltimes, write_context)
+        filename = write_context.write_directory / f"{pkgname}.{self._pkg_id}"
+        self._append_vertices_and_cell2d(filename)
+
         return
 
     def _validate(self, schemata, **kwargs):

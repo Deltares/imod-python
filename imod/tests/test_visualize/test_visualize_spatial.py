@@ -41,7 +41,7 @@ def write_legend():
 def test_read_legend(write_legend, delim, tmp_path):
     leg_path = tmp_path / "example_legend.leg"
     write_legend(delim=delim, path=leg_path)
-    colors, levels = imod.visualize.spatial.read_imod_legend(path=leg_path)
+    colors, levels, labels = imod.visualize.spatial.read_imod_legend(path=leg_path)
 
     assert colors == [
         "#00007d",
@@ -79,6 +79,25 @@ def test_read_legend(write_legend, delim, tmp_path):
         4.0,
         6.0,
         10.0,
+    ]
+    assert labels == [
+        "< 0 m",
+        "0 - 0.2 m",
+        "0.2 - 0.4 m",
+        "0.4 - 0.6 m",
+        "0.6 - 0.8 m",
+        "0.8 - 1.0 m",
+        "1.0 - 1.2 m",
+        "1.2 - 1.4 m",
+        "1.4 - 1.6 m",
+        "1.6 - 1.8 m",
+        "1.8 - 2.0 m",
+        "2.0 - 2.5 m",
+        "2.5 - 3.0 m",
+        "3.0 - 4.0 m",
+        "4.0 - 6.0 m",
+        "6.0 - 10.0 m",
+        "> 10 m",
     ]
 
 

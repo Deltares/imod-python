@@ -1,4 +1,3 @@
-import warnings
 from copy import deepcopy
 from typing import Any, Optional
 
@@ -31,9 +30,6 @@ class InitialConditions(Package, IRegridPackage):
 
     Parameters
     ----------
-    head: array of floats (xr.DataArray)
-        for backwards compatibility this argument is maintained, but please use
-        the start-argument instead.
     start: array of floats (xr.DataArray)
         is the initial (starting) head or concentration—that is, the simulation's
         initial state.
@@ -52,10 +48,9 @@ class InitialConditions(Package, IRegridPackage):
     """
 
     _pkg_id = "ic"
-    _grid_data = {"head": np.float64}
-    _keyword_map = {"head": "strt"}
+    _grid_data = {"start": np.float64}
+    _keyword_map = {"start": "strt"}
     _template = Package._initialize_template(_pkg_id)
-
     _init_schemata = {
         "start": [
             DTypeSchema(np.floating),
@@ -69,26 +64,10 @@ class InitialConditions(Package, IRegridPackage):
             IdentityNoDataSchema(other="idomain", is_other_notnull=(">", 0)),
         ],
     }
-
-    _grid_data = {"start": np.float64}
-    _keyword_map = {"start": "strt"}
-    _template = Package._initialize_template(_pkg_id)
     _regrid_method = InitialConditionsRegridMethod()
 
     @init_log_decorator()
-    def __init__(self, start=None, head=None, validate: bool = True):
-        if start is None:
-            start = head
-            warnings.warn(
-                'The keyword argument "head" is deprecated. Please use the start argument.',
-                DeprecationWarning,
-            )
-            if head is None:
-                raise ValueError("start and head arguments cannot both be None")
-        else:
-            if head is not None:
-                raise ValueError("start and head arguments cannot both be defined")
-
+    def __init__(self, start, validate: bool = True):
         dict_dataset = {"start": start}
         super().__init__(dict_dataset)
         self._validate_init_schemata(validate)

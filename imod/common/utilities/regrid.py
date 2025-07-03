@@ -18,6 +18,7 @@ from imod.common.statusinfo import NestedStatusInfo
 from imod.common.utilities.clip import clip_by_grid
 from imod.common.utilities.regrid_method_type import EmptyRegridMethod, RegridMethodType
 from imod.common.utilities.value_filters import is_valid
+from imod.mf6.validation_settings import ValidationSettings
 from imod.schemata import ValidationError
 from imod.typing.grid import (
     GridDataArray,
@@ -160,7 +161,7 @@ def _get_unique_regridder_types(model: IModel) -> defaultdict[RegridderType, lis
     methods: defaultdict = defaultdict(list)
     regrid_packages = [pkg for pkg in model.values() if isinstance(pkg, IRegridPackage)]
     regrid_packages_with_methods = {
-        pkg: asdict(pkg.get_regrid_methods()).items()  # type: ignore # noqa: union-attr
+        pkg: asdict(pkg.get_regrid_methods()).items()  # type: ignore[union-attr]
         for pkg in regrid_packages
         if not isinstance(pkg.get_regrid_methods(), EmptyRegridMethod)
     }
@@ -315,10 +316,10 @@ def _regrid_like(
     output_domain = handle_extra_coords("dx", target_grid, output_domain)
     output_domain = handle_extra_coords("dy", target_grid, output_domain)
     new_model.mask_all_packages(output_domain)
-    new_model.purge_empty_packages()
     if validate:
+        validation_context = ValidationSettings(validate=validate)
         status_info = NestedStatusInfo("Model validation status")
-        status_info.add(new_model.validate("Regridded model"))
+        status_info.add(new_model.validate("Regridded model", validation_context))
         if status_info.has_errors():
             raise ValidationError("\n" + status_info.to_string())
     return new_model

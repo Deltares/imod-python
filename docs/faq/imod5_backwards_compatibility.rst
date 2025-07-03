@@ -10,8 +10,6 @@ issueboard <https://github.com/Deltares/imod-python/issues>`_.
 Known issues
 ------------
 
-- Constants are only supported for the CAP package. For other packages, the
-  constants will cause an error.
 - ISG files cannot be read directly. The workaround is to rasterize the ISG
   files to IDF files using the iMOD5 BATCH function ISGGRID.
 - MetaSWAP sprinkling wells defined as IPF files are not supported.
@@ -26,16 +24,16 @@ Known issues
   x-coordinate of the well (e.g. 0.1 mm).
 - There is a bug in iMOD5 in how the HFB's hydraulic characteristic is computed.
   iMDO5 adds the background resistance of the aquifer to the HFB resistance when
-  writing the MODFLOW6 input files. The background resistance is already
-  accounted for by MODFLOW6 internally, so in practice this means the background
+  writing the MODFLOW 6 input files. The background resistance is already
+  accounted for by MODFLOW 6 internally, so in practice this means the background
   resistance is added twice. This is especially noticeable when a HFB intersects
   a low permeable layer. The workaround in iMOD5 is to specify a negative HFB
   factor in the projectfile, which makes iMOD5 to skip adding the background
   resistance.
 - By specifying a negative HFB factor in the projectfile, the iMOD5
   documentation mentions this will turn on the option to override a resistance
-  in between cells with the HFB resistance. This is NOT supported by MODFLOW6,
-  as MODFLOW6 always adds the background resistance to the HFB resistance to
+  in between cells with the HFB resistance. This is NOT supported by MODFLOW 6,
+  as MODFLOW 6 always adds the background resistance to the HFB resistance to
   compute the resistance inbetween cells.
 
 
@@ -50,8 +48,8 @@ Notes
 - When importing models with the ANI package, make sure to activate the "XT3D"
   in the NodePropertyFlow package of the model.
 - Solver settings (PCG) are NOT imported from iMOD5, instead a solver settings
-  preset from MODFLOW6 ("Moderate") is set. This is because the solvers between
-  iMODLFOW and MODFLOW6 are different. You are advised to test settings
+  preset from MODFLOW 6 ("Moderate") is set. This is because the solvers between
+  iMODLFOW and MODFLOW 6 are different. You are advised to test settings
   yourself.
 - The imported iMOD5 discretization for the model is created by taking the
   smallest grid and finest resolution amongst the TOP, BOT, and BND grids. This
@@ -81,10 +79,10 @@ Here an overview of iMOD5 files supported:
     Open raster data (.asc),:func:`imod.formats.rasterio.open`,
     Open legend file (.leg),:func:`imod.visualize.read_imod_legend`,
 
-MODFLOW6
---------
+MODFLOW 6
+---------
 
-Here an overview of iMOD5 MODFLOW6 features:
+Here an overview of iMOD5 MODFLOW 6 features:
 
 .. csv-table::
    :header-rows: 1
@@ -101,7 +99,7 @@ Here an overview of iMOD5 MODFLOW6 features:
     "BND, TOP, BOT",Clip,:meth:`imod.mf6.StructuredDiscretization.clip_box`
     "BND, SHD",set constant heads starting head (IBOUND = -1),:meth:`imod.mf6.ConstantHead.from_imod5_shd_data`
     "BND, CHD",set constant heads (IBOUND = -1),:meth:`imod.mf6.ConstantHead.from_imod5_data`
-    "KDW, VCW, KVV, THK",Quasi-3D permeability from grid (IDF),Quasi-3D is only supported by MODFLOW2005. MODFLOW6 requires fully 3D.
+    "KDW, VCW, KVV, THK",Quasi-3D permeability from grid (IDF),Quasi-3D is only supported by MODFLOW2005. MODFLOW 6 requires fully 3D.
     "KHV, KVA",3D permeability from grid (IDF),:meth:`imod.mf6.NodePropertyFlow.from_imod5_data`
     ANI,Set horizontal anistropy ,:meth:`imod.mf6.NodePropertyFlow.from_imod5_data`
     "KHV, KVA, ANI",Align iMOD5 input grids,:meth:`imod.mf6.NodePropertyFlow.from_imod5_data`
@@ -209,3 +207,48 @@ your data, see our iMOD Viewer
     Streamplot,:func:`imod.visualize.streamfunction`
     Water balance,:func:`imod.visualize.waterbalance_barchart`
     3D plot,:class:`imod.visualize.GridAnimation3D`
+
+iMOD BATCH glossary
+-------------------
+
+Here is a glossary of the iMOD5 BATCH functions and their arguments, and which
+iMOD Python argument for a function to look for.
+
+RUNFILE
+*******
+
+The RUNFILE BATCH function is used in iMOD5 to create a MODFLOW 6 runfile or
+namfile from an iMOD5 projectfile. The following table lists the arguments of
+the function and a pointer to the equivalent iMOD Python function and argument
+of this function.
+
+.. csv-table::
+   :header-rows: 1
+   :stub-columns: 1
+
+   BATCH argument, description, iMOD Python, argument
+   PRJFILE_IN, Name of a projectfile that need to be used to create a runfile specified by RUNFILE_OUT or a namfile specified by NAMFILE_OUT e.g. PRJFILE_IN=D:\PRJFILES\MODEL.PRJ., :func:`imod.formats.prj.open_projectfile_data`, ``path``
+   NAMFILE_OUT, Name of a nam-file that will be created e.g. NAMFILE_OUT=D:\NAMFILES\MODEL.NAM, :meth:`imod.mf6.Modflow6Simulation.write`, ``directory``
+   ISS, Type of time configuration to be added to the RUNFILE or NAMFILE; for transient enter ISS=1 and for steady state enter ISS=0., :class:`imod.mf6.StorageCoefficient`, ``transient``
+   SDATE, Starting date of the simulation in yyyymmddhhmmss, :meth:`imod.mf6.Modflow6Simulation.from_imod5_data`, ``times``
+   EDATE, End date of the simulation in yyyymmddhhmmss, :meth:`imod.mf6.Modflow6Simulation.from_imod5_data`, ``times``
+   ITT, Time interval category, :meth:`imod.mf6.Modflow6Simulation.from_imod5_data`, ``times``
+   IDT, Time interval of the time steps corresponding to the chosen time interval category ITT e.g. IDT=7 to denote the 7 days whenever ITT=3, :meth:`imod.mf6.Modflow6Simulation.from_imod5_data`, ``times``
+   ISTEADY, ISTEADY=1 to include an initial steady-state time step to the model. This will add packages with the time stamp STEADY-STATE to the first stress-period of your model., :class:`imod.mf6.StorageCoefficient`, ``transient``
+   NSTEP, Number time step within each stress period, :class:`imod.mf6.TimeDiscretization`, ``n_timesteps``
+   NMULT, Multiplication factor in which the step size of each subsequent time step will increase, :class:`imod.mf6.TimeDiscretization`, ``timestep_multiplier``
+   INFFCT, Use this keyword to generate two RIV-elements to compensate for a given infiltration factor, :meth:`imod.mf6.River.from_imod5_data`, 
+   IDEFLAYER, Assign river-elements to model layers, :meth:`imod.mf6.River.from_imod5_data`, ``allocation_option``
+   DISTRCOND, Distribute conductances over the river-elements, :meth:`imod.mf6.River.from_imod5_data`, ``distributing_option``
+   NEWTON, "Use Newton-Raphson formulation for groundwater flow between connected, convertible groundwater cells", :class:`imod.mf6.GroundwaterFlowModel`, ``newton_raphson``
+   UNCONFINED, Include unconfined conditions for model layers, :class:`imod.mf6.NodePropertyFlow`, ``icelltype``
+   DEFUNCONF, Specify spatially whether the UNCONFINED configuration needs to be applied, :class:`imod.mf6.NodePropertyFlow`, ``icelltype``
+   THICKSTRT, Minimal thickness of an aquifer which becomes in active in case the given starting head is below that level, :class:`imod.mf6.NodePropertyFlow`, ``starting_head_as_confined_thickness``
+   SPECIFIC-STORAGE, Denote that specific storage is entered in the PRJ file instead of storage coefficients, :class:`imod.mf6.SpecificStorage`, 
+   WINDOW, "Specify a window (X1,Y1,X2,Y2) for which the constructed RUNFILE will be clipped", :meth:`imod.mf6.Modflow6Simulation.clip_box`, "``x_min``, ``x_max``, ``y_min``, ``y_max``"
+   CELLSIZE, Specify a cell size to be used, :meth:`imod.mf6.Modflow6Simulation.regrid_like`, ``target_grid``
+   APPLYCHD, Specify APPLYCHD=1 to insert constant head boundary conditions around the model, :meth:`imod.mf6.Modflow6Simulation.clip_box`, ``states_for_boundary``
+   MIXELM, Advection scheme, ":class:`imod.mf6.AdvectionTVD`, :class:`imod.mf6.AdvectionUpstream`, :class:`imod.mf6.AdvectionCentral`", 
+   NADVFD, Weighting scheme Finite-difference, ":class:`imod.mf6.AdvectionUpstream`, :class:`imod.mf6.AdvectionCentral`", 
+   ISOLVE, Start a simulation after generating a RUNFILE or NAMFILE, :meth:`imod.mf6.Modflow6Simulation.run`, 
+   MODFLOW6, MODFLOW 6 executable, :meth:`imod.mf6.Modflow6Simulation.run`, ``mf6path``

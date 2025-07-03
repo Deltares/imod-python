@@ -3,6 +3,7 @@ import pytest
 from .fixtures.backward_compatibility_fixture import (
     imod5_dataset,
     imod5_dataset_periods,
+    imod5_dataset_transient,
 )
 from .fixtures.flow_basic_fixture import (
     basic_dis,
@@ -41,6 +42,7 @@ from .fixtures.mf6_circle_fixture import (
     circle_model_transport_multispecies_variable_density,
     circle_partitioned,
     circle_result,
+    circle_result__offset_origins,
     circle_result_evt,
     circle_result_sto,
 )

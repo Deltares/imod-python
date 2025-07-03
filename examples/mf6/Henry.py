@@ -10,7 +10,7 @@ In overview, we'll set the following steps:
     * Create a suitable 2d (x, z) grid.
     * Create a groundwater flow model, with variable density.
     * Create a solute transport model.
-    * Combine these models into a single MODFLOW6 simulation.
+    * Combine these models into a single MODFLOW 6 simulation.
     * Write to modflow6 files.
     * Run the model.
     * Open the results back into xarray DataArrays.
@@ -31,7 +31,7 @@ represented by a General Head Boundary package.
 
 # %%
 # We'll start with the usual imports. As this is a simple (synthetic)
-# structured model, we can make due with few packages.
+# structured model, we can make do with few packages.
 
 import numpy as np
 import pandas as pd
@@ -193,7 +193,7 @@ gwt_model["oc"] = imod.mf6.OutputControl(save_concentration="last", save_budget=
 gwt_model["dis"] = gwf_model["dis"]
 
 # %%
-# now let's define a simulation using the flow and transport models.
+# Now let's define a simulation using the flow and transport models.
 
 # Attach it to a simulation
 simulation = imod.mf6.Modflow6Simulation("henry")
@@ -257,7 +257,7 @@ simulation.write(modeldir, binary=False)
 # .. note::
 #
 #   The following lines assume the ``mf6`` executable is available on your PATH.
-#   :ref:`The Modflow 6 examples introduction <mf6-introduction>` shortly
+#   :ref:`The MODFLOW 6 examples introduction <mf6-introduction>` shortly
 #   describes how to add it to yours.
 
 simulation.run()

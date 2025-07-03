@@ -22,10 +22,10 @@ def idomain_and_bottom():
 
     dx = 5000.0
     dy = -5000.0
-    xmin = 0.0
-    xmax = dx * ncol
-    ymin = 0.0
-    ymax = abs(dy) * nrow
+    xmin = 10_000.0
+    xmax = dx * ncol + xmin
+    ymin = 10_000.0
+    ymax = abs(dy) * nrow + ymin
     dims = ("layer", "y", "x")
 
     layer = np.array([1, 2, 3])
@@ -47,8 +47,8 @@ def test_render(idomain_and_bottom):
     expected = textwrap.dedent(
         """\
         begin options
-          xorigin 0.0
-          yorigin 0.0
+          xorigin 10000.0
+          yorigin 10000.0
         end options
 
         begin dimensions
@@ -74,6 +74,15 @@ def test_render(idomain_and_bottom):
         """
     )
     assert actual == expected
+
+
+def test_copy(idomain_and_bottom):
+    idomain, bottom = idomain_and_bottom
+
+    dis = imod.mf6.StructuredDiscretization(top=200.0, bottom=bottom, idomain=idomain)
+    dis2 = dis.copy()
+    assert isinstance(dis2, imod.mf6.StructuredDiscretization)
+    assert dis2.dataset.equals(dis.dataset)
 
 
 def test_wrong_dtype(idomain_and_bottom):

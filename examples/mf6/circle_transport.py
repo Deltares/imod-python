@@ -56,9 +56,9 @@ ax.set_aspect(1)
 # %%
 # However a triangular grid has the issue that the direction of the fluxes
 # between cell centres is not perpendicular to the cell vertices. The default
-# formulation of Modflow 6 does not account for this, which causes mass balance
+# formulation of MODFLOW 6 does not account for this, which causes mass balance
 # errors. The XT3D formulation is able to account for this, but the last version
-# of Modflow 6 (6.3 at time of writing) does not support this in combination
+# of MODFLOW 6 (6.3 at time of writing) does not support this in combination
 # with the Buoyancy package and using XT3D comes with an extra, significant
 # computational burden. It is therefore easier to use a voronoi grid, for which
 # `Xugrid <https://deltares.github.io/xugrid/index.html>`_ has a very convenient

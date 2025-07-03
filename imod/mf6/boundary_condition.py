@@ -1,8 +1,7 @@
 import abc
 import pathlib
-import warnings
 from copy import copy, deepcopy
-from typing import List, Mapping, Optional, Tuple, Union
+from typing import Mapping, Optional, Union
 
 import numpy as np
 import xarray as xr
@@ -71,6 +70,13 @@ class BoundaryCondition(Package, abc.ABC):
     """
 
     def __init__(self, allargs: Mapping[str, GridDataArray | float | int | bool | str]):
+        # Convert repeat_stress in dict to a xr.DataArray in the right shape if
+        # necessary, which is required to merge it into the dataset.
+        if "repeat_stress" in allargs.keys() and isinstance(
+            allargs["repeat_stress"], dict
+        ):
+            allargs["repeat_stress"] = get_repeat_stress(allargs["repeat_stress"])  # type: ignore
+        # Call the Package constructor, this merges the arguments into a dataset.
         super().__init__(allargs)
         if "concentration" in allargs.keys() and allargs["concentration"] is None:
             # Remove vars inplace
@@ -78,34 +84,6 @@ class BoundaryCondition(Package, abc.ABC):
             del self.dataset["concentration_boundary_type"]
         else:
             expand_transient_auxiliary_variables(self)
-
-    def set_repeat_stress(self, times: dict[np.datetime64, np.datetime64]) -> None:
-        """
-        Set repeat stresses: re-use data of earlier periods.
-
-        Parameters
-        ----------
-        times: Dict of datetime-like to datetime-like.
-            The data of the value datetime is used for the key datetime.
-        """
-        warnings.warn(
-            f"""{self.__class__.__name__}.set_repeat_stress(...) is deprecated.
-            In the future, add repeat stresses as constructor parameters. An
-            object containing them can be created using 'get_repeat_stress', as
-            follows:
-
-            from imod.mf6.utilities.package_utils import get_repeat_stress
-
-            repeat_stress = get_repeat_stress(repeat_periods) # args before provided to River.set_repeat_stress
-            riv = imod.mf6.River(..., repeat_stress=repeat_stress)
-
-            Note that the location of get_repeat_stress (imod.mf6.utilities.package_utils)
-            may change in the future
-            """,
-            DeprecationWarning,
-        )
-
-        self.dataset["repeat_stress"] = get_repeat_stress(times)
 
     def _max_active_n(self):
         """
@@ -127,8 +105,7 @@ class BoundaryCondition(Package, abc.ABC):
         fields = struct_array.dtype.fields
         fmt = [self._number_format(field[0]) for field in fields.values()]
         header = " ".join(list(fields.keys()))
-        with open(outpath, "w") as f:
-            np.savetxt(fname=f, X=struct_array, fmt=fmt, header=header)
+        np.savetxt(fname=outpath, X=struct_array, fmt=fmt, header=header)
 
     def _write_datafile(self, outpath, ds, binary):
         """
@@ -183,7 +160,9 @@ class BoundaryCondition(Package, abc.ABC):
 
         return recarr
 
-    def _period_paths(self, directory, pkgname, globaltimes, bin_ds, binary):
+    def _period_paths(
+        self, directory: pathlib.Path | str, pkgname: str, globaltimes, bin_ds, binary
+    ):
         directory = pathlib.Path(directory) / pkgname
 
         if binary:
@@ -191,10 +170,12 @@ class BoundaryCondition(Package, abc.ABC):
         else:
             ext = "dat"
 
-        periods = {}
+        periods: dict[np.int64, str] = {}
+        # Force to np.int64 for mypy and numpy >= 2.2.4
+        one = np.int64(1)
         if "time" in bin_ds:  # one of bin_ds has time
             package_times = bin_ds.coords["time"].values
-            starts = np.searchsorted(globaltimes, package_times) + 1
+            starts = np.searchsorted(globaltimes, package_times) + one
             for i, start in enumerate(starts):
                 path = directory / f"{self._pkg_id}-{i}.{ext}"
                 periods[start] = path.as_posix()
@@ -203,15 +184,15 @@ class BoundaryCondition(Package, abc.ABC):
             if repeat_stress is not None and repeat_stress.values[()] is not None:
                 keys = repeat_stress.isel(repeat_items=0).values
                 values = repeat_stress.isel(repeat_items=1).values
-                repeat_starts = np.searchsorted(globaltimes, keys) + 1
-                values_index = np.searchsorted(globaltimes, values) + 1
-                for i, start in zip(values_index, repeat_starts):
-                    periods[start] = periods[i]
+                repeat_starts = np.searchsorted(globaltimes, keys) + one
+                values_index = np.searchsorted(globaltimes, values) + one
+                for j, start_repeat in zip(values_index, repeat_starts):
+                    periods[start_repeat] = periods[j]
                 # Now make sure the periods are sorted by key.
                 periods = dict(sorted(periods.items()))
         else:
             path = directory / f"{self._pkg_id}.{ext}"
-            periods[1] = path.as_posix()
+            periods[one] = path.as_posix()
 
         return periods
 
@@ -365,37 +346,3 @@ class AdvancedBoundaryCondition(BoundaryCondition, abc.ABC):
     @abc.abstractmethod
     def fill_stress_perioddata(self):
         raise NotImplementedError
-
-
-class DisStructuredBoundaryCondition(BoundaryCondition):
-    def _to_struct_array(self, arrdict, layer):
-        spec: List[Tuple[str, np.int32 | np.float64]] = []
-        for key in arrdict:
-            if key in ["layer", "row", "column"]:
-                spec.append((key, np.int32))  # type: ignore[arg-type]
-            else:
-                spec.append((key, np.float64))  # type: ignore[arg-type]
-
-        sparse_dtype = np.dtype(spec)
-        nrow = next(iter(arrdict.values())).size
-        recarr = np.empty(nrow, dtype=sparse_dtype)
-        for key, arr in arrdict.items():
-            recarr[key] = arr
-        return recarr
-
-
-class DisVerticesBoundaryCondition(BoundaryCondition):
-    def _to_struct_array(self, arrdict, layer):
-        spec = []
-        for key in arrdict:
-            if key in ["layer", "cell2d"]:
-                spec.append((key, np.int32))
-            else:
-                spec.append((key, np.float64))  # type: ignore[arg-type]
-
-        sparse_dtype = np.dtype(spec)
-        nrow = next(iter(arrdict.values())).size
-        recarr = np.empty(nrow, dtype=sparse_dtype)
-        for key, arr in arrdict.items():
-            recarr[key] = arr
-        return recarr

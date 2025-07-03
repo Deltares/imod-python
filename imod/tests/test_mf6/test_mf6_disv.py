@@ -20,10 +20,10 @@ def idomain_and_bottom():
 
     dx = 5000.0
     dy = -5000.0
-    xmin = 0.0
-    xmax = dx * ncol
-    ymin = 0.0
-    ymax = abs(dy) * nrow
+    xmin = 10_000.0
+    xmax = dx * ncol + xmin
+    ymin = 10_000.0
+    ymax = abs(dy) * nrow + ymin
     dims = ("layer", "y", "x")
 
     layer = np.array([1, 2, 3])
@@ -77,6 +77,14 @@ def test_wrong_dtype(idomain_and_bottom):
         imod.mf6.VerticesDiscretization(
             top=200.0, bottom=bottom, idomain=idomain.astype(np.float64)
         )
+
+
+def test_copy(idomain_and_bottom):
+    idomain, bottom = idomain_and_bottom
+    disv = imod.mf6.VerticesDiscretization(top=200.0, bottom=bottom, idomain=idomain)
+    disv2 = disv.copy()
+    assert isinstance(disv2, imod.mf6.VerticesDiscretization)
+    assert disv2.dataset.equals(disv.dataset)
 
 
 def test_zero_thickness_validation(idomain_and_bottom):

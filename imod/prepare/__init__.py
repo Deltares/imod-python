@@ -15,7 +15,13 @@ speed by making use of the Numba compiler, to be able to regrid large datasets.
 
 from imod.common.utilities.layer import create_layered_top
 from imod.prepare import hfb, spatial, subsoil, surface_water
-from imod.prepare.cleanup import cleanup_drn, cleanup_ghb, cleanup_riv, cleanup_wel
+from imod.prepare.cleanup import (
+    cleanup_drn,
+    cleanup_ghb,
+    cleanup_riv,
+    cleanup_wel,
+    cleanup_wel_layered,
+)
 from imod.prepare.hfb import (
     linestring_to_square_zpolygons,
     linestring_to_trapezoid_zpolygons,
@@ -27,6 +33,7 @@ from imod.prepare.layer import (
     get_upper_active_layer_number,
 )
 from imod.prepare.layerregrid import LayerRegridder
+from imod.prepare.partition import create_partition_labels
 from imod.prepare.regrid import Regridder
 from imod.prepare.reproject import reproject
 from imod.prepare.spatial import (

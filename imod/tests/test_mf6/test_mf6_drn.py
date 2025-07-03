@@ -10,6 +10,7 @@ from pytest_cases import parametrize_with_cases
 
 import imod
 import imod.mf6.drn
+from imod.common.utilities.version import get_version
 from imod.logging import LoggerType, LogLevel
 from imod.mf6.dis import StructuredDiscretization
 from imod.mf6.npf import NodePropertyFlow
@@ -104,8 +105,11 @@ def test_write(drainage, tmp_path):
     write_context = WriteContext(simulation_directory=tmp_path, use_binary=True)
     drn._write("mydrn", [1], write_context)
 
+    version = get_version()
     block_expected = textwrap.dedent(
-        """\
+        f"""\
+        # File written with iMOD Python version: {version}
+
         begin options
         end options
 
@@ -357,59 +361,13 @@ def test_repeat_stress(
     actual = drn.render(directory, "drn", globaltimes, False)
     assert actual == expected
 
-
-def test_repeat_stress_old_style(
-    elevation_fc,
-    conductance_fc,
-):
-    directory = pathlib.Path("mymodel")
-    globaltimes = np.array(
-        [
-            "2000-01-01",
-            "2000-01-02",
-            "2000-01-03",
-            "2000-01-04",
-            "2000-01-05",
-        ],
-        dtype="datetime64[ns]",
-    )
-
-    expected = textwrap.dedent(
-        """\
-        begin options
-        end options
-
-        begin dimensions
-          maxbound 2
-        end dimensions
-
-        begin period 1
-          open/close mymodel/drn/drn-0.dat
-        end period
-        begin period 2
-          open/close mymodel/drn/drn-1.dat
-        end period
-        begin period 3
-          open/close mymodel/drn/drn-2.dat
-        end period
-        begin period 4
-          open/close mymodel/drn/drn-0.dat
-        end period
-        begin period 5
-          open/close mymodel/drn/drn-1.dat
-        end period
-        """
-    )
-
     drn = imod.mf6.Drainage(
         elevation=elevation_fc,
         conductance=conductance_fc,
-    )
-    drn.set_repeat_stress(
-        times={
+        repeat_stress={
             globaltimes[3]: globaltimes[0],
             globaltimes[4]: globaltimes[1],
-        }
+        },
     )
     actual = drn.render(directory, "drn", globaltimes, False)
     assert actual == expected
@@ -535,6 +493,19 @@ def test_from_imod5(
 
     assert isinstance(drn_2, imod.mf6.Drainage)
 
+    drn_time = drn_2.dataset.coords["time"].data
+    expected_times = np.array(
+        [
+            np.datetime64("2002-02-02"),
+            np.datetime64("2002-04-01"),
+            np.datetime64("2002-10-01"),
+        ]
+    )
+    np.testing.assert_array_equal(drn_time, expected_times)
+    drn_repeat_stress = drn_2.dataset["repeat_stress"].data
+    assert np.all(drn_repeat_stress[:, 1][::2] == np.datetime64("2002-04-01"))
+    assert np.all(drn_repeat_stress[:, 1][1::2] == np.datetime64("2002-10-01"))
+
     pkg_errors = drn_2._validate(
         schemata=drn_2._write_schemata,
         idomain=target_dis["idomain"],
@@ -545,6 +516,117 @@ def test_from_imod5(
     # write the packages for write validation
     write_context = WriteContext(simulation_directory=tmp_path, use_binary=False)
     drn_2._write("mydrn", [1], write_context)
+
+
+@parametrize_with_cases(
+    ["allocation_setting", "distribution_setting"], cases=AllocationSettings
+)
+def test_from_imod5_and_cleanup(
+    imod5_dataset_periods, tmp_path, allocation_setting, distribution_setting
+):
+    period_data = imod5_dataset_periods[1]
+    imod5_dataset = imod5_dataset_periods[0]
+    target_dis = StructuredDiscretization.from_imod5_data(imod5_dataset, validate=False)
+    target_npf = NodePropertyFlow.from_imod5_data(
+        imod5_dataset, target_dis.dataset["idomain"]
+    )
+
+    drn_2 = imod.mf6.Drainage.from_imod5_data(
+        "drn-2",
+        imod5_dataset,
+        period_data,
+        target_dis,
+        target_npf,
+        allocation_option=allocation_setting,
+        distributing_option=distribution_setting,
+        time_min=datetime(2002, 2, 2),
+        time_max=datetime(2022, 2, 2),
+        regridder_types=None,
+    )
+
+    drn_2.cleanup(target_dis)
+
+
+@parametrize_with_cases(
+    ["allocation_setting", "distribution_setting"], cases=AllocationSettings
+)
+def test_from_imod5__with_constant(
+    imod5_dataset_periods, tmp_path, allocation_setting, distribution_setting
+):
+    period_data = imod5_dataset_periods[1]
+    imod5_dataset = imod5_dataset_periods[0]
+
+    target_dis = StructuredDiscretization.from_imod5_data(imod5_dataset, validate=False)
+    target_npf = NodePropertyFlow.from_imod5_data(
+        imod5_dataset, target_dis.dataset["idomain"]
+    )
+
+    original_drn_2 = imod5_dataset["drn-2"].copy()
+    imod5_dataset["drn-2"]["elevation"] = xr.DataArray(
+        [0.0], dims=("layer",), coords={"layer": [0]}
+    )
+
+    drn_2 = imod.mf6.Drainage.from_imod5_data(
+        "drn-2",
+        imod5_dataset,
+        period_data,
+        target_dis,
+        target_npf,
+        allocation_option=allocation_setting,
+        distributing_option=distribution_setting,
+        time_min=datetime(2002, 2, 2),
+        time_max=datetime(2022, 2, 2),
+        regridder_types=None,
+    )
+
+    assert isinstance(drn_2, imod.mf6.Drainage)
+
+    pkg_errors = drn_2._validate(
+        schemata=drn_2._write_schemata,
+        idomain=target_dis["idomain"],
+        bottom=target_dis["bottom"],
+    )
+    assert len(pkg_errors) == 0
+
+    # Tear down
+    imod5_dataset["drn-2"] = original_drn_2
+
+
+@parametrize_with_cases(
+    ["allocation_setting", "distribution_setting"], cases=AllocationSettings
+)
+def test_from_imod5_and_cleanup__with_constant(
+    imod5_dataset_periods, tmp_path, allocation_setting, distribution_setting
+):
+    period_data = imod5_dataset_periods[1]
+    imod5_dataset = imod5_dataset_periods[0]
+
+    target_dis = StructuredDiscretization.from_imod5_data(imod5_dataset, validate=False)
+    target_npf = NodePropertyFlow.from_imod5_data(
+        imod5_dataset, target_dis.dataset["idomain"]
+    )
+
+    original_drn_2 = imod5_dataset["drn-2"].copy()
+    imod5_dataset["drn-2"]["elevation"] = xr.DataArray(
+        [0.0], dims=("layer",), coords={"layer": [0]}
+    )
+
+    drn_2 = imod.mf6.Drainage.from_imod5_data(
+        "drn-2",
+        imod5_dataset,
+        period_data,
+        target_dis,
+        target_npf,
+        allocation_option=allocation_setting,
+        distributing_option=distribution_setting,
+        time_min=datetime(2002, 2, 2),
+        time_max=datetime(2022, 2, 2),
+        regridder_types=None,
+    )
+
+    drn_2.cleanup(target_dis)
+    # Teardown
+    imod5_dataset["drn-2"] = original_drn_2
 
 
 def test_from_imod5__negative_layer(imod5_dataset_periods, tmp_path):
@@ -602,4 +684,51 @@ def test_from_imod5__negative_layer(imod5_dataset_periods, tmp_path):
     assert drn_negative_layer.dataset.identical(drn_reference.dataset)
 
     # Tear down
+    imod5_dataset["drn-2"] = original_drn_2
+
+
+def test_from_imod5_and_cleanup__negative_layer(imod5_dataset_periods, tmp_path):
+    period_data = imod5_dataset_periods[1]
+    imod5_dataset = imod5_dataset_periods[0]
+    target_dis = StructuredDiscretization.from_imod5_data(imod5_dataset, validate=False)
+    target_npf = NodePropertyFlow.from_imod5_data(
+        imod5_dataset, target_dis.dataset["idomain"]
+    )
+
+    drn_reference = imod.mf6.Drainage.from_imod5_data(
+        "drn-2",
+        imod5_dataset,
+        period_data,
+        target_dis,
+        target_npf,
+        allocation_option=ALLOCATION_OPTION.at_first_active,
+        distributing_option=DISTRIBUTING_OPTION.by_crosscut_thickness,
+        time_min=datetime(2002, 2, 2),
+        time_max=datetime(2022, 2, 2),
+        regridder_types=None,
+    )
+
+    original_drn_2 = imod5_dataset["drn-2"].copy()
+    imod5_dataset["drn-2"] = {
+        key: da.assign_coords(layer=[-1]) for key, da in imod5_dataset["drn-2"].items()
+    }
+
+    drn_negative_layer = imod.mf6.Drainage.from_imod5_data(
+        "drn-2",
+        imod5_dataset,
+        period_data,
+        target_dis,
+        target_npf,
+        allocation_option=ALLOCATION_OPTION.at_elevation,
+        distributing_option=DISTRIBUTING_OPTION.by_crosscut_thickness,
+        time_min=datetime(2002, 2, 2),
+        time_max=datetime(2022, 2, 2),
+        regridder_types=None,
+    )
+
+    drn_negative_layer.cleanup(target_dis)
+
+    assert drn_negative_layer.dataset.identical(drn_reference.dataset)
+
+    # Teardown
     imod5_dataset["drn-2"] = original_drn_2

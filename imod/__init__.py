@@ -14,4 +14,4 @@ from imod import (
 )
 from imod.formats import gen, idf, ipf, prj, rasterio
 
-__version__ = "1.0.0rc2"
+__version__ = "1.0.0rc4"

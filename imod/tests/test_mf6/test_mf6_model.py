@@ -1,5 +1,4 @@
 from copy import deepcopy
-from pathlib import Path
 from unittest import mock
 from unittest.mock import MagicMock
 
@@ -17,9 +16,10 @@ from imod.mf6.mf6_wel_adapter import Mf6Wel
 from imod.mf6.model import Modflow6Model
 from imod.mf6.model_gwf import GroundwaterFlowModel
 from imod.mf6.package import Package
-from imod.mf6.validation_context import ValidationContext
+from imod.mf6.validation_settings import ValidationSettings
 from imod.mf6.write_context import WriteContext
 from imod.schemata import ValidationError
+from imod.typing.grid import concat, nan_like
 
 
 # Duplicate from test_mf6_dis.py
@@ -106,7 +106,7 @@ class TestModel:
         model_name = "Test model"
         model = Modflow6Model()
         # create write context
-        validation_context = ValidationContext()
+        validation_context = ValidationSettings()
         write_context = WriteContext(tmp_path)
 
         discretization_mock = MagicMock(spec_set=Package)
@@ -134,7 +134,7 @@ class TestModel:
         model_name = "Test model"
         model = Modflow6Model()
         # create write context
-        validation_context = ValidationContext()
+        validation_context = ValidationSettings()
         write_context = WriteContext(tmp_path)
 
         template_mock = MagicMock(spec_set=Template)
@@ -157,7 +157,7 @@ class TestModel:
         model_name = "Test model"
         model = Modflow6Model()
         # create write context
-        validation_context = ValidationContext()
+        validation_context = ValidationSettings()
         write_context = WriteContext(tmp_path)
 
         discretization_mock = MagicMock(spec_set=Package)
@@ -186,7 +186,7 @@ class TestModel:
         # Arrange.
         tmp_path = tmpdir_factory.mktemp("TestSimulation")
         model_name = "Test model"
-        validation_context = ValidationContext()
+        validation_context = ValidationSettings()
         write_context = WriteContext(simulation_directory=tmp_path)
 
         model = Modflow6Model()
@@ -334,7 +334,6 @@ class TestGroundwaterFlowModel:
 
 
 def test_purge_empty_package(
-    tmp_path: Path,
     unstructured_flow_model: GroundwaterFlowModel,
 ):
     # test that purging leaves the non-empty packages in place
@@ -363,6 +362,26 @@ def test_purge_empty_package(
     unstructured_flow_model["hfb"] = imod.mf6.HorizontalFlowBarrierResistance(geometry)
     unstructured_flow_model.purge_empty_packages()
     assert original_nr_packages == len(unstructured_flow_model.items())
+
+
+def test_purge_empty_package__ignore_time(
+    unstructured_flow_model: GroundwaterFlowModel,
+):
+    # Arrange
+    rch = unstructured_flow_model["rch"]
+    empty = nan_like(rch.dataset["rate"])
+    transient_rate = concat([empty, rch.dataset["rate"]], dim="time")
+    time_coords = [np.datetime64("2000-01-01"), np.datetime64("2001-01-01")]
+    transient_rate = transient_rate.assign_coords(time=time_coords)
+    rch.dataset["rate"] = transient_rate
+
+    # Act
+    original_nr_packages = len(unstructured_flow_model.items())
+    unstructured_flow_model.purge_empty_packages(ignore_time=False)
+    assert original_nr_packages == len(unstructured_flow_model.items())
+
+    unstructured_flow_model.purge_empty_packages(ignore_time=True)
+    assert (original_nr_packages - 1) == len(unstructured_flow_model.items())
 
 
 def test_deepcopy(
@@ -432,3 +451,38 @@ def test_get_domain_geometry(structured_flow_model: GroundwaterFlowModel):
     assert np.all(np.isin(top.values, [10.0]))
     assert np.all(np.isin(bottom.values, [-1.0, -2.0, -3.0]))
     assert np.all(np.isin(idomain.values, [2]))
+
+
+def test_model_options_validation(
+    structured_flow_model: GroundwaterFlowModel,
+):
+    # Act
+    status = structured_flow_model.validate("modelname")
+    # Assert
+    assert not status.has_errors()
+
+    # Arrange
+    structured_flow_model._options["newton"] = 1
+    # Act
+    status = structured_flow_model.validate("modelname")
+    # Assert
+    assert status.has_errors()
+
+
+def test_model_init_validation(
+    structured_flow_model: GroundwaterFlowModel,
+):
+    # Act
+    structured_flow_model.validate_init_schemata_options(
+        validate=True,
+    )
+    # Arrange
+    structured_flow_model._options["newton"] = 1
+    # Act
+    structured_flow_model.validate_init_schemata_options(
+        validate=False,
+    )
+    with pytest.raises(ValidationError):
+        structured_flow_model.validate_init_schemata_options(
+            validate=True,
+        )

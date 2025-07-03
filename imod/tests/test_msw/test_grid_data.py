@@ -5,7 +5,7 @@ from pathlib import Path
 import numpy as np
 import pytest
 import xarray as xr
-from hypothesis import given, settings
+from hypothesis import HealthCheck, given, settings
 from hypothesis.strategies import floats
 from numpy import nan
 from numpy.testing import assert_almost_equal, assert_equal
@@ -40,7 +40,7 @@ from imod.util.spatial import get_total_grid_area
         GridData._metadata_dict["soil_physical_unit"].max_value,
     ),
 )
-@settings(deadline=400)
+@settings(deadline=400, suppress_health_check=[HealthCheck.too_slow])
 def test_write(
     fixed_format_parser,
     area,

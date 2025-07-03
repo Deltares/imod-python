@@ -139,7 +139,7 @@ gwf_model["dis"] = imod.mf6.StructuredDiscretization(
 gwf_model["chd"] = imod.mf6.ConstantHead(
     constant_head, print_input=True, print_flows=True, save_flows=True
 )
-gwf_model["ic"] = imod.mf6.InitialConditions(head=0.0)
+gwf_model["ic"] = imod.mf6.InitialConditions(start=0.0)
 gwf_model["npf"] = imod.mf6.NodePropertyFlow(
     icelltype=icelltype,
     k=k,
@@ -202,7 +202,7 @@ simulation.write(modeldir)
 # .. note::
 #
 #   The following lines assume the ``mf6`` executable is available on your PATH.
-#   :ref:`The Modflow 6 examples introduction <mf6-introduction>` shortly
+#   :ref:`The MODFLOW 6 examples introduction <mf6-introduction>` shortly
 #   describes how to add it to yours.
 
 simulation.run()

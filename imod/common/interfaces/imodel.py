@@ -3,6 +3,7 @@ from typing import Optional, Tuple
 
 from imod.common.interfaces.idict import IDict
 from imod.common.statusinfo import StatusInfoBase
+from imod.mf6.validation_settings import ValidationSettings
 from imod.typing import GridDataArray
 
 
@@ -16,11 +17,17 @@ class IModel(IDict):
         raise NotImplementedError
 
     @abstractmethod
-    def purge_empty_packages(self, model_name: Optional[str] = "") -> None:
+    def purge_empty_packages(
+        self, model_name: Optional[str] = "", ignore_time: bool = False
+    ) -> None:
         raise NotImplementedError
 
     @abstractmethod
-    def validate(self, model_name: str = "") -> StatusInfoBase:
+    def validate(
+        self,
+        model_name: str = "",
+        validation_context: Optional[ValidationSettings] = None,
+    ) -> StatusInfoBase:
         raise NotImplementedError
 
     @property

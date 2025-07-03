@@ -21,7 +21,7 @@ Prepare model input
     gdal_rasterize
     celltable
     rasterize_celltable
-    
+
     zonal_aggregate_polygons
     zonal_aggregate_raster
 
@@ -55,3 +55,6 @@ Prepare model input
     cleanup_ghb
     cleanup_riv
     cleanup_wel
+    cleanup_wel_layered
+
+    create_partition_labels

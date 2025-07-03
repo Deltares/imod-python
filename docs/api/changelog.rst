@@ -9,11 +9,156 @@ The format is based on `Keep a Changelog`_, and this project adheres to
 [Unreleased]
 ------------
 
+Removed
+~~~~~~~
+
+- Removed ``imod.mf6.WellDisStructured`` and ``imod.mf6.WellDisVertices``. Use
+  :class:`imod.mf6.Well` and :class:`imod.mf6.LayeredWell` instead. The
+  :class:`imod.mf6.Well` package can be used to specify wells with filters,
+  :class:`imod.mf6.LayeredWell` directly to layers.
+- Removed ``imod.mf6.multimodel.partition_generator.get_label_array``, use
+  :func:`imod.prepare.create_partition_labels` instead.
+- Removed ``imod.idf.read`` use :func:`imod.idf.open` instead.
+- Removed ``imod.rasterio.read`` use :func:`imod.rasterio.open` instead.
+- Removed ``head`` argument for :class:`imod.mf6.InitialConditions`, use
+  ``start`` instead.
+- Removed ``cell_averaging`` argument for :class:`imod.mf6.NodePropertyFlow`,
+  use ``alternative_cell_averaging`` instead.
+- Removed ``set_repeat_stress`` method from boundary condition packages like
+  :class:`imod.mf6.River`. Use ``repeat_stress`` argument instead.
+- Removed ``time_discretization`` method from
+  :class:`imod.mf6.Modflow6Simulation` and :class:`imod.wq.SeawatModel`. Use
+  :meth:`imod.mf6.Modflow6Simulation.create_time_discretization` and
+  :meth:`imod.wq.SeawatModel.create_time_discretization` instead.
+- Removed ``imod.util.round_extent``, use :func:`imod.prepare.round_extent`
+  instead.
+- Removed :class:`imod.prepare.Regridder`. Use the `xugrid regridder
+  <https://deltares.github.io/xugrid/examples/regridder_overview.html>`_ instead.
+
+
+[1.0.0rc4] - 2025-06-20
+-----------------------
+
+Added
+~~~~~
+
+- Added ``weights`` argument to :func:`imod.prepare.create_partition_labels` to
+  weigh how the simulation should be partioned. Areas with higher weights will
+  result in smaller partions.
+- iMOD Python version is now written in a comment line to MODFLOW6 and
+  MetaSWAP's ``para_sim.inp`` files. This is useful for debugging purposes.
+- Added option ``ignore_time_purge_empty`` to
+  :class:`imod.mf6.Modflow6Simulation.split` to consider a package empty if its
+  first times step is all nodata. This can save a lot of time splitting
+  transient models.
+- Add :class:`imod.mf6.ValidationSettings` to specify validation settings for
+  MODFLOW 6 simulations. You can provide it to the
+  :class:`imod.mf6.Modflow6Simulation` constructor.
+
+Fixed
+~~~~~
+
+- Upon providing an unexpected coordinate in the mask or regridding grid,
+  :meth:`imod.mf6.Modflow6Simulation.regrid_like` and
+  :meth:`imod.mf6.Modflow6Simulation.mask` now present the unexpected
+  coordinates in the error message.
+- :class:`imod.mf6.VerticesDiscretization` now correctly sets the ``xorigins``
+  and ``yorigins`` options in the ``.disv`` file. Incorrect origins cause issues
+  when splitting models and computing with XT3D on the exchanges.
+- :func:`imod.mf6.open_cbc` and :func:`imod.mf6.open_head` now account for
+  xorigins and yorigins for models ran with
+  :class:`imod.mf6.VerticesDiscretization`. **WARNING**: Given that these were
+  set incorrectly in previous versions of iMOD Python (see previous item in this
+  list), this means that reading MODFLOW6 DISV output of models generated with a
+  previous version of iMOD Python will result in a grid with an erroneous
+  offset. You can work around this by creating the model again with this
+  version of iMOD Python or newer.
+- :meth:`imod.mf6.Modflow6Simulation.split` supports label array with a
+  different name than ``"idomain"``.
+- :func:`imod.msw.MetaSwapModel.from_imod5_data` now supports the usage of
+  relative paths for the extra files block.
+- Bug in :meth:`imod.msw.Sprinkling.write` where MetaSWAP svats with surface
+  water sprinkling and no groundwater sprinkling activated were not written to
+  ``scap_svat.inp``.
+- :class:`imod.msw.IdfMapping` swapped order of y_grid and x_grid in dictionary
+  for writing the correct order of coordinates in idf_svat.inp.
+- Improved performance of :meth:`imod.mf6.Modflow6Simulation.split` and
+  :meth:`imod.mf6.Modflow6Simulation.mask` when using dask.
+- Fixed bug in :meth:`imod.mf6.Modflow6Simulation.mask` for unstructured grids
+  with a spatial dimension that differs from the default ``"mesh2d_nFaces"``.
+- Fixed bug in :meth:`imod.mf6.Well.cleanup` and
+  :meth:`imod.mf6.LayeredWell.cleanup` which caused an error when called with an
+  unstructured discretization.
+- Fixed bug in :func:`imod.formats.prj.open_projectfile_data` which caused an
+  error when a periods keyword was used having an upper case.
+- Poor performance of :meth:`imod.mf6.Well.from_imod5_data` and
+  :meth:`imod.mf6.LayeredWell.from_imod5_data` when the ``imod5_data`` contained
+  a well system with a large number of wells (>10k).
+- :meth:`imod.mf6.River.from_imod5_data`,
+  :meth:`imod.mf6.Drainage.from_imod5_data`,
+  :meth:`imod.mf6.GeneralHeadBoundary.from_imod5_data` can now deal with
+  constant values for variables. One variable per package still needs to be a
+  grid.
+- Fix bug where an error was thrown in ``get_non_grid_data`` when calling the
+  ``.cleanup`` and ``regrid_like`` methods on a boundary condition package with
+  a repeated stress. For example, :meth:`imod.mf6.River.cleanup` or
+  :meth:`imod.mf6.River.regrid_like`.
+- Fix bug where an error was thrown in :class:`imod.mf6.Well` when an entry had
+  to be filtered and its ``id`` didn't match the index.
+- Improved performance of :class:`imod.mf6.Modflow6Simulation.split` for
+  structured models, as unnecessary masking is avoided.
+- Fixed warning thrown by type dispatcher about ``~GeoDataFrameType``
+- Fixed bug where variables in a package with only a ``"layer"`` coordinate
+  could not be regridded or masked.
+
+Changed
+~~~~~~~
+
+- :meth:`imod.wq.SeawatModel.write` now throws an error if trying to write in a
+  directory with a space in the path. (iMOD-WQ does not support this.)
+- `imod.mf6.multimodel.partition_generator.get_label_array` moved to
+  :func:`imod.prepare.create_partition_labels`.
+- :func:`imod.prepare.create_partition_labels` structured grids are now
+  partioned by METIS instead (just like already was the case for unstructured
+  grids). This results in more balanced partitions for grids with non-square
+  domains or lots of inactive cells. Downside is that the partitions are more
+  often than not perfectly rectangular in shape.
+- :func:`imod.prepare.create_partition_labels` now returns a griddata with the
+  name ``"label"`` instead of ``"idomain"``.
+- Upon providing the wrong type to one of the options of
+  :class:`imod.mf6.GroundwaterFlowModel`,
+  :class:`imod.mf6.GroundwaterTransportModel`, this will throw a
+  ``ValidationError`` upon initialization and writing.
+- You can now also provide ``repeat_stress`` as dictionary to imod.mf6
+  boundary conditions, such as :class:`imod.mf6.River`, :class:`imod.mf6.Drainage`, and
+  :class:`imod.mf6.GeneralHeadBoundary`.
+- :meth:`imod.mf6.ConstantHead.from_imod5_data`,
+  :meth:`imod.mf6.GeneralHeadBoundary.from_imod5_data`,
+  :meth:`imod.mf6.River.from_imod5_data`,
+  :meth:`imod.mf6.Recharge.from_imod5_data`, and
+  :meth:`imod.mf6.Drainage.from_imod5_data` now forward fill data over time,
+  instead of clipping, when selecting a start time that is inbetween two data
+  records.
+- :meth:`imod.mf6.ConstantHead.from_imod5_data` and
+  :meth:`imod.mf6.Recharge.from_imod5_data` got extra arguments for
+  ``period_data``, ``time_min`` and ``time_max``.
+- :func:`imod.prepare.read_imod_legend` now also returns the labels as an extra
+  argument. Update your code by changing 
+  ``colors, levels = read_imod_legend(...)`` to 
+  ``colors, levels, labels = read_imod_legend(...)``.
+
+
+[1.0.0rc3] - 2025-04-17
+-----------------------
+
 Added
 ~~~~~
 
 - :meth:`imod.msw.MetaSwapModel.clip_box` to clip MetaSWAP models.
 - Methods of class :class:`imod.mf6.Modflow6Simulation` can now be logged.
+- :func:`imod.prepare.cleanup.cleanup_layered_wel` to clean up wells assigned
+  to layers.
+
 
 Fixed
 ~~~~~
@@ -23,6 +168,13 @@ Fixed
   :meth:`imod.mf6.GeneralHeadBoundary.clip_box` threw an error when
   ``time_start`` or ``time_end`` were set to ``None`` and a ``"repeat_stress"``
   was included in the dataset.
+- Fixed bug where :meth:`imod.mf6.package.copy` threw an error.
+- Sorting issue in :func:`imod.prepare.assign_wells`. This could cause
+  :class:`imod.mf6.Well` to assign wells to the wrong cells.
+- Fixed crash upon calling :meth:`imod.mf6.Well.clip_box` when the top/bottom
+  arguments are specified. This could cause :class:`imod.mf6.Well` to crash
+  when wells are located outside the extent of the layer model.
+
 
 [1.0.0rc2] - 2025-03-05
 -----------------------
@@ -41,7 +193,7 @@ values than before.
 Removed
 ~~~~~~~
 - ``imod.flow`` module has been removed for generating iMODFLOW models. Use
-  ``imod.mf6`` instead to generate MODFLOW6 models.
+  ``imod.mf6`` instead to generate MODFLOW 6 models.
 
 Added
 ~~~~~
@@ -69,7 +221,7 @@ Changed
   zero layer numbers to grid coordinates.
 - In :class:`imod.mf6.StructuredDiscretization`, IDOMAIN can now respectively be
   > 0 to indicate an active cell and <0 to indicate a vertical passthrough cell,
-  consistent with MODFLOW6. Previously this could only be indicated with 1 and
+  consistent with MODFLOW 6. Previously this could only be indicated with 1 and
   -1.
 - :meth:`imod.mf6.Well.from_imod5_data` and
   :meth:`imod.mf6.LayeredWell.from_imod5_data` now also accept the argument
@@ -82,8 +234,8 @@ Changed
 - :class:`imod.mf6.Well`, :class:`imod.mf6.LayeredWell`,
   :func:`imod.prepare.wells.assign_wells`, :meth:`imod.mf6.Well.from_imod5_data`
   and :meth:`imod.mf6.LayeredWell.from_imod5_data` now have default values for
-  ``minimum_thickness`` and ``minimum_k`` set to 0.0. 
-- When intitating a MODFLOW6 package with a ``layer`` coordinate with 
+  ``minimum_thickness`` and ``minimum_k`` set to 0.0.
+- When intitating a MODFLOW 6 package with a ``layer`` coordinate with
   values <= 0, iMOD Python will throw an error.
 - :class:`imod.mf6.HorizontalFlowBarrierResistance`,
   :class:`imod.mf6.HorizontalFlowBarrierSingleLayerResistance` and other HFB now
@@ -103,7 +255,7 @@ Changed
 Fixed
 ~~~~~
 
-- :meth:`imod.mf6.Model.mask_all_packages` now preserves the ``dx`` and 
+- :meth:`imod.mf6.Model.mask_all_packages` now preserves the ``dx`` and
   ``dy`` coordinates
 - :meth:`imod.mf6.Well.from_imod5_data` and
   :meth:`imod.mf6.LayeredWell.from_imod5_data` ignore well rates preceding first
@@ -125,7 +277,7 @@ Fixed
   raised in case the ``"cap"`` package was present in the ``imod5_data``.
 - Bug where :meth:`imod.mf6.LayeredWell.from_imod5_cap_data` and
   :meth:`imod.mf6.Recharge.from_imod5_cap_data` threw an error if the ``"cap"``
-  in the ``imod5_data`` had a ``"layer"`` dimension and coordinate. 
+  in the ``imod5_data`` had a ``"layer"`` dimension and coordinate.
 - :meth:`imod.mf6.LayeredWell.from_imod5_cap_data` will convert the
   ``max_abstraction_groundwater`` and ``max_abstraction_surfacewater`` capacity
   from mm/d to m3/d.
@@ -173,7 +325,7 @@ Added
   :class:`imod.mf6.LayeredWell` package from iMOD5 data in the CAP package (for
   MetaSWAP). Currently only griddata (IDF) is supported.
 - :meth:`imod.mf6.Recharge.from_imod5_cap_data` to construct a recharge package
-  for coupling a MODFLOW6 model to MetaSWAP.
+  for coupling a MODFLOW 6 model to MetaSWAP.
 - :meth:`imod.msw.MetaSwapModel.from_imod5_data` to construct a MetaSWAP model
   from data in an iMOD5 projectfile.
 - :meth:`imod.msw.MetaSwapModel.write` has a ``validate`` argument, which can be
@@ -232,7 +384,7 @@ Changed
   We plan to remove this object in the final 1.0 release. `Use the xugrid
   regridder to regrid individual grids instead.
   <https://deltares.github.io/xugrid/examples/regridder_overview.html>`_ To
-  regrid entire MODFLOW6 packages or simulations, `see the user guide here.
+  regrid entire MODFLOW 6 packages or simulations, `see the user guide here.
   <https://deltares.github.io/imod-python/user-guide/08-regridding.html>`_.
 
 [0.18.1] - 2024-11-20
@@ -261,8 +413,8 @@ Changed
 - In :meth:`imod.mf6.Modflow6Simulation.from_imod5_data`, and
   :meth:`imod.mf6.GroundwaterFlowModel.from_imod5_data` the arguments
   ``allocation_options``, ``distributing_options`` are now optional.
-- The order of arguments of :meth:`imod.mf6.Modflow6Simulation.from_imod5_data`, 
-  and :meth:`imod.mf6.GroundwaterFlowModel.from_imod5_data`. It now is 
+- The order of arguments of :meth:`imod.mf6.Modflow6Simulation.from_imod5_data`,
+  and :meth:`imod.mf6.GroundwaterFlowModel.from_imod5_data`. It now is
   ``imod5_data, period_data, times, allocation_options, distributing_options, regridder_types``
   instead of:
   ``imod5_data, period_data, allocation_options, distributing_options, times, regridder_types``
@@ -281,9 +433,9 @@ Fixed
   would be snapped to the same cell edge. These are now summed.
 - Improve performance validation upon Package initialization
 - Improve performance writing ``HorizontalFlowBarrier`` objects
-- `imod.mf6.open_cbc` failing with ``flowja=False`` on budget output for
+- :func:`imod.mf6.open_cbc` failing with ``flowja=False`` on budget output for
   DISV models if the model contained inactive cells.
-- `imod.mf6.open_cbc` now works for 2D and 1D models. 
+- :func:`imod.mf6.open_cbc` now works for 2D and 1D models.
 - :func:`imod.prepare.fill` previously assigned to the result of an xarray
   ``.sel`` operation. This might not work for dask backed data and has been
   addressed.
@@ -333,7 +485,7 @@ Changed
 - :func:`imod.prepare.fill` now takes a ``dims`` argument instead of ``by``,
   and will fill over N dimensions. Secondly, the function no longer takes
   an ``invalid`` argument, but instead always treats NaNs as missing.
-- Reverted the need for providing WriteContext objects to MODFLOW6 Model and
+- Reverted the need for providing WriteContext objects to MODFLOW 6 Model and
   Package objects' ``write`` method. These now use similar arguments to the
   :meth:`imod.mf6.Modflow6Simulation.write` method.
 - :class:`imod.msw.CouplingMapping`, :class:`imod.msw.Sprinkling`,
@@ -344,7 +496,7 @@ Changed
   objects.
 - :class:`imod.msw.CouplingMapping` and :class:`imod.msw.Sprinkling` now take
   the :class:`imod.mf6.mf6_wel_adapter.Mf6Wel` as well argument instead of the
-  deprecated :class:`imod.mf6.WellDisStructured`.
+  deprecated ``imod.mf6.WellDisStructured``.
 
 
 Added
@@ -377,7 +529,7 @@ Added
   definitely will fail.
 - :meth:`imod.msw.MetaSwapModel.regrid_like` to regrid MetaSWAP models.
 - :meth:`imod.mf6.GroundwaterFlowModel.prepare_wel_for_mf6` to prepare wells for
-  MODFLOW6, for debugging purposes.
+  MODFLOW 6, for debugging purposes.
 
 Removed
 ~~~~~~~
@@ -418,7 +570,7 @@ Added
 Changed
 ~~~~~~~
 - Instead of providing a dictionary with settings to ``Package.regrid_like``,
-  provide one of the following ``RegridMethod`` objects: 
+  provide one of the following ``RegridMethod`` objects:
   :class:`imod.mf6.regrid.ConstantHeadRegridMethod`,
   :class:`imod.mf6.regrid.DiscretizationRegridMethod`,
   :class:`imod.mf6.regrid.DispersionRegridMethod`,
@@ -500,7 +652,7 @@ Fixed
 ~~~~~
 - No ``ValidationError`` thrown anymore in :class:`imod.mf6.River` when
   ``bottom_elevation`` equals ``bottom`` in the model discretization.
-- When wells outside of the domain are added, an exception is raised with an 
+- When wells outside of the domain are added, an exception is raised with an
   error message stating a well is outside of the domain.
 - When importing data from a .prj file, the multipliers and additions specified for
   ipf and idf files are now applied
@@ -514,13 +666,13 @@ Changed
 - Removed constructor arguments `source` and `target` from
   ``imod.mf6.utilities.regrid.RegridderWeightsCache``, as they were not
   used.
-- :func:`imod.mf6.open_cbc` now returns arrays which contain np.nan for cells where 
-  budget variables are not defined. Based on new budget output a disquisition between 
+- :func:`imod.mf6.open_cbc` now returns arrays which contain np.nan for cells where
+  budget variables are not defined. Based on new budget output a disquisition between
   active cells but zero flow and inactive cells can be made.
-- :func:`imod.mf6.open_cbc` now returns package type in return budget names. New format 
-  is "package type"-"optional package variable"_"package name". E.g. a River package 
-  named ``primary-sys`` will get a budget name ``riv_primary-sys``. An UZF package 
-  with name ``uzf-sys1`` will get a budget name ``uzf-gwrch_uzf-sys1`` for the 
+- :func:`imod.mf6.open_cbc` now returns package type in return budget names. New format
+  is "package type"-"optional package variable"_"package name". E.g. a River package
+  named ``primary-sys`` will get a budget name ``riv_primary-sys``. An UZF package
+  with name ``uzf-sys1`` will get a budget name ``uzf-gwrch_uzf-sys1`` for the
   groundwater recharge budget from the UZF-CBC.
 
 
@@ -555,7 +707,7 @@ Added
 - added :func:`imod.data.hondsrug_simulation` and
   :func:`imod.data.hondsrug_crosssection` data.
 - simulations and models that include a lake package now raise an exception on
-  clipping, partitioning or regridding. 
+  clipping, partitioning or regridding.
 
 Changed
 ~~~~~~~
@@ -623,8 +775,8 @@ Fixed
   structured grids
 - Packages and boundary conditions in the ``imod.mf6`` module will now throw an
   error upon initialization if coordinate labels are inconsistent amongst
-  variables 
-- Improved performance for merging structured multimodel Modflow 6 output
+  variables
+- Improved performance for merging structured multimodel MODFLOW 6 output
 - Bug where :func:`imod.formats.idf.open_subdomains` did not properly support custom
   patterns
 - Added missing validation for ``concentration`` for :class:`imod.mf6.Drainage` and
@@ -689,7 +841,7 @@ Added
   This converts the ``"time"`` coordinate to datetimes.
 - added :meth:`imod.mf6.Modflow6Simulation.mask_all_models` to apply a mask to
   all models under a simulation, provided the simulation is not split and the
-  models use the same discretization. 
+  models use the same discretization.
 
 
 Changed
@@ -731,7 +883,7 @@ Changed
   imod-environment-dev.yml file (containing additional packages for developers).
 - Changed the way :class:`imod.mf6.Modflow6Simulation`,
   :class:`imod.mf6.GroundwaterFlowModel`,
-  :class:`imod.mf6.GroundwaterTransportModel`, and Modflow 6 packages are
+  :class:`imod.mf6.GroundwaterTransportModel`, and MODFLOW 6 packages are
   represented while printing.
 - The grid-agnostic packages :meth:`imod.mf6.Well.regrid_like` and
   :meth:`imod.mf6.HorizontalFlowBarrier.regrid_like` now return a clip with the
@@ -761,7 +913,7 @@ Added
   belongs. The method will then create the submodels and split the nested
   packages. The split method will create the gwfgwf exchanges required to
   connect the submodels. At the moment auxiliary variables ``cdist`` and
-  ``angldegx`` are only computed for structured grids. 
+  ``angldegx`` are only computed for structured grids.
 - The label array can be generated through a convenience function
   :func:`imod.mf6.partition_generator.get_label_array`
 - Once a split simulation has been executed by MF6, we find head and balance
@@ -772,7 +924,7 @@ Added
   :meth:`imod.mf6.Modflow6Simulation.open_transport_budget`,
   :meth:`imod.mf6.Modflow6Simulation.open_flow_budget`.
   In the case of balances, the exchanges through the partition boundary are not
-  yet added to this merged balance. 
+  yet added to this merged balance.
 - Settings such as ``save_flows`` can be passed through
   :meth:`imod.mf6.SourceSinkMixing.from_flow_model`
 - Added :class:`imod.mf6.LayeredHorizontalFlowBarrierHydraulicCharacteristic`,
@@ -796,14 +948,14 @@ Removed
 Changed
 ~~~~~~~
 
-- TWRI Modflow 6 example uses the grid-agnostic :class:`imod.mf6.Well`
-  package instead of the :class:`imod.mf6.WellDisStructured` package.
+- TWRI MODFLOW 6 example uses the grid-agnostic :class:`imod.mf6.Well`
+  package instead of the ``imod.mf6.WellDisStructured`` package.
 
 Fixed
 ~~~~~
 
 - :class:`imod.mf6.HorizontalFlowBarrier` would write to a binary file by
-  default. However, the current version of Modflow 6 does not support this.
+  default. However, the current version of MODFLOW 6 does not support this.
   Therefore, this class now always writes to text file.
 
 
@@ -863,7 +1015,7 @@ Fixed
 - :class:`imod.mf6.EvapoTranspiration` now supports segments, by adding a
   ``segment`` dimension to the ``proportion_depth`` and ``proportion_rate``
   variables.
-- :class:`imod.mf6.EvapoTranspiration` template for ``.evt`` file now properly 
+- :class:`imod.mf6.EvapoTranspiration` template for ``.evt`` file now properly
   formats ``nseg`` option.
 - Fixed bug in :class:`imod.wq.Well` preventing saving wells without a time
   dimension, but with a layer dimension.
@@ -873,7 +1025,7 @@ Fixed
 Added
 ~~~~~
 
-- :func:`imod.select.grid.active_grid_boundary_xy` & 
+- :func:`imod.select.grid.active_grid_boundary_xy` &
   :func:`imod.select.grid.grid_boundary_xy` are added to find grid boundaries.
 
 [0.13.1] - 2023-05-05
@@ -882,7 +1034,7 @@ Added
 Added
 ~~~~~
 
-- :class:`imod.mf6.SpecificStorage` and :class:`imod.mf6.StorageCoefficient` 
+- :class:`imod.mf6.SpecificStorage` and :class:`imod.mf6.StorageCoefficient`
   now have a ``save_flow`` argument.
 
 Fixed
@@ -899,13 +1051,13 @@ Added
 
 - :class:`imod.mf6.OutputControl` now takes parameters ``head_file``,
   ``concentration_file``, and ``budget_file`` to specify where to store
-  MODFLOW6 output files.
+  MODFLOW 6 output files.
 - :func:`imod.util.spatial.from_mdal_compliant_ugrid2d` to "restack" the variables that
   have have been "unstacked" in :func:`imod.util.spatial.mdal_compliant_ugrid2d`.
 - Added support for the Modflow6 Lake package
 - :func:`imod.select.points_in_bounds`, :func:`imod.select.points_indices`,
   :func:`imod.select.points_values` now support unstructured grids.
-- Added support for the Modflow 6 Lake package: :class:`imod.mf6.Lake`,
+- Added support for the MODFLOW 6 Lake package: :class:`imod.mf6.Lake`,
   :class:`imod.mf6.LakeData`, :class:`imod.mf6.OutletManning`, :class:`OutletSpecified`,
   :class:`OutletWeir`. See the examples for an application of the Lake package.
 - :meth:`imod.mf6.simulation.Modflow6Simulation.dump` now supports dumping to MDAL compliant
@@ -918,7 +1070,7 @@ Fixed
   dimension order again. This confusingly resulted in an error when writing the
   :class:`imod.wq.btn.BasicTransport` package.
 - Fixed bug in :class:`imod.mf6.dis.StructuredDiscretization` and
-  :class:`imod.mf6.dis.VerticesDiscretization` where 
+  :class:`imod.mf6.dis.VerticesDiscretization` where
   ``inactive bottom above active cell`` was incorrectly raised.
 
 [0.12.0] - 2023-03-17
@@ -966,7 +1118,7 @@ Added
 
 - Added an extra optional argument in
   :meth:`imod.couplers.metamod.MetaMod.write` named ``modflow6_write_kwargs``,
-  which can be used to provide keyword arguments to the writing of the Modflow 6
+  which can be used to provide keyword arguments to the writing of the MODFLOW 6
   Simulation.
 
 Fixed
@@ -982,7 +1134,7 @@ Fixed
 ~~~~~
 
 - :meth:`imod.mf6.Modflow6Simulation.write` with ``binary=False`` no longer
-  results in invalid MODFLOW6 input for 2D grid data, such as DIS top.
+  results in invalid MODFLOW 6 input for 2D grid data, such as DIS top.
 - ``imod.flow.ImodflowModel.write`` no longer writes incorrect project
   files for non-grid values with a time and layer dimension.
 - :func:`imod.evaluate.interpolate_value_boundaries`: Fix edge case when
@@ -1018,7 +1170,7 @@ Fixed
   arrays with a single layer coordinate.
 - Hotfixes for :meth:`imod.wq.model.SeawatModel.clip`, until `this merge request
   <https://gitlab.com/deltares/imod/imod-python/-/merge_requests/111>`_ is
-  fulfilled. 
+  fulfilled.
 - ``imod.flow.ImodflowModel.write`` will set the timestring in the
   projectfile to ``steady-state`` for ``BoundaryConditions`` without a time
   dimension.
@@ -1031,7 +1183,7 @@ Fixed
 - :meth:`imod.prepare.LayerRegridder.regrid` will now correctly skip values
   if ``top_source`` or ``bottom_source`` are NaN.
 - :func:`imod.gen.write` no longer errors on dataframes with empty columns.
-- :func:`imod.mf6.BoundaryCondition.set_repeat_stress` reinstated. This is  
+- ``imod.mf6.BoundaryCondition.set_repeat_stress`` reinstated. This is
   a temporary measure, it gives a deprecation warning.
 
 Changed
@@ -1061,7 +1213,7 @@ Changed
   which models should be solved in a single numerical solution. This is
   required to simulate groundwater flow and transport as they should be
   in separate solutions.
-- When writing MODFLOW6 input option blocks, a NaN value is now recognized as
+- When writing MODFLOW 6 input option blocks, a NaN value is now recognized as
   an alternative to None (and the entry will not be included in the options
   block).
 
@@ -1134,7 +1286,7 @@ Added
 -  :meth:`imod.wq.SeawatModel.to_netcdf` has been added to write all model
    packages to netCDF files.
 -  :func:`imod.mf6.open_cbc` has been added to read the budget data of
-   structured (DIS) MODFLOW6 models. The data is read lazily into xarray
+   structured (DIS) MODFLOW 6 models. The data is read lazily into xarray
    DataArrays per timestep.
 -  :func:`imod.visualize.streamfunction` and :func:`imod.visualize.quiver`
    were added to plot a 2D representation of the groundwater flow field using
@@ -1160,14 +1312,14 @@ Added
 -  Added ``imod.flow.ImodflowModel`` to write to model iMODFLOW project
    file.
 -  :meth:`imod.mf6.Modflow6Simulation.write` now has a ``binary`` keyword. When set
-   to ``False``, all MODFLOW6 input is written to text rather than binary files.
--  Added :class:`imod.mf6.DiscretizationVertices` to write MODFLOW6 DISV model
+   to ``False``, all MODFLOW 6 input is written to text rather than binary files.
+-  Added :class:`imod.mf6.DiscretizationVertices` to write MODFLOW 6 DISV model
    input.
 -  Packages for :class:`imod.mf6.GroundwaterFlowModel` will now accept
    :class:`xugrid.UgridDataArray` objects for (DISV) unstructured grids, next to
    :class:`xarray.DataArray` objects for structured (DIS) grids.
--  Transient wells are now supported in :class:`imod.mf6.WellDisStructured` and
-   :class:`imod.mf6.WellDisVertices`.
+-  Transient wells are now supported in ``imod.mf6.WellDisStructured`` and
+   ``imod.mf6.WellDisVertices``.
 -  :func:`imod.util.to_ugrid2d` has been added to convert a (structured) xarray
    DataArray or Dataset to a quadrilateral UGRID dataset.
 -  Functions created to create empty DataArrays with greater ease:
@@ -1178,7 +1330,7 @@ Added
 -  :meth:`imod.mf6.Modflow6Simulation.run` has been added to more easily run a model,
    especially in examples and tests.
 -  :func:`imod.mf6.open_cbc` and :func:`imod.mf6.open_hds` will automatically
-   return a ``xugrid.UgridDataArray`` for MODFLOW6 DISV model output.
+   return a ``xugrid.UgridDataArray`` for MODFLOW 6 DISV model output.
 
 Changed
 ~~~~~~~
@@ -1189,7 +1341,7 @@ Changed
 -  Datetime columns in IPF associated files (via
    :func:`imod.ipf.write_assoc`) will not be placed within quotes, as this can
    break certain iMOD batch functions.
--  :class:`imod.mf6.Well` has been renamed into :class:`imod.mf6.WellDisStructured`.
+-  :class:`imod.mf6.Well` has been renamed into ``imod.mf6.WellDisStructured``.
 -  :meth:`imod.mf6.GroundwaterFlowModel.write` will now write package names
    into the simulation namefile.
 -  :func:`imod.mf6.open_cbc` will now return a dictionary with keys
@@ -1199,7 +1351,7 @@ Changed
    packages now contain an internal (xarray) Dataset, rather than inheriting
    from the xarray Dataset.
 -  :class:`imod.mf6.SpecificStorage` or :class:`imod.mf6.StorageCoefficient` is
-   now mandatory for every MODFLOW6 model to avoid accidental steady-state
+   now mandatory for every MODFLOW 6 model to avoid accidental steady-state
    configuration.
 
 Removed
@@ -1329,14 +1481,14 @@ Added
 -  64-bit IDF files can be opened :meth:`imod.idf.open`
 -  64-bit IDF files can be written using :meth:`imod.idf.save` and (:meth:`imod.idf.write`) using keyword ``dtype=np.float64``
 -  ``sel`` and ``isel`` methods to ``SeawatModel`` to support taking out a subdomain
--  Docstrings for the Modflow 6 classes in :mod:`imod.mf6`
+-  Docstrings for the MODFLOW 6 classes in :mod:`imod.mf6`
 -  :meth:`imod.select.upper_active_layer` function to get the upper active layer from ibound ``xr.DataArray``
 
 Changed
 ~~~~~~~
 
--  :func:`imod.idf.read` is deprecated, use :mod:`imod.idf.open` instead
--  :func:`imod.rasterio.read` is deprecated, use :mod:`imod.rasterio.open` instead
+-  ``imod.idf.read`` is deprecated, use :func:`imod.idf.open` instead
+-  ``imod.rasterio.read`` is deprecated, use :func:`imod.rasterio.open` instead
 
 Fixed
 ~~~~~
@@ -1349,7 +1501,7 @@ Fixed
 Added
 ~~~~~
 -  Laplace grid interpolation :meth:`imod.prepare.laplace_interpolate`
--  Experimental Modflow 6 structured model write support :mod:`imod.mf6`
+-  Experimental MODFLOW 6 structured model write support :mod:`imod.mf6`
 -  More supported visualizations :mod:`imod.visualize`
 -  More extensive reading and writing of GDAL raster in :mod:`imod.rasterio`
 

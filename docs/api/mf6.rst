@@ -1,7 +1,7 @@
 .. currentmodule:: imod.mf6
 
-MODFLOW6
-========
+MODFLOW 6
+=========
 
 Read Output
 -----------
@@ -68,6 +68,7 @@ Model settings
     SolutionPresetSimple
     SolutionPresetModerate
     SolutionPresetComplex
+    ValidationSettings
 
 Flow Packages
 -------------
@@ -162,8 +163,7 @@ Flow Packages
     Well.regrid_like
     Well.to_mf6_pkg
     Well.clip_box
-    WellDisStructured
-    WellDisVertices
+
 
 Transport Packages
 ------------------

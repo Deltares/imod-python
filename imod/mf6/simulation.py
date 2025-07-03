@@ -3,7 +3,6 @@ from __future__ import annotations
 import collections
 import pathlib
 import subprocess
-import warnings
 from copy import deepcopy
 from datetime import datetime
 from pathlib import Path
@@ -27,7 +26,12 @@ from imod.common.statusinfo import NestedStatusInfo
 from imod.common.utilities.mask import _mask_all_models
 from imod.common.utilities.regrid import _regrid_like
 from imod.common.utilities.regrid_method_type import RegridMethodType
-from imod.logging import LogLevel, logger, standard_log_decorator
+from imod.common.utilities.version import (
+    get_version,
+    log_versions,
+    prepend_content_with_version_info,
+)
+from imod.logging import standard_log_decorator
 from imod.mf6.gwfgwf import GWFGWF
 from imod.mf6.gwfgwt import GWFGWT
 from imod.mf6.gwtgwt import GWTGWT
@@ -43,7 +47,7 @@ from imod.mf6.multimodel.modelsplitter import create_partition_info, slice_model
 from imod.mf6.out import open_cbc, open_conc, open_hds
 from imod.mf6.package import Package
 from imod.mf6.ssm import SourceSinkMixing
-from imod.mf6.validation_context import ValidationContext
+from imod.mf6.validation_settings import ValidationSettings
 from imod.mf6.write_context import WriteContext
 from imod.prepare.topsystem.default_allocation_methods import (
     SimulationAllocationOptions,
@@ -87,34 +91,60 @@ def get_packages(simulation: Modflow6Simulation) -> dict[str, Package]:
     }
 
 
-def log_versions(version_saved: Optional[dict[str, str]]) -> None:
-    logger.log(
-        LogLevel.INFO, f"iMOD Python version in current environment: {imod.__version__}"
-    )
-    if version_saved:
-        version_msg = (
-            f"iMOD Python version in dumped simulation: {version_saved['imod-python']}"
-        )
-    else:
-        version_msg = "No iMOD Python version information found in dumped simulation."
-    logger.log(
-        LogLevel.INFO,
-        version_msg,
-    )
-
-
 class Modflow6Simulation(collections.UserDict, ISimulation):
+    """
+    Modflow6Simulation is a class that represents a Modflow 6 simulation. It
+    contains data on simulation timing, models that are present in the
+    simulation, how models exchange information, and how models are solved.
+    More information can be found here:
+    https://water.usgs.gov/water-resources/software/MODFLOW-6/mf6io_6.4.2.pdf#page=20
+
+    Parameters
+    ----------
+    name: str
+        Name of the simulation. This is used to create the simulation name file
+        and the directory in which the simulation is written.
+    validation_settings: ValidationSettings, optional
+        Settings for validation of the simulation. If not provided, default
+        settings are used. These settings can be used to control whether the
+        simulation is validated at write time, and whether strict validation
+        rules are applied.
+
+    Examples
+    --------
+    Create a Modflow 6 simulation and add a groundwater flow model to it:
+
+    >>> import imod
+    >>> simulation = imod.mf6.Modflow6Simulation("example_simulation")
+    >>> simulation["GWF"] = imod.mf6.GroundwaterFlowModel()
+
+    You can configure the validation settings for the simulation as follows:
+
+    >>> validation_settings = imod.mf6.ValidationSettings(ignore_time=True)
+    >>> simulation = imod.mf6.Modflow6Simulation("example_simulation", validation_settings)
+
+    See :class:`imod.mf6.ValidationSettings` for information on how to configure
+    validation settings. Configuring :class:`imod.mf6.ValidationSettings` can
+    help performance or reduce the strictness of validation for some packages,
+    namely the Well and HFB packages.
+    """
+
     def _initialize_template(self):
         loader = jinja2.PackageLoader("imod", "templates/mf6")
         env = jinja2.Environment(loader=loader, keep_trailing_newline=True)
         self._template = env.get_template("sim-nam.j2")
 
-    def __init__(self, name):
+    def __init__(
+        self, name: str, validation_settings: Optional[ValidationSettings] = None
+    ):
         super().__init__()
         self.name = name
         self.directory = None
         self._initialize_template()
-        self._validation_context = ValidationContext()
+        if validation_settings is None:
+            self._validation_context = ValidationSettings()
+        else:
+            self._validation_context = validation_settings
 
     def __setitem__(self, key, value):
         super().__setitem__(key, value)
@@ -122,14 +152,6 @@ class Modflow6Simulation(collections.UserDict, ISimulation):
     def update(self, *args, **kwargs):
         for k, v in dict(*args, **kwargs).items():
             self[k] = v
-
-    def time_discretization(self, times):
-        warnings.warn(
-            f"{self.__class__.__name__}.time_discretization() is deprecated. "
-            f"In the future call {self.__class__.__name__}.create_time_discretization().",
-            DeprecationWarning,
-        )
-        self.create_time_discretization(additional_times=times)
 
     @standard_log_decorator()
     def create_time_discretization(self, additional_times, validate: bool = True):
@@ -198,7 +220,7 @@ class Modflow6Simulation(collections.UserDict, ISimulation):
         # np.unique also sorts
         times = np.unique(np.hstack(times))
 
-        duration = imod.util.time.timestep_duration(times, self.use_cftime)  # type: ignore
+        duration = imod.util.time.timestep_duration(times, self.use_cftime)
         # Generate time discretization, just rely on default arguments
         # Probably won't be used that much anyway?
         timestep_duration = xr.DataArray(
@@ -291,6 +313,7 @@ class Modflow6Simulation(collections.UserDict, ISimulation):
 
         # Write simulation namefile
         mfsim_content = self.render(write_context)
+        mfsim_content = prepend_content_with_version_info(mfsim_content)
         mfsim_path = directory / "mfsim.nam"
         with open(mfsim_path, "w") as f:
             f.write(mfsim_content)
@@ -893,7 +916,8 @@ class Modflow6Simulation(collections.UserDict, ISimulation):
 
         toml_content: DefaultDict[str, dict] = collections.defaultdict(dict)
         # Dump version number
-        toml_content["version"] = {"imod-python": imod.__version__}
+        version = get_version()
+        toml_content["version"] = {"imod-python": version}
         # Dump models and exchanges
         for key, value in self.items():
             cls_name = type(value).__name__
@@ -1075,15 +1099,32 @@ class Modflow6Simulation(collections.UserDict, ISimulation):
         return clipped
 
     @standard_log_decorator()
-    def split(self, submodel_labels: GridDataArray) -> Modflow6Simulation:
+    def split(
+        self,
+        submodel_labels: GridDataArray,
+        ignore_time_purge_empty: Optional[bool] = None,
+    ) -> Modflow6Simulation:
         """
-        Split a simulation in different partitions using a submodel_labels array.
+        Split a simulation in different partitions using a submodel_labels
+        array.
 
-        The submodel_labels array defines how a simulation will be split. The array should have the same topology as
-        the domain being split i.e. similar shape as a layer in the domain. The values in the array indicate to
-        which partition a cell belongs. The values should be zero or greater.
+        Parameters
+        ----------
+        submodel_labels: xr.DataArray or xu.UgridDataArray
+            A grid that defines how the simulation will be split. The array
+            should have the same topology as the domain being split, i.e.
+            similar shape as a layer in the domain. The values in the array
+            indicate to which partition a cell belongs. The values should be
+            zero or greater.
+        ignore_time_purge_empty: bool, default None
+            If True, only the first timestep is validated. This increases
+            performance for packages with a time dimensions over which changes
+            of cell activity are not expected. If None, the value of the
+            validation context is of the simulation is used.
 
-        The method return a new simulation containing all the split models and packages
+        Returns
+        -------
+        A new simulation containing all the split models and packages
         """
         if self.is_split():
             raise RuntimeError(
@@ -1094,6 +1135,9 @@ class Modflow6Simulation(collections.UserDict, ISimulation):
             raise ValueError(
                 "splitting of simulations with more (or less) than 1 flow model currently not supported."
             )
+        if ignore_time_purge_empty is None:
+            ignore_time_purge_empty = self._validation_context.ignore_time
+
         transport_models = self.get_models_of_type("gwt6")
         flow_models = self.get_models_of_type("gwf6")
         if not any(flow_models) and not any(transport_models):
@@ -1132,6 +1176,9 @@ class Modflow6Simulation(collections.UserDict, ISimulation):
                 new_model_name = f"{model_name}_{submodel_partition_info.id}"
                 new_simulation[new_model_name] = slice_model(
                     submodel_partition_info, model
+                )
+                new_simulation[new_model_name].purge_empty_packages(
+                    ignore_time=ignore_time_purge_empty
                 )
                 new_simulation[solution_name].add_model_to_solution(new_model_name)
 
@@ -1250,7 +1297,7 @@ class Modflow6Simulation(collections.UserDict, ISimulation):
                 "x": id.sel({f"cell_dims{i}": f"column_{i}"}),
             }
         exchange_domain = domain.isel(exchange_cells)
-        active_exchange_domain = exchange_domain.where(exchange_domain.values > 0)
+        active_exchange_domain = exchange_domain.where(exchange_domain > 0)
         active_exchange_domain = active_exchange_domain.dropna("index")
         ex.dataset = ex.dataset.sel(index=active_exchange_domain["index"])
 

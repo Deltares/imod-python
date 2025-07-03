@@ -13,7 +13,6 @@ def test_public_api():
         ignore_warnings,  # noqa: F401
         mdal_compliant_ugrid2d,  # noqa: F401
         replace,  # noqa: F401
-        round_extent,  # noqa: F401
         spatial_reference,  # noqa: F401
         temporary_directory,  # noqa: F401
         to_datetime,  # noqa: F401

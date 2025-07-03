@@ -5,7 +5,7 @@ build-backend = "hatchling.build"
 [project]
 name = "imod"
 dynamic = ["version"]
-requires-python = ">=3.10"
+requires-python = ">=3.11"
 authors = [{ name = "Deltares", email = "imod.info@deltares.nl" }, ]
 maintainers = [{ name = "Deltares", email = "imod.info@deltares.nl" }]
 description = "Make massive MODFLOW models!"
@@ -20,9 +20,9 @@ classifiers = [
     "Operating System :: OS Independent",
     "Programming Language :: Python",
     "Programming Language :: Python :: 3",
-    "Programming Language :: Python :: 3.10",
     "Programming Language :: Python :: 3.11",
     "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
     "Programming Language :: Python :: Implementation :: CPython",
     "Topic :: Scientific/Engineering"
 ]
@@ -46,7 +46,7 @@ dependencies = [
     "toolz",
     "tqdm",
     "xarray >=2023.08.0",
-    "xugrid >=0.9.0",
+    "xugrid >=0.14.0",
 ]
 
 [project.urls]
@@ -159,7 +159,8 @@ ignore_missing_imports = true
 markers = [
     "example: marks test as example (deselect with '-m \"not example\"')",
     "user_acceptance: marks user acceptance tests (deselect with '-m \"not user_acceptance\"')",
-    "unittest_jit: marks unit tests that should be jitted (deselect with '-m \"not unittest_jit\"')"
+    "unittest_jit: marks unit tests that should be jitted (deselect with '-m \"not unittest_jit\"')",
+    "qgis_export: marks tests that export to QGIS (deselect with '-m \"not qgis_export\"')",
 ]
 
 [tool.hatch.version]

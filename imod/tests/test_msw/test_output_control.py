@@ -114,6 +114,24 @@ def test_idf_oc_write_simple_model(fixed_format_parser):
     assert_almost_equal(results["x_grid"], np.array([2.0, 2.0, 2.0, 2.0, 4.0]))
 
 
+def test_idf_oc_mapping_order(fixed_format_parser):
+    area, index, svat = grid()
+    nodata = -9999.0
+
+    idf_output_control = IdfMapping(area, nodata)
+
+    with tempfile.TemporaryDirectory() as output_dir:
+        output_dir = Path(output_dir)
+        idf_output_control.write(output_dir, index, svat, None, None)
+
+        results = fixed_format_parser(
+            output_dir / IdfMapping._file_name, IdfMapping._metadata_dict
+        )
+
+    expected_keys = ["svat", "rows", "columns", "x_grid", "y_grid"]
+    assert expected_keys == list(results.keys())
+
+
 def test_idf_oc_settings_simple_model():
     area, _, _ = grid()
     nodata = -9999.0

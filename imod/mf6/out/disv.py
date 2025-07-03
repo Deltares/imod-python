@@ -53,14 +53,17 @@ def read_grb(f: BinaryIO, ntxt: int, lentxt: int) -> Dict[str, Any]:
     nja = struct.unpack("i", f.read(4))[0]
     if ncells != (nlayer * ncells_per_layer):
         raise ValueError(f"Invalid file {ncells} {nlayer} {ncells_per_layer}")
-    _ = struct.unpack("d", f.read(8))[0]  # xorigin
-    _ = struct.unpack("d", f.read(8))[0]  # yorigin
+    xorigin = struct.unpack("d", f.read(8))[0]  # xorigin
+    yorigin = struct.unpack("d", f.read(8))[0]  # yorigin
     f.seek(8, 1)  # skip angrot
     top_np = np.fromfile(f, np.float64, ncells_per_layer)
     bottom_np = np.reshape(
         np.fromfile(f, np.float64, ncells), (nlayer, ncells_per_layer)
     )
     vertices = np.reshape(np.fromfile(f, np.float64, nvert * 2), (nvert, 2))
+    # Add origins to vertices
+    vertices[:, 0] += xorigin
+    vertices[:, 1] += yorigin
     _ = np.fromfile(f, np.float64, ncells_per_layer)  # cellx
     _ = np.fromfile(f, np.float64, ncells_per_layer)  # celly
     # Python is 0-based; MODFLOW6 is Fortran 1-based

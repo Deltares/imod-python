@@ -3,10 +3,9 @@ from __future__ import annotations
 import abc
 import itertools
 import textwrap
-import warnings
 from collections.abc import Iterable
 from datetime import datetime
-from typing import Any, Optional, Tuple, Union, cast
+from typing import Any, Callable, Optional, Self, Sequence, Tuple, Union, cast
 
 import cftime
 import numpy as np
@@ -16,28 +15,25 @@ import xarray as xr
 import xugrid as xu
 
 import imod
-import imod.mf6.utilities
 from imod.common.interfaces.ipointdatapackage import IPointDataPackage
 from imod.common.utilities.grid import broadcast_to_full_domain
 from imod.common.utilities.layer import create_layered_top
+from imod.common.utilities.schemata import validation_pkg_error_message
 from imod.logging import init_log_decorator, logger
 from imod.logging.logging_decorators import standard_log_decorator
 from imod.logging.loglevel import LogLevel
 from imod.mf6 import StructuredDiscretization, VerticesDiscretization
 from imod.mf6.boundary_condition import (
     BoundaryCondition,
-    DisStructuredBoundaryCondition,
-    DisVerticesBoundaryCondition,
 )
 from imod.mf6.mf6_wel_adapter import Mf6Wel, concat_indices_to_cellid
 from imod.mf6.package import Package
 from imod.mf6.utilities.dataset import remove_inactive
 from imod.mf6.utilities.imod5_converter import well_from_imod5_cap_data
-from imod.mf6.validation import validation_pkg_error_message
-from imod.mf6.validation_context import ValidationContext
+from imod.mf6.validation_settings import ValidationSettings
 from imod.mf6.write_context import WriteContext
 from imod.prepare import assign_wells
-from imod.prepare.cleanup import cleanup_wel
+from imod.prepare.cleanup import cleanup_wel, cleanup_wel_layered
 from imod.schemata import (
     AllValueSchema,
     AnyNoDataSchema,
@@ -82,36 +78,25 @@ def mask_2D(package: GridAgnosticWell, domain_2d: GridDataArray) -> GridAgnostic
 
 
 def _df_groups_to_da_rates(
-    unique_well_groups: pd.api.typing.DataFrameGroupBy,
+    unique_well_groups: Sequence[pd.api.typing.DataFrameGroupBy],
 ) -> xr.DataArray:
     # Convert dataframes all groups to DataArrays
-    is_steady_state = "time" not in unique_well_groups[0].columns
-    if is_steady_state:
-        da_groups = [
-            xr.DataArray(df_group["rate"].sum()) for df_group in unique_well_groups
-        ]
+    columns = list(unique_well_groups[0].columns)
+    columns.remove("rate")
+    is_transient = "time" in columns
+    gb_and_summed = pd.concat(unique_well_groups).groupby(columns).sum()
+    if is_transient:
+        index_names = ["time", "index"]
     else:
-        da_groups = [
-            xr.DataArray(
-                df_group["rate"], dims=("time"), coords={"time": df_group["time"]}
-            )
-            for df_group in unique_well_groups
-        ]
-        # Groupby time and sum to aggregate wells with the exact same x, y, and
-        # filter top/bottom.
-        da_groups = [da_group.groupby("time").sum() for da_group in da_groups]
-    # Assign index coordinates
-    da_groups = [
-        da_group.expand_dims(dim="index").assign_coords(index=[i])
-        for i, da_group in enumerate(da_groups)
-    ]
-    # Concatenate datarrays along index dimension
-    return xr.concat(da_groups, dim="index")
+        index_names = ["index"]
+    # Unset multi-index, then set index to index_names
+    df_temp = gb_and_summed.reset_index().set_index(index_names)
+    return df_temp["rate"].to_xarray()
 
 
 def _prepare_well_rates_from_groups(
     pkg_data: dict,
-    unique_well_groups: pd.api.typing.DataFrameGroupBy,
+    unique_well_groups: Sequence[pd.api.typing.DataFrameGroupBy],
     start_times: StressPeriodTimesType,
 ) -> xr.DataArray:
     """
@@ -467,7 +452,7 @@ class GridAgnosticWell(BoundaryCondition, IPointDataPackage, abc.ABC):
         Mf6Wel
             Object with wells as list based input.
         """
-        validation_context = ValidationContext(
+        validation_context = ValidationSettings(
             validate=validate, strict_well_validation=strict_well_validation
         )
         return self._to_mf6_pkg(active, top, bottom, k, validation_context)
@@ -478,7 +463,7 @@ class GridAgnosticWell(BoundaryCondition, IPointDataPackage, abc.ABC):
         top: GridDataArray,
         bottom: GridDataArray,
         k: GridDataArray,
-        validation_context: ValidationContext,
+        validation_context: ValidationSettings,
     ) -> Mf6Wel:
         if validation_context.validate:
             errors = self._validate(self._write_schemata)
@@ -509,7 +494,7 @@ class GridAgnosticWell(BoundaryCondition, IPointDataPackage, abc.ABC):
         ds["cellid"] = self._create_cellid(assigned_wells, active)
 
         ds_vars = self._create_dataset_vars(assigned_wells, ds["cellid"])
-        ds = ds.assign(**ds_vars.data_vars)
+        ds = ds.assign(**ds_vars.data_vars)  # type: ignore[arg-type]
 
         ds = remove_inactive(ds, active)
         ds["save_flows"] = self["save_flows"].values[()]
@@ -526,7 +511,7 @@ class GridAgnosticWell(BoundaryCondition, IPointDataPackage, abc.ABC):
 
         ds = ds.drop_vars("id")
 
-        return Mf6Wel(**ds.data_vars)
+        return Mf6Wel(**ds.data_vars)  # type: ignore[arg-type]
 
     def gather_filtered_well_ids(
         self, well_data_filtered: pd.DataFrame | xr.Dataset, well_data: pd.DataFrame
@@ -551,10 +536,11 @@ class GridAgnosticWell(BoundaryCondition, IPointDataPackage, abc.ABC):
         else:
             message += " The first 10 unplaced wells are: \n"
 
+        is_filtered = self.dataset["id"].isin([filtered_wells])
         for i in range(min(10, len(filtered_wells))):
             ids = filtered_wells[i]
-            x = self.dataset["x"][int(filtered_wells[i])].values[()]
-            y = self.dataset["y"][int(filtered_wells[i])].values[()]
+            x = self.dataset["x"].data[is_filtered][i]
+            y = self.dataset["y"].data[is_filtered][i]
             message += f" id = {ids} x = {x}  y = {y} \n"
         return message
 
@@ -690,8 +676,12 @@ class GridAgnosticWell(BoundaryCondition, IPointDataPackage, abc.ABC):
         # Associated wells need additional grouping by id
         if pkg_data["has_associated"]:
             colnames_group.append("id")
-        wel_index, unique_well_groups = zip(*df.groupby(colnames_group))
-
+        wel_index, well_groups_untagged = zip(*df.groupby(colnames_group))
+        # Explictly sign an index to each group, so that the
+        # DataArray of rates can be created with a unique index.
+        unique_well_groups = [
+            group.assign(index=i) for i, group in enumerate(well_groups_untagged)
+        ]
         # Unpack wel indices by zipping
         varnames = [("x", float), ("y", float)] + cls._depth_colnames
         index_values = zip(*wel_index)
@@ -706,6 +696,43 @@ class GridAgnosticWell(BoundaryCondition, IPointDataPackage, abc.ABC):
         cls_input["minimum_thickness"] = minimum_thickness
 
         return cls(**cls_input)
+
+    def _cleanup(
+        self,
+        dis: StructuredDiscretization | VerticesDiscretization,
+        cleanup_func: Callable,
+        **cleanup_kwargs,
+    ) -> None:
+        # Work around mypy error, .data_vars cannot be used with xu.UgridDataset
+        dict_to_broadcast: dict[str, GridDataArray] = dict(**dis.dataset)  # type: ignore
+        # Top and bottom should be forced to grids with a x, y coordinates
+        top, bottom = broadcast_to_full_domain(**dict_to_broadcast)
+        # Collect point variable datanames
+        point_varnames = list(self._write_schemata.keys())
+        if "concentration" not in self.dataset.keys():
+            point_varnames.remove("concentration")
+        point_varnames.append("id")
+        # Create dataset with purely point locations
+        point_ds = self.dataset[point_varnames]
+        # Take first item of irrelevant dimensions
+        point_ds = point_ds.isel(time=0, species=0, drop=True, missing_dims="ignore")
+        # Cleanup well dataframe
+        wells = point_ds.to_dataframe()
+        cleaned_wells = cleanup_func(wells, top.isel(layer=0), bottom, **cleanup_kwargs)
+        # Select with ids in cleaned dataframe to drop points outside grid.
+        well_ids = cleaned_wells.index
+        dataset_cleaned = self.dataset.swap_dims({"index": "id"}).sel(id=well_ids)
+        # Assign adjusted screen top and bottom
+        if "screen_top" in cleaned_wells:
+            dataset_cleaned["screen_top"] = cleaned_wells["screen_top"]
+        if "screen_bottom" in cleaned_wells:
+            dataset_cleaned["screen_bottom"] = cleaned_wells["screen_bottom"]
+        # Ensure dtype of id is preserved
+        id_type = self.dataset["id"].dtype
+        dataset_cleaned = dataset_cleaned.swap_dims({"id": "index"}).reset_coords("id")
+        dataset_cleaned["id"] = dataset_cleaned["id"].astype(id_type)
+        # Override dataset
+        self.dataset = dataset_cleaned
 
 
 class Well(GridAgnosticWell):
@@ -770,14 +797,15 @@ class Well(GridAgnosticWell):
         Flag to indicate whether the package should be validated upon
         initialization. This raises a ValidationError if package input is
         provided in the wrong manner. Defaults to True.
-    repeat_stress: Optional[xr.DataArray] of datetimes
+    repeat_stress: dict or xr.DataArray of datetimes, optional
         Used to repeat data for e.g. repeating stress periods such as
-        seasonality without duplicating the values. The DataArray should have
-        dimensions ``("repeat", "repeat_items")``. The ``repeat_items``
-        dimension should have size 2: the first value is the "key", the second
-        value is the "value". For the "key" datetime, the data of the "value"
-        datetime will be used. Can also be set with a dictionary using the
-        ``set_repeat_stress`` method.
+        seasonality without duplicating the values. If provided as dict, it
+        should map new dates to old dates present in the dataset.
+        ``{"2001-04-01": "2000-04-01", "2001-10-01": "2000-10-01"}`` if provided
+        as DataArray, it should have dimensions ``("repeat", "repeat_items")``.
+        The ``repeat_items`` dimension should have size 2: the first value is
+        the "key", the second value is the "value". For the "key" datetime, the
+        data of the "value" datetime will be used.
 
     Examples
     ---------
@@ -892,7 +920,7 @@ class Well(GridAgnosticWell):
         y_max: Optional[float] = None,
         top: Optional[GridDataArray] = None,
         bottom: Optional[GridDataArray] = None,
-    ) -> Package:
+    ) -> Self:
         """
         Clip a package by a bounding box (time, layer, y, x).
 
@@ -943,8 +971,12 @@ class Well(GridAgnosticWell):
 
         ds = new.dataset
 
-        z_max = self._find_well_value_at_layer(ds, top, layer_max)
-        z_min = self._find_well_value_at_layer(ds, bottom, layer_min)
+        z_max, in_bounds_z_max = self._find_well_value_at_layer(ds, top, layer_max)
+        z_min, in_bounds_z_min = self._find_well_value_at_layer(ds, bottom, layer_min)
+
+        # Prior to the actual clipping of z_max/z_min, replace the dataset in case a
+        # spatial selection needs to be done when a spatial grid is present (top/bottom).
+        ds = ds.loc[{"index": in_bounds_z_max & in_bounds_z_min}]
 
         if z_max is not None:
             ds["screen_top"] = ds["screen_top"].clip(None, z_max)
@@ -979,9 +1011,14 @@ class Well(GridAgnosticWell):
                 x=well_dataset["x"].values,
                 y=well_dataset["y"].values,
                 out_of_bounds="ignore",
-            ).drop_vars(lambda x: x.coords)
+            )
+            in_bounds = np.full(well_dataset.sizes["index"], False)
+            in_bounds[value["index"]] = True
+            value = value.drop_vars(lambda x: x.coords)
+        else:
+            in_bounds = np.full(well_dataset.sizes["index"], True)
 
-        return value
+        return value, in_bounds
 
     def _create_wells_df(self) -> pd.DataFrame:
         wells_df = self.dataset.to_dataframe()
@@ -1070,33 +1107,8 @@ class Well(GridAgnosticWell):
         dis: imod.mf6.StructuredDiscretization | imod.mf6.VerticesDiscretization
             Model discretization package.
         """
-        # Top and bottom should be forced to grids with a x, y coordinates
-        top, bottom = broadcast_to_full_domain(**dict(dis.dataset.data_vars))
-        # Collect point variable datanames
-        point_varnames = list(self._write_schemata.keys())
-        if "concentration" not in self.dataset.keys():
-            point_varnames.remove("concentration")
-        point_varnames.append("id")
-        # Create dataset with purely point locations
-        point_ds = self.dataset[point_varnames]
-        # Take first item of irrelevant dimensions
-        point_ds = point_ds.isel(time=0, species=0, drop=True, missing_dims="ignore")
-        # Cleanup well dataframe
-        wells = point_ds.to_dataframe()
         minimum_thickness = float(self.dataset["minimum_thickness"])
-        cleaned_wells = cleanup_wel(wells, top.isel(layer=0), bottom, minimum_thickness)
-        # Select with ids in cleaned dataframe to drop points outside grid.
-        well_ids = cleaned_wells.index
-        dataset_cleaned = self.dataset.swap_dims({"index": "id"}).sel(id=well_ids)
-        # Assign adjusted screen top and bottom
-        dataset_cleaned["screen_top"] = cleaned_wells["screen_top"]
-        dataset_cleaned["screen_bottom"] = cleaned_wells["screen_bottom"]
-        # Ensure dtype of id is preserved
-        id_type = self.dataset["id"].dtype
-        dataset_cleaned = dataset_cleaned.swap_dims({"id": "index"}).reset_coords("id")
-        dataset_cleaned["id"] = dataset_cleaned["id"].astype(id_type)
-        # Override dataset
-        self.dataset = dataset_cleaned
+        self._cleanup(dis, cleanup_wel, minimum_thickness=minimum_thickness)
 
 
 class LayeredWell(GridAgnosticWell):
@@ -1160,14 +1172,15 @@ class LayeredWell(GridAgnosticWell):
         Flag to indicate whether the package should be validated upon
         initialization. This raises a ValidationError if package input is
         provided in the wrong manner. Defaults to True.
-    repeat_stress: Optional[xr.DataArray] of datetimes
+    repeat_stress: dict or xr.DataArray of datetimes, optional
         Used to repeat data for e.g. repeating stress periods such as
-        seasonality without duplicating the values. The DataArray should have
-        dimensions ``("repeat", "repeat_items")``. The ``repeat_items``
-        dimension should have size 2: the first value is the "key", the second
-        value is the "value". For the "key" datetime, the data of the "value"
-        datetime will be used. Can also be set with a dictionary using the
-        ``set_repeat_stress`` method.
+        seasonality without duplicating the values. If provided as dict, it
+        should map new dates to old dates present in the dataset.
+        ``{"2001-04-01": "2000-04-01", "2001-10-01": "2000-10-01"}`` if provided
+        as DataArray, it should have dimensions ``("repeat", "repeat_items")``.
+        The ``repeat_items`` dimension should have size 2: the first value is
+        the "key", the second value is the "value". For the "key" datetime, the
+        data of the "value" datetime will be used.
 
     Examples
     ---------
@@ -1269,7 +1282,7 @@ class LayeredWell(GridAgnosticWell):
         y_max: Optional[float] = None,
         top: Optional[GridDataArray] = None,
         bottom: Optional[GridDataArray] = None,
-    ) -> Package:
+    ) -> Self:
         """
         Clip a package by a bounding box (time, layer, y, x).
 
@@ -1395,329 +1408,14 @@ class LayeredWell(GridAgnosticWell):
         data = well_from_imod5_cap_data(imod5_data)
         return cls(**data)  # type: ignore
 
-
-class WellDisStructured(DisStructuredBoundaryCondition):
-    """
-    WEL package for structured discretization (DIS) models .
-    Any number of WEL Packages can be specified for a single groundwater flow model.
-    https://water.usgs.gov/water-resources/software/MODFLOW-6/mf6io_6.0.4.pdf#page=63
-
-    .. warning::
-        This class is deprecated and will be deleted in a future release.
-        Consider changing your code to use the ``imod.mf6.Well`` package.
-
-    Parameters
-    ----------
-    layer: list of int
-        Model layer in which the well is located.
-    row: list of int
-        Row in which the well is located.
-    column: list of int
-        Column in which the well is located.
-    rate: float or list of floats
-        is the volumetric well rate. A positive value indicates well
-        (injection) and a negative value indicates discharge (extraction) (q).
-    concentration: array of floats (xr.DataArray, optional)
-        if this flow package is used in simulations also involving transport, then this array is used
-        as the  concentration for inflow over this boundary.
-    concentration_boundary_type: ({"AUX", "AUXMIXED"}, optional)
-        if this flow package is used in simulations also involving transport, then this keyword specifies
-        how outflow over this boundary is computed.
-    print_input: ({True, False}, optional)
-        keyword to indicate that the list of well information will be written to
-        the listing file immediately after it is read.
-        Default is False.
-    print_flows: ({True, False}, optional)
-        Indicates that the list of well flow rates will be printed to the
-        listing file for every stress period time step in which "BUDGET PRINT"
-        is specified in Output Control. If there is no Output Control option
-        and PRINT FLOWS is specified, then flow rates are printed for the last
-        time step of each stress period.
-        Default is False.
-    save_flows: ({True, False}, optional)
-        Indicates that well flow terms will be written to the file specified
-        with "BUDGET FILEOUT" in Output Control.
-        Default is False.
-    observations: [Not yet supported.]
-        Default is None.
-    validate: {True, False}
-        Flag to indicate whether the package should be validated upon
-        initialization. This raises a ValidationError if package input is
-        provided in the wrong manner. Defaults to True.
-    repeat_stress: Optional[xr.DataArray] of datetimes
-        Used to repeat data for e.g. repeating stress periods such as
-        seasonality without duplicating the values. The DataArray should have
-        dimensions ``("repeat", "repeat_items")``. The ``repeat_items``
-        dimension should have size 2: the first value is the "key", the second
-        value is the "value". For the "key" datetime, the data of the "value"
-        datetime will be used. Can also be set with a dictionary using the
-        ``set_repeat_stress`` method.
-    """
-
-    _pkg_id = "wel"
-    _period_data = ("layer", "row", "column", "rate")
-    _keyword_map = {}
-    _template = DisStructuredBoundaryCondition._initialize_template(_pkg_id)
-    _auxiliary_data = {"concentration": "species"}
-
-    _init_schemata = {
-        "layer": [DTypeSchema(np.integer)],
-        "row": [DTypeSchema(np.integer)],
-        "column": [DTypeSchema(np.integer)],
-        "rate": [DTypeSchema(np.floating)],
-        "concentration": [DTypeSchema(np.floating)],
-    }
-
-    _write_schemata = {}
-
-    @init_log_decorator()
-    def __init__(
-        self,
-        layer,
-        row,
-        column,
-        rate,
-        concentration=None,
-        concentration_boundary_type="aux",
-        print_input=False,
-        print_flows=False,
-        save_flows=False,
-        observations=None,
-        validate: bool = True,
-        repeat_stress=None,
-    ):
-        dict_dataset = {
-            "layer": _assign_dims(layer),
-            "row": _assign_dims(row),
-            "column": _assign_dims(column),
-            "rate": _assign_dims(rate),
-            "print_input": print_input,
-            "print_flows": print_flows,
-            "save_flows": save_flows,
-            "observations": observations,
-            "repeat_stress": repeat_stress,
-            "concentration": concentration,
-            "concentration_boundary_type": concentration_boundary_type,
-        }
-        super().__init__(dict_dataset)
-        self._validate_init_schemata(validate)
-
-        warnings.warn(
-            f"{self.__class__.__name__} is deprecated and will be removed in the v1.0 release."
-            "Please adapt your code to use the imod.mf6.Well package",
-            DeprecationWarning,
-        )
-
-    def clip_box(
-        self,
-        time_min: Optional[cftime.datetime | np.datetime64 | str] = None,
-        time_max: Optional[cftime.datetime | np.datetime64 | str] = None,
-        layer_min: Optional[int] = None,
-        layer_max: Optional[int] = None,
-        x_min: Optional[float] = None,
-        x_max: Optional[float] = None,
-        y_min: Optional[float] = None,
-        y_max: Optional[float] = None,
-        top: Optional[GridDataArray] = None,
-        bottom: Optional[GridDataArray] = None,
-    ) -> Package:
+    @standard_log_decorator()
+    def cleanup(self, dis: StructuredDiscretization | VerticesDiscretization):
         """
-        Clip a package by a bounding box (time, layer, y, x).
+        Clean up package inplace. This method calls
+        :func:`imod.prepare.cleanup_wel_layered`, see documentation of that
+        function for details on cleanup.
 
-        Slicing intervals may be half-bounded, by providing None:
-
-        * To select 500.0 <= x <= 1000.0:
-          ``clip_box(x_min=500.0, x_max=1000.0)``.
-        * To select x <= 1000.0: ``clip_box(x_min=None, x_max=1000.0)``
-          or ``clip_box(x_max=1000.0)``.
-        * To select x >= 500.0: ``clip_box(x_min = 500.0, x_max=None.0)``
-          or ``clip_box(x_min=1000.0)``.
-
-        Parameters
-        ----------
-        time_min: optional
-        time_max: optional
-        layer_min: optional, int
-        layer_max: optional, int
-        x_min: optional, float
-        x_max: optional, float
-        y_min: optional, float
-        y_max: optional, float
-        top: optional, GridDataArray
-        bottom: optional, GridDataArray
-        state_for_boundary: optional, GridDataArray
-
-        Returns
-        -------
-        sliced : Package
+        dis: imod.mf6.StructuredDiscretization | imod.mf6.VerticesDiscretization
+            Model discretization package.
         """
-        # TODO: include x and y values.
-        for arg in (
-            layer_min,
-            layer_max,
-            x_min,
-            x_max,
-            y_min,
-            y_max,
-        ):
-            if arg is not None:
-                raise NotImplementedError("Can only clip_box in time for Well packages")
-
-        # The super method will select in the time dimension without issues.
-        new = super().clip_box(time_min=time_min, time_max=time_max)
-        return new
-
-
-class WellDisVertices(DisVerticesBoundaryCondition):
-    """
-    WEL package for discretization by vertices (DISV) models. Any number of WEL
-    Packages can be specified for a single groundwater flow model.
-    https://water.usgs.gov/water-resources/software/MODFLOW-6/mf6io_6.0.4.pdf#page=63
-
-    .. warning::
-        This class is deprecated and will be deleted in a future release.
-        Consider changing your code to use the ``imod.mf6.Well`` package.
-
-    Parameters
-    ----------
-    layer: list of int
-        Modellayer in which the well is located.
-    cell2d: list of int
-        Cell in which the well is located.
-    rate: float or list of floats
-        is the volumetric well rate. A positive value indicates well (injection)
-        and a negative value indicates discharge (extraction) (q).
-    concentration: array of floats (xr.DataArray, optional)
-        if this flow package is used in simulations also involving transport,
-        then this array is used as the  concentration for inflow over this
-        boundary.
-    concentration_boundary_type: ({"AUX", "AUXMIXED"}, optional)
-        if this flow package is used in simulations also involving transport,
-        then this keyword specifies how outflow over this boundary is computed.
-    print_input: ({True, False}, optional)
-        keyword to indicate that the list of well information will be written to
-        the listing file immediately after it is read. Default is False.
-    print_flows: ({True, False}, optional)
-        Indicates that the list of well flow rates will be printed to the
-        listing file for every stress period time step in which "BUDGET PRINT"
-        is specified in Output Control. If there is no Output Control option and
-        PRINT FLOWS is specified, then flow rates are printed for the last time
-        step of each stress period. Default is False.
-    save_flows: ({True, False}, optional)
-        Indicates that well flow terms will be written to the file specified
-        with "BUDGET FILEOUT" in Output Control. Default is False.
-    observations: [Not yet supported.]
-        Default is None.
-    validate: {True, False}
-        Flag to indicate whether the package should be validated upon
-        initialization. This raises a ValidationError if package input is
-        provided in the wrong manner. Defaults to True.
-    """
-
-    _pkg_id = "wel"
-    _period_data = ("layer", "cell2d", "rate")
-    _keyword_map = {}
-    _template = DisVerticesBoundaryCondition._initialize_template(_pkg_id)
-    _auxiliary_data = {"concentration": "species"}
-
-    _init_schemata = {
-        "layer": [DTypeSchema(np.integer)],
-        "cell2d": [DTypeSchema(np.integer)],
-        "rate": [DTypeSchema(np.floating)],
-        "concentration": [DTypeSchema(np.floating)],
-    }
-
-    _write_schemata = {}
-
-    @init_log_decorator()
-    def __init__(
-        self,
-        layer,
-        cell2d,
-        rate,
-        concentration=None,
-        concentration_boundary_type="aux",
-        print_input=False,
-        print_flows=False,
-        save_flows=False,
-        observations=None,
-        validate: bool = True,
-    ):
-        dict_dataset = {
-            "layer": _assign_dims(layer),
-            "cell2d": _assign_dims(cell2d),
-            "rate": _assign_dims(rate),
-            "print_input": print_input,
-            "print_flows": print_flows,
-            "save_flows": save_flows,
-            "observations": observations,
-            "concentration": concentration,
-            "concentration_boundary_type": concentration_boundary_type,
-        }
-        super().__init__(dict_dataset)
-        self._validate_init_schemata(validate)
-
-        warnings.warn(
-            f"{self.__class__.__name__} is deprecated and will be removed in the v1.0 release."
-            "Please adapt your code to use the imod.mf6.Well package",
-            DeprecationWarning,
-        )
-
-    def clip_box(
-        self,
-        time_min: Optional[cftime.datetime | np.datetime64 | str] = None,
-        time_max: Optional[cftime.datetime | np.datetime64 | str] = None,
-        layer_min: Optional[int] = None,
-        layer_max: Optional[int] = None,
-        x_min: Optional[float] = None,
-        x_max: Optional[float] = None,
-        y_min: Optional[float] = None,
-        y_max: Optional[float] = None,
-        top: Optional[GridDataArray] = None,
-        bottom: Optional[GridDataArray] = None,
-    ) -> Package:
-        """
-        Clip a package by a bounding box (time, layer, y, x).
-
-        Slicing intervals may be half-bounded, by providing None:
-
-        * To select 500.0 <= x <= 1000.0:
-          ``clip_box(x_min=500.0, x_max=1000.0)``.
-        * To select x <= 1000.0: ``clip_box(x_min=None, x_max=1000.0)``
-          or ``clip_box(x_max=1000.0)``.
-        * To select x >= 500.0: ``clip_box(x_min = 500.0, x_max=None.0)``
-          or ``clip_box(x_min=1000.0)``.
-
-        Parameters
-        ----------
-        time_min: optional
-        time_max: optional
-        layer_min: optional, int
-        layer_max: optional, int
-        x_min: optional, float
-        x_max: optional, float
-        y_min: optional, float
-        y_max: optional, float
-        top: optional, GridDataArray
-        bottom: optional, GridDataArray
-        state_for_boundary: optional, GridDataArray
-
-        Returns
-        -------
-        clipped: Package
-        """
-        # TODO: include x and y values.
-        for arg in (
-            layer_min,
-            layer_max,
-            x_min,
-            x_max,
-            y_min,
-            y_max,
-        ):
-            if arg is not None:
-                raise NotImplementedError("Can only clip_box in time for Well packages")
-
-        # The super method will select in the time dimension without issues.
-        new = super().clip_box(time_min=time_min, time_max=time_max)
-        return new
+        self._cleanup(dis, cleanup_wel_layered)

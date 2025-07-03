@@ -235,7 +235,6 @@ def test_mask_unstructured(
 
 
 def test_mask_with_time_coordinate(
-    tmp_path: Path,
     unstructured_flow_model: GroundwaterFlowModel,
 ):
     nlayer = 3
@@ -251,7 +250,9 @@ def test_mask_with_time_coordinate(
     mask.sel(time=1).values = np.array([1, 1, 0])
     mask.sel(time=2).values = np.array([1, 0, 1])
 
-    with pytest.raises(ValueError):
+    with pytest.raises(
+        ValueError, match="Unexpected coordinates in masking domain: {'time'}"
+    ):
         unstructured_flow_model.mask_all_packages(mask)
 
 

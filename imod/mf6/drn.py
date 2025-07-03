@@ -5,6 +5,7 @@ from typing import Optional
 import numpy as np
 
 from imod.common.interfaces.iregridpackage import IRegridPackage
+from imod.common.utilities.mask import broadcast_and_mask_arrays
 from imod.common.utilities.regrid import (
     _regrid_package_data,
 )
@@ -14,7 +15,7 @@ from imod.mf6.dis import StructuredDiscretization
 from imod.mf6.disv import VerticesDiscretization
 from imod.mf6.npf import NodePropertyFlow
 from imod.mf6.regrid.regrid_schemes import DrainageRegridMethod
-from imod.mf6.utilities.package import get_repeat_stress
+from imod.mf6.utilities.package import set_repeat_stress_if_available
 from imod.mf6.validation import BOUNDARY_DIMS_SCHEMA, CONC_DIMS_SCHEMA
 from imod.prepare.cleanup import cleanup_drn
 from imod.prepare.topsystem.allocation import ALLOCATION_OPTION, allocate_drn_cells
@@ -36,7 +37,6 @@ from imod.schemata import (
 )
 from imod.typing import GridDataArray
 from imod.typing.grid import enforce_dim_order, has_negative_layer, is_planar_grid
-from imod.util.expand_repetitions import expand_repetitions
 from imod.util.regrid import RegridderWeightsCache
 
 
@@ -76,14 +76,15 @@ class Drainage(BoundaryCondition, IRegridPackage):
         Flag to indicate whether the package should be validated upon
         initialization. This raises a ValidationError if package input is
         provided in the wrong manner. Defaults to True.
-    repeat_stress: Optional[xr.DataArray] of datetimes
+    repeat_stress: dict or xr.DataArray of datetimes, optional
         Used to repeat data for e.g. repeating stress periods such as
-        seasonality without duplicating the values. The DataArray should have
-        dimensions ``("repeat", "repeat_items")``. The ``repeat_items``
-        dimension should have size 2: the first value is the "key", the second
-        value is the "value". For the "key" datetime, the data of the "value"
-        datetime will be used. Can also be set with a dictionary using the
-        ``set_repeat_stress`` method.
+        seasonality without duplicating the values. If provided as dict, it
+        should map new dates to old dates present in the dataset.
+        ``{"2001-04-01": "2000-04-01", "2001-10-01": "2000-10-01"}`` if provided
+        as DataArray, it should have dimensions ``("repeat", "repeat_items")``.
+        The ``repeat_items`` dimension should have size 2: the first value is
+        the "key", the second value is the "value". For the "key" datetime, the
+        data of the "value" datetime will be used.
     """
 
     _pkg_id = "drn"
@@ -320,7 +321,6 @@ class Drainage(BoundaryCondition, IRegridPackage):
             "elevation": imod5_data[key]["elevation"],
             "conductance": imod5_data[key]["conductance"],
         }
-        is_planar = is_planar_grid(data["elevation"])
 
         if regridder_types is None:
             regridder_types = Drainage.get_regrid_methods()
@@ -328,7 +328,8 @@ class Drainage(BoundaryCondition, IRegridPackage):
         regridded_package_data = _regrid_package_data(
             data, target_idomain, regridder_types, regrid_cache, {}
         )
-
+        regridded_package_data = broadcast_and_mask_arrays(regridded_package_data)
+        is_planar = is_planar_grid(regridded_package_data["elevation"])
         if is_planar:
             layered_data = cls.allocate_and_distribute_planar_data(
                 regridded_package_data,
@@ -341,9 +342,11 @@ class Drainage(BoundaryCondition, IRegridPackage):
 
         drn = Drainage(**regridded_package_data, validate=True)
         repeat = period_data.get(key)
-        if repeat is not None:
-            times = expand_repetitions(repeat, time_min, time_max)
-            drn.dataset["repeat_stress"] = get_repeat_stress(times)
+        set_repeat_stress_if_available(repeat, time_min, time_max, drn)
+        # Clip the drain package to the time range of the simulation and ensure
+        # time is forward filled.
+        drn = drn.clip_box(time_min=time_min, time_max=time_max)
+
         return drn
 
     @classmethod

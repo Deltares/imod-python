@@ -17,6 +17,7 @@ def initialize_timeseries(times: list[datetime], rates: list[float]) -> pd.DataF
     timeseries["id"] = "ID"
     timeseries["filt_top"] = 20
     timeseries["filt_bot"] = 10
+    timeseries["index"] = 0
 
     return timeseries
 
@@ -195,7 +196,7 @@ def test_mean_timeseries():
     dummy_times = [datetime(1989, 1, 1)]
     expected_rates = np.mean(rates)
     expected_timeseries = initialize_timeseries(dummy_times, expected_rates)
-    col_order = ["x", "y", "id", "filt_top", "filt_bot", "rate"]
+    col_order = ["x", "y", "id", "filt_top", "filt_bot", "index", "rate"]
     expected_timeseries = expected_timeseries[col_order]
 
     pd.testing.assert_frame_equal(

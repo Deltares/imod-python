@@ -39,6 +39,7 @@ from imod.prepare.topsystem.default_allocation_methods import (
     SimulationAllocationOptions,
     SimulationDistributingOptions,
 )
+from imod.schemata import TypeSchema
 from imod.typing import GridDataArray, StressPeriodTimesType
 from imod.typing.grid import zeros_like
 from imod.util.regrid import RegridderWeightsCache
@@ -82,6 +83,15 @@ class GroundwaterFlowModel(Modflow6Model):
     _model_id = "gwf6"
     _template = Modflow6Model._initialize_template("gwf-nam.j2")
 
+    _init_schemata = {
+        "listing_file": [TypeSchema(str)],
+        "print_input": [TypeSchema(bool)],
+        "print_flows": [TypeSchema(bool)],
+        "save_flows": [TypeSchema(bool)],
+        "newton": [TypeSchema(bool)],
+        "under_relaxation": [TypeSchema(bool)],
+    }
+
     @init_log_decorator()
     def __init__(
         self,
@@ -91,6 +101,7 @@ class GroundwaterFlowModel(Modflow6Model):
         save_flows: bool = False,
         newton: bool = False,
         under_relaxation: bool = False,
+        validate: bool = True,
     ):
         super().__init__()
         self._options = {
@@ -101,6 +112,7 @@ class GroundwaterFlowModel(Modflow6Model):
             "newton": newton,
             "under_relaxation": under_relaxation,
         }
+        self.validate_init_schemata_options(validate)
 
     def clip_box(
         self,
@@ -300,7 +312,10 @@ class GroundwaterFlowModel(Modflow6Model):
         if "rch" in imod5_data.keys():
             result["rch"] = Recharge.from_imod5_data(
                 imod5_data,
+                period_data,
                 dis_pkg,
+                times[0],
+                times[-1],
                 cast(RechargeRegridMethod, regridder_types.get("rch")),
                 regrid_cache,
             )
@@ -414,6 +429,7 @@ class GroundwaterFlowModel(Modflow6Model):
         if len(chd_keys) == 0:
             result["chd_from_shd"] = ConstantHead.from_imod5_shd_data(
                 imod5_data,
+                period_data,
                 dis_pkg,
                 cast(ConstantHeadRegridMethod, regridder_types.get("chd_from_shd")),
                 regrid_cache,
@@ -424,7 +440,10 @@ class GroundwaterFlowModel(Modflow6Model):
                 chd_packages[chd_key] = ConstantHead.from_imod5_data(
                     chd_key,
                     imod5_data,
+                    period_data,
                     dis_pkg,
+                    times[0],
+                    times[-1],
                     cast(ConstantHeadRegridMethod, regridder_types.get(chd_key)),
                     regrid_cache,
                 )

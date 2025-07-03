@@ -2,10 +2,20 @@ from __future__ import annotations
 
 import abc
 import pathlib
-from collections import defaultdict
 from copy import deepcopy
 from pathlib import Path
-from typing import Any, Callable, Dict, List, Mapping, Optional, Tuple, Union, cast
+from typing import (
+    Any,
+    Callable,
+    Dict,
+    List,
+    Mapping,
+    Optional,
+    Self,
+    Tuple,
+    Union,
+    cast,
+)
 
 import cftime
 import jinja2
@@ -24,8 +34,13 @@ from imod.common.utilities.regrid import (
     _regrid_like,
 )
 from imod.common.utilities.regrid_method_type import EmptyRegridMethod, RegridMethodType
-from imod.common.utilities.schemata import filter_schemata_dict
+from imod.common.utilities.schemata import (
+    filter_schemata_dict,
+    validate_schemata_dict,
+    validate_with_error_message,
+)
 from imod.common.utilities.value_filters import is_valid
+from imod.common.utilities.version import prepend_content_with_version_info
 from imod.logging import standard_log_decorator
 from imod.mf6.auxiliary_variables import (
     expand_transient_auxiliary_variables,
@@ -37,12 +52,12 @@ from imod.mf6.pkgbase import (
     TRANSPORT_PACKAGES,
     PackageBase,
 )
-from imod.mf6.validation import validation_pkg_error_message
+from imod.mf6.validation_settings import ValidationSettings, trim_time_dimension
 from imod.mf6.write_context import WriteContext
 from imod.schemata import (
     AllNoDataSchema,
     EmptyIndexesSchema,
-    SchemaType,
+    SchemataDict,
     ValidationError,
 )
 from imod.typing import GridDataArray
@@ -63,8 +78,8 @@ class Package(PackageBase, IPackage, abc.ABC):
     """
 
     _pkg_id = ""
-    _init_schemata: dict[str, list[SchemaType] | Tuple[SchemaType, ...]] = {}
-    _write_schemata: dict[str, list[SchemaType] | Tuple[SchemaType, ...]] = {}
+    _init_schemata: SchemataDict = {}
+    _write_schemata: SchemataDict = {}
     _keyword_map: dict[str, str] = {}
     _regrid_method: RegridMethodType = EmptyRegridMethod()
     _template: jinja2.Template
@@ -131,6 +146,7 @@ class Package(PackageBase, IPackage, abc.ABC):
             globaltimes=globaltimes,
             binary=write_context.use_binary,
         )
+        content = prepend_content_with_version_info(content)
         filename = write_context.write_directory / f"{pkgname}.{self._pkg_id}"
         with open(filename, "w") as f:
             f.write(content)
@@ -171,18 +187,17 @@ class Package(PackageBase, IPackage, abc.ABC):
             da.values.flatten().astype(dtype).tofile(f)
 
     def write_text_griddata(self, outpath, da, dtype):
-        with open(outpath, "w") as f:
-            # Note: reshaping here avoids writing newlines after every number.
-            # This dumps all the values in a single row rather than a single
-            # column. This is to be preferred, since editors can easily
-            # "reshape" a long row with "word wrap"; they cannot as easily
-            # ignore newlines.
-            fmt = self._number_format(dtype)
-            data = da.values
-            if data.ndim > 2:
-                np.savetxt(fname=f, X=da.values.reshape((1, -1)), fmt=fmt)
-            else:
-                np.savetxt(fname=f, X=da.values, fmt=fmt)
+        # Note: reshaping here avoids writing newlines after every number.
+        # This dumps all the values in a single row rather than a single
+        # column. This is to be preferred, since editors can easily
+        # "reshape" a long row with "word wrap"; they cannot as easily
+        # ignore newlines.
+        fmt = self._number_format(dtype)
+        data = da.values
+        if data.ndim > 2:
+            np.savetxt(fname=outpath, X=data.reshape((1, -1)), fmt=fmt)
+        else:
+            np.savetxt(fname=outpath, X=data, fmt=fmt)
 
     def _get_render_dictionary(
         self,
@@ -327,21 +342,21 @@ class Package(PackageBase, IPackage, abc.ABC):
 
     @standard_log_decorator()
     def _validate(self, schemata: dict, **kwargs) -> dict[str, list[ValidationError]]:
-        errors = defaultdict(list)
-        for variable, var_schemata in schemata.items():
-            for schema in var_schemata:
-                if (
-                    variable in self.dataset.keys()
-                ):  # concentration only added to dataset if specified
-                    try:
-                        schema.validate(self.dataset[variable], **kwargs)
-                    except ValidationError as e:
-                        errors[variable].append(e)
-        return errors
+        ds = trim_time_dimension(self.dataset, **kwargs)
+        return validate_schemata_dict(schemata, ds, **kwargs)
 
-    def is_empty(self) -> bool:
+    def is_empty(self, ignore_time: bool = False) -> bool:
         """
-        Returns True if the package is empty- for example if it contains only no-data values.
+        Returns True if the package is empty, that is if it contains only
+        no-data values.
+
+        Parameters
+        ----------
+        ignore_time: bool, optional
+            If True, the first timestep is selected to validate. This increases
+            performance for packages with a time dimensions over which changes
+            of cell activity are not expected. Default is False, which means the
+            time dimension is not dropped.
         """
 
         # Create schemata dict only containing the
@@ -350,30 +365,28 @@ class Package(PackageBase, IPackage, abc.ABC):
         allnodata_schemata = filter_schemata_dict(
             self._write_schemata, (AllNoDataSchema, EmptyIndexesSchema)
         )
-
+        validation_context = ValidationSettings(ignore_time=ignore_time)
+        ds = trim_time_dimension(self.dataset, validation_context=validation_context)
         # Find if packages throws ValidationError for AllNoDataSchema or
         # EmptyIndexesSchema.
-        allnodata_errors = self._validate(allnodata_schemata)
+        allnodata_errors = validate_schemata_dict(allnodata_schemata, ds)
         return len(allnodata_errors) > 0
 
-    def _validate_init_schemata(self, validate: bool):
+    def _validate_init_schemata(self, validate: bool, **kwargs) -> None:
         """
         Run the "cheap" schema validations.
 
         The expensive validations are run during writing. Some are only
         available then: e.g. idomain to determine active part of domain.
         """
-        if not validate:
-            return
-        errors = self._validate(self._init_schemata)
-        if len(errors) > 0:
-            message = validation_pkg_error_message(errors)
-            raise ValidationError(message)
-        return
+        validate_with_error_message(
+            self._validate, validate, self._init_schemata, **kwargs
+        )
 
     def copy(self) -> Any:
         # All state should be contained in the dataset.
-        return type(self)(**self.dataset.copy())
+        dataset_copy = cast(Mapping[str, Any], self.dataset.copy())
+        return type(self)(**dataset_copy)
 
     def clip_box(
         self,
@@ -387,7 +400,7 @@ class Package(PackageBase, IPackage, abc.ABC):
         y_max: Optional[float] = None,
         top: Optional[GridDataArray] = None,
         bottom: Optional[GridDataArray] = None,
-    ) -> Package:
+    ) -> Self:
         """
         Clip a package by a bounding box (time, layer, y, x).
 
@@ -554,6 +567,15 @@ class Package(PackageBase, IPackage, abc.ABC):
             gridname for gridname in grid_names if gridname in all_non_grid_data
         ):
             all_non_grid_data.remove(name)
+
+        name = "repeat_stress"
+        if name in all_non_grid_data:
+            if "repeat" in self.dataset[name].dims:
+                result[name] = self.dataset[name]
+            else:
+                result[name] = self.dataset[name].values[()]
+            all_non_grid_data.remove(name)
+
         for name in all_non_grid_data:
             if "time" in self.dataset[name].coords:
                 result[name] = self.dataset[name]

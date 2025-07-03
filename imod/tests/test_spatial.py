@@ -42,8 +42,6 @@ def test_round_extent():
     cellsize = 5.0
     expected = (0.0, 0.0, 55.0, 55.0)
     assert imod.prepare.spatial.round_extent(extent, cellsize) == expected
-    # Test if previous namespace available.
-    assert imod.util.round_extent(extent, cellsize) == expected
 
 
 def test_fill():

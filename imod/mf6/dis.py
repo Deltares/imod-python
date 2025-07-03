@@ -132,7 +132,7 @@ class StructuredDiscretization(Package, IRegridPackage, IMaskingSettings):
         else:
             raise ValueError(f"Unhandled type of {dx}")
 
-    def render(self, directory, pkgname, globaltimes, binary):
+    def _get_render_dictionary(self, directory, pkgname, globaltimes, binary):
         disdirectory = pathlib.Path(directory) / pkgname
         d: dict[str, Any] = {}
         x = self.dataset["idomain"].coords["x"]
@@ -156,8 +156,7 @@ class StructuredDiscretization(Package, IRegridPackage, IMaskingSettings):
         d["idomain_layered"], d["idomain"] = self._compose_values(
             self["idomain"], disdirectory, "idomain", binary=binary
         )
-
-        return self._template.render(d)
+        return d
 
     def _validate(self, schemata, **kwargs):
         # Insert additional kwargs

@@ -3,13 +3,16 @@ import re
 import tempfile
 import textwrap
 from copy import deepcopy
+from datetime import datetime
 
+import dask
 import numpy as np
 import pytest
 import xarray as xr
 
 import imod
 from imod.mf6.dis import StructuredDiscretization
+from imod.mf6.validation_settings import ValidationSettings
 from imod.mf6.write_context import WriteContext
 from imod.schemata import ValidationError
 from imod.typing.grid import is_planar_grid, is_transient_data_grid, nan_like
@@ -279,6 +282,31 @@ def test_validate_false():
     imod.mf6.Recharge(rate=0.001, validate=False)
 
 
+@pytest.mark.timeout(10, method="thread")
+def test_ignore_time_validation():
+    # Create a large recharge dataset with a time dimension. This is to test the
+    # performance of the validation when ignore_time_no_data is True.
+    rng = dask.array.random.default_rng()
+    layer = [1, 2, 3]
+    template = imod.util.empty_3d(1.0, 0.0, 1000.0, 1.0, 0.0, 1000.0, layer)
+    idomain = xr.ones_like(template, dtype=np.int32)
+    layer_bottom = xr.DataArray(
+        [0.0, -10.0, -20.0], coords={"layer": layer}, dims=["layer"]
+    )
+    bottom = layer_bottom * idomain
+    x = rng.random((10000, 3, 1000, 1000), chunks=(1, -1, -1, -1))
+    rate = xr.DataArray(x, coords=idomain.coords, dims=("time", "layer", "y", "x"))
+    rch = imod.mf6.Recharge(rate=rate, validate=False)
+    validation_context = ValidationSettings(ignore_time=True)
+    # Act
+    rch._validate(
+        schemata=rch._write_schemata,
+        idomain=idomain,
+        bottom=bottom,
+        validation_context=validation_context,
+    )
+
+
 def test_write_concentration_period_data(rate_fc, concentration_fc):
     globaltimes = np.array(
         [
@@ -330,6 +358,7 @@ def test_clip_box(rch_dict):
 
 def test_planar_rch_from_imod5_constant(imod5_dataset, tmp_path):
     data = deepcopy(imod5_dataset[0])
+    period_data = imod5_dataset[1]
     target_discretization = StructuredDiscretization.from_imod5_data(data)
 
     # create a planar grid with time-independent recharge
@@ -338,7 +367,13 @@ def test_planar_rch_from_imod5_constant(imod5_dataset, tmp_path):
     assert is_planar_grid(data["rch"]["rate"])
 
     # Act
-    rch = imod.mf6.Recharge.from_imod5_data(data, target_discretization)
+    rch = imod.mf6.Recharge.from_imod5_data(
+        data,
+        period_data,
+        target_discretization,
+        time_min=datetime(2002, 2, 2),
+        time_max=datetime(2022, 2, 2),
+    )
     rendered_rch = rch.render(tmp_path, "rch", None, None)
 
     # Assert
@@ -355,11 +390,17 @@ def test_planar_rch_from_imod5_constant(imod5_dataset, tmp_path):
 
 def test_planar_rch_from_imod5_transient(imod5_dataset, tmp_path):
     data = deepcopy(imod5_dataset[0])
+    period_data = imod5_dataset[1]
     target_discretization = StructuredDiscretization.from_imod5_data(data)
 
     # create a grid with recharge for 3 timesteps
     input_recharge = data["rch"]["rate"].copy(deep=True)
-    input_recharge = input_recharge.expand_dims({"time": [0, 1, 2]})
+    times = [
+        np.datetime64("2001-01-01"),
+        np.datetime64("2002-04-01"),
+        np.datetime64("2002-10-01"),
+    ]
+    input_recharge = input_recharge.expand_dims({"time": times})
 
     # make it planar by setting the layer coordinate to -1
     input_recharge = input_recharge.assign_coords({"layer": [-1]})
@@ -370,8 +411,16 @@ def test_planar_rch_from_imod5_transient(imod5_dataset, tmp_path):
     assert is_planar_grid(data["rch"]["rate"])
 
     # act
-    rch = imod.mf6.Recharge.from_imod5_data(data, target_discretization)
-    rendered_rch = rch.render(tmp_path, "rch", [0, 1, 2], None)
+    rch = imod.mf6.Recharge.from_imod5_data(
+        data,
+        period_data,
+        target_discretization,
+        time_min=datetime(2002, 2, 2),
+        time_max=datetime(2022, 2, 2),
+    )
+    globaltimes = times + [np.datetime64("2022-02-02")]
+    globaltimes[0] = np.datetime64("2002-02-02")
+    rendered_rch = rch.render(tmp_path, "rch", globaltimes, None)
 
     # assert
     np.testing.assert_allclose(
@@ -385,6 +434,7 @@ def test_planar_rch_from_imod5_transient(imod5_dataset, tmp_path):
 
 def test_non_planar_rch_from_imod5_constant(imod5_dataset, tmp_path):
     data = deepcopy(imod5_dataset[0])
+    period_data = imod5_dataset[1]
     target_discretization = StructuredDiscretization.from_imod5_data(data)
 
     # make the first layer of the target grid inactive
@@ -404,7 +454,13 @@ def test_non_planar_rch_from_imod5_constant(imod5_dataset, tmp_path):
     assert not is_transient_data_grid(data["rch"]["rate"])
 
     # act
-    rch = imod.mf6.Recharge.from_imod5_data(data, target_discretization)
+    rch = imod.mf6.Recharge.from_imod5_data(
+        data,
+        period_data,
+        target_discretization,
+        time_min=datetime(2002, 2, 2),
+        time_max=datetime(2022, 2, 2),
+    )
     rendered_rch = rch.render(tmp_path, "rch", None, None)
 
     # assert
@@ -422,6 +478,7 @@ def test_non_planar_rch_from_imod5_constant(imod5_dataset, tmp_path):
 
 def test_non_planar_rch_from_imod5_transient(imod5_dataset, tmp_path):
     data = deepcopy(imod5_dataset[0])
+    period_data = imod5_dataset[1]
     target_discretization = StructuredDiscretization.from_imod5_data(data)
     # make the first layer of the target grid inactive
     target_grid = target_discretization.dataset["idomain"]
@@ -431,7 +488,12 @@ def test_non_planar_rch_from_imod5_transient(imod5_dataset, tmp_path):
     input_recharge = nan_like(data["rch"]["rate"])
     input_recharge = input_recharge.assign_coords({"layer": [2]})
     input_recharge.loc[{"layer": 2}] = data["rch"]["rate"].sel(layer=1)
-    input_recharge = input_recharge.expand_dims({"time": [0, 1, 2]})
+    times = [
+        np.datetime64("2001-01-01"),
+        np.datetime64("2002-04-01"),
+        np.datetime64("2002-10-01"),
+    ]
+    input_recharge = input_recharge.expand_dims({"time": times})
 
     # update the data set
     data["rch"]["rate"] = input_recharge
@@ -439,8 +501,16 @@ def test_non_planar_rch_from_imod5_transient(imod5_dataset, tmp_path):
     assert is_transient_data_grid(data["rch"]["rate"])
 
     # act
-    rch = imod.mf6.Recharge.from_imod5_data(data, target_discretization)
-    rendered_rch = rch.render(tmp_path, "rch", [0, 1, 2], None)
+    rch = imod.mf6.Recharge.from_imod5_data(
+        data,
+        period_data,
+        target_discretization,
+        time_min=datetime(2002, 2, 2),
+        time_max=datetime(2022, 2, 2),
+    )
+    globaltimes = times + [np.datetime64("2022-02-02")]
+    globaltimes[0] = np.datetime64("2002-02-02")
+    rendered_rch = rch.render(tmp_path, "rch", globaltimes, None)
 
     # assert
     np.testing.assert_allclose(
