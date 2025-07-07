@@ -9,6 +9,21 @@ The format is based on `Keep a Changelog`_, and this project adheres to
 [Unreleased]
 ------------
 
+Fixed
+~~~~~
+
+- Reduce noisy warnings in models loaded with
+  :meth:`imod.mf6.Modflow6Simulation.from_imod5_data` which have layers with
+  cells with zero thicknesses.
+
+Changed
+~~~~~~~
+
+- :meth:`imod.mf6.StructuredDiscretization.from_imod5_data` and
+  :meth:`imod.mf6.NodePropertyFlow.from_imod5_data` now automatically load the
+  dataset into memory. This improves performance when loading models with
+  multiple topsystem packages.
+
 Removed
 ~~~~~~~
 
