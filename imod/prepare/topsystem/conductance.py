@@ -346,6 +346,8 @@ def _compute_layer_thickness(
     top_layered = _enforce_layered_top(top, bottom)
 
     thickness = top_layered - bottom
+    # Set thickness 0.0 to np.nan to avoid division by zero warnings by Dask.
+    thickness = thickness.where(thickness > 0.0)
     return thickness.where(allocated)
 
 
@@ -394,7 +396,7 @@ def _compute_crosscut_thickness(
         bc_top_equals_bc_bottom = bc_top == bc_bottom
         thickness = thickness.where(~bc_top_equals_bc_bottom, layer_thickness)
 
-    thickness = thickness.where(~outside, 0.0)
+    thickness = thickness.where(~outside, np.nan)
 
     return thickness
 
@@ -628,6 +630,6 @@ def split_conductance_with_infiltration_factor(
     river_conductance = conductance * infiltration_factor
 
     # clean up the packages
-    drainage_conductance = drainage_conductance.where(drainage_conductance > 0)
-    river_conductance = river_conductance.where(river_conductance > 0)
+    drainage_conductance = drainage_conductance.where(drainage_conductance > 0.0)
+    river_conductance = river_conductance.where(river_conductance > 0.0)
     return drainage_conductance, river_conductance
