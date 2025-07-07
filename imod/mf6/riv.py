@@ -475,9 +475,11 @@ class River(BoundaryCondition, IRegridPackage):
         # gather input data
         varnames = ["conductance", "stage", "bottom_elevation", "infiltration_factor"]
         data = {varname: imod5_data[key][varname] for varname in varnames}
+        mask = data["conductance"] > 0
+        data["conductance"] = data["conductance"].where(mask)
         # Regrid the input data
         regridded_riv_pkg_data = regrid_imod5_pkg_data(
-            River, data, target_dis, regridder_types, regrid_cache
+            cls, data, target_dis, regridder_types, regrid_cache
         )
         regridded_riv_pkg_data = broadcast_and_mask_arrays(regridded_riv_pkg_data)
         # Pop infiltration_factor to avoid unnecessarily allocating and
@@ -508,7 +510,7 @@ class River(BoundaryCondition, IRegridPackage):
         regridded_riv_pkg_data, infiltration_drn_data = _separate_infiltration_data(
             regridded_riv_pkg_data, infiltration_factor
         )
-        riv_pkg = River(**regridded_riv_pkg_data, validate=True)
+        riv_pkg = cls(**regridded_riv_pkg_data, validate=True)
         drn_pkg = _create_drain_from_leftover_riv_imod5_data(
             allocation_drn_data,
             infiltration_drn_data,

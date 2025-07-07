@@ -5,13 +5,15 @@ from typing import Optional
 import numpy as np
 
 from imod.common.interfaces.iregridpackage import IRegridPackage
-from imod.common.utilities.regrid import _regrid_package_data
 from imod.logging import init_log_decorator
 from imod.logging.logging_decorators import standard_log_decorator
 from imod.mf6.boundary_condition import BoundaryCondition
 from imod.mf6.dis import StructuredDiscretization
 from imod.mf6.regrid.regrid_schemes import ConstantHeadRegridMethod
-from imod.mf6.utilities.imod5_converter import chd_cells_from_imod5_data
+from imod.mf6.utilities.imod5_converter import (
+    chd_cells_from_imod5_data,
+    regrid_imod5_pkg_data,
+)
 from imod.mf6.utilities.package import set_repeat_stress_if_available
 from imod.mf6.validation import BOUNDARY_DIMS_SCHEMA, CONC_DIMS_SCHEMA
 from imod.schemata import (
@@ -296,13 +298,10 @@ class ConstantHead(BoundaryCondition, IRegridPackage):
     ) -> "ConstantHead":
         target_idomain = target_dis.dataset["idomain"]
 
-        if regridder_types is None:
-            regridder_types = ConstantHead.get_regrid_methods()
-
         data = {"head": head, "ibound": ibound}
 
-        regridded_pkg_data = _regrid_package_data(
-            data, target_idomain, regridder_types, regrid_cache, {}
+        regridded_pkg_data = regrid_imod5_pkg_data(
+            cls, data, target_dis, regridder_types, regrid_cache
         )
         chd_pkg_data = chd_cells_from_imod5_data(regridded_pkg_data, target_idomain)
         chd = cls(**chd_pkg_data, validate=True)
