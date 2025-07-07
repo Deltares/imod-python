@@ -141,13 +141,6 @@ mf6_sim["ims"]
 #
 # By default the data is chunked per raster file, which is a chunk per layer,
 # per timestep. Usually this is not optimal, as this creates many small chunks.
-# The discretization (DIS) package and node property flow (NPF) package are used
-# frequently during the validation process, so it saves us a lot of waiting time
-# if we load these into memory.
-#
-gwf_model = mf6_sim["imported_model"]
-
-# %%
 #
 # Writing the structured model: in fits and starts
 # ------------------------------------------------
@@ -167,7 +160,7 @@ with imod.util.print_if_error(ValueError):
 # We are still missing output control, as the projectfile does not contain this
 # information. For this example, we'll only save the last head of each stress period.
 
-
+gwf_model = mf6_sim["imported_model"]
 gwf_model["oc"] = imod.mf6.OutputControl(
     save_head="last",
 )
