@@ -146,8 +146,6 @@ mf6_sim["ims"]
 # if we load these into memory.
 #
 gwf_model = mf6_sim["imported_model"]
-gwf_model["dis"].dataset.load()
-gwf_model["npf"].dataset.load()
 
 # %%
 #
@@ -448,15 +446,15 @@ head_structured_upscaled = regridder.regrid(head_structured)
 # differences. We can see around the western fault that the regridding caused
 # differences.
 
-diff = head_structured_upscaled - head_unstructured
-diff.isel(time=-1).mean(dim="layer").ugrid.plot()
+diff = (head_structured_upscaled - head_unstructured).isel(time=-1).compute()
+diff.mean(dim="layer").ugrid.plot()
 
 # %%
 #
 # Let's also plot the standard deviation of the difference. This shows that
 # variations in difference are also mostly around the western fault.
 
-diff.isel(time=-1).std(dim="layer").ugrid.plot()
+diff.std(dim="layer").ugrid.plot()
 
 # %%
 #

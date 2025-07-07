@@ -525,7 +525,9 @@ class NodePropertyFlow(Package, IRegridPackage):
         )
         new_package_data["icelltype"] = icelltype
 
-        return NodePropertyFlow(**new_package_data, validate=True)
+        pkg = cls(**new_package_data, validate=True)
+        pkg.dataset.load()  # Force dask dataset into memory
+        return pkg
 
     @classmethod
     def get_regrid_methods(cls) -> NodePropertyFlowRegridMethod:
