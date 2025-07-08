@@ -6,8 +6,10 @@ import numpy as np
 
 from imod import logging
 from imod.common.interfaces.iregridpackage import IRegridPackage
+from imod.common.utilities.dataclass_type import DataclassType
 from imod.common.utilities.mask import broadcast_and_mask_arrays
 from imod.logging import init_log_decorator, standard_log_decorator
+from imod.mf6.aggregate.aggregate_schemes import RiverAggregationMethod
 from imod.mf6.boundary_condition import BoundaryCondition
 from imod.mf6.dis import StructuredDiscretization
 from imod.mf6.disv import VerticesDiscretization
@@ -254,6 +256,7 @@ class River(BoundaryCondition, IRegridPackage):
     _template = BoundaryCondition._initialize_template(_pkg_id)
     _auxiliary_data = {"concentration": "species"}
     _regrid_method = RiverRegridMethod()
+    _aggregate_method: DataclassType = RiverAggregationMethod()
 
     @init_log_decorator()
     def __init__(
