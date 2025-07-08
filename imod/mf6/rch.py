@@ -6,12 +6,14 @@ import numpy as np
 import xarray as xr
 
 from imod.common.interfaces.iregridpackage import IRegridPackage
-from imod.common.utilities.regrid import _regrid_package_data
 from imod.logging import init_log_decorator
 from imod.mf6.boundary_condition import BoundaryCondition
 from imod.mf6.dis import StructuredDiscretization
 from imod.mf6.regrid.regrid_schemes import RechargeRegridMethod
-from imod.mf6.utilities.imod5_converter import convert_unit_rch_rate
+from imod.mf6.utilities.imod5_converter import (
+    convert_unit_rch_rate,
+    regrid_imod5_pkg_data,
+)
 from imod.mf6.utilities.package import set_repeat_stress_if_available
 from imod.mf6.validation import BOUNDARY_DIMS_SCHEMA, CONC_DIMS_SCHEMA
 from imod.msw.utilities.imod5_converter import (
@@ -255,18 +257,12 @@ class Recharge(BoundaryCondition, IRegridPackage):
         Modflow 6 rch package.
 
         """
-        new_idomain = target_dis.dataset["idomain"]
         data = {
             "rate": convert_unit_rch_rate(imod5_data["rch"]["rate"]),
         }
-        # first regrid the inputs to the target grid.
-        if regridder_types is None:
-            regridder_settings = Recharge.get_regrid_methods()
-
-        regridded_package_data = _regrid_package_data(
-            data, new_idomain, regridder_settings, regrid_cache, {}
+        regridded_package_data = regrid_imod5_pkg_data(
+            cls, data, target_dis, regridder_types, regrid_cache
         )
-
         # if rate has only layer 0, then it is planar.
         if is_planar_grid(regridded_package_data["rate"]):
             layered_data = cls.allocate_planar_data(regridded_package_data, target_dis)

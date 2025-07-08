@@ -141,15 +141,6 @@ mf6_sim["ims"]
 #
 # By default the data is chunked per raster file, which is a chunk per layer,
 # per timestep. Usually this is not optimal, as this creates many small chunks.
-# The discretization (DIS) package and node property flow (NPF) package are used
-# frequently during the validation process, so it saves us a lot of waiting time
-# if we load these into memory.
-#
-gwf_model = mf6_sim["imported_model"]
-gwf_model["dis"].dataset.load()
-gwf_model["npf"].dataset.load()
-
-# %%
 #
 # Writing the structured model: in fits and starts
 # ------------------------------------------------
@@ -169,7 +160,7 @@ with imod.util.print_if_error(ValueError):
 # We are still missing output control, as the projectfile does not contain this
 # information. For this example, we'll only save the last head of each stress period.
 
-
+gwf_model = mf6_sim["imported_model"]
 gwf_model["oc"] = imod.mf6.OutputControl(
     save_head="last",
 )
@@ -448,15 +439,15 @@ head_structured_upscaled = regridder.regrid(head_structured)
 # differences. We can see around the western fault that the regridding caused
 # differences.
 
-diff = head_structured_upscaled - head_unstructured
-diff.isel(time=-1).mean(dim="layer").ugrid.plot()
+diff = (head_structured_upscaled - head_unstructured).isel(time=-1).compute()
+diff.mean(dim="layer").ugrid.plot()
 
 # %%
 #
 # Let's also plot the standard deviation of the difference. This shows that
 # variations in difference are also mostly around the western fault.
 
-diff.isel(time=-1).std(dim="layer").ugrid.plot()
+diff.std(dim="layer").ugrid.plot()
 
 # %%
 #
