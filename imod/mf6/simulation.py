@@ -282,7 +282,7 @@ class Modflow6Simulation(collections.UserDict, ISimulation):
         ----------
         directory: str, pathlib.Path
             Directory to write Modflow 6 simulation to.
-        use_binary: ({True, False}, optional)
+        binary: ({True, False}, optional)
             Whether to write time-dependent input for stress packages as binary
             files, which are smaller in size, or more human-readable text files.
         validate: ({True, False}, optional)
