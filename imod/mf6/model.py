@@ -346,7 +346,7 @@ class Modflow6Model(collections.UserDict, IModel, abc.ABC):
         modelname: str,
         globaltimes: Union[list[np.datetime64], np.ndarray],
         directory: str | Path,
-        use_binary: bool = True,
+        binary: bool = True,
         use_absolute_paths: bool = False,
         validate: bool = True,
     ):
@@ -365,7 +365,7 @@ class Modflow6Model(collections.UserDict, IModel, abc.ABC):
             Times of the simulation's stress periods.
         directory: str | Path
             Directory in which the simulation will be written.
-        use_binary: bool = True
+        binary: bool = True
             Whether to write time-dependent input for stress packages as binary
             files, which are smaller in size, or more human-readable text files.
         use_absolute_paths: bool = False
@@ -375,7 +375,7 @@ class Modflow6Model(collections.UserDict, IModel, abc.ABC):
             write. If True, erronous model input will throw a
             ``ValidationError``.
         """
-        write_context = WriteContext(Path(directory), use_binary, use_absolute_paths)
+        write_context = WriteContext(Path(directory), binary, use_absolute_paths)
         validate_context = ValidationSettings(validate, validate, validate)
 
         status_info = self._write(
