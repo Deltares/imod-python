@@ -25,7 +25,7 @@ from imod.common.interfaces.isimulation import ISimulation
 from imod.common.statusinfo import NestedStatusInfo
 from imod.common.utilities.mask import _mask_all_models
 from imod.common.utilities.regrid import _regrid_like
-from imod.common.utilities.regrid_method_type import RegridMethodType
+from imod.common.utilities.dataclass_type import RegridMethodType
 from imod.common.utilities.version import (
     get_version,
     log_versions,

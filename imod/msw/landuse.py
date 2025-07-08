@@ -1,7 +1,7 @@
 from typing import Any, TextIO
 
 from imod.common.interfaces.iregridpackage import IRegridPackage
-from imod.common.utilities.regrid_method_type import EmptyRegridMethod, RegridMethodType
+from imod.common.utilities.dataclass_type import EmptyRegridMethod, RegridMethodType
 from imod.msw.fixed_format import VariableMetaData
 from imod.msw.pkgbase import MetaSwapPackage
 

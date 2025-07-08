@@ -6,7 +6,7 @@ import xarray as xr
 
 from imod.common.interfaces.iregridpackage import IRegridPackage
 from imod.common.utilities.regrid import _regrid_array
-from imod.common.utilities.regrid_method_type import RegridMethodType
+from imod.common.utilities.dataclass_type import RegridMethodType
 from imod.msw.fixed_format import VariableMetaData
 from imod.msw.pkgbase import MetaSwapPackage
 from imod.msw.regrid.regrid_schemes import IdfMappingRegridMethod

@@ -33,7 +33,7 @@ from imod.common.utilities.mask import mask_package
 from imod.common.utilities.regrid import (
     _regrid_like,
 )
-from imod.common.utilities.regrid_method_type import EmptyRegridMethod, RegridMethodType
+from imod.common.utilities.dataclass_type import EmptyRegridMethod, RegridMethodType
 from imod.common.utilities.schemata import (
     filter_schemata_dict,
     validate_schemata_dict,

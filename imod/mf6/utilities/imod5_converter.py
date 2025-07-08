@@ -5,7 +5,7 @@ import pandas as pd
 import xarray as xr
 
 from imod.common.utilities.regrid import _regrid_package_data
-from imod.common.utilities.regrid_method_type import RegridMethodType
+from imod.common.utilities.dataclass_type import RegridMethodType
 from imod.mf6.package import Package
 from imod.typing import GridDataArray, GridDataDict, Imod5DataDict
 from imod.typing.grid import full_like

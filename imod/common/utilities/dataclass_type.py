@@ -1,9 +1,7 @@
-from typing import ClassVar, Protocol, Tuple, TypeAlias, runtime_checkable
+from typing import ClassVar, Protocol, runtime_checkable
 
 from pydantic import ConfigDict
 from pydantic.dataclasses import dataclass
-
-from imod.util.regrid import RegridderType
 
 
 @runtime_checkable
@@ -29,5 +27,3 @@ _CONFIG = ConfigDict(extra="forbid")
 class EmptyRegridMethod(RegridMethodType):
     pass
 
-
-_RegridVarType: TypeAlias = Tuple[RegridderType, str] | Tuple[RegridderType]

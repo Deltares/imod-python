@@ -6,7 +6,7 @@ import numpy as np
 
 from imod.common.interfaces.iregridpackage import IRegridPackage
 from imod.common.utilities.mask import broadcast_and_mask_arrays
-from imod.common.utilities.regrid_method_type import RegridMethodType
+from imod.common.utilities.dataclass_type import RegridMethodType
 from imod.logging import init_log_decorator, standard_log_decorator
 from imod.mf6.boundary_condition import BoundaryCondition
 from imod.mf6.dis import StructuredDiscretization

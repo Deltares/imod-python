@@ -1,14 +1,15 @@
+from typing import Tuple, TypeAlias
 from pydantic.dataclasses import dataclass
 
-from imod.common.utilities.regrid_method_type import (
+from imod.common.utilities.dataclass_type import (
     _CONFIG,
     RegridMethodType,
-    _RegridVarType,
 )
 from imod.util.regrid import (
     RegridderType,
 )
 
+_RegridVarType: TypeAlias = Tuple[RegridderType, str] | Tuple[RegridderType]
 
 @dataclass(config=_CONFIG)
 class ConstantHeadRegridMethod(RegridMethodType):

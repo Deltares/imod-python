@@ -10,7 +10,7 @@ import xarray as xr
 
 import imod
 from imod.common.utilities.clip import clip_spatial_box, clip_time_slice
-from imod.common.utilities.regrid_method_type import RegridMethodType
+from imod.common.utilities.dataclass_type import RegridMethodType
 from imod.msw.fixed_format import VariableMetaData
 from imod.msw.pkgbase import MetaSwapPackage
 from imod.msw.utilities.common import find_in_file_list

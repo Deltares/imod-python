@@ -12,7 +12,7 @@ from imod.common.utilities.clip import clip_spatial_box, clip_time_slice
 from imod.common.utilities.regrid import (
     _regrid_like,
 )
-from imod.common.utilities.regrid_method_type import EmptyRegridMethod, RegridMethodType
+from imod.common.utilities.dataclass_type import EmptyRegridMethod, RegridMethodType
 from imod.mf6.dis import StructuredDiscretization
 from imod.mf6.mf6_wel_adapter import Mf6Wel
 from imod.msw.fixed_format import format_fixed_width
