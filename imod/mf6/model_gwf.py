@@ -7,7 +7,7 @@ from typing import Optional, cast
 import cftime
 import numpy as np
 
-from imod.common.utilities.dataclass_type import RegridMethodType
+from imod.common.utilities.dataclass_type import DataclassType
 from imod.logging import init_log_decorator
 from imod.logging.logging_decorators import standard_log_decorator
 from imod.mf6 import ConstantHead
@@ -207,7 +207,7 @@ class GroundwaterFlowModel(Modflow6Model):
         times: list[datetime],
         allocation_options: Optional[SimulationAllocationOptions] = None,
         distributing_options: Optional[SimulationDistributingOptions] = None,
-        regridder_types: Optional[dict[str, RegridMethodType]] = None,
+        regridder_types: Optional[dict[str, DataclassType]] = None,
     ) -> "GroundwaterFlowModel":
         """
         Imports a GroundwaterFlowModel (GWF) from the data in an iMOD5 project

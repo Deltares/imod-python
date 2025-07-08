@@ -4,8 +4,8 @@ import numpy as np
 import pandas as pd
 import xarray as xr
 
+from imod.common.utilities.dataclass_type import DataclassType
 from imod.common.utilities.regrid import _regrid_package_data
-from imod.common.utilities.dataclass_type import RegridMethodType
 from imod.mf6.package import Package
 from imod.typing import GridDataArray, GridDataDict, Imod5DataDict
 from imod.typing.grid import full_like
@@ -119,7 +119,7 @@ def regrid_imod5_pkg_data(
     cls: type[Package],
     imod5_pkg_data: GridDataDict,
     target_dis: Package,
-    regridder_types: Optional[RegridMethodType],
+    regridder_types: Optional[DataclassType],
     regrid_cache: RegridderWeightsCache,
 ) -> GridDataDict:
     """

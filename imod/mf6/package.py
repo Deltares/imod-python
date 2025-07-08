@@ -29,11 +29,11 @@ from imod.common.utilities.clip import (
     clip_spatial_box,
     clip_time_slice,
 )
+from imod.common.utilities.dataclass_type import DataclassType, EmptyRegridMethod
 from imod.common.utilities.mask import mask_package
 from imod.common.utilities.regrid import (
     _regrid_like,
 )
-from imod.common.utilities.dataclass_type import EmptyRegridMethod, RegridMethodType
 from imod.common.utilities.schemata import (
     filter_schemata_dict,
     validate_schemata_dict,
@@ -81,7 +81,7 @@ class Package(PackageBase, IPackage, abc.ABC):
     _init_schemata: SchemataDict = {}
     _write_schemata: SchemataDict = {}
     _keyword_map: dict[str, str] = {}
-    _regrid_method: RegridMethodType = EmptyRegridMethod()
+    _regrid_method: DataclassType = EmptyRegridMethod()
     _template: jinja2.Template
 
     def __init__(self, allargs: Mapping[str, GridDataArray | float | int | bool | str]):
@@ -480,7 +480,7 @@ class Package(PackageBase, IPackage, abc.ABC):
         self,
         target_grid: GridDataArray,
         regrid_cache: RegridderWeightsCache,
-        regridder_types: Optional[RegridMethodType] = None,
+        regridder_types: Optional[DataclassType] = None,
     ) -> "Package":
         """
         Creates a package of the same type as this package, based on another
@@ -615,5 +615,5 @@ class Package(PackageBase, IPackage, abc.ABC):
         return True
 
     @classmethod
-    def get_regrid_methods(cls) -> RegridMethodType:
+    def get_regrid_methods(cls) -> DataclassType:
         return deepcopy(cls._regrid_method)

@@ -1,7 +1,7 @@
 from typing import Any, TextIO
 
 from imod.common.interfaces.iregridpackage import IRegridPackage
-from imod.common.utilities.dataclass_type import EmptyRegridMethod, RegridMethodType
+from imod.common.utilities.dataclass_type import DataclassType, EmptyRegridMethod
 from imod.msw.fixed_format import VariableMetaData
 from imod.msw.pkgbase import MetaSwapPackage
 
@@ -126,7 +126,7 @@ class LanduseOptions(MetaSwapPackage, IRegridPackage):
 
     _file_name = "luse_svat.inp"
 
-    _regrid_method: RegridMethodType = EmptyRegridMethod()
+    _regrid_method: DataclassType = EmptyRegridMethod()
 
     def __init__(
         self,

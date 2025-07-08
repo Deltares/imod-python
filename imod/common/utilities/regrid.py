@@ -16,7 +16,7 @@ from imod.common.interfaces.iregridpackage import IRegridPackage
 from imod.common.interfaces.isimulation import ISimulation
 from imod.common.statusinfo import NestedStatusInfo
 from imod.common.utilities.clip import clip_by_grid
-from imod.common.utilities.dataclass_type import EmptyRegridMethod, RegridMethodType
+from imod.common.utilities.dataclass_type import DataclassType, EmptyRegridMethod
 from imod.common.utilities.value_filters import is_valid
 from imod.mf6.validation_settings import ValidationSettings
 from imod.schemata import ValidationError
@@ -109,7 +109,7 @@ def _regrid_array(
 def _regrid_package_data(
     package_data: dict[str, GridDataArray] | GridDataset,
     target_grid: GridDataArray,
-    regridder_settings: RegridMethodType,
+    regridder_settings: DataclassType,
     regrid_cache: RegridderWeightsCache,
     new_package_data: Optional[dict[str, GridDataArray]] = None,
 ) -> dict[str, GridDataArray]:
@@ -122,7 +122,7 @@ def _regrid_package_data(
     if new_package_data is None:
         new_package_data = {}
 
-    settings_dict = RegridMethodType.asdict(regridder_settings)
+    settings_dict = DataclassType.asdict(regridder_settings)
     for (
         varname,
         regridder_type_and_function,
@@ -183,7 +183,7 @@ def _regrid_like(
     package: IRegridPackage,
     target_grid: GridDataArray,
     regrid_cache: RegridderWeightsCache,
-    regridder_types: Optional[RegridMethodType] = None,
+    regridder_types: Optional[DataclassType] = None,
     as_pkg_type: Optional[type[IRegridPackage]] = None,
 ) -> IPackage:
     """

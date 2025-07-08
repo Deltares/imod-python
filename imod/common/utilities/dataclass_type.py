@@ -5,7 +5,7 @@ from pydantic.dataclasses import dataclass
 
 
 @runtime_checkable
-class RegridMethodType(Protocol):
+class DataclassType(Protocol):
     # Work around that type annotation is a bit hard on dataclasses, as they
     # don't expose a class interface.
     # Adapted from: https://stackoverflow.com/a/55240861
@@ -24,6 +24,5 @@ _CONFIG = ConfigDict(extra="forbid")
 
 
 @dataclass(config=_CONFIG)
-class EmptyRegridMethod(RegridMethodType):
+class EmptyRegridMethod(DataclassType):
     pass
-

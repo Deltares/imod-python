@@ -2,7 +2,7 @@ import abc
 from typing import Optional
 
 from imod.common.interfaces.ipackage import IPackage
-from imod.common.utilities.dataclass_type import RegridMethodType
+from imod.common.utilities.dataclass_type import DataclassType
 
 
 class IRegridPackage(IPackage, abc.ABC):
@@ -11,5 +11,5 @@ class IRegridPackage(IPackage, abc.ABC):
     """
 
     @abc.abstractmethod
-    def get_regrid_methods(self) -> Optional[RegridMethodType]:
+    def get_regrid_methods(self) -> Optional[DataclassType]:
         raise NotImplementedError

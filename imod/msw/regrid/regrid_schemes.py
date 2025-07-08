@@ -2,16 +2,16 @@ from pydantic.dataclasses import dataclass
 
 from imod.common.utilities.dataclass_type import (
     _CONFIG,
-    RegridMethodType,
-    _RegridVarType,
+    DataclassType,
 )
 from imod.util.regrid import (
     RegridderType,
+    RegridVarType,
 )
 
 
 @dataclass(config=_CONFIG)
-class SprinklingRegridMethod(RegridMethodType):
+class SprinklingRegridMethod(DataclassType):
     """
     Object containing regridder methods for the
     :class:`imod.msw.Sprinkling` package. This can be provided to the
@@ -35,12 +35,12 @@ class SprinklingRegridMethod(RegridMethodType):
     >>> regrid_method = SprinklingRegridMethod(max_abstraction_groundwater=(RegridderType.OVERLAP, "max",))
     """
 
-    max_abstraction_groundwater: _RegridVarType = (RegridderType.OVERLAP, "mean")
-    max_abstraction_surfacewater: _RegridVarType = (RegridderType.OVERLAP, "mean")
+    max_abstraction_groundwater: RegridVarType = (RegridderType.OVERLAP, "mean")
+    max_abstraction_surfacewater: RegridVarType = (RegridderType.OVERLAP, "mean")
 
 
 @dataclass(config=_CONFIG)
-class MeteoGridRegridMethod(RegridMethodType):
+class MeteoGridRegridMethod(DataclassType):
     """
     Object containing regridder methods for the
     :class:`imod.msw.MeteoGrid` package. This can be provided to the
@@ -64,12 +64,12 @@ class MeteoGridRegridMethod(RegridMethodType):
     >>> regrid_method = MeteoGridRegridMethod(precipitation=(RegridderType.OVERLAP, "max",))
     """
 
-    precipitation: _RegridVarType = (RegridderType.OVERLAP, "mean")
-    evapotranspiration: _RegridVarType = (RegridderType.OVERLAP, "mean")
+    precipitation: RegridVarType = (RegridderType.OVERLAP, "mean")
+    evapotranspiration: RegridVarType = (RegridderType.OVERLAP, "mean")
 
 
 @dataclass(config=_CONFIG)
-class GridDataRegridMethod(RegridMethodType):
+class GridDataRegridMethod(DataclassType):
     """
     Object containing regridder methods for the
     :class:`imod.msw.Grid_data` package. This can be provided to the
@@ -97,16 +97,16 @@ class GridDataRegridMethod(RegridMethodType):
     >>> regrid_method = GridDataRegridMethod(area=(RegridderType.OVERLAP, "max",))
     """
 
-    area: _RegridVarType = (RegridderType.RELATIVEOVERLAP, "conductance")
-    landuse: _RegridVarType = (RegridderType.OVERLAP, "mean")
-    rootzone_depth: _RegridVarType = (RegridderType.OVERLAP, "mean")
-    surface_elevation: _RegridVarType = (RegridderType.OVERLAP, "mean")
-    soil_physical_unit: _RegridVarType = (RegridderType.OVERLAP, "mean")
-    active: _RegridVarType = (RegridderType.OVERLAP, "mean")
+    area: RegridVarType = (RegridderType.RELATIVEOVERLAP, "conductance")
+    landuse: RegridVarType = (RegridderType.OVERLAP, "mean")
+    rootzone_depth: RegridVarType = (RegridderType.OVERLAP, "mean")
+    surface_elevation: RegridVarType = (RegridderType.OVERLAP, "mean")
+    soil_physical_unit: RegridVarType = (RegridderType.OVERLAP, "mean")
+    active: RegridVarType = (RegridderType.OVERLAP, "mean")
 
 
 @dataclass(config=_CONFIG)
-class PondingRegridMethod(RegridMethodType):
+class PondingRegridMethod(DataclassType):
     """
     Object containing regridder methods for the
     :class:`imod.msw.ponding` package. This can be provided to the
@@ -131,13 +131,13 @@ class PondingRegridMethod(RegridMethodType):
     >>> regrid_method = PondingRegridMethod(runoff_resistance=(RegridderType.OVERLAP, "max",))
     """
 
-    ponding_depth: _RegridVarType = (RegridderType.OVERLAP, "mean")
-    runon_resistance: _RegridVarType = (RegridderType.OVERLAP, "mean")
-    runoff_resistance: _RegridVarType = (RegridderType.OVERLAP, "mean")
+    ponding_depth: RegridVarType = (RegridderType.OVERLAP, "mean")
+    runon_resistance: RegridVarType = (RegridderType.OVERLAP, "mean")
+    runoff_resistance: RegridVarType = (RegridderType.OVERLAP, "mean")
 
 
 @dataclass(config=_CONFIG)
-class InfiltrationRegridMethod(RegridMethodType):
+class InfiltrationRegridMethod(DataclassType):
     """
     Object containing regridder methods for the
     :class:`imod.msw.infiltration` package. This can be provided to the
@@ -165,16 +165,16 @@ class InfiltrationRegridMethod(RegridMethodType):
     >>> regrid_method = PondingRegridMethod(bottom_resistance=(RegridderType.OVERLAP, "max",))
     """
 
-    infiltration_capacity: _RegridVarType = (RegridderType.OVERLAP, "mean")
-    downward_resistance: _RegridVarType = (RegridderType.OVERLAP, "mean")
-    upward_resistance: _RegridVarType = (RegridderType.OVERLAP, "mean")
-    longitudinal_vertical: _RegridVarType = (RegridderType.OVERLAP, "mean")
-    bottom_resistance: _RegridVarType = (RegridderType.OVERLAP, "mean")
-    extra_storage_coefficient: _RegridVarType = (RegridderType.OVERLAP, "mean")
+    infiltration_capacity: RegridVarType = (RegridderType.OVERLAP, "mean")
+    downward_resistance: RegridVarType = (RegridderType.OVERLAP, "mean")
+    upward_resistance: RegridVarType = (RegridderType.OVERLAP, "mean")
+    longitudinal_vertical: RegridVarType = (RegridderType.OVERLAP, "mean")
+    bottom_resistance: RegridVarType = (RegridderType.OVERLAP, "mean")
+    extra_storage_coefficient: RegridVarType = (RegridderType.OVERLAP, "mean")
 
 
 @dataclass(config=_CONFIG)
-class ScalingRegridMethod(RegridMethodType):
+class ScalingRegridMethod(DataclassType):
     """
     Object containing regridder methods for the
     :class:`imod.msw.scaling_factors` package. This can be provided to the
@@ -200,18 +200,18 @@ class ScalingRegridMethod(RegridMethodType):
     >>> regrid_method = ScalingRegridMethod(scale_soil_moisture=(RegridderType.OVERLAP, "max",))
     """
 
-    scale_soil_moisture: _RegridVarType = (RegridderType.OVERLAP, "mean")
-    scale_hydraulic_conductivity: _RegridVarType = (RegridderType.OVERLAP, "mean")
-    scale_pressure_head: _RegridVarType = (RegridderType.OVERLAP, "mean")
-    depth_perched_water_table: _RegridVarType = (RegridderType.OVERLAP, "mean")
+    scale_soil_moisture: RegridVarType = (RegridderType.OVERLAP, "mean")
+    scale_hydraulic_conductivity: RegridVarType = (RegridderType.OVERLAP, "mean")
+    scale_pressure_head: RegridVarType = (RegridderType.OVERLAP, "mean")
+    depth_perched_water_table: RegridVarType = (RegridderType.OVERLAP, "mean")
 
 
 @dataclass(config=_CONFIG)
-class IdfMappingRegridMethod(RegridMethodType):
+class IdfMappingRegridMethod(DataclassType):
     """
     Object containing regridder methods for the
     :class:`imod.msw.IdfMapping` package. This can be provided to the
     ``regrid_like`` method to regrid with custom settings.
     """
 
-    area: _RegridVarType = (RegridderType.RELATIVEOVERLAP, "conductance")
+    area: RegridVarType = (RegridderType.RELATIVEOVERLAP, "conductance")

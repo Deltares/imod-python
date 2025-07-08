@@ -1,6 +1,6 @@
 import abc
 from enum import Enum
-from typing import Dict, Optional, Tuple, Union
+from typing import Dict, Optional, Tuple, TypeAlias, Union
 
 import xugrid as xu
 from xugrid.regrid.regridder import BaseRegridder
@@ -37,6 +37,7 @@ class RegridderType(Enum):
 
 
 HashRegridderMapping = Tuple[int, int, BaseRegridder]
+RegridVarType: TypeAlias = Tuple[RegridderType, str] | Tuple[RegridderType]
 
 
 class RegridderWeightsCache:
