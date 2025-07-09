@@ -288,7 +288,7 @@ class BoundaryCondition(Package, abc.ABC):
 
         return result
 
-    def aggregate_over_layers(self) -> GridDataDict:
+    def aggregate_layers(self) -> GridDataDict:
         """
         Aggregate data over layers into planar dataset.
 
