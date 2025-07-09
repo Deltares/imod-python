@@ -307,6 +307,7 @@ class BoundaryCondition(Package, abc.ABC):
         planar_data = {
             key: self.dataset[key].reduce(func, dim="layer")
             for key, func in aggr_methods_dict.items()
+            if key in self.dataset.data_vars
         }
         return planar_data
 
