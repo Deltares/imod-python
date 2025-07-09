@@ -8,12 +8,12 @@ from imod.common.interfaces.iregridpackage import IRegridPackage
 from imod.common.utilities.dataclass_type import DataclassType
 from imod.common.utilities.mask import broadcast_and_mask_arrays
 from imod.logging import init_log_decorator, standard_log_decorator
+from imod.mf6.aggregate.aggregate_schemes import DrainageAggregationMethod
 from imod.mf6.boundary_condition import BoundaryCondition
 from imod.mf6.dis import StructuredDiscretization
 from imod.mf6.disv import VerticesDiscretization
 from imod.mf6.npf import NodePropertyFlow
 from imod.mf6.regrid.regrid_schemes import DrainageRegridMethod
-from imod.mf6.aggregate.aggregate_schemes import DrainageAggregationMethod
 from imod.mf6.utilities.imod5_converter import regrid_imod5_pkg_data
 from imod.mf6.utilities.package import set_repeat_stress_if_available
 from imod.mf6.validation import BOUNDARY_DIMS_SCHEMA, CONC_DIMS_SCHEMA

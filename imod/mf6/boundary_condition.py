@@ -1,19 +1,19 @@
 import abc
-from dataclasses import asdict
 import pathlib
 from copy import copy, deepcopy
+from dataclasses import asdict
 from typing import Mapping, Optional, Union
 
 import numpy as np
 import xarray as xr
 import xugrid as xu
 
+from imod.mf6.aggregate.aggregate_schemes import EmptyAggregationMethod
 from imod.mf6.auxiliary_variables import (
     expand_transient_auxiliary_variables,
     get_variable_names,
 )
 from imod.mf6.package import Package
-from imod.mf6.aggregate.aggregate_schemes import EmptyAggregationMethod
 from imod.mf6.utilities.package import get_repeat_stress
 from imod.mf6.write_context import WriteContext
 from imod.typing import GridDataArray, GridDataDict
@@ -305,7 +305,8 @@ class BoundaryCondition(Package, abc.ABC):
             )
         aggr_methods_dict = asdict(aggr_methods)
         planar_data = {
-            key: self.dataset[key].reduce(func, dim="layer") for key, func in aggr_methods_dict.items()
+            key: self.dataset[key].reduce(func, dim="layer")
+            for key, func in aggr_methods_dict.items()
         }
         return planar_data
 
