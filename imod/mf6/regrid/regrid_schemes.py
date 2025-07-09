@@ -4,7 +4,8 @@ from imod.common.utilities.dataclass_type import (
     _CONFIG,
     DataclassType,
 )
-from imod.util.regrid import RegridderType, RegridVarType
+from imod.common.utilities.regrid import RegridVarType
+from imod.util.regrid import RegridderType
 
 
 @dataclass(config=_CONFIG)
