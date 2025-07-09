@@ -1,7 +1,7 @@
 import copy
 from collections import defaultdict
 from dataclasses import asdict
-from typing import Any, Optional, Union
+from typing import Any, Optional, Tuple, TypeAlias, Union
 
 import xarray as xr
 from plum import Dispatcher
@@ -30,6 +30,8 @@ from imod.util.regrid import (
     RegridderType,
     RegridderWeightsCache,
 )
+
+RegridVarType: TypeAlias = Tuple[RegridderType, str] | Tuple[RegridderType]
 
 # create dispatcher instance to limit scope of typedispatching
 dispatch = Dispatcher()
