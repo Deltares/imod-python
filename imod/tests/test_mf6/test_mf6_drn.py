@@ -241,6 +241,20 @@ def test_3d_singelayer():
     assert isinstance(struct_array, np.ndarray)
 
 
+def test_aggregate_layers(drainage):
+    river = imod.mf6.Drainage(**drainage)
+
+    planar_dict = river.aggregate_layers()
+    assert isinstance(planar_dict, dict)
+    for value in planar_dict.values():
+        assert isinstance(value, xr.DataArray)
+        assert "layer" not in value.dims
+        assert "layer" not in value.coords
+
+    # Conductance should be summed, stage averaged
+    assert not (planar_dict["elevation"] > planar_dict["conductance"]).any()
+
+
 def test_render_concentration(
     concentration_fc,
     elevation_fc,

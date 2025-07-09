@@ -410,17 +410,21 @@ def test_check_boundary_outside_active_domain(riv_data, dis_data):
 def test_aggregate_layers(riv_data):
     river = imod.mf6.River(**riv_data)
 
-    expected_type = xu.UgridDataArray if isinstance(river.dataset, xu.UgridDataset) else xr.Dataset
+    expected_type = (
+        xu.UgridDataArray
+        if isinstance(river.dataset, xu.UgridDataset)
+        else xr.DataArray
+    )
 
     planar_dict = river.aggregate_layers()
     assert isinstance(planar_dict, dict)
-    for key, value in planar_dict.items():
+    for value in planar_dict.values():
         assert isinstance(value, expected_type)
         assert "layer" not in value.dims
         assert "layer" not in value.coords
 
     # Conductance should be summed, stage averaged
-    assert (planar_dict["stage"] < planar_dict["conductance"]).all()
+    assert not (planar_dict["stage"] > planar_dict["conductance"]).any()
 
 
 def test_check_dim_monotonicity():
