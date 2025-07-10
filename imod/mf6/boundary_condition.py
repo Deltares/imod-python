@@ -2,7 +2,7 @@ import abc
 import pathlib
 from copy import copy, deepcopy
 from dataclasses import asdict
-from typing import Mapping, Optional, Union
+from typing import Mapping, Optional, Self, Union
 
 import numpy as np
 import xarray as xr
@@ -334,7 +334,7 @@ class BoundaryCondition(Package, abc.ABC):
         npf: NodePropertyFlow,
         allocation_option: ALLOCATION_OPTION,
         distributing_option: DISTRIBUTING_OPTION,
-    ):
+    ) -> Self:
         """
         Reallocates topsystem data across layers in place. Aggregate data to
         planar data first, by taking the mean across layers for the stage and bottom
