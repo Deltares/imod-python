@@ -456,6 +456,30 @@ def test_reallocate(riv_data, dis_data):
     assert river_reallocated["stage"].mean("layer").equals(river["stage"].mean("layer"))
 
 
+@parametrize_with_cases("riv_data,dis_data", cases=RivDisCases)
+def test_reallocate__wrong_allocation_option(riv_data, dis_data):
+    # Arrange
+    river = imod.mf6.River(**riv_data)
+    is_unstructured = isinstance(riv_data["stage"], xu.UgridDataArray)
+    dis_pkg_type = (
+        imod.mf6.VerticesDiscretization
+        if is_unstructured
+        else imod.mf6.StructuredDiscretization
+    )
+    dis = dis_pkg_type(**dis_data)
+    npf = imod.mf6.NodePropertyFlow(icelltype=0, k=1.0)
+    allocation_option = (
+        ALLOCATION_OPTION.stage_to_riv_bot_drn_above
+    )  # unsupported option
+    distributing_option = DISTRIBUTING_OPTION.by_corrected_transmissivity
+    # Act
+    with pytest.raises(
+        ValueError,
+        match="Allocation option ALLOCATION_OPTION.stage_to_riv_bot_drn_above",
+    ):
+        river.reallocate(dis, npf, allocation_option, distributing_option)
+
+
 def test_check_dim_monotonicity():
     """
     Test if dimensions are monotonically increasing or, in case of the y coord,
