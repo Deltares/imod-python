@@ -19,7 +19,11 @@ from imod.mf6.npf import NodePropertyFlow
 from imod.mf6.package import Package
 from imod.mf6.utilities.package import get_repeat_stress
 from imod.mf6.write_context import WriteContext
-from imod.prepare.topsystem import ALLOCATION_OPTION, DISTRIBUTING_OPTION
+from imod.prepare.topsystem import (
+    ALLOCATION_OPTION,
+    DISTRIBUTING_OPTION,
+    SimulationAllocationOptions,
+)
 from imod.typing import GridDataArray, GridDataDict
 
 
@@ -331,9 +335,9 @@ class BoundaryCondition(Package, abc.ABC):
     def reallocate(
         self,
         dis: StructuredDiscretization | VerticesDiscretization,
-        npf: NodePropertyFlow,
-        allocation_option: ALLOCATION_OPTION,
-        distributing_option: DISTRIBUTING_OPTION,
+        npf: Optional[NodePropertyFlow] = None,
+        allocation_option: Optional[ALLOCATION_OPTION] = None,
+        distributing_option: Optional[DISTRIBUTING_OPTION] = None,
     ) -> Self:
         """
         Reallocates topsystem data across layers in place. Aggregate data to
@@ -346,23 +350,36 @@ class BoundaryCondition(Package, abc.ABC):
         dis : StructuredDiscretization | VerticesDiscretization
             The discretization of the model to which the river data should be
             reallocated.
-        npf : NodePropertyFlow
+        npf : NodePropertyFlow, optional
             The node property flow package of the model to which the river
-            conductance should be distributed (if applicable).
-        allocation_option : ALLOCATION_OPTION
-            The allocation option to use for the reallocation.
-        distributing_option : DISTRIBUTING_OPTION
-            The distributing option to use for the reallocation.
+            conductance should be distributed (if applicable). Required for
+            packages with a conductance variable.
+        allocation_option : ALLOCATION_OPTION, optional
+            The allocation option to use for the reallocation. If None, the
+            default allocation option is taken.
+        distributing_option : DISTRIBUTING_OPTION, optional
+            The distributing option to use for the reallocation. Required for
+            packages with a conductance variable.
         """
-        if allocation_option == ALLOCATION_OPTION.stage_to_riv_bot_drn_above:
+        if allocation_option is None:
+            allocation_option = asdict(SimulationAllocationOptions())[self._pkg_id]
+        elif allocation_option == ALLOCATION_OPTION.stage_to_riv_bot_drn_above:
             raise ValueError(
                 f"Allocation option {allocation_option} is not supported for "
                 "reallocation of boundary conditions."
             )
         planar_data = self.aggregate_layers()
-        grid_dict = self.allocate_and_distribute_planar_data(
-            planar_data, dis, npf, allocation_option, distributing_option
-        )
+        if "conductance" in self.dataset.data_vars:
+            if (distributing_option is None) or (npf is None):
+                raise ValueError(
+                    "Distributing option and NodePropertyFlow must be provided "
+                    "for packages with conductance variable."
+                )
+            grid_dict = self.allocate_and_distribute_planar_data(
+                planar_data, dis, npf, allocation_option, distributing_option
+            )
+        else:
+            grid_dict = self.allocate_planar_data(planar_data, dis, allocation_option)
         # River package returns a tuple (can also be Drain package)
         if isinstance(grid_dict, tuple):
             grid_dict, _ = grid_dict
@@ -378,6 +395,18 @@ class BoundaryCondition(Package, abc.ABC):
         npf: NodePropertyFlow,
         allocation_option: ALLOCATION_OPTION,
         distributing_option: DISTRIBUTING_OPTION,
+    ) -> tuple[GridDataDict, GridDataDict] | GridDataDict:
+        raise NotImplementedError(
+            "This method should be implemented in the specific boundary condition "
+            "class that inherits from BoundaryCondition."
+        )
+
+    @classmethod
+    def allocate_planar_data(
+        cls,
+        planar_data: GridDataDict,
+        dis: StructuredDiscretization | VerticesDiscretization,
+        allocation_option: ALLOCATION_OPTION,
     ) -> tuple[GridDataDict, GridDataDict] | GridDataDict:
         raise NotImplementedError(
             "This method should be implemented in the specific boundary condition "

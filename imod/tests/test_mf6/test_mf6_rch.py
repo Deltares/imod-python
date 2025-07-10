@@ -14,6 +14,7 @@ import imod
 from imod.mf6.dis import StructuredDiscretization
 from imod.mf6.validation_settings import ValidationSettings
 from imod.mf6.write_context import WriteContext
+from imod.prepare.topsystem.allocation import ALLOCATION_OPTION
 from imod.schemata import ValidationError
 from imod.typing.grid import is_planar_grid, is_transient_data_grid, nan_like
 from imod.util.regrid import RegridderWeightsCache
@@ -366,6 +367,31 @@ def test_clip_box(rch_dict):
     selection = rch.clip_box(x_min=10.0, x_max=20.0, y_min=10.0, y_max=20.0)
     assert selection["rate"].dims == ("y", "x")
     assert selection["rate"].shape == (1, 1)
+
+
+@pytest.mark.parametrize(
+    "allocation_option",
+    [None, ALLOCATION_OPTION.at_first_active, ALLOCATION_OPTION.stage_to_riv_bot],
+)
+def test_reallocate(rch_dict, allocation_option):
+    # Arrange
+    rch = imod.mf6.Recharge(**rch_dict)
+    idomain = rch_dict["rate"].fillna(0.0).astype(np.int16)
+    top = 1.0
+    bottom = top - idomain.coords["layer"]
+    dis = imod.mf6.StructuredDiscretization(top=top, bottom=bottom, idomain=idomain)
+    if allocation_option is ALLOCATION_OPTION.stage_to_riv_bot:
+        # Act
+        with pytest.raises(
+            ValueError, match="Received incompatible setting for recharge"
+        ):
+            rch.reallocate(dis, allocation_option=allocation_option)
+    else:
+        # Act
+        rch_reallocated = rch.reallocate(dis, allocation_option=allocation_option)
+        # Assert
+        assert isinstance(rch_reallocated, imod.mf6.Recharge)
+        assert rch_reallocated.dataset.equals(rch.dataset)
 
 
 def test_planar_rch_from_imod5_constant(imod5_dataset, tmp_path):
