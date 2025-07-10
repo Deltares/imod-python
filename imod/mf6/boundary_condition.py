@@ -13,9 +13,13 @@ from imod.mf6.auxiliary_variables import (
     expand_transient_auxiliary_variables,
     get_variable_names,
 )
+from imod.mf6.dis import StructuredDiscretization
+from imod.mf6.disv import VerticesDiscretization
+from imod.mf6.npf import NodePropertyFlow
 from imod.mf6.package import Package
 from imod.mf6.utilities.package import get_repeat_stress
 from imod.mf6.write_context import WriteContext
+from imod.prepare.topsystem import ALLOCATION_OPTION, DISTRIBUTING_OPTION
 from imod.typing import GridDataArray, GridDataDict
 
 
@@ -198,7 +202,7 @@ class BoundaryCondition(Package, abc.ABC):
 
         return periods
 
-    def _get_options(
+    def _get_unfiltered_options(
         self, predefined_options: dict, not_options: Optional[list] = None
     ):
         options = copy(predefined_options)
@@ -210,8 +214,21 @@ class BoundaryCondition(Package, abc.ABC):
             if varname in not_options:
                 continue
             v = self.dataset[varname].values[()]
-            if self._valid(v):  # skip None and False
-                options[varname] = v
+            options[varname] = v
+        return options
+
+    def _get_options(
+        self, predefined_options: dict, not_options: Optional[list] = None
+    ):
+        unfiltered_options = self._get_unfiltered_options(
+            predefined_options, not_options=not_options
+        )
+        # Filter out options which are None or False
+        options = {
+            key: value
+            for key, value in unfiltered_options.items()
+            if self._valid(value)
+        }
         return options
 
     def _get_bin_ds(self):
@@ -310,6 +327,62 @@ class BoundaryCondition(Package, abc.ABC):
             if key in self.dataset.data_vars
         }
         return planar_data
+
+    def reallocate(
+        self,
+        dis: StructuredDiscretization | VerticesDiscretization,
+        npf: NodePropertyFlow,
+        allocation_option: ALLOCATION_OPTION,
+        distributing_option: DISTRIBUTING_OPTION,
+    ):
+        """
+        Reallocates topsystem data across layers in place. Aggregate data to
+        planar data first, by taking the mean across layers for the stage and bottom
+        elevation, and the sum for the conductance. Consequently allocate and
+        distribute the planar data to the provided model layer schematization.
+
+        Parameters
+        ----------
+        dis : StructuredDiscretization | VerticesDiscretization
+            The discretization of the model to which the river data should be
+            reallocated.
+        npf : NodePropertyFlow
+            The node property flow package of the model to which the river
+            conductance should be distributed (if applicable).
+        allocation_option : ALLOCATION_OPTION
+            The allocation option to use for the reallocation.
+        distributing_option : DISTRIBUTING_OPTION
+            The distributing option to use for the reallocation.
+        """
+        if allocation_option == ALLOCATION_OPTION.stage_to_riv_bot_drn_above:
+            raise ValueError(
+                f"Allocation option {allocation_option} is not supported for "
+                "reallocation of boundary conditions."
+            )
+        planar_data = self.aggregate_layers()
+        grid_dict = self.allocate_and_distribute_planar_data(
+            planar_data, dis, npf, allocation_option, distributing_option
+        )
+        # River package returns a tuple (can also be Drain package)
+        if isinstance(grid_dict, tuple):
+            grid_dict, _ = grid_dict
+        options = self._get_unfiltered_options({})
+        data_dict = grid_dict | options
+        return self.__class__(**data_dict)
+
+    @classmethod
+    def allocate_and_distribute_planar_data(
+        cls,
+        planar_data: GridDataDict,
+        dis: StructuredDiscretization | VerticesDiscretization,
+        npf: NodePropertyFlow,
+        allocation_option: ALLOCATION_OPTION,
+        distributing_option: DISTRIBUTING_OPTION,
+    ) -> tuple[GridDataDict, GridDataDict] | GridDataDict:
+        raise NotImplementedError(
+            "This method should be implemented in the specific boundary condition "
+            "class that inherits from BoundaryCondition."
+        )
 
 
 class AdvancedBoundaryCondition(BoundaryCondition, abc.ABC):
