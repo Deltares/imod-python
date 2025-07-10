@@ -132,7 +132,7 @@ Flow Packages
     Recharge.mask
     Recharge.regrid_like
     Recharge.clip_box
-    Rechage.reallocate
+    Recharge.reallocate
     River
     River.from_imod5_data
     River.mask
