@@ -9,6 +9,16 @@ The format is based on `Keep a Changelog`_, and this project adheres to
 [Unreleased]
 ------------
 
+Added
+~~~~~
+
+- :meth:`imod.mf6.River.reallocate`, :meth:`imod.mf6.Drainage.reallocate`,
+  :meth:`imod.mf6.GeneralHeadBoundary.reallocate`,
+  :meth:`imod.mf6.Recharge.reallocate` to reallocate the package data to a new
+  discretization or :class:`imod.mf6.NodePropertyFlow` package, or to use a
+  different :class:`imod.prepare.ALLOCATION_OPTION` or
+  :class:`imod.prepare.DISTRIBUTING_OPTION`.
+
 Fixed
 ~~~~~
 
