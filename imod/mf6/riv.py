@@ -314,7 +314,7 @@ class River(BoundaryCondition, IRegridPackage):
     def allocate_and_distribute_planar_data(
         cls,
         planar_data: GridDataDict,
-        dis: StructuredDiscretization,
+        dis: StructuredDiscretization | VerticesDiscretization,
         npf: NodePropertyFlow,
         allocation_option: ALLOCATION_OPTION,
         distributing_option: DISTRIBUTING_OPTION,

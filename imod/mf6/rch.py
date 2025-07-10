@@ -10,7 +10,7 @@ from imod.common.utilities.dataclass_type import DataclassType
 from imod.logging import init_log_decorator
 from imod.mf6.aggregate.aggregate_schemes import RechargeAggregationMethod
 from imod.mf6.boundary_condition import BoundaryCondition
-from imod.mf6.dis import StructuredDiscretization
+from imod.mf6.dis import StructuredDiscretization, VerticesDiscretization
 from imod.mf6.regrid.regrid_schemes import RechargeRegridMethod
 from imod.mf6.utilities.imod5_converter import (
     convert_unit_rch_rate,
@@ -178,7 +178,7 @@ class Recharge(BoundaryCondition, IRegridPackage):
     def allocate_planar_data(
         cls,
         planar_data: dict[str, GridDataArray],
-        dis: StructuredDiscretization,
+        dis: StructuredDiscretization | VerticesDiscretization,
     ) -> dict[str, GridDataArray]:
         """
         Allocate and distribute planar data for given discretization and npf
