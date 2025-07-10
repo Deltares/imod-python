@@ -6,7 +6,9 @@ import numpy as np
 import xarray as xr
 
 from imod.common.interfaces.iregridpackage import IRegridPackage
+from imod.common.utilities.dataclass_type import DataclassType
 from imod.logging import init_log_decorator
+from imod.mf6.aggregate.aggregate_schemes import RechargeAggregationMethod
 from imod.mf6.boundary_condition import BoundaryCondition
 from imod.mf6.dis import StructuredDiscretization
 from imod.mf6.regrid.regrid_schemes import RechargeRegridMethod
@@ -135,6 +137,7 @@ class Recharge(BoundaryCondition, IRegridPackage):
     _template = BoundaryCondition._initialize_template(_pkg_id)
     _auxiliary_data = {"concentration": "species"}
     _regrid_method = RechargeRegridMethod()
+    _aggregate_method: DataclassType = RechargeAggregationMethod()
 
     @init_log_decorator()
     def __init__(

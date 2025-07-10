@@ -6,7 +6,6 @@ import xugrid as xu
 from xugrid.regrid.regridder import BaseRegridder
 
 from imod.typing import GridDataArray
-from imod.typing.grid import get_grid_geometry_hash
 
 
 class RegridderType(Enum):
@@ -137,6 +136,9 @@ class RegridderWeightsCache:
         -------
         a regridder of the specified characteristics
         """
+        # Import inside method to avoid circular import issues
+        from imod.typing.grid import get_grid_geometry_hash
+
         regridder_class = self.__get_regridder_class(regridder_type)
 
         if "layer" not in source_grid.coords and "layer" in target_grid.coords:

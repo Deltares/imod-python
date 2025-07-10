@@ -5,8 +5,10 @@ from typing import Optional
 import numpy as np
 
 from imod.common.interfaces.iregridpackage import IRegridPackage
+from imod.common.utilities.dataclass_type import DataclassType
 from imod.common.utilities.mask import broadcast_and_mask_arrays
 from imod.logging import init_log_decorator, standard_log_decorator
+from imod.mf6.aggregate.aggregate_schemes import DrainageAggregationMethod
 from imod.mf6.boundary_condition import BoundaryCondition
 from imod.mf6.dis import StructuredDiscretization
 from imod.mf6.disv import VerticesDiscretization
@@ -133,6 +135,7 @@ class Drainage(BoundaryCondition, IRegridPackage):
     _template = BoundaryCondition._initialize_template(_pkg_id)
     _auxiliary_data = {"concentration": "species"}
     _regrid_method = DrainageRegridMethod()
+    _aggregate_method: DataclassType = DrainageAggregationMethod()
 
     @init_log_decorator()
     def __init__(

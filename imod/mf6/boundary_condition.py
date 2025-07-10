@@ -1,12 +1,14 @@
 import abc
 import pathlib
 from copy import copy, deepcopy
+from dataclasses import asdict
 from typing import Mapping, Optional, Union
 
 import numpy as np
 import xarray as xr
 import xugrid as xu
 
+from imod.mf6.aggregate.aggregate_schemes import EmptyAggregationMethod
 from imod.mf6.auxiliary_variables import (
     expand_transient_auxiliary_variables,
     get_variable_names,
@@ -14,7 +16,7 @@ from imod.mf6.auxiliary_variables import (
 from imod.mf6.package import Package
 from imod.mf6.utilities.package import get_repeat_stress
 from imod.mf6.write_context import WriteContext
-from imod.typing.grid import GridDataArray
+from imod.typing import GridDataArray, GridDataDict
 
 
 def _dis_recarr(arrdict, layer, notnull):
@@ -285,6 +287,29 @@ class BoundaryCondition(Package, abc.ABC):
             result.extend(get_variable_names(self))
 
         return result
+
+    def aggregate_layers(self) -> GridDataDict:
+        """
+        Aggregate data over layers into planar dataset.
+
+        Returns
+        -------
+        dict
+            Dict of aggregated data arrays, where the keys are the variable
+            names and the values are aggregated across the "layer" dimension.
+        """
+        aggr_methods = self.get_aggregate_methods()
+        if isinstance(aggr_methods, EmptyAggregationMethod):
+            raise TypeError(
+                f"Aggregation methods for {self._pkg_id} package are not defined."
+            )
+        aggr_methods_dict = asdict(aggr_methods)
+        planar_data = {
+            key: self.dataset[key].reduce(func, dim="layer")
+            for key, func in aggr_methods_dict.items()
+            if key in self.dataset.data_vars
+        }
+        return planar_data
 
 
 class AdvancedBoundaryCondition(BoundaryCondition, abc.ABC):

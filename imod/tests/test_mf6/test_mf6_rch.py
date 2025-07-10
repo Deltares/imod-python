@@ -201,6 +201,18 @@ def test_transient_no_layer_dim(rch_dict_transient):
     assert actual == expected
 
 
+def test_transient_aggregate(rch_dict_transient):
+    rch = imod.mf6.Recharge(**rch_dict_transient)
+    planar_dict = rch.aggregate_layers()
+
+    assert isinstance(planar_dict, dict)
+    for value in planar_dict.values():
+        assert isinstance(value, xr.DataArray)
+        assert "layer" not in value.dims
+        assert "layer" not in value.coords
+        assert value.dims == ("time", "y", "x")
+
+
 def test_render_concentration(concentration_fc, rate_fc):
     rch = imod.mf6.Recharge(
         rate=rate_fc,

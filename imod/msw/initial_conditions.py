@@ -3,7 +3,7 @@ import shutil
 from typing import Any, TextIO
 
 from imod.common.interfaces.iregridpackage import IRegridPackage
-from imod.common.utilities.regrid_method_type import EmptyRegridMethod, RegridMethodType
+from imod.common.utilities.dataclass_type import DataclassType, EmptyRegridMethod
 from imod.msw.fixed_format import VariableMetaData
 from imod.msw.pkgbase import MetaSwapPackage
 
@@ -15,7 +15,7 @@ class InitialConditionsEquilibrium(MetaSwapPackage, IRegridPackage):
     This class is responsible for the file `init_svat.inp`
     """
 
-    _regrid_method: RegridMethodType = EmptyRegridMethod()
+    _regrid_method: DataclassType = EmptyRegridMethod()
 
     _file_name = "init_svat.inp"
     _option = "Equilibrium"
@@ -45,7 +45,7 @@ class InitialConditionsRootzonePressureHead(MetaSwapPackage, IRegridPackage):
     _metadata_dict = {
         "initial_pF": VariableMetaData(6, 0.0, 6.0, float),
     }
-    _regrid_method: RegridMethodType = EmptyRegridMethod()
+    _regrid_method: DataclassType = EmptyRegridMethod()
 
     def __init__(self, initial_pF=2.2):
         super().__init__()
@@ -74,7 +74,7 @@ class InitialConditionsPercolation(MetaSwapPackage, IRegridPackage):
     _file_name = "init_svat.inp"
     _option = "MeteoInputP"
     _metadata_dict: dict = {}
-    _regrid_method: RegridMethodType = EmptyRegridMethod()
+    _regrid_method: DataclassType = EmptyRegridMethod()
 
     def __init__(self):
         super().__init__()
