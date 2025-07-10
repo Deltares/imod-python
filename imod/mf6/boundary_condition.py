@@ -23,6 +23,7 @@ from imod.prepare.topsystem import (
     ALLOCATION_OPTION,
     DISTRIBUTING_OPTION,
     SimulationAllocationOptions,
+    SimulationDistributingOptions,
 )
 from imod.typing import GridDataArray, GridDataDict
 
@@ -340,26 +341,35 @@ class BoundaryCondition(Package, abc.ABC):
         distributing_option: Optional[DISTRIBUTING_OPTION] = None,
     ) -> Self:
         """
-        Reallocates topsystem data across layers in place. Aggregate data to
-        planar data first, by taking the mean across layers for the stage and bottom
-        elevation, and the sum for the conductance. Consequently allocate and
-        distribute the planar data to the provided model layer schematization.
+        Reallocates topsystem data across layers and create new package with it.
+        Aggregate data to planar data first, by taking either the mean for state
+        variables (e.g. river stage), or the sum for fluxes and the
+        conductance. Consequently allocate and distribute the planar data to the
+        provided model layer schematization.
 
         Parameters
         ----------
         dis : StructuredDiscretization | VerticesDiscretization
-            The discretization of the model to which the river data should be
+            The discretization of the model to which the data should be
             reallocated.
         npf : NodePropertyFlow, optional
-            The node property flow package of the model to which the river
-            conductance should be distributed (if applicable). Required for
-            packages with a conductance variable.
+            The node property flow package of the model to which the conductance
+            should be distributed (if applicable). Required for packages with a
+            conductance variable.
         allocation_option : ALLOCATION_OPTION, optional
             The allocation option to use for the reallocation. If None, the
-            default allocation option is taken.
+            default allocation option is taken from
+            :class:`imod.prepare.SimulationAllocationOptions`.
         distributing_option : DISTRIBUTING_OPTION, optional
             The distributing option to use for the reallocation. Required for
-            packages with a conductance variable.
+            packages with a conductance variable. If None, the default is taken
+            from :class:`imod.prepare.SimulationDistributingOptions`.
+        
+        Returns
+        -------
+        BoundaryCondition
+            A new instance of the boundary condition class with the reallocated
+            data. The original instance remains unchanged.
         """
         if allocation_option is None:
             allocation_option = asdict(SimulationAllocationOptions())[self._pkg_id]
@@ -368,11 +378,13 @@ class BoundaryCondition(Package, abc.ABC):
                 f"Allocation option {allocation_option} is not supported for "
                 "reallocation of boundary conditions."
             )
+        if distributing_option is None:
+            distributing_option = asdict(SimulationDistributingOptions())[self._pkg_id]
         planar_data = self.aggregate_layers()
         if "conductance" in self.dataset.data_vars:
-            if (distributing_option is None) or (npf is None):
+            if (npf is None):
                 raise ValueError(
-                    "Distributing option and NodePropertyFlow must be provided "
+                    "NodePropertyFlow must be provided "
                     "for packages with conductance variable."
                 )
             grid_dict = self.allocate_and_distribute_planar_data(
