@@ -25,7 +25,7 @@ from imod.prepare.topsystem import (
     SimulationAllocationOptions,
     SimulationDistributingOptions,
 )
-from imod.typing import GridDataArray, GridDataDict
+from imod.typing import GridDataArray, GridDataDict, GridDataset
 
 
 def _dis_recarr(arrdict, layer, notnull):
@@ -327,7 +327,8 @@ class BoundaryCondition(Package, abc.ABC):
 
         return result
 
-    def aggregate_layers(self) -> GridDataDict:
+    @classmethod
+    def aggregate_layers(cls, dataset: GridDataset) -> GridDataDict:
         """
         Aggregate data over layers into planar dataset.
 
@@ -337,16 +338,16 @@ class BoundaryCondition(Package, abc.ABC):
             Dict of aggregated data arrays, where the keys are the variable
             names and the values are aggregated across the "layer" dimension.
         """
-        aggr_methods = self.get_aggregate_methods()
+        aggr_methods = cls.get_aggregate_methods()
         if isinstance(aggr_methods, EmptyAggregationMethod):
             raise TypeError(
-                f"Aggregation methods for {self._pkg_id} package are not defined."
+                f"Aggregation methods for {cls._pkg_id} package are not defined."
             )
         aggr_methods_dict = asdict(aggr_methods)
         planar_data = {
-            key: self.dataset[key].reduce(func, dim="layer")
+            key: dataset[key].reduce(func, dim="layer")
             for key, func in aggr_methods_dict.items()
-            if key in self.dataset.data_vars
+            if key in dataset.data_vars
         }
         return planar_data
 
@@ -392,7 +393,7 @@ class BoundaryCondition(Package, abc.ABC):
             self._pkg_id, allocation_option, distributing_option
         )
         # Aggregate data to planar data first
-        planar_data = self.aggregate_layers()
+        planar_data = self.aggregate_layers(self.dataset)
         if "conductance" in self.dataset.data_vars:
             if npf is None:
                 raise ValueError(
