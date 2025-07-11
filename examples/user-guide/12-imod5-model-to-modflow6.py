@@ -55,7 +55,7 @@ pprint(prj_content)
 # This contains all the projectfile contents in a dictionary, which is quite a
 # lot of information. This is too much to go through in detail. We can also open
 # all data that the projectfile points to, using the
-# :doc:`/api/generated/io/imod.prj.open_projectfile_data` function.
+# :func:`imod.prj.open_projectfile_data` function.
 
 imod5_data, period_data = imod.prj.open_projectfile_data(prj_path)
 imod5_data
