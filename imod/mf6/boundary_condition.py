@@ -224,7 +224,7 @@ class BoundaryCondition(Package, abc.ABC):
 
         return periods
 
-    def _get_unfiltered_options(
+    def _get_unfiltered_pkg_options(
         self, predefined_options: dict, not_options: Optional[list] = None
     ):
         options = copy(predefined_options)
@@ -239,10 +239,10 @@ class BoundaryCondition(Package, abc.ABC):
             options[varname] = v
         return options
 
-    def _get_options(
+    def _get_pkg_options(
         self, predefined_options: dict, not_options: Optional[list] = None
     ):
-        unfiltered_options = self._get_unfiltered_options(
+        unfiltered_options = self._get_unfiltered_pkg_options(
             predefined_options, not_options=not_options
         )
         # Filter out options which are None or False
@@ -269,7 +269,7 @@ class BoundaryCondition(Package, abc.ABC):
             directory, pkgname, globaltimes, bin_ds, binary
         )
         # construct the rest (dict for render)
-        d = self._get_options(d)
+        d = self._get_pkg_options(d)
         d["maxbound"] = self._max_active_n()
 
         if (hasattr(self, "_auxiliary_data")) and (names := get_variable_names(self)):
@@ -409,7 +409,7 @@ class BoundaryCondition(Package, abc.ABC):
         # package)
         if isinstance(grid_dict, tuple):
             grid_dict, _ = grid_dict
-        options = self._get_unfiltered_options({})
+        options = self._get_unfiltered_pkg_options({})
         data_dict = grid_dict | options
         return self.__class__(**data_dict)
 
