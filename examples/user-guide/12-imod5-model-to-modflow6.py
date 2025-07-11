@@ -282,107 +282,25 @@ with imod.util.print_if_error(ValidationError):
 # usually are located in a local valley. Upscaling both with a mean causes the
 # river bottom elevation to have the tendency to be lower than the model bottom.
 # We therefore need to reallocate the river data to the new model layer
-# schematization. There currently is no direct method to do this, but we can
-# reallocate the river dataset with the following function.
+# schematization.
 
-
-def reallocate_river(river, dis, npf, allocation_option, distributing_option):
-    """
-    Reallocates river data across layers in place. Aggregate river data to
-    planar data first, by taking the mean across layers for the stage and bottom
-    elevation, and the sum for the conductance. Consequently allocate and
-    distribute the planar data to the provided model layer schematization.
-
-    Parameters
-    ----------
-    river_ds : River
-        The river package to reallocate.
-    dis : StructuredDiscretization | VerticesDiscretization
-        The discretization of the model to which the river data should be
-        reallocated.
-    npf : NodePropertyFlow
-        The node property flow package of the model to which the river
-        conductance should be distributed (if applicable).
-    allocation_option : ALLOCATION_OPTION
-        The allocation option to use for the reallocation.
-    distributing_option : DISTRIBUTING_OPTION
-        The distributing option to use for the reallocation.
-    """
-    river_ds = river.dataset
-    aggr_dict = {
-        "stage": np.nanmean,
-        "conductance": np.nansum,
-        "bottom_elevation": np.nanmean,
-    }
-    planar_data = {
-        key: river_ds[key].reduce(func, dim="layer") for key, func in aggr_dict.items()
-    }
-    riv_dict, _ = imod.mf6.River.allocate_and_distribute_planar_data(
-        planar_data, dis, npf, allocation_option, distributing_option
-    )
-    # .update for some reason requires the dimensions to be specified.
-    riv_dict = {key: (da.dims, da) for key, da in riv_dict.items()}
-    river_ds.update(riv_dict)
-
-
-def reallocate_drain(drain, dis, npf, allocation_option, distributing_option):
-    """
-    Reallocates river data in place. Aggregate river data to planar data first,
-    by taking the mean across layers for the stage and bottom elevation, and the
-    sum for the conductance. Consequently allocate and distribute the planar
-    data to the provided model layer schematization.
-
-    Parameters
-    ----------
-    drain : Drainage
-        The river dataset to reallocate.
-    dis : StructuredDiscretization | VerticesDiscretization
-        The discretization of the model to which the river data should be
-        reallocated.
-    npf : NodePropertyFlow
-        The node property flow package of the model to which the river
-        conductance should be distributed (if applicable).
-    allocation_option : ALLOCATION_OPTION
-        The allocation option to use for the reallocation.
-    distributing_option : DISTRIBUTING_OPTION
-        The distributing option to use for the reallocation.
-    """
-    drain_ds = drain.dataset
-    aggr_dict = {"elevation": np.nanmean, "conductance": np.nansum}
-    planar_data = {
-        key: drain_ds[key].reduce(func, dim="layer") for key, func in aggr_dict.items()
-    }
-    drn_dict = imod.mf6.Drainage.allocate_and_distribute_planar_data(
-        planar_data, dis, npf, allocation_option, distributing_option
-    )
-    # .update for some reason requires the dimensions to be specified.
-    drn_dict = {key: (da.dims, da) for key, da in drn_dict.items()}
-    drain_ds.update(drn_dict)
-
-
-from imod.prepare import ALLOCATION_OPTION, DISTRIBUTING_OPTION
+from imod.prepare import ALLOCATION_OPTION
 
 gwf_unstructured = mf6_unstructured["imported_model"]
 dis = gwf_unstructured["dis"]
 npf = gwf_unstructured["npf"]
 
-riv_args = (
-    dis,
-    npf,
-    ALLOCATION_OPTION.stage_to_riv_bot,
-    DISTRIBUTING_OPTION.by_corrected_transmissivity,
-)
-drn_args = (
-    dis,
-    npf,
-    ALLOCATION_OPTION.at_elevation,
-    DISTRIBUTING_OPTION.by_corrected_transmissivity,
-)
-reallocate_river(gwf_unstructured["riv-1riv"], *riv_args)
-reallocate_river(gwf_unstructured["riv-2riv"], *riv_args)
-reallocate_drain(gwf_unstructured["riv-1drn"], *drn_args)
-reallocate_drain(gwf_unstructured["riv-2drn"], *drn_args)
+# Drains were generated from rivers with infiltration factors, so we need to
+drn_allocation_option = ALLOCATION_OPTION.first_active_to_elevation
 
+gwf_unstructured["riv-1riv"] = gwf_unstructured["riv-1riv"].reallocate(dis, npf)
+gwf_unstructured["riv-2riv"] = gwf_unstructured["riv-2riv"].reallocate(dis, npf)
+gwf_unstructured["riv-1drn"] = gwf_unstructured["riv-1drn"].reallocate(
+    dis, npf, allocation_option=drn_allocation_option
+)
+gwf_unstructured["riv-2drn"] = gwf_unstructured["riv-2drn"].reallocate(
+    dis, npf, allocation_option=drn_allocation_option
+)
 gwf_unstructured["riv-1riv"].cleanup(dis)
 gwf_unstructured["riv-2riv"].cleanup(dis)
 gwf_unstructured["riv-1drn"].cleanup(dis)
