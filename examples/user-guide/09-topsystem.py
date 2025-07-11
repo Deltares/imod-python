@@ -434,5 +434,41 @@ riv = imod.mf6.River(
 
 riv
 
+# %% 
+# 
+# The river package has a :meth:`imod.mf6.River.reallocate` method which can be
+# used to reallocate the river package to a new model layer schematization.
+# There are equivalent methods for the :meth:`imod.mf6.Drainage.reallocate`,
+# :meth:`imod.mf6.GeneralHeadBoundary.reallocate`, and
+# :meth:`imod.mf6.Recharge.reallocate`.
+
+dis = imod.mf6.StructuredDiscretization(
+    top=layer_model["top"].sel(layer=1),
+    bottom=layer_model["bottom"],
+    idomain=layer_model["idomain"].astype(int),
+)
+npf = imod.mf6.NodePropertyFlow(icelltype=0, k=layer_model["k"])
+
+riv_reallocated = riv.reallocate(
+    dis, npf, allocation_option=ALLOCATION_OPTION.stage_to_riv_bot
+)
+
+riv_reallocated
+
+# %% 
+# 
+# The default allocation option and distribution option for the
+# are set in the :class:`imod.prepare.SimulationAllocationOptions` and :class
+# :`imod.prepare.SimulationDistributingOptions`. Let's print the default options
+# to see what they are. First let's start with the allocation options:
+
+from dataclasses import asdict
+from imod.prepare import SimulationAllocationOptions, SimulationDistributingOptions
+
+print(asdict(SimulationAllocationOptions()))
 
 # %%
+#
+# Now let's print the distribution options:
+
+print(asdict(SimulationDistributingOptions()))
