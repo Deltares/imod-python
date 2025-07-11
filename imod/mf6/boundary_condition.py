@@ -67,6 +67,23 @@ def _disv_recarr(arrdict, layer, notnull):
     return recarr
 
 
+def _handle_reallocation_options(
+    pkg_id: str,
+    allocation_option: Optional[ALLOCATION_OPTION],
+    distributing_option: Optional[DISTRIBUTING_OPTION],
+) -> tuple[ALLOCATION_OPTION, DISTRIBUTING_OPTION]:
+    if allocation_option is None:
+        allocation_option = asdict(SimulationAllocationOptions())[pkg_id]
+    elif allocation_option == ALLOCATION_OPTION.stage_to_riv_bot_drn_above:
+        raise ValueError(
+            f"Allocation option {allocation_option} is not supported for "
+            "reallocation of boundary conditions."
+        )
+    if distributing_option is None:
+        distributing_option = asdict(SimulationDistributingOptions())[pkg_id]
+    return allocation_option, distributing_option
+
+
 class BoundaryCondition(Package, abc.ABC):
     """
     BoundaryCondition is used to share methods for specific stress packages
@@ -364,25 +381,20 @@ class BoundaryCondition(Package, abc.ABC):
             The distributing option to use for the reallocation. Required for
             packages with a conductance variable. If None, the default is taken
             from :class:`imod.prepare.SimulationDistributingOptions`.
-        
+
         Returns
         -------
         BoundaryCondition
             A new instance of the boundary condition class with the reallocated
             data. The original instance remains unchanged.
         """
-        if allocation_option is None:
-            allocation_option = asdict(SimulationAllocationOptions())[self._pkg_id]
-        elif allocation_option == ALLOCATION_OPTION.stage_to_riv_bot_drn_above:
-            raise ValueError(
-                f"Allocation option {allocation_option} is not supported for "
-                "reallocation of boundary conditions."
-            )
-        if distributing_option is None:
-            distributing_option = asdict(SimulationDistributingOptions())[self._pkg_id]
+        allocation_option, distributing_option = _handle_reallocation_options(
+            self._pkg_id, allocation_option, distributing_option
+        )
+        # Aggregate data to planar data first
         planar_data = self.aggregate_layers()
         if "conductance" in self.dataset.data_vars:
-            if (npf is None):
+            if npf is None:
                 raise ValueError(
                     "NodePropertyFlow must be provided "
                     "for packages with conductance variable."
@@ -392,7 +404,8 @@ class BoundaryCondition(Package, abc.ABC):
             )
         else:
             grid_dict = self.allocate_planar_data(planar_data, dis, allocation_option)
-        # River package returns a tuple (can also be Drain package)
+        # River package returns a tuple (second argument can also be Drainage
+        # package)
         if isinstance(grid_dict, tuple):
             grid_dict, _ = grid_dict
         options = self._get_unfiltered_options({})
