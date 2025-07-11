@@ -435,7 +435,7 @@ riv = imod.mf6.River(
 
 riv
 
-# %% 
+# %%
 #
 # Reallocate package
 # ------------------
@@ -459,14 +459,15 @@ riv_reallocated = riv.reallocate(
 
 riv_reallocated
 
-# %% 
-# 
+# %%
+#
 # The default allocation option and distribution option for the are set in the
 # :class:`imod.prepare.SimulationAllocationOptions` and
 # :class:`imod.prepare.SimulationDistributingOptions`. Let's print the default
 # options to see what they are. First let's start with the allocation options:
 
 from dataclasses import asdict
+
 from imod.prepare import SimulationAllocationOptions, SimulationDistributingOptions
 
 print(asdict(SimulationAllocationOptions()))
