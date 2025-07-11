@@ -284,23 +284,14 @@ with imod.util.print_if_error(ValidationError):
 # We therefore need to reallocate the river data to the new model layer
 # schematization.
 
-from imod.prepare import ALLOCATION_OPTION
-
 gwf_unstructured = mf6_unstructured["imported_model"]
 dis = gwf_unstructured["dis"]
 npf = gwf_unstructured["npf"]
 
-# Drains were generated from rivers with infiltration factors, so we need to
-drn_allocation_option = ALLOCATION_OPTION.first_active_to_elevation
-
 gwf_unstructured["riv-1riv"] = gwf_unstructured["riv-1riv"].reallocate(dis, npf)
 gwf_unstructured["riv-2riv"] = gwf_unstructured["riv-2riv"].reallocate(dis, npf)
-gwf_unstructured["riv-1drn"] = gwf_unstructured["riv-1drn"].reallocate(
-    dis, npf, allocation_option=drn_allocation_option
-)
-gwf_unstructured["riv-2drn"] = gwf_unstructured["riv-2drn"].reallocate(
-    dis, npf, allocation_option=drn_allocation_option
-)
+gwf_unstructured["riv-1drn"] = gwf_unstructured["riv-1drn"].reallocate(dis, npf)
+gwf_unstructured["riv-2drn"] = gwf_unstructured["riv-2drn"].reallocate(dis, npf)
 gwf_unstructured["riv-1riv"].cleanup(dis)
 gwf_unstructured["riv-2riv"].cleanup(dis)
 gwf_unstructured["riv-1drn"].cleanup(dis)
