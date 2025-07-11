@@ -418,9 +418,10 @@ riv_stage = enforce_dim_order(riv_stage)
 riv_stage
 
 # %%
+#
 # We can do the same for the river bottom and construct a river package. Note
 # that we use the previously distributed conductance which we assigned to the
-# variable ``riv_conducance``.
+# variable ``riv_conductance``.
 
 riv_bottom = planar_river["bottom"].where(riv_allocated)
 riv_bottom = enforce_dim_order(riv_bottom)
@@ -435,7 +436,10 @@ riv = imod.mf6.River(
 riv
 
 # %% 
-# 
+#
+# Reallocate package
+# ------------------
+#
 # The river package has a :meth:`imod.mf6.River.reallocate` method which can be
 # used to reallocate the river package to a new model layer schematization.
 # There are equivalent methods for the :meth:`imod.mf6.Drainage.reallocate`,
@@ -457,10 +461,10 @@ riv_reallocated
 
 # %% 
 # 
-# The default allocation option and distribution option for the
-# are set in the :class:`imod.prepare.SimulationAllocationOptions` and :class
-# :`imod.prepare.SimulationDistributingOptions`. Let's print the default options
-# to see what they are. First let's start with the allocation options:
+# The default allocation option and distribution option for the are set in the
+# :class:`imod.prepare.SimulationAllocationOptions` and
+# :class:`imod.prepare.SimulationDistributingOptions`. Let's print the default
+# options to see what they are. First let's start with the allocation options:
 
 from dataclasses import asdict
 from imod.prepare import SimulationAllocationOptions, SimulationDistributingOptions
