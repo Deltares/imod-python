@@ -10,7 +10,7 @@ from imod.common.utilities.dataclass_type import DataclassType
 from imod.logging import init_log_decorator
 from imod.mf6.aggregate.aggregate_schemes import RechargeAggregationMethod
 from imod.mf6.boundary_condition import BoundaryCondition
-from imod.mf6.dis import StructuredDiscretization
+from imod.mf6.dis import StructuredDiscretization, VerticesDiscretization
 from imod.mf6.regrid.regrid_schemes import RechargeRegridMethod
 from imod.mf6.utilities.imod5_converter import (
     convert_unit_rch_rate,
@@ -178,7 +178,8 @@ class Recharge(BoundaryCondition, IRegridPackage):
     def allocate_planar_data(
         cls,
         planar_data: dict[str, GridDataArray],
-        dis: StructuredDiscretization,
+        dis: StructuredDiscretization | VerticesDiscretization,
+        allocation_option: ALLOCATION_OPTION,
     ) -> dict[str, GridDataArray]:
         """
         Allocate and distribute planar data for given discretization and npf
@@ -191,8 +192,8 @@ class Recharge(BoundaryCondition, IRegridPackage):
             Dictionary with planar grid data.
         dis: imod.mf6.StructuredDiscretization
             Model discretization package.
-        npf: imod.mf6.NodePropertyFlow
-            Node property flow package.
+        allocation_option: ALLOCATION_OPTION
+            The allocation option to use for the reallocation.
 
         Returns
         -------
@@ -204,7 +205,7 @@ class Recharge(BoundaryCondition, IRegridPackage):
             planar_data["rate"] = planar_data["rate"].isel(layer=0, drop=True)
         # create an array indicating in which cells rch is active
         is_rch_cell = allocate_rch_cells(
-            ALLOCATION_OPTION.at_first_active,
+            allocation_option,
             idomain > 0,
             planar_data["rate"],
         )
@@ -268,7 +269,10 @@ class Recharge(BoundaryCondition, IRegridPackage):
         )
         # if rate has only layer 0, then it is planar.
         if is_planar_grid(regridded_package_data["rate"]):
-            layered_data = cls.allocate_planar_data(regridded_package_data, target_dis)
+            allocation_option = ALLOCATION_OPTION.at_first_active
+            layered_data = cls.allocate_planar_data(
+                regridded_package_data, target_dis, allocation_option
+            )
             regridded_package_data.update(layered_data)
         rch = cls(**regridded_package_data, validate=True, fixed_cell=False)
         repeat = period_data.get("rch")

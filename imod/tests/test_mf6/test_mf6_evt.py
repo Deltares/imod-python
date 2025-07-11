@@ -77,7 +77,7 @@ def test_get_options__no_segments(
     )
 
     # Act
-    options = evt._get_options({})
+    options = evt._get_pkg_options({})
 
     # Assert
     assert options["nseg"] == 1
@@ -108,7 +108,7 @@ def test_get_options__with_segments(
     )
 
     # Act
-    options = evt._get_options({})
+    options = evt._get_pkg_options({})
 
     # Assert
     assert options["nseg"] == 4

@@ -195,7 +195,7 @@ class GeneralHeadBoundary(BoundaryCondition, IRegridPackage):
     def allocate_and_distribute_planar_data(
         cls,
         planar_data: dict[str, GridDataArray],
-        dis: StructuredDiscretization,
+        dis: StructuredDiscretization | VerticesDiscretization,
         npf: NodePropertyFlow,
         allocation_option: ALLOCATION_OPTION,
         distributing_option: DISTRIBUTING_OPTION,

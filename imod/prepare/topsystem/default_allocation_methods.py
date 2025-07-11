@@ -22,6 +22,9 @@ class SimulationAllocationOptions:
     ghb: ALLOCATION_OPTION
         allocation option to be used for general head boundary packages,
         defaults to ``at_elevation``.
+    rch: ALLOCATION_OPTION
+        allocation option to be used for recharge packages, defaults to
+        ``at_first_active``.
 
     Examples
     --------
@@ -40,6 +43,7 @@ class SimulationAllocationOptions:
     drn: ALLOCATION_OPTION = ALLOCATION_OPTION.at_elevation
     riv: ALLOCATION_OPTION = ALLOCATION_OPTION.stage_to_riv_bot
     ghb: ALLOCATION_OPTION = ALLOCATION_OPTION.at_elevation
+    rch: ALLOCATION_OPTION = ALLOCATION_OPTION.at_first_active
 
 
 @dataclass()

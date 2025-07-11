@@ -1,7 +1,7 @@
 import abc
 import numbers
-import pathlib
-from typing import Any, Mapping, Optional
+from pathlib import Path
+from typing import Any, Mapping, Optional, Self
 
 import numpy as np
 import xarray as xr
@@ -67,7 +67,7 @@ class PackageBase(IPackageBase, abc.ABC):
 
     def to_netcdf(
         self, *args, mdal_compliant: bool = False, crs: Optional[Any] = None, **kwargs
-    ):
+    ) -> None:
         """
 
         Write dataset contents to a netCDF file. Custom encoding rules can be
@@ -108,7 +108,7 @@ class PackageBase(IPackageBase, abc.ABC):
                 dataset = imod.util.spatial.gdal_compliant_grid(dataset, crs=crs)
             dataset.to_netcdf(*args, **kwargs)
 
-    def _netcdf_encoding(self):
+    def _netcdf_encoding(self) -> dict:
         """
 
         The encoding used in the to_netcdf method
@@ -118,7 +118,7 @@ class PackageBase(IPackageBase, abc.ABC):
         return {}
 
     @classmethod
-    def _from_dataset(cls, ds: GridDataset):
+    def _from_dataset(cls, ds: GridDataset) -> Self:
         """
         Create package from dataset. Note that no initialization validation is
         done.
@@ -128,7 +128,7 @@ class PackageBase(IPackageBase, abc.ABC):
         return instance
 
     @classmethod
-    def from_file(cls, path, **kwargs):
+    def from_file(cls, path: str | Path, **kwargs) -> Self:
         """
         Loads an imod mf6 package from a file (currently only netcdf and zarr are supported).
         Note that it is expected that this file was saved with imod.mf6.Package.dataset.to_netcdf(),
@@ -163,7 +163,7 @@ class PackageBase(IPackageBase, abc.ABC):
 
         Refer to the xarray documentation for the possible keyword arguments.
         """
-        path = pathlib.Path(path)
+        path = Path(path)
         if path.suffix in (".zip", ".zarr"):
             # TODO: seems like a bug? Remove str() call if fixed in xarray/zarr
             dataset = xr.open_zarr(str(path), **kwargs)
