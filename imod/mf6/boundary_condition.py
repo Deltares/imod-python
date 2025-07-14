@@ -2,7 +2,7 @@ import abc
 import pathlib
 from copy import copy, deepcopy
 from dataclasses import asdict
-from typing import Mapping, Optional, Self, Union
+from typing import Mapping, Optional, Self, Union, cast
 
 import numpy as np
 import xarray as xr
@@ -67,11 +67,13 @@ def _disv_recarr(arrdict, layer, notnull):
     return recarr
 
 
-def _handle_reallocation_options(
+def _handle_reallocate_arguments(
     pkg_id: str,
+    has_conductance: bool,
+    npf: Optional[NodePropertyFlow],
     allocation_option: Optional[ALLOCATION_OPTION],
     distributing_option: Optional[DISTRIBUTING_OPTION],
-) -> tuple[ALLOCATION_OPTION, DISTRIBUTING_OPTION]:
+) -> tuple[ALLOCATION_OPTION, Optional[DISTRIBUTING_OPTION]]:
     if allocation_option is None:
         allocation_option = asdict(SimulationAllocationOptions())[pkg_id]
     elif allocation_option == ALLOCATION_OPTION.stage_to_riv_bot_drn_above:
@@ -79,8 +81,12 @@ def _handle_reallocation_options(
             f"Allocation option {allocation_option} is not supported for "
             "reallocation of boundary conditions."
         )
-    if distributing_option is None:
+    if has_conductance and distributing_option is None:
         distributing_option = asdict(SimulationDistributingOptions())[pkg_id]
+    if has_conductance and npf is None:
+        raise ValueError(
+            "NodePropertyFlow must be provided for packages with conductance variable."
+        )
     return allocation_option, distributing_option
 
 
@@ -390,19 +396,16 @@ class BoundaryCondition(Package, abc.ABC):
             data. The original instance remains unchanged.
         """
         # Handle input arguments
-        allocation_option, distributing_option = _handle_reallocation_options(
-            self._pkg_id, allocation_option, distributing_option
-        )
         has_conductance = "conductance" in self.dataset.data_vars
-        if has_conductance and npf is None:
-            raise ValueError(
-                "NodePropertyFlow must be provided "
-                "for packages with conductance variable."
-            )
+        allocation_option, distributing_option = _handle_reallocate_arguments(
+            self._pkg_id, has_conductance, npf, allocation_option, distributing_option
+        )
         # Aggregate data to planar data first
         planar_data = self.aggregate_layers(self.dataset)
         # Then allocate and distribute the planar data to the model layers
         if has_conductance:
+            npf = cast(NodePropertyFlow, npf)
+            distributing_option = cast(DISTRIBUTING_OPTION, distributing_option)
             grid_dict = self.allocate_and_distribute_planar_data(
                 planar_data, dis, npf, allocation_option, distributing_option
             )
