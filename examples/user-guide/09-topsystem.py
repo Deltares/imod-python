@@ -441,8 +441,13 @@ riv
 # ------------------
 #
 # The river package has a :meth:`imod.mf6.River.reallocate` method which can be
-# used to reallocate the river package to a new model layer schematization.
-# There are equivalent methods for the :meth:`imod.mf6.Drainage.reallocate`,
+# used to reallocate the river package to a new model layer schematization. This
+# is convenient when you already have an existing model, but want to apply a
+# different allocation or distribution option to its river package. This saves
+# you from unpacking the right variables from the the DIS/DISV and NPF package,
+# aggregating the package data over layers and allocating and distributing the
+# conductance again. There are equivalent methods for the
+# :meth:`imod.mf6.Drainage.reallocate`,
 # :meth:`imod.mf6.GeneralHeadBoundary.reallocate`, and
 # :meth:`imod.mf6.Recharge.reallocate`.
 
