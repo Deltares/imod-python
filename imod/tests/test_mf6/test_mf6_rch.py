@@ -204,7 +204,7 @@ def test_transient_no_layer_dim(rch_dict_transient):
 
 def test_transient_aggregate(rch_dict_transient):
     rch = imod.mf6.Recharge(**rch_dict_transient)
-    planar_dict = rch.aggregate_layers()
+    planar_dict = rch.aggregate_layers(rch.dataset)
 
     assert isinstance(planar_dict, dict)
     for value in planar_dict.values():

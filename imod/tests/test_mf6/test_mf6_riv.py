@@ -416,7 +416,7 @@ def test_aggregate_layers(riv_data):
         else xr.DataArray
     )
 
-    planar_dict = river.aggregate_layers()
+    planar_dict = river.aggregate_layers(river.dataset)
     assert isinstance(planar_dict, dict)
     for value in planar_dict.values():
         assert isinstance(value, expected_type)

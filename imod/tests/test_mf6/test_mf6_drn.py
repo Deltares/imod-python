@@ -244,7 +244,7 @@ def test_3d_singelayer():
 def test_aggregate_layers(drainage):
     river = imod.mf6.Drainage(**drainage)
 
-    planar_dict = river.aggregate_layers()
+    planar_dict = river.aggregate_layers(river.dataset)
     assert isinstance(planar_dict, dict)
     for value in planar_dict.values():
         assert isinstance(value, xr.DataArray)
