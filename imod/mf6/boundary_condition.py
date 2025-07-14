@@ -389,17 +389,20 @@ class BoundaryCondition(Package, abc.ABC):
             A new instance of the boundary condition class with the reallocated
             data. The original instance remains unchanged.
         """
+        # Handle input arguments
         allocation_option, distributing_option = _handle_reallocation_options(
             self._pkg_id, allocation_option, distributing_option
         )
+        has_conductance = "conductance" in self.dataset.data_vars
+        if has_conductance and npf is None:
+            raise ValueError(
+                "NodePropertyFlow must be provided "
+                "for packages with conductance variable."
+            )
         # Aggregate data to planar data first
         planar_data = self.aggregate_layers(self.dataset)
-        if "conductance" in self.dataset.data_vars:
-            if npf is None:
-                raise ValueError(
-                    "NodePropertyFlow must be provided "
-                    "for packages with conductance variable."
-                )
+        # Then allocate and distribute the planar data to the model layers
+        if has_conductance:
             grid_dict = self.allocate_and_distribute_planar_data(
                 planar_data, dis, npf, allocation_option, distributing_option
             )
