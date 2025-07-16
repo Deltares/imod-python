@@ -24,7 +24,6 @@ from imod.typing.grid import (
     GridDataArray,
     GridDataset,
     is_unstructured,
-    ones_like,
 )
 from imod.util.regrid import (
     RegridderType,
@@ -313,8 +312,7 @@ def _regrid_like(
                 f"regridding is not implemented for package {pkg_name} of type {type(pkg)}"
             )
 
-    methods = _get_unique_regridder_types(model)
-    output_domain = _get_regridding_domain(model, target_grid, regrid_cache, methods)
+    output_domain = new_model[diskey]["idomain"]
     output_domain = handle_extra_coords("dx", target_grid, output_domain)
     output_domain = handle_extra_coords("dy", target_grid, output_domain)
     new_model.mask_all_packages(output_domain)
@@ -415,34 +413,3 @@ def _regrid_like(
 @dispatch  # type: ignore[no-redef]
 def _regrid_like(package: object, target_grid: GridDataArray, *_) -> None:
     raise TypeError("this object cannot be regridded")
-
-
-def _get_regridding_domain(
-    model: IModel,
-    target_grid: GridDataArray,
-    regrid_cache: RegridderWeightsCache,
-    methods: defaultdict[RegridderType, list[str]],
-) -> GridDataArray:
-    """
-    This method computes the output-domain for a regridding operation by regridding idomain with
-    all regridders. Each regridder may leave some cells inactive. The output domain for the model consists of those
-    cells that all regridders consider active.
-    """
-    idomain = model.domain
-    included_in_all = ones_like(target_grid)
-    regridders = [
-        regrid_cache.get_regridder(idomain, target_grid, regriddertype, function)
-        for regriddertype, functionlist in methods.items()
-        for function in functionlist
-    ]
-    for regridder in regridders:
-        regridded_idomain = regridder.regrid(idomain)
-        included_in_all = included_in_all.where(regridded_idomain.notnull())
-        included_in_all = regridded_idomain.where(
-            regridded_idomain <= 0, other=included_in_all
-        )
-
-    new_idomain = included_in_all.where(included_in_all.notnull(), other=0)
-    new_idomain = new_idomain.astype(int)
-
-    return new_idomain
