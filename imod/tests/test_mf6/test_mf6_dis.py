@@ -4,6 +4,8 @@ import textwrap
 import numpy as np
 import pytest
 import xarray as xr
+import xugrid as xu
+from pytest_cases import parametrize_with_cases
 
 import imod
 from imod.mf6.write_context import WriteContext
@@ -31,11 +33,29 @@ def idomain_and_bottom():
     layer = np.array([1, 2, 3])
     y = np.arange(ymax, ymin, dy) + 0.5 * dy
     x = np.arange(xmin, xmax, dx) + 0.5 * dx
-    coords = {"layer": layer, "y": y, "x": x}
-    idomain = xr.DataArray(np.ones(shape, dtype=np.int8), coords=coords, dims=dims)
+    coords = {"layer": layer, "y": y, "x": x, "dy": dy, "dx": dx}
+    idomain = xr.DataArray(np.ones(shape, dtype=np.int32), coords=coords, dims=dims)
     bottom = xr.DataArray([-200.0, -350.0, -450.0], {"layer": layer}, ("layer",))
 
     return idomain, bottom
+
+
+@pytest.fixture(scope="function")
+def idomain_extended(idomain_and_bottom):
+    idomain, _ = idomain_and_bottom
+    idomain = idomain.copy()
+    # Create grid with larger x dimension
+    coords = idomain.coords.copy()
+    x_max = idomain.coords["x"].max().values
+    dx = idomain.coords["dx"].values
+    n_x = 10
+    extension_x = dx * np.arange(1, n_x + 1) + x_max
+    coords["x"] = extension_x
+    extension = xr.DataArray(
+        np.ones((3, 15, n_x), dtype=np.int8), dims=("layer", "y", "x"), coords=coords
+    )
+    idomain_extended = xr.concat([idomain, extension], dim="x")
+    return idomain_extended
 
 
 def test_render(idomain_and_bottom):
@@ -83,6 +103,63 @@ def test_copy(idomain_and_bottom):
     dis2 = dis.copy()
     assert isinstance(dis2, imod.mf6.StructuredDiscretization)
     assert dis2.dataset.equals(dis.dataset)
+
+
+def test_mask(idomain_and_bottom):
+    # Arrange
+    idomain, bottom = idomain_and_bottom
+    dis = imod.mf6.StructuredDiscretization(top=200.0, bottom=bottom, idomain=idomain)
+    mask = idomain.copy()
+    mask[0, 7, 7] = 0  # Deactivate cell in layer 1.
+    # Act
+    dis_masked = dis.mask(mask)
+    # Assert
+    is_positive = dis_masked.dataset["idomain"] >= 0
+    is_zero = dis_masked.dataset["idomain"][0, 7, 7] == 0
+    assert is_positive.all()
+    assert is_zero
+
+
+class LargerGridCases:
+    def case_structured(self, idomain_extended):
+        target_grid = idomain_extended.sel(layer=1)
+        return target_grid, imod.mf6.StructuredDiscretization
+
+    def case_unstructured(self, idomain_extended):
+        target_grid = xu.UgridDataArray.from_structured2d(idomain_extended.sel(layer=1))
+        return target_grid, imod.mf6.VerticesDiscretization
+
+
+@parametrize_with_cases("target_grid, expected_pkg_type", cases=LargerGridCases)
+def test_regrid_to_larger_grid(
+    idomain_and_bottom, idomain_extended, target_grid, expected_pkg_type
+):
+    """
+    Test in which we regrid to a larger grid. The larger regrid
+    results in nans by xugrid, these should be filled properly for idomain. If
+    this is done incorrectly, the regridded idomain will contain very large
+    negative integer values.
+    """
+    idomain, bottom = idomain_and_bottom
+    bottom_3d = bottom * idomain
+    extension_size = idomain_extended.size - idomain.size
+
+    dis = imod.mf6.StructuredDiscretization(
+        top=200.0, bottom=bottom_3d, idomain=idomain
+    )
+    regrid_cache = imod.util.RegridderWeightsCache()
+    # Act
+    dis_regridded = dis.regrid_like(target_grid, regrid_cache=regrid_cache)
+    # Assert
+    assert isinstance(dis_regridded, expected_pkg_type)
+    is_positive = dis_regridded["idomain"] >= 0
+    assert is_positive.all()
+    contains_zeros = dis_regridded["idomain"] == 0
+    assert contains_zeros.any()
+    assert np.count_nonzero(contains_zeros.values) == extension_size
+    contains_nans = np.isnan(dis_regridded["bottom"])
+    assert contains_nans.any()
+    assert np.count_nonzero(contains_nans.values) == extension_size
 
 
 def test_wrong_dtype(idomain_and_bottom):
