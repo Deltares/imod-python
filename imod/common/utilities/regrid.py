@@ -320,7 +320,9 @@ def _regrid_like(
 
     methods = _get_unique_regridder_types(model)
     regridded_domain = new_model[diskey]["idomain"]
-    output_domain = _get_regridding_domain(model, target_grid, regridded_domain, regrid_cache, methods)
+    output_domain = _get_regridding_domain(
+        model, target_grid, regridded_domain, regrid_cache, methods
+    )
     output_domain = handle_extra_coords("dx", target_grid, output_domain)
     output_domain = handle_extra_coords("dy", target_grid, output_domain)
     new_model.mask_all_packages(output_domain)
@@ -449,7 +451,9 @@ def _get_regridding_domain(
     # Take the first regridder function, as each regridder type handles nans
     # consistently amongst methods.
     regridders = [
-        regrid_cache.get_regridder(is_active, target_grid, regriddertype, functionlist[0])
+        regrid_cache.get_regridder(
+            is_active, target_grid, regriddertype, functionlist[0]
+        )
         for regriddertype, functionlist in methods.items()
     ]
     for regridder in regridders:
