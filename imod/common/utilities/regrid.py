@@ -440,6 +440,10 @@ def _get_regridding_domain(
     """
 
     idomain = model.domain
+    # We are only regridding the -1 and 1 values of idomain, 0 is set to np.nan
+    # to see if the regridding process affects nodata values in inactive cells.
+    # We don't set -1 to np.nan, as otherwise its not possible to track if
+    # np.nan should be converted back to 0 or -1.
     is_active = np.abs(idomain.where(idomain != 0, other=np.nan))
     included_in_all = ones_like(target_grid)
     # Take the first regridder function, as each regridder type handles nans
