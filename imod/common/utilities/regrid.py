@@ -3,6 +3,7 @@ from collections import defaultdict
 from dataclasses import asdict
 from typing import Any, Optional, Tuple, TypeAlias, Union
 
+import numpy as np
 import xarray as xr
 from plum import Dispatcher
 from xarray.core.utils import is_scalar
@@ -24,7 +25,9 @@ from imod.typing.grid import (
     GridDataArray,
     GridDataset,
     is_unstructured,
+    ones_like,
 )
+from imod.util.dims import enforced_dim_order
 from imod.util.regrid import (
     RegridderType,
     RegridderWeightsCache,
@@ -103,7 +106,10 @@ def _regrid_array(
     # regrid data array
     regridded_array = regridder.regrid(da)
 
-    # reconvert the result to the same dtype as the original
+    # reconvert the result to the same dtype as the original before converting,
+    # fill nans with 0 for integer, as this is the default for idomain
+    if np.issubdtype(original_dtype, np.integer):
+        regridded_array = regridded_array.fillna(0)
     return regridded_array.astype(original_dtype)
 
 
@@ -312,7 +318,9 @@ def _regrid_like(
                 f"regridding is not implemented for package {pkg_name} of type {type(pkg)}"
             )
 
-    output_domain = new_model[diskey]["idomain"]
+    methods = _get_unique_regridder_types(model)
+    regridded_domain = new_model[diskey]["idomain"]
+    output_domain = _get_regridding_domain(model, target_grid, regridded_domain, regrid_cache, methods)
     output_domain = handle_extra_coords("dx", target_grid, output_domain)
     output_domain = handle_extra_coords("dy", target_grid, output_domain)
     new_model.mask_all_packages(output_domain)
@@ -413,3 +421,37 @@ def _regrid_like(
 @dispatch  # type: ignore[no-redef]
 def _regrid_like(package: object, target_grid: GridDataArray, *_) -> None:
     raise TypeError("this object cannot be regridded")
+
+
+@enforced_dim_order
+def _get_regridding_domain(
+    model: IModel,
+    target_grid: GridDataArray,
+    regridded_domain: GridDataArray,
+    regrid_cache: RegridderWeightsCache,
+    methods: defaultdict[RegridderType, list[str]],
+) -> GridDataArray:
+    """
+    This method computes the output-domain for a regridding operation by
+    regridding idomain with all regridders. Each regridder type may leave some
+    cells inactive. This is mainly relevant when including both
+    BarycentricInterpolators as well as OverlapRegridders. The output domain for
+    the model consists of those cells that all regridders consider active.
+    """
+
+    idomain = model.domain
+    is_active = np.abs(idomain.where(idomain != 0, other=np.nan))
+    included_in_all = ones_like(target_grid)
+    # Take the first regridder function, as each regridder type handles nans
+    # consistently amongst methods.
+    regridders = [
+        regrid_cache.get_regridder(is_active, target_grid, regriddertype, functionlist[0])
+        for regriddertype, functionlist in methods.items()
+    ]
+    for regridder in regridders:
+        idomain_regridder_type = regridder.regrid(is_active)
+        included_in_all = included_in_all.where(idomain_regridder_type.notnull())
+
+    new_idomain = regridded_domain.where(included_in_all.notnull(), other=0).astype(int)
+
+    return new_idomain
