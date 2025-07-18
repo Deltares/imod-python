@@ -25,6 +25,9 @@ Fixed
 - Reduce noisy warnings in models loaded with
   :meth:`imod.mf6.Modflow6Simulation.from_imod5_data` which have layers with
   cells with zero thicknesses.
+- Issue where regridding lead to excessively large inactive areas.
+- Issue where regridding would lead to very large negative integer values (like
+  IDOMAIN) for inactive areas.
 
 Changed
 ~~~~~~~
