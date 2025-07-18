@@ -106,8 +106,10 @@ def _regrid_array(
     # regrid data array
     regridded_array = regridder.regrid(da)
 
-    # reconvert the result to the same dtype as the original before converting,
-    # fill nans with 0 for integer, as this is the default for idomain
+    # Reconvert the result to the same dtype as the original before converting.
+    # Nans can be introduced when the source data has a nan value, or when the
+    # target grid has a larger domain. Fill nans with 0 for integer, as this is
+    # mainly important for the idomain array where 0 indicates an inactive cell.
     if np.issubdtype(original_dtype, np.integer):
         regridded_array = regridded_array.fillna(0)
     return regridded_array.astype(original_dtype)
@@ -445,7 +447,10 @@ def _get_regridding_domain(
     # We are only regridding the -1 and 1 values of idomain, 0 is set to np.nan
     # to see if the regridding process affects nodata values in inactive cells.
     # We don't set -1 to np.nan, as otherwise its not possible to track if
-    # np.nan should be converted back to 0 or -1.
+    # np.nan should be converted back to 0 or -1. Setting 0 to np.nan allows us
+    # to track nodata cells and verify that the regridding process does not
+    # inadvertently affect them. The use of np.abs() simplifies the logic by
+    # avoiding additional conditional checks for -1 and 1 separately.
     is_active = np.abs(idomain.where(idomain != 0, other=np.nan))
     included_in_all = ones_like(target_grid)
     # Take the first regridder function, as each regridder type handles nans
