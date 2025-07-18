@@ -3,6 +3,7 @@ from collections import defaultdict
 from dataclasses import asdict
 from typing import Any, Optional, Tuple, TypeAlias, Union
 
+import numpy as np
 import xarray as xr
 from plum import Dispatcher
 from xarray.core.utils import is_scalar
@@ -26,6 +27,7 @@ from imod.typing.grid import (
     is_unstructured,
     ones_like,
 )
+from imod.util.dims import enforced_dim_order
 from imod.util.regrid import (
     RegridderType,
     RegridderWeightsCache,
@@ -104,7 +106,12 @@ def _regrid_array(
     # regrid data array
     regridded_array = regridder.regrid(da)
 
-    # reconvert the result to the same dtype as the original
+    # Reconvert the result to the same dtype as the original before converting.
+    # Nans can be introduced when the source data has a nan value, or when the
+    # target grid has a larger domain. Fill nans with 0 for integer, as this is
+    # mainly important for the idomain array where 0 indicates an inactive cell.
+    if np.issubdtype(original_dtype, np.integer):
+        regridded_array = regridded_array.fillna(0)
     return regridded_array.astype(original_dtype)
 
 
@@ -314,7 +321,10 @@ def _regrid_like(
             )
 
     methods = _get_unique_regridder_types(model)
-    output_domain = _get_regridding_domain(model, target_grid, regrid_cache, methods)
+    regridded_domain = new_model[diskey]["idomain"]
+    output_domain = _get_regridding_domain(
+        model, target_grid, regridded_domain, regrid_cache, methods
+    )
     output_domain = handle_extra_coords("dx", target_grid, output_domain)
     output_domain = handle_extra_coords("dy", target_grid, output_domain)
     new_model.mask_all_packages(output_domain)
@@ -417,32 +427,44 @@ def _regrid_like(package: object, target_grid: GridDataArray, *_) -> None:
     raise TypeError("this object cannot be regridded")
 
 
+@enforced_dim_order
 def _get_regridding_domain(
     model: IModel,
     target_grid: GridDataArray,
+    regridded_domain: GridDataArray,
     regrid_cache: RegridderWeightsCache,
     methods: defaultdict[RegridderType, list[str]],
 ) -> GridDataArray:
     """
-    This method computes the output-domain for a regridding operation by regridding idomain with
-    all regridders. Each regridder may leave some cells inactive. The output domain for the model consists of those
-    cells that all regridders consider active.
+    This method computes the output-domain for a regridding operation by
+    regridding idomain with all regridders. Each regridder type may leave some
+    cells inactive. This is mainly relevant when including both
+    BarycentricInterpolators as well as OverlapRegridders. The output domain for
+    the model consists of those cells that all regridders consider active.
     """
+
     idomain = model.domain
+    # We are only regridding the -1 and 1 values of idomain, 0 is set to np.nan
+    # to see if the regridding process affects nodata values in inactive cells.
+    # We don't set -1 to np.nan, as otherwise its not possible to track if
+    # np.nan should be converted back to 0 or -1. Setting 0 to np.nan allows us
+    # to track nodata cells and verify that the regridding process does not
+    # inadvertently affect them. The use of np.abs() simplifies the logic by
+    # avoiding additional conditional checks for -1 and 1 separately.
+    is_active = np.abs(idomain.where(idomain != 0, other=np.nan))
     included_in_all = ones_like(target_grid)
+    # Take the first regridder function, as each regridder type handles nans
+    # consistently amongst methods.
     regridders = [
-        regrid_cache.get_regridder(idomain, target_grid, regriddertype, function)
+        regrid_cache.get_regridder(
+            is_active, target_grid, regriddertype, functionlist[0]
+        )
         for regriddertype, functionlist in methods.items()
-        for function in functionlist
     ]
     for regridder in regridders:
-        regridded_idomain = regridder.regrid(idomain)
-        included_in_all = included_in_all.where(regridded_idomain.notnull())
-        included_in_all = regridded_idomain.where(
-            regridded_idomain <= 0, other=included_in_all
-        )
+        idomain_regridder_type = regridder.regrid(is_active)
+        included_in_all = included_in_all.where(idomain_regridder_type.notnull())
 
-    new_idomain = included_in_all.where(included_in_all.notnull(), other=0)
-    new_idomain = new_idomain.astype(int)
+    new_idomain = regridded_domain.where(included_in_all.notnull(), other=0).astype(int)
 
     return new_idomain
