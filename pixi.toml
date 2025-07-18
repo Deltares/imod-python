@@ -132,7 +132,7 @@ tqdm = "*"
 twine = "*"
 vtk = { version = ">=9.0", build = "*qt*" }
 xarray = "!=2025.04.0" # Issue with xarray 2025.04.0 and rendering HFBs
-xugrid = ">=0.14.0"
+xugrid = ">=0.14.2"
 zarr = "*"
 pytest-timeout = ">=2.3.1,<3"
 
