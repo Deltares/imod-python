@@ -5,6 +5,7 @@ import cftime
 import dateutil
 import numpy as np
 import pandas as pd
+import xarray as xr
 
 DATETIME_FORMATS = {
     14: "%Y%m%d%H%M%S",
@@ -18,13 +19,28 @@ DATETIME_FORMATS = {
 def to_pandas_datetime_series(series: pd.Series):
     """
     Convert series to pandas datetime, uses length of first string to find the
-    appropriate format. This takes nanosecond as base. This only supports going
-    up to the year 2261; the function sets dates beyond this year silently to
-    pd.NaT.
+    appropriate format. This takes nanosecond as base by default, which only supports
+    going up to the year 2261. In case of out-of-bounds date, an xarray CFTimeIndex
+    is returned instead.
     """
     len_date = len(series.iloc[0])
     dt_format = DATETIME_FORMATS[len_date]
-    return pd.to_datetime(series, format=dt_format, errors="coerce")
+    try:
+        return pd.to_datetime(series, format=dt_format, errors="coerce")
+    except pd.errors.OutOfBoundsDatetime:
+        msg = (
+            "Dates are outside of np.datetime64[ns] timespan. "
+            "Converting to cftime.DatetimeProlepticGregorian "
+            "and returning an xarray CFTimeIndex instead of a pandas "
+            "DateTimeIndex."
+        )
+        warnings.warn(msg)
+        return xr.CFTimeIndex(
+            [
+                cftime.DatetimeProlepticGregorian.strptime(v, format=dt_format)
+                for v in series
+            ]
+        )
 
 
 def to_datetime(s: str) -> datetime.datetime:
