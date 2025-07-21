@@ -30,8 +30,9 @@ model_dir = imod.data.fetch_imod5_model(prj_dir)
 
 # %%
 #
-# Let's view the model directory. It contains the project file and
-# accompanying model contents.
+# Let's view the model directory. We can use ``.glob("*")`` to view all
+# directory contents. The directory contains the project file and accompanying
+# model contents.
 
 from pprint import pprint
 
@@ -80,16 +81,16 @@ imod5_data["riv-1"]["stage"].isel(layer=0, drop=True).plot.imshow()
 #
 # This is nice enough, but we want to convert this iMOD5 model to a MODFLOW 6
 # model. We can do this using
-# :doc:`/api/generated/mf6/imod.mf6.Modflow6Simulation.from_imod5_data` method.
-# Next to the iMOD5 data and period data, we also need to provide the times.
-# These will be used to resample the asynchronous well timeseries data to these
-# times. For instance, well 1 in the iMOD5 database can have rates specified on
-# a daily basis, whereas well 2 is specified on a few days in the year. Say the
-# user wants to run a model on a monthly basis, this will require resampling
-# these rate timeseries to make them consistent with the simulation timesteps.
-# Let's therefore first create a list of times which will be the simulation's
-# timesteps, we can use pandas for this. "MS" stands for "month start",
-# meaning the first day of each month.
+# :meth:`imod.mf6.Modflow6Simulation.from_imod5_data` method. Next to the iMOD5
+# data and period data, we also need to provide the times. These will be used to
+# resample the asynchronous well timeseries data to these times. For instance,
+# well 1 in the iMOD5 database can have rates specified on a daily basis,
+# whereas well 2 is specified on a few days in the year. Say the user wants to
+# run a model on a monthly basis, this will require resampling these rate
+# timeseries to make them consistent with the simulation timesteps. Let's
+# therefore first create a list of times which will be the simulation's
+# timesteps, we can use pandas for this. "MS" stands for "month start", meaning
+# the first day of each month.
 
 import pandas as pd
 
@@ -178,7 +179,7 @@ with imod.util.print_if_error(ValidationError):
 # The error message states that the nodata is not aligned with idomain. This
 # means there are k values and ic values specified at inactive locations, or
 # vice versa. Let's try if masking the data works. This will remove all inactive
-# locations (idomain==0) from the data.
+# locations (``idomain > 0``) from the data.
 
 idomain = gwf_model["dis"]["idomain"]
 mf6_sim.mask_all_models(idomain)
@@ -358,10 +359,74 @@ diff.mean(dim="layer").ugrid.plot()
 
 diff.std(dim="layer").ugrid.plot()
 
+# %% 
+# 
+# We can see some higher values in the structured model in the northeast area of
+# the model. Plotting the stage of the rivers on top of the difference shows
+# that the difference occurs where river systems 1 and 2 are located and where
+# there is a large difference between the two.
+
+stage_1 = gwf_unstructured["riv-1riv"]["stage"].mean(dim="layer")
+stage_2 = gwf_unstructured["riv-2riv"]["stage"].mean(dim="layer")
+
+stage_merged = xu.concat([stage_1, stage_2], dim="merged").max(dim="merged")
+
+import matplotlib.pyplot as plt
+fig, ax = plt.subplots()
+diff.sel(layer=1).ugrid.plot(add_colorbar=False)
+stage_merged.ugrid.plot(alpha=0.1, ax=ax)
+
+# %%
+#
+# This is where the river is infiltrating into the aquifer. 
+
+head_min_stage = (head_unstructured.isel(time=-1) - stage_merged).sel(layer=1).ugrid.plot()
+
+# %% 
+# 
+# This is a good example of how regridding can lead to differences in output:
+# The line representing the fault has to be snapped to the cell edges. This is
+# strongly grid dependent. And can lead to local differences in output. Let's
+# visualize how faults are snapped to the grid edges in the structured and
+# unstructured grid.
+
+
+structured_snapped, _ = gwf_model["hfb-5"]._snap_to_grid(gwf_model["dis"]["idomain"])
+unstructured_snapped, _ = gwf_unstructured["hfb-5"]._snap_to_grid(gwf_unstructured["dis"]["idomain"])
+
+import matplotlib.pyplot as plt
+fig, ax = plt.subplots()
+structured_snapped["resistance"].ugrid.plot(add_colorbar=False, ax=ax)
+unstructured_snapped["resistance"].ugrid.plot(add_colorbar=False, ax=ax)
+diff.mean(dim="layer").ugrid.plot(ax=ax)
+ax.set_xlim(197500, 198500)
+ax.set_ylim(361000, 363000)
+
 # %%
 #
 # EXERCISE: Download this file as a script or Jupyter notebook, remove all HFB
 # packages and re-run the example. Investigate if differences are still as large
 # as they were.
+
+# %%
+#
+#
+for i in range(1, 27):
+    gwf_model.pop(f"hfb-{i}")
+    gwf_unstructured.pop(f"hfb-{i}")
+ # %%
+mf6_unstructured.write(mf6_dir / ".." / "no_hfb")
+mf6_unstructured.run()
+head_unstructured = mf6_unstructured.open_head()
+
+mf6_sim.write(mf6_dir / ".." / "no_hfb")
+mf6_sim.run()
+head_structured = mf6_sim.open_head()
+
+head_structured_upscaled = regridder.regrid(head_structured)
+
+diff = (head_structured_upscaled - head_unstructured).isel(time=-1).compute()
+diff.mean(dim="layer").ugrid.plot()
+
 
 # %%
