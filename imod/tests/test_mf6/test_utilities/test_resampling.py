@@ -39,6 +39,25 @@ def test_timeseries_resampling():
     assert new_timeseries.equals(expected_timeseries)
 
 
+def test_timeseries_resampling__index_nonzero_start():
+    # In this test, we resample a timeseries for a coarser output
+    # discretization. The output times are a subset of the input times. The
+    # index of the timeseries has a non-zero start.
+    times = [datetime(1989, 1, i) for i in [1, 3, 4, 5, 6]]
+    rates = [i * 100 for i in range(1, 6)]
+    timeseries = initialize_timeseries(times, rates)
+    timeseries = timeseries.set_index(timeseries.index + 4)
+
+    new_dates = [datetime(1989, 1, 1), datetime(1989, 1, 5), datetime(1989, 1, 6)]
+    new_timeseries = resample_timeseries(timeseries, new_dates)
+
+    expected_times = [datetime(1989, 1, i) for i in [1, 5, 6]]
+    expected_rates = [175.0, 400.0, 500.0]
+    expected_timeseries = initialize_timeseries(expected_times, expected_rates)
+
+    assert new_timeseries.equals(expected_timeseries)
+
+
 def test_timeseries_resampling_2():
     # In this test, we resample a timeseries for a coarser output discretization.
     # The output times are a not a subset of the input times, and they begin earlier.

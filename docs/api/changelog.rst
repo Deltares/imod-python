@@ -28,6 +28,9 @@ Fixed
 - Issue where regridding lead to excessively large inactive areas.
 - Issue where regridding would lead to very large negative integer values (like
   IDOMAIN) for inactive areas.
+- Issue where :meth:`imod.mf6.Well.from_imod5_data` and
+  :meth:`imod.mf6.LayeredWell.from_imod5_data` would throw a KeyError 0 upon
+  trying to resample timeseries with a non-zero index.
 
 Changed
 ~~~~~~~
