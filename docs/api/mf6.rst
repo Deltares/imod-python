@@ -90,6 +90,7 @@ Flow Packages
     Drainage.regrid_like
     Drainage.cleanup
     Drainage.clip_box
+    Drainage.reallocate
     Evapotranspiration
     Evapotranspiration.mask
     Evapotranspiration.regrid_like
@@ -100,6 +101,7 @@ Flow Packages
     GeneralHeadBoundary.regrid_like
     GeneralHeadBoundary.cleanup
     GeneralHeadBoundary.clip_box
+    GeneralHeadBoundary.reallocate
     HorizontalFlowBarrierHydraulicCharacteristic
     HorizontalFlowBarrierHydraulicCharacteristic.to_mf6_pkg
     HorizontalFlowBarrierMultiplier
@@ -130,12 +132,14 @@ Flow Packages
     Recharge.mask
     Recharge.regrid_like
     Recharge.clip_box
+    Recharge.reallocate
     River
     River.from_imod5_data
     River.mask
     River.regrid_like
     River.cleanup
     River.clip_box
+    River.reallocate
     SingleLayerHorizontalFlowBarrierHydraulicCharacteristic
     SingleLayerHorizontalFlowBarrierHydraulicCharacteristic.to_mf6_pkg
     SingleLayerHorizontalFlowBarrierHydraulicCharacteristic.clip_box

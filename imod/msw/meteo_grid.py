@@ -9,7 +9,7 @@ import xarray as xr
 
 import imod
 from imod.common.interfaces.iregridpackage import IRegridPackage
-from imod.common.utilities.regrid_method_type import EmptyRegridMethod, RegridMethodType
+from imod.common.utilities.dataclass_type import DataclassType, EmptyRegridMethod
 from imod.msw.pkgbase import MetaSwapPackage
 from imod.msw.regrid.regrid_schemes import MeteoGridRegridMethod
 from imod.msw.timeutil import to_metaswap_timeformat
@@ -216,7 +216,7 @@ class MeteoGridCopy(MetaSwapPackage, IRegridPackage):
     _file_name = "mete_grid.inp"
     _meteo_dirname = "meteo_grids"
 
-    _regrid_method: RegridMethodType = EmptyRegridMethod()
+    _regrid_method: DataclassType = EmptyRegridMethod()
 
     def __init__(self, path: Path | str):
         super().__init__()

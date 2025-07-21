@@ -5,8 +5,8 @@ import numpy as np
 import xarray as xr
 
 from imod.common.interfaces.iregridpackage import IRegridPackage
+from imod.common.utilities.dataclass_type import DataclassType
 from imod.common.utilities.regrid import _regrid_array
-from imod.common.utilities.regrid_method_type import RegridMethodType
 from imod.msw.fixed_format import VariableMetaData
 from imod.msw.pkgbase import MetaSwapPackage
 from imod.msw.regrid.regrid_schemes import IdfMappingRegridMethod
@@ -95,7 +95,7 @@ class IdfMapping(MetaSwapPackage, IRegridPackage):
         self,
         target_grid: GridDataArray,
         regrid_context: RegridderWeightsCache,
-        regridder_types: Optional[RegridMethodType] = None,
+        regridder_types: Optional[DataclassType] = None,
     ) -> "MetaSwapPackage":
         if regridder_types is None:
             regridder_settings = asdict(self.get_regrid_methods(), dict_factory=dict)

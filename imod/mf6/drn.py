@@ -5,16 +5,16 @@ from typing import Optional
 import numpy as np
 
 from imod.common.interfaces.iregridpackage import IRegridPackage
+from imod.common.utilities.dataclass_type import DataclassType
 from imod.common.utilities.mask import broadcast_and_mask_arrays
-from imod.common.utilities.regrid import (
-    _regrid_package_data,
-)
 from imod.logging import init_log_decorator, standard_log_decorator
+from imod.mf6.aggregate.aggregate_schemes import DrainageAggregationMethod
 from imod.mf6.boundary_condition import BoundaryCondition
 from imod.mf6.dis import StructuredDiscretization
 from imod.mf6.disv import VerticesDiscretization
 from imod.mf6.npf import NodePropertyFlow
 from imod.mf6.regrid.regrid_schemes import DrainageRegridMethod
+from imod.mf6.utilities.imod5_converter import regrid_imod5_pkg_data
 from imod.mf6.utilities.package import set_repeat_stress_if_available
 from imod.mf6.validation import BOUNDARY_DIMS_SCHEMA, CONC_DIMS_SCHEMA
 from imod.prepare.cleanup import cleanup_drn
@@ -135,6 +135,7 @@ class Drainage(BoundaryCondition, IRegridPackage):
     _template = BoundaryCondition._initialize_template(_pkg_id)
     _auxiliary_data = {"concentration": "species"}
     _regrid_method = DrainageRegridMethod()
+    _aggregate_method: DataclassType = DrainageAggregationMethod()
 
     @init_log_decorator()
     def __init__(
@@ -189,7 +190,7 @@ class Drainage(BoundaryCondition, IRegridPackage):
     def allocate_and_distribute_planar_data(
         cls,
         planar_data: dict[str, GridDataArray],
-        dis: StructuredDiscretization,
+        dis: StructuredDiscretization | VerticesDiscretization,
         npf: NodePropertyFlow,
         allocation_option: ALLOCATION_OPTION,
         distributing_option: DISTRIBUTING_OPTION,
@@ -314,19 +315,15 @@ class Drainage(BoundaryCondition, IRegridPackage):
         -------
         A Modflow 6 Drainage package.
         """
-
-        target_idomain = target_dis.dataset["idomain"]
-
         data = {
             "elevation": imod5_data[key]["elevation"],
             "conductance": imod5_data[key]["conductance"],
         }
-
-        if regridder_types is None:
-            regridder_types = Drainage.get_regrid_methods()
-
-        regridded_package_data = _regrid_package_data(
-            data, target_idomain, regridder_types, regrid_cache, {}
+        mask = data["conductance"] > 0
+        data["conductance"] = data["conductance"].where(mask)
+        # Regrid the input data
+        regridded_package_data = regrid_imod5_pkg_data(
+            cls, data, target_dis, regridder_types, regrid_cache
         )
         regridded_package_data = broadcast_and_mask_arrays(regridded_package_data)
         is_planar = is_planar_grid(regridded_package_data["elevation"])
@@ -340,7 +337,7 @@ class Drainage(BoundaryCondition, IRegridPackage):
             )
             regridded_package_data.update(layered_data)
 
-        drn = Drainage(**regridded_package_data, validate=True)
+        drn = cls(**regridded_package_data, validate=True)
         repeat = period_data.get(key)
         set_repeat_stress_if_available(repeat, time_min, time_max, drn)
         # Clip the drain package to the time range of the simulation and ensure

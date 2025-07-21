@@ -7,12 +7,12 @@ import numpy as np
 import imod
 from imod.common.interfaces.imaskingsettings import IMaskingSettings
 from imod.common.interfaces.iregridpackage import IRegridPackage
+from imod.common.utilities.dataclass_type import DataclassType
 from imod.common.utilities.grid import create_smallest_target_grid
 from imod.common.utilities.regrid import (
     _regrid_like,
     _regrid_package_data,
 )
-from imod.common.utilities.regrid_method_type import RegridMethodType
 from imod.logging import init_log_decorator, standard_log_decorator
 from imod.mf6.disv import VerticesDiscretization
 from imod.mf6.package import Package
@@ -170,7 +170,7 @@ class StructuredDiscretization(Package, IRegridPackage, IMaskingSettings):
     def from_imod5_data(
         cls,
         imod5_data: dict[str, dict[str, GridDataArray]],
-        regridder_types: Optional[RegridMethodType] = None,
+        regridder_types: Optional[DataclassType] = None,
         regrid_cache: RegridderWeightsCache = RegridderWeightsCache(),
         validate: bool = True,
     ) -> "StructuredDiscretization":
@@ -236,7 +236,9 @@ class StructuredDiscretization(Package, IRegridPackage, IMaskingSettings):
         # Assume iMOD5 data provided as fully 3D and not Quasi-3D
         new_package_data["top"] = new_package_data["top"].sel(layer=1, drop=True)
 
-        return cls(**new_package_data, validate=True)
+        pkg = cls(**new_package_data, validate=True)
+        pkg.dataset.load()  # Force dask dataset into memory
+        return pkg
 
     @classmethod
     def get_regrid_methods(cls) -> DiscretizationRegridMethod:
@@ -246,7 +248,7 @@ class StructuredDiscretization(Package, IRegridPackage, IMaskingSettings):
         self,
         target_grid: GridDataArray,
         regrid_cache: RegridderWeightsCache,
-        regridder_types: Optional[RegridMethodType] = None,
+        regridder_types: Optional[DataclassType] = None,
     ) -> Union["StructuredDiscretization", VerticesDiscretization]:
         """
         Regrid discretization package. Creates a StructuredDiscretization, or

@@ -345,6 +345,14 @@ def test_to_mf6_pkg__validate_filter_top(well_high_lvl_test_data_stationary):
     )
 
 
+def test_aggregate__raises(well_high_lvl_test_data_stationary):
+    # Arrange
+    wel = imod.mf6.Well(*well_high_lvl_test_data_stationary)
+
+    with pytest.raises(TypeError):
+        wel.aggregate_layers()
+
+
 @parametrize_with_cases("dis", cases=BasicGridCases)
 def test_to_mf6_pkg__logging_with_message(
     tmp_path, dis, well_high_lvl_test_data_transient

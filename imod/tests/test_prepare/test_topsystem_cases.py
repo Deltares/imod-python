@@ -194,7 +194,7 @@ def distribution_by_corrected_transmissivity__first_active():
     allocated_layer = xr.DataArray(
         [True, True, True, False], coords={"layer": [1, 2, 3, 4]}, dims=("layer",)
     )
-    expected = [0.0, (4 / 5), (1 / 5), np.nan]
+    expected = [np.nan, (4 / 5), (1 / 5), np.nan]
     return option, allocated_layer, expected
 
 
@@ -215,7 +215,7 @@ def distribution_by_corrected_transmissivity__TFTF():
     allocated_layer = xr.DataArray(
         [True, False, True, False], coords={"layer": [1, 2, 3, 4]}, dims=("layer",)
     )
-    expected = [0.0, np.nan, 1.0, np.nan]
+    expected = [np.nan, np.nan, 1.0, np.nan]
     return option, allocated_layer, expected
 
 
@@ -267,7 +267,7 @@ def distribution_by_corrected_thickness__first_active():
     allocated_layer = xr.DataArray(
         [True, True, True, False], coords={"layer": [1, 2, 3, 4]}, dims=("layer",)
     )
-    expected = [0.0, (2 / 3), (1 / 3), np.nan]
+    expected = [np.nan, (2 / 3), (1 / 3), np.nan]
     return option, allocated_layer, expected
 
 
@@ -288,7 +288,7 @@ def distribution_by_corrected_thickness__TFTF():
     allocated_layer = xr.DataArray(
         [True, False, True, False], coords={"layer": [1, 2, 3, 4]}, dims=("layer",)
     )
-    expected = [0.0, np.nan, 1.0, np.nan]
+    expected = [np.nan, np.nan, 1.0, np.nan]
     return option, allocated_layer, expected
 
 
@@ -340,7 +340,7 @@ def distribution_by_crosscut_transmissivity__first_active():
     allocated_layer = xr.DataArray(
         [True, True, True, False], coords={"layer": [1, 2, 3, 4]}, dims=("layer",)
     )
-    expected = [0.0, (2 / 3), (1 / 3), np.nan]
+    expected = [np.nan, (2 / 3), (1 / 3), np.nan]
     return option, allocated_layer, expected
 
 
@@ -362,7 +362,7 @@ def distribution_by_crosscut_transmissivity__TFTF():
     allocated_layer = xr.DataArray(
         [True, False, True, False], coords={"layer": [1, 2, 3, 4]}, dims=("layer",)
     )
-    expected = [0.0, np.nan, 1.0, np.nan]
+    expected = [np.nan, np.nan, 1.0, np.nan]
     return option, allocated_layer, expected
 
 
@@ -415,7 +415,7 @@ def distribution_by_crosscut_thickness__first_active():
     allocated_layer = xr.DataArray(
         [True, True, True, False], coords={"layer": [1, 2, 3, 4]}, dims=("layer",)
     )
-    expected = [0.0, 0.5, 0.5, np.nan]
+    expected = [np.nan, 0.5, 0.5, np.nan]
     return option, allocated_layer, expected
 
 
@@ -437,7 +437,7 @@ def distribution_by_crosscut_thickness__TFTF():
     allocated_layer = xr.DataArray(
         [True, False, True, False], coords={"layer": [1, 2, 3, 4]}, dims=("layer",)
     )
-    expected = [0.0, np.nan, 1.0, np.nan]
+    expected = [np.nan, np.nan, 1.0, np.nan]
     return option, allocated_layer, expected
 
 

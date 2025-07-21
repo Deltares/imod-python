@@ -4,7 +4,7 @@ from typing import Any, Optional, TextIO
 import pandas as pd
 
 from imod.common.interfaces.iregridpackage import IRegridPackage
-from imod.common.utilities.regrid_method_type import RegridMethodType
+from imod.common.utilities.dataclass_type import DataclassType
 from imod.msw.fixed_format import VariableMetaData
 from imod.msw.pkgbase import MetaSwapPackage
 from imod.msw.timeutil import to_metaswap_timeformat
@@ -142,6 +142,6 @@ class TimeOutputControl(MetaSwapPackage, IRegridPackage):
         self,
         target_grid: GridDataArray,
         regrid_context: RegridderWeightsCache,
-        regridder_types: Optional[RegridMethodType] = None,
+        regridder_types: Optional[DataclassType] = None,
     ) -> "MetaSwapPackage":
         return deepcopy(self)

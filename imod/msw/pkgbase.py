@@ -9,10 +9,10 @@ import pandas as pd
 import xarray as xr
 
 from imod.common.utilities.clip import clip_spatial_box, clip_time_slice
+from imod.common.utilities.dataclass_type import DataclassType, EmptyRegridMethod
 from imod.common.utilities.regrid import (
     _regrid_like,
 )
-from imod.common.utilities.regrid_method_type import EmptyRegridMethod, RegridMethodType
 from imod.mf6.dis import StructuredDiscretization
 from imod.mf6.mf6_wel_adapter import Mf6Wel
 from imod.msw.fixed_format import format_fixed_width
@@ -33,7 +33,7 @@ class MetaSwapPackage(abc.ABC):
 
     __slots__ = "_pkg_id"
     _file_name = "filename_not_set"
-    _regrid_method: RegridMethodType = EmptyRegridMethod()
+    _regrid_method: DataclassType = EmptyRegridMethod()
     _with_subunit: tuple = ()
     _without_subunit: tuple = ()
     _to_fill: tuple = ()
@@ -230,7 +230,7 @@ class MetaSwapPackage(abc.ABC):
         self,
         target_grid: GridDataArray,
         regrid_context: RegridderWeightsCache,
-        regridder_types: Optional[RegridMethodType] = None,
+        regridder_types: Optional[DataclassType] = None,
     ) -> "MetaSwapPackage":
         try:
             result = _regrid_like(self, target_grid, regrid_context, regridder_types)
@@ -290,7 +290,7 @@ class MetaSwapPackage(abc.ABC):
         cls = type(self)
         return cls._from_dataset(selection)
 
-    def get_regrid_methods(self) -> RegridMethodType:
+    def get_regrid_methods(self) -> DataclassType:
         return deepcopy(self._regrid_method)
 
     def from_imod5_data(self, *args, **kwargs):

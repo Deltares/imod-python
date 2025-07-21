@@ -9,6 +9,34 @@ The format is based on `Keep a Changelog`_, and this project adheres to
 [Unreleased]
 ------------
 
+Added
+~~~~~
+
+- :meth:`imod.mf6.River.reallocate`, :meth:`imod.mf6.Drainage.reallocate`,
+  :meth:`imod.mf6.GeneralHeadBoundary.reallocate`,
+  :meth:`imod.mf6.Recharge.reallocate` to reallocate the package data to a new
+  discretization or :class:`imod.mf6.NodePropertyFlow` package, or to use a
+  different :class:`imod.prepare.ALLOCATION_OPTION` or
+  :class:`imod.prepare.DISTRIBUTING_OPTION`.
+
+Fixed
+~~~~~
+
+- Reduce noisy warnings in models loaded with
+  :meth:`imod.mf6.Modflow6Simulation.from_imod5_data` which have layers with
+  cells with zero thicknesses.
+- Issue where regridding lead to excessively large inactive areas.
+- Issue where regridding would lead to very large negative integer values (like
+  IDOMAIN) for inactive areas.
+
+Changed
+~~~~~~~
+
+- :meth:`imod.mf6.StructuredDiscretization.from_imod5_data` and
+  :meth:`imod.mf6.NodePropertyFlow.from_imod5_data` now automatically load the
+  dataset into memory. This improves performance when loading models with
+  multiple topsystem packages.
+
 Removed
 ~~~~~~~
 

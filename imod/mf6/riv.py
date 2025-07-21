@@ -6,8 +6,10 @@ import numpy as np
 
 from imod import logging
 from imod.common.interfaces.iregridpackage import IRegridPackage
+from imod.common.utilities.dataclass_type import DataclassType
 from imod.common.utilities.mask import broadcast_and_mask_arrays
 from imod.logging import init_log_decorator, standard_log_decorator
+from imod.mf6.aggregate.aggregate_schemes import RiverAggregationMethod
 from imod.mf6.boundary_condition import BoundaryCondition
 from imod.mf6.dis import StructuredDiscretization
 from imod.mf6.disv import VerticesDiscretization
@@ -254,6 +256,7 @@ class River(BoundaryCondition, IRegridPackage):
     _template = BoundaryCondition._initialize_template(_pkg_id)
     _auxiliary_data = {"concentration": "species"}
     _regrid_method = RiverRegridMethod()
+    _aggregate_method: DataclassType = RiverAggregationMethod()
 
     @init_log_decorator()
     def __init__(
@@ -311,7 +314,7 @@ class River(BoundaryCondition, IRegridPackage):
     def allocate_and_distribute_planar_data(
         cls,
         planar_data: GridDataDict,
-        dis: StructuredDiscretization,
+        dis: StructuredDiscretization | VerticesDiscretization,
         npf: NodePropertyFlow,
         allocation_option: ALLOCATION_OPTION,
         distributing_option: DISTRIBUTING_OPTION,
@@ -475,9 +478,11 @@ class River(BoundaryCondition, IRegridPackage):
         # gather input data
         varnames = ["conductance", "stage", "bottom_elevation", "infiltration_factor"]
         data = {varname: imod5_data[key][varname] for varname in varnames}
+        mask = data["conductance"] > 0
+        data["conductance"] = data["conductance"].where(mask)
         # Regrid the input data
         regridded_riv_pkg_data = regrid_imod5_pkg_data(
-            River, data, target_dis, regridder_types, regrid_cache
+            cls, data, target_dis, regridder_types, regrid_cache
         )
         regridded_riv_pkg_data = broadcast_and_mask_arrays(regridded_riv_pkg_data)
         # Pop infiltration_factor to avoid unnecessarily allocating and
@@ -508,7 +513,7 @@ class River(BoundaryCondition, IRegridPackage):
         regridded_riv_pkg_data, infiltration_drn_data = _separate_infiltration_data(
             regridded_riv_pkg_data, infiltration_factor
         )
-        riv_pkg = River(**regridded_riv_pkg_data, validate=True)
+        riv_pkg = cls(**regridded_riv_pkg_data, validate=True)
         drn_pkg = _create_drain_from_leftover_riv_imod5_data(
             allocation_drn_data,
             infiltration_drn_data,

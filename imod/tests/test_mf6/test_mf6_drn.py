@@ -241,6 +241,20 @@ def test_3d_singelayer():
     assert isinstance(struct_array, np.ndarray)
 
 
+def test_aggregate_layers(drainage):
+    river = imod.mf6.Drainage(**drainage)
+
+    planar_dict = river.aggregate_layers(river.dataset)
+    assert isinstance(planar_dict, dict)
+    for value in planar_dict.values():
+        assert isinstance(value, xr.DataArray)
+        assert "layer" not in value.dims
+        assert "layer" not in value.coords
+
+    # Conductance should be summed, stage averaged
+    assert not (planar_dict["elevation"] > planar_dict["conductance"]).any()
+
+
 def test_render_concentration(
     concentration_fc,
     elevation_fc,
@@ -443,6 +457,33 @@ def test_clip_box_transient(transient_drainage):
     assert np.array_equal(selection.dataset["time"].values, expected)
     assert (selection["conductance"].sel(time="1990-06-01") == 1.0).all()
     assert (selection["conductance"].sel(time="2000-01-01") == 1.0).all()
+
+
+def test_reallocate(drainage):
+    drn = imod.mf6.Drainage(**drainage)
+    idomain = drainage["elevation"].astype(np.int16)
+    top = 1.0
+    bottom = top - idomain.coords["layer"]
+
+    dis = imod.mf6.StructuredDiscretization(top=top, bottom=bottom, idomain=idomain)
+    npf = imod.mf6.NodePropertyFlow(icelltype=0, k=1.0)
+    allocation_option = ALLOCATION_OPTION.first_active_to_elevation
+    distributing_option = DISTRIBUTING_OPTION.by_corrected_transmissivity
+    # Act
+    drn_reallocated = drn.reallocate(dis, npf, allocation_option, distributing_option)
+    # Assert
+    assert isinstance(drn_reallocated, imod.mf6.Drainage)
+    assert not drn_reallocated.dataset.equals(drn.dataset)
+    assert (
+        drn_reallocated["conductance"]
+        .sum("layer")
+        .equals(drn["conductance"].sum("layer"))
+    )
+    assert (
+        drn_reallocated["elevation"]
+        .mean("layer")
+        .equals(drn["elevation"].mean("layer"))
+    )
 
 
 def test_repr(drainage):

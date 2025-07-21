@@ -5,8 +5,6 @@ The utilies imported in this file are public API, and previously placed in
 imod/util.py. Therefore these should be available under the imod.util namespace.
 """
 
-import warnings
-
 from imod.util.context import cd, ignore_warnings, print_if_error
 from imod.util.path import temporary_directory
 from imod.util.regrid import RegridderType, RegridderWeightsCache

@@ -29,11 +29,11 @@ from imod.common.utilities.clip import (
     clip_spatial_box,
     clip_time_slice,
 )
+from imod.common.utilities.dataclass_type import DataclassType, EmptyRegridMethod
 from imod.common.utilities.mask import mask_package
 from imod.common.utilities.regrid import (
     _regrid_like,
 )
-from imod.common.utilities.regrid_method_type import EmptyRegridMethod, RegridMethodType
 from imod.common.utilities.schemata import (
     filter_schemata_dict,
     validate_schemata_dict,
@@ -42,6 +42,7 @@ from imod.common.utilities.schemata import (
 from imod.common.utilities.value_filters import is_valid
 from imod.common.utilities.version import prepend_content_with_version_info
 from imod.logging import standard_log_decorator
+from imod.mf6.aggregate.aggregate_schemes import EmptyAggregationMethod
 from imod.mf6.auxiliary_variables import (
     expand_transient_auxiliary_variables,
     get_variable_names,
@@ -81,7 +82,8 @@ class Package(PackageBase, IPackage, abc.ABC):
     _init_schemata: SchemataDict = {}
     _write_schemata: SchemataDict = {}
     _keyword_map: dict[str, str] = {}
-    _regrid_method: RegridMethodType = EmptyRegridMethod()
+    _regrid_method: DataclassType = EmptyRegridMethod()
+    _aggregate_method: DataclassType = EmptyAggregationMethod()
     _template: jinja2.Template
 
     def __init__(self, allargs: Mapping[str, GridDataArray | float | int | bool | str]):
@@ -480,7 +482,7 @@ class Package(PackageBase, IPackage, abc.ABC):
         self,
         target_grid: GridDataArray,
         regrid_cache: RegridderWeightsCache,
-        regridder_types: Optional[RegridMethodType] = None,
+        regridder_types: Optional[DataclassType] = None,
     ) -> "Package":
         """
         Creates a package of the same type as this package, based on another
@@ -615,5 +617,9 @@ class Package(PackageBase, IPackage, abc.ABC):
         return True
 
     @classmethod
-    def get_regrid_methods(cls) -> RegridMethodType:
+    def get_regrid_methods(cls) -> DataclassType:
         return deepcopy(cls._regrid_method)
+
+    @classmethod
+    def get_aggregate_methods(cls) -> DataclassType:
+        return deepcopy(cls._aggregate_method)
