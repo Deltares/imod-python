@@ -66,7 +66,10 @@ def _well_from_imod5_cap_point_data(cap_data: GridDataDict) -> dict[str, np.ndar
 def _well_from_imod5_cap_grid_data(cap_data: GridDataDict) -> dict[str, np.ndarray]:
     artificial_rch_type = cap_data["artificial_recharge"]
     layer = cap_data["artificial_recharge_layer"].astype(int)
-
+    # Workaround to be able to later specify groundwater abstraction rates as
+    # well as surface water abstraction rates in a single row, which is a
+    # requirement of MetaSWAP. If artificial_rch_type == 1 (groundwater
+    # abstraction), the surface water abstraction wells are set to 0.0 later.
     from_groundwater = (artificial_rch_type != 0).to_numpy()
     coords = artificial_rch_type.coords
     x_grid, y_grid = np.meshgrid(coords["x"].to_numpy(), coords["y"].to_numpy())
