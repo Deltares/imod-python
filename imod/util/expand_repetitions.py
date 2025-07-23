@@ -83,6 +83,10 @@ def resample_timeseries(
     a new dataframe containing a timeseries defined on the times in "times".
     """
     is_steady_state = len(times) == 0
+    # Fill NaT for the last timestep in well_rate if it is outside
+    # pandas' Timestamp nanosecond range (2262), for example 2999-12-31.
+    # FUTURE: Can be removed when we require pandas 3.0
+    well_rate["time"].iloc[-1:] = well_rate["time"].iloc[-1:].fillna(pd.Timestamp.max)
 
     output_frame = pd.DataFrame(times)
     output_frame = output_frame.rename(columns={0: "time"})
@@ -133,10 +137,6 @@ def resample_timeseries(
     output_frame["rate"] = (gb["volume"].sum() / gb["duration_sec"].sum()).reset_index(
         drop=True
     )
-    # If last value is nan (fell outside range), pad with last well rate.
-    if np.isnan(output_frame["rate"].values[-1]):
-        output_frame["rate"].values[-1] = well_rate["rate"].values[-1]
-
     if is_steady_state:
         # Take first element, the slice is to force pandas to return it as
         # dataframe instead of series.
