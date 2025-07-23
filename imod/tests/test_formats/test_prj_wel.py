@@ -924,6 +924,7 @@ def test_from_imod5_data_wells__wells_out_of_bounds(
     setup_test_files(wel_case, wel_file, well_out_of_bounds_ipfs, tmp_path)
 
     times = [datetime(1982, i + 3, 1) for i in range(4)]
+    times.extend([datetime(2000, 1, 1), datetime(2001, 1, 1)])
 
     # Act
     data, _ = open_projectfile_data(wel_file)
