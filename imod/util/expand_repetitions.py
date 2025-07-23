@@ -140,7 +140,7 @@ def resample_timeseries(
     # If last value is nan (fell outside range), pad with last well rate.
     if np.isnan(output_frame["rate"].values[-1]):
         output_frame["rate"].values[-1] = well_rate["rate"].values[-1]
-    
+
     if is_steady_state:
         # Take first element, the slice is to force pandas to return it as
         # dataframe instead of series.
