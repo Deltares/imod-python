@@ -39,6 +39,8 @@ Changed
   :meth:`imod.mf6.NodePropertyFlow.from_imod5_data` now automatically load the
   dataset into memory. This improves performance when loading models with
   multiple topsystem packages.
+- No upper limit anymore for ``mod_id`` in ``mod2svat.inp`` for
+  :class:`imod.msw.CouplerMapping`.
 
 Removed
 ~~~~~~~
