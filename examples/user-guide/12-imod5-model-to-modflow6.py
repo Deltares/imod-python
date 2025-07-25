@@ -206,9 +206,7 @@ head_structured.isel(time=-1).sel(layer=5).plot.imshow()
 # Now that we have a MODFLOW 6 simulation, we can regrid it to an unstructured
 # grid. Let's first load a triangular grid.
 
-#triangular_grid = imod.data.lhm_clip_triangular_grid()
-import xugrid as xu
-triangular_grid = xu.open_dataarray(r"c:\Users\engelen\projects_wdir\imod-python\examples\LHM_unstructured\triangular_grid_LHM_clip.nc").ugrid.grid
+triangular_grid = imod.data.lhm_clip_triangular_grid()
 triangular_grid.plot()
 
 # %%
@@ -361,42 +359,21 @@ diff.mean(dim="layer").ugrid.plot()
 
 diff.std(dim="layer").ugrid.plot()
 
-# %% 
-# 
-# We can see some higher values in the structured model in the northeast area of
-# the model. Plotting the stage of the rivers on top of the difference shows
-# that the difference occurs where river systems 1 and 2 are located and where
-# there is a large difference between the two.
-
-stage_1 = gwf_unstructured["riv-1riv"]["stage"].mean(dim="layer")
-stage_2 = gwf_unstructured["riv-2riv"]["stage"].mean(dim="layer")
-
-stage_merged = xu.concat([stage_1, stage_2], dim="merged").max(dim="merged")
-
-import matplotlib.pyplot as plt
-fig, ax = plt.subplots()
-diff.sel(layer=1).ugrid.plot(add_colorbar=False)
-stage_merged.ugrid.plot(alpha=0.1, ax=ax)
-
 # %%
 #
-# This is where the river is infiltrating into the aquifer. 
-
-head_min_stage = (head_unstructured.isel(time=-1) - stage_merged).sel(layer=1).ugrid.plot()
-
-# %% 
-# 
 # This is a good example of how regridding can lead to differences in output:
 # The line representing the fault has to be snapped to the cell edges. This is
 # strongly grid dependent. And can lead to local differences in output. Let's
 # visualize how faults are snapped to the grid edges in the structured and
 # unstructured grid.
 
-
 structured_snapped, _ = gwf_model["hfb-5"]._snap_to_grid(gwf_model["dis"]["idomain"])
-unstructured_snapped, _ = gwf_unstructured["hfb-5"]._snap_to_grid(gwf_unstructured["dis"]["idomain"])
+unstructured_snapped, _ = gwf_unstructured["hfb-5"]._snap_to_grid(
+    gwf_unstructured["dis"]["idomain"]
+)
 
 import matplotlib.pyplot as plt
+
 fig, ax = plt.subplots()
 structured_snapped["resistance"].ugrid.plot(add_colorbar=False, ax=ax)
 unstructured_snapped["resistance"].ugrid.plot(add_colorbar=False, ax=ax)
@@ -408,27 +385,9 @@ ax.set_ylim(361000, 363000)
 #
 # EXERCISE: Download this file as a script or Jupyter notebook, remove all HFB
 # packages and re-run the example. Investigate if differences are still as large
-# as they were.
-
-# %%
-#
-#
-for i in range(1, 27):
-    gwf_model.pop(f"hfb-{i}")
-    gwf_unstructured.pop(f"hfb-{i}")
- # %%
-mf6_unstructured.write(mf6_dir / ".." / "no_hfb_unstructured")
-mf6_unstructured.run()
-head_unstructured = mf6_unstructured.open_head()
-
-mf6_sim.write(mf6_dir / ".." / "no_hfb")
-mf6_sim.run()
-head_structured = mf6_sim.open_head()
-
-head_structured_upscaled = regridder.regrid(head_structured)
-
-diff = (head_structured_upscaled - head_unstructured).isel(time=-1).compute()
-diff.mean(dim="layer").ugrid.plot()
-
+# as they were. You can remove the HFB packages by using the ``pop`` method on
+# the groundwater flow model. There are 26 HFB packages in the model, so you
+# can use a for loop to remove them all. The HFB packages are named
+# "hfb-1", "hfb-2", ..., "hfb-26".
 
 # %%
