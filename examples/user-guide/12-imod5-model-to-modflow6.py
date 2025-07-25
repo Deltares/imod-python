@@ -30,8 +30,9 @@ model_dir = imod.data.fetch_imod5_model(prj_dir)
 
 # %%
 #
-# Let's view the model directory. It contains the project file and
-# accompanying model contents.
+# Let's view the model directory. We can use ``.glob("*")`` to view all
+# directory contents. The directory contains the project file and accompanying
+# model contents.
 
 from pprint import pprint
 
@@ -80,16 +81,16 @@ imod5_data["riv-1"]["stage"].isel(layer=0, drop=True).plot.imshow()
 #
 # This is nice enough, but we want to convert this iMOD5 model to a MODFLOW 6
 # model. We can do this using
-# :doc:`/api/generated/mf6/imod.mf6.Modflow6Simulation.from_imod5_data` method.
-# Next to the iMOD5 data and period data, we also need to provide the times.
-# These will be used to resample the asynchronous well timeseries data to these
-# times. For instance, well 1 in the iMOD5 database can have rates specified on
-# a daily basis, whereas well 2 is specified on a few days in the year. Say the
-# user wants to run a model on a monthly basis, this will require resampling
-# these rate timeseries to make them consistent with the simulation timesteps.
-# Let's therefore first create a list of times which will be the simulation's
-# timesteps, we can use pandas for this. "MS" stands for "month start",
-# meaning the first day of each month.
+# :meth:`imod.mf6.Modflow6Simulation.from_imod5_data` method. Next to the iMOD5
+# data and period data, we also need to provide the times. These will be used to
+# resample the asynchronous well timeseries data to these times. For instance,
+# well 1 in the iMOD5 database can have rates specified on a daily basis,
+# whereas well 2 is specified on a few days in the year. Say the user wants to
+# run a model on a monthly basis, this will require resampling these rate
+# timeseries to make them consistent with the simulation timesteps. Let's
+# therefore first create a list of times which will be the simulation's
+# timesteps, we can use pandas for this. "MS" stands for "month start", meaning
+# the first day of each month.
 
 import pandas as pd
 
@@ -178,7 +179,7 @@ with imod.util.print_if_error(ValidationError):
 # The error message states that the nodata is not aligned with idomain. This
 # means there are k values and ic values specified at inactive locations, or
 # vice versa. Let's try if masking the data works. This will remove all inactive
-# locations (idomain==0) from the data.
+# locations (``idomain > 0``) from the data.
 
 idomain = gwf_model["dis"]["idomain"]
 mf6_sim.mask_all_models(idomain)
@@ -360,8 +361,31 @@ diff.std(dim="layer").ugrid.plot()
 
 # %%
 #
+# This is a good example of how regridding can lead to differences in output:
+# The line representing the fault has to be snapped to the cell edges. This is
+# strongly grid dependent. And can lead to local differences in output. Let's
+# visualize how faults are snapped to the grid edges in the structured and
+# unstructured grid.
+
+structured_snapped = gwf_model["hfb-5"].snap_to_grid(gwf_model["dis"])
+unstructured_snapped = gwf_unstructured["hfb-5"].snap_to_grid(gwf_unstructured["dis"])
+
+import matplotlib.pyplot as plt
+
+fig, ax = plt.subplots()
+structured_snapped["resistance"].ugrid.plot(add_colorbar=False, ax=ax)
+unstructured_snapped["resistance"].ugrid.plot(add_colorbar=False, ax=ax)
+diff.mean(dim="layer").ugrid.plot(ax=ax)
+ax.set_xlim(197500, 198500)
+ax.set_ylim(361000, 363000)
+
+# %%
+#
 # EXERCISE: Download this file as a script or Jupyter notebook, remove all HFB
 # packages and re-run the example. Investigate if differences are still as large
-# as they were.
+# as they were. You can remove the HFB packages by using the ``pop`` method on
+# the groundwater flow model. There are 26 HFB packages in the model, so you
+# can use a for loop to remove them all. The HFB packages are named
+# "hfb-1", "hfb-2", ..., "hfb-26".
 
 # %%

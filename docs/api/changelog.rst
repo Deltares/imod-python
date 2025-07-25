@@ -18,6 +18,9 @@ Added
   discretization or :class:`imod.mf6.NodePropertyFlow` package, or to use a
   different :class:`imod.prepare.ALLOCATION_OPTION` or
   :class:`imod.prepare.DISTRIBUTING_OPTION`.
+- Added :meth:`imod.mf6.HorizontalFlowBarrierResistance.snap_to_grid` and
+  :meth:`imod.mf6.HorizontalFlowBarrierSingleLayerResistance.snap_to_grid` to
+  debug how horizontal flow barriers are snapped to a grid.
 
 Fixed
 ~~~~~
@@ -31,6 +34,10 @@ Fixed
 - Issue where :meth:`imod.mf6.Well.from_imod5_data` and
   :meth:`imod.mf6.LayeredWell.from_imod5_data` would throw a KeyError 0 upon
   trying to resample timeseries with a non-zero index.
+- Fixed bug where :class:`imod.mf6.HorizontalFlowBarrierResistance`,
+  :class:`imod.mf6.HorizontalFlowBarrierSingleLayerResistance` and other HFB
+  packages would have resistances that were double the expected value with
+  xugrid >= 0.14.2
 
 Changed
 ~~~~~~~
