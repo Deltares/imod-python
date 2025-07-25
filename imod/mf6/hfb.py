@@ -439,6 +439,8 @@ def _snap_to_grid_and_aggregate(
     snapping_df = xu.create_snap_to_grid_dataframe(
         barrier_dataframe, grid2d, max_snap_distance=0.5
     )
+    # Sometimes xugrid snaps lines to the same edge twice, drop duplicates.
+    snapping_df = snapping_df.drop_duplicates(subset=["line_index", "edge_index"])
     # Map other variables to snapping_df with line indices
     line_index = snapping_df["line_index"]
     vars_to_snap = list(vardict_agg.keys())
@@ -914,6 +916,28 @@ class HorizontalFlowBarrierBase(BoundaryCondition, ILineDataPackage):
         grid-agnostic, instead this method retuns a copy of itself.
         """
         return deepcopy(self)
+
+    def snap_to_grid(
+        self, dis: StructuredDiscretization | VerticesDiscretization
+    ) -> xu.UgridDataset:
+        """
+        Snap the barriers to the grid edges of the discretization. This is also
+        done when calling `to_mf6_pkg`, but this method can be used to debug and
+        see how your barriers are snapped to grid edges.
+
+        Parameters
+        ----------
+        dis: StructuredDiscretization | VerticesDiscretication
+            Model discretization package.
+
+        Returns
+        -------
+        xugrid.UgridDataset
+            Dataset with barriers snapped to grid edges.
+        """
+        idomain = dis.dataset["idomain"]
+        snapped_dataset, _ = self._snap_to_grid(idomain)
+        return snapped_dataset
 
     def _snap_to_grid(
         self, idomain: GridDataArray
