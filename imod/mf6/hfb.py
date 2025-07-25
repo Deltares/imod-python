@@ -922,8 +922,9 @@ class HorizontalFlowBarrierBase(BoundaryCondition, ILineDataPackage):
     ) -> xu.UgridDataset:
         """
         Snap the barriers to the grid edges of the discretization. This is also
-        done when calling `to_mf6_pkg`, but this method can be used to debug and
-        see how your barriers are snapped to grid edges.
+        done when calling `to_mf6_pkg` or when calling
+        :meth:`imod.mf6.Modflow6Simulation`, but this method can be used to
+        debug and see how your barriers are snapped to grid edges.
 
         Parameters
         ----------
@@ -934,6 +935,17 @@ class HorizontalFlowBarrierBase(BoundaryCondition, ILineDataPackage):
         -------
         xugrid.UgridDataset
             Dataset with barriers snapped to grid edges.
+
+        Example
+        -------
+        See how the barriers are snapped to grid edges. Get the
+        discretization and horizontal flow barrier package from the
+        :class:`imod.mf6.GroundwaterFlowModel` first.
+
+        >>> dis = gwf_model["dis"]
+        >>> hfb = gwf_model["hfb"]
+        >>> snapped_dataset = hfb.snap_to_grid(dis)
+        >>> snapped_dataset["resistance"].ugrid.plot()
         """
         idomain = dis.dataset["idomain"]
         snapped_dataset, _ = self._snap_to_grid(idomain)
