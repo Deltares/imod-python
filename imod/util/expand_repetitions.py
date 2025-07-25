@@ -83,6 +83,10 @@ def resample_timeseries(
     a new dataframe containing a timeseries defined on the times in "times".
     """
     is_steady_state = len(times) == 0
+    # Fill NaT for the last timestep in well_rate if it is outside
+    # pandas' Timestamp nanosecond range (2262), for example 2999-12-31.
+    # FUTURE: Can be removed when we require pandas 3.0
+    well_rate["time"].iloc[-1:] = well_rate["time"].iloc[-1:].fillna(pd.Timestamp.max)
 
     output_frame = pd.DataFrame(times)
     output_frame = output_frame.rename(columns={0: "time"})
@@ -111,7 +115,7 @@ def resample_timeseries(
     if time_before_start_input[0]:
         intermediate_df.loc[time_before_start_input, "rate"] = 0.0
         intermediate_df.loc[time_before_start_input, location_columns] = (
-            well_rate.loc[0, location_columns],
+            well_rate.iloc[0][location_columns],
         )
 
     # compute time difference from perious to current row

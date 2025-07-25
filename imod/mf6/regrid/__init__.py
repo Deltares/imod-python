@@ -1,4 +1,4 @@
-from imod.common.utilities.regrid_method_type import EmptyRegridMethod
+from imod.common.utilities.dataclass_type import EmptyRegridMethod
 from imod.mf6.regrid.regrid_schemes import (
     ConstantHeadRegridMethod,
     DiscretizationRegridMethod,

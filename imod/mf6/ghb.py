@@ -5,10 +5,10 @@ from typing import Optional
 import numpy as np
 
 from imod.common.interfaces.iregridpackage import IRegridPackage
+from imod.common.utilities.dataclass_type import DataclassType
 from imod.common.utilities.mask import broadcast_and_mask_arrays
-from imod.common.utilities.regrid import _regrid_package_data
-from imod.common.utilities.regrid_method_type import RegridMethodType
 from imod.logging import init_log_decorator, standard_log_decorator
+from imod.mf6.aggregate.aggregate_schemes import DrainageAggregationMethod
 from imod.mf6.boundary_condition import BoundaryCondition
 from imod.mf6.dis import StructuredDiscretization
 from imod.mf6.disv import VerticesDiscretization
@@ -16,6 +16,7 @@ from imod.mf6.npf import NodePropertyFlow
 from imod.mf6.regrid.regrid_schemes import (
     GeneralHeadBoundaryRegridMethod,
 )
+from imod.mf6.utilities.imod5_converter import regrid_imod5_pkg_data
 from imod.mf6.utilities.package import set_repeat_stress_if_available
 from imod.mf6.validation import BOUNDARY_DIMS_SCHEMA, CONC_DIMS_SCHEMA
 from imod.prepare.cleanup import cleanup_ghb
@@ -139,6 +140,7 @@ class GeneralHeadBoundary(BoundaryCondition, IRegridPackage):
     _template = BoundaryCondition._initialize_template(_pkg_id)
     _auxiliary_data = {"concentration": "species"}
     _regrid_method = GeneralHeadBoundaryRegridMethod()
+    _aggregate_method: DataclassType = DrainageAggregationMethod()
 
     @init_log_decorator()
     def __init__(
@@ -193,7 +195,7 @@ class GeneralHeadBoundary(BoundaryCondition, IRegridPackage):
     def allocate_and_distribute_planar_data(
         cls,
         planar_data: dict[str, GridDataArray],
-        dis: StructuredDiscretization,
+        dis: StructuredDiscretization | VerticesDiscretization,
         npf: NodePropertyFlow,
         allocation_option: ALLOCATION_OPTION,
         distributing_option: DISTRIBUTING_OPTION,
@@ -272,7 +274,7 @@ class GeneralHeadBoundary(BoundaryCondition, IRegridPackage):
         time_max: datetime,
         allocation_option: ALLOCATION_OPTION,
         distributing_option: DISTRIBUTING_OPTION,
-        regridder_types: Optional[RegridMethodType] = None,
+        regridder_types: Optional[DataclassType] = None,
         regrid_cache: RegridderWeightsCache = RegridderWeightsCache(),
     ) -> "GeneralHeadBoundary":
         """
@@ -317,16 +319,14 @@ class GeneralHeadBoundary(BoundaryCondition, IRegridPackage):
         -------
         A  Modflow 6 GeneralHeadBoundary packages.
         """
-        idomain = target_dis.dataset["idomain"]
         data = {
             "head": imod5_data[key]["head"],
             "conductance": imod5_data[key]["conductance"],
         }
-        if regridder_types is None:
-            regridder_types = GeneralHeadBoundaryRegridMethod()
-
-        regridded_package_data = _regrid_package_data(
-            data, idomain, regridder_types, regrid_cache, {}
+        mask = data["conductance"] > 0
+        data["conductance"] = data["conductance"].where(mask)
+        regridded_package_data = regrid_imod5_pkg_data(
+            cls, data, target_dis, regridder_types, regrid_cache
         )
         regridded_package_data = broadcast_and_mask_arrays(regridded_package_data)
         is_planar = is_planar_grid(regridded_package_data["conductance"])
@@ -340,7 +340,7 @@ class GeneralHeadBoundary(BoundaryCondition, IRegridPackage):
             )
             regridded_package_data.update(layered_data)
 
-        ghb = GeneralHeadBoundary(**regridded_package_data, validate=True)
+        ghb = cls(**regridded_package_data, validate=True)
         repeat = period_data.get(key)
         set_repeat_stress_if_available(repeat, time_min, time_max, ghb)
         # Clip the ghb package to the time range of the simulation and ensure

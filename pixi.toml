@@ -1,6 +1,6 @@
 [project]
 name = "imod-python"
-version = "1.0.0rc3"
+version = "1.0.0rc4"
 description = "Make massive MODFLOW models"
 authors = ["Deltares <imod.info@deltares.nl>"]
 channels = ["conda-forge"]
@@ -148,10 +148,6 @@ jupyter = "*"
 pip = "*"
 pixi-diff-to-markdown = "*"
 
-[feature.py310.dependencies]
-python = ">=3.10.12"
-pip = "*"
-
 [feature.py311.dependencies]
 python = "3.11.*"
 pip = "*"
@@ -178,7 +174,6 @@ install_with_deps = "python -m pip install --editable ."
 [environments]
 default = { features = [], solve-group = "conda-deps" }
 interactive = { features = ["interactive"], solve-group = "conda-deps" }
-py310 = { features = ["py310", "py_common"], no-default-feature = true }
 py311 = { features = ["py311", "py_common"], no-default-feature = true }
 py312 = { features = ["py312", "py_common"], no-default-feature = true }
 py313 = { features = ["py313", "py_common"], no-default-feature = true }

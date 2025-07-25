@@ -201,12 +201,6 @@ STRUCTURED_GRID_PACKAGES = [
     imod.mf6.StructuredDiscretization(
         2.0, get_grid_da(False, np.float32), get_grid_da(False, np.int32)
     ),
-    imod.mf6.WellDisStructured(
-        layer=[3, 2, 1],
-        row=[1, 2, 3],
-        column=[2, 2, 2],
-        rate=[-5.0] * 3,
-    ),
     imod.mf6.MassSourceLoading(
         rate=get_grid_da(False, np.float64, 0.33),
         print_input=True,
@@ -219,23 +213,10 @@ STRUCTURED_GRID_PACKAGES = [
 ]
 
 
-UNSTRUCTURED_GRID_PACKAGES = (
-    [
-        imod.mf6.WellDisVertices(
-            layer=[1, 2, 1],
-            cell2d=[3, 12, 23],
-            rate=[-0.1, 0.2, 0.3],
-            print_input=False,
-            print_flows=False,
-            save_flows=False,
-        )
-    ]
-    + [create_vertices_discretization()]
-    + [
-        *create_instance_packages(is_unstructured=True),
-        *create_instance_boundary_condition_packages(True),
-    ]
-)
+UNSTRUCTURED_GRID_PACKAGES = [create_vertices_discretization()] + [
+    *create_instance_packages(is_unstructured=True),
+    *create_instance_boundary_condition_packages(True),
+]
 
 GRIDLESS_PACKAGES = [
     imod.mf6.adv.Advection("upstream"),

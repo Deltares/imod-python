@@ -12,6 +12,69 @@ The format is based on `Keep a Changelog`_, and this project adheres to
 Added
 ~~~~~
 
+- :meth:`imod.mf6.River.reallocate`, :meth:`imod.mf6.Drainage.reallocate`,
+  :meth:`imod.mf6.GeneralHeadBoundary.reallocate`,
+  :meth:`imod.mf6.Recharge.reallocate` to reallocate the package data to a new
+  discretization or :class:`imod.mf6.NodePropertyFlow` package, or to use a
+  different :class:`imod.prepare.ALLOCATION_OPTION` or
+  :class:`imod.prepare.DISTRIBUTING_OPTION`.
+
+Fixed
+~~~~~
+
+- Reduce noisy warnings in models loaded with
+  :meth:`imod.mf6.Modflow6Simulation.from_imod5_data` which have layers with
+  cells with zero thicknesses.
+- Issue where regridding lead to excessively large inactive areas.
+- Issue where regridding would lead to very large negative integer values (like
+  IDOMAIN) for inactive areas.
+- Issue where :meth:`imod.mf6.Well.from_imod5_data` and
+  :meth:`imod.mf6.LayeredWell.from_imod5_data` would throw a KeyError 0 upon
+  trying to resample timeseries with a non-zero index.
+
+Changed
+~~~~~~~
+
+- :meth:`imod.mf6.StructuredDiscretization.from_imod5_data` and
+  :meth:`imod.mf6.NodePropertyFlow.from_imod5_data` now automatically load the
+  dataset into memory. This improves performance when loading models with
+  multiple topsystem packages.
+- No upper limit anymore for ``mod_id`` in ``mod2svat.inp`` for
+  :class:`imod.msw.CouplerMapping`.
+
+Removed
+~~~~~~~
+
+- Removed ``imod.mf6.WellDisStructured`` and ``imod.mf6.WellDisVertices``. Use
+  :class:`imod.mf6.Well` and :class:`imod.mf6.LayeredWell` instead. The
+  :class:`imod.mf6.Well` package can be used to specify wells with filters,
+  :class:`imod.mf6.LayeredWell` directly to layers.
+- Removed ``imod.mf6.multimodel.partition_generator.get_label_array``, use
+  :func:`imod.prepare.create_partition_labels` instead.
+- Removed ``imod.idf.read`` use :func:`imod.idf.open` instead.
+- Removed ``imod.rasterio.read`` use :func:`imod.rasterio.open` instead.
+- Removed ``head`` argument for :class:`imod.mf6.InitialConditions`, use
+  ``start`` instead.
+- Removed ``cell_averaging`` argument for :class:`imod.mf6.NodePropertyFlow`,
+  use ``alternative_cell_averaging`` instead.
+- Removed ``set_repeat_stress`` method from boundary condition packages like
+  :class:`imod.mf6.River`. Use ``repeat_stress`` argument instead.
+- Removed ``time_discretization`` method from
+  :class:`imod.mf6.Modflow6Simulation` and :class:`imod.wq.SeawatModel`. Use
+  :meth:`imod.mf6.Modflow6Simulation.create_time_discretization` and
+  :meth:`imod.wq.SeawatModel.create_time_discretization` instead.
+- Removed ``imod.util.round_extent``, use :func:`imod.prepare.round_extent`
+  instead.
+- Removed :class:`imod.prepare.Regridder`. Use the `xugrid regridder
+  <https://deltares.github.io/xugrid/examples/regridder_overview.html>`_ instead.
+
+
+[1.0.0rc4] - 2025-06-20
+-----------------------
+
+Added
+~~~~~
+
 - Added ``weights`` argument to :func:`imod.prepare.create_partition_labels` to
   weigh how the simulation should be partioned. Areas with higher weights will
   result in smaller partions.
@@ -466,7 +529,7 @@ Changed
   objects.
 - :class:`imod.msw.CouplingMapping` and :class:`imod.msw.Sprinkling` now take
   the :class:`imod.mf6.mf6_wel_adapter.Mf6Wel` as well argument instead of the
-  deprecated :class:`imod.mf6.WellDisStructured`.
+  deprecated ``imod.mf6.WellDisStructured``.
 
 
 Added
@@ -919,7 +982,7 @@ Changed
 ~~~~~~~
 
 - TWRI MODFLOW 6 example uses the grid-agnostic :class:`imod.mf6.Well`
-  package instead of the :class:`imod.mf6.WellDisStructured` package.
+  package instead of the ``imod.mf6.WellDisStructured`` package.
 
 Fixed
 ~~~~~
@@ -1153,7 +1216,7 @@ Fixed
 - :meth:`imod.prepare.LayerRegridder.regrid` will now correctly skip values
   if ``top_source`` or ``bottom_source`` are NaN.
 - :func:`imod.gen.write` no longer errors on dataframes with empty columns.
-- :func:`imod.mf6.BoundaryCondition.set_repeat_stress` reinstated. This is
+- ``imod.mf6.BoundaryCondition.set_repeat_stress`` reinstated. This is
   a temporary measure, it gives a deprecation warning.
 
 Changed
@@ -1288,8 +1351,8 @@ Added
 -  Packages for :class:`imod.mf6.GroundwaterFlowModel` will now accept
    :class:`xugrid.UgridDataArray` objects for (DISV) unstructured grids, next to
    :class:`xarray.DataArray` objects for structured (DIS) grids.
--  Transient wells are now supported in :class:`imod.mf6.WellDisStructured` and
-   :class:`imod.mf6.WellDisVertices`.
+-  Transient wells are now supported in ``imod.mf6.WellDisStructured`` and
+   ``imod.mf6.WellDisVertices``.
 -  :func:`imod.util.to_ugrid2d` has been added to convert a (structured) xarray
    DataArray or Dataset to a quadrilateral UGRID dataset.
 -  Functions created to create empty DataArrays with greater ease:
@@ -1311,7 +1374,7 @@ Changed
 -  Datetime columns in IPF associated files (via
    :func:`imod.ipf.write_assoc`) will not be placed within quotes, as this can
    break certain iMOD batch functions.
--  :class:`imod.mf6.Well` has been renamed into :class:`imod.mf6.WellDisStructured`.
+-  :class:`imod.mf6.Well` has been renamed into ``imod.mf6.WellDisStructured``.
 -  :meth:`imod.mf6.GroundwaterFlowModel.write` will now write package names
    into the simulation namefile.
 -  :func:`imod.mf6.open_cbc` will now return a dictionary with keys
@@ -1457,8 +1520,8 @@ Added
 Changed
 ~~~~~~~
 
--  :func:`imod.idf.read` is deprecated, use :mod:`imod.idf.open` instead
--  :func:`imod.rasterio.read` is deprecated, use :mod:`imod.rasterio.open` instead
+-  ``imod.idf.read`` is deprecated, use :func:`imod.idf.open` instead
+-  ``imod.rasterio.read`` is deprecated, use :func:`imod.rasterio.open` instead
 
 Fixed
 ~~~~~

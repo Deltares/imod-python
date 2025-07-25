@@ -3,7 +3,6 @@ from __future__ import annotations
 import collections
 import pathlib
 import subprocess
-import warnings
 from copy import deepcopy
 from datetime import datetime
 from pathlib import Path
@@ -24,9 +23,9 @@ import imod.mf6.exchangebase
 from imod.common.interfaces.imodel import IModel
 from imod.common.interfaces.isimulation import ISimulation
 from imod.common.statusinfo import NestedStatusInfo
+from imod.common.utilities.dataclass_type import DataclassType
 from imod.common.utilities.mask import _mask_all_models
 from imod.common.utilities.regrid import _regrid_like
-from imod.common.utilities.regrid_method_type import RegridMethodType
 from imod.common.utilities.version import (
     get_version,
     log_versions,
@@ -153,14 +152,6 @@ class Modflow6Simulation(collections.UserDict, ISimulation):
     def update(self, *args, **kwargs):
         for k, v in dict(*args, **kwargs).items():
             self[k] = v
-
-    def time_discretization(self, times):
-        warnings.warn(
-            f"{self.__class__.__name__}.time_discretization() is deprecated. "
-            f"In the future call {self.__class__.__name__}.create_time_discretization().",
-            DeprecationWarning,
-        )
-        self.create_time_discretization(additional_times=times)
 
     @standard_log_decorator()
     def create_time_discretization(self, additional_times, validate: bool = True):
@@ -291,7 +282,7 @@ class Modflow6Simulation(collections.UserDict, ISimulation):
         ----------
         directory: str, pathlib.Path
             Directory to write Modflow 6 simulation to.
-        use_binary: ({True, False}, optional)
+        binary: ({True, False}, optional)
             Whether to write time-dependent input for stress packages as binary
             files, which are smaller in size, or more human-readable text files.
         validate: ({True, False}, optional)
@@ -1421,7 +1412,7 @@ class Modflow6Simulation(collections.UserDict, ISimulation):
         times: list[datetime],
         allocation_options: Optional[SimulationAllocationOptions] = None,
         distributing_options: Optional[SimulationDistributingOptions] = None,
-        regridder_types: Optional[dict[str, RegridMethodType]] = None,
+        regridder_types: Optional[dict[str, DataclassType]] = None,
     ) -> "Modflow6Simulation":
         """
         Imports a GroundwaterFlowModel (GWF) from the data in an iMOD5 project

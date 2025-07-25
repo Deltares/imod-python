@@ -274,14 +274,6 @@ class SeawatModel(Model):
             else:
                 raise ValueError("Use either cftime or numpy.datetime64[ns].")
 
-    def time_discretization(self, times):
-        warnings.warn(
-            f"{self.__class__.__name__}.time_discretization() is deprecated. "
-            f"In the future call {self.__class__.__name__}.create_time_discretization().",
-            DeprecationWarning,
-        )
-        self.create_time_discretization(additional_times=times)
-
     def create_time_discretization(self, additional_times):
         """
         Collect all unique times from model packages and additional given `times`. These

@@ -26,15 +26,6 @@ from imod.typing.grid import zeros_like
 from imod.util.regrid import RegridderWeightsCache
 
 
-class Storage(Package):
-    _pkg_id = "sto_deprecated"
-
-    def __init__(*args, **kwargs):
-        raise NotImplementedError(
-            r"Storage package has been removed. Use SpecificStorage or StorageCoefficient instead."
-        )
-
-
 class StorageBase(Package, IRegridPackage, abc.ABC):
     _grid_data: Dict[str, type] = {}
 

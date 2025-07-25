@@ -22,7 +22,7 @@ class CouplerMapping(MetaSwapPackage):
 
     _file_name = "mod2svat.inp"
     _metadata_dict = {
-        "mod_id": VariableMetaData(10, 1, 9999999, int),
+        "mod_id": VariableMetaData(10, 1, None, int),
         "free": VariableMetaData(2, None, None, str),
         "svat": VariableMetaData(10, 1, 9999999, int),
         "layer": VariableMetaData(5, 0, 9999, int),

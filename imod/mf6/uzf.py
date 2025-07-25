@@ -425,7 +425,7 @@ class UnsaturatedZoneFlow(AdvancedBoundaryCondition):
         not_options = (
             list(self._period_data) + list(self._package_data) + ["iuzno" + "ivertcon"]
         )
-        d = self._get_options(d, not_options=not_options)
+        d = self._get_pkg_options(d, not_options=not_options)
         path = directory / pkgname / f"{self._pkg_id}-pkgdata.dat"
         d["packagedata"] = path.as_posix()
         # max uzf-cells for which time period data will be supplied
