@@ -206,7 +206,9 @@ head_structured.isel(time=-1).sel(layer=5).plot.imshow()
 # Now that we have a MODFLOW 6 simulation, we can regrid it to an unstructured
 # grid. Let's first load a triangular grid.
 
-triangular_grid = imod.data.lhm_clip_triangular_grid()
+#triangular_grid = imod.data.lhm_clip_triangular_grid()
+import xugrid as xu
+triangular_grid = xu.open_dataarray(r"c:\Users\engelen\projects_wdir\imod-python\examples\LHM_unstructured\triangular_grid_LHM_clip.nc").ugrid.grid
 triangular_grid.plot()
 
 # %%
@@ -415,7 +417,7 @@ for i in range(1, 27):
     gwf_model.pop(f"hfb-{i}")
     gwf_unstructured.pop(f"hfb-{i}")
  # %%
-mf6_unstructured.write(mf6_dir / ".." / "no_hfb")
+mf6_unstructured.write(mf6_dir / ".." / "no_hfb_unstructured")
 mf6_unstructured.run()
 head_unstructured = mf6_unstructured.open_head()
 
