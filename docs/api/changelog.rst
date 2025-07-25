@@ -28,6 +28,9 @@ Fixed
 - Issue where regridding lead to excessively large inactive areas.
 - Issue where regridding would lead to very large negative integer values (like
   IDOMAIN) for inactive areas.
+- Issue where :meth:`imod.mf6.Well.from_imod5_data` and
+  :meth:`imod.mf6.LayeredWell.from_imod5_data` would throw a KeyError 0 upon
+  trying to resample timeseries with a non-zero index.
 
 Changed
 ~~~~~~~
@@ -36,6 +39,8 @@ Changed
   :meth:`imod.mf6.NodePropertyFlow.from_imod5_data` now automatically load the
   dataset into memory. This improves performance when loading models with
   multiple topsystem packages.
+- No upper limit anymore for ``mod_id`` in ``mod2svat.inp`` for
+  :class:`imod.msw.CouplerMapping`.
 
 Removed
 ~~~~~~~
