@@ -367,10 +367,8 @@ diff.std(dim="layer").ugrid.plot()
 # visualize how faults are snapped to the grid edges in the structured and
 # unstructured grid.
 
-structured_snapped, _ = gwf_model["hfb-5"]._snap_to_grid(gwf_model["dis"]["idomain"])
-unstructured_snapped, _ = gwf_unstructured["hfb-5"]._snap_to_grid(
-    gwf_unstructured["dis"]["idomain"]
-)
+structured_snapped = gwf_model["hfb-5"].snap_to_grid(gwf_model["dis"])
+unstructured_snapped = gwf_unstructured["hfb-5"].snap_to_grid(gwf_unstructured["dis"])
 
 import matplotlib.pyplot as plt
 
