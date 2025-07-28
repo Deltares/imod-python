@@ -764,6 +764,35 @@ def test_snap_to_grid_and_aggregate(structured_flow_model):
     np.testing.assert_array_equal(edge_index, argwhere_summed_expected)
 
 
+def test_snap_to_grid_public(structured_flow_model):
+    dis = structured_flow_model["dis"]
+
+    barrier_y = [11.0, 5.0, -1.0]
+    barrier_x = [5.0, 5.0, 5.0]
+    line = linestrings(barrier_x, barrier_y)
+    layer = [1, 1, 1]
+
+    geometry_triple = gpd.GeoDataFrame(
+        geometry=[line, line, line],
+        data={
+            "resistance": [400.0, 400.0, 400.0],
+            "layer": layer,
+            "line_index": [0, 1, 2],
+        },
+    )
+    geometry_triple = geometry_triple.set_index("line_index")
+
+    hfb_triple = SingleLayerHorizontalFlowBarrierResistance(geometry_triple)
+    snapped_dataset = hfb_triple.snap_to_grid(dis)
+
+    argwhere_summed_expected = np.array([7, 20, 33, 46, 59, 72], dtype=np.int64)
+    argwhere_summed_actual = np.nonzero((snapped_dataset["resistance"] == 1200).values)[
+        0
+    ]
+
+    np.testing.assert_array_equal(argwhere_summed_actual, argwhere_summed_expected)
+
+
 def test_combine_linestrings(structured_flow_model):
     dis = structured_flow_model["dis"]
     top, bottom, idomain = (

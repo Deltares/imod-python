@@ -103,12 +103,17 @@ Flow Packages
     GeneralHeadBoundary.clip_box
     GeneralHeadBoundary.reallocate
     HorizontalFlowBarrierHydraulicCharacteristic
+    HorizontalFlowBarrierHydraulicCharacteristic.clip_box
     HorizontalFlowBarrierHydraulicCharacteristic.to_mf6_pkg
+    HorizontalFlowBarrierHydraulicCharacteristic.snap_to_grid
     HorizontalFlowBarrierMultiplier
+    HorizontalFlowBarrierMultiplier.clip_box
     HorizontalFlowBarrierMultiplier.to_mf6_pkg
+    HorizontalFlowBarrierMultiplier.snap_to_grid
     HorizontalFlowBarrierResistance
     HorizontalFlowBarrierResistance.to_mf6_pkg
     HorizontalFlowBarrierResistance.clip_box
+    HorizontalFlowBarrierResistance.snap_to_grid
     LayeredWell
     LayeredWell.from_imod5_data
     LayeredWell.from_imod5_cap_data
@@ -143,13 +148,16 @@ Flow Packages
     SingleLayerHorizontalFlowBarrierHydraulicCharacteristic
     SingleLayerHorizontalFlowBarrierHydraulicCharacteristic.to_mf6_pkg
     SingleLayerHorizontalFlowBarrierHydraulicCharacteristic.clip_box
+    SingleLayerHorizontalFlowBarrierHydraulicCharacteristic.snap_to_grid
     SingleLayerHorizontalFlowBarrierMultiplier
     SingleLayerHorizontalFlowBarrierMultiplier.to_mf6_pkg
     SingleLayerHorizontalFlowBarrierMultiplier.clip_box
+    SingleLayerHorizontalFlowBarrierMultiplier.snap_to_grid
     SingleLayerHorizontalFlowBarrierResistance
     SingleLayerHorizontalFlowBarrierResistance.from_imod5_data
     SingleLayerHorizontalFlowBarrierResistance.to_mf6_pkg
     SingleLayerHorizontalFlowBarrierResistance.clip_box
+    SingleLayerHorizontalFlowBarrierResistance.snap_to_grid
     SpecificStorage
     SpecificStorage.mask
     SpecificStorage.regrid_like
