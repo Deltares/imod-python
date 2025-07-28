@@ -117,7 +117,7 @@ def cleanup_mf6_sim(simulation: Modflow6Simulation) -> None:
 def test_import_lhm_mf6():
     dask.config.set(num_workers=1)
     user_acceptance_dir = Path(os.environ["USER_ACCEPTANCE_DIR"])
-    lhm_dir = user_acceptance_dir / "LHM_transient_test_230725"
+    lhm_dir = user_acceptance_dir / "LHM_transient"
     lhm_prjfile = lhm_dir / "model" / "LHM_transient_test.PRJ"
     logfile_path = lhm_dir / "logfile_mf6.txt"
 
