@@ -56,7 +56,8 @@ user_acceptance = { cmd = [
     "--cache-clear",
     "--verbose",
     "--junitxml=user_acceptance_report.xml",
-], depends-on = ["install"], cwd = "imod/tests", env = { IMOD_DATA_DIR = ".imod_data" } }
+], depends-on = ["install"], cwd = "imod/tests", env = { IMOD_DATA_DIR = ".imod_data" , USER_ACCEPTANCE_DIR = "user_acceptance_data"} }
+run_imod5 = {cmd = ["prepare_mf6_transient_imod5.bat"], cwd = "imod/tests/user_acceptance_data/LHM_transient_test_230725/scripts_imod-5"}
 examples = { cmd = [
     "pytest",
     "-n", "auto",
