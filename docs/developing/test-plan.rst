@@ -55,9 +55,9 @@ checked manually before a release. These are:
 
     python ``ex01_twri.py``
 
-- Installing iMOD Python on a machine that runs on a different operating system
-  than Windows, which is the OS iMOD Python is developed and mostly used on.
-  Call the following and see if the tests run without errors:
+- Installing iMOD Python on Linux. This is less commonly used by iMOD Python
+  users and developers, therefore might lead to missed edge cases. Call the
+  following and see if the tests run without errors:
 
   .. code-block:: console
 
@@ -85,35 +85,71 @@ with large groundwater models. The model currently used for the performance
 tests is `the LHM model <https://nhi.nu/modellen/lhm/>`_, but more models might
 be added in the future.
 
-Run the performance tests locally by following these steps:
+Run the performance tests locally on a Windows machine by following these steps:
 
-1. Download the test data from <...insert...link...here...> and put it in a
-   directory of your liking.
-2. Assign the environment variable ``LHM_PRJ`` to the path of the projectfile
-   of the test data. You can put this in the ``.env`` file in the root of the
-   repository, or set it in your shell.
-3. Run the user acceptance tests by running the following command in the root 
+1. First contact imod.support@deltares.nl and ask for an access key to access
+   the iMOD Python test data. They will contact you and send you a key. Make
+   sure you don't share this key with others!
+2. Activate the user acceptance environment by running the following command in the root
+   of the repository:
+  
+  .. code-block:: console
+    
+    pixi shell -e user-acceptance
+
+3. Add your key to the DVC configuration by running the following command in the root
    of the repository:
 
-.. code-block:: console
+  .. code-block:: console
 
-  pixi run user_acceptance
+    dvc remote modify --local minio access_key_id <your_access_key>
+    dvc remote modify --local minio secret_access_key <your_secret_access_key>
+
+  Don't forget the ``--local`` flag, as this will store the key in the
+  ``.dvc/config.local`` file, which is not committed to the repository.
+4. Pull the data from the DVC remote by running the following command in the root
+   of the repository:
+
+  .. code-block:: console
+
+    pixi run fetch_lhm
+
+   This will unpack the LHM model data, which is used in the user acceptance
+   tests.
+5. Run the user acceptance tests by running the following command in the root 
+   of the repository:
+
+  .. code-block:: console
+
+    pixi run user_acceptance
+
+  This will write the MODFLOW6 input files to the
+  ``imod/tests/user_acceptance_data/mf6_imod-python`` folder and the MetaSWAP
+  files to ``imod/tests/user_acceptance_data/msp_imod-python``.
+6. Run the iMOD5 conversion which is the reference by running the following
+   command in the root of the repository. This needs to be run on a Windows
+   machine.
+
+   .. code-block:: console
+
+     pixi run run_imod5
+
+  This will write the MODFLOW6 and MetaSWAP input files to the
+  ``imod/tests/user_acceptance_data/MF6-MSP_IMOD-5`` folder.
 
 Criteria for user acceptance tests of the 1.0 release are:
 
 * The tests should run without errors.
 * The tests should run without warnings from iMOD Python, unless unavoidable.
+* The conversion of the transient LHM model run of 1 year on a daily timestep
+  (365 stress-periods) should run without memory overflow on a machine with 32
+  GB and write a model within 15 minutes.
 * The MODFLOW6 and MetaSWAP input files written by iMOD Python should be the
   same as iMOD5 (accounting for differences in row sorting.), unless there was a
-  conscious decision to divert from this.
-* The conversion from projectfile to MODFLOW6 and MetaSWAP input files should be
-  done in a reasonable amount of time and should not be much slower than iMOD5.
-  This is subjective and varies per machine, but we aim for less than 5 minutes
-  for the LHM model with 1 timestep on a machine with 32 GB RAM on a single
-  core.
-* The conversion of the transient LHM model run of 40 years on a daily timestep
-  (140K stress-periods) should run without memory overflow on a machine with 32
-  GB and write a model within 30 minutes.
+  conscious decision to divert from this. These will be mentioned in
+  :doc:`../faq/imod5_backwards_compatibility`.
+* The conversion of the transient LHM model should not be slower than doing the
+  same conversion with iMOD5.
 
 Manual checks
 *************
