@@ -56,13 +56,6 @@ examples = { cmd = [
     "--verbose",
     "--junitxml=examples_report.xml",
 ], depends-on = ["install"], cwd = "imod/tests", env = { IMOD_DATA_DIR = ".imod_data" } }
-qgis_export ={ cmd = [
-    "pytest", "-s",
-    "-m", "qgis_export",
-    "--cache-clear",
-    "--verbose",
-    "--junitxml=qgis_export_report.xml",
-], depends-on = ["install"], cwd = "imod/tests", env = { IMOD_DATA_DIR = ".imod_data" } }
 
 [dependencies]
 affine = "*"
@@ -168,6 +161,7 @@ platforms = ["win-64"]
 [feature.user-acceptance.dependencies]
 7zip = "*"
 dvc = "*"
+dvc-s3 = "*"
 
 [feature.user-acceptance.tasks]
 pull_data = "dvc pull --remote minio"
@@ -180,11 +174,18 @@ user_acceptance = { cmd = [
     "--junitxml=user_acceptance_report.xml",
 ], depends-on = ["install"], cwd = "imod/tests", env = { IMOD_DATA_DIR = ".imod_data" , USER_ACCEPTANCE_DIR = "user_acceptance_data"} }
 run_imod5 = {cmd = ["prepare_mf6_transient_imod5.bat"], cwd = "imod/tests/user_acceptance_data/LHM_transient/scripts_imod-5"}
+qgis_export ={ cmd = [
+    "pytest", "-s",
+    "-m", "qgis_export",
+    "--cache-clear",
+    "--verbose",
+    "--junitxml=qgis_export_report.xml",
+], depends-on = ["install"], cwd = "imod/tests", env = { IMOD_DATA_DIR = ".imod_data" } }
 
 [environments]
 default = { features = [], solve-group = "conda-deps" }
 interactive = { features = ["interactive"], solve-group = "conda-deps" }
-user-accept-env = { features = ["user-acceptance"], solve-group = "conda-deps" }
+user-acceptance = { features = ["user-acceptance"], solve-group = "conda-deps" }
 py311 = { features = ["py311", "py_common"], no-default-feature = true }
 py312 = { features = ["py312", "py_common"], no-default-feature = true }
 py313 = { features = ["py313", "py_common"], no-default-feature = true }
