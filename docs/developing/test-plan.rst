@@ -45,7 +45,7 @@ checked manually before a release. These are:
   connection to download the data. Therefore we'll run test an example that
   doesn't require internet connection. Install the `iMODforge distribution
   <https://deltares.github.io/iMOD-Documentation/deltaforge_install.html>`_
-  Mext, open the ``iMODforge prompt``. Copy `the TWRI example
+  Next, open the *iMODforge prompt*. Copy `the TWRI example
   <https://github.com/Deltares/imod-python/blob/master/examples/mf6/ex01_twri.py>`_
   and run the following command to test if the example works:
 
