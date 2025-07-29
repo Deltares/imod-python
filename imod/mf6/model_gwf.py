@@ -130,7 +130,7 @@ class GroundwaterFlowModel(Modflow6Model):
             time_min, time_max, layer_min, layer_max, x_min, x_max, y_min, y_max
         )
 
-        clipped_boundary_condition = self.__create_boundary_condition_clipped_boundary(
+        clipped_boundary_condition = self._create_boundary_condition_clipped_boundary(
             self, clipped, state_for_boundary
         )
         if clipped_boundary_condition is not None:
@@ -140,24 +140,24 @@ class GroundwaterFlowModel(Modflow6Model):
 
         return clipped
 
-    def __create_boundary_condition_clipped_boundary(
+    def _create_boundary_condition_clipped_boundary(
         self,
         original_model: Modflow6Model,
         clipped_model: Modflow6Model,
         state_for_boundary: Optional[GridDataArray],
     ):
         unassigned_boundary_original_domain = (
-            self.__create_boundary_condition_for_unassigned_boundary(
+            self._create_boundary_condition_for_unassigned_boundary(
                 original_model, state_for_boundary
             )
         )
 
-        return self.__create_boundary_condition_for_unassigned_boundary(
+        return self._create_boundary_condition_for_unassigned_boundary(
             clipped_model, state_for_boundary, [unassigned_boundary_original_domain]
         )
 
     @staticmethod
-    def __create_boundary_condition_for_unassigned_boundary(
+    def _create_boundary_condition_for_unassigned_boundary(
         model: Modflow6Model,
         state_for_boundary: Optional[GridDataArray],
         additional_boundaries: Optional[list[ConstantHead]] = None,

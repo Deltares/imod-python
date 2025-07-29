@@ -588,12 +588,12 @@ class HorizontalFlowBarrierBase(BoundaryCondition, ILineDataPackage):
             as_ugrid_dataarray(grid) for grid in [idomain, top, bottom, k]
         )
         snapped_dataset, edge_index = self._snap_to_grid(idomain)
-        edge_index = self.__remove_invalid_edges(unstructured_grid, edge_index)
+        edge_index = self._remove_invalid_edges(unstructured_grid, edge_index)
 
         barrier_values = self._compute_barrier_values(
             snapped_dataset, edge_index, idomain, top, bottom, k
         )
-        barrier_values = self.__remove_edge_values_connected_to_inactive_cells(
+        barrier_values = self._remove_edge_values_connected_to_inactive_cells(
             barrier_values, unstructured_grid, edge_index
         )
 
@@ -612,7 +612,7 @@ class HorizontalFlowBarrierBase(BoundaryCondition, ILineDataPackage):
             unstructured_grid.ugrid.grid,
             edge_index,
             {
-                "hydraulic_characteristic": self.__to_hydraulic_characteristic(
+                "hydraulic_characteristic": self._to_hydraulic_characteristic(
                     barrier_values
                 )
             },
@@ -769,7 +769,7 @@ class HorizontalFlowBarrierBase(BoundaryCondition, ILineDataPackage):
         left, right = snapped_dataset.ugrid.grid.edge_face_connectivity[edge_index].T
         k_mean = _mean_left_and_right(k, left, right)
 
-        resistance = self.__to_resistance(
+        resistance = self._to_resistance(
             snapped_dataset[self._get_variable_name()]
         ).values[edge_index]
 
@@ -784,9 +784,9 @@ class HorizontalFlowBarrierBase(BoundaryCondition, ILineDataPackage):
         inverse_c = (fraction / resistance) + ((1.0 - fraction) / c_aquifer)
         c_total = 1.0 / inverse_c
 
-        return self.__from_resistance(c_total)
+        return self._from_resistance(c_total)
 
-    def __to_resistance(self, value: xu.UgridDataArray) -> xu.UgridDataArray:
+    def _to_resistance(self, value: xu.UgridDataArray) -> xu.UgridDataArray:
         match self._get_barrier_type():
             case BarrierType.HydraulicCharacteristic:
                 return 1.0 / value
@@ -797,7 +797,7 @@ class HorizontalFlowBarrierBase(BoundaryCondition, ILineDataPackage):
 
         raise ValueError(r"Unknown barrier type {barrier_type}")
 
-    def __from_resistance(self, resistance: xr.DataArray) -> xr.DataArray:
+    def _from_resistance(self, resistance: xr.DataArray) -> xr.DataArray:
         match self._get_barrier_type():
             case BarrierType.HydraulicCharacteristic:
                 return 1.0 / resistance
@@ -808,7 +808,7 @@ class HorizontalFlowBarrierBase(BoundaryCondition, ILineDataPackage):
 
         raise ValueError(r"Unknown barrier type {barrier_type}")
 
-    def __to_hydraulic_characteristic(self, value: xr.DataArray) -> xr.DataArray:
+    def _to_hydraulic_characteristic(self, value: xr.DataArray) -> xr.DataArray:
         match self._get_barrier_type():
             case BarrierType.HydraulicCharacteristic:
                 return value
@@ -982,7 +982,7 @@ class HorizontalFlowBarrierBase(BoundaryCondition, ILineDataPackage):
         return _snap_to_grid_and_aggregate(barrier_dataframe, grid2d, vardict_agg)
 
     @staticmethod
-    def __remove_invalid_edges(
+    def _remove_invalid_edges(
         unstructured_grid: xu.UgridDataArray, edge_index: np.ndarray
     ) -> np.ndarray:
         """
@@ -1013,7 +1013,7 @@ class HorizontalFlowBarrierBase(BoundaryCondition, ILineDataPackage):
         return edge_index[valid]
 
     @staticmethod
-    def __remove_edge_values_connected_to_inactive_cells(
+    def _remove_edge_values_connected_to_inactive_cells(
         values, unstructured_grid: xu.UgridDataArray, edge_index: np.ndarray
     ):
         face_dimension = unstructured_grid.ugrid.grid.face_dimension
@@ -1330,11 +1330,11 @@ class SingleLayerHorizontalFlowBarrierMultiplier(HorizontalFlowBarrierBase):
     def _compute_barrier_values(
         self, snapped_dataset, edge_index, idomain, top, bottom, k
     ):
-        barrier_values = self.__multiplier_layer(snapped_dataset, edge_index, idomain)
+        barrier_values = self._multiplier_layer(snapped_dataset, edge_index, idomain)
 
         return barrier_values
 
-    def __multiplier_layer(
+    def _multiplier_layer(
         self,
         snapped_dataset: xu.UgridDataset,
         edge_index: np.ndarray,
