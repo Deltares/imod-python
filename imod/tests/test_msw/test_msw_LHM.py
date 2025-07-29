@@ -8,7 +8,6 @@ describes how to set this up.
 import os
 import sys
 from pathlib import Path
-import dask
 
 import pandas as pd
 import pytest
@@ -46,7 +45,6 @@ def convert_imod5_to_msw_model(
 
 @pytest.mark.user_acceptance
 def test_import_lhm_msw():
-    dask.config.set(num_workers=1)
     user_acceptance_dir = Path(os.environ["USER_ACCEPTANCE_DIR"])
     lhm_dir = user_acceptance_dir / "LHM_transient"
     lhm_prjfile = lhm_dir / "model" / "LHM_transient_test.PRJ"
