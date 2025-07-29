@@ -1,8 +1,6 @@
 iMOD Python test plan
 =====================
 
-**This page is still under construction**.
-
 This document describes how and when to perform tests for iMOD Python.
 
 Known shortcomings and issues can be documented `here
@@ -107,6 +105,7 @@ Run the performance tests locally on a Windows machine by following these steps:
 
   Don't forget the ``--local`` flag, as this will store the key in the
   ``.dvc/config.local`` file, which is not committed to the repository.
+
 4. Pull the data from the DVC remote by running the following command in the root
    of the repository:
 
@@ -114,8 +113,9 @@ Run the performance tests locally on a Windows machine by following these steps:
 
     pixi run fetch_lhm
 
-   This will unpack the LHM model data, which is used in the user acceptance
-   tests.
+  This will unpack the LHM model data, which is used in the user acceptance
+  tests.
+
 5. Run the user acceptance tests by running the following command in the root 
    of the repository:
 
@@ -126,6 +126,7 @@ Run the performance tests locally on a Windows machine by following these steps:
   This will write the MODFLOW6 input files to the
   ``imod/tests/user_acceptance_data/mf6_imod-python`` folder and the MetaSWAP
   files to ``imod/tests/user_acceptance_data/msp_imod-python``.
+
 6. Run the iMOD5 conversion which is the reference by running the following
    command in the root of the repository. This needs to be run on a Windows
    machine.
