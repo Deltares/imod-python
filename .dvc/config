@@ -1,0 +1,5 @@
+[core]
+    remote = minio
+['remote "minio"']
+    url = s3://imod-python-test-data
+    endpointurl = https://s3.deltares.nl
