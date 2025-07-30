@@ -230,7 +230,7 @@ class Modflow6Simulation(collections.UserDict, ISimulation):
             timestep_duration=timestep_duration, validate=validate
         )
 
-    def render(self, write_context: WriteContext):
+    def _render(self, write_context: WriteContext):
         """Renders simulation namefile"""
         d: dict[str, Any] = {}
         models = []
@@ -312,7 +312,7 @@ class Modflow6Simulation(collections.UserDict, ISimulation):
         directory.mkdir(exist_ok=True, parents=True)
 
         # Write simulation namefile
-        mfsim_content = self.render(write_context)
+        mfsim_content = self._render(write_context)
         mfsim_content = prepend_content_with_version_info(mfsim_content)
         mfsim_path = directory / "mfsim.nam"
         with open(mfsim_path, "w") as f:
@@ -948,6 +948,20 @@ class Modflow6Simulation(collections.UserDict, ISimulation):
     @staticmethod
     @standard_log_decorator()
     def from_file(toml_path):
+        """
+        Load Modflow6Simulation, previously dumped to TOML file with
+        :meth:`imod.mf6.Modflow6Simulation.dump` from a TOML file.
+
+        Parameters
+        ----------
+        toml_path: str or Path
+            Path to TOML file containing Modflow6Simulation data.
+
+        Returns
+        -------
+        Modflow6Simulation
+            Modflow6Simulation object with models and packages loaded from
+        """
         classes = {
             item_cls.__name__: item_cls
             for item_cls in (
@@ -985,7 +999,15 @@ class Modflow6Simulation(collections.UserDict, ISimulation):
 
         return simulation
 
-    def get_exchange_relationships(self):
+    def get_exchange_relationships(self) -> list:
+        """
+        Get exchange relationships in the simulation.
+
+        Returns
+        -------
+        list
+            List with exchange relationships in the simulation.
+        """
         result = []
 
         if "gwtgwf_exchanges" in self:
@@ -999,13 +1021,35 @@ class Modflow6Simulation(collections.UserDict, ISimulation):
         return result
 
     def get_models_of_type(self, model_id) -> dict[str, IModel]:
+        """
+        Get all models in the simulation of a specific type.
+
+        Parameters
+        ----------
+        model_id: str
+            Model type identifier, e.g. "gwf6" for groundwater flow models,
+            "gwt6" for groundwater transport models.
+        
+        Returns
+        -------
+        dict[str, Modflow6Model]
+            Dictionary with model names as keys and Modflow6Model objects as values.
+        """
         return {
             k: v
             for k, v in self.items()
             if isinstance(v, Modflow6Model) and (v.model_id == model_id)
         }
 
-    def get_models(self):
+    def get_models(self) -> dict[str, Modflow6Model]:
+        """
+        Get all models in the simulation.
+
+        Returns
+        -------
+        dict[str, Modflow6Model]
+            Dictionary with model names as keys and Modflow6Model objects as values.
+        """
         return {k: v for k, v in self.items() if isinstance(v, Modflow6Model)}
 
     @standard_log_decorator()
@@ -1055,7 +1099,7 @@ class Modflow6Simulation(collections.UserDict, ISimulation):
                 "Unable to clip simulation. Clipping can only be done on simulations that haven't been split."
                 + "Therefore clipping should be done before splitting the simulation."
             )
-        if not self.has_one_flow_model():
+        if not self._has_one_flow_model():
             raise ValueError(
                 "Unable to clip simulation. Clipping can only be done on simulations that have a single flow model ."
             )
@@ -1131,7 +1175,7 @@ class Modflow6Simulation(collections.UserDict, ISimulation):
                 "Unable to split simulation. Splitting can only be done on simulations that haven't been split."
             )
 
-        if not self.has_one_flow_model():
+        if not self._has_one_flow_model():
             raise ValueError(
                 "splitting of simulations with more (or less) than 1 flow model currently not supported."
             )
@@ -1376,9 +1420,17 @@ class Modflow6Simulation(collections.UserDict, ISimulation):
             flow_model.update_buoyancy_package(tpt_models_of_flow_model)
 
     def is_split(self) -> bool:
+        """
+        Check if the simulation is split into multiple partitions.
+
+        Returns
+        -------
+        bool
+            True if the simulation is split, False otherwise.
+        """
         return "split_exchanges" in self.keys()
 
-    def has_one_flow_model(self) -> bool:
+    def _has_one_flow_model(self) -> bool:
         flow_models = self.get_models_of_type("gwf6")
         return len(flow_models) == 1
 

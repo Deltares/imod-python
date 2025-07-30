@@ -22,17 +22,24 @@ Model objects & methods
 
     Modflow6Simulation
     Modflow6Simulation.create_time_discretization
+    Modflow6Simulation.copy
     Modflow6Simulation.write
     Modflow6Simulation.dump
     Modflow6Simulation.run
+    Modflow6Simulation.mask_all_models
     Modflow6Simulation.open_flow_budget
     Modflow6Simulation.open_transport_budget
     Modflow6Simulation.open_head
     Modflow6Simulation.open_concentration
+    Modflow6Simulation.from_file
     Modflow6Simulation.from_imod5_data
     Modflow6Simulation.clip_box
     Modflow6Simulation.split
     Modflow6Simulation.regrid_like
+    Modflow6Simulation.is_split
+    Modflow6Simulation.get_exchange_relationships
+    Modflow6Simulation.get_models_of_type
+    Modflow6Simulation.get_models
     GroundwaterFlowModel
     GroundwaterFlowModel.mask_all_packages
     GroundwaterFlowModel.prepare_wel_for_mf6

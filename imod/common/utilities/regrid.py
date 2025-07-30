@@ -368,7 +368,7 @@ def _regrid_like(
             "Unable to regrid simulation. Regridding can only be done on simulations that haven't been split."
             + " Therefore regridding should be done before splitting the simulation."
         )
-    if not simulation.has_one_flow_model():
+    if not simulation._has_one_flow_model():
         raise ValueError(
             "Unable to regrid simulation. Regridding can only be done on simulations that have a single flow model."
         )
