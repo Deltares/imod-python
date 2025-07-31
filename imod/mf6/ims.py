@@ -486,6 +486,14 @@ def SolutionPresetSimple(
     inner_csvfile=None,
     no_ptc=None,
 ):
+    """
+    Preset solution for simple models, where small mass balance errors are
+    wanted. This therefore is the strictest solution of all presets. We advice
+    users to always try these settings first, even for more complex models.
+
+    These settings are copied from MODFLOW 6, to make them accessible in iMOD
+    Python.
+    """
     solution = Solution(
         modelnames=modelnames,
         print_option=print_option,
@@ -523,6 +531,14 @@ def SolutionPresetModerate(
     inner_csvfile=None,
     no_ptc=None,
 ):
+    """
+    Preset solution for models of moderate complexity. We advice users to always
+    try :func:`imod.mf6.SolutionPresetSimple` first, even for more complex
+    models.
+
+    These settings are copied from MODFLOW 6, to make them accessible in iMOD
+    Python.
+    """
     solution = Solution(
         modelnames=modelnames,
         print_option=print_option,
@@ -560,6 +576,15 @@ def SolutionPresetComplex(
     inner_csvfile=None,
     no_ptc=None,
 ):
+    """
+    Preset solution for models of large complexity. We advice users to always
+    try :func:`imod.mf6.SolutionPresetSimple` first, even for more complex
+    models. Warning: this solution can lead to large mass balance errors (errors
+    in head of 0.1 m are accepted!), so use with care.
+
+    These settings are copied from MODFLOW 6, to make them accessible in iMOD
+    Python.
+    """
     solution = Solution(
         modelnames=modelnames,
         print_option=print_option,
