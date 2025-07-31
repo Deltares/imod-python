@@ -64,7 +64,6 @@ Model objects & methods
     GroundwaterTransportModel.is_regridding_supported
     GroundwaterTransportModel.is_clipping_supported
     GroundwaterTransportModel.validate
-    GroundwaterTransportModel.set_newton
     GroundwaterTransportModel.write
 
 Discretization
