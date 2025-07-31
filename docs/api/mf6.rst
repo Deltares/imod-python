@@ -130,7 +130,37 @@ Model settings
     :toctree: generated/mf6
 
     OutputControl
+    OutputControl.is_budget_output
+    OutputControl.write
+    OutputControl.from_file
+    OutputControl.to_netcdf
+    OutputControl.copy
+    OutputControl.clip_box
+    OutputControl.mask
+    OutputControl.regrid_like
+    OutputControl.is_empty
+    OutputControl.get_non_grid_data
+    OutputControl.is_splitting_supported
+    OutputControl.is_regridding_supported
+    OutputControl.is_clipping_supported
+    OutputControl.is_grid_agnostic_package
+    OutputControl.get_regrid_methods
     Solution
+    Solution.is_budget_output
+    Solution.write
+    Solution.from_file
+    Solution.to_netcdf
+    Solution.copy
+    Solution.clip_box
+    Solution.mask
+    Solution.regrid_like
+    Solution.is_empty
+    Solution.get_non_grid_data
+    Solution.is_splitting_supported
+    Solution.is_regridding_supported
+    Solution.is_clipping_supported
+    Solution.is_grid_agnostic_package
+    Solution.get_regrid_methods
     SolutionPresetSimple
     SolutionPresetModerate
     SolutionPresetComplex
