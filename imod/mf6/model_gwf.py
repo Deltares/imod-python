@@ -112,7 +112,7 @@ class GroundwaterFlowModel(Modflow6Model):
             "newton": newton,
             "under_relaxation": under_relaxation,
         }
-        self.validate_init_schemata_options(validate)
+        self._validate_init_schemata_options(validate)
 
     def clip_box(
         self,
@@ -180,9 +180,27 @@ class GroundwaterFlowModel(Modflow6Model):
         )
 
     def is_use_newton(self):
+        """
+        Returns whether the Newton-Raphson formulation is used for groundwater
+        flow between connected, convertible groundwater cells.
+
+        Returns
+        -------
+        bool
+            True if the Newton-Raphson formulation is used, False otherwise.
+        """
         return self._options["newton"]
 
     def set_newton(self, is_newton: bool) -> None:
+        """
+        Sets whether the Newton-Raphson formulation is used for groundwater
+        flow between connected, convertible groundwater cells.
+
+        Parameters
+        ----------
+        is_newton: bool
+            True if the Newton-Raphson formulation should be used, False otherwise.
+        """
         self._options["newton"] = is_newton
 
     def _update_buoyancy_package(self, transport_models_per_flow_model) -> None:

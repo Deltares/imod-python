@@ -386,6 +386,14 @@ class Package(PackageBase, IPackage, abc.ABC):
         )
 
     def copy(self) -> Any:
+        """
+        Copy package into a new package of the same type.
+
+        Returns
+        -------
+        Package
+            A copy of the package, with the same type as this package.
+        """
         # All state should be contained in the dataset.
         dataset_copy = cast(Mapping[str, Any], self.dataset.copy())
         return type(self)(**dataset_copy)

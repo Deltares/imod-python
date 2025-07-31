@@ -45,9 +45,27 @@ Model objects & methods
     GroundwaterFlowModel.prepare_wel_for_mf6
     GroundwaterFlowModel.dump
     GroundwaterFlowModel.from_imod5_data
+    GroundwaterFlowModel.clip_box
+    GroundwaterFlowModel.from_file
+    GroundwaterFlowModel.purge_empty_packages
+    GroundwaterFlowModel.is_splitting_supported
+    GroundwaterFlowModel.is_regridding_supported
+    GroundwaterFlowModel.is_clipping_supported
+    GroundwaterFlowModel.validate
+    GroundwaterFlowModel.set_newton
+    GroundwaterFlowModel.write
     GroundwaterTransportModel
     GroundwaterTransportModel.mask_all_packages
     GroundwaterTransportModel.dump
+    GroundwaterTransportModel.clip_box
+    GroundwaterTransportModel.from_file
+    GroundwaterTransportModel.purge_empty_packages
+    GroundwaterTransportModel.is_splitting_supported
+    GroundwaterTransportModel.is_regridding_supported
+    GroundwaterTransportModel.is_clipping_supported
+    GroundwaterTransportModel.validate
+    GroundwaterTransportModel.set_newton
+    GroundwaterTransportModel.write
 
 Discretization
 --------------
