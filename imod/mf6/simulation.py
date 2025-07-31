@@ -1416,8 +1416,8 @@ class Modflow6Simulation(collections.UserDict, ISimulation):
     def _update_buoyancy_packages(self) -> None:
         flow_transport_mapping = self._get_transport_models_per_flow_model()
         for flow_name, tpt_models_of_flow_model in flow_transport_mapping.items():
-            flow_model = self[flow_name]
-            flow_model.update_buoyancy_package(tpt_models_of_flow_model)
+            flow_model = cast(GroundwaterFlowModel, self[flow_name])
+            flow_model._update_buoyancy_package(tpt_models_of_flow_model)
 
     def is_split(self) -> bool:
         """
