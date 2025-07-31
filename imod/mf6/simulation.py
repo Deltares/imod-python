@@ -1041,7 +1041,7 @@ class Modflow6Simulation(collections.UserDict, ISimulation):
             if isinstance(v, Modflow6Model) and (v.model_id == model_id)
         }
 
-    def get_models(self) -> dict[str, Modflow6Model]:
+    def get_models(self) -> dict[str, IModel]:
         """
         Get all models in the simulation.
 
