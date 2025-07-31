@@ -137,7 +137,7 @@ class Package(PackageBase, IPackage, abc.ABC):
             fname = f"gwf-{pkg_id}.j2"
         return env.get_template(fname)
 
-    def write_blockfile(self, pkgname, globaltimes, write_context: WriteContext):
+    def _write_blockfile(self, pkgname, globaltimes, write_context: WriteContext):
         directory = write_context.get_formatted_write_directory()
 
         content = self._render(
@@ -151,7 +151,7 @@ class Package(PackageBase, IPackage, abc.ABC):
         with open(filename, "w") as f:
             f.write(content)
 
-    def write_binary_griddata(self, outpath, da, dtype):
+    def _write_binary_griddata(self, outpath, da, dtype):
         # From the modflow6 source, the header is defined as:
         # integer(I4B) :: kstp --> np.int32 : 1
         # integer(I4B) :: kper --> np.int32 : 2
@@ -186,7 +186,7 @@ class Package(PackageBase, IPackage, abc.ABC):
             header.tofile(f)
             da.values.flatten().astype(dtype).tofile(f)
 
-    def write_text_griddata(self, outpath, da, dtype):
+    def _write_text_griddata(self, outpath, da, dtype):
         # Note: reshaping here avoids writing newlines after every number.
         # This dumps all the values in a single row rather than a single
         # column. This is to be preferred, since editors can easily
@@ -323,7 +323,7 @@ class Package(PackageBase, IPackage, abc.ABC):
     ):
         directory = write_context.write_directory
         binary = write_context.use_binary
-        self.write_blockfile(pkgname, globaltimes, write_context)
+        self._write_blockfile(pkgname, globaltimes, write_context)
 
         if hasattr(self, "_grid_data"):
             if self._is_xy_data(self.dataset):
@@ -335,10 +335,10 @@ class Package(PackageBase, IPackage, abc.ABC):
                     if self._is_xy_data(da):
                         if binary:
                             path = pkgdirectory / f"{key}.bin"
-                            self.write_binary_griddata(path, da, dtype)
+                            self._write_binary_griddata(path, da, dtype)
                         else:
                             path = pkgdirectory / f"{key}.dat"
-                            self.write_text_griddata(path, da, dtype)
+                            self._write_text_griddata(path, da, dtype)
 
     @standard_log_decorator()
     def _validate(self, schemata: dict, **kwargs) -> dict[str, list[ValidationError]]:

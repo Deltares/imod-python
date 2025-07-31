@@ -991,7 +991,7 @@ class Lake(BoundaryCondition):
         df = self.dataset[outlet_vars].to_dataframe()
         return df
 
-    def write_blockfile(self, pkgname, globaltimes, write_context: WriteContext):
+    def _write_blockfile(self, pkgname, globaltimes, write_context: WriteContext):
         renderdir = pathlib.Path(write_context.write_directory.stem)
         content = self._render(
             directory=renderdir,
