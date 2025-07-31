@@ -43,6 +43,7 @@ Model objects & methods
     GroundwaterFlowModel
     GroundwaterFlowModel.mask_all_packages
     GroundwaterFlowModel.prepare_wel_for_mf6
+    GroundwaterFlowModel.regrid_like
     GroundwaterFlowModel.dump
     GroundwaterFlowModel.from_imod5_data
     GroundwaterFlowModel.clip_box
@@ -58,6 +59,7 @@ Model objects & methods
     GroundwaterTransportModel.mask_all_packages
     GroundwaterTransportModel.dump
     GroundwaterTransportModel.clip_box
+    GroundwaterTransportModel.regrid_like
     GroundwaterTransportModel.from_file
     GroundwaterTransportModel.purge_empty_packages
     GroundwaterTransportModel.is_splitting_supported
