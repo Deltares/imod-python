@@ -1209,10 +1209,34 @@ class Lake(BoundaryCondition):
         return
 
     def is_splitting_supported(self) -> bool:
+        """
+        Return True if this package supports splitting.
+
+        Returns
+        -------
+        bool
+            True if this package supports splitting, False otherwise.
+        """
         return False
 
     def is_regridding_supported(self) -> bool:
+        """
+        Return True if this package supports regridding.
+
+        Returns
+        -------
+        bool
+            True if this package supports regridding, False otherwise.
+        """
         return False
 
     def is_clipping_supported(self) -> bool:
+        """
+        Return True if this package supports clipping.
+
+        Returns
+        -------
+        bool
+            True if this package supports clipping, False otherwise.
+        """
         return False

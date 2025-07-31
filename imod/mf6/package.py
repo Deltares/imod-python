@@ -620,12 +620,36 @@ class Package(PackageBase, IPackage, abc.ABC):
         return cleaned_grids | settings
 
     def is_splitting_supported(self) -> bool:
+        """
+        Return True if this package supports splitting.
+
+        Returns
+        -------
+        bool
+            True if this package supports splitting, False otherwise.
+        """
         return True
 
     def is_regridding_supported(self) -> bool:
+        """
+        Return True if this package supports regridding.
+
+        Returns
+        -------
+        bool
+            True if this package supports regridding, False otherwise.
+        """
         return True
 
     def is_clipping_supported(self) -> bool:
+        """
+        Return True if this package supports clipping.
+
+        Returns
+        -------
+        bool
+            True if this package supports clipping, False otherwise.
+        """
         return True
 
     @classmethod
