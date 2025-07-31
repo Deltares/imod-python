@@ -77,13 +77,51 @@ Discretization
     :toctree: generated/mf6
 
     StructuredDiscretization
-    StructuredDiscretization.regrid_like
     StructuredDiscretization.from_imod5_data
+    StructuredDiscretization.get_regrid_methods
+    StructuredDiscretization.regrid_like
+    StructuredDiscretization.from_file
+    StructuredDiscretization.to_netcdf
+    StructuredDiscretization.copy
     StructuredDiscretization.clip_box
+    StructuredDiscretization.mask
+    StructuredDiscretization.is_empty
+    StructuredDiscretization.get_non_grid_data
+    StructuredDiscretization.is_grid_agnostic_package
+    StructuredDiscretization.is_splitting_supported
+    StructuredDiscretization.is_regridding_supported
+    StructuredDiscretization.is_clipping_supported
+    StructuredDiscretization.write
     VerticesDiscretization
+    VerticesDiscretization.get_regrid_methods
     VerticesDiscretization.regrid_like
+    VerticesDiscretization.from_file
+    VerticesDiscretization.to_netcdf
+    VerticesDiscretization.copy
     VerticesDiscretization.clip_box
+    VerticesDiscretization.mask
+    VerticesDiscretization.is_empty
+    VerticesDiscretization.get_non_grid_data
+    VerticesDiscretization.is_grid_agnostic_package
+    VerticesDiscretization.is_splitting_supported
+    VerticesDiscretization.is_regridding_supported
+    VerticesDiscretization.is_clipping_supported
+    VerticesDiscretization.write
     TimeDiscretization
+    TimeDiscretization.write
+    TimeDiscretization.from_file
+    TimeDiscretization.to_netcdf
+    TimeDiscretization.copy
+    TimeDiscretization.clip_box
+    TimeDiscretization.mask
+    TimeDiscretization.regrid_like
+    TimeDiscretization.is_empty
+    TimeDiscretization.get_non_grid_data
+    TimeDiscretization.is_splitting_supported
+    TimeDiscretization.is_regridding_supported
+    TimeDiscretization.is_clipping_supported
+    TimeDiscretization.is_grid_agnostic_package
+    TimeDiscretization.get_regrid_methods
 
 Model settings
 --------------
