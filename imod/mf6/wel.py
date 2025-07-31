@@ -332,6 +332,10 @@ class GridAgnosticWell(BoundaryCondition, IPointDataPackage, abc.ABC):
 
     @classmethod
     def is_grid_agnostic_package(cls) -> bool:
+        """
+        Returns True if this package does not depend on a grid, e.g. the
+        :class:`imod.mf6.wel.Wel` package.
+        """
         return True
 
     def _create_cellid(

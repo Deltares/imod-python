@@ -748,6 +748,14 @@ class HorizontalFlowBarrierBase(BoundaryCondition, ILineDataPackage):
 
         return self._to_mf6_pkg(idomain, top, bottom, k, validation_context)
 
+    @classmethod
+    def is_grid_agnostic_package(cls) -> bool:
+        """
+        Returns True if this package does not depend on a grid, e.g. the
+        :class:`imod.mf6.wel.Wel` package.
+        """
+        return True
+
     def is_empty(self, ignore_time: bool = False) -> bool:
         """
         Returns True if the package is empty, that is if it contains only
