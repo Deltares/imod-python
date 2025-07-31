@@ -1215,7 +1215,8 @@ class Modflow6Simulation(collections.UserDict, ISimulation):
 
         for model_name, model in original_models.items():
             solution_name = self.get_solution_name(model_name)
-            new_simulation[solution_name].remove_model_from_solution(model_name)
+            solution = cast(Solution, new_simulation[solution_name])
+            solution._remove_model_from_solution(model_name)
             for submodel_partition_info in partition_info:
                 new_model_name = f"{model_name}_{submodel_partition_info.id}"
                 new_simulation[new_model_name] = slice_model(
@@ -1224,7 +1225,7 @@ class Modflow6Simulation(collections.UserDict, ISimulation):
                 new_simulation[new_model_name].purge_empty_packages(
                     ignore_time=ignore_time_purge_empty
                 )
-                new_simulation[solution_name].add_model_to_solution(new_model_name)
+                solution._add_model_to_solution(new_model_name)
 
         exchanges: list[Any] = []
 
