@@ -534,6 +534,28 @@ class HorizontalFlowBarrierBase(BoundaryCondition, ILineDataPackage):
     def to_netcdf(
         self, *args, mdal_compliant: bool = False, crs: Optional[Any] = None, **kwargs
     ):
+        """
+        Write dataset contents to a netCDF file. Custom encoding rules can be
+        provided on package level by overriding the _netcdf_encoding in the
+        package
+
+        Parameters
+        ----------
+        *args:
+            Will be passed on to ``xr.Dataset.to_netcdf`` or
+            ``xu.UgridDataset.to_netcdf``.
+        mdal_compliant: bool, optional
+            Convert data with
+            :func:`imod.prepare.spatial.mdal_compliant_ugrid2d` to MDAL
+            compliant unstructured grids. Defaults to False.
+        crs: Any, optional
+            Anything accepted by rasterio.crs.CRS.from_user_input
+            Requires ``rioxarray`` installed.
+        **kwargs:
+            Will be passed on to ``xr.Dataset.to_netcdf`` or
+            ``xu.UgridDataset.to_netcdf``.
+
+        """
         kwargs.update({"encoding": self._netcdf_encoding()})
 
         new = deepcopy(self)
