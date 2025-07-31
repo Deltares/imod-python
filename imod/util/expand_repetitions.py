@@ -86,7 +86,10 @@ def resample_timeseries(
     # Fill NaT for the last timestep in well_rate if it is outside
     # pandas' Timestamp nanosecond range (2262), for example 2999-12-31.
     # FUTURE: Can be removed when we require pandas 3.0
-    well_rate["time"].iloc[-1:] = well_rate["time"].iloc[-1:].fillna(pd.Timestamp.max)
+    tc_index = well_rate.columns.get_loc("time")
+    well_rate.iloc[-1:, tc_index] = well_rate.iloc[-1:, tc_index].fillna(
+        pd.Timestamp.max
+    )
 
     output_frame = pd.DataFrame(times)
     output_frame = output_frame.rename(columns={0: "time"})
