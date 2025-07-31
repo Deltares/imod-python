@@ -8,6 +8,7 @@ import numpy as np
 import xarray as xr
 import xugrid as xu
 
+from imod.common.utilities.dataclass_type import DataclassType
 from imod.mf6.aggregate.aggregate_schemes import EmptyAggregationMethod
 from imod.mf6.auxiliary_variables import (
     expand_transient_auxiliary_variables,
@@ -102,6 +103,8 @@ class BoundaryCondition(Package, abc.ABC):
     <https://water.usgs.gov/water-resources/software/MODFLOW-6/mf6io_6.0.4.pdf#page=19>`_,
     not the array input which is used in :class:`Package`.
     """
+
+    _aggregate_method: DataclassType = EmptyAggregationMethod()
 
     def __init__(self, allargs: Mapping[str, GridDataArray | float | int | bool | str]):
         # Convert repeat_stress in dict to a xr.DataArray in the right shape if
@@ -332,6 +335,10 @@ class BoundaryCondition(Package, abc.ABC):
             result.extend(get_variable_names(self))
 
         return result
+
+    @classmethod
+    def get_aggregate_methods(cls) -> DataclassType:
+        return deepcopy(cls._aggregate_method)
 
     @classmethod
     def aggregate_layers(cls, dataset: GridDataset) -> GridDataDict:
