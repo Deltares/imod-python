@@ -52,6 +52,7 @@ Model objects & methods
     GroundwaterFlowModel.is_splitting_supported
     GroundwaterFlowModel.is_regridding_supported
     GroundwaterFlowModel.is_clipping_supported
+    GroundwaterFlowModel.is_use_newton
     GroundwaterFlowModel.validate
     GroundwaterFlowModel.set_newton
     GroundwaterFlowModel.write
@@ -66,6 +67,7 @@ Model objects & methods
     GroundwaterTransportModel.is_regridding_supported
     GroundwaterTransportModel.is_clipping_supported
     GroundwaterTransportModel.validate
+    GroundwaterTransportModel.is_use_newton
     GroundwaterTransportModel.write
 
 Discretization
