@@ -1029,7 +1029,7 @@ class Modflow6Simulation(collections.UserDict, ISimulation):
         model_id: str
             Model type identifier, e.g. "gwf6" for groundwater flow models,
             "gwt6" for groundwater transport models.
-        
+
         Returns
         -------
         dict[str, Modflow6Model]
