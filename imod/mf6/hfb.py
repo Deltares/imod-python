@@ -4,6 +4,7 @@ import textwrap
 import typing
 from copy import deepcopy
 from enum import Enum
+from pathlib import Path
 from typing import TYPE_CHECKING, Any, Dict, List, Optional, Self, Tuple
 
 import cftime
@@ -543,7 +544,37 @@ class HorizontalFlowBarrierBase(BoundaryCondition, ILineDataPackage):
         return {"geometry": {"dtype": "str"}}
 
     @classmethod
-    def from_file(cls, path, **kwargs):
+    def from_file(cls, path: str | Path, **kwargs) -> Self:
+        """
+        Loads an imod mf6 package from a file (currently only netcdf and zarr
+        are supported). Note that it is expected that this file was saved with
+        imod.mf6.Package.dataset.to_netcdf(), as the checks upon package
+        initialization are not done again!
+
+        Parameters
+        ----------
+        path : str, pathlib.Path
+            Path to the file.
+        **kwargs : keyword arguments
+            Arbitrary keyword arguments forwarded to ``xarray.open_dataset()``,
+            or ``xarray.open_zarr()``.
+        Refer to the examples.
+
+        Returns
+        -------
+        package : imod.mf6.Package
+            Returns a package with data loaded from file.
+
+        Examples
+        --------
+
+        To load a package from a file, e.g. a HorizontalFlowBarrierResistance
+        package:
+
+        >>> hfb = imod.mf6.HorizontalFlowBarrierResistance.from_file("hfb.nc")
+
+        Refer to the xarray documentation for the possible keyword arguments.
+        """
         instance = super().from_file(path, **kwargs)
         geometry = json.loads(instance.dataset["geometry"].values.item())
         instance.line_data = gpd.GeoDataFrame.from_features(geometry)
