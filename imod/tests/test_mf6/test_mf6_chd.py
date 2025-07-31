@@ -52,7 +52,7 @@ def test_render(head):
     chd = imod.mf6.ConstantHead(
         head, print_input=True, print_flows=True, save_flows=True
     )
-    actual = chd.render(directory, "chd", globaltimes, True)
+    actual = chd._render(directory, "chd", globaltimes, True)
 
     expected = textwrap.dedent(
         """\
@@ -93,7 +93,7 @@ def test_from_file(head, tmp_path):
     path = tmp_path / "chd.nc"
     chd.dataset.to_netcdf(path)
     chd2 = imod.mf6.ConstantHead.from_file(path)
-    actual = chd2.render(directory, "chd", globaltimes, False)
+    actual = chd2._render(directory, "chd", globaltimes, False)
 
     expected = textwrap.dedent(
         """\
@@ -153,7 +153,7 @@ def test_render_concentration(head_fc, concentration_fc):
         save_flows=True,
     )
 
-    actual = chd.render(directory, "chd", globaltimes, False)
+    actual = chd._render(directory, "chd", globaltimes, False)
 
     expected = textwrap.dedent(
         """\

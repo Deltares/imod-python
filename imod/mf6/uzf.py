@@ -415,7 +415,7 @@ class UnsaturatedZoneFlow(AdvancedBoundaryCondition):
 
         return recarr_new
 
-    def render(self, directory, pkgname, globaltimes, binary):
+    def _render(self, directory, pkgname, globaltimes, binary):
         """Render fills in the template only, doesn't write binary data"""
         d = {}
         bin_ds = self.dataset[list(self._period_data)]

@@ -187,7 +187,7 @@ class SpecificStorage(StorageBase):
         super().__init__(dict_dataset)
         self._validate_init_schemata(validate)
 
-    def render(self, directory, pkgname, globaltimes, binary):
+    def _render(self, directory, pkgname, globaltimes, binary):
         d = self._render_dict(directory, pkgname, globaltimes, binary)
         return self._template.render(d)
 
@@ -319,7 +319,7 @@ class StorageCoefficient(StorageBase):
         super().__init__(dict_dataset)
         self._validate_init_schemata(validate)
 
-    def render(self, directory, pkgname, globaltimes, binary):
+    def _render(self, directory, pkgname, globaltimes, binary):
         d = self._render_dict(directory, pkgname, globaltimes, binary)
         d["storagecoefficient"] = True
         return self._template.render(d)

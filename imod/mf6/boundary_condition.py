@@ -267,7 +267,7 @@ class BoundaryCondition(Package, abc.ABC):
         """
         return self[self.get_period_varnames()]
 
-    def render(self, directory, pkgname, globaltimes, binary):
+    def _render(self, directory, pkgname, globaltimes, binary):
         """Render fills in the template only, doesn't write binary data"""
         d = {"binary": binary}
         bin_ds = self._get_bin_ds()

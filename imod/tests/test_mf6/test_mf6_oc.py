@@ -14,7 +14,7 @@ def test_render_string():
     oc = imod.mf6.OutputControl(save_head="first", save_budget="last")
     directory = pathlib.Path("mymodel")
     globaltimes = [np.datetime64("2000-01-01")]
-    actual = oc.render(directory, "outputcontrol", globaltimes, True)
+    actual = oc._render(directory, "outputcontrol", globaltimes, True)
     expected = textwrap.dedent(
         """\
         begin options
@@ -39,7 +39,7 @@ def test_render_string_two_timesteps():
 
     oc = imod.mf6.OutputControl(save_head=save_head, save_budget="last")
     directory = pathlib.Path("mymodel")
-    actual = oc.render(directory, "outputcontrol", globaltimes, True)
+    actual = oc._render(directory, "outputcontrol", globaltimes, True)
     expected = textwrap.dedent(
         """\
         begin options
@@ -63,7 +63,7 @@ def test_render_int():
     oc = imod.mf6.OutputControl(save_head=4, save_budget=3)
     directory = pathlib.Path("mymodel")
     globaltimes = np.array(["2000-01-01"], dtype="datetime64[ns]")
-    actual = oc.render(directory, "outputcontrol", globaltimes, True)
+    actual = oc._render(directory, "outputcontrol", globaltimes, True)
     expected = textwrap.dedent(
         """\
         begin options
@@ -106,7 +106,7 @@ def test_render_string_fail():
 
     expected_message = "Output Control received wrong string. String should be one of ['first', 'last', 'all'], instead got foo"
     with pytest.raises(ValueError, match=re.escape(expected_message)):
-        _ = oc.render(directory, "outputcontrol", globaltimes, True)
+        _ = oc._render(directory, "outputcontrol", globaltimes, True)
 
 
 def test_render_mixed_two_timesteps():
@@ -119,7 +119,7 @@ def test_render_mixed_two_timesteps():
 
     oc = imod.mf6.OutputControl(save_head=save_head, save_budget=None)
     directory = pathlib.Path("mymodel")
-    actual = oc.render(directory, "outputcontrol", globaltimes, True)
+    actual = oc._render(directory, "outputcontrol", globaltimes, True)
     expected = textwrap.dedent(
         """\
         begin options
@@ -141,7 +141,7 @@ def test_render_string_concentration():
     oc = imod.mf6.OutputControl(save_concentration="first", save_budget="last")
     directory = pathlib.Path("mymodel")
     globaltimes = np.array(["2000-01-01"], dtype="datetime64[ns]")
-    actual = oc.render(directory, "outputcontrol", globaltimes, True)
+    actual = oc._render(directory, "outputcontrol", globaltimes, True)
     expected = textwrap.dedent(
         """\
         begin options
@@ -168,7 +168,7 @@ def test_render_string_two_timesteps_concentration():
         save_concentration=save_concentration, save_budget="last"
     )
     directory = pathlib.Path("mymodel")
-    actual = oc.render(directory, "outputcontrol", globaltimes, True)
+    actual = oc._render(directory, "outputcontrol", globaltimes, True)
     expected = textwrap.dedent(
         """\
         begin options
@@ -207,7 +207,7 @@ def test_fileout_none():
     oc = imod.mf6.OutputControl(save_concentration="first", save_budget="last")
     directory = pathlib.Path("mymodel")
     globaltimes = np.array(["2000-01-01"], dtype="datetime64[ns]")
-    actual = oc.render(directory, "outputcontrol", globaltimes, True)
+    actual = oc._render(directory, "outputcontrol", globaltimes, True)
     expected = textwrap.dedent(
         """\
         begin options
@@ -231,7 +231,7 @@ def test_fileout_abs(tmp_path):
     globaltimes = np.array(["2000-01-01"], dtype="datetime64[ns]")
     outpath = tmp_path / "output" / "mymodel.cbc"
     oc["budget_file"] = outpath
-    actual = oc.render(directory, "outputcontrol", globaltimes, True)
+    actual = oc._render(directory, "outputcontrol", globaltimes, True)
     expected = textwrap.dedent(
         f"""\
         begin options
@@ -254,7 +254,7 @@ def test_fileout_relative(tmp_path):
     directory = pathlib.Path("input/gwf")
     # Relative path, resolve to simulation name file.
     oc["budget_file"] = "output/gwf.cbc"
-    actual = oc.render(directory, "outputcontrol", globaltimes, True)
+    actual = oc._render(directory, "outputcontrol", globaltimes, True)
     expected = textwrap.dedent(
         """\
         begin options

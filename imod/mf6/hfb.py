@@ -524,7 +524,7 @@ class HorizontalFlowBarrierBase(BoundaryCondition, ILineDataPackage):
             value.to_xarray(), overwrite_vars=variables_for_gdf, join="right"
         )
 
-    def render(self, directory, pkgname, globaltimes, binary):
+    def _render(self, directory, pkgname, globaltimes, binary):
         raise NotImplementedError(
             f"""{self.__class__.__name__} is a grid-agnostic package and does not have a render method. To render the
             package, first convert to a Modflow6 package by calling pkg.to_mf6_pkg()"""

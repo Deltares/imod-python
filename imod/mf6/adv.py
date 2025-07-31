@@ -23,7 +23,7 @@ class Advection(Package, IRegridPackage):
         dict_dataset = {"scheme": scheme}
         super().__init__(dict_dataset)
 
-    def render(self, directory, pkgname, globaltimes, binary):
+    def _render(self, directory, pkgname, globaltimes, binary):
         scheme = self.dataset["scheme"].item()
         return self._template.render({"scheme": scheme})
 

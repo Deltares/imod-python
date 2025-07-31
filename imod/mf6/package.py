@@ -142,7 +142,7 @@ class Package(PackageBase, IPackage, abc.ABC):
     def write_blockfile(self, pkgname, globaltimes, write_context: WriteContext):
         directory = write_context.get_formatted_write_directory()
 
-        content = self.render(
+        content = self._render(
             directory=directory,
             pkgname=pkgname,
             globaltimes=globaltimes,
@@ -233,7 +233,7 @@ class Package(PackageBase, IPackage, abc.ABC):
             d["auxiliary"] = names
         return d
 
-    def render(self, directory, pkgname, globaltimes, binary):
+    def _render(self, directory, pkgname, globaltimes, binary):
         d = self._get_render_dictionary(directory, pkgname, globaltimes, binary)
         return self._template.render(d)
 

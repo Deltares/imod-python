@@ -905,7 +905,7 @@ class Lake(BoundaryCondition):
         x[idx[0][:]] = ""
         return x.astype(str)
 
-    def render(self, directory, pkgname, globaltimes, binary):
+    def _render(self, directory, pkgname, globaltimes, binary):
         d = {}
         for var in (
             "print_input",
@@ -993,7 +993,7 @@ class Lake(BoundaryCondition):
 
     def write_blockfile(self, pkgname, globaltimes, write_context: WriteContext):
         renderdir = pathlib.Path(write_context.write_directory.stem)
-        content = self.render(
+        content = self._render(
             directory=renderdir,
             pkgname=pkgname,
             globaltimes=globaltimes,

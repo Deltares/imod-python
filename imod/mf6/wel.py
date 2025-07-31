@@ -371,7 +371,7 @@ class GridAgnosticWell(BoundaryCondition, IPointDataPackage, abc.ABC):
 
         return ds_vars
 
-    def render(self, directory, pkgname, globaltimes, binary):
+    def _render(self, directory, pkgname, globaltimes, binary):
         raise NotImplementedError(
             textwrap.dedent(
                 f"""{self.__class__.__name__} is a grid-agnostic package and does not

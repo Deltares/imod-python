@@ -63,7 +63,7 @@ class SourceSinkMixing(BoundaryCondition, IRegridPackage):
         super().__init__(dict_dataset)
         self._validate_init_schemata(validate)
 
-    def render(self, directory, pkgname, globaltimes, binary):
+    def _render(self, directory, pkgname, globaltimes, binary):
         d = {
             "sources": list(
                 zip(

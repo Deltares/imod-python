@@ -33,7 +33,7 @@ def test_render(
         concentration_boundary_type="AUX",
     )
     # Act
-    actual = evt.render(directory, "evt", globaltimes, False)
+    actual = evt._render(directory, "evt", globaltimes, False)
 
     # Assert
     expected = textwrap.dedent(

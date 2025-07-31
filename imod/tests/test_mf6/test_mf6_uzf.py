@@ -120,7 +120,7 @@ def test_render(test_data):
     uzf = imod.mf6.UnsaturatedZoneFlow(**test_data)
     directory = pathlib.Path("mymodel")
     globaltimes = pd.date_range("2018-01-01", periods=4, freq="h")
-    actual = uzf.render(directory, "uzf", globaltimes, True)
+    actual = uzf._render(directory, "uzf", globaltimes, True)
 
     expected = textwrap.dedent(
         """\

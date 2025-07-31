@@ -39,7 +39,7 @@ def test_render():
         reordering_method=None,
         relaxation_factor=0.97,
     )
-    actual = ims.render(None, None, None, None)
+    actual = ims._render(None, None, None, None)
     expected = textwrap.dedent(
         """\
         begin options
@@ -120,7 +120,7 @@ def test_ims_options():
         no_ptc="first",
         ats_outer_maximum_fraction=0.25,
     )
-    actual = ims.render(None, None, None, None)
+    actual = ims._render(None, None, None, None)
     expected = textwrap.dedent(
         """\
         begin options

@@ -34,7 +34,7 @@ def test_buoyancy_package_simple():
       2 -0.375 25.0 gwt-2 temperature
     end packagedata"""
     )
-    actual = buy.render(directory, "buy", globaltimes, False)
+    actual = buy._render(directory, "buy", globaltimes, False)
     print(actual)
     print(expected)
     assert actual == expected
@@ -70,7 +70,7 @@ def test_buoyancy_package_full():
           2 -0.375 25.0 gwt-2 temperature
         end packagedata"""
     )
-    actual = buy.render(directory, "buy", globaltimes, False)
+    actual = buy._render(directory, "buy", globaltimes, False)
     print(actual)
     print(expected)
     assert actual == expected
@@ -102,7 +102,7 @@ def test_buoyancy_package_update_transport_names():
           2 -0.375 25.0 gwt-2_0 temperature
         end packagedata"""
     )
-    actual = buy.render(directory, "buy", globaltimes, False)
+    actual = buy._render(directory, "buy", globaltimes, False)
     assert actual == expected
 
 

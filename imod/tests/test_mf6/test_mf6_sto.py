@@ -67,7 +67,7 @@ def test_render_specific_storage_with_specific_yield(sy_layered, convertible):
 
     directory = pathlib.Path("mymodel")
     globaltimes = np.array(["2000-01-01"], dtype="datetime64[ns]")
-    actual = sto.render(directory, "sto", globaltimes, True)
+    actual = sto._render(directory, "sto", globaltimes, True)
     expected = textwrap.dedent(
         """\
         begin options
@@ -102,7 +102,7 @@ def test_render_specific_storage_without_specific_yield(convertible):
 
     directory = pathlib.Path("mymodel")
     globaltimes = np.array(["2000-01-01"], dtype="datetime64[ns]")
-    actual = sto.render(directory, "sto", globaltimes, True)
+    actual = sto._render(directory, "sto", globaltimes, True)
     expected = textwrap.dedent(
         """\
         begin options
@@ -135,7 +135,7 @@ def test_render_specific_storage_save_flows(sy_layered, convertible):
 
     directory = pathlib.Path("mymodel")
     globaltimes = np.array(["2000-01-01"], dtype="datetime64[ns]")
-    actual = sto.render(directory, "sto", globaltimes, True)
+    actual = sto._render(directory, "sto", globaltimes, True)
     expected = textwrap.dedent(
         """\
         begin options
@@ -182,7 +182,7 @@ def test_render_specific_storage_three_periods(sy_layered, convertible):
         ],
         dtype="datetime64[ns]",
     )
-    actual = sto.render(directory, "sto", globaltimes, True)
+    actual = sto._render(directory, "sto", globaltimes, True)
     expected = textwrap.dedent(
         """\
         begin options
@@ -221,7 +221,7 @@ def test_render_storage_coefficient(sy_layered, convertible):
 
     directory = pathlib.Path("mymodel")
     globaltimes = np.array(["2000-01-01"], dtype="datetime64[ns]")
-    actual = sto.render(directory, "sto", globaltimes, True)
+    actual = sto._render(directory, "sto", globaltimes, True)
     expected = textwrap.dedent(
         """\
         begin options
@@ -259,7 +259,7 @@ def test_render_storage_coefficient_save_flows(sy_layered, convertible):
 
     directory = pathlib.Path("mymodel")
     globaltimes = np.array(["2000-01-01"], dtype="datetime64[ns]")
-    actual = sto.render(directory, "sto", globaltimes, True)
+    actual = sto._render(directory, "sto", globaltimes, True)
     expected = textwrap.dedent(
         """\
         begin options
@@ -433,7 +433,7 @@ def test_from_imod5(imod5_dataset, tmp_path):
     assert np.all(sto.dataset["storage_coefficient"].values[1:] == 1e-5)
     assert sto.dataset["specific_yield"].values[()] is None
 
-    rendered_sto = sto.render(tmp_path, "sto", None, False)
+    rendered_sto = sto._render(tmp_path, "sto", None, False)
     assert "ss" in rendered_sto
 
 

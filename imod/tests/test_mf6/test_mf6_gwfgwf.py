@@ -68,7 +68,7 @@ class TestGwfgwf:
         self, sample_gwfgwf_structured: imod.mf6.GWFGWF, tmp_path: Path
     ):
         # act
-        actual = sample_gwfgwf_structured.render(tmp_path, "gwfgwf", [], False)
+        actual = sample_gwfgwf_structured._render(tmp_path, "gwfgwf", [], False)
 
         # assert
 
@@ -101,7 +101,7 @@ class TestGwfgwf:
         self, sample_gwfgwf_unstructured: imod.mf6.GWFGWF, tmp_path: Path
     ):
         # act
-        actual = sample_gwfgwf_unstructured.render(tmp_path, "gwfgwf", [], False)
+        actual = sample_gwfgwf_unstructured._render(tmp_path, "gwfgwf", [], False)
 
         # assert
 

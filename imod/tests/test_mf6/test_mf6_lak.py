@@ -22,7 +22,7 @@ def test_alternative_constructor(naardermeer, ijsselmeer):
     actual = Lake.from_lakes_and_outlets(
         [naardermeer(), ijsselmeer()], [outlet1, outlet2]
     )
-    _ = actual.render(None, None, None, False)
+    _ = actual._render(None, None, None, False)
     assert isinstance(actual, Lake)
 
 

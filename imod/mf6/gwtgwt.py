@@ -90,7 +90,7 @@ class GWTGWT(ExchangeBase):
     ) -> Self:
         raise NotImplementedError("this package cannot be clipped")
 
-    def render(
+    def _render(
         self,
         directory: Path,
         pkgname: str,
