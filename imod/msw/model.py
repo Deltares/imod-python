@@ -309,8 +309,30 @@ class MetaSwapModel(Model):
         self,
         mf6_regridded_dis: StructuredDiscretization,
         regrid_cache: Optional[RegridderWeightsCache] = None,
-        regridder_types: Optional[dict[str, Tuple[RegridderType, str]]] = None,
     ) -> "MetaSwapModel":
+        """
+        Creates a model by regridding the packages of this model to another
+        discretization. It regrids all the arrays in the package using the
+        default regridding methods. At the moment only regridding to a different
+        planar grid is supported, meaning ``target_grid`` has different ``"x"``
+        and ``"y"`` or different ``cell2d`` coords.
+
+        Parameters
+        ----------
+        mf6_regridded_dis: StructuredDiscretization
+            Modflow6 Discretization with same discretization as the one we want
+            to regrid the package to.
+        regrid_cache: RegridderWeightsCache, optional
+            stores regridder weights for different regridders. Can be used to
+            speed up regridding, if the same regridders are used several times
+            for regridding different arrays.
+
+        Returns
+        -------
+        A model with similar packages to the input model, and with all the
+        data-arrays regridded to another discretization, similar to the one used
+        in input argument "mf6_regridded_dis"
+        """
         unsat_database = cast(str, self.simulation_settings["unsa_svat_path"])
         regridded_model = MetaSwapModel(unsat_database)
 
@@ -325,9 +347,8 @@ class MetaSwapModel(Model):
                 mod2svat_name = pkgname
             elif msw_package._is_regridding_supported():
                 regridded_package = msw_package.regrid_like(
-                    target_grid, regrid_cache, regridder_types
+                    target_grid, regrid_cache, None
                 )
-
             else:
                 raise ValueError(f"package {pkgname} cannot be  regridded")
             regridded_model[pkgname] = regridded_package
