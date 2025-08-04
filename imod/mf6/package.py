@@ -87,9 +87,6 @@ class Package(PackageBase, IPackage, abc.ABC):
     def __init__(self, allargs: Mapping[str, GridDataArray | float | int | bool | str]):
         super().__init__(allargs)
 
-    def cleanup(self, dis: Any):
-        raise NotImplementedError("Method not implemented for this package.")
-
     @staticmethod
     def _valid(value: Any) -> bool:
         return is_valid(value)
@@ -636,4 +633,33 @@ class Package(PackageBase, IPackage, abc.ABC):
 
     @classmethod
     def get_regrid_methods(cls) -> DataclassType:
+        """
+        Returns the default regrid methods for this package. You can use modify
+        to customize the regridding of the package.
+
+        Returns
+        -------
+        DataclassType
+            The regrid methods for this package, which is a dataclass with
+            attributes that are tuples of (regridder type, method name). If no
+            regrid methods are defined, returns an instance of
+            EmptyRegridMethod.
+
+        Examples
+        --------
+        Get the regrid methods for the Drainage package:
+
+        >>> regrid_settings = Drainage.get_regrid_methods()
+
+        You can modify the regrid methods by changing the attributes of the
+        returned dataclass instance. For example, to set the regridding method
+        for ``elevation`` to minimum.
+
+        >>> regrid_settings.elevation = (imod.RegridderType.OVERLAP, "min")
+
+        These settings can then be used to regrid the package:
+
+        >>> drain.regrid_like(like, regridder_types=regrid_settings)
+
+        """
         return deepcopy(cls._regrid_method)
