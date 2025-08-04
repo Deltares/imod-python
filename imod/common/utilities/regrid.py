@@ -252,7 +252,7 @@ def _regrid_like(
     if regridder_types is None:
         regridder_types = package._regrid_method
 
-    new_package_data = package.get_non_grid_data(regridder_types.asdict().keys())
+    new_package_data = package._get_non_grid_data(regridder_types.asdict().keys())
     new_package_data = _regrid_package_data(
         package.dataset,
         target_grid,

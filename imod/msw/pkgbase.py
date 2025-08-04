@@ -182,7 +182,7 @@ class MetaSwapPackage(abc.ABC):
     def _valid(self, value):
         return True
 
-    def get_non_grid_data(self, grid_names: list[str]) -> dict[str, Any]:
+    def _get_non_grid_data(self, grid_names: list[str]) -> dict[str, Any]:
         """
         This function copies the attributes of a dataset that are scalars, such as options.
 

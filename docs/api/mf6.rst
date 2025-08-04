@@ -80,7 +80,6 @@ Discretization
     StructuredDiscretization.clip_box
     StructuredDiscretization.mask
     StructuredDiscretization.is_empty
-    StructuredDiscretization.get_non_grid_data
     StructuredDiscretization.write
     VerticesDiscretization
     VerticesDiscretization.get_regrid_methods
@@ -91,7 +90,6 @@ Discretization
     VerticesDiscretization.clip_box
     VerticesDiscretization.mask
     VerticesDiscretization.is_empty
-    VerticesDiscretization.get_non_grid_data
     VerticesDiscretization.write
     TimeDiscretization
     TimeDiscretization.write
@@ -102,7 +100,6 @@ Discretization
     TimeDiscretization.mask
     TimeDiscretization.regrid_like
     TimeDiscretization.is_empty
-    TimeDiscretization.get_non_grid_data
     TimeDiscretization.get_regrid_methods
 
 Model settings
@@ -121,7 +118,6 @@ Model settings
     OutputControl.mask
     OutputControl.regrid_like
     OutputControl.is_empty
-    OutputControl.get_non_grid_data
     OutputControl.get_regrid_methods
     Solution
     Solution.write
@@ -132,7 +128,6 @@ Model settings
     Solution.mask
     Solution.regrid_like
     Solution.is_empty
-    Solution.get_non_grid_data
     Solution.get_regrid_methods
     SolutionPresetSimple
     SolutionPresetModerate
@@ -151,7 +146,6 @@ Flow Packages
     ApiPackage.to_netcdf
     ApiPackage.copy
     ApiPackage.is_empty
-    ApiPackage.get_non_grid_data
     ApiPackage.get_regrid_methods
     Buoyancy
     Buoyancy.write
@@ -159,7 +153,6 @@ Flow Packages
     Buoyancy.to_netcdf
     Buoyancy.copy
     Buoyancy.is_empty
-    Buoyancy.get_non_grid_data
     Buoyancy.get_regrid_methods
     ConstantHead
     ConstantHead.from_imod5_data
@@ -172,9 +165,7 @@ Flow Packages
     ConstantHead.to_netcdf
     ConstantHead.copy
     ConstantHead.is_empty
-    ConstantHead.get_non_grid_data
     ConstantHead.get_regrid_methods
-    ConstantHead.get_period_varnames
     Drainage
     Drainage.mask
     Drainage.from_imod5_data
@@ -186,9 +177,7 @@ Flow Packages
     Drainage.to_netcdf
     Drainage.copy
     Drainage.is_empty
-    Drainage.get_non_grid_data
     Drainage.get_regrid_methods
-    Drainage.get_period_varnames
     Drainage.aggregate_layers
     Drainage.reallocate
     Evapotranspiration
@@ -200,9 +189,7 @@ Flow Packages
     Evapotranspiration.to_netcdf
     Evapotranspiration.copy
     Evapotranspiration.is_empty
-    Evapotranspiration.get_non_grid_data
     Evapotranspiration.get_regrid_methods
-    Evapotranspiration.get_period_varnames
     GeneralHeadBoundary
     GeneralHeadBoundary.from_imod5_data
     GeneralHeadBoundary.mask
@@ -214,9 +201,7 @@ Flow Packages
     GeneralHeadBoundary.to_netcdf
     GeneralHeadBoundary.copy
     GeneralHeadBoundary.is_empty
-    GeneralHeadBoundary.get_non_grid_data
     GeneralHeadBoundary.get_regrid_methods
-    GeneralHeadBoundary.get_period_varnames
     GeneralHeadBoundary.aggregate_layers
     GeneralHeadBoundary.reallocate
     HorizontalFlowBarrierHydraulicCharacteristic
@@ -228,7 +213,6 @@ Flow Packages
     HorizontalFlowBarrierHydraulicCharacteristic.to_netcdf
     HorizontalFlowBarrierHydraulicCharacteristic.copy
     HorizontalFlowBarrierHydraulicCharacteristic.is_empty
-    HorizontalFlowBarrierHydraulicCharacteristic.get_non_grid_data
     HorizontalFlowBarrierHydraulicCharacteristic.get_regrid_methods
     HorizontalFlowBarrierMultiplier
     HorizontalFlowBarrierMultiplier.clip_box
@@ -239,7 +223,6 @@ Flow Packages
     HorizontalFlowBarrierMultiplier.to_netcdf
     HorizontalFlowBarrierMultiplier.copy
     HorizontalFlowBarrierMultiplier.is_empty
-    HorizontalFlowBarrierMultiplier.get_non_grid_data
     HorizontalFlowBarrierMultiplier.get_regrid_methods
     HorizontalFlowBarrierResistance
     HorizontalFlowBarrierResistance.to_mf6_pkg
@@ -250,7 +233,6 @@ Flow Packages
     HorizontalFlowBarrierResistance.to_netcdf
     HorizontalFlowBarrierResistance.copy
     HorizontalFlowBarrierResistance.is_empty
-    HorizontalFlowBarrierResistance.get_non_grid_data
     HorizontalFlowBarrierResistance.get_regrid_methods
     LayeredWell
     LayeredWell.from_imod5_data
@@ -264,13 +246,11 @@ Flow Packages
     LayeredWell.to_netcdf
     LayeredWell.copy
     LayeredWell.is_empty
-    LayeredWell.get_non_grid_data
     LayeredWell.is_splitting_supported
     LayeredWell.is_regridding_supported
     LayeredWell.is_clipping_supported
     LayeredWell.is_grid_agnostic_package
     LayeredWell.get_regrid_methods
-    LayeredWell.get_period_varnames
     InitialConditions
     InitialConditions.from_imod5_data
     InitialConditions.mask
@@ -281,7 +261,6 @@ Flow Packages
     InitialConditions.to_netcdf
     InitialConditions.copy
     InitialConditions.is_empty
-    InitialConditions.get_non_grid_data
     InitialConditions.get_regrid_methods
     NodePropertyFlow
     NodePropertyFlow.from_imod5_data
@@ -293,7 +272,6 @@ Flow Packages
     NodePropertyFlow.to_netcdf
     NodePropertyFlow.copy
     NodePropertyFlow.is_empty
-    NodePropertyFlow.get_non_grid_data
     NodePropertyFlow.get_regrid_methods
     Recharge
     Recharge.from_imod5_data
@@ -306,9 +284,7 @@ Flow Packages
     Recharge.to_netcdf
     Recharge.copy
     Recharge.is_empty
-    Recharge.get_non_grid_data
     Recharge.get_regrid_methods
-    Recharge.get_period_varnames
     Recharge.aggregate_layers
     Recharge.reallocate
     River
@@ -322,9 +298,7 @@ Flow Packages
     River.to_netcdf
     River.copy
     River.is_empty
-    River.get_non_grid_data
     River.get_regrid_methods
-    River.get_period_varnames
     River.aggregate_layers
     River.reallocate
     SingleLayerHorizontalFlowBarrierHydraulicCharacteristic
@@ -336,7 +310,6 @@ Flow Packages
     SingleLayerHorizontalFlowBarrierHydraulicCharacteristic.to_netcdf
     SingleLayerHorizontalFlowBarrierHydraulicCharacteristic.copy
     SingleLayerHorizontalFlowBarrierHydraulicCharacteristic.is_empty
-    SingleLayerHorizontalFlowBarrierHydraulicCharacteristic.get_non_grid_data
     SingleLayerHorizontalFlowBarrierHydraulicCharacteristic.get_regrid_methods
     SingleLayerHorizontalFlowBarrierMultiplier
     SingleLayerHorizontalFlowBarrierMultiplier.to_mf6_pkg
@@ -347,7 +320,6 @@ Flow Packages
     SingleLayerHorizontalFlowBarrierMultiplier.to_netcdf
     SingleLayerHorizontalFlowBarrierMultiplier.copy
     SingleLayerHorizontalFlowBarrierMultiplier.is_empty
-    SingleLayerHorizontalFlowBarrierMultiplier.get_non_grid_data
     SingleLayerHorizontalFlowBarrierMultiplier.get_regrid_methods
     SingleLayerHorizontalFlowBarrierResistance
     SingleLayerHorizontalFlowBarrierResistance.from_imod5_data
@@ -359,7 +331,6 @@ Flow Packages
     SingleLayerHorizontalFlowBarrierResistance.to_netcdf
     SingleLayerHorizontalFlowBarrierResistance.copy
     SingleLayerHorizontalFlowBarrierResistance.is_empty
-    SingleLayerHorizontalFlowBarrierResistance.get_non_grid_data
     SingleLayerHorizontalFlowBarrierResistance.get_regrid_methods
     SpecificStorage
     SpecificStorage.mask
@@ -370,7 +341,6 @@ Flow Packages
     SpecificStorage.to_netcdf
     SpecificStorage.copy
     SpecificStorage.is_empty
-    SpecificStorage.get_non_grid_data
     SpecificStorage.get_regrid_methods
     StorageCoefficient
     StorageCoefficient.from_imod5_data
@@ -382,7 +352,6 @@ Flow Packages
     StorageCoefficient.to_netcdf
     StorageCoefficient.copy
     StorageCoefficient.is_empty
-    StorageCoefficient.get_non_grid_data
     StorageCoefficient.get_regrid_methods
     UnsaturatedZoneFlow
     UnsaturatedZoneFlow.clip_box
@@ -393,9 +362,7 @@ Flow Packages
     UnsaturatedZoneFlow.to_netcdf
     UnsaturatedZoneFlow.copy
     UnsaturatedZoneFlow.is_empty
-    UnsaturatedZoneFlow.get_non_grid_data
     UnsaturatedZoneFlow.get_regrid_methods
-    UnsaturatedZoneFlow.get_period_varnames
     Well
     Well.cleanup
     Well.from_imod5_data
@@ -408,9 +375,7 @@ Flow Packages
     Well.to_netcdf
     Well.copy
     Well.is_empty
-    Well.get_non_grid_data
     Well.get_regrid_methods
-    Well.get_period_varnames
 
 
 Transport Packages
@@ -425,7 +390,6 @@ Transport Packages
     ApiPackage.to_netcdf
     ApiPackage.copy
     ApiPackage.is_empty
-    ApiPackage.get_non_grid_data
     ApiPackage.get_regrid_methods
     AdvectionCentral
     AdvectionCentral.write
@@ -433,7 +397,6 @@ Transport Packages
     AdvectionCentral.to_netcdf
     AdvectionCentral.copy
     AdvectionCentral.is_empty
-    AdvectionCentral.get_non_grid_data
     AdvectionCentral.get_regrid_methods
     AdvectionTVD
     AdvectionTVD.write
@@ -441,7 +404,6 @@ Transport Packages
     AdvectionTVD.to_netcdf
     AdvectionTVD.copy
     AdvectionTVD.is_empty
-    AdvectionTVD.get_non_grid_data
     AdvectionTVD.get_regrid_methods
     AdvectionUpstream
     AdvectionUpstream.write
@@ -449,7 +411,6 @@ Transport Packages
     AdvectionUpstream.to_netcdf
     AdvectionUpstream.copy
     AdvectionUpstream.is_empty
-    AdvectionUpstream.get_non_grid_data
     AdvectionUpstream.get_regrid_methods
     ConstantConcentration
     ConstantConcentration.write
@@ -457,16 +418,13 @@ Transport Packages
     ConstantConcentration.to_netcdf
     ConstantConcentration.copy
     ConstantConcentration.is_empty
-    ConstantConcentration.get_non_grid_data
     ConstantConcentration.get_regrid_methods
-    ConstantConcentration.get_period_varnames
     Dispersion
     Dispersion.write
     Dispersion.from_file
     Dispersion.to_netcdf
     Dispersion.copy
     Dispersion.is_empty
-    Dispersion.get_non_grid_data
     Dispersion.get_regrid_methods
     ImmobileStorageTransfer
     ImmobileStorageTransfer.write
@@ -474,7 +432,6 @@ Transport Packages
     ImmobileStorageTransfer.to_netcdf
     ImmobileStorageTransfer.copy
     ImmobileStorageTransfer.is_empty
-    ImmobileStorageTransfer.get_non_grid_data
     ImmobileStorageTransfer.get_regrid_methods
     MobileStorageTransfer
     MobileStorageTransfer.write
@@ -482,7 +439,6 @@ Transport Packages
     MobileStorageTransfer.to_netcdf
     MobileStorageTransfer.copy
     MobileStorageTransfer.is_empty
-    MobileStorageTransfer.get_non_grid_data
     MobileStorageTransfer.get_regrid_methods
     MassSourceLoading
     MassSourceLoading.write
@@ -490,9 +446,7 @@ Transport Packages
     MassSourceLoading.to_netcdf
     MassSourceLoading.copy
     MassSourceLoading.is_empty
-    MassSourceLoading.get_non_grid_data
     MassSourceLoading.get_regrid_methods
-    MassSourceLoading.get_period_varnames
     SourceSinkMixing
     SourceSinkMixing.from_flow_model
     SourceSinkMixing.write
@@ -500,9 +454,7 @@ Transport Packages
     SourceSinkMixing.to_netcdf
     SourceSinkMixing.copy
     SourceSinkMixing.is_empty
-    SourceSinkMixing.get_non_grid_data
     SourceSinkMixing.get_regrid_methods
-    SourceSinkMixing.get_period_varnames
 
 
 .. currentmodule:: imod.mf6.regrid

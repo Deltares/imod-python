@@ -545,7 +545,7 @@ class Package(PackageBase, IPackage, abc.ABC):
             return self._auxiliary_data
         return {}
 
-    def get_non_grid_data(self, grid_names: list[str]) -> dict[str, Any]:
+    def _get_non_grid_data(self, grid_names: list[str]) -> dict[str, Any]:
         """
         This function copies the attributes of a dataset that are scalars, such as options.
 
@@ -595,7 +595,7 @@ class Package(PackageBase, IPackage, abc.ABC):
             if varname in self.dataset.keys()
         }
         cleaned_grids = func(**dis, **grids)
-        settings = self.get_non_grid_data(grid_varnames)
+        settings = self._get_non_grid_data(grid_varnames)
         return cleaned_grids | settings
 
     def _is_splitting_supported(self) -> bool:

@@ -19,7 +19,7 @@ class IPackage(IPackageBase, metaclass=abc.ABCMeta):
         raise NotImplementedError
 
     @abc.abstractmethod
-    def get_non_grid_data(self, grid_names: list[str]) -> dict[str, Any]:
+    def _get_non_grid_data(self, grid_names: list[str]) -> dict[str, Any]:
         raise NotImplementedError
 
     @property

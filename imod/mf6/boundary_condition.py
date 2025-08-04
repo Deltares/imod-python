@@ -90,7 +90,7 @@ class BoundaryCondition(Package, abc.ABC):
         Determine the maximum active number of cells that are active
         during a stress period.
         """
-        da = self.dataset[self.get_period_varnames()[0]]
+        da = self.dataset[self._get_period_varnames()[0]]
         if "time" in da.coords:
             nmax = int(da.groupby("time").count(xr.ALL_DIMS).max())
         else:
@@ -202,7 +202,7 @@ class BoundaryCondition(Package, abc.ABC):
         options = copy(predefined_options)
 
         if not_options is None:
-            not_options = self.get_period_varnames()
+            not_options = self._get_period_varnames()
 
         for varname in self.dataset.data_vars.keys():  # pylint:disable=no-member
             if varname in not_options:
@@ -231,7 +231,7 @@ class BoundaryCondition(Package, abc.ABC):
         datafiles. This method can be overriden to do some extra operations on
         this dataset before writing.
         """
-        return self[self.get_period_varnames()]
+        return self[self._get_period_varnames()]
 
     def _render(self, directory, pkgname, globaltimes, binary):
         """Render fills in the template only, doesn't write binary data"""
@@ -250,7 +250,7 @@ class BoundaryCondition(Package, abc.ABC):
         return self._template.render(d)
 
     def _write_perioddata(self, directory, pkgname, binary):
-        if len(self.get_period_varnames()) == 0:
+        if len(self._get_period_varnames()) == 0:
             return
         bin_ds = self._get_bin_ds()
 
@@ -290,7 +290,7 @@ class BoundaryCondition(Package, abc.ABC):
             binary=write_context.use_binary,
         )
 
-    def get_period_varnames(self) -> list[str]:
+    def _get_period_varnames(self) -> list[str]:
         """
         Get variable names for transient data of this package.
 
@@ -306,7 +306,7 @@ class BoundaryCondition(Package, abc.ABC):
         package:
 
         >>> river = imod.mf6.River.from_file("river_with_concentration.nc")
-        >>> river.get_period_varnames()
+        >>> river._get_period_varnames()
         >>> # prints: ['stage', 'conductance', 'bottom_elevation', 'concentration']
         """
         result = []
