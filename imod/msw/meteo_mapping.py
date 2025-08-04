@@ -139,7 +139,7 @@ class MeteoMapping(MetaSwapPackage):
     def regrid_like(
         self,
         target_grid: GridDataArray,
-        regrid_context: RegridderWeightsCache,
+        regrid_cache: RegridderWeightsCache,
         regridder_types: Optional[DataclassType] = None,
     ):
         """

@@ -308,7 +308,7 @@ class MetaSwapModel(Model):
     def regrid_like(
         self,
         mf6_regridded_dis: StructuredDiscretization,
-        regrid_context: Optional[RegridderWeightsCache] = None,
+        regrid_cache: Optional[RegridderWeightsCache] = None,
         regridder_types: Optional[dict[str, Tuple[RegridderType, str]]] = None,
     ) -> "MetaSwapModel":
         unsat_database = cast(str, self.simulation_settings["unsa_svat_path"])
@@ -325,7 +325,7 @@ class MetaSwapModel(Model):
                 mod2svat_name = pkgname
             elif msw_package._is_regridding_supported():
                 regridded_package = msw_package.regrid_like(
-                    target_grid, regrid_context, regridder_types
+                    target_grid, regrid_cache, regridder_types
                 )
 
             else:

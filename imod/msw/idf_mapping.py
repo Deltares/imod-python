@@ -94,7 +94,7 @@ class IdfMapping(MetaSwapPackage, IRegridPackage):
     def regrid_like(
         self,
         target_grid: GridDataArray,
-        regrid_context: RegridderWeightsCache,
+        regrid_cache: RegridderWeightsCache,
         regridder_types: Optional[DataclassType] = None,
     ) -> "MetaSwapPackage":
         if regridder_types is None:
@@ -105,7 +105,7 @@ class IdfMapping(MetaSwapPackage, IRegridPackage):
         nodata = self.dataset["nodata"].values[()]
         regridded_area = _regrid_array(
             self.dataset["area"],
-            regrid_context,
+            regrid_cache,
             regridder_settings["area"][0],
             regridder_settings["area"][1],
             target_grid,

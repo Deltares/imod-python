@@ -141,7 +141,11 @@ class TimeOutputControl(MetaSwapPackage, IRegridPackage):
     def regrid_like(
         self,
         target_grid: GridDataArray,
-        regrid_context: RegridderWeightsCache,
+        regrid_cache: RegridderWeightsCache,
         regridder_types: Optional[DataclassType] = None,
     ) -> "MetaSwapPackage":
+        """
+        Returns a deepcopy of this instance, as regridding this package is
+        irrelevant: TimeOutputcontrol does not depend on the grid.
+        """
         return deepcopy(self)
