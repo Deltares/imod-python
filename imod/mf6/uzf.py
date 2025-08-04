@@ -308,7 +308,7 @@ class UnsaturatedZoneFlow(AdvancedBoundaryCondition):
         )
         self._validate_init_schemata(validate)
 
-    def fill_stress_perioddata(self):
+    def _fill_stress_perioddata(self):
         """Modflow6 requires something to be filled in the stress perioddata,
         even though the data is not used in the current configuration.
         Only an infiltration rate is required,

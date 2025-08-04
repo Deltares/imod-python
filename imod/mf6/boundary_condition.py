@@ -353,7 +353,7 @@ class AdvancedBoundaryCondition(BoundaryCondition, abc.ABC):
         """
         return
 
-    def write_packagedata(self, directory, pkgname, binary):
+    def _write_packagedata(self, directory, pkgname, binary):
         outpath = directory / pkgname / f"{self._pkg_id}-pkgdata.dat"
         outpath.parent.mkdir(exist_ok=True, parents=True)
         package_data = self._package_data_to_sparse()
@@ -368,12 +368,12 @@ class AdvancedBoundaryCondition(BoundaryCondition, abc.ABC):
         boundary_condition_write_context = deepcopy(write_context)
         boundary_condition_write_context.use_binary = False
 
-        self.fill_stress_perioddata()
+        self._fill_stress_perioddata()
         super()._write(pkgname, globaltimes, boundary_condition_write_context)
 
         directory = boundary_condition_write_context.write_directory
-        self.write_packagedata(directory, pkgname, binary=False)
+        self._write_packagedata(directory, pkgname, binary=False)
 
     @abc.abstractmethod
-    def fill_stress_perioddata(self):
+    def _fill_stress_perioddata(self):
         raise NotImplementedError

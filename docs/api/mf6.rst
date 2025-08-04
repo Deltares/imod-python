@@ -487,6 +487,10 @@ Flow Packages
     StorageCoefficient.is_grid_agnostic_package
     StorageCoefficient.get_regrid_methods
     UnsaturatedZoneFlow
+    UnsaturatedZoneFlow.cleanup
+    UnsaturatedZoneFlow.clip_box
+    UnsaturatedZoneFlow.mask
+    UnsaturatedZoneFlow.regrid_like
     UnsaturatedZoneFlow.write
     UnsaturatedZoneFlow.from_file
     UnsaturatedZoneFlow.to_netcdf
