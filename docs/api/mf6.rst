@@ -146,7 +146,6 @@ Model settings
     OutputControl.is_grid_agnostic_package
     OutputControl.get_regrid_methods
     Solution
-    Solution.is_budget_output
     Solution.write
     Solution.from_file
     Solution.to_netcdf
@@ -173,13 +172,46 @@ Flow Packages
     :toctree: generated/mf6
 
     ApiPackage
+    ApiPackage.write
+    ApiPackage.from_file
+    ApiPackage.to_netcdf
+    ApiPackage.copy
+    ApiPackage.is_empty
+    ApiPackage.get_non_grid_data
+    ApiPackage.is_splitting_supported
+    ApiPackage.is_regridding_supported
+    ApiPackage.is_clipping_supported
+    ApiPackage.is_grid_agnostic_package
+    ApiPackage.get_regrid_methods
     Buoyancy
+    Buoyancy.write
+    Buoyancy.from_file
+    Buoyancy.to_netcdf
+    Buoyancy.copy
+    Buoyancy.is_empty
+    Buoyancy.get_non_grid_data
+    Buoyancy.is_splitting_supported
+    Buoyancy.is_regridding_supported
+    Buoyancy.is_clipping_supported
+    Buoyancy.is_grid_agnostic_package
+    Buoyancy.get_regrid_methods
     ConstantHead
     ConstantHead.from_imod5_data
     ConstantHead.from_imod5_shd_data
     ConstantHead.mask
     ConstantHead.regrid_like
     ConstantHead.clip_box
+    ConstantHead.write
+    ConstantHead.from_file
+    ConstantHead.to_netcdf
+    ConstantHead.copy
+    ConstantHead.is_empty
+    ConstantHead.get_non_grid_data
+    ConstantHead.is_splitting_supported
+    ConstantHead.is_regridding_supported
+    ConstantHead.is_clipping_supported
+    ConstantHead.is_grid_agnostic_package
+    ConstantHead.get_regrid_methods
     Drainage
     Drainage.mask
     Drainage.from_imod5_data
@@ -187,10 +219,32 @@ Flow Packages
     Drainage.cleanup
     Drainage.clip_box
     Drainage.reallocate
+    Drainage.write
+    Drainage.from_file
+    Drainage.to_netcdf
+    Drainage.copy
+    Drainage.is_empty
+    Drainage.get_non_grid_data
+    Drainage.is_splitting_supported
+    Drainage.is_regridding_supported
+    Drainage.is_clipping_supported
+    Drainage.is_grid_agnostic_package
+    Drainage.get_regrid_methods
     Evapotranspiration
     Evapotranspiration.mask
     Evapotranspiration.regrid_like
     Evapotranspiration.clip_box
+    Evapotranspiration.write
+    Evapotranspiration.from_file
+    Evapotranspiration.to_netcdf
+    Evapotranspiration.copy
+    Evapotranspiration.is_empty
+    Evapotranspiration.get_non_grid_data
+    Evapotranspiration.is_splitting_supported
+    Evapotranspiration.is_regridding_supported
+    Evapotranspiration.is_clipping_supported
+    Evapotranspiration.is_grid_agnostic_package
+    Evapotranspiration.get_regrid_methods
     GeneralHeadBoundary
     GeneralHeadBoundary.from_imod5_data
     GeneralHeadBoundary.mask
@@ -198,18 +252,62 @@ Flow Packages
     GeneralHeadBoundary.cleanup
     GeneralHeadBoundary.clip_box
     GeneralHeadBoundary.reallocate
+    GeneralHeadBoundary.write
+    GeneralHeadBoundary.from_file
+    GeneralHeadBoundary.to_netcdf
+    GeneralHeadBoundary.copy
+    GeneralHeadBoundary.is_empty
+    GeneralHeadBoundary.get_non_grid_data
+    GeneralHeadBoundary.is_splitting_supported
+    GeneralHeadBoundary.is_regridding_supported
+    GeneralHeadBoundary.is_clipping_supported
+    GeneralHeadBoundary.is_grid_agnostic_package
+    GeneralHeadBoundary.get_regrid_methods
     HorizontalFlowBarrierHydraulicCharacteristic
     HorizontalFlowBarrierHydraulicCharacteristic.clip_box
     HorizontalFlowBarrierHydraulicCharacteristic.to_mf6_pkg
     HorizontalFlowBarrierHydraulicCharacteristic.snap_to_grid
+    HorizontalFlowBarrierHydraulicCharacteristic.write
+    HorizontalFlowBarrierHydraulicCharacteristic.from_file
+    HorizontalFlowBarrierHydraulicCharacteristic.to_netcdf
+    HorizontalFlowBarrierHydraulicCharacteristic.copy
+    HorizontalFlowBarrierHydraulicCharacteristic.is_empty
+    HorizontalFlowBarrierHydraulicCharacteristic.get_non_grid_data
+    HorizontalFlowBarrierHydraulicCharacteristic.is_splitting_supported
+    HorizontalFlowBarrierHydraulicCharacteristic.is_regridding_supported
+    HorizontalFlowBarrierHydraulicCharacteristic.is_clipping_supported
+    HorizontalFlowBarrierHydraulicCharacteristic.is_grid_agnostic_package
+    HorizontalFlowBarrierHydraulicCharacteristic.get_regrid_methods
     HorizontalFlowBarrierMultiplier
     HorizontalFlowBarrierMultiplier.clip_box
     HorizontalFlowBarrierMultiplier.to_mf6_pkg
     HorizontalFlowBarrierMultiplier.snap_to_grid
+    HorizontalFlowBarrierMultiplier.write
+    HorizontalFlowBarrierMultiplier.from_file
+    HorizontalFlowBarrierMultiplier.to_netcdf
+    HorizontalFlowBarrierMultiplier.copy
+    HorizontalFlowBarrierMultiplier.is_empty
+    HorizontalFlowBarrierMultiplier.get_non_grid_data
+    HorizontalFlowBarrierMultiplier.is_splitting_supported
+    HorizontalFlowBarrierMultiplier.is_regridding_supported
+    HorizontalFlowBarrierMultiplier.is_clipping_supported
+    HorizontalFlowBarrierMultiplier.is_grid_agnostic_package
+    HorizontalFlowBarrierMultiplier.get_regrid_methods
     HorizontalFlowBarrierResistance
     HorizontalFlowBarrierResistance.to_mf6_pkg
     HorizontalFlowBarrierResistance.clip_box
     HorizontalFlowBarrierResistance.snap_to_grid
+    HorizontalFlowBarrierResistance.write
+    HorizontalFlowBarrierResistance.from_file
+    HorizontalFlowBarrierResistance.to_netcdf
+    HorizontalFlowBarrierResistance.copy
+    HorizontalFlowBarrierResistance.is_empty
+    HorizontalFlowBarrierResistance.get_non_grid_data
+    HorizontalFlowBarrierResistance.is_splitting_supported
+    HorizontalFlowBarrierResistance.is_regridding_supported
+    HorizontalFlowBarrierResistance.is_clipping_supported
+    HorizontalFlowBarrierResistance.is_grid_agnostic_package
+    HorizontalFlowBarrierResistance.get_regrid_methods
     LayeredWell
     LayeredWell.from_imod5_data
     LayeredWell.from_imod5_cap_data
@@ -217,16 +315,49 @@ Flow Packages
     LayeredWell.regrid_like
     LayeredWell.to_mf6_pkg
     LayeredWell.clip_box
+    LayeredWell.write
+    LayeredWell.from_file
+    LayeredWell.to_netcdf
+    LayeredWell.copy
+    LayeredWell.is_empty
+    LayeredWell.get_non_grid_data
+    LayeredWell.is_splitting_supported
+    LayeredWell.is_regridding_supported
+    LayeredWell.is_clipping_supported
+    LayeredWell.is_grid_agnostic_package
+    LayeredWell.get_regrid_methods
     InitialConditions
     InitialConditions.from_imod5_data
     InitialConditions.mask
     InitialConditions.regrid_like
     InitialConditions.clip_box
+    InitialConditions.write
+    InitialConditions.from_file
+    InitialConditions.to_netcdf
+    InitialConditions.copy
+    InitialConditions.is_empty
+    InitialConditions.get_non_grid_data
+    InitialConditions.is_splitting_supported
+    InitialConditions.is_regridding_supported
+    InitialConditions.is_clipping_supported
+    InitialConditions.is_grid_agnostic_package
+    InitialConditions.get_regrid_methods
     NodePropertyFlow
     NodePropertyFlow.from_imod5_data
     NodePropertyFlow.mask
     NodePropertyFlow.regrid_like
     NodePropertyFlow.clip_box
+    NodePropertyFlow.write
+    NodePropertyFlow.from_file
+    NodePropertyFlow.to_netcdf
+    NodePropertyFlow.copy
+    NodePropertyFlow.is_empty
+    NodePropertyFlow.get_non_grid_data
+    NodePropertyFlow.is_splitting_supported
+    NodePropertyFlow.is_regridding_supported
+    NodePropertyFlow.is_clipping_supported
+    NodePropertyFlow.is_grid_agnostic_package
+    NodePropertyFlow.get_regrid_methods
     Recharge
     Recharge.from_imod5_data
     Recharge.from_imod5_cap_data
@@ -234,6 +365,17 @@ Flow Packages
     Recharge.regrid_like
     Recharge.clip_box
     Recharge.reallocate
+    Recharge.write
+    Recharge.from_file
+    Recharge.to_netcdf
+    Recharge.copy
+    Recharge.is_empty
+    Recharge.get_non_grid_data
+    Recharge.is_splitting_supported
+    Recharge.is_regridding_supported
+    Recharge.is_clipping_supported
+    Recharge.is_grid_agnostic_package
+    Recharge.get_regrid_methods
     River
     River.from_imod5_data
     River.mask
@@ -241,29 +383,106 @@ Flow Packages
     River.cleanup
     River.clip_box
     River.reallocate
+    River.write
+    River.from_file
+    River.to_netcdf
+    River.copy
+    River.is_empty
+    River.get_non_grid_data
+    River.is_splitting_supported
+    River.is_regridding_supported
+    River.is_clipping_supported
+    River.is_grid_agnostic_package
+    River.get_regrid_methods
     SingleLayerHorizontalFlowBarrierHydraulicCharacteristic
     SingleLayerHorizontalFlowBarrierHydraulicCharacteristic.to_mf6_pkg
     SingleLayerHorizontalFlowBarrierHydraulicCharacteristic.clip_box
     SingleLayerHorizontalFlowBarrierHydraulicCharacteristic.snap_to_grid
+    SingleLayerHorizontalFlowBarrierHydraulicCharacteristic.write
+    SingleLayerHorizontalFlowBarrierHydraulicCharacteristic.from_file
+    SingleLayerHorizontalFlowBarrierHydraulicCharacteristic.to_netcdf
+    SingleLayerHorizontalFlowBarrierHydraulicCharacteristic.copy
+    SingleLayerHorizontalFlowBarrierHydraulicCharacteristic.is_empty
+    SingleLayerHorizontalFlowBarrierHydraulicCharacteristic.get_non_grid_data
+    SingleLayerHorizontalFlowBarrierHydraulicCharacteristic.is_splitting_supported
+    SingleLayerHorizontalFlowBarrierHydraulicCharacteristic.is_regridding_supported
+    SingleLayerHorizontalFlowBarrierHydraulicCharacteristic.is_clipping_supported
+    SingleLayerHorizontalFlowBarrierHydraulicCharacteristic.is_grid_agnostic_package
+    SingleLayerHorizontalFlowBarrierHydraulicCharacteristic.get_regrid_methods
     SingleLayerHorizontalFlowBarrierMultiplier
     SingleLayerHorizontalFlowBarrierMultiplier.to_mf6_pkg
     SingleLayerHorizontalFlowBarrierMultiplier.clip_box
     SingleLayerHorizontalFlowBarrierMultiplier.snap_to_grid
+    SingleLayerHorizontalFlowBarrierMultiplier.write
+    SingleLayerHorizontalFlowBarrierMultiplier.from_file
+    SingleLayerHorizontalFlowBarrierMultiplier.to_netcdf
+    SingleLayerHorizontalFlowBarrierMultiplier.copy
+    SingleLayerHorizontalFlowBarrierMultiplier.is_empty
+    SingleLayerHorizontalFlowBarrierMultiplier.get_non_grid_data
+    SingleLayerHorizontalFlowBarrierMultiplier.is_splitting_supported
+    SingleLayerHorizontalFlowBarrierMultiplier.is_regridding_supported
+    SingleLayerHorizontalFlowBarrierMultiplier.is_clipping_supported
+    SingleLayerHorizontalFlowBarrierMultiplier.is_grid_agnostic_package
+    SingleLayerHorizontalFlowBarrierMultiplier.get_regrid_methods
     SingleLayerHorizontalFlowBarrierResistance
     SingleLayerHorizontalFlowBarrierResistance.from_imod5_data
     SingleLayerHorizontalFlowBarrierResistance.to_mf6_pkg
     SingleLayerHorizontalFlowBarrierResistance.clip_box
     SingleLayerHorizontalFlowBarrierResistance.snap_to_grid
+    SingleLayerHorizontalFlowBarrierResistance.write
+    SingleLayerHorizontalFlowBarrierResistance.from_file
+    SingleLayerHorizontalFlowBarrierResistance.to_netcdf
+    SingleLayerHorizontalFlowBarrierResistance.copy
+    SingleLayerHorizontalFlowBarrierResistance.is_empty
+    SingleLayerHorizontalFlowBarrierResistance.get_non_grid_data
+    SingleLayerHorizontalFlowBarrierResistance.is_splitting_supported
+    SingleLayerHorizontalFlowBarrierResistance.is_regridding_supported
+    SingleLayerHorizontalFlowBarrierResistance.is_clipping_supported
+    SingleLayerHorizontalFlowBarrierResistance.is_grid_agnostic_package
+    SingleLayerHorizontalFlowBarrierResistance.get_regrid_methods
     SpecificStorage
     SpecificStorage.mask
     SpecificStorage.regrid_like
     SpecificStorage.clip_box
+    SpecificStorage.write
+    SpecificStorage.from_file
+    SpecificStorage.to_netcdf
+    SpecificStorage.copy
+    SpecificStorage.is_empty
+    SpecificStorage.get_non_grid_data
+    SpecificStorage.is_splitting_supported
+    SpecificStorage.is_regridding_supported
+    SpecificStorage.is_clipping_supported
+    SpecificStorage.is_grid_agnostic_package
+    SpecificStorage.get_regrid_methods
     StorageCoefficient
     StorageCoefficient.from_imod5_data
     StorageCoefficient.mask
     StorageCoefficient.regrid_like
     StorageCoefficient.clip_box
+    StorageCoefficient.write
+    StorageCoefficient.from_file
+    StorageCoefficient.to_netcdf
+    StorageCoefficient.copy
+    StorageCoefficient.is_empty
+    StorageCoefficient.get_non_grid_data
+    StorageCoefficient.is_splitting_supported
+    StorageCoefficient.is_regridding_supported
+    StorageCoefficient.is_clipping_supported
+    StorageCoefficient.is_grid_agnostic_package
+    StorageCoefficient.get_regrid_methods
     UnsaturatedZoneFlow
+    UnsaturatedZoneFlow.write
+    UnsaturatedZoneFlow.from_file
+    UnsaturatedZoneFlow.to_netcdf
+    UnsaturatedZoneFlow.copy
+    UnsaturatedZoneFlow.is_empty
+    UnsaturatedZoneFlow.get_non_grid_data
+    UnsaturatedZoneFlow.is_splitting_supported
+    UnsaturatedZoneFlow.is_regridding_supported
+    UnsaturatedZoneFlow.is_clipping_supported
+    UnsaturatedZoneFlow.is_grid_agnostic_package
+    UnsaturatedZoneFlow.get_regrid_methods
     Well
     Well.cleanup
     Well.from_imod5_data
@@ -271,6 +490,17 @@ Flow Packages
     Well.regrid_like
     Well.to_mf6_pkg
     Well.clip_box
+    Well.write
+    Well.from_file
+    Well.to_netcdf
+    Well.copy
+    Well.is_empty
+    Well.get_non_grid_data
+    Well.is_splitting_supported
+    Well.is_regridding_supported
+    Well.is_clipping_supported
+    Well.is_grid_agnostic_package
+    Well.get_regrid_methods
 
 
 Transport Packages
@@ -280,16 +510,126 @@ Transport Packages
     :toctree: generated/mf6
 
     ApiPackage
+    ApiPackage.write
+    ApiPackage.from_file
+    ApiPackage.to_netcdf
+    ApiPackage.copy
+    ApiPackage.is_empty
+    ApiPackage.get_non_grid_data
+    ApiPackage.is_splitting_supported
+    ApiPackage.is_regridding_supported
+    ApiPackage.is_clipping_supported
+    ApiPackage.is_grid_agnostic_package
+    ApiPackage.get_regrid_methods
     AdvectionCentral
+    AdvectionCentral.write
+    AdvectionCentral.from_file
+    AdvectionCentral.to_netcdf
+    AdvectionCentral.copy
+    AdvectionCentral.is_empty
+    AdvectionCentral.get_non_grid_data
+    AdvectionCentral.is_splitting_supported
+    AdvectionCentral.is_regridding_supported
+    AdvectionCentral.is_clipping_supported
+    AdvectionCentral.is_grid_agnostic_package
+    AdvectionCentral.get_regrid_methods
     AdvectionTVD
+    AdvectionTVD.write
+    AdvectionTVD.from_file
+    AdvectionTVD.to_netcdf
+    AdvectionTVD.copy
+    AdvectionTVD.is_empty
+    AdvectionTVD.get_non_grid_data
+    AdvectionTVD.is_splitting_supported
+    AdvectionTVD.is_regridding_supported
+    AdvectionTVD.is_clipping_supported
+    AdvectionTVD.is_grid_agnostic_package
+    AdvectionTVD.get_regrid_methods
     AdvectionUpstream
+    AdvectionUpstream.write
+    AdvectionUpstream.from_file
+    AdvectionUpstream.to_netcdf
+    AdvectionUpstream.copy
+    AdvectionUpstream.is_empty
+    AdvectionUpstream.get_non_grid_data
+    AdvectionUpstream.is_splitting_supported
+    AdvectionUpstream.is_regridding_supported
+    AdvectionUpstream.is_clipping_supported
+    AdvectionUpstream.is_grid_agnostic_package
+    AdvectionUpstream.get_regrid_methods
     ConstantConcentration
+    ConstantConcentration.write
+    ConstantConcentration.from_file
+    ConstantConcentration.to_netcdf
+    ConstantConcentration.copy
+    ConstantConcentration.is_empty
+    ConstantConcentration.get_non_grid_data
+    ConstantConcentration.is_splitting_supported
+    ConstantConcentration.is_regridding_supported
+    ConstantConcentration.is_clipping_supported
+    ConstantConcentration.is_grid_agnostic_package
+    ConstantConcentration.get_regrid_methods
     Dispersion
+    Dispersion.write
+    Dispersion.from_file
+    Dispersion.to_netcdf
+    Dispersion.copy
+    Dispersion.is_empty
+    Dispersion.get_non_grid_data
+    Dispersion.is_splitting_supported
+    Dispersion.is_regridding_supported
+    Dispersion.is_clipping_supported
+    Dispersion.is_grid_agnostic_package
+    Dispersion.get_regrid_methods
     ImmobileStorageTransfer
+    ImmobileStorageTransfer.write
+    ImmobileStorageTransfer.from_file
+    ImmobileStorageTransfer.to_netcdf
+    ImmobileStorageTransfer.copy
+    ImmobileStorageTransfer.is_empty
+    ImmobileStorageTransfer.get_non_grid_data
+    ImmobileStorageTransfer.is_splitting_supported
+    ImmobileStorageTransfer.is_regridding_supported
+    ImmobileStorageTransfer.is_clipping_supported
+    ImmobileStorageTransfer.is_grid_agnostic_package
+    ImmobileStorageTransfer.get_regrid_methods
     MobileStorageTransfer
+    MobileStorageTransfer.write
+    MobileStorageTransfer.from_file
+    MobileStorageTransfer.to_netcdf
+    MobileStorageTransfer.copy
+    MobileStorageTransfer.is_empty
+    MobileStorageTransfer.get_non_grid_data
+    MobileStorageTransfer.is_splitting_supported
+    MobileStorageTransfer.is_regridding_supported
+    MobileStorageTransfer.is_clipping_supported
+    MobileStorageTransfer.is_grid_agnostic_package
+    MobileStorageTransfer.get_regrid_methods
     MassSourceLoading
+    MassSourceLoading.write
+    MassSourceLoading.from_file
+    MassSourceLoading.to_netcdf
+    MassSourceLoading.copy
+    MassSourceLoading.is_empty
+    MassSourceLoading.get_non_grid_data
+    MassSourceLoading.is_splitting_supported
+    MassSourceLoading.is_regridding_supported
+    MassSourceLoading.is_clipping_supported
+    MassSourceLoading.is_grid_agnostic_package
+    MassSourceLoading.get_regrid_methods
     SourceSinkMixing
     SourceSinkMixing.from_flow_model
+    SourceSinkMixing.write
+    SourceSinkMixing.from_file
+    SourceSinkMixing.to_netcdf
+    SourceSinkMixing.copy
+    SourceSinkMixing.is_empty
+    SourceSinkMixing.get_non_grid_data
+    SourceSinkMixing.is_splitting_supported
+    SourceSinkMixing.is_regridding_supported
+    SourceSinkMixing.is_clipping_supported
+    SourceSinkMixing.is_grid_agnostic_package
+    SourceSinkMixing.get_regrid_methods
 
 
 .. currentmodule:: imod.mf6.regrid
