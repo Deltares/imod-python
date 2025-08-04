@@ -30,3 +30,7 @@ class IPackage(IPackageBase, metaclass=abc.ABCMeta):
     @abstractmethod
     def _is_regridding_supported(self) -> bool:
         raise NotImplementedError
+
+    @abstractmethod
+    def _is_grid_agnostic_package(self) -> bool:
+        raise NotImplementedError

@@ -1189,7 +1189,7 @@ class Modflow6Simulation(collections.UserDict, ISimulation):
 
         original_models = {**flow_models, **transport_models}
         for model_name, model in original_models.items():
-            supported, error_with_object = model.is_splitting_supported()
+            supported, error_with_object = model._is_splitting_supported()
             if not supported:
                 raise ValueError(
                     f"simulation cannot be split due to presence of package '{error_with_object}' in model '{model_name}'"

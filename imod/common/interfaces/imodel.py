@@ -50,7 +50,7 @@ class IModel(IDict):
         raise NotImplementedError
 
     @abstractmethod
-    def is_splitting_supported(self) -> Tuple[bool, str]:
+    def _is_splitting_supported(self) -> Tuple[bool, str]:
         raise NotImplementedError
 
     @abstractmethod

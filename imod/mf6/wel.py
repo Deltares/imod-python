@@ -331,7 +331,7 @@ class GridAgnosticWell(BoundaryCondition, IPointDataPackage, abc.ABC):
         return self.dataset["y"].values
 
     @classmethod
-    def is_grid_agnostic_package(cls) -> bool:
+    def _is_grid_agnostic_package(cls) -> bool:
         """
         Returns True if this package does not depend on a grid, e.g. the
         :class:`imod.mf6.wel.Wel` package.

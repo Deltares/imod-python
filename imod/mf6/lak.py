@@ -1208,7 +1208,7 @@ class Lake(BoundaryCondition):
         f.write(f"end {title}\n")
         return
 
-    def is_splitting_supported(self) -> bool:
+    def _is_splitting_supported(self) -> bool:
         """
         Return True if this package supports splitting.
 

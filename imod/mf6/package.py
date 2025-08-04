@@ -524,7 +524,7 @@ class Package(PackageBase, IPackage, abc.ABC):
         return result
 
     @classmethod
-    def is_grid_agnostic_package(cls) -> bool:
+    def _is_grid_agnostic_package(cls) -> bool:
         """
         Returns True if this package does not depend on a grid, e.g. the
         :class:`imod.mf6.wel.Wel` package.
@@ -598,7 +598,7 @@ class Package(PackageBase, IPackage, abc.ABC):
         settings = self.get_non_grid_data(grid_varnames)
         return cleaned_grids | settings
 
-    def is_splitting_supported(self) -> bool:
+    def _is_splitting_supported(self) -> bool:
         """
         Return True if this package supports splitting.
 
