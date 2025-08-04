@@ -1,10 +1,12 @@
-from copy import deepcopy
 from typing import Optional, cast
 
 import numpy as np
 import xarray as xr
 
 from imod.common.interfaces.iregridpackage import IRegridPackage
+from imod.common.utilities.dataclass_type import (
+    DataclassType,
+)
 from imod.common.utilities.regrid import (
     _regrid_package_data,
 )
@@ -460,7 +462,7 @@ class NodePropertyFlow(Package, IRegridPackage):
         cls,
         imod5_data: dict[str, dict[str, GridDataArray]],
         target_grid: GridDataArray,
-        regridder_types: Optional[NodePropertyFlowRegridMethod] = None,
+        regridder_types: Optional[DataclassType] = None,
         regrid_cache: RegridderWeightsCache = RegridderWeightsCache(),
     ) -> "NodePropertyFlow":
         """
@@ -518,7 +520,7 @@ class NodePropertyFlow(Package, IRegridPackage):
         icelltype = zeros_like(target_grid, dtype=int)
 
         if regridder_types is None:
-            regridder_types = NodePropertyFlow.get_regrid_methods()
+            regridder_types = cls.get_regrid_methods()
 
         new_package_data = _regrid_package_data(
             data, target_grid, regridder_types, regrid_cache, {}
@@ -528,7 +530,3 @@ class NodePropertyFlow(Package, IRegridPackage):
         pkg = cls(**new_package_data, validate=True)
         pkg.dataset.load()  # Force dask dataset into memory
         return pkg
-
-    @classmethod
-    def get_regrid_methods(cls) -> NodePropertyFlowRegridMethod:
-        return deepcopy(cls._regrid_method)

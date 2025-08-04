@@ -1,4 +1,3 @@
-from copy import deepcopy
 from datetime import datetime
 from typing import Optional, Tuple, cast
 
@@ -536,7 +535,3 @@ class River(TopSystemBoundaryCondition, IRegridPackage):
         optional_drn_pkg = cast(Optional[Drainage], optional_drn_pkg)
 
         return (optional_riv_pkg, optional_drn_pkg)
-
-    @classmethod
-    def get_regrid_methods(cls) -> RiverRegridMethod:
-        return deepcopy(cls._regrid_method)

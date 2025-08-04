@@ -1,7 +1,6 @@
 import numpy as np
 
 from imod.common.interfaces.iregridpackage import IRegridPackage
-from imod.common.utilities.dataclass_type import DataclassType, EmptyRegridMethod
 from imod.logging import init_log_decorator, logger
 from imod.mf6 import GroundwaterFlowModel
 from imod.mf6.boundary_condition import BoundaryCondition
@@ -166,7 +165,3 @@ class SourceSinkMixing(BoundaryCondition, IRegridPackage):
             save_flows=save_flows,
             validate=validate,
         )
-
-    @classmethod
-    def get_regrid_methods(cls) -> DataclassType:
-        return EmptyRegridMethod()

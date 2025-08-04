@@ -1,4 +1,3 @@
-from copy import deepcopy
 from datetime import datetime
 from typing import Optional
 
@@ -345,7 +344,3 @@ class Drainage(TopSystemBoundaryCondition, IRegridPackage):
         drn = drn.clip_box(time_min=time_min, time_max=time_max)
 
         return drn
-
-    @classmethod
-    def get_regrid_methods(cls) -> DrainageRegridMethod:
-        return deepcopy(cls._regrid_method)

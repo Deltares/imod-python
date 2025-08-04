@@ -1,4 +1,3 @@
-from copy import deepcopy
 from datetime import datetime
 from typing import Optional
 
@@ -305,7 +304,3 @@ class Recharge(TopSystemBoundaryCondition, IRegridPackage):
         data["rate"] = zero_scalar.where(active)
 
         return cls(**data, validate=True, fixed_cell=False)
-
-    @classmethod
-    def get_regrid_methods(cls) -> RechargeRegridMethod:
-        return deepcopy(cls._regrid_method)

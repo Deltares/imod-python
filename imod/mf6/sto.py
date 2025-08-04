@@ -1,10 +1,12 @@
 import abc
-from copy import deepcopy
 from typing import Any, Dict, Optional
 
 import numpy as np
 
 from imod.common.interfaces.iregridpackage import IRegridPackage
+from imod.common.utilities.dataclass_type import (
+    DataclassType,
+)
 from imod.common.utilities.regrid import _regrid_package_data
 from imod.logging import init_log_decorator
 from imod.mf6.package import Package
@@ -191,10 +193,6 @@ class SpecificStorage(StorageBase):
         d = self._render_dict(directory, pkgname, globaltimes, binary)
         return self._template.render(d)
 
-    @classmethod
-    def get_regrid_methods(cls) -> SpecificStorageRegridMethod:
-        return deepcopy(cls._regrid_method)
-
 
 class StorageCoefficient(StorageBase):
     """
@@ -329,7 +327,7 @@ class StorageCoefficient(StorageBase):
         cls,
         imod5_data: dict[str, dict[str, GridDataArray]],
         target_grid: GridDataArray,
-        regridder_types: Optional[StorageCoefficientRegridMethod] = None,
+        regridder_types: Optional[DataclassType] = None,
         regrid_cache: RegridderWeightsCache = RegridderWeightsCache(),
     ) -> "StorageCoefficient":
         """
@@ -366,7 +364,7 @@ class StorageCoefficient(StorageBase):
         }
 
         if regridder_types is None:
-            regridder_types = StorageCoefficient.get_regrid_methods()
+            regridder_types = cls.get_regrid_methods()
 
         new_package_data = _regrid_package_data(
             data, target_grid, regridder_types, regrid_cache, {}
@@ -379,7 +377,3 @@ class StorageCoefficient(StorageBase):
         new_package_data["specific_yield"] = None
 
         return cls(**new_package_data, validate=True, save_flows=False)
-
-    @classmethod
-    def get_regrid_methods(cls) -> StorageCoefficientRegridMethod:
-        return deepcopy(cls._regrid_method)

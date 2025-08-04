@@ -1,4 +1,3 @@
-from copy import deepcopy
 from datetime import datetime
 from typing import Optional
 
@@ -347,7 +346,3 @@ class GeneralHeadBoundary(TopSystemBoundaryCondition, IRegridPackage):
         # time is forward filled.
         ghb = ghb.clip_box(time_min=time_min, time_max=time_max)
         return ghb
-
-    @classmethod
-    def get_regrid_methods(cls) -> GeneralHeadBoundaryRegridMethod:
-        return deepcopy(cls._regrid_method)
