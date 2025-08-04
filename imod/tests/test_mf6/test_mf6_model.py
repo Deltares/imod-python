@@ -115,7 +115,7 @@ class TestModel:
         model["dis"] = discretization_mock
 
         template_mock = MagicMock(spec_set=Template)
-        template_mock._render.return_value = ""
+        template_mock.render.return_value = ""
         model._template = template_mock
 
         global_times_mock = MagicMock(spec_set=imod.mf6.TimeDiscretization)
@@ -138,7 +138,7 @@ class TestModel:
         write_context = WriteContext(tmp_path)
 
         template_mock = MagicMock(spec_set=Template)
-        template_mock._render.return_value = ""
+        template_mock.render.return_value = ""
         model._template = template_mock
 
         global_times_mock = MagicMock(spec_set=imod.mf6.TimeDiscretization)
@@ -169,7 +169,7 @@ class TestModel:
         model["dis"] = discretization_mock
 
         template_mock = MagicMock(spec_set=Template)
-        template_mock._render.return_value = ""
+        template_mock.render.return_value = ""
         model._template = template_mock
 
         global_times_mock = MagicMock(spec_set=imod.mf6.TimeDiscretization)
@@ -207,7 +207,7 @@ class TestModel:
         model["test_package"] = package_mock
 
         template_mock = MagicMock(spec_set=Template)
-        template_mock._render.return_value = ""
+        template_mock.render.return_value = ""
         model._template = template_mock
 
         global_times_mock = MagicMock(spec_set=imod.mf6.TimeDiscretization)
