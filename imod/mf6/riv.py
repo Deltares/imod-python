@@ -10,12 +10,12 @@ from imod.common.utilities.dataclass_type import DataclassType
 from imod.common.utilities.mask import broadcast_and_mask_arrays
 from imod.logging import init_log_decorator, standard_log_decorator
 from imod.mf6.aggregate.aggregate_schemes import RiverAggregationMethod
-from imod.mf6.boundary_condition import BoundaryCondition
 from imod.mf6.dis import StructuredDiscretization
 from imod.mf6.disv import VerticesDiscretization
 from imod.mf6.drn import Drainage
 from imod.mf6.npf import NodePropertyFlow
 from imod.mf6.regrid.regrid_schemes import RiverRegridMethod
+from imod.mf6.topsystem import TopSystemBoundaryCondition
 from imod.mf6.utilities.imod5_converter import regrid_imod5_pkg_data
 from imod.mf6.utilities.package import set_repeat_stress_if_available
 from imod.mf6.validation import BOUNDARY_DIMS_SCHEMA, CONC_DIMS_SCHEMA
@@ -52,8 +52,8 @@ from imod.util.regrid import (
 
 
 def mask_package__drop_if_empty(
-    package: BoundaryCondition,
-) -> Optional[BoundaryCondition]:
+    package: TopSystemBoundaryCondition,
+) -> Optional[TopSystemBoundaryCondition]:
     """ "
     Create an optional package from a package if it has data. Return None if
     package is inactive everywhere.
@@ -64,10 +64,10 @@ def mask_package__drop_if_empty(
 
 
 def clip_time_if_package(
-    package: Optional[BoundaryCondition],
+    package: Optional[TopSystemBoundaryCondition],
     time_min: datetime,
     time_max: datetime,
-) -> Optional[BoundaryCondition]:
+) -> Optional[TopSystemBoundaryCondition]:
     if package is not None:
         package = package.clip_box(time_min=time_min, time_max=time_max)
     return package
@@ -145,7 +145,7 @@ def _create_drain_from_leftover_riv_imod5_data(
     return Drainage(**drain_leftover_data)  # type: ignore[arg-type]
 
 
-class River(BoundaryCondition, IRegridPackage):
+class River(TopSystemBoundaryCondition, IRegridPackage):
     """
     River package.
     Any number of RIV Packages can be specified for a single groundwater flow
@@ -253,7 +253,7 @@ class River(BoundaryCondition, IRegridPackage):
         "concentration": [IdentityNoDataSchema("stage"), AllValueSchema(">=", 0.0)],
     }
 
-    _template = BoundaryCondition._initialize_template(_pkg_id)
+    _template = TopSystemBoundaryCondition._initialize_template(_pkg_id)
     _auxiliary_data = {"concentration": "species"}
     _regrid_method = RiverRegridMethod()
     _aggregate_method: DataclassType = RiverAggregationMethod()
@@ -311,7 +311,7 @@ class River(BoundaryCondition, IRegridPackage):
         super().__init__(cleaned_dict)
 
     @classmethod
-    def allocate_and_distribute_planar_data(
+    def _allocate_and_distribute_planar_data(
         cls,
         planar_data: GridDataDict,
         dis: StructuredDiscretization | VerticesDiscretization,
@@ -494,7 +494,7 @@ class River(BoundaryCondition, IRegridPackage):
         if is_planar_xy:
             # allocate and distribute planar data
             allocation_riv_data, allocation_drn_data = (
-                cls.allocate_and_distribute_planar_data(
+                cls._allocate_and_distribute_planar_data(
                     regridded_riv_pkg_data,
                     target_dis,
                     target_npf,

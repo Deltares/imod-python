@@ -122,17 +122,6 @@ def test_wrong_dtype(head):
         )
 
 
-def test_aggregate__raises(head):
-    # Arrange
-    chd = imod.mf6.ConstantHead(head)
-
-    with pytest.raises(TypeError):
-        chd.aggregate_layers()
-
-
-pytest.mark.usefixtures("head_fc", "concentration_fc")
-
-
 def test_render_concentration(head_fc, concentration_fc):
     directory = pathlib.Path("mymodel")
     globaltimes = np.array(
