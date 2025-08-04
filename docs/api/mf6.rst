@@ -232,7 +232,6 @@ Flow Packages
     Drainage.get_regrid_methods
     Drainage.get_period_varnames
     Drainage.aggregate_layers
-    Drainage.get_aggregate_methods
     Drainage.reallocate
     Evapotranspiration
     Evapotranspiration.mask
@@ -269,7 +268,6 @@ Flow Packages
     GeneralHeadBoundary.get_regrid_methods
     GeneralHeadBoundary.get_period_varnames
     GeneralHeadBoundary.aggregate_layers
-    GeneralHeadBoundary.get_aggregate_methods
     GeneralHeadBoundary.reallocate
     HorizontalFlowBarrierHydraulicCharacteristic
     HorizontalFlowBarrierHydraulicCharacteristic.clip_box
@@ -386,7 +384,6 @@ Flow Packages
     Recharge.get_regrid_methods
     Recharge.get_period_varnames
     Recharge.aggregate_layers
-    Recharge.get_aggregate_methods
     Recharge.reallocate
     River
     River.from_imod5_data
@@ -407,7 +404,6 @@ Flow Packages
     River.get_regrid_methods
     River.get_period_varnames
     River.aggregate_layers
-    River.get_aggregate_methods
     River.reallocate
     SingleLayerHorizontalFlowBarrierHydraulicCharacteristic
     SingleLayerHorizontalFlowBarrierHydraulicCharacteristic.to_mf6_pkg

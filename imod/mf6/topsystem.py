@@ -138,7 +138,16 @@ class TopSystemBoundaryCondition(BoundaryCondition, abc.ABC):
         )
 
     @classmethod
-    def get_aggregate_methods(cls) -> DataclassType:
+    def _get_aggregate_methods(cls) -> DataclassType:
+        """
+        Returns the aggregation methods used for aggregating data over layers
+        into planar data.
+
+        Returns
+        -------
+        DataclassType
+            The aggregation methods used for the package.
+        """
         return deepcopy(cls._aggregate_method)
 
     @classmethod
@@ -152,7 +161,7 @@ class TopSystemBoundaryCondition(BoundaryCondition, abc.ABC):
             Dict of aggregated data arrays, where the keys are the variable
             names and the values are aggregated across the "layer" dimension.
         """
-        aggr_methods = cls.get_aggregate_methods()
+        aggr_methods = cls._get_aggregate_methods()
         if isinstance(aggr_methods, EmptyAggregationMethod):
             raise TypeError(
                 f"Aggregation methods for {cls._pkg_id} package are not defined."
