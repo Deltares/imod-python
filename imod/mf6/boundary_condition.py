@@ -299,7 +299,7 @@ class BoundaryCondition(Package, abc.ABC):
         list[str]
             List of variable names that are used for transient data in this
             package.
-        
+
         Examples
         --------
         To get the variable names for transient data in a package, e.g. a River
