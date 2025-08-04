@@ -605,7 +605,7 @@ class Modflow6Model(collections.UserDict, IModel, abc.ABC):
         y_max: optional, float
         state_for_boundary: optional, float
         """
-        supported, error_with_object = self.is_clipping_supported()
+        supported, error_with_object = self._is_clipping_supported()
         if not supported:
             raise ValueError(
                 f"model cannot be clipped due to presence of package '{error_with_object}' in model"
@@ -824,7 +824,7 @@ class Modflow6Model(collections.UserDict, IModel, abc.ABC):
                 return False, package_name
         return True, ""
 
-    def is_regridding_supported(self) -> Tuple[bool, str]:
+    def _is_regridding_supported(self) -> Tuple[bool, str]:
         """
         Returns True if all the packages in the model supports regridding. If one
         of the packages in the model does not support regridding, it returns the
@@ -839,11 +839,11 @@ class Modflow6Model(collections.UserDict, IModel, abc.ABC):
             support regridding.
         """
         for package_name, package in self.items():
-            if not package.is_regridding_supported():
+            if not package._is_regridding_supported():
                 return False, package_name
         return True, ""
 
-    def is_clipping_supported(self) -> Tuple[bool, str]:
+    def _is_clipping_supported(self) -> Tuple[bool, str]:
         """
         Returns True if all the packages in the model supports clipping. If one
         of the packages in the model does not support clipping, it returns the
@@ -858,6 +858,6 @@ class Modflow6Model(collections.UserDict, IModel, abc.ABC):
             support clipping.
         """
         for package_name, package in self.items():
-            if not package.is_clipping_supported():
+            if not package._is_clipping_supported():
                 return False, package_name
         return True, ""

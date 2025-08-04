@@ -421,7 +421,7 @@ class Package(PackageBase, IPackage, abc.ABC):
         -------
         clipped: Package
         """
-        if not self.is_clipping_supported():
+        if not self._is_clipping_supported():
             raise ValueError("this package does not support clipping.")
 
         selection = self.dataset
@@ -609,7 +609,7 @@ class Package(PackageBase, IPackage, abc.ABC):
         """
         return True
 
-    def is_regridding_supported(self) -> bool:
+    def _is_regridding_supported(self) -> bool:
         """
         Return True if this package supports regridding.
 
@@ -620,7 +620,7 @@ class Package(PackageBase, IPackage, abc.ABC):
         """
         return True
 
-    def is_clipping_supported(self) -> bool:
+    def _is_clipping_supported(self) -> bool:
         """
         Return True if this package supports clipping.
 

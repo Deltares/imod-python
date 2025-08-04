@@ -297,7 +297,7 @@ def _regrid_like(
     data-arrays regridded to another discretization, similar to the one used in
     input argument "target_grid"
     """
-    supported, error_with_object_name = model.is_regridding_supported()
+    supported, error_with_object_name = model._is_regridding_supported()
     if not supported:
         raise ValueError(
             f"regridding this model cannot be done due to the presence of package {error_with_object_name}"
@@ -376,7 +376,7 @@ def _regrid_like(
 
     models = simulation.get_models()
     for model_name, model in models.items():
-        supported, error_with_object_name = model.is_regridding_supported()
+        supported, error_with_object_name = model._is_regridding_supported()
         if not supported:
             raise ValueError(
                 f"Unable to regrid simulation, due to the presence of package '{error_with_object_name}' in model {model_name} "

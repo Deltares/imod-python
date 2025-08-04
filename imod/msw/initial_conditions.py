@@ -111,8 +111,8 @@ class InitialConditionsSavedState(MetaSwapPackage):
 
         shutil.copyfile(self.saved_state, filename)
 
-    def is_regridding_supported(self) -> bool:
+    def _is_regridding_supported(self) -> bool:
         return False
 
-    def is_clipping_supported(self) -> bool:
+    def _is_clipping_supported(self) -> bool:
         return False

@@ -1219,7 +1219,7 @@ class Lake(BoundaryCondition):
         """
         return False
 
-    def is_regridding_supported(self) -> bool:
+    def _is_regridding_supported(self) -> bool:
         """
         Return True if this package supports regridding.
 
@@ -1230,7 +1230,7 @@ class Lake(BoundaryCondition):
         """
         return False
 
-    def is_clipping_supported(self) -> bool:
+    def _is_clipping_supported(self) -> bool:
         """
         Return True if this package supports clipping.
 

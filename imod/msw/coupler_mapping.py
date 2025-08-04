@@ -145,5 +145,5 @@ class CouplerMapping(MetaSwapPackage):
 
         return {"mod_id": well_mod_id_1d, "svat": well_svat_1d, "layer": layer_1d}
 
-    def is_regridding_supported(self) -> bool:
+    def _is_regridding_supported(self) -> bool:
         return False

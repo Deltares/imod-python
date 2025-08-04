@@ -46,7 +46,7 @@ class IModel(IDict):
         raise NotImplementedError
 
     @abstractmethod
-    def is_regridding_supported(self) -> Tuple[bool, str]:
+    def _is_regridding_supported(self) -> Tuple[bool, str]:
         raise NotImplementedError
 
     @abstractmethod
@@ -54,5 +54,5 @@ class IModel(IDict):
         raise NotImplementedError
 
     @abstractmethod
-    def is_clipping_supported(self) -> Tuple[bool, str]:
+    def _is_clipping_supported(self) -> Tuple[bool, str]:
         raise NotImplementedError

@@ -205,7 +205,7 @@ class MetaSwapPackage(abc.ABC):
     def auxiliary_data_fields(self) -> dict[str, str]:
         return {}
 
-    def is_regridding_supported(self) -> bool:
+    def _is_regridding_supported(self) -> bool:
         return True
 
     def regrid_like(
@@ -256,7 +256,7 @@ class MetaSwapPackage(abc.ABC):
         -------
         clipped: Package
         """
-        if not self.is_clipping_supported():
+        if not self._is_clipping_supported():
             raise ValueError("this package does not support clipping.")
 
         selection = self.dataset
@@ -278,5 +278,5 @@ class MetaSwapPackage(abc.ABC):
     def from_imod5_data(self, *args, **kwargs):
         raise NotImplementedError("Method not implemented for this package.")
 
-    def is_clipping_supported(self) -> bool:
+    def _is_clipping_supported(self) -> bool:
         return True

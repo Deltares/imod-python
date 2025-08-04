@@ -323,7 +323,7 @@ class MetaSwapModel(Model):
             if isinstance(msw_package, CouplerMapping):
                 # there can be only one couplermapping
                 mod2svat_name = pkgname
-            elif msw_package.is_regridding_supported():
+            elif msw_package._is_regridding_supported():
                 regridded_package = msw_package.regrid_like(
                     target_grid, regrid_context, regridder_types
                 )
