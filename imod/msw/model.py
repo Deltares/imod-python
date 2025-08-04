@@ -2,7 +2,7 @@ import collections
 from copy import copy, deepcopy
 from datetime import datetime
 from pathlib import Path
-from typing import Any, Optional, Tuple, Union, cast
+from typing import Any, Optional, Union, cast
 
 import cftime
 import jinja2
@@ -43,7 +43,7 @@ from imod.msw.utilities.parse import read_para_sim
 from imod.msw.vegetation import AnnualCropFactors
 from imod.typing import Imod5DataDict
 from imod.util.dims import drop_layer_dim_cap_data
-from imod.util.regrid import RegridderType, RegridderWeightsCache
+from imod.util.regrid import RegridderWeightsCache
 
 REQUIRED_PACKAGES = (
     GridData,
