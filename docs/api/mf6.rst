@@ -246,10 +246,6 @@ Flow Packages
     LayeredWell.to_netcdf
     LayeredWell.copy
     LayeredWell.is_empty
-    LayeredWell.is_splitting_supported
-    LayeredWell.is_regridding_supported
-    LayeredWell.is_clipping_supported
-    LayeredWell.is_grid_agnostic_package
     LayeredWell.get_regrid_methods
     InitialConditions
     InitialConditions.from_imod5_data
