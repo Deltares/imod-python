@@ -281,7 +281,7 @@ def test_partitioning_dis_origins(
         y = pkg.dataset["idomain"].coords["y"]
         _, xmin, _ = imod.util.spatial.coord_reference(x)
         _, ymin, _ = imod.util.spatial.coord_reference(y)
-        actual = pkg.render(tmp_path, "dis", None, True)
+        actual = pkg._render(tmp_path, "dis", None, True)
         expected = textwrap.dedent(
             f"""\
             begin options

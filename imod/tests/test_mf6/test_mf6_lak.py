@@ -27,7 +27,7 @@ def test_alternative_constructor(naardermeer, ijsselmeer):
 
 
 def test_lake_render(lake_package):
-    actual = lake_package.render(None, None, None, False)
+    actual = lake_package._render(None, None, None, False)
     expected = textwrap.dedent(
         """\
         begin options

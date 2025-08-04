@@ -18,7 +18,7 @@ from imod.typing.grid import ones_like
 def test_dis_render(twri_model, tmp_path):
     simulation = twri_model
     dis = simulation["GWF_1"]["dis"]
-    actual = dis.render(
+    actual = dis._render(
         directory=tmp_path,
         pkgname="dis",
         globaltimes=None,
@@ -67,7 +67,7 @@ def test_chd_render(twri_model, tmp_path):
     simulation = twri_model
     globaltimes = simulation["time_discretization"]["time"].values
     chd = simulation["GWF_1"]["chd"]
-    actual = chd.render(
+    actual = chd._render(
         directory=tmp_path,
         pkgname="chd",
         globaltimes=globaltimes,
@@ -103,7 +103,7 @@ def test_drn_render(twri_model, tmp_path):
     simulation = twri_model
     globaltimes = simulation["time_discretization"]["time"].values
     drn = simulation["GWF_1"]["drn"]
-    actual = drn.render(
+    actual = drn._render(
         directory=tmp_path,
         pkgname="drn",
         globaltimes=globaltimes,
@@ -138,7 +138,7 @@ def test_drn_render(twri_model, tmp_path):
 def test_ic_render(twri_model, tmp_path):
     simulation = twri_model
     ic = simulation["GWF_1"]["ic"]
-    actual = ic.render(
+    actual = ic._render(
         directory=tmp_path,
         pkgname="ic",
         globaltimes=None,
@@ -164,7 +164,7 @@ def test_ic_render(twri_model, tmp_path):
 def test_npf_render(twri_model, tmp_path):
     simulation = twri_model
     npf = simulation["GWF_1"]["npf"]
-    actual = npf.render(
+    actual = npf._render(
         directory=tmp_path, pkgname="npf", globaltimes=None, binary=True
     )
     expected = textwrap.dedent(
@@ -204,7 +204,7 @@ def test_oc_render(twri_model, tmp_path):
 
     # An absolute path should be maintained in the fileout entries!
     path = tmp_path.as_posix()
-    actual = oc.render(
+    actual = oc._render(
         directory=tmp_path, pkgname="oc", globaltimes=globaltimes, binary=True
     )
     expected = textwrap.dedent(
@@ -223,7 +223,7 @@ def test_oc_render(twri_model, tmp_path):
     assert actual == expected
 
     path = Path(tmp_path.stem)
-    actual = oc.render(
+    actual = oc._render(
         directory=path, pkgname="oc", globaltimes=globaltimes, binary=True
     )
     expected = textwrap.dedent(
@@ -246,7 +246,7 @@ def test_rch_render(twri_model, tmp_path):
     simulation = twri_model
     globaltimes = simulation["time_discretization"]["time"].values
     rch = simulation["GWF_1"]["rch"]
-    actual = rch.render(
+    actual = rch._render(
         directory=tmp_path,
         pkgname="rch",
         globaltimes=globaltimes,
@@ -310,7 +310,7 @@ def test_wel_render(twri_model, tmp_path):
 def test_solver_render(twri_model, tmp_path):
     simulation = twri_model
     solver = simulation["solver"]
-    actual = solver.render(
+    actual = solver._render(
         directory=tmp_path,
         pkgname="solver",
         globaltimes=None,
@@ -349,7 +349,7 @@ def test_gwfmodel_render(twri_model, tmp_path):
     path = Path(tmp_path.stem).as_posix()
     validation_context = ValidationSettings(tmp_path)
     write_context = WriteContext(tmp_path)
-    actual = gwfmodel.render(path, write_context)
+    actual = gwfmodel._render(path, write_context)
     expected = textwrap.dedent(
         f"""\
             begin options
@@ -378,7 +378,7 @@ def test_gwfmodel_render(twri_model, tmp_path):
 def test_simulation_render(twri_model):
     simulation = twri_model
     write_context = WriteContext(".")
-    actual = simulation.render(write_context)
+    actual = simulation._render(write_context)
 
     expected = textwrap.dedent(
         """\
