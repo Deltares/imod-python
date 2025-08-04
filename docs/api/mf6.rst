@@ -49,9 +49,6 @@ Model objects & methods
     GroundwaterFlowModel.clip_box
     GroundwaterFlowModel.from_file
     GroundwaterFlowModel.purge_empty_packages
-    GroundwaterFlowModel.is_splitting_supported
-    GroundwaterFlowModel.is_regridding_supported
-    GroundwaterFlowModel.is_clipping_supported
     GroundwaterFlowModel.is_use_newton
     GroundwaterFlowModel.validate
     GroundwaterFlowModel.set_newton
@@ -63,9 +60,6 @@ Model objects & methods
     GroundwaterTransportModel.regrid_like
     GroundwaterTransportModel.from_file
     GroundwaterTransportModel.purge_empty_packages
-    GroundwaterTransportModel.is_splitting_supported
-    GroundwaterTransportModel.is_regridding_supported
-    GroundwaterTransportModel.is_clipping_supported
     GroundwaterTransportModel.validate
     GroundwaterTransportModel.is_use_newton
     GroundwaterTransportModel.write
@@ -87,10 +81,6 @@ Discretization
     StructuredDiscretization.mask
     StructuredDiscretization.is_empty
     StructuredDiscretization.get_non_grid_data
-    StructuredDiscretization.is_grid_agnostic_package
-    StructuredDiscretization.is_splitting_supported
-    StructuredDiscretization.is_regridding_supported
-    StructuredDiscretization.is_clipping_supported
     StructuredDiscretization.write
     VerticesDiscretization
     VerticesDiscretization.get_regrid_methods
@@ -102,10 +92,6 @@ Discretization
     VerticesDiscretization.mask
     VerticesDiscretization.is_empty
     VerticesDiscretization.get_non_grid_data
-    VerticesDiscretization.is_grid_agnostic_package
-    VerticesDiscretization.is_splitting_supported
-    VerticesDiscretization.is_regridding_supported
-    VerticesDiscretization.is_clipping_supported
     VerticesDiscretization.write
     TimeDiscretization
     TimeDiscretization.write
@@ -117,10 +103,6 @@ Discretization
     TimeDiscretization.regrid_like
     TimeDiscretization.is_empty
     TimeDiscretization.get_non_grid_data
-    TimeDiscretization.is_splitting_supported
-    TimeDiscretization.is_regridding_supported
-    TimeDiscretization.is_clipping_supported
-    TimeDiscretization.is_grid_agnostic_package
     TimeDiscretization.get_regrid_methods
 
 Model settings
@@ -140,10 +122,6 @@ Model settings
     OutputControl.regrid_like
     OutputControl.is_empty
     OutputControl.get_non_grid_data
-    OutputControl.is_splitting_supported
-    OutputControl.is_regridding_supported
-    OutputControl.is_clipping_supported
-    OutputControl.is_grid_agnostic_package
     OutputControl.get_regrid_methods
     Solution
     Solution.write
@@ -155,10 +133,6 @@ Model settings
     Solution.regrid_like
     Solution.is_empty
     Solution.get_non_grid_data
-    Solution.is_splitting_supported
-    Solution.is_regridding_supported
-    Solution.is_clipping_supported
-    Solution.is_grid_agnostic_package
     Solution.get_regrid_methods
     SolutionPresetSimple
     SolutionPresetModerate
@@ -178,10 +152,6 @@ Flow Packages
     ApiPackage.copy
     ApiPackage.is_empty
     ApiPackage.get_non_grid_data
-    ApiPackage.is_splitting_supported
-    ApiPackage.is_regridding_supported
-    ApiPackage.is_clipping_supported
-    ApiPackage.is_grid_agnostic_package
     ApiPackage.get_regrid_methods
     Buoyancy
     Buoyancy.write
@@ -190,10 +160,6 @@ Flow Packages
     Buoyancy.copy
     Buoyancy.is_empty
     Buoyancy.get_non_grid_data
-    Buoyancy.is_splitting_supported
-    Buoyancy.is_regridding_supported
-    Buoyancy.is_clipping_supported
-    Buoyancy.is_grid_agnostic_package
     Buoyancy.get_regrid_methods
     ConstantHead
     ConstantHead.from_imod5_data
@@ -207,10 +173,6 @@ Flow Packages
     ConstantHead.copy
     ConstantHead.is_empty
     ConstantHead.get_non_grid_data
-    ConstantHead.is_splitting_supported
-    ConstantHead.is_regridding_supported
-    ConstantHead.is_clipping_supported
-    ConstantHead.is_grid_agnostic_package
     ConstantHead.get_regrid_methods
     ConstantHead.get_period_varnames
     Drainage
@@ -225,10 +187,6 @@ Flow Packages
     Drainage.copy
     Drainage.is_empty
     Drainage.get_non_grid_data
-    Drainage.is_splitting_supported
-    Drainage.is_regridding_supported
-    Drainage.is_clipping_supported
-    Drainage.is_grid_agnostic_package
     Drainage.get_regrid_methods
     Drainage.get_period_varnames
     Drainage.aggregate_layers
@@ -243,10 +201,6 @@ Flow Packages
     Evapotranspiration.copy
     Evapotranspiration.is_empty
     Evapotranspiration.get_non_grid_data
-    Evapotranspiration.is_splitting_supported
-    Evapotranspiration.is_regridding_supported
-    Evapotranspiration.is_clipping_supported
-    Evapotranspiration.is_grid_agnostic_package
     Evapotranspiration.get_regrid_methods
     Evapotranspiration.get_period_varnames
     GeneralHeadBoundary
@@ -261,10 +215,6 @@ Flow Packages
     GeneralHeadBoundary.copy
     GeneralHeadBoundary.is_empty
     GeneralHeadBoundary.get_non_grid_data
-    GeneralHeadBoundary.is_splitting_supported
-    GeneralHeadBoundary.is_regridding_supported
-    GeneralHeadBoundary.is_clipping_supported
-    GeneralHeadBoundary.is_grid_agnostic_package
     GeneralHeadBoundary.get_regrid_methods
     GeneralHeadBoundary.get_period_varnames
     GeneralHeadBoundary.aggregate_layers
@@ -279,10 +229,6 @@ Flow Packages
     HorizontalFlowBarrierHydraulicCharacteristic.copy
     HorizontalFlowBarrierHydraulicCharacteristic.is_empty
     HorizontalFlowBarrierHydraulicCharacteristic.get_non_grid_data
-    HorizontalFlowBarrierHydraulicCharacteristic.is_splitting_supported
-    HorizontalFlowBarrierHydraulicCharacteristic.is_regridding_supported
-    HorizontalFlowBarrierHydraulicCharacteristic.is_clipping_supported
-    HorizontalFlowBarrierHydraulicCharacteristic.is_grid_agnostic_package
     HorizontalFlowBarrierHydraulicCharacteristic.get_regrid_methods
     HorizontalFlowBarrierMultiplier
     HorizontalFlowBarrierMultiplier.clip_box
@@ -294,10 +240,6 @@ Flow Packages
     HorizontalFlowBarrierMultiplier.copy
     HorizontalFlowBarrierMultiplier.is_empty
     HorizontalFlowBarrierMultiplier.get_non_grid_data
-    HorizontalFlowBarrierMultiplier.is_splitting_supported
-    HorizontalFlowBarrierMultiplier.is_regridding_supported
-    HorizontalFlowBarrierMultiplier.is_clipping_supported
-    HorizontalFlowBarrierMultiplier.is_grid_agnostic_package
     HorizontalFlowBarrierMultiplier.get_regrid_methods
     HorizontalFlowBarrierResistance
     HorizontalFlowBarrierResistance.to_mf6_pkg
@@ -309,10 +251,6 @@ Flow Packages
     HorizontalFlowBarrierResistance.copy
     HorizontalFlowBarrierResistance.is_empty
     HorizontalFlowBarrierResistance.get_non_grid_data
-    HorizontalFlowBarrierResistance.is_splitting_supported
-    HorizontalFlowBarrierResistance.is_regridding_supported
-    HorizontalFlowBarrierResistance.is_clipping_supported
-    HorizontalFlowBarrierResistance.is_grid_agnostic_package
     HorizontalFlowBarrierResistance.get_regrid_methods
     LayeredWell
     LayeredWell.from_imod5_data
@@ -344,10 +282,6 @@ Flow Packages
     InitialConditions.copy
     InitialConditions.is_empty
     InitialConditions.get_non_grid_data
-    InitialConditions.is_splitting_supported
-    InitialConditions.is_regridding_supported
-    InitialConditions.is_clipping_supported
-    InitialConditions.is_grid_agnostic_package
     InitialConditions.get_regrid_methods
     NodePropertyFlow
     NodePropertyFlow.from_imod5_data
@@ -360,10 +294,6 @@ Flow Packages
     NodePropertyFlow.copy
     NodePropertyFlow.is_empty
     NodePropertyFlow.get_non_grid_data
-    NodePropertyFlow.is_splitting_supported
-    NodePropertyFlow.is_regridding_supported
-    NodePropertyFlow.is_clipping_supported
-    NodePropertyFlow.is_grid_agnostic_package
     NodePropertyFlow.get_regrid_methods
     Recharge
     Recharge.from_imod5_data
@@ -377,10 +307,6 @@ Flow Packages
     Recharge.copy
     Recharge.is_empty
     Recharge.get_non_grid_data
-    Recharge.is_splitting_supported
-    Recharge.is_regridding_supported
-    Recharge.is_clipping_supported
-    Recharge.is_grid_agnostic_package
     Recharge.get_regrid_methods
     Recharge.get_period_varnames
     Recharge.aggregate_layers
@@ -397,10 +323,6 @@ Flow Packages
     River.copy
     River.is_empty
     River.get_non_grid_data
-    River.is_splitting_supported
-    River.is_regridding_supported
-    River.is_clipping_supported
-    River.is_grid_agnostic_package
     River.get_regrid_methods
     River.get_period_varnames
     River.aggregate_layers
@@ -415,10 +337,6 @@ Flow Packages
     SingleLayerHorizontalFlowBarrierHydraulicCharacteristic.copy
     SingleLayerHorizontalFlowBarrierHydraulicCharacteristic.is_empty
     SingleLayerHorizontalFlowBarrierHydraulicCharacteristic.get_non_grid_data
-    SingleLayerHorizontalFlowBarrierHydraulicCharacteristic.is_splitting_supported
-    SingleLayerHorizontalFlowBarrierHydraulicCharacteristic.is_regridding_supported
-    SingleLayerHorizontalFlowBarrierHydraulicCharacteristic.is_clipping_supported
-    SingleLayerHorizontalFlowBarrierHydraulicCharacteristic.is_grid_agnostic_package
     SingleLayerHorizontalFlowBarrierHydraulicCharacteristic.get_regrid_methods
     SingleLayerHorizontalFlowBarrierMultiplier
     SingleLayerHorizontalFlowBarrierMultiplier.to_mf6_pkg
@@ -430,10 +348,6 @@ Flow Packages
     SingleLayerHorizontalFlowBarrierMultiplier.copy
     SingleLayerHorizontalFlowBarrierMultiplier.is_empty
     SingleLayerHorizontalFlowBarrierMultiplier.get_non_grid_data
-    SingleLayerHorizontalFlowBarrierMultiplier.is_splitting_supported
-    SingleLayerHorizontalFlowBarrierMultiplier.is_regridding_supported
-    SingleLayerHorizontalFlowBarrierMultiplier.is_clipping_supported
-    SingleLayerHorizontalFlowBarrierMultiplier.is_grid_agnostic_package
     SingleLayerHorizontalFlowBarrierMultiplier.get_regrid_methods
     SingleLayerHorizontalFlowBarrierResistance
     SingleLayerHorizontalFlowBarrierResistance.from_imod5_data
@@ -446,10 +360,6 @@ Flow Packages
     SingleLayerHorizontalFlowBarrierResistance.copy
     SingleLayerHorizontalFlowBarrierResistance.is_empty
     SingleLayerHorizontalFlowBarrierResistance.get_non_grid_data
-    SingleLayerHorizontalFlowBarrierResistance.is_splitting_supported
-    SingleLayerHorizontalFlowBarrierResistance.is_regridding_supported
-    SingleLayerHorizontalFlowBarrierResistance.is_clipping_supported
-    SingleLayerHorizontalFlowBarrierResistance.is_grid_agnostic_package
     SingleLayerHorizontalFlowBarrierResistance.get_regrid_methods
     SpecificStorage
     SpecificStorage.mask
@@ -461,10 +371,6 @@ Flow Packages
     SpecificStorage.copy
     SpecificStorage.is_empty
     SpecificStorage.get_non_grid_data
-    SpecificStorage.is_splitting_supported
-    SpecificStorage.is_regridding_supported
-    SpecificStorage.is_clipping_supported
-    SpecificStorage.is_grid_agnostic_package
     SpecificStorage.get_regrid_methods
     StorageCoefficient
     StorageCoefficient.from_imod5_data
@@ -477,10 +383,6 @@ Flow Packages
     StorageCoefficient.copy
     StorageCoefficient.is_empty
     StorageCoefficient.get_non_grid_data
-    StorageCoefficient.is_splitting_supported
-    StorageCoefficient.is_regridding_supported
-    StorageCoefficient.is_clipping_supported
-    StorageCoefficient.is_grid_agnostic_package
     StorageCoefficient.get_regrid_methods
     UnsaturatedZoneFlow
     UnsaturatedZoneFlow.clip_box
@@ -492,10 +394,6 @@ Flow Packages
     UnsaturatedZoneFlow.copy
     UnsaturatedZoneFlow.is_empty
     UnsaturatedZoneFlow.get_non_grid_data
-    UnsaturatedZoneFlow.is_splitting_supported
-    UnsaturatedZoneFlow.is_regridding_supported
-    UnsaturatedZoneFlow.is_clipping_supported
-    UnsaturatedZoneFlow.is_grid_agnostic_package
     UnsaturatedZoneFlow.get_regrid_methods
     UnsaturatedZoneFlow.get_period_varnames
     Well
@@ -511,10 +409,6 @@ Flow Packages
     Well.copy
     Well.is_empty
     Well.get_non_grid_data
-    Well.is_splitting_supported
-    Well.is_regridding_supported
-    Well.is_clipping_supported
-    Well.is_grid_agnostic_package
     Well.get_regrid_methods
     Well.get_period_varnames
 
@@ -532,10 +426,6 @@ Transport Packages
     ApiPackage.copy
     ApiPackage.is_empty
     ApiPackage.get_non_grid_data
-    ApiPackage.is_splitting_supported
-    ApiPackage.is_regridding_supported
-    ApiPackage.is_clipping_supported
-    ApiPackage.is_grid_agnostic_package
     ApiPackage.get_regrid_methods
     AdvectionCentral
     AdvectionCentral.write
@@ -544,10 +434,6 @@ Transport Packages
     AdvectionCentral.copy
     AdvectionCentral.is_empty
     AdvectionCentral.get_non_grid_data
-    AdvectionCentral.is_splitting_supported
-    AdvectionCentral.is_regridding_supported
-    AdvectionCentral.is_clipping_supported
-    AdvectionCentral.is_grid_agnostic_package
     AdvectionCentral.get_regrid_methods
     AdvectionTVD
     AdvectionTVD.write
@@ -556,10 +442,6 @@ Transport Packages
     AdvectionTVD.copy
     AdvectionTVD.is_empty
     AdvectionTVD.get_non_grid_data
-    AdvectionTVD.is_splitting_supported
-    AdvectionTVD.is_regridding_supported
-    AdvectionTVD.is_clipping_supported
-    AdvectionTVD.is_grid_agnostic_package
     AdvectionTVD.get_regrid_methods
     AdvectionUpstream
     AdvectionUpstream.write
@@ -568,10 +450,6 @@ Transport Packages
     AdvectionUpstream.copy
     AdvectionUpstream.is_empty
     AdvectionUpstream.get_non_grid_data
-    AdvectionUpstream.is_splitting_supported
-    AdvectionUpstream.is_regridding_supported
-    AdvectionUpstream.is_clipping_supported
-    AdvectionUpstream.is_grid_agnostic_package
     AdvectionUpstream.get_regrid_methods
     ConstantConcentration
     ConstantConcentration.write
@@ -580,10 +458,6 @@ Transport Packages
     ConstantConcentration.copy
     ConstantConcentration.is_empty
     ConstantConcentration.get_non_grid_data
-    ConstantConcentration.is_splitting_supported
-    ConstantConcentration.is_regridding_supported
-    ConstantConcentration.is_clipping_supported
-    ConstantConcentration.is_grid_agnostic_package
     ConstantConcentration.get_regrid_methods
     ConstantConcentration.get_period_varnames
     Dispersion
@@ -593,10 +467,6 @@ Transport Packages
     Dispersion.copy
     Dispersion.is_empty
     Dispersion.get_non_grid_data
-    Dispersion.is_splitting_supported
-    Dispersion.is_regridding_supported
-    Dispersion.is_clipping_supported
-    Dispersion.is_grid_agnostic_package
     Dispersion.get_regrid_methods
     ImmobileStorageTransfer
     ImmobileStorageTransfer.write
@@ -605,10 +475,6 @@ Transport Packages
     ImmobileStorageTransfer.copy
     ImmobileStorageTransfer.is_empty
     ImmobileStorageTransfer.get_non_grid_data
-    ImmobileStorageTransfer.is_splitting_supported
-    ImmobileStorageTransfer.is_regridding_supported
-    ImmobileStorageTransfer.is_clipping_supported
-    ImmobileStorageTransfer.is_grid_agnostic_package
     ImmobileStorageTransfer.get_regrid_methods
     MobileStorageTransfer
     MobileStorageTransfer.write
@@ -617,10 +483,6 @@ Transport Packages
     MobileStorageTransfer.copy
     MobileStorageTransfer.is_empty
     MobileStorageTransfer.get_non_grid_data
-    MobileStorageTransfer.is_splitting_supported
-    MobileStorageTransfer.is_regridding_supported
-    MobileStorageTransfer.is_clipping_supported
-    MobileStorageTransfer.is_grid_agnostic_package
     MobileStorageTransfer.get_regrid_methods
     MassSourceLoading
     MassSourceLoading.write
@@ -629,10 +491,6 @@ Transport Packages
     MassSourceLoading.copy
     MassSourceLoading.is_empty
     MassSourceLoading.get_non_grid_data
-    MassSourceLoading.is_splitting_supported
-    MassSourceLoading.is_regridding_supported
-    MassSourceLoading.is_clipping_supported
-    MassSourceLoading.is_grid_agnostic_package
     MassSourceLoading.get_regrid_methods
     MassSourceLoading.get_period_varnames
     SourceSinkMixing
@@ -643,10 +501,6 @@ Transport Packages
     SourceSinkMixing.copy
     SourceSinkMixing.is_empty
     SourceSinkMixing.get_non_grid_data
-    SourceSinkMixing.is_splitting_supported
-    SourceSinkMixing.is_regridding_supported
-    SourceSinkMixing.is_clipping_supported
-    SourceSinkMixing.is_grid_agnostic_package
     SourceSinkMixing.get_regrid_methods
     SourceSinkMixing.get_period_varnames
 
