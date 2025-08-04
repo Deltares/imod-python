@@ -87,22 +87,6 @@ class Package(PackageBase, IPackage, abc.ABC):
     def __init__(self, allargs: Mapping[str, GridDataArray | float | int | bool | str]):
         super().__init__(allargs)
 
-    def isel(self):
-        raise NotImplementedError(
-            "Selection on packages not yet supported. To make a selection on "
-            f"the xr.Dataset, call {self._pkg_id}.dataset.isel instead."
-            "You can create a new package with a selection by calling "
-            f"{type(self).__name__}(**{self._pkg_id}.dataset.isel(**selection))"
-        )
-
-    def sel(self):
-        raise NotImplementedError(
-            "Selection on packages not yet supported. To make a selection on "
-            f"the xr.Dataset, call {self._pkg_id}.dataset.sel instead. "
-            "You can create a new package with a selection by calling "
-            f"{type(self).__name__}(**{self._pkg_id}.dataset.sel(**selection))"
-        )
-
     def cleanup(self, dis: Any):
         raise NotImplementedError("Method not implemented for this package.")
 
