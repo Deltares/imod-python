@@ -290,7 +290,25 @@ class BoundaryCondition(Package, abc.ABC):
             binary=write_context.use_binary,
         )
 
-    def get_period_varnames(self):
+    def get_period_varnames(self) -> list[str]:
+        """
+        Get variable names for transient data of this package.
+
+        Returns
+        -------
+        list[str]
+            List of variable names that are used for transient data in this
+            package.
+        
+        Examples
+        --------
+        To get the variable names for transient data in a package, e.g. a River
+        package:
+
+        >>> river = imod.mf6.River.from_file("river_with_concentration.nc")
+        >>> river.get_period_varnames()
+        >>> # prints: ['stage', 'conductance', 'bottom_elevation', 'concentration']
+        """
         result = []
         if hasattr(self, "_period_data"):
             result.extend(self._period_data)
