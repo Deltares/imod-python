@@ -193,7 +193,7 @@ def circle_result__offset_origins(tmpdir_factory):
     # Original grid ranges from -1000.0 to 1000.0, shift to 9000.0 to 11000.0
     render_dict["xorigin"] = 10000.0
     render_dict["yorigin"] = 10000.0
-    rendered = disv_pkg._template._render(render_dict)
+    rendered = disv_pkg._template.render(render_dict)
     filename = gwf_dir / "disv.disv"
     with open(filename, "w") as f:
         f.write(rendered)
