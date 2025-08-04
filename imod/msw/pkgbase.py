@@ -208,6 +208,13 @@ class MetaSwapPackage(abc.ABC):
     def _is_regridding_supported(self) -> bool:
         return True
 
+    def _is_grid_agnostic_package(self) -> bool:
+        """
+        Check if the package is grid agnostic, meaning it does not depend on a
+        specific grid structure.
+        """
+        return False
+
     def regrid_like(
         self,
         target_grid: GridDataArray,
