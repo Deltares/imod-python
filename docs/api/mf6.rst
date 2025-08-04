@@ -212,13 +212,13 @@ Flow Packages
     ConstantHead.is_clipping_supported
     ConstantHead.is_grid_agnostic_package
     ConstantHead.get_regrid_methods
+    ConstantHead.get_period_varnames
     Drainage
     Drainage.mask
     Drainage.from_imod5_data
     Drainage.regrid_like
     Drainage.cleanup
     Drainage.clip_box
-    Drainage.reallocate
     Drainage.write
     Drainage.from_file
     Drainage.to_netcdf
@@ -230,6 +230,10 @@ Flow Packages
     Drainage.is_clipping_supported
     Drainage.is_grid_agnostic_package
     Drainage.get_regrid_methods
+    Drainage.get_period_varnames
+    Drainage.aggregate_layers
+    Drainage.get_aggregate_methods
+    Drainage.reallocate
     Evapotranspiration
     Evapotranspiration.mask
     Evapotranspiration.regrid_like
@@ -245,13 +249,13 @@ Flow Packages
     Evapotranspiration.is_clipping_supported
     Evapotranspiration.is_grid_agnostic_package
     Evapotranspiration.get_regrid_methods
+    Evapotranspiration.get_period_varnames
     GeneralHeadBoundary
     GeneralHeadBoundary.from_imod5_data
     GeneralHeadBoundary.mask
     GeneralHeadBoundary.regrid_like
     GeneralHeadBoundary.cleanup
     GeneralHeadBoundary.clip_box
-    GeneralHeadBoundary.reallocate
     GeneralHeadBoundary.write
     GeneralHeadBoundary.from_file
     GeneralHeadBoundary.to_netcdf
@@ -263,6 +267,10 @@ Flow Packages
     GeneralHeadBoundary.is_clipping_supported
     GeneralHeadBoundary.is_grid_agnostic_package
     GeneralHeadBoundary.get_regrid_methods
+    GeneralHeadBoundary.get_period_varnames
+    GeneralHeadBoundary.aggregate_layers
+    GeneralHeadBoundary.get_aggregate_methods
+    GeneralHeadBoundary.reallocate
     HorizontalFlowBarrierHydraulicCharacteristic
     HorizontalFlowBarrierHydraulicCharacteristic.clip_box
     HorizontalFlowBarrierHydraulicCharacteristic.to_mf6_pkg
@@ -326,6 +334,7 @@ Flow Packages
     LayeredWell.is_clipping_supported
     LayeredWell.is_grid_agnostic_package
     LayeredWell.get_regrid_methods
+    LayeredWell.get_period_varnames
     InitialConditions
     InitialConditions.from_imod5_data
     InitialConditions.mask
@@ -364,7 +373,6 @@ Flow Packages
     Recharge.mask
     Recharge.regrid_like
     Recharge.clip_box
-    Recharge.reallocate
     Recharge.write
     Recharge.from_file
     Recharge.to_netcdf
@@ -376,13 +384,16 @@ Flow Packages
     Recharge.is_clipping_supported
     Recharge.is_grid_agnostic_package
     Recharge.get_regrid_methods
+    Recharge.get_period_varnames
+    Recharge.aggregate_layers
+    Recharge.get_aggregate_methods
+    Recharge.reallocate
     River
     River.from_imod5_data
     River.mask
     River.regrid_like
     River.cleanup
     River.clip_box
-    River.reallocate
     River.write
     River.from_file
     River.to_netcdf
@@ -394,6 +405,10 @@ Flow Packages
     River.is_clipping_supported
     River.is_grid_agnostic_package
     River.get_regrid_methods
+    River.get_period_varnames
+    River.aggregate_layers
+    River.get_aggregate_methods
+    River.reallocate
     SingleLayerHorizontalFlowBarrierHydraulicCharacteristic
     SingleLayerHorizontalFlowBarrierHydraulicCharacteristic.to_mf6_pkg
     SingleLayerHorizontalFlowBarrierHydraulicCharacteristic.clip_box
@@ -483,6 +498,7 @@ Flow Packages
     UnsaturatedZoneFlow.is_clipping_supported
     UnsaturatedZoneFlow.is_grid_agnostic_package
     UnsaturatedZoneFlow.get_regrid_methods
+    UnsaturatedZoneFlow.get_period_varnames
     Well
     Well.cleanup
     Well.from_imod5_data
@@ -501,6 +517,7 @@ Flow Packages
     Well.is_clipping_supported
     Well.is_grid_agnostic_package
     Well.get_regrid_methods
+    Well.get_period_varnames
 
 
 Transport Packages
@@ -569,6 +586,7 @@ Transport Packages
     ConstantConcentration.is_clipping_supported
     ConstantConcentration.is_grid_agnostic_package
     ConstantConcentration.get_regrid_methods
+    ConstantConcentration.get_period_varnames
     Dispersion
     Dispersion.write
     Dispersion.from_file
@@ -617,6 +635,7 @@ Transport Packages
     MassSourceLoading.is_clipping_supported
     MassSourceLoading.is_grid_agnostic_package
     MassSourceLoading.get_regrid_methods
+    MassSourceLoading.get_period_varnames
     SourceSinkMixing
     SourceSinkMixing.from_flow_model
     SourceSinkMixing.write
@@ -630,6 +649,7 @@ Transport Packages
     SourceSinkMixing.is_clipping_supported
     SourceSinkMixing.is_grid_agnostic_package
     SourceSinkMixing.get_regrid_methods
+    SourceSinkMixing.get_period_varnames
 
 
 .. currentmodule:: imod.mf6.regrid
