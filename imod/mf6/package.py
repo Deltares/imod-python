@@ -479,9 +479,9 @@ class Package(PackageBase, IPackage, abc.ABC):
         ``target_grid`` has different ``"x"`` and ``"y"`` or different
         ``cell2d`` coords.
 
-        The default regridding methods are specified in the ``_regrid_method``
-        attribute of the package. These defaults can be overridden using the
-        input parameters of this function.
+        The default regridding methods are obtained by calling
+        ``.get_regrid_methods()`` on the package, which returns a dataclass with
+        the default regridding methods for each variable in the package.
 
         Parameters
         ----------
