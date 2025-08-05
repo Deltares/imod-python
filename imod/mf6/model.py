@@ -71,12 +71,12 @@ class Modflow6Model(collections.UserDict, IModel, abc.ABC):
         self._options = {}
 
     @standard_log_decorator()
-    def validate_options(
+    def _validate_options(
         self, schemata: dict, **kwargs
     ) -> dict[str, list[ValidationError]]:
         return validate_schemata_dict(schemata, self._options, **kwargs)
 
-    def validate_init_schemata_options(self, validate: bool) -> None:
+    def _validate_init_schemata_options(self, validate: bool) -> None:
         """
         Run the "cheap" schema validations.
 
@@ -84,7 +84,7 @@ class Modflow6Model(collections.UserDict, IModel, abc.ABC):
         available then: e.g. idomain to determine active part of domain.
         """
         validate_with_error_message(
-            self.validate_options, validate, self._init_schemata
+            self._validate_options, validate, self._init_schemata
         )
 
     def __setitem__(self, key, value):
@@ -178,7 +178,7 @@ class Modflow6Model(collections.UserDict, IModel, abc.ABC):
                 modeltimes.append(repeat_stress.isel(repeat_items=0).values)
         return modeltimes
 
-    def render(self, modelname: str, write_context: WriteContext):
+    def _render(self, modelname: str, write_context: WriteContext):
         dir_for_render = write_context.root_directory / modelname
 
         d = {k: v for k, v in self._options.items() if not (v is None or v is False)}
@@ -238,6 +238,23 @@ class Modflow6Model(collections.UserDict, IModel, abc.ABC):
         model_name: str = "",
         validation_context: Optional[ValidationSettings] = None,
     ) -> StatusInfoBase:
+        """
+        Validate model.
+
+        Parameters
+        ----------
+        model_name: str, optional
+            Name of the model, used for status info.
+        validation_context: ValidationSettings, optional
+            Validation settings, which can be used to control the validation
+            process. If not provided, defaults to ValidationSettings(validate=True).
+
+        Returns
+        -------
+        NestedStatusInfo
+            Status information about the validation process, including any errors
+            or warnings encountered during validation.
+        """
         if validation_context is None:
             validation_context = ValidationSettings(validate=True)
 
@@ -255,7 +272,7 @@ class Modflow6Model(collections.UserDict, IModel, abc.ABC):
 
         model_status_info = NestedStatusInfo(f"{model_name} model")
         # Check model options
-        option_errors = self.validate_options(self._init_schemata)
+        option_errors = self._validate_options(self._init_schemata)
         model_status_info.add(
             pkg_errors_to_status_info("model options", option_errors, None)
         )
@@ -407,7 +424,7 @@ class Modflow6Model(collections.UserDict, IModel, abc.ABC):
                 return model_status_info
 
         # write model namefile
-        namefile_content = self.render(modelname, write_context)
+        namefile_content = self._render(modelname, write_context)
         namefile_content = prepend_content_with_version_info(namefile_content)
         namefile_path = modeldirectory / f"{modelname}.nam"
         with open(namefile_path, "w") as f:
@@ -588,7 +605,7 @@ class Modflow6Model(collections.UserDict, IModel, abc.ABC):
         y_max: optional, float
         state_for_boundary: optional, float
         """
-        supported, error_with_object = self.is_clipping_supported()
+        supported, error_with_object = self._is_clipping_supported()
         if not supported:
             raise ValueError(
                 f"model cannot be clipped due to presence of package '{error_with_object}' in model"
@@ -726,7 +743,17 @@ class Modflow6Model(collections.UserDict, IModel, abc.ABC):
         self, model_name: Optional[str] = "", ignore_time: bool = False
     ) -> None:
         """
-        This function removes empty packages from the model.
+        This method removes empty packages from the model in place.
+
+        Parameters
+        ----------
+        model_name: str, optional
+            Name of the model, used for logging.
+        ignore_time: bool, optional
+            If False, packages are considered empty if they have no data at all
+            timesteps. If True, packages are considered empty if they have no
+            data at the first time step. The latter can increase performance
+            considerably.
         """
         empty_packages = [
             package_name
@@ -767,37 +794,70 @@ class Modflow6Model(collections.UserDict, IModel, abc.ABC):
         return "\n".join(content)
 
     def is_use_newton(self):
+        """
+        Returns whether the Newton-Raphson formulation is used for groundwater
+        flow between connected, convertible groundwater cells.
+
+        Returns
+        -------
+        bool
+            True if the Newton-Raphson formulation is used, False otherwise.
+        """
         return False
 
-    def is_splitting_supported(self) -> Tuple[bool, str]:
+    def _is_splitting_supported(self) -> Tuple[bool, str]:
         """
         Returns True if all the packages in the model supports splitting. If one
         of the packages in the model does not support splitting, it returns the
         name of the first one.
+
+        Returns
+        -------
+        Tuple[bool, str]
+            A tuple where the first element is a boolean indicating if splitting
+            is supported, and the second element is the name of the first package
+            that does not support splitting, or an empty string if all packages
+            support splitting.
         """
         for package_name, package in self.items():
-            if not package.is_splitting_supported():
+            if not package._is_splitting_supported():
                 return False, package_name
         return True, ""
 
-    def is_regridding_supported(self) -> Tuple[bool, str]:
+    def _is_regridding_supported(self) -> Tuple[bool, str]:
         """
         Returns True if all the packages in the model supports regridding. If one
         of the packages in the model does not support regridding, it returns the
         name of the first one.
+
+        Returns
+        -------
+        Tuple[bool, str]
+            A tuple where the first element is a boolean indicating if regridding
+            is supported, and the second element is the name of the first package
+            that does not support regridding, or an empty string if all packages
+            support regridding.
         """
         for package_name, package in self.items():
-            if not package.is_regridding_supported():
+            if not package._is_regridding_supported():
                 return False, package_name
         return True, ""
 
-    def is_clipping_supported(self) -> Tuple[bool, str]:
+    def _is_clipping_supported(self) -> Tuple[bool, str]:
         """
         Returns True if all the packages in the model supports clipping. If one
         of the packages in the model does not support clipping, it returns the
         name of the first one.
+
+        Returns
+        -------
+        Tuple[bool, str]
+            A tuple where the first element is a boolean indicating if clipping
+            is supported, and the second element is the name of the first package
+            that does not support clipping, or an empty string if all packages
+            support clipping.
         """
         for package_name, package in self.items():
-            if not package.is_clipping_supported():
+            if not package._is_clipping_supported():
                 return False, package_name
         return True, ""

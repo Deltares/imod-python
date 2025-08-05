@@ -77,20 +77,20 @@ def test_render_twice(instance, tmp_path):
     globaltimes = [np.datetime64("2000-01-01")]
     modeldir = tmp_path / "testdir"
 
-    sig = inspect.signature(instance.render)
+    sig = inspect.signature(instance._render)
     if any(isinstance(instance, pack) for pack in HIGH_LEVEL_PACKAGES):
         with pytest.raises(NotImplementedError):
-            instance.render(modeldir, "test", globaltimes, False)
+            instance._render(modeldir, "test", globaltimes, False)
         return
     elif len(sig.parameters) == 0:
-        text1 = instance.render()
-        text2 = instance.render()
+        text1 = instance._render()
+        text2 = instance._render()
     elif len(sig.parameters) == 3:
-        text1 = instance.render(modeldir, "test", False)
-        text2 = instance.render(modeldir, "test", False)
+        text1 = instance._render(modeldir, "test", False)
+        text2 = instance._render(modeldir, "test", False)
     elif len(sig.parameters) == 4:
-        text1 = instance.render(modeldir, "test", globaltimes, False)
-        text2 = instance.render(modeldir, "test", globaltimes, False)
+        text1 = instance._render(modeldir, "test", globaltimes, False)
+        text2 = instance._render(modeldir, "test", globaltimes, False)
     else:
         assert False  # unexpected nr of arguments
     assert text1 == text2

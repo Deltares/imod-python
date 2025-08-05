@@ -17,7 +17,7 @@ def test_render():
     timedis = imod.mf6.TimeDiscretization(
         timestep_duration, n_timesteps=2, timestep_multiplier=1.1
     )
-    actual = timedis.render(None, None, None, None)
+    actual = timedis._render(None, None, None, None)
     expected = textwrap.dedent(
         """\
         begin options

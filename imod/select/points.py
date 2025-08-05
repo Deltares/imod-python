@@ -24,7 +24,7 @@ def get_unstructured_cell2d_from_xy(uda: xu.UgridDataArray, **points) -> npt.NDA
     return uda.ugrid.grid.locate_points(xy)
 
 
-def __check_and_get_points_shape(points: dict) -> dict:
+def _check_and_get_points_shape(points: dict) -> dict:
     """Check whether points have the right shape"""
     shapes = {}
     for coord, value in points.items():
@@ -39,7 +39,7 @@ def __check_and_get_points_shape(points: dict) -> dict:
     return shapes
 
 
-def __check_point_shapes_consistency(shapes: dict):
+def _check_point_shapes_consistency(shapes: dict):
     if not len(set(shapes.values())) == 1:
         msg = "\n".join([f"{coord}: {shape}" for coord, shape in shapes.items()])
         raise ValueError(f"Shapes of coordinates do match each other:\n{msg}")
@@ -50,11 +50,11 @@ def _check_points(points: dict):
     Check whether the array with points has the right and consistent shape.
     """
 
-    shapes = __check_and_get_points_shape(points)
-    __check_point_shapes_consistency(shapes)
+    shapes = _check_and_get_points_shape(points)
+    _check_point_shapes_consistency(shapes)
 
 
-def __arr_like_points(points: dict, fill_value: Any) -> npt.NDArray:
+def _arr_like_points(points: dict, fill_value: Any) -> npt.NDArray:
     """
     Return array with the same shape as the first array provided in points.
     """
@@ -102,7 +102,7 @@ def points_in_bounds(da: GridDataArray, **points) -> npt.NDArray[np.bool_]:
 
     _check_points(points)
 
-    in_bounds = __arr_like_points(points, True)
+    in_bounds = _arr_like_points(points, True)
 
     if isinstance(da, xu.UgridDataArray):
         index = get_unstructured_cell2d_from_xy(da, **points)

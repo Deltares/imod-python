@@ -165,8 +165,8 @@ class VerticesDiscretization(Package, IRegridPackage, IMaskingSettings):
 
         return
 
-    def write_blockfile(self, pkgname, globaltimes, write_context: WriteContext):
-        super().write_blockfile(pkgname, globaltimes, write_context)
+    def _write_blockfile(self, pkgname, globaltimes, write_context: WriteContext):
+        super()._write_blockfile(pkgname, globaltimes, write_context)
         filename = write_context.write_directory / f"{pkgname}.{self._pkg_id}"
         self._append_vertices_and_cell2d(filename)
 

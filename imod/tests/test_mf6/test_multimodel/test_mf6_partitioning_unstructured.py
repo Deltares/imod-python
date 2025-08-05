@@ -212,7 +212,7 @@ def test_partitioning_disv_origins(
     modelnames = split_simulation.get_models_of_type("gwf6").keys()
     for modelname in modelnames:
         pkg = split_simulation[modelname]["disv"]
-        actual = pkg.render(tmp_path, "dis", None, True)
+        actual = pkg._render(tmp_path, "dis", None, True)
         expected = textwrap.dedent(
             """\
             begin options

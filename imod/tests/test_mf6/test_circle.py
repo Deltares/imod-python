@@ -57,7 +57,7 @@ def test_gwfmodel_render(circle_model, tmp_path):
     globaltimes = simulation["time_discretization"]["time"].values
     gwfmodel = simulation["GWF_1"]
     write_context1 = WriteContext()
-    actual = gwfmodel.render("GWF_1", write_context1)
+    actual = gwfmodel._render("GWF_1", write_context1)
     path = "GWF_1"
     expected = textwrap.dedent(
         f"""\
@@ -109,7 +109,7 @@ def test_gwfmodel_render_evt(circle_model_evt, tmp_path):
     globaltimes = simulation["time_discretization"]["time"].values
     gwfmodel = simulation["GWF_1"]
     write_context1 = WriteContext()
-    actual = gwfmodel.render("GWF_1", write_context1)
+    actual = gwfmodel._render("GWF_1", write_context1)
     path = "GWF_1"
     expected = textwrap.dedent(
         f"""\

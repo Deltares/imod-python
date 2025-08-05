@@ -331,7 +331,11 @@ class GridAgnosticWell(BoundaryCondition, IPointDataPackage, abc.ABC):
         return self.dataset["y"].values
 
     @classmethod
-    def is_grid_agnostic_package(cls) -> bool:
+    def _is_grid_agnostic_package(cls) -> bool:
+        """
+        Returns True if this package does not depend on a grid, e.g. the
+        :class:`imod.mf6.wel.Wel` package.
+        """
         return True
 
     def _create_cellid(
@@ -371,7 +375,7 @@ class GridAgnosticWell(BoundaryCondition, IPointDataPackage, abc.ABC):
 
         return ds_vars
 
-    def render(self, directory, pkgname, globaltimes, binary):
+    def _render(self, directory, pkgname, globaltimes, binary):
         raise NotImplementedError(
             textwrap.dedent(
                 f"""{self.__class__.__name__} is a grid-agnostic package and does not
@@ -479,10 +483,10 @@ class GridAgnosticWell(BoundaryCondition, IPointDataPackage, abc.ABC):
             )
 
         assigned_wells = self._assign_wells_to_layers(wells_df, active, top, bottom, k)
-        filtered_assigned_well_ids = self.gather_filtered_well_ids(
+        filtered_assigned_well_ids = self._gather_filtered_well_ids(
             assigned_wells, wells_df
         )
-        message_assign = self.to_mf6_package_information(
+        message_assign = self._to_mf6_package_information(
             filtered_assigned_well_ids, reason_text="permeability/thickness constraints"
         )
         error_on_well_removal = validation_context.strict_well_validation
@@ -501,10 +505,10 @@ class GridAgnosticWell(BoundaryCondition, IPointDataPackage, abc.ABC):
         ds["print_flows"] = self["print_flows"].values[()]
         ds["print_input"] = self["print_input"].values[()]
 
-        filtered_final_well_ids = self.gather_filtered_well_ids(ds, wells_df)
+        filtered_final_well_ids = self._gather_filtered_well_ids(ds, wells_df)
         if len(filtered_final_well_ids) > 0:
             reason_text = "inactive cells or permeability/thickness constraints"
-            message_end = self.to_mf6_package_information(
+            message_end = self._to_mf6_package_information(
                 filtered_final_well_ids, reason_text=reason_text
             )
             logger.log(loglevel=LogLevel.WARNING, message=message_end)
@@ -513,7 +517,7 @@ class GridAgnosticWell(BoundaryCondition, IPointDataPackage, abc.ABC):
 
         return Mf6Wel(**ds.data_vars)  # type: ignore[arg-type]
 
-    def gather_filtered_well_ids(
+    def _gather_filtered_well_ids(
         self, well_data_filtered: pd.DataFrame | xr.Dataset, well_data: pd.DataFrame
     ) -> list[str]:
         # Work around performance issue with xarray isin for large datasets.
@@ -524,7 +528,7 @@ class GridAgnosticWell(BoundaryCondition, IPointDataPackage, abc.ABC):
         is_missing_id = ~well_data["id"].isin(filtered_ids.unique())
         return well_data["id"].loc[is_missing_id].unique()
 
-    def to_mf6_package_information(
+    def _to_mf6_package_information(
         self, filtered_wells: list[str], reason_text: str
     ) -> str:
         message = textwrap.dedent(

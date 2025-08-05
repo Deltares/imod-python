@@ -11,6 +11,7 @@ import xugrid as xu
 from plum import Dispatcher
 
 from imod.common.interfaces.ilinedatapackage import ILineDataPackage
+from imod.common.interfaces.ipackage import IPackage
 from imod.common.interfaces.ipackagebase import IPackageBase
 from imod.common.interfaces.ipointdatapackage import IPointDataPackage
 from imod.common.utilities.grid import get_active_domain_slice
@@ -50,6 +51,8 @@ def clip_by_grid(_: object, grid: object) -> None:
 
 @dispatch  # type: ignore[no-redef]
 def clip_by_grid(package: IPackageBase, active: xr.DataArray) -> IPackageBase:  # noqa: F811
+    # Note: package needs IPackageBase instead of IPackage as type annotation
+    #   otherwise the dispatching returns an AmbiguousLookupError.
     domain_slice = get_active_domain_slice(active)
     x_min, x_max = domain_slice["x"].start, domain_slice["x"].stop
     y_min, y_max = domain_slice["y"].stop, domain_slice["y"].start
@@ -65,6 +68,8 @@ def clip_by_grid(package: IPackageBase, active: xr.DataArray) -> IPackageBase:  
 
 @dispatch  # type: ignore[no-redef]
 def clip_by_grid(package: IPackageBase, active: xu.UgridDataArray) -> IPackageBase:  # noqa: F811
+    # Note: package needs IPackageBase instead of IPackage as type annotation
+    #   otherwise the dispatching returns an AmbiguousLookupError.
     domain_slice = get_active_domain_slice(active)
 
     clipped_dataset = package.dataset.isel(domain_slice, missing_dims="ignore")
@@ -118,8 +123,8 @@ def _clip_by_grid_line_data(
     return clipped_package
 
 
-def _filter_inactive_cells(package, active):
-    if package.is_grid_agnostic_package():
+def _filter_inactive_cells(package: IPackage, active: GridDataArray):
+    if package._is_grid_agnostic_package():
         return
 
     package_vars = package.dataset.data_vars

@@ -376,7 +376,7 @@ axes[1].set_ylim(ylim)
 # detail. For that we first need to upscale the structured head data to the
 # unstructured grid. This is done using the `OverlapRegridder from the xugrid
 # package
-# <https://deltares.github.io/xugrid/examples/regridder_overview.html#overlapregridder>_,
+# <https://deltares.github.io/xugrid/examples/regridder_overview.html#overlapregridder>`_,
 
 import xugrid as xu
 

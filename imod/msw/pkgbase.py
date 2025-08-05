@@ -65,24 +65,6 @@ class MetaSwapPackage(abc.ABC):
         instance.dataset = ds
         return instance
 
-    def isel(self):
-        raise NotImplementedError(
-            f"Selection on packages not yet supported. "
-            f"To make a selection on the xr.Dataset, "
-            f"call {self._pkg_id}.dataset.isel instead. "
-            f"You can create a new package with a selection by calling: "
-            f"{__class__.__name__}(**{self._pkg_id}.dataset.isel(**selection))"
-        )
-
-    def sel(self):
-        raise NotImplementedError(
-            f"Selection on packages not yet supported. "
-            f"To make a selection on the xr.Dataset, "
-            f"call {self._pkg_id}.dataset.sel instead. "
-            f"You can create a new package with a selection by calling: "
-            f"{__class__.__name__}(**{self._pkg_id}.dataset.sel(**selection))"
-        )
-
     def write(
         self,
         directory: Union[str, Path],
@@ -130,7 +112,7 @@ class MetaSwapPackage(abc.ABC):
                     f"{varname}: not all values are within range ({min_value}-{max_value})."
                 )
 
-    def write_dataframe_fixed_width(self, file, dataframe):
+    def _write_dataframe_fixed_width(self, file, dataframe):
         """Write dataframe to fixed format file."""
         for row in dataframe.itertuples():
             for index, metadata in enumerate(self._metadata_dict.values()):
@@ -177,7 +159,7 @@ class MetaSwapPackage(abc.ABC):
 
         self._check_range(dataframe)
 
-        return self.write_dataframe_fixed_width(file, dataframe)
+        return self._write_dataframe_fixed_width(file, dataframe)
 
     def _pkgcheck(self):
         """
@@ -200,7 +182,7 @@ class MetaSwapPackage(abc.ABC):
     def _valid(self, value):
         return True
 
-    def get_non_grid_data(self, grid_names: list[str]) -> dict[str, Any]:
+    def _get_non_grid_data(self, grid_names: list[str]) -> dict[str, Any]:
         """
         This function copies the attributes of a dataset that are scalars, such as options.
 
@@ -223,17 +205,64 @@ class MetaSwapPackage(abc.ABC):
     def auxiliary_data_fields(self) -> dict[str, str]:
         return {}
 
-    def is_regridding_supported(self) -> bool:
+    def _is_regridding_supported(self) -> bool:
         return True
+
+    def _is_grid_agnostic_package(self) -> bool:
+        """
+        Check if the package is grid agnostic, meaning it does not depend on a
+        specific grid structure.
+        """
+        return False
 
     def regrid_like(
         self,
         target_grid: GridDataArray,
-        regrid_context: RegridderWeightsCache,
+        regrid_cache: RegridderWeightsCache,
         regridder_types: Optional[DataclassType] = None,
     ) -> "MetaSwapPackage":
+        """
+        Creates a package of the same type as this package, based on another
+        discretization. It regrids all the arrays in this package to the desired
+        discretization, and leaves the options unmodified. At the moment only
+        regridding to a different planar grid is supported, meaning
+        ``target_grid`` has different ``"x"`` and ``"y"``.
+
+        The default regridding methods are obtained by calling
+        ``.get_regrid_methods()`` on the package, which returns a dataclass with
+        the default regridding methods for each variable in the package.
+
+        Parameters
+        ----------
+        target_grid: xr.DataArray or xu.UgridDataArray
+            a grid defined using the same discretization as the one we want to
+            regrid the package to.
+        regrid_cache: RegridderWeightsCache
+            stores regridder weights for different regridders. Can be used to
+            speed up regridding, if the same regridders are used several times
+            for regridding different arrays.
+        regridder_types: RegridMethodType, optional
+            dictionary mapping arraynames (str) to a tuple of regrid type (a
+            specialization class of BaseRegridder) and function name (str) this
+            dictionary can be used to override the default mapping method.
+
+        Examples
+        --------
+        To regrid the infiltration package with a non-default method for the
+        infiltration capacity, call ``regrid_like`` with these arguments:
+
+        >>> regridder_types = imod.msw.regrid.InfiltrationRegridMethod(infiltration_capacity=(imod.RegridderType.OVERLAP, "max"))
+        >>> regrid_cache = imod.util.regrid.RegridderWeightsCache()
+        >>> new_infiltration = infiltration.regrid_like(like, regrid_cache, regridder_types)
+
+        Returns
+        -------
+        A package with the same options as this package, and with all the
+        data-arrays regridded to another discretization, similar to the one used
+        in input argument "target_grid"
+        """
         try:
-            result = _regrid_like(self, target_grid, regrid_context, regridder_types)
+            result = _regrid_like(self, target_grid, regrid_cache, regridder_types)
         except ValueError as e:
             raise e
         except Exception as e:
@@ -274,7 +303,7 @@ class MetaSwapPackage(abc.ABC):
         -------
         clipped: Package
         """
-        if not self.is_clipping_supported():
+        if not self._is_clipping_supported():
             raise ValueError("this package does not support clipping.")
 
         selection = self.dataset
@@ -290,11 +319,44 @@ class MetaSwapPackage(abc.ABC):
         cls = type(self)
         return cls._from_dataset(selection)
 
-    def get_regrid_methods(self) -> DataclassType:
-        return deepcopy(self._regrid_method)
+    @classmethod
+    def get_regrid_methods(cls) -> DataclassType:
+        """
+        Returns the default regrid methods for this package. You can use modify
+        to customize the regridding of the package.
+
+        Returns
+        -------
+        DataclassType
+            The regrid methods for this package, which is a dataclass with
+            attributes that are tuples of (regridder type, method name). If no
+            regrid methods are defined, returns an instance of
+            EmptyRegridMethod.
+
+        Examples
+        --------
+        Get the regrid methods for the Drainage package:
+
+        >>> regrid_settings = Infiltration.get_regrid_methods()
+
+        You can modify the regrid methods by changing the attributes of the
+        returned dataclass instance. For example, to set the regridding method
+        for ``infiltration_capacity`` to minimum.
+
+        >>> regrid_settings.infiltration_capacity = (imod.RegridderType.OVERLAP, "min")
+
+        These settings can then be used to regrid the package:
+
+        >>> infiltration.regrid_like(like, regridder_types=regrid_settings)
+
+        """
+        return deepcopy(cls._regrid_method)
 
     def from_imod5_data(self, *args, **kwargs):
+        """
+        This package cannot be constructed from iMOD5 data.
+        """
         raise NotImplementedError("Method not implemented for this package.")
 
-    def is_clipping_supported(self) -> bool:
+    def _is_clipping_supported(self) -> bool:
         return True

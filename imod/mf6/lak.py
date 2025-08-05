@@ -905,7 +905,7 @@ class Lake(BoundaryCondition):
         x[idx[0][:]] = ""
         return x.astype(str)
 
-    def render(self, directory, pkgname, globaltimes, binary):
+    def _render(self, directory, pkgname, globaltimes, binary):
         d = {}
         for var in (
             "print_input",
@@ -991,9 +991,9 @@ class Lake(BoundaryCondition):
         df = self.dataset[outlet_vars].to_dataframe()
         return df
 
-    def write_blockfile(self, pkgname, globaltimes, write_context: WriteContext):
+    def _write_blockfile(self, pkgname, globaltimes, write_context: WriteContext):
         renderdir = pathlib.Path(write_context.write_directory.stem)
-        content = self.render(
+        content = self._render(
             directory=renderdir,
             pkgname=pkgname,
             globaltimes=globaltimes,
@@ -1208,11 +1208,35 @@ class Lake(BoundaryCondition):
         f.write(f"end {title}\n")
         return
 
-    def is_splitting_supported(self) -> bool:
+    def _is_splitting_supported(self) -> bool:
+        """
+        Return True if this package supports splitting.
+
+        Returns
+        -------
+        bool
+            True if this package supports splitting, False otherwise.
+        """
         return False
 
-    def is_regridding_supported(self) -> bool:
+    def _is_regridding_supported(self) -> bool:
+        """
+        Return True if this package supports regridding.
+
+        Returns
+        -------
+        bool
+            True if this package supports regridding, False otherwise.
+        """
         return False
 
-    def is_clipping_supported(self) -> bool:
+    def _is_clipping_supported(self) -> bool:
+        """
+        Return True if this package supports clipping.
+
+        Returns
+        -------
+        bool
+            True if this package supports clipping, False otherwise.
+        """
         return False

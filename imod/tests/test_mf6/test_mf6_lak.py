@@ -22,12 +22,12 @@ def test_alternative_constructor(naardermeer, ijsselmeer):
     actual = Lake.from_lakes_and_outlets(
         [naardermeer(), ijsselmeer()], [outlet1, outlet2]
     )
-    _ = actual.render(None, None, None, False)
+    _ = actual._render(None, None, None, False)
     assert isinstance(actual, Lake)
 
 
 def test_lake_render(lake_package):
-    actual = lake_package.render(None, None, None, False)
+    actual = lake_package._render(None, None, None, False)
     expected = textwrap.dedent(
         """\
         begin options

@@ -14,7 +14,7 @@ class ISimulation(IDict):
         raise NotImplementedError
 
     @abstractmethod
-    def has_one_flow_model(self) -> bool:
+    def _has_one_flow_model(self) -> bool:
         raise NotImplementedError
 
     @abstractmethod

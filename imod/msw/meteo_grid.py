@@ -50,7 +50,7 @@ class MeteoGrid(MetaSwapPackage, IRegridPackage):
 
         self._pkgcheck()
 
-    def write_free_format_file(self, path: Union[str, Path], dataframe: pd.DataFrame):
+    def _write_free_format_file(self, path: Union[str, Path], dataframe: pd.DataFrame):
         """
         Write free format file. The mete_grid.inp file is free format.
         """
@@ -68,7 +68,7 @@ class MeteoGrid(MetaSwapPackage, IRegridPackage):
         ]
         dataframe.loc[:, wofost_columns] = '"NoValue"'
 
-        self.check_string_lengths(dataframe)
+        self._check_string_lengths(dataframe)
 
         dataframe.to_csv(
             path, header=False, quoting=csv.QUOTE_NONE, float_format="%.4f", index=False
@@ -131,7 +131,7 @@ class MeteoGrid(MetaSwapPackage, IRegridPackage):
 
         return dataframe
 
-    def check_string_lengths(self, dataframe: pd.DataFrame):
+    def _check_string_lengths(self, dataframe: pd.DataFrame):
         """
         Check if strings lengths do not exceed 256 characters.
         With absolute paths this might be an issue.
@@ -169,7 +169,7 @@ class MeteoGrid(MetaSwapPackage, IRegridPackage):
         times = self.dataset["time"].values
 
         dataframe = self._compose_dataframe(times)
-        self.write_free_format_file(directory / self._file_name, dataframe)
+        self._write_free_format_file(directory / self._file_name, dataframe)
 
         # Write grid data to ESRI ASCII files
         for varname in self.dataset.data_vars:

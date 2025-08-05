@@ -1,9 +1,11 @@
-from copy import deepcopy
 from typing import Any, Optional
 
 import numpy as np
 
 from imod.common.interfaces.iregridpackage import IRegridPackage
+from imod.common.utilities.dataclass_type import (
+    DataclassType,
+)
 from imod.common.utilities.regrid import _regrid_package_data
 from imod.logging import init_log_decorator
 from imod.mf6.package import Package
@@ -72,7 +74,7 @@ class InitialConditions(Package, IRegridPackage):
         super().__init__(dict_dataset)
         self._validate_init_schemata(validate)
 
-    def render(self, directory, pkgname, globaltimes, binary):
+    def _render(self, directory, pkgname, globaltimes, binary):
         d: dict[str, Any] = {}
 
         icdirectory = directory / pkgname
@@ -86,7 +88,7 @@ class InitialConditions(Package, IRegridPackage):
         cls,
         imod5_data: dict[str, dict[str, GridDataArray]],
         target_grid: GridDataArray,
-        regridder_types: Optional[InitialConditionsRegridMethod] = None,
+        regridder_types: Optional[DataclassType] = None,
         regrid_cache: RegridderWeightsCache = RegridderWeightsCache(),
     ) -> "InitialConditions":
         """
@@ -122,13 +124,9 @@ class InitialConditions(Package, IRegridPackage):
         }
 
         if regridder_types is None:
-            regridder_types = InitialConditions.get_regrid_methods()
+            regridder_types = cls.get_regrid_methods()
 
         new_package_data = _regrid_package_data(
             data, target_grid, regridder_types, regrid_cache, {}
         )
         return cls(**new_package_data, validate=True)
-
-    @classmethod
-    def get_regrid_methods(cls) -> InitialConditionsRegridMethod:
-        return deepcopy(cls._regrid_method)

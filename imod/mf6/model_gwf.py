@@ -10,7 +10,8 @@ import numpy as np
 from imod.common.utilities.dataclass_type import DataclassType
 from imod.logging import init_log_decorator
 from imod.logging.logging_decorators import standard_log_decorator
-from imod.mf6 import ConstantHead
+from imod.mf6.buy import Buoyancy
+from imod.mf6.chd import ConstantHead
 from imod.mf6.clipped_boundary_condition_creator import create_clipped_boundary
 from imod.mf6.dis import StructuredDiscretization
 from imod.mf6.drn import Drainage
@@ -112,7 +113,7 @@ class GroundwaterFlowModel(Modflow6Model):
             "newton": newton,
             "under_relaxation": under_relaxation,
         }
-        self.validate_init_schemata_options(validate)
+        self._validate_init_schemata_options(validate)
 
     def clip_box(
         self,
@@ -130,7 +131,7 @@ class GroundwaterFlowModel(Modflow6Model):
             time_min, time_max, layer_min, layer_max, x_min, x_max, y_min, y_max
         )
 
-        clipped_boundary_condition = self.__create_boundary_condition_clipped_boundary(
+        clipped_boundary_condition = self._create_boundary_condition_clipped_boundary(
             self, clipped, state_for_boundary
         )
         if clipped_boundary_condition is not None:
@@ -140,24 +141,24 @@ class GroundwaterFlowModel(Modflow6Model):
 
         return clipped
 
-    def __create_boundary_condition_clipped_boundary(
+    def _create_boundary_condition_clipped_boundary(
         self,
         original_model: Modflow6Model,
         clipped_model: Modflow6Model,
         state_for_boundary: Optional[GridDataArray],
     ):
         unassigned_boundary_original_domain = (
-            self.__create_boundary_condition_for_unassigned_boundary(
+            self._create_boundary_condition_for_unassigned_boundary(
                 original_model, state_for_boundary
             )
         )
 
-        return self.__create_boundary_condition_for_unassigned_boundary(
+        return self._create_boundary_condition_for_unassigned_boundary(
             clipped_model, state_for_boundary, [unassigned_boundary_original_domain]
         )
 
     @staticmethod
-    def __create_boundary_condition_for_unassigned_boundary(
+    def _create_boundary_condition_for_unassigned_boundary(
         model: Modflow6Model,
         state_for_boundary: Optional[GridDataArray],
         additional_boundaries: Optional[list[ConstantHead]] = None,
@@ -180,12 +181,30 @@ class GroundwaterFlowModel(Modflow6Model):
         )
 
     def is_use_newton(self):
+        """
+        Returns whether the Newton-Raphson formulation is used for groundwater
+        flow between connected, convertible groundwater cells.
+
+        Returns
+        -------
+        bool
+            True if the Newton-Raphson formulation is used, False otherwise.
+        """
         return self._options["newton"]
 
     def set_newton(self, is_newton: bool) -> None:
+        """
+        Sets whether the Newton-Raphson formulation is used for groundwater
+        flow between connected, convertible groundwater cells.
+
+        Parameters
+        ----------
+        is_newton: bool
+            True if the Newton-Raphson formulation should be used, False otherwise.
+        """
         self._options["newton"] = is_newton
 
-    def update_buoyancy_package(self, transport_models_per_flow_model) -> None:
+    def _update_buoyancy_package(self, transport_models_per_flow_model) -> None:
         """
         If the simulation is partitioned, then the buoyancy package, if present,
         must be updated for the renamed transport models.
@@ -193,10 +212,10 @@ class GroundwaterFlowModel(Modflow6Model):
         buoyancy_key = self._get_pkgkey("buy")
         if buoyancy_key is None:
             return
-        buoyancy_package = self[buoyancy_key]
-        transport_models_old = buoyancy_package.get_transport_model_names()
+        buoyancy_package = cast(Buoyancy, self[buoyancy_key])
+        transport_models_old = buoyancy_package._get_transport_model_names()
         if len(transport_models_old) == len(transport_models_per_flow_model):
-            buoyancy_package.update_transport_models(transport_models_per_flow_model)
+            buoyancy_package._update_transport_models(transport_models_per_flow_model)
 
     @classmethod
     @standard_log_decorator()

@@ -88,7 +88,7 @@ def test_render(concentration_steadystate):
     cnc = imod.mf6.ConstantConcentration(
         concentration_steadystate, print_input=True, print_flows=True, save_flows=True
     )
-    actual = cnc.render(directory, "cnc", globaltimes, True)
+    actual = cnc._render(directory, "cnc", globaltimes, True)
 
     expected = textwrap.dedent(
         """\

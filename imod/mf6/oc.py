@@ -153,7 +153,7 @@ class OutputControl(Package, IRegridPackage):
 
         return path
 
-    def render(self, directory, pkgname, globaltimes, binary):
+    def _render(self, directory, pkgname, globaltimes, binary):
         d: dict[str, Any] = {}
 
         for output_variable in OUTPUT_EXT_MAPPING.keys():

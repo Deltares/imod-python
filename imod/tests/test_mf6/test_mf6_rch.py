@@ -63,7 +63,7 @@ def test_render(rch_dict):
     rch = imod.mf6.Recharge(**rch_dict)
     directory = pathlib.Path("mymodel")
     globaltimes = np.array(["2000-01-01"], dtype="datetime64[ns]")
-    actual = rch.render(directory, "recharge", globaltimes, True)
+    actual = rch._render(directory, "recharge", globaltimes, True)
     expected = textwrap.dedent(
         """\
         begin options
@@ -86,7 +86,7 @@ def test_render_fixed_cell(rch_dict):
     rch = imod.mf6.Recharge(**rch_dict)
     directory = pathlib.Path("mymodel")
     globaltimes = np.array(["2000-01-01"], dtype="datetime64[ns]")
-    actual = rch.render(directory, "recharge", globaltimes, True)
+    actual = rch._render(directory, "recharge", globaltimes, True)
     expected = textwrap.dedent(
         """\
         begin options
@@ -116,7 +116,7 @@ def test_render_transient(rch_dict_transient):
         ],
         dtype="datetime64[ns]",
     )
-    actual = rch.render(directory, "recharge", globaltimes, True)
+    actual = rch._render(directory, "recharge", globaltimes, True)
     expected = textwrap.dedent(
         """\
         begin options
@@ -148,7 +148,7 @@ def test_no_layer_dim(rch_dict):
     rch = imod.mf6.Recharge(**rch_dict)
     directory = pathlib.Path("mymodel")
     globaltimes = np.array(["2000-01-01"], dtype="datetime64[ns]")
-    actual = rch.render(directory, "recharge", globaltimes, True)
+    actual = rch._render(directory, "recharge", globaltimes, True)
     expected = textwrap.dedent(
         """\
         begin options
@@ -180,7 +180,7 @@ def test_transient_no_layer_dim(rch_dict_transient):
         dtype="datetime64[ns]",
     )
 
-    actual = rch.render(directory, "recharge", globaltimes, True)
+    actual = rch._render(directory, "recharge", globaltimes, True)
     expected = textwrap.dedent(
         """\
         begin options
@@ -231,7 +231,7 @@ def test_render_concentration(concentration_fc, rate_fc):
         dtype="datetime64[ns]",
     )
 
-    actual = rch.render(directory, "rch", globaltimes, False)
+    actual = rch._render(directory, "rch", globaltimes, False)
 
     expected = textwrap.dedent(
         """\
@@ -412,7 +412,7 @@ def test_planar_rch_from_imod5_constant(imod5_dataset, tmp_path):
         time_min=datetime(2002, 2, 2),
         time_max=datetime(2022, 2, 2),
     )
-    rendered_rch = rch.render(tmp_path, "rch", None, None)
+    rendered_rch = rch._render(tmp_path, "rch", None, None)
 
     # Assert
     np.testing.assert_allclose(
@@ -458,7 +458,7 @@ def test_planar_rch_from_imod5_transient(imod5_dataset, tmp_path):
     )
     globaltimes = times + [np.datetime64("2022-02-02")]
     globaltimes[0] = np.datetime64("2002-02-02")
-    rendered_rch = rch.render(tmp_path, "rch", globaltimes, None)
+    rendered_rch = rch._render(tmp_path, "rch", globaltimes, None)
 
     # assert
     np.testing.assert_allclose(
@@ -499,7 +499,7 @@ def test_non_planar_rch_from_imod5_constant(imod5_dataset, tmp_path):
         time_min=datetime(2002, 2, 2),
         time_max=datetime(2022, 2, 2),
     )
-    rendered_rch = rch.render(tmp_path, "rch", None, None)
+    rendered_rch = rch._render(tmp_path, "rch", None, None)
 
     # assert
     np.testing.assert_allclose(
@@ -548,7 +548,7 @@ def test_non_planar_rch_from_imod5_transient(imod5_dataset, tmp_path):
     )
     globaltimes = times + [np.datetime64("2022-02-02")]
     globaltimes[0] = np.datetime64("2002-02-02")
-    rendered_rch = rch.render(tmp_path, "rch", globaltimes, None)
+    rendered_rch = rch._render(tmp_path, "rch", globaltimes, None)
 
     # assert
     np.testing.assert_allclose(

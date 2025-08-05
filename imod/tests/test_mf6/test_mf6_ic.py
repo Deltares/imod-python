@@ -11,7 +11,7 @@ from imod.schemata import ValidationError
 def test_render():
     ic_start = imod.mf6.InitialConditions(start=0.0)
     directory = pathlib.Path("mymodel")
-    actual_start = ic_start.render(directory, "ic", None, True)
+    actual_start = ic_start._render(directory, "ic", None, True)
     expected = textwrap.dedent(
         """\
         begin options
@@ -44,5 +44,5 @@ def test_from_imod5(imod5_dataset, tmp_path):
 
     ic._validate_init_schemata(True)
 
-    rendered_ic = ic.render(tmp_path, "ic", None, False)
+    rendered_ic = ic._render(tmp_path, "ic", None, False)
     assert "strt" in rendered_ic

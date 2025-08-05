@@ -39,7 +39,7 @@ def test_render():
         reordering_method=None,
         relaxation_factor=0.97,
     )
-    actual = ims.render(None, None, None, None)
+    actual = ims._render(None, None, None, None)
     expected = textwrap.dedent(
         """\
         begin options
@@ -83,23 +83,23 @@ def test_wrong_dtype():
 
 def test_drop_and_add_model():
     ims = create_ims()
-    ims.remove_model_from_solution("GWF_1")
+    ims._remove_model_from_solution("GWF_1")
     assert "modelnames" not in ims.dataset.keys()
-    ims.add_model_to_solution("GWF_2")
+    ims._add_model_to_solution("GWF_2")
     assert "GWF_2" in ims.dataset["modelnames"].values
 
 
 def test_remove_non_present_model():
     ims = create_ims()
-    ims.remove_model_from_solution("GWF_1")
+    ims._remove_model_from_solution("GWF_1")
     with pytest.raises(ValueError):
-        ims.remove_model_from_solution("GWF_1")
+        ims._remove_model_from_solution("GWF_1")
 
 
 def test_add_already_present_model():
     ims = create_ims()
     with pytest.raises(ValueError):
-        ims.add_model_to_solution("GWF_1")
+        ims._add_model_to_solution("GWF_1")
 
 
 def test_ims_options():
@@ -120,7 +120,7 @@ def test_ims_options():
         no_ptc="first",
         ats_outer_maximum_fraction=0.25,
     )
-    actual = ims.render(None, None, None, None)
+    actual = ims._render(None, None, None, None)
     expected = textwrap.dedent(
         """\
         begin options

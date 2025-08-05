@@ -64,7 +64,7 @@ def test_write(
         xr.full_like(like, True, dtype=bool),
     )
 
-    index, svat = grid_data.generate_index_array()
+    index, svat = grid_data._generate_index_array()
 
     with tempfile.TemporaryDirectory() as output_dir:
         output_dir = Path(output_dir)
@@ -298,7 +298,7 @@ def test_generate_index_array(
 ):
     grid_data = GridData(**grid_data_dict)
 
-    index, svat = grid_data.generate_index_array()
+    index, svat = grid_data._generate_index_array()
 
     index_expected = [
         False,
@@ -346,7 +346,7 @@ def test_generate_index_array(
 def test_simple_model(fixed_format_parser, grid_data_dict: dict[str, xr.DataArray]):
     grid_data = GridData(**grid_data_dict)
 
-    index, svat = grid_data.generate_index_array()
+    index, svat = grid_data._generate_index_array()
 
     with tempfile.TemporaryDirectory() as output_dir:
         output_dir = Path(output_dir)
@@ -388,7 +388,7 @@ def test_simple_model_1_subunit(
 ):
     grid_data = GridData(**grid_data_dict)
 
-    index, svat = grid_data.generate_index_array()
+    index, svat = grid_data._generate_index_array()
 
     with tempfile.TemporaryDirectory() as output_dir:
         output_dir = Path(output_dir)
