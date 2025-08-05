@@ -53,6 +53,7 @@ templates_path = ["_templates"]
 remove_from_toctrees = [
     "api/generated/mf6/imod.mf6.*.*.rst",
     "api/generated/msw/imod.msw.*.*.rst",
+    "api/generated/wq/imod.wq.*.*.rst",
 ]
 
 sphinx_gallery_conf = {
