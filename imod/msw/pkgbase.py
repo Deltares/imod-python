@@ -226,8 +226,7 @@ class MetaSwapPackage(abc.ABC):
         discretization. It regrids all the arrays in this package to the desired
         discretization, and leaves the options unmodified. At the moment only
         regridding to a different planar grid is supported, meaning
-        ``target_grid`` has different ``"x"`` and ``"y"`` or different
-        ``cell2d`` coords.
+        ``target_grid`` has different ``"x"`` and ``"y"``.
 
         The default regridding methods are obtained by calling
         ``.get_regrid_methods()`` on the package, which returns a dataclass with
