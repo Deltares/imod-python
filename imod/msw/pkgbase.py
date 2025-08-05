@@ -353,6 +353,9 @@ class MetaSwapPackage(abc.ABC):
         return deepcopy(cls._regrid_method)
 
     def from_imod5_data(self, *args, **kwargs):
+        """
+        This package cannot be constructed from iMOD5 data.
+        """
         raise NotImplementedError("Method not implemented for this package.")
 
     def _is_clipping_supported(self) -> bool:
