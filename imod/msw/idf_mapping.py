@@ -66,7 +66,7 @@ class IdfMapping(MetaSwapPackage, IRegridPackage):
         self.dataset["x_grid"] = x_grid
         self.dataset["y_grid"] = y_grid
 
-    def get_output_settings(self):
+    def _get_output_settings(self):
         grid = self.dataset["area"]
         dx, xmin, _, dy, ymin, _ = spatial_reference(grid)
         ncol = grid["x"].size

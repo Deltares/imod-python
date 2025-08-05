@@ -258,7 +258,8 @@ class MetaSwapModel(Model):
 
         # Add IdfMapping settings
         idf_key = self._get_pkg_key(IdfMapping)
-        simulation_settings.update(self[idf_key].get_output_settings())
+        idf_pkg = cast(IdfMapping, self[idf_key])
+        simulation_settings.update(idf_pkg._get_output_settings())
 
         simulation_settings["unsa_svat_path"] = self._render_unsaturated_database_path(
             simulation_settings["unsa_svat_path"]
