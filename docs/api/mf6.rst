@@ -225,6 +225,7 @@ Flow Packages
     HorizontalFlowBarrierMultiplier.is_empty
     HorizontalFlowBarrierMultiplier.get_regrid_methods
     HorizontalFlowBarrierResistance
+    HorizontalFlowBarrierResistance.cleanup
     HorizontalFlowBarrierResistance.to_mf6_pkg
     HorizontalFlowBarrierResistance.clip_box
     HorizontalFlowBarrierResistance.snap_to_grid
@@ -237,6 +238,7 @@ Flow Packages
     LayeredWell
     LayeredWell.from_imod5_data
     LayeredWell.from_imod5_cap_data
+    LayeredWell.cleanup
     LayeredWell.mask
     LayeredWell.regrid_like
     LayeredWell.to_mf6_pkg
@@ -318,6 +320,7 @@ Flow Packages
     SingleLayerHorizontalFlowBarrierMultiplier.is_empty
     SingleLayerHorizontalFlowBarrierMultiplier.get_regrid_methods
     SingleLayerHorizontalFlowBarrierResistance
+    SingleLayerHorizontalFlowBarrierResistance.cleanup
     SingleLayerHorizontalFlowBarrierResistance.from_imod5_data
     SingleLayerHorizontalFlowBarrierResistance.to_mf6_pkg
     SingleLayerHorizontalFlowBarrierResistance.clip_box
