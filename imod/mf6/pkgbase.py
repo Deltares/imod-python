@@ -69,7 +69,6 @@ class PackageBase(IPackageBase, abc.ABC):
         self, *args, mdal_compliant: bool = False, crs: Optional[Any] = None, **kwargs
     ) -> None:
         """
-
         Write dataset contents to a netCDF file. Custom encoding rules can be
         provided on package level by overriding the _netcdf_encoding in the
         package

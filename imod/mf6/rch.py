@@ -1,4 +1,3 @@
-from copy import deepcopy
 from datetime import datetime
 from typing import Optional
 
@@ -9,9 +8,9 @@ from imod.common.interfaces.iregridpackage import IRegridPackage
 from imod.common.utilities.dataclass_type import DataclassType
 from imod.logging import init_log_decorator
 from imod.mf6.aggregate.aggregate_schemes import RechargeAggregationMethod
-from imod.mf6.boundary_condition import BoundaryCondition
 from imod.mf6.dis import StructuredDiscretization, VerticesDiscretization
 from imod.mf6.regrid.regrid_schemes import RechargeRegridMethod
+from imod.mf6.topsystem import TopSystemBoundaryCondition
 from imod.mf6.utilities.imod5_converter import (
     convert_unit_rch_rate,
     regrid_imod5_pkg_data,
@@ -44,7 +43,7 @@ from imod.util.dims import drop_layer_dim_cap_data
 from imod.util.regrid import RegridderWeightsCache
 
 
-class Recharge(BoundaryCondition, IRegridPackage):
+class Recharge(TopSystemBoundaryCondition, IRegridPackage):
     """
     Recharge Package.
     Any number of RCH Packages can be specified for a single groundwater flow
@@ -134,7 +133,7 @@ class Recharge(BoundaryCondition, IRegridPackage):
         "concentration": [IdentityNoDataSchema("rate"), AllValueSchema(">=", 0.0)],
     }
 
-    _template = BoundaryCondition._initialize_template(_pkg_id)
+    _template = TopSystemBoundaryCondition._initialize_template(_pkg_id)
     _auxiliary_data = {"concentration": "species"}
     _regrid_method = RechargeRegridMethod()
     _aggregate_method: DataclassType = RechargeAggregationMethod()
@@ -175,7 +174,7 @@ class Recharge(BoundaryCondition, IRegridPackage):
         return errors
 
     @classmethod
-    def allocate_planar_data(
+    def _allocate_planar_data(
         cls,
         planar_data: dict[str, GridDataArray],
         dis: StructuredDiscretization | VerticesDiscretization,
@@ -270,7 +269,7 @@ class Recharge(BoundaryCondition, IRegridPackage):
         # if rate has only layer 0, then it is planar.
         if is_planar_grid(regridded_package_data["rate"]):
             allocation_option = ALLOCATION_OPTION.at_first_active
-            layered_data = cls.allocate_planar_data(
+            layered_data = cls._allocate_planar_data(
                 regridded_package_data, target_dis, allocation_option
             )
             regridded_package_data.update(layered_data)
@@ -305,7 +304,3 @@ class Recharge(BoundaryCondition, IRegridPackage):
         data["rate"] = zero_scalar.where(active)
 
         return cls(**data, validate=True, fixed_cell=False)
-
-    @classmethod
-    def get_regrid_methods(cls) -> RechargeRegridMethod:
-        return deepcopy(cls._regrid_method)

@@ -25,9 +25,9 @@ def test_transport_model_rendering():
     m["dsp"] = disp
     m["adv"] = adv
     write_context = WriteContext()
-    actual = m.render("GWF_1", write_context)
+    actual = m._render("GWF_1", write_context)
 
-    actual = m.render("transport", write_context)
+    actual = m._render("transport", write_context)
     expected = textwrap.dedent(
         """\
       begin options

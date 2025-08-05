@@ -86,7 +86,7 @@ class MeteoMapping(MetaSwapPackage):
     ):
         data_dict = {"svat": svat.values.ravel()[index]}
 
-        row, column = self.grid_mapping(svat, self.meteo)
+        row, column = self._grid_mapping(svat, self.meteo)
 
         data_dict["row"] = row[index]
         data_dict["column"] = column[index]
@@ -97,10 +97,10 @@ class MeteoMapping(MetaSwapPackage):
 
         self._check_range(dataframe)
 
-        return self.write_dataframe_fixed_width(file, dataframe)
+        return self._write_dataframe_fixed_width(file, dataframe)
 
     @staticmethod
-    def grid_mapping(svat: xr.DataArray, meteo_grid: xr.DataArray) -> pd.DataFrame:
+    def _grid_mapping(svat: xr.DataArray, meteo_grid: xr.DataArray) -> pd.DataFrame:
         flip_meteo_x = meteo_grid.indexes["x"].is_monotonic_decreasing
         flip_meteo_y = meteo_grid.indexes["y"].is_monotonic_decreasing
         nrow = meteo_grid["y"].size
@@ -139,9 +139,14 @@ class MeteoMapping(MetaSwapPackage):
     def regrid_like(
         self,
         target_grid: GridDataArray,
-        regrid_context: RegridderWeightsCache,
+        regrid_cache: RegridderWeightsCache,
         regridder_types: Optional[DataclassType] = None,
     ):
+        """
+        Returns a deepcopy of this instance, as regridding this package is
+        irrelevant: The meteo data is not on model grid and the mapping is
+        determined upon writing.
+        """
         return deepcopy(self)
 
     def clip_box(
@@ -153,7 +158,32 @@ class MeteoMapping(MetaSwapPackage):
         y_min: Optional[float] = None,
         y_max: Optional[float] = None,
     ):
-        """Clip meteo grid to a box defined by time and space."""
+        """
+        Clip a package by a bounding box (time, layer, y, x).
+
+        Slicing intervals may be half-bounded, by providing None:
+
+        * To select 500.0 <= x <= 1000.0:
+          ``clip_box(x_min=500.0, x_max=1000.0)``.
+        * To select x <= 1000.0: ``clip_box(x_min=None, x_max=1000.0)``
+          or ``clip_box(x_max=1000.0)``.
+        * To select x >= 500.0: ``clip_box(x_min = 500.0, x_max=None.0)``
+          or ``clip_box(x_min=1000.0)``.
+
+        Parameters
+        ----------
+        time_min: optional
+        time_max: optional
+        x_min: optional, float
+        x_max: optional, float
+        y_min: optional, float
+        y_max: optional, float
+
+        Returns
+        -------
+        clipped: Package
+            A new package with the clipped data.
+        """
         selection = self.meteo.to_dataset(name="meteo")  # Force to dataset
         selection = clip_time_slice(selection, time_min=time_min, time_max=time_max)
         selection = clip_spatial_box(

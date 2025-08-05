@@ -1,4 +1,3 @@
-from copy import deepcopy
 from datetime import datetime
 from typing import Optional
 
@@ -313,7 +312,3 @@ class ConstantHead(BoundaryCondition, IRegridPackage):
             chd = chd.clip_box(time_min=time_min, time_max=time_max)
 
         return chd
-
-    @classmethod
-    def get_regrid_methods(cls) -> ConstantHeadRegridMethod:
-        return deepcopy(cls._regrid_method)

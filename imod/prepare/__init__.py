@@ -18,6 +18,7 @@ from imod.prepare import hfb, spatial, subsoil, surface_water
 from imod.prepare.cleanup import (
     cleanup_drn,
     cleanup_ghb,
+    cleanup_hfb,
     cleanup_riv,
     cleanup_wel,
     cleanup_wel_layered,

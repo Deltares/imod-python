@@ -56,7 +56,7 @@ class InitialConditionsRootzonePressureHead(MetaSwapPackage, IRegridPackage):
 
         dataframe = self.dataset.assign_coords(index=[0]).to_dataframe()
 
-        self.write_dataframe_fixed_width(file, dataframe)
+        self._write_dataframe_fixed_width(file, dataframe)
 
 
 class InitialConditionsPercolation(MetaSwapPackage, IRegridPackage):
@@ -111,8 +111,8 @@ class InitialConditionsSavedState(MetaSwapPackage):
 
         shutil.copyfile(self.saved_state, filename)
 
-    def is_regridding_supported(self) -> bool:
+    def _is_regridding_supported(self) -> bool:
         return False
 
-    def is_clipping_supported(self) -> bool:
+    def _is_clipping_supported(self) -> bool:
         return False

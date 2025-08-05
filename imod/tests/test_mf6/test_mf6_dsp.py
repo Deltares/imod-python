@@ -15,7 +15,7 @@ def test_dispersion_default():
     globaltimes = [np.datetime64("2000-01-01")]
     disp = imod.mf6.Dispersion(1e-4, 1.0, 10.0)
 
-    actual = disp.render(directory, "dsp", globaltimes, True)
+    actual = disp._render(directory, "dsp", globaltimes, True)
     expected = textwrap.dedent(
         """\
       begin options
@@ -38,7 +38,7 @@ def test_dispersion_options():
     directory = pathlib.Path("mymodel")
     globaltimes = [np.datetime64("2000-01-01")]
     disp = imod.mf6.Dispersion(1e-4, 1.0, 10.0, 1.0, 2.0, 3.0, True, False)
-    actual = disp.render(directory, "dsp", globaltimes, True)
+    actual = disp._render(directory, "dsp", globaltimes, True)
     expected = textwrap.dedent(
         """\
       begin options
@@ -64,7 +64,7 @@ def test_dispersion_options():
     assert actual == expected
 
     disp = imod.mf6.Dispersion(1e-4, 1.0, 10.0, 1.0, 2.0, 3.0, False, True)
-    actual = disp.render(directory, "dsp", globaltimes, True)
+    actual = disp._render(directory, "dsp", globaltimes, True)
     expected = textwrap.dedent(
         """\
       begin options
@@ -121,7 +121,7 @@ def test_dispersion_layered():
         validate=False,
     )
 
-    actual = disp.render(directory, "dsp", globaltimes, True)
+    actual = disp._render(directory, "dsp", globaltimes, True)
     expected = textwrap.dedent(
         """\
       begin options

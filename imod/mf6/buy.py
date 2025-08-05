@@ -125,7 +125,7 @@ class Buoyancy(Package):
         super().__init__(dict_dataset)
         self._validate_init_schemata(validate)
 
-    def render(self, directory, pkgname, globaltimes, binary):
+    def _render(self, directory, pkgname, globaltimes, binary):
         ds = self.dataset
         packagedata = []
 
@@ -151,13 +151,13 @@ class Buoyancy(Package):
 
         return self._template.render(d)
 
-    def update_transport_models(self, new_modelnames: Sequence[str]):
+    def _update_transport_models(self, new_modelnames: Sequence[str]):
         """
         The names of the transport models can change in some cases, for example
         when partitioning. Use this function to update the names of the
         transport models.
         """
-        transport_model_names = self.get_transport_model_names()
+        transport_model_names = self._get_transport_model_names()
         if not len(transport_model_names) == len(new_modelnames):
             raise ValueError("the number of transport models cannot be changed.")
         for modelname, new_modelname in zip(transport_model_names, new_modelnames):
@@ -167,7 +167,7 @@ class Buoyancy(Package):
                 )
         self.dataset["modelname"] = assign_index(new_modelnames)
 
-    def get_transport_model_names(self) -> list[str]:
+    def _get_transport_model_names(self) -> list[str]:
         """
         Returns the names of the transport  models used by this buoyancy package.
         """

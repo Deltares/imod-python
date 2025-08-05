@@ -104,7 +104,7 @@ class CouplerMapping(MetaSwapPackage):
 
         self._check_range(dataframe)
 
-        return self.write_dataframe_fixed_width(file, dataframe)
+        return self._write_dataframe_fixed_width(file, dataframe)
 
     def _create_well_id(
         self,
@@ -145,5 +145,5 @@ class CouplerMapping(MetaSwapPackage):
 
         return {"mod_id": well_mod_id_1d, "svat": well_svat_1d, "layer": layer_1d}
 
-    def is_regridding_supported(self) -> bool:
+    def _is_regridding_supported(self) -> bool:
         return False

@@ -92,7 +92,7 @@ def test_hfb_render(barrier):
 
     # Act
     directory = pathlib.Path("mymodel")
-    actual = hfb.render(directory, "hfb", None, False)
+    actual = hfb._render(directory, "hfb", None, False)
 
     # Assert
     assert actual == expected

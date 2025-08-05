@@ -18,3 +18,4 @@ Before requesting review, please go through this checklist:
 - [ ] PR title starts with ``Issue #nr``, e.g. ``Issue #737``
 - [ ] Unit tests were added
 - [ ] **If feature added**: Added/extended example
+- [ ] **If feature added**: Added feature to API documentation

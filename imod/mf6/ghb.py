@@ -1,4 +1,3 @@
-from copy import deepcopy
 from datetime import datetime
 from typing import Optional
 
@@ -8,14 +7,14 @@ from imod.common.interfaces.iregridpackage import IRegridPackage
 from imod.common.utilities.dataclass_type import DataclassType
 from imod.common.utilities.mask import broadcast_and_mask_arrays
 from imod.logging import init_log_decorator, standard_log_decorator
-from imod.mf6.aggregate.aggregate_schemes import DrainageAggregationMethod
-from imod.mf6.boundary_condition import BoundaryCondition
+from imod.mf6.aggregate.aggregate_schemes import GeneralHeadBoundaryAggregationMethod
 from imod.mf6.dis import StructuredDiscretization
 from imod.mf6.disv import VerticesDiscretization
 from imod.mf6.npf import NodePropertyFlow
 from imod.mf6.regrid.regrid_schemes import (
     GeneralHeadBoundaryRegridMethod,
 )
+from imod.mf6.topsystem import TopSystemBoundaryCondition
 from imod.mf6.utilities.imod5_converter import regrid_imod5_pkg_data
 from imod.mf6.utilities.package import set_repeat_stress_if_available
 from imod.mf6.validation import BOUNDARY_DIMS_SCHEMA, CONC_DIMS_SCHEMA
@@ -42,7 +41,7 @@ from imod.typing.grid import enforce_dim_order, has_negative_layer, is_planar_gr
 from imod.util.regrid import RegridderWeightsCache
 
 
-class GeneralHeadBoundary(BoundaryCondition, IRegridPackage):
+class GeneralHeadBoundary(TopSystemBoundaryCondition, IRegridPackage):
     """
     The General-Head Boundary package is used to simulate head-dependent flux
     boundaries.
@@ -137,10 +136,10 @@ class GeneralHeadBoundary(BoundaryCondition, IRegridPackage):
     }
 
     _keyword_map = {}
-    _template = BoundaryCondition._initialize_template(_pkg_id)
+    _template = TopSystemBoundaryCondition._initialize_template(_pkg_id)
     _auxiliary_data = {"concentration": "species"}
     _regrid_method = GeneralHeadBoundaryRegridMethod()
-    _aggregate_method: DataclassType = DrainageAggregationMethod()
+    _aggregate_method: DataclassType = GeneralHeadBoundaryAggregationMethod()
 
     @init_log_decorator()
     def __init__(
@@ -192,7 +191,7 @@ class GeneralHeadBoundary(BoundaryCondition, IRegridPackage):
         super().__init__(cleaned_dict)
 
     @classmethod
-    def allocate_and_distribute_planar_data(
+    def _allocate_and_distribute_planar_data(
         cls,
         planar_data: dict[str, GridDataArray],
         dis: StructuredDiscretization | VerticesDiscretization,
@@ -331,7 +330,7 @@ class GeneralHeadBoundary(BoundaryCondition, IRegridPackage):
         regridded_package_data = broadcast_and_mask_arrays(regridded_package_data)
         is_planar = is_planar_grid(regridded_package_data["conductance"])
         if is_planar:
-            layered_data = cls.allocate_and_distribute_planar_data(
+            layered_data = cls._allocate_and_distribute_planar_data(
                 regridded_package_data,
                 target_dis,
                 target_npf,
@@ -347,7 +346,3 @@ class GeneralHeadBoundary(BoundaryCondition, IRegridPackage):
         # time is forward filled.
         ghb = ghb.clip_box(time_min=time_min, time_max=time_max)
         return ghb
-
-    @classmethod
-    def get_regrid_methods(cls) -> GeneralHeadBoundaryRegridMethod:
-        return deepcopy(cls._regrid_method)

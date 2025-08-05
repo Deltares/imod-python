@@ -104,7 +104,7 @@ def test_render(riv_data):
     river = imod.mf6.River(**riv_data)
     directory = pathlib.Path("mymodel")
     globaltimes = [np.datetime64("2000-01-01")]
-    actual = river.render(directory, "river", globaltimes, True)
+    actual = river._render(directory, "river", globaltimes, True)
     expected = textwrap.dedent(
         """\
         begin options
@@ -150,7 +150,7 @@ def test_render_repeat_stress(riv_data):
     }
     river = imod.mf6.River(repeat_stress=repeat_stress, **riv_data)
     directory = pathlib.Path("mymodel")
-    actual = river.render(directory, "river", globaltimes, True)
+    actual = river._render(directory, "river", globaltimes, True)
 
     expected = textwrap.dedent(
         """\
@@ -549,7 +549,7 @@ def test_render_concentration(concentration_fc):
     globaltimes = [np.datetime64("2000-01-01")]
 
     riv = imod.mf6.River(concentration_boundary_type="AUX", **riv_ds)
-    actual = riv.render(directory, "riv", globaltimes, False)
+    actual = riv._render(directory, "riv", globaltimes, False)
 
     expected = textwrap.dedent(
         """\

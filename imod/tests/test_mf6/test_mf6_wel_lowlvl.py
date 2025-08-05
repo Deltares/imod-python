@@ -142,7 +142,7 @@ def test_mf6wel_render__transient(
     directory.mkdir(exist_ok=True)
 
     # Act
-    actual = mf6wel.render(directory.stem, pkgname, globaltimes, False)
+    actual = mf6wel._render(directory.stem, pkgname, globaltimes, False)
     expected = textwrap.dedent(
         """\
     begin options

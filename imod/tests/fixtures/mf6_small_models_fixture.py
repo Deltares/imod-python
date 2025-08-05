@@ -198,7 +198,7 @@ def structured_flow_simulation_2_flow_models(
     """Returns transient confined model."""
     other_flow_model = deepcopy(structured_flow_simulation["flow"])
     structured_flow_simulation["flow_copy"] = other_flow_model
-    structured_flow_simulation["solution"].add_model_to_solution("flow_copy")
+    structured_flow_simulation["solution"]._add_model_to_solution("flow_copy")
 
     return structured_flow_simulation
 

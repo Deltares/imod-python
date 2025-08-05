@@ -88,7 +88,7 @@ def test_checkoptions(test_data):
 
 def test_to_sparsedata(test_data):
     uzf = imod.mf6.UnsaturatedZoneFlow(**test_data)
-    uzf.fill_stress_perioddata()
+    uzf._fill_stress_perioddata()
     bin_data = uzf[list(uzf._period_data)]
     arrdict = uzf._ds_to_arrdict(bin_data.isel(time=0))
     layer = bin_data.isel(time=0)["layer"].values
@@ -105,7 +105,7 @@ def test_to_sparsedata(test_data):
 def test_fill_perioddata(test_data):
     uzf = imod.mf6.UnsaturatedZoneFlow(**test_data)
     assert uzf["root_potential"].item() is None
-    uzf.fill_stress_perioddata()
+    uzf._fill_stress_perioddata()
     assert np.all(uzf["root_potential"] == xr.full_like(uzf["kv_sat"], 0.0))
 
 
@@ -120,7 +120,7 @@ def test_render(test_data):
     uzf = imod.mf6.UnsaturatedZoneFlow(**test_data)
     directory = pathlib.Path("mymodel")
     globaltimes = pd.date_range("2018-01-01", periods=4, freq="h")
-    actual = uzf.render(directory, "uzf", globaltimes, True)
+    actual = uzf._render(directory, "uzf", globaltimes, True)
 
     expected = textwrap.dedent(
         """\

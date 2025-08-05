@@ -231,7 +231,7 @@ class TestModel:
         write_context_mock = MagicMock(spec_set=WriteContext)
 
         # Act.
-        output = model.render("TestModel", write_context_mock)
+        output = model._render("TestModel", write_context_mock)
 
         # Assert.
         assert ("newton" in output) == use_newton and (
@@ -473,16 +473,16 @@ def test_model_init_validation(
     structured_flow_model: GroundwaterFlowModel,
 ):
     # Act
-    structured_flow_model.validate_init_schemata_options(
+    structured_flow_model._validate_init_schemata_options(
         validate=True,
     )
     # Arrange
     structured_flow_model._options["newton"] = 1
     # Act
-    structured_flow_model.validate_init_schemata_options(
+    structured_flow_model._validate_init_schemata_options(
         validate=False,
     )
     with pytest.raises(ValidationError):
-        structured_flow_model.validate_init_schemata_options(
+        structured_flow_model._validate_init_schemata_options(
             validate=True,
         )

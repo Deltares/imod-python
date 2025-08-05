@@ -29,7 +29,7 @@ def test_render():
         alternative_cell_averaging="AMT-HMK",
     )
     directory = pathlib.Path("mymodel")
-    actual = npf.render(directory, "npf", None, True)
+    actual = npf._render(directory, "npf", None, True)
     expected = textwrap.dedent(
         """\
         begin options
@@ -193,20 +193,20 @@ def test_configure_xt3d(tmp_path):
     )
 
     # assert xt3d off by default
-    rendered = npf.render(tmp_path, "npf", None, True)
+    rendered = npf._render(tmp_path, "npf", None, True)
     assert "xt3d" not in rendered
     assert not npf.get_xt3d_option()
 
     # assert xt3d can be turned on
     npf.set_xt3d_option(True, True)
-    rendered = npf.render(tmp_path, "npf", None, True)
+    rendered = npf._render(tmp_path, "npf", None, True)
     assert "xt3d" in rendered
     assert "rhs" in rendered
     assert npf.get_xt3d_option()
 
     # assert xt3d can be turned off
     npf.set_xt3d_option(False, False)
-    rendered = npf.render(tmp_path, "npf", None, True)
+    rendered = npf._render(tmp_path, "npf", None, True)
     assert "xt3d" not in rendered
     assert "rhs" not in rendered
     assert not npf.get_xt3d_option()
@@ -225,7 +225,7 @@ def test_npf_from_imod5_isotropic(imod5_dataset, tmp_path):
     k_nan_removed = xr.where(np.isnan(npf.dataset["k"]), 0, npf.dataset["k"])
     np.testing.assert_allclose(k_nan_removed, data["khv"]["kh"].values)
 
-    rendered_npf = npf.render(tmp_path, "npf", None, None)
+    rendered_npf = npf._render(tmp_path, "npf", None, None)
     assert "k22" not in rendered_npf
     assert "k33" not in rendered_npf
     assert "angle1" not in rendered_npf
@@ -258,7 +258,7 @@ def test_npf_from_imod5_horizontal_anisotropy(imod5_dataset, tmp_path):
             assert np.all(ds_layer["k"].values == ds_layer["k22"].values)
             assert np.all(ds_layer["angle1"].values == 90.0)
 
-    rendered_npf = npf.render(tmp_path, "npf", None, None)
+    rendered_npf = npf._render(tmp_path, "npf", None, None)
     assert "k22" in rendered_npf
     assert "k33" not in rendered_npf
     assert "angle1" in rendered_npf
@@ -285,7 +285,7 @@ def test_npf_from_imod5_vertical_anisotropy(imod5_dataset, tmp_path):
         k33_layer = xr.where(np.isnan(k33_layer), 0.0, k33_layer)
         np.testing.assert_allclose(k_layer.values * 0.1, k33_layer.values, atol=1e-10)
 
-    rendered_npf = npf.render(tmp_path, "npf", None, None)
+    rendered_npf = npf._render(tmp_path, "npf", None, None)
     assert "k22" not in rendered_npf
     assert "k33" in rendered_npf
     assert "angle1" not in rendered_npf
