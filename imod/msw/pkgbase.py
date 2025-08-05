@@ -112,7 +112,7 @@ class MetaSwapPackage(abc.ABC):
                     f"{varname}: not all values are within range ({min_value}-{max_value})."
                 )
 
-    def write_dataframe_fixed_width(self, file, dataframe):
+    def _write_dataframe_fixed_width(self, file, dataframe):
         """Write dataframe to fixed format file."""
         for row in dataframe.itertuples():
             for index, metadata in enumerate(self._metadata_dict.values()):
@@ -159,7 +159,7 @@ class MetaSwapPackage(abc.ABC):
 
         self._check_range(dataframe)
 
-        return self.write_dataframe_fixed_width(file, dataframe)
+        return self._write_dataframe_fixed_width(file, dataframe)
 
     def _pkgcheck(self):
         """
@@ -252,7 +252,7 @@ class MetaSwapPackage(abc.ABC):
         To regrid the infiltration package with a non-default method for the
         infiltration capacity, call ``regrid_like`` with these arguments:
 
-        >>> regridder_types = imod.mf6.regrid.InfiltrationRegridMethod(infiltration_capacity=(imod.RegridderType.OVERLAP, "max"))
+        >>> regridder_types = imod.msw.regrid.InfiltrationRegridMethod(infiltration_capacity=(imod.RegridderType.OVERLAP, "max"))
         >>> regrid_cache = imod.util.regrid.RegridderWeightsCache()
         >>> new_infiltration = infiltration.regrid_like(like, regrid_cache, regridder_types)
 
@@ -320,8 +320,38 @@ class MetaSwapPackage(abc.ABC):
         cls = type(self)
         return cls._from_dataset(selection)
 
-    def get_regrid_methods(self) -> DataclassType:
-        return deepcopy(self._regrid_method)
+    @classmethod
+    def get_regrid_methods(cls) -> DataclassType:
+        """
+        Returns the default regrid methods for this package. You can use modify
+        to customize the regridding of the package.
+
+        Returns
+        -------
+        DataclassType
+            The regrid methods for this package, which is a dataclass with
+            attributes that are tuples of (regridder type, method name). If no
+            regrid methods are defined, returns an instance of
+            EmptyRegridMethod.
+
+        Examples
+        --------
+        Get the regrid methods for the Drainage package:
+
+        >>> regrid_settings = Infiltration.get_regrid_methods()
+
+        You can modify the regrid methods by changing the attributes of the
+        returned dataclass instance. For example, to set the regridding method
+        for ``infiltration_capacity`` to minimum.
+
+        >>> regrid_settings.infiltration_capacity = (imod.RegridderType.OVERLAP, "min")
+
+        These settings can then be used to regrid the package:
+
+        >>> infiltration.regrid_like(like, regridder_types=regrid_settings)
+
+        """
+        return deepcopy(cls._regrid_method)
 
     def from_imod5_data(self, *args, **kwargs):
         raise NotImplementedError("Method not implemented for this package.")

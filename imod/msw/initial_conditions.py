@@ -56,7 +56,7 @@ class InitialConditionsRootzonePressureHead(MetaSwapPackage, IRegridPackage):
 
         dataframe = self.dataset.assign_coords(index=[0]).to_dataframe()
 
-        self.write_dataframe_fixed_width(file, dataframe)
+        self._write_dataframe_fixed_width(file, dataframe)
 
 
 class InitialConditionsPercolation(MetaSwapPackage, IRegridPackage):

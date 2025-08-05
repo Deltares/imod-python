@@ -211,7 +211,7 @@ class LanduseOptions(MetaSwapPackage, IRegridPackage):
         # Reorder columns to _metadata_dict order
         dataframe = dataframe[list(self._metadata_dict.keys())]
 
-        return self.write_dataframe_fixed_width(file, dataframe)
+        return self._write_dataframe_fixed_width(file, dataframe)
 
     def _pkgcheck(self):
         dims = self.dataset.dims

@@ -96,7 +96,7 @@ class VariableOutputControl(MetaSwapPackage, IRegridPackage):
 
         self._check_range(dataframe)
 
-        return self.write_dataframe_fixed_width(file, dataframe)
+        return self._write_dataframe_fixed_width(file, dataframe)
 
 
 class TimeOutputControl(MetaSwapPackage, IRegridPackage):
@@ -136,7 +136,7 @@ class TimeOutputControl(MetaSwapPackage, IRegridPackage):
 
         self._check_range(dataframe)
 
-        return self.write_dataframe_fixed_width(file, dataframe)
+        return self._write_dataframe_fixed_width(file, dataframe)
 
     def regrid_like(
         self,

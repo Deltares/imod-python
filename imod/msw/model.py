@@ -198,7 +198,7 @@ class MetaSwapModel(Model):
                 f"which were not in AnnualCropGrowth: {missing_indices}"
             )
 
-    def has_file_copier(self) -> bool:
+    def _has_file_copier(self) -> bool:
         pkg_types_included = {type(pkg) for pkg in self.values()}
         return FileCopier in pkg_types_included
 
@@ -234,7 +234,7 @@ class MetaSwapModel(Model):
             raise KeyError(f"Could not find package of type: {pkg_type}")
 
     def _model_checks(self, validate: bool):
-        if validate and not self.has_file_copier():
+        if validate and not self._has_file_copier():
             self._check_required_packages()
             self._check_vegetation_indices_in_annual_crop_factors()
             self._check_landuse_indices_in_lookup_options()

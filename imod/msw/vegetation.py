@@ -86,7 +86,7 @@ class AnnualCropFactors(MetaSwapPackage, IRegridPackage):
 
         self._check_range(dataframe)
 
-        return self.write_dataframe_fixed_width(file, dataframe)
+        return self._write_dataframe_fixed_width(file, dataframe)
 
     def _pkgcheck(self):
         dims = self.dataset.dims
