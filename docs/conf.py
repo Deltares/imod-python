@@ -51,7 +51,7 @@ extensions = [
 templates_path = ["_templates"]
 # Skip including the files for methods in the navbar on the side (note the *.*.rst)
 remove_from_toctrees = [
-    "api/generated/mf6/imod.mf6.*.*.rst", 
+    "api/generated/mf6/imod.mf6.*.*.rst",
     "api/generated/msw/imod.msw.*.*.rst",
 ]
 
