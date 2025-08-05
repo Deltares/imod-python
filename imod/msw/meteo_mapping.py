@@ -86,7 +86,7 @@ class MeteoMapping(MetaSwapPackage):
     ):
         data_dict = {"svat": svat.values.ravel()[index]}
 
-        row, column = self.grid_mapping(svat, self.meteo)
+        row, column = self._grid_mapping(svat, self.meteo)
 
         data_dict["row"] = row[index]
         data_dict["column"] = column[index]
@@ -100,7 +100,7 @@ class MeteoMapping(MetaSwapPackage):
         return self._write_dataframe_fixed_width(file, dataframe)
 
     @staticmethod
-    def grid_mapping(svat: xr.DataArray, meteo_grid: xr.DataArray) -> pd.DataFrame:
+    def _grid_mapping(svat: xr.DataArray, meteo_grid: xr.DataArray) -> pd.DataFrame:
         flip_meteo_x = meteo_grid.indexes["x"].is_monotonic_decreasing
         flip_meteo_y = meteo_grid.indexes["y"].is_monotonic_decreasing
         nrow = meteo_grid["y"].size
