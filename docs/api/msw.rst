@@ -119,7 +119,17 @@ Parameter packages
     :toctree: generated/msw
 
     LanduseOptions
+    LanduseOptions.regrid_like
+    LanduseOptions.clip_box
+    LanduseOptions.from_imod5_data
+    LanduseOptions.get_regrid_methods
+    LanduseOptions.write
     AnnualCropFactors
+    AnnualCropFactors.regrid_like
+    AnnualCropFactors.clip_box
+    AnnualCropFactors.from_imod5_data
+    AnnualCropFactors.get_regrid_methods
+    AnnualCropFactors.write
 
 Meteorology packages
 --------------------
