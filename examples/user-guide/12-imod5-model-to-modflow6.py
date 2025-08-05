@@ -335,7 +335,7 @@ head_unstructured.isel(time=-1).sel(layer=5).ugrid.plot()
 #
 # Let's upscale the structured head data to the unstructured grid. This is done
 # using the `OverlapRegridder from the xugrid package
-# <https://deltares.github.io/xugrid/examples/regridder_overview.html#overlapregridder>_,
+# <https://deltares.github.io/xugrid/examples/regridder_overview.html#overlapregridder>`_,
 
 import xugrid as xu
 
