@@ -147,6 +147,9 @@ Flow Packages
     ApiPackage.copy
     ApiPackage.is_empty
     ApiPackage.get_regrid_methods
+    ApiPackage.mask
+    ApiPackage.regrid_like
+    ApiPackage.clip_box
     Buoyancy
     Buoyancy.write
     Buoyancy.from_file
@@ -154,6 +157,9 @@ Flow Packages
     Buoyancy.copy
     Buoyancy.is_empty
     Buoyancy.get_regrid_methods
+    Buoyancy.mask
+    Buoyancy.regrid_like
+    Buoyancy.clip_box
     ConstantHead
     ConstantHead.from_imod5_data
     ConstantHead.from_imod5_shd_data
@@ -383,13 +389,6 @@ Transport Packages
 .. autosummary::
     :toctree: generated/mf6
 
-    ApiPackage
-    ApiPackage.write
-    ApiPackage.from_file
-    ApiPackage.to_netcdf
-    ApiPackage.copy
-    ApiPackage.is_empty
-    ApiPackage.get_regrid_methods
     AdvectionCentral
     AdvectionCentral.write
     AdvectionCentral.from_file

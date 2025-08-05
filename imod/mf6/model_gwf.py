@@ -10,7 +10,8 @@ import numpy as np
 from imod.common.utilities.dataclass_type import DataclassType
 from imod.logging import init_log_decorator
 from imod.logging.logging_decorators import standard_log_decorator
-from imod.mf6 import ConstantHead
+from imod.mf6.buy import Buoyancy
+from imod.mf6.chd import ConstantHead
 from imod.mf6.clipped_boundary_condition_creator import create_clipped_boundary
 from imod.mf6.dis import StructuredDiscretization
 from imod.mf6.drn import Drainage
@@ -211,10 +212,10 @@ class GroundwaterFlowModel(Modflow6Model):
         buoyancy_key = self._get_pkgkey("buy")
         if buoyancy_key is None:
             return
-        buoyancy_package = self[buoyancy_key]
-        transport_models_old = buoyancy_package.get_transport_model_names()
+        buoyancy_package = cast(Buoyancy, self[buoyancy_key])
+        transport_models_old = buoyancy_package._get_transport_model_names()
         if len(transport_models_old) == len(transport_models_per_flow_model):
-            buoyancy_package.update_transport_models(transport_models_per_flow_model)
+            buoyancy_package._update_transport_models(transport_models_per_flow_model)
 
     @classmethod
     @standard_log_decorator()
