@@ -59,5 +59,3 @@ Prepare model input
     cleanup_hfb
 
     create_partition_labels
-
-    ones_like_ugrid
