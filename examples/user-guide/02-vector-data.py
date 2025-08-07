@@ -105,8 +105,10 @@ back
 # --------------------
 #
 # From the perspective of MODFLOW groundwater modeling, we are often interested
-# in the properties of cells in specific polygons or zones. Refer to the
-# examples or the API reference for ``imod.prepare``.
+# in the properties of cells in specific polygons or zones. This often means
+# having to rasterize shapefiles or sometimes polygonizing raster files. For
+# examples, see :doc:`../examples/prepare/rasterize_shp` and
+# :doc:`../examples/prepare/polygonize_raster`.
 #
 # GeoPandas provides a full suite of vector based GIS operations, such as
 # intersections, spatial joins, or plotting.

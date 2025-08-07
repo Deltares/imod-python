@@ -213,7 +213,8 @@ back
 #
 # Reprojection from one CRS to another is a common frustration. Since the data
 # in an xarray DataArray is always accompanied by its x and y coordinates, we
-# can easily reproject the data. See the :doc:`../examples/prepare/reproject`.
+# can easily reproject the data. See the example
+# :doc:`../examples/prepare/reproject`.
 #
 # MODFLOW 6
 # ---------
