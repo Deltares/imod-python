@@ -14,6 +14,8 @@ For a full overview of the supported iMOD5 features in iMOD Python, see
 
 """
 
+# sphinx_gallery_thumbnail_number = -1
+
 # %%
 #
 # Raster data (IDF)
