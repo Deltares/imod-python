@@ -213,7 +213,62 @@ back
 #
 # Reprojection from one CRS to another is a common frustration. Since the data
 # in an xarray DataArray is always accompanied by its x and y coordinates, we
-# can easily reproject the data. See the examples.
+# can easily reproject the data. See the :doc:`../examples/prepare/reproject`.
+#
+# MODFLOW 6
+# ---------
+#
+# iMOD Python's MODFLOW 6 module supports raster data in the form of xarray
+# DataArrays. It will interpret data with an ``"x"`` and ``"y"`` coordinate
+# automatically as data on structured grid. Let's create a structured
+# discretization package (DIS) first. Note that MODFLOW 6 requires ``top`` to
+# have only one layer, so we select the first layer of the layer model.
+# Furthermore, the idomain is required to be an integer array, so we convert it
+# to an integer type.
+
+import imod
+
+top = layermodel["top"].sel(layer=1)
+idomain = layermodel["idomain"].astype(int)
+
+dis = imod.mf6.StructuredDiscretization(
+    top=top, bottom=layermodel["bottom"], idomain=idomain
+)
+dis
+
+# %%
+#
+# Great! We can now use this discretization in a MODFLOW 6 model. Say we want to
+# create a drainage package for overland flow. We can use the top array as drain
+# elevation, but we only want drain cells in the first layer, where ``idomain ==
+# 1``.
+
+layer = layermodel.coords["layer"]
+is_top_layer_and_active = (layer == 1) & (idomain == 1)
+drain_elevation = layermodel["top"].where(is_top_layer_and_active)
+
+# %%
+#
+# Next, we need to create a conductance array. The conductance is a measure of
+# how much water can flow through a cell. We can use the areas of the cells to
+# compute a conductance array.
+
+area = layermodel["dx"] * layermodel["dy"] * -1
+resistance = 1  # Example resistance value in days
+conductance_value = area / resistance
+conductance = conductance_value.where(is_top_layer_and_active)
+
+# %%
+#
+# We can now create a drainage package object:
+
+drn = imod.mf6.Drainage(
+    elevation=drain_elevation,
+    conductance=conductance,
+)
+drn
+
+# %%
 #
 # .. _affine: https://www.perrygeo.com/python-affine-transforms.html
 # .. _Glob: https://en.wikipedia.org/wiki/Glob_(programming)

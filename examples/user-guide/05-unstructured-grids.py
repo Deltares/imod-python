@@ -163,10 +163,8 @@ drain_elevation
 # how much water can flow through a cell. The areas of the cells are used to
 # calculate the conductance, and can be be obtained from its grid.
 
-resistance = 100  # Example resistance value
-conductance = (
-    disv_voronoi["idomain"] * voronoi_grid.area / resistance
-)  # Example conductance value
+resistance = 1  # Example resistance value in days
+conductance = disv_voronoi["idomain"] * voronoi_grid.area / resistance
 
 # %%
 #
