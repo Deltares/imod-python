@@ -122,7 +122,7 @@ n_obs_per_time
 #
 # We can see in the printed summary that most dates have only one observation,
 # and that the last two dates are only two days apart. This is likely caused by
-# observations on inconsistent dates. 
+# observations on inconsistent dates.
 #
 # Let's see if there are some dates with more than one observation.
 
