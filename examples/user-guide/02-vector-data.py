@@ -111,6 +111,40 @@ back
 # GeoPandas provides a full suite of vector based GIS operations, such as
 # intersections, spatial joins, or plotting.
 #
+# MODFLOW 6
+# ---------
+#
+# iMOD Python's MODFLOW 6 module requires vector line data for the horizontal
+# flow barrier packages (HFB). The simplest form of such a package is to add a
+# HFB package for a single layer. For that we have to create some linestrings
+# first with shapely. Next, we need to assign data to the linestrings: a layer
+# number and a resistance value.
+
+from shapely import linestrings
+
+from imod.mf6 import SingleLayerHorizontalFlowBarrierResistance
+
+barrier_linestrings = linestrings(x, y)
+geometry = gpd.GeoDataFrame(
+    geometry=[barrier_linestrings],
+    data={
+        "resistance": [100.0],
+        "layer": [1],
+    },
+)
+
+hfb = SingleLayerHorizontalFlowBarrierResistance(geometry)
+hfb
+
+# %%
+#
+# You can see the GeoDataFrame has been converted to an xr.Dataset. To access
+# the data as a geodataframe again use the line_data property:
+
+hfb.line_data
+
+# %%
+#
 # .. _fiona: https://fiona.readthedocs.io/en/latest/manual.html
 # .. _OGR: https://gdal.org/faq.html#what-is-this-ogr-stuff
 # .. _GDAL: https://gdal.org/
