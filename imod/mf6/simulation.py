@@ -1291,9 +1291,9 @@ class Modflow6Simulation(collections.UserDict, ISimulation):
         validate: bool = True,
     ) -> "Modflow6Simulation":
         """
-        This method creates a new simulation object. The models contained in the new simulation are regridded versions
-        of the models in the input object (this).
-        Time discretization and solver settings are copied.
+        This method creates a new simulation object. The models contained in the
+        new simulation are regridded versions of the models in the input object
+        (this). Time discretization and solver settings are copied.
 
         Parameters
         ----------
@@ -1307,6 +1307,16 @@ class Modflow6Simulation(collections.UserDict, ISimulation):
         Returns
         -------
         a new simulation object with regridded models
+
+        Examples
+        --------
+        >>> target_grid = imod.util.empty_2d(
+        ...     dx=5.0, xmin=500.0, xmax=1000.0, dy=5.0, ymin=500.0, ymax=1000.0
+        ... )
+        >>> regridded_sim = simulation.regrid_like(
+        ...     regridded_simulation_name="regridded_sim",
+        ...     target_grid=target_grid,
+        ... )
         """
 
         return _regrid_like(self, regridded_simulation_name, target_grid, validate)
