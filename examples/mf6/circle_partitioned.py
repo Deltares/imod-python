@@ -12,16 +12,13 @@ import matplotlib.pyplot as plt
 from example_models import create_circle_simulation
 
 import imod
-from imod.prepare.partition import create_partition_labels
 
 simulation = create_circle_simulation()
 tmp_path = imod.util.temporary_directory()
 simulation.write(tmp_path / "original", False)
 
-idomain = simulation["GWF_1"]["disv"].dataset["idomain"]
-
 number_partitions = 5
-submodel_labels = create_partition_labels(simulation, number_partitions)
+submodel_labels = simulation.create_partition_labels(number_partitions)
 
 # Create a simulation that is split in subdomains according to the label array.
 new_sim = simulation.split(submodel_labels)

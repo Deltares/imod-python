@@ -393,33 +393,56 @@ class Package(PackageBase, IPackage, abc.ABC):
         """
         Clip a package by a bounding box (time, layer, y, x).
 
-        Slicing intervals may be half-bounded, by providing None:
-
-        * To select 500.0 <= x <= 1000.0:
-          ``clip_box(x_min=500.0, x_max=1000.0)``.
-        * To select x <= 1000.0: ``clip_box(x_min=None, x_max=1000.0)``
-          or ``clip_box(x_max=1000.0)``.
-        * To select x >= 500.0: ``clip_box(x_min = 500.0, x_max=None.0)``
-          or ``clip_box(x_min=1000.0)``.
-
         Parameters
         ----------
-        time_min: optional
+        time_min: optional, np.datetime64
+            Start time to select. Data will be forward filled to this date. If
+            time_min is before the start time of the dataset, data is
+            backfilled.
         time_max: optional
+            End time to select.
         layer_min: optional, int
+            Minimum layer to select.
         layer_max: optional, int
+            Maximum layer to select.
         x_min: optional, float
+            Minimum x-coordinate to select.
         x_max: optional, float
+            Maximum x-coordinate to select.
         y_min: optional, float
+            Minimum y-coordinate to select.
         y_max: optional, float
+            Maximum y-coordinate to select.
         top: optional, GridDataArray
+            Ignored.
         bottom: optional, GridDataArray
-        state_for_boundary: optional, GridDataArray
-
+            Ignored.
 
         Returns
         -------
-        clipped: Package
+        clipped : Package
+            A new package that is clipped to the specified bounding box.
+
+        Examples
+        --------
+        Slicing intervals may be half-bounded, by providing None:
+
+        To select 500.0 <= x <= 1000.0:
+
+        >>> pkg.clip_box(x_min=500.0, x_max=1000.0)
+
+        To select x <= 1000.0:
+
+        >>> pkg.clip_box(x_max=1000.0)``
+
+        To select x >= 500.0:
+
+        >>> pkg.clip_box(x_min=500.0)
+
+        To select a time interval, you can use datetime64:
+
+        >>> pkg.clip_box(time_min=np.datetime64("2020-01-01"), time_max=np.datetime64("2020-12-31"))
+
         """
         if not self._is_clipping_supported():
             raise ValueError("this package does not support clipping.")
@@ -451,13 +474,25 @@ class Package(PackageBase, IPackage, abc.ABC):
         Parameters
         ----------
         mask: xr.DataArray, xu.UgridDataArray of ints
-            idomain-like integer array. >0 sets cells to active, 0 sets cells to inactive,
-            <0 sets cells to vertical passthrough
+            idomain-like integer array. >0 sets cells to active, 0 sets cells to
+            inactive, <0 sets cells to vertical passthrough
 
         Returns
         -------
         masked: Package
             The package with part masked.
+
+        Examples
+        --------
+        To mask a package with an idomain-like array. For example, to create a
+        package with the first 10 rows and columns masked, create the mask first:
+
+        >>> mask = xr.ones_like(idomain, dtype=int)
+        >>> mask[0:10, 0:10] = 0
+
+        Then call mask:
+
+        >>> masked_pkg = pkg.mask(mask)
         """
         result = cast(IPackage, deepcopy(self))
         remove_expanded_auxiliary_variables_from_dataset(result)
@@ -497,6 +532,13 @@ class Package(PackageBase, IPackage, abc.ABC):
             specialization class of BaseRegridder) and function name (str) this
             dictionary can be used to override the default mapping method.
 
+        Returns
+        -------
+        Package
+            A package with the same options as this package, and with all the
+            data-arrays regridded to another discretization, similar to the one used
+            in input argument "target_grid"
+
         Examples
         --------
         To regrid the npf package with a non-default method for the k-field,
@@ -505,12 +547,6 @@ class Package(PackageBase, IPackage, abc.ABC):
         >>> regridder_types = imod.mf6.regrid.NodePropertyFlowRegridMethod(k=(imod.RegridderType.OVERLAP, "mean"))
         >>> regrid_cache = imod.util.regrid.RegridderWeightsCache()
         >>> new_npf = npf.regrid_like(like, regrid_cache, regridder_types)
-
-        Returns
-        -------
-        A package with the same options as this package, and with all the
-        data-arrays regridded to another discretization, similar to the one used
-        in input argument "target_grid"
         """
         try:
             result = deepcopy(self)

@@ -7,7 +7,6 @@ import pytest
 import xarray as xr
 
 import imod
-from imod.prepare.partition import create_partition_labels
 
 
 def remove_comment_lines(textblock: str) -> str:
@@ -138,12 +137,14 @@ class TestGwfgwf:
 
 
 @pytest.mark.parametrize("newton_option", [False, True])
-def test_option_newton_propagated(circle_model, newton_option, tmp_path):
+def test_option_newton_propagated(
+    circle_model: imod.mf6.Modflow6Simulation, newton_option: bool, tmp_path
+):
     # set newton option on original model
     circle_model["GWF_1"].set_newton(newton_option)
 
     # split original model
-    label_array = create_partition_labels(circle_model, 3)
+    label_array = circle_model.create_partition_labels(3)
     split_simulation = circle_model.split(label_array)
 
     # check that the created exchagnes have the same newton option
@@ -154,12 +155,14 @@ def test_option_newton_propagated(circle_model, newton_option, tmp_path):
 
 
 @pytest.mark.parametrize("xt3d_option", [False, True])
-def test_option_xt3d_propagated(circle_model, xt3d_option, tmp_path):
+def test_option_xt3d_propagated(
+    circle_model: imod.mf6.Modflow6Simulation, xt3d_option: bool, tmp_path
+):
     # set newton option on original model
     circle_model["GWF_1"]["npf"].set_xt3d_option(xt3d_option, is_rhs=xt3d_option)
 
     # split original model
-    label_array = create_partition_labels(circle_model, 3)
+    label_array = circle_model.create_partition_labels(3)
     split_simulation = circle_model.split(label_array)
 
     # check that the created exchanges have the same newton option
@@ -170,12 +173,14 @@ def test_option_xt3d_propagated(circle_model, xt3d_option, tmp_path):
 
 
 @pytest.mark.parametrize("variablecv_option", [False, True])
-def test_option_variablecv_propagated(circle_model, variablecv_option: bool, tmp_path):
+def test_option_variablecv_propagated(
+    circle_model: imod.mf6.Modflow6Simulation, variablecv_option: bool, tmp_path
+):
     # set variablecv option on original model
     circle_model["GWF_1"]["npf"]["variable_vertical_conductance"] = variablecv_option
 
     # split original model
-    label_array = create_partition_labels(circle_model, 3)
+    label_array = circle_model.create_partition_labels(3)
     split_simulation = circle_model.split(label_array)
 
     # check that the created exchanges have the same variablecv option
@@ -186,13 +191,15 @@ def test_option_variablecv_propagated(circle_model, variablecv_option: bool, tmp
 
 
 @pytest.mark.parametrize("dewatered_option", [False, True])
-def test_option_dewatered_propagated(circle_model, dewatered_option: bool, tmp_path):
+def test_option_dewatered_propagated(
+    circle_model: imod.mf6.Modflow6Simulation, dewatered_option: bool, tmp_path
+):
     # set dewatered option on original model
     circle_model["GWF_1"]["npf"]["variable_vertical_conductance"] = True
     circle_model["GWF_1"]["npf"]["dewatered"] = dewatered_option
 
     # split original model
-    label_array = create_partition_labels(circle_model, 3)
+    label_array = circle_model.create_partition_labels(3)
     split_simulation = circle_model.split(label_array)
 
     # check that the created exchanges have the same dewatered option
@@ -203,13 +210,15 @@ def test_option_dewatered_propagated(circle_model, dewatered_option: bool, tmp_p
 
 
 @pytest.mark.parametrize("budget_option", [False, True])
-def test_save_flows_propagated(circle_model, budget_option: bool, tmp_path):
+def test_save_flows_propagated(
+    circle_model: imod.mf6.Modflow6Simulation, budget_option: bool, tmp_path
+):
     # set budget option on original model
     if not budget_option:
         circle_model["GWF_1"]["oc"].dataset["save_budget"] = None
 
     # split original model
-    label_array = create_partition_labels(circle_model, 3)
+    label_array = circle_model.create_partition_labels(3)
     split_simulation = circle_model.split(label_array)
 
     # check that the created exchanges have the same dewatered option

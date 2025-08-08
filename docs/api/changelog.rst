@@ -21,6 +21,9 @@ Added
 - Added :meth:`imod.mf6.HorizontalFlowBarrierResistance.snap_to_grid` and
   :meth:`imod.mf6.SingleLayerHorizontalFlowBarrierResistance.snap_to_grid` to
   debug how horizontal flow barriers are snapped to a grid.
+- Added :meth:`imod.mf6.Modflow6Simulation.create_partition_labels` to create
+  partition labels for a MODFLOW 6 simulation from its idomain. This is useful
+  for splitting a simulation into multiple submodels.
 
 Fixed
 ~~~~~
@@ -48,6 +51,11 @@ Changed
   multiple topsystem packages.
 - No upper limit anymore for ``mod_id`` in ``mod2svat.inp`` for
   :class:`imod.msw.CouplerMapping`.
+- :func:`imod.prepare.create_partition_labels` now takes an ``idomain`` grid
+  instead of :class:`imod.mf6.Modflow6Simulation` as first argument. To generate
+  partition labels from a :class:`imod.mf6.Modflow6Simulation` straightaway, use
+  the newly added :meth:`imod.mf6.Modflow6Simulation.create_partition_labels`
+  method instead.
 
 Removed
 ~~~~~~~

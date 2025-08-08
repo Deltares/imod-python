@@ -926,39 +926,62 @@ class Well(GridAgnosticWell):
         bottom: Optional[GridDataArray] = None,
     ) -> Self:
         """
-        Clip a package by a bounding box (time, layer, y, x).
-
-        The well package doesn't use the layer attribute to describe its depth and length.
-        Instead, it uses the screen_top and screen_bottom parameters which corresponds with
-        the z-coordinates of the top and bottom of the well. To go from a layer_min and
-        layer_max to z-values used for clipping the well a top and bottom array have to be
-        provided as well.
-
-        Slicing intervals may be half-bounded, by providing None:
-
-        * To select 500.0 <= x <= 1000.0:
-          ``clip_box(x_min=500.0, x_max=1000.0)``.
-        * To select x <= 1000.0: ``clip_box(x_min=None, x_max=1000.0)``
-          or ``clip_box(x_max=1000.0)``.
-        * To select x >= 500.0: ``clip_box(x_min = 500.0, x_max=None.0)``
-          or ``clip_box(x_min=1000.0)``.
+        Clip a well package by a bounding box (time, layer, y, x).
 
         Parameters
         ----------
-        time_min: optional
+        time_min: optional, np.datetime64
+            Start time to select. Data will be forward filled to this date. If
+            time_min is before the start time of the dataset, data is
+            backfilled.
         time_max: optional
+            End time to select.
         layer_min: optional, int
+            Ignored.
         layer_max: optional, int
+            Ignored.
         x_min: optional, float
+            Minimum x-coordinate to select.
         x_max: optional, float
+            Maximum x-coordinate to select.
         y_min: optional, float
+            Minimum y-coordinate to select.
         y_max: optional, float
+            Maximum y-coordinate to select.
         top: optional, GridDataArray
+            Grid of top used to clip well screen tops.
         bottom: optional, GridDataArray
+            Grid of bottom used to clip well screen bottoms.
 
         Returns
         -------
-        sliced : Package
+        clipped : Well
+            A new package that is clipped to the specified bounding box.
+
+        Examples
+        --------
+        Slicing intervals may be half-bounded, by providing None:
+
+        To select 500.0 <= x <= 1000.0:
+
+        >>> pkg.clip_box(x_min=500.0, x_max=1000.0)
+
+        To select x <= 1000.0:
+
+        >>> pkg.clip_box(x_max=1000.0)``
+
+        To select x >= 500.0:
+
+        >>> pkg.clip_box(x_min=500.0)
+
+        To select a time interval, you can use datetime64:
+
+        >>> pkg.clip_box(time_min=np.datetime64("2020-01-01"), time_max=np.datetime64("2020-12-31"))
+
+        To clip well screens:
+
+        >>> pkg.clip_box(top=top_grid, bottom=bottom_grid)
+
         """
         if (layer_max or layer_min) and (top is None or bottom is None):
             raise ValueError(
@@ -1288,33 +1311,58 @@ class LayeredWell(GridAgnosticWell):
         bottom: Optional[GridDataArray] = None,
     ) -> Self:
         """
-        Clip a package by a bounding box (time, layer, y, x).
-
-        Slicing intervals may be half-bounded, by providing None:
-
-        * To select 500.0 <= x <= 1000.0:
-          ``clip_box(x_min=500.0, x_max=1000.0)``.
-        * To select x <= 1000.0: ``clip_box(x_min=None, x_max=1000.0)``
-          or ``clip_box(x_max=1000.0)``.
-        * To select x >= 500.0: ``clip_box(x_min = 500.0, x_max=None.0)``
-          or ``clip_box(x_min=1000.0)``.
+        Clip a well package by a bounding box (time, layer, y, x).
 
         Parameters
         ----------
-        time_min: optional
+        time_min: optional, np.datetime64
+            Start time to select. Data will be forward filled to this date. If
+            time_min is before the start time of the dataset, data is
+            backfilled.
         time_max: optional
+            End time to select.
         layer_min: optional, int
+            Minimum layer to select.
         layer_max: optional, int
+            Maximum layer to select.
         x_min: optional, float
+            Minimum x-coordinate to select.
         x_max: optional, float
+            Maximum x-coordinate to select.
         y_min: optional, float
+            Minimum y-coordinate to select.
         y_max: optional, float
+            Maximum y-coordinate to select.
         top: optional, GridDataArray
+            Ignored.
         bottom: optional, GridDataArray
+            Ignored.
 
         Returns
         -------
-        sliced : Package
+        clipped : Well
+            A new package that is clipped to the specified bounding box.
+
+        Examples
+        --------
+        Slicing intervals may be half-bounded, by providing None:
+
+        To select 500.0 <= x <= 1000.0:
+
+        >>> pkg.clip_box(x_min=500.0, x_max=1000.0)
+
+        To select x <= 1000.0:
+
+        >>> pkg.clip_box(x_max=1000.0)``
+
+        To select x >= 500.0:
+
+        >>> pkg.clip_box(x_min=500.0)
+
+        To select a time interval, you can use datetime64:
+
+        >>> pkg.clip_box(time_min=np.datetime64("2020-01-01"), time_max=np.datetime64("2020-12-31"))
+
         """
         # The super method will select in the time dimension without issues.
         new = super().clip_box(time_min=time_min, time_max=time_max)

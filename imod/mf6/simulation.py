@@ -49,6 +49,7 @@ from imod.mf6.package import Package
 from imod.mf6.ssm import SourceSinkMixing
 from imod.mf6.validation_settings import ValidationSettings
 from imod.mf6.write_context import WriteContext
+from imod.prepare.partition import create_partition_labels
 from imod.prepare.topsystem.default_allocation_methods import (
     SimulationAllocationOptions,
     SimulationDistributingOptions,
@@ -291,6 +292,17 @@ class Modflow6Simulation(collections.UserDict, ISimulation):
             ``ValidationError``.
         use_absolute_paths: ({True, False}, optional)
             True if all paths written to the mf6 inputfiles should be absolute.
+
+        Examples
+        --------
+        Write the simulation to a directory:
+
+        >>> simulation.write("path/to/simulation")
+
+        If you continue to run into ValidationErrors, you can disable the validation
+        by setting the ``validate`` argument to ``False``. This is not recommended:
+
+        >>> simulation.write("path/to/simulation", validate=False)
         """
         # create write context
         write_context = WriteContext(directory, binary, use_absolute_paths)
@@ -910,6 +922,27 @@ class Modflow6Simulation(collections.UserDict, ISimulation):
         crs: Any, optional
             Anything accepted by rasterio.crs.CRS.from_user_input
             Requires ``rioxarray`` installed.
+
+        Examples
+        --------
+        Dump simulation to directory:
+
+        >>> mf6_sim.dump("path/to/directory")
+
+        You can load the dumped simulation back with:
+
+        >>> loaded_sim = Modflow6Simulation.from_file("path/to/directory/simulation_name.toml")
+
+        If you keep on getting ValidationErrors, you can set
+        ``validate=False`` to skip validation, but this is not recommended.
+
+        >>> mf6_sim.dump("path/to/directory", validate=False)
+
+        You can then fix the issues later after loading the simulation in a
+        later stage. If you want to dump the simulation in a form that is nicely
+        loaded into QGIS, you can set ``mdal_compliant=True``:
+
+        >>> mf6_sim.dump("path/to/directory", mdal_compliant=True, crs="EPSG:4326")
         """
         directory = pathlib.Path(directory)
         directory.mkdir(parents=True, exist_ok=True)
@@ -961,6 +994,16 @@ class Modflow6Simulation(collections.UserDict, ISimulation):
         -------
         Modflow6Simulation
             Modflow6Simulation object with models and packages loaded from
+
+        Examples
+        --------
+        Dump simulation to directory:
+
+        >>> mf6_sim.dump("path/to/directory")
+
+        You can load the dumped simulation back with:
+
+        >>> loaded_sim = Modflow6Simulation.from_file("path/to/directory/simulation_name.toml")
         """
         classes = {
             item_cls.__name__: item_cls
@@ -1068,30 +1111,65 @@ class Modflow6Simulation(collections.UserDict, ISimulation):
         """
         Clip a simulation by a bounding box (time, layer, y, x).
 
-        Slicing intervals may be half-bounded, by providing None:
-
-        * To select 500.0 <= x <= 1000.0:
-          ``clip_box(x_min=500.0, x_max=1000.0)``.
-        * To select x <= 1000.0: ``clip_box(x_min=None, x_max=1000.0)``
-          or ``clip_box(x_max=1000.0)``.
-        * To select x >= 500.0: ``clip_box(x_min = 500.0, x_max=None.0)``
-          or ``clip_box(x_min=1000.0)``.
-
         Parameters
         ----------
-        time_min: optional
+        time_min: optional, np.datetime64
+            Start time to select. Data will be forward filled to this date. If
+            time_min is before the start time of the dataset, data is
+            backfilled.
         time_max: optional
+            End time to select.
         layer_min: optional, int
+            Minimum layer to select.
         layer_max: optional, int
+            Maximum layer to select.
         x_min: optional, float
+            Minimum x-coordinate to select.
         x_max: optional, float
+            Maximum x-coordinate to select.
         y_min: optional, float
+            Minimum y-coordinate to select.
         y_max: optional, float
-        states_for_boundary : optional, Dict[pkg_name:str, boundary_values:Union[xr.DataArray, xu.UgridDataArray]]
+            Maximum y-coordinate to select.
+        states_for_boundary : optional, Dict[str, Union[xr.DataArray, xu.UgridDataArray]]
+            A dictionary with model names as keys and grids with states that are
+            used to put as boundary values.
+            :class:`imod.mf6.GroundwaterFlowModel` will get a
+            :class:`imod.mf6.ConstantHead`,
+            :class:`imod.mf6.GroundwaterTransportModel` will get a
+            :class:`imod.mf6.ConstantConcentration` package.
 
         Returns
         -------
         clipped : Simulation
+
+        Examples
+        --------
+        Slicing intervals may be half-bounded, by providing None:
+
+        To select 500.0 <= x <= 1000.0:
+
+        >>> mf6_sim.clip_box(x_min=500.0, x_max=1000.0)
+
+        To select x <= 1000.0:
+
+        >>> mf6_sim.clip_box(x_max=1000.0)``
+
+        To select x >= 500.0:
+
+        >>> mf6_sim.clip_box(x_min=500.0)
+
+        To select a time interval, you can use datetime64:
+
+        >>> mf6_sim.clip_box(time_min=np.datetime64("2020-01-01"), time_max=np.datetime64("2020-12-31"))
+
+        To clip an area and set a boundary condition at the clipped boundary:
+
+        >>> states_for_boundary = {"GWF6_model_name": heads}
+        >>> clipped_sim = mf6_sim.clip_box(
+        ...     x_min=500.0, x_max=1000.0, y_min=500.0, y_max=1000.0,
+        ...     states_for_boundary=states_for_boundary
+        ... )
         """
 
         if self.is_split():
@@ -1142,6 +1220,63 @@ class Modflow6Simulation(collections.UserDict, ISimulation):
                 raise ValueError(f"object of type {type(value)} cannot be clipped.")
         return clipped
 
+    def create_partition_labels(
+        self,
+        npartitions: int,
+        weights: Optional[GridDataArray] = None,
+    ) -> GridDataArray:
+        """
+        Returns a label array: a 2d array with a similar size to the top layer of
+        idomain. Every array element is the partition number to which the column of
+        gridblocks of idomain at that location belong. This is provided to
+        :meth:`imod.mf6.Modflow6Simulation.split` to partition the model.
+
+        Parameters
+        ----------
+        npartitions : int
+            The number of partitions to create.
+        weights : xarray.DataArray, xugrid.UgridDataArray, optional
+            The weights to use for partitioning. The weights should be a 2d
+            array with the same size as the top layer of idomain. The weights
+            are used to determine the size of each partition. The weights should
+            be positive integers. If not provided, active cells (idomain > 0)
+            are summed across layers and passed on as weights. If None, the
+            idomain is used to compute weights.
+
+        Returns
+        -------
+        xarray.DataArray or xu.UgridDataArray
+            An array with partition labels, with the same shape as the top layer
+            of the idomain.
+
+        Examples
+        --------
+        Create a partition label array with 4 partitions.
+
+        >>> label_array = mf6_sim.create_partition_labels(n_partitions=4)
+
+        You can then use this label array to split the simulation:
+
+        >>> mf6_splitted = mf6_sim.split(label_array)
+
+        You can also provide weights to the partitioning, which will influence
+        the size of each partition. For example, if you want to create a uniform
+        partitioning, you can use:
+
+        >>> weights = xr.ones_like(idomain)
+        >>> label_array = mf6_sim.create_partition_labels(n_partitions=4, weights=weights)
+
+        """
+        gwf_models = self.get_models_of_type("gwf6")
+        if len(gwf_models) != 1:
+            raise ValueError(
+                "for partitioning a simulation to work, it must have exactly 1 flow model"
+            )
+
+        flowmodel = list(gwf_models.values())[0]
+        idomain = flowmodel.domain
+        return create_partition_labels(idomain, npartitions, weights=weights)
+
     @standard_log_decorator()
     def split(
         self,
@@ -1168,7 +1303,13 @@ class Modflow6Simulation(collections.UserDict, ISimulation):
 
         Returns
         -------
-        A new simulation containing all the split models and packages
+        Modflow6Simulation
+            A new simulation containing all the split models and packages
+
+        Examples
+        --------
+        >>> submodel_labels = mf6_sim.create_partition_labels(n_partitions=4)
+        >>> m6_splitted = mf6_sim.split(submodel_labels)
         """
         if self.is_split():
             raise RuntimeError(
@@ -1256,9 +1397,9 @@ class Modflow6Simulation(collections.UserDict, ISimulation):
         validate: bool = True,
     ) -> "Modflow6Simulation":
         """
-        This method creates a new simulation object. The models contained in the new simulation are regridded versions
-        of the models in the input object (this).
-        Time discretization and solver settings are copied.
+        This method creates a new simulation object. The models contained in the
+        new simulation are regridded versions of the models in the input object
+        (this). Time discretization and solver settings are copied.
 
         Parameters
         ----------
@@ -1272,6 +1413,16 @@ class Modflow6Simulation(collections.UserDict, ISimulation):
         Returns
         -------
         a new simulation object with regridded models
+
+        Examples
+        --------
+        >>> target_grid = imod.util.empty_2d(
+        ...     dx=5.0, xmin=500.0, xmax=1000.0, dy=5.0, ymin=500.0, ymax=1000.0
+        ... )
+        >>> regridded_sim = simulation.regrid_like(
+        ...     regridded_simulation_name="regridded_sim",
+        ...     target_grid=target_grid,
+        ... )
         """
 
         return _regrid_like(self, regridded_simulation_name, target_grid, validate)
@@ -1439,7 +1590,7 @@ class Modflow6Simulation(collections.UserDict, ISimulation):
     def mask_all_models(
         self,
         mask: GridDataArray,
-    ):
+    ) -> None:
         """
         This function applies a mask to all models in a simulation, provided they use
         the same discretization. The  method parameter "mask" is an idomain-like array.
@@ -1453,6 +1604,16 @@ class Modflow6Simulation(collections.UserDict, ISimulation):
         mask: xr.DataArray, xu.UgridDataArray of ints
             idomain-like integer array. >0 sets cells to active, 0 sets cells to inactive,
             <0 sets cells to vertical passthrough
+
+        Examples
+        --------
+        To mask all models in a simulation, you can use the following code:
+
+        >>> mf6_sim.mask_all_models(new_idomain)
+
+        This masks the model inplace and updates the packages accordingly. The
+        mask should be an idomain-like array, i.e. it should have the same shape
+        as the model and contain integer values.
         """
         _mask_all_models(self, mask)
 

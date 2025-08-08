@@ -906,33 +906,51 @@ class HorizontalFlowBarrierBase(BoundaryCondition, ILineDataPackage):
         bottom: Optional[GridDataArray] = None,
     ) -> Self:
         """
-        Clip a package by a bounding box (time, layer, y, x).
-
-        Slicing intervals may be half-bounded, by providing None:
-
-        * To select 500.0 <= x <= 1000.0:
-          ``clip_box(x_min=500.0, x_max=1000.0)``.
-        * To select x <= 1000.0: ``clip_box(x_min=None, x_max=1000.0)``
-          or ``clip_box(x_max=1000.0)``.
-        * To select x >= 500.0: ``clip_box(x_min = 500.0, x_max=None.0)``
-          or ``clip_box(x_min=1000.0)``.
+        Clip a barrier by a bounding box (y, x).
 
         Parameters
         ----------
-        time_min: optional
+        time_min: optional, np.datetime64
+            Ignored
         time_max: optional
+            Ignored
         layer_min: optional, int
+            Ignored
         layer_max: optional, int
+            Ignored
         x_min: optional, float
+            Minimum x-coordinate to select.
         x_max: optional, float
+            Maximum x-coordinate to select.
         y_min: optional, float
+            Minimum y-coordinate to select.
         y_max: optional, float
+            Maximum y-coordinate to select.
         top: optional, GridDataArray
+            Ignored
         bottom: optional, GridDataArray
+            Ignored
 
         Returns
         -------
-        sliced : Package
+        clipped : Package
+            A new package that is clipped to the specified bounding box.
+
+        Examples
+        --------
+        Slicing intervals may be half-bounded, by providing None:
+
+        To select 500.0 <= x <= 1000.0:
+
+        >>> pkg.clip_box(x_min=500.0, x_max=1000.0)
+
+        To select x <= 1000.0:
+
+        >>> pkg.clip_box(x_max=1000.0)``
+
+        To select x >= 500.0:
+
+        >>> pkg.clip_box(x_min=500.0)
         """
         new = deepcopy(self)
 
