@@ -506,6 +506,7 @@ environments:
       - conda: https://conda.anaconda.org/conda-forge/linux-64/zstandard-0.23.0-py312h66e93f0_2.conda
       - conda: https://conda.anaconda.org/conda-forge/linux-64/zstd-1.5.7-hb8e6e7a_2.conda
       - pypi: https://files.pythonhosted.org/packages/50/fa/a2561d6837cd45a3971c514222e94d3ded3f105993ddcf4983ed68ce3da3/mypy2junit-1.9.0-py3-none-any.whl
+      - pypi: ./
       osx-64:
       - conda: https://conda.anaconda.org/conda-forge/noarch/_python_abi3_support-1.0-hd8ed1ab_2.conda
       - conda: https://conda.anaconda.org/conda-forge/noarch/accessible-pygments-0.0.5-pyhd8ed1ab_1.conda
@@ -934,6 +935,7 @@ environments:
       - conda: https://conda.anaconda.org/conda-forge/osx-64/zstandard-0.23.0-py312h01d7ebd_2.conda
       - conda: https://conda.anaconda.org/conda-forge/osx-64/zstd-1.5.7-h8210216_2.conda
       - pypi: https://files.pythonhosted.org/packages/50/fa/a2561d6837cd45a3971c514222e94d3ded3f105993ddcf4983ed68ce3da3/mypy2junit-1.9.0-py3-none-any.whl
+      - pypi: ./
       osx-arm64:
       - conda: https://conda.anaconda.org/conda-forge/noarch/_python_abi3_support-1.0-hd8ed1ab_2.conda
       - conda: https://conda.anaconda.org/conda-forge/noarch/accessible-pygments-0.0.5-pyhd8ed1ab_1.conda
@@ -1362,6 +1364,7 @@ environments:
       - conda: https://conda.anaconda.org/conda-forge/osx-arm64/zstandard-0.23.0-py312hea69d52_2.conda
       - conda: https://conda.anaconda.org/conda-forge/osx-arm64/zstd-1.5.7-h6491c7d_2.conda
       - pypi: https://files.pythonhosted.org/packages/50/fa/a2561d6837cd45a3971c514222e94d3ded3f105993ddcf4983ed68ce3da3/mypy2junit-1.9.0-py3-none-any.whl
+      - pypi: ./
       win-64:
       - conda: https://conda.anaconda.org/conda-forge/win-64/_libavif_api-1.3.0-h57928b3_0.conda
       - conda: https://conda.anaconda.org/conda-forge/win-64/_openmp_mutex-4.5-2_gnu.conda
@@ -1756,6 +1759,7 @@ environments:
       - conda: https://conda.anaconda.org/conda-forge/win-64/zstandard-0.23.0-py312h4389bb4_2.conda
       - conda: https://conda.anaconda.org/conda-forge/win-64/zstd-1.5.7-hbeecb71_2.conda
       - pypi: https://files.pythonhosted.org/packages/50/fa/a2561d6837cd45a3971c514222e94d3ded3f105993ddcf4983ed68ce3da3/mypy2junit-1.9.0-py3-none-any.whl
+      - pypi: ./
   interactive:
     channels:
     - url: https://conda.anaconda.org/conda-forge/
@@ -2347,6 +2351,7 @@ environments:
       - conda: https://conda.anaconda.org/conda-forge/linux-64/zstandard-0.23.0-py312h66e93f0_2.conda
       - conda: https://conda.anaconda.org/conda-forge/linux-64/zstd-1.5.7-hb8e6e7a_2.conda
       - pypi: https://files.pythonhosted.org/packages/50/fa/a2561d6837cd45a3971c514222e94d3ded3f105993ddcf4983ed68ce3da3/mypy2junit-1.9.0-py3-none-any.whl
+      - pypi: ./
       osx-64:
       - conda: https://conda.anaconda.org/conda-forge/noarch/_python_abi3_support-1.0-hd8ed1ab_2.conda
       - conda: https://conda.anaconda.org/conda-forge/noarch/accessible-pygments-0.0.5-pyhd8ed1ab_1.conda
@@ -2863,6 +2868,7 @@ environments:
       - conda: https://conda.anaconda.org/conda-forge/osx-64/zstandard-0.23.0-py312h01d7ebd_2.conda
       - conda: https://conda.anaconda.org/conda-forge/osx-64/zstd-1.5.7-h8210216_2.conda
       - pypi: https://files.pythonhosted.org/packages/50/fa/a2561d6837cd45a3971c514222e94d3ded3f105993ddcf4983ed68ce3da3/mypy2junit-1.9.0-py3-none-any.whl
+      - pypi: ./
       osx-arm64:
       - conda: https://conda.anaconda.org/conda-forge/noarch/_python_abi3_support-1.0-hd8ed1ab_2.conda
       - conda: https://conda.anaconda.org/conda-forge/noarch/accessible-pygments-0.0.5-pyhd8ed1ab_1.conda
@@ -3379,6 +3385,7 @@ environments:
       - conda: https://conda.anaconda.org/conda-forge/osx-arm64/zstandard-0.23.0-py312hea69d52_2.conda
       - conda: https://conda.anaconda.org/conda-forge/osx-arm64/zstd-1.5.7-h6491c7d_2.conda
       - pypi: https://files.pythonhosted.org/packages/50/fa/a2561d6837cd45a3971c514222e94d3ded3f105993ddcf4983ed68ce3da3/mypy2junit-1.9.0-py3-none-any.whl
+      - pypi: ./
       win-64:
       - conda: https://conda.anaconda.org/conda-forge/win-64/_libavif_api-1.3.0-h57928b3_0.conda
       - conda: https://conda.anaconda.org/conda-forge/win-64/_openmp_mutex-4.5-2_gnu.conda
@@ -3859,6 +3866,7 @@ environments:
       - conda: https://conda.anaconda.org/conda-forge/win-64/zstandard-0.23.0-py312h4389bb4_2.conda
       - conda: https://conda.anaconda.org/conda-forge/win-64/zstd-1.5.7-hbeecb71_2.conda
       - pypi: https://files.pythonhosted.org/packages/50/fa/a2561d6837cd45a3971c514222e94d3ded3f105993ddcf4983ed68ce3da3/mypy2junit-1.9.0-py3-none-any.whl
+      - pypi: ./
   pixi-update:
     channels:
     - url: https://conda.anaconda.org/conda-forge/
@@ -4777,6 +4785,7 @@ environments:
       - conda: https://conda.anaconda.org/conda-forge/win-64/zstandard-0.23.0-py312h4389bb4_2.conda
       - conda: https://conda.anaconda.org/conda-forge/win-64/zstd-1.5.7-hbeecb71_2.conda
       - pypi: https://files.pythonhosted.org/packages/50/fa/a2561d6837cd45a3971c514222e94d3ded3f105993ddcf4983ed68ce3da3/mypy2junit-1.9.0-py3-none-any.whl
+      - pypi: ./
 packages:
 - conda: https://conda.anaconda.org/conda-forge/win-64/7zip-24.08-h49e36cd_1.conda
   sha256: 1bf6267adb17d24edf090b0e88830273220590310b8ba26ba6e60698047563b0
@@ -10852,6 +10861,42 @@ packages:
   purls: []
   size: 160408
   timestamp: 1725972042635
+- pypi: ./
+  name: imod
+  version: 1.0.0rc4
+  sha256: 0a26a0a27843cc7d122a3736875ee9550670f1ae2b11d8743489c0b066224672
+  requires_dist:
+  - affine
+  - cftime>=1
+  - dask
+  - filelock
+  - jinja2
+  - loguru
+  - matplotlib
+  - numba
+  - numpy
+  - pandas
+  - plum-dispatch
+  - pooch
+  - pydantic
+  - scipy
+  - tomli-w
+  - tomli>=1.1.0
+  - toolz
+  - tqdm
+  - xarray>=2023.8.0
+  - xugrid>=0.14.0
+  - bottleneck ; extra == 'all'
+  - contextily>=1 ; extra == 'all'
+  - cytoolz ; extra == 'all'
+  - geopandas ; extra == 'all'
+  - pyvista ; extra == 'all'
+  - rasterio>=1 ; extra == 'all'
+  - rioxarray ; extra == 'all'
+  - shapely>=1.8 ; extra == 'all'
+  - zarr ; extra == 'all'
+  requires_python: '>=3.11'
+  editable: true
 - conda: https://conda.anaconda.org/conda-forge/noarch/importlib-metadata-8.7.0-pyhe01879c_1.conda
   sha256: c18ab120a0613ada4391b15981d86ff777b5690ca461ea7e9e49531e8f374745
   md5: 63ccfdc3a3ce25b027b8767eb722fca8

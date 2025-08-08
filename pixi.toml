@@ -14,15 +14,14 @@ repository = "https://github.com/Deltares/imod-python.git"
 
 [tasks]
 # General tasks
-docs = { cmd = "make html", depends-on = ["install"], cwd = "docs" }
-install = "python -m pip install --no-deps --editable ."
+docs = { cmd = "make html", cwd = "docs" }
 pypi-publish = { cmd = "rm --recursive --force dist && python -m build && twine check dist/* && twine upload dist/*" }
 
 # Lint and format tasks
 format = "ruff check --fix .; ruff format ."
 lint = "ruff check . ; ruff format --check ."
-mypy_lint = { cmd ="mypy", depends-on = ["install"]}
-mypy_report = { cmd ="mypy | mypy2junit > mypy-report.xml", depends-on = ["install"]}
+mypy_lint = { cmd = "mypy" }
+mypy_report = { cmd = "mypy | mypy2junit > mypy-report.xml" }
 
 # Tests tasks
 tests = { depends-on = ["unittests", "examples"] }
@@ -30,32 +29,38 @@ unittests = { depends-on = ["unittests_njit", "unittests_jit"] }
 unittests_njit = { cmd = [
     "NUMBA_DISABLE_JIT=1",
     "pytest",
-    "-n", "auto",
-    "-m", "not example and not user_acceptance and not unittest_jit and not qgis_export",
+    "-n",
+    "auto",
+    "-m",
+    "not example and not user_acceptance and not unittest_jit and not qgis_export",
     "--cache-clear",
     "--verbose",
     "--junitxml=unittest_report.xml",
     "--cov=imod",
     "--cov-report=term",
     "--cov-report=html:coverage",
-    "--cov-config=.coveragerc"
-], depends-on = ["install"], cwd = "imod/tests" }
+    "--cov-config=.coveragerc",
+], cwd = "imod/tests" }
 unittests_jit = { cmd = [
     "pytest",
-    "-n", "auto",
-    "-m", "unittest_jit",
+    "-n",
+    "auto",
+    "-m",
+    "unittest_jit",
     "--cache-clear",
     "--verbose",
     "--junitxml=unittest_jit_report.xml",
-], depends-on = ["install"], cwd = "imod/tests" }
+], cwd = "imod/tests" }
 examples = { cmd = [
     "pytest",
-    "-n", "auto",
-    "-m", "example",
+    "-n",
+    "auto",
+    "-m",
+    "example",
     "--cache-clear",
     "--verbose",
     "--junitxml=examples_report.xml",
-], depends-on = ["install"], cwd = "imod/tests", env = { IMOD_DATA_DIR = ".imod_data" } }
+], cwd = "imod/tests", env = { IMOD_DATA_DIR = ".imod_data" } }
 
 [dependencies]
 affine = "*"
@@ -115,12 +120,13 @@ toolz = "*"
 tqdm = "*"
 twine = "*"
 vtk = { version = ">=9.0", build = "*qt*" }
-xarray = "!=2025.04.0" # Issue with xarray 2025.04.0 and rendering HFBs
+xarray = "!=2025.04.0"                      # Issue with xarray 2025.04.0 and rendering HFBs
 xugrid = ">=0.14.2"
 zarr = "*"
 pytest-timeout = ">=2.3.1,<3"
 
 [pypi-dependencies]
+imod = { path = ".", editable = true }
 mypy2junit = "*"
 
 [feature.interactive.dependencies]
@@ -148,12 +154,7 @@ pip = "*"
 update = "pixi update --json | pixi-diff-to-markdown > diff.md"
 
 [feature.py_common.tasks]
-test_import = { cmd = [
-    "python",
-    "-c",
-    "import imod"
-], depends-on = ["install_with_deps"]}
-install_with_deps = "python -m pip install --editable ."
+test_import = { cmd = ["python", "-c", "import imod"] }
 
 [feature.user-acceptance]
 platforms = ["win-64"]
@@ -165,22 +166,29 @@ dvc-s3 = "*"
 
 [feature.user-acceptance.tasks]
 pull_data = "dvc pull --remote minio"
-fetch_lhm = {cmd = "7z x LHM_transient.zip -oLHM_transient -y", depends-on = ["pull_data"], cwd = "imod/tests/user_acceptance_data"}
+fetch_lhm = { cmd = "7z x LHM_transient.zip -oLHM_transient -y", depends-on = [
+    "pull_data",
+], cwd = "imod/tests/user_acceptance_data" }
 user_acceptance = { cmd = [
     "pytest",
-    "-m", "user_acceptance",
+    "-m",
+    "user_acceptance",
     "--cache-clear",
     "--verbose",
     "--junitxml=user_acceptance_report.xml",
-], depends-on = ["install"], cwd = "imod/tests", env = { USER_ACCEPTANCE_DIR = "user_acceptance_data"} }
-run_imod5 = {cmd = ["prepare_mf6_transient_imod5.bat"], cwd = "imod/tests/user_acceptance_data/LHM_transient/scripts_imod-5"}
-qgis_export ={ cmd = [
-    "pytest", "-s",
-    "-m", "qgis_export",
+], cwd = "imod/tests", env = { USER_ACCEPTANCE_DIR = "user_acceptance_data" } }
+run_imod5 = { cmd = [
+    "prepare_mf6_transient_imod5.bat",
+], cwd = "imod/tests/user_acceptance_data/LHM_transient/scripts_imod-5" }
+qgis_export = { cmd = [
+    "pytest",
+    "-s",
+    "-m",
+    "qgis_export",
     "--cache-clear",
     "--verbose",
     "--junitxml=qgis_export_report.xml",
-], depends-on = ["install"], cwd = "imod/tests", env = { IMOD_DATA_DIR = ".imod_data" } }
+], cwd = "imod/tests", env = { IMOD_DATA_DIR = ".imod_data" } }
 
 [environments]
 default = { features = [], solve-group = "conda-deps" }
