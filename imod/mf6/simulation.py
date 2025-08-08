@@ -1474,7 +1474,7 @@ class Modflow6Simulation(collections.UserDict, ISimulation):
     def mask_all_models(
         self,
         mask: GridDataArray,
-    ):
+    ) -> None:
         """
         This function applies a mask to all models in a simulation, provided they use
         the same discretization. The  method parameter "mask" is an idomain-like array.
@@ -1488,6 +1488,16 @@ class Modflow6Simulation(collections.UserDict, ISimulation):
         mask: xr.DataArray, xu.UgridDataArray of ints
             idomain-like integer array. >0 sets cells to active, 0 sets cells to inactive,
             <0 sets cells to vertical passthrough
+        
+        Examples
+        --------
+        To mask all models in a simulation, you can use the following code:
+        
+        >>> mf6_sim.mask_all_models(new_idomain)
+
+        This masks the model inplace and updates the packages accordingly. The
+        mask should be an idomain-like array, i.e. it should have the same shape
+        as the model and contain integer values.
         """
         _mask_all_models(self, mask)
 
