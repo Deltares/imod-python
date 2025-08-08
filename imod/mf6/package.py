@@ -474,13 +474,25 @@ class Package(PackageBase, IPackage, abc.ABC):
         Parameters
         ----------
         mask: xr.DataArray, xu.UgridDataArray of ints
-            idomain-like integer array. >0 sets cells to active, 0 sets cells to inactive,
-            <0 sets cells to vertical passthrough
+            idomain-like integer array. >0 sets cells to active, 0 sets cells to
+            inactive, <0 sets cells to vertical passthrough
 
         Returns
         -------
         masked: Package
             The package with part masked.
+        
+        Examples
+        --------
+        To mask a package with an idomain-like array. For example, to create a
+        package with the first 10 rows and columns masked, create the mask first:
+
+        >>> mask = xr.ones_like(idomain, dtype=int)
+        >>> mask[0:10, 0:10] = 0
+
+        Then call mask:
+
+        >>> masked_pkg = pkg.mask(mask)
         """
         result = cast(IPackage, deepcopy(self))
         remove_expanded_auxiliary_variables_from_dataset(result)
@@ -520,6 +532,13 @@ class Package(PackageBase, IPackage, abc.ABC):
             specialization class of BaseRegridder) and function name (str) this
             dictionary can be used to override the default mapping method.
 
+        Returns
+        -------
+        Package
+            A package with the same options as this package, and with all the
+            data-arrays regridded to another discretization, similar to the one used
+            in input argument "target_grid"
+
         Examples
         --------
         To regrid the npf package with a non-default method for the k-field,
@@ -528,12 +547,6 @@ class Package(PackageBase, IPackage, abc.ABC):
         >>> regridder_types = imod.mf6.regrid.NodePropertyFlowRegridMethod(k=(imod.RegridderType.OVERLAP, "mean"))
         >>> regrid_cache = imod.util.regrid.RegridderWeightsCache()
         >>> new_npf = npf.regrid_like(like, regrid_cache, regridder_types)
-
-        Returns
-        -------
-        A package with the same options as this package, and with all the
-        data-arrays regridded to another discretization, similar to the one used
-        in input argument "target_grid"
         """
         try:
             result = deepcopy(self)
