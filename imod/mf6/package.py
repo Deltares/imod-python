@@ -435,8 +435,8 @@ class Package(PackageBase, IPackage, abc.ABC):
 
         >>> pkg.clip_box(x_max=1000.0)``
 
-        To select x >= 500.0: 
-        
+        To select x >= 500.0:
+
         >>> pkg.clip_box(x_min=500.0)
 
         To select a time interval, you can use datetime64:

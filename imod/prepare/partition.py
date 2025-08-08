@@ -83,7 +83,7 @@ def create_partition_labels(
         A label array with the same size as the top layer of idomain, where each
         element is the partition number to which the column of gridblocks at that
         location belongs.
-    
+
     Examples
     --------
     Create partition labels for a simulation:

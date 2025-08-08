@@ -2,7 +2,6 @@ import numpy as np
 import xarray as xr
 import xugrid as xu
 
-from imod.prepare.partition import create_partition_labels
 from imod.mf6 import Modflow6Simulation
 
 

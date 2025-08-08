@@ -153,7 +153,7 @@ class GroundwaterFlowModel(Modflow6Model):
         state_for_boundary : optional, Union[xr.DataArray, xu.UgridDataArray]
             A grids with states that are used to put as boundary values. This
             model will get a :class:`imod.mf6.ConstantHead`.
-        
+
         Returns
         -------
         clipped : GroundwaterFlowModel
@@ -171,8 +171,8 @@ class GroundwaterFlowModel(Modflow6Model):
 
         >>> gwf.clip_box(x_max=1000.0)``
 
-        To select x >= 500.0: 
-        
+        To select x >= 500.0:
+
         >>> gwf.clip_box(x_min=500.0)
 
         To select a time interval, you can use datetime64:
@@ -182,7 +182,7 @@ class GroundwaterFlowModel(Modflow6Model):
         To clip an area and set a boundary condition at the clipped boundary:
 
         >>> clipped_gwf = gwf.clip_box(
-        ...     x_min=500.0, x_max=1000.0, y_min=500.0, y_max=1000.0, 
+        ...     x_min=500.0, x_max=1000.0, y_min=500.0, y_max=1000.0,
         ...     state_for_boundary=heads
         ... )
         """

@@ -49,11 +49,11 @@ from imod.mf6.package import Package
 from imod.mf6.ssm import SourceSinkMixing
 from imod.mf6.validation_settings import ValidationSettings
 from imod.mf6.write_context import WriteContext
+from imod.prepare.partition import create_partition_labels
 from imod.prepare.topsystem.default_allocation_methods import (
     SimulationAllocationOptions,
     SimulationDistributingOptions,
 )
-from imod.prepare.partition import create_partition_labels
 from imod.schemata import ValidationError
 from imod.typing import GridDataArray, GridDataset
 from imod.typing.grid import (
@@ -911,7 +911,7 @@ class Modflow6Simulation(collections.UserDict, ISimulation):
         crs: Any, optional
             Anything accepted by rasterio.crs.CRS.from_user_input
             Requires ``rioxarray`` installed.
-        
+
         Examples
         --------
         Dump simulation to directory:
@@ -1127,7 +1127,7 @@ class Modflow6Simulation(collections.UserDict, ISimulation):
             :class:`imod.mf6.ConstantHead`,
             :class:`imod.mf6.GroundwaterTransportModel` will get a
             :class:`imod.mf6.ConstantConcentration` package.
-        
+
         Returns
         -------
         clipped : Simulation
@@ -1144,8 +1144,8 @@ class Modflow6Simulation(collections.UserDict, ISimulation):
 
         >>> mf6_sim.clip_box(x_max=1000.0)``
 
-        To select x >= 500.0: 
-        
+        To select x >= 500.0:
+
         >>> mf6_sim.clip_box(x_min=500.0)
 
         To select a time interval, you can use datetime64:
@@ -1156,7 +1156,7 @@ class Modflow6Simulation(collections.UserDict, ISimulation):
 
         >>> states_for_boundary = {"GWF6_model_name": heads}
         >>> clipped_sim = mf6_sim.clip_box(
-        ...     x_min=500.0, x_max=1000.0, y_min=500.0, y_max=1000.0, 
+        ...     x_min=500.0, x_max=1000.0, y_min=500.0, y_max=1000.0,
         ...     states_for_boundary=states_for_boundary
         ... )
         """
@@ -1231,7 +1231,7 @@ class Modflow6Simulation(collections.UserDict, ISimulation):
             be positive integers. If not provided, active cells (idomain > 0)
             are summed across layers and passed on as weights. If None, the
             idomain is used to compute weights.
-        
+
         Returns
         -------
         xarray.DataArray or xu.UgridDataArray
@@ -1266,7 +1266,6 @@ class Modflow6Simulation(collections.UserDict, ISimulation):
         idomain = flowmodel.domain
         return create_partition_labels(idomain, npartitions, weights=weights)
 
-
     @standard_log_decorator()
     def split(
         self,
@@ -1295,7 +1294,7 @@ class Modflow6Simulation(collections.UserDict, ISimulation):
         -------
         Modflow6Simulation
             A new simulation containing all the split models and packages
-        
+
         Examples
         --------
         >>> submodel_labels = mf6_sim.create_partition_labels(n_partitions=4)
@@ -1594,11 +1593,11 @@ class Modflow6Simulation(collections.UserDict, ISimulation):
         mask: xr.DataArray, xu.UgridDataArray of ints
             idomain-like integer array. >0 sets cells to active, 0 sets cells to inactive,
             <0 sets cells to vertical passthrough
-        
+
         Examples
         --------
         To mask all models in a simulation, you can use the following code:
-        
+
         >>> mf6_sim.mask_all_models(new_idomain)
 
         This masks the model inplace and updates the packages accordingly. The
