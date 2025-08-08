@@ -292,11 +292,11 @@ class Modflow6Simulation(collections.UserDict, ISimulation):
             ``ValidationError``.
         use_absolute_paths: ({True, False}, optional)
             True if all paths written to the mf6 inputfiles should be absolute.
-        
+
         Examples
         --------
         Write the simulation to a directory:
-        
+
         >>> simulation.write("path/to/simulation")
 
         If you continue to run into ValidationErrors, you can disable the validation

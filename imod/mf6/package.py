@@ -481,7 +481,7 @@ class Package(PackageBase, IPackage, abc.ABC):
         -------
         masked: Package
             The package with part masked.
-        
+
         Examples
         --------
         To mask a package with an idomain-like array. For example, to create a
