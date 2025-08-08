@@ -13,6 +13,8 @@ Read Output
     open_cbc
     read_cbc_headers
     open_dvs
+    open_conc
+    read_grb
 
 Model objects & methods
 -----------------------
