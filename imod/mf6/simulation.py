@@ -1068,30 +1068,65 @@ class Modflow6Simulation(collections.UserDict, ISimulation):
         """
         Clip a simulation by a bounding box (time, layer, y, x).
 
-        Slicing intervals may be half-bounded, by providing None:
-
-        * To select 500.0 <= x <= 1000.0:
-          ``clip_box(x_min=500.0, x_max=1000.0)``.
-        * To select x <= 1000.0: ``clip_box(x_min=None, x_max=1000.0)``
-          or ``clip_box(x_max=1000.0)``.
-        * To select x >= 500.0: ``clip_box(x_min = 500.0, x_max=None.0)``
-          or ``clip_box(x_min=1000.0)``.
-
         Parameters
         ----------
-        time_min: optional
+        time_min: optional, np.datetime64
+            Start time to select. Data will be forward filled to this date. If
+            time_min is before the start time of the dataset, data is
+            backfilled.
         time_max: optional
+            End time to select.
         layer_min: optional, int
+            Minimum layer to select.
         layer_max: optional, int
+            Maximum layer to select.
         x_min: optional, float
+            Minimum x-coordinate to select.
         x_max: optional, float
+            Maximum x-coordinate to select.
         y_min: optional, float
+            Minimum y-coordinate to select.
         y_max: optional, float
-        states_for_boundary : optional, Dict[pkg_name:str, boundary_values:Union[xr.DataArray, xu.UgridDataArray]]
-
+            Maximum y-coordinate to select.
+        states_for_boundary : optional, Dict[str, Union[xr.DataArray, xu.UgridDataArray]]
+            A dictionary with model names as keys and grids with states that are
+            used to put as boundary values.
+            :class:`imod.mf6.GroundwaterFlowModel` will get a
+            :class:`imod.mf6.ConstantHead`,
+            :class:`imod.mf6.GroundwaterTransportModel` will get a
+            :class:`imod.mf6.ConstantConcentration` package.
+        
         Returns
         -------
         clipped : Simulation
+
+        Examples
+        --------
+        Slicing intervals may be half-bounded, by providing None:
+
+        To select 500.0 <= x <= 1000.0:
+
+        >>> mf6_sim.clip_box(x_min=500.0, x_max=1000.0)
+
+        To select x <= 1000.0:
+
+        >>> mf6_sim.clip_box(x_max=1000.0)``
+
+        To select x >= 500.0: 
+        
+        >>> mf6_sim.clip_box(x_min=500.0)
+
+        To select a time interval, you can use datetime64:
+
+        >>> mf6_sim.clip_box(time_min=np.datetime64("2020-01-01"), time_max=np.datetime64("2020-12-31"))
+
+        To clip an area and set a boundary condition at the clipped boundary:
+
+        >>> states_for_boundary = {"GWF6_model_name": heads}
+        >>> clipped_sim = mf6_sim.clip_box(
+        ...     x_min=500.0, x_max=1000.0, y_min=500.0, y_max=1000.0, 
+        ...     states_for_boundary=states_for_boundary
+        ... )
         """
 
         if self.is_split():

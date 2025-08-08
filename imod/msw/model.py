@@ -377,28 +377,48 @@ class MetaSwapModel(Model):
         ``mete_grid.inp`` copied by :class:`imod.msw.MeteoGridCopy` would be
         computed.
 
-        Slicing intervals may be half-bounded, by providing None:
-
-        * To select 500.0 <= x <= 1000.0:
-          ``clip_box(x_min=500.0, x_max=1000.0)``.
-        * To select x <= 1000.0: ``clip_box(x_min=None, x_max=1000.0)``
-          or ``clip_box(x_max=1000.0)``.
-        * To select x >= 500.0: ``clip_box(x_min = 500.0, x_max=None.0)``
-          or ``clip_box(x_min=1000.0)``.
-
         Parameters
         ----------
-        time_min: optional
+        time_min: optional, np.datetime64
+            Start time to select. Data will be forward filled to this date. If
+            time_min is before the start time of the dataset, data is
+            backfilled.
         time_max: optional
+            End time to select.
         x_min: optional, float
+            Minimum x-coordinate to select.
         x_max: optional, float
+            Maximum x-coordinate to select.
         y_min: optional, float
+            Minimum y-coordinate to select.
         y_max: optional, float
+            Maximum y-coordinate to select.
 
         Returns
         -------
-        MetaSwapModel
-            Clipped model.
+        clipped : MetaSwapModel
+            A new model that is clipped to the specified bounding box.
+
+        Examples
+        --------
+        Slicing intervals may be half-bounded, by providing None:
+
+        To select 500.0 <= x <= 1000.0:
+
+        >>> msw_model.clip_box(x_min=500.0, x_max=1000.0)
+
+        To select x <= 1000.0:
+
+        >>> msw_model.clip_box(x_max=1000.0)``
+
+        To select x >= 500.0: 
+        
+        >>> msw_model.clip_box(x_min=500.0)
+
+        To select a time interval, you can use datetime64:
+
+        >>> msw_model.clip_box(time_min=np.datetime64("2020-01-01"), time_max=np.datetime64("2020-12-31"))
+
         """
         settings = deepcopy(self.simulation_settings)
         unsa_svat_path = settings.pop("unsa_svat_path")

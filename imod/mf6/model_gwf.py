@@ -127,6 +127,65 @@ class GroundwaterFlowModel(Modflow6Model):
         y_max: Optional[float] = None,
         state_for_boundary: Optional[GridDataArray] = None,
     ):
+        """
+        Clip a model by a bounding box (time, layer, y, x).
+
+        Parameters
+        ----------
+        time_min: optional, np.datetime64
+            Start time to select. Data will be forward filled to this date. If
+            time_min is before the start time of the dataset, data is
+            backfilled.
+        time_max: optional
+            End time to select.
+        layer_min: optional, int
+            Minimum layer to select.
+        layer_max: optional, int
+            Maximum layer to select.
+        x_min: optional, float
+            Minimum x-coordinate to select.
+        x_max: optional, float
+            Maximum x-coordinate to select.
+        y_min: optional, float
+            Minimum y-coordinate to select.
+        y_max: optional, float
+            Maximum y-coordinate to select.
+        state_for_boundary : optional, Union[xr.DataArray, xu.UgridDataArray]
+            A grids with states that are used to put as boundary values. This
+            model will get a :class:`imod.mf6.ConstantHead`.
+        
+        Returns
+        -------
+        clipped : GroundwaterFlowModel
+            A new model that is clipped to the specified bounding box.
+
+        Examples
+        --------
+        Slicing intervals may be half-bounded, by providing None:
+
+        To select 500.0 <= x <= 1000.0:
+
+        >>> gwf.clip_box(x_min=500.0, x_max=1000.0)
+
+        To select x <= 1000.0:
+
+        >>> gwf.clip_box(x_max=1000.0)``
+
+        To select x >= 500.0: 
+        
+        >>> gwf.clip_box(x_min=500.0)
+
+        To select a time interval, you can use datetime64:
+
+        >>> gwf.clip_box(time_min=np.datetime64("2020-01-01"), time_max=np.datetime64("2020-12-31"))
+
+        To clip an area and set a boundary condition at the clipped boundary:
+
+        >>> clipped_gwf = gwf.clip_box(
+        ...     x_min=500.0, x_max=1000.0, y_min=500.0, y_max=1000.0, 
+        ...     state_for_boundary=heads
+        ... )
+        """
         clipped = super().clip_box(
             time_min, time_max, layer_min, layer_max, x_min, x_max, y_min, y_max
         )
