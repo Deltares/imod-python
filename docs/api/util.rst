@@ -25,6 +25,7 @@ Utilities
     to_ugrid2d
     mdal_compliant_ugrid2d
     from_mdal_compliant_ugrid2d
+    ones_like_ugrid
 
     RegridderWeightsCache
     RegridderWeightsCache.get_regridder

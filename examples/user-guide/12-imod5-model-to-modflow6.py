@@ -236,20 +236,16 @@ gwf_model["hfb-26"].line_data.plot(ax=ax, color="blue", linewidth=2)
 voronoi_grid = triangular_grid.tesselate_centroidal_voronoi()
 voronoi_grid.plot()
 
+# iMOD Python regridding functionality requires a UgridDataArray instead of a
+# Ugrid2d, so we create a UgridDataArray with the voronoi grid.
+from imod.util import ones_like_ugrid
+
+voronoi_uda = ones_like_ugrid(voronoi_grid)
+
 # %%
 #
 # Now that we have a Voronoi grid, we can regrid the MODFLOW 6 simulation to this
 # grid.
-
-# Workaround for bug where iMOD Python doesn't recognize Ugrid2D, only UgridDataArray
-import numpy as np
-import xarray as xr
-import xugrid as xu
-
-data = xr.DataArray(
-    np.ones(voronoi_grid.sizes["mesh2d_nFaces"]), dims=["mesh2d_nFaces"]
-)
-voronoi_uda = xu.UgridDataArray(data, voronoi_grid)
 
 mf6_unstructured = mf6_sim.regrid_like(
     "unstructured_example", voronoi_uda, validate=False

@@ -220,6 +220,8 @@ Flow Packages
     HorizontalFlowBarrierHydraulicCharacteristic.copy
     HorizontalFlowBarrierHydraulicCharacteristic.is_empty
     HorizontalFlowBarrierHydraulicCharacteristic.get_regrid_methods
+    HorizontalFlowBarrierHydraulicCharacteristic.mask
+    HorizontalFlowBarrierHydraulicCharacteristic.regrid_like
     HorizontalFlowBarrierMultiplier
     HorizontalFlowBarrierMultiplier.clip_box
     HorizontalFlowBarrierMultiplier.to_mf6_pkg
@@ -230,6 +232,8 @@ Flow Packages
     HorizontalFlowBarrierMultiplier.copy
     HorizontalFlowBarrierMultiplier.is_empty
     HorizontalFlowBarrierMultiplier.get_regrid_methods
+    HorizontalFlowBarrierMultiplier.mask
+    HorizontalFlowBarrierMultiplier.regrid_like
     HorizontalFlowBarrierResistance
     HorizontalFlowBarrierResistance.cleanup
     HorizontalFlowBarrierResistance.to_mf6_pkg
@@ -241,6 +245,8 @@ Flow Packages
     HorizontalFlowBarrierResistance.copy
     HorizontalFlowBarrierResistance.is_empty
     HorizontalFlowBarrierResistance.get_regrid_methods
+    HorizontalFlowBarrierResistance.mask
+    HorizontalFlowBarrierResistance.regrid_like
     LayeredWell
     LayeredWell.from_imod5_data
     LayeredWell.from_imod5_cap_data
@@ -315,6 +321,8 @@ Flow Packages
     SingleLayerHorizontalFlowBarrierHydraulicCharacteristic.copy
     SingleLayerHorizontalFlowBarrierHydraulicCharacteristic.is_empty
     SingleLayerHorizontalFlowBarrierHydraulicCharacteristic.get_regrid_methods
+    SingleLayerHorizontalFlowBarrierHydraulicCharacteristic.mask
+    SingleLayerHorizontalFlowBarrierHydraulicCharacteristic.regrid_like
     SingleLayerHorizontalFlowBarrierMultiplier
     SingleLayerHorizontalFlowBarrierMultiplier.to_mf6_pkg
     SingleLayerHorizontalFlowBarrierMultiplier.clip_box
@@ -325,6 +333,8 @@ Flow Packages
     SingleLayerHorizontalFlowBarrierMultiplier.copy
     SingleLayerHorizontalFlowBarrierMultiplier.is_empty
     SingleLayerHorizontalFlowBarrierMultiplier.get_regrid_methods
+    SingleLayerHorizontalFlowBarrierMultiplier.mask
+    SingleLayerHorizontalFlowBarrierMultiplier.regrid_like
     SingleLayerHorizontalFlowBarrierResistance
     SingleLayerHorizontalFlowBarrierResistance.cleanup
     SingleLayerHorizontalFlowBarrierResistance.from_imod5_data
@@ -337,6 +347,8 @@ Flow Packages
     SingleLayerHorizontalFlowBarrierResistance.copy
     SingleLayerHorizontalFlowBarrierResistance.is_empty
     SingleLayerHorizontalFlowBarrierResistance.get_regrid_methods
+    SingleLayerHorizontalFlowBarrierResistance.mask
+    SingleLayerHorizontalFlowBarrierResistance.regrid_like
     SpecificStorage
     SpecificStorage.mask
     SpecificStorage.regrid_like
