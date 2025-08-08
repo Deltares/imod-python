@@ -21,14 +21,15 @@ More information on the available regridding methods can be found in the xugrid 
 https://deltares.github.io/xugrid/user_guide.html
 
 The regridding method that should be used depends on the property being
-regridded. For example a thermodynamically intensive property (whose value do
-not depend intrinsically on the grid block size) such as temperature or density
-can be regridded by an averaging approach (for upscaling) or sampling (for
-downscaling). Extensive properties (whose values do depend on the grid block
-size) include (water) mass and pore volume of a gridblock, and the regridding method should be chosen
-to reflect that. Finally regridding methods for conductivity-like properties
-follow the rules for parallel or serial resistors- at least when the tensor rotation angles
-are constant or comparable in the involved gridblocks.
+regridded. For example a point-based property (whose value do not depend
+intrinsically on the grid block size) such as temperature or density can be
+regridded by an averaging approach (for upscaling) or sampling (for
+downscaling). Volume-based properties (whose values do depend on the grid block
+size) include (water) mass and pore volume of a gridblock, and the regridding
+method should be chosen to reflect that. Finally regridding methods for
+conductivity-like properties follow the rules for parallel or serial resistors-
+at least when the tensor rotation angles are constant or comparable in the
+involved gridblocks.
 
 Note that the different regridding methods may have a different output domain
 when regridding: if the original array has no-data values in some cells, then
@@ -42,7 +43,7 @@ same number of layers as the input array.
 
 # %%
 # Obtaining the final (i)domain
-# =============================
+# -----------------------------
 #
 # In many real-world models, some cells will be inactive or marked as "vertical
 # passthrough" (VPT) in the idomain array of the simulation. Some packages require
@@ -78,33 +79,12 @@ same number of layers as the input array.
 #    step.
 #
 # Regridding using default methods
-# ================================
+# --------------------------------
 #
 # The regrid_like function is available on packages, models and simulations.
 # When the default methods are acceptable, regridding the whole simulation is the most convenient
 # from a user-perspective.
-#
-#
-# Regridding using non-default methods
-# ====================================
-#
-# When non-default methods are used for one or more packages, these should be
-# regridded separately. In that case, the most convenient approach is likely:
-#
-# - pop the packages that should use non-default methods from the source simulation (the
-#   popping is optional, and is only recommended for packages whose presence is not
-#   mandatory for validation.)
-# - regrid the source simulation: this takes care of all the packages that should use default methods.
-# - regrid the package(s) where you want to use non-standard rergridding methods indivudually starting from the
-#   packages in the source simulation
-# - insert the custom-regridded packages to the
-#   regridded simulation (or replace the package regridded with default methods with
-#   the one you just regridded with non-default methods if it was not popped)
-#
-# In code, consider an example where we want to regrid the recharge package using non default methods
-# then we would do the following. First we'll load some example simulation.
-# There is a separate example contained in :doc:`/examples/mf6/hondsrug`
-# that you should look at if you are interested in the model building
+
 import imod
 
 tmpdir = imod.util.temporary_directory()
@@ -148,13 +128,6 @@ target_grid = xr.ones_like(target_grid)
 target_grid
 
 # %%
-# Next, we'll remove the recharge package and obtain it as a variable:
-
-original_rch_package = original_simulation["GWF"].pop("rch")
-
-original_rch_package
-
-# %%
 # Now regrid the simulation (without recharge):
 regridded_simulation = original_simulation.regrid_like("regridded", target_grid)
 
@@ -186,6 +159,29 @@ axes[0].set_ylabel("original")
 axes[1].set_ylabel("regridded")
 
 # %%
+#
+# Regridding using non-default methods
+# ------------------------------------
+#
+# When non-default methods are used for one or more packages, these should be
+# regridded separately. In that case, the most convenient approach is likely:
+#
+# - pop the packages that should use non-default methods from the source simulation (the
+#   popping is optional, and is only recommended for packages whose presence is not
+#   mandatory for validation.)
+# - regrid the source simulation: this takes care of all the packages that should use default methods.
+# - regrid the package(s) where you want to use non-standard rergridding methods indivudually starting from the
+#   packages in the source simulation
+# - insert the custom-regridded packages to the
+#   regridded simulation (or replace the package regridded with default methods with
+#   the one you just regridded with non-default methods if it was not popped)
+#
+# In code, consider an example where we want to regrid the recharge package using non default methods
+# then we would do the following. First we'll load some example simulation.
+# There is a separate example contained in :doc:`/examples/mf6/hondsrug`
+# that you should look at if you are interested in the model building
+
+# %%
 # Set up the input needed for custom regridding. Create a regridder
 # weight-cache. This object can (and should) be reused for all the packages that
 # undergo custom regridding at this stage.
@@ -194,6 +190,13 @@ from imod.util.regrid import RegridderWeightsCache
 regrid_cache = RegridderWeightsCache()
 
 regrid_cache
+
+# %%
+# Next, we'll remove the recharge package and obtain it as a variable. We'll do this for later use.
+
+original_rch_package = original_simulation["GWF"].pop("rch")
+
+original_rch_package
 
 # %%
 # Regrid the recharge package with a custom regridder. In this case we opt
@@ -221,7 +224,7 @@ original_simulation["GWF"]["rch"] = original_rch_package
 
 # %%
 # Comparison with histograms
-# ==========================
+# --------------------------
 #
 # In the next segment we will compare the input of the models on different grids.
 # We advice to always check how your input is regridded. In this example we upscaled grid,
@@ -352,7 +355,7 @@ axes[1].set_ylabel("regridded")
 
 # %%
 # A note on regridding conductivity
-# =================================
+# ---------------------------------
 # In the npf package, it is possible to use for definining the conductivity tensor:
 #
 # - 1 array (K)
@@ -370,7 +373,7 @@ axes[1].set_ylabel("regridded")
 # if the input arrays angle2 and/or angle3 have large values.
 #
 # Regridding boundary conditions
-# ==============================
+# ------------------------------
 # Special care must be taken when regridding boundary conditions, and it is
 # recommended that users verify the balance output of a regridded simulation and
 # compare it to the original model. If the regridded simulation is a good
@@ -394,7 +397,7 @@ axes[1].set_ylabel("regridded")
 #
 #
 # A note on regridding transport
-# ==============================
+# ------------------------------
 # Transport simulations can be unstable if constraints related to the grid Peclet
 # number and the courant number are exceeded. This can easily happen when
 # regridding. It may be necessary to reduce the simulation's time step size
@@ -404,7 +407,7 @@ axes[1].set_ylabel("regridded")
 #
 #
 # Unsupported packages
-# ====================
+# --------------------
 # Some packages cannot be regridded. This includes the Lake package and the UZF
 # package. Such packages should be removed from the simulation before regridding,
 # and then new packages should be created by the user and then added to the
@@ -413,11 +416,11 @@ axes[1].set_ylabel("regridded")
 #
 # This code snippet prints all default methods:
 #
+import inspect, sys
 from dataclasses import asdict
 
 import pandas as pd
 
-from imod.tests.fixtures.package_instance_creation import ALL_PACKAGE_INSTANCES
 
 regrid_method_setup = {
     "package name": [],
@@ -426,12 +429,15 @@ regrid_method_setup = {
     "function name": [],
 }
 regrid_method_table = pd.DataFrame(regrid_method_setup)
+# Get all classes in the imod.mf6 module (e.g. imod.mf6.NodePropertyFlow,
+# imod.mf6.GroundwaterFlowModel, imod.mf6.River)
+mf6_classes = [obj for _, obj in inspect.getmembers(sys.modules["imod.mf6"], inspect.isclass)]
 
 counter = 0
-for pkg in ALL_PACKAGE_INSTANCES:
-    if hasattr(pkg, "_regrid_method"):
-        package_name = type(pkg).__name__
-        regrid_methods = asdict(pkg.get_regrid_methods())
+for obj in mf6_classes:
+    if hasattr(obj, "_regrid_method"):
+        package_name = obj.__name__
+        regrid_methods = asdict(obj.get_regrid_methods())
         for array_name in regrid_methods.keys():
             method_name = regrid_methods[array_name][0].name
             function_name = ""
