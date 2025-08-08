@@ -53,6 +53,7 @@ from imod.prepare.topsystem.default_allocation_methods import (
     SimulationAllocationOptions,
     SimulationDistributingOptions,
 )
+from imod.prepare.partition import create_partition_labels
 from imod.schemata import ValidationError
 from imod.typing import GridDataArray, GridDataset
 from imod.typing.grid import (
@@ -1208,6 +1209,64 @@ class Modflow6Simulation(collections.UserDict, ISimulation):
                 raise ValueError(f"object of type {type(value)} cannot be clipped.")
         return clipped
 
+    def create_partition_labels(
+        self,
+        npartitions: int,
+        weights: Optional[GridDataArray] = None,
+    ) -> GridDataArray:
+        """
+        Returns a label array: a 2d array with a similar size to the top layer of
+        idomain. Every array element is the partition number to which the column of
+        gridblocks of idomain at that location belong. This is provided to
+        :meth:`imod.mf6.Modflow6Simulation.split` to partition the model.
+
+        Parameters
+        ----------
+        npartitions : int
+            The number of partitions to create.
+        weights : xarray.DataArray, xugrid.UgridDataArray, optional
+            The weights to use for partitioning. The weights should be a 2d
+            array with the same size as the top layer of idomain. The weights
+            are used to determine the size of each partition. The weights should
+            be positive integers. If not provided, active cells (idomain > 0)
+            are summed across layers and passed on as weights. If None, the
+            idomain is used to compute weights.
+        
+        Returns
+        -------
+        xarray.DataArray or xu.UgridDataArray
+            An array with partition labels, with the same shape as the top layer
+            of the idomain.
+
+        Examples
+        --------
+        Create a partition label array with 4 partitions.
+
+        >>> label_array = mf6_sim.create_partition_labels(n_partitions=4)
+
+        You can then use this label array to split the simulation:
+
+        >>> mf6_splitted = mf6_sim.split(label_array)
+
+        You can also provide weights to the partitioning, which will influence
+        the size of each partition. For example, if you want to create a uniform
+        partitioning, you can use:
+
+        >>> weights = xr.ones_like(idomain)
+        >>> label_array = mf6_sim.create_partition_labels(n_partitions=4, weights=weights)
+
+        """
+        gwf_models = self.get_models_of_type("gwf6")
+        if len(gwf_models) != 1:
+            raise ValueError(
+                "for partitioning a simulation to work, it must have exactly 1 flow model"
+            )
+
+        flowmodel = list(gwf_models.values())[0]
+        idomain = flowmodel.domain
+        return create_partition_labels(idomain, npartitions, weights=weights)
+
+
     @standard_log_decorator()
     def split(
         self,
@@ -1234,7 +1293,13 @@ class Modflow6Simulation(collections.UserDict, ISimulation):
 
         Returns
         -------
-        A new simulation containing all the split models and packages
+        Modflow6Simulation
+            A new simulation containing all the split models and packages
+        
+        Examples
+        --------
+        >>> submodel_labels = mf6_sim.create_partition_labels(n_partitions=4)
+        >>> m6_splitted = mf6_sim.split(submodel_labels)
         """
         if self.is_split():
             raise RuntimeError(

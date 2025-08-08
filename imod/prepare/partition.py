@@ -5,7 +5,6 @@ import xarray as xr
 import xugrid as xu
 from plum import Dispatcher
 
-from imod.common.interfaces.isimulation import ISimulation
 from imod.typing import GridDataArray
 from imod.typing.grid import as_ugrid_dataarray
 
@@ -53,7 +52,7 @@ def _partition_idomain(weights: xr.DataArray, npartitions: int) -> GridDataArray
 
 
 def create_partition_labels(
-    simulation: ISimulation,
+    idomain: GridDataArray,
     npartitions: int,
     weights: Optional[GridDataArray] = None,
 ) -> GridDataArray:
@@ -65,8 +64,9 @@ def create_partition_labels(
 
     Parameters
     ----------
-    simulation : Modflow6Simulation
-        The simulation to partition. It must have exactly one flow model.
+    idomain : GridDataArray
+        idomain-like integer array. >0 sets cells to active, 0 sets cells to inactive,
+        <0 sets cells to vertical passthrough.
     npartitions : int
         The number of partitions to create.
     weights : xarray.DataArray, xugrid.UgridDataArray, optional
@@ -74,18 +74,35 @@ def create_partition_labels(
         with the same size as the top layer of idomain. The weights are used to
         determine the size of each partition. The weights should be positive
         integers. If not provided, active cells (idomain > 0) are summed across
-        layers and passed on as weights.
+        layers and passed on as weights. If None, the idomain is used to compute
+        weights.
+
+    Returns
+    -------
+    xr.DataArray or xugrid.UgridDataArray
+        A label array with the same size as the top layer of idomain, where each
+        element is the partition number to which the column of gridblocks at that
+        location belongs.
+    
+    Examples
+    --------
+    Create partition labels for a simulation:
+
+    >>> partition_labels = create_partition_labels(idomain, npartitions=4)
+
+    You can provide these labels to the :meth:`imod.mf6.Modflow6Simulation.split` method
+
+    >>> mf6_splitted = mf6_sim.split(label_array)
+
+    You can also provide weights to the partitioning, which will influence the
+    size of each partition. For example, if you want to create a uniform
+    partitioning, you can use:
+
+    >>> weights = xr.ones_like(idomain)
+    >>> label_array = create_partition_labels(idomain, n_partitions=4, weights=weights)
     """
-    gwf_models = simulation.get_models_of_type("gwf6")
-    if len(gwf_models) != 1:
-        raise ValueError(
-            "for partitioning a simulation to work, it must have exactly 1 flow model"
-        )
     if npartitions <= 0:
         raise ValueError("You should create at least 1 partition")
-
-    flowmodel = list(gwf_models.values())[0]
-    idomain = flowmodel.domain
 
     if weights is None:
         weights = (idomain > 0).sum(dim="layer").astype(int)

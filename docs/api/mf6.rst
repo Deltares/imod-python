@@ -42,6 +42,7 @@ Model objects & methods
     Modflow6Simulation.get_exchange_relationships
     Modflow6Simulation.get_models_of_type
     Modflow6Simulation.get_models
+    Modflow6Simulation.create_partition_labels
     GroundwaterFlowModel
     GroundwaterFlowModel.mask_all_packages
     GroundwaterFlowModel.prepare_wel_for_mf6
