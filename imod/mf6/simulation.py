@@ -910,6 +910,27 @@ class Modflow6Simulation(collections.UserDict, ISimulation):
         crs: Any, optional
             Anything accepted by rasterio.crs.CRS.from_user_input
             Requires ``rioxarray`` installed.
+        
+        Examples
+        --------
+        Dump simulation to directory:
+
+        >>> mf6_sim.dump("path/to/directory")
+
+        You can load the dumped simulation back with:
+
+        >>> loaded_sim = Modflow6Simulation.from_file("path/to/directory/simulation_name.toml")
+
+        If you keep on getting ValidationErrors, you can set
+        ``validate=False`` to skip validation, but this is not recommended.
+
+        >>> mf6_sim.dump("path/to/directory", validate=False)
+
+        You can then fix the issues later after loading the simulation in a
+        later stage. If you want to dump the simulation in a form that is nicely
+        loaded into QGIS, you can set ``mdal_compliant=True``:
+
+        >>> mf6_sim.dump("path/to/directory", mdal_compliant=True, crs="EPSG:4326")
         """
         directory = pathlib.Path(directory)
         directory.mkdir(parents=True, exist_ok=True)
@@ -961,6 +982,16 @@ class Modflow6Simulation(collections.UserDict, ISimulation):
         -------
         Modflow6Simulation
             Modflow6Simulation object with models and packages loaded from
+
+        Examples
+        --------
+        Dump simulation to directory:
+
+        >>> mf6_sim.dump("path/to/directory")
+
+        You can load the dumped simulation back with:
+
+        >>> loaded_sim = Modflow6Simulation.from_file("path/to/directory/simulation_name.toml")
         """
         classes = {
             item_cls.__name__: item_cls
