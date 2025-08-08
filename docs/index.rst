@@ -199,8 +199,8 @@ respectively 1 and 365 stress periods) than the alternative `Flopy`_ package.
 Furthermore ``imod`` can even write models that are larger than the available
 memory, using `dask`_ arrays.
 
-*NOTE:* We don't hate Flopy, nor seek its demise. iMOD developers also
-contribute and aid in the development of Flopy.
+*NOTE:* iMOD developers work alongside the Flopy development team and contribute
+to both projects.
 
 8\. Import your iMOD5 models
 ----------------------------
@@ -230,7 +230,9 @@ Why not ``imod``?
 
 If you are not interested in deriving models from spatial data, but just want to
 allocate boundary conditions based on layer, row, column numbers, or create a
-model of a 2D cross-section: You are better off using `Flopy`_.
+model of a 2D cross-section: You are better off using `Flopy`_. If you want to
+complexify this model with a lot of stress periods and run into slow writing
+speeds, consider using ``imod`` for performance.
 
 2\. Not all MODFLOW 6 features are supported
 --------------------------------------------
