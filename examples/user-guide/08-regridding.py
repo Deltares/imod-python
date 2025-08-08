@@ -416,11 +416,11 @@ axes[1].set_ylabel("regridded")
 #
 # This code snippet prints all default methods:
 #
-import inspect, sys
+import inspect
+import sys
 from dataclasses import asdict
 
 import pandas as pd
-
 
 regrid_method_setup = {
     "package name": [],
@@ -431,7 +431,9 @@ regrid_method_setup = {
 regrid_method_table = pd.DataFrame(regrid_method_setup)
 # Get all classes in the imod.mf6 module (e.g. imod.mf6.NodePropertyFlow,
 # imod.mf6.GroundwaterFlowModel, imod.mf6.River)
-mf6_classes = [obj for _, obj in inspect.getmembers(sys.modules["imod.mf6"], inspect.isclass)]
+mf6_classes = [
+    obj for _, obj in inspect.getmembers(sys.modules["imod.mf6"], inspect.isclass)
+]
 
 counter = 0
 for obj in mf6_classes:
