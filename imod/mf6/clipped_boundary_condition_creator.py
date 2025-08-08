@@ -1,14 +1,15 @@
-import imod
-from imod.mf6 import ConstantHead
+from imod.mf6 import ConstantConcentration, ConstantHead
 from imod.select.grid import active_grid_boundary_xy
 from imod.typing import GridDataArray
+
+StateType = ConstantHead | ConstantConcentration
 
 
 def create_clipped_boundary(
     idomain: GridDataArray,
     state_for_clipped_boundary: GridDataArray,
-    original_constant_head_boundaries: list[ConstantHead],
-) -> ConstantHead:
+    original_constant_head_boundaries: list[StateType],
+) -> StateType:
     """
     Create a ConstantHead package on boundary cells that don't have any assigned to them. This is useful in
     combination with the clip_box method which can produce a domain with missing boundary conditions.
@@ -32,22 +33,23 @@ def create_clipped_boundary(
     unassigned_grid_boundaries = _find_unassigned_grid_boundaries(
         active_grid_boundary, original_constant_head_boundaries
     )
+    pkg_type = type(original_constant_head_boundaries[0])
+    constant_state = state_for_clipped_boundary.where(unassigned_grid_boundaries)
 
-    constant_head = state_for_clipped_boundary.where(unassigned_grid_boundaries)
-
-    return imod.mf6.ConstantHead(
-        constant_head, print_input=True, print_flows=True, save_flows=True
-    )
+    return pkg_type(constant_state, print_input=True, print_flows=True, save_flows=True)
 
 
 def _find_unassigned_grid_boundaries(
     active_grid_boundary: GridDataArray,
-    boundary_conditions: list[ConstantHead],
+    boundary_conditions: list[StateType],
 ) -> GridDataArray:
     unassigned_grid_boundaries = active_grid_boundary
+    # Fetch variable name from the first boundary condition, can be "head" or
+    # "concentration".
+    varname = boundary_conditions[0]._period_data[0]
     for boundary_condition in boundary_conditions:
         unassigned_grid_boundaries = (
-            unassigned_grid_boundaries & boundary_condition["head"].isnull()
+            unassigned_grid_boundaries & boundary_condition[varname].isnull()
         )
 
     return unassigned_grid_boundaries

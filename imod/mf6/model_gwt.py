@@ -3,6 +3,7 @@ from __future__ import annotations
 from typing import Optional
 
 from imod.logging import init_log_decorator
+from imod.mf6.cnc import ConstantConcentration
 from imod.mf6.model import Modflow6Model
 from imod.schemata import TypeSchema
 
@@ -36,6 +37,7 @@ class GroundwaterTransportModel(Modflow6Model):
     _mandatory_packages = ("mst", "dsp", "oc", "ic")
     _model_id = "gwt6"
     _template = Modflow6Model._initialize_template("gwt-nam.j2")
+    _boundary_state_pkg_type = ConstantConcentration
 
     _init_schemata = {
         "listing_file": [TypeSchema(str)],
