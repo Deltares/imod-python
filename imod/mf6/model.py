@@ -19,6 +19,7 @@ from jinja2 import Template
 import imod
 from imod.common.interfaces.imodel import IModel
 from imod.common.statusinfo import NestedStatusInfo, StatusInfo, StatusInfoBase
+from imod.common.utilities.clip import clip_box_dataset
 from imod.common.utilities.mask import _mask_all_packages
 from imod.common.utilities.regrid import _regrid_like
 from imod.common.utilities.schemata import (
@@ -77,7 +78,7 @@ def _create_boundary_condition_for_unassigned_boundary(
     constant_state_packages.extend(additional_boundaries)
 
     return create_clipped_boundary(
-        model.domain, state_for_boundary, constant_state_packages
+        model.domain, state_for_boundary, constant_state_packages, pkg_type
     )
 
 
@@ -85,6 +86,7 @@ def _create_boundary_condition_clipped_boundary(
     original_model: Modflow6Model,
     clipped_model: Modflow6Model,
     state_for_boundary: Optional[GridDataArray],
+    clip_box_args: tuple,
 ):
     unassigned_boundary_original_domain = (
         _create_boundary_condition_for_unassigned_boundary(
@@ -92,8 +94,11 @@ def _create_boundary_condition_clipped_boundary(
         )
     )
 
+    unassigned_boundary_clipped = unassigned_boundary_original_domain.clip_box(*clip_box_args)
+    state_for_boundary_clipped = clip_box_dataset(state_for_boundary, *clip_box_args)
+
     return _create_boundary_condition_for_unassigned_boundary(
-        clipped_model, state_for_boundary, [unassigned_boundary_original_domain]
+        clipped_model, state_for_boundary_clipped, [unassigned_boundary_clipped]
     )
 
 
@@ -693,7 +698,7 @@ class Modflow6Model(collections.UserDict, IModel, abc.ABC):
                 f"model cannot be clipped due to presence of package '{error_with_object}' in model"
             )
 
-        clipped = self._clip_box_packages(
+        clip_box_args = (
             time_min,
             time_max,
             layer_min,
@@ -704,8 +709,12 @@ class Modflow6Model(collections.UserDict, IModel, abc.ABC):
             y_max,
         )
 
+        clipped = self._clip_box_packages(
+            *clip_box_args,
+        )
+
         clipped_boundary_condition = _create_boundary_condition_clipped_boundary(
-            self, clipped, state_for_boundary
+            self, clipped, state_for_boundary, clip_box_args
         )
         state_pkg_id = self._boundary_state_pkg_type._pkg_id
         pkg_name = f"{state_pkg_id}_clipped"
