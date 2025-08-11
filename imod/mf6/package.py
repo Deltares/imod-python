@@ -25,9 +25,7 @@ import xugrid as xu
 
 from imod.common.interfaces.ipackage import IPackage
 from imod.common.utilities.clip import (
-    clip_layer_slice,
-    clip_spatial_box,
-    clip_time_slice,
+    clip_box_dataset,
 )
 from imod.common.utilities.dataclass_type import DataclassType, EmptyRegridMethod
 from imod.common.utilities.mask import mask_package
@@ -447,17 +445,8 @@ class Package(PackageBase, IPackage, abc.ABC):
         if not self._is_clipping_supported():
             raise ValueError("this package does not support clipping.")
 
-        selection = self.dataset
-        selection = clip_time_slice(selection, time_min=time_min, time_max=time_max)
-        selection = clip_layer_slice(
-            selection, layer_min=layer_min, layer_max=layer_max
-        )
-        selection = clip_spatial_box(
-            selection,
-            x_min=x_min,
-            x_max=x_max,
-            y_min=y_min,
-            y_max=y_max,
+        selection = clip_box_dataset(
+            self.dataset, time_min, time_max, layer_min, layer_max, x_min, x_max, y_min, y_max
         )
 
         cls = type(self)
