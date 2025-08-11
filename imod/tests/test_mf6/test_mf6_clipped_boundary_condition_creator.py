@@ -54,7 +54,7 @@ class TestClippedBoundaryConditionCreator:
 
         # Act.
         constant_head_pkg_clipped_domain = create_clipped_boundary(
-            idomain, clipped_boundary_values, [reduced_boundary_constant_head_pkg]
+            idomain, clipped_boundary_values, [reduced_boundary_constant_head_pkg], ConstantHead
         )
 
         # Assert.
@@ -100,7 +100,7 @@ class TestClippedBoundaryConditionCreator:
 
         # Act.
         constant_head_pkg_clipped_domain = create_clipped_boundary(
-            idomain, clipped_boundary_values, [reduced_boundary_constant_head_pkg]
+            idomain, clipped_boundary_values, [reduced_boundary_constant_head_pkg], ConstantHead
         )
 
         # Assert.

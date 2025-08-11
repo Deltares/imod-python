@@ -286,6 +286,7 @@ class TestModel:
             discretization_mock["idomain"],
             state_for_boundary,
             [],
+            pkg_type,
         )
 
     @mock.patch("imod.mf6.model.create_clipped_boundary")
@@ -334,6 +335,7 @@ class TestModel:
             discretization_mock["idomain"],
             state_for_boundary,
             [constant_boundary_mock, unassigned_original_constant_boundary],
+            pkg_type,
         )
 
 

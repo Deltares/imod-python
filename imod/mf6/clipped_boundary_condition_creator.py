@@ -9,6 +9,7 @@ def create_clipped_boundary(
     idomain: GridDataArray,
     state_for_clipped_boundary: GridDataArray,
     original_constant_head_boundaries: list[StateType],
+    pkg_type: type[StateType]
 ) -> StateType:
     """
     Create a ConstantHead package on boundary cells that don't have any assigned to them. This is useful in
@@ -33,7 +34,6 @@ def create_clipped_boundary(
     unassigned_grid_boundaries = _find_unassigned_grid_boundaries(
         active_grid_boundary, original_constant_head_boundaries
     )
-    pkg_type = type(original_constant_head_boundaries[0])
     constant_state = state_for_clipped_boundary.where(unassigned_grid_boundaries)
 
     return pkg_type(constant_state, print_input=True, print_flows=True, save_flows=True)
@@ -44,10 +44,10 @@ def _find_unassigned_grid_boundaries(
     boundary_conditions: list[StateType],
 ) -> GridDataArray:
     unassigned_grid_boundaries = active_grid_boundary
-    # Fetch variable name from the first boundary condition, can be "head" or
-    # "concentration".
-    varname = boundary_conditions[0]._period_data[0]
     for boundary_condition in boundary_conditions:
+        # Fetch variable name from the first boundary condition, can be "head" or
+        # "concentration".
+        varname = boundary_condition._period_data[0]
         unassigned_grid_boundaries = (
             unassigned_grid_boundaries & boundary_condition[varname].isnull()
         )
