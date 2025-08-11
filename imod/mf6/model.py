@@ -80,6 +80,7 @@ def _create_boundary_condition_for_unassigned_boundary(
         model.domain, state_for_boundary, constant_state_packages
     )
 
+
 def _create_boundary_condition_clipped_boundary(
     original_model: Modflow6Model,
     clipped_model: Modflow6Model,
@@ -97,6 +98,7 @@ def _create_boundary_condition_clipped_boundary(
 
 
 StateClassType = type[ConstantHead] | type[ConstantConcentration]
+
 
 class Modflow6Model(collections.UserDict, IModel, abc.ABC):
     _mandatory_packages: tuple[str, ...] = ()
