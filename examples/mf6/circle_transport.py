@@ -108,6 +108,7 @@ rch_concentration = rch_concentration.expand_dims(species=["salinity"])
 
 
 # %%
+#
 # Unlike a recharge boundary, with a prescribed head boundary we don't know a
 # priori whether water will flow in over the boundary or leave across the
 # boundary. If water flows into the model over the boundary, it carries a
@@ -117,19 +118,16 @@ rch_concentration = rch_concentration.expand_dims(species=["salinity"])
 # In this example we set the prescribed head value to 0.0 and the external
 # concentration to 35.0 as well. The boundary only operates on the top layer.
 
-chd_location = xu.zeros_like(idomain.sel(layer=1), dtype=bool).ugrid.binary_dilation(
+ghb_location = xu.zeros_like(idomain.sel(layer=1), dtype=bool).ugrid.binary_dilation(
     border_value=True
 )
-constant_head = xu.full_like(idomain, 0.0, dtype=float).where(chd_location)
-# Approximate face area
-face_area = (1000.0 / 6) ** 2 * 0.5
-
-conductance = xu.full_like(idomain, face_area * k_value, dtype=float).where(
-    chd_location
+constant_head = xu.full_like(idomain, 0.0, dtype=float).where(ghb_location)
+conductance = (idomain * grid.area * k_value).where(
+    ghb_location
 )
 
 constant_concentration = xu.full_like(constant_head, max_concentration).where(
-    chd_location
+    ghb_location
 )
 constant_concentration = constant_concentration.expand_dims(species=["salinity"])
 
