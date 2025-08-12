@@ -382,7 +382,7 @@ half_sim_concentration = half_sim_concentration.assign_coords(**coords)
 # provided by xarray and xugrid:
 
 fig, ax = plt.subplots()
-half_sim_concentration.isel(time=-1, layer=0).ugrid.plot(ax=ax)
+half_sim_head.isel(time=-1, layer=0).ugrid.plot(ax=ax)
 ax.set_aspect(1)
 
 # %%
