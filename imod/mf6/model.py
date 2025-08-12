@@ -94,11 +94,25 @@ def _create_boundary_condition_clipped_boundary(
             original_model, state_for_boundary
         )
     )
+    # Clip the unassigned boundary to the clipped model's domain, required to
+    # avoid topological errors later.
+    if unassigned_boundary_original_domain is not None:
+        unassigned_boundary_clipped = unassigned_boundary_original_domain.clip_box(
+            *clip_box_args
+        )
+    else:
+        unassigned_boundary_clipped = None
 
-    unassigned_boundary_clipped = unassigned_boundary_original_domain.clip_box(
-        *clip_box_args
-    )
-    state_for_boundary_clipped = clip_box_dataset(state_for_boundary, *clip_box_args)
+    if state_for_boundary is not None:
+        # Clip box as dataset, temporarily add variable name to convert to
+        # dataset, then turn back into DataArray.
+        varname = original_model._boundary_state_pkg_type._period_data[0]
+        state_for_boundary = state_for_boundary.to_dataset(name=varname)
+        state_for_boundary_clipped = clip_box_dataset(
+            state_for_boundary, *clip_box_args
+        )[varname]
+    else:
+        state_for_boundary_clipped = None
 
     return _create_boundary_condition_for_unassigned_boundary(
         clipped_model, state_for_boundary_clipped, [unassigned_boundary_clipped]
