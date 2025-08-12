@@ -42,7 +42,6 @@ from imod.common.utilities.schemata import (
 from imod.common.utilities.value_filters import is_valid
 from imod.common.utilities.version import prepend_content_with_version_info
 from imod.logging import standard_log_decorator
-from imod.mf6.aggregate.aggregate_schemes import EmptyAggregationMethod
 from imod.mf6.auxiliary_variables import (
     expand_transient_auxiliary_variables,
     get_variable_names,
@@ -83,30 +82,10 @@ class Package(PackageBase, IPackage, abc.ABC):
     _write_schemata: SchemataDict = {}
     _keyword_map: dict[str, str] = {}
     _regrid_method: DataclassType = EmptyRegridMethod()
-    _aggregate_method: DataclassType = EmptyAggregationMethod()
     _template: jinja2.Template
 
     def __init__(self, allargs: Mapping[str, GridDataArray | float | int | bool | str]):
         super().__init__(allargs)
-
-    def isel(self):
-        raise NotImplementedError(
-            "Selection on packages not yet supported. To make a selection on "
-            f"the xr.Dataset, call {self._pkg_id}.dataset.isel instead."
-            "You can create a new package with a selection by calling "
-            f"{type(self).__name__}(**{self._pkg_id}.dataset.isel(**selection))"
-        )
-
-    def sel(self):
-        raise NotImplementedError(
-            "Selection on packages not yet supported. To make a selection on "
-            f"the xr.Dataset, call {self._pkg_id}.dataset.sel instead. "
-            "You can create a new package with a selection by calling "
-            f"{type(self).__name__}(**{self._pkg_id}.dataset.sel(**selection))"
-        )
-
-    def cleanup(self, dis: Any):
-        raise NotImplementedError("Method not implemented for this package.")
 
     @staticmethod
     def _valid(value: Any) -> bool:
@@ -139,10 +118,10 @@ class Package(PackageBase, IPackage, abc.ABC):
             fname = f"gwf-{pkg_id}.j2"
         return env.get_template(fname)
 
-    def write_blockfile(self, pkgname, globaltimes, write_context: WriteContext):
+    def _write_blockfile(self, pkgname, globaltimes, write_context: WriteContext):
         directory = write_context.get_formatted_write_directory()
 
-        content = self.render(
+        content = self._render(
             directory=directory,
             pkgname=pkgname,
             globaltimes=globaltimes,
@@ -153,7 +132,7 @@ class Package(PackageBase, IPackage, abc.ABC):
         with open(filename, "w") as f:
             f.write(content)
 
-    def write_binary_griddata(self, outpath, da, dtype):
+    def _write_binary_griddata(self, outpath, da, dtype):
         # From the modflow6 source, the header is defined as:
         # integer(I4B) :: kstp --> np.int32 : 1
         # integer(I4B) :: kper --> np.int32 : 2
@@ -188,7 +167,7 @@ class Package(PackageBase, IPackage, abc.ABC):
             header.tofile(f)
             da.values.flatten().astype(dtype).tofile(f)
 
-    def write_text_griddata(self, outpath, da, dtype):
+    def _write_text_griddata(self, outpath, da, dtype):
         # Note: reshaping here avoids writing newlines after every number.
         # This dumps all the values in a single row rather than a single
         # column. This is to be preferred, since editors can easily
@@ -233,7 +212,7 @@ class Package(PackageBase, IPackage, abc.ABC):
             d["auxiliary"] = names
         return d
 
-    def render(self, directory, pkgname, globaltimes, binary):
+    def _render(self, directory, pkgname, globaltimes, binary):
         d = self._get_render_dictionary(directory, pkgname, globaltimes, binary)
         return self._template.render(d)
 
@@ -325,7 +304,7 @@ class Package(PackageBase, IPackage, abc.ABC):
     ):
         directory = write_context.write_directory
         binary = write_context.use_binary
-        self.write_blockfile(pkgname, globaltimes, write_context)
+        self._write_blockfile(pkgname, globaltimes, write_context)
 
         if hasattr(self, "_grid_data"):
             if self._is_xy_data(self.dataset):
@@ -337,10 +316,10 @@ class Package(PackageBase, IPackage, abc.ABC):
                     if self._is_xy_data(da):
                         if binary:
                             path = pkgdirectory / f"{key}.bin"
-                            self.write_binary_griddata(path, da, dtype)
+                            self._write_binary_griddata(path, da, dtype)
                         else:
                             path = pkgdirectory / f"{key}.dat"
-                            self.write_text_griddata(path, da, dtype)
+                            self._write_text_griddata(path, da, dtype)
 
     @standard_log_decorator()
     def _validate(self, schemata: dict, **kwargs) -> dict[str, list[ValidationError]]:
@@ -386,6 +365,14 @@ class Package(PackageBase, IPackage, abc.ABC):
         )
 
     def copy(self) -> Any:
+        """
+        Copy package into a new package of the same type.
+
+        Returns
+        -------
+        Package
+            A copy of the package, with the same type as this package.
+        """
         # All state should be contained in the dataset.
         dataset_copy = cast(Mapping[str, Any], self.dataset.copy())
         return type(self)(**dataset_copy)
@@ -406,35 +393,58 @@ class Package(PackageBase, IPackage, abc.ABC):
         """
         Clip a package by a bounding box (time, layer, y, x).
 
-        Slicing intervals may be half-bounded, by providing None:
-
-        * To select 500.0 <= x <= 1000.0:
-          ``clip_box(x_min=500.0, x_max=1000.0)``.
-        * To select x <= 1000.0: ``clip_box(x_min=None, x_max=1000.0)``
-          or ``clip_box(x_max=1000.0)``.
-        * To select x >= 500.0: ``clip_box(x_min = 500.0, x_max=None.0)``
-          or ``clip_box(x_min=1000.0)``.
-
         Parameters
         ----------
-        time_min: optional
+        time_min: optional, np.datetime64
+            Start time to select. Data will be forward filled to this date. If
+            time_min is before the start time of the dataset, data is
+            backfilled.
         time_max: optional
+            End time to select.
         layer_min: optional, int
+            Minimum layer to select.
         layer_max: optional, int
+            Maximum layer to select.
         x_min: optional, float
+            Minimum x-coordinate to select.
         x_max: optional, float
+            Maximum x-coordinate to select.
         y_min: optional, float
+            Minimum y-coordinate to select.
         y_max: optional, float
+            Maximum y-coordinate to select.
         top: optional, GridDataArray
+            Ignored.
         bottom: optional, GridDataArray
-        state_for_boundary: optional, GridDataArray
-
+            Ignored.
 
         Returns
         -------
-        clipped: Package
+        clipped : Package
+            A new package that is clipped to the specified bounding box.
+
+        Examples
+        --------
+        Slicing intervals may be half-bounded, by providing None:
+
+        To select 500.0 <= x <= 1000.0:
+
+        >>> pkg.clip_box(x_min=500.0, x_max=1000.0)
+
+        To select x <= 1000.0:
+
+        >>> pkg.clip_box(x_max=1000.0)``
+
+        To select x >= 500.0:
+
+        >>> pkg.clip_box(x_min=500.0)
+
+        To select a time interval, you can use datetime64:
+
+        >>> pkg.clip_box(time_min=np.datetime64("2020-01-01"), time_max=np.datetime64("2020-12-31"))
+
         """
-        if not self.is_clipping_supported():
+        if not self._is_clipping_supported():
             raise ValueError("this package does not support clipping.")
 
         selection = self.dataset
@@ -464,13 +474,25 @@ class Package(PackageBase, IPackage, abc.ABC):
         Parameters
         ----------
         mask: xr.DataArray, xu.UgridDataArray of ints
-            idomain-like integer array. >0 sets cells to active, 0 sets cells to inactive,
-            <0 sets cells to vertical passthrough
+            idomain-like integer array. >0 sets cells to active, 0 sets cells to
+            inactive, <0 sets cells to vertical passthrough
 
         Returns
         -------
         masked: Package
             The package with part masked.
+
+        Examples
+        --------
+        To mask a package with an idomain-like array. For example, to create a
+        package with the first 10 rows and columns masked, create the mask first:
+
+        >>> mask = xr.ones_like(idomain, dtype=int)
+        >>> mask[0:10, 0:10] = 0
+
+        Then call mask:
+
+        >>> masked_pkg = pkg.mask(mask)
         """
         result = cast(IPackage, deepcopy(self))
         remove_expanded_auxiliary_variables_from_dataset(result)
@@ -492,9 +514,9 @@ class Package(PackageBase, IPackage, abc.ABC):
         ``target_grid`` has different ``"x"`` and ``"y"`` or different
         ``cell2d`` coords.
 
-        The default regridding methods are specified in the ``_regrid_method``
-        attribute of the package. These defaults can be overridden using the
-        input parameters of this function.
+        The default regridding methods are obtained by calling
+        ``.get_regrid_methods()`` on the package, which returns a dataclass with
+        the default regridding methods for each variable in the package.
 
         Parameters
         ----------
@@ -510,6 +532,13 @@ class Package(PackageBase, IPackage, abc.ABC):
             specialization class of BaseRegridder) and function name (str) this
             dictionary can be used to override the default mapping method.
 
+        Returns
+        -------
+        Package
+            A package with the same options as this package, and with all the
+            data-arrays regridded to another discretization, similar to the one used
+            in input argument "target_grid"
+
         Examples
         --------
         To regrid the npf package with a non-default method for the k-field,
@@ -518,12 +547,6 @@ class Package(PackageBase, IPackage, abc.ABC):
         >>> regridder_types = imod.mf6.regrid.NodePropertyFlowRegridMethod(k=(imod.RegridderType.OVERLAP, "mean"))
         >>> regrid_cache = imod.util.regrid.RegridderWeightsCache()
         >>> new_npf = npf.regrid_like(like, regrid_cache, regridder_types)
-
-        Returns
-        -------
-        A package with the same options as this package, and with all the
-        data-arrays regridded to another discretization, similar to the one used
-        in input argument "target_grid"
         """
         try:
             result = deepcopy(self)
@@ -537,7 +560,11 @@ class Package(PackageBase, IPackage, abc.ABC):
         return result
 
     @classmethod
-    def is_grid_agnostic_package(cls) -> bool:
+    def _is_grid_agnostic_package(cls) -> bool:
+        """
+        Returns True if this package does not depend on a grid, e.g. the
+        :class:`imod.mf6.wel.Wel` package.
+        """
         return False
 
     def __repr__(self) -> str:
@@ -554,7 +581,7 @@ class Package(PackageBase, IPackage, abc.ABC):
             return self._auxiliary_data
         return {}
 
-    def get_non_grid_data(self, grid_names: list[str]) -> dict[str, Any]:
+    def _get_non_grid_data(self, grid_names: list[str]) -> dict[str, Any]:
         """
         This function copies the attributes of a dataset that are scalars, such as options.
 
@@ -604,22 +631,71 @@ class Package(PackageBase, IPackage, abc.ABC):
             if varname in self.dataset.keys()
         }
         cleaned_grids = func(**dis, **grids)
-        settings = self.get_non_grid_data(grid_varnames)
+        settings = self._get_non_grid_data(grid_varnames)
         return cleaned_grids | settings
 
-    def is_splitting_supported(self) -> bool:
+    def _is_splitting_supported(self) -> bool:
+        """
+        Return True if this package supports splitting.
+
+        Returns
+        -------
+        bool
+            True if this package supports splitting, False otherwise.
+        """
         return True
 
-    def is_regridding_supported(self) -> bool:
+    def _is_regridding_supported(self) -> bool:
+        """
+        Return True if this package supports regridding.
+
+        Returns
+        -------
+        bool
+            True if this package supports regridding, False otherwise.
+        """
         return True
 
-    def is_clipping_supported(self) -> bool:
+    def _is_clipping_supported(self) -> bool:
+        """
+        Return True if this package supports clipping.
+
+        Returns
+        -------
+        bool
+            True if this package supports clipping, False otherwise.
+        """
         return True
 
     @classmethod
     def get_regrid_methods(cls) -> DataclassType:
-        return deepcopy(cls._regrid_method)
+        """
+        Returns the default regrid methods for this package. You can use modify
+        to customize the regridding of the package.
 
-    @classmethod
-    def get_aggregate_methods(cls) -> DataclassType:
-        return deepcopy(cls._aggregate_method)
+        Returns
+        -------
+        DataclassType
+            The regrid methods for this package, which is a dataclass with
+            attributes that are tuples of (regridder type, method name). If no
+            regrid methods are defined, returns an instance of
+            EmptyRegridMethod.
+
+        Examples
+        --------
+        Get the regrid methods for the Drainage package:
+
+        >>> regrid_settings = Drainage.get_regrid_methods()
+
+        You can modify the regrid methods by changing the attributes of the
+        returned dataclass instance. For example, to set the regridding method
+        for ``elevation`` to minimum.
+
+        >>> regrid_settings.elevation = (imod.RegridderType.OVERLAP, "min")
+
+        These settings can then be used to regrid the package:
+
+        >>> drain.regrid_like(like, regridder_types=regrid_settings)
+
+        """
+        return deepcopy(cls._regrid_method)

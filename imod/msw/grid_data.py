@@ -83,7 +83,7 @@ class GridData(MetaSwapPackage, IRegridPackage):
 
         self._pkgcheck()
 
-    def generate_index_array(self):
+    def _generate_index_array(self):
         """
         Generate index arrays to be used on other packages
         """

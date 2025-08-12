@@ -46,7 +46,7 @@ def test_ist_simple(grid_array):
     )
     directory = pathlib.Path("mymodel")
     globaltimes = [np.datetime64("2000-01-01")]
-    actual = ist.render(directory, "ist", globaltimes, False)
+    actual = ist._render(directory, "ist", globaltimes, False)
     expected = textwrap.dedent(
         """\
         begin options
@@ -99,7 +99,7 @@ def test_ist_elaborate(grid_array):
 
     directory = pathlib.Path("mymodel")
     globaltimes = [np.datetime64("2000-01-01")]
-    actual = ist.render(directory, "ist", globaltimes, False)
+    actual = ist._render(directory, "ist", globaltimes, False)
     expected = textwrap.dedent(
         """\
         begin options

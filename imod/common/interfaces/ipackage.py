@@ -19,7 +19,7 @@ class IPackage(IPackageBase, metaclass=abc.ABCMeta):
         raise NotImplementedError
 
     @abc.abstractmethod
-    def get_non_grid_data(self, grid_names: list[str]) -> dict[str, Any]:
+    def _get_non_grid_data(self, grid_names: list[str]) -> dict[str, Any]:
         raise NotImplementedError
 
     @property
@@ -28,5 +28,9 @@ class IPackage(IPackageBase, metaclass=abc.ABCMeta):
         raise NotImplementedError
 
     @abstractmethod
-    def is_regridding_supported(self) -> bool:
+    def _is_regridding_supported(self) -> bool:
+        raise NotImplementedError
+
+    @abstractmethod
+    def _is_grid_agnostic_package(self) -> bool:
         raise NotImplementedError

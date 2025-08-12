@@ -139,7 +139,7 @@ def test_initial_conditions_saved_state_regrid():
         output_dir = Path(output_dir)
         ic = InitialConditionsSavedState(output_dir / "foo.out")
 
-        assert not ic.is_regridding_supported()
+        assert not ic._is_regridding_supported()
 
 
 def test_initial_conditions_saved_state_clip_box():
@@ -147,4 +147,4 @@ def test_initial_conditions_saved_state_clip_box():
         output_dir = Path(output_dir)
         ic = InitialConditionsSavedState(output_dir / "foo.out")
 
-        assert not ic.is_clipping_supported()
+        assert not ic._is_clipping_supported()

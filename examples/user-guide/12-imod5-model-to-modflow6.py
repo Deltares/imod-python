@@ -10,6 +10,8 @@ and unstructured grids.
 
 """
 
+# sphinx_gallery_thumbnail_number = -4
+
 import imod
 
 # %%
@@ -234,20 +236,16 @@ gwf_model["hfb-26"].line_data.plot(ax=ax, color="blue", linewidth=2)
 voronoi_grid = triangular_grid.tesselate_centroidal_voronoi()
 voronoi_grid.plot()
 
+# iMOD Python regridding functionality requires a UgridDataArray instead of a
+# Ugrid2d, so we create a UgridDataArray with the voronoi grid.
+from imod.util import ones_like_ugrid
+
+voronoi_uda = ones_like_ugrid(voronoi_grid)
+
 # %%
 #
 # Now that we have a Voronoi grid, we can regrid the MODFLOW 6 simulation to this
 # grid.
-
-# Workaround for bug where iMOD Python doesn't recognize Ugrid2D, only UgridDataArray
-import numpy as np
-import xarray as xr
-import xugrid as xu
-
-data = xr.DataArray(
-    np.ones(voronoi_grid.sizes["mesh2d_nFaces"]), dims=["mesh2d_nFaces"]
-)
-voronoi_uda = xu.UgridDataArray(data, voronoi_grid)
 
 mf6_unstructured = mf6_sim.regrid_like(
     "unstructured_example", voronoi_uda, validate=False
@@ -333,9 +331,48 @@ head_unstructured.isel(time=-1).sel(layer=5).ugrid.plot()
 # Comparing differences in output
 # -------------------------------
 #
-# Let's upscale the structured head data to the unstructured grid. This is done
-# using the `OverlapRegridder from the xugrid package
-# <https://deltares.github.io/xugrid/examples/regridder_overview.html#overlapregridder>_,
+# In this section, we will compare the output of the structured and unstructured
+# models. We fill first plot the structured and unstructured results side by
+# side. Next, we will regrid the structured head data to the unstructured grid
+# and compare the differences in output. This will show how the regridding
+# affects the output.
+#
+# Side-by-side comparison
+# ***********************
+#
+# Let's first plot the structured and unstructured head data side by side.
+
+head_structured_end_l5 = head_structured.isel(time=-1).sel(layer=5)
+head_unstructured_end_l5 = head_unstructured.isel(time=-1).sel(layer=5)
+
+import matplotlib.pyplot as plt
+
+# Get the data range from both datasets
+vmin = min(head_structured_end_l5.min().values, head_unstructured_end_l5.min().values)
+vmax = max(head_structured_end_l5.max().values, head_unstructured_end_l5.max().values)
+
+fig, axes = plt.subplots(nrows=1, ncols=3, figsize=(12, 6), width_ratios=(1, 1, 0.1))
+head_structured_end_l5.plot.imshow(ax=axes[0], add_colorbar=False, vmin=vmin, vmax=vmax)
+axes[0].set_title(f"Structured grid (ncells = {head_structured_end_l5.size})")
+head_unstructured_end_l5.ugrid.plot(ax=axes[1], cbar_ax=axes[2], vmin=vmin, vmax=vmax)
+axes[1].set_title(f"Unstructured grid (ncells = {head_unstructured_end_l5.size})")
+axes[1].get_yaxis().set_visible(False)
+
+# Get the y-limits from the first axis and apply to both
+ylim = axes[0].get_ylim()
+axes[1].set_ylim(ylim)
+
+# %%
+#
+# Computing differences
+# *********************
+#
+# Next, we will compute the differences between the structured and unstructured
+# head data. This will show how the regridding affects the output in more
+# detail. For that we first need to upscale the structured head data to the
+# unstructured grid. This is done using the `OverlapRegridder from the xugrid
+# package
+# <https://deltares.github.io/xugrid/examples/regridder_overview.html#overlapregridder>`_,
 
 import xugrid as xu
 
@@ -360,6 +397,9 @@ diff.mean(dim="layer").ugrid.plot()
 diff.std(dim="layer").ugrid.plot()
 
 # %%
+#
+# Differences in detail
+# *********************
 #
 # This is a good example of how regridding can lead to differences in output:
 # The line representing the fault has to be snapped to the cell edges. This is

@@ -86,7 +86,7 @@ class MeteoMapping(MetaSwapPackage):
     ):
         data_dict = {"svat": svat.values.ravel()[index]}
 
-        row, column = self.grid_mapping(svat, self.meteo)
+        row, column = self._grid_mapping(svat, self.meteo)
 
         data_dict["row"] = row[index]
         data_dict["column"] = column[index]
@@ -97,10 +97,10 @@ class MeteoMapping(MetaSwapPackage):
 
         self._check_range(dataframe)
 
-        return self.write_dataframe_fixed_width(file, dataframe)
+        return self._write_dataframe_fixed_width(file, dataframe)
 
     @staticmethod
-    def grid_mapping(svat: xr.DataArray, meteo_grid: xr.DataArray) -> pd.DataFrame:
+    def _grid_mapping(svat: xr.DataArray, meteo_grid: xr.DataArray) -> pd.DataFrame:
         flip_meteo_x = meteo_grid.indexes["x"].is_monotonic_decreasing
         flip_meteo_y = meteo_grid.indexes["y"].is_monotonic_decreasing
         nrow = meteo_grid["y"].size
@@ -139,9 +139,14 @@ class MeteoMapping(MetaSwapPackage):
     def regrid_like(
         self,
         target_grid: GridDataArray,
-        regrid_context: RegridderWeightsCache,
+        regrid_cache: RegridderWeightsCache,
         regridder_types: Optional[DataclassType] = None,
     ):
+        """
+        Returns a deepcopy of this instance, as regridding this package is
+        irrelevant: The meteo data is not on model grid and the mapping is
+        determined upon writing.
+        """
         return deepcopy(self)
 
     def clip_box(
@@ -153,7 +158,52 @@ class MeteoMapping(MetaSwapPackage):
         y_min: Optional[float] = None,
         y_max: Optional[float] = None,
     ):
-        """Clip meteo grid to a box defined by time and space."""
+        """
+        Clip a package by a bounding box (time, y, x).
+
+        Parameters
+        ----------
+        time_min: optional, np.datetime64
+            Start time to select. Data will be forward filled to this date. If
+            time_min is before the start time of the dataset, data is
+            backfilled.
+        time_max: optional
+            End time to select.
+        x_min: optional, float
+            Minimum x-coordinate to select.
+        x_max: optional, float
+            Maximum x-coordinate to select.
+        y_min: optional, float
+            Minimum y-coordinate to select.
+        y_max: optional, float
+            Maximum y-coordinate to select.
+
+        Returns
+        -------
+        clipped : Package
+            A new package that is clipped to the specified bounding box.
+
+        Examples
+        --------
+        Slicing intervals may be half-bounded, by providing None:
+
+        To select 500.0 <= x <= 1000.0:
+
+        >>> pkg.clip_box(x_min=500.0, x_max=1000.0)
+
+        To select x <= 1000.0:
+
+        >>> pkg.clip_box(x_max=1000.0)``
+
+        To select x >= 500.0:
+
+        >>> pkg.clip_box(x_min=500.0)
+
+        To select a time interval, you can use datetime64:
+
+        >>> pkg.clip_box(time_min=np.datetime64("2020-01-01"), time_max=np.datetime64("2020-12-31"))
+
+        """
         selection = self.meteo.to_dataset(name="meteo")  # Force to dataset
         selection = clip_time_slice(selection, time_min=time_min, time_max=time_max)
         selection = clip_spatial_box(

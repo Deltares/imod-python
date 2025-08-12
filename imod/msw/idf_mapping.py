@@ -66,7 +66,7 @@ class IdfMapping(MetaSwapPackage, IRegridPackage):
         self.dataset["x_grid"] = x_grid
         self.dataset["y_grid"] = y_grid
 
-    def get_output_settings(self):
+    def _get_output_settings(self):
         grid = self.dataset["area"]
         dx, xmin, _, dy, ymin, _ = spatial_reference(grid)
         ncol = grid["x"].size
@@ -94,9 +94,49 @@ class IdfMapping(MetaSwapPackage, IRegridPackage):
     def regrid_like(
         self,
         target_grid: GridDataArray,
-        regrid_context: RegridderWeightsCache,
+        regrid_cache: RegridderWeightsCache,
         regridder_types: Optional[DataclassType] = None,
     ) -> "MetaSwapPackage":
+        """
+        Creates a package of the same type as this package, based on another
+        discretization. It regrids all the arrays in this package to the desired
+        discretization, and leaves the options unmodified. At the moment only
+        regridding to a different planar grid is supported, meaning
+        ``target_grid`` has different ``"x"`` and ``"y"``.
+
+        The default regridding methods are obtained by calling
+        ``.get_regrid_methods()`` on the package, which returns a dataclass with
+        the default regridding methods for each variable in the package.
+
+        Parameters
+        ----------
+        target_grid: xr.DataArray or xu.UgridDataArray
+            a grid defined using the same discretization as the one we want to
+            regrid the package to.
+        regrid_cache: RegridderWeightsCache
+            stores regridder weights for different regridders. Can be used to
+            speed up regridding, if the same regridders are used several times
+            for regridding different arrays.
+        regridder_types: RegridMethodType, optional
+            dictionary mapping arraynames (str) to a tuple of regrid type (a
+            specialization class of BaseRegridder) and function name (str) this
+            dictionary can be used to override the default mapping method.
+
+        Examples
+        --------
+        To regrid the infiltration package with a non-default method for the
+        infiltration capacity, call ``regrid_like`` with these arguments:
+
+        >>> regridder_types = imod.msw.regrid.InfiltrationRegridMethod(infiltration_capacity=(imod.RegridderType.OVERLAP, "max"))
+        >>> regrid_cache = imod.util.regrid.RegridderWeightsCache()
+        >>> new_infiltration = infiltration.regrid_like(like, regrid_cache, regridder_types)
+
+        Returns
+        -------
+        A package with the same options as this package, and with all the
+        data-arrays regridded to another discretization, similar to the one used
+        in input argument "target_grid"
+        """
         if regridder_types is None:
             regridder_settings = asdict(self.get_regrid_methods(), dict_factory=dict)
         else:
@@ -105,7 +145,7 @@ class IdfMapping(MetaSwapPackage, IRegridPackage):
         nodata = self.dataset["nodata"].values[()]
         regridded_area = _regrid_array(
             self.dataset["area"],
-            regrid_context,
+            regrid_cache,
             regridder_settings["area"][0],
             regridder_settings["area"][1],
             target_grid,

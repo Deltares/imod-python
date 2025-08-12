@@ -2,7 +2,7 @@ import collections
 from copy import copy, deepcopy
 from datetime import datetime
 from pathlib import Path
-from typing import Any, Optional, Tuple, Union, cast
+from typing import Any, Optional, Union, cast
 
 import cftime
 import jinja2
@@ -43,7 +43,7 @@ from imod.msw.utilities.parse import read_para_sim
 from imod.msw.vegetation import AnnualCropFactors
 from imod.typing import Imod5DataDict
 from imod.util.dims import drop_layer_dim_cap_data
-from imod.util.regrid import RegridderType, RegridderWeightsCache
+from imod.util.regrid import RegridderWeightsCache
 
 REQUIRED_PACKAGES = (
     GridData,
@@ -198,7 +198,7 @@ class MetaSwapModel(Model):
                 f"which were not in AnnualCropGrowth: {missing_indices}"
             )
 
-    def has_file_copier(self) -> bool:
+    def _has_file_copier(self) -> bool:
         pkg_types_included = {type(pkg) for pkg in self.values()}
         return FileCopier in pkg_types_included
 
@@ -234,7 +234,7 @@ class MetaSwapModel(Model):
             raise KeyError(f"Could not find package of type: {pkg_type}")
 
     def _model_checks(self, validate: bool):
-        if validate and not self.has_file_copier():
+        if validate and not self._has_file_copier():
             self._check_required_packages()
             self._check_vegetation_indices_in_annual_crop_factors()
             self._check_landuse_indices_in_lookup_options()
@@ -258,7 +258,8 @@ class MetaSwapModel(Model):
 
         # Add IdfMapping settings
         idf_key = self._get_pkg_key(IdfMapping)
-        simulation_settings.update(self[idf_key].get_output_settings())
+        idf_pkg = cast(IdfMapping, self[idf_key])
+        simulation_settings.update(idf_pkg._get_output_settings())
 
         simulation_settings["unsa_svat_path"] = self._render_unsaturated_database_path(
             simulation_settings["unsa_svat_path"]
@@ -299,7 +300,8 @@ class MetaSwapModel(Model):
 
         # Get index and svat
         grid_key = self._get_pkg_key(GridData)
-        index, svat = self[grid_key].generate_index_array()
+        grid_pkg = cast(GridData, self[grid_key])
+        index, svat = grid_pkg._generate_index_array()
 
         # write package contents
         for pkgname in self:
@@ -308,9 +310,31 @@ class MetaSwapModel(Model):
     def regrid_like(
         self,
         mf6_regridded_dis: StructuredDiscretization,
-        regrid_context: Optional[RegridderWeightsCache] = None,
-        regridder_types: Optional[dict[str, Tuple[RegridderType, str]]] = None,
+        regrid_cache: Optional[RegridderWeightsCache] = None,
     ) -> "MetaSwapModel":
+        """
+        Creates a model by regridding the packages of this model to another
+        discretization. It regrids all the arrays in the package using the
+        default regridding methods. At the moment only regridding to a different
+        planar grid is supported, meaning ``target_grid`` has different ``"x"``
+        and ``"y"`` or different ``cell2d`` coords.
+
+        Parameters
+        ----------
+        mf6_regridded_dis: StructuredDiscretization
+            Modflow6 Discretization with same discretization as the one we want
+            to regrid the package to.
+        regrid_cache: RegridderWeightsCache, optional
+            stores regridder weights for different regridders. Can be used to
+            speed up regridding, if the same regridders are used several times
+            for regridding different arrays.
+
+        Returns
+        -------
+        A model with similar packages to the input model, and with all the
+        data-arrays regridded to another discretization, similar to the one used
+        in input argument "mf6_regridded_dis"
+        """
         unsat_database = cast(str, self.simulation_settings["unsa_svat_path"])
         regridded_model = MetaSwapModel(unsat_database)
 
@@ -323,11 +347,10 @@ class MetaSwapModel(Model):
             if isinstance(msw_package, CouplerMapping):
                 # there can be only one couplermapping
                 mod2svat_name = pkgname
-            elif msw_package.is_regridding_supported():
+            elif msw_package._is_regridding_supported():
                 regridded_package = msw_package.regrid_like(
-                    target_grid, regrid_context, regridder_types
+                    target_grid, regrid_cache, None
                 )
-
             else:
                 raise ValueError(f"package {pkgname} cannot be  regridded")
             regridded_model[pkgname] = regridded_package
@@ -354,28 +377,48 @@ class MetaSwapModel(Model):
         ``mete_grid.inp`` copied by :class:`imod.msw.MeteoGridCopy` would be
         computed.
 
-        Slicing intervals may be half-bounded, by providing None:
-
-        * To select 500.0 <= x <= 1000.0:
-          ``clip_box(x_min=500.0, x_max=1000.0)``.
-        * To select x <= 1000.0: ``clip_box(x_min=None, x_max=1000.0)``
-          or ``clip_box(x_max=1000.0)``.
-        * To select x >= 500.0: ``clip_box(x_min = 500.0, x_max=None.0)``
-          or ``clip_box(x_min=1000.0)``.
-
         Parameters
         ----------
-        time_min: optional
+        time_min: optional, np.datetime64
+            Start time to select. Data will be forward filled to this date. If
+            time_min is before the start time of the dataset, data is
+            backfilled.
         time_max: optional
+            End time to select.
         x_min: optional, float
+            Minimum x-coordinate to select.
         x_max: optional, float
+            Maximum x-coordinate to select.
         y_min: optional, float
+            Minimum y-coordinate to select.
         y_max: optional, float
+            Maximum y-coordinate to select.
 
         Returns
         -------
-        MetaSwapModel
-            Clipped model.
+        clipped : MetaSwapModel
+            A new model that is clipped to the specified bounding box.
+
+        Examples
+        --------
+        Slicing intervals may be half-bounded, by providing None:
+
+        To select 500.0 <= x <= 1000.0:
+
+        >>> msw_model.clip_box(x_min=500.0, x_max=1000.0)
+
+        To select x <= 1000.0:
+
+        >>> msw_model.clip_box(x_max=1000.0)``
+
+        To select x >= 500.0:
+
+        >>> msw_model.clip_box(x_min=500.0)
+
+        To select a time interval, you can use datetime64:
+
+        >>> msw_model.clip_box(time_min=np.datetime64("2020-01-01"), time_max=np.datetime64("2020-12-31"))
+
         """
         settings = deepcopy(self.simulation_settings)
         unsa_svat_path = settings.pop("unsa_svat_path")

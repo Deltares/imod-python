@@ -277,7 +277,7 @@ def test_render_concentration(
         concentration_boundary_type="AUX",
     )
 
-    actual = drn.render(directory, "drn", globaltimes, False)
+    actual = drn._render(directory, "drn", globaltimes, False)
 
     expected = textwrap.dedent(
         """\
@@ -359,7 +359,7 @@ def test_repeat_stress(
         conductance=conductance_fc,
         repeat_stress=repeat_stress,
     )
-    actual = drn.render(directory, "drn", globaltimes, False)
+    actual = drn._render(directory, "drn", globaltimes, False)
     assert actual == expected
 
     drn = imod.mf6.Drainage(
@@ -372,7 +372,7 @@ def test_repeat_stress(
             globaltimes[4]: globaltimes[1],
         },
     )
-    actual = drn.render(directory, "drn", globaltimes, False)
+    actual = drn._render(directory, "drn", globaltimes, False)
     assert actual == expected
 
     drn = imod.mf6.Drainage(
@@ -383,7 +383,7 @@ def test_repeat_stress(
             globaltimes[4]: globaltimes[1],
         },
     )
-    actual = drn.render(directory, "drn", globaltimes, False)
+    actual = drn._render(directory, "drn", globaltimes, False)
     assert actual == expected
 
 

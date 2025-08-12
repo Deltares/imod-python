@@ -208,8 +208,8 @@ def test_regrid(tmp_path: Path):
     new_npf = npf.regrid_like(k, regrid_cache)
 
     # check the rendered versions are the same, they contain the options
-    new_rendered = new_npf.render(tmp_path, "regridded", None, False)
-    original_rendered = npf.render(tmp_path, "original", None, False)
+    new_rendered = new_npf._render(tmp_path, "regridded", None, False)
+    original_rendered = npf._render(tmp_path, "original", None, False)
 
     new_rendered = new_rendered.replace("regridded", "original")
     assert new_rendered == original_rendered

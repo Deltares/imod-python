@@ -60,4 +60,4 @@ class GroundwaterTransportModel(Modflow6Model):
             "print_flows": print_flows,
             "save_flows": save_flows,
         }
-        self.validate_init_schemata_options(validate)
+        self._validate_init_schemata_options(validate)

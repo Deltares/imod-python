@@ -24,7 +24,6 @@ import pandas as pd
 import xarray as xr
 
 import imod
-from imod.prepare.partition import create_partition_labels
 from imod.typing.grid import nan_like, zeros_like
 
 # %%
@@ -188,7 +187,7 @@ simulation.write(modeldir, binary=False)
 # To split the model in 4 partitions, we must create a label array.
 # We use the utility function  ``get_label_array`` for that.
 
-label_array = create_partition_labels(simulation, 4)
+label_array = simulation.create_partition_labels(4)
 fig, ax = plt.subplots()
 label_array.plot(ax=ax)
 

@@ -10,7 +10,7 @@ These examples demonstrate how to use imod to build MODFLOW 6 models.
     The examples expect you to have added the MODFLOW 6 executable to your PATH.
     If you have not done this yet:
     First, `download the latest MODFLOW 6 executables here. <https://water.usgs.gov/water-resources/software/MODFLOW-6/>`_
-    Next, follow the following instructions to add the executable to your PATH on Windows 10:
+    Next, follow the following instructions to add the executable to your PATH on Windows 11:
 
     1. Press the Start key on your keyboard.
     2. Search and open “Edit the system environment variables.”

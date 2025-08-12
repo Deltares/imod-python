@@ -19,8 +19,11 @@ Added
   different :class:`imod.prepare.ALLOCATION_OPTION` or
   :class:`imod.prepare.DISTRIBUTING_OPTION`.
 - Added :meth:`imod.mf6.HorizontalFlowBarrierResistance.snap_to_grid` and
-  :meth:`imod.mf6.HorizontalFlowBarrierSingleLayerResistance.snap_to_grid` to
+  :meth:`imod.mf6.SingleLayerHorizontalFlowBarrierResistance.snap_to_grid` to
   debug how horizontal flow barriers are snapped to a grid.
+- Added :meth:`imod.mf6.Modflow6Simulation.create_partition_labels` to create
+  partition labels for a MODFLOW 6 simulation from its idomain. This is useful
+  for splitting a simulation into multiple submodels.
 
 Fixed
 ~~~~~
@@ -35,7 +38,7 @@ Fixed
   :meth:`imod.mf6.LayeredWell.from_imod5_data` would throw a KeyError 0 upon
   trying to resample timeseries with a non-zero index.
 - Fixed bug where :class:`imod.mf6.HorizontalFlowBarrierResistance`,
-  :class:`imod.mf6.HorizontalFlowBarrierSingleLayerResistance` and other HFB
+  :class:`imod.mf6.SingleLayerHorizontalFlowBarrierResistance` and other HFB
   packages would have resistances that were double the expected value with
   xugrid >= 0.14.2
 
@@ -48,6 +51,11 @@ Changed
   multiple topsystem packages.
 - No upper limit anymore for ``mod_id`` in ``mod2svat.inp`` for
   :class:`imod.msw.CouplerMapping`.
+- :func:`imod.prepare.create_partition_labels` now takes an ``idomain`` grid
+  instead of :class:`imod.mf6.Modflow6Simulation` as first argument. To generate
+  partition labels from a :class:`imod.mf6.Modflow6Simulation` straightaway, use
+  the newly added :meth:`imod.mf6.Modflow6Simulation.create_partition_labels`
+  method instead.
 
 Removed
 ~~~~~~~
@@ -58,8 +66,8 @@ Removed
   :class:`imod.mf6.LayeredWell` directly to layers.
 - Removed ``imod.mf6.multimodel.partition_generator.get_label_array``, use
   :func:`imod.prepare.create_partition_labels` instead.
-- Removed ``imod.idf.read`` use :func:`imod.idf.open` instead.
-- Removed ``imod.rasterio.read`` use :func:`imod.rasterio.open` instead.
+- Removed ``imod.formats.idf.read`` use :func:`imod.formats.idf.open` instead.
+- Removed ``imod.formats.rasterio.read`` use :func:`imod.formats.rasterio.open` instead.
 - Removed ``head`` argument for :class:`imod.mf6.InitialConditions`, use
   ``start`` instead.
 - Removed ``cell_averaging`` argument for :class:`imod.mf6.NodePropertyFlow`,
@@ -88,7 +96,7 @@ Added
 - iMOD Python version is now written in a comment line to MODFLOW6 and
   MetaSWAP's ``para_sim.inp`` files. This is useful for debugging purposes.
 - Added option ``ignore_time_purge_empty`` to
-  :class:`imod.mf6.Modflow6Simulation.split` to consider a package empty if its
+  :meth:`imod.mf6.Modflow6Simulation.split` to consider a package empty if its
   first times step is all nodata. This can save a lot of time splitting
   transient models.
 - Add :class:`imod.mf6.ValidationSettings` to specify validation settings for
@@ -100,12 +108,12 @@ Fixed
 
 - Upon providing an unexpected coordinate in the mask or regridding grid,
   :meth:`imod.mf6.Modflow6Simulation.regrid_like` and
-  :meth:`imod.mf6.Modflow6Simulation.mask` now present the unexpected
+  :meth:`imod.mf6.Modflow6Simulation.mask_all_models` now present the unexpected
   coordinates in the error message.
 - :class:`imod.mf6.VerticesDiscretization` now correctly sets the ``xorigins``
   and ``yorigins`` options in the ``.disv`` file. Incorrect origins cause issues
   when splitting models and computing with XT3D on the exchanges.
-- :func:`imod.mf6.open_cbc` and :func:`imod.mf6.open_head` now account for
+- :func:`imod.mf6.open_cbc` and :func:`imod.mf6.open_hds` now account for
   xorigins and yorigins for models ran with
   :class:`imod.mf6.VerticesDiscretization`. **WARNING**: Given that these were
   set incorrectly in previous versions of iMOD Python (see previous item in this
@@ -123,8 +131,8 @@ Fixed
 - :class:`imod.msw.IdfMapping` swapped order of y_grid and x_grid in dictionary
   for writing the correct order of coordinates in idf_svat.inp.
 - Improved performance of :meth:`imod.mf6.Modflow6Simulation.split` and
-  :meth:`imod.mf6.Modflow6Simulation.mask` when using dask.
-- Fixed bug in :meth:`imod.mf6.Modflow6Simulation.mask` for unstructured grids
+  :meth:`imod.mf6.Modflow6Simulation.mask_all_models` when using dask.
+- Fixed bug in :meth:`imod.mf6.Modflow6Simulation.mask_all_models` for unstructured grids
   with a spatial dimension that differs from the default ``"mesh2d_nFaces"``.
 - Fixed bug in :meth:`imod.mf6.Well.cleanup` and
   :meth:`imod.mf6.LayeredWell.cleanup` which caused an error when called with an
@@ -182,7 +190,7 @@ Changed
 - :meth:`imod.mf6.ConstantHead.from_imod5_data` and
   :meth:`imod.mf6.Recharge.from_imod5_data` got extra arguments for
   ``period_data``, ``time_min`` and ``time_max``.
-- :func:`imod.prepare.read_imod_legend` now also returns the labels as an extra
+- :func:`imod.visualize.read_imod_legend` now also returns the labels as an extra
   argument. Update your code by changing 
   ``colors, levels = read_imod_legend(...)`` to 
   ``colors, levels, labels = read_imod_legend(...)``.
@@ -196,7 +204,7 @@ Added
 
 - :meth:`imod.msw.MetaSwapModel.clip_box` to clip MetaSWAP models.
 - Methods of class :class:`imod.mf6.Modflow6Simulation` can now be logged.
-- :func:`imod.prepare.cleanup.cleanup_layered_wel` to clean up wells assigned
+- :func:`imod.prepare.cleanup.cleanup_wel_layered` to clean up wells assigned
   to layers.
 
 
@@ -246,7 +254,7 @@ Added
   numbers to the first active layer.
 - :func:`imod.prepare.DISTRIBUTING_OPTION` got a new setting
   ``by_corrected_thickness``. This matches DISTRCOND=-1 in iMOD5.
-- :func:`imod.prepare.cleanup.cleanup_hfb` to clean up HFB geometries.
+- :func:`imod.prepare.cleanup_hfb` to clean up HFB geometries.
 - :meth:`imod.mf6.HorizontalFlowBarrierResistance.cleanup`,
   :meth:`imod.mf6.SingleLayerHorizontalFlowBarrierResistance.cleanup`,
   to clean up HFB geometries crossing inactive model cells.
@@ -270,18 +278,18 @@ Changed
 - The ``drn`` attribute of :class:`imod.prepare.SimulationAllocationOptions` has
   the ``at_elevation`` of :func:`imod.prepare.ALLOCATION_OPTION` option now set
   as default. This means by default drainage cells are placed differently in
-  :meth:`imod.mf6.Simulation.from_imod5_data`.
+  :meth:`imod.mf6.Modflow6Simulation.from_imod5_data`.
 - :class:`imod.mf6.Well`, :class:`imod.mf6.LayeredWell`,
-  :func:`imod.prepare.wells.assign_wells`, :meth:`imod.mf6.Well.from_imod5_data`
+  :func:`imod.prepare.assign_wells`, :meth:`imod.mf6.Well.from_imod5_data`
   and :meth:`imod.mf6.LayeredWell.from_imod5_data` now have default values for
   ``minimum_thickness`` and ``minimum_k`` set to 0.0.
 - When intitating a MODFLOW 6 package with a ``layer`` coordinate with
   values <= 0, iMOD Python will throw an error.
 - :class:`imod.mf6.HorizontalFlowBarrierResistance`,
-  :class:`imod.mf6.HorizontalFlowBarrierSingleLayerResistance` and other HFB now
+  :class:`imod.mf6.SingleLayerHorizontalFlowBarrierResistance` and other HFB now
   validate whether proper type of geometry is provided, respectively Polygon for
   :class:`imod.mf6.HorizontalFlowBarrierResistance`, and LineString for
-  :class:`imod.mf6.HorizontalFlowBarrierSingleLayerResistance`.
+  :class:`imod.mf6.SingleLayerHorizontalFlowBarrierResistance`.
 - Relaxed validation for :class:`imod.msw.MetaSwapModel` if ``FileCopier``
   package is present.
 - Change aterisk to dash and tabs to four spaces in ``ValidationError`` messages.
@@ -295,7 +303,7 @@ Changed
 Fixed
 ~~~~~
 
-- :meth:`imod.mf6.Model.mask_all_packages` now preserves the ``dx`` and
+- :meth:`imod.mf6.GroundwaterFlowModel.mask_all_packages` now preserves the ``dx`` and
   ``dy`` coordinates
 - :meth:`imod.mf6.Well.from_imod5_data` and
   :meth:`imod.mf6.LayeredWell.from_imod5_data` ignore well rates preceding first
@@ -359,7 +367,7 @@ Added
 
 - :class:`imod.msw.MeteoGridCopy` to copy existing `mete_grid.inp` files, so
   ASCII grids in large existing meteo databases do not have to be read.
-- :class:`imod.msw.CopyFiles` to copy settings and lookup tables in existing
+- :class:`imod.msw.FileCopier` to copy settings and lookup tables in existing
   ``.inp`` files.
 - :meth:`imod.mf6.LayeredWell.from_imod5_cap_data` to construct a
   :class:`imod.mf6.LayeredWell` package from iMOD5 data in the CAP package (for
@@ -380,18 +388,18 @@ Fixed
 ~~~~~
 
 - Fixed bug where :class:`imod.mf6.HorizontalFlowBarrierResistance`,
-  :class:`imod.mf6.HorizontalFlowBarrierSingleLayerResistance` and other HFB
+  :class:`imod.mf6.SingleLayerHorizontalFlowBarrierResistance` and other HFB
   packages could not be allocated to cell edges when idomain in layer 1 was
   largely inactive.
-- Fixed bug where :meth:`HorizontalFlowBarrierResistance.clip_box`,
-  :meth:`HorizontalFlowBarrierSingleLayerResistance.clip_box` methods only
-  returned deepcopy instead of actually clipping the line geometries.
+- Fixed bug where :meth:`imod.mf6.HorizontalFlowBarrierResistance.clip_box`,
+  :meth:`imod.mf6.SingleLayerHorizontalFlowBarrierResistance.clip_box` methods
+  only returned deepcopy instead of actually clipping the line geometries.
 - Fixed bug where :class:`imod.mf6.HorizontalFlowBarrierResistance`,
-  :class:`imod.mf6.HorizontalFlowBarrierSingleLayerResistance` and other HFB
+  :class:`imod.mf6.SingleLayerHorizontalFlowBarrierResistance` and other HFB
   packages could not be clipped or copied with xarray >= 2024.10.0.
 - Fixed crash upon calling :meth:`imod.mf6.GroundwaterFlowModel.dump`, when a
   :class:`imod.mf6.HorizontalFlowBarrierResistance`,
-  :class:`imod.mf6.HorizontalFlowBarrierSingleLayerResistance` or other HFB
+  :class:`imod.mf6.SingleLayerHorizontalFlowBarrierResistance` or other HFB
   package was assigned to the model.
 - :meth:`imod.mf6.Modflow6Simulation.regrid_like` can now regrid a structured
   model to an unstructured grid.
@@ -417,7 +425,7 @@ Changed
   :meth:`imod.mf6.GroundwaterFlowModel.from_imod5_data` now automatically adds a
   well for metaswap sprinkling named ``"msw-sprinkling"``
 - Less strict validation for :class:`imod.mf6.HorizontalFlowBarrierResistance`,
-  :class:`imod.mf6.HorizontalFlowBarrierSingleLayerResistance` and other HFB packages for
+  :class:`imod.mf6.SingleLayerHorizontalFlowBarrierResistance` and other HFB packages for
   simulations which are imported with
   :meth:`imod.mf6.Modflow6Simulation.from_imod5_data`
 - DeprecationWarning thrown upon initializing :class:`imod.prepare.Regridder`.
@@ -759,11 +767,11 @@ Fixed
 ~~~~~
 - Incorrect validation error ``data values found at nodata values of idomain``
   for boundary condition packages with a scalar coordinate not set as dimension.
-- Fix issue where :func:`imod.idf.open_subdomains` and
+- Fix issue where :func:`imod.formats.idf.open_subdomains` and
   :func:`imod.mf6.Modflow6Simulation.open_head` (for split simulations) would
   return arrays with incorrect ``dx`` and ``dy`` coordinates for equidistant
   data.
-- Fix issue where :func:`imod.idf.open_subdomains` returned a flipped ``dy``
+- Fix issue where :func:`imod.formats.idf.open_subdomains` returned a flipped ``dy``
   coordinate for nonequidistant data.
 - Made :func:`imod.util.round_extent` available again, as it was moved without
   notice. Function now throws a DeprecationWarning to use
@@ -1038,7 +1046,7 @@ Added
 Changed
 ~~~~~~~
 
-- :func:`imod.rasterio.save` will now write ESRII ASCII rasters, even if
+- :func:`imod.formats.rasterio.save` will now write ESRII ASCII rasters, even if
   rasterio is not installed. A fallback function has been added specifically
   for ASCII rasters.
 
@@ -1139,7 +1147,7 @@ Fixed
 Changed
 ~~~~~~~
 
-- :func:`imod.ipf.save` will error on duplicate IDs for associated files if a
+- :func:`imod.formats.ipf.save` will error on duplicate IDs for associated files if a
   ``"layer"`` column is present. As a dataframe is automatically broken down
   into a single IPF per layer, associated files for the first layer would be
   overwritten by the second, and so forth.
@@ -1215,7 +1223,7 @@ Fixed
   projectfile to ``steady-state`` for ``BoundaryConditions`` without a time
   dimension.
 - Added ``imod.flow.OutputControl`` as this was still missing.
-- :func:`imod.ipf.read` will no longer error when an associated files with 0
+- :func:`imod.formats.ipf.read` will no longer error when an associated files with 0
   rows is read.
 - :func:`imod.evaluate.calculate_gxg` now correctly uses (March 14, March
   28, April 14) to calculate GVG rather than (March 28, April 14, April 28).
@@ -1232,7 +1240,7 @@ Changed
 - Deprecate the current documentation URL: https://imod.xyz. For the coming
   months, redirection is automatic to:
   https://deltares.gitlab.io/imod/imod-python/.
-- :func:`imod.ipf.save` will now store associated files in separate directories
+- :func:`imod.formats.ipf.save` will now store associated files in separate directories
   named ``layer1``, ``layer2``, etc. The ID in the main IPF file is updated
   accordingly. Previously, if IDs were shared between different layers, the
   associated files would be overwritten as the IDs would result in the same
@@ -1302,7 +1310,7 @@ Fixed
 Fixed
 ~~~~~
 
--  :func:`imod.ipf.read` accepts list of file names.
+-  :func:`imod.formats.ipf.read` accepts list of file names.
 -  :func:`imod.mf6.open_hds` did not read the appropriate bytes from the
    heads file, apart for the first timestep. It will now read the right records.
 -  Use the appropriate array for modflow6 timestep duration: the
@@ -1321,7 +1329,7 @@ Fixed
 Added
 ~~~~~
 
--  :func:`imod.idf.open_subdomains` will now also accept iMOD-WQ output of
+-  :func:`imod.formats.idf.open_subdomains` will now also accept iMOD-WQ output of
    multiple species runs.
 -  :meth:`imod.wq.SeawatModel.to_netcdf` has been added to write all model
    packages to netCDF files.
@@ -1379,7 +1387,7 @@ Changed
    Frequently Asked Questions (FAQ) section, restructure API Reference. Examples
    now ru
 -  Datetime columns in IPF associated files (via
-   :func:`imod.ipf.write_assoc`) will not be placed within quotes, as this can
+   :func:`imod.formats.ipf.write_assoc`) will not be placed within quotes, as this can
    break certain iMOD batch functions.
 -  :class:`imod.mf6.Well` has been renamed into ``imod.mf6.WellDisStructured``.
 -  :meth:`imod.mf6.GroundwaterFlowModel.write` will now write package names
@@ -1433,7 +1441,7 @@ Fixed
    recharge package concentration given in IDF files. It did not prepend the
    name of the package correctly (resulting in paths like
    ``concentration_l1.idf`` instead of ``rch/concentration_l1.idf``).
--  :meth:`imod.idf.save` will simplify constant cellsize arrays to a scalar
+-  :meth:`imod.formats.idf.save` will simplify constant cellsize arrays to a scalar
    value -- this greatly speeds up drawing in the iMOD-GUI.
 
 [0.10.0] - 2020-05-23
@@ -1478,7 +1486,7 @@ Added
    have been added to setup 3D animations of DataArrays with transient data.
 -  Support for out of core computation by ``imod.prepare.Regridder`` if ``source``
    is chunked.
--  :func:`imod.ipf.read` now reports the problematic file if reading errors occur.
+-  :func:`imod.formats.ipf.read` now reports the problematic file if reading errors occur.
 -  :func:`imod.prepare.polygonize` added to polygonize DataArrays to GeoDataFrames.
 -  Added more support for multiple species imod-wq models, specifically: scalar concentration
    for boundary condition packages and well IPFs.
@@ -1494,7 +1502,7 @@ Fixed
 -  ``density`` is no longer an optional argument in :class:`imod.wq.GeneralHeadboundary` and
    :class:`imod.wq.River`. The reason is that iMOD-WQ fully removes (!) these packages if density
    is not present.
--  :func:`imod.idf.save` and :func:`imod.rasterio.save` will now also save DataArrays in
+-  :func:`imod.formats.idf.save` and :func:`imod.formats.rasterio.save` will now also save DataArrays in
    which a coordinate other than ``x`` or ``y`` is descending.
 -  :func:`imod.visualize.plot_map` enforces decreasing ``y``, which ensures maps are not plotted
    upside down.
@@ -1517,9 +1525,9 @@ Added
    y, layer, and time.
 -  Added multi-species support for (:mod:`imod.wq`)
 -  GDAL rasters representing N-dimensional data can be opened and saved similar to (:mod:`imod.idf`) in (:mod:`imod.rasterio`)
--  Writing GDAL rasters using :meth:`imod.rasterio.save` and (:meth:`imod.rasterio.write`) auto-detects GDAL driver based on file extension
--  64-bit IDF files can be opened :meth:`imod.idf.open`
--  64-bit IDF files can be written using :meth:`imod.idf.save` and (:meth:`imod.idf.write`) using keyword ``dtype=np.float64``
+-  Writing GDAL rasters using :meth:`imod.formats.rasterio.save` and (:meth:`imod.formats.rasterio.write`) auto-detects GDAL driver based on file extension
+-  64-bit IDF files can be opened :meth:`imod.formats.idf.open`
+-  64-bit IDF files can be written using :meth:`imod.formats.idf.save` and (:meth:`imod.formats.idf.write`) using keyword ``dtype=np.float64``
 -  ``sel`` and ``isel`` methods to ``SeawatModel`` to support taking out a subdomain
 -  Docstrings for the MODFLOW 6 classes in :mod:`imod.mf6`
 -  :meth:`imod.select.upper_active_layer` function to get the upper active layer from ibound ``xr.DataArray``
@@ -1527,8 +1535,8 @@ Added
 Changed
 ~~~~~~~
 
--  ``imod.idf.read`` is deprecated, use :func:`imod.idf.open` instead
--  ``imod.rasterio.read`` is deprecated, use :func:`imod.rasterio.open` instead
+-  ``imod.formats.idf.read`` is deprecated, use :func:`imod.formats.idf.open` instead
+-  ``imod.formats.rasterio.read`` is deprecated, use :func:`imod.formats.rasterio.open` instead
 
 Fixed
 ~~~~~
@@ -1582,8 +1590,8 @@ Added
 -  :mod:`imod.select` module for extracting data along cross sections or at points
 -  :mod:`imod.visualize` module added to visualize results
 -  :func:`imod.idf.open_subdomains` function to open and merge the IDF results of a parallelized run
--  :func:`imod.ipf.read` now infers delimeters for the headers and the body
--  :func:`imod.ipf.read` can now deal with heterogeneous delimiters between multiple IPF files, and between the headers and body in a single file
+-  :func:`imod.formats.ipf.read` now infers delimeters for the headers and the body
+-  :func:`imod.formats.ipf.read` can now deal with heterogeneous delimiters between multiple IPF files, and between the headers and body in a single file
 
 Changed
 ~~~~~~~

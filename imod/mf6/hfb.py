@@ -4,6 +4,7 @@ import textwrap
 import typing
 from copy import deepcopy
 from enum import Enum
+from pathlib import Path
 from typing import TYPE_CHECKING, Any, Dict, List, Optional, Self, Tuple
 
 import cftime
@@ -524,7 +525,7 @@ class HorizontalFlowBarrierBase(BoundaryCondition, ILineDataPackage):
             value.to_xarray(), overwrite_vars=variables_for_gdf, join="right"
         )
 
-    def render(self, directory, pkgname, globaltimes, binary):
+    def _render(self, directory, pkgname, globaltimes, binary):
         raise NotImplementedError(
             f"""{self.__class__.__name__} is a grid-agnostic package and does not have a render method. To render the
             package, first convert to a Modflow6 package by calling pkg.to_mf6_pkg()"""
@@ -533,6 +534,28 @@ class HorizontalFlowBarrierBase(BoundaryCondition, ILineDataPackage):
     def to_netcdf(
         self, *args, mdal_compliant: bool = False, crs: Optional[Any] = None, **kwargs
     ):
+        """
+        Write dataset contents to a netCDF file. Custom encoding rules can be
+        provided on package level by overriding the _netcdf_encoding in the
+        package
+
+        Parameters
+        ----------
+        *args:
+            Will be passed on to ``xr.Dataset.to_netcdf`` or
+            ``xu.UgridDataset.to_netcdf``.
+        mdal_compliant: bool, optional
+            Convert data with
+            :func:`imod.prepare.spatial.mdal_compliant_ugrid2d` to MDAL
+            compliant unstructured grids. Defaults to False.
+        crs: Any, optional
+            Anything accepted by rasterio.crs.CRS.from_user_input
+            Requires ``rioxarray`` installed.
+        **kwargs:
+            Will be passed on to ``xr.Dataset.to_netcdf`` or
+            ``xu.UgridDataset.to_netcdf``.
+
+        """
         kwargs.update({"encoding": self._netcdf_encoding()})
 
         new = deepcopy(self)
@@ -543,7 +566,37 @@ class HorizontalFlowBarrierBase(BoundaryCondition, ILineDataPackage):
         return {"geometry": {"dtype": "str"}}
 
     @classmethod
-    def from_file(cls, path, **kwargs):
+    def from_file(cls, path: str | Path, **kwargs) -> Self:
+        """
+        Loads an imod mf6 package from a file (currently only netcdf and zarr
+        are supported). Note that it is expected that this file was saved with
+        imod.mf6.Package.dataset.to_netcdf(), as the checks upon package
+        initialization are not done again!
+
+        Parameters
+        ----------
+        path : str, pathlib.Path
+            Path to the file.
+        **kwargs : keyword arguments
+            Arbitrary keyword arguments forwarded to ``xarray.open_dataset()``,
+            or ``xarray.open_zarr()``.
+        Refer to the examples.
+
+        Returns
+        -------
+        package : imod.mf6.Package
+            Returns a package with data loaded from file.
+
+        Examples
+        --------
+
+        To load a package from a file, e.g. a HorizontalFlowBarrierResistance
+        package:
+
+        >>> hfb = imod.mf6.HorizontalFlowBarrierResistance.from_file("hfb.nc")
+
+        Refer to the xarray documentation for the possible keyword arguments.
+        """
         instance = super().from_file(path, **kwargs)
         geometry = json.loads(instance.dataset["geometry"].values.item())
         instance.line_data = gpd.GeoDataFrame.from_features(geometry)
@@ -588,12 +641,12 @@ class HorizontalFlowBarrierBase(BoundaryCondition, ILineDataPackage):
             as_ugrid_dataarray(grid) for grid in [idomain, top, bottom, k]
         )
         snapped_dataset, edge_index = self._snap_to_grid(idomain)
-        edge_index = self.__remove_invalid_edges(unstructured_grid, edge_index)
+        edge_index = self._remove_invalid_edges(unstructured_grid, edge_index)
 
         barrier_values = self._compute_barrier_values(
             snapped_dataset, edge_index, idomain, top, bottom, k
         )
-        barrier_values = self.__remove_edge_values_connected_to_inactive_cells(
+        barrier_values = self._remove_edge_values_connected_to_inactive_cells(
             barrier_values, unstructured_grid, edge_index
         )
 
@@ -612,7 +665,7 @@ class HorizontalFlowBarrierBase(BoundaryCondition, ILineDataPackage):
             unstructured_grid.ugrid.grid,
             edge_index,
             {
-                "hydraulic_characteristic": self.__to_hydraulic_characteristic(
+                "hydraulic_characteristic": self._to_hydraulic_characteristic(
                     barrier_values
                 )
             },
@@ -695,6 +748,14 @@ class HorizontalFlowBarrierBase(BoundaryCondition, ILineDataPackage):
 
         return self._to_mf6_pkg(idomain, top, bottom, k, validation_context)
 
+    @classmethod
+    def _is_grid_agnostic_package(cls) -> bool:
+        """
+        Returns True if this package does not depend on a grid, e.g. the
+        :class:`imod.mf6.wel.Wel` package.
+        """
+        return True
+
     def is_empty(self, ignore_time: bool = False) -> bool:
         """
         Returns True if the package is empty, that is if it contains only
@@ -769,7 +830,7 @@ class HorizontalFlowBarrierBase(BoundaryCondition, ILineDataPackage):
         left, right = snapped_dataset.ugrid.grid.edge_face_connectivity[edge_index].T
         k_mean = _mean_left_and_right(k, left, right)
 
-        resistance = self.__to_resistance(
+        resistance = self._to_resistance(
             snapped_dataset[self._get_variable_name()]
         ).values[edge_index]
 
@@ -784,9 +845,9 @@ class HorizontalFlowBarrierBase(BoundaryCondition, ILineDataPackage):
         inverse_c = (fraction / resistance) + ((1.0 - fraction) / c_aquifer)
         c_total = 1.0 / inverse_c
 
-        return self.__from_resistance(c_total)
+        return self._from_resistance(c_total)
 
-    def __to_resistance(self, value: xu.UgridDataArray) -> xu.UgridDataArray:
+    def _to_resistance(self, value: xu.UgridDataArray) -> xu.UgridDataArray:
         match self._get_barrier_type():
             case BarrierType.HydraulicCharacteristic:
                 return 1.0 / value
@@ -797,7 +858,7 @@ class HorizontalFlowBarrierBase(BoundaryCondition, ILineDataPackage):
 
         raise ValueError(r"Unknown barrier type {barrier_type}")
 
-    def __from_resistance(self, resistance: xr.DataArray) -> xr.DataArray:
+    def _from_resistance(self, resistance: xr.DataArray) -> xr.DataArray:
         match self._get_barrier_type():
             case BarrierType.HydraulicCharacteristic:
                 return 1.0 / resistance
@@ -808,7 +869,7 @@ class HorizontalFlowBarrierBase(BoundaryCondition, ILineDataPackage):
 
         raise ValueError(r"Unknown barrier type {barrier_type}")
 
-    def __to_hydraulic_characteristic(self, value: xr.DataArray) -> xr.DataArray:
+    def _to_hydraulic_characteristic(self, value: xr.DataArray) -> xr.DataArray:
         match self._get_barrier_type():
             case BarrierType.HydraulicCharacteristic:
                 return value
@@ -845,33 +906,51 @@ class HorizontalFlowBarrierBase(BoundaryCondition, ILineDataPackage):
         bottom: Optional[GridDataArray] = None,
     ) -> Self:
         """
-        Clip a package by a bounding box (time, layer, y, x).
-
-        Slicing intervals may be half-bounded, by providing None:
-
-        * To select 500.0 <= x <= 1000.0:
-          ``clip_box(x_min=500.0, x_max=1000.0)``.
-        * To select x <= 1000.0: ``clip_box(x_min=None, x_max=1000.0)``
-          or ``clip_box(x_max=1000.0)``.
-        * To select x >= 500.0: ``clip_box(x_min = 500.0, x_max=None.0)``
-          or ``clip_box(x_min=1000.0)``.
+        Clip a barrier by a bounding box (y, x).
 
         Parameters
         ----------
-        time_min: optional
+        time_min: optional, np.datetime64
+            Ignored
         time_max: optional
+            Ignored
         layer_min: optional, int
+            Ignored
         layer_max: optional, int
+            Ignored
         x_min: optional, float
+            Minimum x-coordinate to select.
         x_max: optional, float
+            Maximum x-coordinate to select.
         y_min: optional, float
+            Minimum y-coordinate to select.
         y_max: optional, float
+            Maximum y-coordinate to select.
         top: optional, GridDataArray
+            Ignored
         bottom: optional, GridDataArray
+            Ignored
 
         Returns
         -------
-        sliced : Package
+        clipped : Package
+            A new package that is clipped to the specified bounding box.
+
+        Examples
+        --------
+        Slicing intervals may be half-bounded, by providing None:
+
+        To select 500.0 <= x <= 1000.0:
+
+        >>> pkg.clip_box(x_min=500.0, x_max=1000.0)
+
+        To select x <= 1000.0:
+
+        >>> pkg.clip_box(x_max=1000.0)``
+
+        To select x >= 500.0:
+
+        >>> pkg.clip_box(x_min=500.0)
         """
         new = deepcopy(self)
 
@@ -982,7 +1061,7 @@ class HorizontalFlowBarrierBase(BoundaryCondition, ILineDataPackage):
         return _snap_to_grid_and_aggregate(barrier_dataframe, grid2d, vardict_agg)
 
     @staticmethod
-    def __remove_invalid_edges(
+    def _remove_invalid_edges(
         unstructured_grid: xu.UgridDataArray, edge_index: np.ndarray
     ) -> np.ndarray:
         """
@@ -1013,7 +1092,7 @@ class HorizontalFlowBarrierBase(BoundaryCondition, ILineDataPackage):
         return edge_index[valid]
 
     @staticmethod
-    def __remove_edge_values_connected_to_inactive_cells(
+    def _remove_edge_values_connected_to_inactive_cells(
         values, unstructured_grid: xu.UgridDataArray, edge_index: np.ndarray
     ):
         face_dimension = unstructured_grid.ugrid.grid.face_dimension
@@ -1330,11 +1409,11 @@ class SingleLayerHorizontalFlowBarrierMultiplier(HorizontalFlowBarrierBase):
     def _compute_barrier_values(
         self, snapped_dataset, edge_index, idomain, top, bottom, k
     ):
-        barrier_values = self.__multiplier_layer(snapped_dataset, edge_index, idomain)
+        barrier_values = self._multiplier_layer(snapped_dataset, edge_index, idomain)
 
         return barrier_values
 
-    def __multiplier_layer(
+    def _multiplier_layer(
         self,
         snapped_dataset: xu.UgridDataset,
         edge_index: np.ndarray,

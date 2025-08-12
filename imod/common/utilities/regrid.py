@@ -252,7 +252,7 @@ def _regrid_like(
     if regridder_types is None:
         regridder_types = package._regrid_method
 
-    new_package_data = package.get_non_grid_data(regridder_types.asdict().keys())
+    new_package_data = package._get_non_grid_data(regridder_types.asdict().keys())
     new_package_data = _regrid_package_data(
         package.dataset,
         target_grid,
@@ -297,7 +297,7 @@ def _regrid_like(
     data-arrays regridded to another discretization, similar to the one used in
     input argument "target_grid"
     """
-    supported, error_with_object_name = model.is_regridding_supported()
+    supported, error_with_object_name = model._is_regridding_supported()
     if not supported:
         raise ValueError(
             f"regridding this model cannot be done due to the presence of package {error_with_object_name}"
@@ -368,7 +368,7 @@ def _regrid_like(
             "Unable to regrid simulation. Regridding can only be done on simulations that haven't been split."
             + " Therefore regridding should be done before splitting the simulation."
         )
-    if not simulation.has_one_flow_model():
+    if not simulation._has_one_flow_model():
         raise ValueError(
             "Unable to regrid simulation. Regridding can only be done on simulations that have a single flow model."
         )
@@ -376,7 +376,7 @@ def _regrid_like(
 
     models = simulation.get_models()
     for model_name, model in models.items():
-        supported, error_with_object_name = model.is_regridding_supported()
+        supported, error_with_object_name = model._is_regridding_supported()
         if not supported:
             raise ValueError(
                 f"Unable to regrid simulation, due to the presence of package '{error_with_object_name}' in model {model_name} "

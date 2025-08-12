@@ -7,7 +7,6 @@ import pytest
 import xarray as xr
 
 import imod
-from imod.prepare.partition import create_partition_labels
 
 
 def remove_comment_lines(textblock: str) -> str:
@@ -68,7 +67,7 @@ class TestGwfgwf:
         self, sample_gwfgwf_structured: imod.mf6.GWFGWF, tmp_path: Path
     ):
         # act
-        actual = sample_gwfgwf_structured.render(tmp_path, "gwfgwf", [], False)
+        actual = sample_gwfgwf_structured._render(tmp_path, "gwfgwf", [], False)
 
         # assert
 
@@ -101,7 +100,7 @@ class TestGwfgwf:
         self, sample_gwfgwf_unstructured: imod.mf6.GWFGWF, tmp_path: Path
     ):
         # act
-        actual = sample_gwfgwf_unstructured.render(tmp_path, "gwfgwf", [], False)
+        actual = sample_gwfgwf_unstructured._render(tmp_path, "gwfgwf", [], False)
 
         # assert
 
@@ -138,82 +137,92 @@ class TestGwfgwf:
 
 
 @pytest.mark.parametrize("newton_option", [False, True])
-def test_option_newton_propagated(circle_model, newton_option, tmp_path):
+def test_option_newton_propagated(
+    circle_model: imod.mf6.Modflow6Simulation, newton_option: bool, tmp_path
+):
     # set newton option on original model
     circle_model["GWF_1"].set_newton(newton_option)
 
     # split original model
-    label_array = create_partition_labels(circle_model, 3)
+    label_array = circle_model.create_partition_labels(3)
     split_simulation = circle_model.split(label_array)
 
     # check that the created exchagnes have the same newton option
     for exchange in split_simulation["split_exchanges"]:
         assert exchange.dataset["newton"].values[()] == newton_option
-        textrep = exchange.render(tmp_path, "gwfgwf", [], False)
+        textrep = exchange._render(tmp_path, "gwfgwf", [], False)
         assert ("newton" in textrep) == newton_option
 
 
 @pytest.mark.parametrize("xt3d_option", [False, True])
-def test_option_xt3d_propagated(circle_model, xt3d_option, tmp_path):
+def test_option_xt3d_propagated(
+    circle_model: imod.mf6.Modflow6Simulation, xt3d_option: bool, tmp_path
+):
     # set newton option on original model
     circle_model["GWF_1"]["npf"].set_xt3d_option(xt3d_option, is_rhs=xt3d_option)
 
     # split original model
-    label_array = create_partition_labels(circle_model, 3)
+    label_array = circle_model.create_partition_labels(3)
     split_simulation = circle_model.split(label_array)
 
     # check that the created exchanges have the same newton option
     for exchange in split_simulation["split_exchanges"]:
         assert exchange.dataset["xt3d"].values[()] == xt3d_option
-        textrep = exchange.render(tmp_path, "gwfgwf", [], False)
+        textrep = exchange._render(tmp_path, "gwfgwf", [], False)
         assert ("xt3d" in textrep) == xt3d_option
 
 
 @pytest.mark.parametrize("variablecv_option", [False, True])
-def test_option_variablecv_propagated(circle_model, variablecv_option: bool, tmp_path):
+def test_option_variablecv_propagated(
+    circle_model: imod.mf6.Modflow6Simulation, variablecv_option: bool, tmp_path
+):
     # set variablecv option on original model
     circle_model["GWF_1"]["npf"]["variable_vertical_conductance"] = variablecv_option
 
     # split original model
-    label_array = create_partition_labels(circle_model, 3)
+    label_array = circle_model.create_partition_labels(3)
     split_simulation = circle_model.split(label_array)
 
     # check that the created exchanges have the same variablecv option
     for exchange in split_simulation["split_exchanges"]:
         assert exchange.dataset["variablecv"].values[()] == variablecv_option
-        textrep = exchange.render(tmp_path, "gwfgwf", [], False)
+        textrep = exchange._render(tmp_path, "gwfgwf", [], False)
         assert ("variablecv" in textrep) == variablecv_option
 
 
 @pytest.mark.parametrize("dewatered_option", [False, True])
-def test_option_dewatered_propagated(circle_model, dewatered_option: bool, tmp_path):
+def test_option_dewatered_propagated(
+    circle_model: imod.mf6.Modflow6Simulation, dewatered_option: bool, tmp_path
+):
     # set dewatered option on original model
     circle_model["GWF_1"]["npf"]["variable_vertical_conductance"] = True
     circle_model["GWF_1"]["npf"]["dewatered"] = dewatered_option
 
     # split original model
-    label_array = create_partition_labels(circle_model, 3)
+    label_array = circle_model.create_partition_labels(3)
     split_simulation = circle_model.split(label_array)
 
     # check that the created exchanges have the same dewatered option
     for exchange in split_simulation["split_exchanges"]:
         assert exchange.dataset["dewatered"].values[()] == dewatered_option
-        textrep = exchange.render(tmp_path, "gwfgwf", [], False)
+        textrep = exchange._render(tmp_path, "gwfgwf", [], False)
         assert ("dewatered" in textrep) == dewatered_option
 
 
 @pytest.mark.parametrize("budget_option", [False, True])
-def test_save_flows_propagated(circle_model, budget_option: bool, tmp_path):
+def test_save_flows_propagated(
+    circle_model: imod.mf6.Modflow6Simulation, budget_option: bool, tmp_path
+):
     # set budget option on original model
     if not budget_option:
         circle_model["GWF_1"]["oc"].dataset["save_budget"] = None
 
     # split original model
-    label_array = create_partition_labels(circle_model, 3)
+    label_array = circle_model.create_partition_labels(3)
     split_simulation = circle_model.split(label_array)
 
     # check that the created exchanges have the same dewatered option
     for exchange in split_simulation["split_exchanges"]:
         assert exchange.dataset["save_flows"].values[()] == budget_option
-        textrep = exchange.render(tmp_path, "gwfgwf", [], False)
+        textrep = exchange._render(tmp_path, "gwfgwf", [], False)
         assert ("save_flows" in textrep) == budget_option

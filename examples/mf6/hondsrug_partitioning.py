@@ -16,7 +16,6 @@ comparison.
 import matplotlib.pyplot as plt
 
 import imod
-from imod.prepare.partition import create_partition_labels
 
 # %%
 # Obtain the simulation, write it, run it, and plot some heads.
@@ -45,9 +44,8 @@ hds_original.sel(layer=3).isel(time=6).plot(ax=ax)
 ax.set_title("hondsrug original ")
 # %%
 # Now we partition the Hondsrug model
-idomain = gwf_simulation["GWF"].domain
 number_partitions = 16
-submodel_labels = create_partition_labels(gwf_simulation, number_partitions)
+submodel_labels = gwf_simulation.create_partition_labels(number_partitions)
 
 # %%
 # This label array determines how the model will be split. `METIS

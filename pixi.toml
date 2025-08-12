@@ -109,6 +109,7 @@ setuptools_scm = "*"
 shapely = ">=2.0"
 sphinx = "*"
 sphinx-gallery = "*"
+sphinx-remove-toctrees = "*"
 tomli = ">=1.1.0"
 tomli-w = "*"
 toolz = "*"
@@ -155,11 +156,14 @@ test_import = { cmd = [
 ], depends-on = ["install_with_deps"]}
 install_with_deps = "python -m pip install --editable ."
 
-[feature.user-acceptance]
-platforms = ["win-64"]
+
+[target.win-64.dependencies]
+7zip = "*"
+
+[target.linux-64.dependencies]
+p7zip = "*"
 
 [feature.user-acceptance.dependencies]
-7zip = "*"
 dvc = "*"
 dvc-s3 = "*"
 

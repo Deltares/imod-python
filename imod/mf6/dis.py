@@ -1,5 +1,4 @@
 import pathlib
-from copy import deepcopy
 from typing import Any, List, Optional, Union
 
 import numpy as np
@@ -111,7 +110,13 @@ class StructuredDiscretization(Package, IRegridPackage, IMaskingSettings):
         return ["bottom"]
 
     @init_log_decorator()
-    def __init__(self, top, bottom, idomain, validate: bool = True):
+    def __init__(
+        self,
+        top: GridDataArray,
+        bottom: GridDataArray,
+        idomain: GridDataArray,
+        validate: bool = True,
+    ):
         dict_dataset = {
             "idomain": idomain,
             "top": top,
@@ -239,10 +244,6 @@ class StructuredDiscretization(Package, IRegridPackage, IMaskingSettings):
         pkg = cls(**new_package_data, validate=True)
         pkg.dataset.load()  # Force dask dataset into memory
         return pkg
-
-    @classmethod
-    def get_regrid_methods(cls) -> DiscretizationRegridMethod:
-        return deepcopy(cls._regrid_method)
 
     def regrid_like(
         self,

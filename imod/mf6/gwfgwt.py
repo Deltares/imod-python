@@ -38,6 +38,7 @@ class GWFGWT(ExchangeBase):
         bottom: Optional[GridDataArray] = None,
     ) -> Self:
         """
-        The GWF-GWT exchange does not have any spatial coordinates that can be clipped.
+        The GWF-GWT exchange does not have any spatial coordinates that can be
+        clipped. Package is deepcopied instead.
         """
         return deepcopy(self)

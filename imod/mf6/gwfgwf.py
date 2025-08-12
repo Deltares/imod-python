@@ -92,9 +92,10 @@ class GWFGWF(ExchangeBase):
         top: Optional[GridDataArray] = None,
         bottom: Optional[GridDataArray] = None,
     ) -> Self:
+        """This package cannot be clipped by a bounding box."""
         raise NotImplementedError("this package cannot be clipped")
 
-    def render(
+    def _render(
         self,
         directory: Path,
         pkgname: str,

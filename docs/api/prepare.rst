@@ -56,5 +56,6 @@ Prepare model input
     cleanup_riv
     cleanup_wel
     cleanup_wel_layered
+    cleanup_hfb
 
     create_partition_labels

@@ -1041,8 +1041,12 @@ def open_projectfile_data(path: FilePath) -> tuple[dict[str, Any], dict[str, Any
 
     Returns
     -------
-    data: Dict[str, Any]
-    Keys are the iMOD project file "topics", without parentheses.
+    data: dict[str, Any]
+        Keys are the iMOD project file "topics", without parentheses.
+    repeat_stress: dict[str, list[datetime]]
+        Repeat stress periods, with the key being the topic name and the value
+        being a list of datetimes indicating which stress periods are repeated.
+        E.g. a summer and winter stage for the river package.
     """
     content = read_projectfile(path)
     periods_block = content.pop("periods", None)
