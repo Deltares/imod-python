@@ -28,22 +28,25 @@ def create_clipped_boundary(
     pkg_type: type[StateType],
 ) -> StateType:
     """
-    Create a ConstantHead package on boundary cells that don't have any assigned to them. This is useful in
-    combination with the clip_box method which can produce a domain with missing boundary conditions.
+    Create a ConstantHead/ConstantConcentration package on boundary cells that
+    don't have any assigned to them. This is useful in combination with the
+    clip_box method which can produce a domain with missing boundary conditions.
 
     Parameters
     ----------
     idomain:
         The clipped domain
     state_for_clipped_boundary :
-        The values to be assigned to the created ConstantHead package
+        The values to be assigned to the created
+        ConstantHead/ConstantConcentration package
     original_constant_head_boundaries :
-        List of existing ConstantHead boundaries
+        List of existing ConstantHead/ConstantConcentration boundaries
 
     Returns
     -------
-        ConstantHead package providing values for boundary cells that are not
-        covered by other ConstantHead packages
+        ConstantHead/ConstantConcentration package providing values for boundary
+        cells that are not covered by other ConstantHead/ConstantConcentration
+        packages
 
     """
     active_grid_boundary = active_grid_boundary_xy(idomain > 0)
