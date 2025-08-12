@@ -30,8 +30,6 @@ from imod.common.utilities.schemata import (
 )
 from imod.common.utilities.version import prepend_content_with_version_info
 from imod.logging import LogLevel, logger, standard_log_decorator
-from imod.mf6.chd import ConstantHead
-from imod.mf6.cnc import ConstantConcentration
 from imod.mf6.drn import Drainage
 from imod.mf6.ghb import GeneralHeadBoundary
 from imod.mf6.hfb import HorizontalFlowBarrierBase
@@ -39,6 +37,7 @@ from imod.mf6.mf6_wel_adapter import Mf6Wel
 from imod.mf6.package import Package
 from imod.mf6.riv import River
 from imod.mf6.utilities.clipped_bc_creator import (
+    StateClassType,
     create_clipped_boundary,
 )
 from imod.mf6.utilities.mf6hfb import merge_hfb_packages
@@ -104,9 +103,6 @@ def _create_boundary_condition_clipped_boundary(
     return _create_boundary_condition_for_unassigned_boundary(
         clipped_model, state_for_boundary_clipped, [unassigned_boundary_clipped]
     )
-
-
-StateClassType = type[ConstantHead] | type[ConstantConcentration]
 
 
 class Modflow6Model(collections.UserDict, IModel, abc.ABC):

@@ -1,8 +1,11 @@
+from typing import TypeAlias
+
 from imod.mf6 import ConstantConcentration, ConstantHead
 from imod.select.grid import active_grid_boundary_xy
 from imod.typing import GridDataArray
 
-StateType = ConstantHead | ConstantConcentration
+StateType: TypeAlias = ConstantHead | ConstantConcentration
+StateClassType: TypeAlias = type[ConstantHead] | type[ConstantConcentration]
 
 
 def _find_unassigned_grid_boundaries(
@@ -25,7 +28,7 @@ def create_clipped_boundary(
     idomain: GridDataArray,
     state_for_clipped_boundary: GridDataArray,
     original_constant_head_boundaries: list[StateType],
-    pkg_type: type[StateType],
+    pkg_type: StateClassType,
 ) -> StateType:
     """
     Create a ConstantHead/ConstantConcentration package on boundary cells that
