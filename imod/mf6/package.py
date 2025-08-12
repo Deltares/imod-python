@@ -446,7 +446,15 @@ class Package(PackageBase, IPackage, abc.ABC):
             raise ValueError("this package does not support clipping.")
 
         selection = clip_box_dataset(
-            self.dataset, time_min, time_max, layer_min, layer_max, x_min, x_max, y_min, y_max
+            self.dataset,
+            time_min,
+            time_max,
+            layer_min,
+            layer_max,
+            x_min,
+            x_max,
+            y_min,
+            y_max,
         )
 
         cls = type(self)

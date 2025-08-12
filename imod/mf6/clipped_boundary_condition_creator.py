@@ -9,7 +9,7 @@ def create_clipped_boundary(
     idomain: GridDataArray,
     state_for_clipped_boundary: GridDataArray,
     original_constant_head_boundaries: list[StateType],
-    pkg_type: type[StateType]
+    pkg_type: type[StateType],
 ) -> StateType:
     """
     Create a ConstantHead package on boundary cells that don't have any assigned to them. This is useful in

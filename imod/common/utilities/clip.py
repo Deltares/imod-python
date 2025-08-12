@@ -223,9 +223,7 @@ def clip_box_dataset(
 ):
     selection = dataset.copy()
     selection = clip_time_slice(selection, time_min=time_min, time_max=time_max)
-    selection = clip_layer_slice(
-        selection, layer_min=layer_min, layer_max=layer_max
-    )
+    selection = clip_layer_slice(selection, layer_min=layer_min, layer_max=layer_max)
     selection = clip_spatial_box(
         selection,
         x_min=x_min,

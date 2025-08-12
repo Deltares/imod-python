@@ -94,7 +94,9 @@ def _create_boundary_condition_clipped_boundary(
         )
     )
 
-    unassigned_boundary_clipped = unassigned_boundary_original_domain.clip_box(*clip_box_args)
+    unassigned_boundary_clipped = unassigned_boundary_original_domain.clip_box(
+        *clip_box_args
+    )
     state_for_boundary_clipped = clip_box_dataset(state_for_boundary, *clip_box_args)
 
     return _create_boundary_condition_for_unassigned_boundary(

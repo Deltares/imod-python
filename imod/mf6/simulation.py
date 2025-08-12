@@ -1216,10 +1216,14 @@ class Modflow6Simulation(collections.UserDict, ISimulation):
                     y_min=y_min,
                     y_max=y_max,
                 )
-            elif isinstance(value, list) and all(isinstance(item, GWFGWT) for item in value):
+            elif isinstance(value, list) and all(
+                isinstance(item, GWFGWT) for item in value
+            ):
                 continue
             else:
-                raise ValueError(f"object {key} of type {type(value)} cannot be clipped.")
+                raise ValueError(
+                    f"object {key} of type {type(value)} cannot be clipped."
+                )
         return clipped
 
     def create_partition_labels(
