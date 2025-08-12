@@ -122,9 +122,7 @@ ghb_location = xu.zeros_like(idomain.sel(layer=1), dtype=bool).ugrid.binary_dila
     border_value=True
 )
 constant_head = xu.full_like(idomain, 0.0, dtype=float).where(ghb_location)
-conductance = (idomain * grid.area * k_value).where(
-    ghb_location
-)
+conductance = (idomain * grid.area * k_value).where(ghb_location)
 
 constant_concentration = xu.full_like(constant_head, max_concentration).where(
     ghb_location
