@@ -41,6 +41,11 @@ Fixed
   :class:`imod.mf6.SingleLayerHorizontalFlowBarrierResistance` and other HFB
   packages would have resistances that were double the expected value with
   xugrid >= 0.14.2
+- The ``states_for_boundary`` argument now also works for tranport models in
+  :meth:`imod.mf6.Modflow6Simulation.clip_box`.
+- Fix bug where :meth:`imod.mf6.Modflow6Simulation.clip_box` and the
+  ``states_for_boundary`` argument would place these bc at the
+  incorrect places with unstructured grids.
 
 Changed
 ~~~~~~~
