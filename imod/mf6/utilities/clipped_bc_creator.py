@@ -5,6 +5,22 @@ from imod.typing import GridDataArray
 StateType = ConstantHead | ConstantConcentration
 
 
+def _find_unassigned_grid_boundaries(
+    active_grid_boundary: GridDataArray,
+    boundary_conditions: list[StateType],
+) -> GridDataArray:
+    unassigned_grid_boundaries = active_grid_boundary
+    for boundary_condition in boundary_conditions:
+        # Fetch variable name from the first boundary condition, can be "head" or
+        # "concentration".
+        varname = boundary_condition._period_data[0]
+        unassigned_grid_boundaries = (
+            unassigned_grid_boundaries & boundary_condition[varname].isnull()
+        )
+
+    return unassigned_grid_boundaries
+
+
 def create_clipped_boundary(
     idomain: GridDataArray,
     state_for_clipped_boundary: GridDataArray,
@@ -37,19 +53,3 @@ def create_clipped_boundary(
     constant_state = state_for_clipped_boundary.where(unassigned_grid_boundaries)
 
     return pkg_type(constant_state, print_input=True, print_flows=True, save_flows=True)
-
-
-def _find_unassigned_grid_boundaries(
-    active_grid_boundary: GridDataArray,
-    boundary_conditions: list[StateType],
-) -> GridDataArray:
-    unassigned_grid_boundaries = active_grid_boundary
-    for boundary_condition in boundary_conditions:
-        # Fetch variable name from the first boundary condition, can be "head" or
-        # "concentration".
-        varname = boundary_condition._period_data[0]
-        unassigned_grid_boundaries = (
-            unassigned_grid_boundaries & boundary_condition[varname].isnull()
-        )
-
-    return unassigned_grid_boundaries
