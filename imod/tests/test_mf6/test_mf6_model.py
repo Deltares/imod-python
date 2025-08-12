@@ -284,7 +284,7 @@ class TestModel:
         assert f"{pkg_id}_clipped" in clipped
         create_clipped_boundary_mock.assert_called_with(
             discretization_mock["idomain"],
-            state_for_boundary,
+            state_for_boundary.to_dataset().copy().__getitem__(),
             [],
             pkg_type,
         )
@@ -333,8 +333,8 @@ class TestModel:
         assert f"{pkg_id}_clipped" in clipped
         create_clipped_boundary_mock.assert_called_with(
             discretization_mock["idomain"],
-            state_for_boundary,
-            [constant_boundary_mock, unassigned_original_constant_boundary],
+            state_for_boundary.to_dataset().copy().__getitem__(),
+            [constant_boundary_mock, unassigned_original_constant_boundary.clip_box()],
             pkg_type,
         )
 
