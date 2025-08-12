@@ -134,7 +134,7 @@ constant_concentration = constant_concentration.expand_dims(species=["salinity"]
 # Add flow model to simulation
 # ----------------------------
 #
-# See the circle.py example for more information.
+# See the :doc:`circle.py` example for more information.
 
 gwf_model = imod.mf6.GroundwaterFlowModel()
 gwf_model["disv"] = imod.mf6.VerticesDiscretization(
