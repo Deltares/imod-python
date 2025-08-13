@@ -24,6 +24,8 @@ Added
 - Added :meth:`imod.mf6.Modflow6Simulation.create_partition_labels` to create
   partition labels for a MODFLOW 6 simulation from its idomain. This is useful
   for splitting a simulation into multiple submodels.
+- Added :class:`imod.mf6.Viscosity` package to specify the viscosity of the
+  groundwater flow model.
 
 Fixed
 ~~~~~
