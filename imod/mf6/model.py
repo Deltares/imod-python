@@ -89,6 +89,10 @@ def _create_boundary_condition_clipped_boundary(
     state_for_boundary: Optional[GridDataArray],
     clip_box_args: tuple,
 ):
+    # Create temporary boundary condition for the original model boundary. This
+    # is used later to see which boundaries can be ignored as they were already
+    # present in the original model. We want to just end up with the boundary
+    # created by the clip.
     unassigned_boundary_original_domain = (
         _create_boundary_condition_for_unassigned_boundary(
             original_model, state_for_boundary

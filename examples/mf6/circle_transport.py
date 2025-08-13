@@ -343,7 +343,9 @@ sim_concentration.isel(time=-1).ugrid.sel(y=0).plot.contourf(
 # domain. To set up the boundary conditions on the clipped edges you can provide
 # a states_for_boundary dictionary. In this case we add the head values for the
 # flow model and the concentration values for the transport model of the
-# computed full domain simulation as the clipped boundary values.
+# computed full domain simulation as the clipped boundary values. You can use
+# this feature to clip a smaller model from an existing larger model, downscale
+# it, and conduct a study in more detail around an area of interest.
 
 states_for_boundary = {
     "flow": sim_head.isel(time=-1, drop=True).drop_vars("z"),
