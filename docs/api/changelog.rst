@@ -46,6 +46,9 @@ Fixed
 - Fix bug where :meth:`imod.mf6.Modflow6Simulation.clip_box` and the
   ``states_for_boundary`` argument would place these bc at the
   incorrect places with unstructured grids.
+- Fixed bug where :meth:`imod.mf6.SourceSinkMixing.from_flow_model` would return
+  an error upon adding a package which cannot have a ``concentration``, such as 
+  :class:`imod.mf6.HorizontalFlowBarrierResistance`.
 
 Changed
 ~~~~~~~
