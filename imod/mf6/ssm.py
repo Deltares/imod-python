@@ -4,6 +4,7 @@ from imod.common.interfaces.iregridpackage import IRegridPackage
 from imod.logging import init_log_decorator, logger
 from imod.mf6 import GroundwaterFlowModel
 from imod.mf6.boundary_condition import BoundaryCondition
+from imod.mf6.package import Package
 from imod.schemata import DTypeSchema
 
 
@@ -13,6 +14,27 @@ def with_index_dim(array_like):
     if arr1d.ndim > 1:
         raise ValueError("array must be 1d")
     return ("index", arr1d)
+
+
+def is_concentration_package(package: Package) -> bool:
+    """
+    Check if the package has auxiliary data with a concentration variable.
+    This is used to determine if a package can be used in SourceSinkMixing.
+
+    Parameters
+    ----------
+    package: Package
+        The package to check.
+
+    Returns
+    -------
+    bool
+        True if the package has a concentration variable in its auxiliary data.
+    """
+    return (
+        hasattr(package, "_auxiliary_data")
+        and "concentration" in package._auxiliary_data.keys()
+    )
 
 
 class SourceSinkMixing(BoundaryCondition, IRegridPackage):
@@ -128,7 +150,7 @@ class SourceSinkMixing(BoundaryCondition, IRegridPackage):
         boundary_types = []
         aux_var_names = []
         for name, package in model.items():
-            if isinstance(package, BoundaryCondition):
+            if is_concentration_package(package):
                 ds = package.dataset
                 # The package should contain a concentration variable, with a
                 # species coordinate.

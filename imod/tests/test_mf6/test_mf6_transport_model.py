@@ -1,11 +1,14 @@
 import textwrap
 
+import geopandas as gpd
 import numpy as np
 import pytest
 import xarray as xr
+from shapely import linestrings
 
 import imod
 from imod.mf6.adv import AdvectionCentral
+from imod.mf6.hfb import SingleLayerHorizontalFlowBarrierResistance
 from imod.mf6.write_context import WriteContext
 
 
@@ -78,6 +81,54 @@ def test_assign_flow_discretization(basic_dis, concentration_fc):
     assert len(tpt_model.keys()) == 3
     assert "dis" in tpt_model.keys()
     assert isinstance(tpt_model["dis"], imod.mf6.StructuredDiscretization)
+
+
+def test_from_flow_model_with_hfb(basic_dis, concentration_fc):
+    """
+    Test that SourceSinkMixing can be created from a flow model with a HFB
+    which has no concentration and should thus be ignored.
+    """
+    # define a grid
+    _, _, bottom = basic_dis
+    idomain = xr.ones_like(
+        concentration_fc.isel(species=0, time=0, drop=True), dtype=int
+    )
+
+    like = idomain.sel(layer=1).astype(np.float32)
+    concentration = concentration_fc.sel(layer=1)
+
+    gwf_model = imod.mf6.GroundwaterFlowModel()
+    gwf_model["dis"] = imod.mf6.StructuredDiscretization(
+        top=200.0, bottom=bottom, idomain=idomain
+    )
+
+    gwf_model["riv-1"] = imod.mf6.River(
+        stage=like,
+        conductance=like,
+        bottom_elevation=like - 2.0,
+        concentration=concentration,
+        concentration_boundary_type="AUX",
+    )
+
+    barrier_y = [5.5, 5.5, 5.5]
+    barrier_x = [82.0, 40.0, 0.0]
+
+    geometry = gpd.GeoDataFrame(
+        geometry=[linestrings(barrier_x, barrier_y)],
+        data={
+            "resistance": [1e3],
+            "layer": [1],
+        },
+    )
+
+    gwf_model["hfb-1"] = SingleLayerHorizontalFlowBarrierResistance(geometry)
+
+    tpt_model = imod.mf6.GroundwaterTransportModel()
+    tpt_model["ssm"] = imod.mf6.SourceSinkMixing.from_flow_model(gwf_model, "salinity")
+    tpt_model["advection"] = AdvectionCentral()
+
+    assert "riv-1" in tpt_model["ssm"]["package_names"]
+    assert "hfb-1" not in tpt_model["ssm"]["package_names"]
 
 
 def test_flowmodel_validation(twri_model):
