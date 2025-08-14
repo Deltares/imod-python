@@ -383,6 +383,16 @@ Flow Packages
     UnsaturatedZoneFlow.copy
     UnsaturatedZoneFlow.is_empty
     UnsaturatedZoneFlow.get_regrid_methods
+    Viscosity
+    Viscosity.write
+    Viscosity.from_file
+    Viscosity.to_netcdf
+    Viscosity.copy
+    Viscosity.is_empty
+    Viscosity.get_regrid_methods
+    Viscosity.mask
+    Viscosity.regrid_like
+    Viscosity.clip_box
     Well
     Well.cleanup
     Well.from_imod5_data

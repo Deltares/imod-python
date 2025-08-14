@@ -1,24 +1,11 @@
 from typing import Optional, Sequence
 
 import numpy as np
-import xarray as xr
 
 from imod.logging import init_log_decorator
 from imod.mf6.package import Package
+from imod.mf6.utilities.dataset import assign_index
 from imod.schemata import DTypeSchema
-
-
-def assign_index(arg):
-    if isinstance(arg, xr.DataArray):
-        arg = arg.values
-    elif not isinstance(arg, (np.ndarray, list, tuple)):
-        raise TypeError("should be a tuple, list, or numpy array")
-
-    arr = np.array(arg)
-    if arr.ndim != 1:
-        raise ValueError("should be 1D")
-
-    return xr.DataArray(arr, dims=("index",))
 
 
 class Buoyancy(Package):
