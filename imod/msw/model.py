@@ -1,9 +1,9 @@
 import collections
+import warnings
 from copy import copy, deepcopy
 from datetime import datetime
 from pathlib import Path
 from typing import Any, Optional, Union, cast
-import warnings
 
 import cftime
 import jinja2
@@ -227,7 +227,9 @@ class MetaSwapModel(Model):
 
         return year, time_since_start_year
 
-    def get_pkgkey(self, pkg_type: type[MetaSwapPackage], optional_package: bool = False) -> str:
+    def get_pkgkey(
+        self, pkg_type: type[MetaSwapPackage], optional_package: bool = False
+    ) -> str:
         """
         Get the package key for a package of type ``pkg_type``. Returns the
         first occurrence of the package type.
@@ -238,7 +240,7 @@ class MetaSwapModel(Model):
             Type of the package to get the key for.
         optional_package: bool
             If True, the method will not raise an error if the package is not found.
-        
+
         Returns
         -------
         str
@@ -251,8 +253,10 @@ class MetaSwapModel(Model):
         if not optional_package:
             raise KeyError(f"Could not find package of type: {pkg_type}")
 
-    def _get_pkg_key(self, pkg_type: type[MetaSwapPackage], optional_package: bool = False):
-        """"
+    def _get_pkg_key(
+        self, pkg_type: type[MetaSwapPackage], optional_package: bool = False
+    ):
+        """ "
         Preserves backwards compatibility with old code (primod) that used this.
         """
         warnings.warn(

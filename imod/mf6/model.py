@@ -4,9 +4,9 @@ import abc
 import collections
 import inspect
 import pathlib
+import warnings
 from pathlib import Path
 from typing import Any, List, Optional, Tuple, Union
-import warnings
 
 import cftime
 import jinja2
@@ -111,7 +111,7 @@ class Modflow6Model(collections.UserDict, IModel, abc.ABC):
         -------
         str
             Key of the discretization package in the model.
-        
+
         Examples
         --------
 
@@ -135,7 +135,7 @@ class Modflow6Model(collections.UserDict, IModel, abc.ABC):
             return diskeys[0]
 
     def _get_diskey(self):
-        """"
+        """ "
         Preserves backwards compatibility with old code (primod) that used this.
         """
         warnings.warn(
