@@ -14,6 +14,7 @@ Model objects & methods
     MetaSwapModel.from_imod5_data
     MetaSwapModel.regrid_like
     MetaSwapModel.clip_box
+    MetaSwapModel.get_pkgkey
 
 
 Packages

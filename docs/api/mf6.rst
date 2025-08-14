@@ -56,6 +56,7 @@ Model objects & methods
     GroundwaterFlowModel.validate
     GroundwaterFlowModel.set_newton
     GroundwaterFlowModel.write
+    GroundwaterFlowModel.get_diskey
     GroundwaterTransportModel
     GroundwaterTransportModel.mask_all_packages
     GroundwaterTransportModel.dump
