@@ -107,6 +107,7 @@ class Viscosity(Package):
     ... )
 
     """
+
     _pkg_id = "vsc"
     _template = Package._initialize_template(_pkg_id)
 
@@ -116,6 +117,7 @@ class Viscosity(Package):
         "reference_concentration": [DTypeSchema(np.floating)],
     }
     _write_schemata = {}
+
     def __init__(
         self,
         reference_viscosity: float,

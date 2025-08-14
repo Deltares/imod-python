@@ -9,7 +9,7 @@ import imod
 
 def test_viscosity_package_simple():
     vsc = imod.mf6.Viscosity(
-        reference_viscosity=8.904E-04,
+        reference_viscosity=8.904e-04,
         viscosity_concentration_slope=[1.92e-6],
         reference_concentration=[0.0],
         modelname=["gwt-1"],
@@ -84,7 +84,6 @@ def test_viscosity_package_full():
     assert actual == expected
 
 
-
 def test_viscosity_package_update_transport_names():
     vsc = imod.mf6.Viscosity(
         reference_viscosity=8.904e-04,
@@ -122,7 +121,6 @@ def test_viscosity_package_update_transport_names():
     actual = vsc._render(directory, "vsc", globaltimes, False)
 
     assert actual == expected
-
 
 
 def test_viscosity_package_update_transport_names_check():
