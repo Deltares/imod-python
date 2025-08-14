@@ -67,6 +67,7 @@ Model objects & methods
     GroundwaterTransportModel.validate
     GroundwaterTransportModel.is_use_newton
     GroundwaterTransportModel.write
+    GroundwaterTransportModel.get_diskey
 
 Discretization
 --------------
