@@ -528,7 +528,7 @@ def test_slice_and_run_with_state(transient_twri_model, tmp_path):
     transient_twri_model["GWF_1"].pop("wel")
     transient_twri_model.write(tmp_path, False, True, False)
     transient_twri_model.run()
-    head = transient_twri_model.open_head()
+    head = transient_twri_model.open_head(simulation_start_time="2000-01-01")
 
     # set the boundary to  recognizable value, in this case 1.23
     state_for_boundary = {"GWF_1": 1.23 * ones_like(head)}
@@ -545,8 +545,8 @@ def test_slice_and_run_with_state(transient_twri_model, tmp_path):
     )
 
     # check that the value 1.23 occurrs in the chd_clipped package of the clipped simulation
-    clipped_boundary = clipped_simulation["GWF_1"]["chd_clipped"].dataset.sel(
-        time=2, layer=1
+    clipped_boundary = (
+        clipped_simulation["GWF_1"]["chd_clipped"].dataset.sel(layer=1).isel(time=2)
     )
     np_array = clipped_boundary["head"].values
     assert (np_array == 1.23).sum() == 33

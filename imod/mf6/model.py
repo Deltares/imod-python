@@ -19,6 +19,7 @@ from jinja2 import Template
 import imod
 from imod.common.interfaces.imodel import IModel
 from imod.common.statusinfo import NestedStatusInfo, StatusInfo, StatusInfoBase
+from imod.common.utilities.clip import clip_box_dataset
 from imod.common.utilities.mask import _mask_all_packages
 from imod.common.utilities.regrid import _regrid_like
 from imod.common.utilities.schemata import (
@@ -35,6 +36,10 @@ from imod.mf6.hfb import HorizontalFlowBarrierBase
 from imod.mf6.mf6_wel_adapter import Mf6Wel
 from imod.mf6.package import Package
 from imod.mf6.riv import River
+from imod.mf6.utilities.clipped_bc_creator import (
+    StateClassType,
+    create_clipped_boundary,
+)
 from imod.mf6.utilities.mf6hfb import merge_hfb_packages
 from imod.mf6.validation_settings import ValidationSettings
 from imod.mf6.wel import GridAgnosticWell
@@ -54,11 +59,76 @@ def pkg_has_cleanup(pkg: Package):
     return any(isinstance(pkg, pkgtype) for pkgtype in PKGTYPES_WITH_CLEANUP)
 
 
+def _create_boundary_condition_for_unassigned_boundary(
+    model: Modflow6Model,
+    state_for_boundary: Optional[GridDataArray],
+    additional_boundaries: Optional[list[StateClassType]] = None,
+):
+    if state_for_boundary is None:
+        return None
+
+    pkg_type = model._boundary_state_pkg_type
+    constant_state_packages = [
+        pkg for _, pkg in model.items() if isinstance(pkg, pkg_type)
+    ]
+
+    additional_boundaries = [
+        item for item in additional_boundaries or [] if item is not None
+    ]
+
+    constant_state_packages.extend(additional_boundaries)
+
+    return create_clipped_boundary(
+        model.domain, state_for_boundary, constant_state_packages, pkg_type
+    )
+
+
+def _create_boundary_condition_clipped_boundary(
+    original_model: Modflow6Model,
+    clipped_model: Modflow6Model,
+    state_for_boundary: Optional[GridDataArray],
+    clip_box_args: tuple,
+):
+    # Create temporary boundary condition for the original model boundary. This
+    # is used later to see which boundaries can be ignored as they were already
+    # present in the original model. We want to just end up with the boundary
+    # created by the clip.
+    unassigned_boundary_original_domain = (
+        _create_boundary_condition_for_unassigned_boundary(
+            original_model, state_for_boundary
+        )
+    )
+    # Clip the unassigned boundary to the clipped model's domain, required to
+    # avoid topological errors later.
+    if unassigned_boundary_original_domain is not None:
+        unassigned_boundary_clipped = unassigned_boundary_original_domain.clip_box(
+            *clip_box_args
+        )
+    else:
+        unassigned_boundary_clipped = None
+
+    if state_for_boundary is not None:
+        # Clip box as dataset, temporarily add variable name to convert to
+        # dataset, then turn back into DataArray.
+        varname = original_model._boundary_state_pkg_type._period_data[0]
+        state_for_boundary = state_for_boundary.to_dataset(name=varname)
+        state_for_boundary_clipped = clip_box_dataset(
+            state_for_boundary, *clip_box_args
+        )[varname]
+    else:
+        state_for_boundary_clipped = None
+
+    return _create_boundary_condition_for_unassigned_boundary(
+        clipped_model, state_for_boundary_clipped, [unassigned_boundary_clipped]
+    )
+
+
 class Modflow6Model(collections.UserDict, IModel, abc.ABC):
     _mandatory_packages: tuple[str, ...] = ()
     _init_schemata: SchemataDict = {}
     _model_id: Optional[str] = None
     _template: Template
+    _boundary_state_pkg_type: StateClassType
 
     @staticmethod
     def _initialize_template(name: str) -> Template:
@@ -584,26 +654,61 @@ class Modflow6Model(collections.UserDict, IModel, abc.ABC):
         """
         Clip a model by a bounding box (time, layer, y, x).
 
-        Slicing intervals may be half-bounded, by providing None:
-
-        * To select 500.0 <= x <= 1000.0:
-          ``clip_box(x_min=500.0, x_max=1000.0)``.
-        * To select x <= 1000.0: ``clip_box(x_min=None, x_max=1000.0)``
-          or ``clip_box(x_max=1000.0)``.
-        * To select x >= 500.0: ``clip_box(x_min = 500.0, x_max=None.0)``
-          or ``clip_box(x_min=1000.0)``.
-
         Parameters
         ----------
-        time_min: optional
+        time_min: optional, np.datetime64
+            Start time to select. Data will be forward filled to this date. If
+            time_min is before the start time of the dataset, data is
+            backfilled.
         time_max: optional
+            End time to select.
         layer_min: optional, int
+            Minimum layer to select.
         layer_max: optional, int
+            Maximum layer to select.
         x_min: optional, float
+            Minimum x-coordinate to select.
         x_max: optional, float
+            Maximum x-coordinate to select.
         y_min: optional, float
+            Minimum y-coordinate to select.
         y_max: optional, float
-        state_for_boundary: optional, float
+            Maximum y-coordinate to select.
+        state_for_boundary : optional, Union[xr.DataArray, xu.UgridDataArray]
+            A grids with states that are used to put as boundary values. This
+            model will get a :class:`imod.mf6.ConstantHead`.
+
+        Returns
+        -------
+        clipped : GroundwaterFlowModel
+            A new model that is clipped to the specified bounding box.
+
+        Examples
+        --------
+        Slicing intervals may be half-bounded, by providing None:
+
+        To select 500.0 <= x <= 1000.0:
+
+        >>> gwf.clip_box(x_min=500.0, x_max=1000.0)
+
+        To select x <= 1000.0:
+
+        >>> gwf.clip_box(x_max=1000.0)``
+
+        To select x >= 500.0:
+
+        >>> gwf.clip_box(x_min=500.0)
+
+        To select a time interval, you can use datetime64:
+
+        >>> gwf.clip_box(time_min=np.datetime64("2020-01-01"), time_max=np.datetime64("2020-12-31"))
+
+        To clip an area and set a boundary condition at the clipped boundary:
+
+        >>> clipped_gwf = gwf.clip_box(
+        ...     x_min=500.0, x_max=1000.0, y_min=500.0, y_max=1000.0,
+        ...     state_for_boundary=heads
+        ... )
         """
         supported, error_with_object = self._is_clipping_supported()
         if not supported:
@@ -611,7 +716,7 @@ class Modflow6Model(collections.UserDict, IModel, abc.ABC):
                 f"model cannot be clipped due to presence of package '{error_with_object}' in model"
             )
 
-        clipped = self._clip_box_packages(
+        clip_box_args = (
             time_min,
             time_max,
             layer_min,
@@ -621,6 +726,20 @@ class Modflow6Model(collections.UserDict, IModel, abc.ABC):
             y_min,
             y_max,
         )
+
+        clipped = self._clip_box_packages(
+            *clip_box_args,
+        )
+
+        clipped_boundary_condition = _create_boundary_condition_clipped_boundary(
+            self, clipped, state_for_boundary, clip_box_args
+        )
+        state_pkg_id = self._boundary_state_pkg_type._pkg_id
+        pkg_name = f"{state_pkg_id}_clipped"
+        if clipped_boundary_condition is not None:
+            clipped[pkg_name] = clipped_boundary_condition
+
+        clipped.purge_empty_packages()
 
         return clipped
 

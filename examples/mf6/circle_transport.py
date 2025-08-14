@@ -108,6 +108,7 @@ rch_concentration = rch_concentration.expand_dims(species=["salinity"])
 
 
 # %%
+#
 # Unlike a recharge boundary, with a prescribed head boundary we don't know a
 # priori whether water will flow in over the boundary or leave across the
 # boundary. If water flows into the model over the boundary, it carries a
@@ -117,19 +118,14 @@ rch_concentration = rch_concentration.expand_dims(species=["salinity"])
 # In this example we set the prescribed head value to 0.0 and the external
 # concentration to 35.0 as well. The boundary only operates on the top layer.
 
-chd_location = xu.zeros_like(idomain.sel(layer=1), dtype=bool).ugrid.binary_dilation(
+ghb_location = xu.zeros_like(idomain.sel(layer=1), dtype=bool).ugrid.binary_dilation(
     border_value=True
 )
-constant_head = xu.full_like(idomain, 0.0, dtype=float).where(chd_location)
-# Approximate face area
-face_area = (1000.0 / 6) ** 2 * 0.5
-
-conductance = xu.full_like(idomain, face_area * k_value, dtype=float).where(
-    chd_location
-)
+constant_head = xu.full_like(idomain, 0.0, dtype=float).where(ghb_location)
+conductance = (idomain * grid.area * k_value).where(ghb_location)
 
 constant_concentration = xu.full_like(constant_head, max_concentration).where(
-    chd_location
+    ghb_location
 )
 constant_concentration = constant_concentration.expand_dims(species=["salinity"])
 
@@ -138,7 +134,7 @@ constant_concentration = constant_concentration.expand_dims(species=["salinity"]
 # Add flow model to simulation
 # ----------------------------
 #
-# See the circle.py example for more information.
+# See the :doc:`circle.py` example for more information.
 
 gwf_model = imod.mf6.GroundwaterFlowModel()
 gwf_model["disv"] = imod.mf6.VerticesDiscretization(
@@ -277,7 +273,7 @@ simulation["transport_solver"] = imod.mf6.Solution(
 # %%
 # We'll create a new directory in which we will write and run the model.
 
-modeldir = imod.util.temporary_directory()
+modeldir = imod.util.temporary_directory() / "full"
 simulation.write(modeldir, binary=False)
 
 # %%
@@ -295,8 +291,8 @@ simulation.run()
 # Open the results
 # ----------------
 
-sim_concentration = simulation.open_concentration().compute()
-sim_head = simulation.open_head().compute()
+sim_concentration = simulation.open_concentration().compute().reindex_like(idomain)
+sim_head = simulation.open_head().compute().reindex_like(idomain)
 
 # %%
 # Assign coordinates to output
@@ -337,6 +333,66 @@ ax.set_aspect(1)
 
 fig, ax = plt.subplots()
 sim_concentration.isel(time=-1).ugrid.sel(y=0).plot.contourf(
+    ax=ax, x="mesh2d_x", y="z", cmap="RdYlBu_r"
+)
+# %%
+# Slice the model domain
+# ----------------------
+#
+# We may also quickly setup a smaller model. We'll select half of the original
+# domain. To set up the boundary conditions on the clipped edges you can provide
+# a states_for_boundary dictionary. In this case we add the head values for the
+# flow model and the concentration values for the transport model of the
+# computed full domain simulation as the clipped boundary values. You can use
+# this feature to clip a smaller model from an existing larger model, downscale
+# it, and conduct a study in more detail around an area of interest.
+
+states_for_boundary = {
+    "flow": sim_head.isel(time=-1, drop=True).drop_vars("z"),
+    "transport": sim_concentration.isel(time=-1, drop=True).drop_vars("z"),
+}
+
+half_simulation = simulation.clip_box(
+    x_max=0.1, states_for_boundary=states_for_boundary
+)
+
+# %%
+#
+# Let's run the model, read the results, and visualize.
+modeldir = imod.util.temporary_directory() / "half"
+half_simulation.write(modeldir)
+half_simulation.run()
+
+# %%
+# Open the results
+# ----------------
+
+half_sim_concentration = half_simulation.open_concentration().compute()
+half_sim_head = half_simulation.open_head().compute()
+
+# %%
+# Assign these new coordinate values to the dataset
+half_sim_head = half_sim_head.assign_coords(**coords)
+half_sim_concentration = half_sim_concentration.assign_coords(**coords)
+
+
+# %%
+# Visualize the results
+# ---------------------
+#
+# We can quickly and easily visualize the output with the plotting functions
+# provided by xarray and xugrid:
+
+fig, ax = plt.subplots()
+half_sim_head.isel(time=-1, layer=0).ugrid.plot(ax=ax)
+ax.set_aspect(1)
+
+# %%
+# We can draw a crossection through the center by selecting y=0, for which we
+# can plot the contours as follows:
+
+fig, ax = plt.subplots()
+half_sim_concentration.isel(time=-1).ugrid.sel(y=0).plot.contourf(
     ax=ax, x="mesh2d_x", y="z", cmap="RdYlBu_r"
 )
 # %%

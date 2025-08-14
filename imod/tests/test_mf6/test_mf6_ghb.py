@@ -82,6 +82,7 @@ def test_from_imod5_constant(imod5_dataset_periods, tmp_path):
     target_npf = NodePropertyFlow.from_imod5_data(
         imod5_dataset, target_dis.dataset["idomain"]
     )
+    original_ghb = deepcopy(imod5_dataset["ghb"])
     layer = imod5_dataset["ghb"]["conductance"].coords["layer"].data
     imod5_dataset["ghb"]["conductance"] = xr.DataArray(
         [1.0], coords={"layer": layer}, dims=("layer",)
@@ -117,6 +118,9 @@ def test_from_imod5_constant(imod5_dataset_periods, tmp_path):
     write_context = WriteContext(simulation_directory=tmp_path, use_binary=False)
     ghb._write("ghb", [1], write_context)
 
+    # teardown
+    imod5_dataset["ghb"] = original_ghb
+
 
 def test_from_imod5_and_cleanup_constant(imod5_dataset_periods, tmp_path):
     period_data = imod5_dataset_periods[1]
@@ -125,6 +129,7 @@ def test_from_imod5_and_cleanup_constant(imod5_dataset_periods, tmp_path):
     target_npf = NodePropertyFlow.from_imod5_data(
         imod5_dataset, target_dis.dataset["idomain"]
     )
+    original_ghb = deepcopy(imod5_dataset["ghb"])
     layer = imod5_dataset["ghb"]["conductance"].coords["layer"].data
     imod5_dataset["ghb"]["conductance"] = xr.DataArray(
         [1.0], coords={"layer": layer}, dims=("layer",)
@@ -142,6 +147,8 @@ def test_from_imod5_and_cleanup_constant(imod5_dataset_periods, tmp_path):
     )
 
     ghb.cleanup(target_dis)
+    # teardown
+    imod5_dataset["ghb"] = original_ghb
 
 
 def test_from_imod5_planar(imod5_dataset_periods, tmp_path):
