@@ -30,6 +30,7 @@ Grid packages
     GridData.clip_box
     GridData.from_imod5_data
     GridData.get_regrid_methods
+    GridData.generate_index_array
     GridData.write
     Infiltration
     Infiltration.regrid_like

@@ -301,7 +301,7 @@ class MetaSwapModel(Model):
         # Get index and svat
         grid_key = self._get_pkg_key(GridData)
         grid_pkg = cast(GridData, self[grid_key])
-        index, svat = grid_pkg._generate_index_array()
+        index, svat = grid_pkg.generate_index_array()
 
         # write package contents
         for pkgname in self:
