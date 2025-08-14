@@ -229,7 +229,7 @@ class MetaSwapModel(Model):
 
     def get_pkgkey(
         self, pkg_type: type[MetaSwapPackage], optional_package: bool = False
-    ) -> str:
+    ) -> str | None:
         """
         Get the package key for a package of type ``pkg_type``. Returns the
         first occurrence of the package type.
@@ -239,7 +239,8 @@ class MetaSwapModel(Model):
         pkg_type: type[MetaSwapPackage]
             Type of the package to get the key for.
         optional_package: bool
-            If True, the method will not raise an error if the package is not found.
+            If True, the method will not raise an error if the package is not
+            found. Method returns None in this case.
 
         Returns
         -------
@@ -253,9 +254,11 @@ class MetaSwapModel(Model):
         if not optional_package:
             raise KeyError(f"Could not find package of type: {pkg_type}")
 
+        return None
+
     def _get_pkg_key(
         self, pkg_type: type[MetaSwapPackage], optional_package: bool = False
-    ):
+    ) -> str | None:
         """ "
         Preserves backwards compatibility with old code (primod) that used this.
         """
