@@ -121,6 +121,7 @@ def test_from_imod5_constant(imod5_dataset_periods, tmp_path):
     # teardown
     imod5_dataset["ghb"] = original_ghb
 
+
 def test_from_imod5_and_cleanup_constant(imod5_dataset_periods, tmp_path):
     period_data = imod5_dataset_periods[1]
     imod5_dataset = imod5_dataset_periods[0]
@@ -148,6 +149,7 @@ def test_from_imod5_and_cleanup_constant(imod5_dataset_periods, tmp_path):
     ghb.cleanup(target_dis)
     # teardown
     imod5_dataset["ghb"] = original_ghb
+
 
 def test_from_imod5_planar(imod5_dataset_periods, tmp_path):
     period_data = imod5_dataset_periods[1]

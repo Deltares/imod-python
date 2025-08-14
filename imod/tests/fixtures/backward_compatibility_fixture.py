@@ -1,11 +1,11 @@
 from copy import deepcopy
 from datetime import datetime
-from filelock import FileLock
 from typing import Any
 from zipfile import ZipFile
 
 import pytest
 import xarray as xr
+from filelock import FileLock
 
 import imod
 from imod.data.sample_data import REGISTRY
