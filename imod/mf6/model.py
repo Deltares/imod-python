@@ -4,6 +4,7 @@ import abc
 import collections
 import inspect
 import pathlib
+import warnings
 from pathlib import Path
 from typing import Any, List, Optional, Tuple, Union
 
@@ -170,7 +171,24 @@ class Modflow6Model(collections.UserDict, IModel, abc.ABC):
         for k, v in dict(*args, **kwargs).items():
             self[k] = v
 
-    def _get_diskey(self):
+    def get_diskey(self) -> str:
+        """
+        Get discretization key from the model. The key is the name of the
+        package, which is user defined. If multiple discretizations are found,
+        an error is raised.
+
+        Returns
+        -------
+        str
+            Key of the discretization package in the model.
+
+        Examples
+        --------
+
+        >>> model = Modflow6Model()
+        >>> model["dis"] = StructuredDiscretization(...)
+        >>> model.get_diskey() # returns "dis"
+        """
         dis_pkg_ids = ["dis", "disv", "disu"]
 
         diskeys = [
@@ -185,6 +203,16 @@ class Modflow6Model(collections.UserDict, IModel, abc.ABC):
             raise ValueError("No model discretization found")
         else:
             return diskeys[0]
+
+    def _get_diskey(self):
+        """ "
+        Preserves backwards compatibility with old code (primod) that used this.
+        """
+        warnings.warn(
+            "Method '_get_diskey' is deprecated, use 'get_diskey' instead.",
+            DeprecationWarning,
+        )
+        return self.get_diskey()
 
     def _get_pkgkey(self, pkg_id):
         """
@@ -284,7 +312,7 @@ class Modflow6Model(collections.UserDict, IModel, abc.ABC):
         Union[xr.DataArray, xu.UgridDataArray],
         Union[xr.DataArray, xu.UgridDataArray],
     ]:
-        discretization = self[self._get_diskey()]
+        discretization = self[self.get_diskey()]
         if discretization is None:
             raise ValueError("Discretization not found")
         top = discretization["top"]
@@ -329,7 +357,7 @@ class Modflow6Model(collections.UserDict, IModel, abc.ABC):
             validation_context = ValidationSettings(validate=True)
 
         try:
-            diskey = self._get_diskey()
+            diskey = self.get_diskey()
         except Exception as e:
             status_info = StatusInfo(f"{model_name} model")
             status_info.add_error(str(e))
@@ -887,12 +915,12 @@ class Modflow6Model(collections.UserDict, IModel, abc.ABC):
 
     @property
     def domain(self):
-        dis = self._get_diskey()
+        dis = self.get_diskey()
         return self[dis]["idomain"]
 
     @property
     def bottom(self):
-        dis = self._get_diskey()
+        dis = self.get_diskey()
         return self[dis]["bottom"]
 
     def __repr__(self) -> str:

@@ -83,9 +83,16 @@ class GridData(MetaSwapPackage, IRegridPackage):
 
         self._pkgcheck()
 
-    def _generate_index_array(self):
+    def generate_index_array(self) -> tuple[np.ndarray, xr.DataArray]:
         """
-        Generate index arrays to be used on other packages
+        Generate index array and svat grid to be used on other packages.
+
+        Returns
+        -------
+        tuple[np.ndarray, xr.DataArray]
+            Index array and svat grid.
+            The index array is a 1D array with the index of the active cells.
+            The svat grid is a 2D array with the SVAT numbers for each cell.
         """
         area = self.dataset["area"]
         active = self.dataset["active"]
