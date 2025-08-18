@@ -66,7 +66,7 @@ def test_get_starttime(msw_model):
 
 
 def test_get_pkgkey(msw_model):
-    pkg_id = msw_model._get_pkg_key(msw.GridData)
+    pkg_id = msw_model.get_pkgkey(msw.GridData)
 
     assert pkg_id == "grid"
 

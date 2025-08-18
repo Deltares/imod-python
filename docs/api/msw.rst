@@ -14,6 +14,7 @@ Model objects & methods
     MetaSwapModel.from_imod5_data
     MetaSwapModel.regrid_like
     MetaSwapModel.clip_box
+    MetaSwapModel.get_pkgkey
 
 
 Packages
@@ -30,6 +31,7 @@ Grid packages
     GridData.clip_box
     GridData.from_imod5_data
     GridData.get_regrid_methods
+    GridData.generate_index_array
     GridData.write
     Infiltration
     Infiltration.regrid_like

@@ -890,7 +890,7 @@ class Modflow6Simulation(collections.UserDict, ISimulation):
         else:
             flow_model_path = self.directory / modelname
 
-        diskey = model._get_diskey()
+        diskey = model.get_diskey()
         dis_id = model[diskey]._pkg_id
         return flow_model_path / f"{diskey}.{dis_id}.grb"
 

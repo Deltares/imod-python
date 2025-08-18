@@ -302,7 +302,7 @@ def _regrid_like(
         raise ValueError(
             f"regridding this model cannot be done due to the presence of package {error_with_object_name}"
         )
-    diskey = model._get_diskey()
+    diskey = model.get_diskey()
     dis = model[diskey]
     if is_unstructured(dis["idomain"]) and not is_unstructured(target_grid):
         raise NotImplementedError(
