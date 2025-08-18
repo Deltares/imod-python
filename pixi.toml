@@ -61,19 +61,7 @@ generate-sbom-imod-python-noarch = { cmd = [
     "-m", "imod", 
     "--system", "--sbom", "spdx", 
     "--format", "json", "--output", "imod-python.spdx.json"
-], env = { "PATH" = "$PATH$path_sep$CONDA_PREFIX/Lib/site-packages/magic/libmagic" }, inputs = ["pyproject.toml"], outputs = ["imod-python.spdx.json"], depends-on = ["install"] }
-
-[[target.win-64.tasks.generate-sbom-imod-python.depends-on]]
-task = "generate-sbom-imod-python-noarch"
-args = [";"]
-
-[[target.linux.tasks.generate-sbom-imod-python.depends-on]]
-task = "generate-sbom-imod-python-noarch"
-args = [":"]
-
-[[target.osx.tasks.generate-sbom-imod-python.depends-on]]
-task = "generate-sbom-imod-python-noarch"
-args = [":"]
+], env = { "PATH" = "$PATH;$CONDA_PREFIX/Lib/site-packages/magic/libmagic" }, inputs = ["pyproject.toml"], outputs = ["imod-python.spdx.json"], depends-on = ["install"] }
 
 [dependencies]
 affine = "*"
