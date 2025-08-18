@@ -6,12 +6,12 @@
     "creators": [
       "Tool: sbom4python-0.12.4"
     ],
-    "created": "2025-08-18T15:44:31Z",
+    "created": "2025-08-18T16:24:34Z",
     "licenseListVersion": "3.26"
   },
   "name": "Python-imod",
   "dataLicense": "CC0-1.0",
-  "documentNamespace": "http://spdx.org/spdxdocs/Python-imod-d4153b54-8724-4f0f-8f59-6bd0bfd38f8f",
+  "documentNamespace": "http://spdx.org/spdxdocs/Python-imod-b9026ff7-0ffd-48ad-a124-26505142f302",
   "packages": [
     {
       "SPDXID": "SPDXRef-1-imod",
@@ -715,16 +715,16 @@
     {
       "SPDXID": "SPDXRef-18-filelock",
       "name": "filelock",
-      "versionInfo": "3.18.0",
+      "versionInfo": "3.19.1",
       "primaryPackagePurpose": "LIBRARY",
       "supplier": "NOASSERTION",
-      "downloadLocation": "https://pypi.org/project/filelock/3.18.0/#files",
+      "downloadLocation": "https://pypi.org/project/filelock/3.19.1/#files",
       "filesAnalyzed": false,
       "homepage": "https://github.com/tox-dev/py-filelock",
       "checksums": [
         {
           "algorithm": "SHA256",
-          "checksumValue": "c401f4f8377c4464e6db25fff06205fd89bdd83b65eb0488ed1b160f780e21de"
+          "checksumValue": "d38e30481def20772f5baf097c122c3babc4fcdb7e14e57049eb9d88c6dc017d"
         }
       ],
       "licenseConcluded": "NOASSERTION",
@@ -732,7 +732,7 @@
       "licenseComments": "filelock declares The Unlicense (Unlicense) which is not currently a valid SPDX License identifier or expression.",
       "copyrightText": "NOASSERTION",
       "summary": "A platform independent file lock.",
-      "releaseDate": "2025-03-14T07:11:39Z",
+      "releaseDate": "2025-08-14T16:56:01Z",
       "externalRefs": [
         {
           "referenceCategory": "OTHER",
@@ -752,7 +752,7 @@
         {
           "referenceCategory": "PACKAGE-MANAGER",
           "referenceType": "purl",
-          "referenceLocator": "pkg:pypi/filelock@3.18.0"
+          "referenceLocator": "pkg:pypi/filelock@3.19.1"
         }
       ]
     },
@@ -1090,33 +1090,33 @@
     {
       "SPDXID": "SPDXRef-26-fonttools",
       "name": "fonttools",
-      "versionInfo": "4.59.0",
+      "versionInfo": "4.59.1",
       "primaryPackagePurpose": "LIBRARY",
       "supplier": "Organization: Just van Rossum (just@letterror.com)",
-      "downloadLocation": "https://pypi.org/project/fonttools/4.59.0/#files",
+      "downloadLocation": "https://pypi.org/project/fonttools/4.59.1/#files",
       "filesAnalyzed": false,
       "homepage": "http://github.com/fonttools/fonttools",
       "checksums": [
         {
           "algorithm": "SHA256",
-          "checksumValue": "524133c1be38445c5c0575eacea42dbd44374b310b1ffc4b60ff01d881fabb96"
+          "checksumValue": "e90a89e52deb56b928e761bb5b5f65f13f669bfd96ed5962975debea09776a23"
         }
       ],
       "licenseConcluded": "MIT",
       "licenseDeclared": "MIT",
       "copyrightText": "NOASSERTION",
       "summary": "Tools to manipulate font files",
-      "releaseDate": "2025-07-16T12:03:33Z",
+      "releaseDate": "2025-08-14T16:26:10Z",
       "externalRefs": [
         {
           "referenceCategory": "PACKAGE-MANAGER",
           "referenceType": "purl",
-          "referenceLocator": "pkg:pypi/fonttools@4.59.0"
+          "referenceLocator": "pkg:pypi/fonttools@4.59.1"
         },
         {
           "referenceCategory": "SECURITY",
           "referenceType": "cpe23Type",
-          "referenceLocator": "cpe:2.3:a:just_van_rossum:fonttools:4.59.0:*:*:*:*:*:*:*"
+          "referenceLocator": "cpe:2.3:a:just_van_rossum:fonttools:4.59.1:*:*:*:*:*:*:*"
         }
       ]
     },
@@ -2474,23 +2474,23 @@
     {
       "SPDXID": "SPDXRef-58-xarray",
       "name": "xarray",
-      "versionInfo": "2025.7.1",
+      "versionInfo": "2025.8.0",
       "primaryPackagePurpose": "LIBRARY",
       "supplier": "Person: xarray Developers (xarray@googlegroups.com)",
-      "downloadLocation": "https://pypi.org/project/xarray/2025.7.1/#files",
+      "downloadLocation": "https://pypi.org/project/xarray/2025.8.0/#files",
       "filesAnalyzed": false,
       "homepage": "https://xarray.dev/",
       "checksums": [
         {
           "algorithm": "SHA256",
-          "checksumValue": "e8647b659e53bd350d7c5a91c34dd4122ad6a3ca0bc41399d424a7c0273c7635"
+          "checksumValue": "1c454f32b38c93df68e450238c9473fe21248b8572d42ddd58c5170bb30934ee"
         }
       ],
       "licenseConcluded": "NOASSERTION",
       "licenseDeclared": "NOASSERTION",
       "copyrightText": "NOASSERTION",
       "summary": "N-D labeled arrays and datasets in Python",
-      "releaseDate": "2025-07-10T04:53:05Z",
+      "releaseDate": "2025-08-14T16:52:10Z",
       "externalRefs": [
         {
           "referenceCategory": "OTHER",
@@ -2515,12 +2515,12 @@
         {
           "referenceCategory": "PACKAGE-MANAGER",
           "referenceType": "purl",
-          "referenceLocator": "pkg:pypi/xarray@2025.7.1"
+          "referenceLocator": "pkg:pypi/xarray@2025.8.0"
         },
         {
           "referenceCategory": "SECURITY",
           "referenceType": "cpe23Type",
-          "referenceLocator": "cpe:2.3:a:xarray_developers:xarray:2025.7.1:*:*:*:*:*:*:*"
+          "referenceLocator": "cpe:2.3:a:xarray_developers:xarray:2025.8.0:*:*:*:*:*:*:*"
         }
       ]
     },
