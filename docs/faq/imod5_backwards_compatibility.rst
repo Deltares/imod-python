@@ -252,3 +252,16 @@ of this function.
    NADVFD, Weighting scheme Finite-difference, ":class:`imod.mf6.AdvectionUpstream`, :class:`imod.mf6.AdvectionCentral`", 
    ISOLVE, Start a simulation after generating a RUNFILE or NAMFILE, :meth:`imod.mf6.Modflow6Simulation.run`, 
    MODFLOW6, MODFLOW 6 executable, :meth:`imod.mf6.Modflow6Simulation.run`, ``mf6path``
+
+Some things previously configurable in iMOD5 are fixed in iMOD Python:
+
+.. csv-table::
+   :header-rows: 1
+   :stub-columns: 1
+
+   BATCH argument, description, iMOD Python
+   ICONSISTENCY=1 & MINTHICKNESS=0.0, "Correct layer thickness of ``=< MINTHICKNESS`` automatically. This fixed setting combination is also enforced by iMOD5 for MODFLOW6 models", :meth:`imod.mf6.StructuredDiscretization.from_imod5_data`
+   SSYSTEM=0, "Aggregating packages of the same type together is not supported yet in iMOD Python.", 
+   ICONCHK=0, "Correct drainage levels automatically during simulation. ICONCHK=0 is also enforced by iMOD5 for MODFLOW6 models and is not supported in iMOD Python.", 
+   DWEL=1, "Overrule any intermediate dates specfied for the WEL package in the PRJ file.", :meth:`imod.mf6.Well.from_imod5_data`, 
+
