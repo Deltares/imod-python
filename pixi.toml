@@ -57,6 +57,26 @@ examples = { cmd = [
     "--junitxml=examples_report.xml",
 ], depends-on = ["install"], cwd = "imod/tests", env = { IMOD_DATA_DIR = ".imod_data" } }
 
+[tasks.generate-sbom-imod-python-noarch]
+args = [{ "arg" = "path_sep" }]
+cmd = "sbom4python -m imod --system --sbom spdx --format json --output imod-python.spdx.json"
+env = { "PATH" = "$PATH$path_sep$CONDA_PREFIX/Lib/site-packages/magic/libmagic" }
+inputs = ["pyproject.toml"]
+outputs = ["imod-python.spdx.json"]
+depends-on = ["install"]
+
+[[target.win-64.tasks.generate-sbom-imod-python.depends-on]]
+task = "generate-sbom-imod-python-noarch"
+args = [";"]
+
+[[target.linux.tasks.generate-sbom-imod-python.depends-on]]
+task = "generate-sbom-imod-python-noarch"
+args = [":"]
+
+[[target.osx.tasks.generate-sbom-imod-python.depends-on]]
+task = "generate-sbom-imod-python-noarch"
+args = [":"]
+
 [dependencies]
 affine = "*"
 black = "*"
@@ -123,6 +143,8 @@ pytest-timeout = ">=2.3.1,<3"
 
 [pypi-dependencies]
 mypy2junit = "*"
+sbom4python = ">=0.12.3"
+python-magic = ">=0.4.27"
 
 [feature.interactive.dependencies]
 ipykernel = "*"
