@@ -220,7 +220,8 @@ RUNFILE
 The RUNFILE BATCH function is used in iMOD5 to create a MODFLOW 6 runfile or
 namfile from an iMOD5 projectfile. The following table lists the arguments of
 the function and a pointer to the equivalent iMOD Python function and argument
-of this function.
+of this function. The method that contains most of the logic of the RUNFILE BATCH
+function is :meth:`imod.mf6.Modflow6Simulation.from_imod5_data`.
 
 .. csv-table::
    :header-rows: 1
@@ -253,7 +254,7 @@ of this function.
    ISOLVE, Start a simulation after generating a RUNFILE or NAMFILE, :meth:`imod.mf6.Modflow6Simulation.run`, 
    MODFLOW6, MODFLOW 6 executable, :meth:`imod.mf6.Modflow6Simulation.run`, ``mf6path``
 
-Some things previously configurable in iMOD5 are fixed in iMOD Python:
+Some settings previously configurable in iMOD5 are fixed in iMOD Python:
 
 .. csv-table::
    :header-rows: 1
@@ -264,4 +265,335 @@ Some things previously configurable in iMOD5 are fixed in iMOD Python:
    SSYSTEM=0, "Aggregating packages of the same type together is not supported yet in iMOD Python.", 
    ICONCHK=0, "Correct drainage levels automatically during simulation. ICONCHK=0 is also enforced by iMOD5 for MODFLOW6 models and is not supported in iMOD Python.", 
    DWEL=1, "Overrule any intermediate dates specfied for the WEL package in the PRJ file.", :meth:`imod.mf6.Well.from_imod5_data`, 
+
+GENSNAPTOGRID
+*************
+
+The GENSNAPTOGRID function can be used to rasterize a GEN file for a given
+raster. See
+:meth:`imod.mf6.SingleLayerHorizontalFlowBarrierResistance.snap_to_grid` and
+:meth:`imod.mf6.HorizontalFlowBarrierResistance.snap_to_grid` to snap lines to
+the grid. The table below lists pointers to the functions and arguments that can
+be used to achieve full feature parity with the iMOD5 BATCH function.
+
+.. csv-table::
+   :header-rows: 1
+   :stub-columns: 1
+
+   BATCH argument, description, iMOD Python, argument
+   GENFILE_IN, Name of a GEN file that needs to be snapped to the grid, ":meth:`imod.mf6.SingleLayerHorizontalFlowBarrierResistance.from_imod5_data`, :func:`imod.formats.gen.read`", ``path``
+   GENFILE_OUT, Name of a GEN file that will be created, :func:`imod.formats.gen.write`, ``path``
+   IDFFILE, Name of an IDF file that will be used to snap the GEN file to, :func:`imod.formats.idf.open`, ``path``
+   WINDOW, Enter the coordinates of the window that need to be computed solely, :meth:`imod.mf6.SingleLayerHorizontalFlowBarrierResistance.snap_to_grid`, "``dis``"
+   CELLSIZE, Specify a cell size to be used, :func:`imod.util.empty_2d`, "``dx``, ``dy``"
+   I3D, Specify whether the GEN file needs to be transformed to 3D (a vertical polygon), :class:`imod.mf6.HorizontalFlowBarrierResistance`,
+   IDF_TOP, The uppermost values of the snapped vertical polygon, :func:`imod.prepare.linestring_to_square_zpolygons`, ``barrier_ztop``
+   IDF_BOT, The lowermost values of the snapped vertical polygon, :func:`imod.prepare.linestring_to_square_zpolygons`, ``barrier_zbot``
+
+IMODPATH
+********
+
+The function IMODPATH computes flowlines based on the budget terms that result
+from the iMODFLOW computation. The equivalent functionality in MODFLOW6 is the
+particle tracking (PRT) model. This is currently not supported in iMOD Python.
+
+ISGGRID
+*******
+
+Use this function to rasterize the selected ISG-files into IDF-files that can be
+used by iMODFLOW in a runfile. There currently is no equivalent functionality in
+iMOD Python to read and grid ISG files.
+
+MF6TOIDF
+********
+
+Use this post-processing function to convert standard MODFLOW6 output to IDF
+files. The eequivalent functionality in iMOD Python is mostly covered by the
+following functions: :func:`imod.mf6.open_hds`, :func:`imod.mf6.open_cbc`,
+:meth:`Modflow6Simulation.open_flow_budget`,
+:meth:`Modflow6Simulation.open_transport_budget`,
+:meth:`Modflow6Simulation.open_head`,
+:meth:`Modflow6Simulation.open_concentration`. The table below lists pointers to
+the functions and arguments that can be used to achieve full feature parity with
+the iMOD5 BATCH function. You can write the data to IDF files using
+:func:`imod.formats.idf.save`.
+
+.. csv-table::
+   :header-rows: 1
+   :stub-columns: 1
+
+   BATCH argument, description, iMOD Python, argument
+   ISTEADY, Indicates that the first entry in the output file is a steady-state solution, , 
+   SDATE, The initial date of the model, ":func:`imod.mf6.open_hds`, :func:`imod.mf6.open_cbc`" , ``simulation_start_time``
+   DATEFORMAT, Enforce a long date format in the produced IDF filename, :func:`imod.formats.idf.save`, ``pattern``
+   IDF, IDF file used as spatial definition, ":func:`imod.mf6.open_hds`, :func:`imod.mf6.open_cbc`" , ``grb_path``
+   GRB, GRB file used as spatial definition, ":func:`imod.mf6.open_hds`, :func:`imod.mf6.open_cbc`" , ``grb_path``
+   HED, "The output file (\*.HED) for MODFLOW6 that contains the heads", :func:`imod.mf6.open_hds`, ``hds_path``
+   BDG, "The output file (\*.CBC) for MODFLOW6 that contains the flow budget", :func:`imod.mf6.open_cbc`, ``cbc_path``
+   BDGUZF, "The output file (\*.CBC) for MODFLOW6 that contains the UZF flow budgets", :func:`imod.mf6.open_cbc`, ``cbc_path``
+   WC_UZF, "The output file (\*.WC) for MODFLOW6 that contains the UZF water content", :func:`imod.mf6.open_dvs`, ``dvs_path``
+   IDOUBLE, Save in double precision, `xarray.DataArray.astype<https://docs.xarray.dev/en/stable/generated/xarray.DataArray.astype.html>`_, ``dtype=np.float32``
+   SAVE\*, Save the results per layer, `xarray.DataArray.sel<https://docs.xarray.dev/en/stable/generated/xarray.DataArray.sel.html>`_, ``layer=[1, 2, ...]``
+   IPHRLVL, Save the first active value in the vertical dimension, ":func:`imod.prepare.layer.get_upper_active_grid_cells`, :func:`imod.prepare.layer.get_upper_active_layer_number`", 
+   IFILLHEAD, Fill head values where ``idomain==-1``, :func:`imod.prepare.fill`, ``dims="layer"``
+
+Some settings previously configurable in iMOD5 are fixed in iMOD Python:
+
+.. csv-table::
+   :header-rows: 1
+   :stub-columns: 1
+
+   BATCH argument, description, iMOD Python
+   ISAVEENDDATE=1, Set time stamp to match the end of each time step, :func:`imod.mf6.open_hds`, 
+
+GXG
+***
+
+Computes the GXG values, this is an indicator used in the Netherlands to
+indicate the seasonal variation of the groundwater head. You can compute the GXG
+values using the :func:`imod.evaluate.calculate_gxg` function. The table below
+lists pointers to the functions and arguments that can be used to achieve full
+feature parity with the iMOD5 BATCH function. See the API examples in
+:func:`imod.evaluate.calculate_gxg` how to do similar things as with the GXG
+function in iMOD5.
+
+.. csv-table::
+   :header-rows: 1
+   :stub-columns: 1
+
+   BATCH argument, description, iMOD Python, argument
+   ILAYER, Layers numbers to be used in the GxG computation, `xarray.DataArray.sel<https://docs.xarray.dev/en/stable/generated/xarray.DataArray.sel.html>`_, ``layer=[1, 2, ...]``
+   NDIR, Number of folders to be processed, unnecessary in iMOD Python,
+   SOURCEDIR, The folder and first part of the file name for all files that need to be used, :func:`imod.formats.idf.open`, ``pattern``
+   OUTPUTFOLDER, The folder where the output files need to be written, :func:`imod.formats.idf.save`, ``directory``
+   SURFACEIDF, "The IDF file that contains the surface elevation, if absent GXG is computed their reference", :func:`imod.evaluate.calculate_gxg`, see API examples
+   SYEAR, The start year (yyyy) for which IDF-files are used, `xarray.DataArray.sel<https://docs.xarray.dev/en/stable/generated/xarray.DataArray.sel.html>`_, ``time=...``
+   EYEAR, The end year (yyyy) for which IDF-files are used, `xarray.DataArray.sel<https://docs.xarray.dev/en/stable/generated/xarray.DataArray.sel.html>`_, ``time=...``
+   IYEAR, The year (yyyy) for which the GXG values need to be computed, `xarray.DataArray.sel<https://docs.xarray.dev/en/stable/generated/xarray.DataArray.sel.html>`_, ``time=...``
+   STARTMONTH, The start month from the which the hydrological year starts, `xarray.DataArray.sel<https://docs.xarray.dev/en/stable/generated/xarray.DataArray.sel.html>`_, ``time=...``
+   IPERIOD, Enter two integers for each month to express the inclusion of the first and second day of that particular month in the GXG computation, `xarray.DataArray.sel<https://docs.xarray.dev/en/stable/generated/xarray.DataArray.sel.html>`_, ``time=...``
+   GENFILE, Enter a GEN-filename for polygon(s) for which mean values need to be computed, :func:`imod.prepare.zonal_aggregate_raster`, 
+   IDFNAME, "Cells in the IDF-file that are not equal to the NoDataValue of that IDF-file, the GXG will be computed.", `xarray.DataArray.where<https://docs.xarray.dev/en/stable/generated/xarray.DataArray.where.html>`_, ``cond=idfdata.notnull()``
+
+Some settings previously configurable in iMOD5 are fixed in iMOD Python:
+
+.. csv-table::
+   :header-rows: 1
+   :stub-columns: 1
+
+   BATCH argument, description, iMOD Python
+   FIRSTDAY=14, First day in a month to include in the computation of the GXG, :func:`imod.evaluate.calculate_gxg`,
+   SECONDARY=28, Second day in a month to include in the computation of the GXG, :func:`imod.evaluate.calculate_gxg`,
+   ISEL=1, All active cells are used in the computation of the GXG, :func:`imod.evaluate.calculate_gxg`,
+
+MKWELLIPF
+*********
+
+The MKWELLIPF function computes the extraction strength for each well based on a
+weighed value according to their length and permeability of the penetrated model
+layer. Most of this functionality is implemented in iMOD Python's
+:func:`imod.prepare.wells.assign_wells`. Note: The function computes rates for
+each timestep in a timeseries, instead of averaging them. This function is also
+called when running :meth:`imod.mf6.Well.to_mf6_pkg` and
+:meth:`imod.mf6.LayeredWell.to_mf6_pkg`. The table below lists pointers to the
+functions and arguments that can be used to achieve full feature parity with the
+iMOD5 BATCH function.
+
+.. csv-table::
+   :header-rows: 1
+   :stub-columns: 1
+
+   BATCH argument, description, iMOD Python, argument
+   NIPF, Number of IPF files to be processed, unnecessary in iMOD Python,
+   IPF\{i\}, Name of the ith IPF file, :func:`imod.formats.ipf.read`, ``path``
+   IXCOL, Column number of the x-coordinate, :func:`imod.prepare.wells.assign_wells`, ``dataframe["x"]``
+   IYCOL, Column number of the y-coordinate, :func:`imod.prepare.wells.assign_wells`, ``dataframe["y"]``
+   IQCOL, Column number of the well extraction rate, :func:`imod.prepare.wells.assign_wells`, ``dataframe["rate"]``
+   ITCOL, Column number of the well filter top, :func:`imod.prepare.wells.assign_wells`, ``dataframe["top"]``
+   IBCOL, Column number of the well filter bottom, :func:`imod.prepare.wells.assign_wells`, ``dataframe["bottom"]``
+   ISS, Whether rates need to be averaged for a specific time instead of the complete time series, , , 
+   SDATE, The start date to be averaged, `pd.DataFrame.loc <https://pandas.pydata.org/pandas-docs/stable/reference/api/pandas.DataFrame.loc.html>`_ , ``dataframe.loc[dataframe["time"] >= start_time]``
+   EDATE, The end date to be averaged, `pd.DataFrame.loc <https://pandas.pydata.org/pandas-docs/stable/reference/api/pandas.DataFrame.loc.html>`_ , ``dataframe.loc[dataframe["time"] <= start_time]``
+   HNODATA, NoDataValue for the extraction rate, `pd.DataFrame.loc <https://pandas.pydata.org/pandas-docs/stable/reference/api/pandas.DataFrame.loc.html>`_ , ``dataframe.loc(dataframe["rate"] != nodata_value)``
+   NLAY, Number of layers from which wells may be organized, unnecessary in iMOD Python,
+   TOPIDF\{i\}, Name of the ith IDF file that contains the top layer, :func:`imod.prepare.wells.assign_wells`, ``top``
+   BOTIDF\{i\}, Name of the ith IDF file that contains the top layer, :func:`imod.prepare.wells.assign_wells`, ``bottom``
+   KHKVIDF\{i\}, Name of the ith IDF file that contains the horizontal permeability, :func:`imod.prepare.wells.assign_wells`, ``k``
+   KDVIDF\{i\}, Name of the ith IDF file that contains the transmissivity, not applicable for MODFLOW 6,
+   MINKHT, Minimal horizontal permeability that will receive a well, :func:`imod.prepare.wells.assign_wells`, ``minimum_k``
+   MINKD, Minimal transmissivity that will receive a well, not applicable for MODFLOW 6,
+   FNODATA, NoDataValue for the top and bottom of the well screen (ITCOL and IBCOL),`pd.DataFrame.loc <https://pandas.pydata.org/pandas-docs/stable/reference/api/pandas.DataFrame.loc.html>`_, ``dataframe.loc[dataframe["top"] != fnodata]``
+
+Some settings previously configurable in iMOD5 are fixed in iMOD Python:
+
+.. csv-table::
+   :header-rows: 1
+   :stub-columns: 1
+
+   BATCH argument, description, iMOD Python
+   IMIDF=0, How to compute midpoints of well screens when either top or bottom is missing, :func:`imod.prepare.wells.assign_wells`
+
+GENPUZZLE
+*********
+
+The GENPUZZLE function reads a GEN file and creates a new GEN-file in which all
+loose-ends are connected to form a continuous segment. This can be done with the
+`line_merge function in geopandas.
+<https://geopandas.org/en/latest/docs/reference/api/geopandas.GeoSeries.line_merge.html>`_
+
+.. csv-table::
+   :header-rows: 1
+   :stub-columns: 1
+
+   BATCH argument, description, iMOD Python, argument
+   GENFILE_IN, Give a GEN file containing x and y coordinates of GEN segments, :func:`imod.formats.gen.read`, ``path``
+   GENFILE_OUT, Specify the output GEN file, :func:`imod.formats.gen.write`, ``path``
+
+Some settings previously configurable in iMOD5 are fixed in iMOD Python:
+
+.. csv-table::
+   :header-rows: 1
+   :stub-columns: 1
+
+   BATCH argument, description, iMOD Python
+   IBINARY, Enforce GENFILE_OUT to be binary at all times, :func:`imod.formats.gen.write`
+
+IDFSCALE
+********
+
+Rescale IDF-files according to different methodologies. This functionality is
+implemented in iMOD Python for MODFLOW 6 simulations
+:meth:`imod.mf6.Modflow6Simulation.regrid_like`. This automatically selects
+default values for different packages. An overview of these is presented in
+:doc:`../user-guide/08-regridding`. For individual grids, you can `call the
+regridding functionality xugrid
+<https://deltares.github.io/xugrid/examples/regridder_overview.html>`_, which
+also works for structured grids, like saved in IDF files. Multiple methods are
+available to upscale and downscale models. As upscaling methods SCLTYPE_UP 1 to
+10 method are supported. The table below lists pointers to the functions and
+arguments that can be used to achieve full feature parity with the iMOD5 BATCH
+function.
+
+.. csv-table::
+   :header-rows: 1
+   :stub-columns: 1
+
+   BATCH argument, description, iMOD Python, argument
+   SCALESIZE, Cell size of the upscaled or downscaled IDF-file, :func:`imod.util.empty_2d`, "``dx``, ``dy``"
+   SCLTYPE_UP, Method to upscale data, e.g. :meth:`imod.mf6.NodePropertyFlow.regrid_like`, ``regridder_types``
+   SCLTYPE_DOWN, Method to downscale data, e.g. :meth:`imod.mf6.NodePropertyFlow.regrid_like`, ``regridder_types``
+   SOURCEIDF, IDF file that needs to be rescaled, :func:`imod.formats.idf.open`, ``path``
+   OUTFILE, IDF file that will be created, :func:`imod.formats.idf.save`, ``path``
+   PERCENTILE, Percentile to be used for upscaling, `xugrid.OverlapRegridder.create_percentile_method <https://deltares.github.io/xugrid/api/xugrid.OverlapRegridder.html#xugrid.OverlapRegridder>`_, ``percentile``
+   WEIGHFACTOR, Weight factor, :class:`imod.util.RegridderWeightsCache` , 
+   WINDOW, Window to be used for rescaling, :meth:`imod.mf6.Modflow6Simulation.clip_box`, "``x_min``, ``x_max``, ``y_min``, ``y_max``"
+
+
+Some settings previously configurable in iMOD5 are fixed in iMOD Python:
+
+.. csv-table::
+   :header-rows: 1
+   :stub-columns: 1
+
+   BATCH argument, description, iMOD Python
+   BLOCK=4, size of the interpolation block, `xugrid.BaryCentricInterpolator <https://deltares.github.io/xugrid/api/xugrid.BarycentricInterpolator.html>`_
+
+
+IDFTIMESERIE
+************
+
+Generate timeseries out of IDF-files that have the notation
+``{item}_yyyymmdd_l{ilay}.idf``. These are IDF-files that yield from a normal
+iMODFLOW simulation. Equivalent functionality in iMOD Python is found in
+:func:`imod.select.points.points_values`.
+
+.. csv-table::
+   :header-rows: 1
+   :stub-columns: 1
+
+   BATCH argument, description, iMOD Python, argument
+   IPF1, Name of the IPF file that contains the locations, :func:`imod.select.points.points_values`, ``**points``
+   IPF2, Name of the IPF file to store the timeseries, :func:`imod.formats.ipf.save`, ``path``
+   ILAY, Layer number to be used in the timeseries, `xarray.DataArray.sel<https://docs.xarray.dev/en/stable/generated/xarray.DataArray.sel.html>`_, ``layer=[1, 2, ...]``
+   SOURCEDIR, directory name of the folder that contains the specific files + the first (similar) part of the name of the files, `imod.formats.idf.open`, ``path``
+   SDATE, Start date of the timeseries, `xarray.DataArray.sel<https://docs.xarray.dev/en/stable/generated/xarray.DataArray.sel.html>`_, ``time=...``
+   EDATE, Start date of the timeseries, `xarray.DataArray.sel<https://docs.xarray.dev/en/stable/generated/xarray.DataArray.sel.html>`_, ``time=...``
+   LABELCOL, Column number of the label for the associated text files, :func:`imod.formats.ipf.save`, ``assoc_columns``
+   NGXG, compute GXG values, :func:`imod.evaluate.calculate_gxg_points`, 
+   ICLEAN, remove points from the IPF1 that are outside the domain of IDF data in SOURCEDIR, :func:`imod.select.points.points_values`, ``out_of_bounds``
+
+Some settings previously configurable in iMOD5 are fixed in iMOD Python:
+
+.. csv-table::
+   :header-rows: 1
+   :stub-columns: 1
+
+   BATCH argument, description, iMOD Python
+   IASSF=0, specify whether or not to include the time series from IPF1 into the new IPF2 associated files, :func:`imod.select.points.points_values`
+   TXTCOL=2, Enter the column to be used from the associated text files, :func:`imod.formats.ipf.read`
+   INT=0, Carry out a 4-point polynomial interpolation of the 4 enclosed grid points surrounding the location of the measurement. Default INT=0 and it takes grid value, :func:`imod.select.points.points_values`
+
+
+CREATSOF
+********
+
+The iMOD-Batch function SOF (Surface Overland Flow) is able to compute “spill”
+levels (surface overlandflow levels) for large regions with or without supplied
+outflow or outlet locations. iMOD Python does not have a direct equivalent
+functionality, but you can use the `python package PyFlwDir
+<https://deltares.github.io/pyflwdir/latest/quickstart.html>`_ to do similar
+things.
+
+IDFMEAN
+*******
+
+Compute a new IDF-file with the mean value (or minimum, maximum value) of
+different IDF-files. This can be easily done with xarray:
+
+.. code:: python
+
+  import imod
+  import xarray as xr
+
+  idf_data = imod.formats.idf.open("path/to/your/idf/files/*.idf")
+  mean_value_idf = idf_data.mean()  # or min, max, sum
+  # To get data in the same shape as the original IDF files, you can use:
+  mean_idf = xr.ones_like(idf_data) * mean_value_idf
+  # Save the mean IDF file
+  imod.formats.idf.save(mean_idf, "path/to/your/mean_idf_file.idf")
+
+IDFMERGE
+********
+
+The MERGE function can be used to merge different IDF-files into a new IDF-file.
+If these IDF-files might overlap, an interpolation between the overlapping
+IDF-files will be carried out (if selected). Equivalent functionality in
+iMOD Python is found in :func:`imod.formats.idf.open_subdomains`
+
+.. csv-table::
+   :header-rows: 1
+   :stub-columns: 1
+
+   BATCH argument, description, iMOD Python, argument
+   NMERGE, Number of IDF files to be merged, unnecessary in iMOD Python,
+   SOURCEDIR, The folder and first part of the file name for all files that need to be merged, :func:`imod.formats.idf.open_subdomains`, ``path`` \& ``pattern``
+   TARGETIDF, The IDF file that will be created, :func:`imod.formats.idf.save`, ``path``
+   WINDOW, The window that needs to be computed solely, :meth:`imod.mf6.Modflow6Simulation.clip_box`, "``x_min``, ``x_max``, ``y_min``, ``y_max``"
+   MASKIDF, IDF-file to mask areas , `xarray.DataArray.where<https://docs.xarray.dev/en/stable/generated/xarray.DataArray.where.html>`_, ``cond=maskidf.notnull()``
+
+Some settings previously configurable in iMOD5 are fixed in iMOD Python:
+
+.. csv-table::
+   :header-rows: 1
+   :stub-columns: 1
+
+   BATCH argument, description, iMOD Python
+   IINT=0, Specify IINT=1 to enforce a smooth interpolation between IDF-files in their overlapping areas, this is the default setting., :func:`imod.formats.idf.open_subdomains`
+
+PLOT
+****
+
+The Plot function can be used to construct figures that are normally displayed
+on the graphical display of iMOD. Equivalent functionality in iMOD Python is
+found in :func:`imod.visualize.plot_map`.
 
