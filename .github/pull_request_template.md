@@ -19,3 +19,4 @@ Before requesting review, please go through this checklist:
 - [ ] Unit tests were added
 - [ ] **If feature added**: Added/extended example
 - [ ] **If feature added**: Added feature to API documentation
+- [ ] **If pixi.lock was changed**: Ran `pixi run generate-sbom` and committed changes
