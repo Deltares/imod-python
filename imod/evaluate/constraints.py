@@ -157,9 +157,9 @@ def intra_cell_boundary_conditions(
         'top_bot' should at least contain `top` and `bot` data_vars
     porosity : float or xr.DataArray of floats, optional
         Effective porosity of model cells
-    riv : (dict or list of) imod.RiverPackage, optional
-    ghb : (dict or list of) imod.GeneralHeadBoundaryPackage, optional
-    drn : (dict or list of) imod.DrainagePackage, optional
+    riv : (dict or list of) imod.wq.River, optional
+    ghb : (dict or list of) imod.wq.GeneralHeadBoundary, optional
+    drn : (dict or list of) imod.wq.Drainage, optional
     drop_allnan : boolean, optional
         Whether source-sink combinations without overlap should be dropped from result (default True)
 
