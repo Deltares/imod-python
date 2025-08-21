@@ -629,11 +629,11 @@ logic, for examples see below. To plot waterbalance terms, you can use
    EDATE, The end date of the water balance computation, `xarray.DataArray.sel <https://docs.xarray.dev/en/stable/generated/xarray.DataArray.sel.html>`_, ``time=...``
    IYEAR, The year for which the water balance needs to be computed, `xarray.DataArray.sel <https://docs.xarray.dev/en/stable/generated/xarray.DataArray.sel.html>`_, ``time=...``
    NPERIOD, The number of periods for which the water balance needs to be computed, unnecessary in iMOD Python,
-   PERIOD{i}, period i (ddmm-ddmm), The period for which the water balance needs to be computed, `xarray.DataArray.sel <https://docs.xarray.dev/en/stable/generated/xarray.DataArray.sel.html>`_, ``time=...``
+   PERIOD{i}, The period for which the water balance needs to be computed, `xarray.DataArray.sel <https://docs.xarray.dev/en/stable/generated/xarray.DataArray.sel.html>`_, ``time=...``
    NBAL, The number of budget terms to be computed, unnecessary in iMOD Python,
    BAL{i}, The budget term to be computed, :func:`imod.evaluate.facebudget`,"``front``, ``lower``, ``right``"
    BAL{i}SYS, The number of systems to be included in the water balance,"unnecessary in iMOD Python, as it treats systems as separate packages",
-   ISEL,"The type of water balance to be computed, see below for the different types of ISEL", ,
+   ISEL,"The type of water balance to be computed, see below for the different types of ISEL", See examples below,
    GENFILE, The GEN file that contains the area for which the water balance needs to be computed, :func:`imod.formats.gen.read`, ``path``
    IDFNAME, The IDF file that contains the area for which the water balance needs to be computed, :func:`imod.formats.idf.open`, ``path``
 
