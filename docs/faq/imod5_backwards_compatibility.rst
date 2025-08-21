@@ -603,3 +603,121 @@ The PLOT function can be used to construct figures that are normally displayed
 on the graphical display of iMOD. Equivalent functionality in iMOD Python is
 found in :func:`imod.visualize.plot_map`.
 
+WBALANCE
+********
+
+The WBALANCE function calculates the water balance based on the model output for
+the steady state condition or for a specific period and area. The result is a
+CSV file (Step 1). Alternatively, this function can create images, IDF files
+and/or CVS files from aggregation on existing CSV files (Step 2). The hardest
+part of the functionality for step 1 in iMOD Python is found in
+:func:`imod.evaluate.facebudget`, for ISEL=3-type of behaviour of the
+facebudgets. Other water balance terms can be computed by using general xarray
+logic, for examples see below. To plot waterbalance terms, you can use
+:func:`imod.visualize.plot_waterbalance`.
+
+
+.. csv-table::
+   :header-rows: 1
+   :stub-columns: 1
+
+   BATCH argument, description, iMOD Python, argument
+   NDIR, Number of folders to be processed, unnecessary in iMOD Python,
+   SOURCEDIR, The folder and first part of the file name for all files that need to be used, :func:`imod.formats.idf.open`, ``path`` \& ``pattern``
+   ILAYER, Layer numbers to be used in the water balance computation, `xarray.DataArray.sel <https://docs.xarray.dev/en/stable/generated/xarray.DataArray.sel.html>`_, ``layer=[i]``
+   SDATE, The start date of the water balance computation, `xarray.DataArray.sel <https://docs.xarray.dev/en/stable/generated/xarray.DataArray.sel.html>`_, ``time=...``
+   EDATE, The end date of the water balance computation, `xarray.DataArray.sel <https://docs.xarray.dev/en/stable/generated/xarray.DataArray.sel.html>`_, ``time=...``
+   IYEAR, The year for which the water balance needs to be computed, `xarray.DataArray.sel <https://docs.xarray.dev/en/stable/generated/xarray.DataArray.sel.html>`_, ``time=...``
+   NPERIOD, The number of periods for which the water balance needs to be computed, unnecessary in iMOD Python,
+   PERIOD{i}, period i (ddmm-ddmm), The period for which the water balance needs to be computed, `xarray.DataArray.sel <https://docs.xarray.dev/en/stable/generated/xarray.DataArray.sel.html>`_, ``time=...``
+   NBAL, The number of budget terms to be computed, unnecessary in iMOD Python,
+   BAL{i}, The budget term to be computed, :func:`imod.evaluate.facebudget`,"``front``, ``lower``, ``right``"
+   BAL{i}SYS, The number of systems to be included in the water balance,"unnecessary in iMOD Python, as it treats systems as separate packages",
+   ISEL,"The type of water balance to be computed, see below for the different types of ISEL", ,
+   GENFILE, The GEN file that contains the area for which the water balance needs to be computed, :func:`imod.formats.gen.read`, ``path``
+   IDFNAME, The IDF file that contains the area for which the water balance needs to be computed, :func:`imod.formats.idf.open`, ``path``
+
+Some settings previously configurable in iMOD5 are fixed in iMOD Python:
+
+.. csv-table::
+   :header-rows: 1
+   :stub-columns: 1
+
+   BATCH argument, description, iMOD Python
+   WBEX=0, Compute interconnected fluxes between zones, :func:`imod.evaluate.facebudget`
+
+
+To get ISEL=1-type of behaviour, you can use:
+
+.. code:: python
+
+  import imod
+
+  cbc_data = imod.mf6.open_cbc("path/to/your/cbc_file.cbc", merge_to_dataset=True)
+  wbalance = cbc_data.sum()
+  # to compute  per timestep
+  wbalance_per_time = cbc_data.sum(dim=("layer", "y", "x"))
+
+Or to get ISEL=2-type of behaviour, you can use:
+
+.. code:: python
+
+  import imod
+  import xarray as xr
+
+  cbc_data = imod.mf6.open_cbc("path/to/your/cbc_file.cbc", "path/to/your/grb_file.grb")
+  gen_data = imod.formats.gen.read("path/to/your/gen_file.gen")
+  
+  # Pop the facebudgets from the cbc_data
+  front = cbc_data.pop("flow-front-face")
+  lower = cbc_data.pop("flow-lower-face")
+  right = cbc_data.pop("flow-right-face")
+
+  like = front.isel(layer=0, time=0, drop=True)
+  wbalance_area = imod.prepare.rasterize(gen_data, like)
+  netflow = imod.evaluate.facebudget(
+      wbalance_area,
+      front=front,
+      lower=lower,
+      right=right,
+      netflow=True
+  )
+  cbc_data["netflow"] = netflow
+  # Convert cbc_data from dict to xarray.Dataset
+  cbc_data = xr.merge([cbc_data])
+  # Mask all budget terms that are not present in the cbc_data
+  cbc_area = cbc_data.where(wbalance_area.notnull())
+  # Sum the budget terms for waterbalance of the area
+  cbc_area.sum()
+
+Or to get ISEL=3-type of behaviour, you can use:
+
+.. code:: python
+
+  import imod
+  import xarray as xr
+
+  cbc_data = imod.mf6.open_cbc("path/to/your/cbc_file.cbc", "path/to/your/grb_file.grb")
+  idf_data = imod.formats.idf.open("path/to/your/idf_file.idf")
+  
+  # Pop the facebudgets from the cbc_data
+  front = cbc_data.pop("flow-front-face")
+  lower = cbc_data.pop("flow-lower-face")
+  right = cbc_data.pop("flow-right-face")
+
+  like = front.isel(layer=0, time=0, drop=True)
+  netflow = imod.evaluate.facebudget(
+      idf_data,
+      front=front,
+      lower=lower,
+      right=right,
+      netflow=True
+  )
+  cbc_data["netflow"] = netflow
+  # Convert cbc_data from dict to xarray.Dataset
+  cbc_data = xr.merge([cbc_data])
+  # Mask all budget terms that are not present in the cbc_data
+  cbc_area = cbc_data.where(idf_data.notnull())
+  # Sum the budget terms for waterbalance of the area
+  cbc_area.sum()
+  
