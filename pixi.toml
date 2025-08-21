@@ -56,7 +56,7 @@ examples = { cmd = [
     "--verbose",
     "--junitxml=examples_report.xml",
 ], depends-on = ["install"], cwd = "imod/tests", env = { IMOD_DATA_DIR = ".imod_data" } }
-generate-sbom-imod-python-noarch = { cmd = [
+generate-sbom = { cmd = [
     "sbom4python", 
     "-m", "imod", 
     "--system", "--sbom", "spdx", 
