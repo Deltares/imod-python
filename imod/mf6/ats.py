@@ -1,7 +1,7 @@
 import numpy as np
 
 from imod.mf6.package import Package
-from imod.schemata import DimsSchema, DTypeSchema, AllValueSchema
+from imod.schemata import AllValueSchema, DimsSchema, DTypeSchema
 
 
 class AdaptiveTimeStepping(Package):
@@ -56,7 +56,13 @@ class AdaptiveTimeStepping(Package):
     _keyword_map = {}
     _template = Package._initialize_template(_pkg_id)
 
-    _period_data = ("dt_init", "dt_min", "dt_max", "dt_multiplier", "dt_fail_multiplier")
+    _period_data = (
+        "dt_init",
+        "dt_min",
+        "dt_max",
+        "dt_multiplier",
+        "dt_fail_multiplier",
+    )
     _init_schemata = {
         "dt_init": [DimsSchema("time"), DTypeSchema(np.floating)],
         "dt_min": [DimsSchema("time"), DTypeSchema(np.floating)],
@@ -72,7 +78,7 @@ class AdaptiveTimeStepping(Package):
     }
 
     _write_schemata = {
-        "dt_init": [AllValueSchema(">=", 0.0)], 
+        "dt_init": [AllValueSchema(">=", 0.0)],
         "dt_min": [AllValueSchema("<", "dt_max"), AllValueSchema(">", 0.0)],
         "dt_multiplier": [AllValueSchema("==", 0.0) | AllValueSchema(">=", 1.0)],
     }

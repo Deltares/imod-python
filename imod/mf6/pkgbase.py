@@ -21,6 +21,7 @@ TRANSPORT_PACKAGES = ("adv", "dsp", "ssm", "mst", "ist", "src")
 EXCHANGE_PACKAGES = ("gwfgwf", "gwfgwt", "gwtgwt")
 UTIL_PACKAGES = ("ats", "hpc")
 
+
 def _is_scalar_nan(da: GridDataArray):
     """
     Test if is_scalar_nan, carefully avoid loading grids in memory
