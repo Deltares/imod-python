@@ -2,6 +2,7 @@ import textwrap
 
 import geopandas as gpd
 import numpy as np
+import pandas as pd
 import pytest
 import xarray as xr
 from shapely import linestrings
@@ -191,3 +192,44 @@ def test_transport_output_wrong_species(tmp_path, flow_transport_simulation):
     with pytest.raises(ValueError):
         # Should be ["a", "b", "c", "d"]
         flow_transport_simulation.open_concentration(species_ls=["a", "b"])
+
+
+def test_transport_with_ats(tmp_path, flow_transport_simulation):
+    """
+    Test that transport model works with ATS and that timesteps are actually
+    affected by the ATS settings.
+    """
+    # Arrange
+    sim = flow_transport_simulation
+    coords = {"time": [np.datetime64("2000-01-01")]}
+    dims = ("time",)
+    dt_init = xr.DataArray([1e-3], coords=coords, dims=dims)
+    dt_min = xr.DataArray([1e-4], coords=coords, dims=dims)
+    dt_max = xr.DataArray([10.0], coords=coords, dims=dims)
+    dt_multiplier = xr.DataArray([1.2], coords=coords, dims=dims)
+    dt_fail_multiplier = xr.DataArray([0.0], coords=coords, dims=dims)
+    sim["ats"] = imod.mf6.AdaptiveTimeStepping(
+        dt_init, dt_min, dt_max, dt_multiplier, dt_fail_multiplier
+    )
+    # Make sure iterations written to csv files to check amount of timesteps.
+    sim["solver"]["outer_csvfile"] = "flow_outer.csv"
+    sim["transport_solver"]["outer_csvfile"] = "tpt_outer.csv"
+    # Act
+    # Write with ATS
+    path_with_ats = tmp_path / "with_ats"
+    path_without_ats = tmp_path / "without_ats"
+    sim.write(path_with_ats)
+    sim.run()
+    # Write without ATS
+    sim.pop("ats")
+    sim.write(path_without_ats)
+    sim.run()
+    with_ats_outer = pd.read_csv(path_with_ats / "tpt_outer.csv")
+    without_ats_outer = pd.read_csv(path_without_ats / "tpt_outer.csv")
+
+    # Assert
+    assert len(with_ats_outer) > len(without_ats_outer)
+    dt_init_with_actual = with_ats_outer.loc[0, "totim"]
+    dt_init_without_actual = without_ats_outer.loc[0, "totim"]
+    assert (dt_init == dt_init_with_actual).all()
+    assert not (dt_init == dt_init_without_actual).all()
