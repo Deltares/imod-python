@@ -233,3 +233,43 @@ def test_transport_with_ats(tmp_path, flow_transport_simulation):
     dt_init_without_actual = without_ats_outer.loc[0, "totim"]
     assert (dt_init == dt_init_with_actual).all()
     assert not (dt_init == dt_init_without_actual).all()
+
+
+def test_transport_with_ats_percel(tmp_path, flow_transport_simulation):
+    """
+    Test that transport model works with ATS and that timesteps are actually
+    affected by the ATS settings.
+    """
+    # Arrange
+    sim = flow_transport_simulation
+    coords = {"time": [np.datetime64("2000-01-01")]}
+    dims = ("time",)
+    dt_init = xr.DataArray([1e-3], coords=coords, dims=dims)
+    dt_min = xr.DataArray([1e-4], coords=coords, dims=dims)
+    dt_max = xr.DataArray([10.0], coords=coords, dims=dims)
+    dt_multiplier = xr.DataArray([1.2], coords=coords, dims=dims)
+    dt_fail_multiplier = xr.DataArray([0.0], coords=coords, dims=dims)
+    sim["ats"] = imod.mf6.AdaptiveTimeStepping(
+        dt_init, dt_min, dt_max, dt_multiplier, dt_fail_multiplier
+    )
+    # Make sure iterations written to csv files to check amount of timesteps.
+    sim["solver"]["outer_csvfile"] = "flow_outer.csv"
+    sim["transport_solver"]["outer_csvfile"] = "tpt_outer.csv"
+    ats_percel = 0.1
+    sim["tpt_a"]["adv"] = imod.mf6.AdvectionTVD(ats_percel=ats_percel)
+    sim["flow"]["npf"].dataset["save_flows"] = True
+    # Act
+    path_with_ats = tmp_path / "with_ats"
+    sim.write(path_with_ats)
+    sim.run()
+    with_ats_outer = pd.read_csv(path_with_ats / "tpt_outer.csv")
+    # Expected percel timestep
+    cbc = sim.open_flow_budget().compute()
+    max_flux = np.abs(cbc).max()
+    dt_percel_expected = 10 / max_flux * 0.25 * ats_percel
+
+    # Assert
+    dt_init_with_actual = with_ats_outer.loc[0, "totim"]
+    assert (dt_init == dt_init_with_actual).all()
+    dt_percel_actual = with_ats_outer.loc[5420, "totim"] - with_ats_outer.loc[5419, "totim"]
+    assert (dt_percel_expected == dt_percel_actual).all()
