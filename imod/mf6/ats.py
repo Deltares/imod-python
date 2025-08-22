@@ -103,14 +103,21 @@ class AdaptiveTimeStepping(Package):
         if "time" in self.dataset:  # one of bin_ds has time
             package_times = self.dataset.coords["time"].values
             starts = np.searchsorted(globaltimes, package_times) + one
-            for start in starts:
-                data = self.dataset.sel(time=package_times[start - one])
+            for i, start in enumerate(starts):
+                data = self.dataset.sel(time=package_times[i])
                 perioddata[start] = [data[key].values[()] for key in self._period_data]
 
         d = {}
         d["maxats"] = len(package_times)
         d["perioddata"] = perioddata
         return self._template.render(d)
+
+    def _validate(self, schemata, **kwargs):
+        # Insert additional kwargs
+        kwargs["dt_max"] = self["dt_max"]
+        errors = super()._validate(schemata, **kwargs)
+
+        return errors
 
     def _write(self, pkgname, globaltimes, write_context):
         ats_content = self._render(
