@@ -10,6 +10,7 @@ robust alternative.
 """
 
 from copy import deepcopy
+from typing import Optional
 
 from imod.common.interfaces.iregridpackage import IRegridPackage
 from imod.mf6.package import Package
@@ -18,10 +19,6 @@ from imod.mf6.package import Package
 class Advection(Package, IRegridPackage):
     _pkg_id = "adv"
     _template = Package._initialize_template(_pkg_id)
-
-    def __init__(self, scheme: str):
-        dict_dataset = {"scheme": scheme}
-        super().__init__(dict_dataset)
 
     def _render(self, directory, pkgname, globaltimes, binary):
         scheme = self.dataset["scheme"].item()
@@ -40,15 +37,27 @@ class AdvectionUpstream(Advection):
     The upstream weighting (first order upwind) scheme sets the concentration
     at the cellface between two adjacent cells equal to the concentration in
     the cell where the flow comes from. It surpresses oscillations.
-    Note: all constructor arguments will be ignored
+
+    Parameters
+    ----------
+    ats_percel: float, optional
+        Fractional cell distance submitted by the ADV Package to the
+        AdaptiveTimeStepping (ATS) package. If ``ats_percel`` is specified and
+        the ATS Package is active, a time step calculation will be made for each
+        cell based on flow through the cell and cell properties. The largest
+        time step will be calculated such that the advective fractional cell
+        distance (``ats_percel``) is not exceeded for any active cell in the
+        grid. This time-step constraint will be submitted to the ATS Package,
+        perhaps with constraints submitted by other packages, in the calculation
+        of the time step. ``ats_percel`` must be greater than zero. If a value
+        of zero is specified for ``ats_percel`` the program will automatically
+        reset it to an internal no data value to indicate that time steps should
+        not be subject to this constraint.
     """
 
-    def __init__(self, scheme: str = "upstream"):
-        if not scheme == "upstream":
-            raise ValueError(
-                "error in scheme parameter. Should be 'upstream' if present."
-            )
-        super().__init__(scheme="upstream")
+    def __init__(self, ats_percel: Optional[float] = None):
+        dict_dataset = {"scheme": "upstream", "ats_percel": ats_percel}
+        super().__init__(dict_dataset)
 
 
 class AdvectionCentral(Advection):
@@ -60,25 +69,51 @@ class AdvectionCentral(Advection):
     grids without equal spacing between connected cells, it is retained here
     for consistency with nomenclature used by other MODFLOW-based transport
     programs, such as MT3D.
-    Note: all constructor arguments will be ignored
+
+    Parameters
+    ----------
+    ats_percel: float, optional
+        Fractional cell distance submitted by the ADV Package to the
+        AdaptiveTimeStepping (ATS) package. If ``ats_percel`` is specified and
+        the ATS Package is active, a time step calculation will be made for each
+        cell based on flow through the cell and cell properties. The largest
+        time step will be calculated such that the advective fractional cell
+        distance (``ats_percel``) is not exceeded for any active cell in the
+        grid. This time-step constraint will be submitted to the ATS Package,
+        perhaps with constraints submitted by other packages, in the calculation
+        of the time step. ``ats_percel`` must be greater than zero. If a value
+        of zero is specified for ``ats_percel`` the program will automatically
+        reset it to an internal no data value to indicate that time steps should
+        not be subject to this constraint.
     """
 
-    def __init__(self, scheme: str = "central"):
-        if not scheme == "central":
-            raise ValueError(
-                "error in scheme parameter. Should be 'central' if present."
-            )
-        super().__init__(scheme="central")
+    def __init__(self, ats_percel: Optional[float] = None):
+        dict_dataset = {"scheme": "central", "ats_percel": ats_percel}
+        super().__init__(dict_dataset)
 
 
 class AdvectionTVD(Advection):
     """
     An implicit second order TVD scheme. More expensive than upstream
     weighting but more robust.
-    Note: all constructor arguments will be ignored
+
+    Parameters
+    ----------
+    ats_percel: float, optional
+        Fractional cell distance submitted by the ADV Package to the
+        AdaptiveTimeStepping (ATS) package. If ``ats_percel`` is specified and
+        the ATS Package is active, a time step calculation will be made for each
+        cell based on flow through the cell and cell properties. The largest
+        time step will be calculated such that the advective fractional cell
+        distance (``ats_percel``) is not exceeded for any active cell in the
+        grid. This time-step constraint will be submitted to the ATS Package,
+        perhaps with constraints submitted by other packages, in the calculation
+        of the time step. ``ats_percel`` must be greater than zero. If a value
+        of zero is specified for ``ats_percel`` the program will automatically
+        reset it to an internal no data value to indicate that time steps should
+        not be subject to this constraint.
     """
 
-    def __init__(self, scheme: str = "TVD"):
-        if not scheme == "TVD":
-            raise ValueError("error in scheme parameter. Should be 'TVD' if present.")
-        super().__init__(scheme="TVD")
+    def __init__(self, ats_percel: Optional[float] = None):
+        dict_dataset = {"scheme": "TVD", "ats_percel": ats_percel}
+        super().__init__(dict_dataset)
