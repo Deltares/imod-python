@@ -78,6 +78,8 @@ class TimeDiscretization(Package):
             "time_units": "days",
             "start_date_time": start_date_time,
         }
+        if "ats_filename" in self.dataset:
+            d["ats_filename"] = self.dataset["ats_filename"].item()
         timestep_duration = self.dataset["timestep_duration"]
         n_timesteps = self.dataset["n_timesteps"]
         timestep_multiplier = self.dataset["timestep_multiplier"]
