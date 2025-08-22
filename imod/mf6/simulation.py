@@ -154,6 +154,20 @@ class Modflow6Simulation(collections.UserDict, ISimulation):
         for k, v in dict(*args, **kwargs).items():
             self[k] = v
 
+    def _get_pkgkey(self, pkg_id):
+        """
+        Get package key that belongs to a certain pkg_id, since the keys are
+        user specified.
+        """
+        key = [pkgname for pkgname, pkg in self.items() if pkg._pkg_id == pkg_id]
+        nkey = len(key)
+        if nkey > 1:
+            raise ValueError(f"Multiple instances of {key} detected")
+        elif nkey == 1:
+            return key[0]
+        else:
+            return None
+
     @standard_log_decorator()
     def create_time_discretization(self, additional_times, validate: bool = True):
         """
@@ -267,6 +281,20 @@ class Modflow6Simulation(collections.UserDict, ISimulation):
         d["solutiongroups"] = [solutiongroups]
         return self._template.render(d)
 
+    def _write_tdis_package(self, globaltimes, write_context):
+        """Write time discretization package, and set/clear ats filename if needed"""
+        ats_pkgname = self._get_pkgkey("ats")
+        if ats_pkgname:
+            self["time_discretization"]._set_ats_filename(ats_pkgname, write_context)
+        else:
+            # Make sure no ats_filename is set (in case it was set before)
+            self["time_discretization"]._clear_ats_filename()
+        self["time_discretization"]._write(
+            pkgname="time_discretization",
+            globaltimes=globaltimes,
+            write_context=write_context,
+        )
+
     @standard_log_decorator()
     def write(
         self,
@@ -332,11 +360,7 @@ class Modflow6Simulation(collections.UserDict, ISimulation):
 
         # Write time discretization file
         globaltimes = self["time_discretization"]["time"].values
-        self["time_discretization"]._write(
-            pkgname="time_discretization",
-            globaltimes=globaltimes,
-            write_context=write_context,
-        )
+        self._write_tdis_package(globaltimes, write_context)
 
         # Write individual models
         status_info = NestedStatusInfo("Simulation validation status")
@@ -356,11 +380,12 @@ class Modflow6Simulation(collections.UserDict, ISimulation):
                     )
                 )
             elif isinstance(value, Package):
-                if value._pkg_id == "ims":
-                    ims_write_context = write_context.copy_with_new_write_directory(
+                if value._pkg_id in ["ims", "ats"]:
+                    # TODO: Is this really necessary?
+                    sim_write_context = write_context.copy_with_new_write_directory(
                         write_context.simulation_directory
                     )
-                    value._write(key, globaltimes, ims_write_context)
+                    value._write(key, globaltimes, sim_write_context)
             elif isinstance(value, list):
                 for exchange in value:
                     if isinstance(exchange, imod.mf6.exchangebase.ExchangeBase):
