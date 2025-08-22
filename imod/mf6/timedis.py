@@ -120,7 +120,7 @@ class TimeDiscretization(Package):
             )
 
     def _set_ats_filename(self, ats_pkgname: str, write_context: WriteContext):
-        ats_path = write_context.get_formatted_write_directory / f"{ats_pkgname}.ats"
+        ats_path = write_context.get_formatted_write_directory() / f"{ats_pkgname}.ats"
         self.dataset["ats_filename"] = ats_path
 
     def _clear_ats_filename(self):
