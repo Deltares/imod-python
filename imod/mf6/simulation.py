@@ -159,7 +159,11 @@ class Modflow6Simulation(collections.UserDict, ISimulation):
         Get package key that belongs to a certain pkg_id, since the keys are
         user specified.
         """
-        key = [pkgname for pkgname, pkg in self.items() if pkg._pkg_id == pkg_id]
+        key = [
+            pkgname
+            for pkgname, pkg in self.items()
+            if isinstance(pkg, Package) and (pkg._pkg_id == pkg_id)
+        ]
         nkey = len(key)
         if nkey > 1:
             raise ValueError(f"Multiple instances of {key} detected")
