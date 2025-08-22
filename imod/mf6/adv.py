@@ -21,8 +21,13 @@ class Advection(Package, IRegridPackage):
     _template = Package._initialize_template(_pkg_id)
 
     def _render(self, directory, pkgname, globaltimes, binary):
-        scheme = self.dataset["scheme"].item()
-        return self._template.render({"scheme": scheme})
+        render_dict = {}
+        render_dict["scheme"] = self.dataset["scheme"].item()
+        if "ats_percel" in self.dataset and self._valid(
+            self.dataset["ats_percel"].item()
+        ):
+            render_dict["ats_percel"] = self.dataset["ats_percel"].item()
+        return self._template.render(render_dict)
 
     def mask(self, _) -> Package:
         """
