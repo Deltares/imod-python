@@ -57,7 +57,7 @@ class AdvectionUpstream(Advection):
         of the time step. ``ats_percel`` must be greater than zero. If a value
         of zero is specified for ``ats_percel`` the program will automatically
         reset it to an internal no data value to indicate that time steps should
-        not be subject to this constraint.
+        not be subject to this constraint. Requires MODFLOW 6.6.0 or higher.
     """
 
     def __init__(self, ats_percel: Optional[float] = None):
@@ -89,7 +89,7 @@ class AdvectionCentral(Advection):
         of the time step. ``ats_percel`` must be greater than zero. If a value
         of zero is specified for ``ats_percel`` the program will automatically
         reset it to an internal no data value to indicate that time steps should
-        not be subject to this constraint.
+        not be subject to this constraint. Requires MODFLOW 6.6.0 or higher.
     """
 
     def __init__(self, ats_percel: Optional[float] = None):
@@ -116,7 +116,7 @@ class AdvectionTVD(Advection):
         of the time step. ``ats_percel`` must be greater than zero. If a value
         of zero is specified for ``ats_percel`` the program will automatically
         reset it to an internal no data value to indicate that time steps should
-        not be subject to this constraint.
+        not be subject to this constraint. Requires MODFLOW 6.6.0 or higher.
     """
 
     def __init__(self, ats_percel: Optional[float] = None):
