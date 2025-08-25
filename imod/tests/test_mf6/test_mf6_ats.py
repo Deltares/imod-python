@@ -33,7 +33,7 @@ def ats_dict():
 
 def test_render_defaults(ats_dict):
     """Render with default values for dt_multiplier and dt_fail_multiplier"""
-    globaltimes = pd.date_range("2023-01-01", periods=10, freq="D")
+    globaltimes = pd.date_range("2023-01-01", periods=5, freq="D")
 
     ats_dict.pop("dt_multiplier")
     ats_dict.pop("dt_fail_multiplier")
@@ -44,12 +44,15 @@ def test_render_defaults(ats_dict):
 
     expected = dedent("""\
         begin dimensions
-          maxats 2
+          maxats 5
         end dimensions
 
         begin perioddata
+          1 1.0 0.5 2.0 0.0 0.0
           2 1.0 0.5 2.0 0.0 0.0
+          3 1.0 0.5 2.0 0.0 0.0
           4 2.0 1.0 4.0 0.0 0.0
+          5 2.0 1.0 4.0 0.0 0.0
         end perioddata
         """)
 
@@ -59,7 +62,7 @@ def test_render_defaults(ats_dict):
 
 def test_render_all_transient(ats_dict):
     """Render with all transient values"""
-    globaltimes = pd.date_range("2023-01-01", periods=10, freq="D")
+    globaltimes = pd.date_range("2023-01-01", periods=5, freq="D")
 
     ats = AdaptiveTimeStepping(validate=True, **ats_dict)
 
@@ -67,12 +70,15 @@ def test_render_all_transient(ats_dict):
 
     expected = dedent("""\
         begin dimensions
-          maxats 2
+          maxats 5
         end dimensions
 
         begin perioddata
+          1 1.0 0.5 2.0 1.5 2.0
           2 1.0 0.5 2.0 1.5 2.0
+          3 1.0 0.5 2.0 1.5 2.0
           4 2.0 1.0 4.0 2.0 3.0
+          5 2.0 1.0 4.0 2.0 3.0
         end perioddata
         """)
 
@@ -82,7 +88,7 @@ def test_render_all_transient(ats_dict):
 
 def test_render_mixed(ats_dict):
     """Render with mixed constant and transient values"""
-    globaltimes = pd.date_range("2023-01-01", periods=10, freq="D")
+    globaltimes = pd.date_range("2023-01-01", periods=5, freq="D")
 
     ats_dict["dt_multiplier"] = 1.0
     ats_dict["dt_fail_multiplier"] = 0.5
@@ -93,12 +99,15 @@ def test_render_mixed(ats_dict):
 
     expected = dedent("""\
         begin dimensions
-          maxats 2
+          maxats 5
         end dimensions
 
         begin perioddata
+          1 1.0 0.5 2.0 1.0 0.5
           2 1.0 0.5 2.0 1.0 0.5
+          3 1.0 0.5 2.0 1.0 0.5
           4 2.0 1.0 4.0 1.0 0.5
+          5 2.0 1.0 4.0 1.0 0.5
         end perioddata
         """)
 
@@ -116,7 +125,7 @@ def test_render_constants():
         "dt_fail_multiplier": 3.0,
     }
 
-    globaltimes = pd.date_range("2023-01-01", periods=10, freq="D")
+    globaltimes = pd.date_range("2023-01-01", periods=5, freq="D")
 
     ats = AdaptiveTimeStepping(validate=True, **ats_dict)
 
@@ -124,11 +133,15 @@ def test_render_constants():
 
     expected = dedent("""\
         begin dimensions
-          maxats 1
+          maxats 5
         end dimensions
 
         begin perioddata
           1 2.0 1.0 4.0 2.0 3.0
+          2 2.0 1.0 4.0 2.0 3.0
+          3 2.0 1.0 4.0 2.0 3.0
+          4 2.0 1.0 4.0 2.0 3.0
+          5 2.0 1.0 4.0 2.0 3.0
         end perioddata
         """)
 
