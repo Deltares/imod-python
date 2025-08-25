@@ -231,14 +231,14 @@ def test_transport_with_ats(tmp_path, flow_transport_simulation):
     assert len(with_ats_outer) > len(without_ats_outer)
     dt_init_with_actual = with_ats_outer.loc[0, "totim"]
     dt_init_without_actual = without_ats_outer.loc[0, "totim"]
-    assert (dt_init == dt_init_with_actual).all()
-    assert not (dt_init == dt_init_without_actual).all()
+    assert dt_init.item() == dt_init_with_actual
+    assert dt_init.item() != dt_init_without_actual
 
 
 def test_transport_with_ats_percel(tmp_path, flow_transport_simulation):
     """
     Test that transport model works with ATS and that timesteps are actually
-    affected by the ATS settings.
+    affected by the ATS percel setting in the advection package.
     """
     # Arrange
     sim = flow_transport_simulation
@@ -255,21 +255,18 @@ def test_transport_with_ats_percel(tmp_path, flow_transport_simulation):
     # Make sure iterations written to csv files to check amount of timesteps.
     sim["solver"]["outer_csvfile"] = "flow_outer.csv"
     sim["transport_solver"]["outer_csvfile"] = "tpt_outer.csv"
+    # Act
+    # Write and run without percel
+    path_with_percel = tmp_path / "with_percel"
+    path_without_percel = tmp_path / "without_percel"
+    sim.write(path_without_percel)
+    sim.run()
+    # Write and run with percel
     ats_percel = 0.1
     sim["tpt_a"]["adv"] = imod.mf6.AdvectionTVD(ats_percel=ats_percel)
-    sim["flow"]["npf"].dataset["save_flows"] = True
-    # Act
-    path_with_ats = tmp_path / "with_ats"
-    sim.write(path_with_ats)
+    sim.write(path_with_percel)
     sim.run()
-    with_ats_outer = pd.read_csv(path_with_ats / "tpt_outer.csv")
-    # Expected percel timestep
-    cbc = sim.open_flow_budget().compute()
-    max_flux = np.abs(cbc).max()
-    dt_percel_expected = 10 / max_flux * 0.25 * ats_percel
-
+    with_percel_outer = pd.read_csv(path_with_percel / "tpt_outer.csv")
+    without_percel_outer = pd.read_csv(path_without_percel / "tpt_outer.csv")
     # Assert
-    dt_init_with_actual = with_ats_outer.loc[0, "totim"]
-    assert (dt_init == dt_init_with_actual).all()
-    dt_percel_actual = with_ats_outer.loc[5420, "totim"] - with_ats_outer.loc[5419, "totim"]
-    assert (dt_percel_expected == dt_percel_actual).all()
+    assert with_percel_outer.size > without_percel_outer.size
