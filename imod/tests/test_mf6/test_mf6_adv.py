@@ -1,8 +1,10 @@
 import pathlib
 
 import numpy as np
+import pytest
 
 import imod
+from imod.schemata import ValidationError
 
 
 def test_advection_upstream():
@@ -39,3 +41,13 @@ def test_advection_ats_percel():
     actual = a._render(directory, "adv", globaltimes, True)
     expected = "begin options\n  scheme TVD\n  ats_percel 0.5\nend options"
     assert actual == expected
+
+
+def test_advection_ats_percel_invalid():
+    """Test that invalid ats_percel values raise ValidationError."""
+    with pytest.raises(ValidationError):
+        imod.mf6.AdvectionTVD(ats_percel=1)
+    with pytest.raises(ValidationError):
+        imod.mf6.AdvectionTVD(ats_percel=-0.1)
+    with pytest.raises(ValidationError):
+        imod.mf6.AdvectionTVD(ats_percel=0.0)

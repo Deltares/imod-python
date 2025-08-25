@@ -12,13 +12,24 @@ robust alternative.
 from copy import deepcopy
 from typing import Optional
 
+import numpy as np
+
 from imod.common.interfaces.iregridpackage import IRegridPackage
 from imod.mf6.package import Package
+from imod.schemata import AllValueSchema, DimsSchema, DTypeSchema
 
 
 class Advection(Package, IRegridPackage):
     _pkg_id = "adv"
     _template = Package._initialize_template(_pkg_id)
+
+    _init_schemata = {
+        "ats_percel": [
+            DimsSchema(),
+            DTypeSchema(np.floating),
+            AllValueSchema(">", 0.0),
+        ],
+    }
 
     def _render(self, directory, pkgname, globaltimes, binary):
         render_dict = {}
@@ -58,10 +69,13 @@ class AdvectionUpstream(Advection):
         of zero is specified for ``ats_percel`` the program will automatically
         reset it to an internal no data value to indicate that time steps should
         not be subject to this constraint. Requires MODFLOW 6.6.0 or higher.
+    validate: bool, optional
+        Validate the package upon initialization. Defaults to True.
     """
 
-    def __init__(self, ats_percel: Optional[float] = None):
+    def __init__(self, ats_percel: Optional[float] = None, validate: bool = True):
         dict_dataset = {"scheme": "upstream", "ats_percel": ats_percel}
+        self._validate_init_schemata(validate)
         super().__init__(dict_dataset)
 
 
@@ -90,11 +104,14 @@ class AdvectionCentral(Advection):
         of zero is specified for ``ats_percel`` the program will automatically
         reset it to an internal no data value to indicate that time steps should
         not be subject to this constraint. Requires MODFLOW 6.6.0 or higher.
+    validate: bool, optional
+        Validate the package upon initialization. Defaults to True.
     """
 
-    def __init__(self, ats_percel: Optional[float] = None):
+    def __init__(self, ats_percel: Optional[float] = None, validate: bool = True):
         dict_dataset = {"scheme": "central", "ats_percel": ats_percel}
         super().__init__(dict_dataset)
+        self._validate_init_schemata(validate)
 
 
 class AdvectionTVD(Advection):
@@ -117,8 +134,11 @@ class AdvectionTVD(Advection):
         of zero is specified for ``ats_percel`` the program will automatically
         reset it to an internal no data value to indicate that time steps should
         not be subject to this constraint. Requires MODFLOW 6.6.0 or higher.
+    validate: bool, optional
+        Validate the package upon initialization. Defaults to True.
     """
 
-    def __init__(self, ats_percel: Optional[float] = None):
+    def __init__(self, ats_percel: Optional[float] = None, validate: bool = True):
         dict_dataset = {"scheme": "TVD", "ats_percel": ats_percel}
         super().__init__(dict_dataset)
+        self._validate_init_schemata(validate)
