@@ -302,7 +302,7 @@ class Package(PackageBase, IPackage, abc.ABC):
         pkgname: str,
         globaltimes: Union[list[np.datetime64], np.ndarray],
         write_context: WriteContext,
-    ):
+    ) -> None:
         directory = write_context.write_directory
         binary = write_context.use_binary
         self._write_blockfile(pkgname, globaltimes, write_context)
