@@ -75,8 +75,8 @@ class AdvectionUpstream(Advection):
 
     def __init__(self, ats_percel: Optional[float] = None, validate: bool = True):
         dict_dataset = {"scheme": "upstream", "ats_percel": ats_percel}
-        self._validate_init_schemata(validate)
         super().__init__(dict_dataset)
+        self._validate_init_schemata(validate)
 
 
 class AdvectionCentral(Advection):
