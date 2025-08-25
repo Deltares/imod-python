@@ -106,6 +106,16 @@ Discretization
     TimeDiscretization.regrid_like
     TimeDiscretization.is_empty
     TimeDiscretization.get_regrid_methods
+    AdaptiveTimeStepping
+    AdaptiveTimeStepping.write
+    AdaptiveTimeStepping.from_file
+    AdaptiveTimeStepping.to_netcdf
+    AdaptiveTimeStepping.copy
+    AdaptiveTimeStepping.clip_box
+    AdaptiveTimeStepping.mask
+    AdaptiveTimeStepping.regrid_like
+    AdaptiveTimeStepping.is_empty
+    AdaptiveTimeStepping.get_regrid_methods
 
 Model settings
 --------------

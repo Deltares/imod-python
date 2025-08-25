@@ -24,6 +24,12 @@ Added
 - Added :meth:`imod.mf6.Modflow6Simulation.create_partition_labels` to create
   partition labels for a MODFLOW 6 simulation from its idomain. This is useful
   for splitting a simulation into multiple submodels.
+- :class:`imod.mf6.AdaptiveTimeStepping` to specify adaptive time stepping
+  settings for MODFLOW 6 simulations.
+- The ``ats_percel`` argument to :class:`imod.mf6.AdvectionTVD`,
+  :class:`imod.mf6.AdvectionUpstream`, :class:`imod.mf6.AdvectionCentral` to
+  adapt the time step based on the maximum fraction of a cell that a solute
+  parcel is allowed to travel.
 
 Fixed
 ~~~~~
@@ -49,6 +55,8 @@ Fixed
 - Fixed bug where :meth:`imod.mf6.SourceSinkMixing.from_flow_model` would return
   an error upon adding a package which cannot have a ``concentration``, such as 
   :class:`imod.mf6.HorizontalFlowBarrierResistance`.
+- Broken names for ``outer_csvfile`` and ``inner_csvfile`` in the
+  :class:`imod.mf6.Solution` MODFLOW 6 template file.
 
 Changed
 ~~~~~~~

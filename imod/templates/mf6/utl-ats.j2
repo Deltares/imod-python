@@ -1,0 +1,8 @@
+begin dimensions
+  maxats {{maxats}}
+end dimensions
+
+begin perioddata
+{% for start, period_list in perioddata.items() %}  {{start}} {{period_list|join(" ")}}
+{% endfor -%}
+end perioddata

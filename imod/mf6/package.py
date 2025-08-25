@@ -48,6 +48,7 @@ from imod.mf6.auxiliary_variables import (
 from imod.mf6.pkgbase import (
     EXCHANGE_PACKAGES,
     TRANSPORT_PACKAGES,
+    UTIL_PACKAGES,
     PackageBase,
 )
 from imod.mf6.validation_settings import ValidationSettings, trim_time_dimension
@@ -110,6 +111,8 @@ class Package(PackageBase, IPackage, abc.ABC):
             fname = f"gwt-{pkg_id}.j2"
         elif pkg_id in EXCHANGE_PACKAGES:
             fname = f"exg-{pkg_id}.j2"
+        elif pkg_id in UTIL_PACKAGES:
+            fname = f"utl-{pkg_id}.j2"
         elif pkg_id == "api":
             fname = f"{pkg_id}.j2"
         else:
@@ -299,7 +302,7 @@ class Package(PackageBase, IPackage, abc.ABC):
         pkgname: str,
         globaltimes: Union[list[np.datetime64], np.ndarray],
         write_context: WriteContext,
-    ):
+    ) -> None:
         directory = write_context.write_directory
         binary = write_context.use_binary
         self._write_blockfile(pkgname, globaltimes, write_context)
