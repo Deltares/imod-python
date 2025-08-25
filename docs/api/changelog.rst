@@ -55,6 +55,8 @@ Fixed
 - Fixed bug where :meth:`imod.mf6.SourceSinkMixing.from_flow_model` would return
   an error upon adding a package which cannot have a ``concentration``, such as 
   :class:`imod.mf6.HorizontalFlowBarrierResistance`.
+- Broken names for ``outer_csvfile`` and ``inner_csvfile`` in the
+  :class:`imod.mf6.Solution` MODFLOW 6 template file.
 
 Changed
 ~~~~~~~
