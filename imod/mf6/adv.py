@@ -58,17 +58,18 @@ class AdvectionUpstream(Advection):
     ----------
     ats_percel: float, optional
         Fractional cell distance submitted by the ADV Package to the
-        AdaptiveTimeStepping (ATS) package. If ``ats_percel`` is specified and
-        the ATS Package is active, a time step calculation will be made for each
-        cell based on flow through the cell and cell properties. The largest
-        time step will be calculated such that the advective fractional cell
-        distance (``ats_percel``) is not exceeded for any active cell in the
-        grid. This time-step constraint will be submitted to the ATS Package,
-        perhaps with constraints submitted by other packages, in the calculation
-        of the time step. ``ats_percel`` must be greater than zero. If a value
-        of zero is specified for ``ats_percel`` the program will automatically
-        reset it to an internal no data value to indicate that time steps should
-        not be subject to this constraint. Requires MODFLOW 6.6.0 or higher.
+        :class:`imod.mf6.AdaptiveTimeStepping` (ATS) package. If ``ats_percel``
+        is specified and the ATS Package is active, a time step calculation will
+        be made for each cell based on flow through the cell and cell
+        properties. The largest time step will be calculated such that the
+        advective fractional cell distance (``ats_percel``) is not exceeded for
+        any active cell in the grid. This time-step constraint will be submitted
+        to the ATS Package, perhaps with constraints submitted by other
+        packages, in the calculation of the time step. ``ats_percel`` must be
+        greater than zero. If a value of zero is specified for ``ats_percel``
+        the program will automatically reset it to an internal no data value to
+        indicate that time steps should not be subject to this constraint.
+        Requires MODFLOW 6.6.0 or higher.
     validate: bool, optional
         Validate the package upon initialization. Defaults to True.
     """
@@ -93,17 +94,18 @@ class AdvectionCentral(Advection):
     ----------
     ats_percel: float, optional
         Fractional cell distance submitted by the ADV Package to the
-        AdaptiveTimeStepping (ATS) package. If ``ats_percel`` is specified and
-        the ATS Package is active, a time step calculation will be made for each
-        cell based on flow through the cell and cell properties. The largest
-        time step will be calculated such that the advective fractional cell
-        distance (``ats_percel``) is not exceeded for any active cell in the
-        grid. This time-step constraint will be submitted to the ATS Package,
-        perhaps with constraints submitted by other packages, in the calculation
-        of the time step. ``ats_percel`` must be greater than zero. If a value
-        of zero is specified for ``ats_percel`` the program will automatically
-        reset it to an internal no data value to indicate that time steps should
-        not be subject to this constraint. Requires MODFLOW 6.6.0 or higher.
+        :class:`imod.mf6.AdaptiveTimeStepping` (ATS) package. If ``ats_percel``
+        is specified and the ATS Package is active, a time step calculation will
+        be made for each cell based on flow through the cell and cell
+        properties. The largest time step will be calculated such that the
+        advective fractional cell distance (``ats_percel``) is not exceeded for
+        any active cell in the grid. This time-step constraint will be submitted
+        to the ATS Package, perhaps with constraints submitted by other
+        packages, in the calculation of the time step. ``ats_percel`` must be
+        greater than zero. If a value of zero is specified for ``ats_percel``
+        the program will automatically reset it to an internal no data value to
+        indicate that time steps should not be subject to this constraint.
+        Requires MODFLOW 6.6.0 or higher.
     validate: bool, optional
         Validate the package upon initialization. Defaults to True.
     """
@@ -123,17 +125,18 @@ class AdvectionTVD(Advection):
     ----------
     ats_percel: float, optional
         Fractional cell distance submitted by the ADV Package to the
-        AdaptiveTimeStepping (ATS) package. If ``ats_percel`` is specified and
-        the ATS Package is active, a time step calculation will be made for each
-        cell based on flow through the cell and cell properties. The largest
-        time step will be calculated such that the advective fractional cell
-        distance (``ats_percel``) is not exceeded for any active cell in the
-        grid. This time-step constraint will be submitted to the ATS Package,
-        perhaps with constraints submitted by other packages, in the calculation
-        of the time step. ``ats_percel`` must be greater than zero. If a value
-        of zero is specified for ``ats_percel`` the program will automatically
-        reset it to an internal no data value to indicate that time steps should
-        not be subject to this constraint. Requires MODFLOW 6.6.0 or higher.
+        :class:`imod.mf6.AdaptiveTimeStepping` (ATS) package. If ``ats_percel``
+        is specified and the ATS Package is active, a time step calculation will
+        be made for each cell based on flow through the cell and cell
+        properties. The largest time step will be calculated such that the
+        advective fractional cell distance (``ats_percel``) is not exceeded for
+        any active cell in the grid. This time-step constraint will be submitted
+        to the ATS Package, perhaps with constraints submitted by other
+        packages, in the calculation of the time step. ``ats_percel`` must be
+        greater than zero. If a value of zero is specified for ``ats_percel``
+        the program will automatically reset it to an internal no data value to
+        indicate that time steps should not be subject to this constraint.
+        Requires MODFLOW 6.6.0 or higher.
     validate: bool, optional
         Validate the package upon initialization. Defaults to True.
     """

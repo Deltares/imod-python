@@ -71,6 +71,52 @@ class AdaptiveTimeStepping(Package):
     validate: {True, False}
         Flag to indicate whether the package should be validated upon
         initialization. Defaults to True.
+    
+        
+    Examples
+    --------
+    Create an Adaptive Time Stepping package with an initial time step of 0.1
+    days, a minimum time step of 0.1 days, a maximum time step of 10 days, and
+    a time step multiplier of 2.0 for all stress periods:
+    
+    >>> ats = imod.mf6.AdaptiveTimeStepping(
+    ...     dt_init=0.1,
+    ...     dt_min=0.1,
+    ...     dt_max=10.0,
+    ...     dt_multiplier=2.0
+    ... )
+
+    Assign this to a simulation:
+    
+    >>> simulation = imod.mf6.Modflow6Simulation()
+    >>> simulation["ats"] = ats
+
+    Create an Adaptive Time Stepping package with different settings for
+    ``dt_init`` two times. The time discretization created by
+    :meth:`imod.mf6.Modflow6Simulation.create_time_discretization` will
+    determine to which stress periods these will be assigned eventually.
+
+    >>> dt_init = xr.DataArray(
+    ...     [0.1, 0.5],
+    ...     dims=["time"],
+    ...     coords={"time": [np.datetime64("2024-01-01"), np.datetime64("2024-01-02")]}
+    ... )
+    >>> simulation["ats"] = imod.mf6.AdaptiveTimeStepping(
+    ...     dt_init=dt_init,
+    ...     dt_min=0.1,
+    ...     dt_max=10.0,
+    ...     dt_multiplier=2.0
+    ... )
+
+    Use the Adaptive Time Stepping package together with an advection package
+    such as :class:`imod.mf6.AdvectionTVD` and set the ``ats_percel`` argument
+    to adapt the time step based on the maximum fraction of a cell that a solute
+    parcel is allowed to travel:
+
+    >>> simulation["transport_model"]["adv"] = imod.mf6.AdvectionTVD(
+    ...     ats_percel=0.5,
+    ... )
+
     """
 
     _pkg_id = "ats"
