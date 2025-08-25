@@ -87,7 +87,7 @@ class AdaptiveTimeStepping(Package):
     _init_schemata = {
         "dt_init": [DimsSchema("time") | DimsSchema(), DTypeSchema(np.floating)],
         "dt_min": [DimsSchema("time") | DimsSchema(), DTypeSchema(np.floating)],
-        "dt_max": [DimsSchema("time"), DTypeSchema(np.floating)],
+        "dt_max": [DimsSchema("time") | DimsSchema(), DTypeSchema(np.floating)],
         "dt_multiplier": [
             DimsSchema("time") | DimsSchema(),
             DTypeSchema(np.floating),

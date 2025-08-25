@@ -38,7 +38,7 @@ def test_render_defaults(ats_dict):
     ats_dict.pop("dt_multiplier")
     ats_dict.pop("dt_fail_multiplier")
 
-    ats = AdaptiveTimeStepping(validate=False, **ats_dict)
+    ats = AdaptiveTimeStepping(validate=True, **ats_dict)
 
     rendered = ats._render("test_dir", "test_pkg", globaltimes, False)
 
@@ -61,7 +61,7 @@ def test_render_all_transient(ats_dict):
     """Render with all transient values"""
     globaltimes = pd.date_range("2023-01-01", periods=10, freq="D")
 
-    ats = AdaptiveTimeStepping(validate=False, **ats_dict)
+    ats = AdaptiveTimeStepping(validate=True, **ats_dict)
 
     rendered = ats._render("test_dir", "test_pkg", globaltimes, False)
 
@@ -87,7 +87,7 @@ def test_render_mixed(ats_dict):
     ats_dict["dt_multiplier"] = 1.0
     ats_dict["dt_fail_multiplier"] = 0.5
 
-    ats = AdaptiveTimeStepping(validate=False, **ats_dict)
+    ats = AdaptiveTimeStepping(validate=True, **ats_dict)
 
     rendered = ats._render("test_dir", "test_pkg", globaltimes, False)
 
@@ -118,7 +118,7 @@ def test_render_constants():
 
     globaltimes = pd.date_range("2023-01-01", periods=10, freq="D")
 
-    ats = AdaptiveTimeStepping(validate=False, **ats_dict)
+    ats = AdaptiveTimeStepping(validate=True, **ats_dict)
 
     rendered = ats._render("test_dir", "test_pkg", globaltimes, False)
 
