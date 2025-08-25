@@ -135,15 +135,17 @@ class AdaptiveTimeStepping(Package):
         one = np.int64(1)
         if "time" in self.dataset:  # one of bin_ds has time
             package_times = self.dataset.coords["time"].values
+            maxats = len(package_times)
             starts = np.searchsorted(globaltimes, package_times) + one
             for i, start in enumerate(starts):
                 data = self.dataset.sel(time=package_times[i])
                 _assign_data_to_perioddata(perioddata, self._period_data, start, data)
         else:
             _assign_data_to_perioddata(perioddata, self._period_data, one, self.dataset)
+            maxats = 1
 
         d: dict[str, int | _PeriodDataType] = {}
-        d["maxats"] = len(package_times)
+        d["maxats"] = maxats
         d["perioddata"] = perioddata
         return d
 
