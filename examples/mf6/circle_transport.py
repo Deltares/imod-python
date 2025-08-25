@@ -184,14 +184,32 @@ simulation["flow_solver"] = imod.mf6.Solution(
 )
 
 # %%
+#
+# Time discretization
+# -------------------
+#
 # Set the timesteps, we want output each year, so we specify stress periods
-# which last 1 year. However, timesteps of 1 year yield unstable results, so we
-# set ``n_timesteps`` to 10, which sets the amount of timesteps within a stress
-# period.
+# which last 1 year. We add the additional times to ensure that there is output
+# at the end of each year.
 
 simtimes = pd.date_range(start="2000-01-01", end="2030-01-01", freq="As")
 simulation.create_time_discretization(additional_times=simtimes)
-simulation["time_discretization"]["n_timesteps"] = 10
+
+# %%
+#
+# We want to use adaptive time stepping to ensure stable results. We set the
+# initial time step to 0.001 year, the minimum time step to 0.0001 year, and the
+# maximum time step to 1 year. We will set the ``ats_percel`` in the Advection
+# package in the next section to let MODFLOW 6 compute an appropriate time step
+# based on the velocity field: A solute parcel should not travel more than one
+# cell in a time step.
+
+simulation["ats"] = imod.mf6.AdaptiveTimeStepping(
+    dt_init=1e-1,
+    dt_min=1e-1,
+    dt_max=50.0,
+    dt_multiplier=2.0,
+)
 
 # %%
 # Buoyancy
@@ -241,7 +259,8 @@ transport_model["dsp"] = imod.mf6.Dispersion(
     xt3d_off=False,
     xt3d_rhs=False,
 )
-transport_model["adv"] = imod.mf6.AdvectionUpstream()
+# transport_model["adv"] = imod.mf6.AdvectionTVD(ats_percel=0.5)
+transport_model["adv"] = imod.mf6.AdvectionTVD()
 transport_model["mst"] = imod.mf6.MobileStorageTransfer(porosity)
 
 # %%
