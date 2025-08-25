@@ -1,11 +1,12 @@
-from typing import TypeAlias
+import pathlib
+from typing import Any, Dict, TypeAlias, Union
 
 import numpy as np
 
 from imod.mf6.package import Package
 from imod.mf6.write_context import WriteContext
 from imod.schemata import AllValueSchema, DimsSchema, DTypeSchema
-from imod.typing import GridDataset, Union
+from imod.typing import GridDataset
 
 _PeriodDataType: TypeAlias = dict[np.int64, list]
 _PeriodDataVarNames: TypeAlias = tuple[str, str, str, str, str]
@@ -122,7 +123,13 @@ class AdaptiveTimeStepping(Package):
         super().__init__(dict_dataset)
         self._validate_init_schemata(validate)
 
-    def _render(self, directory, pkgname, globaltimes, binary):
+    def _get_render_dictionary(
+        self,
+        directory: pathlib.Path,
+        pkgname: str,
+        globaltimes: Union[list[np.datetime64], np.ndarray],
+        binary: bool,
+    ) -> Dict[str, Any]:
         perioddata: _PeriodDataType = {}
         # Force to np.int64 for mypy and numpy >= 2.2.4
         one = np.int64(1)
@@ -138,7 +145,7 @@ class AdaptiveTimeStepping(Package):
         d: dict[str, int | _PeriodDataType] = {}
         d["maxats"] = len(package_times)
         d["perioddata"] = perioddata
-        return self._template.render(d)
+        return d
 
     def _validate(self, schemata: dict, **kwargs):
         # Insert additional kwargs
