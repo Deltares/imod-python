@@ -7,7 +7,7 @@ transport model using the ``imod`` package and associated packages.
 
 In overview, we'll set the following steps:
 
-    * Setting up the flow model, just like in the circle.py example
+    * Setting up the flow model, just like in the :doc:`circle` example
     * set up the transport model
     * Run the simulation.
     * Visualize the results.
@@ -134,7 +134,7 @@ constant_concentration = constant_concentration.expand_dims(species=["salinity"]
 # Add flow model to simulation
 # ----------------------------
 #
-# See the :doc:`circle.py` example for more information.
+# See the :doc:`circle` example for more information.
 
 gwf_model = imod.mf6.GroundwaterFlowModel()
 gwf_model["disv"] = imod.mf6.VerticesDiscretization(
