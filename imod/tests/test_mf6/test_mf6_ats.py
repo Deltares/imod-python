@@ -30,6 +30,7 @@ def ats_dict():
         "dt_fail_multiplier": _to_time_da(np.array([2.0, 3.0])),
     }
 
+
 def test_render_defaults(ats_dict):
     """Render with default values for dt_multiplier and dt_fail_multiplier"""
     globaltimes = pd.date_range("2023-01-01", periods=10, freq="D")
@@ -108,12 +109,12 @@ def test_render_mixed(ats_dict):
 def test_render_constants():
     """Render with all constant values"""
     ats_dict = {
-            "dt_init": 2.0,
-            "dt_min": 1.0,
-            "dt_max": 4.0,
-            "dt_multiplier": 2.0,
-            "dt_fail_multiplier": 3.0,
-        }
+        "dt_init": 2.0,
+        "dt_min": 1.0,
+        "dt_max": 4.0,
+        "dt_multiplier": 2.0,
+        "dt_fail_multiplier": 3.0,
+    }
 
     globaltimes = pd.date_range("2023-01-01", periods=10, freq="D")
 
@@ -134,6 +135,7 @@ def test_render_constants():
     assert isinstance(rendered, str)
     assert rendered == expected
 
+
 def test_validate_init_schemata(ats_dict):
     # Test that the validation of the init schemata works correctly
     ats = AdaptiveTimeStepping(validate=False, **ats_dict)
@@ -141,7 +143,11 @@ def test_validate_init_schemata(ats_dict):
 
     ats_dict_copy = ats_dict.copy()
     ats_dict_copy.pop("dt_init")  # Remove dt_init to trigger validation error
-    erronous_dt_init = xr.DataArray([3.0], coords={"wrong_name": [np.datetime64("2023-01-02")]}, dims=("wrong_name",))
+    erronous_dt_init = xr.DataArray(
+        [3.0],
+        coords={"wrong_name": [np.datetime64("2023-01-02")]},
+        dims=("wrong_name",),
+    )
     with pytest.raises(ValidationError, match="dt_init"):
         AdaptiveTimeStepping(validate=True, dt_init=erronous_dt_init, **ats_dict_copy)
 
