@@ -133,16 +133,22 @@ class AdaptiveTimeStepping(Package):
         perioddata: _PeriodDataType = {}
         # Force to np.int64 for mypy and numpy >= 2.2.4
         one = np.int64(1)
-        if "time" in self.dataset:  # one of bin_ds has time
-            package_times = self.dataset.coords["time"].values
-            maxats = len(package_times)
-            starts = np.searchsorted(globaltimes, package_times) + one
-            for i, start in enumerate(starts):
-                data = self.dataset.sel(time=package_times[i])
-                _assign_data_to_perioddata(perioddata, self._period_data, start, data)
+        # MODLFLOW 6 doesn't automatically forward fill stress period data so we
+        # need to assign data for each stress period, apply xarray's forward
+        # filling functionality for this.
+        if "time" not in self.dataset:
+            ds_to_reindex = self.dataset.expand_dims("time").assign_coords(
+                time=globaltimes[:1]
+            )
         else:
-            _assign_data_to_perioddata(perioddata, self._period_data, one, self.dataset)
-            maxats = 1
+            ds_to_reindex = self.dataset
+        dataset_full = ds_to_reindex.reindex(time=globaltimes, method="ffill").bfill(
+            "time"
+        )  # bfill in case first value is NaN
+        maxats = len(globaltimes)
+        for i, time in enumerate(globaltimes):
+            data = dataset_full.sel(time=time)
+            _assign_data_to_perioddata(perioddata, self._period_data, i + one, data)
 
         d: dict[str, int | _PeriodDataType] = {}
         d["maxats"] = maxats

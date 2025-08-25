@@ -198,11 +198,12 @@ simulation.create_time_discretization(additional_times=simtimes)
 # %%
 #
 # We want to use adaptive time stepping to ensure stable results. We set the
-# initial time step to 0.001 year, the minimum time step to 0.0001 year, and the
-# maximum time step to 1 year. We will set the ``ats_percel`` in the Advection
-# package in the next section to let MODFLOW 6 compute an appropriate time step
-# based on the velocity field: A solute parcel should not travel more than one
-# cell in a time step.
+# initial time step to 0.1 day, the minimum time step to 0.1 day, and the
+# maximum time step to 50 days. The multiplier is set to 2.0 so that consecutive
+# timesteps will be increased by a factor of 2. We will set the ``ats_percel``
+# in the Advection package in the next section to let MODFLOW 6 compute an
+# appropriate time step based on the velocity field: A solute parcel should not
+# travel more than one cell in a time step.
 
 simulation["ats"] = imod.mf6.AdaptiveTimeStepping(
     dt_init=1e-1,
@@ -259,8 +260,7 @@ transport_model["dsp"] = imod.mf6.Dispersion(
     xt3d_off=False,
     xt3d_rhs=False,
 )
-# transport_model["adv"] = imod.mf6.AdvectionTVD(ats_percel=0.5)
-transport_model["adv"] = imod.mf6.AdvectionTVD()
+transport_model["adv"] = imod.mf6.AdvectionTVD(ats_percel=0.5)
 transport_model["mst"] = imod.mf6.MobileStorageTransfer(porosity)
 
 # %%
