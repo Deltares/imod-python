@@ -71,14 +71,14 @@ class AdaptiveTimeStepping(Package):
     validate: {True, False}
         Flag to indicate whether the package should be validated upon
         initialization. Defaults to True.
-    
-        
+
+
     Examples
     --------
     Create an Adaptive Time Stepping package with an initial time step of 0.1
     days, a minimum time step of 0.1 days, a maximum time step of 10 days, and
     a time step multiplier of 2.0 for all stress periods:
-    
+
     >>> ats = imod.mf6.AdaptiveTimeStepping(
     ...     dt_init=0.1,
     ...     dt_min=0.1,
@@ -87,7 +87,7 @@ class AdaptiveTimeStepping(Package):
     ... )
 
     Assign this to a simulation:
-    
+
     >>> simulation = imod.mf6.Modflow6Simulation()
     >>> simulation["ats"] = ats
 
