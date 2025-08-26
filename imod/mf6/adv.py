@@ -23,7 +23,7 @@ from imod.typing import GridDataArray
 from imod.util.regrid import RegridderWeightsCache
 
 
-class Advection(Package, IRegridPackage, ABC):
+class AdvectionBase(Package, IRegridPackage, ABC):
     _pkg_id = "adv"
     _template = Package._initialize_template(_pkg_id)
     _scheme: str
@@ -70,7 +70,7 @@ class Advection(Package, IRegridPackage, ABC):
         return deepcopy(self)
 
 
-class AdvectionUpstream(Advection):
+class AdvectionUpstream(AdvectionBase):
     """
     The upstream weighting (first order upwind) scheme sets the concentration
     at the cellface between two adjacent cells equal to the concentration in
@@ -99,7 +99,7 @@ class AdvectionUpstream(Advection):
     _scheme = "upstream"
 
 
-class AdvectionCentral(Advection):
+class AdvectionCentral(AdvectionBase):
     """
     The central-in-space weighting scheme is based on a simple
     distance-weighted linear interpolation between the center of cell n and the
@@ -132,7 +132,7 @@ class AdvectionCentral(Advection):
     _scheme = "central"
 
 
-class AdvectionTVD(Advection):
+class AdvectionTVD(AdvectionBase):
     """
     An implicit second order TVD scheme. More expensive than upstream
     weighting but more robust.
