@@ -32,8 +32,10 @@ import xarray as xr
 import imod
 
 # %%
+#
 # We can discretize a simulation as follows, this creates a
-# TimeDiscretization object under the key ``"time_discretization"``.
+# :class:`imod.mf6.TimeDiscretization` object under the key
+# ``"time_discretization"``.
 
 simulation = imod.mf6.Modflow6Simulation("example")
 simulation.create_time_discretization(
@@ -43,7 +45,8 @@ simulation.create_time_discretization(
 simulation["time_discretization"]
 
 # %%
-# To view the data inside TimeDiscretization object:
+#
+# To view the data inside :class:`imod.mf6.TimeDiscretization` object:
 
 simulation["time_discretization"].dataset
 
@@ -128,15 +131,15 @@ simulation_bc["time_discretization"].dataset
 # Notice that iMOD Python figured out that the two boundary conditions, both
 # with two timesteps, should lead to three stress periods!
 #
-# Specifying extra settings
-# -------------------------
+# Extra settings
+# --------------
 #
-# The ``TimeDiscretization`` package also supports other settings, like the
-# amount of timesteps which Modflow should use within a stress period, as well
-# as a timestep multiplier, to gradually increase the timesteps modflow uses
-# within a stress period. This can be useful when boundary conditions change
-# very abruptly between stress periods. These settings are set by accessing
-# their respective variables in the ``dataset``.
+# The :class:`imod.mf6.TimeDiscretization` package also supports other settings,
+# like the amount of timesteps which Modflow should use within a stress period,
+# as well as a timestep multiplier, to gradually increase the timesteps modflow
+# uses within a stress period. This can be useful when boundary conditions
+# change very abruptly between stress periods. These settings are set by
+# accessing their respective variables in the ``dataset``.
 
 times = simulation_bc["time_discretization"].dataset.coords["time"]
 
@@ -148,3 +151,53 @@ simulation_bc["time_discretization"].dataset["n_timesteps"] = xr.DataArray(
 simulation_bc["time_discretization"].dataset
 
 # %%
+#
+# Adaptive Time Stepping
+# ----------------------
+#
+# The :class:`imod.mf6.AdaptiveTimeStepping` package can be used to let Modflow
+# decide the length of each timestep within a stress period. This can be useful
+# when boundary conditions change abruptly, or when a model is highly dynamic.
+# The :class:`imod.mf6.AdaptiveTimeStepping` package can be added to a
+# :class:`imod.mf6.Modflow6Simulation` as follows:
+
+simulation_bc["ats"] = imod.mf6.AdaptiveTimeStepping(
+    dt_init=1e-4, dt_min=1e-4, dt_max=2.0, dt_multiplier=2.0, dt_fail_multiplier=5.0
+)
+
+simulation_bc["ats"]
+
+# %%
+# 
+# The ``dt_init`` parameter sets the initial timestep length, ``dt_min`` and
+# ``dt_max`` set the minimum and maximum timestep length allowed,
+# ``dt_multiplier`` multiplies the timestep length for each consecutive timestep
+# if the model converges well, and ``dt_fail_multiplier`` decreases the timestep
+# length if the model has convergence problems.
+#
+# There is one further way to influence the timestep length, which is to set the
+# ``ats_percel`` parameter in the :class:`imod.mf6.AdvectionTVD` package of a
+# transport model. This parameter sets the maximum fraction of a cell that a
+# parcel of solute is allowed to travel in a single timestep. This can be used
+# to ensure that the timestep is small enough to get accurate transport results.
+# Once this is set, MODFLOW 6 will choose the smallest necessary timestep based
+# on the convergence criteria and the ``ats_percel`` criteria.
+
+transport_model = imod.mf6.GroundwaterTransportModel()
+transport_model["adv"] = imod.mf6.AdvectionTVD(ats_percel=0.95)
+simulation_bc["gwt_1"] = transport_model
+
+transport_model["adv"]
+
+# %%
+#
+# Conclusion
+# ----------
+#
+# The :meth:`imod.mf6.Modflow6Simulation.create_time_discretization` method can
+# be used to easily generate stress periods for a simulation, based on the
+# timesteps of the boundary conditions assigned to the model. The
+# :class:`imod.mf6.AdaptiveTimeStepping` package can be used to let MODFLOW 6
+# decide the length of each timestep within a stress period, based on
+# convergence criteria and, in case of using the ``ats_percel`` options, the
+# velocity field.
