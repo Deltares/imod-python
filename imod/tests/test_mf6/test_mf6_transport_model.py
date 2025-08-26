@@ -194,6 +194,18 @@ def test_transport_output_wrong_species(tmp_path, flow_transport_simulation):
         flow_transport_simulation.open_concentration(species_ls=["a", "b"])
 
 
+def test_transport_clip_box(tmp_path, flow_transport_simulation):
+    x_min = 300.0
+    flow_transport_simulation_clipped = flow_transport_simulation.clip_box(x_min=x_min)
+    flow_transport_simulation_clipped.write(tmp_path)
+    flow_transport_simulation_clipped.run()
+
+    conc = flow_transport_simulation_clipped.open_concentration(
+        species_ls=["a", "b", "c", "d"]
+    )
+    assert conc.coords["x"].min() > x_min
+
+
 def test_transport_with_ats(tmp_path, flow_transport_simulation):
     """
     Test that transport model works with ATS and that timesteps are actually

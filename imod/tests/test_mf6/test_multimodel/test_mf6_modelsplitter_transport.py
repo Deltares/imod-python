@@ -4,9 +4,10 @@ from pathlib import Path
 import numpy as np
 import pytest
 
-from imod.mf6.adv import Advection
+from imod.mf6 import AdvectionCentral, AdvectionTVD, AdvectionUpstream
 from imod.mf6.dsp import Dispersion
 from imod.mf6.multimodel.modelsplitter import create_partition_info, slice_model
+from imod.mf6.package import Package
 from imod.mf6.simulation import Modflow6Simulation
 from imod.tests.fixtures.mf6_modelrun_fixture import assert_simulation_can_run
 from imod.typing.grid import zeros_like
@@ -196,12 +197,14 @@ def test_split_flow_and_transport_model_evaluate_output_with_species(
     )
 
 
-@pytest.mark.parametrize("advection_scheme", ["TVD", "upstream", "central"])
+@pytest.mark.parametrize(
+    "advection_pkg", [AdvectionCentral, AdvectionTVD, AdvectionUpstream]
+)
 @pytest.mark.parametrize("dsp_xt3d_off", [True, False])
 def test_split_flow_and_transport_settings(
     tmp_path: Path,
     flow_transport_simulation: Modflow6Simulation,
-    advection_scheme: str,
+    advection_pkg: Package,
     dsp_xt3d_off: bool,
 ):
     simulation = flow_transport_simulation
@@ -216,7 +219,7 @@ def test_split_flow_and_transport_settings(
         xt3d_off=dsp_xt3d_off,
         xt3d_rhs=not dsp_xt3d_off,
     )
-    simulation["tpt_b"]["adv"] = Advection(scheme=advection_scheme)
+    simulation["tpt_b"]["adv"] = advection_pkg()
     # create label array
     submodel_labels = zeros_like(active)
     submodel_labels = submodel_labels.drop_vars("layer")
@@ -226,7 +229,7 @@ def test_split_flow_and_transport_settings(
     new_simulation = simulation.split(submodel_labels)
     assert (
         new_simulation["split_exchanges"][2].dataset["adv_scheme"].values[()]
-        == advection_scheme
+        == advection_pkg._scheme
     )
     assert (
         new_simulation["split_exchanges"][2].dataset["dsp_xt3d_off"].values[()]
