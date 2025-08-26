@@ -168,7 +168,7 @@ simulation_bc["ats"] = imod.mf6.AdaptiveTimeStepping(
 simulation_bc["ats"]
 
 # %%
-# 
+#
 # The ``dt_init`` parameter sets the initial timestep length, ``dt_min`` and
 # ``dt_max`` set the minimum and maximum timestep length allowed,
 # ``dt_multiplier`` multiplies the timestep length for each consecutive timestep
