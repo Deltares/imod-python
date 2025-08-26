@@ -194,7 +194,10 @@ class AdaptiveTimeStepping(Package):
         maxats = len(globaltimes)
         for i, time in enumerate(globaltimes):
             data = dataset_full.sel(time=time)
-            _assign_data_to_perioddata(perioddata, self._period_data, i + one, data)
+            stress_period_nr = i + one
+            _assign_data_to_perioddata(
+                perioddata, self._period_data, stress_period_nr, data
+            )
 
         d: dict[str, int | _PeriodDataType] = {}
         d["maxats"] = maxats
