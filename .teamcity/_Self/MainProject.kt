@@ -94,7 +94,7 @@ object UnitTests : BuildType({
     name = "UnitTests"
 
     params {
-        param("reverse.dep.Modflow_Modflow6Release.MODFLOW6_Version", "6.5.0")
+        param("reverse.dep.Modflow_Modflow6Release.MODFLOW6_Version", "6.6.0")
         param("reverse.dep.Modflow_Modflow6Release.MODFLOW6_Platform", "win64")
     }
     templates(UnitTestsTemplate, GitHubIntegrationTemplate)
@@ -123,7 +123,7 @@ object Examples : BuildType({
     name = "Examples"
 
     params {
-        param("reverse.dep.Modflow_Modflow6Release.MODFLOW6_Version", "6.5.0")
+        param("reverse.dep.Modflow_Modflow6Release.MODFLOW6_Version", "6.6.0")
         param("reverse.dep.Modflow_Modflow6Release.MODFLOW6_Platform", "win64")
     }
 
