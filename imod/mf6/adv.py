@@ -9,19 +9,24 @@ Upstream weighting is a fast alternative, and TVD is a more expensive and more
 robust alternative.
 """
 
+from abc import ABC
 from copy import deepcopy
 from typing import Optional
 
 import numpy as np
 
 from imod.common.interfaces.iregridpackage import IRegridPackage
+from imod.common.utilities.dataclass_type import DataclassType
 from imod.mf6.package import Package
 from imod.schemata import AllValueSchema, DimsSchema, DTypeSchema
+from imod.typing import GridDataArray
+from imod.util.regrid import RegridderWeightsCache
 
 
-class Advection(Package, IRegridPackage):
+class Advection(Package, IRegridPackage, ABC):
     _pkg_id = "adv"
     _template = Package._initialize_template(_pkg_id)
+    _scheme: str
 
     _init_schemata = {
         "ats_percel": [
@@ -30,6 +35,11 @@ class Advection(Package, IRegridPackage):
             AllValueSchema(">", 0.0),
         ],
     }
+
+    def __init__(self, ats_percel: Optional[float] = None, validate: bool = True):
+        dict_dataset = {"scheme": self._scheme, "ats_percel": ats_percel}
+        super().__init__(dict_dataset)
+        self._validate_init_schemata(validate)
 
     def _render(self, directory, pkgname, globaltimes, binary):
         render_dict = {}
@@ -42,7 +52,19 @@ class Advection(Package, IRegridPackage):
 
     def mask(self, _) -> Package:
         """
-        The mask method is irrelevant for this package , instead this method
+        The mask method is irrelevant for this package, instead this method
+        retuns a copy of itself.
+        """
+        return deepcopy(self)
+
+    def regrid_like(
+        self,
+        target_grid: GridDataArray,
+        regrid_cache: RegridderWeightsCache,
+        regridder_types: Optional[DataclassType] = None,
+    ) -> Package:
+        """
+        The regrid_like method is irrelevant for this package, instead this method
         retuns a copy of itself.
         """
         return deepcopy(self)
@@ -74,10 +96,7 @@ class AdvectionUpstream(Advection):
         Validate the package upon initialization. Defaults to True.
     """
 
-    def __init__(self, ats_percel: Optional[float] = None, validate: bool = True):
-        dict_dataset = {"scheme": "upstream", "ats_percel": ats_percel}
-        super().__init__(dict_dataset)
-        self._validate_init_schemata(validate)
+    _scheme = "upstream"
 
 
 class AdvectionCentral(Advection):
@@ -110,10 +129,7 @@ class AdvectionCentral(Advection):
         Validate the package upon initialization. Defaults to True.
     """
 
-    def __init__(self, ats_percel: Optional[float] = None, validate: bool = True):
-        dict_dataset = {"scheme": "central", "ats_percel": ats_percel}
-        super().__init__(dict_dataset)
-        self._validate_init_schemata(validate)
+    _scheme = "central"
 
 
 class AdvectionTVD(Advection):
@@ -141,7 +157,4 @@ class AdvectionTVD(Advection):
         Validate the package upon initialization. Defaults to True.
     """
 
-    def __init__(self, ats_percel: Optional[float] = None, validate: bool = True):
-        dict_dataset = {"scheme": "TVD", "ats_percel": ats_percel}
-        super().__init__(dict_dataset)
-        self._validate_init_schemata(validate)
+    _scheme = "TVD"
