@@ -385,11 +385,13 @@ class Modflow6Simulation(collections.UserDict, ISimulation):
                 )
             elif isinstance(value, Package):
                 if value._pkg_id in ["ims", "ats"]:
-                    # TODO: Is this really necessary?
-                    sim_write_context = write_context.copy_with_new_write_directory(
+                    # TODO: Is this really necessary? This is the same as
+                    #   model_write_context above? And model_write_context seems
+                    #   not dynamically changed?
+                    pkg_write_context = write_context.copy_with_new_write_directory(
                         write_context.simulation_directory
                     )
-                    value._write(key, globaltimes, sim_write_context)
+                    value._write(key, globaltimes, pkg_write_context)
             elif isinstance(value, list):
                 for exchange in value:
                     if isinstance(exchange, imod.mf6.exchangebase.ExchangeBase):
