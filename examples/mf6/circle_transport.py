@@ -190,20 +190,24 @@ simulation["flow_solver"] = imod.mf6.Solution(
 #
 # Set the timesteps, we want output each year, so we specify stress periods
 # which last 1 year. We add the additional times to ensure that there is output
-# at the end of each year.
+# at the end of each year. To achieve this we setup stress periods were each
+# stress period is a year long. We can then use the "last" keyword in the output
+# control to save the output.
 
 simtimes = pd.date_range(start="2000-01-01", end="2030-01-01", freq="As")
 simulation.create_time_discretization(additional_times=simtimes)
 
 # %%
 #
-# We want to use adaptive time stepping to ensure stable results. We set the
-# initial time step to 0.1 day, the minimum time step to 0.1 day, and the
-# maximum time step to 50 days. The multiplier is set to 2.0 so that consecutive
-# timesteps will be increased by a factor of 2. We will set the ``ats_percel``
-# in the Advection package in the next section to let MODFLOW 6 compute an
-# appropriate time step based on the velocity field: A solute parcel should not
-# travel more than one cell in a time step.
+# We want to use adaptive time stepping to ensure stable results without taking
+# an unnecessary amount of small timesteps. We set the initial time step to 0.1
+# day, the minimum time step to 0.1 day, and the maximum time step to 50 days.
+# The multiplier is set to 2.0 so that consecutive timesteps will be increased
+# by a factor of 2 if the convergence is good. Furthermore, we will set the
+# ``ats_percel`` to 0.95 in the Advection package in the next section to let
+# MODFLOW 6 compute an appropriate time step based on the velocity field: A
+# solute parcel should not travel more than one cell in a time step. From these
+# two criteria MODFLOW 6 will select the smallest time step.
 
 simulation["ats"] = imod.mf6.AdaptiveTimeStepping(
     dt_init=1e-1,
@@ -260,7 +264,7 @@ transport_model["dsp"] = imod.mf6.Dispersion(
     xt3d_off=False,
     xt3d_rhs=False,
 )
-transport_model["adv"] = imod.mf6.AdvectionTVD(ats_percel=0.5)
+transport_model["adv"] = imod.mf6.AdvectionTVD(ats_percel=0.95)
 transport_model["mst"] = imod.mf6.MobileStorageTransfer(porosity)
 
 # %%
