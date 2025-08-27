@@ -385,9 +385,9 @@ class Modflow6Simulation(collections.UserDict, ISimulation):
                 )
             elif isinstance(value, Package):
                 if value._pkg_id in ["ims", "ats"]:
-                    # TODO: Is this really necessary? This is the same as
-                    #   model_write_context above? And model_write_context seems
-                    #   not dynamically changed?
+                    # Copy write_context again for packages to avoid changing it
+                    # down the line and risk clashing with the model write
+                    # context.
                     pkg_write_context = write_context.copy_with_new_write_directory(
                         write_context.simulation_directory
                     )
