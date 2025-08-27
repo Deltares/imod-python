@@ -219,9 +219,9 @@ def test_transport_with_ats(tmp_path, flow_transport_simulation):
     dt_min = xr.DataArray([1e-4], coords=coords, dims=dims)
     dt_max = xr.DataArray([10.0], coords=coords, dims=dims)
     dt_multiplier = xr.DataArray([1.2], coords=coords, dims=dims)
-    dt_fail_multiplier = xr.DataArray([0.0], coords=coords, dims=dims)
+    dt_fail_divisor = xr.DataArray([0.0], coords=coords, dims=dims)
     sim["ats"] = imod.mf6.AdaptiveTimeStepping(
-        dt_init, dt_min, dt_max, dt_multiplier, dt_fail_multiplier
+        dt_init, dt_min, dt_max, dt_multiplier, dt_fail_divisor
     )
     # Make sure iterations written to csv files to check amount of timesteps.
     sim["solver"]["outer_csvfile"] = "flow_outer.csv"
@@ -260,9 +260,9 @@ def test_transport_with_ats_percel(tmp_path, flow_transport_simulation):
     dt_min = xr.DataArray([1e-4], coords=coords, dims=dims)
     dt_max = xr.DataArray([10.0], coords=coords, dims=dims)
     dt_multiplier = xr.DataArray([1.2], coords=coords, dims=dims)
-    dt_fail_multiplier = xr.DataArray([0.0], coords=coords, dims=dims)
+    dt_fail_divisor = xr.DataArray([0.0], coords=coords, dims=dims)
     sim["ats"] = imod.mf6.AdaptiveTimeStepping(
-        dt_init, dt_min, dt_max, dt_multiplier, dt_fail_multiplier
+        dt_init, dt_min, dt_max, dt_multiplier, dt_fail_divisor
     )
     # Make sure iterations written to csv files to check amount of timesteps.
     sim["solver"]["outer_csvfile"] = "flow_outer.csv"

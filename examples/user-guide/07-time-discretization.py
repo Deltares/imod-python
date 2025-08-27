@@ -162,7 +162,7 @@ simulation_bc["time_discretization"].dataset
 # :class:`imod.mf6.Modflow6Simulation` as follows:
 
 simulation_bc["ats"] = imod.mf6.AdaptiveTimeStepping(
-    dt_init=1e-4, dt_min=1e-4, dt_max=2.0, dt_multiplier=2.0, dt_fail_multiplier=5.0
+    dt_init=1e-4, dt_min=1e-4, dt_max=2.0, dt_multiplier=2.0, dt_fail_divisor=5.0
 )
 
 simulation_bc["ats"]
@@ -172,7 +172,7 @@ simulation_bc["ats"]
 # The ``dt_init`` parameter sets the initial timestep length, ``dt_min`` and
 # ``dt_max`` set the minimum and maximum timestep length allowed,
 # ``dt_multiplier`` multiplies the timestep length for each consecutive timestep
-# if the model converges well, and ``dt_fail_multiplier`` decreases the timestep
+# if the model converges well, and ``dt_fail_divisor`` decreases the timestep
 # length if the model has convergence problems.
 #
 # There is one further way to influence the timestep length, which is to set the

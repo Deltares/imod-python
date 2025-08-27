@@ -27,16 +27,16 @@ def ats_dict():
         "dt_min": _to_time_da(np.array([0.5, 1.0])),
         "dt_max": _to_time_da(np.array([2.0, 4.0])),
         "dt_multiplier": _to_time_da(np.array([1.5, 2.0])),
-        "dt_fail_multiplier": _to_time_da(np.array([2.0, 3.0])),
+        "dt_fail_divisor": _to_time_da(np.array([2.0, 3.0])),
     }
 
 
 def test_render_defaults(ats_dict):
-    """Render with default values for dt_multiplier and dt_fail_multiplier"""
+    """Render with default values for dt_multiplier and dt_fail_divisor"""
     globaltimes = pd.date_range("2023-01-01", periods=5, freq="D")
 
     ats_dict.pop("dt_multiplier")
-    ats_dict.pop("dt_fail_multiplier")
+    ats_dict.pop("dt_fail_divisor")
 
     ats = AdaptiveTimeStepping(validate=True, **ats_dict)
 
@@ -91,7 +91,7 @@ def test_render_mixed(ats_dict):
     globaltimes = pd.date_range("2023-01-01", periods=5, freq="D")
 
     ats_dict["dt_multiplier"] = 1.0
-    ats_dict["dt_fail_multiplier"] = 0.5
+    ats_dict["dt_fail_divisor"] = 0.5
 
     ats = AdaptiveTimeStepping(validate=True, **ats_dict)
 
@@ -122,7 +122,7 @@ def test_render_constants():
         "dt_min": 1.0,
         "dt_max": 4.0,
         "dt_multiplier": 2.0,
-        "dt_fail_multiplier": 3.0,
+        "dt_fail_divisor": 3.0,
     }
 
     globaltimes = pd.date_range("2023-01-01", periods=5, freq="D")

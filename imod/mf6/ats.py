@@ -57,12 +57,12 @@ class AdaptiveTimeStepping(Package):
         one. If ``dt_multiplier`` is zero or one, then it has no effect on the
         simulation. A value between 2.0 and 5.0 can be used as an initial
         estimate.
-    dt_fail_multiplier: xr.DataArray of floats, default 0.0
+    dt_fail_divisor: xr.DataArray of floats, default 0.0
         Divisor of the time step length when a time step fails to converge. If
         there is solver failure, then the time step will be tried again with a
         shorter time step length calculated as the previous time step length
-        divided by ``dt_fail_multiplier``. ``dt_fail_multiplier`` must be zero,
-        one, or greater than one. If ``dt_fail_multiplier`` is zero or one, then
+        divided by ``dt_fail_divisor``. ``dt_fail_divisor`` must be zero,
+        one, or greater than one. If ``dt_fail_divisor`` is zero or one, then
         time steps will not be retried with shorter lengths. In this case, the
         program will terminate with an error, or it will continue of the
         CONTINUE option is set in the simulation name file. Initial tests with
@@ -76,14 +76,16 @@ class AdaptiveTimeStepping(Package):
     Examples
     --------
     Create an Adaptive Time Stepping package with an initial time step of 0.1
-    days, a minimum time step of 0.1 days, a maximum time step of 10 days, and
-    a time step multiplier of 2.0 for all stress periods:
+    days, a minimum time step of 0.1 days, a maximum time step of 10 days, a
+    time step multiplier of 2.0 for all stress periods, and a time step fail
+    divisor of 5.0:
 
     >>> ats = imod.mf6.AdaptiveTimeStepping(
     ...     dt_init=0.1,
     ...     dt_min=0.1,
     ...     dt_max=10.0,
     ...     dt_multiplier=2.0
+    ...     dt_fail_divisor=5.0,
     ... )
 
     Assign this to a simulation:
@@ -106,6 +108,7 @@ class AdaptiveTimeStepping(Package):
     ...     dt_min=0.1,
     ...     dt_max=10.0,
     ...     dt_multiplier=2.0
+    ...     dt_fail_divisor=5.0,
     ... )
 
     Use the Adaptive Time Stepping package together with an advection package
@@ -114,7 +117,7 @@ class AdaptiveTimeStepping(Package):
     parcel is allowed to travel:
 
     >>> simulation["transport_model"]["adv"] = imod.mf6.AdvectionTVD(
-    ...     ats_percel=0.5,
+    ...     ats_percel=0.95,
     ... )
 
     """
@@ -128,7 +131,7 @@ class AdaptiveTimeStepping(Package):
         "dt_min",
         "dt_max",
         "dt_multiplier",
-        "dt_fail_multiplier",
+        "dt_fail_divisor",
     )
     _init_schemata = {
         "dt_init": [DimsSchema("time") | DimsSchema(), DTypeSchema(np.floating)],
@@ -138,7 +141,7 @@ class AdaptiveTimeStepping(Package):
             DimsSchema("time") | DimsSchema(),
             DTypeSchema(np.floating),
         ],
-        "dt_fail_multiplier": [
+        "dt_fail_divisor": [
             DimsSchema("time") | DimsSchema(),
             DTypeSchema(np.floating),
         ],
@@ -148,6 +151,7 @@ class AdaptiveTimeStepping(Package):
         "dt_init": [AllValueSchema(">=", 0.0)],
         "dt_min": [AllValueSchema("<", "dt_max"), AllValueSchema(">", 0.0)],
         "dt_multiplier": [AllValueSchema("==", 0.0) | AllValueSchema(">=", 1.0)],
+        "dt_fail_divisor": [AllValueSchema("==", 0.0) | AllValueSchema(">=", 1.0)],
     }
 
     def __init__(
@@ -156,7 +160,7 @@ class AdaptiveTimeStepping(Package):
         dt_min,
         dt_max,
         dt_multiplier=0.0,
-        dt_fail_multiplier=0.0,
+        dt_fail_divisor=0.0,
         validate=True,
     ):
         dict_dataset = {
@@ -164,7 +168,7 @@ class AdaptiveTimeStepping(Package):
             "dt_min": dt_min,
             "dt_max": dt_max,
             "dt_multiplier": dt_multiplier,
-            "dt_fail_multiplier": dt_fail_multiplier,
+            "dt_fail_divisor": dt_fail_divisor,
         }
         super().__init__(dict_dataset)
         self._validate_init_schemata(validate)
