@@ -56,5 +56,6 @@ from imod.mf6.sto import SpecificStorage, StorageCoefficient
 from imod.mf6.timedis import TimeDiscretization
 from imod.mf6.uzf import UnsaturatedZoneFlow
 from imod.mf6.validation_settings import ValidationSettings
+from imod.mf6.vsc import Viscosity
 from imod.mf6.wel import LayeredWell, Well
 from imod.mf6.write_context import WriteContext
