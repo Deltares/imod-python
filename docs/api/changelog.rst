@@ -64,7 +64,7 @@ Changed
   partition labels from a :class:`imod.mf6.Modflow6Simulation` straightaway, use
   the newly added :meth:`imod.mf6.Modflow6Simulation.create_partition_labels`
   method instead.
-- :class:`imod.mf6.River` now ignore cells with ``icelltype == 0`` when
+- :class:`imod.mf6.River` now ignore confined cells (``icelltype == 0``) when
   validating whether the river bottom elevation is below the model bottom
   elevation.
 
