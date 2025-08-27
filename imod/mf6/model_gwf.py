@@ -6,6 +6,7 @@ from typing import Optional, cast
 
 import numpy as np
 
+from imod.common.statusinfo import StatusInfo, StatusInfoBase
 from imod.common.utilities.dataclass_type import DataclassType
 from imod.logging import init_log_decorator
 from imod.logging.logging_decorators import standard_log_decorator
@@ -33,6 +34,7 @@ from imod.mf6.regrid.regrid_schemes import (
 from imod.mf6.riv import River
 from imod.mf6.sto import StorageCoefficient
 from imod.mf6.utilities.chd_concat import concat_layered_chd_packages
+from imod.mf6.validation_settings import ValidationSettings
 from imod.mf6.wel import LayeredWell, Well
 from imod.prepare.topsystem.default_allocation_methods import (
     SimulationAllocationOptions,
@@ -150,6 +152,46 @@ class GroundwaterFlowModel(Modflow6Model):
         transport_models_old = buoyancy_package._get_transport_model_names()
         if len(transport_models_old) == len(transport_models_per_flow_model):
             buoyancy_package._update_transport_models(transport_models_per_flow_model)
+
+    def validate(
+        self,
+        model_name: str = "",
+        validation_context: Optional[ValidationSettings] = None,
+        **kwargs,
+    ) -> StatusInfoBase:
+        """
+        Validate model.
+
+        Parameters
+        ----------
+        model_name: str, optional
+            Name of the model, used for status info.
+        validation_context: ValidationSettings, optional
+            Validation settings, which can be used to control the validation
+            process. If not provided, defaults to ValidationSettings(validate=True).
+        **kwargs: dict
+            Additional keyword arguments passed to Package._validate
+
+        Returns
+        -------
+        NestedStatusInfo
+            Status information about the validation process, including any errors
+            or warnings encountered during validation.
+        """
+        try:
+            npfkey = self._get_pkgkey(NodePropertyFlow._pkg_id)
+        except Exception as e:
+            status_info = StatusInfo(f"{model_name} model")
+            status_info.add_error(str(e))
+            return status_info
+
+        icelltype = self[npfkey]["icelltype"]
+        return super().validate(
+            model_name=model_name,
+            validation_context=validation_context,
+            icelltype=icelltype,
+            **kwargs,
+        )
 
     @classmethod
     @standard_log_decorator()

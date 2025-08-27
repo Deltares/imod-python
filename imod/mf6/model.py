@@ -335,6 +335,7 @@ class Modflow6Model(collections.UserDict, IModel, abc.ABC):
         self,
         model_name: str = "",
         validation_context: Optional[ValidationSettings] = None,
+        **kwargs,
     ) -> StatusInfoBase:
         """
         Validate model.
@@ -346,6 +347,8 @@ class Modflow6Model(collections.UserDict, IModel, abc.ABC):
         validation_context: ValidationSettings, optional
             Validation settings, which can be used to control the validation
             process. If not provided, defaults to ValidationSettings(validate=True).
+        **kwargs: dict
+            Additional keyword arguments passed to Package._validate
 
         Returns
         -------
@@ -392,6 +395,7 @@ class Modflow6Model(collections.UserDict, IModel, abc.ABC):
                 idomain=idomain,
                 bottom=bottom,
                 validation_context=validation_context,
+                **kwargs,
             )
             if len(pkg_errors) > 0:
                 footer = SUGGESTION_TEXT if pkg_has_cleanup(pkg) else None
