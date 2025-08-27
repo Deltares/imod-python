@@ -3,6 +3,7 @@ import numpy as np
 
 from imod.logging import init_log_decorator
 from imod.mf6.package import Package
+from imod.mf6.write_context import WriteContext
 from imod.schemata import DimsSchema, DTypeSchema
 
 
@@ -77,6 +78,8 @@ class TimeDiscretization(Package):
             "time_units": "days",
             "start_date_time": start_date_time,
         }
+        if "ats_filename" in self.dataset:
+            d["ats_filename"] = self.dataset["ats_filename"].item()
         timestep_duration = self.dataset["timestep_duration"]
         n_timesteps = self.dataset["n_timesteps"]
         timestep_multiplier = self.dataset["timestep_multiplier"]
@@ -117,6 +120,14 @@ class TimeDiscretization(Package):
                 f"{self.__class__.__name__} package. "
                 f"Got {da.dims}. Can be at max ('time', )."
             )
+
+    def _set_ats_filename(self, ats_pkgname: str, write_context: WriteContext):
+        ats_path = write_context.get_formatted_write_directory() / f"{ats_pkgname}.ats"
+        self.dataset["ats_filename"] = ats_path
+
+    def _clear_ats_filename(self):
+        if "ats_filename" in self.dataset.keys():
+            del self.dataset["ats_filename"]
 
     def _write(self, pkgname, globaltimes, write_context):
         timedis_content = self._render(

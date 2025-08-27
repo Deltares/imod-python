@@ -219,7 +219,7 @@ UNSTRUCTURED_GRID_PACKAGES = [create_vertices_discretization()] + [
 ]
 
 GRIDLESS_PACKAGES = [
-    imod.mf6.adv.Advection("upstream"),
+    imod.mf6.AdvectionUpstream(),
     imod.mf6.Buoyancy(
         reference_density=1000.0,
         reference_concentration=[4.0, 25.0],
