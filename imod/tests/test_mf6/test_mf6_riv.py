@@ -623,6 +623,7 @@ def test_import_river_from_imod5(imod5_dataset, tmp_path):
     riv._write("riv", globaltimes, write_context)
     drn._write("drn", globaltimes, write_context)
 
+    # set icelltype=1.0 to enforce checking river bottom above dis bottom
     errors = riv._validate(
         imod.mf6.River._write_schemata,
         icelltype=1.0,
