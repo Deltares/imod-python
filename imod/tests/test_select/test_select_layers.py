@@ -1,117 +1,113 @@
 import numpy as np
 import pytest
-import xarray as xr
+from pytest_cases import parametrize_with_cases
 
-import imod
-
-# seed random generator
-np.random.seed(0)
-
-
-def test_upper_active_layer_ibound():
-    x = np.arange(10)
-    y = np.arange(10)
-    layer = np.arange(1, 6)
-    values = np.ones((5, 10, 10))
-    active_layer = np.random.randint(low=1, high=6, size=(10, 10))
-    coords = {"x": x, "y": y, "layer": layer}
-    dims = ["layer", "y", "x"]
-
-    # set to 0 above active layer (in loop to make sure we know what we're doing)
-    for i in range(10):
-        for j in range(10):
-            li = active_layer[i, j] - 1  # layer is 1-based
-            values[:li, i, j] = 0
-
-    da_test = xr.DataArray(data=values, coords=coords, dims=dims, name="test")
-
-    active_layer_test = imod.select.upper_active_layer(da_test, is_ibound=True)
-
-    # assert
-    np.testing.assert_equal(active_layer_test, active_layer)
+from imod.select.layers import (
+    get_lower_active_grid_cells,
+    get_lower_active_layer_number,
+    get_upper_active_grid_cells,
+    get_upper_active_layer_number,
+)
+from imod.typing.grid import ones_like
 
 
-def test_upper_active_layer_ibound_some_inactive():
-    x = np.arange(10)
-    y = np.arange(10)
-    layer = np.arange(1, 6)
-    values = np.ones((5, 10, 10))
-    active_layer = np.random.randint(low=1, high=6, size=(10, 10))
-    coords = {"x": x, "y": y, "layer": layer}
-    dims = ["layer", "y", "x"]
-
-    # set to 0 above active layer (in loop to make sure we know what we're doing)
-    for i in range(10):
-        for j in range(10):
-            li = active_layer[i, j] - 1  # layer is 1-based
-            values[:li, i, j] = 0
-
-    # all layers 0 in ibound, nan in active_layer
-    active_layer = active_layer.astype(float)
-    active_layer[3, 3] = np.nan
-    values[:, 3, 3] = 0
-
-    da_test = xr.DataArray(data=values, coords=coords, dims=dims, name="test")
-
-    active_layer_test = imod.select.upper_active_layer(da_test, is_ibound=True)
-
-    # assert
-    np.testing.assert_equal(active_layer_test, active_layer)
+@pytest.fixture(scope="function")
+def active_structured(basic_dis):
+    idomain, _, _ = basic_dis
+    return idomain == 1
 
 
-def test_upper_active_layer_ibound_all_inactive():
-    x = np.arange(10)
-    y = np.arange(10)
-    layer = np.arange(1, 6)
-    values = np.zeros((5, 10, 10))
-    active_layer = np.empty((10, 10))
-    active_layer[...] = np.nan
-    coords = {"x": x, "y": y, "layer": layer}
-    dims = ["layer", "y", "x"]
-
-    da_test = xr.DataArray(data=values, coords=coords, dims=dims, name="test")
-
-    active_layer_test = imod.select.upper_active_layer(da_test, is_ibound=True)
-
-    # assert
-    np.testing.assert_equal(active_layer_test, active_layer)
+@pytest.fixture(scope="function")
+def active_unstructured(basic_unstructured_dis):
+    idomain, _, _ = basic_unstructured_dis
+    return idomain == 1
 
 
-def test_upper_active_layer_values():
-    x = np.arange(10)
-    y = np.arange(10)
-    layer = np.arange(1, 6)
-    values = np.random.random((5, 10, 10))
-    values[:, 0, 0] = 0  # introduce some zeros
-    active_layer = np.random.randint(low=1, high=6, size=(10, 10))
-    coords = {"x": x, "y": y, "layer": layer}
-    dims = ["layer", "y", "x"]
-
-    # set to nan above active layer (in loop to make sure we know what we're doing)
-    for i in range(10):
-        for j in range(10):
-            li = active_layer[i, j] - 1  # layer is 1-based
-            values[:li, i, j] = np.nan
-
-    da_test = xr.DataArray(data=values, coords=coords, dims=dims, name="test")
-
-    active_layer_test = imod.select.upper_active_layer(da_test, is_ibound=False)
-
-    # assert
-    np.testing.assert_equal(active_layer_test, active_layer)
+@pytest.fixture(scope="function")
+def layer(basic_dis):
+    idomain, _, _ = basic_dis
+    return idomain.coords["layer"]
 
 
-def test_upper_active_layer_not_an_ibound():
-    x = np.arange(10)
-    y = np.arange(10)
-    layer = np.arange(1, 6)
-    values = np.random.random((5, 10, 10))
-    # TODO:? active_layer = np.random.randint(low=1, high=6, size=(10, 10))
-    coords = {"x": x, "y": y, "layer": layer}
-    dims = ["layer", "y", "x"]
+class ActiveLayerCases:
+    def case_all_active_structured(self, active_structured):
+        upper_layer_number = ones_like(active_structured.sel(layer=1)).astype(int)
+        lower_layer_number = upper_layer_number + 2
+        return active_structured, upper_layer_number, lower_layer_number
 
-    da_test = xr.DataArray(data=values, coords=coords, dims=dims, name="test")
+    def case_all_active_unstructured(self, active_unstructured):
+        upper_layer_number = ones_like(active_unstructured.sel(layer=1)).astype(int)
+        lower_layer_number = upper_layer_number + 2
+        return active_unstructured, upper_layer_number, lower_layer_number
 
-    # assert
-    with pytest.raises(ValueError):
-        assert imod.select.upper_active_layer(da_test, is_ibound=True)
+    def case_structured(self, active_structured):
+        active_structured[0, :, 1] = False
+        active_structured[1, :, 2] = False
+        active_structured[0, :, 3] = False
+        active_structured[1, :, 3] = False
+        active_structured[1, :, 4] = False
+        active_structured[2, :, 4] = False
+        active_structured[2, :, 5] = False
+        upper_layer_number = ones_like(active_structured.sel(layer=1)).astype(int)
+        lower_layer_number = upper_layer_number + 2
+        upper_layer_number[:, 1] = 2
+        upper_layer_number[:, 3] = 3
+        lower_layer_number[:, 4] = 1
+        lower_layer_number[:, 5] = 2
+        return active_structured, upper_layer_number, lower_layer_number
+
+    def case_unstructured(self, active_unstructured):
+        active_unstructured[0, 1] = False
+        active_unstructured[1, 2] = False
+        active_unstructured[0, 3] = False
+        active_unstructured[1, 3] = False
+        active_unstructured[1, 4] = False
+        active_unstructured[2, 4] = False
+        active_unstructured[2, 5] = False
+        upper_layer_number = ones_like(active_unstructured.sel(layer=1)).astype(int)
+        lower_layer_number = upper_layer_number + 2
+        upper_layer_number[1] = 2
+        upper_layer_number[3] = 3
+        lower_layer_number[4] = 1
+        lower_layer_number[5] = 2
+        return active_unstructured, upper_layer_number, lower_layer_number
+
+
+@parametrize_with_cases("active_case", cases=ActiveLayerCases)
+def test_get_lower_active_grid(active_case, layer):
+    active, _, expected_lower_layer_nr = active_case
+    is_lower_active = get_lower_active_grid_cells(active)
+
+    expected_lower_active = layer == expected_lower_layer_nr
+
+    np.testing.assert_array_equal(is_lower_active.values, expected_lower_active.values)
+
+
+@parametrize_with_cases("active_case", cases=ActiveLayerCases)
+def test_get_upper_active_grid(active_case, layer):
+    active, expected_upper_layer_nr, _ = active_case
+    is_upper_active = get_upper_active_grid_cells(active)
+
+    expected_upper_active = layer == expected_upper_layer_nr
+
+    np.testing.assert_array_equal(is_upper_active.values, expected_upper_active.values)
+
+
+@parametrize_with_cases("active_case", cases=ActiveLayerCases)
+def test_get_lower_layer_number(active_case):
+    active, _, expected_lower_layer_nr = active_case
+    is_lower_active = get_lower_active_layer_number(active)
+
+    np.testing.assert_array_equal(
+        is_lower_active.values, expected_lower_layer_nr.values
+    )
+
+
+@parametrize_with_cases("active_case", cases=ActiveLayerCases)
+def test_get_upper_layer_number(active_case):
+    active, expected_upper_layer_nr, _ = active_case
+    is_upper_active = get_upper_active_layer_number(active)
+
+    np.testing.assert_array_equal(
+        is_upper_active.values, expected_upper_layer_nr.values
+    )
