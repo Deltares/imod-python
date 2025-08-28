@@ -832,7 +832,6 @@ class Modflow6Model(collections.UserDict, IModel, abc.ABC):
     def regrid_like(
         self,
         target_grid: GridDataArray,
-        validate: bool = True,
         regrid_cache: Optional[RegridderWeightsCache] = None,
     ) -> "Modflow6Model":
         """
@@ -847,8 +846,6 @@ class Modflow6Model(collections.UserDict, IModel, abc.ABC):
         target_grid: xr.DataArray or xu.UgridDataArray
             a grid defined using the same discretization as the one we want to
             regrid the package to.
-        validate: bool
-            set to true to validate the regridded packages
         regrid_cache: RegridderWeightsCache, optional
             stores regridder weights for different regridders. Can be used to
             speed up regridding, if the same regridders are used several times
@@ -861,7 +858,7 @@ class Modflow6Model(collections.UserDict, IModel, abc.ABC):
         data-arrays regridded to another discretization, similar to the one used
         in input argument "target_grid"
         """
-        return _regrid_like(self, target_grid, validate, regrid_cache)
+        return _regrid_like(self, target_grid, regrid_cache)
 
     def mask_all_packages(
         self,

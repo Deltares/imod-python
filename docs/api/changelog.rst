@@ -6,6 +6,21 @@ All notable changes to this project will be documented in this file.
 The format is based on `Keep a Changelog`_, and this project adheres to
 `Semantic Versioning`_.
 
+[Unreleased]
+------------
+
+Changed
+~~~~~~~
+
+- No automatic validation upon calling :meth:`imod.mf6.Modflow6Simulation.regrid_like` anymore.
+  Use the ``validate`` argument of :meth:`imod.mf6.Modflow6Simulation.write` to
+  validate the regridded model upon writing instead.
+
+[1.0.0rc6] - 2025-08-28
+-----------------------
+
+Small post-release to fix rendering of documentation online.
+
 [1.0.0rc5] - 2025-08-27
 -----------------------
 

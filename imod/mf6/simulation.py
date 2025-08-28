@@ -1431,7 +1431,6 @@ class Modflow6Simulation(collections.UserDict, ISimulation):
         self,
         regridded_simulation_name: str,
         target_grid: GridDataArray,
-        validate: bool = True,
     ) -> "Modflow6Simulation":
         """
         This method creates a new simulation object. The models contained in the
@@ -1444,8 +1443,6 @@ class Modflow6Simulation(collections.UserDict, ISimulation):
             name given to the output simulation
         target_grid: xr.DataArray or  xu.UgridDataArray
             discretization onto which the models  in this simulation will be regridded
-        validate: bool
-            set to true to validate the regridded packages
 
         Returns
         -------
@@ -1462,7 +1459,7 @@ class Modflow6Simulation(collections.UserDict, ISimulation):
         ... )
         """
 
-        return _regrid_like(self, regridded_simulation_name, target_grid, validate)
+        return _regrid_like(self, regridded_simulation_name, target_grid)
 
     def _add_modelsplit_exchanges(self, exchanges_list: list[GWFGWF]) -> None:
         if not self.is_split():
