@@ -194,7 +194,7 @@ def test_all_nan(riv_data, dis_data):
 
     river = imod.mf6.River(**riv_data)
 
-    errors = river._validate(river._write_schemata, **dis_data)
+    errors = river._validate(river._write_schemata, icelltype=1.0, **dis_data)
 
     assert len(errors) == 1
     assert "stage" in errors.keys()
@@ -205,7 +205,7 @@ def test_validate_inconsistent_nan(riv_data, dis_data):
     riv_data["stage"][..., 2] = np.nan
     river = imod.mf6.River(**riv_data)
 
-    errors = river._validate(river._write_schemata, **dis_data)
+    errors = river._validate(river._write_schemata, icelltype=1.0, **dis_data)
 
     assert len(errors) == 2
     assert "bottom_elevation" in errors.keys()
@@ -220,7 +220,7 @@ def test_cleanup_inconsistent_nan(riv_data, dis_data):
     dis_pkg = TYPE_DIS_PKG[type_grid](**dis_data)
 
     river.cleanup(dis_pkg)
-    errors = river._validate(river._write_schemata, **dis_data)
+    errors = river._validate(river._write_schemata, icelltype=1.0, **dis_data)
 
     assert len(errors) == 0
 
@@ -233,7 +233,7 @@ def test_layer_as_coord_in_active_cells(riv_data, dis_data):
 
     dis_data["idomain"][1, ...] = 0
 
-    errors = river._validate(river._write_schemata, **dis_data)
+    errors = river._validate(river._write_schemata, icelltype=1.0, **dis_data)
 
     assert len(errors) == 0
 
@@ -245,7 +245,7 @@ def test_layer_as_coord_in_inactive_cells(riv_data, dis_data):
 
     dis_data["idomain"][0, ...] = 0
 
-    errors = river._validate(river._write_schemata, **dis_data)
+    errors = river._validate(river._write_schemata, icelltype=1.0, **dis_data)
 
     assert len(errors) == 1
 
@@ -310,7 +310,7 @@ def test_validate_zero_conductance(riv_data, dis_data):
 
     river = imod.mf6.River(**riv_data)
 
-    errors = river._validate(river._write_schemata, **dis_data)
+    errors = river._validate(river._write_schemata, icelltype=0.0, **dis_data)
 
     assert len(errors) == 1
     for var, var_errors in errors.items():
@@ -329,7 +329,7 @@ def test_cleanup_zero_conductance(riv_data, dis_data):
     river = imod.mf6.River(**riv_data)
     river.cleanup(dis_pkg)
 
-    errors = river._validate(river._write_schemata, **dis_data)
+    errors = river._validate(river._write_schemata, icelltype=0.0, **dis_data)
     assert len(errors) == 0
 
 
@@ -343,7 +343,7 @@ def test_validate_bottom_above_stage(riv_data, dis_data):
 
     river = imod.mf6.River(**riv_data)
 
-    errors = river._validate(river._write_schemata, **dis_data)
+    errors = river._validate(river._write_schemata, icelltype=0.0, **dis_data)
 
     assert len(errors) == 1
     assert "stage" in errors.keys()
@@ -362,7 +362,7 @@ def test_cleanup_bottom_above_stage(riv_data, dis_data):
     river = imod.mf6.River(**riv_data)
     river.cleanup(dis_pkg)
 
-    errors = river._validate(river._write_schemata, **dis_data)
+    errors = river._validate(river._write_schemata, icelltype=0.0, **dis_data)
 
     assert len(errors) == 0
     assert river.dataset["bottom_elevation"].equals(river.dataset["stage"])
@@ -375,12 +375,18 @@ def test_check_riv_bottom_above_dis_bottom(riv_data, dis_data):
     """
 
     river = imod.mf6.River(**riv_data)
+    # Verify no errors initially
+    errors = river._validate(river._write_schemata, icelltype=0.0, **dis_data)
+    assert len(errors) == 0
 
-    river._validate(river._write_schemata, **dis_data)
-
+    # Adapt dis bottom to be above river bottom
     dis_data["bottom"] += 2.0
 
-    errors = river._validate(river._write_schemata, **dis_data)
+    # Should not error if icelltype <= 0
+    errors = river._validate(river._write_schemata, icelltype=0.0, **dis_data)
+    assert len(errors) == 0
+    # Error if icelltype > 0
+    errors = river._validate(river._write_schemata, icelltype=1.0, **dis_data)
 
     assert len(errors) == 1
     for var, var_errors in errors.items():
@@ -395,13 +401,13 @@ def test_check_boundary_outside_active_domain(riv_data, dis_data):
 
     river = imod.mf6.River(**riv_data)
 
-    errors = river._validate(river._write_schemata, **dis_data)
+    errors = river._validate(river._write_schemata, icelltype=0.0, **dis_data)
 
     assert len(errors) == 0
 
     dis_data["idomain"][..., 0] = 0
 
-    errors = river._validate(river._write_schemata, **dis_data)
+    errors = river._validate(river._write_schemata, icelltype=0.0, **dis_data)
 
     assert len(errors) == 1
 
@@ -617,8 +623,10 @@ def test_import_river_from_imod5(imod5_dataset, tmp_path):
     riv._write("riv", globaltimes, write_context)
     drn._write("drn", globaltimes, write_context)
 
+    # set icelltype=1.0 to enforce checking river bottom above dis bottom
     errors = riv._validate(
         imod.mf6.River._write_schemata,
+        icelltype=1.0,
         idomain=target_dis.dataset["idomain"],
         bottom=target_dis.dataset["bottom"],
     )
@@ -688,6 +696,7 @@ def test_import_river_from_imod5__negative_layer(imod5_dataset, tmp_path):
         imod.mf6.River._write_schemata,
         idomain=target_dis.dataset["idomain"],
         bottom=target_dis.dataset["bottom"],
+        icelltype=1.0,
     )
     assert len(errors) == 0
     errors = drn._validate(
@@ -818,6 +827,7 @@ def test_import_river_from_imod5__period_data(imod5_dataset_periods, tmp_path):
         imod.mf6.River._write_schemata,
         idomain=target_dis.dataset["idomain"],
         bottom=target_dis.dataset["bottom"],
+        icelltype=1.0,
     )
     assert len(errors) == 0
 

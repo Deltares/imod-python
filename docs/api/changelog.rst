@@ -15,6 +15,9 @@ Changed
 - No automatic validation upon calling :meth:`imod.mf6.Modflow6Simulation.regrid_like` anymore.
   Use the ``validate`` argument of :meth:`imod.mf6.Modflow6Simulation.write` to
   validate the regridded model upon writing instead.
+- :class:`imod.mf6.River` now ignore confined cells (``icelltype == 0``) when
+  validating whether the river bottom elevation is below the model bottom
+  elevation.
 
 [1.0.0rc6] - 2025-08-28
 -----------------------
