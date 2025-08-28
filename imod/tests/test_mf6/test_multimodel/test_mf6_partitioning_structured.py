@@ -623,7 +623,9 @@ def test_partitioning_structured_hfb(
     np.testing.assert_allclose(head["head"].values, original_head.values, rtol=1e-3)
 
 
-@parametrize_with_cases("partition_array", cases=PartitionArrayCases, prefix="case_four_")
+@parametrize_with_cases(
+    "partition_array", cases=PartitionArrayCases, prefix="case_four_"
+)
 def test_partitioning_structured__disconnected_models(
     tmp_path: Path,
     transient_twri_model: Modflow6Simulation,
@@ -634,7 +636,7 @@ def test_partitioning_structured__disconnected_models(
     # Isolate models from each other. There shouldn't be exchanges between these
     # models.
     new_idomain = simulation["GWF_1"]["dis"].dataset["idomain"].copy()
-    new_idomain[:, 7, :8] = 0
+    new_idomain[:, 7, :7] = 0
     simulation.mask_all_models(new_idomain)
 
     # Run the original example, so without partitioning, and save the simulation
@@ -657,11 +659,18 @@ def test_partitioning_structured__disconnected_models(
     head = split_simulation.open_head()
     _ = split_simulation.open_flow_budget()
 
-
-    modelnames = split_simulation.get_models_of_type("gwf6").keys()
-    unique_partitions = np.unique(partition_array)
-    assert len(modelnames) == (len(unique_partitions) - 2)
-
+    # Check that one exchange has been removed, as the models are disconnected.
+    assert len(split_simulation["split_exchanges"]) == 3
+    varnames = ["model_name_1", "model_name_2"]
+    modelnames = [
+        [exch[key].item() for key in varnames]
+        for exch in split_simulation["split_exchanges"]
+    ]
+    assert sorted(modelnames) == [
+        ["GWF_1_0", "GWF_1_1"],
+        ["GWF_1_1", "GWF_1_3"],
+        ["GWF_1_2", "GWF_1_3"],
+    ]
 
     # Compare the head result of the original simulation with the result of the
     # partitioned simulation.
