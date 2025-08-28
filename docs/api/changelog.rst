@@ -19,6 +19,14 @@ Changed
   validating whether the river bottom elevation is below the model bottom
   elevation.
 
+Fixed
+~~~~~
+
+- Fixed bug where :meth:`imod.mf6.Modflow6Simulation.split` could result in
+  empty exchanges being present in the ``split_exchanges`` package list, when
+  two models were isolated by inactive cells from each other. These empty
+  exchanges are now removed.
+
 [1.0.0rc6] - 2025-08-28
 -----------------------
 
