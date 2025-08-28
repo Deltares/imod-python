@@ -28,8 +28,35 @@ def _build_connectivity(shape):
     return sparse.coo_matrix((np.ones(len(i)), (i, j)), shape=(size, size)).tocsr()
 
 
+def _broadcast_connectivity(connectivity2d: sparse.csr_matrix, shape):
+    """
+    Broadcast a 2D unstructured connectivity matrix across higher dimensions.
+
+    Parameters
+    ----------
+    connectivity2d: sparse.csr_matrix
+        The 2D connectivity matrix to "broadcast"
+    shape: tuple
+        The target shape to broadcast to (excluding the 2D connectivity dimensions)
+
+    Returns
+    -------
+    connectivity_nd: sparse.csr_matrix
+        Connectivity matrix for the full n-dimensional grid
+    """
+    # TODO
+
+
+def _broadcast_connectivity(connectivity2d: sparse.csr_matrix, shape):
+    n, m = connectivity2d.shape
+    size = np.prod(shape) * n
+
+
 def _interpolate(
     arr: np.ndarray,
+    neumann_value: float | np.ndarray,
+    robin_coefficient: float | np.ndarray,
+    robin_value: float | np.ndarray,
     connectivity: sparse.csr_matrix,
     direct: bool,
     delta: float,
@@ -44,9 +71,21 @@ def _interpolate(
 
     # Set up system of equations.
     matrix = connectivity.copy()
-    matrix.setdiag(-matrix.sum(axis=1).A[:, 0])
+    diag = -matrix.sum(axis=1).A[:, 0]
     rhs = -matrix[:, known].dot(ar1d[known])
 
+    if isinstance(neumann_value, np.ndarray):
+        rhs -= neumann_value.ravel()
+    if isinstance(robin_coefficient, np.ndarray):
+        # Loop over potential systems
+        n = len(ar1d)
+        coef_n = robin_coefficient.reshape((-1, n))
+        value_n = robin_value.reshape((-1, n))
+        for coef, value in zip(coef_n, value_n):
+            diag -= coef
+            rhs -= coef * value
+
+    matrix.setdiag(diag)
     # Linear solve for the unknowns.
     A = matrix[unknown][:, unknown]
     b = rhs[unknown]
