@@ -8,7 +8,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>Transport 2d example &#8212; iMOD Python 1.0.0rc4 documentation</title>
+    <title>Transport 2d example &#8212; iMOD Python 1.0.0rc6 documentation</title>
   
   
   
@@ -42,7 +42,7 @@
   <link rel="preload" as="script" href="../../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
 <link rel="preload" as="script" href="../../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
 
-    <script src="../../_static/documentation_options.js?v=2fc85bd2"></script>
+    <script src="../../_static/documentation_options.js?v=bc4855a1"></script>
     <script src="../../_static/doctools.js?v=9bcbadda"></script>
     <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script>DOCUMENTATION_OPTIONS.pagename = 'examples/mf6/transport_2d';</script>
@@ -53,7 +53,7 @@
     <link rel="prev" title="Lake package example" href="lake.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
-  <meta name="docsearch:version" content="1.0.0rc4.dev" />
+  <meta name="docsearch:version" content="1.0.0rc6.dev" />
   </head>
   
   
@@ -117,8 +117,8 @@
     
     
     
-    <img src="../../_static/imod-python-logo-light.svg" class="logo__image only-light" alt="iMOD Python 1.0.0rc4 documentation - Home"/>
-    <img src="../../_static/imod-python-logo-dark.svg" class="logo__image only-dark pst-js-only" alt="iMOD Python 1.0.0rc4 documentation - Home"/>
+    <img src="../../_static/imod-python-logo-light.svg" class="logo__image only-light" alt="iMOD Python 1.0.0rc6 documentation - Home"/>
+    <img src="../../_static/imod-python-logo-dark.svg" class="logo__image only-dark pst-js-only" alt="iMOD Python 1.0.0rc6 documentation - Home"/>
   
   
 </a></div>
@@ -156,7 +156,7 @@
 
 <li class="nav-item ">
   <a class="nav-link nav-internal" href="../../api/index.html">
-    API Reference
+    API
   </a>
 </li>
 
@@ -308,7 +308,7 @@
 
 <li class="nav-item ">
   <a class="nav-link nav-internal" href="../../api/index.html">
-    API Reference
+    API
   </a>
 </li>
 
@@ -521,7 +521,6 @@ Systems; Documentation and User’s Guide</p>
 <span class="kn">import</span><span class="w"> </span><span class="nn">xarray</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">xr</span>
 
 <span class="kn">import</span><span class="w"> </span><span class="nn">imod</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">imod.prepare.partition</span><span class="w"> </span><span class="kn">import</span> <span class="n">create_partition_labels</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">imod.typing.grid</span><span class="w"> </span><span class="kn">import</span> <span class="n">nan_like</span><span class="p">,</span> <span class="n">zeros_like</span>
 </pre></div>
 </div>
@@ -681,12 +680,12 @@ Finally create 365 time steps of 1 day each.</p>
 </div>
 <p>To split the model in 4 partitions, we must create a label array.
 We use the utility function  <code class="docutils literal notranslate"><span class="pre">get_label_array</span></code> for that.</p>
-<div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="n">label_array</span> <span class="o">=</span> <span class="n">create_partition_labels</span><span class="p">(</span><span class="n">simulation</span><span class="p">,</span> <span class="mi">4</span><span class="p">)</span>
+<div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="n">label_array</span> <span class="o">=</span> <span class="n">simulation</span><span class="o">.</span><span class="n">create_partition_labels</span><span class="p">(</span><span class="mi">4</span><span class="p">)</span>
 <span class="n">fig</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">()</span>
 <span class="n">label_array</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">ax</span><span class="o">=</span><span class="n">ax</span><span class="p">)</span>
 </pre></div>
 </div>
-<img src="../../_images/sphx_glr_transport_2d_001.png" srcset="../../_images/sphx_glr_transport_2d_001.png" alt="transport 2d" class = "sphx-glr-single-img"/><div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>&lt;matplotlib.collections.QuadMesh object at 0x0000016F4465B8F0&gt;
+<img src="../../_images/sphx_glr_transport_2d_001.png" srcset="../../_images/sphx_glr_transport_2d_001.png" alt="transport 2d" class = "sphx-glr-single-img"/><div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>&lt;matplotlib.collections.QuadMesh object at 0x00000251D2085700&gt;
 </pre></div>
 </div>
 <p>This label array determines how the model will be split. <a class="reference external" href="https://github.com/KarypisLab/METIS/blob/master/manual/manual.pdf">METIS</a> is used
@@ -696,13 +695,13 @@ array is used to define the partitioning.</p>
 <div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="n">split_simulation</span> <span class="o">=</span> <span class="n">simulation</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="n">label_array</span><span class="p">)</span>
 </pre></div>
 </div>
-<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>C:\buildagent\work\4b9080cbb3354582\imod-python\.pixi\envs\default\Lib\site-packages\xarray\core\duck_array_ops.py:253: RuntimeWarning: invalid value encountered in cast
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>C:\buildagent\work\4b9080cbb3354582\imod-python\.pixi\envs\default\Lib\site-packages\xarray\core\duck_array_ops.py:250: RuntimeWarning: invalid value encountered in cast
   return data.astype(dtype, **kwargs)
-C:\buildagent\work\4b9080cbb3354582\imod-python\.pixi\envs\default\Lib\site-packages\xarray\core\duck_array_ops.py:253: RuntimeWarning: invalid value encountered in cast
+C:\buildagent\work\4b9080cbb3354582\imod-python\.pixi\envs\default\Lib\site-packages\xarray\core\duck_array_ops.py:250: RuntimeWarning: invalid value encountered in cast
   return data.astype(dtype, **kwargs)
-C:\buildagent\work\4b9080cbb3354582\imod-python\.pixi\envs\default\Lib\site-packages\xarray\core\duck_array_ops.py:253: RuntimeWarning: invalid value encountered in cast
+C:\buildagent\work\4b9080cbb3354582\imod-python\.pixi\envs\default\Lib\site-packages\xarray\core\duck_array_ops.py:250: RuntimeWarning: invalid value encountered in cast
   return data.astype(dtype, **kwargs)
-C:\buildagent\work\4b9080cbb3354582\imod-python\.pixi\envs\default\Lib\site-packages\xarray\core\duck_array_ops.py:253: RuntimeWarning: invalid value encountered in cast
+C:\buildagent\work\4b9080cbb3354582\imod-python\.pixi\envs\default\Lib\site-packages\xarray\core\duck_array_ops.py:250: RuntimeWarning: invalid value encountered in cast
   return data.astype(dtype, **kwargs)
 </pre></div>
 </div>
@@ -720,7 +719,7 @@ C:\buildagent\work\4b9080cbb3354582\imod-python\.pixi\envs\default\Lib\site-pack
 <span class="n">split_conc</span><span class="o">.</span><span class="n">isel</span><span class="p">(</span><span class="n">layer</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">time</span><span class="o">=</span><span class="mi">364</span><span class="p">)</span><span class="o">.</span><span class="n">plot</span><span class="o">.</span><span class="n">contourf</span><span class="p">(</span><span class="n">ax</span><span class="o">=</span><span class="n">ax</span><span class="p">,</span> <span class="n">levels</span><span class="o">=</span><span class="p">[</span><span class="mf">0.1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">10</span><span class="p">])</span>
 </pre></div>
 </div>
-<img src="../../_images/sphx_glr_transport_2d_002.png" srcset="../../_images/sphx_glr_transport_2d_002.png" alt="dx = 10.0, dy = -10.0, layer = 1, time = 365.0" class = "sphx-glr-single-img"/><div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>&lt;matplotlib.contour.QuadContourSet object at 0x0000016F3FEEB770&gt;
+<img src="../../_images/sphx_glr_transport_2d_002.png" srcset="../../_images/sphx_glr_transport_2d_002.png" alt="dx = 10.0, dy = -10.0, layer = 1, time = 365.0" class = "sphx-glr-single-img"/><div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>&lt;matplotlib.contour.QuadContourSet object at 0x00000251D202C7D0&gt;
 </pre></div>
 </div>
 <p>Compute the difference between the split and unsplit simulation results for transport at the
@@ -730,10 +729,10 @@ end of the simulation, and print them</p>
 <span class="n">diff</span><span class="o">.</span><span class="n">isel</span><span class="p">(</span><span class="n">layer</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">time</span><span class="o">=</span><span class="mi">364</span><span class="p">)</span><span class="o">.</span><span class="n">plot</span><span class="o">.</span><span class="n">contourf</span><span class="p">(</span><span class="n">ax</span><span class="o">=</span><span class="n">ax</span><span class="p">)</span>
 </pre></div>
 </div>
-<img src="../../_images/sphx_glr_transport_2d_003.png" srcset="../../_images/sphx_glr_transport_2d_003.png" alt="dx = 10.0, dy = -10.0, layer = 1, time = 365.0" class = "sphx-glr-single-img"/><div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>&lt;matplotlib.contour.QuadContourSet object at 0x0000016F3BD31DF0&gt;
+<img src="../../_images/sphx_glr_transport_2d_003.png" srcset="../../_images/sphx_glr_transport_2d_003.png" alt="dx = 10.0, dy = -10.0, layer = 1, time = 365.0" class = "sphx-glr-single-img"/><div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>&lt;matplotlib.contour.QuadContourSet object at 0x00000251D062B0B0&gt;
 </pre></div>
 </div>
-<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> (1 minutes 16.141 seconds)</p>
+<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> (0 minutes 52.835 seconds)</p>
 <div class="sphx-glr-footer sphx-glr-footer-example docutils container" id="sphx-glr-download-examples-mf6-transport-2d-py">
 <div class="sphx-glr-download sphx-glr-download-jupyter docutils container">
 <p><a class="reference download internal" download="" href="../../_downloads/0c664f948b24c042ef878353e08d519b/transport_2d.ipynb"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Jupyter</span> <span class="pre">notebook:</span> <span class="pre">transport_2d.ipynb</span></code></a></p>

@@ -14,29 +14,15 @@
    .. autosummary::
    
       ~Buoyancy.__init__
-      ~Buoyancy.cleanup
       ~Buoyancy.clip_box
       ~Buoyancy.copy
       ~Buoyancy.from_file
-      ~Buoyancy.get_non_grid_data
       ~Buoyancy.get_regrid_methods
-      ~Buoyancy.get_transport_model_names
-      ~Buoyancy.is_clipping_supported
       ~Buoyancy.is_empty
-      ~Buoyancy.is_grid_agnostic_package
-      ~Buoyancy.is_regridding_supported
-      ~Buoyancy.is_splitting_supported
-      ~Buoyancy.isel
       ~Buoyancy.mask
       ~Buoyancy.regrid_like
-      ~Buoyancy.render
-      ~Buoyancy.sel
       ~Buoyancy.to_netcdf
-      ~Buoyancy.update_transport_models
       ~Buoyancy.write
-      ~Buoyancy.write_binary_griddata
-      ~Buoyancy.write_blockfile
-      ~Buoyancy.write_text_griddata
    
    
 

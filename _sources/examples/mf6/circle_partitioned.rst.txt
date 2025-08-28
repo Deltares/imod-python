@@ -26,7 +26,7 @@ The split method returns a simulation object that can be run as is. In this
 case the 3 submodels are roughly equal sized partitions that have the shape
 of pie pieces.
 
-.. GENERATED FROM PYTHON SOURCE LINES 10-28
+.. GENERATED FROM PYTHON SOURCE LINES 10-25
 
 .. code-block:: Python
 
@@ -35,16 +35,13 @@ of pie pieces.
     from example_models import create_circle_simulation
 
     import imod
-    from imod.prepare.partition import create_partition_labels
 
     simulation = create_circle_simulation()
     tmp_path = imod.util.temporary_directory()
     simulation.write(tmp_path / "original", False)
 
-    idomain = simulation["GWF_1"]["disv"].dataset["idomain"]
-
     number_partitions = 5
-    submodel_labels = create_partition_labels(simulation, number_partitions)
+    submodel_labels = simulation.create_partition_labels(number_partitions)
 
     # Create a simulation that is split in subdomains according to the label array.
     new_sim = simulation.split(submodel_labels)
@@ -55,11 +52,11 @@ of pie pieces.
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 29-30
+.. GENERATED FROM PYTHON SOURCE LINES 26-27
 
 Write the simulation input files for the new simulation.
 
-.. GENERATED FROM PYTHON SOURCE LINES 30-34
+.. GENERATED FROM PYTHON SOURCE LINES 27-31
 
 .. code-block:: Python
 
@@ -74,11 +71,11 @@ Write the simulation input files for the new simulation.
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 35-36
+.. GENERATED FROM PYTHON SOURCE LINES 32-33
 
 Visualize the computed heads in the top layer.
 
-.. GENERATED FROM PYTHON SOURCE LINES 36-40
+.. GENERATED FROM PYTHON SOURCE LINES 33-37
 
 .. code-block:: Python
 
@@ -100,15 +97,15 @@ Visualize the computed heads in the top layer.
  .. code-block:: none
 
 
-    <matplotlib.tri._tricontour.TriContourSet object at 0x0000016F3FDA33B0>
+    <matplotlib.tri._tricontour.TriContourSet object at 0x00000251C8E9BF20>
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 41-42
+.. GENERATED FROM PYTHON SOURCE LINES 38-39
 
 Visualize the flow-horizontal-face-x componenty of the balances.
 
-.. GENERATED FROM PYTHON SOURCE LINES 42-48
+.. GENERATED FROM PYTHON SOURCE LINES 39-45
 
 .. code-block:: Python
 
@@ -133,7 +130,7 @@ Visualize the flow-horizontal-face-x componenty of the balances.
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** (0 minutes 3.205 seconds)
+   **Total running time of the script:** (0 minutes 3.013 seconds)
 
 
 .. _sphx_glr_download_examples_mf6_circle_partitioned.py:

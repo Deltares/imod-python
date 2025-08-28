@@ -1,0 +1,6 @@
+﻿imod.mf6.HorizontalFlowBarrierHydraulicCharacteristic.is\_empty
+===============================================================
+
+.. currentmodule:: imod.mf6
+
+.. automethod:: HorizontalFlowBarrierHydraulicCharacteristic.is_empty

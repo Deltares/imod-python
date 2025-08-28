@@ -1,0 +1,6 @@
+﻿imod.mf6.OutputControl.copy
+===========================
+
+.. currentmodule:: imod.mf6
+
+.. automethod:: OutputControl.copy

@@ -1,0 +1,6 @@
+﻿imod.msw.GridData.generate\_index\_array
+========================================
+
+.. currentmodule:: imod.msw
+
+.. automethod:: GridData.generate_index_array

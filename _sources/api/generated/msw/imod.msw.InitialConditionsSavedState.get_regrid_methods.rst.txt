@@ -1,0 +1,6 @@
+﻿imod.msw.InitialConditionsSavedState.get\_regrid\_methods
+=========================================================
+
+.. currentmodule:: imod.msw
+
+.. automethod:: InitialConditionsSavedState.get_regrid_methods

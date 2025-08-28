@@ -16,15 +16,9 @@
       ~TimeOutputControl.__init__
       ~TimeOutputControl.clip_box
       ~TimeOutputControl.from_imod5_data
-      ~TimeOutputControl.get_non_grid_data
       ~TimeOutputControl.get_regrid_methods
-      ~TimeOutputControl.is_clipping_supported
-      ~TimeOutputControl.is_regridding_supported
-      ~TimeOutputControl.isel
       ~TimeOutputControl.regrid_like
-      ~TimeOutputControl.sel
       ~TimeOutputControl.write
-      ~TimeOutputControl.write_dataframe_fixed_width
    
    
 

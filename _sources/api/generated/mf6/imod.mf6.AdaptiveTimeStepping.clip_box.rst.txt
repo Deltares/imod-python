@@ -1,0 +1,6 @@
+﻿imod.mf6.AdaptiveTimeStepping.clip\_box
+=======================================
+
+.. currentmodule:: imod.mf6
+
+.. automethod:: AdaptiveTimeStepping.clip_box

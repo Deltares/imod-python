@@ -1,0 +1,6 @@
+﻿imod.mf6.ApiPackage.get\_regrid\_methods
+========================================
+
+.. currentmodule:: imod.mf6
+
+.. automethod:: ApiPackage.get_regrid_methods

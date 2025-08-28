@@ -1,0 +1,6 @@
+﻿imod.msw.AnnualCropFactors.regrid\_like
+=======================================
+
+.. currentmodule:: imod.msw
+
+.. automethod:: AnnualCropFactors.regrid_like

@@ -1,0 +1,6 @@
+﻿imod.mf6.VerticesDiscretization.mask
+====================================
+
+.. currentmodule:: imod.mf6
+
+.. automethod:: VerticesDiscretization.mask

@@ -1,0 +1,6 @@
+﻿imod.msw.LanduseOptions.write
+=============================
+
+.. currentmodule:: imod.msw
+
+.. automethod:: LanduseOptions.write

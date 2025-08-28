@@ -29,7 +29,6 @@
       ~SeawatModel.render
       ~SeawatModel.sel
       ~SeawatModel.setdefault
-      ~SeawatModel.time_discretization
       ~SeawatModel.to_netcdf
       ~SeawatModel.update
       ~SeawatModel.values

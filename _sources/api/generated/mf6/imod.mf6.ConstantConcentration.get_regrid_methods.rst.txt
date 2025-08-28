@@ -1,0 +1,6 @@
+﻿imod.mf6.ConstantConcentration.get\_regrid\_methods
+===================================================
+
+.. currentmodule:: imod.mf6
+
+.. automethod:: ConstantConcentration.get_regrid_methods

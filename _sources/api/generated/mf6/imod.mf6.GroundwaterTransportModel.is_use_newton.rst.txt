@@ -1,0 +1,6 @@
+﻿imod.mf6.GroundwaterTransportModel.is\_use\_newton
+==================================================
+
+.. currentmodule:: imod.mf6
+
+.. automethod:: GroundwaterTransportModel.is_use_newton

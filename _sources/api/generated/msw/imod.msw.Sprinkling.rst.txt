@@ -16,15 +16,9 @@
       ~Sprinkling.__init__
       ~Sprinkling.clip_box
       ~Sprinkling.from_imod5_data
-      ~Sprinkling.get_non_grid_data
       ~Sprinkling.get_regrid_methods
-      ~Sprinkling.is_clipping_supported
-      ~Sprinkling.is_regridding_supported
-      ~Sprinkling.isel
       ~Sprinkling.regrid_like
-      ~Sprinkling.sel
       ~Sprinkling.write
-      ~Sprinkling.write_dataframe_fixed_width
    
    
 

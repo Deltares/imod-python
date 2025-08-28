@@ -7,7 +7,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>imod.mf6.simulation &#8212; iMOD Python 1.0.0rc4 documentation</title>
+    <title>imod.mf6.simulation &#8212; iMOD Python 1.0.0rc6 documentation</title>
   
   
   
@@ -41,7 +41,7 @@
   <link rel="preload" as="script" href="../../../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
 <link rel="preload" as="script" href="../../../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
 
-    <script src="../../../_static/documentation_options.js?v=2fc85bd2"></script>
+    <script src="../../../_static/documentation_options.js?v=bc4855a1"></script>
     <script src="../../../_static/doctools.js?v=9bcbadda"></script>
     <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script>DOCUMENTATION_OPTIONS.pagename = '_modules/imod/mf6/simulation';</script>
@@ -50,7 +50,7 @@
     <link rel="search" title="Search" href="../../../search.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
-  <meta name="docsearch:version" content="1.0.0rc4.dev" />
+  <meta name="docsearch:version" content="1.0.0rc6.dev" />
   </head>
   
   
@@ -114,8 +114,8 @@
     
     
     
-    <img src="../../../_static/imod-python-logo-light.svg" class="logo__image only-light" alt="iMOD Python 1.0.0rc4 documentation - Home"/>
-    <img src="../../../_static/imod-python-logo-dark.svg" class="logo__image only-dark pst-js-only" alt="iMOD Python 1.0.0rc4 documentation - Home"/>
+    <img src="../../../_static/imod-python-logo-light.svg" class="logo__image only-light" alt="iMOD Python 1.0.0rc6 documentation - Home"/>
+    <img src="../../../_static/imod-python-logo-dark.svg" class="logo__image only-dark pst-js-only" alt="iMOD Python 1.0.0rc6 documentation - Home"/>
   
   
 </a></div>
@@ -153,7 +153,7 @@
 
 <li class="nav-item ">
   <a class="nav-link nav-internal" href="../../../api/index.html">
-    API Reference
+    API
   </a>
 </li>
 
@@ -303,7 +303,7 @@
 
 <li class="nav-item ">
   <a class="nav-link nav-internal" href="../../../api/index.html">
-    API Reference
+    API
   </a>
 </li>
 
@@ -432,7 +432,6 @@
 <span class="kn">import</span><span class="w"> </span><span class="nn">collections</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">pathlib</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">subprocess</span>
-<span class="kn">import</span><span class="w"> </span><span class="nn">warnings</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">copy</span><span class="w"> </span><span class="kn">import</span> <span class="n">deepcopy</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">datetime</span><span class="w"> </span><span class="kn">import</span> <span class="n">datetime</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">pathlib</span><span class="w"> </span><span class="kn">import</span> <span class="n">Path</span>
@@ -453,9 +452,9 @@
 <span class="kn">from</span><span class="w"> </span><span class="nn">imod.common.interfaces.imodel</span><span class="w"> </span><span class="kn">import</span> <span class="n">IModel</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">imod.common.interfaces.isimulation</span><span class="w"> </span><span class="kn">import</span> <span class="n">ISimulation</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">imod.common.statusinfo</span><span class="w"> </span><span class="kn">import</span> <span class="n">NestedStatusInfo</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">imod.common.utilities.dataclass_type</span><span class="w"> </span><span class="kn">import</span> <span class="n">DataclassType</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">imod.common.utilities.mask</span><span class="w"> </span><span class="kn">import</span> <span class="n">_mask_all_models</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">imod.common.utilities.regrid</span><span class="w"> </span><span class="kn">import</span> <span class="n">_regrid_like</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">imod.common.utilities.regrid_method_type</span><span class="w"> </span><span class="kn">import</span> <span class="n">RegridMethodType</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">imod.common.utilities.version</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
     <span class="n">get_version</span><span class="p">,</span>
     <span class="n">log_versions</span><span class="p">,</span>
@@ -479,6 +478,7 @@
 <span class="kn">from</span><span class="w"> </span><span class="nn">imod.mf6.ssm</span><span class="w"> </span><span class="kn">import</span> <span class="n">SourceSinkMixing</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">imod.mf6.validation_settings</span><span class="w"> </span><span class="kn">import</span> <span class="n">ValidationSettings</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">imod.mf6.write_context</span><span class="w"> </span><span class="kn">import</span> <span class="n">WriteContext</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">imod.prepare.partition</span><span class="w"> </span><span class="kn">import</span> <span class="n">create_partition_labels</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">imod.prepare.topsystem.default_allocation_methods</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
     <span class="n">SimulationAllocationOptions</span><span class="p">,</span>
     <span class="n">SimulationDistributingOptions</span><span class="p">,</span>
@@ -588,13 +588,23 @@
         <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="nb">dict</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
             <span class="bp">self</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="o">=</span> <span class="n">v</span>
 
-    <span class="k">def</span><span class="w"> </span><span class="nf">time_discretization</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">times</span><span class="p">):</span>
-        <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span>
-            <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__name__</span><span class="si">}</span><span class="s2">.time_discretization() is deprecated. &quot;</span>
-            <span class="sa">f</span><span class="s2">&quot;In the future call </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__name__</span><span class="si">}</span><span class="s2">.create_time_discretization().&quot;</span><span class="p">,</span>
-            <span class="ne">DeprecationWarning</span><span class="p">,</span>
-        <span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">create_time_discretization</span><span class="p">(</span><span class="n">additional_times</span><span class="o">=</span><span class="n">times</span><span class="p">)</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_get_pkgkey</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">pkg_id</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Get package key that belongs to a certain pkg_id, since the keys are</span>
+<span class="sd">        user specified.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">key</span> <span class="o">=</span> <span class="p">[</span>
+            <span class="n">pkgname</span>
+            <span class="k">for</span> <span class="n">pkgname</span><span class="p">,</span> <span class="n">pkg</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">items</span><span class="p">()</span>
+            <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">pkg</span><span class="p">,</span> <span class="n">Package</span><span class="p">)</span> <span class="ow">and</span> <span class="p">(</span><span class="n">pkg</span><span class="o">.</span><span class="n">_pkg_id</span> <span class="o">==</span> <span class="n">pkg_id</span><span class="p">)</span>
+        <span class="p">]</span>
+        <span class="n">nkey</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">key</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">nkey</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Multiple instances of </span><span class="si">{</span><span class="n">key</span><span class="si">}</span><span class="s2"> detected&quot;</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="n">nkey</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">key</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">return</span> <span class="kc">None</span>
 
 <div class="viewcode-block" id="Modflow6Simulation.create_time_discretization">
 <a class="viewcode-back" href="../../../api/generated/mf6/imod.mf6.Modflow6Simulation.create_time_discretization.html#imod.mf6.Modflow6Simulation.create_time_discretization">[docs]</a>
@@ -676,7 +686,7 @@
         <span class="p">)</span></div>
 
 
-    <span class="k">def</span><span class="w"> </span><span class="nf">render</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">write_context</span><span class="p">:</span> <span class="n">WriteContext</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_render</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">write_context</span><span class="p">:</span> <span class="n">WriteContext</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Renders simulation namefile&quot;&quot;&quot;</span>
         <span class="n">d</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]</span> <span class="o">=</span> <span class="p">{}</span>
         <span class="n">models</span> <span class="o">=</span> <span class="p">[]</span>
@@ -712,6 +722,20 @@
         <span class="n">d</span><span class="p">[</span><span class="s2">&quot;solutiongroups&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="n">solutiongroups</span><span class="p">]</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_template</span><span class="o">.</span><span class="n">render</span><span class="p">(</span><span class="n">d</span><span class="p">)</span>
 
+    <span class="k">def</span><span class="w"> </span><span class="nf">_write_tdis_package</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">globaltimes</span><span class="p">,</span> <span class="n">write_context</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Write time discretization package, and set/clear ats filename if needed&quot;&quot;&quot;</span>
+        <span class="n">ats_pkgname</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_pkgkey</span><span class="p">(</span><span class="s2">&quot;ats&quot;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">ats_pkgname</span><span class="p">:</span>
+            <span class="bp">self</span><span class="p">[</span><span class="s2">&quot;time_discretization&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">_set_ats_filename</span><span class="p">(</span><span class="n">ats_pkgname</span><span class="p">,</span> <span class="n">write_context</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="c1"># Make sure no ats_filename is set (in case it was set before)</span>
+            <span class="bp">self</span><span class="p">[</span><span class="s2">&quot;time_discretization&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">_clear_ats_filename</span><span class="p">()</span>
+        <span class="bp">self</span><span class="p">[</span><span class="s2">&quot;time_discretization&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">_write</span><span class="p">(</span>
+            <span class="n">pkgname</span><span class="o">=</span><span class="s2">&quot;time_discretization&quot;</span><span class="p">,</span>
+            <span class="n">globaltimes</span><span class="o">=</span><span class="n">globaltimes</span><span class="p">,</span>
+            <span class="n">write_context</span><span class="o">=</span><span class="n">write_context</span><span class="p">,</span>
+        <span class="p">)</span>
+
 <div class="viewcode-block" id="Modflow6Simulation.write">
 <a class="viewcode-back" href="../../../api/generated/mf6/imod.mf6.Modflow6Simulation.write.html#imod.mf6.Modflow6Simulation.write">[docs]</a>
     <span class="nd">@standard_log_decorator</span><span class="p">()</span>
@@ -730,7 +754,7 @@
 <span class="sd">        ----------</span>
 <span class="sd">        directory: str, pathlib.Path</span>
 <span class="sd">            Directory to write Modflow 6 simulation to.</span>
-<span class="sd">        use_binary: ({True, False}, optional)</span>
+<span class="sd">        binary: ({True, False}, optional)</span>
 <span class="sd">            Whether to write time-dependent input for stress packages as binary</span>
 <span class="sd">            files, which are smaller in size, or more human-readable text files.</span>
 <span class="sd">        validate: ({True, False}, optional)</span>
@@ -739,6 +763,17 @@
 <span class="sd">            ``ValidationError``.</span>
 <span class="sd">        use_absolute_paths: ({True, False}, optional)</span>
 <span class="sd">            True if all paths written to the mf6 inputfiles should be absolute.</span>
+
+<span class="sd">        Examples</span>
+<span class="sd">        --------</span>
+<span class="sd">        Write the simulation to a directory:</span>
+
+<span class="sd">        &gt;&gt;&gt; simulation.write(&quot;path/to/simulation&quot;)</span>
+
+<span class="sd">        If you continue to run into ValidationErrors, you can disable the validation</span>
+<span class="sd">        by setting the ``validate`` argument to ``False``. This is not recommended:</span>
+
+<span class="sd">        &gt;&gt;&gt; simulation.write(&quot;path/to/simulation&quot;, validate=False)</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="c1"># create write context</span>
         <span class="n">write_context</span> <span class="o">=</span> <span class="n">WriteContext</span><span class="p">(</span><span class="n">directory</span><span class="p">,</span> <span class="n">binary</span><span class="p">,</span> <span class="n">use_absolute_paths</span><span class="p">)</span>
@@ -760,7 +795,7 @@
         <span class="n">directory</span><span class="o">.</span><span class="n">mkdir</span><span class="p">(</span><span class="n">exist_ok</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">parents</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 
         <span class="c1"># Write simulation namefile</span>
-        <span class="n">mfsim_content</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">render</span><span class="p">(</span><span class="n">write_context</span><span class="p">)</span>
+        <span class="n">mfsim_content</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_render</span><span class="p">(</span><span class="n">write_context</span><span class="p">)</span>
         <span class="n">mfsim_content</span> <span class="o">=</span> <span class="n">prepend_content_with_version_info</span><span class="p">(</span><span class="n">mfsim_content</span><span class="p">)</span>
         <span class="n">mfsim_path</span> <span class="o">=</span> <span class="n">directory</span> <span class="o">/</span> <span class="s2">&quot;mfsim.nam&quot;</span>
         <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">mfsim_path</span><span class="p">,</span> <span class="s2">&quot;w&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
@@ -768,11 +803,7 @@
 
         <span class="c1"># Write time discretization file</span>
         <span class="n">globaltimes</span> <span class="o">=</span> <span class="bp">self</span><span class="p">[</span><span class="s2">&quot;time_discretization&quot;</span><span class="p">][</span><span class="s2">&quot;time&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">values</span>
-        <span class="bp">self</span><span class="p">[</span><span class="s2">&quot;time_discretization&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">_write</span><span class="p">(</span>
-            <span class="n">pkgname</span><span class="o">=</span><span class="s2">&quot;time_discretization&quot;</span><span class="p">,</span>
-            <span class="n">globaltimes</span><span class="o">=</span><span class="n">globaltimes</span><span class="p">,</span>
-            <span class="n">write_context</span><span class="o">=</span><span class="n">write_context</span><span class="p">,</span>
-        <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_write_tdis_package</span><span class="p">(</span><span class="n">globaltimes</span><span class="p">,</span> <span class="n">write_context</span><span class="p">)</span>
 
         <span class="c1"># Write individual models</span>
         <span class="n">status_info</span> <span class="o">=</span> <span class="n">NestedStatusInfo</span><span class="p">(</span><span class="s2">&quot;Simulation validation status&quot;</span><span class="p">)</span>
@@ -792,11 +823,14 @@
                     <span class="p">)</span>
                 <span class="p">)</span>
             <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="n">Package</span><span class="p">):</span>
-                <span class="k">if</span> <span class="n">value</span><span class="o">.</span><span class="n">_pkg_id</span> <span class="o">==</span> <span class="s2">&quot;ims&quot;</span><span class="p">:</span>
-                    <span class="n">ims_write_context</span> <span class="o">=</span> <span class="n">write_context</span><span class="o">.</span><span class="n">copy_with_new_write_directory</span><span class="p">(</span>
+                <span class="k">if</span> <span class="n">value</span><span class="o">.</span><span class="n">_pkg_id</span> <span class="ow">in</span> <span class="p">[</span><span class="s2">&quot;ims&quot;</span><span class="p">,</span> <span class="s2">&quot;ats&quot;</span><span class="p">]:</span>
+                    <span class="c1"># Copy write_context again for packages to avoid changing it</span>
+                    <span class="c1"># down the line and risk clashing with the model write</span>
+                    <span class="c1"># context.</span>
+                    <span class="n">pkg_write_context</span> <span class="o">=</span> <span class="n">write_context</span><span class="o">.</span><span class="n">copy_with_new_write_directory</span><span class="p">(</span>
                         <span class="n">write_context</span><span class="o">.</span><span class="n">simulation_directory</span>
                     <span class="p">)</span>
-                    <span class="n">value</span><span class="o">.</span><span class="n">_write</span><span class="p">(</span><span class="n">key</span><span class="p">,</span> <span class="n">globaltimes</span><span class="p">,</span> <span class="n">ims_write_context</span><span class="p">)</span>
+                    <span class="n">value</span><span class="o">.</span><span class="n">_write</span><span class="p">(</span><span class="n">key</span><span class="p">,</span> <span class="n">globaltimes</span><span class="p">,</span> <span class="n">pkg_write_context</span><span class="p">)</span>
             <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="nb">list</span><span class="p">):</span>
                 <span class="k">for</span> <span class="n">exchange</span> <span class="ow">in</span> <span class="n">value</span><span class="p">:</span>
                     <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">exchange</span><span class="p">,</span> <span class="n">imod</span><span class="o">.</span><span class="n">mf6</span><span class="o">.</span><span class="n">exchangebase</span><span class="o">.</span><span class="n">ExchangeBase</span><span class="p">):</span>
@@ -1342,7 +1376,7 @@
         <span class="k">else</span><span class="p">:</span>
             <span class="n">flow_model_path</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">directory</span> <span class="o">/</span> <span class="n">modelname</span>
 
-        <span class="n">diskey</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">_get_diskey</span><span class="p">()</span>
+        <span class="n">diskey</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">get_diskey</span><span class="p">()</span>
         <span class="n">dis_id</span> <span class="o">=</span> <span class="n">model</span><span class="p">[</span><span class="n">diskey</span><span class="p">]</span><span class="o">.</span><span class="n">_pkg_id</span>
         <span class="k">return</span> <span class="n">flow_model_path</span> <span class="o">/</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">diskey</span><span class="si">}</span><span class="s2">.</span><span class="si">{</span><span class="n">dis_id</span><span class="si">}</span><span class="s2">.grb&quot;</span>
 
@@ -1376,6 +1410,27 @@
 <span class="sd">        crs: Any, optional</span>
 <span class="sd">            Anything accepted by rasterio.crs.CRS.from_user_input</span>
 <span class="sd">            Requires ``rioxarray`` installed.</span>
+
+<span class="sd">        Examples</span>
+<span class="sd">        --------</span>
+<span class="sd">        Dump simulation to directory:</span>
+
+<span class="sd">        &gt;&gt;&gt; mf6_sim.dump(&quot;path/to/directory&quot;)</span>
+
+<span class="sd">        You can load the dumped simulation back with:</span>
+
+<span class="sd">        &gt;&gt;&gt; loaded_sim = Modflow6Simulation.from_file(&quot;path/to/directory/simulation_name.toml&quot;)</span>
+
+<span class="sd">        If you keep on getting ValidationErrors, you can set</span>
+<span class="sd">        ``validate=False`` to skip validation, but this is not recommended.</span>
+
+<span class="sd">        &gt;&gt;&gt; mf6_sim.dump(&quot;path/to/directory&quot;, validate=False)</span>
+
+<span class="sd">        You can then fix the issues later after loading the simulation in a</span>
+<span class="sd">        later stage. If you want to dump the simulation in a form that is nicely</span>
+<span class="sd">        loaded into QGIS, you can set ``mdal_compliant=True``:</span>
+
+<span class="sd">        &gt;&gt;&gt; mf6_sim.dump(&quot;path/to/directory&quot;, mdal_compliant=True, crs=&quot;EPSG:4326&quot;)</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">directory</span> <span class="o">=</span> <span class="n">pathlib</span><span class="o">.</span><span class="n">Path</span><span class="p">(</span><span class="n">directory</span><span class="p">)</span>
         <span class="n">directory</span><span class="o">.</span><span class="n">mkdir</span><span class="p">(</span><span class="n">parents</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">exist_ok</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
@@ -1412,9 +1467,35 @@
             <span class="n">tomli_w</span><span class="o">.</span><span class="n">dump</span><span class="p">(</span><span class="n">toml_content</span><span class="p">,</span> <span class="n">f</span><span class="p">)</span></div>
 
 
+<div class="viewcode-block" id="Modflow6Simulation.from_file">
+<a class="viewcode-back" href="../../../api/generated/mf6/imod.mf6.Modflow6Simulation.from_file.html#imod.mf6.Modflow6Simulation.from_file">[docs]</a>
     <span class="nd">@staticmethod</span>
     <span class="nd">@standard_log_decorator</span><span class="p">()</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">from_file</span><span class="p">(</span><span class="n">toml_path</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Load Modflow6Simulation, previously dumped to TOML file with</span>
+<span class="sd">        :meth:`imod.mf6.Modflow6Simulation.dump` from a TOML file.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        toml_path: str or Path</span>
+<span class="sd">            Path to TOML file containing Modflow6Simulation data.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        Modflow6Simulation</span>
+<span class="sd">            Modflow6Simulation object with models and packages loaded from</span>
+
+<span class="sd">        Examples</span>
+<span class="sd">        --------</span>
+<span class="sd">        Dump simulation to directory:</span>
+
+<span class="sd">        &gt;&gt;&gt; mf6_sim.dump(&quot;path/to/directory&quot;)</span>
+
+<span class="sd">        You can load the dumped simulation back with:</span>
+
+<span class="sd">        &gt;&gt;&gt; loaded_sim = Modflow6Simulation.from_file(&quot;path/to/directory/simulation_name.toml&quot;)</span>
+<span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">classes</span> <span class="o">=</span> <span class="p">{</span>
             <span class="n">item_cls</span><span class="o">.</span><span class="vm">__name__</span><span class="p">:</span> <span class="n">item_cls</span>
             <span class="k">for</span> <span class="n">item_cls</span> <span class="ow">in</span> <span class="p">(</span>
@@ -1450,9 +1531,20 @@
                         <span class="n">path</span> <span class="o">=</span> <span class="n">toml_path</span><span class="o">.</span><span class="n">parent</span> <span class="o">/</span> <span class="n">filename</span>
                         <span class="n">simulation</span><span class="p">[</span><span class="n">key</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">item_cls</span><span class="o">.</span><span class="n">from_file</span><span class="p">(</span><span class="n">path</span><span class="p">))</span>
 
-        <span class="k">return</span> <span class="n">simulation</span>
+        <span class="k">return</span> <span class="n">simulation</span></div>
 
-    <span class="k">def</span><span class="w"> </span><span class="nf">get_exchange_relationships</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+
+<div class="viewcode-block" id="Modflow6Simulation.get_exchange_relationships">
+<a class="viewcode-back" href="../../../api/generated/mf6/imod.mf6.Modflow6Simulation.get_exchange_relationships.html#imod.mf6.Modflow6Simulation.get_exchange_relationships">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_exchange_relationships</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Get exchange relationships in the simulation.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        list</span>
+<span class="sd">            List with exchange relationships in the simulation.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">result</span> <span class="o">=</span> <span class="p">[]</span>
 
         <span class="k">if</span> <span class="s2">&quot;gwtgwf_exchanges&quot;</span> <span class="ow">in</span> <span class="bp">self</span><span class="p">:</span>
@@ -1463,17 +1555,46 @@
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">is_split</span><span class="p">():</span>
             <span class="k">for</span> <span class="n">exchange</span> <span class="ow">in</span> <span class="bp">self</span><span class="p">[</span><span class="s2">&quot;split_exchanges&quot;</span><span class="p">]:</span>
                 <span class="n">result</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">exchange</span><span class="o">.</span><span class="n">get_specification</span><span class="p">())</span>
-        <span class="k">return</span> <span class="n">result</span>
+        <span class="k">return</span> <span class="n">result</span></div>
 
+
+<div class="viewcode-block" id="Modflow6Simulation.get_models_of_type">
+<a class="viewcode-back" href="../../../api/generated/mf6/imod.mf6.Modflow6Simulation.get_models_of_type.html#imod.mf6.Modflow6Simulation.get_models_of_type">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">get_models_of_type</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">model_id</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">IModel</span><span class="p">]:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Get all models in the simulation of a specific type.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        model_id: str</span>
+<span class="sd">            Model type identifier, e.g. &quot;gwf6&quot; for groundwater flow models,</span>
+<span class="sd">            &quot;gwt6&quot; for groundwater transport models.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        dict[str, Modflow6Model]</span>
+<span class="sd">            Dictionary with model names as keys and Modflow6Model objects as values.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="p">{</span>
             <span class="n">k</span><span class="p">:</span> <span class="n">v</span>
             <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">items</span><span class="p">()</span>
             <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">v</span><span class="p">,</span> <span class="n">Modflow6Model</span><span class="p">)</span> <span class="ow">and</span> <span class="p">(</span><span class="n">v</span><span class="o">.</span><span class="n">model_id</span> <span class="o">==</span> <span class="n">model_id</span><span class="p">)</span>
-        <span class="p">}</span>
+        <span class="p">}</span></div>
 
-    <span class="k">def</span><span class="w"> </span><span class="nf">get_models</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="k">return</span> <span class="p">{</span><span class="n">k</span><span class="p">:</span> <span class="n">v</span> <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">items</span><span class="p">()</span> <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">v</span><span class="p">,</span> <span class="n">Modflow6Model</span><span class="p">)}</span>
+
+<div class="viewcode-block" id="Modflow6Simulation.get_models">
+<a class="viewcode-back" href="../../../api/generated/mf6/imod.mf6.Modflow6Simulation.get_models.html#imod.mf6.Modflow6Simulation.get_models">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_models</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">IModel</span><span class="p">]:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Get all models in the simulation.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        dict[str, Modflow6Model]</span>
+<span class="sd">            Dictionary with model names as keys and Modflow6Model objects as values.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="p">{</span><span class="n">k</span><span class="p">:</span> <span class="n">v</span> <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">items</span><span class="p">()</span> <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">v</span><span class="p">,</span> <span class="n">Modflow6Model</span><span class="p">)}</span></div>
+
 
 <div class="viewcode-block" id="Modflow6Simulation.clip_box">
 <a class="viewcode-back" href="../../../api/generated/mf6/imod.mf6.Modflow6Simulation.clip_box.html#imod.mf6.Modflow6Simulation.clip_box">[docs]</a>
@@ -1493,30 +1614,65 @@
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Clip a simulation by a bounding box (time, layer, y, x).</span>
 
-<span class="sd">        Slicing intervals may be half-bounded, by providing None:</span>
-
-<span class="sd">        * To select 500.0 &lt;= x &lt;= 1000.0:</span>
-<span class="sd">          ``clip_box(x_min=500.0, x_max=1000.0)``.</span>
-<span class="sd">        * To select x &lt;= 1000.0: ``clip_box(x_min=None, x_max=1000.0)``</span>
-<span class="sd">          or ``clip_box(x_max=1000.0)``.</span>
-<span class="sd">        * To select x &gt;= 500.0: ``clip_box(x_min = 500.0, x_max=None.0)``</span>
-<span class="sd">          or ``clip_box(x_min=1000.0)``.</span>
-
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
-<span class="sd">        time_min: optional</span>
+<span class="sd">        time_min: optional, np.datetime64</span>
+<span class="sd">            Start time to select. Data will be forward filled to this date. If</span>
+<span class="sd">            time_min is before the start time of the dataset, data is</span>
+<span class="sd">            backfilled.</span>
 <span class="sd">        time_max: optional</span>
+<span class="sd">            End time to select.</span>
 <span class="sd">        layer_min: optional, int</span>
+<span class="sd">            Minimum layer to select.</span>
 <span class="sd">        layer_max: optional, int</span>
+<span class="sd">            Maximum layer to select.</span>
 <span class="sd">        x_min: optional, float</span>
+<span class="sd">            Minimum x-coordinate to select.</span>
 <span class="sd">        x_max: optional, float</span>
+<span class="sd">            Maximum x-coordinate to select.</span>
 <span class="sd">        y_min: optional, float</span>
+<span class="sd">            Minimum y-coordinate to select.</span>
 <span class="sd">        y_max: optional, float</span>
-<span class="sd">        states_for_boundary : optional, Dict[pkg_name:str, boundary_values:Union[xr.DataArray, xu.UgridDataArray]]</span>
+<span class="sd">            Maximum y-coordinate to select.</span>
+<span class="sd">        states_for_boundary : optional, Dict[str, Union[xr.DataArray, xu.UgridDataArray]]</span>
+<span class="sd">            A dictionary with model names as keys and grids with states that are</span>
+<span class="sd">            used to put as boundary values.</span>
+<span class="sd">            :class:`imod.mf6.GroundwaterFlowModel` will get a</span>
+<span class="sd">            :class:`imod.mf6.ConstantHead`,</span>
+<span class="sd">            :class:`imod.mf6.GroundwaterTransportModel` will get a</span>
+<span class="sd">            :class:`imod.mf6.ConstantConcentration` package.</span>
 
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
 <span class="sd">        clipped : Simulation</span>
+
+<span class="sd">        Examples</span>
+<span class="sd">        --------</span>
+<span class="sd">        Slicing intervals may be half-bounded, by providing None:</span>
+
+<span class="sd">        To select 500.0 &lt;= x &lt;= 1000.0:</span>
+
+<span class="sd">        &gt;&gt;&gt; mf6_sim.clip_box(x_min=500.0, x_max=1000.0)</span>
+
+<span class="sd">        To select x &lt;= 1000.0:</span>
+
+<span class="sd">        &gt;&gt;&gt; mf6_sim.clip_box(x_max=1000.0)``</span>
+
+<span class="sd">        To select x &gt;= 500.0:</span>
+
+<span class="sd">        &gt;&gt;&gt; mf6_sim.clip_box(x_min=500.0)</span>
+
+<span class="sd">        To select a time interval, you can use datetime64:</span>
+
+<span class="sd">        &gt;&gt;&gt; mf6_sim.clip_box(time_min=np.datetime64(&quot;2020-01-01&quot;), time_max=np.datetime64(&quot;2020-12-31&quot;))</span>
+
+<span class="sd">        To clip an area and set a boundary condition at the clipped boundary:</span>
+
+<span class="sd">        &gt;&gt;&gt; states_for_boundary = {&quot;GWF6_model_name&quot;: heads}</span>
+<span class="sd">        &gt;&gt;&gt; clipped_sim = mf6_sim.clip_box(</span>
+<span class="sd">        ...     x_min=500.0, x_max=1000.0, y_min=500.0, y_max=1000.0,</span>
+<span class="sd">        ...     states_for_boundary=states_for_boundary</span>
+<span class="sd">        ... )</span>
 <span class="sd">        &quot;&quot;&quot;</span>
 
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">is_split</span><span class="p">():</span>
@@ -1524,12 +1680,12 @@
                 <span class="s2">&quot;Unable to clip simulation. Clipping can only be done on simulations that haven&#39;t been split.&quot;</span>
                 <span class="o">+</span> <span class="s2">&quot;Therefore clipping should be done before splitting the simulation.&quot;</span>
             <span class="p">)</span>
-        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">has_one_flow_model</span><span class="p">():</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">_has_one_flow_model</span><span class="p">():</span>
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
                 <span class="s2">&quot;Unable to clip simulation. Clipping can only be done on simulations that have a single flow model .&quot;</span>
             <span class="p">)</span>
         <span class="k">for</span> <span class="n">model_name</span><span class="p">,</span> <span class="n">model</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_models</span><span class="p">()</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
-            <span class="n">supported</span><span class="p">,</span> <span class="n">error_with_object</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">is_clipping_supported</span><span class="p">()</span>
+            <span class="n">supported</span><span class="p">,</span> <span class="n">error_with_object</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">_is_clipping_supported</span><span class="p">()</span>
             <span class="k">if</span> <span class="ow">not</span> <span class="n">supported</span><span class="p">:</span>
                 <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
                     <span class="sa">f</span><span class="s2">&quot;simulation cannot be clipped due to presence of package &#39;</span><span class="si">{</span><span class="n">error_with_object</span><span class="si">}</span><span class="s2">&#39; in model &#39;</span><span class="si">{</span><span class="n">model_name</span><span class="si">}</span><span class="s2">&#39;&quot;</span>
@@ -1563,9 +1719,75 @@
                     <span class="n">y_min</span><span class="o">=</span><span class="n">y_min</span><span class="p">,</span>
                     <span class="n">y_max</span><span class="o">=</span><span class="n">y_max</span><span class="p">,</span>
                 <span class="p">)</span>
+            <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="nb">list</span><span class="p">)</span> <span class="ow">and</span> <span class="nb">all</span><span class="p">(</span>
+                <span class="nb">isinstance</span><span class="p">(</span><span class="n">item</span><span class="p">,</span> <span class="n">GWFGWT</span><span class="p">)</span> <span class="k">for</span> <span class="n">item</span> <span class="ow">in</span> <span class="n">value</span>
+            <span class="p">):</span>
+                <span class="k">continue</span>
             <span class="k">else</span><span class="p">:</span>
-                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;object of type </span><span class="si">{</span><span class="nb">type</span><span class="p">(</span><span class="n">value</span><span class="p">)</span><span class="si">}</span><span class="s2"> cannot be clipped.&quot;</span><span class="p">)</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+                    <span class="sa">f</span><span class="s2">&quot;object </span><span class="si">{</span><span class="n">key</span><span class="si">}</span><span class="s2"> of type </span><span class="si">{</span><span class="nb">type</span><span class="p">(</span><span class="n">value</span><span class="p">)</span><span class="si">}</span><span class="s2"> cannot be clipped.&quot;</span>
+                <span class="p">)</span>
         <span class="k">return</span> <span class="n">clipped</span></div>
+
+
+<div class="viewcode-block" id="Modflow6Simulation.create_partition_labels">
+<a class="viewcode-back" href="../../../api/generated/mf6/imod.mf6.Modflow6Simulation.create_partition_labels.html#imod.mf6.Modflow6Simulation.create_partition_labels">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">create_partition_labels</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">npartitions</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+        <span class="n">weights</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">GridDataArray</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">GridDataArray</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Returns a label array: a 2d array with a similar size to the top layer of</span>
+<span class="sd">        idomain. Every array element is the partition number to which the column of</span>
+<span class="sd">        gridblocks of idomain at that location belong. This is provided to</span>
+<span class="sd">        :meth:`imod.mf6.Modflow6Simulation.split` to partition the model.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        npartitions : int</span>
+<span class="sd">            The number of partitions to create.</span>
+<span class="sd">        weights : xarray.DataArray, xugrid.UgridDataArray, optional</span>
+<span class="sd">            The weights to use for partitioning. The weights should be a 2d</span>
+<span class="sd">            array with the same size as the top layer of idomain. The weights</span>
+<span class="sd">            are used to determine the size of each partition. The weights should</span>
+<span class="sd">            be positive integers. If not provided, active cells (idomain &gt; 0)</span>
+<span class="sd">            are summed across layers and passed on as weights. If None, the</span>
+<span class="sd">            idomain is used to compute weights.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        xarray.DataArray or xu.UgridDataArray</span>
+<span class="sd">            An array with partition labels, with the same shape as the top layer</span>
+<span class="sd">            of the idomain.</span>
+
+<span class="sd">        Examples</span>
+<span class="sd">        --------</span>
+<span class="sd">        Create a partition label array with 4 partitions.</span>
+
+<span class="sd">        &gt;&gt;&gt; label_array = mf6_sim.create_partition_labels(n_partitions=4)</span>
+
+<span class="sd">        You can then use this label array to split the simulation:</span>
+
+<span class="sd">        &gt;&gt;&gt; mf6_splitted = mf6_sim.split(label_array)</span>
+
+<span class="sd">        You can also provide weights to the partitioning, which will influence</span>
+<span class="sd">        the size of each partition. For example, if you want to create a uniform</span>
+<span class="sd">        partitioning, you can use:</span>
+
+<span class="sd">        &gt;&gt;&gt; weights = xr.ones_like(idomain)</span>
+<span class="sd">        &gt;&gt;&gt; label_array = mf6_sim.create_partition_labels(n_partitions=4, weights=weights)</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">gwf_models</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_models_of_type</span><span class="p">(</span><span class="s2">&quot;gwf6&quot;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">gwf_models</span><span class="p">)</span> <span class="o">!=</span> <span class="mi">1</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+                <span class="s2">&quot;for partitioning a simulation to work, it must have exactly 1 flow model&quot;</span>
+            <span class="p">)</span>
+
+        <span class="n">flowmodel</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">gwf_models</span><span class="o">.</span><span class="n">values</span><span class="p">())[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="n">idomain</span> <span class="o">=</span> <span class="n">flowmodel</span><span class="o">.</span><span class="n">domain</span>
+        <span class="k">return</span> <span class="n">create_partition_labels</span><span class="p">(</span><span class="n">idomain</span><span class="p">,</span> <span class="n">npartitions</span><span class="p">,</span> <span class="n">weights</span><span class="o">=</span><span class="n">weights</span><span class="p">)</span></div>
 
 
 <div class="viewcode-block" id="Modflow6Simulation.split">
@@ -1596,14 +1818,20 @@
 
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
-<span class="sd">        A new simulation containing all the split models and packages</span>
+<span class="sd">        Modflow6Simulation</span>
+<span class="sd">            A new simulation containing all the split models and packages</span>
+
+<span class="sd">        Examples</span>
+<span class="sd">        --------</span>
+<span class="sd">        &gt;&gt;&gt; submodel_labels = mf6_sim.create_partition_labels(n_partitions=4)</span>
+<span class="sd">        &gt;&gt;&gt; m6_splitted = mf6_sim.split(submodel_labels)</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">is_split</span><span class="p">():</span>
             <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span>
                 <span class="s2">&quot;Unable to split simulation. Splitting can only be done on simulations that haven&#39;t been split.&quot;</span>
             <span class="p">)</span>
 
-        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">has_one_flow_model</span><span class="p">():</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">_has_one_flow_model</span><span class="p">():</span>
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
                 <span class="s2">&quot;splitting of simulations with more (or less) than 1 flow model currently not supported.&quot;</span>
             <span class="p">)</span>
@@ -1617,7 +1845,7 @@
 
         <span class="n">original_models</span> <span class="o">=</span> <span class="p">{</span><span class="o">**</span><span class="n">flow_models</span><span class="p">,</span> <span class="o">**</span><span class="n">transport_models</span><span class="p">}</span>
         <span class="k">for</span> <span class="n">model_name</span><span class="p">,</span> <span class="n">model</span> <span class="ow">in</span> <span class="n">original_models</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
-            <span class="n">supported</span><span class="p">,</span> <span class="n">error_with_object</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">is_splitting_supported</span><span class="p">()</span>
+            <span class="n">supported</span><span class="p">,</span> <span class="n">error_with_object</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">_is_splitting_supported</span><span class="p">()</span>
             <span class="k">if</span> <span class="ow">not</span> <span class="n">supported</span><span class="p">:</span>
                 <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
                     <span class="sa">f</span><span class="s2">&quot;simulation cannot be split due to presence of package &#39;</span><span class="si">{</span><span class="n">error_with_object</span><span class="si">}</span><span class="s2">&#39; in model &#39;</span><span class="si">{</span><span class="n">model_name</span><span class="si">}</span><span class="s2">&#39;&quot;</span>
@@ -1643,7 +1871,8 @@
 
         <span class="k">for</span> <span class="n">model_name</span><span class="p">,</span> <span class="n">model</span> <span class="ow">in</span> <span class="n">original_models</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
             <span class="n">solution_name</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_solution_name</span><span class="p">(</span><span class="n">model_name</span><span class="p">)</span>
-            <span class="n">new_simulation</span><span class="p">[</span><span class="n">solution_name</span><span class="p">]</span><span class="o">.</span><span class="n">remove_model_from_solution</span><span class="p">(</span><span class="n">model_name</span><span class="p">)</span>
+            <span class="n">solution</span> <span class="o">=</span> <span class="n">cast</span><span class="p">(</span><span class="n">Solution</span><span class="p">,</span> <span class="n">new_simulation</span><span class="p">[</span><span class="n">solution_name</span><span class="p">])</span>
+            <span class="n">solution</span><span class="o">.</span><span class="n">_remove_model_from_solution</span><span class="p">(</span><span class="n">model_name</span><span class="p">)</span>
             <span class="k">for</span> <span class="n">submodel_partition_info</span> <span class="ow">in</span> <span class="n">partition_info</span><span class="p">:</span>
                 <span class="n">new_model_name</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">model_name</span><span class="si">}</span><span class="s2">_</span><span class="si">{</span><span class="n">submodel_partition_info</span><span class="o">.</span><span class="n">id</span><span class="si">}</span><span class="s2">&quot;</span>
                 <span class="n">new_simulation</span><span class="p">[</span><span class="n">new_model_name</span><span class="p">]</span> <span class="o">=</span> <span class="n">slice_model</span><span class="p">(</span>
@@ -1652,7 +1881,7 @@
                 <span class="n">new_simulation</span><span class="p">[</span><span class="n">new_model_name</span><span class="p">]</span><span class="o">.</span><span class="n">purge_empty_packages</span><span class="p">(</span>
                     <span class="n">ignore_time</span><span class="o">=</span><span class="n">ignore_time_purge_empty</span>
                 <span class="p">)</span>
-                <span class="n">new_simulation</span><span class="p">[</span><span class="n">solution_name</span><span class="p">]</span><span class="o">.</span><span class="n">add_model_to_solution</span><span class="p">(</span><span class="n">new_model_name</span><span class="p">)</span>
+                <span class="n">solution</span><span class="o">.</span><span class="n">_add_model_to_solution</span><span class="p">(</span><span class="n">new_model_name</span><span class="p">)</span>
 
         <span class="n">exchanges</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="n">Any</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
 
@@ -1686,9 +1915,9 @@
         <span class="n">validate</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="s2">&quot;Modflow6Simulation&quot;</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        This method creates a new simulation object. The models contained in the new simulation are regridded versions</span>
-<span class="sd">        of the models in the input object (this).</span>
-<span class="sd">        Time discretization and solver settings are copied.</span>
+<span class="sd">        This method creates a new simulation object. The models contained in the</span>
+<span class="sd">        new simulation are regridded versions of the models in the input object</span>
+<span class="sd">        (this). Time discretization and solver settings are copied.</span>
 
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
@@ -1702,6 +1931,16 @@
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
 <span class="sd">        a new simulation object with regridded models</span>
+
+<span class="sd">        Examples</span>
+<span class="sd">        --------</span>
+<span class="sd">        &gt;&gt;&gt; target_grid = imod.util.empty_2d(</span>
+<span class="sd">        ...     dx=5.0, xmin=500.0, xmax=1000.0, dy=5.0, ymin=500.0, ymax=1000.0</span>
+<span class="sd">        ... )</span>
+<span class="sd">        &gt;&gt;&gt; regridded_sim = simulation.regrid_like(</span>
+<span class="sd">        ...     regridded_simulation_name=&quot;regridded_sim&quot;,</span>
+<span class="sd">        ...     target_grid=target_grid,</span>
+<span class="sd">        ... )</span>
 <span class="sd">        &quot;&quot;&quot;</span>
 
         <span class="k">return</span> <span class="n">_regrid_like</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">regridded_simulation_name</span><span class="p">,</span> <span class="n">target_grid</span><span class="p">,</span> <span class="n">validate</span><span class="p">)</span></div>
@@ -1848,21 +2087,34 @@
     <span class="k">def</span><span class="w"> </span><span class="nf">_update_buoyancy_packages</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
         <span class="n">flow_transport_mapping</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_transport_models_per_flow_model</span><span class="p">()</span>
         <span class="k">for</span> <span class="n">flow_name</span><span class="p">,</span> <span class="n">tpt_models_of_flow_model</span> <span class="ow">in</span> <span class="n">flow_transport_mapping</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
-            <span class="n">flow_model</span> <span class="o">=</span> <span class="bp">self</span><span class="p">[</span><span class="n">flow_name</span><span class="p">]</span>
-            <span class="n">flow_model</span><span class="o">.</span><span class="n">update_buoyancy_package</span><span class="p">(</span><span class="n">tpt_models_of_flow_model</span><span class="p">)</span>
+            <span class="n">flow_model</span> <span class="o">=</span> <span class="n">cast</span><span class="p">(</span><span class="n">GroundwaterFlowModel</span><span class="p">,</span> <span class="bp">self</span><span class="p">[</span><span class="n">flow_name</span><span class="p">])</span>
+            <span class="n">flow_model</span><span class="o">.</span><span class="n">_update_buoyancy_package</span><span class="p">(</span><span class="n">tpt_models_of_flow_model</span><span class="p">)</span>
 
+<div class="viewcode-block" id="Modflow6Simulation.is_split">
+<a class="viewcode-back" href="../../../api/generated/mf6/imod.mf6.Modflow6Simulation.is_split.html#imod.mf6.Modflow6Simulation.is_split">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">is_split</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
-        <span class="k">return</span> <span class="s2">&quot;split_exchanges&quot;</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">keys</span><span class="p">()</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Check if the simulation is split into multiple partitions.</span>
 
-    <span class="k">def</span><span class="w"> </span><span class="nf">has_one_flow_model</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        bool</span>
+<span class="sd">            True if the simulation is split, False otherwise.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="s2">&quot;split_exchanges&quot;</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">keys</span><span class="p">()</span></div>
+
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_has_one_flow_model</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
         <span class="n">flow_models</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_models_of_type</span><span class="p">(</span><span class="s2">&quot;gwf6&quot;</span><span class="p">)</span>
         <span class="k">return</span> <span class="nb">len</span><span class="p">(</span><span class="n">flow_models</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span>
 
+<div class="viewcode-block" id="Modflow6Simulation.mask_all_models">
+<a class="viewcode-back" href="../../../api/generated/mf6/imod.mf6.Modflow6Simulation.mask_all_models.html#imod.mf6.Modflow6Simulation.mask_all_models">[docs]</a>
     <span class="nd">@standard_log_decorator</span><span class="p">()</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">mask_all_models</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">mask</span><span class="p">:</span> <span class="n">GridDataArray</span><span class="p">,</span>
-    <span class="p">):</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        This function applies a mask to all models in a simulation, provided they use</span>
 <span class="sd">        the same discretization. The  method parameter &quot;mask&quot; is an idomain-like array.</span>
@@ -1876,8 +2128,19 @@
 <span class="sd">        mask: xr.DataArray, xu.UgridDataArray of ints</span>
 <span class="sd">            idomain-like integer array. &gt;0 sets cells to active, 0 sets cells to inactive,</span>
 <span class="sd">            &lt;0 sets cells to vertical passthrough</span>
+
+<span class="sd">        Examples</span>
+<span class="sd">        --------</span>
+<span class="sd">        To mask all models in a simulation, you can use the following code:</span>
+
+<span class="sd">        &gt;&gt;&gt; mf6_sim.mask_all_models(new_idomain)</span>
+
+<span class="sd">        This masks the model inplace and updates the packages accordingly. The</span>
+<span class="sd">        mask should be an idomain-like array, i.e. it should have the same shape</span>
+<span class="sd">        as the model and contain integer values.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="n">_mask_all_models</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">mask</span><span class="p">)</span>
+        <span class="n">_mask_all_models</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">mask</span><span class="p">)</span></div>
+
 
 <div class="viewcode-block" id="Modflow6Simulation.from_imod5_data">
 <a class="viewcode-back" href="../../../api/generated/mf6/imod.mf6.Modflow6Simulation.from_imod5_data.html#imod.mf6.Modflow6Simulation.from_imod5_data">[docs]</a>
@@ -1890,7 +2153,7 @@
         <span class="n">times</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="n">datetime</span><span class="p">],</span>
         <span class="n">allocation_options</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">SimulationAllocationOptions</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
         <span class="n">distributing_options</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">SimulationDistributingOptions</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-        <span class="n">regridder_types</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">RegridMethodType</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">regridder_types</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">DataclassType</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="s2">&quot;Modflow6Simulation&quot;</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Imports a GroundwaterFlowModel (GWF) from the data in an iMOD5 project</span>

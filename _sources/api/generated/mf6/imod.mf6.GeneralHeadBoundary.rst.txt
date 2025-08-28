@@ -14,31 +14,19 @@
    .. autosummary::
    
       ~GeneralHeadBoundary.__init__
-      ~GeneralHeadBoundary.allocate_and_distribute_planar_data
+      ~GeneralHeadBoundary.aggregate_layers
       ~GeneralHeadBoundary.cleanup
       ~GeneralHeadBoundary.clip_box
       ~GeneralHeadBoundary.copy
       ~GeneralHeadBoundary.from_file
       ~GeneralHeadBoundary.from_imod5_data
-      ~GeneralHeadBoundary.get_non_grid_data
-      ~GeneralHeadBoundary.get_period_varnames
       ~GeneralHeadBoundary.get_regrid_methods
-      ~GeneralHeadBoundary.is_clipping_supported
       ~GeneralHeadBoundary.is_empty
-      ~GeneralHeadBoundary.is_grid_agnostic_package
-      ~GeneralHeadBoundary.is_regridding_supported
-      ~GeneralHeadBoundary.is_splitting_supported
-      ~GeneralHeadBoundary.isel
       ~GeneralHeadBoundary.mask
+      ~GeneralHeadBoundary.reallocate
       ~GeneralHeadBoundary.regrid_like
-      ~GeneralHeadBoundary.render
-      ~GeneralHeadBoundary.sel
-      ~GeneralHeadBoundary.set_repeat_stress
       ~GeneralHeadBoundary.to_netcdf
       ~GeneralHeadBoundary.write
-      ~GeneralHeadBoundary.write_binary_griddata
-      ~GeneralHeadBoundary.write_blockfile
-      ~GeneralHeadBoundary.write_text_griddata
    
    
 

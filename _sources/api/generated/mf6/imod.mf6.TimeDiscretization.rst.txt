@@ -14,27 +14,15 @@
    .. autosummary::
    
       ~TimeDiscretization.__init__
-      ~TimeDiscretization.cleanup
       ~TimeDiscretization.clip_box
       ~TimeDiscretization.copy
       ~TimeDiscretization.from_file
-      ~TimeDiscretization.get_non_grid_data
       ~TimeDiscretization.get_regrid_methods
-      ~TimeDiscretization.is_clipping_supported
       ~TimeDiscretization.is_empty
-      ~TimeDiscretization.is_grid_agnostic_package
-      ~TimeDiscretization.is_regridding_supported
-      ~TimeDiscretization.is_splitting_supported
-      ~TimeDiscretization.isel
       ~TimeDiscretization.mask
       ~TimeDiscretization.regrid_like
-      ~TimeDiscretization.render
-      ~TimeDiscretization.sel
       ~TimeDiscretization.to_netcdf
       ~TimeDiscretization.write
-      ~TimeDiscretization.write_binary_griddata
-      ~TimeDiscretization.write_blockfile
-      ~TimeDiscretization.write_text_griddata
    
    
 

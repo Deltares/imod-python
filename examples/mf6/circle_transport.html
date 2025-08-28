@@ -8,7 +8,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>Freshwater lens (circle) &#8212; iMOD Python 1.0.0rc4 documentation</title>
+    <title>Freshwater lens (circle) &#8212; iMOD Python 1.0.0rc6 documentation</title>
   
   
   
@@ -42,7 +42,7 @@
   <link rel="preload" as="script" href="../../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
 <link rel="preload" as="script" href="../../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
 
-    <script src="../../_static/documentation_options.js?v=2fc85bd2"></script>
+    <script src="../../_static/documentation_options.js?v=bc4855a1"></script>
     <script src="../../_static/doctools.js?v=9bcbadda"></script>
     <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script>DOCUMENTATION_OPTIONS.pagename = 'examples/mf6/circle_transport';</script>
@@ -53,7 +53,7 @@
     <link rel="prev" title="Circle partitioned" href="circle_partitioned.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
-  <meta name="docsearch:version" content="1.0.0rc4.dev" />
+  <meta name="docsearch:version" content="1.0.0rc6.dev" />
   </head>
   
   
@@ -117,8 +117,8 @@
     
     
     
-    <img src="../../_static/imod-python-logo-light.svg" class="logo__image only-light" alt="iMOD Python 1.0.0rc4 documentation - Home"/>
-    <img src="../../_static/imod-python-logo-dark.svg" class="logo__image only-dark pst-js-only" alt="iMOD Python 1.0.0rc4 documentation - Home"/>
+    <img src="../../_static/imod-python-logo-light.svg" class="logo__image only-light" alt="iMOD Python 1.0.0rc6 documentation - Home"/>
+    <img src="../../_static/imod-python-logo-dark.svg" class="logo__image only-dark pst-js-only" alt="iMOD Python 1.0.0rc6 documentation - Home"/>
   
   
 </a></div>
@@ -156,7 +156,7 @@
 
 <li class="nav-item ">
   <a class="nav-link nav-internal" href="../../api/index.html">
-    API Reference
+    API
   </a>
 </li>
 
@@ -308,7 +308,7 @@
 
 <li class="nav-item ">
   <a class="nav-link nav-internal" href="../../api/index.html">
-    API Reference
+    API
   </a>
 </li>
 
@@ -508,7 +508,7 @@ transport model using the <code class="docutils literal notranslate"><span class
 <p>In overview, we’ll set the following steps:</p>
 <blockquote>
 <div><ul class="simple">
-<li><p>Setting up the flow model, just like in the circle.py example</p></li>
+<li><p>Setting up the flow model, just like in the <a class="reference internal" href="circle.html"><span class="doc">Circle</span></a> example</p></li>
 <li><p>set up the transport model</p></li>
 <li><p>Run the simulation.</p></li>
 <li><p>Visualize the results.</p></li>
@@ -609,19 +609,14 @@ prescribed solute concentration. If it leaves, it leaves with the
 concentration that was computed for the cell.</p>
 <p>In this example we set the prescribed head value to 0.0 and the external
 concentration to 35.0 as well. The boundary only operates on the top layer.</p>
-<div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="n">chd_location</span> <span class="o">=</span> <span class="n">xu</span><span class="o">.</span><span class="n">zeros_like</span><span class="p">(</span><span class="n">idomain</span><span class="o">.</span><span class="n">sel</span><span class="p">(</span><span class="n">layer</span><span class="o">=</span><span class="mi">1</span><span class="p">),</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">bool</span><span class="p">)</span><span class="o">.</span><span class="n">ugrid</span><span class="o">.</span><span class="n">binary_dilation</span><span class="p">(</span>
+<div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="n">ghb_location</span> <span class="o">=</span> <span class="n">xu</span><span class="o">.</span><span class="n">zeros_like</span><span class="p">(</span><span class="n">idomain</span><span class="o">.</span><span class="n">sel</span><span class="p">(</span><span class="n">layer</span><span class="o">=</span><span class="mi">1</span><span class="p">),</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">bool</span><span class="p">)</span><span class="o">.</span><span class="n">ugrid</span><span class="o">.</span><span class="n">binary_dilation</span><span class="p">(</span>
     <span class="n">border_value</span><span class="o">=</span><span class="kc">True</span>
 <span class="p">)</span>
-<span class="n">constant_head</span> <span class="o">=</span> <span class="n">xu</span><span class="o">.</span><span class="n">full_like</span><span class="p">(</span><span class="n">idomain</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">float</span><span class="p">)</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">chd_location</span><span class="p">)</span>
-<span class="c1"># Approximate face area</span>
-<span class="n">face_area</span> <span class="o">=</span> <span class="p">(</span><span class="mf">1000.0</span> <span class="o">/</span> <span class="mi">6</span><span class="p">)</span> <span class="o">**</span> <span class="mi">2</span> <span class="o">*</span> <span class="mf">0.5</span>
-
-<span class="n">conductance</span> <span class="o">=</span> <span class="n">xu</span><span class="o">.</span><span class="n">full_like</span><span class="p">(</span><span class="n">idomain</span><span class="p">,</span> <span class="n">face_area</span> <span class="o">*</span> <span class="n">k_value</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">float</span><span class="p">)</span><span class="o">.</span><span class="n">where</span><span class="p">(</span>
-    <span class="n">chd_location</span>
-<span class="p">)</span>
+<span class="n">constant_head</span> <span class="o">=</span> <span class="n">xu</span><span class="o">.</span><span class="n">full_like</span><span class="p">(</span><span class="n">idomain</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">float</span><span class="p">)</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">ghb_location</span><span class="p">)</span>
+<span class="n">conductance</span> <span class="o">=</span> <span class="p">(</span><span class="n">idomain</span> <span class="o">*</span> <span class="n">grid</span><span class="o">.</span><span class="n">area</span> <span class="o">*</span> <span class="n">k_value</span><span class="p">)</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">ghb_location</span><span class="p">)</span>
 
 <span class="n">constant_concentration</span> <span class="o">=</span> <span class="n">xu</span><span class="o">.</span><span class="n">full_like</span><span class="p">(</span><span class="n">constant_head</span><span class="p">,</span> <span class="n">max_concentration</span><span class="p">)</span><span class="o">.</span><span class="n">where</span><span class="p">(</span>
-    <span class="n">chd_location</span>
+    <span class="n">ghb_location</span>
 <span class="p">)</span>
 <span class="n">constant_concentration</span> <span class="o">=</span> <span class="n">constant_concentration</span><span class="o">.</span><span class="n">expand_dims</span><span class="p">(</span><span class="n">species</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;salinity&quot;</span><span class="p">])</span>
 </pre></div>
@@ -629,7 +624,7 @@ concentration to 35.0 as well. The boundary only operates on the top layer.</p>
 </section>
 <section id="add-flow-model-to-simulation">
 <h2>Add flow model to simulation<a class="headerlink" href="#add-flow-model-to-simulation" title="Link to this heading">#</a></h2>
-<p>See the circle.py example for more information.</p>
+<p>See the <a class="reference internal" href="circle.html"><span class="doc">Circle</span></a> example for more information.</p>
 <div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="n">gwf_model</span> <span class="o">=</span> <span class="n">imod</span><span class="o">.</span><span class="n">mf6</span><span class="o">.</span><span class="n">GroundwaterFlowModel</span><span class="p">()</span>
 <span class="n">gwf_model</span><span class="p">[</span><span class="s2">&quot;disv&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">imod</span><span class="o">.</span><span class="n">mf6</span><span class="o">.</span><span class="n">VerticesDiscretization</span><span class="p">(</span>
     <span class="n">top</span><span class="o">=</span><span class="n">top</span><span class="p">,</span> <span class="n">bottom</span><span class="o">=</span><span class="n">bottom</span><span class="p">,</span> <span class="n">idomain</span><span class="o">=</span><span class="n">idomain</span>
@@ -678,13 +673,33 @@ concentration to 35.0 as well. The boundary only operates on the top layer.</p>
 <span class="p">)</span>
 </pre></div>
 </div>
+</section>
+<section id="time-discretization">
+<h2>Time discretization<a class="headerlink" href="#time-discretization" title="Link to this heading">#</a></h2>
 <p>Set the timesteps, we want output each year, so we specify stress periods
-which last 1 year. However, timesteps of 1 year yield unstable results, so we
-set <code class="docutils literal notranslate"><span class="pre">n_timesteps</span></code> to 10, which sets the amount of timesteps within a stress
-period.</p>
+which last 1 year. We add the additional times to ensure that there is output
+at the end of each year. To achieve this we setup stress periods were each
+stress period is a year long. We can then use the “last” keyword in the output
+control to save the output.</p>
 <div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="n">simtimes</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">date_range</span><span class="p">(</span><span class="n">start</span><span class="o">=</span><span class="s2">&quot;2000-01-01&quot;</span><span class="p">,</span> <span class="n">end</span><span class="o">=</span><span class="s2">&quot;2030-01-01&quot;</span><span class="p">,</span> <span class="n">freq</span><span class="o">=</span><span class="s2">&quot;As&quot;</span><span class="p">)</span>
 <span class="n">simulation</span><span class="o">.</span><span class="n">create_time_discretization</span><span class="p">(</span><span class="n">additional_times</span><span class="o">=</span><span class="n">simtimes</span><span class="p">)</span>
-<span class="n">simulation</span><span class="p">[</span><span class="s2">&quot;time_discretization&quot;</span><span class="p">][</span><span class="s2">&quot;n_timesteps&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">10</span>
+</pre></div>
+</div>
+<p>We want to use adaptive time stepping to ensure stable results without taking
+an unnecessary amount of small timesteps. We set the initial time step to 0.1
+day, the minimum time step to 0.1 day, and the maximum time step to 50 days.
+The multiplier is set to 2.0 so that consecutive timesteps will be increased
+by a factor of 2 if the convergence is good. Furthermore, we will set the
+<code class="docutils literal notranslate"><span class="pre">ats_percel</span></code> to 0.95 in the Advection package in the next section to let
+MODFLOW 6 compute an appropriate time step based on the velocity field: A
+solute parcel should not travel more than one cell in a time step. From these
+two criteria MODFLOW 6 will select the smallest time step.</p>
+<div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="n">simulation</span><span class="p">[</span><span class="s2">&quot;ats&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">imod</span><span class="o">.</span><span class="n">mf6</span><span class="o">.</span><span class="n">AdaptiveTimeStepping</span><span class="p">(</span>
+    <span class="n">dt_init</span><span class="o">=</span><span class="mf">1e-1</span><span class="p">,</span>
+    <span class="n">dt_min</span><span class="o">=</span><span class="mf">1e-1</span><span class="p">,</span>
+    <span class="n">dt_max</span><span class="o">=</span><span class="mf">50.0</span><span class="p">,</span>
+    <span class="n">dt_multiplier</span><span class="o">=</span><span class="mf">2.0</span><span class="p">,</span>
+<span class="p">)</span>
 </pre></div>
 </div>
 </section>
@@ -732,7 +747,7 @@ in this case 0.10.</p>
     <span class="n">xt3d_off</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
     <span class="n">xt3d_rhs</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
 <span class="p">)</span>
-<span class="n">transport_model</span><span class="p">[</span><span class="s2">&quot;adv&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">imod</span><span class="o">.</span><span class="n">mf6</span><span class="o">.</span><span class="n">AdvectionUpstream</span><span class="p">()</span>
+<span class="n">transport_model</span><span class="p">[</span><span class="s2">&quot;adv&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">imod</span><span class="o">.</span><span class="n">mf6</span><span class="o">.</span><span class="n">AdvectionTVD</span><span class="p">(</span><span class="n">ats_percel</span><span class="o">=</span><span class="mf">0.95</span><span class="p">)</span>
 <span class="n">transport_model</span><span class="p">[</span><span class="s2">&quot;mst&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">imod</span><span class="o">.</span><span class="n">mf6</span><span class="o">.</span><span class="n">MobileStorageTransfer</span><span class="p">(</span><span class="n">porosity</span><span class="p">)</span>
 </pre></div>
 </div>
@@ -762,7 +777,7 @@ simulation as well.</p>
 </pre></div>
 </div>
 <p>We’ll create a new directory in which we will write and run the model.</p>
-<div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="n">modeldir</span> <span class="o">=</span> <span class="n">imod</span><span class="o">.</span><span class="n">util</span><span class="o">.</span><span class="n">temporary_directory</span><span class="p">()</span>
+<div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="n">modeldir</span> <span class="o">=</span> <span class="n">imod</span><span class="o">.</span><span class="n">util</span><span class="o">.</span><span class="n">temporary_directory</span><span class="p">()</span> <span class="o">/</span> <span class="s2">&quot;full&quot;</span>
 <span class="n">simulation</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">modeldir</span><span class="p">,</span> <span class="n">binary</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
 </pre></div>
 </div>
@@ -780,8 +795,8 @@ PATH. The examples introduction shortly describes how to add it to yours.</p>
 </section>
 <section id="open-the-results">
 <h2>Open the results<a class="headerlink" href="#open-the-results" title="Link to this heading">#</a></h2>
-<div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="n">sim_concentration</span> <span class="o">=</span> <span class="n">simulation</span><span class="o">.</span><span class="n">open_concentration</span><span class="p">()</span><span class="o">.</span><span class="n">compute</span><span class="p">()</span>
-<span class="n">sim_head</span> <span class="o">=</span> <span class="n">simulation</span><span class="o">.</span><span class="n">open_head</span><span class="p">()</span><span class="o">.</span><span class="n">compute</span><span class="p">()</span>
+<div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="n">sim_concentration</span> <span class="o">=</span> <span class="n">simulation</span><span class="o">.</span><span class="n">open_concentration</span><span class="p">()</span><span class="o">.</span><span class="n">compute</span><span class="p">()</span><span class="o">.</span><span class="n">reindex_like</span><span class="p">(</span><span class="n">idomain</span><span class="p">)</span>
+<span class="n">sim_head</span> <span class="o">=</span> <span class="n">simulation</span><span class="o">.</span><span class="n">open_head</span><span class="p">()</span><span class="o">.</span><span class="n">compute</span><span class="p">()</span><span class="o">.</span><span class="n">reindex_like</span><span class="p">(</span><span class="n">idomain</span><span class="p">)</span>
 </pre></div>
 </div>
 </section>
@@ -826,10 +841,69 @@ can plot the contours as follows:</p>
 <span class="p">)</span>
 </pre></div>
 </div>
-<img src="../../_images/sphx_glr_circle_transport_004.png" srcset="../../_images/sphx_glr_circle_transport_004.png" alt="time = 2030-01-01" class = "sphx-glr-single-img"/><div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>&lt;matplotlib.contour.QuadContourSet object at 0x0000016F45E96540&gt;
+<img src="../../_images/sphx_glr_circle_transport_004.png" srcset="../../_images/sphx_glr_circle_transport_004.png" alt="time = 2030-01-01" class = "sphx-glr-single-img"/><div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>&lt;matplotlib.contour.QuadContourSet object at 0x00000251D2069DF0&gt;
 </pre></div>
 </div>
-<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> (1 minutes 1.868 seconds)</p>
+</section>
+<section id="slice-the-model-domain">
+<h2>Slice the model domain<a class="headerlink" href="#slice-the-model-domain" title="Link to this heading">#</a></h2>
+<p>We may also quickly setup a smaller model. We’ll select half of the original
+domain. To set up the boundary conditions on the clipped edges you can provide
+a states_for_boundary dictionary. In this case we add the head values for the
+flow model and the concentration values for the transport model of the
+computed full domain simulation as the clipped boundary values. You can use
+this feature to clip a smaller model from an existing larger model, downscale
+it, and conduct a study in more detail around an area of interest.</p>
+<div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="n">states_for_boundary</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="s2">&quot;flow&quot;</span><span class="p">:</span> <span class="n">sim_head</span><span class="o">.</span><span class="n">isel</span><span class="p">(</span><span class="n">time</span><span class="o">=-</span><span class="mi">1</span><span class="p">,</span> <span class="n">drop</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span><span class="o">.</span><span class="n">drop_vars</span><span class="p">(</span><span class="s2">&quot;z&quot;</span><span class="p">),</span>
+    <span class="s2">&quot;transport&quot;</span><span class="p">:</span> <span class="n">sim_concentration</span><span class="o">.</span><span class="n">isel</span><span class="p">(</span><span class="n">time</span><span class="o">=-</span><span class="mi">1</span><span class="p">,</span> <span class="n">drop</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span><span class="o">.</span><span class="n">drop_vars</span><span class="p">(</span><span class="s2">&quot;z&quot;</span><span class="p">),</span>
+<span class="p">}</span>
+
+<span class="n">half_simulation</span> <span class="o">=</span> <span class="n">simulation</span><span class="o">.</span><span class="n">clip_box</span><span class="p">(</span>
+    <span class="n">x_max</span><span class="o">=</span><span class="mf">0.1</span><span class="p">,</span> <span class="n">states_for_boundary</span><span class="o">=</span><span class="n">states_for_boundary</span>
+<span class="p">)</span>
+</pre></div>
+</div>
+<p>Let’s run the model, read the results, and visualize.</p>
+<div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="n">modeldir</span> <span class="o">=</span> <span class="n">imod</span><span class="o">.</span><span class="n">util</span><span class="o">.</span><span class="n">temporary_directory</span><span class="p">()</span> <span class="o">/</span> <span class="s2">&quot;half&quot;</span>
+<span class="n">half_simulation</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">modeldir</span><span class="p">)</span>
+<span class="n">half_simulation</span><span class="o">.</span><span class="n">run</span><span class="p">()</span>
+</pre></div>
+</div>
+</section>
+<section id="id1">
+<h2>Open the results<a class="headerlink" href="#id1" title="Link to this heading">#</a></h2>
+<div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="n">half_sim_concentration</span> <span class="o">=</span> <span class="n">half_simulation</span><span class="o">.</span><span class="n">open_concentration</span><span class="p">()</span><span class="o">.</span><span class="n">compute</span><span class="p">()</span>
+<span class="n">half_sim_head</span> <span class="o">=</span> <span class="n">half_simulation</span><span class="o">.</span><span class="n">open_head</span><span class="p">()</span><span class="o">.</span><span class="n">compute</span><span class="p">()</span>
+</pre></div>
+</div>
+<p>Assign these new coordinate values to the dataset</p>
+<div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="n">half_sim_head</span> <span class="o">=</span> <span class="n">half_sim_head</span><span class="o">.</span><span class="n">assign_coords</span><span class="p">(</span><span class="o">**</span><span class="n">coords</span><span class="p">)</span>
+<span class="n">half_sim_concentration</span> <span class="o">=</span> <span class="n">half_sim_concentration</span><span class="o">.</span><span class="n">assign_coords</span><span class="p">(</span><span class="o">**</span><span class="n">coords</span><span class="p">)</span>
+</pre></div>
+</div>
+</section>
+<section id="id2">
+<h2>Visualize the results<a class="headerlink" href="#id2" title="Link to this heading">#</a></h2>
+<p>We can quickly and easily visualize the output with the plotting functions
+provided by xarray and xugrid:</p>
+<div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="n">fig</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">()</span>
+<span class="n">half_sim_head</span><span class="o">.</span><span class="n">isel</span><span class="p">(</span><span class="n">time</span><span class="o">=-</span><span class="mi">1</span><span class="p">,</span> <span class="n">layer</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span><span class="o">.</span><span class="n">ugrid</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">ax</span><span class="o">=</span><span class="n">ax</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">set_aspect</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+</pre></div>
+</div>
+<img src="../../_images/sphx_glr_circle_transport_005.png" srcset="../../_images/sphx_glr_circle_transport_005.png" alt="layer = 1, time = 2030-01-01, z = -5.0" class = "sphx-glr-single-img"/><p>We can draw a crossection through the center by selecting y=0, for which we
+can plot the contours as follows:</p>
+<div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="n">fig</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">()</span>
+<span class="n">half_sim_concentration</span><span class="o">.</span><span class="n">isel</span><span class="p">(</span><span class="n">time</span><span class="o">=-</span><span class="mi">1</span><span class="p">)</span><span class="o">.</span><span class="n">ugrid</span><span class="o">.</span><span class="n">sel</span><span class="p">(</span><span class="n">y</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span><span class="o">.</span><span class="n">plot</span><span class="o">.</span><span class="n">contourf</span><span class="p">(</span>
+    <span class="n">ax</span><span class="o">=</span><span class="n">ax</span><span class="p">,</span> <span class="n">x</span><span class="o">=</span><span class="s2">&quot;mesh2d_x&quot;</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="s2">&quot;z&quot;</span><span class="p">,</span> <span class="n">cmap</span><span class="o">=</span><span class="s2">&quot;RdYlBu_r&quot;</span>
+<span class="p">)</span>
+</pre></div>
+</div>
+<img src="../../_images/sphx_glr_circle_transport_006.png" srcset="../../_images/sphx_glr_circle_transport_006.png" alt="time = 2030-01-01" class = "sphx-glr-single-img"/><div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>&lt;matplotlib.contour.QuadContourSet object at 0x00000251D7A1F860&gt;
+</pre></div>
+</div>
+<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> (1 minutes 15.846 seconds)</p>
 <div class="sphx-glr-footer sphx-glr-footer-example docutils container" id="sphx-glr-download-examples-mf6-circle-transport-py">
 <div class="sphx-glr-download sphx-glr-download-jupyter docutils container">
 <p><a class="reference download internal" download="" href="../../_downloads/9965fe2b3f087f8c76ddd1d60b60c7d5/circle_transport.ipynb"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Jupyter</span> <span class="pre">notebook:</span> <span class="pre">circle_transport.ipynb</span></code></a></p>
@@ -896,12 +970,16 @@ can plot the contours as follows:</p>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#create-a-mesh">Create a mesh</a></li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#recharge">Recharge</a></li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#add-flow-model-to-simulation">Add flow model to simulation</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#time-discretization">Time discretization</a></li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#buoyancy">Buoyancy</a></li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#add-transport-model-to-simulation">Add transport model to simulation</a></li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#run-the-model">Run the model</a></li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#open-the-results">Open the results</a></li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#assign-coordinates-to-output">Assign coordinates to output</a></li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#visualize-the-results">Visualize the results</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#slice-the-model-domain">Slice the model domain</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#id1">Open the results</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#id2">Visualize the results</a></li>
 </ul>
   </nav></div>
 

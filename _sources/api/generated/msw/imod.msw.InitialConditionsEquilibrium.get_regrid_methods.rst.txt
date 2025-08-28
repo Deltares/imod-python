@@ -1,0 +1,6 @@
+﻿imod.msw.InitialConditionsEquilibrium.get\_regrid\_methods
+==========================================================
+
+.. currentmodule:: imod.msw
+
+.. automethod:: InitialConditionsEquilibrium.get_regrid_methods

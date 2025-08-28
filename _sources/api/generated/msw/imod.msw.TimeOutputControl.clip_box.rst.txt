@@ -1,0 +1,6 @@
+﻿imod.msw.TimeOutputControl.clip\_box
+====================================
+
+.. currentmodule:: imod.msw
+
+.. automethod:: TimeOutputControl.clip_box

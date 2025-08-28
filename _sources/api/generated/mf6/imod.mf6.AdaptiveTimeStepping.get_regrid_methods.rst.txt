@@ -1,0 +1,6 @@
+﻿imod.mf6.AdaptiveTimeStepping.get\_regrid\_methods
+==================================================
+
+.. currentmodule:: imod.mf6
+
+.. automethod:: AdaptiveTimeStepping.get_regrid_methods

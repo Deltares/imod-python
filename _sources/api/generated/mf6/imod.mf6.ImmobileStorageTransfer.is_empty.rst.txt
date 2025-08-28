@@ -1,0 +1,6 @@
+﻿imod.mf6.ImmobileStorageTransfer.is\_empty
+==========================================
+
+.. currentmodule:: imod.mf6
+
+.. automethod:: ImmobileStorageTransfer.is_empty

@@ -1,0 +1,881 @@
+
+<!DOCTYPE html>
+
+
+<html lang="en" data-content_root="../../../" data-theme="light">
+
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>imod.msw.VariableOutputControl.clip_box &#8212; iMOD Python 1.0.0rc6 documentation</title>
+  
+  
+  
+  <script data-cfasync="false">
+    document.documentElement.dataset.mode = localStorage.getItem("mode") || "light";
+    document.documentElement.dataset.theme = localStorage.getItem("theme") || "light";
+  </script>
+  <!--
+    this give us a css class that will be invisible only if js is disabled
+  -->
+  <noscript>
+    <style>
+      .pst-js-only { display: none !important; }
+
+    </style>
+  </noscript>
+  
+  <!-- Loaded before other Sphinx assets -->
+  <link href="../../../_static/styles/theme.css?digest=8878045cc6db502f8baf" rel="stylesheet" />
+<link href="../../../_static/styles/pydata-sphinx-theme.css?digest=8878045cc6db502f8baf" rel="stylesheet" />
+
+    <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=03e43079" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/sg_gallery.css?v=d2d258e8" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/sg_gallery-binder.css?v=f4aeca0c" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/sg_gallery-dataframe.css?v=2082cf3c" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/sg_gallery-rendered-html.css?v=1277b6f3" />
+  
+  <!-- So that users can add custom icons -->
+  <script src="../../../_static/scripts/fontawesome.js?digest=8878045cc6db502f8baf"></script>
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="../../../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
+<link rel="preload" as="script" href="../../../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
+
+    <script src="../../../_static/documentation_options.js?v=bc4855a1"></script>
+    <script src="../../../_static/doctools.js?v=9bcbadda"></script>
+    <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script>DOCUMENTATION_OPTIONS.pagename = 'api/generated/msw/imod.msw.VariableOutputControl.clip_box';</script>
+    <script src="../../../_static/deltares.js?v=8d5578be"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" />
+    <link rel="next" title="imod.msw.VariableOutputControl.from_imod5_data" href="imod.msw.VariableOutputControl.from_imod5_data.html" />
+    <link rel="prev" title="imod.msw.VariableOutputControl.regrid_like" href="imod.msw.VariableOutputControl.regrid_like.html" />
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <meta name="docsearch:language" content="en"/>
+  <meta name="docsearch:version" content="1.0.0rc6.dev" />
+  </head>
+  
+  
+  <body data-bs-spy="scroll" data-bs-target=".bd-toc-nav" data-offset="180" data-bs-root-margin="0px 0px -60%" data-default-mode="light">
+
+  
+  
+  <div id="pst-skip-link" class="skip-link d-print-none"><a href="#main-content">Skip to main content</a></div>
+  
+  <div id="pst-scroll-pixel-helper"></div>
+  
+  <button type="button" class="btn rounded-pill" id="pst-back-to-top">
+    <i class="fa-solid fa-arrow-up"></i>Back to top</button>
+
+  
+  <dialog id="pst-search-dialog">
+    
+<form class="bd-search d-flex align-items-center"
+      action="../../../search.html"
+      method="get">
+  <i class="fa-solid fa-magnifying-glass"></i>
+  <input type="search"
+         class="form-control"
+         name="q"
+         placeholder="Search the docs ..."
+         aria-label="Search the docs ..."
+         autocomplete="off"
+         autocorrect="off"
+         autocapitalize="off"
+         spellcheck="false"/>
+  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
+</form>
+  </dialog>
+
+  <div class="pst-async-banner-revealer d-none">
+  <aside id="bd-header-version-warning" class="d-none d-print-none" aria-label="Version warning"></aside>
+</div>
+
+  
+    <header class="bd-header navbar navbar-expand-lg bd-navbar d-print-none">
+<div class="bd-header__inner bd-page-width">
+  <button class="pst-navbar-icon sidebar-toggle primary-toggle" aria-label="Site navigation">
+    <span class="fa-solid fa-bars"></span>
+  </button>
+  
+  
+  <div class="col-lg-3 navbar-header-items__start">
+    
+      <div class="navbar-item">
+
+  
+    
+  
+
+<a class="navbar-brand logo" href="../../../index.html">
+  
+  
+  
+  
+  
+    
+    
+    
+    <img src="../../../_static/imod-python-logo-light.svg" class="logo__image only-light" alt="iMOD Python 1.0.0rc6 documentation - Home"/>
+    <img src="../../../_static/imod-python-logo-dark.svg" class="logo__image only-dark pst-js-only" alt="iMOD Python 1.0.0rc6 documentation - Home"/>
+  
+  
+</a></div>
+    
+  </div>
+  
+  <div class="col-lg-9 navbar-header-items">
+    
+    <div class="me-auto navbar-header-items__center">
+      
+        <div class="navbar-item">
+<nav>
+  <ul class="bd-navbar-elements navbar-nav">
+    
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../../installation.html">
+    Installing
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../../user-guide/index.html">
+    User Guide
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../../examples/index.html">
+    Examples
+  </a>
+</li>
+
+
+<li class="nav-item current active">
+  <a class="nav-link nav-internal" href="../../index.html">
+    API
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../../faq/index.html">
+    FAQ
+  </a>
+</li>
+
+            <li class="nav-item dropdown">
+                <button class="btn dropdown-toggle nav-item" type="button"
+                data-bs-toggle="dropdown" aria-expanded="false"
+                aria-controls="pst-nav-more-links">
+                    More
+                </button>
+                <ul id="pst-nav-more-links" class="dropdown-menu">
+                    
+<li class=" ">
+  <a class="nav-link dropdown-item nav-internal" href="../../../developing/index.html">
+    Developing
+  </a>
+</li>
+
+                </ul>
+            </li>
+            
+  </ul>
+</nav></div>
+      
+    </div>
+    
+    
+    <div class="navbar-header-items__end">
+      
+        <div class="navbar-item navbar-persistent--container">
+          
+
+<button class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+ <i class="fa-solid fa-magnifying-glass"></i>
+ <span class="search-button__default-text">Search</span>
+ <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+</button>
+        </div>
+      
+      
+        <div class="navbar-item">
+
+<button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button pst-js-only" aria-label="Color mode" data-bs-title="Color mode"  data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <i class="theme-switch fa-solid fa-sun                fa-lg" data-mode="light" title="Light"></i>
+  <i class="theme-switch fa-solid fa-moon               fa-lg" data-mode="dark"  title="Dark"></i>
+  <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg" data-mode="auto"  title="System Settings"></i>
+</button></div>
+      
+        <div class="navbar-item"><ul class="navbar-icon-links"
+    aria-label="Icon Links">
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://www.deltares.nl/en/" title="Deltares" class="nav-link pst-navbar-icon" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><i class="fa-custom fa-deltares fa-lg" aria-hidden="true"></i>
+            <span class="sr-only">Deltares</span></a>
+        </li>
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://github.com/Deltares/imod-python" title="GitHub" class="nav-link pst-navbar-icon" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><i class="fab fa-github fa-lg" aria-hidden="true"></i>
+            <span class="sr-only">GitHub</span></a>
+        </li>
+</ul></div>
+      
+    </div>
+    
+  </div>
+  
+  
+    <div class="navbar-persistent--mobile">
+
+<button class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+ <i class="fa-solid fa-magnifying-glass"></i>
+ <span class="search-button__default-text">Search</span>
+ <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+</button>
+    </div>
+  
+
+  
+    <button class="pst-navbar-icon sidebar-toggle secondary-toggle" aria-label="On this page">
+      <span class="fa-solid fa-outdent"></span>
+    </button>
+  
+</div>
+
+    </header>
+  
+
+  <div class="bd-container">
+    <div class="bd-container__inner bd-page-width">
+      
+      
+      
+      <dialog id="pst-primary-sidebar-modal"></dialog>
+      <div id="pst-primary-sidebar" class="bd-sidebar-primary bd-sidebar">
+        
+
+  
+  <div class="sidebar-header-items sidebar-primary__section">
+    
+    
+      <div class="sidebar-header-items__center">
+        
+          
+          
+            <div class="navbar-item">
+<nav>
+  <ul class="bd-navbar-elements navbar-nav">
+    
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../../installation.html">
+    Installing
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../../user-guide/index.html">
+    User Guide
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../../examples/index.html">
+    Examples
+  </a>
+</li>
+
+
+<li class="nav-item current active">
+  <a class="nav-link nav-internal" href="../../index.html">
+    API
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../../faq/index.html">
+    FAQ
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../../developing/index.html">
+    Developing
+  </a>
+</li>
+
+  </ul>
+</nav></div>
+          
+        
+      </div>
+    
+    
+    
+      <div class="sidebar-header-items__end">
+        
+          <div class="navbar-item">
+
+<button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button pst-js-only" aria-label="Color mode" data-bs-title="Color mode"  data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <i class="theme-switch fa-solid fa-sun                fa-lg" data-mode="light" title="Light"></i>
+  <i class="theme-switch fa-solid fa-moon               fa-lg" data-mode="dark"  title="Dark"></i>
+  <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg" data-mode="auto"  title="System Settings"></i>
+</button></div>
+        
+          <div class="navbar-item"><ul class="navbar-icon-links"
+    aria-label="Icon Links">
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://www.deltares.nl/en/" title="Deltares" class="nav-link pst-navbar-icon" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><i class="fa-custom fa-deltares fa-lg" aria-hidden="true"></i>
+            <span class="sr-only">Deltares</span></a>
+        </li>
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://github.com/Deltares/imod-python" title="GitHub" class="nav-link pst-navbar-icon" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><i class="fab fa-github fa-lg" aria-hidden="true"></i>
+            <span class="sr-only">GitHub</span></a>
+        </li>
+</ul></div>
+        
+      </div>
+    
+  </div>
+  
+    <div class="sidebar-primary-items__start sidebar-primary__section">
+        <div class="sidebar-primary-item">
+<nav class="bd-docs-nav bd-links"
+     aria-label="Section Navigation">
+  <p class="bd-links__title" role="heading" aria-level="1">Section Navigation</p>
+  <div class="bd-toc-item navbar-nav"><ul class="nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="../../changelog.html">Changelog</a></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../../io.html">Input/output</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="../io/imod.formats.idf.open.html">imod.formats.idf.open</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../io/imod.formats.idf.open_dataset.html">imod.formats.idf.open_dataset</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../io/imod.formats.idf.open_subdomains.html">imod.formats.idf.open_subdomains</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../io/imod.formats.idf.save.html">imod.formats.idf.save</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../io/imod.formats.idf.header.html">imod.formats.idf.header</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../io/imod.formats.ipf.read.html">imod.formats.ipf.read</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../io/imod.formats.ipf.read_associated.html">imod.formats.ipf.read_associated</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../io/imod.formats.ipf.save.html">imod.formats.ipf.save</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../io/imod.formats.ipf.write.html">imod.formats.ipf.write</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../io/imod.formats.ipf.write_assoc.html">imod.formats.ipf.write_assoc</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../io/imod.formats.rasterio.header.html">imod.formats.rasterio.header</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../io/imod.formats.rasterio.open.html">imod.formats.rasterio.open</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../io/imod.formats.rasterio.save.html">imod.formats.rasterio.save</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../io/imod.formats.gen.read.html">imod.formats.gen.read</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../io/imod.formats.gen.write.html">imod.formats.gen.write</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../io/imod.formats.gen.read_ascii.html">imod.formats.gen.read_ascii</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../io/imod.formats.prj.read_projectfile.html">imod.formats.prj.read_projectfile</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../io/imod.formats.prj.open_projectfile_data.html">imod.formats.prj.open_projectfile_data</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../io/imod.formats.prj.read_timfile.html">imod.formats.prj.read_timfile</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../../prepare.html">Prepare model input</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="../prepare/imod.prepare.Regridder.html">imod.prepare.Regridder</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../prepare/imod.prepare.LayerRegridder.html">imod.prepare.LayerRegridder</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../prepare/imod.prepare.Voxelizer.html">imod.prepare.Voxelizer</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../prepare/imod.prepare.fill.html">imod.prepare.fill</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../prepare/imod.prepare.laplace_interpolate.html">imod.prepare.laplace_interpolate</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../prepare/imod.prepare.polygonize.html">imod.prepare.polygonize</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../prepare/imod.prepare.reproject.html">imod.prepare.reproject</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../prepare/imod.prepare.rasterize.html">imod.prepare.rasterize</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../prepare/imod.prepare.gdal_rasterize.html">imod.prepare.gdal_rasterize</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../prepare/imod.prepare.celltable.html">imod.prepare.celltable</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../prepare/imod.prepare.rasterize_celltable.html">imod.prepare.rasterize_celltable</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../prepare/imod.prepare.zonal_aggregate_polygons.html">imod.prepare.zonal_aggregate_polygons</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../prepare/imod.prepare.zonal_aggregate_raster.html">imod.prepare.zonal_aggregate_raster</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../prepare/imod.prepare.linestring_to_square_zpolygons.html">imod.prepare.linestring_to_square_zpolygons</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../prepare/imod.prepare.linestring_to_trapezoid_zpolygons.html">imod.prepare.linestring_to_trapezoid_zpolygons</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../prepare/imod.prepare.assign_wells.html">imod.prepare.assign_wells</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../prepare/imod.prepare.get_lower_active_grid_cells.html">imod.prepare.get_lower_active_grid_cells</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../prepare/imod.prepare.get_lower_active_layer_number.html">imod.prepare.get_lower_active_layer_number</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../prepare/imod.prepare.get_upper_active_grid_cells.html">imod.prepare.get_upper_active_grid_cells</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../prepare/imod.prepare.get_upper_active_layer_number.html">imod.prepare.get_upper_active_layer_number</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../prepare/imod.prepare.create_layered_top.html">imod.prepare.create_layered_top</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../prepare/imod.prepare.ALLOCATION_OPTION.html">imod.prepare.ALLOCATION_OPTION</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../prepare/imod.prepare.DISTRIBUTING_OPTION.html">imod.prepare.DISTRIBUTING_OPTION</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../prepare/imod.prepare.SimulationAllocationOptions.html">imod.prepare.SimulationAllocationOptions</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../prepare/imod.prepare.SimulationDistributingOptions.html">imod.prepare.SimulationDistributingOptions</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../prepare/imod.prepare.allocate_drn_cells.html">imod.prepare.allocate_drn_cells</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../prepare/imod.prepare.allocate_ghb_cells.html">imod.prepare.allocate_ghb_cells</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../prepare/imod.prepare.allocate_rch_cells.html">imod.prepare.allocate_rch_cells</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../prepare/imod.prepare.allocate_riv_cells.html">imod.prepare.allocate_riv_cells</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../prepare/imod.prepare.c_leakage.html">imod.prepare.c_leakage</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../prepare/imod.prepare.c_radial.html">imod.prepare.c_radial</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../prepare/imod.prepare.distribute_drn_conductance.html">imod.prepare.distribute_drn_conductance</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../prepare/imod.prepare.distribute_ghb_conductance.html">imod.prepare.distribute_ghb_conductance</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../prepare/imod.prepare.distribute_riv_conductance.html">imod.prepare.distribute_riv_conductance</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../prepare/imod.prepare.split_conductance_with_infiltration_factor.html">imod.prepare.split_conductance_with_infiltration_factor</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../prepare/imod.prepare.cleanup_drn.html">imod.prepare.cleanup_drn</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../prepare/imod.prepare.cleanup_ghb.html">imod.prepare.cleanup_ghb</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../prepare/imod.prepare.cleanup_riv.html">imod.prepare.cleanup_riv</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../prepare/imod.prepare.cleanup_wel.html">imod.prepare.cleanup_wel</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../prepare/imod.prepare.cleanup_wel_layered.html">imod.prepare.cleanup_wel_layered</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../prepare/imod.prepare.cleanup_hfb.html">imod.prepare.cleanup_hfb</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../prepare/imod.prepare.create_partition_labels.html">imod.prepare.create_partition_labels</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../../select.html">Select points and cross sections</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="../select/imod.select.cross_section_line.html">imod.select.cross_section_line</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../select/imod.select.cross_section_linestring.html">imod.select.cross_section_linestring</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../select/imod.select.points_in_bounds.html">imod.select.points_in_bounds</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../select/imod.select.points_values.html">imod.select.points_values</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../select/imod.select.points_set_values.html">imod.select.points_set_values</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../select/imod.select.points_indices.html">imod.select.points_indices</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../select/imod.select.upper_active_layer.html">imod.select.upper_active_layer</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../select/imod.select.grid_boundary_xy.html">imod.select.grid_boundary_xy</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../select/imod.select.active_grid_boundary_xy.html">imod.select.active_grid_boundary_xy</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../../evaluate.html">Evaluate model output</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="../evaluate/imod.evaluate.calculate_gxg.html">imod.evaluate.calculate_gxg</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../evaluate/imod.evaluate.calculate_gxg_points.html">imod.evaluate.calculate_gxg_points</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../evaluate/imod.evaluate.convert_pointwaterhead_freshwaterhead.html">imod.evaluate.convert_pointwaterhead_freshwaterhead</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../evaluate/imod.evaluate.facebudget.html">imod.evaluate.facebudget</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../evaluate/imod.evaluate.flow_velocity.html">imod.evaluate.flow_velocity</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../evaluate/imod.evaluate.interpolate_value_boundaries.html">imod.evaluate.interpolate_value_boundaries</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../evaluate/imod.evaluate.quiver_line.html">imod.evaluate.quiver_line</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../evaluate/imod.evaluate.quiver_linestring.html">imod.evaluate.quiver_linestring</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../evaluate/imod.evaluate.streamfunction_line.html">imod.evaluate.streamfunction_line</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../evaluate/imod.evaluate.streamfunction_linestring.html">imod.evaluate.streamfunction_linestring</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../evaluate/imod.evaluate.intra_cell_boundary_conditions.html">imod.evaluate.intra_cell_boundary_conditions</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../evaluate/imod.evaluate.stability_constraint_advection.html">imod.evaluate.stability_constraint_advection</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../evaluate/imod.evaluate.stability_constraint_wel.html">imod.evaluate.stability_constraint_wel</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../../visualize.html">Visualize</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="../visualize/imod.visualize.cross_section.html">imod.visualize.cross_section</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../visualize/imod.visualize.plot_map.html">imod.visualize.plot_map</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../visualize/imod.visualize.imshow_topview.html">imod.visualize.imshow_topview</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../visualize/imod.visualize.read_imod_legend.html">imod.visualize.read_imod_legend</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../visualize/imod.visualize.quiver.html">imod.visualize.quiver</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../visualize/imod.visualize.streamfunction.html">imod.visualize.streamfunction</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../visualize/imod.visualize.waterbalance_barchart.html">imod.visualize.waterbalance_barchart</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../visualize/imod.visualize.grid_3d.html">imod.visualize.grid_3d</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../visualize/imod.visualize.line_3d.html">imod.visualize.line_3d</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../visualize/imod.visualize.GridAnimation3D.html">imod.visualize.GridAnimation3D</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../visualize/imod.visualize.StaticGridAnimation3D.html">imod.visualize.StaticGridAnimation3D</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../../util.html">Utilities</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="../util/imod.util.empty_2d.html">imod.util.empty_2d</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../util/imod.util.empty_2d_transient.html">imod.util.empty_2d_transient</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../util/imod.util.empty_3d.html">imod.util.empty_3d</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../util/imod.util.empty_3d_transient.html">imod.util.empty_3d_transient</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../util/imod.util.where.html">imod.util.where</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../util/imod.util.cd.html">imod.util.cd</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../util/imod.util.ignore_warnings.html">imod.util.ignore_warnings</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../util/imod.util.print_if_error.html">imod.util.print_if_error</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../util/imod.util.to_datetime.html">imod.util.to_datetime</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../util/imod.util.coord_reference.html">imod.util.coord_reference</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../util/imod.util.spatial_reference.html">imod.util.spatial_reference</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../util/imod.util.transform.html">imod.util.transform</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../util/imod.util.to_ugrid2d.html">imod.util.to_ugrid2d</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../util/imod.util.mdal_compliant_ugrid2d.html">imod.util.mdal_compliant_ugrid2d</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../util/imod.util.from_mdal_compliant_ugrid2d.html">imod.util.from_mdal_compliant_ugrid2d</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../util/imod.util.ones_like_ugrid.html">imod.util.ones_like_ugrid</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../util/imod.util.RegridderWeightsCache.html">imod.util.RegridderWeightsCache</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../util/imod.util.RegridderWeightsCache.get_regridder.html">imod.util.RegridderWeightsCache.get_regridder</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../util/imod.util.RegridderType.html">imod.util.RegridderType</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../../logging.html">Logging</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2 has-children"><a class="reference internal" href="../logging/imod.logging.html">imod.logging</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l3 has-children"><a class="reference internal" href="../logging/imod.logging.config.html">imod.logging.config</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l4"><a class="reference internal" href="../logging/imod.logging.config.configure.html">imod.logging.config.configure</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../logging/imod.logging.config.LoggerType.html">imod.logging.config.LoggerType</a></li>
+</ul>
+</details></li>
+<li class="toctree-l3 has-children"><a class="reference internal" href="../logging/imod.logging.ilogger.html">imod.logging.ilogger</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l4"><a class="reference internal" href="../logging/imod.logging.ilogger.ILogger.html">imod.logging.ilogger.ILogger</a></li>
+</ul>
+</details></li>
+<li class="toctree-l3 has-children"><a class="reference internal" href="../logging/imod.logging.logging_decorators.html">imod.logging.logging_decorators</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l4"><a class="reference internal" href="../logging/imod.logging.logging_decorators.init_log_decorator.html">imod.logging.logging_decorators.init_log_decorator</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../logging/imod.logging.logging_decorators.standard_log_decorator.html">imod.logging.logging_decorators.standard_log_decorator</a></li>
+</ul>
+</details></li>
+<li class="toctree-l3 has-children"><a class="reference internal" href="../logging/imod.logging.loglevel.html">imod.logging.loglevel</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l4"><a class="reference internal" href="../logging/imod.logging.loglevel.LogLevel.html">imod.logging.loglevel.LogLevel</a></li>
+</ul>
+</details></li>
+<li class="toctree-l3 has-children"><a class="reference internal" href="../logging/imod.logging.logurulogger.html">imod.logging.logurulogger</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l4"><a class="reference internal" href="../logging/imod.logging.logurulogger.LoguruLogger.html">imod.logging.logurulogger.LoguruLogger</a></li>
+</ul>
+</details></li>
+<li class="toctree-l3 has-children"><a class="reference internal" href="../logging/imod.logging.nulllogger.html">imod.logging.nulllogger</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l4"><a class="reference internal" href="../logging/imod.logging.nulllogger.NullLogger.html">imod.logging.nulllogger.NullLogger</a></li>
+</ul>
+</details></li>
+<li class="toctree-l3 has-children"><a class="reference internal" href="../logging/imod.logging.pythonlogger.html">imod.logging.pythonlogger</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l4"><a class="reference internal" href="../logging/imod.logging.pythonlogger.PythonLogger.html">imod.logging.pythonlogger.PythonLogger</a></li>
+</ul>
+</details></li>
+</ul>
+</details></li>
+</ul>
+</details></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../../mf6.html">MODFLOW 6</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="../mf6/imod.mf6.open_hds.html">imod.mf6.open_hds</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../mf6/imod.mf6.open_cbc.html">imod.mf6.open_cbc</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../mf6/imod.mf6.read_cbc_headers.html">imod.mf6.read_cbc_headers</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../mf6/imod.mf6.open_dvs.html">imod.mf6.open_dvs</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../mf6/imod.mf6.open_conc.html">imod.mf6.open_conc</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../mf6/imod.mf6.read_grb.html">imod.mf6.read_grb</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../mf6/imod.mf6.Modflow6Simulation.html">imod.mf6.Modflow6Simulation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../mf6/imod.mf6.GroundwaterFlowModel.html">imod.mf6.GroundwaterFlowModel</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../mf6/imod.mf6.GroundwaterTransportModel.html">imod.mf6.GroundwaterTransportModel</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../mf6/imod.mf6.StructuredDiscretization.html">imod.mf6.StructuredDiscretization</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../mf6/imod.mf6.VerticesDiscretization.html">imod.mf6.VerticesDiscretization</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../mf6/imod.mf6.TimeDiscretization.html">imod.mf6.TimeDiscretization</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../mf6/imod.mf6.AdaptiveTimeStepping.html">imod.mf6.AdaptiveTimeStepping</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../mf6/imod.mf6.OutputControl.html">imod.mf6.OutputControl</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../mf6/imod.mf6.Solution.html">imod.mf6.Solution</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../mf6/imod.mf6.SolutionPresetSimple.html">imod.mf6.SolutionPresetSimple</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../mf6/imod.mf6.SolutionPresetModerate.html">imod.mf6.SolutionPresetModerate</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../mf6/imod.mf6.SolutionPresetComplex.html">imod.mf6.SolutionPresetComplex</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../mf6/imod.mf6.ValidationSettings.html">imod.mf6.ValidationSettings</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../mf6/imod.mf6.ApiPackage.html">imod.mf6.ApiPackage</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../mf6/imod.mf6.Buoyancy.html">imod.mf6.Buoyancy</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../mf6/imod.mf6.ConstantHead.html">imod.mf6.ConstantHead</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../mf6/imod.mf6.Drainage.html">imod.mf6.Drainage</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../mf6/imod.mf6.Evapotranspiration.html">imod.mf6.Evapotranspiration</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../mf6/imod.mf6.GeneralHeadBoundary.html">imod.mf6.GeneralHeadBoundary</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../mf6/imod.mf6.HorizontalFlowBarrierHydraulicCharacteristic.html">imod.mf6.HorizontalFlowBarrierHydraulicCharacteristic</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../mf6/imod.mf6.HorizontalFlowBarrierMultiplier.html">imod.mf6.HorizontalFlowBarrierMultiplier</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../mf6/imod.mf6.HorizontalFlowBarrierResistance.html">imod.mf6.HorizontalFlowBarrierResistance</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../mf6/imod.mf6.LayeredWell.html">imod.mf6.LayeredWell</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../mf6/imod.mf6.InitialConditions.html">imod.mf6.InitialConditions</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../mf6/imod.mf6.NodePropertyFlow.html">imod.mf6.NodePropertyFlow</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../mf6/imod.mf6.Recharge.html">imod.mf6.Recharge</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../mf6/imod.mf6.River.html">imod.mf6.River</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../mf6/imod.mf6.SingleLayerHorizontalFlowBarrierHydraulicCharacteristic.html">imod.mf6.SingleLayerHorizontalFlowBarrierHydraulicCharacteristic</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../mf6/imod.mf6.SingleLayerHorizontalFlowBarrierMultiplier.html">imod.mf6.SingleLayerHorizontalFlowBarrierMultiplier</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../mf6/imod.mf6.SingleLayerHorizontalFlowBarrierResistance.html">imod.mf6.SingleLayerHorizontalFlowBarrierResistance</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../mf6/imod.mf6.SpecificStorage.html">imod.mf6.SpecificStorage</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../mf6/imod.mf6.StorageCoefficient.html">imod.mf6.StorageCoefficient</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../mf6/imod.mf6.UnsaturatedZoneFlow.html">imod.mf6.UnsaturatedZoneFlow</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../mf6/imod.mf6.Well.html">imod.mf6.Well</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../mf6/imod.mf6.AdvectionCentral.html">imod.mf6.AdvectionCentral</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../mf6/imod.mf6.AdvectionTVD.html">imod.mf6.AdvectionTVD</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../mf6/imod.mf6.AdvectionUpstream.html">imod.mf6.AdvectionUpstream</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../mf6/imod.mf6.ConstantConcentration.html">imod.mf6.ConstantConcentration</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../mf6/imod.mf6.Dispersion.html">imod.mf6.Dispersion</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../mf6/imod.mf6.ImmobileStorageTransfer.html">imod.mf6.ImmobileStorageTransfer</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../mf6/imod.mf6.MobileStorageTransfer.html">imod.mf6.MobileStorageTransfer</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../mf6/imod.mf6.MassSourceLoading.html">imod.mf6.MassSourceLoading</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../mf6/imod.mf6.SourceSinkMixing.html">imod.mf6.SourceSinkMixing</a></li>
+</ul>
+</details></li>
+
+<li class="toctree-l1 has-children"><a class="reference internal" href="../../wq.html">iMOD-WQ</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="../wq/imod.wq.SeawatModel.html">imod.wq.SeawatModel</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../wq/imod.wq.TimeDiscretization.html">imod.wq.TimeDiscretization</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../wq/imod.wq.OutputControl.html">imod.wq.OutputControl</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../wq/imod.wq.PreconditionedConjugateGradientSolver.html">imod.wq.PreconditionedConjugateGradientSolver</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../wq/imod.wq.GeneralizedConjugateGradientSolver.html">imod.wq.GeneralizedConjugateGradientSolver</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../wq/imod.wq.ParallelKrylovFlowSolver.html">imod.wq.ParallelKrylovFlowSolver</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../wq/imod.wq.ParallelKrylovTransportSolver.html">imod.wq.ParallelKrylovTransportSolver</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../wq/imod.wq.BasicFlow.html">imod.wq.BasicFlow</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../wq/imod.wq.ConstantHead.html">imod.wq.ConstantHead</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../wq/imod.wq.Drainage.html">imod.wq.Drainage</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../wq/imod.wq.EvapotranspirationTopLayer.html">imod.wq.EvapotranspirationTopLayer</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../wq/imod.wq.EvapotranspirationLayers.html">imod.wq.EvapotranspirationLayers</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../wq/imod.wq.EvapotranspirationHighestActive.html">imod.wq.EvapotranspirationHighestActive</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../wq/imod.wq.GeneralHeadBoundary.html">imod.wq.GeneralHeadBoundary</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../wq/imod.wq.LayerPropertyFlow.html">imod.wq.LayerPropertyFlow</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../wq/imod.wq.RechargeTopLayer.html">imod.wq.RechargeTopLayer</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../wq/imod.wq.RechargeLayers.html">imod.wq.RechargeLayers</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../wq/imod.wq.RechargeHighestActive.html">imod.wq.RechargeHighestActive</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../wq/imod.wq.River.html">imod.wq.River</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../wq/imod.wq.Well.html">imod.wq.Well</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../wq/imod.wq.VariableDensityFlow.html">imod.wq.VariableDensityFlow</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../wq/imod.wq.AdvectionTVD.html">imod.wq.AdvectionTVD</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../wq/imod.wq.AdvectionMOC.html">imod.wq.AdvectionMOC</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../wq/imod.wq.AdvectionModifiedMOC.html">imod.wq.AdvectionModifiedMOC</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../wq/imod.wq.AdvectionHybridMOC.html">imod.wq.AdvectionHybridMOC</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../wq/imod.wq.AdvectionFiniteDifference.html">imod.wq.AdvectionFiniteDifference</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../wq/imod.wq.BasicTransport.html">imod.wq.BasicTransport</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../wq/imod.wq.Dispersion.html">imod.wq.Dispersion</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../wq/imod.wq.MassLoading.html">imod.wq.MassLoading</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../wq/imod.wq.TimeVaryingConstantConcentration.html">imod.wq.TimeVaryingConstantConcentration</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../../msw.html">MetaSWAP</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="imod.msw.MetaSwapModel.html">imod.msw.MetaSwapModel</a></li>
+</ul>
+</details></li>
+
+
+
+
+
+
+<li class="toctree-l1 has-children"><a class="reference internal" href="../../metamod.html">Coupling MetaSWAP and MODFLOW</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="../metamod/imod.couplers.metamod.MetaMod.html">imod.couplers.metamod.MetaMod</a></li>
+</ul>
+</details></li>
+</ul>
+</div>
+</nav></div>
+    </div>
+  
+  
+  <div class="sidebar-primary-items__end sidebar-primary__section">
+      <div class="sidebar-primary-item">
+<div id="ethical-ad-placement"
+      class="flat"
+      data-ea-publisher="readthedocs"
+      data-ea-type="readthedocs-sidebar"
+      data-ea-manual="true">
+</div></div>
+  </div>
+
+
+      </div>
+      
+      <main id="main-content" class="bd-main" role="main">
+        
+        
+          <div class="bd-content">
+            <div class="bd-article-container">
+              
+              <div class="bd-header-article d-print-none">
+<div class="header-article-items header-article__inner">
+  
+    <div class="header-article-items__start">
+      
+        <div class="header-article-item">
+
+<nav aria-label="Breadcrumb" class="d-print-none">
+  <ul class="bd-breadcrumbs">
+    
+    <li class="breadcrumb-item breadcrumb-home">
+      <a href="../../../index.html" class="nav-link" aria-label="Home">
+        <i class="fa-solid fa-home"></i>
+      </a>
+    </li>
+    
+    <li class="breadcrumb-item"><a href="../../index.html" class="nav-link">API</a></li>
+    
+    
+    <li class="breadcrumb-item"><a href="../../msw.html" class="nav-link">MetaSWAP</a></li>
+    
+    <li class="breadcrumb-item active" aria-current="page"><span class="ellipsis">imod.msw.VariableOutputControl.clip_box</span></li>
+  </ul>
+</nav>
+</div>
+      
+    </div>
+  
+  
+</div>
+</div>
+              
+              
+              
+                
+<div id="searchbox"></div>
+                <article class="bd-article">
+                  
+  <section id="imod-msw-variableoutputcontrol-clip-box">
+<h1>imod.msw.VariableOutputControl.clip_box<a class="headerlink" href="#imod-msw-variableoutputcontrol-clip-box" title="Link to this heading">#</a></h1>
+<dl class="py method">
+<dt class="sig sig-object py" id="imod.msw.VariableOutputControl.clip_box">
+<span class="sig-prename descclassname"><span class="pre">VariableOutputControl.</span></span><span class="sig-name descname"><span class="pre">clip_box</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">time_min</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">datetime</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">datetime64</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">time_max</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">datetime</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">datetime64</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">x_min</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">x_max</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y_min</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y_max</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">MetaSwapPackage</span></span></span><a class="headerlink" href="#imod.msw.VariableOutputControl.clip_box" title="Link to this definition">#</a></dt>
+<dd><p>Clip a package by a bounding box (time, y, x).</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>time_min</strong> (<em>optional</em><em>, </em><em>np.datetime64</em>) – Start time to select. Data will be forward filled to this date. If
+time_min is before the start time of the dataset, data is
+backfilled.</p></li>
+<li><p><strong>time_max</strong> (<em>optional</em>) – End time to select.</p></li>
+<li><p><strong>x_min</strong> (<em>optional</em><em>, </em><em>float</em>) – Minimum x-coordinate to select.</p></li>
+<li><p><strong>x_max</strong> (<em>optional</em><em>, </em><em>float</em>) – Maximum x-coordinate to select.</p></li>
+<li><p><strong>y_min</strong> (<em>optional</em><em>, </em><em>float</em>) – Minimum y-coordinate to select.</p></li>
+<li><p><strong>y_max</strong> (<em>optional</em><em>, </em><em>float</em>) – Maximum y-coordinate to select.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>clipped</strong> – A new package that is clipped to the specified bounding box.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Package</p>
+</dd>
+</dl>
+<p class="rubric">Examples</p>
+<p>Slicing intervals may be half-bounded, by providing None:</p>
+<p>To select 500.0 &lt;= x &lt;= 1000.0:</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">pkg</span><span class="o">.</span><span class="n">clip_box</span><span class="p">(</span><span class="n">x_min</span><span class="o">=</span><span class="mf">500.0</span><span class="p">,</span> <span class="n">x_max</span><span class="o">=</span><span class="mf">1000.0</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>To select x &lt;= 1000.0:</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span>&gt;&gt;&gt; pkg.clip_box(x_max=1000.0)``
+</pre></div>
+</div>
+<p>To select x &gt;= 500.0:</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">pkg</span><span class="o">.</span><span class="n">clip_box</span><span class="p">(</span><span class="n">x_min</span><span class="o">=</span><span class="mf">500.0</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>To select a time interval, you can use datetime64:</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">pkg</span><span class="o">.</span><span class="n">clip_box</span><span class="p">(</span><span class="n">time_min</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">datetime64</span><span class="p">(</span><span class="s2">&quot;2020-01-01&quot;</span><span class="p">),</span> <span class="n">time_max</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">datetime64</span><span class="p">(</span><span class="s2">&quot;2020-12-31&quot;</span><span class="p">))</span>
+</pre></div>
+</div>
+</dd></dl>
+
+</section>
+
+
+                </article>
+              
+              
+              
+              
+              
+                <footer class="prev-next-footer d-print-none">
+                  
+<div class="prev-next-area">
+    <a class="left-prev"
+       href="imod.msw.VariableOutputControl.regrid_like.html"
+       title="previous page">
+      <i class="fa-solid fa-angle-left"></i>
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">previous</p>
+        <p class="prev-next-title">imod.msw.VariableOutputControl.regrid_like</p>
+      </div>
+    </a>
+    <a class="right-next"
+       href="imod.msw.VariableOutputControl.from_imod5_data.html"
+       title="next page">
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">next</p>
+        <p class="prev-next-title">imod.msw.VariableOutputControl.from_imod5_data</p>
+      </div>
+      <i class="fa-solid fa-angle-right"></i>
+    </a>
+</div>
+                </footer>
+              
+            </div>
+            
+            
+              
+                <dialog id="pst-secondary-sidebar-modal"></dialog>
+                <div id="pst-secondary-sidebar" class="bd-sidebar-secondary bd-toc"><div class="sidebar-secondary-items sidebar-secondary__inner">
+
+
+  <div class="sidebar-secondary-item">
+<div
+    id="pst-page-navigation-heading-2"
+    class="page-toc tocsection onthispage">
+    <i class="fa-solid fa-list"></i> On this page
+  </div>
+  <nav class="bd-toc-nav page-toc" aria-labelledby="pst-page-navigation-heading-2">
+    <ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#imod.msw.VariableOutputControl.clip_box"><code class="docutils literal notranslate"><span class="pre">VariableOutputControl.clip_box()</span></code></a></li>
+</ul>
+  </nav></div>
+
+  <div class="sidebar-secondary-item">
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="../../../_sources/api/generated/msw/imod.msw.VariableOutputControl.clip_box.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div></div>
+
+</div></div>
+              
+            
+          </div>
+          <footer class="bd-footer-content">
+            
+          </footer>
+        
+      </main>
+    </div>
+  </div>
+  
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script defer src="../../../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf"></script>
+<script defer src="../../../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf"></script>
+
+  <footer class="bd-footer">
+<div class="bd-footer__inner bd-page-width">
+  
+    <div class="footer-items__start">
+      
+        <div class="footer-item">
+
+  <p class="copyright">
+    
+      © Copyright Deltares.
+      <br/>
+    
+  </p>
+</div>
+      
+        <div class="footer-item">
+
+  <p class="sphinx-version">
+    Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 8.2.3.
+    <br/>
+  </p>
+</div>
+      
+    </div>
+  
+  
+  
+    <div class="footer-items__end">
+      
+        <div class="footer-item">
+<p class="theme-version">
+  <!-- # L10n: Setting the PST URL as an argument as this does not need to be localized -->
+  Built with the <a href="https://pydata-sphinx-theme.readthedocs.io/en/stable/index.html">PyData Sphinx Theme</a> 0.16.1.
+</p></div>
+      
+    </div>
+  
+</div>
+
+  </footer>
+  </body>
+</html>

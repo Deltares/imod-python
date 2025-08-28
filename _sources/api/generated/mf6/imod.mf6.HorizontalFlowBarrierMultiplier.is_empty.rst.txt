@@ -1,0 +1,6 @@
+﻿imod.mf6.HorizontalFlowBarrierMultiplier.is\_empty
+==================================================
+
+.. currentmodule:: imod.mf6
+
+.. automethod:: HorizontalFlowBarrierMultiplier.is_empty

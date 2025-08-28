@@ -14,30 +14,15 @@
    .. autosummary::
    
       ~Solution.__init__
-      ~Solution.add_model_to_solution
-      ~Solution.cleanup
       ~Solution.clip_box
       ~Solution.copy
       ~Solution.from_file
-      ~Solution.get_models_in_solution
-      ~Solution.get_non_grid_data
       ~Solution.get_regrid_methods
-      ~Solution.is_clipping_supported
       ~Solution.is_empty
-      ~Solution.is_grid_agnostic_package
-      ~Solution.is_regridding_supported
-      ~Solution.is_splitting_supported
-      ~Solution.isel
       ~Solution.mask
       ~Solution.regrid_like
-      ~Solution.remove_model_from_solution
-      ~Solution.render
-      ~Solution.sel
       ~Solution.to_netcdf
       ~Solution.write
-      ~Solution.write_binary_griddata
-      ~Solution.write_blockfile
-      ~Solution.write_text_griddata
    
    
 

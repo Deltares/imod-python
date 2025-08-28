@@ -1,0 +1,6 @@
+﻿imod.mf6.Modflow6Simulation.copy
+================================
+
+.. currentmodule:: imod.mf6
+
+.. automethod:: Modflow6Simulation.copy

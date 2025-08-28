@@ -1,0 +1,6 @@
+﻿imod.msw.TimeOutputControl.regrid\_like
+=======================================
+
+.. currentmodule:: imod.msw
+
+.. automethod:: TimeOutputControl.regrid_like

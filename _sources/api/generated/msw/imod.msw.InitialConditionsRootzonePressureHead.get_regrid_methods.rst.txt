@@ -1,0 +1,6 @@
+﻿imod.msw.InitialConditionsRootzonePressureHead.get\_regrid\_methods
+===================================================================
+
+.. currentmodule:: imod.msw
+
+.. automethod:: InitialConditionsRootzonePressureHead.get_regrid_methods

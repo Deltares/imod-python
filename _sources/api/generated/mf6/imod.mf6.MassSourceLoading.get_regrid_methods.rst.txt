@@ -1,0 +1,6 @@
+﻿imod.mf6.MassSourceLoading.get\_regrid\_methods
+===============================================
+
+.. currentmodule:: imod.mf6
+
+.. automethod:: MassSourceLoading.get_regrid_methods

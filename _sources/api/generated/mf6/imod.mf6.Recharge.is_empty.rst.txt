@@ -1,0 +1,6 @@
+﻿imod.mf6.Recharge.is\_empty
+===========================
+
+.. currentmodule:: imod.mf6
+
+.. automethod:: Recharge.is_empty

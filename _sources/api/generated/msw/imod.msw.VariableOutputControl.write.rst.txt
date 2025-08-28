@@ -1,0 +1,6 @@
+﻿imod.msw.VariableOutputControl.write
+====================================
+
+.. currentmodule:: imod.msw
+
+.. automethod:: VariableOutputControl.write

@@ -1,0 +1,6 @@
+﻿imod.mf6.TimeDiscretization.clip\_box
+=====================================
+
+.. currentmodule:: imod.mf6
+
+.. automethod:: TimeDiscretization.clip_box

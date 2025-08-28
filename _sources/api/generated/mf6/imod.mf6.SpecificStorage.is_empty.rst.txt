@@ -1,0 +1,6 @@
+﻿imod.mf6.SpecificStorage.is\_empty
+==================================
+
+.. currentmodule:: imod.mf6
+
+.. automethod:: SpecificStorage.is_empty

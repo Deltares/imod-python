@@ -7,7 +7,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>imod.mf6.rch &#8212; iMOD Python 1.0.0rc4 documentation</title>
+    <title>imod.mf6.rch &#8212; iMOD Python 1.0.0rc6 documentation</title>
   
   
   
@@ -41,7 +41,7 @@
   <link rel="preload" as="script" href="../../../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
 <link rel="preload" as="script" href="../../../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
 
-    <script src="../../../_static/documentation_options.js?v=2fc85bd2"></script>
+    <script src="../../../_static/documentation_options.js?v=bc4855a1"></script>
     <script src="../../../_static/doctools.js?v=9bcbadda"></script>
     <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script>DOCUMENTATION_OPTIONS.pagename = '_modules/imod/mf6/rch';</script>
@@ -50,7 +50,7 @@
     <link rel="search" title="Search" href="../../../search.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
-  <meta name="docsearch:version" content="1.0.0rc4.dev" />
+  <meta name="docsearch:version" content="1.0.0rc6.dev" />
   </head>
   
   
@@ -114,8 +114,8 @@
     
     
     
-    <img src="../../../_static/imod-python-logo-light.svg" class="logo__image only-light" alt="iMOD Python 1.0.0rc4 documentation - Home"/>
-    <img src="../../../_static/imod-python-logo-dark.svg" class="logo__image only-dark pst-js-only" alt="iMOD Python 1.0.0rc4 documentation - Home"/>
+    <img src="../../../_static/imod-python-logo-light.svg" class="logo__image only-light" alt="iMOD Python 1.0.0rc6 documentation - Home"/>
+    <img src="../../../_static/imod-python-logo-dark.svg" class="logo__image only-dark pst-js-only" alt="iMOD Python 1.0.0rc6 documentation - Home"/>
   
   
 </a></div>
@@ -153,7 +153,7 @@
 
 <li class="nav-item ">
   <a class="nav-link nav-internal" href="../../../api/index.html">
-    API Reference
+    API
   </a>
 </li>
 
@@ -303,7 +303,7 @@
 
 <li class="nav-item ">
   <a class="nav-link nav-internal" href="../../../api/index.html">
-    API Reference
+    API
   </a>
 </li>
 
@@ -427,20 +427,23 @@
                 <article class="bd-article">
                   
   <h1>Source code for imod.mf6.rch</h1><div class="highlight"><pre>
-<span></span><span class="kn">from</span><span class="w"> </span><span class="nn">copy</span><span class="w"> </span><span class="kn">import</span> <span class="n">deepcopy</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">datetime</span><span class="w"> </span><span class="kn">import</span> <span class="n">datetime</span>
+<span></span><span class="kn">from</span><span class="w"> </span><span class="nn">datetime</span><span class="w"> </span><span class="kn">import</span> <span class="n">datetime</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Optional</span>
 
 <span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">xarray</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">xr</span>
 
 <span class="kn">from</span><span class="w"> </span><span class="nn">imod.common.interfaces.iregridpackage</span><span class="w"> </span><span class="kn">import</span> <span class="n">IRegridPackage</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">imod.common.utilities.regrid</span><span class="w"> </span><span class="kn">import</span> <span class="n">_regrid_package_data</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">imod.common.utilities.dataclass_type</span><span class="w"> </span><span class="kn">import</span> <span class="n">DataclassType</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">imod.logging</span><span class="w"> </span><span class="kn">import</span> <span class="n">init_log_decorator</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">imod.mf6.boundary_condition</span><span class="w"> </span><span class="kn">import</span> <span class="n">BoundaryCondition</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">imod.mf6.dis</span><span class="w"> </span><span class="kn">import</span> <span class="n">StructuredDiscretization</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">imod.mf6.aggregate.aggregate_schemes</span><span class="w"> </span><span class="kn">import</span> <span class="n">RechargeAggregationMethod</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">imod.mf6.dis</span><span class="w"> </span><span class="kn">import</span> <span class="n">StructuredDiscretization</span><span class="p">,</span> <span class="n">VerticesDiscretization</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">imod.mf6.regrid.regrid_schemes</span><span class="w"> </span><span class="kn">import</span> <span class="n">RechargeRegridMethod</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">imod.mf6.utilities.imod5_converter</span><span class="w"> </span><span class="kn">import</span> <span class="n">convert_unit_rch_rate</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">imod.mf6.topsystem</span><span class="w"> </span><span class="kn">import</span> <span class="n">TopSystemBoundaryCondition</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">imod.mf6.utilities.imod5_converter</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
+    <span class="n">convert_unit_rch_rate</span><span class="p">,</span>
+    <span class="n">regrid_imod5_pkg_data</span><span class="p">,</span>
+<span class="p">)</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">imod.mf6.utilities.package</span><span class="w"> </span><span class="kn">import</span> <span class="n">set_repeat_stress_if_available</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">imod.mf6.validation</span><span class="w"> </span><span class="kn">import</span> <span class="n">BOUNDARY_DIMS_SCHEMA</span><span class="p">,</span> <span class="n">CONC_DIMS_SCHEMA</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">imod.msw.utilities.imod5_converter</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
@@ -471,7 +474,7 @@
 
 <div class="viewcode-block" id="Recharge">
 <a class="viewcode-back" href="../../../api/generated/mf6/imod.mf6.Recharge.html#imod.mf6.Recharge">[docs]</a>
-<span class="k">class</span><span class="w"> </span><span class="nc">Recharge</span><span class="p">(</span><span class="n">BoundaryCondition</span><span class="p">,</span> <span class="n">IRegridPackage</span><span class="p">):</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">Recharge</span><span class="p">(</span><span class="n">TopSystemBoundaryCondition</span><span class="p">,</span> <span class="n">IRegridPackage</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Recharge Package.</span>
 <span class="sd">    Any number of RCH Packages can be specified for a single groundwater flow</span>
@@ -561,9 +564,10 @@
         <span class="s2">&quot;concentration&quot;</span><span class="p">:</span> <span class="p">[</span><span class="n">IdentityNoDataSchema</span><span class="p">(</span><span class="s2">&quot;rate&quot;</span><span class="p">),</span> <span class="n">AllValueSchema</span><span class="p">(</span><span class="s2">&quot;&gt;=&quot;</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">)],</span>
     <span class="p">}</span>
 
-    <span class="n">_template</span> <span class="o">=</span> <span class="n">BoundaryCondition</span><span class="o">.</span><span class="n">_initialize_template</span><span class="p">(</span><span class="n">_pkg_id</span><span class="p">)</span>
+    <span class="n">_template</span> <span class="o">=</span> <span class="n">TopSystemBoundaryCondition</span><span class="o">.</span><span class="n">_initialize_template</span><span class="p">(</span><span class="n">_pkg_id</span><span class="p">)</span>
     <span class="n">_auxiliary_data</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;concentration&quot;</span><span class="p">:</span> <span class="s2">&quot;species&quot;</span><span class="p">}</span>
     <span class="n">_regrid_method</span> <span class="o">=</span> <span class="n">RechargeRegridMethod</span><span class="p">()</span>
+    <span class="n">_aggregate_method</span><span class="p">:</span> <span class="n">DataclassType</span> <span class="o">=</span> <span class="n">RechargeAggregationMethod</span><span class="p">()</span>
 
 <div class="viewcode-block" id="Recharge.__init__">
 <a class="viewcode-back" href="../../../api/generated/mf6/imod.mf6.Recharge.html#imod.mf6.Recharge.__init__">[docs]</a>
@@ -604,10 +608,11 @@
         <span class="k">return</span> <span class="n">errors</span>
 
     <span class="nd">@classmethod</span>
-    <span class="k">def</span><span class="w"> </span><span class="nf">allocate_planar_data</span><span class="p">(</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_allocate_planar_data</span><span class="p">(</span>
         <span class="bp">cls</span><span class="p">,</span>
         <span class="n">planar_data</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">GridDataArray</span><span class="p">],</span>
-        <span class="n">dis</span><span class="p">:</span> <span class="n">StructuredDiscretization</span><span class="p">,</span>
+        <span class="n">dis</span><span class="p">:</span> <span class="n">StructuredDiscretization</span> <span class="o">|</span> <span class="n">VerticesDiscretization</span><span class="p">,</span>
+        <span class="n">allocation_option</span><span class="p">:</span> <span class="n">ALLOCATION_OPTION</span><span class="p">,</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">GridDataArray</span><span class="p">]:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Allocate and distribute planar data for given discretization and npf</span>
@@ -620,8 +625,8 @@
 <span class="sd">            Dictionary with planar grid data.</span>
 <span class="sd">        dis: imod.mf6.StructuredDiscretization</span>
 <span class="sd">            Model discretization package.</span>
-<span class="sd">        npf: imod.mf6.NodePropertyFlow</span>
-<span class="sd">            Node property flow package.</span>
+<span class="sd">        allocation_option: ALLOCATION_OPTION</span>
+<span class="sd">            The allocation option to use for the reallocation.</span>
 
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
@@ -633,7 +638,7 @@
             <span class="n">planar_data</span><span class="p">[</span><span class="s2">&quot;rate&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">planar_data</span><span class="p">[</span><span class="s2">&quot;rate&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">isel</span><span class="p">(</span><span class="n">layer</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">drop</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
         <span class="c1"># create an array indicating in which cells rch is active</span>
         <span class="n">is_rch_cell</span> <span class="o">=</span> <span class="n">allocate_rch_cells</span><span class="p">(</span>
-            <span class="n">ALLOCATION_OPTION</span><span class="o">.</span><span class="n">at_first_active</span><span class="p">,</span>
+            <span class="n">allocation_option</span><span class="p">,</span>
             <span class="n">idomain</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">,</span>
             <span class="n">planar_data</span><span class="p">[</span><span class="s2">&quot;rate&quot;</span><span class="p">],</span>
         <span class="p">)</span>
@@ -691,21 +696,18 @@
 <span class="sd">        Modflow 6 rch package.</span>
 
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="n">new_idomain</span> <span class="o">=</span> <span class="n">target_dis</span><span class="o">.</span><span class="n">dataset</span><span class="p">[</span><span class="s2">&quot;idomain&quot;</span><span class="p">]</span>
         <span class="n">data</span> <span class="o">=</span> <span class="p">{</span>
             <span class="s2">&quot;rate&quot;</span><span class="p">:</span> <span class="n">convert_unit_rch_rate</span><span class="p">(</span><span class="n">imod5_data</span><span class="p">[</span><span class="s2">&quot;rch&quot;</span><span class="p">][</span><span class="s2">&quot;rate&quot;</span><span class="p">]),</span>
         <span class="p">}</span>
-        <span class="c1"># first regrid the inputs to the target grid.</span>
-        <span class="k">if</span> <span class="n">regridder_types</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="n">regridder_settings</span> <span class="o">=</span> <span class="n">Recharge</span><span class="o">.</span><span class="n">get_regrid_methods</span><span class="p">()</span>
-
-        <span class="n">regridded_package_data</span> <span class="o">=</span> <span class="n">_regrid_package_data</span><span class="p">(</span>
-            <span class="n">data</span><span class="p">,</span> <span class="n">new_idomain</span><span class="p">,</span> <span class="n">regridder_settings</span><span class="p">,</span> <span class="n">regrid_cache</span><span class="p">,</span> <span class="p">{}</span>
+        <span class="n">regridded_package_data</span> <span class="o">=</span> <span class="n">regrid_imod5_pkg_data</span><span class="p">(</span>
+            <span class="bp">cls</span><span class="p">,</span> <span class="n">data</span><span class="p">,</span> <span class="n">target_dis</span><span class="p">,</span> <span class="n">regridder_types</span><span class="p">,</span> <span class="n">regrid_cache</span>
         <span class="p">)</span>
-
         <span class="c1"># if rate has only layer 0, then it is planar.</span>
         <span class="k">if</span> <span class="n">is_planar_grid</span><span class="p">(</span><span class="n">regridded_package_data</span><span class="p">[</span><span class="s2">&quot;rate&quot;</span><span class="p">]):</span>
-            <span class="n">layered_data</span> <span class="o">=</span> <span class="bp">cls</span><span class="o">.</span><span class="n">allocate_planar_data</span><span class="p">(</span><span class="n">regridded_package_data</span><span class="p">,</span> <span class="n">target_dis</span><span class="p">)</span>
+            <span class="n">allocation_option</span> <span class="o">=</span> <span class="n">ALLOCATION_OPTION</span><span class="o">.</span><span class="n">at_first_active</span>
+            <span class="n">layered_data</span> <span class="o">=</span> <span class="bp">cls</span><span class="o">.</span><span class="n">_allocate_planar_data</span><span class="p">(</span>
+                <span class="n">regridded_package_data</span><span class="p">,</span> <span class="n">target_dis</span><span class="p">,</span> <span class="n">allocation_option</span>
+            <span class="p">)</span>
             <span class="n">regridded_package_data</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">layered_data</span><span class="p">)</span>
         <span class="n">rch</span> <span class="o">=</span> <span class="bp">cls</span><span class="p">(</span><span class="o">**</span><span class="n">regridded_package_data</span><span class="p">,</span> <span class="n">validate</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">fixed_cell</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
         <span class="n">repeat</span> <span class="o">=</span> <span class="n">period_data</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;rch&quot;</span><span class="p">)</span>
@@ -741,11 +743,7 @@
         <span class="n">data</span><span class="p">[</span><span class="s2">&quot;rate&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">zero_scalar</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">active</span><span class="p">)</span>
 
         <span class="k">return</span> <span class="bp">cls</span><span class="p">(</span><span class="o">**</span><span class="n">data</span><span class="p">,</span> <span class="n">validate</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">fixed_cell</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span></div>
-
-
-    <span class="nd">@classmethod</span>
-    <span class="k">def</span><span class="w"> </span><span class="nf">get_regrid_methods</span><span class="p">(</span><span class="bp">cls</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">RechargeRegridMethod</span><span class="p">:</span>
-        <span class="k">return</span> <span class="n">deepcopy</span><span class="p">(</span><span class="bp">cls</span><span class="o">.</span><span class="n">_regrid_method</span><span class="p">)</span></div>
+</div>
 
 </pre></div>
 

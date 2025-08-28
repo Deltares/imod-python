@@ -1,0 +1,6 @@
+﻿imod.mf6.GroundwaterTransportModel.get\_diskey
+==============================================
+
+.. currentmodule:: imod.mf6
+
+.. automethod:: GroundwaterTransportModel.get_diskey

@@ -8,7 +8,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>iMOD Python: make massive MODFLOW models &#8212; iMOD Python 1.0.0rc4 documentation</title>
+    <title>iMOD Python: make massive MODFLOW models &#8212; iMOD Python 1.0.0rc6 documentation</title>
   
   
   
@@ -42,7 +42,7 @@
   <link rel="preload" as="script" href="_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
 <link rel="preload" as="script" href="_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
 
-    <script src="_static/documentation_options.js?v=2fc85bd2"></script>
+    <script src="_static/documentation_options.js?v=bc4855a1"></script>
     <script src="_static/doctools.js?v=9bcbadda"></script>
     <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
     <script>DOCUMENTATION_OPTIONS.pagename = 'index';</script>
@@ -52,7 +52,7 @@
     <link rel="next" title="Installing" href="installation.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
-  <meta name="docsearch:version" content="1.0.0rc4.dev" />
+  <meta name="docsearch:version" content="1.0.0rc6.dev" />
   </head>
   
   
@@ -116,8 +116,8 @@
     
     
     
-    <img src="_static/imod-python-logo-light.svg" class="logo__image only-light" alt="iMOD Python 1.0.0rc4 documentation - Home"/>
-    <img src="_static/imod-python-logo-dark.svg" class="logo__image only-dark pst-js-only" alt="iMOD Python 1.0.0rc4 documentation - Home"/>
+    <img src="_static/imod-python-logo-light.svg" class="logo__image only-light" alt="iMOD Python 1.0.0rc6 documentation - Home"/>
+    <img src="_static/imod-python-logo-dark.svg" class="logo__image only-dark pst-js-only" alt="iMOD Python 1.0.0rc6 documentation - Home"/>
   
   
 </a></div>
@@ -155,7 +155,7 @@
 
 <li class="nav-item ">
   <a class="nav-link nav-internal" href="api/index.html">
-    API Reference
+    API
   </a>
 </li>
 
@@ -309,7 +309,7 @@
 
 <li class="nav-item ">
   <a class="nav-link nav-internal" href="api/index.html">
-    API Reference
+    API
   </a>
 </li>
 
@@ -414,6 +414,8 @@
 <a class="reference external image-reference" href="https://github.com/conda-forge/imod-feedstock"><img alt="https://img.shields.io/conda/vn/conda-forge/imod.svg" src="https://img.shields.io/conda/vn/conda-forge/imod.svg" />
 </a>
 <a class="reference external image-reference" href="https://pixi.sh"><img alt="https://img.shields.io/endpoint?url=https://raw.githubusercontent.com/prefix-dev/pixi/main/assets/badge/v0.json" src="https://img.shields.io/endpoint?url=https://raw.githubusercontent.com/prefix-dev/pixi/main/assets/badge/v0.json" />
+</a>
+<a class="reference external image-reference" href="https://scientific-python.org/specs/spec-0000/"><img alt="https://img.shields.io/badge/SPEC-0-green?labelColor=%23004811&amp;color=%235CA038" src="https://img.shields.io/badge/SPEC-0-green?labelColor=%23004811&amp;color=%235CA038" />
 </a>
 <p>The <code class="docutils literal notranslate"><span class="pre">imod</span></code> Python package is an open source project to make working with
 MODFLOW groundwater models in Python easier. It builds on top of popular
@@ -576,8 +578,8 @@ iMOD Python can write a model with 21.84 million cells 5 to 60 times faster (for
 respectively 1 and 365 stress periods) than the alternative <a class="reference external" href="https://flopy.readthedocs.io/en/latest/">Flopy</a> package.
 Furthermore <code class="docutils literal notranslate"><span class="pre">imod</span></code> can even write models that are larger than the available
 memory, using <a class="reference external" href="https://dask.org/">dask</a> arrays.</p>
-<p><em>NOTE:</em> We don’t hate Flopy, nor seek its demise. iMOD developers also
-contribute and aid in the development of Flopy.</p>
+<p><em>NOTE:</em> iMOD developers work alongside the Flopy development team and contribute
+to both projects.</p>
 </section>
 <section id="import-your-imod5-models">
 <h3>8. Import your iMOD5 models<a class="headerlink" href="#import-your-imod5-models" title="Link to this heading">#</a></h3>
@@ -603,7 +605,9 @@ defined in a projectfile.</p>
 <h3>1. You want to make a small, synthetic model<a class="headerlink" href="#you-want-to-make-a-small-synthetic-model" title="Link to this heading">#</a></h3>
 <p>If you are not interested in deriving models from spatial data, but just want to
 allocate boundary conditions based on layer, row, column numbers, or create a
-model of a 2D cross-section: You are better off using <a class="reference external" href="https://flopy.readthedocs.io/en/latest/">Flopy</a>.</p>
+model of a 2D cross-section: You are better off using <a class="reference external" href="https://flopy.readthedocs.io/en/latest/">Flopy</a>. If you want to
+complexify this model with a lot of stress periods and run into slow writing
+speeds, consider using <code class="docutils literal notranslate"><span class="pre">imod</span></code> for performance.</p>
 </section>
 <section id="not-all-modflow-6-features-are-supported">
 <h3>2. Not all MODFLOW 6 features are supported<a class="headerlink" href="#not-all-modflow-6-features-are-supported" title="Link to this heading">#</a></h3>

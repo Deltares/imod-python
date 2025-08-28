@@ -1,0 +1,6 @@
+﻿imod.mf6.Recharge.from\_file
+============================
+
+.. currentmodule:: imod.mf6
+
+.. automethod:: Recharge.from_file

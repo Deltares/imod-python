@@ -1,0 +1,6 @@
+﻿imod.msw.CouplerMapping.clip\_box
+=================================
+
+.. currentmodule:: imod.msw
+
+.. automethod:: CouplerMapping.clip_box

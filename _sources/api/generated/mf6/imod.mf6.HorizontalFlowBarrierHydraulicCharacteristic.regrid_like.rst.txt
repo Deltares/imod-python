@@ -1,0 +1,6 @@
+﻿imod.mf6.HorizontalFlowBarrierHydraulicCharacteristic.regrid\_like
+==================================================================
+
+.. currentmodule:: imod.mf6
+
+.. automethod:: HorizontalFlowBarrierHydraulicCharacteristic.regrid_like

@@ -1,0 +1,6 @@
+﻿imod.msw.PrecipitationMapping.regrid\_like
+==========================================
+
+.. currentmodule:: imod.msw
+
+.. automethod:: PrecipitationMapping.regrid_like

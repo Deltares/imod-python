@@ -8,7 +8,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>Time series data and Pandas &#8212; iMOD Python 1.0.0rc4 documentation</title>
+    <title>Time series data and Pandas &#8212; iMOD Python 1.0.0rc6 documentation</title>
   
   
   
@@ -42,7 +42,7 @@
   <link rel="preload" as="script" href="../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
 <link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
 
-    <script src="../_static/documentation_options.js?v=2fc85bd2"></script>
+    <script src="../_static/documentation_options.js?v=bc4855a1"></script>
     <script src="../_static/doctools.js?v=9bcbadda"></script>
     <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script>DOCUMENTATION_OPTIONS.pagename = 'user-guide/03-timeseries-data';</script>
@@ -53,7 +53,7 @@
     <link rel="prev" title="Vector data and Geopandas" href="02-vector-data.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
-  <meta name="docsearch:version" content="1.0.0rc4.dev" />
+  <meta name="docsearch:version" content="1.0.0rc6.dev" />
   </head>
   
   
@@ -117,8 +117,8 @@
     
     
     
-    <img src="../_static/imod-python-logo-light.svg" class="logo__image only-light" alt="iMOD Python 1.0.0rc4 documentation - Home"/>
-    <img src="../_static/imod-python-logo-dark.svg" class="logo__image only-dark pst-js-only" alt="iMOD Python 1.0.0rc4 documentation - Home"/>
+    <img src="../_static/imod-python-logo-light.svg" class="logo__image only-light" alt="iMOD Python 1.0.0rc6 documentation - Home"/>
+    <img src="../_static/imod-python-logo-dark.svg" class="logo__image only-dark pst-js-only" alt="iMOD Python 1.0.0rc6 documentation - Home"/>
   
   
 </a></div>
@@ -156,7 +156,7 @@
 
 <li class="nav-item ">
   <a class="nav-link nav-internal" href="../api/index.html">
-    API Reference
+    API
   </a>
 </li>
 
@@ -308,7 +308,7 @@
 
 <li class="nav-item ">
   <a class="nav-link nav-internal" href="../api/index.html">
-    API Reference
+    API
   </a>
 </li>
 
@@ -390,16 +390,10 @@
 <li class="toctree-l1"><a class="reference internal" href="06-lazy-evaluation.html">Lazy evaluation</a></li>
 <li class="toctree-l1"><a class="reference internal" href="07-time-discretization.html">Model time discretization</a></li>
 <li class="toctree-l1"><a class="reference internal" href="08-regridding.html">Regridding</a></li>
-
-
-
-
-
-
-
-
 <li class="toctree-l1"><a class="reference internal" href="09-topsystem.html">Topsystem: from 2D map to 3D model</a></li>
 <li class="toctree-l1"><a class="reference internal" href="10-cleanup.html">Data cleanup</a></li>
+<li class="toctree-l1"><a class="reference internal" href="11-imod5-files.html">Reading and writing iMOD5 files in Python</a></li>
+<li class="toctree-l1"><a class="reference internal" href="12-imod5-model-to-modflow6.html">Working with iMOD5 models in MODFLOW 6</a></li>
 </ul>
 </div>
 </nav></div>
@@ -498,7 +492,7 @@ its data as:</p>
 point can be associated with a timeseries with a label.</p></li>
 <li><p>A timeries file for every point.</p></li>
 </ul>
-<p>These files can be read via <code class="xref py py-func docutils literal notranslate"><span class="pre">imod.ipf.read()</span></code>. The <code class="docutils literal notranslate"><span class="pre">read</span></code> function
+<p>These files can be read via <a class="reference internal" href="../api/generated/io/imod.formats.ipf.read.html#imod.formats.ipf.read" title="imod.formats.ipf.read"><code class="xref py py-func docutils literal notranslate"><span class="pre">imod.formats.ipf.read()</span></code></a>. The <code class="docutils literal notranslate"><span class="pre">read</span></code> function
 will read the mother file, and follow its labels, reading every associated
 timeseries file as well. Finally, these are merged into a single large table;
 the properties of the point (e.g. the x,y coordinates) are duplicated for every
@@ -516,6 +510,316 @@ table is supported by many file formats.</p></li>
 <li><p>Pandas <a class="reference external" href="https://pandas.pydata.org/pandas-docs/stable/user_guide/groupby.html">group by</a> functionality is quite fast.</p></li>
 </ul>
 </div>
+</section>
+<section id="example-head-observations">
+<h2>Example: Head observations<a class="headerlink" href="#example-head-observations" title="Link to this heading">#</a></h2>
+<p>Let’s load some example data. We’ll load some head observations. This is a
+large dataset, originally stored in the IPF format. This dataset has a similar
+form to what <a class="reference internal" href="../api/generated/io/imod.formats.ipf.read.html#imod.formats.ipf.read" title="imod.formats.ipf.read"><code class="xref py py-func docutils literal notranslate"><span class="pre">imod.formats.ipf.read()</span></code></a> would return.</p>
+<div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">imod</span>
+
+<span class="n">heads</span> <span class="o">=</span> <span class="n">imod</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">head_observations</span><span class="p">()</span>
+<span class="n">heads</span>
+</pre></div>
+</div>
+<div class="output_subarea output_html rendered_html output_result">
+<div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>Unnamed: 0</th>
+      <th>id</th>
+      <th>Filternummer</th>
+      <th>time</th>
+      <th>head</th>
+      <th>filt_top</th>
+      <th>filt_bot</th>
+      <th>Meetpunt tov m NAP</th>
+      <th>x</th>
+      <th>y</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>0</td>
+      <td>B12A1745001</td>
+      <td>1</td>
+      <td>2007-12-28</td>
+      <td>NaN</td>
+      <td>9.29</td>
+      <td>8.29</td>
+      <td>9.86</td>
+      <td>226410</td>
+      <td>563800</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>2</td>
+      <td>B12A1745001</td>
+      <td>1</td>
+      <td>2008-01-28</td>
+      <td>9.03</td>
+      <td>9.29</td>
+      <td>8.29</td>
+      <td>9.86</td>
+      <td>226410</td>
+      <td>563800</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>3</td>
+      <td>B12A1745001</td>
+      <td>1</td>
+      <td>2008-02-14</td>
+      <td>8.70</td>
+      <td>9.29</td>
+      <td>8.29</td>
+      <td>9.86</td>
+      <td>226410</td>
+      <td>563800</td>
+    </tr>
+    <tr>
+      <th>3</th>
+      <td>4</td>
+      <td>B12A1745001</td>
+      <td>1</td>
+      <td>2008-02-28</td>
+      <td>8.53</td>
+      <td>9.29</td>
+      <td>8.29</td>
+      <td>9.86</td>
+      <td>226410</td>
+      <td>563800</td>
+    </tr>
+    <tr>
+      <th>4</th>
+      <td>5</td>
+      <td>B12A1745001</td>
+      <td>1</td>
+      <td>2008-03-17</td>
+      <td>8.63</td>
+      <td>9.29</td>
+      <td>8.29</td>
+      <td>9.86</td>
+      <td>226410</td>
+      <td>563800</td>
+    </tr>
+    <tr>
+      <th>...</th>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+    </tr>
+    <tr>
+      <th>60374</th>
+      <td>92</td>
+      <td>B17E2244001</td>
+      <td>1</td>
+      <td>2019-05-14</td>
+      <td>15.44</td>
+      <td>8.64</td>
+      <td>7.64</td>
+      <td>16.08</td>
+      <td>240586</td>
+      <td>543605</td>
+    </tr>
+    <tr>
+      <th>60375</th>
+      <td>93</td>
+      <td>B17E2244001</td>
+      <td>1</td>
+      <td>2019-05-28</td>
+      <td>15.28</td>
+      <td>8.64</td>
+      <td>7.64</td>
+      <td>16.08</td>
+      <td>240586</td>
+      <td>543605</td>
+    </tr>
+    <tr>
+      <th>60376</th>
+      <td>94</td>
+      <td>B17E2244001</td>
+      <td>1</td>
+      <td>2019-06-14</td>
+      <td>15.13</td>
+      <td>8.64</td>
+      <td>7.64</td>
+      <td>16.08</td>
+      <td>240586</td>
+      <td>543605</td>
+    </tr>
+    <tr>
+      <th>60377</th>
+      <td>95</td>
+      <td>B17E2244001</td>
+      <td>1</td>
+      <td>2019-06-28</td>
+      <td>14.88</td>
+      <td>8.64</td>
+      <td>7.64</td>
+      <td>16.08</td>
+      <td>240586</td>
+      <td>543605</td>
+    </tr>
+    <tr>
+      <th>60378</th>
+      <td>98</td>
+      <td>B17E2244001</td>
+      <td>1</td>
+      <td>2019-08-14</td>
+      <td>14.53</td>
+      <td>8.64</td>
+      <td>7.64</td>
+      <td>16.08</td>
+      <td>240586</td>
+      <td>543605</td>
+    </tr>
+  </tbody>
+</table>
+<p>60379 rows × 10 columns</p>
+</div>
+</div>
+<br />
+<br /><p>We can see that the data is stored in a long format, with duplicate entries
+for each time. Let’s do some selections to showcase some functionality of
+pandas. Let’s first compute filter depth, which is the difference between the
+surface_elevation and the top of the filter. Note: “Meetpunt tov m NAP” =
+surface elevation, “filt_top” = top of the filter.</p>
+<div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="n">filter_depth</span> <span class="o">=</span> <span class="n">heads</span><span class="p">[</span><span class="s2">&quot;Meetpunt tov m NAP&quot;</span><span class="p">]</span> <span class="o">-</span> <span class="n">heads</span><span class="p">[</span><span class="s2">&quot;filt_top&quot;</span><span class="p">]</span>
+<span class="n">filter_depth</span>
+</pre></div>
+</div>
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>0        0.57
+1        0.57
+2        0.57
+3        0.57
+4        0.57
+         ...
+60374    7.44
+60375    7.44
+60376    7.44
+60377    7.44
+60378    7.44
+Length: 60379, dtype: float64
+</pre></div>
+</div>
+<p>The original dataset is very large, so let’s limit ourselves to only head
+observations close to surface elevation. Let’s say the first 20 cm below surface.</p>
+<div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="n">heads_shallow</span> <span class="o">=</span> <span class="n">heads</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">filter_depth</span> <span class="o">&lt;</span> <span class="mf">0.2</span><span class="p">]</span>
+<span class="n">heads_shallow</span> <span class="o">=</span> <span class="n">heads_shallow</span><span class="o">.</span><span class="n">sort_values</span><span class="p">(</span><span class="n">by</span><span class="o">=</span><span class="s2">&quot;time&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>Let’s plot the head observations for these shallow observations over time with
+a separate line for each filter.</p>
+<div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">matplotlib.pyplot</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">plt</span>
+
+<span class="n">fig</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">()</span>
+<span class="k">for</span> <span class="n">key</span><span class="p">,</span> <span class="n">group</span> <span class="ow">in</span> <span class="n">heads_shallow</span><span class="o">.</span><span class="n">groupby</span><span class="p">(</span><span class="s2">&quot;id&quot;</span><span class="p">):</span>
+    <span class="n">ax</span> <span class="o">=</span> <span class="n">group</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">x</span><span class="o">=</span><span class="s2">&quot;time&quot;</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="s2">&quot;head&quot;</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="n">ax</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="n">key</span><span class="p">)</span>
+</pre></div>
+</div>
+<img src="../_images/sphx_glr_03-timeseries-data_001.png" srcset="../_images/sphx_glr_03-timeseries-data_001.png" alt="03 timeseries data" class = "sphx-glr-single-img"/><p>It seems one line disappeared. Let’s count the number of observations per
+filter. We can see that one of the filters has only one observation, making it
+hard to draw a line.</p>
+<div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="n">heads_shallow</span><span class="o">.</span><span class="n">groupby</span><span class="p">(</span><span class="s2">&quot;id&quot;</span><span class="p">)[</span><span class="s2">&quot;head&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">count</span><span class="p">()</span>
+</pre></div>
+</div>
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>id
+B12A1792001     72
+B12A1898001      1
+B12D1846001    113
+B17B0271002    124
+Name: head, dtype: int64
+</pre></div>
+</div>
+<p>Let’s check whether these head observations were all measured at the same
+date. We can groupby time and count the number of observations per time.</p>
+<div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="n">n_obs_per_time</span> <span class="o">=</span> <span class="n">heads_shallow</span><span class="o">.</span><span class="n">groupby</span><span class="p">(</span><span class="s2">&quot;time&quot;</span><span class="p">)[</span><span class="s2">&quot;id&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">count</span><span class="p">()</span>
+<span class="n">n_obs_per_time</span>
+</pre></div>
+</div>
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>time
+2001-07-16    1
+2001-08-14    1
+2001-09-14    1
+2001-09-28    1
+2001-10-14    1
+             ..
+2018-11-14    1
+2018-12-13    1
+2019-05-14    1
+2019-08-28    1
+2019-08-30    1
+Name: id, Length: 297, dtype: int64
+</pre></div>
+</div>
+<p>We can see in the printed summary that most dates have only one observation,
+and that the last two dates are only two days apart. This is likely caused by
+observations on inconsistent dates.</p>
+<p>Let’s see if there are some dates with more than one observation.</p>
+<div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="n">n_obs_per_time</span><span class="o">.</span><span class="n">unique</span><span class="p">()</span>
+</pre></div>
+</div>
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>array([1, 2])
+</pre></div>
+</div>
+<p>We can see that there are some dates with two observations. Lets’s
+see which dates those are:</p>
+<div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="n">n_obs_per_time</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">n_obs_per_time</span> <span class="o">==</span> <span class="mi">2</span><span class="p">]</span>
+</pre></div>
+</div>
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>time
+2004-08-14    2
+2004-10-14    2
+2005-04-14    2
+2005-04-28    2
+2005-05-14    2
+2005-10-28    2
+2007-10-14    2
+2008-12-14    2
+2009-01-14    2
+2009-01-28    2
+2009-08-28    2
+2009-09-14    2
+2009-09-28    2
+2014-09-29    2
+2014-10-14    2
+Name: id, dtype: int64
+</pre></div>
+</div>
+</section>
+<section id="modflow-6">
+<h2>MODFLOW 6<a class="headerlink" href="#modflow-6" title="Link to this heading">#</a></h2>
+<p>iMOD Python’s <a class="reference internal" href="../api/generated/mf6/imod.mf6.Well.html#imod.mf6.Well" title="imod.mf6.Well"><code class="xref py py-class docutils literal notranslate"><span class="pre">imod.mf6.Well</span></code></a> and <a class="reference internal" href="../api/generated/mf6/imod.mf6.LayeredWell.html#imod.mf6.LayeredWell" title="imod.mf6.LayeredWell"><code class="xref py py-class docutils literal notranslate"><span class="pre">imod.mf6.LayeredWell</span></code></a> classes
+require their data to be provided as points. However, these require the rates
+to be provided on consistent timesteps amongst all points. This means that the
+data has to be resampled to a consistent frequency. This is done for the user
+when calling <a class="reference internal" href="../api/generated/mf6/imod.mf6.Well.from_imod5_data.html#imod.mf6.Well.from_imod5_data" title="imod.mf6.Well.from_imod5_data"><code class="xref py py-meth docutils literal notranslate"><span class="pre">imod.mf6.Well.from_imod5_data()</span></code></a> or
+<a class="reference internal" href="../api/generated/mf6/imod.mf6.LayeredWell.from_imod5_data.html#imod.mf6.LayeredWell.from_imod5_data" title="imod.mf6.LayeredWell.from_imod5_data"><code class="xref py py-meth docutils literal notranslate"><span class="pre">imod.mf6.LayeredWell.from_imod5_data()</span></code></a>.</p>
+<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> (0 minutes 1.397 seconds)</p>
 <div class="sphx-glr-footer sphx-glr-footer-example docutils container" id="sphx-glr-download-user-guide-03-timeseries-data-py">
 <div class="sphx-glr-download sphx-glr-download-jupyter docutils container">
 <p><a class="reference download internal" download="" href="../_downloads/2da08518e6a9d571f7aee5c95a773928/03-timeseries-data.ipynb"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Jupyter</span> <span class="pre">notebook:</span> <span class="pre">03-timeseries-data.ipynb</span></code></a></p>
@@ -579,6 +883,8 @@ table is supported by many file formats.</p></li>
   <nav class="bd-toc-nav page-toc" aria-labelledby="pst-page-navigation-heading-2">
     <ul class="visible nav section-nav flex-column">
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#timeseries-at-point-locations">Timeseries at point locations</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#example-head-observations">Example: Head observations</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#modflow-6">MODFLOW 6</a></li>
 </ul>
   </nav></div>
 

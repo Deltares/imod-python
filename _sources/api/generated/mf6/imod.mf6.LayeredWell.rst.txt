@@ -20,28 +20,13 @@
       ~LayeredWell.from_file
       ~LayeredWell.from_imod5_cap_data
       ~LayeredWell.from_imod5_data
-      ~LayeredWell.gather_filtered_well_ids
-      ~LayeredWell.get_non_grid_data
-      ~LayeredWell.get_period_varnames
       ~LayeredWell.get_regrid_methods
-      ~LayeredWell.is_clipping_supported
       ~LayeredWell.is_empty
-      ~LayeredWell.is_grid_agnostic_package
-      ~LayeredWell.is_regridding_supported
-      ~LayeredWell.is_splitting_supported
-      ~LayeredWell.isel
       ~LayeredWell.mask
       ~LayeredWell.regrid_like
-      ~LayeredWell.render
-      ~LayeredWell.sel
-      ~LayeredWell.set_repeat_stress
-      ~LayeredWell.to_mf6_package_information
       ~LayeredWell.to_mf6_pkg
       ~LayeredWell.to_netcdf
       ~LayeredWell.write
-      ~LayeredWell.write_binary_griddata
-      ~LayeredWell.write_blockfile
-      ~LayeredWell.write_text_griddata
    
    
 

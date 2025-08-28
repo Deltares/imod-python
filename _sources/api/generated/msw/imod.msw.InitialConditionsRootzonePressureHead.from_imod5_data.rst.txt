@@ -1,0 +1,6 @@
+﻿imod.msw.InitialConditionsRootzonePressureHead.from\_imod5\_data
+================================================================
+
+.. currentmodule:: imod.msw
+
+.. automethod:: InitialConditionsRootzonePressureHead.from_imod5_data

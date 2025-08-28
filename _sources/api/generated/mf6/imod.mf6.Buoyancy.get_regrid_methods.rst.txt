@@ -1,0 +1,6 @@
+﻿imod.mf6.Buoyancy.get\_regrid\_methods
+======================================
+
+.. currentmodule:: imod.mf6
+
+.. automethod:: Buoyancy.get_regrid_methods

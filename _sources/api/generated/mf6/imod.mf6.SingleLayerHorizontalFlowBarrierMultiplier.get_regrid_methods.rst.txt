@@ -1,0 +1,6 @@
+﻿imod.mf6.SingleLayerHorizontalFlowBarrierMultiplier.get\_regrid\_methods
+========================================================================
+
+.. currentmodule:: imod.mf6
+
+.. automethod:: SingleLayerHorizontalFlowBarrierMultiplier.get_regrid_methods

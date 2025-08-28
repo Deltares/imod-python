@@ -1,0 +1,6 @@
+﻿imod.mf6.Recharge.aggregate\_layers
+===================================
+
+.. currentmodule:: imod.mf6
+
+.. automethod:: Recharge.aggregate_layers

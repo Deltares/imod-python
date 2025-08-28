@@ -16,16 +16,9 @@
       ~IdfMapping.__init__
       ~IdfMapping.clip_box
       ~IdfMapping.from_imod5_data
-      ~IdfMapping.get_non_grid_data
-      ~IdfMapping.get_output_settings
       ~IdfMapping.get_regrid_methods
-      ~IdfMapping.is_clipping_supported
-      ~IdfMapping.is_regridding_supported
-      ~IdfMapping.isel
       ~IdfMapping.regrid_like
-      ~IdfMapping.sel
       ~IdfMapping.write
-      ~IdfMapping.write_dataframe_fixed_width
    
    
 

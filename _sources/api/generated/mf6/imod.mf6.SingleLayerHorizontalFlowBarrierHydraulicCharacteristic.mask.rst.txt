@@ -1,0 +1,6 @@
+﻿imod.mf6.SingleLayerHorizontalFlowBarrierHydraulicCharacteristic.mask
+=====================================================================
+
+.. currentmodule:: imod.mf6
+
+.. automethod:: SingleLayerHorizontalFlowBarrierHydraulicCharacteristic.mask

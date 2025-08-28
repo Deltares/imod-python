@@ -1,0 +1,6 @@
+﻿imod.mf6.HorizontalFlowBarrierHydraulicCharacteristic.get\_regrid\_methods
+==========================================================================
+
+.. currentmodule:: imod.mf6
+
+.. automethod:: HorizontalFlowBarrierHydraulicCharacteristic.get_regrid_methods

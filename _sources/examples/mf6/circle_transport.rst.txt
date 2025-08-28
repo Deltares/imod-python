@@ -26,7 +26,7 @@ transport model using the ``imod`` package and associated packages.
 
 In overview, we'll set the following steps:
 
-    * Setting up the flow model, just like in the circle.py example
+    * Setting up the flow model, just like in the :doc:`circle` example
     * set up the transport model
     * Run the simulation.
     * Visualize the results.
@@ -236,24 +236,19 @@ concentration that was computed for the cell.
 In this example we set the prescribed head value to 0.0 and the external
 concentration to 35.0 as well. The boundary only operates on the top layer.
 
-.. GENERATED FROM PYTHON SOURCE LINES 119-137
+.. GENERATED FROM PYTHON SOURCE LINES 120-133
 
 .. code-block:: Python
 
 
-    chd_location = xu.zeros_like(idomain.sel(layer=1), dtype=bool).ugrid.binary_dilation(
+    ghb_location = xu.zeros_like(idomain.sel(layer=1), dtype=bool).ugrid.binary_dilation(
         border_value=True
     )
-    constant_head = xu.full_like(idomain, 0.0, dtype=float).where(chd_location)
-    # Approximate face area
-    face_area = (1000.0 / 6) ** 2 * 0.5
-
-    conductance = xu.full_like(idomain, face_area * k_value, dtype=float).where(
-        chd_location
-    )
+    constant_head = xu.full_like(idomain, 0.0, dtype=float).where(ghb_location)
+    conductance = (idomain * grid.area * k_value).where(ghb_location)
 
     constant_concentration = xu.full_like(constant_head, max_concentration).where(
-        chd_location
+        ghb_location
     )
     constant_concentration = constant_concentration.expand_dims(species=["salinity"])
 
@@ -265,14 +260,14 @@ concentration to 35.0 as well. The boundary only operates on the top layer.
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 138-142
+.. GENERATED FROM PYTHON SOURCE LINES 134-138
 
 Add flow model to simulation
 ----------------------------
 
-See the circle.py example for more information.
+See the :doc:`circle` example for more information.
 
-.. GENERATED FROM PYTHON SOURCE LINES 142-190
+.. GENERATED FROM PYTHON SOURCE LINES 138-186
 
 .. code-block:: Python
 
@@ -331,21 +326,24 @@ See the circle.py example for more information.
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 191-195
+.. GENERATED FROM PYTHON SOURCE LINES 187-195
+
+Time discretization
+-------------------
 
 Set the timesteps, we want output each year, so we specify stress periods
-which last 1 year. However, timesteps of 1 year yield unstable results, so we
-set ``n_timesteps`` to 10, which sets the amount of timesteps within a stress
-period.
+which last 1 year. We add the additional times to ensure that there is output
+at the end of each year. To achieve this we setup stress periods were each
+stress period is a year long. We can then use the "last" keyword in the output
+control to save the output.
 
-.. GENERATED FROM PYTHON SOURCE LINES 195-200
+.. GENERATED FROM PYTHON SOURCE LINES 196-200
 
 .. code-block:: Python
 
 
     simtimes = pd.date_range(start="2000-01-01", end="2030-01-01", freq="As")
     simulation.create_time_discretization(additional_times=simtimes)
-    simulation["time_discretization"]["n_timesteps"] = 10
 
 
 
@@ -354,7 +352,38 @@ period.
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 201-206
+.. GENERATED FROM PYTHON SOURCE LINES 201-210
+
+We want to use adaptive time stepping to ensure stable results without taking
+an unnecessary amount of small timesteps. We set the initial time step to 0.1
+day, the minimum time step to 0.1 day, and the maximum time step to 50 days.
+The multiplier is set to 2.0 so that consecutive timesteps will be increased
+by a factor of 2 if the convergence is good. Furthermore, we will set the
+``ats_percel`` to 0.95 in the Advection package in the next section to let
+MODFLOW 6 compute an appropriate time step based on the velocity field: A
+solute parcel should not travel more than one cell in a time step. From these
+two criteria MODFLOW 6 will select the smallest time step.
+
+.. GENERATED FROM PYTHON SOURCE LINES 211-219
+
+.. code-block:: Python
+
+
+    simulation["ats"] = imod.mf6.AdaptiveTimeStepping(
+        dt_init=1e-1,
+        dt_min=1e-1,
+        dt_max=50.0,
+        dt_multiplier=2.0,
+    )
+
+
+
+
+
+
+
+
+.. GENERATED FROM PYTHON SOURCE LINES 220-225
 
 Buoyancy
 --------
@@ -362,7 +391,7 @@ Since we are solving a variable density problem, we need to add the buoyancy
 package. It will use the species "salinity" that we are simulating with a
 transport model defined below.
 
-.. GENERATED FROM PYTHON SOURCE LINES 206-216
+.. GENERATED FROM PYTHON SOURCE LINES 225-235
 
 .. code-block:: Python
 
@@ -383,7 +412,7 @@ transport model defined below.
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 217-225
+.. GENERATED FROM PYTHON SOURCE LINES 236-244
 
 Add transport model to simulation
 ---------------------------------
@@ -394,7 +423,7 @@ discretization as the flow model. Here we create a transport model for
 salinity, derive sources and sinks based from the flow model, and tell it to
 use the same discretization.
 
-.. GENERATED FROM PYTHON SOURCE LINES 225-232
+.. GENERATED FROM PYTHON SOURCE LINES 244-251
 
 .. code-block:: Python
 
@@ -412,14 +441,14 @@ use the same discretization.
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 233-237
+.. GENERATED FROM PYTHON SOURCE LINES 252-256
 
 Now we define some transport packages for simulating the physical processes
 of advection, mechanical dispersion, and molecular diffusion dispersion. This
 example is transient, and the volume available for storage is the porosity,
 in this case 0.10.
 
-.. GENERATED FROM PYTHON SOURCE LINES 237-251
+.. GENERATED FROM PYTHON SOURCE LINES 256-270
 
 .. code-block:: Python
 
@@ -434,7 +463,7 @@ in this case 0.10.
         xt3d_off=False,
         xt3d_rhs=False,
     )
-    transport_model["adv"] = imod.mf6.AdvectionUpstream()
+    transport_model["adv"] = imod.mf6.AdvectionTVD(ats_percel=0.95)
     transport_model["mst"] = imod.mf6.MobileStorageTransfer(porosity)
 
 
@@ -444,13 +473,13 @@ in this case 0.10.
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 252-255
+.. GENERATED FROM PYTHON SOURCE LINES 271-274
 
 Define the maximum concentration as the initial conditions, also output
 options for the transport model, and assign the transport model to the
 simulation as well.
 
-.. GENERATED FROM PYTHON SOURCE LINES 255-277
+.. GENERATED FROM PYTHON SOURCE LINES 274-296
 
 .. code-block:: Python
 
@@ -483,16 +512,16 @@ simulation as well.
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 278-279
+.. GENERATED FROM PYTHON SOURCE LINES 297-298
 
 We'll create a new directory in which we will write and run the model.
 
-.. GENERATED FROM PYTHON SOURCE LINES 279-283
+.. GENERATED FROM PYTHON SOURCE LINES 298-302
 
 .. code-block:: Python
 
 
-    modeldir = imod.util.temporary_directory()
+    modeldir = imod.util.temporary_directory() / "full"
     simulation.write(modeldir, binary=False)
 
 
@@ -502,7 +531,7 @@ We'll create a new directory in which we will write and run the model.
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 284-291
+.. GENERATED FROM PYTHON SOURCE LINES 303-310
 
 Run the model
 -------------
@@ -512,7 +541,7 @@ Run the model
   The following lines assume the ``mf6`` executable is available on your
   PATH. The examples introduction shortly describes how to add it to yours.
 
-.. GENERATED FROM PYTHON SOURCE LINES 291-294
+.. GENERATED FROM PYTHON SOURCE LINES 310-313
 
 .. code-block:: Python
 
@@ -526,18 +555,18 @@ Run the model
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 295-297
+.. GENERATED FROM PYTHON SOURCE LINES 314-316
 
 Open the results
 ----------------
 
-.. GENERATED FROM PYTHON SOURCE LINES 297-301
+.. GENERATED FROM PYTHON SOURCE LINES 316-320
 
 .. code-block:: Python
 
 
-    sim_concentration = simulation.open_concentration().compute()
-    sim_head = simulation.open_head().compute()
+    sim_concentration = simulation.open_concentration().compute().reindex_like(idomain)
+    sim_head = simulation.open_head().compute().reindex_like(idomain)
 
 
 
@@ -546,7 +575,7 @@ Open the results
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 302-310
+.. GENERATED FROM PYTHON SOURCE LINES 321-329
 
 Assign coordinates to output
 ----------------------------
@@ -557,7 +586,7 @@ understandable plots.
 
 First we have to compute values for a z coordinate. The
 
-.. GENERATED FROM PYTHON SOURCE LINES 310-315
+.. GENERATED FROM PYTHON SOURCE LINES 329-334
 
 .. code-block:: Python
 
@@ -580,11 +609,11 @@ First we have to compute values for a z coordinate. The
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 316-317
+.. GENERATED FROM PYTHON SOURCE LINES 335-336
 
 Assign these new coordinate values to the dataset
 
-.. GENERATED FROM PYTHON SOURCE LINES 317-323
+.. GENERATED FROM PYTHON SOURCE LINES 336-342
 
 .. code-block:: Python
 
@@ -601,7 +630,7 @@ Assign these new coordinate values to the dataset
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 324-329
+.. GENERATED FROM PYTHON SOURCE LINES 343-348
 
 Visualize the results
 ---------------------
@@ -609,7 +638,7 @@ Visualize the results
 We can quickly and easily visualize the output with the plotting functions
 provided by xarray and xugrid:
 
-.. GENERATED FROM PYTHON SOURCE LINES 329-334
+.. GENERATED FROM PYTHON SOURCE LINES 348-353
 
 .. code-block:: Python
 
@@ -630,12 +659,12 @@ provided by xarray and xugrid:
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 335-337
+.. GENERATED FROM PYTHON SOURCE LINES 354-356
 
 We can draw a crossection through the center by selecting y=0, for which we
 can plot the contours as follows:
 
-.. GENERATED FROM PYTHON SOURCE LINES 337-342
+.. GENERATED FROM PYTHON SOURCE LINES 356-361
 
 .. code-block:: Python
 
@@ -658,14 +687,167 @@ can plot the contours as follows:
  .. code-block:: none
 
 
-    <matplotlib.contour.QuadContourSet object at 0x0000016F45E96540>
+    <matplotlib.contour.QuadContourSet object at 0x00000251D2069DF0>
+
+
+
+.. GENERATED FROM PYTHON SOURCE LINES 362-372
+
+Slice the model domain
+----------------------
+
+We may also quickly setup a smaller model. We'll select half of the original
+domain. To set up the boundary conditions on the clipped edges you can provide
+a states_for_boundary dictionary. In this case we add the head values for the
+flow model and the concentration values for the transport model of the
+computed full domain simulation as the clipped boundary values. You can use
+this feature to clip a smaller model from an existing larger model, downscale
+it, and conduct a study in more detail around an area of interest.
+
+.. GENERATED FROM PYTHON SOURCE LINES 372-382
+
+.. code-block:: Python
+
+
+    states_for_boundary = {
+        "flow": sim_head.isel(time=-1, drop=True).drop_vars("z"),
+        "transport": sim_concentration.isel(time=-1, drop=True).drop_vars("z"),
+    }
+
+    half_simulation = simulation.clip_box(
+        x_max=0.1, states_for_boundary=states_for_boundary
+    )
+
+
+
+
+
+
+
+
+.. GENERATED FROM PYTHON SOURCE LINES 383-384
+
+Let's run the model, read the results, and visualize.
+
+.. GENERATED FROM PYTHON SOURCE LINES 385-389
+
+.. code-block:: Python
+
+    modeldir = imod.util.temporary_directory() / "half"
+    half_simulation.write(modeldir)
+    half_simulation.run()
+
+
+
+
+
+
+
+
+.. GENERATED FROM PYTHON SOURCE LINES 390-392
+
+Open the results
+----------------
+
+.. GENERATED FROM PYTHON SOURCE LINES 392-396
+
+.. code-block:: Python
+
+
+    half_sim_concentration = half_simulation.open_concentration().compute()
+    half_sim_head = half_simulation.open_head().compute()
+
+
+
+
+
+
+
+
+.. GENERATED FROM PYTHON SOURCE LINES 397-398
+
+Assign these new coordinate values to the dataset
+
+.. GENERATED FROM PYTHON SOURCE LINES 398-402
+
+.. code-block:: Python
+
+    half_sim_head = half_sim_head.assign_coords(**coords)
+    half_sim_concentration = half_sim_concentration.assign_coords(**coords)
+
+
+
+
+
+
+
+
+
+.. GENERATED FROM PYTHON SOURCE LINES 403-408
+
+Visualize the results
+---------------------
+
+We can quickly and easily visualize the output with the plotting functions
+provided by xarray and xugrid:
+
+.. GENERATED FROM PYTHON SOURCE LINES 408-413
+
+.. code-block:: Python
+
+
+    fig, ax = plt.subplots()
+    half_sim_head.isel(time=-1, layer=0).ugrid.plot(ax=ax)
+    ax.set_aspect(1)
+
+
+
+
+.. image-sg:: /examples/mf6/images/sphx_glr_circle_transport_005.png
+   :alt: layer = 1, time = 2030-01-01, z = -5.0
+   :srcset: /examples/mf6/images/sphx_glr_circle_transport_005.png
+   :class: sphx-glr-single-img
+
+
+
+
+
+.. GENERATED FROM PYTHON SOURCE LINES 414-416
+
+We can draw a crossection through the center by selecting y=0, for which we
+can plot the contours as follows:
+
+.. GENERATED FROM PYTHON SOURCE LINES 416-421
+
+.. code-block:: Python
+
+
+    fig, ax = plt.subplots()
+    half_sim_concentration.isel(time=-1).ugrid.sel(y=0).plot.contourf(
+        ax=ax, x="mesh2d_x", y="z", cmap="RdYlBu_r"
+    )
+
+
+
+.. image-sg:: /examples/mf6/images/sphx_glr_circle_transport_006.png
+   :alt: time = 2030-01-01
+   :srcset: /examples/mf6/images/sphx_glr_circle_transport_006.png
+   :class: sphx-glr-single-img
+
+
+.. rst-class:: sphx-glr-script-out
+
+ .. code-block:: none
+
+
+    <matplotlib.contour.QuadContourSet object at 0x00000251D7A1F860>
 
 
 
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** (1 minutes 1.868 seconds)
+   **Total running time of the script:** (1 minutes 15.846 seconds)
 
 
 .. _sphx_glr_download_examples_mf6_circle_transport.py:

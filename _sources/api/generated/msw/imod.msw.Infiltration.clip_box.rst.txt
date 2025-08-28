@@ -1,0 +1,6 @@
+﻿imod.msw.Infiltration.clip\_box
+===============================
+
+.. currentmodule:: imod.msw
+
+.. automethod:: Infiltration.clip_box

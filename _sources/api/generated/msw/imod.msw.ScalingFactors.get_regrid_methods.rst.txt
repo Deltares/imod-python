@@ -1,0 +1,6 @@
+﻿imod.msw.ScalingFactors.get\_regrid\_methods
+============================================
+
+.. currentmodule:: imod.msw
+
+.. automethod:: ScalingFactors.get_regrid_methods

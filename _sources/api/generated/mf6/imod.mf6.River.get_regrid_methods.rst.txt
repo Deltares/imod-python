@@ -1,0 +1,6 @@
+﻿imod.mf6.River.get\_regrid\_methods
+===================================
+
+.. currentmodule:: imod.mf6
+
+.. automethod:: River.get_regrid_methods

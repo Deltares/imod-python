@@ -1,0 +1,6 @@
+﻿imod.msw.InitialConditionsSavedState.regrid\_like
+=================================================
+
+.. currentmodule:: imod.msw
+
+.. automethod:: InitialConditionsSavedState.regrid_like

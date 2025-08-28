@@ -1,0 +1,6 @@
+﻿imod.mf6.SingleLayerHorizontalFlowBarrierHydraulicCharacteristic.snap\_to\_grid
+===============================================================================
+
+.. currentmodule:: imod.mf6
+
+.. automethod:: SingleLayerHorizontalFlowBarrierHydraulicCharacteristic.snap_to_grid

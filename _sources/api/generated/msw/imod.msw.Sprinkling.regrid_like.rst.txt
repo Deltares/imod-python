@@ -1,0 +1,6 @@
+﻿imod.msw.Sprinkling.regrid\_like
+================================
+
+.. currentmodule:: imod.msw
+
+.. automethod:: Sprinkling.regrid_like

@@ -14,27 +14,15 @@
    .. autosummary::
    
       ~MobileStorageTransfer.__init__
-      ~MobileStorageTransfer.cleanup
       ~MobileStorageTransfer.clip_box
       ~MobileStorageTransfer.copy
       ~MobileStorageTransfer.from_file
-      ~MobileStorageTransfer.get_non_grid_data
       ~MobileStorageTransfer.get_regrid_methods
-      ~MobileStorageTransfer.is_clipping_supported
       ~MobileStorageTransfer.is_empty
-      ~MobileStorageTransfer.is_grid_agnostic_package
-      ~MobileStorageTransfer.is_regridding_supported
-      ~MobileStorageTransfer.is_splitting_supported
-      ~MobileStorageTransfer.isel
       ~MobileStorageTransfer.mask
       ~MobileStorageTransfer.regrid_like
-      ~MobileStorageTransfer.render
-      ~MobileStorageTransfer.sel
       ~MobileStorageTransfer.to_netcdf
       ~MobileStorageTransfer.write
-      ~MobileStorageTransfer.write_binary_griddata
-      ~MobileStorageTransfer.write_blockfile
-      ~MobileStorageTransfer.write_text_griddata
    
    
 

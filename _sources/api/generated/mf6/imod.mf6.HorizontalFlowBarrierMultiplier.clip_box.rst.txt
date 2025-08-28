@@ -1,0 +1,6 @@
+﻿imod.mf6.HorizontalFlowBarrierMultiplier.clip\_box
+==================================================
+
+.. currentmodule:: imod.mf6
+
+.. automethod:: HorizontalFlowBarrierMultiplier.clip_box

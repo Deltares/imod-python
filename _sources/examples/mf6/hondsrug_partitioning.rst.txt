@@ -30,14 +30,13 @@ head array for the whole grid. we print both the heads obtained without
 partitioning, and the merged heads of the partitioned simulation, ' for
 comparison.
 
-.. GENERATED FROM PYTHON SOURCE LINES 16-21
+.. GENERATED FROM PYTHON SOURCE LINES 16-20
 
 .. code-block:: Python
 
     import matplotlib.pyplot as plt
 
     import imod
-    from imod.prepare.partition import create_partition_labels
 
 
 
@@ -46,14 +45,14 @@ comparison.
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 22-26
+.. GENERATED FROM PYTHON SOURCE LINES 21-25
 
 Obtain the simulation, write it, run it, and plot some heads.
 There is a separate example contained in
 :doc:`hondsrug </examples/mf6/hondsrug>`
 that you should look at if you are interested in the model building
 
-.. GENERATED FROM PYTHON SOURCE LINES 26-30
+.. GENERATED FROM PYTHON SOURCE LINES 25-29
 
 .. code-block:: Python
 
@@ -68,12 +67,12 @@ that you should look at if you are interested in the model building
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 31-33
+.. GENERATED FROM PYTHON SOURCE LINES 30-32
 
 Write the model and run it (before partitioning, so we can compare if the
 results are similar).
 
-.. GENERATED FROM PYTHON SOURCE LINES 33-38
+.. GENERATED FROM PYTHON SOURCE LINES 32-37
 
 .. code-block:: Python
 
@@ -89,11 +88,11 @@ results are similar).
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 39-40
+.. GENERATED FROM PYTHON SOURCE LINES 38-39
 
 Plot the simulation results of the unpartitioned model.
 
-.. GENERATED FROM PYTHON SOURCE LINES 40-46
+.. GENERATED FROM PYTHON SOURCE LINES 39-45
 
 .. code-block:: Python
 
@@ -121,17 +120,16 @@ Plot the simulation results of the unpartitioned model.
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 47-48
+.. GENERATED FROM PYTHON SOURCE LINES 46-47
 
 Now we partition the Hondsrug model
 
-.. GENERATED FROM PYTHON SOURCE LINES 48-52
+.. GENERATED FROM PYTHON SOURCE LINES 47-50
 
 .. code-block:: Python
 
-    idomain = gwf_simulation["GWF"].domain
     number_partitions = 16
-    submodel_labels = create_partition_labels(gwf_simulation, number_partitions)
+    submodel_labels = gwf_simulation.create_partition_labels(number_partitions)
 
 
 
@@ -140,7 +138,7 @@ Now we partition the Hondsrug model
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 53-58
+.. GENERATED FROM PYTHON SOURCE LINES 51-56
 
 This label array determines how the model will be split. `METIS
 <https://github.com/KarypisLab/METIS/blob/master/manual/manual.pdf>`_ is used
@@ -148,7 +146,7 @@ in the background to partition models, which is the cause of the imperfect
 rectangular shapes. By default, partitions are weighted by the number of active cells
 across the layer dimension.
 
-.. GENERATED FROM PYTHON SOURCE LINES 58-63
+.. GENERATED FROM PYTHON SOURCE LINES 56-61
 
 .. code-block:: Python
 
@@ -175,11 +173,11 @@ across the layer dimension.
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 64-65
+.. GENERATED FROM PYTHON SOURCE LINES 62-63
 
 Let's split the simulation into 16 submodels.
 
-.. GENERATED FROM PYTHON SOURCE LINES 65-69
+.. GENERATED FROM PYTHON SOURCE LINES 63-67
 
 .. code-block:: Python
 
@@ -195,13 +193,13 @@ Let's split the simulation into 16 submodels.
 
  .. code-block:: none
 
-    C:\buildagent\work\4b9080cbb3354582\imod-python\.pixi\envs\default\Lib\site-packages\xarray\core\duck_array_ops.py:253: RuntimeWarning: invalid value encountered in cast
+    C:\buildagent\work\4b9080cbb3354582\imod-python\.pixi\envs\default\Lib\site-packages\xarray\core\duck_array_ops.py:250: RuntimeWarning: invalid value encountered in cast
       return data.astype(dtype, **kwargs)
-    C:\buildagent\work\4b9080cbb3354582\imod-python\.pixi\envs\default\Lib\site-packages\xarray\core\duck_array_ops.py:253: RuntimeWarning: invalid value encountered in cast
+    C:\buildagent\work\4b9080cbb3354582\imod-python\.pixi\envs\default\Lib\site-packages\xarray\core\duck_array_ops.py:250: RuntimeWarning: invalid value encountered in cast
       return data.astype(dtype, **kwargs)
-    C:\buildagent\work\4b9080cbb3354582\imod-python\.pixi\envs\default\Lib\site-packages\xarray\core\duck_array_ops.py:253: RuntimeWarning: invalid value encountered in cast
+    C:\buildagent\work\4b9080cbb3354582\imod-python\.pixi\envs\default\Lib\site-packages\xarray\core\duck_array_ops.py:250: RuntimeWarning: invalid value encountered in cast
       return data.astype(dtype, **kwargs)
-    C:\buildagent\work\4b9080cbb3354582\imod-python\.pixi\envs\default\Lib\site-packages\xarray\core\duck_array_ops.py:253: RuntimeWarning: invalid value encountered in cast
+    C:\buildagent\work\4b9080cbb3354582\imod-python\.pixi\envs\default\Lib\site-packages\xarray\core\duck_array_ops.py:250: RuntimeWarning: invalid value encountered in cast
       return data.astype(dtype, **kwargs)
 
     Modflow6Simulation(
@@ -231,11 +229,11 @@ Let's split the simulation into 16 submodels.
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 70-71
+.. GENERATED FROM PYTHON SOURCE LINES 68-69
 
 Now we  write and run the partitioned model
 
-.. GENERATED FROM PYTHON SOURCE LINES 71-77
+.. GENERATED FROM PYTHON SOURCE LINES 69-75
 
 .. code-block:: Python
 
@@ -252,11 +250,11 @@ Now we  write and run the partitioned model
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 78-79
+.. GENERATED FROM PYTHON SOURCE LINES 76-77
 
 Load and plot the simulation results. Also plot the differences with the original model
 
-.. GENERATED FROM PYTHON SOURCE LINES 79-90
+.. GENERATED FROM PYTHON SOURCE LINES 77-88
 
 .. code-block:: Python
 
@@ -304,7 +302,7 @@ Load and plot the simulation results. Also plot the differences with the origina
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** (4 minutes 23.188 seconds)
+   **Total running time of the script:** (4 minutes 20.440 seconds)
 
 
 .. _sphx_glr_download_examples_mf6_hondsrug_partitioning.py:

@@ -1,0 +1,6 @@
+﻿imod.mf6.AdaptiveTimeStepping.regrid\_like
+==========================================
+
+.. currentmodule:: imod.mf6
+
+.. automethod:: AdaptiveTimeStepping.regrid_like

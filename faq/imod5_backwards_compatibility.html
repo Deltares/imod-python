@@ -8,7 +8,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>iMOD5 backwards compatibility &#8212; iMOD Python 1.0.0rc4 documentation</title>
+    <title>iMOD5 backwards compatibility &#8212; iMOD Python 1.0.0rc6 documentation</title>
   
   
   
@@ -42,7 +42,7 @@
   <link rel="preload" as="script" href="../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
 <link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
 
-    <script src="../_static/documentation_options.js?v=2fc85bd2"></script>
+    <script src="../_static/documentation_options.js?v=bc4855a1"></script>
     <script src="../_static/doctools.js?v=9bcbadda"></script>
     <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script>DOCUMENTATION_OPTIONS.pagename = 'faq/imod5_backwards_compatibility';</script>
@@ -53,7 +53,7 @@
     <link rel="prev" title="Known Issues" href="known-issues.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
-  <meta name="docsearch:version" content="1.0.0rc4.dev" />
+  <meta name="docsearch:version" content="1.0.0rc6.dev" />
   </head>
   
   
@@ -117,8 +117,8 @@
     
     
     
-    <img src="../_static/imod-python-logo-light.svg" class="logo__image only-light" alt="iMOD Python 1.0.0rc4 documentation - Home"/>
-    <img src="../_static/imod-python-logo-dark.svg" class="logo__image only-dark pst-js-only" alt="iMOD Python 1.0.0rc4 documentation - Home"/>
+    <img src="../_static/imod-python-logo-light.svg" class="logo__image only-light" alt="iMOD Python 1.0.0rc6 documentation - Home"/>
+    <img src="../_static/imod-python-logo-dark.svg" class="logo__image only-dark pst-js-only" alt="iMOD Python 1.0.0rc6 documentation - Home"/>
   
   
 </a></div>
@@ -156,7 +156,7 @@
 
 <li class="nav-item ">
   <a class="nav-link nav-internal" href="../api/index.html">
-    API Reference
+    API
   </a>
 </li>
 
@@ -308,7 +308,7 @@
 
 <li class="nav-item ">
   <a class="nav-link nav-internal" href="../api/index.html">
-    API Reference
+    API
   </a>
 </li>
 
@@ -639,7 +639,7 @@ have a very fine resolution in one of these packages.</p></li>
 </tr>
 <tr class="row-odd"><td><p>KHV, KVA, ANI</p></td>
 <td><p>Regrid</p></td>
-<td><p><a class="reference internal" href="../api/generated/mf6/imod.mf6.NodePropertyFlow.regrid_like.html#imod.mf6.NodePropertyFlow.regrid_like" title="imod.mf6.NodePropertyFlow.regrid_like"><code class="xref py py-meth docutils literal notranslate"><span class="pre">imod.mf6.NodePropertyFlow.regrid_like()</span></code></a></p></td>
+<td><p><a class="reference internal" href="../api/generated/mf6/imod.mf6.NodePropertyFlow.regrid_like.html#imod.mf6.NodePropertyFlow.regrid_like" title="imod.mf6.NodePropertyFlow.regrid_like"><code class="xref py py-meth docutils literal notranslate"><span class="pre">NPF.regrid_like</span></code></a></p></td>
 </tr>
 <tr class="row-even"><td><p>KHV, KVA, ANI</p></td>
 <td><p>Clip</p></td>
@@ -981,6 +981,1124 @@ your data, see our iMOD Viewer</a>.</p>
 </table>
 </div>
 </section>
+<section id="imod-batch-glossary">
+<h2>iMOD BATCH glossary<a class="headerlink" href="#imod-batch-glossary" title="Link to this heading">#</a></h2>
+<p>Here is a glossary of the iMOD5 BATCH functions and their arguments, and which
+iMOD Python argument for a function to look for.</p>
+<section id="runfile">
+<h3>RUNFILE<a class="headerlink" href="#runfile" title="Link to this heading">#</a></h3>
+<p>The RUNFILE BATCH function is used in iMOD5 to create a MODFLOW 6 runfile or
+namfile from an iMOD5 projectfile. The following table lists the arguments of
+the function and a pointer to the equivalent iMOD Python function and argument
+of this function. The method that contains most of the logic of the RUNFILE BATCH
+function is <a class="reference internal" href="../api/generated/mf6/imod.mf6.Modflow6Simulation.from_imod5_data.html#imod.mf6.Modflow6Simulation.from_imod5_data" title="imod.mf6.Modflow6Simulation.from_imod5_data"><code class="xref py py-meth docutils literal notranslate"><span class="pre">imod.mf6.Modflow6Simulation.from_imod5_data()</span></code></a>.</p>
+<div class="pst-scrollable-table-container"><table class="table">
+<colgroup>
+<col style="width: 7.7%" />
+<col style="width: 30.8%" />
+<col style="width: 30.8%" />
+<col style="width: 30.8%" />
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head stub"><p>BATCH argument</p></th>
+<th class="head"><p>description</p></th>
+<th class="head"><p>iMOD Python</p></th>
+<th class="head"><p>argument</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><th class="stub"><p>PRJFILE_IN</p></th>
+<td><p>Name of a projectfile that need to be used to create a runfile specified by RUNFILE_OUT or a namfile specified by NAMFILE_OUT e.g. PRJFILE_IN=D:PRJFILESMODEL.PRJ.</p></td>
+<td><p><a class="reference internal" href="../api/generated/io/imod.formats.prj.open_projectfile_data.html#imod.formats.prj.open_projectfile_data" title="imod.formats.prj.open_projectfile_data"><code class="xref py py-func docutils literal notranslate"><span class="pre">imod.formats.prj.open_projectfile_data()</span></code></a></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">path</span></code></p></td>
+</tr>
+<tr class="row-odd"><th class="stub"><p>NAMFILE_OUT</p></th>
+<td><p>Name of a nam-file that will be created e.g. NAMFILE_OUT=D:NAMFILESMODEL.NAM</p></td>
+<td><p><a class="reference internal" href="../api/generated/mf6/imod.mf6.Modflow6Simulation.write.html#imod.mf6.Modflow6Simulation.write" title="imod.mf6.Modflow6Simulation.write"><code class="xref py py-meth docutils literal notranslate"><span class="pre">imod.mf6.Modflow6Simulation.write()</span></code></a></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">directory</span></code></p></td>
+</tr>
+<tr class="row-even"><th class="stub"><p>ISS</p></th>
+<td><p>Type of time configuration to be added to the RUNFILE or NAMFILE; for transient enter ISS=1 and for steady state enter ISS=0.</p></td>
+<td><p><a class="reference internal" href="../api/generated/mf6/imod.mf6.StorageCoefficient.html#imod.mf6.StorageCoefficient" title="imod.mf6.StorageCoefficient"><code class="xref py py-class docutils literal notranslate"><span class="pre">imod.mf6.StorageCoefficient</span></code></a></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">transient</span></code></p></td>
+</tr>
+<tr class="row-odd"><th class="stub"><p>SDATE</p></th>
+<td><p>Starting date of the simulation in yyyymmddhhmmss</p></td>
+<td><p><a class="reference internal" href="../api/generated/mf6/imod.mf6.Modflow6Simulation.from_imod5_data.html#imod.mf6.Modflow6Simulation.from_imod5_data" title="imod.mf6.Modflow6Simulation.from_imod5_data"><code class="xref py py-meth docutils literal notranslate"><span class="pre">imod.mf6.Modflow6Simulation.from_imod5_data()</span></code></a></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">times</span></code></p></td>
+</tr>
+<tr class="row-even"><th class="stub"><p>EDATE</p></th>
+<td><p>End date of the simulation in yyyymmddhhmmss</p></td>
+<td><p><a class="reference internal" href="../api/generated/mf6/imod.mf6.Modflow6Simulation.from_imod5_data.html#imod.mf6.Modflow6Simulation.from_imod5_data" title="imod.mf6.Modflow6Simulation.from_imod5_data"><code class="xref py py-meth docutils literal notranslate"><span class="pre">imod.mf6.Modflow6Simulation.from_imod5_data()</span></code></a></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">times</span></code></p></td>
+</tr>
+<tr class="row-odd"><th class="stub"><p>ITT</p></th>
+<td><p>Time interval category</p></td>
+<td><p><a class="reference internal" href="../api/generated/mf6/imod.mf6.Modflow6Simulation.from_imod5_data.html#imod.mf6.Modflow6Simulation.from_imod5_data" title="imod.mf6.Modflow6Simulation.from_imod5_data"><code class="xref py py-meth docutils literal notranslate"><span class="pre">imod.mf6.Modflow6Simulation.from_imod5_data()</span></code></a></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">times</span></code></p></td>
+</tr>
+<tr class="row-even"><th class="stub"><p>IDT</p></th>
+<td><p>Time interval of the time steps corresponding to the chosen time interval category ITT e.g. IDT=7 to denote the 7 days whenever ITT=3</p></td>
+<td><p><a class="reference internal" href="../api/generated/mf6/imod.mf6.Modflow6Simulation.from_imod5_data.html#imod.mf6.Modflow6Simulation.from_imod5_data" title="imod.mf6.Modflow6Simulation.from_imod5_data"><code class="xref py py-meth docutils literal notranslate"><span class="pre">imod.mf6.Modflow6Simulation.from_imod5_data()</span></code></a></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">times</span></code></p></td>
+</tr>
+<tr class="row-odd"><th class="stub"><p>ISTEADY</p></th>
+<td><p>ISTEADY=1 to include an initial steady-state time step to the model. This will add packages with the time stamp STEADY-STATE to the first stress-period of your model.</p></td>
+<td><p><a class="reference internal" href="../api/generated/mf6/imod.mf6.StorageCoefficient.html#imod.mf6.StorageCoefficient" title="imod.mf6.StorageCoefficient"><code class="xref py py-class docutils literal notranslate"><span class="pre">imod.mf6.StorageCoefficient</span></code></a></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">transient</span></code></p></td>
+</tr>
+<tr class="row-even"><th class="stub"><p>NSTEP</p></th>
+<td><p>Number time step within each stress period</p></td>
+<td><p><a class="reference internal" href="../api/generated/mf6/imod.mf6.TimeDiscretization.html#imod.mf6.TimeDiscretization" title="imod.mf6.TimeDiscretization"><code class="xref py py-class docutils literal notranslate"><span class="pre">imod.mf6.TimeDiscretization</span></code></a></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">n_timesteps</span></code></p></td>
+</tr>
+<tr class="row-odd"><th class="stub"><p>NMULT</p></th>
+<td><p>Multiplication factor in which the step size of each subsequent time step will increase</p></td>
+<td><p><a class="reference internal" href="../api/generated/mf6/imod.mf6.TimeDiscretization.html#imod.mf6.TimeDiscretization" title="imod.mf6.TimeDiscretization"><code class="xref py py-class docutils literal notranslate"><span class="pre">imod.mf6.TimeDiscretization</span></code></a></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">timestep_multiplier</span></code></p></td>
+</tr>
+<tr class="row-even"><th class="stub"><p>INFFCT</p></th>
+<td><p>Use this keyword to generate two RIV-elements to compensate for a given infiltration factor</p></td>
+<td><p><a class="reference internal" href="../api/generated/mf6/imod.mf6.River.from_imod5_data.html#imod.mf6.River.from_imod5_data" title="imod.mf6.River.from_imod5_data"><code class="xref py py-meth docutils literal notranslate"><span class="pre">imod.mf6.River.from_imod5_data()</span></code></a></p></td>
+<td></td>
+</tr>
+<tr class="row-odd"><th class="stub"><p>IDEFLAYER</p></th>
+<td><p>Assign river-elements to model layers</p></td>
+<td><p><a class="reference internal" href="../api/generated/mf6/imod.mf6.River.from_imod5_data.html#imod.mf6.River.from_imod5_data" title="imod.mf6.River.from_imod5_data"><code class="xref py py-meth docutils literal notranslate"><span class="pre">imod.mf6.River.from_imod5_data()</span></code></a></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">allocation_option</span></code></p></td>
+</tr>
+<tr class="row-even"><th class="stub"><p>DISTRCOND</p></th>
+<td><p>Distribute conductances over the river-elements</p></td>
+<td><p><a class="reference internal" href="../api/generated/mf6/imod.mf6.River.from_imod5_data.html#imod.mf6.River.from_imod5_data" title="imod.mf6.River.from_imod5_data"><code class="xref py py-meth docutils literal notranslate"><span class="pre">imod.mf6.River.from_imod5_data()</span></code></a></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">distributing_option</span></code></p></td>
+</tr>
+<tr class="row-odd"><th class="stub"><p>NEWTON</p></th>
+<td><p>Use Newton-Raphson formulation for groundwater flow between connected, convertible groundwater cells</p></td>
+<td><p><a class="reference internal" href="../api/generated/mf6/imod.mf6.GroundwaterFlowModel.html#imod.mf6.GroundwaterFlowModel" title="imod.mf6.GroundwaterFlowModel"><code class="xref py py-class docutils literal notranslate"><span class="pre">imod.mf6.GroundwaterFlowModel</span></code></a></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">newton_raphson</span></code></p></td>
+</tr>
+<tr class="row-even"><th class="stub"><p>UNCONFINED</p></th>
+<td><p>Include unconfined conditions for model layers</p></td>
+<td><p><a class="reference internal" href="../api/generated/mf6/imod.mf6.NodePropertyFlow.html#imod.mf6.NodePropertyFlow" title="imod.mf6.NodePropertyFlow"><code class="xref py py-class docutils literal notranslate"><span class="pre">imod.mf6.NodePropertyFlow</span></code></a></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">icelltype</span></code></p></td>
+</tr>
+<tr class="row-odd"><th class="stub"><p>DEFUNCONF</p></th>
+<td><p>Specify spatially whether the UNCONFINED configuration needs to be applied</p></td>
+<td><p><a class="reference internal" href="../api/generated/mf6/imod.mf6.NodePropertyFlow.html#imod.mf6.NodePropertyFlow" title="imod.mf6.NodePropertyFlow"><code class="xref py py-class docutils literal notranslate"><span class="pre">imod.mf6.NodePropertyFlow</span></code></a></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">icelltype</span></code></p></td>
+</tr>
+<tr class="row-even"><th class="stub"><p>THICKSTRT</p></th>
+<td><p>Minimal thickness of an aquifer which becomes in active in case the given starting head is below that level</p></td>
+<td><p><a class="reference internal" href="../api/generated/mf6/imod.mf6.NodePropertyFlow.html#imod.mf6.NodePropertyFlow" title="imod.mf6.NodePropertyFlow"><code class="xref py py-class docutils literal notranslate"><span class="pre">imod.mf6.NodePropertyFlow</span></code></a></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">starting_head_as_confined_thickness</span></code></p></td>
+</tr>
+<tr class="row-odd"><th class="stub"><p>SPECIFIC-STORAGE</p></th>
+<td><p>Denote that specific storage is entered in the PRJ file instead of storage coefficients</p></td>
+<td><p><a class="reference internal" href="../api/generated/mf6/imod.mf6.SpecificStorage.html#imod.mf6.SpecificStorage" title="imod.mf6.SpecificStorage"><code class="xref py py-class docutils literal notranslate"><span class="pre">imod.mf6.SpecificStorage</span></code></a></p></td>
+<td></td>
+</tr>
+<tr class="row-even"><th class="stub"><p>WINDOW</p></th>
+<td><p>Specify a window (X1,Y1,X2,Y2) for which the constructed RUNFILE will be clipped</p></td>
+<td><p><a class="reference internal" href="../api/generated/mf6/imod.mf6.Modflow6Simulation.clip_box.html#imod.mf6.Modflow6Simulation.clip_box" title="imod.mf6.Modflow6Simulation.clip_box"><code class="xref py py-meth docutils literal notranslate"><span class="pre">imod.mf6.Modflow6Simulation.clip_box()</span></code></a></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">x_min</span></code>, <code class="docutils literal notranslate"><span class="pre">x_max</span></code>, <code class="docutils literal notranslate"><span class="pre">y_min</span></code>, <code class="docutils literal notranslate"><span class="pre">y_max</span></code></p></td>
+</tr>
+<tr class="row-odd"><th class="stub"><p>CELLSIZE</p></th>
+<td><p>Specify a cell size to be used</p></td>
+<td><p><a class="reference internal" href="../api/generated/mf6/imod.mf6.Modflow6Simulation.regrid_like.html#imod.mf6.Modflow6Simulation.regrid_like" title="imod.mf6.Modflow6Simulation.regrid_like"><code class="xref py py-meth docutils literal notranslate"><span class="pre">imod.mf6.Modflow6Simulation.regrid_like()</span></code></a></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">target_grid</span></code></p></td>
+</tr>
+<tr class="row-even"><th class="stub"><p>APPLYCHD</p></th>
+<td><p>Specify APPLYCHD=1 to insert constant head boundary conditions around the model</p></td>
+<td><p><a class="reference internal" href="../api/generated/mf6/imod.mf6.Modflow6Simulation.clip_box.html#imod.mf6.Modflow6Simulation.clip_box" title="imod.mf6.Modflow6Simulation.clip_box"><code class="xref py py-meth docutils literal notranslate"><span class="pre">imod.mf6.Modflow6Simulation.clip_box()</span></code></a></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">states_for_boundary</span></code></p></td>
+</tr>
+<tr class="row-odd"><th class="stub"><p>MIXELM</p></th>
+<td><p>Advection scheme</p></td>
+<td><p><a class="reference internal" href="../api/generated/mf6/imod.mf6.AdvectionTVD.html#imod.mf6.AdvectionTVD" title="imod.mf6.AdvectionTVD"><code class="xref py py-class docutils literal notranslate"><span class="pre">imod.mf6.AdvectionTVD</span></code></a>, <a class="reference internal" href="../api/generated/mf6/imod.mf6.AdvectionUpstream.html#imod.mf6.AdvectionUpstream" title="imod.mf6.AdvectionUpstream"><code class="xref py py-class docutils literal notranslate"><span class="pre">imod.mf6.AdvectionUpstream</span></code></a>, <a class="reference internal" href="../api/generated/mf6/imod.mf6.AdvectionCentral.html#imod.mf6.AdvectionCentral" title="imod.mf6.AdvectionCentral"><code class="xref py py-class docutils literal notranslate"><span class="pre">imod.mf6.AdvectionCentral</span></code></a></p></td>
+<td></td>
+</tr>
+<tr class="row-even"><th class="stub"><p>NADVFD</p></th>
+<td><p>Weighting scheme Finite-difference</p></td>
+<td><p><a class="reference internal" href="../api/generated/mf6/imod.mf6.AdvectionUpstream.html#imod.mf6.AdvectionUpstream" title="imod.mf6.AdvectionUpstream"><code class="xref py py-class docutils literal notranslate"><span class="pre">imod.mf6.AdvectionUpstream</span></code></a>, <a class="reference internal" href="../api/generated/mf6/imod.mf6.AdvectionCentral.html#imod.mf6.AdvectionCentral" title="imod.mf6.AdvectionCentral"><code class="xref py py-class docutils literal notranslate"><span class="pre">imod.mf6.AdvectionCentral</span></code></a></p></td>
+<td></td>
+</tr>
+<tr class="row-odd"><th class="stub"><p>ISOLVE</p></th>
+<td><p>Start a simulation after generating a RUNFILE or NAMFILE</p></td>
+<td><p><a class="reference internal" href="../api/generated/mf6/imod.mf6.Modflow6Simulation.run.html#imod.mf6.Modflow6Simulation.run" title="imod.mf6.Modflow6Simulation.run"><code class="xref py py-meth docutils literal notranslate"><span class="pre">imod.mf6.Modflow6Simulation.run()</span></code></a></p></td>
+<td></td>
+</tr>
+<tr class="row-even"><th class="stub"><p>MODFLOW6</p></th>
+<td><p>MODFLOW 6 executable</p></td>
+<td><p><a class="reference internal" href="../api/generated/mf6/imod.mf6.Modflow6Simulation.run.html#imod.mf6.Modflow6Simulation.run" title="imod.mf6.Modflow6Simulation.run"><code class="xref py py-meth docutils literal notranslate"><span class="pre">imod.mf6.Modflow6Simulation.run()</span></code></a></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">mf6path</span></code></p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<p>Some settings previously configurable in iMOD5 are fixed in iMOD Python:</p>
+<div class="pst-scrollable-table-container"><table class="table">
+<colgroup>
+<col style="width: 11.1%" />
+<col style="width: 44.4%" />
+<col style="width: 44.4%" />
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head stub"><p>BATCH argument</p></th>
+<th class="head"><p>description</p></th>
+<th class="head"><p>iMOD Python</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><th class="stub"><p>ICONSISTENCY=1 &amp; MINTHICKNESS=0.0</p></th>
+<td><p>Correct layer thickness of <code class="docutils literal notranslate"><span class="pre">=&lt;</span> <span class="pre">MINTHICKNESS</span></code> automatically. This fixed setting combination is also enforced by iMOD5 for MODFLOW6 models</p></td>
+<td><p><a class="reference internal" href="../api/generated/mf6/imod.mf6.StructuredDiscretization.from_imod5_data.html#imod.mf6.StructuredDiscretization.from_imod5_data" title="imod.mf6.StructuredDiscretization.from_imod5_data"><code class="xref py py-meth docutils literal notranslate"><span class="pre">DIS.from_imod5_data</span></code></a></p></td>
+</tr>
+<tr class="row-odd"><th class="stub"><p>SSYSTEM=0</p></th>
+<td><p>Aggregating packages of the same type together is not supported yet in iMOD Python.</p></td>
+<td></td>
+</tr>
+<tr class="row-even"><th class="stub"><p>ICONCHK=0</p></th>
+<td><p>Correct drainage levels automatically during simulation. ICONCHK=0 is also enforced by iMOD5 for MODFLOW6 models and is not supported in iMOD Python.</p></td>
+<td></td>
+</tr>
+<tr class="row-odd"><th class="stub"><p>DWEL=1</p></th>
+<td><p>Overrule any intermediate dates specfied for the WEL package in the PRJ file.</p></td>
+<td><p><a class="reference internal" href="../api/generated/mf6/imod.mf6.Well.from_imod5_data.html#imod.mf6.Well.from_imod5_data" title="imod.mf6.Well.from_imod5_data"><code class="xref py py-meth docutils literal notranslate"><span class="pre">WEL.from_imod5_data</span></code></a></p></td>
+</tr>
+</tbody>
+</table>
+</div>
+</section>
+<section id="gensnaptogrid">
+<h3>GENSNAPTOGRID<a class="headerlink" href="#gensnaptogrid" title="Link to this heading">#</a></h3>
+<p>The GENSNAPTOGRID function can be used to rasterize a GEN file for a given
+raster. See
+<a class="reference internal" href="../api/generated/mf6/imod.mf6.SingleLayerHorizontalFlowBarrierResistance.snap_to_grid.html#imod.mf6.SingleLayerHorizontalFlowBarrierResistance.snap_to_grid" title="imod.mf6.SingleLayerHorizontalFlowBarrierResistance.snap_to_grid"><code class="xref py py-meth docutils literal notranslate"><span class="pre">imod.mf6.SingleLayerHorizontalFlowBarrierResistance.snap_to_grid()</span></code></a> and
+<a class="reference internal" href="../api/generated/mf6/imod.mf6.HorizontalFlowBarrierResistance.snap_to_grid.html#imod.mf6.HorizontalFlowBarrierResistance.snap_to_grid" title="imod.mf6.HorizontalFlowBarrierResistance.snap_to_grid"><code class="xref py py-meth docutils literal notranslate"><span class="pre">imod.mf6.HorizontalFlowBarrierResistance.snap_to_grid()</span></code></a> to snap lines to
+the grid. The table below lists pointers to the functions and arguments that can
+be used to achieve full feature parity with the iMOD5 BATCH function.</p>
+<div class="pst-scrollable-table-container"><table class="table">
+<colgroup>
+<col style="width: 7.7%" />
+<col style="width: 30.8%" />
+<col style="width: 30.8%" />
+<col style="width: 30.8%" />
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head stub"><p>BATCH argument</p></th>
+<th class="head"><p>description</p></th>
+<th class="head"><p>iMOD Python</p></th>
+<th class="head"><p>argument</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><th class="stub"><p>GENFILE_IN</p></th>
+<td><p>Name of a GEN file that needs to be snapped to the grid</p></td>
+<td><p><a class="reference internal" href="../api/generated/mf6/imod.mf6.SingleLayerHorizontalFlowBarrierResistance.from_imod5_data.html#imod.mf6.SingleLayerHorizontalFlowBarrierResistance.from_imod5_data" title="imod.mf6.SingleLayerHorizontalFlowBarrierResistance.from_imod5_data"><code class="xref py py-meth docutils literal notranslate"><span class="pre">HFB.from_imod5_data</span></code></a>, <a class="reference internal" href="../api/generated/io/imod.formats.gen.read.html#imod.formats.gen.read" title="imod.formats.gen.read"><code class="xref py py-func docutils literal notranslate"><span class="pre">imod.formats.gen.read()</span></code></a></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">path</span></code></p></td>
+</tr>
+<tr class="row-odd"><th class="stub"><p>GENFILE_OUT</p></th>
+<td><p>Name of a GEN file that will be created</p></td>
+<td><p><a class="reference internal" href="../api/generated/io/imod.formats.gen.write.html#imod.formats.gen.write" title="imod.formats.gen.write"><code class="xref py py-func docutils literal notranslate"><span class="pre">imod.formats.gen.write()</span></code></a></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">path</span></code></p></td>
+</tr>
+<tr class="row-even"><th class="stub"><p>IDFFILE</p></th>
+<td><p>Name of an IDF file that will be used to snap the GEN file to</p></td>
+<td><p><a class="reference internal" href="../api/generated/io/imod.formats.idf.open.html#imod.formats.idf.open" title="imod.formats.idf.open"><code class="xref py py-func docutils literal notranslate"><span class="pre">imod.formats.idf.open()</span></code></a></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">path</span></code></p></td>
+</tr>
+<tr class="row-odd"><th class="stub"><p>WINDOW</p></th>
+<td><p>Enter the coordinates of the window that need to be computed solely</p></td>
+<td><p><a class="reference internal" href="../api/generated/mf6/imod.mf6.SingleLayerHorizontalFlowBarrierResistance.snap_to_grid.html#imod.mf6.SingleLayerHorizontalFlowBarrierResistance.snap_to_grid" title="imod.mf6.SingleLayerHorizontalFlowBarrierResistance.snap_to_grid"><code class="xref py py-meth docutils literal notranslate"><span class="pre">HFB.snap_to_grid</span></code></a></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">dis</span></code></p></td>
+</tr>
+<tr class="row-even"><th class="stub"><p>CELLSIZE</p></th>
+<td><p>Specify a cell size to be used</p></td>
+<td><p><a class="reference internal" href="../api/generated/util/imod.util.empty_2d.html#imod.util.empty_2d" title="imod.util.empty_2d"><code class="xref py py-func docutils literal notranslate"><span class="pre">imod.util.empty_2d()</span></code></a></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">dx</span></code>, <code class="docutils literal notranslate"><span class="pre">dy</span></code></p></td>
+</tr>
+<tr class="row-odd"><th class="stub"><p>I3D</p></th>
+<td><p>Specify whether the GEN file needs to be transformed to 3D (a vertical polygon)</p></td>
+<td><p><a class="reference internal" href="../api/generated/mf6/imod.mf6.HorizontalFlowBarrierResistance.html#imod.mf6.HorizontalFlowBarrierResistance" title="imod.mf6.HorizontalFlowBarrierResistance"><code class="xref py py-class docutils literal notranslate"><span class="pre">3D</span> <span class="pre">HFB</span></code></a></p></td>
+<td></td>
+</tr>
+<tr class="row-even"><th class="stub"><p>IDF_TOP</p></th>
+<td><p>The uppermost values of the snapped vertical polygon</p></td>
+<td><p><a class="reference internal" href="../api/generated/prepare/imod.prepare.linestring_to_square_zpolygons.html#imod.prepare.linestring_to_square_zpolygons" title="imod.prepare.linestring_to_square_zpolygons"><code class="xref py py-func docutils literal notranslate"><span class="pre">linestring_to_square_zpolygons</span></code></a></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">barrier_ztop</span></code></p></td>
+</tr>
+<tr class="row-odd"><th class="stub"><p>IDF_BOT</p></th>
+<td><p>The lowermost values of the snapped vertical polygon</p></td>
+<td><p><a class="reference internal" href="../api/generated/prepare/imod.prepare.linestring_to_square_zpolygons.html#imod.prepare.linestring_to_square_zpolygons" title="imod.prepare.linestring_to_square_zpolygons"><code class="xref py py-func docutils literal notranslate"><span class="pre">linestring_to_square_zpolygons</span></code></a></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">barrier_zbot</span></code></p></td>
+</tr>
+</tbody>
+</table>
+</div>
+</section>
+<section id="imodpath">
+<h3>IMODPATH<a class="headerlink" href="#imodpath" title="Link to this heading">#</a></h3>
+<p>The function IMODPATH computes flowlines based on the budget terms that result
+from the iMODFLOW computation. The equivalent functionality in MODFLOW6 is the
+particle tracking (PRT) model. This is currently not supported in iMOD Python.</p>
+</section>
+<section id="isggrid">
+<h3>ISGGRID<a class="headerlink" href="#isggrid" title="Link to this heading">#</a></h3>
+<p>Use this function to rasterize the selected ISG-files into IDF-files that can be
+used by iMODFLOW in a runfile. There currently is no equivalent functionality in
+iMOD Python to read and grid ISG files.</p>
+</section>
+<section id="mf6toidf">
+<h3>MF6TOIDF<a class="headerlink" href="#mf6toidf" title="Link to this heading">#</a></h3>
+<p>Use this post-processing function to convert standard MODFLOW6 output to IDF
+files. The eequivalent functionality in iMOD Python is mostly covered by the
+following functions: <a class="reference internal" href="../api/generated/mf6/imod.mf6.open_hds.html#imod.mf6.open_hds" title="imod.mf6.open_hds"><code class="xref py py-func docutils literal notranslate"><span class="pre">imod.mf6.open_hds()</span></code></a>, <a class="reference internal" href="../api/generated/mf6/imod.mf6.open_cbc.html#imod.mf6.open_cbc" title="imod.mf6.open_cbc"><code class="xref py py-func docutils literal notranslate"><span class="pre">imod.mf6.open_cbc()</span></code></a>,
+<code class="xref py py-meth docutils literal notranslate"><span class="pre">Modflow6Simulation.open_flow_budget()</span></code>,
+<code class="xref py py-meth docutils literal notranslate"><span class="pre">Modflow6Simulation.open_transport_budget()</span></code>,
+<code class="xref py py-meth docutils literal notranslate"><span class="pre">Modflow6Simulation.open_head()</span></code>,
+<code class="xref py py-meth docutils literal notranslate"><span class="pre">Modflow6Simulation.open_concentration()</span></code>. The table below lists pointers to
+the functions and arguments that can be used to achieve full feature parity with
+the iMOD5 BATCH function. You can write the data to IDF files using
+<a class="reference internal" href="../api/generated/io/imod.formats.idf.save.html#imod.formats.idf.save" title="imod.formats.idf.save"><code class="xref py py-func docutils literal notranslate"><span class="pre">imod.formats.idf.save()</span></code></a>.</p>
+<div class="pst-scrollable-table-container"><table class="table">
+<colgroup>
+<col style="width: 7.7%" />
+<col style="width: 30.8%" />
+<col style="width: 30.8%" />
+<col style="width: 30.8%" />
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head stub"><p>BATCH argument</p></th>
+<th class="head"><p>description</p></th>
+<th class="head"><p>iMOD Python</p></th>
+<th class="head"><p>argument</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><th class="stub"><p>ISTEADY</p></th>
+<td><p>Indicates that the first entry in the output file is a steady-state solution</p></td>
+<td></td>
+<td></td>
+</tr>
+<tr class="row-odd"><th class="stub"><p>SDATE</p></th>
+<td><p>The initial date of the model</p></td>
+<td><p><a class="reference internal" href="../api/generated/mf6/imod.mf6.open_hds.html#imod.mf6.open_hds" title="imod.mf6.open_hds"><code class="xref py py-func docutils literal notranslate"><span class="pre">imod.mf6.open_hds()</span></code></a>, <a class="reference internal" href="../api/generated/mf6/imod.mf6.open_cbc.html#imod.mf6.open_cbc" title="imod.mf6.open_cbc"><code class="xref py py-func docutils literal notranslate"><span class="pre">imod.mf6.open_cbc()</span></code></a></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">simulation_start_time</span></code></p></td>
+</tr>
+<tr class="row-even"><th class="stub"><p>DATEFORMAT</p></th>
+<td><p>Enforce a long date format in the produced IDF filename</p></td>
+<td><p><a class="reference internal" href="../api/generated/io/imod.formats.idf.save.html#imod.formats.idf.save" title="imod.formats.idf.save"><code class="xref py py-func docutils literal notranslate"><span class="pre">imod.formats.idf.save()</span></code></a></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">pattern</span></code></p></td>
+</tr>
+<tr class="row-odd"><th class="stub"><p>IDF</p></th>
+<td><p>IDF file used as spatial definition</p></td>
+<td><p><a class="reference internal" href="../api/generated/mf6/imod.mf6.open_hds.html#imod.mf6.open_hds" title="imod.mf6.open_hds"><code class="xref py py-func docutils literal notranslate"><span class="pre">imod.mf6.open_hds()</span></code></a>, <a class="reference internal" href="../api/generated/mf6/imod.mf6.open_cbc.html#imod.mf6.open_cbc" title="imod.mf6.open_cbc"><code class="xref py py-func docutils literal notranslate"><span class="pre">imod.mf6.open_cbc()</span></code></a></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">grb_path</span></code></p></td>
+</tr>
+<tr class="row-even"><th class="stub"><p>GRB</p></th>
+<td><p>GRB file used as spatial definition</p></td>
+<td><p><a class="reference internal" href="../api/generated/mf6/imod.mf6.open_hds.html#imod.mf6.open_hds" title="imod.mf6.open_hds"><code class="xref py py-func docutils literal notranslate"><span class="pre">imod.mf6.open_hds()</span></code></a>, <a class="reference internal" href="../api/generated/mf6/imod.mf6.open_cbc.html#imod.mf6.open_cbc" title="imod.mf6.open_cbc"><code class="xref py py-func docutils literal notranslate"><span class="pre">imod.mf6.open_cbc()</span></code></a></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">grb_path</span></code></p></td>
+</tr>
+<tr class="row-odd"><th class="stub"><p>HED</p></th>
+<td><p>The output file (*.HED) for MODFLOW6 that contains the heads</p></td>
+<td><p><a class="reference internal" href="../api/generated/mf6/imod.mf6.open_hds.html#imod.mf6.open_hds" title="imod.mf6.open_hds"><code class="xref py py-func docutils literal notranslate"><span class="pre">imod.mf6.open_hds()</span></code></a></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">hds_path</span></code></p></td>
+</tr>
+<tr class="row-even"><th class="stub"><p>BDG</p></th>
+<td><p>The output file (*.CBC) for MODFLOW6 that contains the flow budget</p></td>
+<td><p><a class="reference internal" href="../api/generated/mf6/imod.mf6.open_cbc.html#imod.mf6.open_cbc" title="imod.mf6.open_cbc"><code class="xref py py-func docutils literal notranslate"><span class="pre">imod.mf6.open_cbc()</span></code></a></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">cbc_path</span></code></p></td>
+</tr>
+<tr class="row-odd"><th class="stub"><p>BDGUZF</p></th>
+<td><p>The output file (*.CBC) for MODFLOW6 that contains the UZF flow budgets</p></td>
+<td><p><a class="reference internal" href="../api/generated/mf6/imod.mf6.open_cbc.html#imod.mf6.open_cbc" title="imod.mf6.open_cbc"><code class="xref py py-func docutils literal notranslate"><span class="pre">imod.mf6.open_cbc()</span></code></a></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">cbc_path</span></code></p></td>
+</tr>
+<tr class="row-even"><th class="stub"><p>WC_UZF</p></th>
+<td><p>The output file (*.WC) for MODFLOW6 that contains the UZF water content</p></td>
+<td><p><a class="reference internal" href="../api/generated/mf6/imod.mf6.open_dvs.html#imod.mf6.open_dvs" title="imod.mf6.open_dvs"><code class="xref py py-func docutils literal notranslate"><span class="pre">imod.mf6.open_dvs()</span></code></a></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">dvs_path</span></code></p></td>
+</tr>
+<tr class="row-odd"><th class="stub"><p>IDOUBLE</p></th>
+<td><p>Save in double precision</p></td>
+<td><p><a class="reference external" href="https://docs.xarray.dev/en/stable/generated/xarray.DataArray.astype.html">xarray.DataArray.astype</a></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">dtype=np.float32</span></code></p></td>
+</tr>
+<tr class="row-even"><th class="stub"><p>SAVE*</p></th>
+<td><p>Save the results per layer</p></td>
+<td><p><a class="reference external" href="https://docs.xarray.dev/en/stable/generated/xarray.DataArray.sel.html">xarray.DataArray.sel</a></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">layer=[i]</span></code></p></td>
+</tr>
+<tr class="row-odd"><th class="stub"><p>IPHRLVL</p></th>
+<td><p>Save the first active value in the vertical dimension</p></td>
+<td><p><a class="reference internal" href="../api/generated/prepare/imod.prepare.get_upper_active_grid_cells.html#imod.prepare.get_upper_active_grid_cells" title="imod.prepare.get_upper_active_grid_cells"><code class="xref py py-func docutils literal notranslate"><span class="pre">get_upper_active_grid_cells</span></code></a>, <a class="reference internal" href="../api/generated/prepare/imod.prepare.get_upper_active_layer_number.html#imod.prepare.get_upper_active_layer_number" title="imod.prepare.get_upper_active_layer_number"><code class="xref py py-func docutils literal notranslate"><span class="pre">get_upper_active_layer_number</span></code></a></p></td>
+<td></td>
+</tr>
+<tr class="row-even"><th class="stub"><p>IFILLHEAD</p></th>
+<td><p>Fill head values where <code class="docutils literal notranslate"><span class="pre">idomain==-1</span></code></p></td>
+<td><p><a class="reference internal" href="../api/generated/prepare/imod.prepare.fill.html#imod.prepare.fill" title="imod.prepare.fill"><code class="xref py py-func docutils literal notranslate"><span class="pre">imod.prepare.fill()</span></code></a></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">dims='layer'</span></code></p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<p>Some settings previously configurable in iMOD5 are fixed in iMOD Python:</p>
+<div class="pst-scrollable-table-container"><table class="table">
+<thead>
+<tr class="row-odd"><th class="head stub"><p>BATCH argument</p></th>
+<th class="head"><p>description</p></th>
+<th class="head"><p>iMOD Python</p></th>
+<th class="head"></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><th class="stub"><p>ISAVEENDDATE=1</p></th>
+<td><p>Set time stamp to match the end of each time step</p></td>
+<td><p><a class="reference internal" href="../api/generated/mf6/imod.mf6.open_hds.html#imod.mf6.open_hds" title="imod.mf6.open_hds"><code class="xref py py-func docutils literal notranslate"><span class="pre">imod.mf6.open_hds()</span></code></a></p></td>
+<td></td>
+</tr>
+</tbody>
+</table>
+</div>
+</section>
+<section id="gxg">
+<h3>GXG<a class="headerlink" href="#gxg" title="Link to this heading">#</a></h3>
+<p>Computes the GXG values, this is an indicator used in the Netherlands to
+indicate the seasonal variation of the groundwater head. You can compute the GXG
+values using the <a class="reference internal" href="../api/generated/evaluate/imod.evaluate.calculate_gxg.html#imod.evaluate.calculate_gxg" title="imod.evaluate.calculate_gxg"><code class="xref py py-func docutils literal notranslate"><span class="pre">imod.evaluate.calculate_gxg()</span></code></a> function. The table below
+lists pointers to the functions and arguments that can be used to achieve full
+feature parity with the iMOD5 BATCH function. See the API examples in
+<a class="reference internal" href="../api/generated/evaluate/imod.evaluate.calculate_gxg.html#imod.evaluate.calculate_gxg" title="imod.evaluate.calculate_gxg"><code class="xref py py-func docutils literal notranslate"><span class="pre">imod.evaluate.calculate_gxg()</span></code></a> how to do similar things as with the GXG
+function in iMOD5.</p>
+<div class="pst-scrollable-table-container"><table class="table">
+<thead>
+<tr class="row-odd"><th class="head stub"><p>BATCH argument</p></th>
+<th class="head"><p>description</p></th>
+<th class="head"><p>iMOD Python</p></th>
+<th class="head"><p>argument</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><th class="stub"><p>ILAYER</p></th>
+<td><p>Layers numbers to be used in the GxG computation</p></td>
+<td><p><a class="reference external" href="https://docs.xarray.dev/en/stable/generated/xarray.DataArray.sel.html">xarray.DataArray.sel</a></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">layer=[i]</span></code></p></td>
+</tr>
+<tr class="row-odd"><th class="stub"><p>NDIR</p></th>
+<td><p>Number of folders to be processed</p></td>
+<td><p>unnecessary in iMOD Python</p></td>
+<td></td>
+</tr>
+<tr class="row-even"><th class="stub"><p>SOURCEDIR</p></th>
+<td><p>The folder and first part of the file name for all files that need to be used</p></td>
+<td><p><a class="reference internal" href="../api/generated/io/imod.formats.idf.open.html#imod.formats.idf.open" title="imod.formats.idf.open"><code class="xref py py-func docutils literal notranslate"><span class="pre">imod.formats.idf.open()</span></code></a></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">pattern</span></code></p></td>
+</tr>
+<tr class="row-odd"><th class="stub"><p>OUTPUTFOLDER</p></th>
+<td><p>The folder where the output files need to be written</p></td>
+<td><p><a class="reference internal" href="../api/generated/io/imod.formats.idf.save.html#imod.formats.idf.save" title="imod.formats.idf.save"><code class="xref py py-func docutils literal notranslate"><span class="pre">imod.formats.idf.save()</span></code></a></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">directory</span></code></p></td>
+</tr>
+<tr class="row-even"><th class="stub"><p>SURFACEIDF</p></th>
+<td><p>The IDF file that contains the surface elevation, if absent GXG is computed their reference</p></td>
+<td><p><a class="reference internal" href="../api/generated/evaluate/imod.evaluate.calculate_gxg.html#imod.evaluate.calculate_gxg" title="imod.evaluate.calculate_gxg"><code class="xref py py-func docutils literal notranslate"><span class="pre">calculate_gxg</span></code></a></p></td>
+<td><p>see API examples</p></td>
+</tr>
+<tr class="row-odd"><th class="stub"><p>SYEAR</p></th>
+<td><p>The start year (yyyy) for which IDF-files are used</p></td>
+<td><p><a class="reference external" href="https://docs.xarray.dev/en/stable/generated/xarray.DataArray.sel.html">xarray.DataArray.sel</a></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">time=...</span></code></p></td>
+</tr>
+<tr class="row-even"><th class="stub"><p>EYEAR</p></th>
+<td><p>The end year (yyyy) for which IDF-files are used</p></td>
+<td><p><a class="reference external" href="https://docs.xarray.dev/en/stable/generated/xarray.DataArray.sel.html">xarray.DataArray.sel</a></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">time=...</span></code></p></td>
+</tr>
+<tr class="row-odd"><th class="stub"><p>IYEAR</p></th>
+<td><p>The year (yyyy) for which the GXG values need to be computed</p></td>
+<td><p><a class="reference external" href="https://docs.xarray.dev/en/stable/generated/xarray.DataArray.sel.html">xarray.DataArray.sel</a></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">time=...</span></code></p></td>
+</tr>
+<tr class="row-even"><th class="stub"><p>STARTMONTH</p></th>
+<td><p>The start month from the which the hydrological year starts</p></td>
+<td><p><a class="reference external" href="https://docs.xarray.dev/en/stable/generated/xarray.DataArray.sel.html">xarray.DataArray.sel</a></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">time=...</span></code></p></td>
+</tr>
+<tr class="row-odd"><th class="stub"><p>IPERIOD</p></th>
+<td><p>Enter two integers for each month to express the inclusion of the first and second day of that particular month in the GXG computation</p></td>
+<td><p><a class="reference external" href="https://docs.xarray.dev/en/stable/generated/xarray.DataArray.sel.html">xarray.DataArray.sel</a></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">time=...</span></code></p></td>
+</tr>
+<tr class="row-even"><th class="stub"><p>GENFILE</p></th>
+<td><p>Enter a GEN-filename for polygon(s) for which mean values need to be computed</p></td>
+<td><p><a class="reference internal" href="../api/generated/prepare/imod.prepare.zonal_aggregate_raster.html#imod.prepare.zonal_aggregate_raster" title="imod.prepare.zonal_aggregate_raster"><code class="xref py py-func docutils literal notranslate"><span class="pre">zonal_aggregate_raster</span></code></a></p></td>
+<td></td>
+</tr>
+<tr class="row-odd"><th class="stub"><p>IDFNAME</p></th>
+<td><p>Cells in the IDF-file that are not equal to the NoDataValue of that IDF-file, the GXG will be computed.</p></td>
+<td><p><a class="reference external" href="https://docs.xarray.dev/en/stable/generated/xarray.DataArray.where.html">xarray.DataArray.where</a></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">cond=idfdata.notnull()</span></code></p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<p>Some settings previously configurable in iMOD5 are fixed in iMOD Python:</p>
+<div class="pst-scrollable-table-container"><table class="table">
+<colgroup>
+<col style="width: 11.1%" />
+<col style="width: 44.4%" />
+<col style="width: 44.4%" />
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head stub"><p>BATCH argument</p></th>
+<th class="head"><p>description</p></th>
+<th class="head"><p>iMOD Python</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><th class="stub"><p>FIRSTDAY=14</p></th>
+<td><p>First day in a month to include in the computation of the GXG</p></td>
+<td><p><a class="reference internal" href="../api/generated/evaluate/imod.evaluate.calculate_gxg.html#imod.evaluate.calculate_gxg" title="imod.evaluate.calculate_gxg"><code class="xref py py-func docutils literal notranslate"><span class="pre">imod.evaluate.calculate_gxg()</span></code></a></p></td>
+</tr>
+<tr class="row-odd"><th class="stub"><p>SECONDARY=28</p></th>
+<td><p>Second day in a month to include in the computation of the GXG</p></td>
+<td><p><a class="reference internal" href="../api/generated/evaluate/imod.evaluate.calculate_gxg.html#imod.evaluate.calculate_gxg" title="imod.evaluate.calculate_gxg"><code class="xref py py-func docutils literal notranslate"><span class="pre">imod.evaluate.calculate_gxg()</span></code></a></p></td>
+</tr>
+<tr class="row-even"><th class="stub"><p>ISEL=1</p></th>
+<td><p>All active cells are used in the computation of the GXG</p></td>
+<td><p><a class="reference internal" href="../api/generated/evaluate/imod.evaluate.calculate_gxg.html#imod.evaluate.calculate_gxg" title="imod.evaluate.calculate_gxg"><code class="xref py py-func docutils literal notranslate"><span class="pre">imod.evaluate.calculate_gxg()</span></code></a></p></td>
+</tr>
+</tbody>
+</table>
+</div>
+</section>
+<section id="mkwellipf">
+<h3>MKWELLIPF<a class="headerlink" href="#mkwellipf" title="Link to this heading">#</a></h3>
+<p>The MKWELLIPF function computes the extraction strength for each well based on a
+weighed value according to their length and permeability of the penetrated model
+layer. Most of this functionality is implemented in iMOD Python’s
+<a class="reference internal" href="../api/generated/prepare/imod.prepare.assign_wells.html#imod.prepare.assign_wells" title="imod.prepare.assign_wells"><code class="xref py py-func docutils literal notranslate"><span class="pre">assign_wells</span></code></a>. Note: The function computes rates for
+each timestep in a timeseries, instead of averaging them. This function is also
+called when running <a class="reference internal" href="../api/generated/mf6/imod.mf6.Well.to_mf6_pkg.html#imod.mf6.Well.to_mf6_pkg" title="imod.mf6.Well.to_mf6_pkg"><code class="xref py py-meth docutils literal notranslate"><span class="pre">imod.mf6.Well.to_mf6_pkg()</span></code></a> and
+<a class="reference internal" href="../api/generated/mf6/imod.mf6.LayeredWell.to_mf6_pkg.html#imod.mf6.LayeredWell.to_mf6_pkg" title="imod.mf6.LayeredWell.to_mf6_pkg"><code class="xref py py-meth docutils literal notranslate"><span class="pre">imod.mf6.LayeredWell.to_mf6_pkg()</span></code></a>. The table below lists pointers to the
+functions and arguments that can be used to achieve full feature parity with the
+iMOD5 BATCH function.</p>
+<div class="pst-scrollable-table-container"><table class="table">
+<colgroup>
+<col style="width: 7.7%" />
+<col style="width: 30.8%" />
+<col style="width: 30.8%" />
+<col style="width: 30.8%" />
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head stub"><p>BATCH argument</p></th>
+<th class="head"><p>description</p></th>
+<th class="head"><p>iMOD Python</p></th>
+<th class="head"><p>argument</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><th class="stub"><p>NIPF</p></th>
+<td><p>Number of IPF files to be processed</p></td>
+<td><p>unnecessary in iMOD Python</p></td>
+<td></td>
+</tr>
+<tr class="row-odd"><th class="stub"><p>IPF{i}</p></th>
+<td><p>Name of the ith IPF file</p></td>
+<td><p><a class="reference internal" href="../api/generated/io/imod.formats.ipf.read.html#imod.formats.ipf.read" title="imod.formats.ipf.read"><code class="xref py py-func docutils literal notranslate"><span class="pre">imod.formats.ipf.read()</span></code></a></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">path</span></code></p></td>
+</tr>
+<tr class="row-even"><th class="stub"><p>IXCOL</p></th>
+<td><p>Column number of the x-coordinate</p></td>
+<td><p><a class="reference internal" href="../api/generated/prepare/imod.prepare.assign_wells.html#imod.prepare.assign_wells" title="imod.prepare.assign_wells"><code class="xref py py-func docutils literal notranslate"><span class="pre">assign_wells</span></code></a></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">dataframe[&quot;x&quot;]</span></code></p></td>
+</tr>
+<tr class="row-odd"><th class="stub"><p>IYCOL</p></th>
+<td><p>Column number of the y-coordinate</p></td>
+<td><p><a class="reference internal" href="../api/generated/prepare/imod.prepare.assign_wells.html#imod.prepare.assign_wells" title="imod.prepare.assign_wells"><code class="xref py py-func docutils literal notranslate"><span class="pre">assign_wells</span></code></a></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">dataframe[&quot;y&quot;]</span></code></p></td>
+</tr>
+<tr class="row-even"><th class="stub"><p>IQCOL</p></th>
+<td><p>Column number of the well extraction rate</p></td>
+<td><p><a class="reference internal" href="../api/generated/prepare/imod.prepare.assign_wells.html#imod.prepare.assign_wells" title="imod.prepare.assign_wells"><code class="xref py py-func docutils literal notranslate"><span class="pre">assign_wells</span></code></a></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">dataframe[&quot;rate&quot;]</span></code></p></td>
+</tr>
+<tr class="row-odd"><th class="stub"><p>ITCOL</p></th>
+<td><p>Column number of the well filter top</p></td>
+<td><p><a class="reference internal" href="../api/generated/prepare/imod.prepare.assign_wells.html#imod.prepare.assign_wells" title="imod.prepare.assign_wells"><code class="xref py py-func docutils literal notranslate"><span class="pre">assign_wells</span></code></a></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">dataframe[&quot;top&quot;]</span></code></p></td>
+</tr>
+<tr class="row-even"><th class="stub"><p>IBCOL</p></th>
+<td><p>Column number of the well filter bottom</p></td>
+<td><p><a class="reference internal" href="../api/generated/prepare/imod.prepare.assign_wells.html#imod.prepare.assign_wells" title="imod.prepare.assign_wells"><code class="xref py py-func docutils literal notranslate"><span class="pre">assign_wells</span></code></a></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">dataframe[&quot;bottom&quot;]</span></code></p></td>
+</tr>
+<tr class="row-odd"><th class="stub"><p>ISS</p></th>
+<td><p>Whether rates need to be averaged for a specific time instead of the complete time series</p></td>
+<td></td>
+<td></td>
+</tr>
+<tr class="row-even"><th class="stub"><p>SDATE</p></th>
+<td><p>The start date to be averaged</p></td>
+<td><p><a class="reference external" href="https://pandas.pydata.org/pandas-docs/stable/reference/api/pandas.DataFrame.loc.html">pd.DataFrame.loc</a></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">dataframe.loc[</span> <span class="pre">dataframe[&quot;time&quot;]</span> <span class="pre">&gt;=</span> <span class="pre">start_time]</span></code></p></td>
+</tr>
+<tr class="row-odd"><th class="stub"><p>EDATE</p></th>
+<td><p>The end date to be averaged</p></td>
+<td><p><a class="reference external" href="https://pandas.pydata.org/pandas-docs/stable/reference/api/pandas.DataFrame.loc.html">pd.DataFrame.loc</a></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">dataframe.loc[</span> <span class="pre">dataframe[&quot;time&quot;]</span> <span class="pre">&lt;=</span> <span class="pre">start_time]</span></code></p></td>
+</tr>
+<tr class="row-even"><th class="stub"><p>HNODATA</p></th>
+<td><p>NoDataValue for the extraction rate</p></td>
+<td><p><a class="reference external" href="https://pandas.pydata.org/pandas-docs/stable/reference/api/pandas.DataFrame.loc.html">pd.DataFrame.loc</a></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">dataframe.loc[</span> <span class="pre">dataframe[&quot;rate&quot;]</span> <span class="pre">!=</span> <span class="pre">nodata_value]</span></code></p></td>
+</tr>
+<tr class="row-odd"><th class="stub"><p>NLAY</p></th>
+<td><p>Number of layers from which wells may be organized</p></td>
+<td><p>unnecessary in iMOD Python</p></td>
+<td></td>
+</tr>
+<tr class="row-even"><th class="stub"><p>TOPIDF{i}</p></th>
+<td><p>Name of the ith IDF file that contains the top layer</p></td>
+<td><p><a class="reference internal" href="../api/generated/prepare/imod.prepare.assign_wells.html#imod.prepare.assign_wells" title="imod.prepare.assign_wells"><code class="xref py py-func docutils literal notranslate"><span class="pre">assign_wells</span></code></a></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">top</span></code></p></td>
+</tr>
+<tr class="row-odd"><th class="stub"><p>BOTIDF{i}</p></th>
+<td><p>Name of the ith IDF file that contains the top layer</p></td>
+<td><p><a class="reference internal" href="../api/generated/prepare/imod.prepare.assign_wells.html#imod.prepare.assign_wells" title="imod.prepare.assign_wells"><code class="xref py py-func docutils literal notranslate"><span class="pre">assign_wells</span></code></a></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">bottom</span></code></p></td>
+</tr>
+<tr class="row-even"><th class="stub"><p>KHKVIDF{i}</p></th>
+<td><p>Name of the ith IDF file that contains the horizontal permeability</p></td>
+<td><p><a class="reference internal" href="../api/generated/prepare/imod.prepare.assign_wells.html#imod.prepare.assign_wells" title="imod.prepare.assign_wells"><code class="xref py py-func docutils literal notranslate"><span class="pre">assign_wells</span></code></a></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">k</span></code></p></td>
+</tr>
+<tr class="row-odd"><th class="stub"><p>KDVIDF{i}</p></th>
+<td><p>Name of the ith IDF file that contains the transmissivity</p></td>
+<td><p>not applicable for MODFLOW 6</p></td>
+<td></td>
+</tr>
+<tr class="row-even"><th class="stub"><p>MINKHT</p></th>
+<td><p>Minimal horizontal permeability that will receive a well</p></td>
+<td><p><a class="reference internal" href="../api/generated/prepare/imod.prepare.assign_wells.html#imod.prepare.assign_wells" title="imod.prepare.assign_wells"><code class="xref py py-func docutils literal notranslate"><span class="pre">assign_wells</span></code></a></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">minimum_k</span></code></p></td>
+</tr>
+<tr class="row-odd"><th class="stub"><p>MINKD</p></th>
+<td><p>Minimal transmissivity that will receive a well</p></td>
+<td><p>not applicable for MODFLOW 6</p></td>
+<td></td>
+</tr>
+<tr class="row-even"><th class="stub"><p>FNODATA</p></th>
+<td><p>NoDataValue for the top and bottom of the well screen (ITCOL and IBCOL)</p></td>
+<td><p><a class="reference external" href="https://pandas.pydata.org/pandas-docs/stable/reference/api/pandas.DataFrame.loc.html">pd.DataFrame.loc</a></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">dataframe.loc[</span> <span class="pre">dataframe[&quot;top&quot;]</span> <span class="pre">!=</span> <span class="pre">fnodata]</span></code></p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<p>Some settings previously configurable in iMOD5 are fixed in iMOD Python:</p>
+<div class="pst-scrollable-table-container"><table class="table">
+<thead>
+<tr class="row-odd"><th class="head stub"><p>BATCH argument</p></th>
+<th class="head"><p>description</p></th>
+<th class="head"><p>iMOD Python</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><th class="stub"><p>IMIDF=0</p></th>
+<td><p>How to compute midpoints of well screens when either top or bottom is missing</p></td>
+<td><p><a class="reference internal" href="../api/generated/prepare/imod.prepare.assign_wells.html#imod.prepare.assign_wells" title="imod.prepare.assign_wells"><code class="xref py py-func docutils literal notranslate"><span class="pre">assign_wells</span></code></a></p></td>
+</tr>
+</tbody>
+</table>
+</div>
+</section>
+<section id="genpuzzle">
+<h3>GENPUZZLE<a class="headerlink" href="#genpuzzle" title="Link to this heading">#</a></h3>
+<p>The GENPUZZLE function reads a GEN file and creates a new GEN-file in which all
+loose-ends are connected to form a continuous segment. This can be done with the
+<a class="reference external" href="https://geopandas.org/en/latest/docs/reference/api/geopandas.GeoSeries.line_merge.html">line_merge function in geopandas.</a></p>
+<div class="pst-scrollable-table-container"><table class="table">
+<thead>
+<tr class="row-odd"><th class="head stub"><p>BATCH argument</p></th>
+<th class="head"><p>description</p></th>
+<th class="head"><p>iMOD Python</p></th>
+<th class="head"><p>argument</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><th class="stub"><p>GENFILE_IN</p></th>
+<td><p>Give a GEN file containing x and y coordinates of GEN segments</p></td>
+<td><p><a class="reference internal" href="../api/generated/io/imod.formats.gen.read.html#imod.formats.gen.read" title="imod.formats.gen.read"><code class="xref py py-func docutils literal notranslate"><span class="pre">imod.formats.gen.read()</span></code></a></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">path</span></code></p></td>
+</tr>
+<tr class="row-odd"><th class="stub"><p>GENFILE_OUT</p></th>
+<td><p>Specify the output GEN file</p></td>
+<td><p><a class="reference internal" href="../api/generated/io/imod.formats.gen.write.html#imod.formats.gen.write" title="imod.formats.gen.write"><code class="xref py py-func docutils literal notranslate"><span class="pre">imod.formats.gen.write()</span></code></a></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">path</span></code></p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<p>Some settings previously configurable in iMOD5 are fixed in iMOD Python:</p>
+<div class="pst-scrollable-table-container"><table class="table">
+<thead>
+<tr class="row-odd"><th class="head stub"><p>BATCH argument</p></th>
+<th class="head"><p>description</p></th>
+<th class="head"><p>iMOD Python</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><th class="stub"><p>IBINARY</p></th>
+<td><p>Enforce GENFILE_OUT to be binary at all times</p></td>
+<td><p><a class="reference internal" href="../api/generated/io/imod.formats.gen.write.html#imod.formats.gen.write" title="imod.formats.gen.write"><code class="xref py py-func docutils literal notranslate"><span class="pre">imod.formats.gen.write()</span></code></a></p></td>
+</tr>
+</tbody>
+</table>
+</div>
+</section>
+<section id="idfscale">
+<h3>IDFSCALE<a class="headerlink" href="#idfscale" title="Link to this heading">#</a></h3>
+<p>Rescale IDF-files according to different methodologies. This functionality is
+implemented in iMOD Python for MODFLOW 6 simulations
+<a class="reference internal" href="../api/generated/mf6/imod.mf6.Modflow6Simulation.regrid_like.html#imod.mf6.Modflow6Simulation.regrid_like" title="imod.mf6.Modflow6Simulation.regrid_like"><code class="xref py py-meth docutils literal notranslate"><span class="pre">imod.mf6.Modflow6Simulation.regrid_like()</span></code></a>. This automatically selects
+default values for different packages. An overview of these is presented in
+<a class="reference internal" href="../user-guide/08-regridding.html"><span class="doc">Regridding</span></a>. For individual grids, you can <a class="reference external" href="https://deltares.github.io/xugrid/examples/regridder_overview.html">call the
+regridding functionality xugrid</a>, which
+also works for structured grids, like saved in IDF files. Multiple methods are
+available to upscale and downscale models. As upscaling methods SCLTYPE_UP 1 to
+10 method are supported. The table below lists pointers to the functions and
+arguments that can be used to achieve full feature parity with the iMOD5 BATCH
+function.</p>
+<div class="pst-scrollable-table-container"><table class="table">
+<thead>
+<tr class="row-odd"><th class="head stub"><p>BATCH argument</p></th>
+<th class="head"><p>description</p></th>
+<th class="head"><p>iMOD Python</p></th>
+<th class="head"><p>argument</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><th class="stub"><p>SCALESIZE</p></th>
+<td><p>Cell size of the upscaled or downscaled IDF-file</p></td>
+<td><p><a class="reference internal" href="../api/generated/util/imod.util.empty_2d.html#imod.util.empty_2d" title="imod.util.empty_2d"><code class="xref py py-func docutils literal notranslate"><span class="pre">imod.util.empty_2d()</span></code></a></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">dx</span></code>, <code class="docutils literal notranslate"><span class="pre">dy</span></code></p></td>
+</tr>
+<tr class="row-odd"><th class="stub"><p>SCLTYPE_UP</p></th>
+<td><p>Method to upscale data</p></td>
+<td><p>e.g. <a class="reference internal" href="../api/generated/mf6/imod.mf6.NodePropertyFlow.regrid_like.html#imod.mf6.NodePropertyFlow.regrid_like" title="imod.mf6.NodePropertyFlow.regrid_like"><code class="xref py py-meth docutils literal notranslate"><span class="pre">NPF.regrid_like</span></code></a></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">regridder_types</span></code></p></td>
+</tr>
+<tr class="row-even"><th class="stub"><p>SCLTYPE_DOWN</p></th>
+<td><p>Method to downscale data</p></td>
+<td><p>e.g. <a class="reference internal" href="../api/generated/mf6/imod.mf6.NodePropertyFlow.regrid_like.html#imod.mf6.NodePropertyFlow.regrid_like" title="imod.mf6.NodePropertyFlow.regrid_like"><code class="xref py py-meth docutils literal notranslate"><span class="pre">NPF.regrid_like</span></code></a></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">regridder_types</span></code></p></td>
+</tr>
+<tr class="row-odd"><th class="stub"><p>SOURCEIDF</p></th>
+<td><p>IDF file that needs to be rescaled</p></td>
+<td><p><a class="reference internal" href="../api/generated/io/imod.formats.idf.open.html#imod.formats.idf.open" title="imod.formats.idf.open"><code class="xref py py-func docutils literal notranslate"><span class="pre">imod.formats.idf.open()</span></code></a></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">path</span></code></p></td>
+</tr>
+<tr class="row-even"><th class="stub"><p>OUTFILE</p></th>
+<td><p>IDF file that will be created</p></td>
+<td><p><a class="reference internal" href="../api/generated/io/imod.formats.idf.save.html#imod.formats.idf.save" title="imod.formats.idf.save"><code class="xref py py-func docutils literal notranslate"><span class="pre">imod.formats.idf.save()</span></code></a></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">path</span></code></p></td>
+</tr>
+<tr class="row-odd"><th class="stub"><p>PERCENTILE</p></th>
+<td><p>Percentile to be used for upscaling</p></td>
+<td><p><a class="reference external" href="https://deltares.github.io/xugrid/api/xugrid.OverlapRegridder.html#xugrid.OverlapRegridder">xugrid create_percentile_method</a></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">percentile</span></code></p></td>
+</tr>
+<tr class="row-even"><th class="stub"><p>WEIGHFACTOR</p></th>
+<td><p>Weight factor</p></td>
+<td><p><a class="reference internal" href="../api/generated/util/imod.util.RegridderWeightsCache.html#imod.util.RegridderWeightsCache" title="imod.util.RegridderWeightsCache"><code class="xref py py-class docutils literal notranslate"><span class="pre">imod.util.RegridderWeightsCache</span></code></a></p></td>
+<td></td>
+</tr>
+<tr class="row-odd"><th class="stub"><p>WINDOW</p></th>
+<td><p>Window to be used for rescaling</p></td>
+<td><p><a class="reference internal" href="../api/generated/mf6/imod.mf6.Modflow6Simulation.clip_box.html#imod.mf6.Modflow6Simulation.clip_box" title="imod.mf6.Modflow6Simulation.clip_box"><code class="xref py py-meth docutils literal notranslate"><span class="pre">mf6_sim.clip_box</span></code></a></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">x_min</span></code>, <code class="docutils literal notranslate"><span class="pre">x_max</span></code>, <code class="docutils literal notranslate"><span class="pre">y_min</span></code>, <code class="docutils literal notranslate"><span class="pre">y_max</span></code></p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<p>Some settings previously configurable in iMOD5 are fixed in iMOD Python:</p>
+<div class="pst-scrollable-table-container"><table class="table">
+<thead>
+<tr class="row-odd"><th class="head stub"><p>BATCH argument</p></th>
+<th class="head"><p>description</p></th>
+<th class="head"><p>iMOD Python</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><th class="stub"><p>BLOCK=4</p></th>
+<td><p>size of the interpolation block</p></td>
+<td><p><a class="reference external" href="https://deltares.github.io/xugrid/api/xugrid.BarycentricInterpolator.html">xugrid.BaryCentricInterpolator</a></p></td>
+</tr>
+</tbody>
+</table>
+</div>
+</section>
+<section id="idftimeserie">
+<h3>IDFTIMESERIE<a class="headerlink" href="#idftimeserie" title="Link to this heading">#</a></h3>
+<p>Generate timeseries out of IDF-files that have the notation
+<code class="docutils literal notranslate"><span class="pre">{item}_yyyymmdd_l{ilay}.idf</span></code>. These are IDF-files that yield from a normal
+iMODFLOW simulation. Equivalent functionality in iMOD Python is found in
+<a class="reference internal" href="../api/generated/select/imod.select.points_values.html#imod.select.points_values" title="imod.select.points_values"><code class="xref py py-func docutils literal notranslate"><span class="pre">imod.select.points_values()</span></code></a>.</p>
+<div class="pst-scrollable-table-container"><table class="table">
+<thead>
+<tr class="row-odd"><th class="head stub"><p>BATCH argument</p></th>
+<th class="head"><p>description</p></th>
+<th class="head"><p>iMOD Python</p></th>
+<th class="head"><p>argument</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><th class="stub"><p>IPF1</p></th>
+<td><p>Name of the IPF file that contains the locations</p></td>
+<td><p><a class="reference internal" href="../api/generated/select/imod.select.points_values.html#imod.select.points_values" title="imod.select.points_values"><code class="xref py py-func docutils literal notranslate"><span class="pre">imod.select.points_values()</span></code></a></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">**points</span></code></p></td>
+</tr>
+<tr class="row-odd"><th class="stub"><p>IPF2</p></th>
+<td><p>Name of the IPF file to store the timeseries</p></td>
+<td><p><a class="reference internal" href="../api/generated/io/imod.formats.ipf.save.html#imod.formats.ipf.save" title="imod.formats.ipf.save"><code class="xref py py-func docutils literal notranslate"><span class="pre">imod.formats.ipf.save()</span></code></a></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">path</span></code></p></td>
+</tr>
+<tr class="row-even"><th class="stub"><p>ILAY</p></th>
+<td><p>Layer number to be used in the timeseries</p></td>
+<td><p><a class="reference external" href="https://docs.xarray.dev/en/stable/generated/xarray.DataArray.sel.html">xarray.DataArray.sel</a></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">layer=[i]</span></code></p></td>
+</tr>
+<tr class="row-odd"><th class="stub"><p>SOURCEDIR</p></th>
+<td><p>directory name of the folder that contains the specific files + the first (similar) part of the name of the files</p></td>
+<td><p><a class="reference internal" href="../api/generated/io/imod.formats.idf.open.html#imod.formats.idf.open" title="imod.formats.idf.open"><code class="xref py py-func docutils literal notranslate"><span class="pre">imod.formats.idf.open()</span></code></a></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">path</span></code></p></td>
+</tr>
+<tr class="row-even"><th class="stub"><p>SDATE</p></th>
+<td><p>Start date of the timeseries</p></td>
+<td><p><a class="reference external" href="https://docs.xarray.dev/en/stable/generated/xarray.DataArray.sel.html">xarray.DataArray.sel</a></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">time=...</span></code></p></td>
+</tr>
+<tr class="row-odd"><th class="stub"><p>EDATE</p></th>
+<td><p>Start date of the timeseries</p></td>
+<td><p><a class="reference external" href="https://docs.xarray.dev/en/stable/generated/xarray.DataArray.sel.html">xarray.DataArray.sel</a></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">time=...</span></code></p></td>
+</tr>
+<tr class="row-even"><th class="stub"><p>LABELCOL</p></th>
+<td><p>Column number of the label for the associated text files</p></td>
+<td><p><a class="reference internal" href="../api/generated/io/imod.formats.ipf.save.html#imod.formats.ipf.save" title="imod.formats.ipf.save"><code class="xref py py-func docutils literal notranslate"><span class="pre">imod.formats.ipf.save()</span></code></a></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">assoc_columns</span></code></p></td>
+</tr>
+<tr class="row-odd"><th class="stub"><p>NGXG</p></th>
+<td><p>compute GXG values</p></td>
+<td><p><a class="reference internal" href="../api/generated/evaluate/imod.evaluate.calculate_gxg_points.html#imod.evaluate.calculate_gxg_points" title="imod.evaluate.calculate_gxg_points"><code class="xref py py-func docutils literal notranslate"><span class="pre">imod.evaluate.calculate_gxg_points()</span></code></a></p></td>
+<td></td>
+</tr>
+<tr class="row-even"><th class="stub"><p>ICLEAN</p></th>
+<td><p>remove points from the IPF1 that are outside the domain of IDF data in SOURCEDIR</p></td>
+<td><p><a class="reference internal" href="../api/generated/select/imod.select.points_values.html#imod.select.points_values" title="imod.select.points_values"><code class="xref py py-func docutils literal notranslate"><span class="pre">imod.select.points_values()</span></code></a></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">out_of_bounds</span></code></p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<p>Some settings previously configurable in iMOD5 are fixed in iMOD Python:</p>
+<div class="pst-scrollable-table-container"><table class="table">
+<thead>
+<tr class="row-odd"><th class="head stub"><p>BATCH argument</p></th>
+<th class="head"><p>description</p></th>
+<th class="head"><p>iMOD Python</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><th class="stub"><p>IASSF=0</p></th>
+<td><p>specify whether or not to include the time series from IPF1 into the new IPF2 associated files</p></td>
+<td><p><a class="reference internal" href="../api/generated/select/imod.select.points_values.html#imod.select.points_values" title="imod.select.points_values"><code class="xref py py-func docutils literal notranslate"><span class="pre">imod.select.points_values()</span></code></a></p></td>
+</tr>
+<tr class="row-odd"><th class="stub"><p>TXTCOL=2</p></th>
+<td><p>Enter the column to be used from the associated text files</p></td>
+<td><p><a class="reference internal" href="../api/generated/io/imod.formats.ipf.read.html#imod.formats.ipf.read" title="imod.formats.ipf.read"><code class="xref py py-func docutils literal notranslate"><span class="pre">imod.formats.ipf.read()</span></code></a></p></td>
+</tr>
+<tr class="row-even"><th class="stub"><p>INT=0</p></th>
+<td><p>Carry out a 4-point polynomial interpolation of the 4 enclosed grid points surrounding the location of the measurement. Default INT=0 and it takes grid value</p></td>
+<td><p><a class="reference internal" href="../api/generated/select/imod.select.points_values.html#imod.select.points_values" title="imod.select.points_values"><code class="xref py py-func docutils literal notranslate"><span class="pre">imod.select.points_values()</span></code></a></p></td>
+</tr>
+</tbody>
+</table>
+</div>
+</section>
+<section id="creatsof">
+<h3>CREATSOF<a class="headerlink" href="#creatsof" title="Link to this heading">#</a></h3>
+<p>The iMOD-Batch function SOF (Surface Overland Flow) is able to compute “spill”
+levels (surface overlandflow levels) for large regions with or without supplied
+outflow or outlet locations. iMOD Python does not have a direct equivalent
+functionality, but you can use the <a class="reference external" href="https://deltares.github.io/pyflwdir/latest/quickstart.html">python package PyFlwDir</a> to do similar
+things.</p>
+</section>
+<section id="idfmean">
+<h3>IDFMEAN<a class="headerlink" href="#idfmean" title="Link to this heading">#</a></h3>
+<p>Compute a new IDF-file with the mean value (or minimum, maximum value) of
+different IDF-files. This can be easily done with xarray:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">imod</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">xarray</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">xr</span>
+
+<span class="n">idf_data</span> <span class="o">=</span> <span class="n">imod</span><span class="o">.</span><span class="n">formats</span><span class="o">.</span><span class="n">idf</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="s2">&quot;path/to/your/idf/files/*.idf&quot;</span><span class="p">)</span>
+<span class="n">mean_value_idf</span> <span class="o">=</span> <span class="n">idf_data</span><span class="o">.</span><span class="n">mean</span><span class="p">()</span>  <span class="c1"># or min, max, sum</span>
+<span class="c1"># To get data in the same shape as the original IDF files, you can use:</span>
+<span class="n">mean_idf</span> <span class="o">=</span> <span class="n">xr</span><span class="o">.</span><span class="n">ones_like</span><span class="p">(</span><span class="n">idf_data</span><span class="p">)</span> <span class="o">*</span> <span class="n">mean_value_idf</span>
+<span class="c1"># Save the mean IDF file</span>
+<span class="n">imod</span><span class="o">.</span><span class="n">formats</span><span class="o">.</span><span class="n">idf</span><span class="o">.</span><span class="n">save</span><span class="p">(</span><span class="n">mean_idf</span><span class="p">,</span> <span class="s2">&quot;path/to/your/mean_idf_file.idf&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</section>
+<section id="idfmerge">
+<h3>IDFMERGE<a class="headerlink" href="#idfmerge" title="Link to this heading">#</a></h3>
+<p>The MERGE function can be used to merge different IDF-files into a new IDF-file.
+If these IDF-files might overlap, an interpolation between the overlapping
+IDF-files will be carried out (if selected). Equivalent functionality in
+iMOD Python is found in <a class="reference internal" href="../api/generated/io/imod.formats.idf.open_subdomains.html#imod.formats.idf.open_subdomains" title="imod.formats.idf.open_subdomains"><code class="xref py py-func docutils literal notranslate"><span class="pre">imod.formats.idf.open_subdomains()</span></code></a></p>
+<div class="pst-scrollable-table-container"><table class="table">
+<thead>
+<tr class="row-odd"><th class="head stub"><p>BATCH argument</p></th>
+<th class="head"><p>description</p></th>
+<th class="head"><p>iMOD Python</p></th>
+<th class="head"><p>argument</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><th class="stub"><p>NMERGE</p></th>
+<td><p>Number of IDF files to be merged</p></td>
+<td><p>unnecessary in iMOD Python</p></td>
+<td></td>
+</tr>
+<tr class="row-odd"><th class="stub"><p>SOURCEDIR</p></th>
+<td><p>The folder and first part of the file name for all files that need to be merged</p></td>
+<td><p><a class="reference internal" href="../api/generated/io/imod.formats.idf.open_subdomains.html#imod.formats.idf.open_subdomains" title="imod.formats.idf.open_subdomains"><code class="xref py py-func docutils literal notranslate"><span class="pre">open_subdomains</span></code></a></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">path</span></code> &amp; <code class="docutils literal notranslate"><span class="pre">pattern</span></code></p></td>
+</tr>
+<tr class="row-even"><th class="stub"><p>TARGETIDF</p></th>
+<td><p>The IDF file that will be created</p></td>
+<td><p><a class="reference internal" href="../api/generated/io/imod.formats.idf.save.html#imod.formats.idf.save" title="imod.formats.idf.save"><code class="xref py py-func docutils literal notranslate"><span class="pre">imod.formats.idf.save()</span></code></a></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">path</span></code></p></td>
+</tr>
+<tr class="row-odd"><th class="stub"><p>WINDOW</p></th>
+<td><p>The window that needs to be computed solely</p></td>
+<td><p><a class="reference internal" href="../api/generated/mf6/imod.mf6.Modflow6Simulation.clip_box.html#imod.mf6.Modflow6Simulation.clip_box" title="imod.mf6.Modflow6Simulation.clip_box"><code class="xref py py-meth docutils literal notranslate"><span class="pre">mf6_sim.clip_box</span></code></a></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">x_min</span></code>, <code class="docutils literal notranslate"><span class="pre">x_max</span></code>, <code class="docutils literal notranslate"><span class="pre">y_min</span></code>, <code class="docutils literal notranslate"><span class="pre">y_max</span></code></p></td>
+</tr>
+<tr class="row-even"><th class="stub"><p>MASKIDF</p></th>
+<td><p>IDF-file to mask areas</p></td>
+<td><p><a class="reference external" href="https://docs.xarray.dev/en/stable/generated/xarray.DataArray.where.html">xarray.DataArray.where</a></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">cond=maskidf.notnull()</span></code></p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<p>Some settings previously configurable in iMOD5 are fixed in iMOD Python:</p>
+<div class="pst-scrollable-table-container"><table class="table">
+<thead>
+<tr class="row-odd"><th class="head stub"><p>BATCH argument</p></th>
+<th class="head"><p>description</p></th>
+<th class="head"><p>iMOD Python</p></th>
+<th class="head"></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><th class="stub"><p>IINT=0</p></th>
+<td><p>Specify IINT=1 to enforce a smooth interpolation between IDF-files in their overlapping areas</p></td>
+<td><p>this is the default setting.</p></td>
+<td><p><a class="reference internal" href="../api/generated/io/imod.formats.idf.open_subdomains.html#imod.formats.idf.open_subdomains" title="imod.formats.idf.open_subdomains"><code class="xref py py-func docutils literal notranslate"><span class="pre">open_subdomains</span></code></a></p></td>
+</tr>
+</tbody>
+</table>
+</div>
+</section>
+<section id="plot">
+<h3>PLOT<a class="headerlink" href="#plot" title="Link to this heading">#</a></h3>
+<p>The PLOT function can be used to construct figures that are normally displayed
+on the graphical display of iMOD. Equivalent functionality in iMOD Python is
+found in <a class="reference internal" href="../api/generated/visualize/imod.visualize.plot_map.html#imod.visualize.plot_map" title="imod.visualize.plot_map"><code class="xref py py-func docutils literal notranslate"><span class="pre">imod.visualize.plot_map()</span></code></a>.</p>
+</section>
+<section id="wbalance">
+<h3>WBALANCE<a class="headerlink" href="#wbalance" title="Link to this heading">#</a></h3>
+<p>The WBALANCE function calculates the water balance based on the model output for
+the steady state condition or for a specific period and area. The result is a
+CSV file (Step 1). Alternatively, this function can create images, IDF files
+and/or CVS files from aggregation on existing CSV files (Step 2). The hardest
+part of the functionality for step 1 in iMOD Python is found in
+<a class="reference internal" href="../api/generated/evaluate/imod.evaluate.facebudget.html#imod.evaluate.facebudget" title="imod.evaluate.facebudget"><code class="xref py py-func docutils literal notranslate"><span class="pre">imod.evaluate.facebudget()</span></code></a>, for ISEL=3-type of behaviour of the
+facebudgets. Other water balance terms can be computed by using general xarray
+logic, for examples see below. To plot waterbalance terms, you can use
+<code class="xref py py-func docutils literal notranslate"><span class="pre">imod.visualize.plot_waterbalance()</span></code>.</p>
+<div class="pst-scrollable-table-container"><table class="table">
+<thead>
+<tr class="row-odd"><th class="head stub"><p>BATCH argument</p></th>
+<th class="head"><p>description</p></th>
+<th class="head"><p>iMOD Python</p></th>
+<th class="head"><p>argument</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><th class="stub"><p>NDIR</p></th>
+<td><p>Number of folders to be processed</p></td>
+<td><p>unnecessary in iMOD Python</p></td>
+<td></td>
+</tr>
+<tr class="row-odd"><th class="stub"><p>SOURCEDIR</p></th>
+<td><p>The folder and first part of the file name for all files that need to be used</p></td>
+<td><p><a class="reference internal" href="../api/generated/io/imod.formats.idf.open.html#imod.formats.idf.open" title="imod.formats.idf.open"><code class="xref py py-func docutils literal notranslate"><span class="pre">imod.formats.idf.open()</span></code></a></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">path</span></code> &amp; <code class="docutils literal notranslate"><span class="pre">pattern</span></code></p></td>
+</tr>
+<tr class="row-even"><th class="stub"><p>ILAYER</p></th>
+<td><p>Layer numbers to be used in the water balance computation</p></td>
+<td><p><a class="reference external" href="https://docs.xarray.dev/en/stable/generated/xarray.DataArray.sel.html">xarray.DataArray.sel</a></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">layer=[i]</span></code></p></td>
+</tr>
+<tr class="row-odd"><th class="stub"><p>SDATE</p></th>
+<td><p>The start date of the water balance computation</p></td>
+<td><p><a class="reference external" href="https://docs.xarray.dev/en/stable/generated/xarray.DataArray.sel.html">xarray.DataArray.sel</a></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">time=...</span></code></p></td>
+</tr>
+<tr class="row-even"><th class="stub"><p>EDATE</p></th>
+<td><p>The end date of the water balance computation</p></td>
+<td><p><a class="reference external" href="https://docs.xarray.dev/en/stable/generated/xarray.DataArray.sel.html">xarray.DataArray.sel</a></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">time=...</span></code></p></td>
+</tr>
+<tr class="row-odd"><th class="stub"><p>IYEAR</p></th>
+<td><p>The year for which the water balance needs to be computed</p></td>
+<td><p><a class="reference external" href="https://docs.xarray.dev/en/stable/generated/xarray.DataArray.sel.html">xarray.DataArray.sel</a></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">time=...</span></code></p></td>
+</tr>
+<tr class="row-even"><th class="stub"><p>NPERIOD</p></th>
+<td><p>The number of periods for which the water balance needs to be computed</p></td>
+<td><p>unnecessary in iMOD Python</p></td>
+<td></td>
+</tr>
+<tr class="row-odd"><th class="stub"><p>PERIOD{i}</p></th>
+<td><p>The period for which the water balance needs to be computed</p></td>
+<td><p><a class="reference external" href="https://docs.xarray.dev/en/stable/generated/xarray.DataArray.sel.html">xarray.DataArray.sel</a></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">time=...</span></code></p></td>
+</tr>
+<tr class="row-even"><th class="stub"><p>NBAL</p></th>
+<td><p>The number of budget terms to be computed</p></td>
+<td><p>unnecessary in iMOD Python</p></td>
+<td></td>
+</tr>
+<tr class="row-odd"><th class="stub"><p>BAL{i}</p></th>
+<td><p>The budget term to be computed</p></td>
+<td><p><a class="reference internal" href="../api/generated/evaluate/imod.evaluate.facebudget.html#imod.evaluate.facebudget" title="imod.evaluate.facebudget"><code class="xref py py-func docutils literal notranslate"><span class="pre">imod.evaluate.facebudget()</span></code></a></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">front</span></code>, <code class="docutils literal notranslate"><span class="pre">lower</span></code>, <code class="docutils literal notranslate"><span class="pre">right</span></code></p></td>
+</tr>
+<tr class="row-even"><th class="stub"><p>BAL{i}SYS</p></th>
+<td><p>The number of systems to be included in the water balance</p></td>
+<td><p>unnecessary in iMOD Python, as it treats systems as separate packages</p></td>
+<td></td>
+</tr>
+<tr class="row-odd"><th class="stub"><p>ISEL</p></th>
+<td><p>The type of water balance to be computed, see below for the different types of ISEL</p></td>
+<td><p>See examples below</p></td>
+<td></td>
+</tr>
+<tr class="row-even"><th class="stub"><p>GENFILE</p></th>
+<td><p>The GEN file that contains the area for which the water balance needs to be computed</p></td>
+<td><p><a class="reference internal" href="../api/generated/io/imod.formats.gen.read.html#imod.formats.gen.read" title="imod.formats.gen.read"><code class="xref py py-func docutils literal notranslate"><span class="pre">imod.formats.gen.read()</span></code></a></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">path</span></code></p></td>
+</tr>
+<tr class="row-odd"><th class="stub"><p>IDFNAME</p></th>
+<td><p>The IDF file that contains the area for which the water balance needs to be computed</p></td>
+<td><p><a class="reference internal" href="../api/generated/io/imod.formats.idf.open.html#imod.formats.idf.open" title="imod.formats.idf.open"><code class="xref py py-func docutils literal notranslate"><span class="pre">imod.formats.idf.open()</span></code></a></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">path</span></code></p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<p>Some settings previously configurable in iMOD5 are fixed in iMOD Python:</p>
+<div class="pst-scrollable-table-container"><table class="table">
+<thead>
+<tr class="row-odd"><th class="head stub"><p>BATCH argument</p></th>
+<th class="head"><p>description</p></th>
+<th class="head"><p>iMOD Python</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><th class="stub"><p>WBEX=0</p></th>
+<td><p>Compute interconnected fluxes between zones</p></td>
+<td><p><a class="reference internal" href="../api/generated/evaluate/imod.evaluate.facebudget.html#imod.evaluate.facebudget" title="imod.evaluate.facebudget"><code class="xref py py-func docutils literal notranslate"><span class="pre">imod.evaluate.facebudget()</span></code></a></p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<p>To get ISEL=1-type of behaviour, you can use:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">imod</span>
+
+<span class="n">cbc_data</span> <span class="o">=</span> <span class="n">imod</span><span class="o">.</span><span class="n">mf6</span><span class="o">.</span><span class="n">open_cbc</span><span class="p">(</span><span class="s2">&quot;path/to/your/cbc_file.cbc&quot;</span><span class="p">,</span> <span class="n">merge_to_dataset</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="n">wbalance</span> <span class="o">=</span> <span class="n">cbc_data</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span>
+<span class="c1"># to compute  per timestep</span>
+<span class="n">wbalance_per_time</span> <span class="o">=</span> <span class="n">cbc_data</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">dim</span><span class="o">=</span><span class="p">(</span><span class="s2">&quot;layer&quot;</span><span class="p">,</span> <span class="s2">&quot;y&quot;</span><span class="p">,</span> <span class="s2">&quot;x&quot;</span><span class="p">))</span>
+</pre></div>
+</div>
+<p>Or to get ISEL=2-type of behaviour, you can use:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">imod</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">xarray</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">xr</span>
+
+<span class="n">cbc_data</span> <span class="o">=</span> <span class="n">imod</span><span class="o">.</span><span class="n">mf6</span><span class="o">.</span><span class="n">open_cbc</span><span class="p">(</span><span class="s2">&quot;path/to/your/cbc_file.cbc&quot;</span><span class="p">,</span> <span class="s2">&quot;path/to/your/grb_file.grb&quot;</span><span class="p">)</span>
+<span class="n">gen_data</span> <span class="o">=</span> <span class="n">imod</span><span class="o">.</span><span class="n">formats</span><span class="o">.</span><span class="n">gen</span><span class="o">.</span><span class="n">read</span><span class="p">(</span><span class="s2">&quot;path/to/your/gen_file.gen&quot;</span><span class="p">)</span>
+
+<span class="c1"># Pop the facebudgets from the cbc_data</span>
+<span class="n">front</span> <span class="o">=</span> <span class="n">cbc_data</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s2">&quot;flow-front-face&quot;</span><span class="p">)</span>
+<span class="n">lower</span> <span class="o">=</span> <span class="n">cbc_data</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s2">&quot;flow-lower-face&quot;</span><span class="p">)</span>
+<span class="n">right</span> <span class="o">=</span> <span class="n">cbc_data</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s2">&quot;flow-right-face&quot;</span><span class="p">)</span>
+
+<span class="n">like</span> <span class="o">=</span> <span class="n">front</span><span class="o">.</span><span class="n">isel</span><span class="p">(</span><span class="n">layer</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">time</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">drop</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="n">wbalance_area</span> <span class="o">=</span> <span class="n">imod</span><span class="o">.</span><span class="n">prepare</span><span class="o">.</span><span class="n">rasterize</span><span class="p">(</span><span class="n">gen_data</span><span class="p">,</span> <span class="n">like</span><span class="p">)</span>
+<span class="n">netflow</span> <span class="o">=</span> <span class="n">imod</span><span class="o">.</span><span class="n">evaluate</span><span class="o">.</span><span class="n">facebudget</span><span class="p">(</span>
+    <span class="n">wbalance_area</span><span class="p">,</span>
+    <span class="n">front</span><span class="o">=</span><span class="n">front</span><span class="p">,</span>
+    <span class="n">lower</span><span class="o">=</span><span class="n">lower</span><span class="p">,</span>
+    <span class="n">right</span><span class="o">=</span><span class="n">right</span><span class="p">,</span>
+    <span class="n">netflow</span><span class="o">=</span><span class="kc">True</span>
+<span class="p">)</span>
+<span class="n">cbc_data</span><span class="p">[</span><span class="s2">&quot;netflow&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">netflow</span>
+<span class="c1"># Convert cbc_data from dict to xarray.Dataset</span>
+<span class="n">cbc_data</span> <span class="o">=</span> <span class="n">xr</span><span class="o">.</span><span class="n">merge</span><span class="p">([</span><span class="n">cbc_data</span><span class="p">])</span>
+<span class="c1"># Mask all budget terms that are not present in the cbc_data</span>
+<span class="n">cbc_area</span> <span class="o">=</span> <span class="n">cbc_data</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">wbalance_area</span><span class="o">.</span><span class="n">notnull</span><span class="p">())</span>
+<span class="c1"># Sum the budget terms for waterbalance of the area</span>
+<span class="n">cbc_area</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span>
+</pre></div>
+</div>
+<p>Or to get ISEL=3-type of behaviour, you can use:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">imod</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">xarray</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">xr</span>
+
+<span class="n">cbc_data</span> <span class="o">=</span> <span class="n">imod</span><span class="o">.</span><span class="n">mf6</span><span class="o">.</span><span class="n">open_cbc</span><span class="p">(</span><span class="s2">&quot;path/to/your/cbc_file.cbc&quot;</span><span class="p">,</span> <span class="s2">&quot;path/to/your/grb_file.grb&quot;</span><span class="p">)</span>
+<span class="n">idf_data</span> <span class="o">=</span> <span class="n">imod</span><span class="o">.</span><span class="n">formats</span><span class="o">.</span><span class="n">idf</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="s2">&quot;path/to/your/idf_file.idf&quot;</span><span class="p">)</span>
+
+<span class="c1"># Pop the facebudgets from the cbc_data</span>
+<span class="n">front</span> <span class="o">=</span> <span class="n">cbc_data</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s2">&quot;flow-front-face&quot;</span><span class="p">)</span>
+<span class="n">lower</span> <span class="o">=</span> <span class="n">cbc_data</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s2">&quot;flow-lower-face&quot;</span><span class="p">)</span>
+<span class="n">right</span> <span class="o">=</span> <span class="n">cbc_data</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s2">&quot;flow-right-face&quot;</span><span class="p">)</span>
+
+<span class="n">like</span> <span class="o">=</span> <span class="n">front</span><span class="o">.</span><span class="n">isel</span><span class="p">(</span><span class="n">layer</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">time</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">drop</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="n">netflow</span> <span class="o">=</span> <span class="n">imod</span><span class="o">.</span><span class="n">evaluate</span><span class="o">.</span><span class="n">facebudget</span><span class="p">(</span>
+    <span class="n">idf_data</span><span class="p">,</span>
+    <span class="n">front</span><span class="o">=</span><span class="n">front</span><span class="p">,</span>
+    <span class="n">lower</span><span class="o">=</span><span class="n">lower</span><span class="p">,</span>
+    <span class="n">right</span><span class="o">=</span><span class="n">right</span><span class="p">,</span>
+    <span class="n">netflow</span><span class="o">=</span><span class="kc">True</span>
+<span class="p">)</span>
+<span class="n">cbc_data</span><span class="p">[</span><span class="s2">&quot;netflow&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">netflow</span>
+<span class="c1"># Convert cbc_data from dict to xarray.Dataset</span>
+<span class="n">cbc_data</span> <span class="o">=</span> <span class="n">xr</span><span class="o">.</span><span class="n">merge</span><span class="p">([</span><span class="n">cbc_data</span><span class="p">])</span>
+<span class="c1"># Mask all budget terms that are not present in the cbc_data</span>
+<span class="n">cbc_area</span> <span class="o">=</span> <span class="n">cbc_data</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">idf_data</span><span class="o">.</span><span class="n">notnull</span><span class="p">())</span>
+<span class="c1"># Sum the budget terms for waterbalance of the area</span>
+<span class="n">cbc_area</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span>
+</pre></div>
+</div>
+</section>
+</section>
 </section>
 
 
@@ -1037,6 +2155,24 @@ your data, see our iMOD Viewer</a>.</p>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#metaswap">MetaSWAP</a></li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#postprocessing">Postprocessing</a></li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#visualization">Visualization</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#imod-batch-glossary">iMOD BATCH glossary</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#runfile">RUNFILE</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gensnaptogrid">GENSNAPTOGRID</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#imodpath">IMODPATH</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#isggrid">ISGGRID</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#mf6toidf">MF6TOIDF</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gxg">GXG</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#mkwellipf">MKWELLIPF</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#genpuzzle">GENPUZZLE</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#idfscale">IDFSCALE</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#idftimeserie">IDFTIMESERIE</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#creatsof">CREATSOF</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#idfmean">IDFMEAN</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#idfmerge">IDFMERGE</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#plot">PLOT</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#wbalance">WBALANCE</a></li>
+</ul>
+</li>
 </ul>
   </nav></div>
 

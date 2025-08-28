@@ -7,7 +7,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>imod.mf6.adv &#8212; iMOD Python 1.0.0rc4 documentation</title>
+    <title>imod.mf6.adv &#8212; iMOD Python 1.0.0rc6 documentation</title>
   
   
   
@@ -41,7 +41,7 @@
   <link rel="preload" as="script" href="../../../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
 <link rel="preload" as="script" href="../../../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
 
-    <script src="../../../_static/documentation_options.js?v=2fc85bd2"></script>
+    <script src="../../../_static/documentation_options.js?v=bc4855a1"></script>
     <script src="../../../_static/doctools.js?v=9bcbadda"></script>
     <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script>DOCUMENTATION_OPTIONS.pagename = '_modules/imod/mf6/adv';</script>
@@ -50,7 +50,7 @@
     <link rel="search" title="Search" href="../../../search.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
-  <meta name="docsearch:version" content="1.0.0rc4.dev" />
+  <meta name="docsearch:version" content="1.0.0rc6.dev" />
   </head>
   
   
@@ -114,8 +114,8 @@
     
     
     
-    <img src="../../../_static/imod-python-logo-light.svg" class="logo__image only-light" alt="iMOD Python 1.0.0rc4 documentation - Home"/>
-    <img src="../../../_static/imod-python-logo-dark.svg" class="logo__image only-dark pst-js-only" alt="iMOD Python 1.0.0rc4 documentation - Home"/>
+    <img src="../../../_static/imod-python-logo-light.svg" class="logo__image only-light" alt="iMOD Python 1.0.0rc6 documentation - Home"/>
+    <img src="../../../_static/imod-python-logo-dark.svg" class="logo__image only-dark pst-js-only" alt="iMOD Python 1.0.0rc6 documentation - Home"/>
   
   
 </a></div>
@@ -153,7 +153,7 @@
 
 <li class="nav-item ">
   <a class="nav-link nav-internal" href="../../../api/index.html">
-    API Reference
+    API
   </a>
 </li>
 
@@ -303,7 +303,7 @@
 
 <li class="nav-item ">
   <a class="nav-link nav-internal" href="../../../api/index.html">
-    API Reference
+    API
   </a>
 </li>
 
@@ -438,27 +438,62 @@
 <span class="sd">robust alternative.</span>
 <span class="sd">&quot;&quot;&quot;</span>
 
+<span class="kn">from</span><span class="w"> </span><span class="nn">abc</span><span class="w"> </span><span class="kn">import</span> <span class="n">ABC</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">copy</span><span class="w"> </span><span class="kn">import</span> <span class="n">deepcopy</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Optional</span>
+
+<span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
 
 <span class="kn">from</span><span class="w"> </span><span class="nn">imod.common.interfaces.iregridpackage</span><span class="w"> </span><span class="kn">import</span> <span class="n">IRegridPackage</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">imod.common.utilities.dataclass_type</span><span class="w"> </span><span class="kn">import</span> <span class="n">DataclassType</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">imod.mf6.package</span><span class="w"> </span><span class="kn">import</span> <span class="n">Package</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">imod.schemata</span><span class="w"> </span><span class="kn">import</span> <span class="n">AllValueSchema</span><span class="p">,</span> <span class="n">DimsSchema</span><span class="p">,</span> <span class="n">DTypeSchema</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">imod.typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">GridDataArray</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">imod.util.regrid</span><span class="w"> </span><span class="kn">import</span> <span class="n">RegridderWeightsCache</span>
 
 
-<span class="k">class</span><span class="w"> </span><span class="nc">Advection</span><span class="p">(</span><span class="n">Package</span><span class="p">,</span> <span class="n">IRegridPackage</span><span class="p">):</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">AdvectionBase</span><span class="p">(</span><span class="n">Package</span><span class="p">,</span> <span class="n">IRegridPackage</span><span class="p">,</span> <span class="n">ABC</span><span class="p">):</span>
     <span class="n">_pkg_id</span> <span class="o">=</span> <span class="s2">&quot;adv&quot;</span>
     <span class="n">_template</span> <span class="o">=</span> <span class="n">Package</span><span class="o">.</span><span class="n">_initialize_template</span><span class="p">(</span><span class="n">_pkg_id</span><span class="p">)</span>
+    <span class="n">_scheme</span><span class="p">:</span> <span class="nb">str</span>
 
-    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">scheme</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
-        <span class="n">dict_dataset</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;scheme&quot;</span><span class="p">:</span> <span class="n">scheme</span><span class="p">}</span>
+    <span class="n">_init_schemata</span> <span class="o">=</span> <span class="p">{</span>
+        <span class="s2">&quot;ats_percel&quot;</span><span class="p">:</span> <span class="p">[</span>
+            <span class="n">DimsSchema</span><span class="p">(),</span>
+            <span class="n">DTypeSchema</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">floating</span><span class="p">),</span>
+            <span class="n">AllValueSchema</span><span class="p">(</span><span class="s2">&quot;&gt;&quot;</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">),</span>
+        <span class="p">],</span>
+    <span class="p">}</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">ats_percel</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">float</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">validate</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">):</span>
+        <span class="n">dict_dataset</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;scheme&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">_scheme</span><span class="p">,</span> <span class="s2">&quot;ats_percel&quot;</span><span class="p">:</span> <span class="n">ats_percel</span><span class="p">}</span>
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">dict_dataset</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_validate_init_schemata</span><span class="p">(</span><span class="n">validate</span><span class="p">)</span>
 
-    <span class="k">def</span><span class="w"> </span><span class="nf">render</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">directory</span><span class="p">,</span> <span class="n">pkgname</span><span class="p">,</span> <span class="n">globaltimes</span><span class="p">,</span> <span class="n">binary</span><span class="p">):</span>
-        <span class="n">scheme</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">dataset</span><span class="p">[</span><span class="s2">&quot;scheme&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">item</span><span class="p">()</span>
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_template</span><span class="o">.</span><span class="n">render</span><span class="p">({</span><span class="s2">&quot;scheme&quot;</span><span class="p">:</span> <span class="n">scheme</span><span class="p">})</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_render</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">directory</span><span class="p">,</span> <span class="n">pkgname</span><span class="p">,</span> <span class="n">globaltimes</span><span class="p">,</span> <span class="n">binary</span><span class="p">):</span>
+        <span class="n">render_dict</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="n">render_dict</span><span class="p">[</span><span class="s2">&quot;scheme&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">dataset</span><span class="p">[</span><span class="s2">&quot;scheme&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">item</span><span class="p">()</span>
+        <span class="k">if</span> <span class="s2">&quot;ats_percel&quot;</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">dataset</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">_valid</span><span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">dataset</span><span class="p">[</span><span class="s2">&quot;ats_percel&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">item</span><span class="p">()</span>
+        <span class="p">):</span>
+            <span class="n">render_dict</span><span class="p">[</span><span class="s2">&quot;ats_percel&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">dataset</span><span class="p">[</span><span class="s2">&quot;ats_percel&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">item</span><span class="p">()</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_template</span><span class="o">.</span><span class="n">render</span><span class="p">(</span><span class="n">render_dict</span><span class="p">)</span>
 
     <span class="k">def</span><span class="w"> </span><span class="nf">mask</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">_</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Package</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        The mask method is irrelevant for this package , instead this method</span>
+<span class="sd">        The mask method is irrelevant for this package, instead this method</span>
+<span class="sd">        retuns a copy of itself.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="n">deepcopy</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">regrid_like</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">target_grid</span><span class="p">:</span> <span class="n">GridDataArray</span><span class="p">,</span>
+        <span class="n">regrid_cache</span><span class="p">:</span> <span class="n">RegridderWeightsCache</span><span class="p">,</span>
+        <span class="n">regridder_types</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">DataclassType</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Package</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        The regrid_like method is irrelevant for this package, instead this method</span>
 <span class="sd">        retuns a copy of itself.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="n">deepcopy</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
@@ -466,29 +501,39 @@
 
 <div class="viewcode-block" id="AdvectionUpstream">
 <a class="viewcode-back" href="../../../api/generated/mf6/imod.mf6.AdvectionUpstream.html#imod.mf6.AdvectionUpstream">[docs]</a>
-<span class="k">class</span><span class="w"> </span><span class="nc">AdvectionUpstream</span><span class="p">(</span><span class="n">Advection</span><span class="p">):</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">AdvectionUpstream</span><span class="p">(</span><span class="n">AdvectionBase</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    The upstream weighting (first order upwind) scheme sets the concentration</span>
 <span class="sd">    at the cellface between two adjacent cells equal to the concentration in</span>
 <span class="sd">    the cell where the flow comes from. It surpresses oscillations.</span>
-<span class="sd">    Note: all constructor arguments will be ignored</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    ats_percel: float, optional</span>
+<span class="sd">        Fractional cell distance submitted by the ADV Package to the</span>
+<span class="sd">        :class:`imod.mf6.AdaptiveTimeStepping` (ATS) package. If ``ats_percel``</span>
+<span class="sd">        is specified and the ATS Package is active, a time step calculation will</span>
+<span class="sd">        be made for each cell based on flow through the cell and cell</span>
+<span class="sd">        properties. The largest time step will be calculated such that the</span>
+<span class="sd">        advective fractional cell distance (``ats_percel``) is not exceeded for</span>
+<span class="sd">        any active cell in the grid. This time-step constraint will be submitted</span>
+<span class="sd">        to the ATS Package, perhaps with constraints submitted by other</span>
+<span class="sd">        packages, in the calculation of the time step. ``ats_percel`` must be</span>
+<span class="sd">        greater than zero. If a value of zero is specified for ``ats_percel``</span>
+<span class="sd">        the program will automatically reset it to an internal no data value to</span>
+<span class="sd">        indicate that time steps should not be subject to this constraint.</span>
+<span class="sd">        Requires MODFLOW 6.6.0 or higher.</span>
+<span class="sd">    validate: bool, optional</span>
+<span class="sd">        Validate the package upon initialization. Defaults to True.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
-<div class="viewcode-block" id="AdvectionUpstream.__init__">
-<a class="viewcode-back" href="../../../api/generated/mf6/imod.mf6.AdvectionUpstream.html#imod.mf6.AdvectionUpstream.__init__">[docs]</a>
-    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">scheme</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;upstream&quot;</span><span class="p">):</span>
-        <span class="k">if</span> <span class="ow">not</span> <span class="n">scheme</span> <span class="o">==</span> <span class="s2">&quot;upstream&quot;</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
-                <span class="s2">&quot;error in scheme parameter. Should be &#39;upstream&#39; if present.&quot;</span>
-            <span class="p">)</span>
-        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">scheme</span><span class="o">=</span><span class="s2">&quot;upstream&quot;</span><span class="p">)</span></div>
-</div>
+    <span class="n">_scheme</span> <span class="o">=</span> <span class="s2">&quot;upstream&quot;</span></div>
 
 
 
 <div class="viewcode-block" id="AdvectionCentral">
 <a class="viewcode-back" href="../../../api/generated/mf6/imod.mf6.AdvectionCentral.html#imod.mf6.AdvectionCentral">[docs]</a>
-<span class="k">class</span><span class="w"> </span><span class="nc">AdvectionCentral</span><span class="p">(</span><span class="n">Advection</span><span class="p">):</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">AdvectionCentral</span><span class="p">(</span><span class="n">AdvectionBase</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    The central-in-space weighting scheme is based on a simple</span>
 <span class="sd">    distance-weighted linear interpolation between the center of cell n and the</span>
@@ -497,37 +542,59 @@
 <span class="sd">    grids without equal spacing between connected cells, it is retained here</span>
 <span class="sd">    for consistency with nomenclature used by other MODFLOW-based transport</span>
 <span class="sd">    programs, such as MT3D.</span>
-<span class="sd">    Note: all constructor arguments will be ignored</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    ats_percel: float, optional</span>
+<span class="sd">        Fractional cell distance submitted by the ADV Package to the</span>
+<span class="sd">        :class:`imod.mf6.AdaptiveTimeStepping` (ATS) package. If ``ats_percel``</span>
+<span class="sd">        is specified and the ATS Package is active, a time step calculation will</span>
+<span class="sd">        be made for each cell based on flow through the cell and cell</span>
+<span class="sd">        properties. The largest time step will be calculated such that the</span>
+<span class="sd">        advective fractional cell distance (``ats_percel``) is not exceeded for</span>
+<span class="sd">        any active cell in the grid. This time-step constraint will be submitted</span>
+<span class="sd">        to the ATS Package, perhaps with constraints submitted by other</span>
+<span class="sd">        packages, in the calculation of the time step. ``ats_percel`` must be</span>
+<span class="sd">        greater than zero. If a value of zero is specified for ``ats_percel``</span>
+<span class="sd">        the program will automatically reset it to an internal no data value to</span>
+<span class="sd">        indicate that time steps should not be subject to this constraint.</span>
+<span class="sd">        Requires MODFLOW 6.6.0 or higher.</span>
+<span class="sd">    validate: bool, optional</span>
+<span class="sd">        Validate the package upon initialization. Defaults to True.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
-<div class="viewcode-block" id="AdvectionCentral.__init__">
-<a class="viewcode-back" href="../../../api/generated/mf6/imod.mf6.AdvectionCentral.html#imod.mf6.AdvectionCentral.__init__">[docs]</a>
-    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">scheme</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;central&quot;</span><span class="p">):</span>
-        <span class="k">if</span> <span class="ow">not</span> <span class="n">scheme</span> <span class="o">==</span> <span class="s2">&quot;central&quot;</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
-                <span class="s2">&quot;error in scheme parameter. Should be &#39;central&#39; if present.&quot;</span>
-            <span class="p">)</span>
-        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">scheme</span><span class="o">=</span><span class="s2">&quot;central&quot;</span><span class="p">)</span></div>
-</div>
+    <span class="n">_scheme</span> <span class="o">=</span> <span class="s2">&quot;central&quot;</span></div>
 
 
 
 <div class="viewcode-block" id="AdvectionTVD">
 <a class="viewcode-back" href="../../../api/generated/mf6/imod.mf6.AdvectionTVD.html#imod.mf6.AdvectionTVD">[docs]</a>
-<span class="k">class</span><span class="w"> </span><span class="nc">AdvectionTVD</span><span class="p">(</span><span class="n">Advection</span><span class="p">):</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">AdvectionTVD</span><span class="p">(</span><span class="n">AdvectionBase</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    An implicit second order TVD scheme. More expensive than upstream</span>
 <span class="sd">    weighting but more robust.</span>
-<span class="sd">    Note: all constructor arguments will be ignored</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    ats_percel: float, optional</span>
+<span class="sd">        Fractional cell distance submitted by the ADV Package to the</span>
+<span class="sd">        :class:`imod.mf6.AdaptiveTimeStepping` (ATS) package. If ``ats_percel``</span>
+<span class="sd">        is specified and the ATS Package is active, a time step calculation will</span>
+<span class="sd">        be made for each cell based on flow through the cell and cell</span>
+<span class="sd">        properties. The largest time step will be calculated such that the</span>
+<span class="sd">        advective fractional cell distance (``ats_percel``) is not exceeded for</span>
+<span class="sd">        any active cell in the grid. This time-step constraint will be submitted</span>
+<span class="sd">        to the ATS Package, perhaps with constraints submitted by other</span>
+<span class="sd">        packages, in the calculation of the time step. ``ats_percel`` must be</span>
+<span class="sd">        greater than zero. If a value of zero is specified for ``ats_percel``</span>
+<span class="sd">        the program will automatically reset it to an internal no data value to</span>
+<span class="sd">        indicate that time steps should not be subject to this constraint.</span>
+<span class="sd">        Requires MODFLOW 6.6.0 or higher.</span>
+<span class="sd">    validate: bool, optional</span>
+<span class="sd">        Validate the package upon initialization. Defaults to True.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
-<div class="viewcode-block" id="AdvectionTVD.__init__">
-<a class="viewcode-back" href="../../../api/generated/mf6/imod.mf6.AdvectionTVD.html#imod.mf6.AdvectionTVD.__init__">[docs]</a>
-    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">scheme</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;TVD&quot;</span><span class="p">):</span>
-        <span class="k">if</span> <span class="ow">not</span> <span class="n">scheme</span> <span class="o">==</span> <span class="s2">&quot;TVD&quot;</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;error in scheme parameter. Should be &#39;TVD&#39; if present.&quot;</span><span class="p">)</span>
-        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">scheme</span><span class="o">=</span><span class="s2">&quot;TVD&quot;</span><span class="p">)</span></div>
-</div>
+    <span class="n">_scheme</span> <span class="o">=</span> <span class="s2">&quot;TVD&quot;</span></div>
 
 </pre></div>
 

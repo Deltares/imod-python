@@ -36,7 +36,7 @@ of Advection, Dispersion, and Chemical
 Reactions of Contaminants in Groundwater
 Systems; Documentation and User's Guide
 
-.. GENERATED FROM PYTHON SOURCE LINES 20-30
+.. GENERATED FROM PYTHON SOURCE LINES 20-29
 
 .. code-block:: Python
 
@@ -47,7 +47,6 @@ Systems; Documentation and User's Guide
     import xarray as xr
 
     import imod
-    from imod.prepare.partition import create_partition_labels
     from imod.typing.grid import nan_like, zeros_like
 
 
@@ -57,11 +56,11 @@ Systems; Documentation and User's Guide
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 31-32
+.. GENERATED FROM PYTHON SOURCE LINES 30-31
 
 Set some grid dimensions
 
-.. GENERATED FROM PYTHON SOURCE LINES 32-42
+.. GENERATED FROM PYTHON SOURCE LINES 31-41
 
 .. code-block:: Python
 
@@ -82,11 +81,11 @@ Set some grid dimensions
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 43-44
+.. GENERATED FROM PYTHON SOURCE LINES 42-43
 
 Construct the "idomain" array, and then the discretization package which represents the model grid.
 
-.. GENERATED FROM PYTHON SOURCE LINES 44-56
+.. GENERATED FROM PYTHON SOURCE LINES 43-55
 
 .. code-block:: Python
 
@@ -109,13 +108,13 @@ Construct the "idomain" array, and then the discretization package which represe
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 57-60
+.. GENERATED FROM PYTHON SOURCE LINES 56-59
 
 Construct the other flow packages. Flow is steady-state in this simulation,
 meaning specific storage is set to zero.
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 60-72
+.. GENERATED FROM PYTHON SOURCE LINES 59-71
 
 .. code-block:: Python
 
@@ -138,13 +137,13 @@ meaning specific storage is set to zero.
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 73-76
+.. GENERATED FROM PYTHON SOURCE LINES 72-75
 
 Set up the boundary conditions. We have: 2 constant head boundaries at
 the left and right, chosen so that the velocity is 1/3 m/day
 and a well that injects 1 m3 per day, with a concentration of 1000
 
-.. GENERATED FROM PYTHON SOURCE LINES 76-116
+.. GENERATED FROM PYTHON SOURCE LINES 75-115
 
 .. code-block:: Python
 
@@ -195,14 +194,14 @@ and a well that injects 1 m3 per day, with a concentration of 1000
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 117-121
+.. GENERATED FROM PYTHON SOURCE LINES 116-120
 
 Now construct the transport simulation. The flow boundaries
 already have inflow concentration data associated, so the transport
 boundaries can be imported using the ssm package, and the rest of the
 transport model definition is straightforward.
 
-.. GENERATED FROM PYTHON SOURCE LINES 121-141
+.. GENERATED FROM PYTHON SOURCE LINES 120-140
 
 .. code-block:: Python
 
@@ -233,13 +232,13 @@ transport model definition is straightforward.
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 142-145
+.. GENERATED FROM PYTHON SOURCE LINES 141-144
 
 Create a simulation and add the flow and transport models to it.
 Then define some ims packages: 1 for every type of model.
 Finally create 365 time steps of 1 day each.
 
-.. GENERATED FROM PYTHON SOURCE LINES 145-187
+.. GENERATED FROM PYTHON SOURCE LINES 144-186
 
 .. code-block:: Python
 
@@ -292,17 +291,17 @@ Finally create 365 time steps of 1 day each.
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 188-190
+.. GENERATED FROM PYTHON SOURCE LINES 187-189
 
 To split the model in 4 partitions, we must create a label array.
 We use the utility function  ``get_label_array`` for that.
 
-.. GENERATED FROM PYTHON SOURCE LINES 190-195
+.. GENERATED FROM PYTHON SOURCE LINES 189-194
 
 .. code-block:: Python
 
 
-    label_array = create_partition_labels(simulation, 4)
+    label_array = simulation.create_partition_labels(4)
     fig, ax = plt.subplots()
     label_array.plot(ax=ax)
 
@@ -320,11 +319,11 @@ We use the utility function  ``get_label_array`` for that.
  .. code-block:: none
 
 
-    <matplotlib.collections.QuadMesh object at 0x0000016F4465B8F0>
+    <matplotlib.collections.QuadMesh object at 0x00000251D2085700>
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 196-201
+.. GENERATED FROM PYTHON SOURCE LINES 195-200
 
 This label array determines how the model will be split. `METIS
 <https://github.com/KarypisLab/METIS/blob/master/manual/manual.pdf>`_ is used
@@ -332,7 +331,7 @@ in the background to partition models, which is the cause of the imperfect
 rectangular shapes. Let's split the simulation into 4 submodels. The label
 array is used to define the partitioning.
 
-.. GENERATED FROM PYTHON SOURCE LINES 201-202
+.. GENERATED FROM PYTHON SOURCE LINES 200-201
 
 .. code-block:: Python
 
@@ -345,23 +344,23 @@ array is used to define the partitioning.
 
  .. code-block:: none
 
-    C:\buildagent\work\4b9080cbb3354582\imod-python\.pixi\envs\default\Lib\site-packages\xarray\core\duck_array_ops.py:253: RuntimeWarning: invalid value encountered in cast
+    C:\buildagent\work\4b9080cbb3354582\imod-python\.pixi\envs\default\Lib\site-packages\xarray\core\duck_array_ops.py:250: RuntimeWarning: invalid value encountered in cast
       return data.astype(dtype, **kwargs)
-    C:\buildagent\work\4b9080cbb3354582\imod-python\.pixi\envs\default\Lib\site-packages\xarray\core\duck_array_ops.py:253: RuntimeWarning: invalid value encountered in cast
+    C:\buildagent\work\4b9080cbb3354582\imod-python\.pixi\envs\default\Lib\site-packages\xarray\core\duck_array_ops.py:250: RuntimeWarning: invalid value encountered in cast
       return data.astype(dtype, **kwargs)
-    C:\buildagent\work\4b9080cbb3354582\imod-python\.pixi\envs\default\Lib\site-packages\xarray\core\duck_array_ops.py:253: RuntimeWarning: invalid value encountered in cast
+    C:\buildagent\work\4b9080cbb3354582\imod-python\.pixi\envs\default\Lib\site-packages\xarray\core\duck_array_ops.py:250: RuntimeWarning: invalid value encountered in cast
       return data.astype(dtype, **kwargs)
-    C:\buildagent\work\4b9080cbb3354582\imod-python\.pixi\envs\default\Lib\site-packages\xarray\core\duck_array_ops.py:253: RuntimeWarning: invalid value encountered in cast
+    C:\buildagent\work\4b9080cbb3354582\imod-python\.pixi\envs\default\Lib\site-packages\xarray\core\duck_array_ops.py:250: RuntimeWarning: invalid value encountered in cast
       return data.astype(dtype, **kwargs)
 
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 203-204
+.. GENERATED FROM PYTHON SOURCE LINES 202-203
 
 Run the unsplit model and load the simulation results.
 
-.. GENERATED FROM PYTHON SOURCE LINES 204-207
+.. GENERATED FROM PYTHON SOURCE LINES 203-206
 
 .. code-block:: Python
 
@@ -375,11 +374,11 @@ Run the unsplit model and load the simulation results.
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 208-209
+.. GENERATED FROM PYTHON SOURCE LINES 207-208
 
 Run the split model and load the simulation results.
 
-.. GENERATED FROM PYTHON SOURCE LINES 209-216
+.. GENERATED FROM PYTHON SOURCE LINES 208-215
 
 .. code-block:: Python
 
@@ -404,16 +403,16 @@ Run the split model and load the simulation results.
  .. code-block:: none
 
 
-    <matplotlib.contour.QuadContourSet object at 0x0000016F3FEEB770>
+    <matplotlib.contour.QuadContourSet object at 0x00000251D202C7D0>
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 217-219
+.. GENERATED FROM PYTHON SOURCE LINES 216-218
 
 Compute the difference between the split and unsplit simulation results for transport at the
 end of the simulation, and print them
 
-.. GENERATED FROM PYTHON SOURCE LINES 219-222
+.. GENERATED FROM PYTHON SOURCE LINES 218-221
 
 .. code-block:: Python
 
@@ -434,14 +433,14 @@ end of the simulation, and print them
  .. code-block:: none
 
 
-    <matplotlib.contour.QuadContourSet object at 0x0000016F3BD31DF0>
+    <matplotlib.contour.QuadContourSet object at 0x00000251D062B0B0>
 
 
 
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** (1 minutes 16.141 seconds)
+   **Total running time of the script:** (0 minutes 52.835 seconds)
 
 
 .. _sphx_glr_download_examples_mf6_transport_2d.py:

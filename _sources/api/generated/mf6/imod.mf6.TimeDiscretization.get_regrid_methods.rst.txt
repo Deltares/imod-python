@@ -1,0 +1,6 @@
+﻿imod.mf6.TimeDiscretization.get\_regrid\_methods
+================================================
+
+.. currentmodule:: imod.mf6
+
+.. automethod:: TimeDiscretization.get_regrid_methods

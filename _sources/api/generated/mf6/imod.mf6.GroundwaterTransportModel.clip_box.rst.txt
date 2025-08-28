@@ -1,0 +1,6 @@
+﻿imod.mf6.GroundwaterTransportModel.clip\_box
+============================================
+
+.. currentmodule:: imod.mf6
+
+.. automethod:: GroundwaterTransportModel.clip_box

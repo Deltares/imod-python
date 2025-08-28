@@ -7,7 +7,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>imod.prepare.regrid &#8212; iMOD Python 1.0.0rc4 documentation</title>
+    <title>imod.prepare.regrid &#8212; iMOD Python 1.0.0rc6 documentation</title>
   
   
   
@@ -41,7 +41,7 @@
   <link rel="preload" as="script" href="../../../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
 <link rel="preload" as="script" href="../../../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
 
-    <script src="../../../_static/documentation_options.js?v=2fc85bd2"></script>
+    <script src="../../../_static/documentation_options.js?v=bc4855a1"></script>
     <script src="../../../_static/doctools.js?v=9bcbadda"></script>
     <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script>DOCUMENTATION_OPTIONS.pagename = '_modules/imod/prepare/regrid';</script>
@@ -50,7 +50,7 @@
     <link rel="search" title="Search" href="../../../search.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
-  <meta name="docsearch:version" content="1.0.0rc4.dev" />
+  <meta name="docsearch:version" content="1.0.0rc6.dev" />
   </head>
   
   
@@ -114,8 +114,8 @@
     
     
     
-    <img src="../../../_static/imod-python-logo-light.svg" class="logo__image only-light" alt="iMOD Python 1.0.0rc4 documentation - Home"/>
-    <img src="../../../_static/imod-python-logo-dark.svg" class="logo__image only-dark pst-js-only" alt="iMOD Python 1.0.0rc4 documentation - Home"/>
+    <img src="../../../_static/imod-python-logo-light.svg" class="logo__image only-light" alt="iMOD Python 1.0.0rc6 documentation - Home"/>
+    <img src="../../../_static/imod-python-logo-dark.svg" class="logo__image only-dark pst-js-only" alt="iMOD Python 1.0.0rc6 documentation - Home"/>
   
   
 </a></div>
@@ -153,7 +153,7 @@
 
 <li class="nav-item ">
   <a class="nav-link nav-internal" href="../../../api/index.html">
-    API Reference
+    API
   </a>
 </li>
 
@@ -303,7 +303,7 @@
 
 <li class="nav-item ">
   <a class="nav-link nav-internal" href="../../../api/index.html">
-    API Reference
+    API
   </a>
 </li>
 
@@ -427,308 +427,10 @@
                 <article class="bd-article">
                   
   <h1>Source code for imod.prepare.regrid</h1><div class="highlight"><pre>
-<span></span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">Module that provides a class to do a variety of regridding operations, up to</span>
-<span class="sd">three dimensions.</span>
+<span></span><span class="kn">import</span><span class="w"> </span><span class="nn">textwrap</span>
 
-<span class="sd">Before regridding, the dimension over which regridding should occur are</span>
-<span class="sd">inferred, using the functions in the imod.prepare.common module. In case</span>
-<span class="sd">multiple dimensions are represent, the data is reshaped such that a single loop</span>
-<span class="sd">will regrid them all.</span>
-
-<span class="sd">For example: let there be a DataArray with dimensions time, layer, y, and x. We</span>
-<span class="sd">wish to regrid using an area weighted mean, over x and y. This means values</span>
-<span class="sd">across times and layers are not aggregated together. In this case, the array is</span>
-<span class="sd">reshaped into a 3D array, rather than a 4D array. Time and layer are stacked</span>
-<span class="sd">into this first dimension together, so that a single loop suffices (see</span>
-<span class="sd">common._reshape and _iter_regrid).</span>
-
-<span class="sd">Functions can be incorporated into the multidimensional regridding. This is done</span>
-<span class="sd">by making use of numba closures, since there&#39;s an overhead to passing function</span>
-<span class="sd">objects directly. In this case, the function is simply compiled into the</span>
-<span class="sd">specific regridding method, without additional overhead.</span>
-
-<span class="sd">The regrid methods _regrid_{n}d are quite straightfoward. Using the indices that</span>
-<span class="sd">and weights that have been gathered by _weights_1d, these methods fetch the</span>
-<span class="sd">values from the source array (src), and pass it on to the aggregation method.</span>
-<span class="sd">The single aggregated value is then filled into the destination array (dst).</span>
-<span class="sd">&quot;&quot;&quot;</span>
-
-<span class="kn">import</span><span class="w"> </span><span class="nn">textwrap</span>
-<span class="kn">import</span><span class="w"> </span><span class="nn">warnings</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">collections</span><span class="w"> </span><span class="kn">import</span> <span class="n">namedtuple</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">List</span><span class="p">,</span> <span class="n">Sequence</span>
-
-<span class="kn">import</span><span class="w"> </span><span class="nn">dask</span>
-<span class="kn">import</span><span class="w"> </span><span class="nn">numba</span>
-<span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
-<span class="kn">import</span><span class="w"> </span><span class="nn">xarray</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">xr</span>
-
-<span class="kn">from</span><span class="w"> </span><span class="nn">imod.prepare</span><span class="w"> </span><span class="kn">import</span> <span class="n">common</span><span class="p">,</span> <span class="n">interpolate</span>
-
-<span class="n">_RegridInfo</span> <span class="o">=</span> <span class="n">namedtuple</span><span class="p">(</span>
-    <span class="s2">&quot;_RegridInfo&quot;</span><span class="p">,</span>
-    <span class="p">[</span>
-        <span class="s2">&quot;matching_dims&quot;</span><span class="p">,</span>
-        <span class="s2">&quot;regrid_dims&quot;</span><span class="p">,</span>
-        <span class="s2">&quot;add_dims&quot;</span><span class="p">,</span>
-        <span class="s2">&quot;dst_shape&quot;</span><span class="p">,</span>
-        <span class="s2">&quot;dst_dims&quot;</span><span class="p">,</span>
-        <span class="s2">&quot;dst_da_coords&quot;</span><span class="p">,</span>
-        <span class="s2">&quot;src_coords_regrid&quot;</span><span class="p">,</span>
-        <span class="s2">&quot;dst_coords_regrid&quot;</span><span class="p">,</span>
-    <span class="p">],</span>
-<span class="p">)</span>
-
-
-<span class="nd">@numba</span><span class="o">.</span><span class="n">njit</span><span class="p">(</span><span class="n">cache</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-<span class="k">def</span><span class="w"> </span><span class="nf">_regrid_1d</span><span class="p">(</span><span class="n">src</span><span class="p">,</span> <span class="n">dst</span><span class="p">,</span> <span class="n">values</span><span class="p">,</span> <span class="n">weights</span><span class="p">,</span> <span class="n">method</span><span class="p">,</span> <span class="o">*</span><span class="n">inds_weights</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    numba compiled function to regrid in three dimensions</span>
-
-<span class="sd">    Parameters</span>
-<span class="sd">    ----------</span>
-<span class="sd">    src : np.array</span>
-<span class="sd">    dst : np.array</span>
-<span class="sd">    src_coords : tuple of np.arrays of edges</span>
-<span class="sd">    dst_coords : tuple of np.arrays of edges</span>
-<span class="sd">    method : numba.njit&#39;ed function</span>
-<span class="sd">    &quot;&quot;&quot;</span>
-    <span class="n">kk</span><span class="p">,</span> <span class="n">blocks_ix</span><span class="p">,</span> <span class="n">blocks_weights_x</span> <span class="o">=</span> <span class="n">inds_weights</span>
-    <span class="c1"># k are indices of dst array</span>
-    <span class="c1"># block_i contains indices of src array</span>
-    <span class="c1"># block_w contains weights of src array</span>
-    <span class="k">for</span> <span class="n">countk</span><span class="p">,</span> <span class="n">k</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">kk</span><span class="p">):</span>
-        <span class="n">block_ix</span> <span class="o">=</span> <span class="n">blocks_ix</span><span class="p">[</span><span class="n">countk</span><span class="p">]</span>
-        <span class="n">block_wx</span> <span class="o">=</span> <span class="n">blocks_weights_x</span><span class="p">[</span><span class="n">countk</span><span class="p">]</span>
-        <span class="c1"># Add the values and weights per cell in multi-dim block</span>
-        <span class="n">count</span> <span class="o">=</span> <span class="mi">0</span>
-        <span class="k">for</span> <span class="n">ix</span><span class="p">,</span> <span class="n">wx</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">block_ix</span><span class="p">,</span> <span class="n">block_wx</span><span class="p">):</span>
-            <span class="k">if</span> <span class="n">ix</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">:</span>
-                <span class="k">break</span>
-            <span class="n">values</span><span class="p">[</span><span class="n">count</span><span class="p">]</span> <span class="o">=</span> <span class="n">src</span><span class="p">[</span><span class="n">ix</span><span class="p">]</span>
-            <span class="n">weights</span><span class="p">[</span><span class="n">count</span><span class="p">]</span> <span class="o">=</span> <span class="n">wx</span>
-            <span class="n">count</span> <span class="o">+=</span> <span class="mi">1</span>
-
-        <span class="c1"># aggregate</span>
-        <span class="n">dst</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="o">=</span> <span class="n">method</span><span class="p">(</span><span class="n">values</span><span class="p">[:</span><span class="n">count</span><span class="p">],</span> <span class="n">weights</span><span class="p">[:</span><span class="n">count</span><span class="p">])</span>
-
-        <span class="c1"># reset storage</span>
-        <span class="n">values</span><span class="p">[:</span><span class="n">count</span><span class="p">]</span> <span class="o">=</span> <span class="mi">0</span>
-        <span class="n">weights</span><span class="p">[:</span><span class="n">count</span><span class="p">]</span> <span class="o">=</span> <span class="mi">0</span>
-
-    <span class="k">return</span> <span class="n">dst</span>
-
-
-<span class="nd">@numba</span><span class="o">.</span><span class="n">njit</span><span class="p">(</span><span class="n">cache</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-<span class="k">def</span><span class="w"> </span><span class="nf">_regrid_2d</span><span class="p">(</span><span class="n">src</span><span class="p">,</span> <span class="n">dst</span><span class="p">,</span> <span class="n">values</span><span class="p">,</span> <span class="n">weights</span><span class="p">,</span> <span class="n">method</span><span class="p">,</span> <span class="o">*</span><span class="n">inds_weights</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    numba compiled function to regrid in three dimensions</span>
-
-<span class="sd">    Parameters</span>
-<span class="sd">    ----------</span>
-<span class="sd">    src : np.array</span>
-<span class="sd">    dst : np.array</span>
-<span class="sd">    src_coords : tuple of np.arrays of edges</span>
-<span class="sd">    dst_coords : tuple of np.arrays of edges</span>
-<span class="sd">    method : numba.njit&#39;ed function</span>
-<span class="sd">    &quot;&quot;&quot;</span>
-    <span class="n">jj</span><span class="p">,</span> <span class="n">blocks_iy</span><span class="p">,</span> <span class="n">blocks_weights_y</span><span class="p">,</span> <span class="n">kk</span><span class="p">,</span> <span class="n">blocks_ix</span><span class="p">,</span> <span class="n">blocks_weights_x</span> <span class="o">=</span> <span class="n">inds_weights</span>
-
-    <span class="c1"># j, k are indices of dst array</span>
-    <span class="c1"># block_i contains indices of src array</span>
-    <span class="c1"># block_w contains weights of src array</span>
-    <span class="k">for</span> <span class="n">countj</span><span class="p">,</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">jj</span><span class="p">):</span>
-        <span class="n">block_iy</span> <span class="o">=</span> <span class="n">blocks_iy</span><span class="p">[</span><span class="n">countj</span><span class="p">]</span>
-        <span class="n">block_wy</span> <span class="o">=</span> <span class="n">blocks_weights_y</span><span class="p">[</span><span class="n">countj</span><span class="p">]</span>
-        <span class="k">for</span> <span class="n">countk</span><span class="p">,</span> <span class="n">k</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">kk</span><span class="p">):</span>
-            <span class="n">block_ix</span> <span class="o">=</span> <span class="n">blocks_ix</span><span class="p">[</span><span class="n">countk</span><span class="p">]</span>
-            <span class="n">block_wx</span> <span class="o">=</span> <span class="n">blocks_weights_x</span><span class="p">[</span><span class="n">countk</span><span class="p">]</span>
-            <span class="c1"># Add the values and weights per cell in multi-dim block</span>
-            <span class="n">count</span> <span class="o">=</span> <span class="mi">0</span>
-            <span class="k">for</span> <span class="n">iy</span><span class="p">,</span> <span class="n">wy</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">block_iy</span><span class="p">,</span> <span class="n">block_wy</span><span class="p">):</span>
-                <span class="k">if</span> <span class="n">iy</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">:</span>
-                    <span class="k">break</span>
-                <span class="k">for</span> <span class="n">ix</span><span class="p">,</span> <span class="n">wx</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">block_ix</span><span class="p">,</span> <span class="n">block_wx</span><span class="p">):</span>
-                    <span class="k">if</span> <span class="n">ix</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">:</span>
-                        <span class="k">break</span>
-                    <span class="n">values</span><span class="p">[</span><span class="n">count</span><span class="p">]</span> <span class="o">=</span> <span class="n">src</span><span class="p">[</span><span class="n">iy</span><span class="p">,</span> <span class="n">ix</span><span class="p">]</span>
-                    <span class="n">weights</span><span class="p">[</span><span class="n">count</span><span class="p">]</span> <span class="o">=</span> <span class="n">wy</span> <span class="o">*</span> <span class="n">wx</span>
-                    <span class="n">count</span> <span class="o">+=</span> <span class="mi">1</span>
-
-            <span class="c1"># aggregate</span>
-            <span class="n">dst</span><span class="p">[</span><span class="n">j</span><span class="p">,</span> <span class="n">k</span><span class="p">]</span> <span class="o">=</span> <span class="n">method</span><span class="p">(</span><span class="n">values</span><span class="p">[:</span><span class="n">count</span><span class="p">],</span> <span class="n">weights</span><span class="p">[:</span><span class="n">count</span><span class="p">])</span>
-
-            <span class="c1"># reset storage</span>
-            <span class="n">values</span><span class="p">[:</span><span class="n">count</span><span class="p">]</span> <span class="o">=</span> <span class="mf">0.0</span>
-            <span class="n">weights</span><span class="p">[:</span><span class="n">count</span><span class="p">]</span> <span class="o">=</span> <span class="mf">0.0</span>
-
-    <span class="k">return</span> <span class="n">dst</span>
-
-
-<span class="nd">@numba</span><span class="o">.</span><span class="n">njit</span><span class="p">(</span><span class="n">cache</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-<span class="k">def</span><span class="w"> </span><span class="nf">_regrid_3d</span><span class="p">(</span><span class="n">src</span><span class="p">,</span> <span class="n">dst</span><span class="p">,</span> <span class="n">values</span><span class="p">,</span> <span class="n">weights</span><span class="p">,</span> <span class="n">method</span><span class="p">,</span> <span class="o">*</span><span class="n">inds_weights</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    numba compiled function to regrid in three dimensions</span>
-
-<span class="sd">    Parameters</span>
-<span class="sd">    ----------</span>
-<span class="sd">    src : np.array</span>
-<span class="sd">    dst : np.array</span>
-<span class="sd">    src_coords : tuple of np.arrays of edges</span>
-<span class="sd">    dst_coords : tuple of np.arrays of edges</span>
-<span class="sd">    method : numba.njit&#39;ed function</span>
-<span class="sd">    &quot;&quot;&quot;</span>
-    <span class="p">(</span>
-        <span class="n">ii</span><span class="p">,</span>
-        <span class="n">blocks_iz</span><span class="p">,</span>
-        <span class="n">blocks_weights_z</span><span class="p">,</span>
-        <span class="n">jj</span><span class="p">,</span>
-        <span class="n">blocks_iy</span><span class="p">,</span>
-        <span class="n">blocks_weights_y</span><span class="p">,</span>
-        <span class="n">kk</span><span class="p">,</span>
-        <span class="n">blocks_ix</span><span class="p">,</span>
-        <span class="n">blocks_weights_x</span><span class="p">,</span>
-    <span class="p">)</span> <span class="o">=</span> <span class="n">inds_weights</span>
-
-    <span class="c1"># i, j, k are indices of dst array</span>
-    <span class="c1"># block_i contains indices of src array</span>
-    <span class="c1"># block_w contains weights of src array</span>
-    <span class="k">for</span> <span class="n">counti</span><span class="p">,</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">ii</span><span class="p">):</span>
-        <span class="n">block_iz</span> <span class="o">=</span> <span class="n">blocks_iz</span><span class="p">[</span><span class="n">counti</span><span class="p">]</span>
-        <span class="n">block_wz</span> <span class="o">=</span> <span class="n">blocks_weights_z</span><span class="p">[</span><span class="n">counti</span><span class="p">]</span>
-        <span class="k">for</span> <span class="n">countj</span><span class="p">,</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">jj</span><span class="p">):</span>
-            <span class="n">block_iy</span> <span class="o">=</span> <span class="n">blocks_iy</span><span class="p">[</span><span class="n">countj</span><span class="p">]</span>
-            <span class="n">block_wy</span> <span class="o">=</span> <span class="n">blocks_weights_y</span><span class="p">[</span><span class="n">countj</span><span class="p">]</span>
-            <span class="k">for</span> <span class="n">countk</span><span class="p">,</span> <span class="n">k</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">kk</span><span class="p">):</span>
-                <span class="n">block_ix</span> <span class="o">=</span> <span class="n">blocks_ix</span><span class="p">[</span><span class="n">countk</span><span class="p">]</span>
-                <span class="n">block_wx</span> <span class="o">=</span> <span class="n">blocks_weights_x</span><span class="p">[</span><span class="n">countk</span><span class="p">]</span>
-                <span class="c1"># Add the values and weights per cell in multi-dim block</span>
-                <span class="n">count</span> <span class="o">=</span> <span class="mi">0</span>
-                <span class="k">for</span> <span class="n">iz</span><span class="p">,</span> <span class="n">wz</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">block_iz</span><span class="p">,</span> <span class="n">block_wz</span><span class="p">):</span>
-                    <span class="k">if</span> <span class="n">iz</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">:</span>
-                        <span class="k">break</span>
-                    <span class="k">for</span> <span class="n">iy</span><span class="p">,</span> <span class="n">wy</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">block_iy</span><span class="p">,</span> <span class="n">block_wy</span><span class="p">):</span>
-                        <span class="k">if</span> <span class="n">iy</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">:</span>
-                            <span class="k">break</span>
-                        <span class="k">for</span> <span class="n">ix</span><span class="p">,</span> <span class="n">wx</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">block_ix</span><span class="p">,</span> <span class="n">block_wx</span><span class="p">):</span>
-                            <span class="k">if</span> <span class="n">ix</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">:</span>
-                                <span class="k">break</span>
-                            <span class="n">values</span><span class="p">[</span><span class="n">count</span><span class="p">]</span> <span class="o">=</span> <span class="n">src</span><span class="p">[</span><span class="n">iz</span><span class="p">,</span> <span class="n">iy</span><span class="p">,</span> <span class="n">ix</span><span class="p">]</span>
-                            <span class="n">weights</span><span class="p">[</span><span class="n">count</span><span class="p">]</span> <span class="o">=</span> <span class="n">wz</span> <span class="o">*</span> <span class="n">wy</span> <span class="o">*</span> <span class="n">wx</span>
-                            <span class="n">count</span> <span class="o">+=</span> <span class="mi">1</span>
-
-                <span class="c1"># aggregate</span>
-                <span class="n">dst</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="n">j</span><span class="p">,</span> <span class="n">k</span><span class="p">]</span> <span class="o">=</span> <span class="n">method</span><span class="p">(</span><span class="n">values</span><span class="p">[:</span><span class="n">count</span><span class="p">],</span> <span class="n">weights</span><span class="p">[:</span><span class="n">count</span><span class="p">])</span>
-
-                <span class="c1"># reset storage</span>
-                <span class="n">values</span><span class="p">[:</span><span class="n">count</span><span class="p">]</span> <span class="o">=</span> <span class="mf">0.0</span>
-                <span class="n">weights</span><span class="p">[:</span><span class="n">count</span><span class="p">]</span> <span class="o">=</span> <span class="mf">0.0</span>
-
-    <span class="k">return</span> <span class="n">dst</span>
-
-
-<span class="nd">@numba</span><span class="o">.</span><span class="n">njit</span>
-<span class="k">def</span><span class="w"> </span><span class="nf">_iter_regrid</span><span class="p">(</span><span class="n">iter_src</span><span class="p">,</span> <span class="n">iter_dst</span><span class="p">,</span> <span class="n">alloc_len</span><span class="p">,</span> <span class="n">regrid_function</span><span class="p">,</span> <span class="o">*</span><span class="n">inds_weights</span><span class="p">):</span>
-    <span class="n">n_iter</span> <span class="o">=</span> <span class="n">iter_src</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
-    <span class="c1"># Pre-allocate temporary storage arrays</span>
-    <span class="n">values</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">alloc_len</span><span class="p">)</span>
-    <span class="n">weights</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">alloc_len</span><span class="p">)</span>
-    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">n_iter</span><span class="p">):</span>
-        <span class="n">iter_dst</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="o">...</span><span class="p">]</span> <span class="o">=</span> <span class="n">regrid_function</span><span class="p">(</span>
-            <span class="n">iter_src</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="o">...</span><span class="p">],</span> <span class="n">iter_dst</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="o">...</span><span class="p">],</span> <span class="n">values</span><span class="p">,</span> <span class="n">weights</span><span class="p">,</span> <span class="o">*</span><span class="n">inds_weights</span>
-        <span class="p">)</span>
-    <span class="k">return</span> <span class="n">iter_dst</span>
-
-
-<span class="k">def</span><span class="w"> </span><span class="nf">_jit_regrid</span><span class="p">(</span><span class="n">jit_method</span><span class="p">,</span> <span class="n">ndim_regrid</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Compile a specific aggregation function using the compiled external method</span>
-<span class="sd">    Closure avoids numba overhead</span>
-<span class="sd">    https://numba.pydata.org/numba-doc/dev/user/faq.html#can-i-pass-a-function-as-an-argument-to-a-jitted-function</span>
-<span class="sd">    &quot;&quot;&quot;</span>
-
-    <span class="nd">@numba</span><span class="o">.</span><span class="n">njit</span>
-    <span class="k">def</span><span class="w"> </span><span class="nf">jit_regrid_1d</span><span class="p">(</span><span class="n">src</span><span class="p">,</span> <span class="n">dst</span><span class="p">,</span> <span class="n">values</span><span class="p">,</span> <span class="n">weights</span><span class="p">,</span> <span class="o">*</span><span class="n">inds_weights</span><span class="p">):</span>
-        <span class="k">return</span> <span class="n">_regrid_1d</span><span class="p">(</span><span class="n">src</span><span class="p">,</span> <span class="n">dst</span><span class="p">,</span> <span class="n">values</span><span class="p">,</span> <span class="n">weights</span><span class="p">,</span> <span class="n">jit_method</span><span class="p">,</span> <span class="o">*</span><span class="n">inds_weights</span><span class="p">)</span>
-
-    <span class="nd">@numba</span><span class="o">.</span><span class="n">njit</span>
-    <span class="k">def</span><span class="w"> </span><span class="nf">jit_regrid_2d</span><span class="p">(</span><span class="n">src</span><span class="p">,</span> <span class="n">dst</span><span class="p">,</span> <span class="n">values</span><span class="p">,</span> <span class="n">weights</span><span class="p">,</span> <span class="o">*</span><span class="n">inds_weights</span><span class="p">):</span>
-        <span class="k">return</span> <span class="n">_regrid_2d</span><span class="p">(</span><span class="n">src</span><span class="p">,</span> <span class="n">dst</span><span class="p">,</span> <span class="n">values</span><span class="p">,</span> <span class="n">weights</span><span class="p">,</span> <span class="n">jit_method</span><span class="p">,</span> <span class="o">*</span><span class="n">inds_weights</span><span class="p">)</span>
-
-    <span class="nd">@numba</span><span class="o">.</span><span class="n">njit</span>
-    <span class="k">def</span><span class="w"> </span><span class="nf">jit_regrid_3d</span><span class="p">(</span><span class="n">src</span><span class="p">,</span> <span class="n">dst</span><span class="p">,</span> <span class="n">values</span><span class="p">,</span> <span class="n">weights</span><span class="p">,</span> <span class="o">*</span><span class="n">inds_weights</span><span class="p">):</span>
-        <span class="k">return</span> <span class="n">_regrid_3d</span><span class="p">(</span><span class="n">src</span><span class="p">,</span> <span class="n">dst</span><span class="p">,</span> <span class="n">values</span><span class="p">,</span> <span class="n">weights</span><span class="p">,</span> <span class="n">jit_method</span><span class="p">,</span> <span class="o">*</span><span class="n">inds_weights</span><span class="p">)</span>
-
-    <span class="k">if</span> <span class="n">ndim_regrid</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
-        <span class="n">jit_regrid</span> <span class="o">=</span> <span class="n">jit_regrid_1d</span>
-    <span class="k">elif</span> <span class="n">ndim_regrid</span> <span class="o">==</span> <span class="mi">2</span><span class="p">:</span>
-        <span class="n">jit_regrid</span> <span class="o">=</span> <span class="n">jit_regrid_2d</span>
-    <span class="k">elif</span> <span class="n">ndim_regrid</span> <span class="o">==</span> <span class="mi">3</span><span class="p">:</span>
-        <span class="n">jit_regrid</span> <span class="o">=</span> <span class="n">jit_regrid_3d</span>
-    <span class="k">else</span><span class="p">:</span>
-        <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="s2">&quot;cannot regrid over more than three dimensions&quot;</span><span class="p">)</span>
-
-    <span class="k">return</span> <span class="n">jit_regrid</span>
-
-
-<span class="k">def</span><span class="w"> </span><span class="nf">_make_regrid</span><span class="p">(</span><span class="n">method</span><span class="p">,</span> <span class="n">ndim_regrid</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Closure avoids numba overhead</span>
-<span class="sd">    https://numba.pydata.org/numba-doc/dev/user/faq.html#can-i-pass-a-function-as-an-argument-to-a-jitted-function</span>
-<span class="sd">    &quot;&quot;&quot;</span>
-
-    <span class="c1"># First, compile external method</span>
-    <span class="n">jit_method</span> <span class="o">=</span> <span class="n">numba</span><span class="o">.</span><span class="n">njit</span><span class="p">(</span><span class="n">method</span><span class="p">,</span> <span class="n">cache</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-    <span class="n">jit_regrid</span> <span class="o">=</span> <span class="n">_jit_regrid</span><span class="p">(</span><span class="n">jit_method</span><span class="p">,</span> <span class="n">ndim_regrid</span><span class="p">)</span>
-
-    <span class="c1"># Finally, compile the iterating regrid method with the specific aggregation function</span>
-    <span class="nd">@numba</span><span class="o">.</span><span class="n">njit</span>
-    <span class="k">def</span><span class="w"> </span><span class="nf">iter_regrid</span><span class="p">(</span><span class="n">iter_src</span><span class="p">,</span> <span class="n">iter_dst</span><span class="p">,</span> <span class="n">alloc_len</span><span class="p">,</span> <span class="o">*</span><span class="n">inds_weights</span><span class="p">):</span>
-        <span class="k">return</span> <span class="n">_iter_regrid</span><span class="p">(</span><span class="n">iter_src</span><span class="p">,</span> <span class="n">iter_dst</span><span class="p">,</span> <span class="n">alloc_len</span><span class="p">,</span> <span class="n">jit_regrid</span><span class="p">,</span> <span class="o">*</span><span class="n">inds_weights</span><span class="p">)</span>
-
-    <span class="k">return</span> <span class="n">iter_regrid</span>
-
-
-<span class="k">def</span><span class="w"> </span><span class="nf">_nd_regrid</span><span class="p">(</span><span class="n">src</span><span class="p">,</span> <span class="n">dst</span><span class="p">,</span> <span class="n">src_coords</span><span class="p">,</span> <span class="n">dst_coords</span><span class="p">,</span> <span class="n">iter_regrid</span><span class="p">,</span> <span class="n">use_relative_weights</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Regrids an ndarray up to maximum 3 dimensions.</span>
-<span class="sd">    Dimensionality of regridding is determined by the the length of src_coords</span>
-<span class="sd">    (== len(dst_coords)), which has to match with the provide iter_regrid</span>
-<span class="sd">    function.</span>
-
-<span class="sd">    Parameters</span>
-<span class="sd">    ----------</span>
-<span class="sd">    src : np.array</span>
-<span class="sd">    dst : np.array</span>
-<span class="sd">    src_coords : tuple of np.array</span>
-<span class="sd">    dst_coords : tuple of np.array</span>
-<span class="sd">    iter_regrid : function, numba compiled</span>
-<span class="sd">    &quot;&quot;&quot;</span>
-    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">src</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span> <span class="o">!=</span> <span class="nb">len</span><span class="p">(</span><span class="n">dst</span><span class="o">.</span><span class="n">shape</span><span class="p">):</span>
-        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;shape mismatch between src and dst&quot;</span><span class="p">)</span>
-    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">src_coords</span><span class="p">)</span> <span class="o">!=</span> <span class="nb">len</span><span class="p">(</span><span class="n">dst_coords</span><span class="p">):</span>
-        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;coords mismatch between src and dst&quot;</span><span class="p">)</span>
-    <span class="n">ndim_regrid</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">src_coords</span><span class="p">)</span>
-
-    <span class="c1"># Determine weights for every regrid dimension, and alloc_len,</span>
-    <span class="c1"># the maximum number of src cells that may end up in a single dst cell</span>
-    <span class="n">inds_weights</span> <span class="o">=</span> <span class="p">[]</span>
-    <span class="n">alloc_len</span> <span class="o">=</span> <span class="mi">1</span>
-    <span class="k">for</span> <span class="n">src_x</span><span class="p">,</span> <span class="n">dst_x</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">src_coords</span><span class="p">,</span> <span class="n">dst_coords</span><span class="p">):</span>
-        <span class="n">size</span><span class="p">,</span> <span class="n">i_w</span> <span class="o">=</span> <span class="n">common</span><span class="o">.</span><span class="n">_weights_1d</span><span class="p">(</span><span class="n">src_x</span><span class="p">,</span> <span class="n">dst_x</span><span class="p">,</span> <span class="n">use_relative_weights</span><span class="p">)</span>
-        <span class="k">for</span> <span class="n">elem</span> <span class="ow">in</span> <span class="n">i_w</span><span class="p">:</span>
-            <span class="n">inds_weights</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">elem</span><span class="p">)</span>
-        <span class="n">alloc_len</span> <span class="o">*=</span> <span class="n">size</span>
-
-    <span class="n">iter_src</span><span class="p">,</span> <span class="n">iter_dst</span> <span class="o">=</span> <span class="n">common</span><span class="o">.</span><span class="n">_reshape</span><span class="p">(</span><span class="n">src</span><span class="p">,</span> <span class="n">dst</span><span class="p">,</span> <span class="n">ndim_regrid</span><span class="p">)</span>
-    <span class="n">iter_dst</span> <span class="o">=</span> <span class="n">iter_regrid</span><span class="p">(</span><span class="n">iter_src</span><span class="p">,</span> <span class="n">iter_dst</span><span class="p">,</span> <span class="n">alloc_len</span><span class="p">,</span> <span class="o">*</span><span class="n">inds_weights</span><span class="p">)</span>
-
-    <span class="k">return</span> <span class="n">iter_dst</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="n">dst</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span>
-
-
-<span class="n">WARNING_MSG</span> <span class="o">=</span> <span class="n">textwrap</span><span class="o">.</span><span class="n">dedent</span><span class="p">(</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;{name} is deprecated so we will remove it eventually. Use the</span>
+<span class="n">ERROR_MSG</span> <span class="o">=</span> <span class="n">textwrap</span><span class="o">.</span><span class="n">dedent</span><span class="p">(</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;{name} is removed. Use the</span>
 <span class="sd">    the regridder in ``xugrid`` instead, which is around 10 times faster. To</span>
 <span class="sd">    regrid a single array, see:</span>
 <span class="sd">    https://deltares.github.io/xugrid/examples/regridder_overview.html. To</span>
@@ -743,14 +445,12 @@
 <a class="viewcode-back" href="../../../api/generated/prepare/imod.prepare.Regridder.html#imod.prepare.Regridder">[docs]</a>
 <span class="k">class</span><span class="w"> </span><span class="nc">Regridder</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Object to repeatedly regrid similar objects. Compiles once on first call,</span>
-<span class="sd">    can then be repeatedly called without JIT compilation overhead.</span>
+<span class="sd">    Placeholder to preserve removed Regridder class namespace.</span>
 
-<span class="sd">    .. caution::</span>
+<span class="sd">    .. attention::</span>
 
-<span class="sd">        ``imod.prepare.Regridder`` is deprecated so we will remove it</span>
-<span class="sd">        eventually. Use the regridder in ``xugrid`` instead, which is around 10</span>
-<span class="sd">        times faster. It is as simple as:</span>
+<span class="sd">        ``imod.prepare.Regridder`` is removed. Use the regridder in ``xugrid``</span>
+<span class="sd">        instead, which is around 10 times faster. It is as simple as:</span>
 
 <span class="sd">        &gt;&gt;&gt; import xugrid as xu</span>
 <span class="sd">        &gt;&gt;&gt; regridder = xu.OverlapRegridder(source=source, target=like, method=&quot;mean&quot;)</span>
@@ -762,349 +462,13 @@
 <span class="sd">        Python user guide:</span>
 <span class="sd">        https://deltares.github.io/imod-python/user-guide/08-regridding.html.</span>
 
-<span class="sd">    Attributes</span>
-<span class="sd">    ----------</span>
-<span class="sd">    method : str, function</span>
-<span class="sd">        The method to use for regridding. Default available methods are:</span>
-<span class="sd">        ``{&quot;nearest&quot;, &quot;multilinear&quot;, mean&quot;, &quot;harmonic_mean&quot;, &quot;geometric_mean&quot;,</span>
-<span class="sd">        &quot;sum&quot;, &quot;minimum&quot;, &quot;maximum&quot;, &quot;mode&quot;, &quot;median&quot;, &quot;conductance&quot;}``</span>
-<span class="sd">    ndim_regrid : int, optional</span>
-<span class="sd">        The number of dimensions over which to regrid. If not provided,</span>
-<span class="sd">        ``ndim_regrid`` will be inferred. It serves to prevent regridding over an</span>
-<span class="sd">        unexpected number of dimensions; say you want to regrid over only two</span>
-<span class="sd">        dimensions. Due to an input error in the coordinates of ``like``, three</span>
-<span class="sd">        dimensions may be inferred in the first ``.regrid`` call. An error will</span>
-<span class="sd">        be raised if ndim_regrid not match the number of inferred dimensions.</span>
-<span class="sd">        Default value is None.</span>
-<span class="sd">    use_relative_weights : bool, optional</span>
-<span class="sd">        Whether to use relative weights in the regridding method or not.</span>
-<span class="sd">        Relative weights are defined as: cell_overlap / source_cellsize, for</span>
-<span class="sd">        every axis.</span>
-
-<span class="sd">        This argument should only be used if you are providing your own</span>
-<span class="sd">        ``method`` as a function, where the function requires relative, rather</span>
-<span class="sd">        than absolute weights (the provided ``conductance`` method requires</span>
-<span class="sd">        relative weights, for example). Default value is False.</span>
-<span class="sd">    extra_overlap : integer, optional</span>
-<span class="sd">        In case of chunked regridding, how many cells of additional overlap is</span>
-<span class="sd">        necessary. Linear interpolation requires this for example, as it reaches</span>
-<span class="sd">        beyond cell boundaries to compute values. Default value is 0.</span>
-
-<span class="sd">    Examples</span>
-<span class="sd">    --------</span>
-<span class="sd">    Initialize the Regridder object:</span>
-
-<span class="sd">    &gt;&gt;&gt; mean_regridder = imod.prepare.Regridder(method=&quot;mean&quot;)</span>
-
-<span class="sd">    Then call the ``regrid`` method to regrid.</span>
-
-<span class="sd">    &gt;&gt;&gt; result = mean_regridder.regrid(source, like)</span>
-
-<span class="sd">    The regridder can be re-used if the number of regridding dimensions</span>
-<span class="sd">    match, saving some time by not (re)compiling the regridding method.</span>
-
-<span class="sd">    &gt;&gt;&gt; second_result = mean_regridder.regrid(second_source, like)</span>
-
-<span class="sd">    A one-liner is possible for single use:</span>
-
-<span class="sd">    &gt;&gt;&gt; result = imod.prepare.Regridder(method=&quot;mean&quot;).regrid(source, like)</span>
-
-<span class="sd">    It&#39;s possible to provide your own methods to the ``Regridder``, provided that</span>
-<span class="sd">    numba can compile them. They need to take the arguments ``values`` and</span>
-<span class="sd">    ``weights``. Make sure they deal with ``nan`` values gracefully!</span>
-
-<span class="sd">    &gt;&gt;&gt; def p30(values, weights):</span>
-<span class="sd">    &gt;&gt;&gt;     return np.nanpercentile(values, 30)</span>
-
-<span class="sd">    &gt;&gt;&gt; p30_regridder = imod.prepare.Regridder(method=p30)</span>
-<span class="sd">    &gt;&gt;&gt; p30_result = p30_regridder.regrid(source, like)</span>
-
-<span class="sd">    The Numba developers maintain a list of support Numpy features here:</span>
-<span class="sd">    https://numba.pydata.org/numba-doc/dev/reference/numpysupported.html</span>
-
-<span class="sd">    In general, however, the provided methods should be adequate for your</span>
-<span class="sd">    regridding needs.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
 <div class="viewcode-block" id="Regridder.__init__">
 <a class="viewcode-back" href="../../../api/generated/prepare/imod.prepare.Regridder.html#imod.prepare.Regridder.__init__">[docs]</a>
-    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
-        <span class="bp">self</span><span class="p">,</span> <span class="n">method</span><span class="p">,</span> <span class="n">ndim_regrid</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">use_relative_weights</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">extra_overlap</span><span class="o">=</span><span class="mi">0</span>
-    <span class="p">):</span>
-        <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span>
-            <span class="n">WARNING_MSG</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__name__</span><span class="p">),</span>
-            <span class="ne">DeprecationWarning</span><span class="p">,</span>
-        <span class="p">)</span>
-
-        <span class="n">_method</span> <span class="o">=</span> <span class="n">common</span><span class="o">.</span><span class="n">_get_method</span><span class="p">(</span><span class="n">method</span><span class="p">,</span> <span class="n">common</span><span class="o">.</span><span class="n">METHODS</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">method</span> <span class="o">=</span> <span class="n">_method</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">ndim_regrid</span> <span class="o">=</span> <span class="n">ndim_regrid</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_first_call</span> <span class="o">=</span> <span class="kc">True</span>
-        <span class="k">if</span> <span class="n">_method</span> <span class="o">==</span> <span class="n">common</span><span class="o">.</span><span class="n">METHODS</span><span class="p">[</span><span class="s2">&quot;conductance&quot;</span><span class="p">]:</span>
-            <span class="n">use_relative_weights</span> <span class="o">=</span> <span class="kc">True</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">use_relative_weights</span> <span class="o">=</span> <span class="n">use_relative_weights</span>
-        <span class="k">if</span> <span class="n">_method</span> <span class="o">==</span> <span class="n">common</span><span class="o">.</span><span class="n">METHODS</span><span class="p">[</span><span class="s2">&quot;multilinear&quot;</span><span class="p">]:</span>
-            <span class="n">extra_overlap</span> <span class="o">=</span> <span class="mi">1</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">extra_overlap</span> <span class="o">=</span> <span class="n">extra_overlap</span></div>
-
-
-    <span class="k">def</span><span class="w"> </span><span class="nf">_make_regrid</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="n">iter_regrid</span> <span class="o">=</span> <span class="n">_make_regrid</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">method</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">ndim_regrid</span><span class="p">)</span>
-        <span class="n">iter_interp</span> <span class="o">=</span> <span class="n">interpolate</span><span class="o">.</span><span class="n">_make_interp</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">ndim_regrid</span><span class="p">)</span>
-
-        <span class="k">def</span><span class="w"> </span><span class="nf">nd_regrid</span><span class="p">(</span><span class="n">src</span><span class="p">,</span> <span class="n">dst</span><span class="p">,</span> <span class="n">src_coords_regrid</span><span class="p">,</span> <span class="n">dst_coords_regrid</span><span class="p">):</span>
-            <span class="k">return</span> <span class="n">_nd_regrid</span><span class="p">(</span>
-                <span class="n">src</span><span class="p">,</span>
-                <span class="n">dst</span><span class="p">,</span>
-                <span class="n">src_coords_regrid</span><span class="p">,</span>
-                <span class="n">dst_coords_regrid</span><span class="p">,</span>
-                <span class="n">iter_regrid</span><span class="p">,</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">use_relative_weights</span><span class="p">,</span>
-            <span class="p">)</span>
-
-        <span class="k">def</span><span class="w"> </span><span class="nf">nd_interp</span><span class="p">(</span><span class="n">src</span><span class="p">,</span> <span class="n">dst</span><span class="p">,</span> <span class="n">src_coords_regrid</span><span class="p">,</span> <span class="n">dst_coords_regrid</span><span class="p">):</span>
-            <span class="k">return</span> <span class="n">interpolate</span><span class="o">.</span><span class="n">_nd_interp</span><span class="p">(</span>
-                <span class="n">src</span><span class="p">,</span> <span class="n">dst</span><span class="p">,</span> <span class="n">src_coords_regrid</span><span class="p">,</span> <span class="n">dst_coords_regrid</span><span class="p">,</span> <span class="n">iter_interp</span>
-            <span class="p">)</span>
-
-        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">method</span> <span class="o">==</span> <span class="s2">&quot;nearest&quot;</span><span class="p">:</span>
-            <span class="k">pass</span>
-        <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">method</span> <span class="o">==</span> <span class="s2">&quot;multilinear&quot;</span><span class="p">:</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">_nd_regrid</span> <span class="o">=</span> <span class="n">nd_interp</span>
-        <span class="k">else</span><span class="p">:</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">_nd_regrid</span> <span class="o">=</span> <span class="n">nd_regrid</span>
-
-    <span class="k">def</span><span class="w"> </span><span class="nf">_check_ndim_regrid</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">regrid_dims</span><span class="p">):</span>
-        <span class="k">if</span> <span class="ow">not</span> <span class="nb">len</span><span class="p">(</span><span class="n">regrid_dims</span><span class="p">)</span> <span class="o">==</span> <span class="bp">self</span><span class="o">.</span><span class="n">ndim_regrid</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
-                <span class="s2">&quot;Number of dimensions to regrid does not match: &quot;</span>
-                <span class="sa">f</span><span class="s2">&quot;Regridder.ndim_regrid = </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">ndim_regrid</span><span class="si">}</span><span class="s2">&quot;</span>
-            <span class="p">)</span>
-
-    <span class="k">def</span><span class="w"> </span><span class="nf">_prepare</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">regrid_dims</span><span class="p">):</span>
-        <span class="c1"># Create tailor made regridding function: take method and ndims into</span>
-        <span class="c1"># account and call it</span>
-        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">ndim_regrid</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">ndim_regrid</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">regrid_dims</span><span class="p">)</span>
-        <span class="k">else</span><span class="p">:</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">_check_ndim_regrid</span><span class="p">(</span><span class="n">regrid_dims</span><span class="p">)</span>
-
-        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">method</span> <span class="o">==</span> <span class="n">common</span><span class="o">.</span><span class="n">METHODS</span><span class="p">[</span><span class="s2">&quot;conductance&quot;</span><span class="p">]</span> <span class="ow">and</span> <span class="nb">len</span><span class="p">(</span><span class="n">regrid_dims</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">2</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
-                <span class="s2">&quot;The conductance method should not be applied to &quot;</span>
-                <span class="s2">&quot;regridding more than two dimensions&quot;</span>
-            <span class="p">)</span>
-        <span class="c1"># Create the method.</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_make_regrid</span><span class="p">()</span>
-
-    <span class="nd">@staticmethod</span>
-    <span class="k">def</span><span class="w"> </span><span class="nf">_regrid_info</span><span class="p">(</span><span class="n">src</span><span class="p">,</span> <span class="n">like</span><span class="p">):</span>
-        <span class="c1"># Find coordinates that already match, and those that have to be</span>
-        <span class="c1"># regridded, and those that exist in source but not in like (left</span>
-        <span class="c1"># untouched)</span>
-        <span class="n">matching_dims</span><span class="p">,</span> <span class="n">regrid_dims</span><span class="p">,</span> <span class="n">add_dims</span> <span class="o">=</span> <span class="n">common</span><span class="o">.</span><span class="n">_match_dims</span><span class="p">(</span><span class="n">src</span><span class="p">,</span> <span class="n">like</span><span class="p">)</span>
-
-        <span class="c1"># Order dimensions in the right way:</span>
-        <span class="c1"># dimensions that are regridded end up at the end for efficient iteration</span>
-        <span class="n">dst_dims</span> <span class="o">=</span> <span class="p">(</span><span class="o">*</span><span class="n">add_dims</span><span class="p">,</span> <span class="o">*</span><span class="n">matching_dims</span><span class="p">,</span> <span class="o">*</span><span class="n">regrid_dims</span><span class="p">)</span>
-        <span class="n">dims_from_src</span> <span class="o">=</span> <span class="p">(</span><span class="o">*</span><span class="n">add_dims</span><span class="p">,</span> <span class="o">*</span><span class="n">matching_dims</span><span class="p">)</span>
-        <span class="n">dims_from_like</span> <span class="o">=</span> <span class="nb">tuple</span><span class="p">(</span><span class="n">regrid_dims</span><span class="p">)</span>
-
-        <span class="c1"># Gather destination coordinates</span>
-        <span class="n">dst_da_coords</span><span class="p">,</span> <span class="n">dst_shape</span> <span class="o">=</span> <span class="n">common</span><span class="o">.</span><span class="n">_dst_coords</span><span class="p">(</span>
-            <span class="n">src</span><span class="p">,</span> <span class="n">like</span><span class="p">,</span> <span class="n">dims_from_src</span><span class="p">,</span> <span class="n">dims_from_like</span>
-        <span class="p">)</span>
-
-        <span class="n">dst_tmp</span> <span class="o">=</span> <span class="n">xr</span><span class="o">.</span><span class="n">DataArray</span><span class="p">(</span>
-            <span class="n">data</span><span class="o">=</span><span class="n">dask</span><span class="o">.</span><span class="n">array</span><span class="o">.</span><span class="n">empty</span><span class="p">(</span><span class="n">dst_shape</span><span class="p">),</span> <span class="n">coords</span><span class="o">=</span><span class="n">dst_da_coords</span><span class="p">,</span> <span class="n">dims</span><span class="o">=</span><span class="n">dst_dims</span>
-        <span class="p">)</span>
-
-        <span class="c1"># TODO: check that axes are aligned</span>
-        <span class="n">src_coords_regrid</span> <span class="o">=</span> <span class="p">[</span><span class="n">common</span><span class="o">.</span><span class="n">_coord</span><span class="p">(</span><span class="n">src</span><span class="p">,</span> <span class="n">dim</span><span class="p">)</span> <span class="k">for</span> <span class="n">dim</span> <span class="ow">in</span> <span class="n">regrid_dims</span><span class="p">]</span>
-        <span class="n">dst_coords_regrid</span> <span class="o">=</span> <span class="p">[</span><span class="n">common</span><span class="o">.</span><span class="n">_coord</span><span class="p">(</span><span class="n">dst_tmp</span><span class="p">,</span> <span class="n">dim</span><span class="p">)</span> <span class="k">for</span> <span class="n">dim</span> <span class="ow">in</span> <span class="n">regrid_dims</span><span class="p">]</span>
-
-        <span class="k">return</span> <span class="n">_RegridInfo</span><span class="p">(</span>
-            <span class="n">matching_dims</span><span class="o">=</span><span class="n">matching_dims</span><span class="p">,</span>
-            <span class="n">regrid_dims</span><span class="o">=</span><span class="n">regrid_dims</span><span class="p">,</span>
-            <span class="n">add_dims</span><span class="o">=</span><span class="n">add_dims</span><span class="p">,</span>
-            <span class="n">dst_shape</span><span class="o">=</span><span class="n">dst_shape</span><span class="p">,</span>
-            <span class="n">dst_da_coords</span><span class="o">=</span><span class="n">dst_da_coords</span><span class="p">,</span>
-            <span class="n">dst_dims</span><span class="o">=</span><span class="p">(</span><span class="o">*</span><span class="n">add_dims</span><span class="p">,</span> <span class="o">*</span><span class="n">matching_dims</span><span class="p">,</span> <span class="o">*</span><span class="n">regrid_dims</span><span class="p">),</span>
-            <span class="n">src_coords_regrid</span><span class="o">=</span><span class="n">src_coords_regrid</span><span class="p">,</span>
-            <span class="n">dst_coords_regrid</span><span class="o">=</span><span class="n">dst_coords_regrid</span><span class="p">,</span>
-        <span class="p">)</span>
-
-    <span class="k">def</span><span class="w"> </span><span class="nf">_regrid</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">src</span><span class="p">,</span> <span class="n">fill_value</span><span class="p">,</span> <span class="n">info</span><span class="p">):</span>
-        <span class="c1"># Allocate dst</span>
-        <span class="n">dst</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">full</span><span class="p">(</span><span class="n">info</span><span class="o">.</span><span class="n">dst_shape</span><span class="p">,</span> <span class="n">fill_value</span><span class="p">)</span>
-        <span class="c1"># No overlap whatsoever, early exit</span>
-        <span class="k">if</span> <span class="nb">any</span><span class="p">(</span><span class="n">size</span> <span class="o">==</span> <span class="mi">0</span> <span class="k">for</span> <span class="n">size</span> <span class="ow">in</span> <span class="n">src</span><span class="o">.</span><span class="n">shape</span><span class="p">):</span>
-            <span class="k">return</span> <span class="n">dst</span>
-
-        <span class="c1"># Transpose src so that dims to regrid are last</span>
-        <span class="n">src</span> <span class="o">=</span> <span class="n">src</span><span class="o">.</span><span class="n">transpose</span><span class="p">(</span><span class="o">*</span><span class="n">info</span><span class="o">.</span><span class="n">dst_dims</span><span class="p">)</span>
-
-        <span class="c1"># Exit early if nothing is to be done</span>
-        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">info</span><span class="o">.</span><span class="n">regrid_dims</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
-            <span class="k">return</span> <span class="n">src</span><span class="o">.</span><span class="n">values</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
-        <span class="k">else</span><span class="p">:</span>
-            <span class="n">dst</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_nd_regrid</span><span class="p">(</span>
-                <span class="n">src</span><span class="o">.</span><span class="n">values</span><span class="p">,</span> <span class="n">dst</span><span class="p">,</span> <span class="n">info</span><span class="o">.</span><span class="n">src_coords_regrid</span><span class="p">,</span> <span class="n">info</span><span class="o">.</span><span class="n">dst_coords_regrid</span>
-            <span class="p">)</span>
-            <span class="k">return</span> <span class="n">dst</span>
-
-    <span class="k">def</span><span class="w"> </span><span class="nf">_delayed_regrid</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">src</span><span class="p">,</span> <span class="n">like</span><span class="p">,</span> <span class="n">fill_value</span><span class="p">,</span> <span class="n">info</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Deal with chunks in dimensions that will NOT be regridded.</span>
-<span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">info</span><span class="o">.</span><span class="n">add_dims</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
-            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_chunked_regrid</span><span class="p">(</span><span class="n">src</span><span class="p">,</span> <span class="n">like</span><span class="p">,</span> <span class="n">fill_value</span><span class="p">)</span>
-
-        <span class="n">src_dim_slices</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">Sequence</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
-        <span class="n">shape_chunks</span> <span class="o">=</span> <span class="p">[]</span>
-        <span class="k">for</span> <span class="n">dim</span><span class="p">,</span> <span class="n">chunksize</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">src</span><span class="o">.</span><span class="n">dims</span><span class="p">,</span> <span class="n">src</span><span class="o">.</span><span class="n">chunks</span><span class="p">):</span>
-            <span class="k">if</span> <span class="n">dim</span> <span class="ow">in</span> <span class="n">info</span><span class="o">.</span><span class="n">add_dims</span><span class="p">:</span>
-                <span class="n">end</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">cumsum</span><span class="p">(</span><span class="n">chunksize</span><span class="p">)</span>
-                <span class="n">start</span> <span class="o">=</span> <span class="n">end</span> <span class="o">-</span> <span class="n">chunksize</span>
-                <span class="n">src_dim_slices</span><span class="o">.</span><span class="n">append</span><span class="p">([</span><span class="nb">slice</span><span class="p">(</span><span class="n">s</span><span class="p">,</span> <span class="n">e</span><span class="p">)</span> <span class="k">for</span> <span class="n">s</span><span class="p">,</span> <span class="n">e</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">start</span><span class="p">,</span> <span class="n">end</span><span class="p">)])</span>
-                <span class="n">shape_chunks</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">chunksize</span><span class="p">))</span>
-
-        <span class="n">src_expanded_slices</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">stack</span><span class="p">(</span>
-            <span class="p">[</span><span class="n">a</span><span class="o">.</span><span class="n">ravel</span><span class="p">()</span> <span class="k">for</span> <span class="n">a</span> <span class="ow">in</span> <span class="n">np</span><span class="o">.</span><span class="n">meshgrid</span><span class="p">(</span><span class="o">*</span><span class="n">src_dim_slices</span><span class="p">,</span> <span class="n">indexing</span><span class="o">=</span><span class="s2">&quot;ij&quot;</span><span class="p">)],</span> <span class="n">axis</span><span class="o">=-</span><span class="mi">1</span>
-        <span class="p">)</span>
-        <span class="n">src_das</span> <span class="o">=</span> <span class="n">common</span><span class="o">.</span><span class="n">_sel_chunks</span><span class="p">(</span><span class="n">src</span><span class="p">,</span> <span class="n">info</span><span class="o">.</span><span class="n">add_dims</span><span class="p">,</span> <span class="n">src_expanded_slices</span><span class="p">)</span>
-        <span class="n">n_das</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">src_das</span><span class="p">)</span>
-        <span class="n">np_collection</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">full</span><span class="p">(</span><span class="n">n_das</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
-
-        <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">src_da</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">src_das</span><span class="p">):</span>
-            <span class="n">np_collection</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_chunked_regrid</span><span class="p">(</span><span class="n">src_da</span><span class="p">,</span> <span class="n">like</span><span class="p">,</span> <span class="n">fill_value</span><span class="p">)</span>
-
-        <span class="n">shape_chunks</span> <span class="o">=</span> <span class="n">shape_chunks</span> <span class="o">+</span> <span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">*</span> <span class="nb">len</span><span class="p">(</span><span class="n">info</span><span class="o">.</span><span class="n">regrid_dims</span><span class="p">)</span>
-        <span class="n">reshaped_collection</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="n">np_collection</span><span class="p">,</span> <span class="n">shape_chunks</span><span class="p">)</span><span class="o">.</span><span class="n">tolist</span><span class="p">()</span>
-        <span class="n">data</span> <span class="o">=</span> <span class="n">dask</span><span class="o">.</span><span class="n">array</span><span class="o">.</span><span class="n">block</span><span class="p">(</span><span class="n">reshaped_collection</span><span class="p">)</span>
-        <span class="k">return</span> <span class="n">data</span>
-
-    <span class="k">def</span><span class="w"> </span><span class="nf">_chunked_regrid</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">src</span><span class="p">,</span> <span class="n">like</span><span class="p">,</span> <span class="n">fill_value</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Deal with chunks in dimensions that will be regridded.</span>
-<span class="sd">        &quot;&quot;&quot;</span>
-        <span class="n">like_expanded_slices</span><span class="p">,</span> <span class="n">shape_chunks</span> <span class="o">=</span> <span class="n">common</span><span class="o">.</span><span class="n">_define_slices</span><span class="p">(</span><span class="n">src</span><span class="p">,</span> <span class="n">like</span><span class="p">)</span>
-        <span class="n">like_das</span> <span class="o">=</span> <span class="n">common</span><span class="o">.</span><span class="n">_sel_chunks</span><span class="p">(</span><span class="n">like</span><span class="p">,</span> <span class="n">like</span><span class="o">.</span><span class="n">dims</span><span class="p">,</span> <span class="n">like_expanded_slices</span><span class="p">)</span>
-        <span class="n">n_das</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">like_das</span><span class="p">)</span>
-        <span class="n">np_collection</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">full</span><span class="p">(</span><span class="n">n_das</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
-
-        <span class="c1"># Regridder should compute first chunk once</span>
-        <span class="c1"># so numba has compiled the necessary functions for subsequent chunks</span>
-        <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">dst_da</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">like_das</span><span class="p">):</span>
-            <span class="n">chunk_src</span> <span class="o">=</span> <span class="n">common</span><span class="o">.</span><span class="n">_slice_src</span><span class="p">(</span><span class="n">src</span><span class="p">,</span> <span class="n">dst_da</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">extra_overlap</span><span class="p">)</span>
-            <span class="n">info</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_regrid_info</span><span class="p">(</span><span class="n">chunk_src</span><span class="p">,</span> <span class="n">dst_da</span><span class="p">)</span>
-
-            <span class="k">if</span> <span class="nb">any</span><span class="p">(</span>
-                <span class="n">size</span> <span class="o">==</span> <span class="mi">0</span> <span class="k">for</span> <span class="n">size</span> <span class="ow">in</span> <span class="n">chunk_src</span><span class="o">.</span><span class="n">shape</span>
-            <span class="p">):</span>  <span class="c1"># zero overlap for the chunk, zero size chunk</span>
-                <span class="c1"># N.B. Make sure to include chunks=-1, defaults to chunks=&quot;auto&quot;, which</span>
-                <span class="c1"># automatically results in unnecessary, error prone chunks.</span>
-                <span class="c1"># TODO: Not covered by tests -- but also rather hard to test.</span>
-                <span class="n">dask_array</span> <span class="o">=</span> <span class="n">dask</span><span class="o">.</span><span class="n">array</span><span class="o">.</span><span class="n">full</span><span class="p">(</span>
-                    <span class="n">shape</span><span class="o">=</span><span class="n">info</span><span class="o">.</span><span class="n">dst_shape</span><span class="p">,</span>
-                    <span class="n">fill_value</span><span class="o">=</span><span class="n">fill_value</span><span class="p">,</span>
-                    <span class="n">dtype</span><span class="o">=</span><span class="n">src</span><span class="o">.</span><span class="n">dtype</span><span class="p">,</span>
-                    <span class="n">chunks</span><span class="o">=-</span><span class="mi">1</span><span class="p">,</span>
-                <span class="p">)</span>
-            <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">_first_call</span><span class="p">:</span>
-                <span class="c1"># NOT delayed, trigger compilation</span>
-                <span class="n">a</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_regrid</span><span class="p">(</span><span class="n">chunk_src</span><span class="p">,</span> <span class="n">fill_value</span><span class="p">,</span> <span class="n">info</span><span class="p">)</span>
-                <span class="n">dask_array</span> <span class="o">=</span> <span class="n">dask</span><span class="o">.</span><span class="n">array</span><span class="o">.</span><span class="n">from_array</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="n">chunks</span><span class="o">=-</span><span class="mi">1</span><span class="p">)</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">_first_call</span> <span class="o">=</span> <span class="kc">False</span>
-            <span class="k">else</span><span class="p">:</span>
-                <span class="c1"># Alllocation occurs inside</span>
-                <span class="n">a</span> <span class="o">=</span> <span class="n">dask</span><span class="o">.</span><span class="n">delayed</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_regrid</span><span class="p">,</span> <span class="n">pure</span><span class="o">=</span><span class="kc">True</span><span class="p">)(</span><span class="n">chunk_src</span><span class="p">,</span> <span class="n">fill_value</span><span class="p">,</span> <span class="n">info</span><span class="p">)</span>
-                <span class="n">dask_array</span> <span class="o">=</span> <span class="n">dask</span><span class="o">.</span><span class="n">array</span><span class="o">.</span><span class="n">from_delayed</span><span class="p">(</span>
-                    <span class="n">a</span><span class="p">,</span> <span class="n">shape</span><span class="o">=</span><span class="n">info</span><span class="o">.</span><span class="n">dst_shape</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">src</span><span class="o">.</span><span class="n">dtype</span>
-                <span class="p">)</span>
-
-            <span class="n">np_collection</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">dask_array</span>
-
-        <span class="c1"># Determine the shape of the chunks, and reshape so dask.block does the right thing</span>
-        <span class="n">reshaped_collection</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="n">np_collection</span><span class="p">,</span> <span class="n">shape_chunks</span><span class="p">)</span><span class="o">.</span><span class="n">tolist</span><span class="p">()</span>
-        <span class="n">data</span> <span class="o">=</span> <span class="n">dask</span><span class="o">.</span><span class="n">array</span><span class="o">.</span><span class="n">block</span><span class="p">(</span><span class="n">reshaped_collection</span><span class="p">)</span>
-        <span class="k">return</span> <span class="n">data</span>
-
-    <span class="k">def</span><span class="w"> </span><span class="nf">regrid</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">source</span><span class="p">,</span> <span class="n">like</span><span class="p">,</span> <span class="n">fill_value</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Regrid ``source`` along dimensions that ``source`` and ``like`` share.</span>
-<span class="sd">        These dimensions will be inferred the first time ``.regrid`` is called</span>
-<span class="sd">        for the Regridder object.</span>
-
-<span class="sd">        Following xarray conventions, nodata is assumed to ``np.nan``.</span>
-
-<span class="sd">        Parameters</span>
-<span class="sd">        ----------</span>
-<span class="sd">        source : xr.DataArray of floats</span>
-<span class="sd">        like : xr.DataArray of floats</span>
-<span class="sd">            The like array present what the coordinates should look like.</span>
-<span class="sd">        fill_value : float</span>
-<span class="sd">            The fill_value. Defaults to np.nan</span>
-
-<span class="sd">        Returns</span>
-<span class="sd">        -------</span>
-<span class="sd">        result : xr.DataArray</span>
-<span class="sd">            Regridded result.</span>
-<span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">source</span><span class="p">,</span> <span class="n">xr</span><span class="o">.</span><span class="n">DataArray</span><span class="p">):</span>
-            <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">&quot;source must be a DataArray&quot;</span><span class="p">)</span>
-        <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">like</span><span class="p">,</span> <span class="n">xr</span><span class="o">.</span><span class="n">DataArray</span><span class="p">):</span>
-            <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">&quot;like must be a DataArray&quot;</span><span class="p">)</span>
-
-        <span class="c1"># Don&#39;t mutate source; src stands for source, dst for destination</span>
-        <span class="n">src</span> <span class="o">=</span> <span class="n">source</span><span class="o">.</span><span class="n">copy</span><span class="p">(</span><span class="n">deep</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
-        <span class="n">like</span> <span class="o">=</span> <span class="n">like</span><span class="o">.</span><span class="n">copy</span><span class="p">(</span><span class="n">deep</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
-        <span class="n">_</span><span class="p">,</span> <span class="n">regrid_dims</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">common</span><span class="o">.</span><span class="n">_match_dims</span><span class="p">(</span><span class="n">src</span><span class="p">,</span> <span class="n">like</span><span class="p">)</span>
-        <span class="c1"># Exit early if nothing is to be done</span>
-        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">regrid_dims</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
-            <span class="k">return</span> <span class="n">source</span><span class="o">.</span><span class="n">copy</span><span class="p">(</span><span class="n">deep</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-
-        <span class="c1"># Collect dimensions to flip to make everything ascending</span>
-        <span class="n">src</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">common</span><span class="o">.</span><span class="n">_increasing_dims</span><span class="p">(</span><span class="n">src</span><span class="p">,</span> <span class="n">regrid_dims</span><span class="p">)</span>
-        <span class="n">like</span><span class="p">,</span> <span class="n">flip_dst</span> <span class="o">=</span> <span class="n">common</span><span class="o">.</span><span class="n">_increasing_dims</span><span class="p">(</span><span class="n">like</span><span class="p">,</span> <span class="n">regrid_dims</span><span class="p">)</span>
-
-        <span class="n">info</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_regrid_info</span><span class="p">(</span><span class="n">source</span><span class="p">,</span> <span class="n">like</span><span class="p">)</span>
-        <span class="c1"># Use xarray for nearest</span>
-        <span class="c1"># TODO: replace by more efficient, specialized method</span>
-        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">method</span> <span class="o">==</span> <span class="s2">&quot;nearest&quot;</span><span class="p">:</span>
-            <span class="n">dst</span> <span class="o">=</span> <span class="n">source</span><span class="o">.</span><span class="n">reindex_like</span><span class="p">(</span><span class="n">like</span><span class="p">,</span> <span class="n">method</span><span class="o">=</span><span class="s2">&quot;nearest&quot;</span><span class="p">)</span>
-            <span class="n">dst</span> <span class="o">=</span> <span class="n">dst</span><span class="o">.</span><span class="n">assign_coords</span><span class="p">(</span><span class="n">info</span><span class="o">.</span><span class="n">dst_da_coords</span><span class="p">)</span>
-            <span class="k">return</span> <span class="n">dst</span>
-
-        <span class="c1"># Prepare for regridding; quick checks</span>
-        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_first_call</span><span class="p">:</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">_prepare</span><span class="p">(</span><span class="n">info</span><span class="o">.</span><span class="n">regrid_dims</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_check_ndim_regrid</span><span class="p">(</span><span class="n">info</span><span class="o">.</span><span class="n">regrid_dims</span><span class="p">)</span>
-
-        <span class="k">if</span> <span class="n">src</span><span class="o">.</span><span class="n">chunks</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="n">src</span> <span class="o">=</span> <span class="n">common</span><span class="o">.</span><span class="n">_slice_src</span><span class="p">(</span><span class="n">src</span><span class="p">,</span> <span class="n">like</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">extra_overlap</span><span class="p">)</span>
-            <span class="c1"># Recollect info with sliced part of src</span>
-            <span class="n">info</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_regrid_info</span><span class="p">(</span><span class="n">src</span><span class="p">,</span> <span class="n">like</span><span class="p">)</span>
-            <span class="n">data</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_regrid</span><span class="p">(</span><span class="n">src</span><span class="p">,</span> <span class="n">fill_value</span><span class="p">,</span> <span class="n">info</span><span class="p">)</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">_first_call</span> <span class="o">=</span> <span class="kc">False</span>
-        <span class="k">else</span><span class="p">:</span>
-            <span class="c1"># Ensure all dimensions have a dx coordinate, so that if the chunks</span>
-            <span class="c1"># results in chunks which are size 1 along a dimension, the cellsize</span>
-            <span class="c1"># can still be determined.</span>
-            <span class="n">src</span> <span class="o">=</span> <span class="n">common</span><span class="o">.</span><span class="n">_set_cellsizes</span><span class="p">(</span><span class="n">src</span><span class="p">,</span> <span class="n">info</span><span class="o">.</span><span class="n">regrid_dims</span><span class="p">)</span>
-            <span class="n">like</span> <span class="o">=</span> <span class="n">common</span><span class="o">.</span><span class="n">_set_cellsizes</span><span class="p">(</span><span class="n">like</span><span class="p">,</span> <span class="n">info</span><span class="o">.</span><span class="n">regrid_dims</span><span class="p">)</span>
-            <span class="n">data</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_delayed_regrid</span><span class="p">(</span><span class="n">src</span><span class="p">,</span> <span class="n">like</span><span class="p">,</span> <span class="n">fill_value</span><span class="p">,</span> <span class="n">info</span><span class="p">)</span>
-
-        <span class="n">dst</span> <span class="o">=</span> <span class="n">xr</span><span class="o">.</span><span class="n">DataArray</span><span class="p">(</span><span class="n">data</span><span class="o">=</span><span class="n">data</span><span class="p">,</span> <span class="n">coords</span><span class="o">=</span><span class="n">info</span><span class="o">.</span><span class="n">dst_da_coords</span><span class="p">,</span> <span class="n">dims</span><span class="o">=</span><span class="n">info</span><span class="o">.</span><span class="n">dst_dims</span><span class="p">)</span>
-        <span class="c1"># Replace equidistant cellsize arrays by scalar values</span>
-        <span class="n">dst</span> <span class="o">=</span> <span class="n">common</span><span class="o">.</span><span class="n">_set_scalar_cellsizes</span><span class="p">(</span><span class="n">dst</span><span class="p">)</span>
-
-        <span class="c1"># Flip dimensions to return as like</span>
-        <span class="k">for</span> <span class="n">dim</span> <span class="ow">in</span> <span class="n">flip_dst</span><span class="p">:</span>
-            <span class="n">dst</span> <span class="o">=</span> <span class="n">dst</span><span class="o">.</span><span class="n">sel</span><span class="p">({</span><span class="n">dim</span><span class="p">:</span> <span class="nb">slice</span><span class="p">(</span><span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">)})</span>
-
-        <span class="c1"># Transpose to original dimension coordinates</span>
-        <span class="k">return</span> <span class="n">dst</span><span class="o">.</span><span class="n">transpose</span><span class="p">(</span><span class="o">*</span><span class="n">source</span><span class="o">.</span><span class="n">dims</span><span class="p">)</span></div>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="n">ERROR_MSG</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__name__</span><span class="p">))</span></div>
+</div>
 
 </pre></div>
 

@@ -1,0 +1,6 @@
+﻿imod.msw.Infiltration.regrid\_like
+==================================
+
+.. currentmodule:: imod.msw
+
+.. automethod:: Infiltration.regrid_like

@@ -1,0 +1,6 @@
+﻿imod.msw.AnnualCropFactors.get\_regrid\_methods
+===============================================
+
+.. currentmodule:: imod.msw
+
+.. automethod:: AnnualCropFactors.get_regrid_methods

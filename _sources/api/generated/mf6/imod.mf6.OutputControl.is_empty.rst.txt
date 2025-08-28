@@ -1,0 +1,6 @@
+﻿imod.mf6.OutputControl.is\_empty
+================================
+
+.. currentmodule:: imod.mf6
+
+.. automethod:: OutputControl.is_empty

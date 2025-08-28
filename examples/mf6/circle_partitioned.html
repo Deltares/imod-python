@@ -8,7 +8,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>Circle partitioned &#8212; iMOD Python 1.0.0rc4 documentation</title>
+    <title>Circle partitioned &#8212; iMOD Python 1.0.0rc6 documentation</title>
   
   
   
@@ -42,7 +42,7 @@
   <link rel="preload" as="script" href="../../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
 <link rel="preload" as="script" href="../../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
 
-    <script src="../../_static/documentation_options.js?v=2fc85bd2"></script>
+    <script src="../../_static/documentation_options.js?v=bc4855a1"></script>
     <script src="../../_static/doctools.js?v=9bcbadda"></script>
     <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script>DOCUMENTATION_OPTIONS.pagename = 'examples/mf6/circle_partitioned';</script>
@@ -53,7 +53,7 @@
     <link rel="prev" title="Circle" href="circle.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
-  <meta name="docsearch:version" content="1.0.0rc4.dev" />
+  <meta name="docsearch:version" content="1.0.0rc6.dev" />
   </head>
   
   
@@ -117,8 +117,8 @@
     
     
     
-    <img src="../../_static/imod-python-logo-light.svg" class="logo__image only-light" alt="iMOD Python 1.0.0rc4 documentation - Home"/>
-    <img src="../../_static/imod-python-logo-dark.svg" class="logo__image only-dark pst-js-only" alt="iMOD Python 1.0.0rc4 documentation - Home"/>
+    <img src="../../_static/imod-python-logo-light.svg" class="logo__image only-light" alt="iMOD Python 1.0.0rc6 documentation - Home"/>
+    <img src="../../_static/imod-python-logo-dark.svg" class="logo__image only-dark pst-js-only" alt="iMOD Python 1.0.0rc6 documentation - Home"/>
   
   
 </a></div>
@@ -156,7 +156,7 @@
 
 <li class="nav-item ">
   <a class="nav-link nav-internal" href="../../api/index.html">
-    API Reference
+    API
   </a>
 </li>
 
@@ -308,7 +308,7 @@
 
 <li class="nav-item ">
   <a class="nav-link nav-internal" href="../../api/index.html">
-    API Reference
+    API
   </a>
 </li>
 
@@ -511,16 +511,13 @@ of pie pieces.</p>
 <span class="kn">from</span><span class="w"> </span><span class="nn">example_models</span><span class="w"> </span><span class="kn">import</span> <span class="n">create_circle_simulation</span>
 
 <span class="kn">import</span><span class="w"> </span><span class="nn">imod</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">imod.prepare.partition</span><span class="w"> </span><span class="kn">import</span> <span class="n">create_partition_labels</span>
 
 <span class="n">simulation</span> <span class="o">=</span> <span class="n">create_circle_simulation</span><span class="p">()</span>
 <span class="n">tmp_path</span> <span class="o">=</span> <span class="n">imod</span><span class="o">.</span><span class="n">util</span><span class="o">.</span><span class="n">temporary_directory</span><span class="p">()</span>
 <span class="n">simulation</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">tmp_path</span> <span class="o">/</span> <span class="s2">&quot;original&quot;</span><span class="p">,</span> <span class="kc">False</span><span class="p">)</span>
 
-<span class="n">idomain</span> <span class="o">=</span> <span class="n">simulation</span><span class="p">[</span><span class="s2">&quot;GWF_1&quot;</span><span class="p">][</span><span class="s2">&quot;disv&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">dataset</span><span class="p">[</span><span class="s2">&quot;idomain&quot;</span><span class="p">]</span>
-
 <span class="n">number_partitions</span> <span class="o">=</span> <span class="mi">5</span>
-<span class="n">submodel_labels</span> <span class="o">=</span> <span class="n">create_partition_labels</span><span class="p">(</span><span class="n">simulation</span><span class="p">,</span> <span class="n">number_partitions</span><span class="p">)</span>
+<span class="n">submodel_labels</span> <span class="o">=</span> <span class="n">simulation</span><span class="o">.</span><span class="n">create_partition_labels</span><span class="p">(</span><span class="n">number_partitions</span><span class="p">)</span>
 
 <span class="c1"># Create a simulation that is split in subdomains according to the label array.</span>
 <span class="n">new_sim</span> <span class="o">=</span> <span class="n">simulation</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="n">submodel_labels</span><span class="p">)</span>
@@ -540,7 +537,7 @@ of pie pieces.</p>
 <span class="n">head</span><span class="p">[</span><span class="s2">&quot;head&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">isel</span><span class="p">(</span><span class="n">layer</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">time</span><span class="o">=-</span><span class="mi">1</span><span class="p">)</span><span class="o">.</span><span class="n">ugrid</span><span class="o">.</span><span class="n">plot</span><span class="o">.</span><span class="n">contourf</span><span class="p">(</span><span class="n">ax</span><span class="o">=</span><span class="n">ax</span><span class="p">)</span>
 </pre></div>
 </div>
-<img src="../../_images/sphx_glr_circle_partitioned_001.png" srcset="../../_images/sphx_glr_circle_partitioned_001.png" alt="layer = 1, time = 1.0" class = "sphx-glr-single-img"/><div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>&lt;matplotlib.tri._tricontour.TriContourSet object at 0x0000016F3FDA33B0&gt;
+<img src="../../_images/sphx_glr_circle_partitioned_001.png" srcset="../../_images/sphx_glr_circle_partitioned_001.png" alt="layer = 1, time = 1.0" class = "sphx-glr-single-img"/><div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>&lt;matplotlib.tri._tricontour.TriContourSet object at 0x00000251C8E9BF20&gt;
 </pre></div>
 </div>
 <p>Visualize the flow-horizontal-face-x componenty of the balances.</p>
@@ -551,7 +548,7 @@ of pie pieces.</p>
 <span class="k">pass</span>
 </pre></div>
 </div>
-<img src="../../_images/sphx_glr_circle_partitioned_002.png" srcset="../../_images/sphx_glr_circle_partitioned_002.png" alt="layer = 1, time = 1.0" class = "sphx-glr-single-img"/><p class="sphx-glr-timing"><strong>Total running time of the script:</strong> (0 minutes 3.205 seconds)</p>
+<img src="../../_images/sphx_glr_circle_partitioned_002.png" srcset="../../_images/sphx_glr_circle_partitioned_002.png" alt="layer = 1, time = 1.0" class = "sphx-glr-single-img"/><p class="sphx-glr-timing"><strong>Total running time of the script:</strong> (0 minutes 3.013 seconds)</p>
 <div class="sphx-glr-footer sphx-glr-footer-example docutils container" id="sphx-glr-download-examples-mf6-circle-partitioned-py">
 <div class="sphx-glr-download sphx-glr-download-jupyter docutils container">
 <p><a class="reference download internal" download="" href="../../_downloads/beeeba1ec165d52bbb3122b703653992/circle_partitioned.ipynb"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Jupyter</span> <span class="pre">notebook:</span> <span class="pre">circle_partitioned.ipynb</span></code></a></p>

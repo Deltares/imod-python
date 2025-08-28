@@ -1,0 +1,6 @@
+﻿imod.mf6.MassSourceLoading.write
+================================
+
+.. currentmodule:: imod.mf6
+
+.. automethod:: MassSourceLoading.write

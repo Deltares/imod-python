@@ -6,7 +6,7 @@
 
 Computation times
 =================
-**03:01.978** total execution time for 10 files **from user-guide**:
+**05:52.151** total execution time for 12 files **from user-guide**:
 
 .. container::
 
@@ -32,33 +32,39 @@ Computation times
    * - Example
      - Time
      - Mem (MB)
+   * - :ref:`sphx_glr_user-guide_12-imod5-model-to-modflow6.py` (``12-imod5-model-to-modflow6.py``)
+     - 03:00.054
+     - 0.0
    * - :ref:`sphx_glr_user-guide_08-regridding.py` (``08-regridding.py``)
-     - 01:36.332
+     - 01:12.475
      - 0.0
    * - :ref:`sphx_glr_user-guide_00-index-examples.py` (``00-index-examples.py``)
-     - 01:03.201
+     - 01:00.353
      - 0.0
    * - :ref:`sphx_glr_user-guide_09-topsystem.py` (``09-topsystem.py``)
-     - 00:10.566
+     - 00:11.599
+     - 0.0
+   * - :ref:`sphx_glr_user-guide_11-imod5-files.py` (``11-imod5-files.py``)
+     - 00:11.375
      - 0.0
    * - :ref:`sphx_glr_user-guide_01-raster-data.py` (``01-raster-data.py``)
-     - 00:03.840
+     - 00:03.808
      - 0.0
    * - :ref:`sphx_glr_user-guide_06-lazy-evaluation.py` (``06-lazy-evaluation.py``)
-     - 00:03.417
+     - 00:03.762
+     - 0.0
+   * - :ref:`sphx_glr_user-guide_05-unstructured-grids.py` (``05-unstructured-grids.py``)
+     - 00:02.891
      - 0.0
    * - :ref:`sphx_glr_user-guide_10-cleanup.py` (``10-cleanup.py``)
-     - 00:02.974
+     - 00:02.868
      - 0.0
    * - :ref:`sphx_glr_user-guide_02-vector-data.py` (``02-vector-data.py``)
-     - 00:01.554
+     - 00:01.474
+     - 0.0
+   * - :ref:`sphx_glr_user-guide_03-timeseries-data.py` (``03-timeseries-data.py``)
+     - 00:01.397
      - 0.0
    * - :ref:`sphx_glr_user-guide_07-time-discretization.py` (``07-time-discretization.py``)
      - 00:00.094
-     - 0.0
-   * - :ref:`sphx_glr_user-guide_03-timeseries-data.py` (``03-timeseries-data.py``)
-     - 00:00.000
-     - 0.0
-   * - :ref:`sphx_glr_user-guide_05-unstructured-grids.py` (``05-unstructured-grids.py``)
-     - 00:00.000
      - 0.0

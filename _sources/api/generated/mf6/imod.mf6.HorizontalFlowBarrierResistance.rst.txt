@@ -18,26 +18,14 @@
       ~HorizontalFlowBarrierResistance.clip_box
       ~HorizontalFlowBarrierResistance.copy
       ~HorizontalFlowBarrierResistance.from_file
-      ~HorizontalFlowBarrierResistance.get_non_grid_data
-      ~HorizontalFlowBarrierResistance.get_period_varnames
       ~HorizontalFlowBarrierResistance.get_regrid_methods
-      ~HorizontalFlowBarrierResistance.is_clipping_supported
       ~HorizontalFlowBarrierResistance.is_empty
-      ~HorizontalFlowBarrierResistance.is_grid_agnostic_package
-      ~HorizontalFlowBarrierResistance.is_regridding_supported
-      ~HorizontalFlowBarrierResistance.is_splitting_supported
-      ~HorizontalFlowBarrierResistance.isel
       ~HorizontalFlowBarrierResistance.mask
       ~HorizontalFlowBarrierResistance.regrid_like
-      ~HorizontalFlowBarrierResistance.render
-      ~HorizontalFlowBarrierResistance.sel
-      ~HorizontalFlowBarrierResistance.set_repeat_stress
+      ~HorizontalFlowBarrierResistance.snap_to_grid
       ~HorizontalFlowBarrierResistance.to_mf6_pkg
       ~HorizontalFlowBarrierResistance.to_netcdf
       ~HorizontalFlowBarrierResistance.write
-      ~HorizontalFlowBarrierResistance.write_binary_griddata
-      ~HorizontalFlowBarrierResistance.write_blockfile
-      ~HorizontalFlowBarrierResistance.write_text_griddata
    
    
 

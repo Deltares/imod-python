@@ -1,0 +1,6 @@
+﻿imod.msw.GridData.clip\_box
+===========================
+
+.. currentmodule:: imod.msw
+
+.. automethod:: GridData.clip_box

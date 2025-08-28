@@ -1,0 +1,6 @@
+﻿imod.mf6.Buoyancy.mask
+======================
+
+.. currentmodule:: imod.mf6
+
+.. automethod:: Buoyancy.mask

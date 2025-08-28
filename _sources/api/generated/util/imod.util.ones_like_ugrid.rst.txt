@@ -1,0 +1,6 @@
+﻿imod.util.ones\_like\_ugrid
+===========================
+
+.. currentmodule:: imod.util
+
+.. autofunction:: ones_like_ugrid

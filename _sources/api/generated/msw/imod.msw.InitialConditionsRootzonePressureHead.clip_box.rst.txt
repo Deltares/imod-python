@@ -1,0 +1,6 @@
+﻿imod.msw.InitialConditionsRootzonePressureHead.clip\_box
+========================================================
+
+.. currentmodule:: imod.msw
+
+.. automethod:: InitialConditionsRootzonePressureHead.clip_box

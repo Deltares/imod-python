@@ -1,0 +1,6 @@
+﻿imod.mf6.UnsaturatedZoneFlow.get\_regrid\_methods
+=================================================
+
+.. currentmodule:: imod.mf6
+
+.. automethod:: UnsaturatedZoneFlow.get_regrid_methods

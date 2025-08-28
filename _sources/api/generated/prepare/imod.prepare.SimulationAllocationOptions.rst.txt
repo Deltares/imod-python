@@ -25,6 +25,7 @@
    
       ~SimulationAllocationOptions.drn
       ~SimulationAllocationOptions.ghb
+      ~SimulationAllocationOptions.rch
       ~SimulationAllocationOptions.riv
    
    

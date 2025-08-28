@@ -1,0 +1,6 @@
+﻿imod.msw.IdfMapping.from\_imod5\_data
+=====================================
+
+.. currentmodule:: imod.msw
+
+.. automethod:: IdfMapping.from_imod5_data

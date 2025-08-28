@@ -1,0 +1,6 @@
+﻿imod.msw.Ponding.clip\_box
+==========================
+
+.. currentmodule:: imod.msw
+
+.. automethod:: Ponding.clip_box

@@ -1,0 +1,6 @@
+﻿imod.msw.InitialConditionsPercolation.write
+===========================================
+
+.. currentmodule:: imod.msw
+
+.. automethod:: InitialConditionsPercolation.write

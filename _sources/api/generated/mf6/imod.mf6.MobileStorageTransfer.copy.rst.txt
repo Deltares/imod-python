@@ -1,0 +1,6 @@
+﻿imod.mf6.MobileStorageTransfer.copy
+===================================
+
+.. currentmodule:: imod.mf6
+
+.. automethod:: MobileStorageTransfer.copy

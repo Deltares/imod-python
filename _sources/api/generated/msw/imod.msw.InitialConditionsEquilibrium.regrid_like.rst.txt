@@ -1,0 +1,6 @@
+﻿imod.msw.InitialConditionsEquilibrium.regrid\_like
+==================================================
+
+.. currentmodule:: imod.msw
+
+.. automethod:: InitialConditionsEquilibrium.regrid_like

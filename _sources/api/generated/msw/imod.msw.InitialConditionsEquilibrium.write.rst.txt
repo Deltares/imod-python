@@ -1,0 +1,6 @@
+﻿imod.msw.InitialConditionsEquilibrium.write
+===========================================
+
+.. currentmodule:: imod.msw
+
+.. automethod:: InitialConditionsEquilibrium.write

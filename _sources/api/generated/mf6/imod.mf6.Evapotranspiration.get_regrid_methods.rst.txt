@@ -1,0 +1,6 @@
+﻿imod.mf6.Evapotranspiration.get\_regrid\_methods
+================================================
+
+.. currentmodule:: imod.mf6
+
+.. automethod:: Evapotranspiration.get_regrid_methods

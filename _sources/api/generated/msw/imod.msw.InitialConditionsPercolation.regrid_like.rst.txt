@@ -1,0 +1,6 @@
+﻿imod.msw.InitialConditionsPercolation.regrid\_like
+==================================================
+
+.. currentmodule:: imod.msw
+
+.. automethod:: InitialConditionsPercolation.regrid_like

@@ -1,0 +1,6 @@
+﻿imod.mf6.GroundwaterFlowModel.clip\_box
+=======================================
+
+.. currentmodule:: imod.mf6
+
+.. automethod:: GroundwaterFlowModel.clip_box

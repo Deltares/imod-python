@@ -1,0 +1,6 @@
+﻿imod.mf6.HorizontalFlowBarrierResistance.regrid\_like
+=====================================================
+
+.. currentmodule:: imod.mf6
+
+.. automethod:: HorizontalFlowBarrierResistance.regrid_like

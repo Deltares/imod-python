@@ -1,0 +1,6 @@
+﻿imod.mf6.open\_conc
+===================
+
+.. currentmodule:: imod.mf6
+
+.. autofunction:: open_conc

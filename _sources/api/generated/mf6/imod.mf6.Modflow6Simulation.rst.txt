@@ -17,6 +17,7 @@
       ~Modflow6Simulation.clear
       ~Modflow6Simulation.clip_box
       ~Modflow6Simulation.copy
+      ~Modflow6Simulation.create_partition_labels
       ~Modflow6Simulation.create_time_discretization
       ~Modflow6Simulation.dump
       ~Modflow6Simulation.from_file
@@ -28,7 +29,6 @@
       ~Modflow6Simulation.get_models_of_type
       ~Modflow6Simulation.get_solution_name
       ~Modflow6Simulation.has_key
-      ~Modflow6Simulation.has_one_flow_model
       ~Modflow6Simulation.is_split
       ~Modflow6Simulation.items
       ~Modflow6Simulation.keys
@@ -40,11 +40,9 @@
       ~Modflow6Simulation.pop
       ~Modflow6Simulation.popitem
       ~Modflow6Simulation.regrid_like
-      ~Modflow6Simulation.render
       ~Modflow6Simulation.run
       ~Modflow6Simulation.setdefault
       ~Modflow6Simulation.split
-      ~Modflow6Simulation.time_discretization
       ~Modflow6Simulation.update
       ~Modflow6Simulation.values
       ~Modflow6Simulation.write

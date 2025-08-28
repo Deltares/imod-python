@@ -1,0 +1,6 @@
+﻿imod.mf6.VerticesDiscretization.get\_regrid\_methods
+====================================================
+
+.. currentmodule:: imod.mf6
+
+.. automethod:: VerticesDiscretization.get_regrid_methods

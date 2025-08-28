@@ -7,7 +7,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>imod.mf6.wel &#8212; iMOD Python 1.0.0rc4 documentation</title>
+    <title>imod.mf6.wel &#8212; iMOD Python 1.0.0rc6 documentation</title>
   
   
   
@@ -41,7 +41,7 @@
   <link rel="preload" as="script" href="../../../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
 <link rel="preload" as="script" href="../../../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
 
-    <script src="../../../_static/documentation_options.js?v=2fc85bd2"></script>
+    <script src="../../../_static/documentation_options.js?v=bc4855a1"></script>
     <script src="../../../_static/doctools.js?v=9bcbadda"></script>
     <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script>DOCUMENTATION_OPTIONS.pagename = '_modules/imod/mf6/wel';</script>
@@ -50,7 +50,7 @@
     <link rel="search" title="Search" href="../../../search.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
-  <meta name="docsearch:version" content="1.0.0rc4.dev" />
+  <meta name="docsearch:version" content="1.0.0rc6.dev" />
   </head>
   
   
@@ -114,8 +114,8 @@
     
     
     
-    <img src="../../../_static/imod-python-logo-light.svg" class="logo__image only-light" alt="iMOD Python 1.0.0rc4 documentation - Home"/>
-    <img src="../../../_static/imod-python-logo-dark.svg" class="logo__image only-dark pst-js-only" alt="iMOD Python 1.0.0rc4 documentation - Home"/>
+    <img src="../../../_static/imod-python-logo-light.svg" class="logo__image only-light" alt="iMOD Python 1.0.0rc6 documentation - Home"/>
+    <img src="../../../_static/imod-python-logo-dark.svg" class="logo__image only-dark pst-js-only" alt="iMOD Python 1.0.0rc6 documentation - Home"/>
   
   
 </a></div>
@@ -153,7 +153,7 @@
 
 <li class="nav-item ">
   <a class="nav-link nav-internal" href="../../../api/index.html">
-    API Reference
+    API
   </a>
 </li>
 
@@ -303,7 +303,7 @@
 
 <li class="nav-item ">
   <a class="nav-link nav-internal" href="../../../api/index.html">
-    API Reference
+    API
   </a>
 </li>
 
@@ -432,7 +432,6 @@
 <span class="kn">import</span><span class="w"> </span><span class="nn">abc</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">itertools</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">textwrap</span>
-<span class="kn">import</span><span class="w"> </span><span class="nn">warnings</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">collections.abc</span><span class="w"> </span><span class="kn">import</span> <span class="n">Iterable</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">datetime</span><span class="w"> </span><span class="kn">import</span> <span class="n">datetime</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Any</span><span class="p">,</span> <span class="n">Callable</span><span class="p">,</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">Self</span><span class="p">,</span> <span class="n">Sequence</span><span class="p">,</span> <span class="n">Tuple</span><span class="p">,</span> <span class="n">Union</span><span class="p">,</span> <span class="n">cast</span>
@@ -455,8 +454,6 @@
 <span class="kn">from</span><span class="w"> </span><span class="nn">imod.mf6</span><span class="w"> </span><span class="kn">import</span> <span class="n">StructuredDiscretization</span><span class="p">,</span> <span class="n">VerticesDiscretization</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">imod.mf6.boundary_condition</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
     <span class="n">BoundaryCondition</span><span class="p">,</span>
-    <span class="n">DisStructuredBoundaryCondition</span><span class="p">,</span>
-    <span class="n">DisVerticesBoundaryCondition</span><span class="p">,</span>
 <span class="p">)</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">imod.mf6.mf6_wel_adapter</span><span class="w"> </span><span class="kn">import</span> <span class="n">Mf6Wel</span><span class="p">,</span> <span class="n">concat_indices_to_cellid</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">imod.mf6.package</span><span class="w"> </span><span class="kn">import</span> <span class="n">Package</span>
@@ -763,7 +760,11 @@
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">dataset</span><span class="p">[</span><span class="s2">&quot;y&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">values</span>
 
     <span class="nd">@classmethod</span>
-    <span class="k">def</span><span class="w"> </span><span class="nf">is_grid_agnostic_package</span><span class="p">(</span><span class="bp">cls</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_is_grid_agnostic_package</span><span class="p">(</span><span class="bp">cls</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Returns True if this package does not depend on a grid, e.g. the</span>
+<span class="sd">        :class:`imod.mf6.wel.Wel` package.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="kc">True</span>
 
     <span class="k">def</span><span class="w"> </span><span class="nf">_create_cellid</span><span class="p">(</span>
@@ -803,7 +804,7 @@
 
         <span class="k">return</span> <span class="n">ds_vars</span>
 
-    <span class="k">def</span><span class="w"> </span><span class="nf">render</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">directory</span><span class="p">,</span> <span class="n">pkgname</span><span class="p">,</span> <span class="n">globaltimes</span><span class="p">,</span> <span class="n">binary</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_render</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">directory</span><span class="p">,</span> <span class="n">pkgname</span><span class="p">,</span> <span class="n">globaltimes</span><span class="p">,</span> <span class="n">binary</span><span class="p">):</span>
         <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span>
             <span class="n">textwrap</span><span class="o">.</span><span class="n">dedent</span><span class="p">(</span>
                 <span class="sa">f</span><span class="s2">&quot;&quot;&quot;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__name__</span><span class="si">}</span><span class="s2"> is a grid-agnostic package and does not</span>
@@ -911,10 +912,10 @@
             <span class="p">)</span>
 
         <span class="n">assigned_wells</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_assign_wells_to_layers</span><span class="p">(</span><span class="n">wells_df</span><span class="p">,</span> <span class="n">active</span><span class="p">,</span> <span class="n">top</span><span class="p">,</span> <span class="n">bottom</span><span class="p">,</span> <span class="n">k</span><span class="p">)</span>
-        <span class="n">filtered_assigned_well_ids</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">gather_filtered_well_ids</span><span class="p">(</span>
+        <span class="n">filtered_assigned_well_ids</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_gather_filtered_well_ids</span><span class="p">(</span>
             <span class="n">assigned_wells</span><span class="p">,</span> <span class="n">wells_df</span>
         <span class="p">)</span>
-        <span class="n">message_assign</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">to_mf6_package_information</span><span class="p">(</span>
+        <span class="n">message_assign</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_to_mf6_package_information</span><span class="p">(</span>
             <span class="n">filtered_assigned_well_ids</span><span class="p">,</span> <span class="n">reason_text</span><span class="o">=</span><span class="s2">&quot;permeability/thickness constraints&quot;</span>
         <span class="p">)</span>
         <span class="n">error_on_well_removal</span> <span class="o">=</span> <span class="n">validation_context</span><span class="o">.</span><span class="n">strict_well_validation</span>
@@ -933,10 +934,10 @@
         <span class="n">ds</span><span class="p">[</span><span class="s2">&quot;print_flows&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="p">[</span><span class="s2">&quot;print_flows&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">values</span><span class="p">[()]</span>
         <span class="n">ds</span><span class="p">[</span><span class="s2">&quot;print_input&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="p">[</span><span class="s2">&quot;print_input&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">values</span><span class="p">[()]</span>
 
-        <span class="n">filtered_final_well_ids</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">gather_filtered_well_ids</span><span class="p">(</span><span class="n">ds</span><span class="p">,</span> <span class="n">wells_df</span><span class="p">)</span>
+        <span class="n">filtered_final_well_ids</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_gather_filtered_well_ids</span><span class="p">(</span><span class="n">ds</span><span class="p">,</span> <span class="n">wells_df</span><span class="p">)</span>
         <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">filtered_final_well_ids</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
             <span class="n">reason_text</span> <span class="o">=</span> <span class="s2">&quot;inactive cells or permeability/thickness constraints&quot;</span>
-            <span class="n">message_end</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">to_mf6_package_information</span><span class="p">(</span>
+            <span class="n">message_end</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_to_mf6_package_information</span><span class="p">(</span>
                 <span class="n">filtered_final_well_ids</span><span class="p">,</span> <span class="n">reason_text</span><span class="o">=</span><span class="n">reason_text</span>
             <span class="p">)</span>
             <span class="n">logger</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="n">loglevel</span><span class="o">=</span><span class="n">LogLevel</span><span class="o">.</span><span class="n">WARNING</span><span class="p">,</span> <span class="n">message</span><span class="o">=</span><span class="n">message_end</span><span class="p">)</span>
@@ -945,7 +946,7 @@
 
         <span class="k">return</span> <span class="n">Mf6Wel</span><span class="p">(</span><span class="o">**</span><span class="n">ds</span><span class="o">.</span><span class="n">data_vars</span><span class="p">)</span>  <span class="c1"># type: ignore[arg-type]</span>
 
-    <span class="k">def</span><span class="w"> </span><span class="nf">gather_filtered_well_ids</span><span class="p">(</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_gather_filtered_well_ids</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span> <span class="n">well_data_filtered</span><span class="p">:</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span> <span class="o">|</span> <span class="n">xr</span><span class="o">.</span><span class="n">Dataset</span><span class="p">,</span> <span class="n">well_data</span><span class="p">:</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
         <span class="c1"># Work around performance issue with xarray isin for large datasets.</span>
@@ -956,7 +957,7 @@
         <span class="n">is_missing_id</span> <span class="o">=</span> <span class="o">~</span><span class="n">well_data</span><span class="p">[</span><span class="s2">&quot;id&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">isin</span><span class="p">(</span><span class="n">filtered_ids</span><span class="o">.</span><span class="n">unique</span><span class="p">())</span>
         <span class="k">return</span> <span class="n">well_data</span><span class="p">[</span><span class="s2">&quot;id&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">is_missing_id</span><span class="p">]</span><span class="o">.</span><span class="n">unique</span><span class="p">()</span>
 
-    <span class="k">def</span><span class="w"> </span><span class="nf">to_mf6_package_information</span><span class="p">(</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_to_mf6_package_information</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span> <span class="n">filtered_wells</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span> <span class="n">reason_text</span><span class="p">:</span> <span class="nb">str</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
         <span class="n">message</span> <span class="o">=</span> <span class="n">textwrap</span><span class="o">.</span><span class="n">dedent</span><span class="p">(</span>
@@ -1361,39 +1362,62 @@
         <span class="n">bottom</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">GridDataArray</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Self</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Clip a package by a bounding box (time, layer, y, x).</span>
-
-<span class="sd">        The well package doesn&#39;t use the layer attribute to describe its depth and length.</span>
-<span class="sd">        Instead, it uses the screen_top and screen_bottom parameters which corresponds with</span>
-<span class="sd">        the z-coordinates of the top and bottom of the well. To go from a layer_min and</span>
-<span class="sd">        layer_max to z-values used for clipping the well a top and bottom array have to be</span>
-<span class="sd">        provided as well.</span>
-
-<span class="sd">        Slicing intervals may be half-bounded, by providing None:</span>
-
-<span class="sd">        * To select 500.0 &lt;= x &lt;= 1000.0:</span>
-<span class="sd">          ``clip_box(x_min=500.0, x_max=1000.0)``.</span>
-<span class="sd">        * To select x &lt;= 1000.0: ``clip_box(x_min=None, x_max=1000.0)``</span>
-<span class="sd">          or ``clip_box(x_max=1000.0)``.</span>
-<span class="sd">        * To select x &gt;= 500.0: ``clip_box(x_min = 500.0, x_max=None.0)``</span>
-<span class="sd">          or ``clip_box(x_min=1000.0)``.</span>
+<span class="sd">        Clip a well package by a bounding box (time, layer, y, x).</span>
 
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
-<span class="sd">        time_min: optional</span>
+<span class="sd">        time_min: optional, np.datetime64</span>
+<span class="sd">            Start time to select. Data will be forward filled to this date. If</span>
+<span class="sd">            time_min is before the start time of the dataset, data is</span>
+<span class="sd">            backfilled.</span>
 <span class="sd">        time_max: optional</span>
+<span class="sd">            End time to select.</span>
 <span class="sd">        layer_min: optional, int</span>
+<span class="sd">            Ignored.</span>
 <span class="sd">        layer_max: optional, int</span>
+<span class="sd">            Ignored.</span>
 <span class="sd">        x_min: optional, float</span>
+<span class="sd">            Minimum x-coordinate to select.</span>
 <span class="sd">        x_max: optional, float</span>
+<span class="sd">            Maximum x-coordinate to select.</span>
 <span class="sd">        y_min: optional, float</span>
+<span class="sd">            Minimum y-coordinate to select.</span>
 <span class="sd">        y_max: optional, float</span>
+<span class="sd">            Maximum y-coordinate to select.</span>
 <span class="sd">        top: optional, GridDataArray</span>
+<span class="sd">            Grid of top used to clip well screen tops.</span>
 <span class="sd">        bottom: optional, GridDataArray</span>
+<span class="sd">            Grid of bottom used to clip well screen bottoms.</span>
 
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
-<span class="sd">        sliced : Package</span>
+<span class="sd">        clipped : Well</span>
+<span class="sd">            A new package that is clipped to the specified bounding box.</span>
+
+<span class="sd">        Examples</span>
+<span class="sd">        --------</span>
+<span class="sd">        Slicing intervals may be half-bounded, by providing None:</span>
+
+<span class="sd">        To select 500.0 &lt;= x &lt;= 1000.0:</span>
+
+<span class="sd">        &gt;&gt;&gt; pkg.clip_box(x_min=500.0, x_max=1000.0)</span>
+
+<span class="sd">        To select x &lt;= 1000.0:</span>
+
+<span class="sd">        &gt;&gt;&gt; pkg.clip_box(x_max=1000.0)``</span>
+
+<span class="sd">        To select x &gt;= 500.0:</span>
+
+<span class="sd">        &gt;&gt;&gt; pkg.clip_box(x_min=500.0)</span>
+
+<span class="sd">        To select a time interval, you can use datetime64:</span>
+
+<span class="sd">        &gt;&gt;&gt; pkg.clip_box(time_min=np.datetime64(&quot;2020-01-01&quot;), time_max=np.datetime64(&quot;2020-12-31&quot;))</span>
+
+<span class="sd">        To clip well screens:</span>
+
+<span class="sd">        &gt;&gt;&gt; pkg.clip_box(top=top_grid, bottom=bottom_grid)</span>
+
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="p">(</span><span class="n">layer_max</span> <span class="ow">or</span> <span class="n">layer_min</span><span class="p">)</span> <span class="ow">and</span> <span class="p">(</span><span class="n">top</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">or</span> <span class="n">bottom</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">):</span>
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
@@ -1735,33 +1759,58 @@
         <span class="n">bottom</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">GridDataArray</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Self</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Clip a package by a bounding box (time, layer, y, x).</span>
-
-<span class="sd">        Slicing intervals may be half-bounded, by providing None:</span>
-
-<span class="sd">        * To select 500.0 &lt;= x &lt;= 1000.0:</span>
-<span class="sd">          ``clip_box(x_min=500.0, x_max=1000.0)``.</span>
-<span class="sd">        * To select x &lt;= 1000.0: ``clip_box(x_min=None, x_max=1000.0)``</span>
-<span class="sd">          or ``clip_box(x_max=1000.0)``.</span>
-<span class="sd">        * To select x &gt;= 500.0: ``clip_box(x_min = 500.0, x_max=None.0)``</span>
-<span class="sd">          or ``clip_box(x_min=1000.0)``.</span>
+<span class="sd">        Clip a well package by a bounding box (time, layer, y, x).</span>
 
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
-<span class="sd">        time_min: optional</span>
+<span class="sd">        time_min: optional, np.datetime64</span>
+<span class="sd">            Start time to select. Data will be forward filled to this date. If</span>
+<span class="sd">            time_min is before the start time of the dataset, data is</span>
+<span class="sd">            backfilled.</span>
 <span class="sd">        time_max: optional</span>
+<span class="sd">            End time to select.</span>
 <span class="sd">        layer_min: optional, int</span>
+<span class="sd">            Minimum layer to select.</span>
 <span class="sd">        layer_max: optional, int</span>
+<span class="sd">            Maximum layer to select.</span>
 <span class="sd">        x_min: optional, float</span>
+<span class="sd">            Minimum x-coordinate to select.</span>
 <span class="sd">        x_max: optional, float</span>
+<span class="sd">            Maximum x-coordinate to select.</span>
 <span class="sd">        y_min: optional, float</span>
+<span class="sd">            Minimum y-coordinate to select.</span>
 <span class="sd">        y_max: optional, float</span>
+<span class="sd">            Maximum y-coordinate to select.</span>
 <span class="sd">        top: optional, GridDataArray</span>
+<span class="sd">            Ignored.</span>
 <span class="sd">        bottom: optional, GridDataArray</span>
+<span class="sd">            Ignored.</span>
 
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
-<span class="sd">        sliced : Package</span>
+<span class="sd">        clipped : Well</span>
+<span class="sd">            A new package that is clipped to the specified bounding box.</span>
+
+<span class="sd">        Examples</span>
+<span class="sd">        --------</span>
+<span class="sd">        Slicing intervals may be half-bounded, by providing None:</span>
+
+<span class="sd">        To select 500.0 &lt;= x &lt;= 1000.0:</span>
+
+<span class="sd">        &gt;&gt;&gt; pkg.clip_box(x_min=500.0, x_max=1000.0)</span>
+
+<span class="sd">        To select x &lt;= 1000.0:</span>
+
+<span class="sd">        &gt;&gt;&gt; pkg.clip_box(x_max=1000.0)``</span>
+
+<span class="sd">        To select x &gt;= 500.0:</span>
+
+<span class="sd">        &gt;&gt;&gt; pkg.clip_box(x_min=500.0)</span>
+
+<span class="sd">        To select a time interval, you can use datetime64:</span>
+
+<span class="sd">        &gt;&gt;&gt; pkg.clip_box(time_min=np.datetime64(&quot;2020-01-01&quot;), time_max=np.datetime64(&quot;2020-12-31&quot;))</span>
+
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="c1"># The super method will select in the time dimension without issues.</span>
         <span class="n">new</span> <span class="o">=</span> <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">clip_box</span><span class="p">(</span><span class="n">time_min</span><span class="o">=</span><span class="n">time_min</span><span class="p">,</span> <span class="n">time_max</span><span class="o">=</span><span class="n">time_max</span><span class="p">)</span>
@@ -1863,6 +1912,8 @@
         <span class="k">return</span> <span class="bp">cls</span><span class="p">(</span><span class="o">**</span><span class="n">data</span><span class="p">)</span>  <span class="c1"># type: ignore</span></div>
 
 
+<div class="viewcode-block" id="LayeredWell.cleanup">
+<a class="viewcode-back" href="../../../api/generated/mf6/imod.mf6.LayeredWell.cleanup.html#imod.mf6.LayeredWell.cleanup">[docs]</a>
     <span class="nd">@standard_log_decorator</span><span class="p">()</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">cleanup</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">dis</span><span class="p">:</span> <span class="n">StructuredDiscretization</span> <span class="o">|</span> <span class="n">VerticesDiscretization</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
@@ -1874,345 +1925,7 @@
 <span class="sd">            Model discretization package.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_cleanup</span><span class="p">(</span><span class="n">dis</span><span class="p">,</span> <span class="n">cleanup_wel_layered</span><span class="p">)</span></div>
-
-
-
-<div class="viewcode-block" id="WellDisStructured">
-<a class="viewcode-back" href="../../../api/generated/mf6/imod.mf6.WellDisStructured.html#imod.mf6.WellDisStructured">[docs]</a>
-<span class="k">class</span><span class="w"> </span><span class="nc">WellDisStructured</span><span class="p">(</span><span class="n">DisStructuredBoundaryCondition</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    WEL package for structured discretization (DIS) models .</span>
-<span class="sd">    Any number of WEL Packages can be specified for a single groundwater flow model.</span>
-<span class="sd">    https://water.usgs.gov/water-resources/software/MODFLOW-6/mf6io_6.0.4.pdf#page=63</span>
-
-<span class="sd">    .. warning::</span>
-<span class="sd">        This class is deprecated and will be deleted in a future release.</span>
-<span class="sd">        Consider changing your code to use the ``imod.mf6.Well`` package.</span>
-
-<span class="sd">    Parameters</span>
-<span class="sd">    ----------</span>
-<span class="sd">    layer: list of int</span>
-<span class="sd">        Model layer in which the well is located.</span>
-<span class="sd">    row: list of int</span>
-<span class="sd">        Row in which the well is located.</span>
-<span class="sd">    column: list of int</span>
-<span class="sd">        Column in which the well is located.</span>
-<span class="sd">    rate: float or list of floats</span>
-<span class="sd">        is the volumetric well rate. A positive value indicates well</span>
-<span class="sd">        (injection) and a negative value indicates discharge (extraction) (q).</span>
-<span class="sd">    concentration: array of floats (xr.DataArray, optional)</span>
-<span class="sd">        if this flow package is used in simulations also involving transport, then this array is used</span>
-<span class="sd">        as the  concentration for inflow over this boundary.</span>
-<span class="sd">    concentration_boundary_type: ({&quot;AUX&quot;, &quot;AUXMIXED&quot;}, optional)</span>
-<span class="sd">        if this flow package is used in simulations also involving transport, then this keyword specifies</span>
-<span class="sd">        how outflow over this boundary is computed.</span>
-<span class="sd">    print_input: ({True, False}, optional)</span>
-<span class="sd">        keyword to indicate that the list of well information will be written to</span>
-<span class="sd">        the listing file immediately after it is read.</span>
-<span class="sd">        Default is False.</span>
-<span class="sd">    print_flows: ({True, False}, optional)</span>
-<span class="sd">        Indicates that the list of well flow rates will be printed to the</span>
-<span class="sd">        listing file for every stress period time step in which &quot;BUDGET PRINT&quot;</span>
-<span class="sd">        is specified in Output Control. If there is no Output Control option</span>
-<span class="sd">        and PRINT FLOWS is specified, then flow rates are printed for the last</span>
-<span class="sd">        time step of each stress period.</span>
-<span class="sd">        Default is False.</span>
-<span class="sd">    save_flows: ({True, False}, optional)</span>
-<span class="sd">        Indicates that well flow terms will be written to the file specified</span>
-<span class="sd">        with &quot;BUDGET FILEOUT&quot; in Output Control.</span>
-<span class="sd">        Default is False.</span>
-<span class="sd">    observations: [Not yet supported.]</span>
-<span class="sd">        Default is None.</span>
-<span class="sd">    validate: {True, False}</span>
-<span class="sd">        Flag to indicate whether the package should be validated upon</span>
-<span class="sd">        initialization. This raises a ValidationError if package input is</span>
-<span class="sd">        provided in the wrong manner. Defaults to True.</span>
-<span class="sd">    repeat_stress: Optional[xr.DataArray] of datetimes</span>
-<span class="sd">        Used to repeat data for e.g. repeating stress periods such as</span>
-<span class="sd">        seasonality without duplicating the values. The DataArray should have</span>
-<span class="sd">        dimensions ``(&quot;repeat&quot;, &quot;repeat_items&quot;)``. The ``repeat_items``</span>
-<span class="sd">        dimension should have size 2: the first value is the &quot;key&quot;, the second</span>
-<span class="sd">        value is the &quot;value&quot;. For the &quot;key&quot; datetime, the data of the &quot;value&quot;</span>
-<span class="sd">        datetime will be used. Can also be set with a dictionary using the</span>
-<span class="sd">        ``set_repeat_stress`` method.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
-
-    <span class="n">_pkg_id</span> <span class="o">=</span> <span class="s2">&quot;wel&quot;</span>
-    <span class="n">_period_data</span> <span class="o">=</span> <span class="p">(</span><span class="s2">&quot;layer&quot;</span><span class="p">,</span> <span class="s2">&quot;row&quot;</span><span class="p">,</span> <span class="s2">&quot;column&quot;</span><span class="p">,</span> <span class="s2">&quot;rate&quot;</span><span class="p">)</span>
-    <span class="n">_keyword_map</span> <span class="o">=</span> <span class="p">{}</span>
-    <span class="n">_template</span> <span class="o">=</span> <span class="n">DisStructuredBoundaryCondition</span><span class="o">.</span><span class="n">_initialize_template</span><span class="p">(</span><span class="n">_pkg_id</span><span class="p">)</span>
-    <span class="n">_auxiliary_data</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;concentration&quot;</span><span class="p">:</span> <span class="s2">&quot;species&quot;</span><span class="p">}</span>
-
-    <span class="n">_init_schemata</span> <span class="o">=</span> <span class="p">{</span>
-        <span class="s2">&quot;layer&quot;</span><span class="p">:</span> <span class="p">[</span><span class="n">DTypeSchema</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">integer</span><span class="p">)],</span>
-        <span class="s2">&quot;row&quot;</span><span class="p">:</span> <span class="p">[</span><span class="n">DTypeSchema</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">integer</span><span class="p">)],</span>
-        <span class="s2">&quot;column&quot;</span><span class="p">:</span> <span class="p">[</span><span class="n">DTypeSchema</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">integer</span><span class="p">)],</span>
-        <span class="s2">&quot;rate&quot;</span><span class="p">:</span> <span class="p">[</span><span class="n">DTypeSchema</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">floating</span><span class="p">)],</span>
-        <span class="s2">&quot;concentration&quot;</span><span class="p">:</span> <span class="p">[</span><span class="n">DTypeSchema</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">floating</span><span class="p">)],</span>
-    <span class="p">}</span>
-
-    <span class="n">_write_schemata</span> <span class="o">=</span> <span class="p">{}</span>
-
-<div class="viewcode-block" id="WellDisStructured.__init__">
-<a class="viewcode-back" href="../../../api/generated/mf6/imod.mf6.WellDisStructured.html#imod.mf6.WellDisStructured.__init__">[docs]</a>
-    <span class="nd">@init_log_decorator</span><span class="p">()</span>
-    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
-        <span class="bp">self</span><span class="p">,</span>
-        <span class="n">layer</span><span class="p">,</span>
-        <span class="n">row</span><span class="p">,</span>
-        <span class="n">column</span><span class="p">,</span>
-        <span class="n">rate</span><span class="p">,</span>
-        <span class="n">concentration</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
-        <span class="n">concentration_boundary_type</span><span class="o">=</span><span class="s2">&quot;aux&quot;</span><span class="p">,</span>
-        <span class="n">print_input</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
-        <span class="n">print_flows</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
-        <span class="n">save_flows</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
-        <span class="n">observations</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
-        <span class="n">validate</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
-        <span class="n">repeat_stress</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
-    <span class="p">):</span>
-        <span class="n">dict_dataset</span> <span class="o">=</span> <span class="p">{</span>
-            <span class="s2">&quot;layer&quot;</span><span class="p">:</span> <span class="n">_assign_dims</span><span class="p">(</span><span class="n">layer</span><span class="p">),</span>
-            <span class="s2">&quot;row&quot;</span><span class="p">:</span> <span class="n">_assign_dims</span><span class="p">(</span><span class="n">row</span><span class="p">),</span>
-            <span class="s2">&quot;column&quot;</span><span class="p">:</span> <span class="n">_assign_dims</span><span class="p">(</span><span class="n">column</span><span class="p">),</span>
-            <span class="s2">&quot;rate&quot;</span><span class="p">:</span> <span class="n">_assign_dims</span><span class="p">(</span><span class="n">rate</span><span class="p">),</span>
-            <span class="s2">&quot;print_input&quot;</span><span class="p">:</span> <span class="n">print_input</span><span class="p">,</span>
-            <span class="s2">&quot;print_flows&quot;</span><span class="p">:</span> <span class="n">print_flows</span><span class="p">,</span>
-            <span class="s2">&quot;save_flows&quot;</span><span class="p">:</span> <span class="n">save_flows</span><span class="p">,</span>
-            <span class="s2">&quot;observations&quot;</span><span class="p">:</span> <span class="n">observations</span><span class="p">,</span>
-            <span class="s2">&quot;repeat_stress&quot;</span><span class="p">:</span> <span class="n">repeat_stress</span><span class="p">,</span>
-            <span class="s2">&quot;concentration&quot;</span><span class="p">:</span> <span class="n">concentration</span><span class="p">,</span>
-            <span class="s2">&quot;concentration_boundary_type&quot;</span><span class="p">:</span> <span class="n">concentration_boundary_type</span><span class="p">,</span>
-        <span class="p">}</span>
-        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">dict_dataset</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_validate_init_schemata</span><span class="p">(</span><span class="n">validate</span><span class="p">)</span>
-
-        <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span>
-            <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__name__</span><span class="si">}</span><span class="s2"> is deprecated and will be removed in the v1.0 release.&quot;</span>
-            <span class="s2">&quot;Please adapt your code to use the imod.mf6.Well package&quot;</span><span class="p">,</span>
-            <span class="ne">DeprecationWarning</span><span class="p">,</span>
-        <span class="p">)</span></div>
-
-
-    <span class="k">def</span><span class="w"> </span><span class="nf">clip_box</span><span class="p">(</span>
-        <span class="bp">self</span><span class="p">,</span>
-        <span class="n">time_min</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">cftime</span><span class="o">.</span><span class="n">datetime</span> <span class="o">|</span> <span class="n">np</span><span class="o">.</span><span class="n">datetime64</span> <span class="o">|</span> <span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-        <span class="n">time_max</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">cftime</span><span class="o">.</span><span class="n">datetime</span> <span class="o">|</span> <span class="n">np</span><span class="o">.</span><span class="n">datetime64</span> <span class="o">|</span> <span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-        <span class="n">layer_min</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-        <span class="n">layer_max</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-        <span class="n">x_min</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">float</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-        <span class="n">x_max</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">float</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-        <span class="n">y_min</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">float</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-        <span class="n">y_max</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">float</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-        <span class="n">top</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">GridDataArray</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-        <span class="n">bottom</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">GridDataArray</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Self</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Clip a package by a bounding box (time, layer, y, x).</span>
-
-<span class="sd">        Slicing intervals may be half-bounded, by providing None:</span>
-
-<span class="sd">        * To select 500.0 &lt;= x &lt;= 1000.0:</span>
-<span class="sd">          ``clip_box(x_min=500.0, x_max=1000.0)``.</span>
-<span class="sd">        * To select x &lt;= 1000.0: ``clip_box(x_min=None, x_max=1000.0)``</span>
-<span class="sd">          or ``clip_box(x_max=1000.0)``.</span>
-<span class="sd">        * To select x &gt;= 500.0: ``clip_box(x_min = 500.0, x_max=None.0)``</span>
-<span class="sd">          or ``clip_box(x_min=1000.0)``.</span>
-
-<span class="sd">        Parameters</span>
-<span class="sd">        ----------</span>
-<span class="sd">        time_min: optional</span>
-<span class="sd">        time_max: optional</span>
-<span class="sd">        layer_min: optional, int</span>
-<span class="sd">        layer_max: optional, int</span>
-<span class="sd">        x_min: optional, float</span>
-<span class="sd">        x_max: optional, float</span>
-<span class="sd">        y_min: optional, float</span>
-<span class="sd">        y_max: optional, float</span>
-<span class="sd">        top: optional, GridDataArray</span>
-<span class="sd">        bottom: optional, GridDataArray</span>
-<span class="sd">        state_for_boundary: optional, GridDataArray</span>
-
-<span class="sd">        Returns</span>
-<span class="sd">        -------</span>
-<span class="sd">        sliced : Package</span>
-<span class="sd">        &quot;&quot;&quot;</span>
-        <span class="c1"># TODO: include x and y values.</span>
-        <span class="k">for</span> <span class="n">arg</span> <span class="ow">in</span> <span class="p">(</span>
-            <span class="n">layer_min</span><span class="p">,</span>
-            <span class="n">layer_max</span><span class="p">,</span>
-            <span class="n">x_min</span><span class="p">,</span>
-            <span class="n">x_max</span><span class="p">,</span>
-            <span class="n">y_min</span><span class="p">,</span>
-            <span class="n">y_max</span><span class="p">,</span>
-        <span class="p">):</span>
-            <span class="k">if</span> <span class="n">arg</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-                <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="s2">&quot;Can only clip_box in time for Well packages&quot;</span><span class="p">)</span>
-
-        <span class="c1"># The super method will select in the time dimension without issues.</span>
-        <span class="n">new</span> <span class="o">=</span> <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">clip_box</span><span class="p">(</span><span class="n">time_min</span><span class="o">=</span><span class="n">time_min</span><span class="p">,</span> <span class="n">time_max</span><span class="o">=</span><span class="n">time_max</span><span class="p">)</span>
-        <span class="k">return</span> <span class="n">new</span></div>
-
-
-
-<div class="viewcode-block" id="WellDisVertices">
-<a class="viewcode-back" href="../../../api/generated/mf6/imod.mf6.WellDisVertices.html#imod.mf6.WellDisVertices">[docs]</a>
-<span class="k">class</span><span class="w"> </span><span class="nc">WellDisVertices</span><span class="p">(</span><span class="n">DisVerticesBoundaryCondition</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    WEL package for discretization by vertices (DISV) models. Any number of WEL</span>
-<span class="sd">    Packages can be specified for a single groundwater flow model.</span>
-<span class="sd">    https://water.usgs.gov/water-resources/software/MODFLOW-6/mf6io_6.0.4.pdf#page=63</span>
-
-<span class="sd">    .. warning::</span>
-<span class="sd">        This class is deprecated and will be deleted in a future release.</span>
-<span class="sd">        Consider changing your code to use the ``imod.mf6.Well`` package.</span>
-
-<span class="sd">    Parameters</span>
-<span class="sd">    ----------</span>
-<span class="sd">    layer: list of int</span>
-<span class="sd">        Modellayer in which the well is located.</span>
-<span class="sd">    cell2d: list of int</span>
-<span class="sd">        Cell in which the well is located.</span>
-<span class="sd">    rate: float or list of floats</span>
-<span class="sd">        is the volumetric well rate. A positive value indicates well (injection)</span>
-<span class="sd">        and a negative value indicates discharge (extraction) (q).</span>
-<span class="sd">    concentration: array of floats (xr.DataArray, optional)</span>
-<span class="sd">        if this flow package is used in simulations also involving transport,</span>
-<span class="sd">        then this array is used as the  concentration for inflow over this</span>
-<span class="sd">        boundary.</span>
-<span class="sd">    concentration_boundary_type: ({&quot;AUX&quot;, &quot;AUXMIXED&quot;}, optional)</span>
-<span class="sd">        if this flow package is used in simulations also involving transport,</span>
-<span class="sd">        then this keyword specifies how outflow over this boundary is computed.</span>
-<span class="sd">    print_input: ({True, False}, optional)</span>
-<span class="sd">        keyword to indicate that the list of well information will be written to</span>
-<span class="sd">        the listing file immediately after it is read. Default is False.</span>
-<span class="sd">    print_flows: ({True, False}, optional)</span>
-<span class="sd">        Indicates that the list of well flow rates will be printed to the</span>
-<span class="sd">        listing file for every stress period time step in which &quot;BUDGET PRINT&quot;</span>
-<span class="sd">        is specified in Output Control. If there is no Output Control option and</span>
-<span class="sd">        PRINT FLOWS is specified, then flow rates are printed for the last time</span>
-<span class="sd">        step of each stress period. Default is False.</span>
-<span class="sd">    save_flows: ({True, False}, optional)</span>
-<span class="sd">        Indicates that well flow terms will be written to the file specified</span>
-<span class="sd">        with &quot;BUDGET FILEOUT&quot; in Output Control. Default is False.</span>
-<span class="sd">    observations: [Not yet supported.]</span>
-<span class="sd">        Default is None.</span>
-<span class="sd">    validate: {True, False}</span>
-<span class="sd">        Flag to indicate whether the package should be validated upon</span>
-<span class="sd">        initialization. This raises a ValidationError if package input is</span>
-<span class="sd">        provided in the wrong manner. Defaults to True.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
-
-    <span class="n">_pkg_id</span> <span class="o">=</span> <span class="s2">&quot;wel&quot;</span>
-    <span class="n">_period_data</span> <span class="o">=</span> <span class="p">(</span><span class="s2">&quot;layer&quot;</span><span class="p">,</span> <span class="s2">&quot;cell2d&quot;</span><span class="p">,</span> <span class="s2">&quot;rate&quot;</span><span class="p">)</span>
-    <span class="n">_keyword_map</span> <span class="o">=</span> <span class="p">{}</span>
-    <span class="n">_template</span> <span class="o">=</span> <span class="n">DisVerticesBoundaryCondition</span><span class="o">.</span><span class="n">_initialize_template</span><span class="p">(</span><span class="n">_pkg_id</span><span class="p">)</span>
-    <span class="n">_auxiliary_data</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;concentration&quot;</span><span class="p">:</span> <span class="s2">&quot;species&quot;</span><span class="p">}</span>
-
-    <span class="n">_init_schemata</span> <span class="o">=</span> <span class="p">{</span>
-        <span class="s2">&quot;layer&quot;</span><span class="p">:</span> <span class="p">[</span><span class="n">DTypeSchema</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">integer</span><span class="p">)],</span>
-        <span class="s2">&quot;cell2d&quot;</span><span class="p">:</span> <span class="p">[</span><span class="n">DTypeSchema</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">integer</span><span class="p">)],</span>
-        <span class="s2">&quot;rate&quot;</span><span class="p">:</span> <span class="p">[</span><span class="n">DTypeSchema</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">floating</span><span class="p">)],</span>
-        <span class="s2">&quot;concentration&quot;</span><span class="p">:</span> <span class="p">[</span><span class="n">DTypeSchema</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">floating</span><span class="p">)],</span>
-    <span class="p">}</span>
-
-    <span class="n">_write_schemata</span> <span class="o">=</span> <span class="p">{}</span>
-
-<div class="viewcode-block" id="WellDisVertices.__init__">
-<a class="viewcode-back" href="../../../api/generated/mf6/imod.mf6.WellDisVertices.html#imod.mf6.WellDisVertices.__init__">[docs]</a>
-    <span class="nd">@init_log_decorator</span><span class="p">()</span>
-    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
-        <span class="bp">self</span><span class="p">,</span>
-        <span class="n">layer</span><span class="p">,</span>
-        <span class="n">cell2d</span><span class="p">,</span>
-        <span class="n">rate</span><span class="p">,</span>
-        <span class="n">concentration</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
-        <span class="n">concentration_boundary_type</span><span class="o">=</span><span class="s2">&quot;aux&quot;</span><span class="p">,</span>
-        <span class="n">print_input</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
-        <span class="n">print_flows</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
-        <span class="n">save_flows</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
-        <span class="n">observations</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
-        <span class="n">validate</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
-    <span class="p">):</span>
-        <span class="n">dict_dataset</span> <span class="o">=</span> <span class="p">{</span>
-            <span class="s2">&quot;layer&quot;</span><span class="p">:</span> <span class="n">_assign_dims</span><span class="p">(</span><span class="n">layer</span><span class="p">),</span>
-            <span class="s2">&quot;cell2d&quot;</span><span class="p">:</span> <span class="n">_assign_dims</span><span class="p">(</span><span class="n">cell2d</span><span class="p">),</span>
-            <span class="s2">&quot;rate&quot;</span><span class="p">:</span> <span class="n">_assign_dims</span><span class="p">(</span><span class="n">rate</span><span class="p">),</span>
-            <span class="s2">&quot;print_input&quot;</span><span class="p">:</span> <span class="n">print_input</span><span class="p">,</span>
-            <span class="s2">&quot;print_flows&quot;</span><span class="p">:</span> <span class="n">print_flows</span><span class="p">,</span>
-            <span class="s2">&quot;save_flows&quot;</span><span class="p">:</span> <span class="n">save_flows</span><span class="p">,</span>
-            <span class="s2">&quot;observations&quot;</span><span class="p">:</span> <span class="n">observations</span><span class="p">,</span>
-            <span class="s2">&quot;concentration&quot;</span><span class="p">:</span> <span class="n">concentration</span><span class="p">,</span>
-            <span class="s2">&quot;concentration_boundary_type&quot;</span><span class="p">:</span> <span class="n">concentration_boundary_type</span><span class="p">,</span>
-        <span class="p">}</span>
-        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">dict_dataset</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_validate_init_schemata</span><span class="p">(</span><span class="n">validate</span><span class="p">)</span>
-
-        <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span>
-            <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__name__</span><span class="si">}</span><span class="s2"> is deprecated and will be removed in the v1.0 release.&quot;</span>
-            <span class="s2">&quot;Please adapt your code to use the imod.mf6.Well package&quot;</span><span class="p">,</span>
-            <span class="ne">DeprecationWarning</span><span class="p">,</span>
-        <span class="p">)</span></div>
-
-
-    <span class="k">def</span><span class="w"> </span><span class="nf">clip_box</span><span class="p">(</span>
-        <span class="bp">self</span><span class="p">,</span>
-        <span class="n">time_min</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">cftime</span><span class="o">.</span><span class="n">datetime</span> <span class="o">|</span> <span class="n">np</span><span class="o">.</span><span class="n">datetime64</span> <span class="o">|</span> <span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-        <span class="n">time_max</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">cftime</span><span class="o">.</span><span class="n">datetime</span> <span class="o">|</span> <span class="n">np</span><span class="o">.</span><span class="n">datetime64</span> <span class="o">|</span> <span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-        <span class="n">layer_min</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-        <span class="n">layer_max</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-        <span class="n">x_min</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">float</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-        <span class="n">x_max</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">float</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-        <span class="n">y_min</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">float</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-        <span class="n">y_max</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">float</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-        <span class="n">top</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">GridDataArray</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-        <span class="n">bottom</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">GridDataArray</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Self</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Clip a package by a bounding box (time, layer, y, x).</span>
-
-<span class="sd">        Slicing intervals may be half-bounded, by providing None:</span>
-
-<span class="sd">        * To select 500.0 &lt;= x &lt;= 1000.0:</span>
-<span class="sd">          ``clip_box(x_min=500.0, x_max=1000.0)``.</span>
-<span class="sd">        * To select x &lt;= 1000.0: ``clip_box(x_min=None, x_max=1000.0)``</span>
-<span class="sd">          or ``clip_box(x_max=1000.0)``.</span>
-<span class="sd">        * To select x &gt;= 500.0: ``clip_box(x_min = 500.0, x_max=None.0)``</span>
-<span class="sd">          or ``clip_box(x_min=1000.0)``.</span>
-
-<span class="sd">        Parameters</span>
-<span class="sd">        ----------</span>
-<span class="sd">        time_min: optional</span>
-<span class="sd">        time_max: optional</span>
-<span class="sd">        layer_min: optional, int</span>
-<span class="sd">        layer_max: optional, int</span>
-<span class="sd">        x_min: optional, float</span>
-<span class="sd">        x_max: optional, float</span>
-<span class="sd">        y_min: optional, float</span>
-<span class="sd">        y_max: optional, float</span>
-<span class="sd">        top: optional, GridDataArray</span>
-<span class="sd">        bottom: optional, GridDataArray</span>
-<span class="sd">        state_for_boundary: optional, GridDataArray</span>
-
-<span class="sd">        Returns</span>
-<span class="sd">        -------</span>
-<span class="sd">        clipped: Package</span>
-<span class="sd">        &quot;&quot;&quot;</span>
-        <span class="c1"># TODO: include x and y values.</span>
-        <span class="k">for</span> <span class="n">arg</span> <span class="ow">in</span> <span class="p">(</span>
-            <span class="n">layer_min</span><span class="p">,</span>
-            <span class="n">layer_max</span><span class="p">,</span>
-            <span class="n">x_min</span><span class="p">,</span>
-            <span class="n">x_max</span><span class="p">,</span>
-            <span class="n">y_min</span><span class="p">,</span>
-            <span class="n">y_max</span><span class="p">,</span>
-        <span class="p">):</span>
-            <span class="k">if</span> <span class="n">arg</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-                <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="s2">&quot;Can only clip_box in time for Well packages&quot;</span><span class="p">)</span>
-
-        <span class="c1"># The super method will select in the time dimension without issues.</span>
-        <span class="n">new</span> <span class="o">=</span> <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">clip_box</span><span class="p">(</span><span class="n">time_min</span><span class="o">=</span><span class="n">time_min</span><span class="p">,</span> <span class="n">time_max</span><span class="o">=</span><span class="n">time_max</span><span class="p">)</span>
-        <span class="k">return</span> <span class="n">new</span></div>
+</div>
 
 </pre></div>
 

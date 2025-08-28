@@ -1,0 +1,6 @@
+﻿imod.mf6.UnsaturatedZoneFlow.clip\_box
+======================================
+
+.. currentmodule:: imod.mf6
+
+.. automethod:: UnsaturatedZoneFlow.clip_box

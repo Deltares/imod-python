@@ -1,0 +1,6 @@
+﻿imod.msw.IdfMapping.regrid\_like
+================================
+
+.. currentmodule:: imod.msw
+
+.. automethod:: IdfMapping.regrid_like

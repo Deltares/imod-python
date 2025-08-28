@@ -6,7 +6,7 @@
 
 Computation times
 =================
-**10:26.445** total execution time for 12 files **from examples\mf6**:
+**09:34.786** total execution time for 12 files **from examples\mf6**:
 
 .. container::
 
@@ -33,37 +33,37 @@ Computation times
      - Time
      - Mem (MB)
    * - :ref:`sphx_glr_examples_mf6_hondsrug_partitioning.py` (``hondsrug_partitioning.py``)
-     - 04:23.188
+     - 04:20.440
      - 0.0
    * - :ref:`sphx_glr_examples_mf6_hondsrug.py` (``hondsrug.py``)
-     - 02:25.334
-     - 0.0
-   * - :ref:`sphx_glr_examples_mf6_transport_2d.py` (``transport_2d.py``)
-     - 01:16.141
+     - 02:18.020
      - 0.0
    * - :ref:`sphx_glr_examples_mf6_circle_transport.py` (``circle_transport.py``)
-     - 01:01.868
+     - 01:15.846
+     - 0.0
+   * - :ref:`sphx_glr_examples_mf6_transport_2d.py` (``transport_2d.py``)
+     - 00:52.835
      - 0.0
    * - :ref:`sphx_glr_examples_mf6_Henry.py` (``Henry.py``)
-     - 00:58.243
-     - 0.0
-   * - :ref:`sphx_glr_examples_mf6_different_ways_to_regrid_models.py` (``different_ways_to_regrid_models.py``)
-     - 00:12.328
+     - 00:37.209
      - 0.0
    * - :ref:`sphx_glr_examples_mf6_circle_partitioned.py` (``circle_partitioned.py``)
-     - 00:03.205
-     - 0.0
-   * - :ref:`sphx_glr_examples_mf6_example_1d_transport.py` (``example_1d_transport.py``)
-     - 00:03.091
+     - 00:03.013
      - 0.0
    * - :ref:`sphx_glr_examples_mf6_circle.py` (``circle.py``)
-     - 00:01.748
+     - 00:02.570
+     - 0.0
+   * - :ref:`sphx_glr_examples_mf6_example_1d_transport.py` (``example_1d_transport.py``)
+     - 00:02.027
+     - 0.0
+   * - :ref:`sphx_glr_examples_mf6_different_ways_to_regrid_models.py` (``different_ways_to_regrid_models.py``)
+     - 00:01.250
      - 0.0
    * - :ref:`sphx_glr_examples_mf6_lake.py` (``lake.py``)
-     - 00:00.750
+     - 00:00.833
      - 0.0
    * - :ref:`sphx_glr_examples_mf6_ex01_twri.py` (``ex01_twri.py``)
-     - 00:00.548
+     - 00:00.742
      - 0.0
    * - :ref:`sphx_glr_examples_mf6_example_models.py` (``example_models.py``)
      - 00:00.000

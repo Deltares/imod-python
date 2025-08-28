@@ -1,0 +1,6 @@
+﻿imod.msw.AnnualCropFactors.clip\_box
+====================================
+
+.. currentmodule:: imod.msw
+
+.. automethod:: AnnualCropFactors.clip_box

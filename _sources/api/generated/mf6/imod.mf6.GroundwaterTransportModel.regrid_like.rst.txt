@@ -1,0 +1,6 @@
+﻿imod.mf6.GroundwaterTransportModel.regrid\_like
+===============================================
+
+.. currentmodule:: imod.mf6
+
+.. automethod:: GroundwaterTransportModel.regrid_like

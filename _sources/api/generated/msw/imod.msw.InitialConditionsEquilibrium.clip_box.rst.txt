@@ -1,0 +1,6 @@
+﻿imod.msw.InitialConditionsEquilibrium.clip\_box
+===============================================
+
+.. currentmodule:: imod.msw
+
+.. automethod:: InitialConditionsEquilibrium.clip_box

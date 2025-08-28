@@ -1,0 +1,6 @@
+﻿imod.mf6.ImmobileStorageTransfer.get\_regrid\_methods
+=====================================================
+
+.. currentmodule:: imod.mf6
+
+.. automethod:: ImmobileStorageTransfer.get_regrid_methods

@@ -1,0 +1,6 @@
+﻿imod.msw.ScalingFactors.clip\_box
+=================================
+
+.. currentmodule:: imod.msw
+
+.. automethod:: ScalingFactors.clip_box

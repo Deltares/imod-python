@@ -1,0 +1,6 @@
+﻿imod.msw.GridData.regrid\_like
+==============================
+
+.. currentmodule:: imod.msw
+
+.. automethod:: GridData.regrid_like

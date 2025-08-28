@@ -1,0 +1,6 @@
+﻿imod.msw.InitialConditionsSavedState.write
+==========================================
+
+.. currentmodule:: imod.msw
+
+.. automethod:: InitialConditionsSavedState.write

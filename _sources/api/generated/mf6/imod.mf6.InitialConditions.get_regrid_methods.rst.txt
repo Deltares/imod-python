@@ -1,0 +1,6 @@
+﻿imod.mf6.InitialConditions.get\_regrid\_methods
+===============================================
+
+.. currentmodule:: imod.mf6
+
+.. automethod:: InitialConditions.get_regrid_methods

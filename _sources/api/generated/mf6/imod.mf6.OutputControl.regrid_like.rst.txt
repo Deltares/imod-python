@@ -1,0 +1,6 @@
+﻿imod.mf6.OutputControl.regrid\_like
+===================================
+
+.. currentmodule:: imod.mf6
+
+.. automethod:: OutputControl.regrid_like

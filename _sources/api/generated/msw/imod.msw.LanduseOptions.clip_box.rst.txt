@@ -1,0 +1,6 @@
+﻿imod.msw.LanduseOptions.clip\_box
+=================================
+
+.. currentmodule:: imod.msw
+
+.. automethod:: LanduseOptions.clip_box

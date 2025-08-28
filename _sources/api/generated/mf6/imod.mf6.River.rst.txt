@@ -14,31 +14,19 @@
    .. autosummary::
    
       ~River.__init__
-      ~River.allocate_and_distribute_planar_data
+      ~River.aggregate_layers
       ~River.cleanup
       ~River.clip_box
       ~River.copy
       ~River.from_file
       ~River.from_imod5_data
-      ~River.get_non_grid_data
-      ~River.get_period_varnames
       ~River.get_regrid_methods
-      ~River.is_clipping_supported
       ~River.is_empty
-      ~River.is_grid_agnostic_package
-      ~River.is_regridding_supported
-      ~River.is_splitting_supported
-      ~River.isel
       ~River.mask
+      ~River.reallocate
       ~River.regrid_like
-      ~River.render
-      ~River.sel
-      ~River.set_repeat_stress
       ~River.to_netcdf
       ~River.write
-      ~River.write_binary_griddata
-      ~River.write_blockfile
-      ~River.write_text_griddata
    
    
 

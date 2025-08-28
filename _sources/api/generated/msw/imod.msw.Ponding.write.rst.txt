@@ -1,0 +1,6 @@
+﻿imod.msw.Ponding.write
+======================
+
+.. currentmodule:: imod.msw
+
+.. automethod:: Ponding.write

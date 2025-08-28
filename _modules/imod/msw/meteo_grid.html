@@ -7,7 +7,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>imod.msw.meteo_grid &#8212; iMOD Python 1.0.0rc4 documentation</title>
+    <title>imod.msw.meteo_grid &#8212; iMOD Python 1.0.0rc6 documentation</title>
   
   
   
@@ -41,7 +41,7 @@
   <link rel="preload" as="script" href="../../../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
 <link rel="preload" as="script" href="../../../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
 
-    <script src="../../../_static/documentation_options.js?v=2fc85bd2"></script>
+    <script src="../../../_static/documentation_options.js?v=bc4855a1"></script>
     <script src="../../../_static/doctools.js?v=9bcbadda"></script>
     <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script>DOCUMENTATION_OPTIONS.pagename = '_modules/imod/msw/meteo_grid';</script>
@@ -50,7 +50,7 @@
     <link rel="search" title="Search" href="../../../search.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
-  <meta name="docsearch:version" content="1.0.0rc4.dev" />
+  <meta name="docsearch:version" content="1.0.0rc6.dev" />
   </head>
   
   
@@ -114,8 +114,8 @@
     
     
     
-    <img src="../../../_static/imod-python-logo-light.svg" class="logo__image only-light" alt="iMOD Python 1.0.0rc4 documentation - Home"/>
-    <img src="../../../_static/imod-python-logo-dark.svg" class="logo__image only-dark pst-js-only" alt="iMOD Python 1.0.0rc4 documentation - Home"/>
+    <img src="../../../_static/imod-python-logo-light.svg" class="logo__image only-light" alt="iMOD Python 1.0.0rc6 documentation - Home"/>
+    <img src="../../../_static/imod-python-logo-dark.svg" class="logo__image only-dark pst-js-only" alt="iMOD Python 1.0.0rc6 documentation - Home"/>
   
   
 </a></div>
@@ -153,7 +153,7 @@
 
 <li class="nav-item ">
   <a class="nav-link nav-internal" href="../../../api/index.html">
-    API Reference
+    API
   </a>
 </li>
 
@@ -303,7 +303,7 @@
 
 <li class="nav-item ">
   <a class="nav-link nav-internal" href="../../../api/index.html">
-    API Reference
+    API
   </a>
 </li>
 
@@ -438,7 +438,7 @@
 
 <span class="kn">import</span><span class="w"> </span><span class="nn">imod</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">imod.common.interfaces.iregridpackage</span><span class="w"> </span><span class="kn">import</span> <span class="n">IRegridPackage</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">imod.common.utilities.regrid_method_type</span><span class="w"> </span><span class="kn">import</span> <span class="n">EmptyRegridMethod</span><span class="p">,</span> <span class="n">RegridMethodType</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">imod.common.utilities.dataclass_type</span><span class="w"> </span><span class="kn">import</span> <span class="n">DataclassType</span><span class="p">,</span> <span class="n">EmptyRegridMethod</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">imod.msw.pkgbase</span><span class="w"> </span><span class="kn">import</span> <span class="n">MetaSwapPackage</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">imod.msw.regrid.regrid_schemes</span><span class="w"> </span><span class="kn">import</span> <span class="n">MeteoGridRegridMethod</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">imod.msw.timeutil</span><span class="w"> </span><span class="kn">import</span> <span class="n">to_metaswap_timeformat</span>
@@ -484,7 +484,7 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">_pkgcheck</span><span class="p">()</span></div>
 
 
-    <span class="k">def</span><span class="w"> </span><span class="nf">write_free_format_file</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">path</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Path</span><span class="p">],</span> <span class="n">dataframe</span><span class="p">:</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_write_free_format_file</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">path</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Path</span><span class="p">],</span> <span class="n">dataframe</span><span class="p">:</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Write free format file. The mete_grid.inp file is free format.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
@@ -502,7 +502,7 @@
         <span class="p">]</span>
         <span class="n">dataframe</span><span class="o">.</span><span class="n">loc</span><span class="p">[:,</span> <span class="n">wofost_columns</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;&quot;NoValue&quot;&#39;</span>
 
-        <span class="bp">self</span><span class="o">.</span><span class="n">check_string_lengths</span><span class="p">(</span><span class="n">dataframe</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_check_string_lengths</span><span class="p">(</span><span class="n">dataframe</span><span class="p">)</span>
 
         <span class="n">dataframe</span><span class="o">.</span><span class="n">to_csv</span><span class="p">(</span>
             <span class="n">path</span><span class="p">,</span> <span class="n">header</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">quoting</span><span class="o">=</span><span class="n">csv</span><span class="o">.</span><span class="n">QUOTE_NONE</span><span class="p">,</span> <span class="n">float_format</span><span class="o">=</span><span class="s2">&quot;</span><span class="si">%.4f</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">index</span><span class="o">=</span><span class="kc">False</span>
@@ -565,7 +565,7 @@
 
         <span class="k">return</span> <span class="n">dataframe</span>
 
-    <span class="k">def</span><span class="w"> </span><span class="nf">check_string_lengths</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">dataframe</span><span class="p">:</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_check_string_lengths</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">dataframe</span><span class="p">:</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Check if strings lengths do not exceed 256 characters.</span>
 <span class="sd">        With absolute paths this might be an issue.</span>
@@ -588,6 +588,8 @@
                 <span class="sa">f</span><span class="s2">&quot;Encountered strings longer than 256 characters in columns: </span><span class="si">{</span><span class="n">too_long_columns</span><span class="si">}</span><span class="s2">&quot;</span>
             <span class="p">)</span>
 
+<div class="viewcode-block" id="MeteoGrid.write">
+<a class="viewcode-back" href="../../../api/generated/msw/imod.msw.MeteoGrid.write.html#imod.msw.MeteoGrid.write">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">write</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">directory</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Path</span><span class="p">],</span> <span class="o">*</span><span class="n">args</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Write mete_grid.inp and accompanying ASCII grid files.</span>
@@ -603,7 +605,7 @@
         <span class="n">times</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">dataset</span><span class="p">[</span><span class="s2">&quot;time&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">values</span>
 
         <span class="n">dataframe</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_compose_dataframe</span><span class="p">(</span><span class="n">times</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">write_free_format_file</span><span class="p">(</span><span class="n">directory</span> <span class="o">/</span> <span class="bp">self</span><span class="o">.</span><span class="n">_file_name</span><span class="p">,</span> <span class="n">dataframe</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_write_free_format_file</span><span class="p">(</span><span class="n">directory</span> <span class="o">/</span> <span class="bp">self</span><span class="o">.</span><span class="n">_file_name</span><span class="p">,</span> <span class="n">dataframe</span><span class="p">)</span>
 
         <span class="c1"># Write grid data to ESRI ASCII files</span>
         <span class="k">for</span> <span class="n">varname</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">dataset</span><span class="o">.</span><span class="n">data_vars</span><span class="p">:</span>
@@ -613,7 +615,8 @@
                 <span class="p">)</span>
                 <span class="n">imod</span><span class="o">.</span><span class="n">rasterio</span><span class="o">.</span><span class="n">save</span><span class="p">(</span>
                     <span class="n">path</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">dataset</span><span class="p">[</span><span class="nb">str</span><span class="p">(</span><span class="n">varname</span><span class="p">)],</span> <span class="n">nodata</span><span class="o">=</span><span class="n">MaskValues</span><span class="o">.</span><span class="n">default</span>
-                <span class="p">)</span>
+                <span class="p">)</span></div>
+
 
     <span class="k">def</span><span class="w"> </span><span class="nf">_pkgcheck</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">for</span> <span class="n">varname</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">dataset</span><span class="o">.</span><span class="n">data_vars</span><span class="p">:</span>
@@ -653,7 +656,7 @@
     <span class="n">_file_name</span> <span class="o">=</span> <span class="s2">&quot;mete_grid.inp&quot;</span>
     <span class="n">_meteo_dirname</span> <span class="o">=</span> <span class="s2">&quot;meteo_grids&quot;</span>
 
-    <span class="n">_regrid_method</span><span class="p">:</span> <span class="n">RegridMethodType</span> <span class="o">=</span> <span class="n">EmptyRegridMethod</span><span class="p">()</span>
+    <span class="n">_regrid_method</span><span class="p">:</span> <span class="n">DataclassType</span> <span class="o">=</span> <span class="n">EmptyRegridMethod</span><span class="p">()</span>
 
 <div class="viewcode-block" id="MeteoGridCopy.__init__">
 <a class="viewcode-back" href="../../../api/generated/msw/imod.msw.MeteoGridCopy.html#imod.msw.MeteoGridCopy.__init__">[docs]</a>
@@ -662,11 +665,14 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">dataset</span><span class="p">[</span><span class="s2">&quot;path&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">path</span></div>
 
 
+<div class="viewcode-block" id="MeteoGridCopy.write">
+<a class="viewcode-back" href="../../../api/generated/msw/imod.msw.MeteoGridCopy.write.html#imod.msw.MeteoGridCopy.write">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">write</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">directory</span><span class="p">:</span> <span class="n">Path</span> <span class="o">|</span> <span class="nb">str</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">):</span>
         <span class="n">directory</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="n">directory</span><span class="p">)</span>
         <span class="n">path_metegrid</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">dataset</span><span class="p">[</span><span class="s2">&quot;path&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">values</span><span class="p">[()]))</span>
         <span class="n">new_path</span> <span class="o">=</span> <span class="n">directory</span> <span class="o">/</span> <span class="bp">self</span><span class="o">.</span><span class="n">_file_name</span>
-        <span class="n">copyfile</span><span class="p">(</span><span class="n">path_metegrid</span><span class="p">,</span> <span class="n">new_path</span><span class="p">)</span>
+        <span class="n">copyfile</span><span class="p">(</span><span class="n">path_metegrid</span><span class="p">,</span> <span class="n">new_path</span><span class="p">)</span></div>
+
 
 <div class="viewcode-block" id="MeteoGridCopy.from_imod5_data">
 <a class="viewcode-back" href="../../../api/generated/msw/imod.msw.MeteoGridCopy.from_imod5_data.html#imod.msw.MeteoGridCopy.from_imod5_data">[docs]</a>

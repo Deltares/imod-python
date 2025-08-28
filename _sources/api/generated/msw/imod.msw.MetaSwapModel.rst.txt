@@ -20,7 +20,7 @@
       ~MetaSwapModel.from_imod5_data
       ~MetaSwapModel.fromkeys
       ~MetaSwapModel.get
-      ~MetaSwapModel.has_file_copier
+      ~MetaSwapModel.get_pkgkey
       ~MetaSwapModel.items
       ~MetaSwapModel.keys
       ~MetaSwapModel.pop

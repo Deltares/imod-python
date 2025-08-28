@@ -1,0 +1,6 @@
+﻿imod.msw.IdfMapping.clip\_box
+=============================
+
+.. currentmodule:: imod.msw
+
+.. automethod:: IdfMapping.clip_box

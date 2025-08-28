@@ -1,0 +1,6 @@
+﻿imod.mf6.ConstantHead.get\_regrid\_methods
+==========================================
+
+.. currentmodule:: imod.mf6
+
+.. automethod:: ConstantHead.get_regrid_methods

@@ -1,0 +1,6 @@
+﻿imod.mf6.TimeDiscretization.mask
+================================
+
+.. currentmodule:: imod.mf6
+
+.. automethod:: TimeDiscretization.mask

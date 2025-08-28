@@ -1,0 +1,6 @@
+﻿imod.prepare.cleanup\_hfb
+=========================
+
+.. currentmodule:: imod.prepare
+
+.. autofunction:: cleanup_hfb

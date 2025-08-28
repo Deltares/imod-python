@@ -21,10 +21,8 @@
       ~GroundwaterTransportModel.from_file
       ~GroundwaterTransportModel.fromkeys
       ~GroundwaterTransportModel.get
+      ~GroundwaterTransportModel.get_diskey
       ~GroundwaterTransportModel.has_key
-      ~GroundwaterTransportModel.is_clipping_supported
-      ~GroundwaterTransportModel.is_regridding_supported
-      ~GroundwaterTransportModel.is_splitting_supported
       ~GroundwaterTransportModel.is_use_newton
       ~GroundwaterTransportModel.items
       ~GroundwaterTransportModel.keys
@@ -34,12 +32,9 @@
       ~GroundwaterTransportModel.prepare_wel_for_mf6
       ~GroundwaterTransportModel.purge_empty_packages
       ~GroundwaterTransportModel.regrid_like
-      ~GroundwaterTransportModel.render
       ~GroundwaterTransportModel.setdefault
       ~GroundwaterTransportModel.update
       ~GroundwaterTransportModel.validate
-      ~GroundwaterTransportModel.validate_init_schemata_options
-      ~GroundwaterTransportModel.validate_options
       ~GroundwaterTransportModel.values
       ~GroundwaterTransportModel.write
    

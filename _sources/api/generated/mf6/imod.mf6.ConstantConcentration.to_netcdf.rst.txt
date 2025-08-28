@@ -1,0 +1,6 @@
+﻿imod.mf6.ConstantConcentration.to\_netcdf
+=========================================
+
+.. currentmodule:: imod.mf6
+
+.. automethod:: ConstantConcentration.to_netcdf

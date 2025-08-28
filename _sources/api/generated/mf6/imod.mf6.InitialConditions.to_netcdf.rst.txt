@@ -1,0 +1,6 @@
+﻿imod.mf6.InitialConditions.to\_netcdf
+=====================================
+
+.. currentmodule:: imod.mf6
+
+.. automethod:: InitialConditions.to_netcdf

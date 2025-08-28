@@ -1,0 +1,6 @@
+﻿imod.msw.EvapotranspirationMapping.regrid\_like
+===============================================
+
+.. currentmodule:: imod.msw
+
+.. automethod:: EvapotranspirationMapping.regrid_like

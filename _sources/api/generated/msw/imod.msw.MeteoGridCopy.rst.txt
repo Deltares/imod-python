@@ -16,15 +16,9 @@
       ~MeteoGridCopy.__init__
       ~MeteoGridCopy.clip_box
       ~MeteoGridCopy.from_imod5_data
-      ~MeteoGridCopy.get_non_grid_data
       ~MeteoGridCopy.get_regrid_methods
-      ~MeteoGridCopy.is_clipping_supported
-      ~MeteoGridCopy.is_regridding_supported
-      ~MeteoGridCopy.isel
       ~MeteoGridCopy.regrid_like
-      ~MeteoGridCopy.sel
       ~MeteoGridCopy.write
-      ~MeteoGridCopy.write_dataframe_fixed_width
    
    
 

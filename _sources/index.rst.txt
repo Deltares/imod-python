@@ -9,6 +9,8 @@ iMOD Python: make massive MODFLOW models
    :target: https://github.com/conda-forge/imod-feedstock
 .. image:: https://img.shields.io/endpoint?url=https://raw.githubusercontent.com/prefix-dev/pixi/main/assets/badge/v0.json
    :target: https://pixi.sh
+.. image:: https://img.shields.io/badge/SPEC-0-green?labelColor=%23004811&color=%235CA038
+   :target: https://scientific-python.org/specs/spec-0000/
 
 The ``imod`` Python package is an open source project to make working with
 MODFLOW groundwater models in Python easier. It builds on top of popular
@@ -197,8 +199,8 @@ respectively 1 and 365 stress periods) than the alternative `Flopy`_ package.
 Furthermore ``imod`` can even write models that are larger than the available
 memory, using `dask`_ arrays.
 
-*NOTE:* We don't hate Flopy, nor seek its demise. iMOD developers also
-contribute and aid in the development of Flopy.
+*NOTE:* iMOD developers work alongside the Flopy development team and contribute
+to both projects.
 
 8\. Import your iMOD5 models
 ----------------------------
@@ -228,7 +230,9 @@ Why not ``imod``?
 
 If you are not interested in deriving models from spatial data, but just want to
 allocate boundary conditions based on layer, row, column numbers, or create a
-model of a 2D cross-section: You are better off using `Flopy`_.
+model of a 2D cross-section: You are better off using `Flopy`_. If you want to
+complexify this model with a lot of stress periods and run into slow writing
+speeds, consider using ``imod`` for performance.
 
 2\. Not all MODFLOW 6 features are supported
 --------------------------------------------

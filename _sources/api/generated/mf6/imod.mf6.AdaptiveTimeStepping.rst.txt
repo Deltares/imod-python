@@ -1,0 +1,38 @@
+﻿imod.mf6.AdaptiveTimeStepping
+=============================
+
+.. currentmodule:: imod.mf6
+
+.. autoclass:: AdaptiveTimeStepping
+
+   
+   .. automethod:: __init__
+
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      ~AdaptiveTimeStepping.__init__
+      ~AdaptiveTimeStepping.clip_box
+      ~AdaptiveTimeStepping.copy
+      ~AdaptiveTimeStepping.from_file
+      ~AdaptiveTimeStepping.get_regrid_methods
+      ~AdaptiveTimeStepping.is_empty
+      ~AdaptiveTimeStepping.mask
+      ~AdaptiveTimeStepping.regrid_like
+      ~AdaptiveTimeStepping.to_netcdf
+      ~AdaptiveTimeStepping.write
+   
+   
+
+   
+   
+   .. rubric:: Attributes
+
+   .. autosummary::
+   
+      ~AdaptiveTimeStepping.auxiliary_data_fields
+      ~AdaptiveTimeStepping.dataset
+   
+   

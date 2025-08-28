@@ -1,0 +1,6 @@
+﻿imod.msw.MeteoGrid.regrid\_like
+===============================
+
+.. currentmodule:: imod.msw
+
+.. automethod:: MeteoGrid.regrid_like

@@ -1,0 +1,6 @@
+﻿imod.mf6.Buoyancy.clip\_box
+===========================
+
+.. currentmodule:: imod.mf6
+
+.. automethod:: Buoyancy.clip_box

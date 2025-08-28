@@ -1,0 +1,6 @@
+﻿imod.msw.InitialConditionsRootzonePressureHead.regrid\_like
+===========================================================
+
+.. currentmodule:: imod.msw
+
+.. automethod:: InitialConditionsRootzonePressureHead.regrid_like

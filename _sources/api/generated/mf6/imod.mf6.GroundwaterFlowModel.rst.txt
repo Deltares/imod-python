@@ -22,10 +22,8 @@
       ~GroundwaterFlowModel.from_imod5_data
       ~GroundwaterFlowModel.fromkeys
       ~GroundwaterFlowModel.get
+      ~GroundwaterFlowModel.get_diskey
       ~GroundwaterFlowModel.has_key
-      ~GroundwaterFlowModel.is_clipping_supported
-      ~GroundwaterFlowModel.is_regridding_supported
-      ~GroundwaterFlowModel.is_splitting_supported
       ~GroundwaterFlowModel.is_use_newton
       ~GroundwaterFlowModel.items
       ~GroundwaterFlowModel.keys
@@ -35,14 +33,10 @@
       ~GroundwaterFlowModel.prepare_wel_for_mf6
       ~GroundwaterFlowModel.purge_empty_packages
       ~GroundwaterFlowModel.regrid_like
-      ~GroundwaterFlowModel.render
       ~GroundwaterFlowModel.set_newton
       ~GroundwaterFlowModel.setdefault
       ~GroundwaterFlowModel.update
-      ~GroundwaterFlowModel.update_buoyancy_package
       ~GroundwaterFlowModel.validate
-      ~GroundwaterFlowModel.validate_init_schemata_options
-      ~GroundwaterFlowModel.validate_options
       ~GroundwaterFlowModel.values
       ~GroundwaterFlowModel.write
    

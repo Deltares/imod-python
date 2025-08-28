@@ -14,28 +14,16 @@
    .. autosummary::
    
       ~StructuredDiscretization.__init__
-      ~StructuredDiscretization.cleanup
       ~StructuredDiscretization.clip_box
       ~StructuredDiscretization.copy
       ~StructuredDiscretization.from_file
       ~StructuredDiscretization.from_imod5_data
-      ~StructuredDiscretization.get_non_grid_data
       ~StructuredDiscretization.get_regrid_methods
-      ~StructuredDiscretization.is_clipping_supported
       ~StructuredDiscretization.is_empty
-      ~StructuredDiscretization.is_grid_agnostic_package
-      ~StructuredDiscretization.is_regridding_supported
-      ~StructuredDiscretization.is_splitting_supported
-      ~StructuredDiscretization.isel
       ~StructuredDiscretization.mask
       ~StructuredDiscretization.regrid_like
-      ~StructuredDiscretization.render
-      ~StructuredDiscretization.sel
       ~StructuredDiscretization.to_netcdf
       ~StructuredDiscretization.write
-      ~StructuredDiscretization.write_binary_griddata
-      ~StructuredDiscretization.write_blockfile
-      ~StructuredDiscretization.write_text_griddata
    
    
 

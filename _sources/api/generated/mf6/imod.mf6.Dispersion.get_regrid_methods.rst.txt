@@ -1,0 +1,6 @@
+﻿imod.mf6.Dispersion.get\_regrid\_methods
+========================================
+
+.. currentmodule:: imod.mf6
+
+.. automethod:: Dispersion.get_regrid_methods

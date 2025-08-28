@@ -14,29 +14,15 @@
    .. autosummary::
    
       ~Evapotranspiration.__init__
-      ~Evapotranspiration.cleanup
       ~Evapotranspiration.clip_box
       ~Evapotranspiration.copy
       ~Evapotranspiration.from_file
-      ~Evapotranspiration.get_non_grid_data
-      ~Evapotranspiration.get_period_varnames
       ~Evapotranspiration.get_regrid_methods
-      ~Evapotranspiration.is_clipping_supported
       ~Evapotranspiration.is_empty
-      ~Evapotranspiration.is_grid_agnostic_package
-      ~Evapotranspiration.is_regridding_supported
-      ~Evapotranspiration.is_splitting_supported
-      ~Evapotranspiration.isel
       ~Evapotranspiration.mask
       ~Evapotranspiration.regrid_like
-      ~Evapotranspiration.render
-      ~Evapotranspiration.sel
-      ~Evapotranspiration.set_repeat_stress
       ~Evapotranspiration.to_netcdf
       ~Evapotranspiration.write
-      ~Evapotranspiration.write_binary_griddata
-      ~Evapotranspiration.write_blockfile
-      ~Evapotranspiration.write_text_griddata
    
    
 

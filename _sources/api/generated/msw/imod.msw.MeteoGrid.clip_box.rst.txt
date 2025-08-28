@@ -1,0 +1,6 @@
+﻿imod.msw.MeteoGrid.clip\_box
+============================
+
+.. currentmodule:: imod.msw
+
+.. automethod:: MeteoGrid.clip_box

@@ -1,0 +1,6 @@
+﻿imod.msw.ScalingFactors.write
+=============================
+
+.. currentmodule:: imod.msw
+
+.. automethod:: ScalingFactors.write

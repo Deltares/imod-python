@@ -1,0 +1,6 @@
+﻿imod.msw.LanduseOptions.regrid\_like
+====================================
+
+.. currentmodule:: imod.msw
+
+.. automethod:: LanduseOptions.regrid_like

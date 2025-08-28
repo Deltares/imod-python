@@ -1,0 +1,6 @@
+﻿imod.mf6.SourceSinkMixing.get\_regrid\_methods
+==============================================
+
+.. currentmodule:: imod.mf6
+
+.. automethod:: SourceSinkMixing.get_regrid_methods

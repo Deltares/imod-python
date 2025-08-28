@@ -8,7 +8,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>imod.wq.RechargeHighestActive &#8212; iMOD Python 1.0.0rc4 documentation</title>
+    <title>imod.wq.RechargeHighestActive &#8212; iMOD Python 1.0.0rc6 documentation</title>
   
   
   
@@ -42,7 +42,7 @@
   <link rel="preload" as="script" href="../../../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
 <link rel="preload" as="script" href="../../../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
 
-    <script src="../../../_static/documentation_options.js?v=2fc85bd2"></script>
+    <script src="../../../_static/documentation_options.js?v=bc4855a1"></script>
     <script src="../../../_static/doctools.js?v=9bcbadda"></script>
     <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script>DOCUMENTATION_OPTIONS.pagename = 'api/generated/wq/imod.wq.RechargeHighestActive';</script>
@@ -53,7 +53,7 @@
     <link rel="prev" title="imod.wq.RechargeLayers" href="imod.wq.RechargeLayers.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
-  <meta name="docsearch:version" content="1.0.0rc4.dev" />
+  <meta name="docsearch:version" content="1.0.0rc6.dev" />
   </head>
   
   
@@ -117,8 +117,8 @@
     
     
     
-    <img src="../../../_static/imod-python-logo-light.svg" class="logo__image only-light" alt="iMOD Python 1.0.0rc4 documentation - Home"/>
-    <img src="../../../_static/imod-python-logo-dark.svg" class="logo__image only-dark pst-js-only" alt="iMOD Python 1.0.0rc4 documentation - Home"/>
+    <img src="../../../_static/imod-python-logo-light.svg" class="logo__image only-light" alt="iMOD Python 1.0.0rc6 documentation - Home"/>
+    <img src="../../../_static/imod-python-logo-dark.svg" class="logo__image only-dark pst-js-only" alt="iMOD Python 1.0.0rc6 documentation - Home"/>
   
   
 </a></div>
@@ -156,7 +156,7 @@
 
 <li class="nav-item current active">
   <a class="nav-link nav-internal" href="../../index.html">
-    API Reference
+    API
   </a>
 </li>
 
@@ -308,7 +308,7 @@
 
 <li class="nav-item current active">
   <a class="nav-link nav-internal" href="../../index.html">
-    API Reference
+    API
   </a>
 </li>
 
@@ -446,6 +446,7 @@
 <li class="toctree-l2"><a class="reference internal" href="../prepare/imod.prepare.cleanup_riv.html">imod.prepare.cleanup_riv</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../prepare/imod.prepare.cleanup_wel.html">imod.prepare.cleanup_wel</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../prepare/imod.prepare.cleanup_wel_layered.html">imod.prepare.cleanup_wel_layered</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../prepare/imod.prepare.cleanup_hfb.html">imod.prepare.cleanup_hfb</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../prepare/imod.prepare.create_partition_labels.html">imod.prepare.create_partition_labels</a></li>
 </ul>
 </details></li>
@@ -463,6 +464,7 @@
 </details></li>
 <li class="toctree-l1 has-children"><a class="reference internal" href="../../evaluate.html">Evaluate model output</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
 <li class="toctree-l2"><a class="reference internal" href="../evaluate/imod.evaluate.calculate_gxg.html">imod.evaluate.calculate_gxg</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../evaluate/imod.evaluate.calculate_gxg_points.html">imod.evaluate.calculate_gxg_points</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../evaluate/imod.evaluate.convert_pointwaterhead_freshwaterhead.html">imod.evaluate.convert_pointwaterhead_freshwaterhead</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../evaluate/imod.evaluate.facebudget.html">imod.evaluate.facebudget</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../evaluate/imod.evaluate.flow_velocity.html">imod.evaluate.flow_velocity</a></li>
@@ -506,6 +508,7 @@
 <li class="toctree-l2"><a class="reference internal" href="../util/imod.util.to_ugrid2d.html">imod.util.to_ugrid2d</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../util/imod.util.mdal_compliant_ugrid2d.html">imod.util.mdal_compliant_ugrid2d</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../util/imod.util.from_mdal_compliant_ugrid2d.html">imod.util.from_mdal_compliant_ugrid2d</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../util/imod.util.ones_like_ugrid.html">imod.util.ones_like_ugrid</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../util/imod.util.RegridderWeightsCache.html">imod.util.RegridderWeightsCache</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../util/imod.util.RegridderWeightsCache.get_regridder.html">imod.util.RegridderWeightsCache.get_regridder</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../util/imod.util.RegridderType.html">imod.util.RegridderType</a></li>
@@ -552,35 +555,15 @@
 <li class="toctree-l2"><a class="reference internal" href="../mf6/imod.mf6.open_cbc.html">imod.mf6.open_cbc</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../mf6/imod.mf6.read_cbc_headers.html">imod.mf6.read_cbc_headers</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../mf6/imod.mf6.open_dvs.html">imod.mf6.open_dvs</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../mf6/imod.mf6.open_conc.html">imod.mf6.open_conc</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../mf6/imod.mf6.read_grb.html">imod.mf6.read_grb</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../mf6/imod.mf6.Modflow6Simulation.html">imod.mf6.Modflow6Simulation</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../mf6/imod.mf6.Modflow6Simulation.create_time_discretization.html">imod.mf6.Modflow6Simulation.create_time_discretization</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../mf6/imod.mf6.Modflow6Simulation.write.html">imod.mf6.Modflow6Simulation.write</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../mf6/imod.mf6.Modflow6Simulation.dump.html">imod.mf6.Modflow6Simulation.dump</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../mf6/imod.mf6.Modflow6Simulation.run.html">imod.mf6.Modflow6Simulation.run</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../mf6/imod.mf6.Modflow6Simulation.open_flow_budget.html">imod.mf6.Modflow6Simulation.open_flow_budget</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../mf6/imod.mf6.Modflow6Simulation.open_transport_budget.html">imod.mf6.Modflow6Simulation.open_transport_budget</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../mf6/imod.mf6.Modflow6Simulation.open_head.html">imod.mf6.Modflow6Simulation.open_head</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../mf6/imod.mf6.Modflow6Simulation.open_concentration.html">imod.mf6.Modflow6Simulation.open_concentration</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../mf6/imod.mf6.Modflow6Simulation.from_imod5_data.html">imod.mf6.Modflow6Simulation.from_imod5_data</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../mf6/imod.mf6.Modflow6Simulation.clip_box.html">imod.mf6.Modflow6Simulation.clip_box</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../mf6/imod.mf6.Modflow6Simulation.split.html">imod.mf6.Modflow6Simulation.split</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../mf6/imod.mf6.Modflow6Simulation.regrid_like.html">imod.mf6.Modflow6Simulation.regrid_like</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../mf6/imod.mf6.GroundwaterFlowModel.html">imod.mf6.GroundwaterFlowModel</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../mf6/imod.mf6.GroundwaterFlowModel.mask_all_packages.html">imod.mf6.GroundwaterFlowModel.mask_all_packages</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../mf6/imod.mf6.GroundwaterFlowModel.prepare_wel_for_mf6.html">imod.mf6.GroundwaterFlowModel.prepare_wel_for_mf6</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../mf6/imod.mf6.GroundwaterFlowModel.dump.html">imod.mf6.GroundwaterFlowModel.dump</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../mf6/imod.mf6.GroundwaterFlowModel.from_imod5_data.html">imod.mf6.GroundwaterFlowModel.from_imod5_data</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../mf6/imod.mf6.GroundwaterTransportModel.html">imod.mf6.GroundwaterTransportModel</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../mf6/imod.mf6.GroundwaterTransportModel.mask_all_packages.html">imod.mf6.GroundwaterTransportModel.mask_all_packages</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../mf6/imod.mf6.GroundwaterTransportModel.dump.html">imod.mf6.GroundwaterTransportModel.dump</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../mf6/imod.mf6.StructuredDiscretization.html">imod.mf6.StructuredDiscretization</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../mf6/imod.mf6.StructuredDiscretization.regrid_like.html">imod.mf6.StructuredDiscretization.regrid_like</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../mf6/imod.mf6.StructuredDiscretization.from_imod5_data.html">imod.mf6.StructuredDiscretization.from_imod5_data</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../mf6/imod.mf6.StructuredDiscretization.clip_box.html">imod.mf6.StructuredDiscretization.clip_box</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../mf6/imod.mf6.VerticesDiscretization.html">imod.mf6.VerticesDiscretization</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../mf6/imod.mf6.VerticesDiscretization.regrid_like.html">imod.mf6.VerticesDiscretization.regrid_like</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../mf6/imod.mf6.VerticesDiscretization.clip_box.html">imod.mf6.VerticesDiscretization.clip_box</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../mf6/imod.mf6.TimeDiscretization.html">imod.mf6.TimeDiscretization</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../mf6/imod.mf6.AdaptiveTimeStepping.html">imod.mf6.AdaptiveTimeStepping</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../mf6/imod.mf6.OutputControl.html">imod.mf6.OutputControl</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../mf6/imod.mf6.Solution.html">imod.mf6.Solution</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../mf6/imod.mf6.SolutionPresetSimple.html">imod.mf6.SolutionPresetSimple</a></li>
@@ -590,93 +573,24 @@
 <li class="toctree-l2"><a class="reference internal" href="../mf6/imod.mf6.ApiPackage.html">imod.mf6.ApiPackage</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../mf6/imod.mf6.Buoyancy.html">imod.mf6.Buoyancy</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../mf6/imod.mf6.ConstantHead.html">imod.mf6.ConstantHead</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../mf6/imod.mf6.ConstantHead.from_imod5_data.html">imod.mf6.ConstantHead.from_imod5_data</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../mf6/imod.mf6.ConstantHead.from_imod5_shd_data.html">imod.mf6.ConstantHead.from_imod5_shd_data</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../mf6/imod.mf6.ConstantHead.mask.html">imod.mf6.ConstantHead.mask</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../mf6/imod.mf6.ConstantHead.regrid_like.html">imod.mf6.ConstantHead.regrid_like</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../mf6/imod.mf6.ConstantHead.clip_box.html">imod.mf6.ConstantHead.clip_box</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../mf6/imod.mf6.Drainage.html">imod.mf6.Drainage</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../mf6/imod.mf6.Drainage.mask.html">imod.mf6.Drainage.mask</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../mf6/imod.mf6.Drainage.from_imod5_data.html">imod.mf6.Drainage.from_imod5_data</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../mf6/imod.mf6.Drainage.regrid_like.html">imod.mf6.Drainage.regrid_like</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../mf6/imod.mf6.Drainage.cleanup.html">imod.mf6.Drainage.cleanup</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../mf6/imod.mf6.Drainage.clip_box.html">imod.mf6.Drainage.clip_box</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../mf6/imod.mf6.Evapotranspiration.html">imod.mf6.Evapotranspiration</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../mf6/imod.mf6.Evapotranspiration.mask.html">imod.mf6.Evapotranspiration.mask</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../mf6/imod.mf6.Evapotranspiration.regrid_like.html">imod.mf6.Evapotranspiration.regrid_like</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../mf6/imod.mf6.Evapotranspiration.clip_box.html">imod.mf6.Evapotranspiration.clip_box</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../mf6/imod.mf6.GeneralHeadBoundary.html">imod.mf6.GeneralHeadBoundary</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../mf6/imod.mf6.GeneralHeadBoundary.from_imod5_data.html">imod.mf6.GeneralHeadBoundary.from_imod5_data</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../mf6/imod.mf6.GeneralHeadBoundary.mask.html">imod.mf6.GeneralHeadBoundary.mask</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../mf6/imod.mf6.GeneralHeadBoundary.regrid_like.html">imod.mf6.GeneralHeadBoundary.regrid_like</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../mf6/imod.mf6.GeneralHeadBoundary.cleanup.html">imod.mf6.GeneralHeadBoundary.cleanup</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../mf6/imod.mf6.GeneralHeadBoundary.clip_box.html">imod.mf6.GeneralHeadBoundary.clip_box</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../mf6/imod.mf6.HorizontalFlowBarrierHydraulicCharacteristic.html">imod.mf6.HorizontalFlowBarrierHydraulicCharacteristic</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../mf6/imod.mf6.HorizontalFlowBarrierHydraulicCharacteristic.to_mf6_pkg.html">imod.mf6.HorizontalFlowBarrierHydraulicCharacteristic.to_mf6_pkg</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../mf6/imod.mf6.HorizontalFlowBarrierMultiplier.html">imod.mf6.HorizontalFlowBarrierMultiplier</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../mf6/imod.mf6.HorizontalFlowBarrierMultiplier.to_mf6_pkg.html">imod.mf6.HorizontalFlowBarrierMultiplier.to_mf6_pkg</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../mf6/imod.mf6.HorizontalFlowBarrierResistance.html">imod.mf6.HorizontalFlowBarrierResistance</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../mf6/imod.mf6.HorizontalFlowBarrierResistance.to_mf6_pkg.html">imod.mf6.HorizontalFlowBarrierResistance.to_mf6_pkg</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../mf6/imod.mf6.HorizontalFlowBarrierResistance.clip_box.html">imod.mf6.HorizontalFlowBarrierResistance.clip_box</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../mf6/imod.mf6.LayeredWell.html">imod.mf6.LayeredWell</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../mf6/imod.mf6.LayeredWell.from_imod5_data.html">imod.mf6.LayeredWell.from_imod5_data</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../mf6/imod.mf6.LayeredWell.from_imod5_cap_data.html">imod.mf6.LayeredWell.from_imod5_cap_data</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../mf6/imod.mf6.LayeredWell.mask.html">imod.mf6.LayeredWell.mask</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../mf6/imod.mf6.LayeredWell.regrid_like.html">imod.mf6.LayeredWell.regrid_like</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../mf6/imod.mf6.LayeredWell.to_mf6_pkg.html">imod.mf6.LayeredWell.to_mf6_pkg</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../mf6/imod.mf6.LayeredWell.clip_box.html">imod.mf6.LayeredWell.clip_box</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../mf6/imod.mf6.InitialConditions.html">imod.mf6.InitialConditions</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../mf6/imod.mf6.InitialConditions.from_imod5_data.html">imod.mf6.InitialConditions.from_imod5_data</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../mf6/imod.mf6.InitialConditions.mask.html">imod.mf6.InitialConditions.mask</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../mf6/imod.mf6.InitialConditions.regrid_like.html">imod.mf6.InitialConditions.regrid_like</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../mf6/imod.mf6.InitialConditions.clip_box.html">imod.mf6.InitialConditions.clip_box</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../mf6/imod.mf6.NodePropertyFlow.html">imod.mf6.NodePropertyFlow</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../mf6/imod.mf6.NodePropertyFlow.from_imod5_data.html">imod.mf6.NodePropertyFlow.from_imod5_data</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../mf6/imod.mf6.NodePropertyFlow.mask.html">imod.mf6.NodePropertyFlow.mask</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../mf6/imod.mf6.NodePropertyFlow.regrid_like.html">imod.mf6.NodePropertyFlow.regrid_like</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../mf6/imod.mf6.NodePropertyFlow.clip_box.html">imod.mf6.NodePropertyFlow.clip_box</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../mf6/imod.mf6.Recharge.html">imod.mf6.Recharge</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../mf6/imod.mf6.Recharge.from_imod5_data.html">imod.mf6.Recharge.from_imod5_data</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../mf6/imod.mf6.Recharge.from_imod5_cap_data.html">imod.mf6.Recharge.from_imod5_cap_data</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../mf6/imod.mf6.Recharge.mask.html">imod.mf6.Recharge.mask</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../mf6/imod.mf6.Recharge.regrid_like.html">imod.mf6.Recharge.regrid_like</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../mf6/imod.mf6.Recharge.clip_box.html">imod.mf6.Recharge.clip_box</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../mf6/imod.mf6.River.html">imod.mf6.River</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../mf6/imod.mf6.River.from_imod5_data.html">imod.mf6.River.from_imod5_data</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../mf6/imod.mf6.River.mask.html">imod.mf6.River.mask</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../mf6/imod.mf6.River.regrid_like.html">imod.mf6.River.regrid_like</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../mf6/imod.mf6.River.cleanup.html">imod.mf6.River.cleanup</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../mf6/imod.mf6.River.clip_box.html">imod.mf6.River.clip_box</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../mf6/imod.mf6.SingleLayerHorizontalFlowBarrierHydraulicCharacteristic.html">imod.mf6.SingleLayerHorizontalFlowBarrierHydraulicCharacteristic</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../mf6/imod.mf6.SingleLayerHorizontalFlowBarrierHydraulicCharacteristic.to_mf6_pkg.html">imod.mf6.SingleLayerHorizontalFlowBarrierHydraulicCharacteristic.to_mf6_pkg</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../mf6/imod.mf6.SingleLayerHorizontalFlowBarrierHydraulicCharacteristic.clip_box.html">imod.mf6.SingleLayerHorizontalFlowBarrierHydraulicCharacteristic.clip_box</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../mf6/imod.mf6.SingleLayerHorizontalFlowBarrierMultiplier.html">imod.mf6.SingleLayerHorizontalFlowBarrierMultiplier</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../mf6/imod.mf6.SingleLayerHorizontalFlowBarrierMultiplier.to_mf6_pkg.html">imod.mf6.SingleLayerHorizontalFlowBarrierMultiplier.to_mf6_pkg</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../mf6/imod.mf6.SingleLayerHorizontalFlowBarrierMultiplier.clip_box.html">imod.mf6.SingleLayerHorizontalFlowBarrierMultiplier.clip_box</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../mf6/imod.mf6.SingleLayerHorizontalFlowBarrierResistance.html">imod.mf6.SingleLayerHorizontalFlowBarrierResistance</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../mf6/imod.mf6.SingleLayerHorizontalFlowBarrierResistance.from_imod5_data.html">imod.mf6.SingleLayerHorizontalFlowBarrierResistance.from_imod5_data</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../mf6/imod.mf6.SingleLayerHorizontalFlowBarrierResistance.to_mf6_pkg.html">imod.mf6.SingleLayerHorizontalFlowBarrierResistance.to_mf6_pkg</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../mf6/imod.mf6.SingleLayerHorizontalFlowBarrierResistance.clip_box.html">imod.mf6.SingleLayerHorizontalFlowBarrierResistance.clip_box</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../mf6/imod.mf6.SpecificStorage.html">imod.mf6.SpecificStorage</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../mf6/imod.mf6.SpecificStorage.mask.html">imod.mf6.SpecificStorage.mask</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../mf6/imod.mf6.SpecificStorage.regrid_like.html">imod.mf6.SpecificStorage.regrid_like</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../mf6/imod.mf6.SpecificStorage.clip_box.html">imod.mf6.SpecificStorage.clip_box</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../mf6/imod.mf6.StorageCoefficient.html">imod.mf6.StorageCoefficient</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../mf6/imod.mf6.StorageCoefficient.from_imod5_data.html">imod.mf6.StorageCoefficient.from_imod5_data</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../mf6/imod.mf6.StorageCoefficient.mask.html">imod.mf6.StorageCoefficient.mask</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../mf6/imod.mf6.StorageCoefficient.regrid_like.html">imod.mf6.StorageCoefficient.regrid_like</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../mf6/imod.mf6.StorageCoefficient.clip_box.html">imod.mf6.StorageCoefficient.clip_box</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../mf6/imod.mf6.UnsaturatedZoneFlow.html">imod.mf6.UnsaturatedZoneFlow</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../mf6/imod.mf6.Well.html">imod.mf6.Well</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../mf6/imod.mf6.Well.cleanup.html">imod.mf6.Well.cleanup</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../mf6/imod.mf6.Well.from_imod5_data.html">imod.mf6.Well.from_imod5_data</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../mf6/imod.mf6.Well.mask.html">imod.mf6.Well.mask</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../mf6/imod.mf6.Well.regrid_like.html">imod.mf6.Well.regrid_like</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../mf6/imod.mf6.Well.to_mf6_pkg.html">imod.mf6.Well.to_mf6_pkg</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../mf6/imod.mf6.Well.clip_box.html">imod.mf6.Well.clip_box</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../mf6/imod.mf6.WellDisStructured.html">imod.mf6.WellDisStructured</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../mf6/imod.mf6.WellDisVertices.html">imod.mf6.WellDisVertices</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../mf6/imod.mf6.ApiPackage.html">imod.mf6.ApiPackage</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../mf6/imod.mf6.AdvectionCentral.html">imod.mf6.AdvectionCentral</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../mf6/imod.mf6.AdvectionTVD.html">imod.mf6.AdvectionTVD</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../mf6/imod.mf6.AdvectionUpstream.html">imod.mf6.AdvectionUpstream</a></li>
@@ -686,13 +600,11 @@
 <li class="toctree-l2"><a class="reference internal" href="../mf6/imod.mf6.MobileStorageTransfer.html">imod.mf6.MobileStorageTransfer</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../mf6/imod.mf6.MassSourceLoading.html">imod.mf6.MassSourceLoading</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../mf6/imod.mf6.SourceSinkMixing.html">imod.mf6.SourceSinkMixing</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../mf6/imod.mf6.SourceSinkMixing.from_flow_model.html">imod.mf6.SourceSinkMixing.from_flow_model</a></li>
 </ul>
 </details></li>
 
 <li class="toctree-l1 current active has-children"><a class="reference internal" href="../../wq.html">iMOD-WQ</a><details open="open"><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul class="current">
 <li class="toctree-l2"><a class="reference internal" href="imod.wq.SeawatModel.html">imod.wq.SeawatModel</a></li>
-<li class="toctree-l2"><a class="reference internal" href="imod.wq.SeawatModel.create_time_discretization.html">imod.wq.SeawatModel.create_time_discretization</a></li>
 <li class="toctree-l2"><a class="reference internal" href="imod.wq.TimeDiscretization.html">imod.wq.TimeDiscretization</a></li>
 <li class="toctree-l2"><a class="reference internal" href="imod.wq.OutputControl.html">imod.wq.OutputControl</a></li>
 <li class="toctree-l2"><a class="reference internal" href="imod.wq.PreconditionedConjugateGradientSolver.html">imod.wq.PreconditionedConjugateGradientSolver</a></li>
@@ -725,41 +637,16 @@
 </ul>
 </details></li>
 <li class="toctree-l1 has-children"><a class="reference internal" href="../../msw.html">MetaSWAP</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
-<li class="toctree-l2"><a class="reference internal" href="../msw/imod.msw.GridData.html">imod.msw.GridData</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../msw/imod.msw.GridData.from_imod5_data.html">imod.msw.GridData.from_imod5_data</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../msw/imod.msw.Infiltration.html">imod.msw.Infiltration</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../msw/imod.msw.Infiltration.from_imod5_data.html">imod.msw.Infiltration.from_imod5_data</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../msw/imod.msw.Ponding.html">imod.msw.Ponding</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../msw/imod.msw.Ponding.from_imod5_data.html">imod.msw.Ponding.from_imod5_data</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../msw/imod.msw.ScalingFactors.html">imod.msw.ScalingFactors</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../msw/imod.msw.ScalingFactors.from_imod5_data.html">imod.msw.ScalingFactors.from_imod5_data</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../msw/imod.msw.Sprinkling.html">imod.msw.Sprinkling</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../msw/imod.msw.Sprinkling.from_imod5_data.html">imod.msw.Sprinkling.from_imod5_data</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../msw/imod.msw.IdfMapping.html">imod.msw.IdfMapping</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../msw/imod.msw.TimeOutputControl.html">imod.msw.TimeOutputControl</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../msw/imod.msw.VariableOutputControl.html">imod.msw.VariableOutputControl</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../msw/imod.msw.InitialConditionsEquilibrium.html">imod.msw.InitialConditionsEquilibrium</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../msw/imod.msw.InitialConditionsPercolation.html">imod.msw.InitialConditionsPercolation</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../msw/imod.msw.InitialConditionsRootzonePressureHead.html">imod.msw.InitialConditionsRootzonePressureHead</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../msw/imod.msw.InitialConditionsSavedState.html">imod.msw.InitialConditionsSavedState</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../msw/imod.msw.LanduseOptions.html">imod.msw.LanduseOptions</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../msw/imod.msw.AnnualCropFactors.html">imod.msw.AnnualCropFactors</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../msw/imod.msw.MeteoGrid.html">imod.msw.MeteoGrid</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../msw/imod.msw.MeteoGridCopy.html">imod.msw.MeteoGridCopy</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../msw/imod.msw.MeteoGridCopy.from_imod5_data.html">imod.msw.MeteoGridCopy.from_imod5_data</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../msw/imod.msw.EvapotranspirationMapping.html">imod.msw.EvapotranspirationMapping</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../msw/imod.msw.EvapotranspirationMapping.from_imod5_data.html">imod.msw.EvapotranspirationMapping.from_imod5_data</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../msw/imod.msw.PrecipitationMapping.html">imod.msw.PrecipitationMapping</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../msw/imod.msw.PrecipitationMapping.from_imod5_data.html">imod.msw.PrecipitationMapping.from_imod5_data</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../msw/imod.msw.CouplerMapping.html">imod.msw.CouplerMapping</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../msw/imod.msw.MetaSwapModel.html">imod.msw.MetaSwapModel</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../msw/imod.msw.MetaSwapModel.write.html">imod.msw.MetaSwapModel.write</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../msw/imod.msw.MetaSwapModel.from_imod5_data.html">imod.msw.MetaSwapModel.from_imod5_data</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../msw/imod.msw.MetaSwapModel.regrid_like.html">imod.msw.MetaSwapModel.regrid_like</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../msw/imod.msw.MetaSwapModel.clip_box.html">imod.msw.MetaSwapModel.clip_box</a></li>
 </ul>
 </details></li>
-<li class="toctree-l1 has-children"><a class="reference internal" href="../../metamod.html">MetaMod</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+
+
+
+
+
+
+<li class="toctree-l1 has-children"><a class="reference internal" href="../../metamod.html">Coupling MetaSWAP and MODFLOW</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
 <li class="toctree-l2"><a class="reference internal" href="../metamod/imod.couplers.metamod.MetaMod.html">imod.couplers.metamod.MetaMod</a></li>
 </ul>
 </details></li>
@@ -804,7 +691,7 @@
       </a>
     </li>
     
-    <li class="breadcrumb-item"><a href="../../index.html" class="nav-link">API Reference</a></li>
+    <li class="breadcrumb-item"><a href="../../index.html" class="nav-link">API</a></li>
     
     
     <li class="breadcrumb-item"><a href="../../wq.html" class="nav-link">iMOD-WQ</a></li>

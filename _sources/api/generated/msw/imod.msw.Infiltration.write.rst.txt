@@ -1,0 +1,6 @@
+﻿imod.msw.Infiltration.write
+===========================
+
+.. currentmodule:: imod.msw
+
+.. automethod:: Infiltration.write

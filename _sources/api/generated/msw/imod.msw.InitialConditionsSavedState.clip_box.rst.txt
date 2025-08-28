@@ -1,0 +1,6 @@
+﻿imod.msw.InitialConditionsSavedState.clip\_box
+==============================================
+
+.. currentmodule:: imod.msw
+
+.. automethod:: InitialConditionsSavedState.clip_box

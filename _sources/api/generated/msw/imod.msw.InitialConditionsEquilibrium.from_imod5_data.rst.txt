@@ -1,0 +1,6 @@
+﻿imod.msw.InitialConditionsEquilibrium.from\_imod5\_data
+=======================================================
+
+.. currentmodule:: imod.msw
+
+.. automethod:: InitialConditionsEquilibrium.from_imod5_data

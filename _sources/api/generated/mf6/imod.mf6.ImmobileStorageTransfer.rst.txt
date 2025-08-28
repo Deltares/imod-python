@@ -14,27 +14,15 @@
    .. autosummary::
    
       ~ImmobileStorageTransfer.__init__
-      ~ImmobileStorageTransfer.cleanup
       ~ImmobileStorageTransfer.clip_box
       ~ImmobileStorageTransfer.copy
       ~ImmobileStorageTransfer.from_file
-      ~ImmobileStorageTransfer.get_non_grid_data
       ~ImmobileStorageTransfer.get_regrid_methods
-      ~ImmobileStorageTransfer.is_clipping_supported
       ~ImmobileStorageTransfer.is_empty
-      ~ImmobileStorageTransfer.is_grid_agnostic_package
-      ~ImmobileStorageTransfer.is_regridding_supported
-      ~ImmobileStorageTransfer.is_splitting_supported
-      ~ImmobileStorageTransfer.isel
       ~ImmobileStorageTransfer.mask
       ~ImmobileStorageTransfer.regrid_like
-      ~ImmobileStorageTransfer.render
-      ~ImmobileStorageTransfer.sel
       ~ImmobileStorageTransfer.to_netcdf
       ~ImmobileStorageTransfer.write
-      ~ImmobileStorageTransfer.write_binary_griddata
-      ~ImmobileStorageTransfer.write_blockfile
-      ~ImmobileStorageTransfer.write_text_griddata
    
    
 

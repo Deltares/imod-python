@@ -1,0 +1,6 @@
+﻿imod.evaluate.calculate\_gxg\_points
+====================================
+
+.. currentmodule:: imod.evaluate
+
+.. autofunction:: calculate_gxg_points

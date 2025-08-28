@@ -14,31 +14,17 @@
    .. autosummary::
    
       ~ConstantHead.__init__
-      ~ConstantHead.cleanup
       ~ConstantHead.clip_box
       ~ConstantHead.copy
       ~ConstantHead.from_file
       ~ConstantHead.from_imod5_data
       ~ConstantHead.from_imod5_shd_data
-      ~ConstantHead.get_non_grid_data
-      ~ConstantHead.get_period_varnames
       ~ConstantHead.get_regrid_methods
-      ~ConstantHead.is_clipping_supported
       ~ConstantHead.is_empty
-      ~ConstantHead.is_grid_agnostic_package
-      ~ConstantHead.is_regridding_supported
-      ~ConstantHead.is_splitting_supported
-      ~ConstantHead.isel
       ~ConstantHead.mask
       ~ConstantHead.regrid_like
-      ~ConstantHead.render
-      ~ConstantHead.sel
-      ~ConstantHead.set_repeat_stress
       ~ConstantHead.to_netcdf
       ~ConstantHead.write
-      ~ConstantHead.write_binary_griddata
-      ~ConstantHead.write_blockfile
-      ~ConstantHead.write_text_griddata
    
    
 

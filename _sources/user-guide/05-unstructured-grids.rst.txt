@@ -26,6 +26,2726 @@ unstructured grids is irregular. This means that the number of neighboring
 cells is not constant; for structured grids, every cell has 4 neighbors (in
 2D), or 6 neighbors (in 3D).
 
+The package we use to handle unstructured grids is called `xugrid
+<https://deltares.github.io/xugrid/>`_. It is a Python package that provides a
+data structure for unstructured grids, and allows for plotting and analysis of
+these grids. It is built on top of `xarray
+<https://xarray.pydata.org/en/stable/>`_`, so handling data is similar to how
+you would handle raster data in xarray, with some differences.
+
+.. GENERATED FROM PYTHON SOURCE LINES 19-21
+
+Let's first load some sample data from xugrid.data module. The example data
+is a triangular grid of the elevation of the Netherlands.
+
+.. GENERATED FROM PYTHON SOURCE LINES 22-29
+
+.. code-block:: Python
+
+
+    import xugrid as xu
+
+    elevation = xu.data.elevation_nl()
+
+    elevation
+
+
+
+
+
+
+.. raw:: html
+
+    <div class="output_subarea output_html rendered_html output_result">
+    <div><svg style="position: absolute; width: 0; height: 0; overflow: hidden">
+    <defs>
+    <symbol id="icon-database" viewBox="0 0 32 32">
+    <path d="M16 0c-8.837 0-16 2.239-16 5v4c0 2.761 7.163 5 16 5s16-2.239 16-5v-4c0-2.761-7.163-5-16-5z"></path>
+    <path d="M16 17c-8.837 0-16-2.239-16-5v6c0 2.761 7.163 5 16 5s16-2.239 16-5v-6c0 2.761-7.163 5-16 5z"></path>
+    <path d="M16 26c-8.837 0-16-2.239-16-5v6c0 2.761 7.163 5 16 5s16-2.239 16-5v-6c0 2.761-7.163 5-16 5z"></path>
+    </symbol>
+    <symbol id="icon-file-text2" viewBox="0 0 32 32">
+    <path d="M28.681 7.159c-0.694-0.947-1.662-2.053-2.724-3.116s-2.169-2.030-3.116-2.724c-1.612-1.182-2.393-1.319-2.841-1.319h-15.5c-1.378 0-2.5 1.121-2.5 2.5v27c0 1.378 1.122 2.5 2.5 2.5h23c1.378 0 2.5-1.122 2.5-2.5v-19.5c0-0.448-0.137-1.23-1.319-2.841zM24.543 5.457c0.959 0.959 1.712 1.825 2.268 2.543h-4.811v-4.811c0.718 0.556 1.584 1.309 2.543 2.268zM28 29.5c0 0.271-0.229 0.5-0.5 0.5h-23c-0.271 0-0.5-0.229-0.5-0.5v-27c0-0.271 0.229-0.5 0.5-0.5 0 0 15.499-0 15.5 0v7c0 0.552 0.448 1 1 1h7v19.5z"></path>
+    <path d="M23 26h-14c-0.552 0-1-0.448-1-1s0.448-1 1-1h14c0.552 0 1 0.448 1 1s-0.448 1-1 1z"></path>
+    <path d="M23 22h-14c-0.552 0-1-0.448-1-1s0.448-1 1-1h14c0.552 0 1 0.448 1 1s-0.448 1-1 1z"></path>
+    <path d="M23 18h-14c-0.552 0-1-0.448-1-1s0.448-1 1-1h14c0.552 0 1 0.448 1 1s-0.448 1-1 1z"></path>
+    </symbol>
+    </defs>
+    </svg>
+    <style>/* CSS stylesheet for displaying xarray objects in jupyterlab.
+     *
+     */
+
+    :root {
+      --xr-font-color0: var(
+        --jp-content-font-color0,
+        var(--pst-color-text-base rgba(0, 0, 0, 1))
+      );
+      --xr-font-color2: var(
+        --jp-content-font-color2,
+        var(--pst-color-text-base, rgba(0, 0, 0, 0.54))
+      );
+      --xr-font-color3: var(
+        --jp-content-font-color3,
+        var(--pst-color-text-base, rgba(0, 0, 0, 0.38))
+      );
+      --xr-border-color: var(
+        --jp-border-color2,
+        hsl(from var(--pst-color-on-background, white) h s calc(l - 10))
+      );
+      --xr-disabled-color: var(
+        --jp-layout-color3,
+        hsl(from var(--pst-color-on-background, white) h s calc(l - 40))
+      );
+      --xr-background-color: var(
+        --jp-layout-color0,
+        var(--pst-color-on-background, white)
+      );
+      --xr-background-color-row-even: var(
+        --jp-layout-color1,
+        hsl(from var(--pst-color-on-background, white) h s calc(l - 5))
+      );
+      --xr-background-color-row-odd: var(
+        --jp-layout-color2,
+        hsl(from var(--pst-color-on-background, white) h s calc(l - 15))
+      );
+    }
+
+    html[theme="dark"],
+    html[data-theme="dark"],
+    body[data-theme="dark"],
+    body.vscode-dark {
+      --xr-font-color0: var(
+        --jp-content-font-color0,
+        var(--pst-color-text-base, rgba(255, 255, 255, 1))
+      );
+      --xr-font-color2: var(
+        --jp-content-font-color2,
+        var(--pst-color-text-base, rgba(255, 255, 255, 0.54))
+      );
+      --xr-font-color3: var(
+        --jp-content-font-color3,
+        var(--pst-color-text-base, rgba(255, 255, 255, 0.38))
+      );
+      --xr-border-color: var(
+        --jp-border-color2,
+        hsl(from var(--pst-color-on-background, #111111) h s calc(l + 10))
+      );
+      --xr-disabled-color: var(
+        --jp-layout-color3,
+        hsl(from var(--pst-color-on-background, #111111) h s calc(l + 40))
+      );
+      --xr-background-color: var(
+        --jp-layout-color0,
+        var(--pst-color-on-background, #111111)
+      );
+      --xr-background-color-row-even: var(
+        --jp-layout-color1,
+        hsl(from var(--pst-color-on-background, #111111) h s calc(l + 5))
+      );
+      --xr-background-color-row-odd: var(
+        --jp-layout-color2,
+        hsl(from var(--pst-color-on-background, #111111) h s calc(l + 15))
+      );
+    }
+
+    .xr-wrap {
+      display: block !important;
+      min-width: 300px;
+      max-width: 700px;
+    }
+
+    .xr-text-repr-fallback {
+      /* fallback to plain text repr when CSS is not injected (untrusted notebook) */
+      display: none;
+    }
+
+    .xr-header {
+      padding-top: 6px;
+      padding-bottom: 6px;
+      margin-bottom: 4px;
+      border-bottom: solid 1px var(--xr-border-color);
+    }
+
+    .xr-header > div,
+    .xr-header > ul {
+      display: inline;
+      margin-top: 0;
+      margin-bottom: 0;
+    }
+
+    .xr-obj-type,
+    .xr-array-name {
+      margin-left: 2px;
+      margin-right: 10px;
+    }
+
+    .xr-obj-type {
+      color: var(--xr-font-color2);
+    }
+
+    .xr-sections {
+      padding-left: 0 !important;
+      display: grid;
+      grid-template-columns: 150px auto auto 1fr 0 20px 0 20px;
+    }
+
+    .xr-section-item {
+      display: contents;
+    }
+
+    .xr-section-item input {
+      display: inline-block;
+      opacity: 0;
+      height: 0;
+    }
+
+    .xr-section-item input + label {
+      color: var(--xr-disabled-color);
+      border: 2px solid transparent !important;
+    }
+
+    .xr-section-item input:enabled + label {
+      cursor: pointer;
+      color: var(--xr-font-color2);
+    }
+
+    .xr-section-item input:focus + label {
+      border: 2px solid var(--xr-font-color0) !important;
+    }
+
+    .xr-section-item input:enabled + label:hover {
+      color: var(--xr-font-color0);
+    }
+
+    .xr-section-summary {
+      grid-column: 1;
+      color: var(--xr-font-color2);
+      font-weight: 500;
+    }
+
+    .xr-section-summary > span {
+      display: inline-block;
+      padding-left: 0.5em;
+    }
+
+    .xr-section-summary-in:disabled + label {
+      color: var(--xr-font-color2);
+    }
+
+    .xr-section-summary-in + label:before {
+      display: inline-block;
+      content: "►";
+      font-size: 11px;
+      width: 15px;
+      text-align: center;
+    }
+
+    .xr-section-summary-in:disabled + label:before {
+      color: var(--xr-disabled-color);
+    }
+
+    .xr-section-summary-in:checked + label:before {
+      content: "▼";
+    }
+
+    .xr-section-summary-in:checked + label > span {
+      display: none;
+    }
+
+    .xr-section-summary,
+    .xr-section-inline-details {
+      padding-top: 4px;
+      padding-bottom: 4px;
+    }
+
+    .xr-section-inline-details {
+      grid-column: 2 / -1;
+    }
+
+    .xr-section-details {
+      display: none;
+      grid-column: 1 / -1;
+      margin-bottom: 5px;
+    }
+
+    .xr-section-summary-in:checked ~ .xr-section-details {
+      display: contents;
+    }
+
+    .xr-array-wrap {
+      grid-column: 1 / -1;
+      display: grid;
+      grid-template-columns: 20px auto;
+    }
+
+    .xr-array-wrap > label {
+      grid-column: 1;
+      vertical-align: top;
+    }
+
+    .xr-preview {
+      color: var(--xr-font-color3);
+    }
+
+    .xr-array-preview,
+    .xr-array-data {
+      padding: 0 5px !important;
+      grid-column: 2;
+    }
+
+    .xr-array-data,
+    .xr-array-in:checked ~ .xr-array-preview {
+      display: none;
+    }
+
+    .xr-array-in:checked ~ .xr-array-data,
+    .xr-array-preview {
+      display: inline-block;
+    }
+
+    .xr-dim-list {
+      display: inline-block !important;
+      list-style: none;
+      padding: 0 !important;
+      margin: 0;
+    }
+
+    .xr-dim-list li {
+      display: inline-block;
+      padding: 0;
+      margin: 0;
+    }
+
+    .xr-dim-list:before {
+      content: "(";
+    }
+
+    .xr-dim-list:after {
+      content: ")";
+    }
+
+    .xr-dim-list li:not(:last-child):after {
+      content: ",";
+      padding-right: 5px;
+    }
+
+    .xr-has-index {
+      font-weight: bold;
+    }
+
+    .xr-var-list,
+    .xr-var-item {
+      display: contents;
+    }
+
+    .xr-var-item > div,
+    .xr-var-item label,
+    .xr-var-item > .xr-var-name span {
+      background-color: var(--xr-background-color-row-even);
+      border-color: var(--xr-background-color-row-odd);
+      margin-bottom: 0;
+      padding-top: 2px;
+    }
+
+    .xr-var-item > .xr-var-name:hover span {
+      padding-right: 5px;
+    }
+
+    .xr-var-list > li:nth-child(odd) > div,
+    .xr-var-list > li:nth-child(odd) > label,
+    .xr-var-list > li:nth-child(odd) > .xr-var-name span {
+      background-color: var(--xr-background-color-row-odd);
+      border-color: var(--xr-background-color-row-even);
+    }
+
+    .xr-var-name {
+      grid-column: 1;
+    }
+
+    .xr-var-dims {
+      grid-column: 2;
+    }
+
+    .xr-var-dtype {
+      grid-column: 3;
+      text-align: right;
+      color: var(--xr-font-color2);
+    }
+
+    .xr-var-preview {
+      grid-column: 4;
+    }
+
+    .xr-index-preview {
+      grid-column: 2 / 5;
+      color: var(--xr-font-color2);
+    }
+
+    .xr-var-name,
+    .xr-var-dims,
+    .xr-var-dtype,
+    .xr-preview,
+    .xr-attrs dt {
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      padding-right: 10px;
+    }
+
+    .xr-var-name:hover,
+    .xr-var-dims:hover,
+    .xr-var-dtype:hover,
+    .xr-attrs dt:hover {
+      overflow: visible;
+      width: auto;
+      z-index: 1;
+    }
+
+    .xr-var-attrs,
+    .xr-var-data,
+    .xr-index-data {
+      display: none;
+      border-top: 2px dotted var(--xr-background-color);
+      padding-bottom: 20px !important;
+      padding-top: 10px !important;
+    }
+
+    .xr-var-attrs-in + label,
+    .xr-var-data-in + label,
+    .xr-index-data-in + label {
+      padding: 0 1px;
+    }
+
+    .xr-var-attrs-in:checked ~ .xr-var-attrs,
+    .xr-var-data-in:checked ~ .xr-var-data,
+    .xr-index-data-in:checked ~ .xr-index-data {
+      display: block;
+    }
+
+    .xr-var-data > table {
+      float: right;
+    }
+
+    .xr-var-data > pre,
+    .xr-index-data > pre,
+    .xr-var-data > table > tbody > tr {
+      background-color: transparent !important;
+    }
+
+    .xr-var-name span,
+    .xr-var-data,
+    .xr-index-name div,
+    .xr-index-data,
+    .xr-attrs {
+      padding-left: 25px !important;
+    }
+
+    .xr-attrs,
+    .xr-var-attrs,
+    .xr-var-data,
+    .xr-index-data {
+      grid-column: 1 / -1;
+    }
+
+    dl.xr-attrs {
+      padding: 0;
+      margin: 0;
+      display: grid;
+      grid-template-columns: 125px auto;
+    }
+
+    .xr-attrs dt,
+    .xr-attrs dd {
+      padding: 0;
+      margin: 0;
+      float: left;
+      padding-right: 10px;
+      width: auto;
+    }
+
+    .xr-attrs dt {
+      font-weight: normal;
+      grid-column: 1;
+    }
+
+    .xr-attrs dt:hover span {
+      display: inline-block;
+      background: var(--xr-background-color);
+      padding-right: 10px;
+    }
+
+    .xr-attrs dd {
+      grid-column: 2;
+      white-space: pre-wrap;
+      word-break: break-all;
+    }
+
+    .xr-icon-database,
+    .xr-icon-file-text2,
+    .xr-no-icon {
+      display: inline-block;
+      vertical-align: middle;
+      width: 1em;
+      height: 1.5em !important;
+      stroke-width: 0;
+      stroke: currentColor;
+      fill: currentColor;
+    }
+
+    .xr-var-attrs-in:checked + label > .xr-icon-file-text2,
+    .xr-var-data-in:checked + label > .xr-icon-database,
+    .xr-index-data-in:checked + label > .xr-icon-database {
+      color: var(--xr-font-color0);
+      filter: drop-shadow(1px 1px 5px var(--xr-font-color2));
+      stroke-width: 0.8px;
+    }
+    </style><pre class='xr-text-repr-fallback'>&lt;xarray.DataArray &#x27;elevation&#x27; (mesh2d_nFaces: 5248)&gt; Size: 21kB
+    [5248 values with dtype=float32]
+    Coordinates:
+        mesh2d_face_x  (mesh2d_nFaces) float64 42kB ...
+        mesh2d_face_y  (mesh2d_nFaces) float64 42kB ...
+      * mesh2d_nFaces  (mesh2d_nFaces) int64 42kB 0 1 2 3 4 ... 5244 5245 5246 5247
+    Attributes:
+        unit:     m NAP</pre><div class='xr-wrap' style='display:none'><div class='xr-header'><div class='xr-obj-type'>xarray.DataArray</div><div class='xr-array-name'>'elevation'</div><ul class='xr-dim-list'><li><span class='xr-has-index'>mesh2d_nFaces</span>: 5248</li></ul></div><ul class='xr-sections'><li class='xr-section-item'><div class='xr-array-wrap'><input id='section-1246c0f7-ae68-40e4-b08a-261aaa0bbf6d' class='xr-array-in' type='checkbox' checked><label for='section-1246c0f7-ae68-40e4-b08a-261aaa0bbf6d' title='Show/hide data repr'><svg class='icon xr-icon-database'><use xlink:href='#icon-database'></use></svg></label><div class='xr-array-preview xr-preview'><span>...</span></div><div class='xr-array-data'><pre>[5248 values with dtype=float32]</pre></div></div></li><li class='xr-section-item'><input id='section-e0480a0c-e031-4fa2-9124-60075e2d50e1' class='xr-section-summary-in' type='checkbox'  checked><label for='section-e0480a0c-e031-4fa2-9124-60075e2d50e1' class='xr-section-summary' >Coordinates: <span>(3)</span></label><div class='xr-section-inline-details'></div><div class='xr-section-details'><ul class='xr-var-list'><li class='xr-var-item'><div class='xr-var-name'><span>mesh2d_face_x</span></div><div class='xr-var-dims'>(mesh2d_nFaces)</div><div class='xr-var-dtype'>float64</div><div class='xr-var-preview xr-preview'>...</div><input id='attrs-883cf465-152a-4d2f-a684-5dac696a49a0' class='xr-var-attrs-in' type='checkbox' ><label for='attrs-883cf465-152a-4d2f-a684-5dac696a49a0' title='Show/Hide attributes'><svg class='icon xr-icon-file-text2'><use xlink:href='#icon-file-text2'></use></svg></label><input id='data-731498a2-e521-4666-a54c-65cc088dbda1' class='xr-var-data-in' type='checkbox'><label for='data-731498a2-e521-4666-a54c-65cc088dbda1' title='Show/Hide data repr'><svg class='icon xr-icon-database'><use xlink:href='#icon-database'></use></svg></label><div class='xr-var-attrs'><dl class='xr-attrs'><dt><span>standard_name :</span></dt><dd>projection_x_coordinate</dd></dl></div><div class='xr-var-data'><pre>[5248 values with dtype=float64]</pre></div></li><li class='xr-var-item'><div class='xr-var-name'><span>mesh2d_face_y</span></div><div class='xr-var-dims'>(mesh2d_nFaces)</div><div class='xr-var-dtype'>float64</div><div class='xr-var-preview xr-preview'>...</div><input id='attrs-09f945d2-4b1d-4640-853a-313d89dccf36' class='xr-var-attrs-in' type='checkbox' ><label for='attrs-09f945d2-4b1d-4640-853a-313d89dccf36' title='Show/Hide attributes'><svg class='icon xr-icon-file-text2'><use xlink:href='#icon-file-text2'></use></svg></label><input id='data-4f4e1d0d-aee0-4ac1-b6d0-de41e46e2f6b' class='xr-var-data-in' type='checkbox'><label for='data-4f4e1d0d-aee0-4ac1-b6d0-de41e46e2f6b' title='Show/Hide data repr'><svg class='icon xr-icon-database'><use xlink:href='#icon-database'></use></svg></label><div class='xr-var-attrs'><dl class='xr-attrs'><dt><span>standard_name :</span></dt><dd>projection_y_coordinate</dd></dl></div><div class='xr-var-data'><pre>[5248 values with dtype=float64]</pre></div></li><li class='xr-var-item'><div class='xr-var-name'><span class='xr-has-index'>mesh2d_nFaces</span></div><div class='xr-var-dims'>(mesh2d_nFaces)</div><div class='xr-var-dtype'>int64</div><div class='xr-var-preview xr-preview'>0 1 2 3 4 ... 5244 5245 5246 5247</div><input id='attrs-38842488-5ebb-4bb4-935f-3420d9cae540' class='xr-var-attrs-in' type='checkbox' disabled><label for='attrs-38842488-5ebb-4bb4-935f-3420d9cae540' title='Show/Hide attributes'><svg class='icon xr-icon-file-text2'><use xlink:href='#icon-file-text2'></use></svg></label><input id='data-f6616b21-da6f-443a-a661-720d3def3903' class='xr-var-data-in' type='checkbox'><label for='data-f6616b21-da6f-443a-a661-720d3def3903' title='Show/Hide data repr'><svg class='icon xr-icon-database'><use xlink:href='#icon-database'></use></svg></label><div class='xr-var-attrs'><dl class='xr-attrs'></dl></div><div class='xr-var-data'><pre>[5248 values with dtype=int64]</pre></div></li></ul></div></li><li class='xr-section-item'><input id='section-c872bdf5-355e-4f8b-bd3d-9994a79a1ea8' class='xr-section-summary-in' type='checkbox'  ><label for='section-c872bdf5-355e-4f8b-bd3d-9994a79a1ea8' class='xr-section-summary' >Indexes: <span>(1)</span></label><div class='xr-section-inline-details'></div><div class='xr-section-details'><ul class='xr-var-list'><li class='xr-var-item'><div class='xr-index-name'><div>mesh2d_nFaces</div></div><div class='xr-index-preview'>PandasIndex</div><input type='checkbox' disabled/><label></label><input id='index-969b3767-a482-464a-a729-ce14062f9dff' class='xr-index-data-in' type='checkbox'/><label for='index-969b3767-a482-464a-a729-ce14062f9dff' title='Show/Hide index repr'><svg class='icon xr-icon-database'><use xlink:href='#icon-database'></use></svg></label><div class='xr-index-data'><pre>PandasIndex(RangeIndex(start=0, stop=5248, step=1, name=&#x27;mesh2d_nFaces&#x27;))</pre></div></li></ul></div></li><li class='xr-section-item'><input id='section-23d54d7c-4889-48d1-bff5-4e2fde2bb664' class='xr-section-summary-in' type='checkbox'  checked><label for='section-23d54d7c-4889-48d1-bff5-4e2fde2bb664' class='xr-section-summary' >Attributes: <span>(1)</span></label><div class='xr-section-inline-details'></div><div class='xr-section-details'><dl class='xr-attrs'><dt><span>unit :</span></dt><dd>m NAP</dd></dl></div></li></ul></div></div>
+    </div>
+    <br />
+    <br />
+
+.. GENERATED FROM PYTHON SOURCE LINES 30-35
+
+Note that this data is stored differently than a raster dataset. We don't see
+an x- and a y-dimension here. So where is this spatial information?
+It's in this ``grid`` attribute, which is accesses via the ``ugrid`` accessor.
+This is a special accessor that provides access to the unstructured grid
+properties of the dataset.
+
+.. GENERATED FROM PYTHON SOURCE LINES 36-40
+
+.. code-block:: Python
+
+
+    grid = elevation.ugrid.grid
+    grid
+
+
+
+
+
+.. rst-class:: sphx-glr-script-out
+
+ .. code-block:: none
+
+
+    <xarray.Dataset> Size: 255kB
+    Dimensions:            (mesh2d_nFaces: 5248, nmax_face: 3, mesh2d_nNodes: 2790)
+    Coordinates:
+        mesh2d_node_x      (mesh2d_nNodes) float64 22kB ...
+        mesh2d_node_y      (mesh2d_nNodes) float64 22kB ...
+        mesh2d_face_x      (mesh2d_nFaces) float64 42kB ...
+        mesh2d_face_y      (mesh2d_nFaces) float64 42kB ...
+    Dimensions without coordinates: mesh2d_nFaces, nmax_face, mesh2d_nNodes
+    Data variables:
+        mesh2d             int32 4B ...
+        mesh2d_face_nodes  (mesh2d_nFaces, nmax_face) float64 126kB 138.0 ... 1.9...
+    Attributes:
+        Conventions:  CF-1.8 UGRID-1.0
+
+
+
+.. GENERATED FROM PYTHON SOURCE LINES 41-48
+
+The grid has a number of properties, such as the number of cells, the
+coordinates of the vertices, and the connectivity of the cells. The latter is
+very important when dealing with unstructured grids, as it defines how the
+cells are connected to each other. This is different from structured grids,
+where you don't need to specify this as there connectivity follows from the
+rows and columns. Let's take a look at the connectivity of this unstructured
+grid:
+
+.. GENERATED FROM PYTHON SOURCE LINES 49-52
+
+.. code-block:: Python
+
+
+    grid.format_connectivity_as_dense(grid.face_face_connectivity)
+
+
+
+
+
+.. rst-class:: sphx-glr-script-out
+
+ .. code-block:: none
+
+
+    array([[  89,   -1,   -1],
+           [ 244,  362,  367],
+           [  15,  279,  335],
+           ...,
+           [2041, 3617, 5246],
+           [ 528, 3618, 5245],
+           [ 528, 3617, 3640]], shape=(5248, 3))
+
+
+
+.. GENERATED FROM PYTHON SOURCE LINES 53-63
+
+This shows the connectivity of the cells in the grid. Each row represents a
+cell, and the columns represent the neighboring cells. Because this is a grid
+with triangles, we can see three columns in the connectivity matrix. -1
+indicates that a cell is not connected to a neighbour. For example, the first
+cell is only connected to one cell.
+
+You can imagine that plotting unstructured grids is quite a hassle, as you
+need to provide quite some information to the plotting function. Fortunately,
+the xugrid package provides a convenient way to plot unstructured grids. Let's
+plot the grid:
+
+.. GENERATED FROM PYTHON SOURCE LINES 64-67
+
+.. code-block:: Python
+
+
+    grid.plot()
+
+
+
+
+.. image-sg:: /user-guide/images/sphx_glr_05-unstructured-grids_001.png
+   :alt: 05 unstructured grids
+   :srcset: /user-guide/images/sphx_glr_05-unstructured-grids_001.png
+   :class: sphx-glr-single-img
+
+
+.. rst-class:: sphx-glr-script-out
+
+ .. code-block:: none
+
+
+    <matplotlib.collections.LineCollection object at 0x00000251D1AE22A0>
+
+
+
+.. GENERATED FROM PYTHON SOURCE LINES 68-69
+
+We can plot the grid with the data values as well:
+
+.. GENERATED FROM PYTHON SOURCE LINES 70-73
+
+.. code-block:: Python
+
+
+    elevation.ugrid.plot()
+
+
+
+
+.. image-sg:: /user-guide/images/sphx_glr_05-unstructured-grids_002.png
+   :alt: 05 unstructured grids
+   :srcset: /user-guide/images/sphx_glr_05-unstructured-grids_002.png
+   :class: sphx-glr-single-img
+
+
+.. rst-class:: sphx-glr-script-out
+
+ .. code-block:: none
+
+
+    <matplotlib.collections.PolyCollection object at 0x00000251CA4AE480>
+
+
+
+.. GENERATED FROM PYTHON SOURCE LINES 74-81
+
+Note that we need to call the ``ugrid`` accessor to plot the data. This is
+because the data is stored in a different format than raster data, and we need
+to tell python that xugrid needs to be used for plotting, and not the regular
+xarray plotting methods.
+
+We can make calculations just like we would do with raster data. For example,
+we can calculate the mean elevation of the Netherlands:
+
+.. GENERATED FROM PYTHON SOURCE LINES 82-86
+
+.. code-block:: Python
+
+
+    mean_elevation = elevation.mean()
+    mean_elevation
+
+
+
+
+
+
+.. raw:: html
+
+    <div class="output_subarea output_html rendered_html output_result">
+    <div><svg style="position: absolute; width: 0; height: 0; overflow: hidden">
+    <defs>
+    <symbol id="icon-database" viewBox="0 0 32 32">
+    <path d="M16 0c-8.837 0-16 2.239-16 5v4c0 2.761 7.163 5 16 5s16-2.239 16-5v-4c0-2.761-7.163-5-16-5z"></path>
+    <path d="M16 17c-8.837 0-16-2.239-16-5v6c0 2.761 7.163 5 16 5s16-2.239 16-5v-6c0 2.761-7.163 5-16 5z"></path>
+    <path d="M16 26c-8.837 0-16-2.239-16-5v6c0 2.761 7.163 5 16 5s16-2.239 16-5v-6c0 2.761-7.163 5-16 5z"></path>
+    </symbol>
+    <symbol id="icon-file-text2" viewBox="0 0 32 32">
+    <path d="M28.681 7.159c-0.694-0.947-1.662-2.053-2.724-3.116s-2.169-2.030-3.116-2.724c-1.612-1.182-2.393-1.319-2.841-1.319h-15.5c-1.378 0-2.5 1.121-2.5 2.5v27c0 1.378 1.122 2.5 2.5 2.5h23c1.378 0 2.5-1.122 2.5-2.5v-19.5c0-0.448-0.137-1.23-1.319-2.841zM24.543 5.457c0.959 0.959 1.712 1.825 2.268 2.543h-4.811v-4.811c0.718 0.556 1.584 1.309 2.543 2.268zM28 29.5c0 0.271-0.229 0.5-0.5 0.5h-23c-0.271 0-0.5-0.229-0.5-0.5v-27c0-0.271 0.229-0.5 0.5-0.5 0 0 15.499-0 15.5 0v7c0 0.552 0.448 1 1 1h7v19.5z"></path>
+    <path d="M23 26h-14c-0.552 0-1-0.448-1-1s0.448-1 1-1h14c0.552 0 1 0.448 1 1s-0.448 1-1 1z"></path>
+    <path d="M23 22h-14c-0.552 0-1-0.448-1-1s0.448-1 1-1h14c0.552 0 1 0.448 1 1s-0.448 1-1 1z"></path>
+    <path d="M23 18h-14c-0.552 0-1-0.448-1-1s0.448-1 1-1h14c0.552 0 1 0.448 1 1s-0.448 1-1 1z"></path>
+    </symbol>
+    </defs>
+    </svg>
+    <style>/* CSS stylesheet for displaying xarray objects in jupyterlab.
+     *
+     */
+
+    :root {
+      --xr-font-color0: var(
+        --jp-content-font-color0,
+        var(--pst-color-text-base rgba(0, 0, 0, 1))
+      );
+      --xr-font-color2: var(
+        --jp-content-font-color2,
+        var(--pst-color-text-base, rgba(0, 0, 0, 0.54))
+      );
+      --xr-font-color3: var(
+        --jp-content-font-color3,
+        var(--pst-color-text-base, rgba(0, 0, 0, 0.38))
+      );
+      --xr-border-color: var(
+        --jp-border-color2,
+        hsl(from var(--pst-color-on-background, white) h s calc(l - 10))
+      );
+      --xr-disabled-color: var(
+        --jp-layout-color3,
+        hsl(from var(--pst-color-on-background, white) h s calc(l - 40))
+      );
+      --xr-background-color: var(
+        --jp-layout-color0,
+        var(--pst-color-on-background, white)
+      );
+      --xr-background-color-row-even: var(
+        --jp-layout-color1,
+        hsl(from var(--pst-color-on-background, white) h s calc(l - 5))
+      );
+      --xr-background-color-row-odd: var(
+        --jp-layout-color2,
+        hsl(from var(--pst-color-on-background, white) h s calc(l - 15))
+      );
+    }
+
+    html[theme="dark"],
+    html[data-theme="dark"],
+    body[data-theme="dark"],
+    body.vscode-dark {
+      --xr-font-color0: var(
+        --jp-content-font-color0,
+        var(--pst-color-text-base, rgba(255, 255, 255, 1))
+      );
+      --xr-font-color2: var(
+        --jp-content-font-color2,
+        var(--pst-color-text-base, rgba(255, 255, 255, 0.54))
+      );
+      --xr-font-color3: var(
+        --jp-content-font-color3,
+        var(--pst-color-text-base, rgba(255, 255, 255, 0.38))
+      );
+      --xr-border-color: var(
+        --jp-border-color2,
+        hsl(from var(--pst-color-on-background, #111111) h s calc(l + 10))
+      );
+      --xr-disabled-color: var(
+        --jp-layout-color3,
+        hsl(from var(--pst-color-on-background, #111111) h s calc(l + 40))
+      );
+      --xr-background-color: var(
+        --jp-layout-color0,
+        var(--pst-color-on-background, #111111)
+      );
+      --xr-background-color-row-even: var(
+        --jp-layout-color1,
+        hsl(from var(--pst-color-on-background, #111111) h s calc(l + 5))
+      );
+      --xr-background-color-row-odd: var(
+        --jp-layout-color2,
+        hsl(from var(--pst-color-on-background, #111111) h s calc(l + 15))
+      );
+    }
+
+    .xr-wrap {
+      display: block !important;
+      min-width: 300px;
+      max-width: 700px;
+    }
+
+    .xr-text-repr-fallback {
+      /* fallback to plain text repr when CSS is not injected (untrusted notebook) */
+      display: none;
+    }
+
+    .xr-header {
+      padding-top: 6px;
+      padding-bottom: 6px;
+      margin-bottom: 4px;
+      border-bottom: solid 1px var(--xr-border-color);
+    }
+
+    .xr-header > div,
+    .xr-header > ul {
+      display: inline;
+      margin-top: 0;
+      margin-bottom: 0;
+    }
+
+    .xr-obj-type,
+    .xr-array-name {
+      margin-left: 2px;
+      margin-right: 10px;
+    }
+
+    .xr-obj-type {
+      color: var(--xr-font-color2);
+    }
+
+    .xr-sections {
+      padding-left: 0 !important;
+      display: grid;
+      grid-template-columns: 150px auto auto 1fr 0 20px 0 20px;
+    }
+
+    .xr-section-item {
+      display: contents;
+    }
+
+    .xr-section-item input {
+      display: inline-block;
+      opacity: 0;
+      height: 0;
+    }
+
+    .xr-section-item input + label {
+      color: var(--xr-disabled-color);
+      border: 2px solid transparent !important;
+    }
+
+    .xr-section-item input:enabled + label {
+      cursor: pointer;
+      color: var(--xr-font-color2);
+    }
+
+    .xr-section-item input:focus + label {
+      border: 2px solid var(--xr-font-color0) !important;
+    }
+
+    .xr-section-item input:enabled + label:hover {
+      color: var(--xr-font-color0);
+    }
+
+    .xr-section-summary {
+      grid-column: 1;
+      color: var(--xr-font-color2);
+      font-weight: 500;
+    }
+
+    .xr-section-summary > span {
+      display: inline-block;
+      padding-left: 0.5em;
+    }
+
+    .xr-section-summary-in:disabled + label {
+      color: var(--xr-font-color2);
+    }
+
+    .xr-section-summary-in + label:before {
+      display: inline-block;
+      content: "►";
+      font-size: 11px;
+      width: 15px;
+      text-align: center;
+    }
+
+    .xr-section-summary-in:disabled + label:before {
+      color: var(--xr-disabled-color);
+    }
+
+    .xr-section-summary-in:checked + label:before {
+      content: "▼";
+    }
+
+    .xr-section-summary-in:checked + label > span {
+      display: none;
+    }
+
+    .xr-section-summary,
+    .xr-section-inline-details {
+      padding-top: 4px;
+      padding-bottom: 4px;
+    }
+
+    .xr-section-inline-details {
+      grid-column: 2 / -1;
+    }
+
+    .xr-section-details {
+      display: none;
+      grid-column: 1 / -1;
+      margin-bottom: 5px;
+    }
+
+    .xr-section-summary-in:checked ~ .xr-section-details {
+      display: contents;
+    }
+
+    .xr-array-wrap {
+      grid-column: 1 / -1;
+      display: grid;
+      grid-template-columns: 20px auto;
+    }
+
+    .xr-array-wrap > label {
+      grid-column: 1;
+      vertical-align: top;
+    }
+
+    .xr-preview {
+      color: var(--xr-font-color3);
+    }
+
+    .xr-array-preview,
+    .xr-array-data {
+      padding: 0 5px !important;
+      grid-column: 2;
+    }
+
+    .xr-array-data,
+    .xr-array-in:checked ~ .xr-array-preview {
+      display: none;
+    }
+
+    .xr-array-in:checked ~ .xr-array-data,
+    .xr-array-preview {
+      display: inline-block;
+    }
+
+    .xr-dim-list {
+      display: inline-block !important;
+      list-style: none;
+      padding: 0 !important;
+      margin: 0;
+    }
+
+    .xr-dim-list li {
+      display: inline-block;
+      padding: 0;
+      margin: 0;
+    }
+
+    .xr-dim-list:before {
+      content: "(";
+    }
+
+    .xr-dim-list:after {
+      content: ")";
+    }
+
+    .xr-dim-list li:not(:last-child):after {
+      content: ",";
+      padding-right: 5px;
+    }
+
+    .xr-has-index {
+      font-weight: bold;
+    }
+
+    .xr-var-list,
+    .xr-var-item {
+      display: contents;
+    }
+
+    .xr-var-item > div,
+    .xr-var-item label,
+    .xr-var-item > .xr-var-name span {
+      background-color: var(--xr-background-color-row-even);
+      border-color: var(--xr-background-color-row-odd);
+      margin-bottom: 0;
+      padding-top: 2px;
+    }
+
+    .xr-var-item > .xr-var-name:hover span {
+      padding-right: 5px;
+    }
+
+    .xr-var-list > li:nth-child(odd) > div,
+    .xr-var-list > li:nth-child(odd) > label,
+    .xr-var-list > li:nth-child(odd) > .xr-var-name span {
+      background-color: var(--xr-background-color-row-odd);
+      border-color: var(--xr-background-color-row-even);
+    }
+
+    .xr-var-name {
+      grid-column: 1;
+    }
+
+    .xr-var-dims {
+      grid-column: 2;
+    }
+
+    .xr-var-dtype {
+      grid-column: 3;
+      text-align: right;
+      color: var(--xr-font-color2);
+    }
+
+    .xr-var-preview {
+      grid-column: 4;
+    }
+
+    .xr-index-preview {
+      grid-column: 2 / 5;
+      color: var(--xr-font-color2);
+    }
+
+    .xr-var-name,
+    .xr-var-dims,
+    .xr-var-dtype,
+    .xr-preview,
+    .xr-attrs dt {
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      padding-right: 10px;
+    }
+
+    .xr-var-name:hover,
+    .xr-var-dims:hover,
+    .xr-var-dtype:hover,
+    .xr-attrs dt:hover {
+      overflow: visible;
+      width: auto;
+      z-index: 1;
+    }
+
+    .xr-var-attrs,
+    .xr-var-data,
+    .xr-index-data {
+      display: none;
+      border-top: 2px dotted var(--xr-background-color);
+      padding-bottom: 20px !important;
+      padding-top: 10px !important;
+    }
+
+    .xr-var-attrs-in + label,
+    .xr-var-data-in + label,
+    .xr-index-data-in + label {
+      padding: 0 1px;
+    }
+
+    .xr-var-attrs-in:checked ~ .xr-var-attrs,
+    .xr-var-data-in:checked ~ .xr-var-data,
+    .xr-index-data-in:checked ~ .xr-index-data {
+      display: block;
+    }
+
+    .xr-var-data > table {
+      float: right;
+    }
+
+    .xr-var-data > pre,
+    .xr-index-data > pre,
+    .xr-var-data > table > tbody > tr {
+      background-color: transparent !important;
+    }
+
+    .xr-var-name span,
+    .xr-var-data,
+    .xr-index-name div,
+    .xr-index-data,
+    .xr-attrs {
+      padding-left: 25px !important;
+    }
+
+    .xr-attrs,
+    .xr-var-attrs,
+    .xr-var-data,
+    .xr-index-data {
+      grid-column: 1 / -1;
+    }
+
+    dl.xr-attrs {
+      padding: 0;
+      margin: 0;
+      display: grid;
+      grid-template-columns: 125px auto;
+    }
+
+    .xr-attrs dt,
+    .xr-attrs dd {
+      padding: 0;
+      margin: 0;
+      float: left;
+      padding-right: 10px;
+      width: auto;
+    }
+
+    .xr-attrs dt {
+      font-weight: normal;
+      grid-column: 1;
+    }
+
+    .xr-attrs dt:hover span {
+      display: inline-block;
+      background: var(--xr-background-color);
+      padding-right: 10px;
+    }
+
+    .xr-attrs dd {
+      grid-column: 2;
+      white-space: pre-wrap;
+      word-break: break-all;
+    }
+
+    .xr-icon-database,
+    .xr-icon-file-text2,
+    .xr-no-icon {
+      display: inline-block;
+      vertical-align: middle;
+      width: 1em;
+      height: 1.5em !important;
+      stroke-width: 0;
+      stroke: currentColor;
+      fill: currentColor;
+    }
+
+    .xr-var-attrs-in:checked + label > .xr-icon-file-text2,
+    .xr-var-data-in:checked + label > .xr-icon-database,
+    .xr-index-data-in:checked + label > .xr-icon-database {
+      color: var(--xr-font-color0);
+      filter: drop-shadow(1px 1px 5px var(--xr-font-color2));
+      stroke-width: 0.8px;
+    }
+    </style><pre class='xr-text-repr-fallback'>&lt;xarray.DataArray &#x27;elevation&#x27; ()&gt; Size: 8B
+    array(7.61234045)</pre><div class='xr-wrap' style='display:none'><div class='xr-header'><div class='xr-obj-type'>xarray.DataArray</div><div class='xr-array-name'>'elevation'</div></div><ul class='xr-sections'><li class='xr-section-item'><div class='xr-array-wrap'><input id='section-4728c0d7-8cef-465d-9e2d-1a561b9606cb' class='xr-array-in' type='checkbox' checked><label for='section-4728c0d7-8cef-465d-9e2d-1a561b9606cb' title='Show/hide data repr'><svg class='icon xr-icon-database'><use xlink:href='#icon-database'></use></svg></label><div class='xr-array-preview xr-preview'><span>7.612</span></div><div class='xr-array-data'><pre>array(7.61234045)</pre></div></div></li><li class='xr-section-item'><input id='section-6c6dbe09-47dc-4e35-a06c-9e3f7f2b9f6c' class='xr-section-summary-in' type='checkbox' disabled ><label for='section-6c6dbe09-47dc-4e35-a06c-9e3f7f2b9f6c' class='xr-section-summary'  title='Expand/collapse section'>Coordinates: <span>(0)</span></label><div class='xr-section-inline-details'></div><div class='xr-section-details'><ul class='xr-var-list'></ul></div></li><li class='xr-section-item'><input id='section-64e7cc81-d4b6-4d84-85d9-203c46a5a19e' class='xr-section-summary-in' type='checkbox' disabled ><label for='section-64e7cc81-d4b6-4d84-85d9-203c46a5a19e' class='xr-section-summary'  title='Expand/collapse section'>Indexes: <span>(0)</span></label><div class='xr-section-inline-details'></div><div class='xr-section-details'><ul class='xr-var-list'></ul></div></li><li class='xr-section-item'><input id='section-a330124f-91a6-4629-9ea4-63b50421f1c6' class='xr-section-summary-in' type='checkbox' disabled ><label for='section-a330124f-91a6-4629-9ea4-63b50421f1c6' class='xr-section-summary'  title='Expand/collapse section'>Attributes: <span>(0)</span></label><div class='xr-section-inline-details'></div><div class='xr-section-details'><dl class='xr-attrs'></dl></div></li></ul></div></div>
+    </div>
+    <br />
+    <br />
+
+.. GENERATED FROM PYTHON SOURCE LINES 87-88
+
+Or if we want to compute a grid of the elevation 100 meters below the surface:
+
+.. GENERATED FROM PYTHON SOURCE LINES 89-93
+
+.. code-block:: Python
+
+
+    elevation_100m_below = elevation - 100
+    elevation_100m_below.ugrid.plot()
+
+
+
+
+.. image-sg:: /user-guide/images/sphx_glr_05-unstructured-grids_003.png
+   :alt: 05 unstructured grids
+   :srcset: /user-guide/images/sphx_glr_05-unstructured-grids_003.png
+   :class: sphx-glr-single-img
+
+
+.. rst-class:: sphx-glr-script-out
+
+ .. code-block:: none
+
+
+    <matplotlib.collections.PolyCollection object at 0x00000251D088B4D0>
+
+
+
+.. GENERATED FROM PYTHON SOURCE LINES 94-98
+
+We can use this data to be the bottom elevation of a MODFLOW 6 layered
+unstructured discretization (DISV). For that we need to assign a layer
+coordinate as iMOD Python requires a layer dimension to be present on the
+bottom and idomain variables.
+
+.. GENERATED FROM PYTHON SOURCE LINES 99-102
+
+.. code-block:: Python
+
+
+    bottom = elevation_100m_below.expand_dims("layer").assign_coords(layer=[1])
+
+
+
+
+
+
+
+
+.. GENERATED FROM PYTHON SOURCE LINES 103-107
+
+Finally we need to create an idomain variable that indicates which cells are
+active. For this example we will assume all cells are active, so we can just
+create an idomain variable with all ones. We can do this with the `xu.ones_like`
+function.
+
+.. GENERATED FROM PYTHON SOURCE LINES 108-111
+
+.. code-block:: Python
+
+
+    idomain = xu.ones_like(bottom).astype(int)
+
+
+
+
+
+
+
+
+.. GENERATED FROM PYTHON SOURCE LINES 112-115
+
+Now we can create a MODFLOW 6 unstructured discretization (DISV) object using
+the :class:`imod.mf6.VerticesDiscretization` class. We will create a
+discretization with one model layer.
+
+.. GENERATED FROM PYTHON SOURCE LINES 116-121
+
+.. code-block:: Python
+
+
+    from imod.mf6 import VerticesDiscretization
+
+    disv = VerticesDiscretization(top=elevation, bottom=bottom, idomain=idomain)
+
+
+
+
+
+
+
+
+.. GENERATED FROM PYTHON SOURCE LINES 122-128
+
+Note: we just created a model discretization on a triangular grid. This means
+that a line connecting two cell centers is rarely perfectly orthogonal to the
+cell edge. This causes mass balance errors. A voronoi grid would be a better
+choice for a model discretization, as it ensures that the cell centers are
+perfectly orthogonal to the cell edges. Luckily for us, xugrid has
+functionality to tesselate a grid into voronoi cells.
+
+.. GENERATED FROM PYTHON SOURCE LINES 129-134
+
+.. code-block:: Python
+
+
+    voronoi_grid = grid.tesselate_centroidal_voronoi()
+    voronoi_grid.plot()
+
+
+
+
+
+.. image-sg:: /user-guide/images/sphx_glr_05-unstructured-grids_004.png
+   :alt: 05 unstructured grids
+   :srcset: /user-guide/images/sphx_glr_05-unstructured-grids_004.png
+   :class: sphx-glr-single-img
+
+
+.. rst-class:: sphx-glr-script-out
+
+ .. code-block:: none
+
+
+    <matplotlib.collections.LineCollection object at 0x00000251C77B4EC0>
+
+
+
+.. GENERATED FROM PYTHON SOURCE LINES 135-141
+
+We can use this voronoi grid to create a new MODFLOW 6 unstructured
+discretization (DISV) object. iMOD Python has regridding functionality to
+regrid the top, bottom and idomain variables to the new grid.
+
+For that, iMOD Python regridding functionality requires a UgridDataArray
+instead of a Ugrid2d, so we create a UgridDataArray with the voronoi grid.
+
+.. GENERATED FROM PYTHON SOURCE LINES 142-148
+
+.. code-block:: Python
+
+    from imod.util import RegridderWeightsCache, ones_like_ugrid
+
+    voronoi_uda = ones_like_ugrid(voronoi_grid)
+
+    disv_voronoi = disv.regrid_like(voronoi_uda, RegridderWeightsCache())
+    disv_voronoi
+
+
+
+
+
+.. raw:: html
+
+    <div class="output_subarea output_html rendered_html output_result">
+    <div>VerticesDiscretization</div><div><svg style="position: absolute; width: 0; height: 0; overflow: hidden">
+    <defs>
+    <symbol id="icon-database" viewBox="0 0 32 32">
+    <path d="M16 0c-8.837 0-16 2.239-16 5v4c0 2.761 7.163 5 16 5s16-2.239 16-5v-4c0-2.761-7.163-5-16-5z"></path>
+    <path d="M16 17c-8.837 0-16-2.239-16-5v6c0 2.761 7.163 5 16 5s16-2.239 16-5v-6c0 2.761-7.163 5-16 5z"></path>
+    <path d="M16 26c-8.837 0-16-2.239-16-5v6c0 2.761 7.163 5 16 5s16-2.239 16-5v-6c0 2.761-7.163 5-16 5z"></path>
+    </symbol>
+    <symbol id="icon-file-text2" viewBox="0 0 32 32">
+    <path d="M28.681 7.159c-0.694-0.947-1.662-2.053-2.724-3.116s-2.169-2.030-3.116-2.724c-1.612-1.182-2.393-1.319-2.841-1.319h-15.5c-1.378 0-2.5 1.121-2.5 2.5v27c0 1.378 1.122 2.5 2.5 2.5h23c1.378 0 2.5-1.122 2.5-2.5v-19.5c0-0.448-0.137-1.23-1.319-2.841zM24.543 5.457c0.959 0.959 1.712 1.825 2.268 2.543h-4.811v-4.811c0.718 0.556 1.584 1.309 2.543 2.268zM28 29.5c0 0.271-0.229 0.5-0.5 0.5h-23c-0.271 0-0.5-0.229-0.5-0.5v-27c0-0.271 0.229-0.5 0.5-0.5 0 0 15.499-0 15.5 0v7c0 0.552 0.448 1 1 1h7v19.5z"></path>
+    <path d="M23 26h-14c-0.552 0-1-0.448-1-1s0.448-1 1-1h14c0.552 0 1 0.448 1 1s-0.448 1-1 1z"></path>
+    <path d="M23 22h-14c-0.552 0-1-0.448-1-1s0.448-1 1-1h14c0.552 0 1 0.448 1 1s-0.448 1-1 1z"></path>
+    <path d="M23 18h-14c-0.552 0-1-0.448-1-1s0.448-1 1-1h14c0.552 0 1 0.448 1 1s-0.448 1-1 1z"></path>
+    </symbol>
+    </defs>
+    </svg>
+    <style>/* CSS stylesheet for displaying xarray objects in jupyterlab.
+     *
+     */
+
+    :root {
+      --xr-font-color0: var(
+        --jp-content-font-color0,
+        var(--pst-color-text-base rgba(0, 0, 0, 1))
+      );
+      --xr-font-color2: var(
+        --jp-content-font-color2,
+        var(--pst-color-text-base, rgba(0, 0, 0, 0.54))
+      );
+      --xr-font-color3: var(
+        --jp-content-font-color3,
+        var(--pst-color-text-base, rgba(0, 0, 0, 0.38))
+      );
+      --xr-border-color: var(
+        --jp-border-color2,
+        hsl(from var(--pst-color-on-background, white) h s calc(l - 10))
+      );
+      --xr-disabled-color: var(
+        --jp-layout-color3,
+        hsl(from var(--pst-color-on-background, white) h s calc(l - 40))
+      );
+      --xr-background-color: var(
+        --jp-layout-color0,
+        var(--pst-color-on-background, white)
+      );
+      --xr-background-color-row-even: var(
+        --jp-layout-color1,
+        hsl(from var(--pst-color-on-background, white) h s calc(l - 5))
+      );
+      --xr-background-color-row-odd: var(
+        --jp-layout-color2,
+        hsl(from var(--pst-color-on-background, white) h s calc(l - 15))
+      );
+    }
+
+    html[theme="dark"],
+    html[data-theme="dark"],
+    body[data-theme="dark"],
+    body.vscode-dark {
+      --xr-font-color0: var(
+        --jp-content-font-color0,
+        var(--pst-color-text-base, rgba(255, 255, 255, 1))
+      );
+      --xr-font-color2: var(
+        --jp-content-font-color2,
+        var(--pst-color-text-base, rgba(255, 255, 255, 0.54))
+      );
+      --xr-font-color3: var(
+        --jp-content-font-color3,
+        var(--pst-color-text-base, rgba(255, 255, 255, 0.38))
+      );
+      --xr-border-color: var(
+        --jp-border-color2,
+        hsl(from var(--pst-color-on-background, #111111) h s calc(l + 10))
+      );
+      --xr-disabled-color: var(
+        --jp-layout-color3,
+        hsl(from var(--pst-color-on-background, #111111) h s calc(l + 40))
+      );
+      --xr-background-color: var(
+        --jp-layout-color0,
+        var(--pst-color-on-background, #111111)
+      );
+      --xr-background-color-row-even: var(
+        --jp-layout-color1,
+        hsl(from var(--pst-color-on-background, #111111) h s calc(l + 5))
+      );
+      --xr-background-color-row-odd: var(
+        --jp-layout-color2,
+        hsl(from var(--pst-color-on-background, #111111) h s calc(l + 15))
+      );
+    }
+
+    .xr-wrap {
+      display: block !important;
+      min-width: 300px;
+      max-width: 700px;
+    }
+
+    .xr-text-repr-fallback {
+      /* fallback to plain text repr when CSS is not injected (untrusted notebook) */
+      display: none;
+    }
+
+    .xr-header {
+      padding-top: 6px;
+      padding-bottom: 6px;
+      margin-bottom: 4px;
+      border-bottom: solid 1px var(--xr-border-color);
+    }
+
+    .xr-header > div,
+    .xr-header > ul {
+      display: inline;
+      margin-top: 0;
+      margin-bottom: 0;
+    }
+
+    .xr-obj-type,
+    .xr-array-name {
+      margin-left: 2px;
+      margin-right: 10px;
+    }
+
+    .xr-obj-type {
+      color: var(--xr-font-color2);
+    }
+
+    .xr-sections {
+      padding-left: 0 !important;
+      display: grid;
+      grid-template-columns: 150px auto auto 1fr 0 20px 0 20px;
+    }
+
+    .xr-section-item {
+      display: contents;
+    }
+
+    .xr-section-item input {
+      display: inline-block;
+      opacity: 0;
+      height: 0;
+    }
+
+    .xr-section-item input + label {
+      color: var(--xr-disabled-color);
+      border: 2px solid transparent !important;
+    }
+
+    .xr-section-item input:enabled + label {
+      cursor: pointer;
+      color: var(--xr-font-color2);
+    }
+
+    .xr-section-item input:focus + label {
+      border: 2px solid var(--xr-font-color0) !important;
+    }
+
+    .xr-section-item input:enabled + label:hover {
+      color: var(--xr-font-color0);
+    }
+
+    .xr-section-summary {
+      grid-column: 1;
+      color: var(--xr-font-color2);
+      font-weight: 500;
+    }
+
+    .xr-section-summary > span {
+      display: inline-block;
+      padding-left: 0.5em;
+    }
+
+    .xr-section-summary-in:disabled + label {
+      color: var(--xr-font-color2);
+    }
+
+    .xr-section-summary-in + label:before {
+      display: inline-block;
+      content: "►";
+      font-size: 11px;
+      width: 15px;
+      text-align: center;
+    }
+
+    .xr-section-summary-in:disabled + label:before {
+      color: var(--xr-disabled-color);
+    }
+
+    .xr-section-summary-in:checked + label:before {
+      content: "▼";
+    }
+
+    .xr-section-summary-in:checked + label > span {
+      display: none;
+    }
+
+    .xr-section-summary,
+    .xr-section-inline-details {
+      padding-top: 4px;
+      padding-bottom: 4px;
+    }
+
+    .xr-section-inline-details {
+      grid-column: 2 / -1;
+    }
+
+    .xr-section-details {
+      display: none;
+      grid-column: 1 / -1;
+      margin-bottom: 5px;
+    }
+
+    .xr-section-summary-in:checked ~ .xr-section-details {
+      display: contents;
+    }
+
+    .xr-array-wrap {
+      grid-column: 1 / -1;
+      display: grid;
+      grid-template-columns: 20px auto;
+    }
+
+    .xr-array-wrap > label {
+      grid-column: 1;
+      vertical-align: top;
+    }
+
+    .xr-preview {
+      color: var(--xr-font-color3);
+    }
+
+    .xr-array-preview,
+    .xr-array-data {
+      padding: 0 5px !important;
+      grid-column: 2;
+    }
+
+    .xr-array-data,
+    .xr-array-in:checked ~ .xr-array-preview {
+      display: none;
+    }
+
+    .xr-array-in:checked ~ .xr-array-data,
+    .xr-array-preview {
+      display: inline-block;
+    }
+
+    .xr-dim-list {
+      display: inline-block !important;
+      list-style: none;
+      padding: 0 !important;
+      margin: 0;
+    }
+
+    .xr-dim-list li {
+      display: inline-block;
+      padding: 0;
+      margin: 0;
+    }
+
+    .xr-dim-list:before {
+      content: "(";
+    }
+
+    .xr-dim-list:after {
+      content: ")";
+    }
+
+    .xr-dim-list li:not(:last-child):after {
+      content: ",";
+      padding-right: 5px;
+    }
+
+    .xr-has-index {
+      font-weight: bold;
+    }
+
+    .xr-var-list,
+    .xr-var-item {
+      display: contents;
+    }
+
+    .xr-var-item > div,
+    .xr-var-item label,
+    .xr-var-item > .xr-var-name span {
+      background-color: var(--xr-background-color-row-even);
+      border-color: var(--xr-background-color-row-odd);
+      margin-bottom: 0;
+      padding-top: 2px;
+    }
+
+    .xr-var-item > .xr-var-name:hover span {
+      padding-right: 5px;
+    }
+
+    .xr-var-list > li:nth-child(odd) > div,
+    .xr-var-list > li:nth-child(odd) > label,
+    .xr-var-list > li:nth-child(odd) > .xr-var-name span {
+      background-color: var(--xr-background-color-row-odd);
+      border-color: var(--xr-background-color-row-even);
+    }
+
+    .xr-var-name {
+      grid-column: 1;
+    }
+
+    .xr-var-dims {
+      grid-column: 2;
+    }
+
+    .xr-var-dtype {
+      grid-column: 3;
+      text-align: right;
+      color: var(--xr-font-color2);
+    }
+
+    .xr-var-preview {
+      grid-column: 4;
+    }
+
+    .xr-index-preview {
+      grid-column: 2 / 5;
+      color: var(--xr-font-color2);
+    }
+
+    .xr-var-name,
+    .xr-var-dims,
+    .xr-var-dtype,
+    .xr-preview,
+    .xr-attrs dt {
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      padding-right: 10px;
+    }
+
+    .xr-var-name:hover,
+    .xr-var-dims:hover,
+    .xr-var-dtype:hover,
+    .xr-attrs dt:hover {
+      overflow: visible;
+      width: auto;
+      z-index: 1;
+    }
+
+    .xr-var-attrs,
+    .xr-var-data,
+    .xr-index-data {
+      display: none;
+      border-top: 2px dotted var(--xr-background-color);
+      padding-bottom: 20px !important;
+      padding-top: 10px !important;
+    }
+
+    .xr-var-attrs-in + label,
+    .xr-var-data-in + label,
+    .xr-index-data-in + label {
+      padding: 0 1px;
+    }
+
+    .xr-var-attrs-in:checked ~ .xr-var-attrs,
+    .xr-var-data-in:checked ~ .xr-var-data,
+    .xr-index-data-in:checked ~ .xr-index-data {
+      display: block;
+    }
+
+    .xr-var-data > table {
+      float: right;
+    }
+
+    .xr-var-data > pre,
+    .xr-index-data > pre,
+    .xr-var-data > table > tbody > tr {
+      background-color: transparent !important;
+    }
+
+    .xr-var-name span,
+    .xr-var-data,
+    .xr-index-name div,
+    .xr-index-data,
+    .xr-attrs {
+      padding-left: 25px !important;
+    }
+
+    .xr-attrs,
+    .xr-var-attrs,
+    .xr-var-data,
+    .xr-index-data {
+      grid-column: 1 / -1;
+    }
+
+    dl.xr-attrs {
+      padding: 0;
+      margin: 0;
+      display: grid;
+      grid-template-columns: 125px auto;
+    }
+
+    .xr-attrs dt,
+    .xr-attrs dd {
+      padding: 0;
+      margin: 0;
+      float: left;
+      padding-right: 10px;
+      width: auto;
+    }
+
+    .xr-attrs dt {
+      font-weight: normal;
+      grid-column: 1;
+    }
+
+    .xr-attrs dt:hover span {
+      display: inline-block;
+      background: var(--xr-background-color);
+      padding-right: 10px;
+    }
+
+    .xr-attrs dd {
+      grid-column: 2;
+      white-space: pre-wrap;
+      word-break: break-all;
+    }
+
+    .xr-icon-database,
+    .xr-icon-file-text2,
+    .xr-no-icon {
+      display: inline-block;
+      vertical-align: middle;
+      width: 1em;
+      height: 1.5em !important;
+      stroke-width: 0;
+      stroke: currentColor;
+      fill: currentColor;
+    }
+
+    .xr-var-attrs-in:checked + label > .xr-icon-file-text2,
+    .xr-var-data-in:checked + label > .xr-icon-database,
+    .xr-index-data-in:checked + label > .xr-icon-database {
+      color: var(--xr-font-color0);
+      filter: drop-shadow(1px 1px 5px var(--xr-font-color2));
+      stroke-width: 0.8px;
+    }
+    </style><pre class='xr-text-repr-fallback'>&lt;xarray.Dataset&gt; Size: 67kB
+    Dimensions:        (layer: 1, mesh2d_nFaces: 2790)
+    Coordinates:
+      * layer          (layer) int64 8B 1
+      * mesh2d_nFaces  (mesh2d_nFaces) int64 22kB 0 1 2 3 4 ... 2786 2787 2788 2789
+    Data variables:
+        idomain        (layer, mesh2d_nFaces) int64 22kB 1 1 1 1 1 1 ... 1 1 1 1 1 1
+        top            (mesh2d_nFaces) float32 11kB 21.15 64.51 ... -0.1434 37.68
+        bottom         (layer, mesh2d_nFaces) float32 11kB -78.85 -35.49 ... -62.32</pre><div class='xr-wrap' style='display:none'><div class='xr-header'><div class='xr-obj-type'>xarray.Dataset</div></div><ul class='xr-sections'><li class='xr-section-item'><input id='section-a8340321-c8fe-4924-8b93-3d3bb9acf090' class='xr-section-summary-in' type='checkbox' disabled ><label for='section-a8340321-c8fe-4924-8b93-3d3bb9acf090' class='xr-section-summary'  title='Expand/collapse section'>Dimensions:</label><div class='xr-section-inline-details'><ul class='xr-dim-list'><li><span class='xr-has-index'>layer</span>: 1</li><li><span class='xr-has-index'>mesh2d_nFaces</span>: 2790</li></ul></div><div class='xr-section-details'></div></li><li class='xr-section-item'><input id='section-cf2dd609-03f1-4a8c-bac2-86e038fdfb85' class='xr-section-summary-in' type='checkbox'  checked><label for='section-cf2dd609-03f1-4a8c-bac2-86e038fdfb85' class='xr-section-summary' >Coordinates: <span>(2)</span></label><div class='xr-section-inline-details'></div><div class='xr-section-details'><ul class='xr-var-list'><li class='xr-var-item'><div class='xr-var-name'><span class='xr-has-index'>layer</span></div><div class='xr-var-dims'>(layer)</div><div class='xr-var-dtype'>int64</div><div class='xr-var-preview xr-preview'>1</div><input id='attrs-087d60d2-aa07-4cdf-802c-5daee1d239c0' class='xr-var-attrs-in' type='checkbox' disabled><label for='attrs-087d60d2-aa07-4cdf-802c-5daee1d239c0' title='Show/Hide attributes'><svg class='icon xr-icon-file-text2'><use xlink:href='#icon-file-text2'></use></svg></label><input id='data-ff42ebee-5943-4acd-8895-ca2d9e44d9cc' class='xr-var-data-in' type='checkbox'><label for='data-ff42ebee-5943-4acd-8895-ca2d9e44d9cc' title='Show/Hide data repr'><svg class='icon xr-icon-database'><use xlink:href='#icon-database'></use></svg></label><div class='xr-var-attrs'><dl class='xr-attrs'></dl></div><div class='xr-var-data'><pre>array([1])</pre></div></li><li class='xr-var-item'><div class='xr-var-name'><span class='xr-has-index'>mesh2d_nFaces</span></div><div class='xr-var-dims'>(mesh2d_nFaces)</div><div class='xr-var-dtype'>int64</div><div class='xr-var-preview xr-preview'>0 1 2 3 4 ... 2786 2787 2788 2789</div><input id='attrs-a6e6b8f4-9dac-477e-a5be-b1509f669670' class='xr-var-attrs-in' type='checkbox' disabled><label for='attrs-a6e6b8f4-9dac-477e-a5be-b1509f669670' title='Show/Hide attributes'><svg class='icon xr-icon-file-text2'><use xlink:href='#icon-file-text2'></use></svg></label><input id='data-0def16fd-8db8-4a1a-8797-ee91f49ded2e' class='xr-var-data-in' type='checkbox'><label for='data-0def16fd-8db8-4a1a-8797-ee91f49ded2e' title='Show/Hide data repr'><svg class='icon xr-icon-database'><use xlink:href='#icon-database'></use></svg></label><div class='xr-var-attrs'><dl class='xr-attrs'></dl></div><div class='xr-var-data'><pre>[2790 values with dtype=int64]</pre></div></li></ul></div></li><li class='xr-section-item'><input id='section-5cff4d41-53e8-455c-8f42-0e853b8adceb' class='xr-section-summary-in' type='checkbox'  checked><label for='section-5cff4d41-53e8-455c-8f42-0e853b8adceb' class='xr-section-summary' >Data variables: <span>(3)</span></label><div class='xr-section-inline-details'></div><div class='xr-section-details'><ul class='xr-var-list'><li class='xr-var-item'><div class='xr-var-name'><span>idomain</span></div><div class='xr-var-dims'>(layer, mesh2d_nFaces)</div><div class='xr-var-dtype'>int64</div><div class='xr-var-preview xr-preview'>1 1 1 1 1 1 1 1 ... 1 1 1 1 1 1 1 1</div><input id='attrs-03ddfb57-9c07-4de2-bf1b-abbcef0d97ab' class='xr-var-attrs-in' type='checkbox' disabled><label for='attrs-03ddfb57-9c07-4de2-bf1b-abbcef0d97ab' title='Show/Hide attributes'><svg class='icon xr-icon-file-text2'><use xlink:href='#icon-file-text2'></use></svg></label><input id='data-79b2f9b3-86c5-46ae-83b5-5966800c0705' class='xr-var-data-in' type='checkbox'><label for='data-79b2f9b3-86c5-46ae-83b5-5966800c0705' title='Show/Hide data repr'><svg class='icon xr-icon-database'><use xlink:href='#icon-database'></use></svg></label><div class='xr-var-attrs'><dl class='xr-attrs'></dl></div><div class='xr-var-data'><pre>array([[1, 1, 1, ..., 1, 1, 1]], shape=(1, 2790))</pre></div></li><li class='xr-var-item'><div class='xr-var-name'><span>top</span></div><div class='xr-var-dims'>(mesh2d_nFaces)</div><div class='xr-var-dtype'>float32</div><div class='xr-var-preview xr-preview'>21.15 64.51 43.33 ... -0.1434 37.68</div><input id='attrs-fdf432bf-d134-4faa-9a9e-2381295667fa' class='xr-var-attrs-in' type='checkbox' ><label for='attrs-fdf432bf-d134-4faa-9a9e-2381295667fa' title='Show/Hide attributes'><svg class='icon xr-icon-file-text2'><use xlink:href='#icon-file-text2'></use></svg></label><input id='data-b1748305-3e80-49e4-8f57-0d2e2f7392e3' class='xr-var-data-in' type='checkbox'><label for='data-b1748305-3e80-49e4-8f57-0d2e2f7392e3' title='Show/Hide data repr'><svg class='icon xr-icon-database'><use xlink:href='#icon-database'></use></svg></label><div class='xr-var-attrs'><dl class='xr-attrs'><dt><span>unit :</span></dt><dd>m NAP</dd></dl></div><div class='xr-var-data'><pre>array([21.14808   , 64.50981   , 43.331017  , ...,  4.8425164 ,
+           -0.14340343, 37.675953  ], shape=(2790,), dtype=float32)</pre></div></li><li class='xr-var-item'><div class='xr-var-name'><span>bottom</span></div><div class='xr-var-dims'>(layer, mesh2d_nFaces)</div><div class='xr-var-dtype'>float32</div><div class='xr-var-preview xr-preview'>-78.85 -35.49 ... -100.1 -62.32</div><input id='attrs-37263016-bd64-40e9-aa88-a7bb51eec2f3' class='xr-var-attrs-in' type='checkbox' disabled><label for='attrs-37263016-bd64-40e9-aa88-a7bb51eec2f3' title='Show/Hide attributes'><svg class='icon xr-icon-file-text2'><use xlink:href='#icon-file-text2'></use></svg></label><input id='data-79a13b18-88d2-4cf6-a557-c493a3bf4e0a' class='xr-var-data-in' type='checkbox'><label for='data-79a13b18-88d2-4cf6-a557-c493a3bf4e0a' title='Show/Hide data repr'><svg class='icon xr-icon-database'><use xlink:href='#icon-database'></use></svg></label><div class='xr-var-attrs'><dl class='xr-attrs'></dl></div><div class='xr-var-data'><pre>array([[ -78.85192 ,  -35.49019 ,  -56.668983, ...,  -95.157486,
+            -100.1434  ,  -62.324043]], shape=(1, 2790), dtype=float32)</pre></div></li></ul></div></li><li class='xr-section-item'><input id='section-b94202f3-20c6-49f2-a023-b3a1182cd7de' class='xr-section-summary-in' type='checkbox'  ><label for='section-b94202f3-20c6-49f2-a023-b3a1182cd7de' class='xr-section-summary' >Indexes: <span>(2)</span></label><div class='xr-section-inline-details'></div><div class='xr-section-details'><ul class='xr-var-list'><li class='xr-var-item'><div class='xr-index-name'><div>layer</div></div><div class='xr-index-preview'>PandasIndex</div><input type='checkbox' disabled/><label></label><input id='index-087021cd-acfd-44c7-848d-cc24de38bb3f' class='xr-index-data-in' type='checkbox'/><label for='index-087021cd-acfd-44c7-848d-cc24de38bb3f' title='Show/Hide index repr'><svg class='icon xr-icon-database'><use xlink:href='#icon-database'></use></svg></label><div class='xr-index-data'><pre>PandasIndex(Index([1], dtype=&#x27;int64&#x27;, name=&#x27;layer&#x27;))</pre></div></li><li class='xr-var-item'><div class='xr-index-name'><div>mesh2d_nFaces</div></div><div class='xr-index-preview'>PandasIndex</div><input type='checkbox' disabled/><label></label><input id='index-c0648253-ff44-4a25-b9e6-f7d1658da3e5' class='xr-index-data-in' type='checkbox'/><label for='index-c0648253-ff44-4a25-b9e6-f7d1658da3e5' title='Show/Hide index repr'><svg class='icon xr-icon-database'><use xlink:href='#icon-database'></use></svg></label><div class='xr-index-data'><pre>PandasIndex(RangeIndex(start=0, stop=2790, step=1, name=&#x27;mesh2d_nFaces&#x27;))</pre></div></li></ul></div></li><li class='xr-section-item'><input id='section-18db35fb-78fe-48b2-8e9f-9efbf1455ac0' class='xr-section-summary-in' type='checkbox' disabled ><label for='section-18db35fb-78fe-48b2-8e9f-9efbf1455ac0' class='xr-section-summary'  title='Expand/collapse section'>Attributes: <span>(0)</span></label><div class='xr-section-inline-details'></div><div class='xr-section-details'><dl class='xr-attrs'></dl></div></li></ul></div></div>
+    </div>
+    <br />
+    <br />
+
+.. GENERATED FROM PYTHON SOURCE LINES 149-154
+
+Other packages like the :class:`imod.mf6.Drainage` package, accept both structured and
+unstructured grids.
+
+The drain elevation requires a layer dimension. We can use the `idomain`
+to broadcast the data to include the layer dimension.
+
+.. GENERATED FROM PYTHON SOURCE LINES 155-159
+
+.. code-block:: Python
+
+
+    drain_elevation = disv_voronoi["idomain"] * disv_voronoi["top"]
+    drain_elevation
+
+
+
+
+
+
+.. raw:: html
+
+    <div class="output_subarea output_html rendered_html output_result">
+    <div><svg style="position: absolute; width: 0; height: 0; overflow: hidden">
+    <defs>
+    <symbol id="icon-database" viewBox="0 0 32 32">
+    <path d="M16 0c-8.837 0-16 2.239-16 5v4c0 2.761 7.163 5 16 5s16-2.239 16-5v-4c0-2.761-7.163-5-16-5z"></path>
+    <path d="M16 17c-8.837 0-16-2.239-16-5v6c0 2.761 7.163 5 16 5s16-2.239 16-5v-6c0 2.761-7.163 5-16 5z"></path>
+    <path d="M16 26c-8.837 0-16-2.239-16-5v6c0 2.761 7.163 5 16 5s16-2.239 16-5v-6c0 2.761-7.163 5-16 5z"></path>
+    </symbol>
+    <symbol id="icon-file-text2" viewBox="0 0 32 32">
+    <path d="M28.681 7.159c-0.694-0.947-1.662-2.053-2.724-3.116s-2.169-2.030-3.116-2.724c-1.612-1.182-2.393-1.319-2.841-1.319h-15.5c-1.378 0-2.5 1.121-2.5 2.5v27c0 1.378 1.122 2.5 2.5 2.5h23c1.378 0 2.5-1.122 2.5-2.5v-19.5c0-0.448-0.137-1.23-1.319-2.841zM24.543 5.457c0.959 0.959 1.712 1.825 2.268 2.543h-4.811v-4.811c0.718 0.556 1.584 1.309 2.543 2.268zM28 29.5c0 0.271-0.229 0.5-0.5 0.5h-23c-0.271 0-0.5-0.229-0.5-0.5v-27c0-0.271 0.229-0.5 0.5-0.5 0 0 15.499-0 15.5 0v7c0 0.552 0.448 1 1 1h7v19.5z"></path>
+    <path d="M23 26h-14c-0.552 0-1-0.448-1-1s0.448-1 1-1h14c0.552 0 1 0.448 1 1s-0.448 1-1 1z"></path>
+    <path d="M23 22h-14c-0.552 0-1-0.448-1-1s0.448-1 1-1h14c0.552 0 1 0.448 1 1s-0.448 1-1 1z"></path>
+    <path d="M23 18h-14c-0.552 0-1-0.448-1-1s0.448-1 1-1h14c0.552 0 1 0.448 1 1s-0.448 1-1 1z"></path>
+    </symbol>
+    </defs>
+    </svg>
+    <style>/* CSS stylesheet for displaying xarray objects in jupyterlab.
+     *
+     */
+
+    :root {
+      --xr-font-color0: var(
+        --jp-content-font-color0,
+        var(--pst-color-text-base rgba(0, 0, 0, 1))
+      );
+      --xr-font-color2: var(
+        --jp-content-font-color2,
+        var(--pst-color-text-base, rgba(0, 0, 0, 0.54))
+      );
+      --xr-font-color3: var(
+        --jp-content-font-color3,
+        var(--pst-color-text-base, rgba(0, 0, 0, 0.38))
+      );
+      --xr-border-color: var(
+        --jp-border-color2,
+        hsl(from var(--pst-color-on-background, white) h s calc(l - 10))
+      );
+      --xr-disabled-color: var(
+        --jp-layout-color3,
+        hsl(from var(--pst-color-on-background, white) h s calc(l - 40))
+      );
+      --xr-background-color: var(
+        --jp-layout-color0,
+        var(--pst-color-on-background, white)
+      );
+      --xr-background-color-row-even: var(
+        --jp-layout-color1,
+        hsl(from var(--pst-color-on-background, white) h s calc(l - 5))
+      );
+      --xr-background-color-row-odd: var(
+        --jp-layout-color2,
+        hsl(from var(--pst-color-on-background, white) h s calc(l - 15))
+      );
+    }
+
+    html[theme="dark"],
+    html[data-theme="dark"],
+    body[data-theme="dark"],
+    body.vscode-dark {
+      --xr-font-color0: var(
+        --jp-content-font-color0,
+        var(--pst-color-text-base, rgba(255, 255, 255, 1))
+      );
+      --xr-font-color2: var(
+        --jp-content-font-color2,
+        var(--pst-color-text-base, rgba(255, 255, 255, 0.54))
+      );
+      --xr-font-color3: var(
+        --jp-content-font-color3,
+        var(--pst-color-text-base, rgba(255, 255, 255, 0.38))
+      );
+      --xr-border-color: var(
+        --jp-border-color2,
+        hsl(from var(--pst-color-on-background, #111111) h s calc(l + 10))
+      );
+      --xr-disabled-color: var(
+        --jp-layout-color3,
+        hsl(from var(--pst-color-on-background, #111111) h s calc(l + 40))
+      );
+      --xr-background-color: var(
+        --jp-layout-color0,
+        var(--pst-color-on-background, #111111)
+      );
+      --xr-background-color-row-even: var(
+        --jp-layout-color1,
+        hsl(from var(--pst-color-on-background, #111111) h s calc(l + 5))
+      );
+      --xr-background-color-row-odd: var(
+        --jp-layout-color2,
+        hsl(from var(--pst-color-on-background, #111111) h s calc(l + 15))
+      );
+    }
+
+    .xr-wrap {
+      display: block !important;
+      min-width: 300px;
+      max-width: 700px;
+    }
+
+    .xr-text-repr-fallback {
+      /* fallback to plain text repr when CSS is not injected (untrusted notebook) */
+      display: none;
+    }
+
+    .xr-header {
+      padding-top: 6px;
+      padding-bottom: 6px;
+      margin-bottom: 4px;
+      border-bottom: solid 1px var(--xr-border-color);
+    }
+
+    .xr-header > div,
+    .xr-header > ul {
+      display: inline;
+      margin-top: 0;
+      margin-bottom: 0;
+    }
+
+    .xr-obj-type,
+    .xr-array-name {
+      margin-left: 2px;
+      margin-right: 10px;
+    }
+
+    .xr-obj-type {
+      color: var(--xr-font-color2);
+    }
+
+    .xr-sections {
+      padding-left: 0 !important;
+      display: grid;
+      grid-template-columns: 150px auto auto 1fr 0 20px 0 20px;
+    }
+
+    .xr-section-item {
+      display: contents;
+    }
+
+    .xr-section-item input {
+      display: inline-block;
+      opacity: 0;
+      height: 0;
+    }
+
+    .xr-section-item input + label {
+      color: var(--xr-disabled-color);
+      border: 2px solid transparent !important;
+    }
+
+    .xr-section-item input:enabled + label {
+      cursor: pointer;
+      color: var(--xr-font-color2);
+    }
+
+    .xr-section-item input:focus + label {
+      border: 2px solid var(--xr-font-color0) !important;
+    }
+
+    .xr-section-item input:enabled + label:hover {
+      color: var(--xr-font-color0);
+    }
+
+    .xr-section-summary {
+      grid-column: 1;
+      color: var(--xr-font-color2);
+      font-weight: 500;
+    }
+
+    .xr-section-summary > span {
+      display: inline-block;
+      padding-left: 0.5em;
+    }
+
+    .xr-section-summary-in:disabled + label {
+      color: var(--xr-font-color2);
+    }
+
+    .xr-section-summary-in + label:before {
+      display: inline-block;
+      content: "►";
+      font-size: 11px;
+      width: 15px;
+      text-align: center;
+    }
+
+    .xr-section-summary-in:disabled + label:before {
+      color: var(--xr-disabled-color);
+    }
+
+    .xr-section-summary-in:checked + label:before {
+      content: "▼";
+    }
+
+    .xr-section-summary-in:checked + label > span {
+      display: none;
+    }
+
+    .xr-section-summary,
+    .xr-section-inline-details {
+      padding-top: 4px;
+      padding-bottom: 4px;
+    }
+
+    .xr-section-inline-details {
+      grid-column: 2 / -1;
+    }
+
+    .xr-section-details {
+      display: none;
+      grid-column: 1 / -1;
+      margin-bottom: 5px;
+    }
+
+    .xr-section-summary-in:checked ~ .xr-section-details {
+      display: contents;
+    }
+
+    .xr-array-wrap {
+      grid-column: 1 / -1;
+      display: grid;
+      grid-template-columns: 20px auto;
+    }
+
+    .xr-array-wrap > label {
+      grid-column: 1;
+      vertical-align: top;
+    }
+
+    .xr-preview {
+      color: var(--xr-font-color3);
+    }
+
+    .xr-array-preview,
+    .xr-array-data {
+      padding: 0 5px !important;
+      grid-column: 2;
+    }
+
+    .xr-array-data,
+    .xr-array-in:checked ~ .xr-array-preview {
+      display: none;
+    }
+
+    .xr-array-in:checked ~ .xr-array-data,
+    .xr-array-preview {
+      display: inline-block;
+    }
+
+    .xr-dim-list {
+      display: inline-block !important;
+      list-style: none;
+      padding: 0 !important;
+      margin: 0;
+    }
+
+    .xr-dim-list li {
+      display: inline-block;
+      padding: 0;
+      margin: 0;
+    }
+
+    .xr-dim-list:before {
+      content: "(";
+    }
+
+    .xr-dim-list:after {
+      content: ")";
+    }
+
+    .xr-dim-list li:not(:last-child):after {
+      content: ",";
+      padding-right: 5px;
+    }
+
+    .xr-has-index {
+      font-weight: bold;
+    }
+
+    .xr-var-list,
+    .xr-var-item {
+      display: contents;
+    }
+
+    .xr-var-item > div,
+    .xr-var-item label,
+    .xr-var-item > .xr-var-name span {
+      background-color: var(--xr-background-color-row-even);
+      border-color: var(--xr-background-color-row-odd);
+      margin-bottom: 0;
+      padding-top: 2px;
+    }
+
+    .xr-var-item > .xr-var-name:hover span {
+      padding-right: 5px;
+    }
+
+    .xr-var-list > li:nth-child(odd) > div,
+    .xr-var-list > li:nth-child(odd) > label,
+    .xr-var-list > li:nth-child(odd) > .xr-var-name span {
+      background-color: var(--xr-background-color-row-odd);
+      border-color: var(--xr-background-color-row-even);
+    }
+
+    .xr-var-name {
+      grid-column: 1;
+    }
+
+    .xr-var-dims {
+      grid-column: 2;
+    }
+
+    .xr-var-dtype {
+      grid-column: 3;
+      text-align: right;
+      color: var(--xr-font-color2);
+    }
+
+    .xr-var-preview {
+      grid-column: 4;
+    }
+
+    .xr-index-preview {
+      grid-column: 2 / 5;
+      color: var(--xr-font-color2);
+    }
+
+    .xr-var-name,
+    .xr-var-dims,
+    .xr-var-dtype,
+    .xr-preview,
+    .xr-attrs dt {
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      padding-right: 10px;
+    }
+
+    .xr-var-name:hover,
+    .xr-var-dims:hover,
+    .xr-var-dtype:hover,
+    .xr-attrs dt:hover {
+      overflow: visible;
+      width: auto;
+      z-index: 1;
+    }
+
+    .xr-var-attrs,
+    .xr-var-data,
+    .xr-index-data {
+      display: none;
+      border-top: 2px dotted var(--xr-background-color);
+      padding-bottom: 20px !important;
+      padding-top: 10px !important;
+    }
+
+    .xr-var-attrs-in + label,
+    .xr-var-data-in + label,
+    .xr-index-data-in + label {
+      padding: 0 1px;
+    }
+
+    .xr-var-attrs-in:checked ~ .xr-var-attrs,
+    .xr-var-data-in:checked ~ .xr-var-data,
+    .xr-index-data-in:checked ~ .xr-index-data {
+      display: block;
+    }
+
+    .xr-var-data > table {
+      float: right;
+    }
+
+    .xr-var-data > pre,
+    .xr-index-data > pre,
+    .xr-var-data > table > tbody > tr {
+      background-color: transparent !important;
+    }
+
+    .xr-var-name span,
+    .xr-var-data,
+    .xr-index-name div,
+    .xr-index-data,
+    .xr-attrs {
+      padding-left: 25px !important;
+    }
+
+    .xr-attrs,
+    .xr-var-attrs,
+    .xr-var-data,
+    .xr-index-data {
+      grid-column: 1 / -1;
+    }
+
+    dl.xr-attrs {
+      padding: 0;
+      margin: 0;
+      display: grid;
+      grid-template-columns: 125px auto;
+    }
+
+    .xr-attrs dt,
+    .xr-attrs dd {
+      padding: 0;
+      margin: 0;
+      float: left;
+      padding-right: 10px;
+      width: auto;
+    }
+
+    .xr-attrs dt {
+      font-weight: normal;
+      grid-column: 1;
+    }
+
+    .xr-attrs dt:hover span {
+      display: inline-block;
+      background: var(--xr-background-color);
+      padding-right: 10px;
+    }
+
+    .xr-attrs dd {
+      grid-column: 2;
+      white-space: pre-wrap;
+      word-break: break-all;
+    }
+
+    .xr-icon-database,
+    .xr-icon-file-text2,
+    .xr-no-icon {
+      display: inline-block;
+      vertical-align: middle;
+      width: 1em;
+      height: 1.5em !important;
+      stroke-width: 0;
+      stroke: currentColor;
+      fill: currentColor;
+    }
+
+    .xr-var-attrs-in:checked + label > .xr-icon-file-text2,
+    .xr-var-data-in:checked + label > .xr-icon-database,
+    .xr-index-data-in:checked + label > .xr-icon-database {
+      color: var(--xr-font-color0);
+      filter: drop-shadow(1px 1px 5px var(--xr-font-color2));
+      stroke-width: 0.8px;
+    }
+    </style><pre class='xr-text-repr-fallback'>&lt;xarray.DataArray (layer: 1, mesh2d_nFaces: 2790)&gt; Size: 22kB
+    array([[21.14808083, 64.5098114 , 43.33101654, ...,  4.84251642,
+            -0.14340343, 37.67595291]], shape=(1, 2790))
+    Coordinates:
+      * layer          (layer) int64 8B 1
+      * mesh2d_nFaces  (mesh2d_nFaces) int64 22kB 0 1 2 3 4 ... 2786 2787 2788 2789</pre><div class='xr-wrap' style='display:none'><div class='xr-header'><div class='xr-obj-type'>xarray.DataArray</div><div class='xr-array-name'></div><ul class='xr-dim-list'><li><span class='xr-has-index'>layer</span>: 1</li><li><span class='xr-has-index'>mesh2d_nFaces</span>: 2790</li></ul></div><ul class='xr-sections'><li class='xr-section-item'><div class='xr-array-wrap'><input id='section-3c3e64e0-14de-4222-9407-40086170867c' class='xr-array-in' type='checkbox' checked><label for='section-3c3e64e0-14de-4222-9407-40086170867c' title='Show/hide data repr'><svg class='icon xr-icon-database'><use xlink:href='#icon-database'></use></svg></label><div class='xr-array-preview xr-preview'><span>21.15 64.51 43.33 182.7 21.39 4.288 ... 9.23 5.781 4.843 -0.1434 37.68</span></div><div class='xr-array-data'><pre>array([[21.14808083, 64.5098114 , 43.33101654, ...,  4.84251642,
+            -0.14340343, 37.67595291]], shape=(1, 2790))</pre></div></div></li><li class='xr-section-item'><input id='section-f01d2346-e068-40f3-a1d7-aa271f6d30d6' class='xr-section-summary-in' type='checkbox'  checked><label for='section-f01d2346-e068-40f3-a1d7-aa271f6d30d6' class='xr-section-summary' >Coordinates: <span>(2)</span></label><div class='xr-section-inline-details'></div><div class='xr-section-details'><ul class='xr-var-list'><li class='xr-var-item'><div class='xr-var-name'><span class='xr-has-index'>layer</span></div><div class='xr-var-dims'>(layer)</div><div class='xr-var-dtype'>int64</div><div class='xr-var-preview xr-preview'>1</div><input id='attrs-1af6cbf2-3317-489a-8b65-b6ee914399e1' class='xr-var-attrs-in' type='checkbox' disabled><label for='attrs-1af6cbf2-3317-489a-8b65-b6ee914399e1' title='Show/Hide attributes'><svg class='icon xr-icon-file-text2'><use xlink:href='#icon-file-text2'></use></svg></label><input id='data-b44d70a3-b303-42f8-9134-b891e4cd91e8' class='xr-var-data-in' type='checkbox'><label for='data-b44d70a3-b303-42f8-9134-b891e4cd91e8' title='Show/Hide data repr'><svg class='icon xr-icon-database'><use xlink:href='#icon-database'></use></svg></label><div class='xr-var-attrs'><dl class='xr-attrs'></dl></div><div class='xr-var-data'><pre>array([1])</pre></div></li><li class='xr-var-item'><div class='xr-var-name'><span class='xr-has-index'>mesh2d_nFaces</span></div><div class='xr-var-dims'>(mesh2d_nFaces)</div><div class='xr-var-dtype'>int64</div><div class='xr-var-preview xr-preview'>0 1 2 3 4 ... 2786 2787 2788 2789</div><input id='attrs-8b145eb1-3b7b-4939-82c5-aa9cace82e65' class='xr-var-attrs-in' type='checkbox' disabled><label for='attrs-8b145eb1-3b7b-4939-82c5-aa9cace82e65' title='Show/Hide attributes'><svg class='icon xr-icon-file-text2'><use xlink:href='#icon-file-text2'></use></svg></label><input id='data-9f972477-c97a-4793-bbe2-a9198156f66e' class='xr-var-data-in' type='checkbox'><label for='data-9f972477-c97a-4793-bbe2-a9198156f66e' title='Show/Hide data repr'><svg class='icon xr-icon-database'><use xlink:href='#icon-database'></use></svg></label><div class='xr-var-attrs'><dl class='xr-attrs'></dl></div><div class='xr-var-data'><pre>[2790 values with dtype=int64]</pre></div></li></ul></div></li><li class='xr-section-item'><input id='section-0906dd3b-61dd-4318-8ad9-05603cc69b8d' class='xr-section-summary-in' type='checkbox'  ><label for='section-0906dd3b-61dd-4318-8ad9-05603cc69b8d' class='xr-section-summary' >Indexes: <span>(2)</span></label><div class='xr-section-inline-details'></div><div class='xr-section-details'><ul class='xr-var-list'><li class='xr-var-item'><div class='xr-index-name'><div>layer</div></div><div class='xr-index-preview'>PandasIndex</div><input type='checkbox' disabled/><label></label><input id='index-ac21f1bf-8993-4a3a-aa75-0edcbfc79a44' class='xr-index-data-in' type='checkbox'/><label for='index-ac21f1bf-8993-4a3a-aa75-0edcbfc79a44' title='Show/Hide index repr'><svg class='icon xr-icon-database'><use xlink:href='#icon-database'></use></svg></label><div class='xr-index-data'><pre>PandasIndex(Index([1], dtype=&#x27;int64&#x27;, name=&#x27;layer&#x27;))</pre></div></li><li class='xr-var-item'><div class='xr-index-name'><div>mesh2d_nFaces</div></div><div class='xr-index-preview'>PandasIndex</div><input type='checkbox' disabled/><label></label><input id='index-a15e4c53-236d-4b6b-a618-77ee3bbb89da' class='xr-index-data-in' type='checkbox'/><label for='index-a15e4c53-236d-4b6b-a618-77ee3bbb89da' title='Show/Hide index repr'><svg class='icon xr-icon-database'><use xlink:href='#icon-database'></use></svg></label><div class='xr-index-data'><pre>PandasIndex(RangeIndex(start=0, stop=2790, step=1, name=&#x27;mesh2d_nFaces&#x27;))</pre></div></li></ul></div></li><li class='xr-section-item'><input id='section-72ab5d5f-41e4-4058-a2cb-52147012ad21' class='xr-section-summary-in' type='checkbox' disabled ><label for='section-72ab5d5f-41e4-4058-a2cb-52147012ad21' class='xr-section-summary'  title='Expand/collapse section'>Attributes: <span>(0)</span></label><div class='xr-section-inline-details'></div><div class='xr-section-details'><dl class='xr-attrs'></dl></div></li></ul></div></div>
+    </div>
+    <br />
+    <br />
+
+.. GENERATED FROM PYTHON SOURCE LINES 160-164
+
+We also need to create a conductance variable for the
+:class:`imod.mf6.Drainage` package. The conductance variable is a measure of
+how much water can flow through a cell. The areas of the cells are used to
+calculate the conductance, and can be be obtained from its grid.
+
+.. GENERATED FROM PYTHON SOURCE LINES 165-169
+
+.. code-block:: Python
+
+
+    resistance = 1  # Example resistance value in days
+    conductance = disv_voronoi["idomain"] * voronoi_grid.area / resistance
+
+
+
+
+
+
+
+
+.. GENERATED FROM PYTHON SOURCE LINES 170-171
+
+We can now use these variables to create a :class:`imod.mf6.Drainage` package object.
+
+.. GENERATED FROM PYTHON SOURCE LINES 172-181
+
+.. code-block:: Python
+
+
+    from imod.mf6 import Drainage
+
+    drainage = Drainage(
+        elevation=drain_elevation,
+        conductance=conductance,
+    )
+    drainage
+
+
+
+
+
+
+.. raw:: html
+
+    <div class="output_subarea output_html rendered_html output_result">
+    <div>Drainage</div><div><svg style="position: absolute; width: 0; height: 0; overflow: hidden">
+    <defs>
+    <symbol id="icon-database" viewBox="0 0 32 32">
+    <path d="M16 0c-8.837 0-16 2.239-16 5v4c0 2.761 7.163 5 16 5s16-2.239 16-5v-4c0-2.761-7.163-5-16-5z"></path>
+    <path d="M16 17c-8.837 0-16-2.239-16-5v6c0 2.761 7.163 5 16 5s16-2.239 16-5v-6c0 2.761-7.163 5-16 5z"></path>
+    <path d="M16 26c-8.837 0-16-2.239-16-5v6c0 2.761 7.163 5 16 5s16-2.239 16-5v-6c0 2.761-7.163 5-16 5z"></path>
+    </symbol>
+    <symbol id="icon-file-text2" viewBox="0 0 32 32">
+    <path d="M28.681 7.159c-0.694-0.947-1.662-2.053-2.724-3.116s-2.169-2.030-3.116-2.724c-1.612-1.182-2.393-1.319-2.841-1.319h-15.5c-1.378 0-2.5 1.121-2.5 2.5v27c0 1.378 1.122 2.5 2.5 2.5h23c1.378 0 2.5-1.122 2.5-2.5v-19.5c0-0.448-0.137-1.23-1.319-2.841zM24.543 5.457c0.959 0.959 1.712 1.825 2.268 2.543h-4.811v-4.811c0.718 0.556 1.584 1.309 2.543 2.268zM28 29.5c0 0.271-0.229 0.5-0.5 0.5h-23c-0.271 0-0.5-0.229-0.5-0.5v-27c0-0.271 0.229-0.5 0.5-0.5 0 0 15.499-0 15.5 0v7c0 0.552 0.448 1 1 1h7v19.5z"></path>
+    <path d="M23 26h-14c-0.552 0-1-0.448-1-1s0.448-1 1-1h14c0.552 0 1 0.448 1 1s-0.448 1-1 1z"></path>
+    <path d="M23 22h-14c-0.552 0-1-0.448-1-1s0.448-1 1-1h14c0.552 0 1 0.448 1 1s-0.448 1-1 1z"></path>
+    <path d="M23 18h-14c-0.552 0-1-0.448-1-1s0.448-1 1-1h14c0.552 0 1 0.448 1 1s-0.448 1-1 1z"></path>
+    </symbol>
+    </defs>
+    </svg>
+    <style>/* CSS stylesheet for displaying xarray objects in jupyterlab.
+     *
+     */
+
+    :root {
+      --xr-font-color0: var(
+        --jp-content-font-color0,
+        var(--pst-color-text-base rgba(0, 0, 0, 1))
+      );
+      --xr-font-color2: var(
+        --jp-content-font-color2,
+        var(--pst-color-text-base, rgba(0, 0, 0, 0.54))
+      );
+      --xr-font-color3: var(
+        --jp-content-font-color3,
+        var(--pst-color-text-base, rgba(0, 0, 0, 0.38))
+      );
+      --xr-border-color: var(
+        --jp-border-color2,
+        hsl(from var(--pst-color-on-background, white) h s calc(l - 10))
+      );
+      --xr-disabled-color: var(
+        --jp-layout-color3,
+        hsl(from var(--pst-color-on-background, white) h s calc(l - 40))
+      );
+      --xr-background-color: var(
+        --jp-layout-color0,
+        var(--pst-color-on-background, white)
+      );
+      --xr-background-color-row-even: var(
+        --jp-layout-color1,
+        hsl(from var(--pst-color-on-background, white) h s calc(l - 5))
+      );
+      --xr-background-color-row-odd: var(
+        --jp-layout-color2,
+        hsl(from var(--pst-color-on-background, white) h s calc(l - 15))
+      );
+    }
+
+    html[theme="dark"],
+    html[data-theme="dark"],
+    body[data-theme="dark"],
+    body.vscode-dark {
+      --xr-font-color0: var(
+        --jp-content-font-color0,
+        var(--pst-color-text-base, rgba(255, 255, 255, 1))
+      );
+      --xr-font-color2: var(
+        --jp-content-font-color2,
+        var(--pst-color-text-base, rgba(255, 255, 255, 0.54))
+      );
+      --xr-font-color3: var(
+        --jp-content-font-color3,
+        var(--pst-color-text-base, rgba(255, 255, 255, 0.38))
+      );
+      --xr-border-color: var(
+        --jp-border-color2,
+        hsl(from var(--pst-color-on-background, #111111) h s calc(l + 10))
+      );
+      --xr-disabled-color: var(
+        --jp-layout-color3,
+        hsl(from var(--pst-color-on-background, #111111) h s calc(l + 40))
+      );
+      --xr-background-color: var(
+        --jp-layout-color0,
+        var(--pst-color-on-background, #111111)
+      );
+      --xr-background-color-row-even: var(
+        --jp-layout-color1,
+        hsl(from var(--pst-color-on-background, #111111) h s calc(l + 5))
+      );
+      --xr-background-color-row-odd: var(
+        --jp-layout-color2,
+        hsl(from var(--pst-color-on-background, #111111) h s calc(l + 15))
+      );
+    }
+
+    .xr-wrap {
+      display: block !important;
+      min-width: 300px;
+      max-width: 700px;
+    }
+
+    .xr-text-repr-fallback {
+      /* fallback to plain text repr when CSS is not injected (untrusted notebook) */
+      display: none;
+    }
+
+    .xr-header {
+      padding-top: 6px;
+      padding-bottom: 6px;
+      margin-bottom: 4px;
+      border-bottom: solid 1px var(--xr-border-color);
+    }
+
+    .xr-header > div,
+    .xr-header > ul {
+      display: inline;
+      margin-top: 0;
+      margin-bottom: 0;
+    }
+
+    .xr-obj-type,
+    .xr-array-name {
+      margin-left: 2px;
+      margin-right: 10px;
+    }
+
+    .xr-obj-type {
+      color: var(--xr-font-color2);
+    }
+
+    .xr-sections {
+      padding-left: 0 !important;
+      display: grid;
+      grid-template-columns: 150px auto auto 1fr 0 20px 0 20px;
+    }
+
+    .xr-section-item {
+      display: contents;
+    }
+
+    .xr-section-item input {
+      display: inline-block;
+      opacity: 0;
+      height: 0;
+    }
+
+    .xr-section-item input + label {
+      color: var(--xr-disabled-color);
+      border: 2px solid transparent !important;
+    }
+
+    .xr-section-item input:enabled + label {
+      cursor: pointer;
+      color: var(--xr-font-color2);
+    }
+
+    .xr-section-item input:focus + label {
+      border: 2px solid var(--xr-font-color0) !important;
+    }
+
+    .xr-section-item input:enabled + label:hover {
+      color: var(--xr-font-color0);
+    }
+
+    .xr-section-summary {
+      grid-column: 1;
+      color: var(--xr-font-color2);
+      font-weight: 500;
+    }
+
+    .xr-section-summary > span {
+      display: inline-block;
+      padding-left: 0.5em;
+    }
+
+    .xr-section-summary-in:disabled + label {
+      color: var(--xr-font-color2);
+    }
+
+    .xr-section-summary-in + label:before {
+      display: inline-block;
+      content: "►";
+      font-size: 11px;
+      width: 15px;
+      text-align: center;
+    }
+
+    .xr-section-summary-in:disabled + label:before {
+      color: var(--xr-disabled-color);
+    }
+
+    .xr-section-summary-in:checked + label:before {
+      content: "▼";
+    }
+
+    .xr-section-summary-in:checked + label > span {
+      display: none;
+    }
+
+    .xr-section-summary,
+    .xr-section-inline-details {
+      padding-top: 4px;
+      padding-bottom: 4px;
+    }
+
+    .xr-section-inline-details {
+      grid-column: 2 / -1;
+    }
+
+    .xr-section-details {
+      display: none;
+      grid-column: 1 / -1;
+      margin-bottom: 5px;
+    }
+
+    .xr-section-summary-in:checked ~ .xr-section-details {
+      display: contents;
+    }
+
+    .xr-array-wrap {
+      grid-column: 1 / -1;
+      display: grid;
+      grid-template-columns: 20px auto;
+    }
+
+    .xr-array-wrap > label {
+      grid-column: 1;
+      vertical-align: top;
+    }
+
+    .xr-preview {
+      color: var(--xr-font-color3);
+    }
+
+    .xr-array-preview,
+    .xr-array-data {
+      padding: 0 5px !important;
+      grid-column: 2;
+    }
+
+    .xr-array-data,
+    .xr-array-in:checked ~ .xr-array-preview {
+      display: none;
+    }
+
+    .xr-array-in:checked ~ .xr-array-data,
+    .xr-array-preview {
+      display: inline-block;
+    }
+
+    .xr-dim-list {
+      display: inline-block !important;
+      list-style: none;
+      padding: 0 !important;
+      margin: 0;
+    }
+
+    .xr-dim-list li {
+      display: inline-block;
+      padding: 0;
+      margin: 0;
+    }
+
+    .xr-dim-list:before {
+      content: "(";
+    }
+
+    .xr-dim-list:after {
+      content: ")";
+    }
+
+    .xr-dim-list li:not(:last-child):after {
+      content: ",";
+      padding-right: 5px;
+    }
+
+    .xr-has-index {
+      font-weight: bold;
+    }
+
+    .xr-var-list,
+    .xr-var-item {
+      display: contents;
+    }
+
+    .xr-var-item > div,
+    .xr-var-item label,
+    .xr-var-item > .xr-var-name span {
+      background-color: var(--xr-background-color-row-even);
+      border-color: var(--xr-background-color-row-odd);
+      margin-bottom: 0;
+      padding-top: 2px;
+    }
+
+    .xr-var-item > .xr-var-name:hover span {
+      padding-right: 5px;
+    }
+
+    .xr-var-list > li:nth-child(odd) > div,
+    .xr-var-list > li:nth-child(odd) > label,
+    .xr-var-list > li:nth-child(odd) > .xr-var-name span {
+      background-color: var(--xr-background-color-row-odd);
+      border-color: var(--xr-background-color-row-even);
+    }
+
+    .xr-var-name {
+      grid-column: 1;
+    }
+
+    .xr-var-dims {
+      grid-column: 2;
+    }
+
+    .xr-var-dtype {
+      grid-column: 3;
+      text-align: right;
+      color: var(--xr-font-color2);
+    }
+
+    .xr-var-preview {
+      grid-column: 4;
+    }
+
+    .xr-index-preview {
+      grid-column: 2 / 5;
+      color: var(--xr-font-color2);
+    }
+
+    .xr-var-name,
+    .xr-var-dims,
+    .xr-var-dtype,
+    .xr-preview,
+    .xr-attrs dt {
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      padding-right: 10px;
+    }
+
+    .xr-var-name:hover,
+    .xr-var-dims:hover,
+    .xr-var-dtype:hover,
+    .xr-attrs dt:hover {
+      overflow: visible;
+      width: auto;
+      z-index: 1;
+    }
+
+    .xr-var-attrs,
+    .xr-var-data,
+    .xr-index-data {
+      display: none;
+      border-top: 2px dotted var(--xr-background-color);
+      padding-bottom: 20px !important;
+      padding-top: 10px !important;
+    }
+
+    .xr-var-attrs-in + label,
+    .xr-var-data-in + label,
+    .xr-index-data-in + label {
+      padding: 0 1px;
+    }
+
+    .xr-var-attrs-in:checked ~ .xr-var-attrs,
+    .xr-var-data-in:checked ~ .xr-var-data,
+    .xr-index-data-in:checked ~ .xr-index-data {
+      display: block;
+    }
+
+    .xr-var-data > table {
+      float: right;
+    }
+
+    .xr-var-data > pre,
+    .xr-index-data > pre,
+    .xr-var-data > table > tbody > tr {
+      background-color: transparent !important;
+    }
+
+    .xr-var-name span,
+    .xr-var-data,
+    .xr-index-name div,
+    .xr-index-data,
+    .xr-attrs {
+      padding-left: 25px !important;
+    }
+
+    .xr-attrs,
+    .xr-var-attrs,
+    .xr-var-data,
+    .xr-index-data {
+      grid-column: 1 / -1;
+    }
+
+    dl.xr-attrs {
+      padding: 0;
+      margin: 0;
+      display: grid;
+      grid-template-columns: 125px auto;
+    }
+
+    .xr-attrs dt,
+    .xr-attrs dd {
+      padding: 0;
+      margin: 0;
+      float: left;
+      padding-right: 10px;
+      width: auto;
+    }
+
+    .xr-attrs dt {
+      font-weight: normal;
+      grid-column: 1;
+    }
+
+    .xr-attrs dt:hover span {
+      display: inline-block;
+      background: var(--xr-background-color);
+      padding-right: 10px;
+    }
+
+    .xr-attrs dd {
+      grid-column: 2;
+      white-space: pre-wrap;
+      word-break: break-all;
+    }
+
+    .xr-icon-database,
+    .xr-icon-file-text2,
+    .xr-no-icon {
+      display: inline-block;
+      vertical-align: middle;
+      width: 1em;
+      height: 1.5em !important;
+      stroke-width: 0;
+      stroke: currentColor;
+      fill: currentColor;
+    }
+
+    .xr-var-attrs-in:checked + label > .xr-icon-file-text2,
+    .xr-var-data-in:checked + label > .xr-icon-database,
+    .xr-index-data-in:checked + label > .xr-icon-database {
+      color: var(--xr-font-color0);
+      filter: drop-shadow(1px 1px 5px var(--xr-font-color2));
+      stroke-width: 0.8px;
+    }
+    </style><pre class='xr-text-repr-fallback'>&lt;xarray.Dataset&gt; Size: 67kB
+    Dimensions:        (layer: 1, mesh2d_nFaces: 2790)
+    Coordinates:
+      * layer          (layer) int64 8B 1
+      * mesh2d_nFaces  (mesh2d_nFaces) int64 22kB 0 1 2 3 4 ... 2786 2787 2788 2789
+    Data variables:
+        elevation      (layer, mesh2d_nFaces) float64 22kB 21.15 64.51 ... 37.68
+        conductance    (layer, mesh2d_nFaces) float64 22kB 1.34e+07 ... 1.044e+07
+        print_input    bool 1B False
+        print_flows    bool 1B False
+        save_flows     bool 1B False
+        observations   object 8B None
+        repeat_stress  object 8B None</pre><div class='xr-wrap' style='display:none'><div class='xr-header'><div class='xr-obj-type'>xarray.Dataset</div></div><ul class='xr-sections'><li class='xr-section-item'><input id='section-03c58d0b-0936-47fd-85e6-522f9660d61f' class='xr-section-summary-in' type='checkbox' disabled ><label for='section-03c58d0b-0936-47fd-85e6-522f9660d61f' class='xr-section-summary'  title='Expand/collapse section'>Dimensions:</label><div class='xr-section-inline-details'><ul class='xr-dim-list'><li><span class='xr-has-index'>layer</span>: 1</li><li><span class='xr-has-index'>mesh2d_nFaces</span>: 2790</li></ul></div><div class='xr-section-details'></div></li><li class='xr-section-item'><input id='section-e77c7a58-64ae-4009-85ce-c1c10295d682' class='xr-section-summary-in' type='checkbox'  checked><label for='section-e77c7a58-64ae-4009-85ce-c1c10295d682' class='xr-section-summary' >Coordinates: <span>(2)</span></label><div class='xr-section-inline-details'></div><div class='xr-section-details'><ul class='xr-var-list'><li class='xr-var-item'><div class='xr-var-name'><span class='xr-has-index'>layer</span></div><div class='xr-var-dims'>(layer)</div><div class='xr-var-dtype'>int64</div><div class='xr-var-preview xr-preview'>1</div><input id='attrs-424686c8-2eca-4334-8fd6-17490215db72' class='xr-var-attrs-in' type='checkbox' disabled><label for='attrs-424686c8-2eca-4334-8fd6-17490215db72' title='Show/Hide attributes'><svg class='icon xr-icon-file-text2'><use xlink:href='#icon-file-text2'></use></svg></label><input id='data-b7d7d5db-678d-4eaa-9c16-02931c384b40' class='xr-var-data-in' type='checkbox'><label for='data-b7d7d5db-678d-4eaa-9c16-02931c384b40' title='Show/Hide data repr'><svg class='icon xr-icon-database'><use xlink:href='#icon-database'></use></svg></label><div class='xr-var-attrs'><dl class='xr-attrs'></dl></div><div class='xr-var-data'><pre>array([1])</pre></div></li><li class='xr-var-item'><div class='xr-var-name'><span class='xr-has-index'>mesh2d_nFaces</span></div><div class='xr-var-dims'>(mesh2d_nFaces)</div><div class='xr-var-dtype'>int64</div><div class='xr-var-preview xr-preview'>0 1 2 3 4 ... 2786 2787 2788 2789</div><input id='attrs-fffee935-a441-4cb8-b2d3-7f286fafcbea' class='xr-var-attrs-in' type='checkbox' disabled><label for='attrs-fffee935-a441-4cb8-b2d3-7f286fafcbea' title='Show/Hide attributes'><svg class='icon xr-icon-file-text2'><use xlink:href='#icon-file-text2'></use></svg></label><input id='data-7ddf0683-7989-47af-a905-b04a3d46552e' class='xr-var-data-in' type='checkbox'><label for='data-7ddf0683-7989-47af-a905-b04a3d46552e' title='Show/Hide data repr'><svg class='icon xr-icon-database'><use xlink:href='#icon-database'></use></svg></label><div class='xr-var-attrs'><dl class='xr-attrs'></dl></div><div class='xr-var-data'><pre>[2790 values with dtype=int64]</pre></div></li></ul></div></li><li class='xr-section-item'><input id='section-b7888520-485e-46a2-8174-27159c952007' class='xr-section-summary-in' type='checkbox'  checked><label for='section-b7888520-485e-46a2-8174-27159c952007' class='xr-section-summary' >Data variables: <span>(7)</span></label><div class='xr-section-inline-details'></div><div class='xr-section-details'><ul class='xr-var-list'><li class='xr-var-item'><div class='xr-var-name'><span>elevation</span></div><div class='xr-var-dims'>(layer, mesh2d_nFaces)</div><div class='xr-var-dtype'>float64</div><div class='xr-var-preview xr-preview'>21.15 64.51 43.33 ... -0.1434 37.68</div><input id='attrs-3219e4e5-c394-44af-837b-07bca049cbde' class='xr-var-attrs-in' type='checkbox' disabled><label for='attrs-3219e4e5-c394-44af-837b-07bca049cbde' title='Show/Hide attributes'><svg class='icon xr-icon-file-text2'><use xlink:href='#icon-file-text2'></use></svg></label><input id='data-53c81d31-b843-4a63-81f1-148cad8c3e5d' class='xr-var-data-in' type='checkbox'><label for='data-53c81d31-b843-4a63-81f1-148cad8c3e5d' title='Show/Hide data repr'><svg class='icon xr-icon-database'><use xlink:href='#icon-database'></use></svg></label><div class='xr-var-attrs'><dl class='xr-attrs'></dl></div><div class='xr-var-data'><pre>array([[21.14808083, 64.5098114 , 43.33101654, ...,  4.84251642,
+            -0.14340343, 37.67595291]], shape=(1, 2790))</pre></div></li><li class='xr-var-item'><div class='xr-var-name'><span>conductance</span></div><div class='xr-var-dims'>(layer, mesh2d_nFaces)</div><div class='xr-var-dtype'>float64</div><div class='xr-var-preview xr-preview'>1.34e+07 1.946e+07 ... 1.044e+07</div><input id='attrs-c1cfd7f1-1e59-4675-8a68-6a8d56a2ea78' class='xr-var-attrs-in' type='checkbox' disabled><label for='attrs-c1cfd7f1-1e59-4675-8a68-6a8d56a2ea78' title='Show/Hide attributes'><svg class='icon xr-icon-file-text2'><use xlink:href='#icon-file-text2'></use></svg></label><input id='data-488aa944-cc63-4cdd-9e23-e5a2044e312a' class='xr-var-data-in' type='checkbox'><label for='data-488aa944-cc63-4cdd-9e23-e5a2044e312a' title='Show/Hide data repr'><svg class='icon xr-icon-database'><use xlink:href='#icon-database'></use></svg></label><div class='xr-var-attrs'><dl class='xr-attrs'></dl></div><div class='xr-var-data'><pre>array([[13399941.82645187, 19455727.79080786, 16309249.99846802, ...,
+             7970138.38326237,  6182539.70209495, 10437455.38383284]],
+          shape=(1, 2790))</pre></div></li><li class='xr-var-item'><div class='xr-var-name'><span>print_input</span></div><div class='xr-var-dims'>()</div><div class='xr-var-dtype'>bool</div><div class='xr-var-preview xr-preview'>False</div><input id='attrs-9037bb49-fbf9-411b-91a8-301c04bea7d8' class='xr-var-attrs-in' type='checkbox' disabled><label for='attrs-9037bb49-fbf9-411b-91a8-301c04bea7d8' title='Show/Hide attributes'><svg class='icon xr-icon-file-text2'><use xlink:href='#icon-file-text2'></use></svg></label><input id='data-055ba4ce-99a4-42bb-8b23-5a642b1e4154' class='xr-var-data-in' type='checkbox'><label for='data-055ba4ce-99a4-42bb-8b23-5a642b1e4154' title='Show/Hide data repr'><svg class='icon xr-icon-database'><use xlink:href='#icon-database'></use></svg></label><div class='xr-var-attrs'><dl class='xr-attrs'></dl></div><div class='xr-var-data'><pre>array(False)</pre></div></li><li class='xr-var-item'><div class='xr-var-name'><span>print_flows</span></div><div class='xr-var-dims'>()</div><div class='xr-var-dtype'>bool</div><div class='xr-var-preview xr-preview'>False</div><input id='attrs-d8b084a9-8281-4e8b-b4be-8ee28fbf6153' class='xr-var-attrs-in' type='checkbox' disabled><label for='attrs-d8b084a9-8281-4e8b-b4be-8ee28fbf6153' title='Show/Hide attributes'><svg class='icon xr-icon-file-text2'><use xlink:href='#icon-file-text2'></use></svg></label><input id='data-155351b9-bc06-4298-ace2-b94ae4e693b2' class='xr-var-data-in' type='checkbox'><label for='data-155351b9-bc06-4298-ace2-b94ae4e693b2' title='Show/Hide data repr'><svg class='icon xr-icon-database'><use xlink:href='#icon-database'></use></svg></label><div class='xr-var-attrs'><dl class='xr-attrs'></dl></div><div class='xr-var-data'><pre>array(False)</pre></div></li><li class='xr-var-item'><div class='xr-var-name'><span>save_flows</span></div><div class='xr-var-dims'>()</div><div class='xr-var-dtype'>bool</div><div class='xr-var-preview xr-preview'>False</div><input id='attrs-40b52059-8411-48de-83de-88c37da9cab9' class='xr-var-attrs-in' type='checkbox' disabled><label for='attrs-40b52059-8411-48de-83de-88c37da9cab9' title='Show/Hide attributes'><svg class='icon xr-icon-file-text2'><use xlink:href='#icon-file-text2'></use></svg></label><input id='data-b3e18cec-c1f0-4d9a-bdbf-b1454adca25c' class='xr-var-data-in' type='checkbox'><label for='data-b3e18cec-c1f0-4d9a-bdbf-b1454adca25c' title='Show/Hide data repr'><svg class='icon xr-icon-database'><use xlink:href='#icon-database'></use></svg></label><div class='xr-var-attrs'><dl class='xr-attrs'></dl></div><div class='xr-var-data'><pre>array(False)</pre></div></li><li class='xr-var-item'><div class='xr-var-name'><span>observations</span></div><div class='xr-var-dims'>()</div><div class='xr-var-dtype'>object</div><div class='xr-var-preview xr-preview'>None</div><input id='attrs-c422eef6-2161-47d8-b0ed-d70613949a75' class='xr-var-attrs-in' type='checkbox' disabled><label for='attrs-c422eef6-2161-47d8-b0ed-d70613949a75' title='Show/Hide attributes'><svg class='icon xr-icon-file-text2'><use xlink:href='#icon-file-text2'></use></svg></label><input id='data-5c9269f2-2877-4a66-9333-d2bfa6f5fbd8' class='xr-var-data-in' type='checkbox'><label for='data-5c9269f2-2877-4a66-9333-d2bfa6f5fbd8' title='Show/Hide data repr'><svg class='icon xr-icon-database'><use xlink:href='#icon-database'></use></svg></label><div class='xr-var-attrs'><dl class='xr-attrs'></dl></div><div class='xr-var-data'><pre>array(None, dtype=object)</pre></div></li><li class='xr-var-item'><div class='xr-var-name'><span>repeat_stress</span></div><div class='xr-var-dims'>()</div><div class='xr-var-dtype'>object</div><div class='xr-var-preview xr-preview'>None</div><input id='attrs-993584f9-d2bd-4a19-9c0f-83fe5cac4abc' class='xr-var-attrs-in' type='checkbox' disabled><label for='attrs-993584f9-d2bd-4a19-9c0f-83fe5cac4abc' title='Show/Hide attributes'><svg class='icon xr-icon-file-text2'><use xlink:href='#icon-file-text2'></use></svg></label><input id='data-723c63d6-e7a5-4904-8e35-ed930571b036' class='xr-var-data-in' type='checkbox'><label for='data-723c63d6-e7a5-4904-8e35-ed930571b036' title='Show/Hide data repr'><svg class='icon xr-icon-database'><use xlink:href='#icon-database'></use></svg></label><div class='xr-var-attrs'><dl class='xr-attrs'></dl></div><div class='xr-var-data'><pre>array(None, dtype=object)</pre></div></li></ul></div></li><li class='xr-section-item'><input id='section-d378fb57-2a5f-4dbd-b3c0-8c555a22ba5c' class='xr-section-summary-in' type='checkbox'  ><label for='section-d378fb57-2a5f-4dbd-b3c0-8c555a22ba5c' class='xr-section-summary' >Indexes: <span>(2)</span></label><div class='xr-section-inline-details'></div><div class='xr-section-details'><ul class='xr-var-list'><li class='xr-var-item'><div class='xr-index-name'><div>layer</div></div><div class='xr-index-preview'>PandasIndex</div><input type='checkbox' disabled/><label></label><input id='index-5ebd7634-5192-459d-ab68-736d6577fd8a' class='xr-index-data-in' type='checkbox'/><label for='index-5ebd7634-5192-459d-ab68-736d6577fd8a' title='Show/Hide index repr'><svg class='icon xr-icon-database'><use xlink:href='#icon-database'></use></svg></label><div class='xr-index-data'><pre>PandasIndex(Index([1], dtype=&#x27;int64&#x27;, name=&#x27;layer&#x27;))</pre></div></li><li class='xr-var-item'><div class='xr-index-name'><div>mesh2d_nFaces</div></div><div class='xr-index-preview'>PandasIndex</div><input type='checkbox' disabled/><label></label><input id='index-9f8612b3-04ba-43b9-8936-7e9d2ab45074' class='xr-index-data-in' type='checkbox'/><label for='index-9f8612b3-04ba-43b9-8936-7e9d2ab45074' title='Show/Hide index repr'><svg class='icon xr-icon-database'><use xlink:href='#icon-database'></use></svg></label><div class='xr-index-data'><pre>PandasIndex(RangeIndex(start=0, stop=2790, step=1, name=&#x27;mesh2d_nFaces&#x27;))</pre></div></li></ul></div></li><li class='xr-section-item'><input id='section-32129166-7a79-4c43-9fee-67188a9ba174' class='xr-section-summary-in' type='checkbox' disabled ><label for='section-32129166-7a79-4c43-9fee-67188a9ba174' class='xr-section-summary'  title='Expand/collapse section'>Attributes: <span>(0)</span></label><div class='xr-section-inline-details'></div><div class='xr-section-details'><dl class='xr-attrs'></dl></div></li></ul></div></div>
+    </div>
+    <br />
+    <br />
+
+.. GENERATED FROM PYTHON SOURCE LINES 182-186
+
+That wraps up the example of how to use unstructured grids in iMOD Python. For
+more information on how to manipulate unstructured grids and how to make
+selections, please refer to the `xugrid documentation
+<https://deltares.github.io/xugrid/>`_.
+
+
+.. rst-class:: sphx-glr-timing
+
+   **Total running time of the script:** (0 minutes 2.891 seconds)
+
 
 .. _sphx_glr_download_user-guide_05-unstructured-grids.py:
 

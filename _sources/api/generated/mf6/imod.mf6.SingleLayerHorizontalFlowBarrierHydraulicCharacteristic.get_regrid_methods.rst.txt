@@ -1,0 +1,6 @@
+﻿imod.mf6.SingleLayerHorizontalFlowBarrierHydraulicCharacteristic.get\_regrid\_methods
+=====================================================================================
+
+.. currentmodule:: imod.mf6
+
+.. automethod:: SingleLayerHorizontalFlowBarrierHydraulicCharacteristic.get_regrid_methods

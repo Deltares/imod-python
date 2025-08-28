@@ -1,0 +1,6 @@
+﻿imod.msw.PrecipitationMapping.write
+===================================
+
+.. currentmodule:: imod.msw
+
+.. automethod:: PrecipitationMapping.write

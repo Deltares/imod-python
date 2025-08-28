@@ -18,26 +18,14 @@
       ~HorizontalFlowBarrierMultiplier.clip_box
       ~HorizontalFlowBarrierMultiplier.copy
       ~HorizontalFlowBarrierMultiplier.from_file
-      ~HorizontalFlowBarrierMultiplier.get_non_grid_data
-      ~HorizontalFlowBarrierMultiplier.get_period_varnames
       ~HorizontalFlowBarrierMultiplier.get_regrid_methods
-      ~HorizontalFlowBarrierMultiplier.is_clipping_supported
       ~HorizontalFlowBarrierMultiplier.is_empty
-      ~HorizontalFlowBarrierMultiplier.is_grid_agnostic_package
-      ~HorizontalFlowBarrierMultiplier.is_regridding_supported
-      ~HorizontalFlowBarrierMultiplier.is_splitting_supported
-      ~HorizontalFlowBarrierMultiplier.isel
       ~HorizontalFlowBarrierMultiplier.mask
       ~HorizontalFlowBarrierMultiplier.regrid_like
-      ~HorizontalFlowBarrierMultiplier.render
-      ~HorizontalFlowBarrierMultiplier.sel
-      ~HorizontalFlowBarrierMultiplier.set_repeat_stress
+      ~HorizontalFlowBarrierMultiplier.snap_to_grid
       ~HorizontalFlowBarrierMultiplier.to_mf6_pkg
       ~HorizontalFlowBarrierMultiplier.to_netcdf
       ~HorizontalFlowBarrierMultiplier.write
-      ~HorizontalFlowBarrierMultiplier.write_binary_griddata
-      ~HorizontalFlowBarrierMultiplier.write_blockfile
-      ~HorizontalFlowBarrierMultiplier.write_text_griddata
    
    
 

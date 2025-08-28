@@ -16,15 +16,9 @@
       ~InitialConditionsRootzonePressureHead.__init__
       ~InitialConditionsRootzonePressureHead.clip_box
       ~InitialConditionsRootzonePressureHead.from_imod5_data
-      ~InitialConditionsRootzonePressureHead.get_non_grid_data
       ~InitialConditionsRootzonePressureHead.get_regrid_methods
-      ~InitialConditionsRootzonePressureHead.is_clipping_supported
-      ~InitialConditionsRootzonePressureHead.is_regridding_supported
-      ~InitialConditionsRootzonePressureHead.isel
       ~InitialConditionsRootzonePressureHead.regrid_like
-      ~InitialConditionsRootzonePressureHead.sel
       ~InitialConditionsRootzonePressureHead.write
-      ~InitialConditionsRootzonePressureHead.write_dataframe_fixed_width
    
    
 

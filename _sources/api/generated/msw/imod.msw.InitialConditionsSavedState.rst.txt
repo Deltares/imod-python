@@ -16,15 +16,9 @@
       ~InitialConditionsSavedState.__init__
       ~InitialConditionsSavedState.clip_box
       ~InitialConditionsSavedState.from_imod5_data
-      ~InitialConditionsSavedState.get_non_grid_data
       ~InitialConditionsSavedState.get_regrid_methods
-      ~InitialConditionsSavedState.is_clipping_supported
-      ~InitialConditionsSavedState.is_regridding_supported
-      ~InitialConditionsSavedState.isel
       ~InitialConditionsSavedState.regrid_like
-      ~InitialConditionsSavedState.sel
       ~InitialConditionsSavedState.write
-      ~InitialConditionsSavedState.write_dataframe_fixed_width
    
    
 

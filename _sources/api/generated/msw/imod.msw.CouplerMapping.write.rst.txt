@@ -1,0 +1,6 @@
+﻿imod.msw.CouplerMapping.write
+=============================
+
+.. currentmodule:: imod.msw
+
+.. automethod:: CouplerMapping.write

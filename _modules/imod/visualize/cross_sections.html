@@ -7,7 +7,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>imod.visualize.cross_sections &#8212; iMOD Python 1.0.0rc4 documentation</title>
+    <title>imod.visualize.cross_sections &#8212; iMOD Python 1.0.0rc6 documentation</title>
   
   
   
@@ -41,7 +41,7 @@
   <link rel="preload" as="script" href="../../../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
 <link rel="preload" as="script" href="../../../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
 
-    <script src="../../../_static/documentation_options.js?v=2fc85bd2"></script>
+    <script src="../../../_static/documentation_options.js?v=bc4855a1"></script>
     <script src="../../../_static/doctools.js?v=9bcbadda"></script>
     <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script>DOCUMENTATION_OPTIONS.pagename = '_modules/imod/visualize/cross_sections';</script>
@@ -50,7 +50,7 @@
     <link rel="search" title="Search" href="../../../search.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
-  <meta name="docsearch:version" content="1.0.0rc4.dev" />
+  <meta name="docsearch:version" content="1.0.0rc6.dev" />
   </head>
   
   
@@ -114,8 +114,8 @@
     
     
     
-    <img src="../../../_static/imod-python-logo-light.svg" class="logo__image only-light" alt="iMOD Python 1.0.0rc4 documentation - Home"/>
-    <img src="../../../_static/imod-python-logo-dark.svg" class="logo__image only-dark pst-js-only" alt="iMOD Python 1.0.0rc4 documentation - Home"/>
+    <img src="../../../_static/imod-python-logo-light.svg" class="logo__image only-light" alt="iMOD Python 1.0.0rc6 documentation - Home"/>
+    <img src="../../../_static/imod-python-logo-dark.svg" class="logo__image only-dark pst-js-only" alt="iMOD Python 1.0.0rc6 documentation - Home"/>
   
   
 </a></div>
@@ -153,7 +153,7 @@
 
 <li class="nav-item ">
   <a class="nav-link nav-internal" href="../../../api/index.html">
-    API Reference
+    API
   </a>
 </li>
 
@@ -303,7 +303,7 @@
 
 <li class="nav-item ">
   <a class="nav-link nav-internal" href="../../../api/index.html">
-    API Reference
+    API
   </a>
 </li>
 
@@ -628,6 +628,18 @@
 
 <span class="sd">    &gt;&gt;&gt; kwargs_aquitards = {&quot;hatch&quot;: &quot;/&quot;, &quot;edgecolor&quot;: &quot;k&quot;}</span>
 <span class="sd">    &gt;&gt;&gt; imod.visualize.cross_section(da, colors, levels, aquitards=aquitards, kwargs_aquitards)</span>
+
+<span class="sd">    To turn off the colorbar:</span>
+
+<span class="sd">    &gt;&gt;&gt; kwargs_colorbar = {&quot;plot_colorbar&quot;: False}</span>
+<span class="sd">    &gt;&gt;&gt; imod.visualize.cross_section(da, colors, levels, kwargs_colorbar=kwargs_colorbar)</span>
+
+<span class="sd">    To turn off the white triangles in the colorbar if values exceed the minimum</span>
+<span class="sd">    or maximum levels:</span>
+
+<span class="sd">    &gt;&gt;&gt; kwargs_colorbar = {&quot;whiten_triangles&quot;: False}</span>
+<span class="sd">    &gt;&gt;&gt; imod.visualize.cross_section(da, colors, levels, kwargs_colorbar=kwargs_colorbar)</span>
+
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">da</span> <span class="o">=</span> <span class="n">da</span><span class="o">.</span><span class="n">copy</span><span class="p">(</span><span class="n">deep</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
     <span class="k">if</span> <span class="n">aquitards</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>

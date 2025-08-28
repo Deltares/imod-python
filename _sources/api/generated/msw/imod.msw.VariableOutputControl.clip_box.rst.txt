@@ -1,0 +1,6 @@
+﻿imod.msw.VariableOutputControl.clip\_box
+========================================
+
+.. currentmodule:: imod.msw
+
+.. automethod:: VariableOutputControl.clip_box

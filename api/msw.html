@@ -8,7 +8,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>MetaSWAP &#8212; iMOD Python 1.0.0rc4 documentation</title>
+    <title>MetaSWAP &#8212; iMOD Python 1.0.0rc6 documentation</title>
   
   
   
@@ -42,18 +42,18 @@
   <link rel="preload" as="script" href="../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
 <link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
 
-    <script src="../_static/documentation_options.js?v=2fc85bd2"></script>
+    <script src="../_static/documentation_options.js?v=bc4855a1"></script>
     <script src="../_static/doctools.js?v=9bcbadda"></script>
     <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script>DOCUMENTATION_OPTIONS.pagename = 'api/msw';</script>
     <script src="../_static/deltares.js?v=8d5578be"></script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
-    <link rel="next" title="imod.msw.GridData" href="generated/msw/imod.msw.GridData.html" />
+    <link rel="next" title="imod.msw.MetaSwapModel" href="generated/msw/imod.msw.MetaSwapModel.html" />
     <link rel="prev" title="imod.wq.TimeVaryingConstantConcentration" href="generated/wq/imod.wq.TimeVaryingConstantConcentration.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
-  <meta name="docsearch:version" content="1.0.0rc4.dev" />
+  <meta name="docsearch:version" content="1.0.0rc6.dev" />
   </head>
   
   
@@ -117,8 +117,8 @@
     
     
     
-    <img src="../_static/imod-python-logo-light.svg" class="logo__image only-light" alt="iMOD Python 1.0.0rc4 documentation - Home"/>
-    <img src="../_static/imod-python-logo-dark.svg" class="logo__image only-dark pst-js-only" alt="iMOD Python 1.0.0rc4 documentation - Home"/>
+    <img src="../_static/imod-python-logo-light.svg" class="logo__image only-light" alt="iMOD Python 1.0.0rc6 documentation - Home"/>
+    <img src="../_static/imod-python-logo-dark.svg" class="logo__image only-dark pst-js-only" alt="iMOD Python 1.0.0rc6 documentation - Home"/>
   
   
 </a></div>
@@ -156,7 +156,7 @@
 
 <li class="nav-item current active">
   <a class="nav-link nav-internal" href="index.html">
-    API Reference
+    API
   </a>
 </li>
 
@@ -308,7 +308,7 @@
 
 <li class="nav-item current active">
   <a class="nav-link nav-internal" href="index.html">
-    API Reference
+    API
   </a>
 </li>
 
@@ -446,6 +446,7 @@
 <li class="toctree-l2"><a class="reference internal" href="generated/prepare/imod.prepare.cleanup_riv.html">imod.prepare.cleanup_riv</a></li>
 <li class="toctree-l2"><a class="reference internal" href="generated/prepare/imod.prepare.cleanup_wel.html">imod.prepare.cleanup_wel</a></li>
 <li class="toctree-l2"><a class="reference internal" href="generated/prepare/imod.prepare.cleanup_wel_layered.html">imod.prepare.cleanup_wel_layered</a></li>
+<li class="toctree-l2"><a class="reference internal" href="generated/prepare/imod.prepare.cleanup_hfb.html">imod.prepare.cleanup_hfb</a></li>
 <li class="toctree-l2"><a class="reference internal" href="generated/prepare/imod.prepare.create_partition_labels.html">imod.prepare.create_partition_labels</a></li>
 </ul>
 </details></li>
@@ -463,6 +464,7 @@
 </details></li>
 <li class="toctree-l1 has-children"><a class="reference internal" href="evaluate.html">Evaluate model output</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
 <li class="toctree-l2"><a class="reference internal" href="generated/evaluate/imod.evaluate.calculate_gxg.html">imod.evaluate.calculate_gxg</a></li>
+<li class="toctree-l2"><a class="reference internal" href="generated/evaluate/imod.evaluate.calculate_gxg_points.html">imod.evaluate.calculate_gxg_points</a></li>
 <li class="toctree-l2"><a class="reference internal" href="generated/evaluate/imod.evaluate.convert_pointwaterhead_freshwaterhead.html">imod.evaluate.convert_pointwaterhead_freshwaterhead</a></li>
 <li class="toctree-l2"><a class="reference internal" href="generated/evaluate/imod.evaluate.facebudget.html">imod.evaluate.facebudget</a></li>
 <li class="toctree-l2"><a class="reference internal" href="generated/evaluate/imod.evaluate.flow_velocity.html">imod.evaluate.flow_velocity</a></li>
@@ -506,6 +508,7 @@
 <li class="toctree-l2"><a class="reference internal" href="generated/util/imod.util.to_ugrid2d.html">imod.util.to_ugrid2d</a></li>
 <li class="toctree-l2"><a class="reference internal" href="generated/util/imod.util.mdal_compliant_ugrid2d.html">imod.util.mdal_compliant_ugrid2d</a></li>
 <li class="toctree-l2"><a class="reference internal" href="generated/util/imod.util.from_mdal_compliant_ugrid2d.html">imod.util.from_mdal_compliant_ugrid2d</a></li>
+<li class="toctree-l2"><a class="reference internal" href="generated/util/imod.util.ones_like_ugrid.html">imod.util.ones_like_ugrid</a></li>
 <li class="toctree-l2"><a class="reference internal" href="generated/util/imod.util.RegridderWeightsCache.html">imod.util.RegridderWeightsCache</a></li>
 <li class="toctree-l2"><a class="reference internal" href="generated/util/imod.util.RegridderWeightsCache.get_regridder.html">imod.util.RegridderWeightsCache.get_regridder</a></li>
 <li class="toctree-l2"><a class="reference internal" href="generated/util/imod.util.RegridderType.html">imod.util.RegridderType</a></li>
@@ -552,35 +555,15 @@
 <li class="toctree-l2"><a class="reference internal" href="generated/mf6/imod.mf6.open_cbc.html">imod.mf6.open_cbc</a></li>
 <li class="toctree-l2"><a class="reference internal" href="generated/mf6/imod.mf6.read_cbc_headers.html">imod.mf6.read_cbc_headers</a></li>
 <li class="toctree-l2"><a class="reference internal" href="generated/mf6/imod.mf6.open_dvs.html">imod.mf6.open_dvs</a></li>
+<li class="toctree-l2"><a class="reference internal" href="generated/mf6/imod.mf6.open_conc.html">imod.mf6.open_conc</a></li>
+<li class="toctree-l2"><a class="reference internal" href="generated/mf6/imod.mf6.read_grb.html">imod.mf6.read_grb</a></li>
 <li class="toctree-l2"><a class="reference internal" href="generated/mf6/imod.mf6.Modflow6Simulation.html">imod.mf6.Modflow6Simulation</a></li>
-<li class="toctree-l2"><a class="reference internal" href="generated/mf6/imod.mf6.Modflow6Simulation.create_time_discretization.html">imod.mf6.Modflow6Simulation.create_time_discretization</a></li>
-<li class="toctree-l2"><a class="reference internal" href="generated/mf6/imod.mf6.Modflow6Simulation.write.html">imod.mf6.Modflow6Simulation.write</a></li>
-<li class="toctree-l2"><a class="reference internal" href="generated/mf6/imod.mf6.Modflow6Simulation.dump.html">imod.mf6.Modflow6Simulation.dump</a></li>
-<li class="toctree-l2"><a class="reference internal" href="generated/mf6/imod.mf6.Modflow6Simulation.run.html">imod.mf6.Modflow6Simulation.run</a></li>
-<li class="toctree-l2"><a class="reference internal" href="generated/mf6/imod.mf6.Modflow6Simulation.open_flow_budget.html">imod.mf6.Modflow6Simulation.open_flow_budget</a></li>
-<li class="toctree-l2"><a class="reference internal" href="generated/mf6/imod.mf6.Modflow6Simulation.open_transport_budget.html">imod.mf6.Modflow6Simulation.open_transport_budget</a></li>
-<li class="toctree-l2"><a class="reference internal" href="generated/mf6/imod.mf6.Modflow6Simulation.open_head.html">imod.mf6.Modflow6Simulation.open_head</a></li>
-<li class="toctree-l2"><a class="reference internal" href="generated/mf6/imod.mf6.Modflow6Simulation.open_concentration.html">imod.mf6.Modflow6Simulation.open_concentration</a></li>
-<li class="toctree-l2"><a class="reference internal" href="generated/mf6/imod.mf6.Modflow6Simulation.from_imod5_data.html">imod.mf6.Modflow6Simulation.from_imod5_data</a></li>
-<li class="toctree-l2"><a class="reference internal" href="generated/mf6/imod.mf6.Modflow6Simulation.clip_box.html">imod.mf6.Modflow6Simulation.clip_box</a></li>
-<li class="toctree-l2"><a class="reference internal" href="generated/mf6/imod.mf6.Modflow6Simulation.split.html">imod.mf6.Modflow6Simulation.split</a></li>
-<li class="toctree-l2"><a class="reference internal" href="generated/mf6/imod.mf6.Modflow6Simulation.regrid_like.html">imod.mf6.Modflow6Simulation.regrid_like</a></li>
 <li class="toctree-l2"><a class="reference internal" href="generated/mf6/imod.mf6.GroundwaterFlowModel.html">imod.mf6.GroundwaterFlowModel</a></li>
-<li class="toctree-l2"><a class="reference internal" href="generated/mf6/imod.mf6.GroundwaterFlowModel.mask_all_packages.html">imod.mf6.GroundwaterFlowModel.mask_all_packages</a></li>
-<li class="toctree-l2"><a class="reference internal" href="generated/mf6/imod.mf6.GroundwaterFlowModel.prepare_wel_for_mf6.html">imod.mf6.GroundwaterFlowModel.prepare_wel_for_mf6</a></li>
-<li class="toctree-l2"><a class="reference internal" href="generated/mf6/imod.mf6.GroundwaterFlowModel.dump.html">imod.mf6.GroundwaterFlowModel.dump</a></li>
-<li class="toctree-l2"><a class="reference internal" href="generated/mf6/imod.mf6.GroundwaterFlowModel.from_imod5_data.html">imod.mf6.GroundwaterFlowModel.from_imod5_data</a></li>
 <li class="toctree-l2"><a class="reference internal" href="generated/mf6/imod.mf6.GroundwaterTransportModel.html">imod.mf6.GroundwaterTransportModel</a></li>
-<li class="toctree-l2"><a class="reference internal" href="generated/mf6/imod.mf6.GroundwaterTransportModel.mask_all_packages.html">imod.mf6.GroundwaterTransportModel.mask_all_packages</a></li>
-<li class="toctree-l2"><a class="reference internal" href="generated/mf6/imod.mf6.GroundwaterTransportModel.dump.html">imod.mf6.GroundwaterTransportModel.dump</a></li>
 <li class="toctree-l2"><a class="reference internal" href="generated/mf6/imod.mf6.StructuredDiscretization.html">imod.mf6.StructuredDiscretization</a></li>
-<li class="toctree-l2"><a class="reference internal" href="generated/mf6/imod.mf6.StructuredDiscretization.regrid_like.html">imod.mf6.StructuredDiscretization.regrid_like</a></li>
-<li class="toctree-l2"><a class="reference internal" href="generated/mf6/imod.mf6.StructuredDiscretization.from_imod5_data.html">imod.mf6.StructuredDiscretization.from_imod5_data</a></li>
-<li class="toctree-l2"><a class="reference internal" href="generated/mf6/imod.mf6.StructuredDiscretization.clip_box.html">imod.mf6.StructuredDiscretization.clip_box</a></li>
 <li class="toctree-l2"><a class="reference internal" href="generated/mf6/imod.mf6.VerticesDiscretization.html">imod.mf6.VerticesDiscretization</a></li>
-<li class="toctree-l2"><a class="reference internal" href="generated/mf6/imod.mf6.VerticesDiscretization.regrid_like.html">imod.mf6.VerticesDiscretization.regrid_like</a></li>
-<li class="toctree-l2"><a class="reference internal" href="generated/mf6/imod.mf6.VerticesDiscretization.clip_box.html">imod.mf6.VerticesDiscretization.clip_box</a></li>
 <li class="toctree-l2"><a class="reference internal" href="generated/mf6/imod.mf6.TimeDiscretization.html">imod.mf6.TimeDiscretization</a></li>
+<li class="toctree-l2"><a class="reference internal" href="generated/mf6/imod.mf6.AdaptiveTimeStepping.html">imod.mf6.AdaptiveTimeStepping</a></li>
 <li class="toctree-l2"><a class="reference internal" href="generated/mf6/imod.mf6.OutputControl.html">imod.mf6.OutputControl</a></li>
 <li class="toctree-l2"><a class="reference internal" href="generated/mf6/imod.mf6.Solution.html">imod.mf6.Solution</a></li>
 <li class="toctree-l2"><a class="reference internal" href="generated/mf6/imod.mf6.SolutionPresetSimple.html">imod.mf6.SolutionPresetSimple</a></li>
@@ -590,93 +573,24 @@
 <li class="toctree-l2"><a class="reference internal" href="generated/mf6/imod.mf6.ApiPackage.html">imod.mf6.ApiPackage</a></li>
 <li class="toctree-l2"><a class="reference internal" href="generated/mf6/imod.mf6.Buoyancy.html">imod.mf6.Buoyancy</a></li>
 <li class="toctree-l2"><a class="reference internal" href="generated/mf6/imod.mf6.ConstantHead.html">imod.mf6.ConstantHead</a></li>
-<li class="toctree-l2"><a class="reference internal" href="generated/mf6/imod.mf6.ConstantHead.from_imod5_data.html">imod.mf6.ConstantHead.from_imod5_data</a></li>
-<li class="toctree-l2"><a class="reference internal" href="generated/mf6/imod.mf6.ConstantHead.from_imod5_shd_data.html">imod.mf6.ConstantHead.from_imod5_shd_data</a></li>
-<li class="toctree-l2"><a class="reference internal" href="generated/mf6/imod.mf6.ConstantHead.mask.html">imod.mf6.ConstantHead.mask</a></li>
-<li class="toctree-l2"><a class="reference internal" href="generated/mf6/imod.mf6.ConstantHead.regrid_like.html">imod.mf6.ConstantHead.regrid_like</a></li>
-<li class="toctree-l2"><a class="reference internal" href="generated/mf6/imod.mf6.ConstantHead.clip_box.html">imod.mf6.ConstantHead.clip_box</a></li>
 <li class="toctree-l2"><a class="reference internal" href="generated/mf6/imod.mf6.Drainage.html">imod.mf6.Drainage</a></li>
-<li class="toctree-l2"><a class="reference internal" href="generated/mf6/imod.mf6.Drainage.mask.html">imod.mf6.Drainage.mask</a></li>
-<li class="toctree-l2"><a class="reference internal" href="generated/mf6/imod.mf6.Drainage.from_imod5_data.html">imod.mf6.Drainage.from_imod5_data</a></li>
-<li class="toctree-l2"><a class="reference internal" href="generated/mf6/imod.mf6.Drainage.regrid_like.html">imod.mf6.Drainage.regrid_like</a></li>
-<li class="toctree-l2"><a class="reference internal" href="generated/mf6/imod.mf6.Drainage.cleanup.html">imod.mf6.Drainage.cleanup</a></li>
-<li class="toctree-l2"><a class="reference internal" href="generated/mf6/imod.mf6.Drainage.clip_box.html">imod.mf6.Drainage.clip_box</a></li>
 <li class="toctree-l2"><a class="reference internal" href="generated/mf6/imod.mf6.Evapotranspiration.html">imod.mf6.Evapotranspiration</a></li>
-<li class="toctree-l2"><a class="reference internal" href="generated/mf6/imod.mf6.Evapotranspiration.mask.html">imod.mf6.Evapotranspiration.mask</a></li>
-<li class="toctree-l2"><a class="reference internal" href="generated/mf6/imod.mf6.Evapotranspiration.regrid_like.html">imod.mf6.Evapotranspiration.regrid_like</a></li>
-<li class="toctree-l2"><a class="reference internal" href="generated/mf6/imod.mf6.Evapotranspiration.clip_box.html">imod.mf6.Evapotranspiration.clip_box</a></li>
 <li class="toctree-l2"><a class="reference internal" href="generated/mf6/imod.mf6.GeneralHeadBoundary.html">imod.mf6.GeneralHeadBoundary</a></li>
-<li class="toctree-l2"><a class="reference internal" href="generated/mf6/imod.mf6.GeneralHeadBoundary.from_imod5_data.html">imod.mf6.GeneralHeadBoundary.from_imod5_data</a></li>
-<li class="toctree-l2"><a class="reference internal" href="generated/mf6/imod.mf6.GeneralHeadBoundary.mask.html">imod.mf6.GeneralHeadBoundary.mask</a></li>
-<li class="toctree-l2"><a class="reference internal" href="generated/mf6/imod.mf6.GeneralHeadBoundary.regrid_like.html">imod.mf6.GeneralHeadBoundary.regrid_like</a></li>
-<li class="toctree-l2"><a class="reference internal" href="generated/mf6/imod.mf6.GeneralHeadBoundary.cleanup.html">imod.mf6.GeneralHeadBoundary.cleanup</a></li>
-<li class="toctree-l2"><a class="reference internal" href="generated/mf6/imod.mf6.GeneralHeadBoundary.clip_box.html">imod.mf6.GeneralHeadBoundary.clip_box</a></li>
 <li class="toctree-l2"><a class="reference internal" href="generated/mf6/imod.mf6.HorizontalFlowBarrierHydraulicCharacteristic.html">imod.mf6.HorizontalFlowBarrierHydraulicCharacteristic</a></li>
-<li class="toctree-l2"><a class="reference internal" href="generated/mf6/imod.mf6.HorizontalFlowBarrierHydraulicCharacteristic.to_mf6_pkg.html">imod.mf6.HorizontalFlowBarrierHydraulicCharacteristic.to_mf6_pkg</a></li>
 <li class="toctree-l2"><a class="reference internal" href="generated/mf6/imod.mf6.HorizontalFlowBarrierMultiplier.html">imod.mf6.HorizontalFlowBarrierMultiplier</a></li>
-<li class="toctree-l2"><a class="reference internal" href="generated/mf6/imod.mf6.HorizontalFlowBarrierMultiplier.to_mf6_pkg.html">imod.mf6.HorizontalFlowBarrierMultiplier.to_mf6_pkg</a></li>
 <li class="toctree-l2"><a class="reference internal" href="generated/mf6/imod.mf6.HorizontalFlowBarrierResistance.html">imod.mf6.HorizontalFlowBarrierResistance</a></li>
-<li class="toctree-l2"><a class="reference internal" href="generated/mf6/imod.mf6.HorizontalFlowBarrierResistance.to_mf6_pkg.html">imod.mf6.HorizontalFlowBarrierResistance.to_mf6_pkg</a></li>
-<li class="toctree-l2"><a class="reference internal" href="generated/mf6/imod.mf6.HorizontalFlowBarrierResistance.clip_box.html">imod.mf6.HorizontalFlowBarrierResistance.clip_box</a></li>
 <li class="toctree-l2"><a class="reference internal" href="generated/mf6/imod.mf6.LayeredWell.html">imod.mf6.LayeredWell</a></li>
-<li class="toctree-l2"><a class="reference internal" href="generated/mf6/imod.mf6.LayeredWell.from_imod5_data.html">imod.mf6.LayeredWell.from_imod5_data</a></li>
-<li class="toctree-l2"><a class="reference internal" href="generated/mf6/imod.mf6.LayeredWell.from_imod5_cap_data.html">imod.mf6.LayeredWell.from_imod5_cap_data</a></li>
-<li class="toctree-l2"><a class="reference internal" href="generated/mf6/imod.mf6.LayeredWell.mask.html">imod.mf6.LayeredWell.mask</a></li>
-<li class="toctree-l2"><a class="reference internal" href="generated/mf6/imod.mf6.LayeredWell.regrid_like.html">imod.mf6.LayeredWell.regrid_like</a></li>
-<li class="toctree-l2"><a class="reference internal" href="generated/mf6/imod.mf6.LayeredWell.to_mf6_pkg.html">imod.mf6.LayeredWell.to_mf6_pkg</a></li>
-<li class="toctree-l2"><a class="reference internal" href="generated/mf6/imod.mf6.LayeredWell.clip_box.html">imod.mf6.LayeredWell.clip_box</a></li>
 <li class="toctree-l2"><a class="reference internal" href="generated/mf6/imod.mf6.InitialConditions.html">imod.mf6.InitialConditions</a></li>
-<li class="toctree-l2"><a class="reference internal" href="generated/mf6/imod.mf6.InitialConditions.from_imod5_data.html">imod.mf6.InitialConditions.from_imod5_data</a></li>
-<li class="toctree-l2"><a class="reference internal" href="generated/mf6/imod.mf6.InitialConditions.mask.html">imod.mf6.InitialConditions.mask</a></li>
-<li class="toctree-l2"><a class="reference internal" href="generated/mf6/imod.mf6.InitialConditions.regrid_like.html">imod.mf6.InitialConditions.regrid_like</a></li>
-<li class="toctree-l2"><a class="reference internal" href="generated/mf6/imod.mf6.InitialConditions.clip_box.html">imod.mf6.InitialConditions.clip_box</a></li>
 <li class="toctree-l2"><a class="reference internal" href="generated/mf6/imod.mf6.NodePropertyFlow.html">imod.mf6.NodePropertyFlow</a></li>
-<li class="toctree-l2"><a class="reference internal" href="generated/mf6/imod.mf6.NodePropertyFlow.from_imod5_data.html">imod.mf6.NodePropertyFlow.from_imod5_data</a></li>
-<li class="toctree-l2"><a class="reference internal" href="generated/mf6/imod.mf6.NodePropertyFlow.mask.html">imod.mf6.NodePropertyFlow.mask</a></li>
-<li class="toctree-l2"><a class="reference internal" href="generated/mf6/imod.mf6.NodePropertyFlow.regrid_like.html">imod.mf6.NodePropertyFlow.regrid_like</a></li>
-<li class="toctree-l2"><a class="reference internal" href="generated/mf6/imod.mf6.NodePropertyFlow.clip_box.html">imod.mf6.NodePropertyFlow.clip_box</a></li>
 <li class="toctree-l2"><a class="reference internal" href="generated/mf6/imod.mf6.Recharge.html">imod.mf6.Recharge</a></li>
-<li class="toctree-l2"><a class="reference internal" href="generated/mf6/imod.mf6.Recharge.from_imod5_data.html">imod.mf6.Recharge.from_imod5_data</a></li>
-<li class="toctree-l2"><a class="reference internal" href="generated/mf6/imod.mf6.Recharge.from_imod5_cap_data.html">imod.mf6.Recharge.from_imod5_cap_data</a></li>
-<li class="toctree-l2"><a class="reference internal" href="generated/mf6/imod.mf6.Recharge.mask.html">imod.mf6.Recharge.mask</a></li>
-<li class="toctree-l2"><a class="reference internal" href="generated/mf6/imod.mf6.Recharge.regrid_like.html">imod.mf6.Recharge.regrid_like</a></li>
-<li class="toctree-l2"><a class="reference internal" href="generated/mf6/imod.mf6.Recharge.clip_box.html">imod.mf6.Recharge.clip_box</a></li>
 <li class="toctree-l2"><a class="reference internal" href="generated/mf6/imod.mf6.River.html">imod.mf6.River</a></li>
-<li class="toctree-l2"><a class="reference internal" href="generated/mf6/imod.mf6.River.from_imod5_data.html">imod.mf6.River.from_imod5_data</a></li>
-<li class="toctree-l2"><a class="reference internal" href="generated/mf6/imod.mf6.River.mask.html">imod.mf6.River.mask</a></li>
-<li class="toctree-l2"><a class="reference internal" href="generated/mf6/imod.mf6.River.regrid_like.html">imod.mf6.River.regrid_like</a></li>
-<li class="toctree-l2"><a class="reference internal" href="generated/mf6/imod.mf6.River.cleanup.html">imod.mf6.River.cleanup</a></li>
-<li class="toctree-l2"><a class="reference internal" href="generated/mf6/imod.mf6.River.clip_box.html">imod.mf6.River.clip_box</a></li>
 <li class="toctree-l2"><a class="reference internal" href="generated/mf6/imod.mf6.SingleLayerHorizontalFlowBarrierHydraulicCharacteristic.html">imod.mf6.SingleLayerHorizontalFlowBarrierHydraulicCharacteristic</a></li>
-<li class="toctree-l2"><a class="reference internal" href="generated/mf6/imod.mf6.SingleLayerHorizontalFlowBarrierHydraulicCharacteristic.to_mf6_pkg.html">imod.mf6.SingleLayerHorizontalFlowBarrierHydraulicCharacteristic.to_mf6_pkg</a></li>
-<li class="toctree-l2"><a class="reference internal" href="generated/mf6/imod.mf6.SingleLayerHorizontalFlowBarrierHydraulicCharacteristic.clip_box.html">imod.mf6.SingleLayerHorizontalFlowBarrierHydraulicCharacteristic.clip_box</a></li>
 <li class="toctree-l2"><a class="reference internal" href="generated/mf6/imod.mf6.SingleLayerHorizontalFlowBarrierMultiplier.html">imod.mf6.SingleLayerHorizontalFlowBarrierMultiplier</a></li>
-<li class="toctree-l2"><a class="reference internal" href="generated/mf6/imod.mf6.SingleLayerHorizontalFlowBarrierMultiplier.to_mf6_pkg.html">imod.mf6.SingleLayerHorizontalFlowBarrierMultiplier.to_mf6_pkg</a></li>
-<li class="toctree-l2"><a class="reference internal" href="generated/mf6/imod.mf6.SingleLayerHorizontalFlowBarrierMultiplier.clip_box.html">imod.mf6.SingleLayerHorizontalFlowBarrierMultiplier.clip_box</a></li>
 <li class="toctree-l2"><a class="reference internal" href="generated/mf6/imod.mf6.SingleLayerHorizontalFlowBarrierResistance.html">imod.mf6.SingleLayerHorizontalFlowBarrierResistance</a></li>
-<li class="toctree-l2"><a class="reference internal" href="generated/mf6/imod.mf6.SingleLayerHorizontalFlowBarrierResistance.from_imod5_data.html">imod.mf6.SingleLayerHorizontalFlowBarrierResistance.from_imod5_data</a></li>
-<li class="toctree-l2"><a class="reference internal" href="generated/mf6/imod.mf6.SingleLayerHorizontalFlowBarrierResistance.to_mf6_pkg.html">imod.mf6.SingleLayerHorizontalFlowBarrierResistance.to_mf6_pkg</a></li>
-<li class="toctree-l2"><a class="reference internal" href="generated/mf6/imod.mf6.SingleLayerHorizontalFlowBarrierResistance.clip_box.html">imod.mf6.SingleLayerHorizontalFlowBarrierResistance.clip_box</a></li>
 <li class="toctree-l2"><a class="reference internal" href="generated/mf6/imod.mf6.SpecificStorage.html">imod.mf6.SpecificStorage</a></li>
-<li class="toctree-l2"><a class="reference internal" href="generated/mf6/imod.mf6.SpecificStorage.mask.html">imod.mf6.SpecificStorage.mask</a></li>
-<li class="toctree-l2"><a class="reference internal" href="generated/mf6/imod.mf6.SpecificStorage.regrid_like.html">imod.mf6.SpecificStorage.regrid_like</a></li>
-<li class="toctree-l2"><a class="reference internal" href="generated/mf6/imod.mf6.SpecificStorage.clip_box.html">imod.mf6.SpecificStorage.clip_box</a></li>
 <li class="toctree-l2"><a class="reference internal" href="generated/mf6/imod.mf6.StorageCoefficient.html">imod.mf6.StorageCoefficient</a></li>
-<li class="toctree-l2"><a class="reference internal" href="generated/mf6/imod.mf6.StorageCoefficient.from_imod5_data.html">imod.mf6.StorageCoefficient.from_imod5_data</a></li>
-<li class="toctree-l2"><a class="reference internal" href="generated/mf6/imod.mf6.StorageCoefficient.mask.html">imod.mf6.StorageCoefficient.mask</a></li>
-<li class="toctree-l2"><a class="reference internal" href="generated/mf6/imod.mf6.StorageCoefficient.regrid_like.html">imod.mf6.StorageCoefficient.regrid_like</a></li>
-<li class="toctree-l2"><a class="reference internal" href="generated/mf6/imod.mf6.StorageCoefficient.clip_box.html">imod.mf6.StorageCoefficient.clip_box</a></li>
 <li class="toctree-l2"><a class="reference internal" href="generated/mf6/imod.mf6.UnsaturatedZoneFlow.html">imod.mf6.UnsaturatedZoneFlow</a></li>
 <li class="toctree-l2"><a class="reference internal" href="generated/mf6/imod.mf6.Well.html">imod.mf6.Well</a></li>
-<li class="toctree-l2"><a class="reference internal" href="generated/mf6/imod.mf6.Well.cleanup.html">imod.mf6.Well.cleanup</a></li>
-<li class="toctree-l2"><a class="reference internal" href="generated/mf6/imod.mf6.Well.from_imod5_data.html">imod.mf6.Well.from_imod5_data</a></li>
-<li class="toctree-l2"><a class="reference internal" href="generated/mf6/imod.mf6.Well.mask.html">imod.mf6.Well.mask</a></li>
-<li class="toctree-l2"><a class="reference internal" href="generated/mf6/imod.mf6.Well.regrid_like.html">imod.mf6.Well.regrid_like</a></li>
-<li class="toctree-l2"><a class="reference internal" href="generated/mf6/imod.mf6.Well.to_mf6_pkg.html">imod.mf6.Well.to_mf6_pkg</a></li>
-<li class="toctree-l2"><a class="reference internal" href="generated/mf6/imod.mf6.Well.clip_box.html">imod.mf6.Well.clip_box</a></li>
-<li class="toctree-l2"><a class="reference internal" href="generated/mf6/imod.mf6.WellDisStructured.html">imod.mf6.WellDisStructured</a></li>
-<li class="toctree-l2"><a class="reference internal" href="generated/mf6/imod.mf6.WellDisVertices.html">imod.mf6.WellDisVertices</a></li>
-<li class="toctree-l2"><a class="reference internal" href="generated/mf6/imod.mf6.ApiPackage.html">imod.mf6.ApiPackage</a></li>
 <li class="toctree-l2"><a class="reference internal" href="generated/mf6/imod.mf6.AdvectionCentral.html">imod.mf6.AdvectionCentral</a></li>
 <li class="toctree-l2"><a class="reference internal" href="generated/mf6/imod.mf6.AdvectionTVD.html">imod.mf6.AdvectionTVD</a></li>
 <li class="toctree-l2"><a class="reference internal" href="generated/mf6/imod.mf6.AdvectionUpstream.html">imod.mf6.AdvectionUpstream</a></li>
@@ -686,13 +600,11 @@
 <li class="toctree-l2"><a class="reference internal" href="generated/mf6/imod.mf6.MobileStorageTransfer.html">imod.mf6.MobileStorageTransfer</a></li>
 <li class="toctree-l2"><a class="reference internal" href="generated/mf6/imod.mf6.MassSourceLoading.html">imod.mf6.MassSourceLoading</a></li>
 <li class="toctree-l2"><a class="reference internal" href="generated/mf6/imod.mf6.SourceSinkMixing.html">imod.mf6.SourceSinkMixing</a></li>
-<li class="toctree-l2"><a class="reference internal" href="generated/mf6/imod.mf6.SourceSinkMixing.from_flow_model.html">imod.mf6.SourceSinkMixing.from_flow_model</a></li>
 </ul>
 </details></li>
 
 <li class="toctree-l1 has-children"><a class="reference internal" href="wq.html">iMOD-WQ</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
 <li class="toctree-l2"><a class="reference internal" href="generated/wq/imod.wq.SeawatModel.html">imod.wq.SeawatModel</a></li>
-<li class="toctree-l2"><a class="reference internal" href="generated/wq/imod.wq.SeawatModel.create_time_discretization.html">imod.wq.SeawatModel.create_time_discretization</a></li>
 <li class="toctree-l2"><a class="reference internal" href="generated/wq/imod.wq.TimeDiscretization.html">imod.wq.TimeDiscretization</a></li>
 <li class="toctree-l2"><a class="reference internal" href="generated/wq/imod.wq.OutputControl.html">imod.wq.OutputControl</a></li>
 <li class="toctree-l2"><a class="reference internal" href="generated/wq/imod.wq.PreconditionedConjugateGradientSolver.html">imod.wq.PreconditionedConjugateGradientSolver</a></li>
@@ -725,41 +637,16 @@
 </ul>
 </details></li>
 <li class="toctree-l1 current active has-children"><a class="current reference internal" href="#">MetaSWAP</a><details open="open"><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
-<li class="toctree-l2"><a class="reference internal" href="generated/msw/imod.msw.GridData.html">imod.msw.GridData</a></li>
-<li class="toctree-l2"><a class="reference internal" href="generated/msw/imod.msw.GridData.from_imod5_data.html">imod.msw.GridData.from_imod5_data</a></li>
-<li class="toctree-l2"><a class="reference internal" href="generated/msw/imod.msw.Infiltration.html">imod.msw.Infiltration</a></li>
-<li class="toctree-l2"><a class="reference internal" href="generated/msw/imod.msw.Infiltration.from_imod5_data.html">imod.msw.Infiltration.from_imod5_data</a></li>
-<li class="toctree-l2"><a class="reference internal" href="generated/msw/imod.msw.Ponding.html">imod.msw.Ponding</a></li>
-<li class="toctree-l2"><a class="reference internal" href="generated/msw/imod.msw.Ponding.from_imod5_data.html">imod.msw.Ponding.from_imod5_data</a></li>
-<li class="toctree-l2"><a class="reference internal" href="generated/msw/imod.msw.ScalingFactors.html">imod.msw.ScalingFactors</a></li>
-<li class="toctree-l2"><a class="reference internal" href="generated/msw/imod.msw.ScalingFactors.from_imod5_data.html">imod.msw.ScalingFactors.from_imod5_data</a></li>
-<li class="toctree-l2"><a class="reference internal" href="generated/msw/imod.msw.Sprinkling.html">imod.msw.Sprinkling</a></li>
-<li class="toctree-l2"><a class="reference internal" href="generated/msw/imod.msw.Sprinkling.from_imod5_data.html">imod.msw.Sprinkling.from_imod5_data</a></li>
-<li class="toctree-l2"><a class="reference internal" href="generated/msw/imod.msw.IdfMapping.html">imod.msw.IdfMapping</a></li>
-<li class="toctree-l2"><a class="reference internal" href="generated/msw/imod.msw.TimeOutputControl.html">imod.msw.TimeOutputControl</a></li>
-<li class="toctree-l2"><a class="reference internal" href="generated/msw/imod.msw.VariableOutputControl.html">imod.msw.VariableOutputControl</a></li>
-<li class="toctree-l2"><a class="reference internal" href="generated/msw/imod.msw.InitialConditionsEquilibrium.html">imod.msw.InitialConditionsEquilibrium</a></li>
-<li class="toctree-l2"><a class="reference internal" href="generated/msw/imod.msw.InitialConditionsPercolation.html">imod.msw.InitialConditionsPercolation</a></li>
-<li class="toctree-l2"><a class="reference internal" href="generated/msw/imod.msw.InitialConditionsRootzonePressureHead.html">imod.msw.InitialConditionsRootzonePressureHead</a></li>
-<li class="toctree-l2"><a class="reference internal" href="generated/msw/imod.msw.InitialConditionsSavedState.html">imod.msw.InitialConditionsSavedState</a></li>
-<li class="toctree-l2"><a class="reference internal" href="generated/msw/imod.msw.LanduseOptions.html">imod.msw.LanduseOptions</a></li>
-<li class="toctree-l2"><a class="reference internal" href="generated/msw/imod.msw.AnnualCropFactors.html">imod.msw.AnnualCropFactors</a></li>
-<li class="toctree-l2"><a class="reference internal" href="generated/msw/imod.msw.MeteoGrid.html">imod.msw.MeteoGrid</a></li>
-<li class="toctree-l2"><a class="reference internal" href="generated/msw/imod.msw.MeteoGridCopy.html">imod.msw.MeteoGridCopy</a></li>
-<li class="toctree-l2"><a class="reference internal" href="generated/msw/imod.msw.MeteoGridCopy.from_imod5_data.html">imod.msw.MeteoGridCopy.from_imod5_data</a></li>
-<li class="toctree-l2"><a class="reference internal" href="generated/msw/imod.msw.EvapotranspirationMapping.html">imod.msw.EvapotranspirationMapping</a></li>
-<li class="toctree-l2"><a class="reference internal" href="generated/msw/imod.msw.EvapotranspirationMapping.from_imod5_data.html">imod.msw.EvapotranspirationMapping.from_imod5_data</a></li>
-<li class="toctree-l2"><a class="reference internal" href="generated/msw/imod.msw.PrecipitationMapping.html">imod.msw.PrecipitationMapping</a></li>
-<li class="toctree-l2"><a class="reference internal" href="generated/msw/imod.msw.PrecipitationMapping.from_imod5_data.html">imod.msw.PrecipitationMapping.from_imod5_data</a></li>
-<li class="toctree-l2"><a class="reference internal" href="generated/msw/imod.msw.CouplerMapping.html">imod.msw.CouplerMapping</a></li>
 <li class="toctree-l2"><a class="reference internal" href="generated/msw/imod.msw.MetaSwapModel.html">imod.msw.MetaSwapModel</a></li>
-<li class="toctree-l2"><a class="reference internal" href="generated/msw/imod.msw.MetaSwapModel.write.html">imod.msw.MetaSwapModel.write</a></li>
-<li class="toctree-l2"><a class="reference internal" href="generated/msw/imod.msw.MetaSwapModel.from_imod5_data.html">imod.msw.MetaSwapModel.from_imod5_data</a></li>
-<li class="toctree-l2"><a class="reference internal" href="generated/msw/imod.msw.MetaSwapModel.regrid_like.html">imod.msw.MetaSwapModel.regrid_like</a></li>
-<li class="toctree-l2"><a class="reference internal" href="generated/msw/imod.msw.MetaSwapModel.clip_box.html">imod.msw.MetaSwapModel.clip_box</a></li>
 </ul>
 </details></li>
-<li class="toctree-l1 has-children"><a class="reference internal" href="metamod.html">MetaMod</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+
+
+
+
+
+
+<li class="toctree-l1 has-children"><a class="reference internal" href="metamod.html">Coupling MetaSWAP and MODFLOW</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
 <li class="toctree-l2"><a class="reference internal" href="generated/metamod/imod.couplers.metamod.MetaMod.html">imod.couplers.metamod.MetaMod</a></li>
 </ul>
 </details></li>
@@ -804,7 +691,7 @@
       </a>
     </li>
     
-    <li class="breadcrumb-item"><a href="index.html" class="nav-link">API Reference</a></li>
+    <li class="breadcrumb-item"><a href="index.html" class="nav-link">API</a></li>
     
     <li class="breadcrumb-item active" aria-current="page"><span class="ellipsis">MetaSWAP</span></li>
   </ul>
@@ -825,103 +712,424 @@
                   
   <section id="metaswap">
 <h1>MetaSWAP<a class="headerlink" href="#metaswap" title="Link to this heading">#</a></h1>
+<section id="model-objects-methods">
+<h2>Model objects &amp; methods<a class="headerlink" href="#model-objects-methods" title="Link to this heading">#</a></h2>
+<div class="pst-scrollable-table-container"><table class="autosummary longtable table">
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="generated/msw/imod.msw.MetaSwapModel.html#imod.msw.MetaSwapModel" title="imod.msw.MetaSwapModel"><code class="xref py py-obj docutils literal notranslate"><span class="pre">MetaSwapModel</span></code></a>(unsaturated_database[, settings])</p></td>
+<td><p>Contains data and writes consistent model input files</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="generated/msw/imod.msw.MetaSwapModel.write.html#imod.msw.MetaSwapModel.write" title="imod.msw.MetaSwapModel.write"><code class="xref py py-obj docutils literal notranslate"><span class="pre">MetaSwapModel.write</span></code></a>(directory, mf6_dis, mf6_wel)</p></td>
+<td><p>Write packages and simulation settings (para_sim.inp).</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="generated/msw/imod.msw.MetaSwapModel.from_imod5_data.html#imod.msw.MetaSwapModel.from_imod5_data" title="imod.msw.MetaSwapModel.from_imod5_data"><code class="xref py py-obj docutils literal notranslate"><span class="pre">MetaSwapModel.from_imod5_data</span></code></a>(imod5_data, ...)</p></td>
+<td><p>Construct a MetaSWAP model from iMOD5 data in the CAP package, loaded with the <a class="reference internal" href="generated/io/imod.formats.prj.open_projectfile_data.html#imod.formats.prj.open_projectfile_data" title="imod.formats.prj.open_projectfile_data"><code class="xref py py-func docutils literal notranslate"><span class="pre">imod.formats.prj.open_projectfile_data()</span></code></a> function.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="generated/msw/imod.msw.MetaSwapModel.regrid_like.html#imod.msw.MetaSwapModel.regrid_like" title="imod.msw.MetaSwapModel.regrid_like"><code class="xref py py-obj docutils literal notranslate"><span class="pre">MetaSwapModel.regrid_like</span></code></a>(mf6_regridded_dis)</p></td>
+<td><p>Creates a model by regridding the packages of this model to another discretization.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="generated/msw/imod.msw.MetaSwapModel.clip_box.html#imod.msw.MetaSwapModel.clip_box" title="imod.msw.MetaSwapModel.clip_box"><code class="xref py py-obj docutils literal notranslate"><span class="pre">MetaSwapModel.clip_box</span></code></a>([time_min, time_max, ...])</p></td>
+<td><p>Clip a model by a bounding box (time, y, x).</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="generated/msw/imod.msw.MetaSwapModel.get_pkgkey.html#imod.msw.MetaSwapModel.get_pkgkey" title="imod.msw.MetaSwapModel.get_pkgkey"><code class="xref py py-obj docutils literal notranslate"><span class="pre">MetaSwapModel.get_pkgkey</span></code></a>(pkg_type[, ...])</p></td>
+<td><p>Get the package key for a package of type <code class="docutils literal notranslate"><span class="pre">pkg_type</span></code>.</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+</section>
+<section id="packages">
+<h2>Packages<a class="headerlink" href="#packages" title="Link to this heading">#</a></h2>
+</section>
+</section>
+<section id="grid-packages">
+<h1>Grid packages<a class="headerlink" href="#grid-packages" title="Link to this heading">#</a></h1>
 <div class="pst-scrollable-table-container"><table class="autosummary longtable table">
 <tbody>
 <tr class="row-odd"><td><p><a class="reference internal" href="generated/msw/imod.msw.GridData.html#imod.msw.GridData" title="imod.msw.GridData"><code class="xref py py-obj docutils literal notranslate"><span class="pre">GridData</span></code></a>(area, landuse, rootzone_depth, ...)</p></td>
 <td><p>This contains the grid data of MetaSWAP.</p></td>
 </tr>
+<tr class="row-even"><td><p><a class="reference internal" href="generated/msw/imod.msw.GridData.regrid_like.html#imod.msw.GridData.regrid_like" title="imod.msw.GridData.regrid_like"><code class="xref py py-obj docutils literal notranslate"><span class="pre">GridData.regrid_like</span></code></a>(target_grid, regrid_cache)</p></td>
+<td><p>Creates a package of the same type as this package, based on another discretization.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="generated/msw/imod.msw.GridData.clip_box.html#imod.msw.GridData.clip_box" title="imod.msw.GridData.clip_box"><code class="xref py py-obj docutils literal notranslate"><span class="pre">GridData.clip_box</span></code></a>([time_min, time_max, ...])</p></td>
+<td><p>Clip a package by a bounding box (time, y, x).</p></td>
+</tr>
 <tr class="row-even"><td><p><a class="reference internal" href="generated/msw/imod.msw.GridData.from_imod5_data.html#imod.msw.GridData.from_imod5_data" title="imod.msw.GridData.from_imod5_data"><code class="xref py py-obj docutils literal notranslate"><span class="pre">GridData.from_imod5_data</span></code></a>(imod5_data, target_dis)</p></td>
 <td><p>Construct a MetaSWAP GridData package from iMOD5 data in the CAP package, loaded with the <a class="reference internal" href="generated/io/imod.formats.prj.open_projectfile_data.html#imod.formats.prj.open_projectfile_data" title="imod.formats.prj.open_projectfile_data"><code class="xref py py-func docutils literal notranslate"><span class="pre">imod.formats.prj.open_projectfile_data()</span></code></a> function.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="generated/msw/imod.msw.Infiltration.html#imod.msw.Infiltration" title="imod.msw.Infiltration"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Infiltration</span></code></a>(infiltration_capacity, ...)</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="generated/msw/imod.msw.GridData.get_regrid_methods.html#imod.msw.GridData.get_regrid_methods" title="imod.msw.GridData.get_regrid_methods"><code class="xref py py-obj docutils literal notranslate"><span class="pre">GridData.get_regrid_methods</span></code></a>()</p></td>
+<td><p>Returns the default regrid methods for this package.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="generated/msw/imod.msw.GridData.generate_index_array.html#imod.msw.GridData.generate_index_array" title="imod.msw.GridData.generate_index_array"><code class="xref py py-obj docutils literal notranslate"><span class="pre">GridData.generate_index_array</span></code></a>()</p></td>
+<td><p>Generate index array and svat grid to be used on other packages.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="generated/msw/imod.msw.GridData.write.html#imod.msw.GridData.write" title="imod.msw.GridData.write"><code class="xref py py-obj docutils literal notranslate"><span class="pre">GridData.write</span></code></a>(directory, index, svat, ...)</p></td>
+<td><p>Write MetaSWAP package to its corresponding fixed format file.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="generated/msw/imod.msw.Infiltration.html#imod.msw.Infiltration" title="imod.msw.Infiltration"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Infiltration</span></code></a>(infiltration_capacity, ...)</p></td>
 <td><p>This contains the infiltration data.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="generated/msw/imod.msw.Infiltration.from_imod5_data.html#imod.msw.Infiltration.from_imod5_data" title="imod.msw.Infiltration.from_imod5_data"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Infiltration.from_imod5_data</span></code></a>(imod5_data)</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="generated/msw/imod.msw.Infiltration.regrid_like.html#imod.msw.Infiltration.regrid_like" title="imod.msw.Infiltration.regrid_like"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Infiltration.regrid_like</span></code></a>(target_grid, ...[, ...])</p></td>
+<td><p>Creates a package of the same type as this package, based on another discretization.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="generated/msw/imod.msw.Infiltration.clip_box.html#imod.msw.Infiltration.clip_box" title="imod.msw.Infiltration.clip_box"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Infiltration.clip_box</span></code></a>([time_min, time_max, ...])</p></td>
+<td><p>Clip a package by a bounding box (time, y, x).</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="generated/msw/imod.msw.Infiltration.from_imod5_data.html#imod.msw.Infiltration.from_imod5_data" title="imod.msw.Infiltration.from_imod5_data"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Infiltration.from_imod5_data</span></code></a>(imod5_data)</p></td>
 <td><p>Construct a MetaSWAP Infiltration package from iMOD5 data in the CAP package, loaded with the <a class="reference internal" href="generated/io/imod.formats.prj.open_projectfile_data.html#imod.formats.prj.open_projectfile_data" title="imod.formats.prj.open_projectfile_data"><code class="xref py py-func docutils literal notranslate"><span class="pre">imod.formats.prj.open_projectfile_data()</span></code></a> function.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="generated/msw/imod.msw.Ponding.html#imod.msw.Ponding" title="imod.msw.Ponding"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Ponding</span></code></a>(ponding_depth, runon_resistance, ...)</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="generated/msw/imod.msw.Infiltration.get_regrid_methods.html#imod.msw.Infiltration.get_regrid_methods" title="imod.msw.Infiltration.get_regrid_methods"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Infiltration.get_regrid_methods</span></code></a>()</p></td>
+<td><p>Returns the default regrid methods for this package.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="generated/msw/imod.msw.Infiltration.write.html#imod.msw.Infiltration.write" title="imod.msw.Infiltration.write"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Infiltration.write</span></code></a>(directory, index, svat, ...)</p></td>
+<td><p>Write MetaSWAP package to its corresponding fixed format file.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="generated/msw/imod.msw.Ponding.html#imod.msw.Ponding" title="imod.msw.Ponding"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Ponding</span></code></a>(ponding_depth, runon_resistance, ...)</p></td>
 <td><p>Set ponding related parameters for MetaSWAP.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="generated/msw/imod.msw.Ponding.from_imod5_data.html#imod.msw.Ponding.from_imod5_data" title="imod.msw.Ponding.from_imod5_data"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Ponding.from_imod5_data</span></code></a>(imod5_data)</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="generated/msw/imod.msw.Ponding.regrid_like.html#imod.msw.Ponding.regrid_like" title="imod.msw.Ponding.regrid_like"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Ponding.regrid_like</span></code></a>(target_grid, regrid_cache)</p></td>
+<td><p>Creates a package of the same type as this package, based on another discretization.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="generated/msw/imod.msw.Ponding.clip_box.html#imod.msw.Ponding.clip_box" title="imod.msw.Ponding.clip_box"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Ponding.clip_box</span></code></a>([time_min, time_max, ...])</p></td>
+<td><p>Clip a package by a bounding box (time, y, x).</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="generated/msw/imod.msw.Ponding.from_imod5_data.html#imod.msw.Ponding.from_imod5_data" title="imod.msw.Ponding.from_imod5_data"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Ponding.from_imod5_data</span></code></a>(imod5_data)</p></td>
 <td><p>Construct a MetaSWAP Ponding package from iMOD5 data in the CAP package, loaded with the <a class="reference internal" href="generated/io/imod.formats.prj.open_projectfile_data.html#imod.formats.prj.open_projectfile_data" title="imod.formats.prj.open_projectfile_data"><code class="xref py py-func docutils literal notranslate"><span class="pre">imod.formats.prj.open_projectfile_data()</span></code></a> function.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="generated/msw/imod.msw.ScalingFactors.html#imod.msw.ScalingFactors" title="imod.msw.ScalingFactors"><code class="xref py py-obj docutils literal notranslate"><span class="pre">ScalingFactors</span></code></a>(scale_soil_moisture, ...)</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="generated/msw/imod.msw.Ponding.get_regrid_methods.html#imod.msw.Ponding.get_regrid_methods" title="imod.msw.Ponding.get_regrid_methods"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Ponding.get_regrid_methods</span></code></a>()</p></td>
+<td><p>Returns the default regrid methods for this package.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="generated/msw/imod.msw.Ponding.write.html#imod.msw.Ponding.write" title="imod.msw.Ponding.write"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Ponding.write</span></code></a>(directory, index, svat, ...)</p></td>
+<td><p>Write MetaSWAP package to its corresponding fixed format file.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="generated/msw/imod.msw.ScalingFactors.html#imod.msw.ScalingFactors" title="imod.msw.ScalingFactors"><code class="xref py py-obj docutils literal notranslate"><span class="pre">ScalingFactors</span></code></a>(scale_soil_moisture, ...)</p></td>
 <td><p>This package allows you to do three things:</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="generated/msw/imod.msw.ScalingFactors.from_imod5_data.html#imod.msw.ScalingFactors.from_imod5_data" title="imod.msw.ScalingFactors.from_imod5_data"><code class="xref py py-obj docutils literal notranslate"><span class="pre">ScalingFactors.from_imod5_data</span></code></a>(imod5_data)</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="generated/msw/imod.msw.ScalingFactors.regrid_like.html#imod.msw.ScalingFactors.regrid_like" title="imod.msw.ScalingFactors.regrid_like"><code class="xref py py-obj docutils literal notranslate"><span class="pre">ScalingFactors.regrid_like</span></code></a>(target_grid, ...)</p></td>
+<td><p>Creates a package of the same type as this package, based on another discretization.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="generated/msw/imod.msw.ScalingFactors.clip_box.html#imod.msw.ScalingFactors.clip_box" title="imod.msw.ScalingFactors.clip_box"><code class="xref py py-obj docutils literal notranslate"><span class="pre">ScalingFactors.clip_box</span></code></a>([time_min, ...])</p></td>
+<td><p>Clip a package by a bounding box (time, y, x).</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="generated/msw/imod.msw.ScalingFactors.from_imod5_data.html#imod.msw.ScalingFactors.from_imod5_data" title="imod.msw.ScalingFactors.from_imod5_data"><code class="xref py py-obj docutils literal notranslate"><span class="pre">ScalingFactors.from_imod5_data</span></code></a>(imod5_data)</p></td>
 <td><p>Construct a MetaSWAP Ponding package from iMOD5 data in the CAP package, loaded with the <a class="reference internal" href="generated/io/imod.formats.prj.open_projectfile_data.html#imod.formats.prj.open_projectfile_data" title="imod.formats.prj.open_projectfile_data"><code class="xref py py-func docutils literal notranslate"><span class="pre">imod.formats.prj.open_projectfile_data()</span></code></a> function.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="generated/msw/imod.msw.Sprinkling.html#imod.msw.Sprinkling" title="imod.msw.Sprinkling"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Sprinkling</span></code></a>(max_abstraction_groundwater, ...)</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="generated/msw/imod.msw.ScalingFactors.get_regrid_methods.html#imod.msw.ScalingFactors.get_regrid_methods" title="imod.msw.ScalingFactors.get_regrid_methods"><code class="xref py py-obj docutils literal notranslate"><span class="pre">ScalingFactors.get_regrid_methods</span></code></a>()</p></td>
+<td><p>Returns the default regrid methods for this package.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="generated/msw/imod.msw.ScalingFactors.write.html#imod.msw.ScalingFactors.write" title="imod.msw.ScalingFactors.write"><code class="xref py py-obj docutils literal notranslate"><span class="pre">ScalingFactors.write</span></code></a>(directory, index, svat, ...)</p></td>
+<td><p>Write MetaSWAP package to its corresponding fixed format file.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="generated/msw/imod.msw.Sprinkling.html#imod.msw.Sprinkling" title="imod.msw.Sprinkling"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Sprinkling</span></code></a>(max_abstraction_groundwater, ...)</p></td>
 <td><p>This contains the sprinkling capacities of links between SVAT units and groundwater/surface water locations.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="generated/msw/imod.msw.Sprinkling.from_imod5_data.html#imod.msw.Sprinkling.from_imod5_data" title="imod.msw.Sprinkling.from_imod5_data"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Sprinkling.from_imod5_data</span></code></a>(imod5_data)</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="generated/msw/imod.msw.Sprinkling.regrid_like.html#imod.msw.Sprinkling.regrid_like" title="imod.msw.Sprinkling.regrid_like"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Sprinkling.regrid_like</span></code></a>(target_grid, regrid_cache)</p></td>
+<td><p>Creates a package of the same type as this package, based on another discretization.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="generated/msw/imod.msw.Sprinkling.clip_box.html#imod.msw.Sprinkling.clip_box" title="imod.msw.Sprinkling.clip_box"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Sprinkling.clip_box</span></code></a>([time_min, time_max, ...])</p></td>
+<td><p>Clip a package by a bounding box (time, y, x).</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="generated/msw/imod.msw.Sprinkling.from_imod5_data.html#imod.msw.Sprinkling.from_imod5_data" title="imod.msw.Sprinkling.from_imod5_data"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Sprinkling.from_imod5_data</span></code></a>(imod5_data)</p></td>
 <td><p>Import sprinkling data from imod5 data.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="generated/msw/imod.msw.IdfMapping.html#imod.msw.IdfMapping" title="imod.msw.IdfMapping"><code class="xref py py-obj docutils literal notranslate"><span class="pre">IdfMapping</span></code></a>(area, nodata)</p></td>
-<td><p>Describes svat location in the IDF grid.</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="generated/msw/imod.msw.Sprinkling.get_regrid_methods.html#imod.msw.Sprinkling.get_regrid_methods" title="imod.msw.Sprinkling.get_regrid_methods"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Sprinkling.get_regrid_methods</span></code></a>()</p></td>
+<td><p>Returns the default regrid methods for this package.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="generated/msw/imod.msw.TimeOutputControl.html#imod.msw.TimeOutputControl" title="imod.msw.TimeOutputControl"><code class="xref py py-obj docutils literal notranslate"><span class="pre">TimeOutputControl</span></code></a>(time)</p></td>
-<td><p>Specify the accumulation periods which will be used to write output.</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="generated/msw/imod.msw.Sprinkling.write.html#imod.msw.Sprinkling.write" title="imod.msw.Sprinkling.write"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Sprinkling.write</span></code></a>(directory, index, svat, ...)</p></td>
+<td><p>Write MetaSWAP package to its corresponding fixed format file.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="generated/msw/imod.msw.VariableOutputControl.html#imod.msw.VariableOutputControl" title="imod.msw.VariableOutputControl"><code class="xref py py-obj docutils literal notranslate"><span class="pre">VariableOutputControl</span></code></a>([Pm, Psgw, Pssw, ...])</p></td>
-<td><p>Control which variables will be created as output.</p></td>
-</tr>
-<tr class="row-even"><td><p><a class="reference internal" href="generated/msw/imod.msw.InitialConditionsEquilibrium.html#imod.msw.InitialConditionsEquilibrium" title="imod.msw.InitialConditionsEquilibrium"><code class="xref py py-obj docutils literal notranslate"><span class="pre">InitialConditionsEquilibrium</span></code></a>()</p></td>
+</tbody>
+</table>
+</div>
+</section>
+<section id="initial-conditions">
+<h1>Initial conditions<a class="headerlink" href="#initial-conditions" title="Link to this heading">#</a></h1>
+<div class="pst-scrollable-table-container"><table class="autosummary longtable table">
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="generated/msw/imod.msw.InitialConditionsEquilibrium.html#imod.msw.InitialConditionsEquilibrium" title="imod.msw.InitialConditionsEquilibrium"><code class="xref py py-obj docutils literal notranslate"><span class="pre">InitialConditionsEquilibrium</span></code></a>()</p></td>
 <td><p>Use an equilibrium profile to initialize the model.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="generated/msw/imod.msw.InitialConditionsEquilibrium.regrid_like.html#imod.msw.InitialConditionsEquilibrium.regrid_like" title="imod.msw.InitialConditionsEquilibrium.regrid_like"><code class="xref py py-obj docutils literal notranslate"><span class="pre">InitialConditionsEquilibrium.regrid_like</span></code></a>(...)</p></td>
+<td><p>Creates a package of the same type as this package, based on another discretization.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="generated/msw/imod.msw.InitialConditionsEquilibrium.clip_box.html#imod.msw.InitialConditionsEquilibrium.clip_box" title="imod.msw.InitialConditionsEquilibrium.clip_box"><code class="xref py py-obj docutils literal notranslate"><span class="pre">InitialConditionsEquilibrium.clip_box</span></code></a>([...])</p></td>
+<td><p>Clip a package by a bounding box (time, y, x).</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="generated/msw/imod.msw.InitialConditionsEquilibrium.from_imod5_data.html#imod.msw.InitialConditionsEquilibrium.from_imod5_data" title="imod.msw.InitialConditionsEquilibrium.from_imod5_data"><code class="xref py py-obj docutils literal notranslate"><span class="pre">InitialConditionsEquilibrium.from_imod5_data</span></code></a>(...)</p></td>
+<td><p>This package cannot be constructed from iMOD5 data.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="generated/msw/imod.msw.InitialConditionsEquilibrium.get_regrid_methods.html#imod.msw.InitialConditionsEquilibrium.get_regrid_methods" title="imod.msw.InitialConditionsEquilibrium.get_regrid_methods"><code class="xref py py-obj docutils literal notranslate"><span class="pre">InitialConditionsEquilibrium.get_regrid_methods</span></code></a>()</p></td>
+<td><p>Returns the default regrid methods for this package.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="generated/msw/imod.msw.InitialConditionsEquilibrium.write.html#imod.msw.InitialConditionsEquilibrium.write" title="imod.msw.InitialConditionsEquilibrium.write"><code class="xref py py-obj docutils literal notranslate"><span class="pre">InitialConditionsEquilibrium.write</span></code></a>(...)</p></td>
+<td><p>Write MetaSWAP package to its corresponding fixed format file.</p></td>
 </tr>
 <tr class="row-odd"><td><p><a class="reference internal" href="generated/msw/imod.msw.InitialConditionsPercolation.html#imod.msw.InitialConditionsPercolation" title="imod.msw.InitialConditionsPercolation"><code class="xref py py-obj docutils literal notranslate"><span class="pre">InitialConditionsPercolation</span></code></a>()</p></td>
 <td><p>The precipitation intensity at the starting time (iybg, tdbg in PARA_SIM.INP) is used for initializing the percolation flux in the profiles.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="generated/msw/imod.msw.InitialConditionsRootzonePressureHead.html#imod.msw.InitialConditionsRootzonePressureHead" title="imod.msw.InitialConditionsRootzonePressureHead"><code class="xref py py-obj docutils literal notranslate"><span class="pre">InitialConditionsRootzonePressureHead</span></code></a>([...])</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="generated/msw/imod.msw.InitialConditionsPercolation.regrid_like.html#imod.msw.InitialConditionsPercolation.regrid_like" title="imod.msw.InitialConditionsPercolation.regrid_like"><code class="xref py py-obj docutils literal notranslate"><span class="pre">InitialConditionsPercolation.regrid_like</span></code></a>(...)</p></td>
+<td><p>Creates a package of the same type as this package, based on another discretization.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="generated/msw/imod.msw.InitialConditionsPercolation.clip_box.html#imod.msw.InitialConditionsPercolation.clip_box" title="imod.msw.InitialConditionsPercolation.clip_box"><code class="xref py py-obj docutils literal notranslate"><span class="pre">InitialConditionsPercolation.clip_box</span></code></a>([...])</p></td>
+<td><p>Clip a package by a bounding box (time, y, x).</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="generated/msw/imod.msw.InitialConditionsPercolation.from_imod5_data.html#imod.msw.InitialConditionsPercolation.from_imod5_data" title="imod.msw.InitialConditionsPercolation.from_imod5_data"><code class="xref py py-obj docutils literal notranslate"><span class="pre">InitialConditionsPercolation.from_imod5_data</span></code></a>(...)</p></td>
+<td><p>This package cannot be constructed from iMOD5 data.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="generated/msw/imod.msw.InitialConditionsPercolation.get_regrid_methods.html#imod.msw.InitialConditionsPercolation.get_regrid_methods" title="imod.msw.InitialConditionsPercolation.get_regrid_methods"><code class="xref py py-obj docutils literal notranslate"><span class="pre">InitialConditionsPercolation.get_regrid_methods</span></code></a>()</p></td>
+<td><p>Returns the default regrid methods for this package.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="generated/msw/imod.msw.InitialConditionsPercolation.write.html#imod.msw.InitialConditionsPercolation.write" title="imod.msw.InitialConditionsPercolation.write"><code class="xref py py-obj docutils literal notranslate"><span class="pre">InitialConditionsPercolation.write</span></code></a>(...)</p></td>
+<td><p>Write MetaSWAP package to its corresponding fixed format file.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="generated/msw/imod.msw.InitialConditionsRootzonePressureHead.html#imod.msw.InitialConditionsRootzonePressureHead" title="imod.msw.InitialConditionsRootzonePressureHead"><code class="xref py py-obj docutils literal notranslate"><span class="pre">InitialConditionsRootzonePressureHead</span></code></a>([...])</p></td>
 <td><p>Use the pF-value of the root zone pressure head as initial condition.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="generated/msw/imod.msw.InitialConditionsRootzonePressureHead.regrid_like.html#imod.msw.InitialConditionsRootzonePressureHead.regrid_like" title="imod.msw.InitialConditionsRootzonePressureHead.regrid_like"><code class="xref py py-obj docutils literal notranslate"><span class="pre">InitialConditionsRootzonePressureHead.regrid_like</span></code></a>(...)</p></td>
+<td><p>Creates a package of the same type as this package, based on another discretization.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="generated/msw/imod.msw.InitialConditionsRootzonePressureHead.clip_box.html#imod.msw.InitialConditionsRootzonePressureHead.clip_box" title="imod.msw.InitialConditionsRootzonePressureHead.clip_box"><code class="xref py py-obj docutils literal notranslate"><span class="pre">InitialConditionsRootzonePressureHead.clip_box</span></code></a>([...])</p></td>
+<td><p>Clip a package by a bounding box (time, y, x).</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="generated/msw/imod.msw.InitialConditionsRootzonePressureHead.from_imod5_data.html#imod.msw.InitialConditionsRootzonePressureHead.from_imod5_data" title="imod.msw.InitialConditionsRootzonePressureHead.from_imod5_data"><code class="xref py py-obj docutils literal notranslate"><span class="pre">InitialConditionsRootzonePressureHead.from_imod5_data</span></code></a>(...)</p></td>
+<td><p>This package cannot be constructed from iMOD5 data.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="generated/msw/imod.msw.InitialConditionsRootzonePressureHead.get_regrid_methods.html#imod.msw.InitialConditionsRootzonePressureHead.get_regrid_methods" title="imod.msw.InitialConditionsRootzonePressureHead.get_regrid_methods"><code class="xref py py-obj docutils literal notranslate"><span class="pre">InitialConditionsRootzonePressureHead.get_regrid_methods</span></code></a>()</p></td>
+<td><p>Returns the default regrid methods for this package.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="generated/msw/imod.msw.InitialConditionsRootzonePressureHead.write.html#imod.msw.InitialConditionsRootzonePressureHead.write" title="imod.msw.InitialConditionsRootzonePressureHead.write"><code class="xref py py-obj docutils literal notranslate"><span class="pre">InitialConditionsRootzonePressureHead.write</span></code></a>(...)</p></td>
+<td><p>Write MetaSWAP package to its corresponding fixed format file.</p></td>
 </tr>
 <tr class="row-odd"><td><p><a class="reference internal" href="generated/msw/imod.msw.InitialConditionsSavedState.html#imod.msw.InitialConditionsSavedState" title="imod.msw.InitialConditionsSavedState"><code class="xref py py-obj docutils literal notranslate"><span class="pre">InitialConditionsSavedState</span></code></a>(saved_state)</p></td>
 <td><p>Use saved state of a previous MetaSWAP run as initial condition.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="generated/msw/imod.msw.LanduseOptions.html#imod.msw.LanduseOptions" title="imod.msw.LanduseOptions"><code class="xref py py-obj docutils literal notranslate"><span class="pre">LanduseOptions</span></code></a>(landuse_name, ...[, ...])</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="generated/msw/imod.msw.InitialConditionsSavedState.regrid_like.html#imod.msw.InitialConditionsSavedState.regrid_like" title="imod.msw.InitialConditionsSavedState.regrid_like"><code class="xref py py-obj docutils literal notranslate"><span class="pre">InitialConditionsSavedState.regrid_like</span></code></a>(...)</p></td>
+<td><p>Creates a package of the same type as this package, based on another discretization.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="generated/msw/imod.msw.InitialConditionsSavedState.clip_box.html#imod.msw.InitialConditionsSavedState.clip_box" title="imod.msw.InitialConditionsSavedState.clip_box"><code class="xref py py-obj docutils literal notranslate"><span class="pre">InitialConditionsSavedState.clip_box</span></code></a>([...])</p></td>
+<td><p>Clip a package by a bounding box (time, y, x).</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="generated/msw/imod.msw.InitialConditionsSavedState.from_imod5_data.html#imod.msw.InitialConditionsSavedState.from_imod5_data" title="imod.msw.InitialConditionsSavedState.from_imod5_data"><code class="xref py py-obj docutils literal notranslate"><span class="pre">InitialConditionsSavedState.from_imod5_data</span></code></a>(...)</p></td>
+<td><p>This package cannot be constructed from iMOD5 data.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="generated/msw/imod.msw.InitialConditionsSavedState.get_regrid_methods.html#imod.msw.InitialConditionsSavedState.get_regrid_methods" title="imod.msw.InitialConditionsSavedState.get_regrid_methods"><code class="xref py py-obj docutils literal notranslate"><span class="pre">InitialConditionsSavedState.get_regrid_methods</span></code></a>()</p></td>
+<td><p>Returns the default regrid methods for this package.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="generated/msw/imod.msw.InitialConditionsSavedState.write.html#imod.msw.InitialConditionsSavedState.write" title="imod.msw.InitialConditionsSavedState.write"><code class="xref py py-obj docutils literal notranslate"><span class="pre">InitialConditionsSavedState.write</span></code></a>(directory, ...)</p></td>
+<td><p>Write MetaSWAP package to its corresponding fixed format file.</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+</section>
+<section id="output-control">
+<h1>Output control<a class="headerlink" href="#output-control" title="Link to this heading">#</a></h1>
+<div class="pst-scrollable-table-container"><table class="autosummary longtable table">
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="generated/msw/imod.msw.IdfMapping.html#imod.msw.IdfMapping" title="imod.msw.IdfMapping"><code class="xref py py-obj docutils literal notranslate"><span class="pre">IdfMapping</span></code></a>(area, nodata)</p></td>
+<td><p>Describes svat location in the IDF grid.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="generated/msw/imod.msw.IdfMapping.regrid_like.html#imod.msw.IdfMapping.regrid_like" title="imod.msw.IdfMapping.regrid_like"><code class="xref py py-obj docutils literal notranslate"><span class="pre">IdfMapping.regrid_like</span></code></a>(target_grid, regrid_cache)</p></td>
+<td><p>Creates a package of the same type as this package, based on another discretization.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="generated/msw/imod.msw.IdfMapping.clip_box.html#imod.msw.IdfMapping.clip_box" title="imod.msw.IdfMapping.clip_box"><code class="xref py py-obj docutils literal notranslate"><span class="pre">IdfMapping.clip_box</span></code></a>([time_min, time_max, ...])</p></td>
+<td><p>Clip a package by a bounding box (time, y, x).</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="generated/msw/imod.msw.IdfMapping.from_imod5_data.html#imod.msw.IdfMapping.from_imod5_data" title="imod.msw.IdfMapping.from_imod5_data"><code class="xref py py-obj docutils literal notranslate"><span class="pre">IdfMapping.from_imod5_data</span></code></a>(*args, **kwargs)</p></td>
+<td><p>This package cannot be constructed from iMOD5 data.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="generated/msw/imod.msw.IdfMapping.get_regrid_methods.html#imod.msw.IdfMapping.get_regrid_methods" title="imod.msw.IdfMapping.get_regrid_methods"><code class="xref py py-obj docutils literal notranslate"><span class="pre">IdfMapping.get_regrid_methods</span></code></a>()</p></td>
+<td><p>Returns the default regrid methods for this package.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="generated/msw/imod.msw.IdfMapping.write.html#imod.msw.IdfMapping.write" title="imod.msw.IdfMapping.write"><code class="xref py py-obj docutils literal notranslate"><span class="pre">IdfMapping.write</span></code></a>(directory, index, svat, ...)</p></td>
+<td><p>Write MetaSWAP package to its corresponding fixed format file.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="generated/msw/imod.msw.TimeOutputControl.html#imod.msw.TimeOutputControl" title="imod.msw.TimeOutputControl"><code class="xref py py-obj docutils literal notranslate"><span class="pre">TimeOutputControl</span></code></a>(time)</p></td>
+<td><p>Specify the accumulation periods which will be used to write output.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="generated/msw/imod.msw.TimeOutputControl.regrid_like.html#imod.msw.TimeOutputControl.regrid_like" title="imod.msw.TimeOutputControl.regrid_like"><code class="xref py py-obj docutils literal notranslate"><span class="pre">TimeOutputControl.regrid_like</span></code></a>(target_grid, ...)</p></td>
+<td><p>Returns a deepcopy of this instance, as regridding this package is irrelevant: TimeOutputcontrol does not depend on the grid.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="generated/msw/imod.msw.TimeOutputControl.clip_box.html#imod.msw.TimeOutputControl.clip_box" title="imod.msw.TimeOutputControl.clip_box"><code class="xref py py-obj docutils literal notranslate"><span class="pre">TimeOutputControl.clip_box</span></code></a>([time_min, ...])</p></td>
+<td><p>Clip a package by a bounding box (time, y, x).</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="generated/msw/imod.msw.TimeOutputControl.from_imod5_data.html#imod.msw.TimeOutputControl.from_imod5_data" title="imod.msw.TimeOutputControl.from_imod5_data"><code class="xref py py-obj docutils literal notranslate"><span class="pre">TimeOutputControl.from_imod5_data</span></code></a>(*args, ...)</p></td>
+<td><p>This package cannot be constructed from iMOD5 data.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="generated/msw/imod.msw.TimeOutputControl.get_regrid_methods.html#imod.msw.TimeOutputControl.get_regrid_methods" title="imod.msw.TimeOutputControl.get_regrid_methods"><code class="xref py py-obj docutils literal notranslate"><span class="pre">TimeOutputControl.get_regrid_methods</span></code></a>()</p></td>
+<td><p>Returns the default regrid methods for this package.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="generated/msw/imod.msw.TimeOutputControl.write.html#imod.msw.TimeOutputControl.write" title="imod.msw.TimeOutputControl.write"><code class="xref py py-obj docutils literal notranslate"><span class="pre">TimeOutputControl.write</span></code></a>(directory, index, ...)</p></td>
+<td><p>Write MetaSWAP package to its corresponding fixed format file.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="generated/msw/imod.msw.VariableOutputControl.html#imod.msw.VariableOutputControl" title="imod.msw.VariableOutputControl"><code class="xref py py-obj docutils literal notranslate"><span class="pre">VariableOutputControl</span></code></a>([Pm, Psgw, Pssw, ...])</p></td>
+<td><p>Control which variables will be created as output.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="generated/msw/imod.msw.VariableOutputControl.regrid_like.html#imod.msw.VariableOutputControl.regrid_like" title="imod.msw.VariableOutputControl.regrid_like"><code class="xref py py-obj docutils literal notranslate"><span class="pre">VariableOutputControl.regrid_like</span></code></a>(...[, ...])</p></td>
+<td><p>Creates a package of the same type as this package, based on another discretization.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="generated/msw/imod.msw.VariableOutputControl.clip_box.html#imod.msw.VariableOutputControl.clip_box" title="imod.msw.VariableOutputControl.clip_box"><code class="xref py py-obj docutils literal notranslate"><span class="pre">VariableOutputControl.clip_box</span></code></a>([time_min, ...])</p></td>
+<td><p>Clip a package by a bounding box (time, y, x).</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="generated/msw/imod.msw.VariableOutputControl.from_imod5_data.html#imod.msw.VariableOutputControl.from_imod5_data" title="imod.msw.VariableOutputControl.from_imod5_data"><code class="xref py py-obj docutils literal notranslate"><span class="pre">VariableOutputControl.from_imod5_data</span></code></a>(*args, ...)</p></td>
+<td><p>This package cannot be constructed from iMOD5 data.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="generated/msw/imod.msw.VariableOutputControl.get_regrid_methods.html#imod.msw.VariableOutputControl.get_regrid_methods" title="imod.msw.VariableOutputControl.get_regrid_methods"><code class="xref py py-obj docutils literal notranslate"><span class="pre">VariableOutputControl.get_regrid_methods</span></code></a>()</p></td>
+<td><p>Returns the default regrid methods for this package.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="generated/msw/imod.msw.VariableOutputControl.write.html#imod.msw.VariableOutputControl.write" title="imod.msw.VariableOutputControl.write"><code class="xref py py-obj docutils literal notranslate"><span class="pre">VariableOutputControl.write</span></code></a>(directory, ...)</p></td>
+<td><p>Write MetaSWAP package to its corresponding fixed format file.</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+</section>
+<section id="parameter-packages">
+<h1>Parameter packages<a class="headerlink" href="#parameter-packages" title="Link to this heading">#</a></h1>
+<div class="pst-scrollable-table-container"><table class="autosummary longtable table">
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="generated/msw/imod.msw.LanduseOptions.html#imod.msw.LanduseOptions" title="imod.msw.LanduseOptions"><code class="xref py py-obj docutils literal notranslate"><span class="pre">LanduseOptions</span></code></a>(landuse_name, ...[, ...])</p></td>
 <td><p>Land use options.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="generated/msw/imod.msw.LanduseOptions.regrid_like.html#imod.msw.LanduseOptions.regrid_like" title="imod.msw.LanduseOptions.regrid_like"><code class="xref py py-obj docutils literal notranslate"><span class="pre">LanduseOptions.regrid_like</span></code></a>(target_grid, ...)</p></td>
+<td><p>Creates a package of the same type as this package, based on another discretization.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="generated/msw/imod.msw.LanduseOptions.clip_box.html#imod.msw.LanduseOptions.clip_box" title="imod.msw.LanduseOptions.clip_box"><code class="xref py py-obj docutils literal notranslate"><span class="pre">LanduseOptions.clip_box</span></code></a>([time_min, ...])</p></td>
+<td><p>Clip a package by a bounding box (time, y, x).</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="generated/msw/imod.msw.LanduseOptions.from_imod5_data.html#imod.msw.LanduseOptions.from_imod5_data" title="imod.msw.LanduseOptions.from_imod5_data"><code class="xref py py-obj docutils literal notranslate"><span class="pre">LanduseOptions.from_imod5_data</span></code></a>(*args, **kwargs)</p></td>
+<td><p>This package cannot be constructed from iMOD5 data.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="generated/msw/imod.msw.LanduseOptions.get_regrid_methods.html#imod.msw.LanduseOptions.get_regrid_methods" title="imod.msw.LanduseOptions.get_regrid_methods"><code class="xref py py-obj docutils literal notranslate"><span class="pre">LanduseOptions.get_regrid_methods</span></code></a>()</p></td>
+<td><p>Returns the default regrid methods for this package.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="generated/msw/imod.msw.LanduseOptions.write.html#imod.msw.LanduseOptions.write" title="imod.msw.LanduseOptions.write"><code class="xref py py-obj docutils literal notranslate"><span class="pre">LanduseOptions.write</span></code></a>(directory, index, svat, ...)</p></td>
+<td><p>Write MetaSWAP package to its corresponding fixed format file.</p></td>
 </tr>
 <tr class="row-odd"><td><p><a class="reference internal" href="generated/msw/imod.msw.AnnualCropFactors.html#imod.msw.AnnualCropFactors" title="imod.msw.AnnualCropFactors"><code class="xref py py-obj docutils literal notranslate"><span class="pre">AnnualCropFactors</span></code></a>(soil_cover, ...)</p></td>
 <td><p>For each vegetation type specify a yearly trend in vegetation factors and interception characteristics.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="generated/msw/imod.msw.MeteoGrid.html#imod.msw.MeteoGrid" title="imod.msw.MeteoGrid"><code class="xref py py-obj docutils literal notranslate"><span class="pre">MeteoGrid</span></code></a>(precipitation, evapotranspiration)</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="generated/msw/imod.msw.AnnualCropFactors.regrid_like.html#imod.msw.AnnualCropFactors.regrid_like" title="imod.msw.AnnualCropFactors.regrid_like"><code class="xref py py-obj docutils literal notranslate"><span class="pre">AnnualCropFactors.regrid_like</span></code></a>(target_grid, ...)</p></td>
+<td><p>Creates a package of the same type as this package, based on another discretization.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="generated/msw/imod.msw.AnnualCropFactors.clip_box.html#imod.msw.AnnualCropFactors.clip_box" title="imod.msw.AnnualCropFactors.clip_box"><code class="xref py py-obj docutils literal notranslate"><span class="pre">AnnualCropFactors.clip_box</span></code></a>([time_min, ...])</p></td>
+<td><p>Clip a package by a bounding box (time, y, x).</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="generated/msw/imod.msw.AnnualCropFactors.from_imod5_data.html#imod.msw.AnnualCropFactors.from_imod5_data" title="imod.msw.AnnualCropFactors.from_imod5_data"><code class="xref py py-obj docutils literal notranslate"><span class="pre">AnnualCropFactors.from_imod5_data</span></code></a>(*args, ...)</p></td>
+<td><p>This package cannot be constructed from iMOD5 data.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="generated/msw/imod.msw.AnnualCropFactors.get_regrid_methods.html#imod.msw.AnnualCropFactors.get_regrid_methods" title="imod.msw.AnnualCropFactors.get_regrid_methods"><code class="xref py py-obj docutils literal notranslate"><span class="pre">AnnualCropFactors.get_regrid_methods</span></code></a>()</p></td>
+<td><p>Returns the default regrid methods for this package.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="generated/msw/imod.msw.AnnualCropFactors.write.html#imod.msw.AnnualCropFactors.write" title="imod.msw.AnnualCropFactors.write"><code class="xref py py-obj docutils literal notranslate"><span class="pre">AnnualCropFactors.write</span></code></a>(directory, index, ...)</p></td>
+<td><p>Write MetaSWAP package to its corresponding fixed format file.</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+</section>
+<section id="meteorology-packages">
+<h1>Meteorology packages<a class="headerlink" href="#meteorology-packages" title="Link to this heading">#</a></h1>
+<div class="pst-scrollable-table-container"><table class="autosummary longtable table">
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="generated/msw/imod.msw.MeteoGrid.html#imod.msw.MeteoGrid" title="imod.msw.MeteoGrid"><code class="xref py py-obj docutils literal notranslate"><span class="pre">MeteoGrid</span></code></a>(precipitation, evapotranspiration)</p></td>
 <td><p>This contains the meteorological grid data.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="generated/msw/imod.msw.MeteoGrid.regrid_like.html#imod.msw.MeteoGrid.regrid_like" title="imod.msw.MeteoGrid.regrid_like"><code class="xref py py-obj docutils literal notranslate"><span class="pre">MeteoGrid.regrid_like</span></code></a>(target_grid, regrid_cache)</p></td>
+<td><p>Creates a package of the same type as this package, based on another discretization.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="generated/msw/imod.msw.MeteoGrid.clip_box.html#imod.msw.MeteoGrid.clip_box" title="imod.msw.MeteoGrid.clip_box"><code class="xref py py-obj docutils literal notranslate"><span class="pre">MeteoGrid.clip_box</span></code></a>([time_min, time_max, ...])</p></td>
+<td><p>Clip a package by a bounding box (time, y, x).</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="generated/msw/imod.msw.MeteoGrid.from_imod5_data.html#imod.msw.MeteoGrid.from_imod5_data" title="imod.msw.MeteoGrid.from_imod5_data"><code class="xref py py-obj docutils literal notranslate"><span class="pre">MeteoGrid.from_imod5_data</span></code></a>(*args, **kwargs)</p></td>
+<td><p>This package cannot be constructed from iMOD5 data.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="generated/msw/imod.msw.MeteoGrid.get_regrid_methods.html#imod.msw.MeteoGrid.get_regrid_methods" title="imod.msw.MeteoGrid.get_regrid_methods"><code class="xref py py-obj docutils literal notranslate"><span class="pre">MeteoGrid.get_regrid_methods</span></code></a>()</p></td>
+<td><p>Returns the default regrid methods for this package.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="generated/msw/imod.msw.MeteoGrid.write.html#imod.msw.MeteoGrid.write" title="imod.msw.MeteoGrid.write"><code class="xref py py-obj docutils literal notranslate"><span class="pre">MeteoGrid.write</span></code></a>(directory, *args)</p></td>
+<td><p>Write mete_grid.inp and accompanying ASCII grid files.</p></td>
 </tr>
 <tr class="row-odd"><td><p><a class="reference internal" href="generated/msw/imod.msw.MeteoGridCopy.html#imod.msw.MeteoGridCopy" title="imod.msw.MeteoGridCopy"><code class="xref py py-obj docutils literal notranslate"><span class="pre">MeteoGridCopy</span></code></a>(path)</p></td>
 <td><p>Class to copy existing <code class="docutils literal notranslate"><span class="pre">mete_grid.inp</span></code>, which contains the meteorological grid data.</p></td>
 </tr>
+<tr class="row-even"><td><p><a class="reference internal" href="generated/msw/imod.msw.MeteoGridCopy.regrid_like.html#imod.msw.MeteoGridCopy.regrid_like" title="imod.msw.MeteoGridCopy.regrid_like"><code class="xref py py-obj docutils literal notranslate"><span class="pre">MeteoGridCopy.regrid_like</span></code></a>(target_grid, ...)</p></td>
+<td><p>Creates a package of the same type as this package, based on another discretization.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="generated/msw/imod.msw.MeteoGridCopy.clip_box.html#imod.msw.MeteoGridCopy.clip_box" title="imod.msw.MeteoGridCopy.clip_box"><code class="xref py py-obj docutils literal notranslate"><span class="pre">MeteoGridCopy.clip_box</span></code></a>([time_min, time_max, ...])</p></td>
+<td><p>Clip a package by a bounding box (time, y, x).</p></td>
+</tr>
 <tr class="row-even"><td><p><a class="reference internal" href="generated/msw/imod.msw.MeteoGridCopy.from_imod5_data.html#imod.msw.MeteoGridCopy.from_imod5_data" title="imod.msw.MeteoGridCopy.from_imod5_data"><code class="xref py py-obj docutils literal notranslate"><span class="pre">MeteoGridCopy.from_imod5_data</span></code></a>(imod5_data)</p></td>
 <td><p>Construct a MetaSWAP MeteoGridCopy package from iMOD5 data in the CAP package, loaded with the <a class="reference internal" href="generated/io/imod.formats.prj.open_projectfile_data.html#imod.formats.prj.open_projectfile_data" title="imod.formats.prj.open_projectfile_data"><code class="xref py py-func docutils literal notranslate"><span class="pre">imod.formats.prj.open_projectfile_data()</span></code></a> function.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="generated/msw/imod.msw.MeteoGridCopy.get_regrid_methods.html#imod.msw.MeteoGridCopy.get_regrid_methods" title="imod.msw.MeteoGridCopy.get_regrid_methods"><code class="xref py py-obj docutils literal notranslate"><span class="pre">MeteoGridCopy.get_regrid_methods</span></code></a>()</p></td>
+<td><p>Returns the default regrid methods for this package.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="generated/msw/imod.msw.MeteoGridCopy.write.html#imod.msw.MeteoGridCopy.write" title="imod.msw.MeteoGridCopy.write"><code class="xref py py-obj docutils literal notranslate"><span class="pre">MeteoGridCopy.write</span></code></a>(directory, *args)</p></td>
+<td><p>Write MetaSWAP package to its corresponding fixed format file.</p></td>
 </tr>
 <tr class="row-odd"><td><p><a class="reference internal" href="generated/msw/imod.msw.EvapotranspirationMapping.html#imod.msw.EvapotranspirationMapping" title="imod.msw.EvapotranspirationMapping"><code class="xref py py-obj docutils literal notranslate"><span class="pre">EvapotranspirationMapping</span></code></a>(evapotranspiration)</p></td>
 <td><p>This contains the data to connect evapotranspiration grid cells to MetaSWAP svats.</p></td>
 </tr>
+<tr class="row-even"><td><p><a class="reference internal" href="generated/msw/imod.msw.EvapotranspirationMapping.regrid_like.html#imod.msw.EvapotranspirationMapping.regrid_like" title="imod.msw.EvapotranspirationMapping.regrid_like"><code class="xref py py-obj docutils literal notranslate"><span class="pre">EvapotranspirationMapping.regrid_like</span></code></a>(...[, ...])</p></td>
+<td><p>Returns a deepcopy of this instance, as regridding this package is irrelevant: The meteo data is not on model grid and the mapping is determined upon writing.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="generated/msw/imod.msw.EvapotranspirationMapping.clip_box.html#imod.msw.EvapotranspirationMapping.clip_box" title="imod.msw.EvapotranspirationMapping.clip_box"><code class="xref py py-obj docutils literal notranslate"><span class="pre">EvapotranspirationMapping.clip_box</span></code></a>([...])</p></td>
+<td><p>Clip a package by a bounding box (time, y, x).</p></td>
+</tr>
 <tr class="row-even"><td><p><a class="reference internal" href="generated/msw/imod.msw.EvapotranspirationMapping.from_imod5_data.html#imod.msw.EvapotranspirationMapping.from_imod5_data" title="imod.msw.EvapotranspirationMapping.from_imod5_data"><code class="xref py py-obj docutils literal notranslate"><span class="pre">EvapotranspirationMapping.from_imod5_data</span></code></a>(...)</p></td>
 <td><p>Construct a MetaSWAP EvapotranspirationMapping package from iMOD5 data in the CAP package, loaded with the <a class="reference internal" href="generated/io/imod.formats.prj.open_projectfile_data.html#imod.formats.prj.open_projectfile_data" title="imod.formats.prj.open_projectfile_data"><code class="xref py py-func docutils literal notranslate"><span class="pre">imod.formats.prj.open_projectfile_data()</span></code></a> function.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="generated/msw/imod.msw.EvapotranspirationMapping.get_regrid_methods.html#imod.msw.EvapotranspirationMapping.get_regrid_methods" title="imod.msw.EvapotranspirationMapping.get_regrid_methods"><code class="xref py py-obj docutils literal notranslate"><span class="pre">EvapotranspirationMapping.get_regrid_methods</span></code></a>()</p></td>
+<td><p>Returns the default regrid methods for this package.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="generated/msw/imod.msw.EvapotranspirationMapping.write.html#imod.msw.EvapotranspirationMapping.write" title="imod.msw.EvapotranspirationMapping.write"><code class="xref py py-obj docutils literal notranslate"><span class="pre">EvapotranspirationMapping.write</span></code></a>(directory, ...)</p></td>
+<td><p>Write MetaSWAP package to its corresponding fixed format file.</p></td>
 </tr>
 <tr class="row-odd"><td><p><a class="reference internal" href="generated/msw/imod.msw.PrecipitationMapping.html#imod.msw.PrecipitationMapping" title="imod.msw.PrecipitationMapping"><code class="xref py py-obj docutils literal notranslate"><span class="pre">PrecipitationMapping</span></code></a>(precipitation)</p></td>
 <td><p>This contains the data to connect precipitation grid cells to MetaSWAP svats.</p></td>
 </tr>
+<tr class="row-even"><td><p><a class="reference internal" href="generated/msw/imod.msw.PrecipitationMapping.regrid_like.html#imod.msw.PrecipitationMapping.regrid_like" title="imod.msw.PrecipitationMapping.regrid_like"><code class="xref py py-obj docutils literal notranslate"><span class="pre">PrecipitationMapping.regrid_like</span></code></a>(...[, ...])</p></td>
+<td><p>Returns a deepcopy of this instance, as regridding this package is irrelevant: The meteo data is not on model grid and the mapping is determined upon writing.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="generated/msw/imod.msw.PrecipitationMapping.clip_box.html#imod.msw.PrecipitationMapping.clip_box" title="imod.msw.PrecipitationMapping.clip_box"><code class="xref py py-obj docutils literal notranslate"><span class="pre">PrecipitationMapping.clip_box</span></code></a>([time_min, ...])</p></td>
+<td><p>Clip a package by a bounding box (time, y, x).</p></td>
+</tr>
 <tr class="row-even"><td><p><a class="reference internal" href="generated/msw/imod.msw.PrecipitationMapping.from_imod5_data.html#imod.msw.PrecipitationMapping.from_imod5_data" title="imod.msw.PrecipitationMapping.from_imod5_data"><code class="xref py py-obj docutils literal notranslate"><span class="pre">PrecipitationMapping.from_imod5_data</span></code></a>(imod5_data)</p></td>
 <td><p>Construct a MetaSWAP PrecipitationMapping package from iMOD5 data in the CAP package, loaded with the <a class="reference internal" href="generated/io/imod.formats.prj.open_projectfile_data.html#imod.formats.prj.open_projectfile_data" title="imod.formats.prj.open_projectfile_data"><code class="xref py py-func docutils literal notranslate"><span class="pre">imod.formats.prj.open_projectfile_data()</span></code></a> function.</p></td>
 </tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="generated/msw/imod.msw.PrecipitationMapping.get_regrid_methods.html#imod.msw.PrecipitationMapping.get_regrid_methods" title="imod.msw.PrecipitationMapping.get_regrid_methods"><code class="xref py py-obj docutils literal notranslate"><span class="pre">PrecipitationMapping.get_regrid_methods</span></code></a>()</p></td>
+<td><p>Returns the default regrid methods for this package.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="generated/msw/imod.msw.PrecipitationMapping.write.html#imod.msw.PrecipitationMapping.write" title="imod.msw.PrecipitationMapping.write"><code class="xref py py-obj docutils literal notranslate"><span class="pre">PrecipitationMapping.write</span></code></a>(directory, index, ...)</p></td>
+<td><p>Write MetaSWAP package to its corresponding fixed format file.</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+</section>
+<section id="mappings">
+<h1>Mappings<a class="headerlink" href="#mappings" title="Link to this heading">#</a></h1>
+<div class="pst-scrollable-table-container"><table class="autosummary longtable table">
+<tbody>
 <tr class="row-odd"><td><p><a class="reference internal" href="generated/msw/imod.msw.CouplerMapping.html#imod.msw.CouplerMapping" title="imod.msw.CouplerMapping"><code class="xref py py-obj docutils literal notranslate"><span class="pre">CouplerMapping</span></code></a>()</p></td>
 <td><p>This contains the data to connect MODFLOW 6 cells to MetaSWAP svats.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="generated/msw/imod.msw.MetaSwapModel.html#imod.msw.MetaSwapModel" title="imod.msw.MetaSwapModel"><code class="xref py py-obj docutils literal notranslate"><span class="pre">MetaSwapModel</span></code></a>(unsaturated_database[, settings])</p></td>
-<td><p>Contains data and writes consistent model input files</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="generated/msw/imod.msw.CouplerMapping.regrid_like.html#imod.msw.CouplerMapping.regrid_like" title="imod.msw.CouplerMapping.regrid_like"><code class="xref py py-obj docutils literal notranslate"><span class="pre">CouplerMapping.regrid_like</span></code></a>(target_grid, ...)</p></td>
+<td><p>Creates a package of the same type as this package, based on another discretization.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="generated/msw/imod.msw.MetaSwapModel.write.html#imod.msw.MetaSwapModel.write" title="imod.msw.MetaSwapModel.write"><code class="xref py py-obj docutils literal notranslate"><span class="pre">MetaSwapModel.write</span></code></a>(directory, mf6_dis, mf6_wel)</p></td>
-<td><p>Write packages and simulation settings (para_sim.inp).</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="generated/msw/imod.msw.CouplerMapping.clip_box.html#imod.msw.CouplerMapping.clip_box" title="imod.msw.CouplerMapping.clip_box"><code class="xref py py-obj docutils literal notranslate"><span class="pre">CouplerMapping.clip_box</span></code></a>([time_min, ...])</p></td>
+<td><p>Clip a package by a bounding box (time, y, x).</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="generated/msw/imod.msw.MetaSwapModel.from_imod5_data.html#imod.msw.MetaSwapModel.from_imod5_data" title="imod.msw.MetaSwapModel.from_imod5_data"><code class="xref py py-obj docutils literal notranslate"><span class="pre">MetaSwapModel.from_imod5_data</span></code></a>(imod5_data, ...)</p></td>
-<td><p>Construct a MetaSWAP model from iMOD5 data in the CAP package, loaded with the <a class="reference internal" href="generated/io/imod.formats.prj.open_projectfile_data.html#imod.formats.prj.open_projectfile_data" title="imod.formats.prj.open_projectfile_data"><code class="xref py py-func docutils literal notranslate"><span class="pre">imod.formats.prj.open_projectfile_data()</span></code></a> function.</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="generated/msw/imod.msw.CouplerMapping.from_imod5_data.html#imod.msw.CouplerMapping.from_imod5_data" title="imod.msw.CouplerMapping.from_imod5_data"><code class="xref py py-obj docutils literal notranslate"><span class="pre">CouplerMapping.from_imod5_data</span></code></a>(*args, **kwargs)</p></td>
+<td><p>This package cannot be constructed from iMOD5 data.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="generated/msw/imod.msw.MetaSwapModel.regrid_like.html#imod.msw.MetaSwapModel.regrid_like" title="imod.msw.MetaSwapModel.regrid_like"><code class="xref py py-obj docutils literal notranslate"><span class="pre">MetaSwapModel.regrid_like</span></code></a>(mf6_regridded_dis)</p></td>
-<td><p></p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="generated/msw/imod.msw.CouplerMapping.get_regrid_methods.html#imod.msw.CouplerMapping.get_regrid_methods" title="imod.msw.CouplerMapping.get_regrid_methods"><code class="xref py py-obj docutils literal notranslate"><span class="pre">CouplerMapping.get_regrid_methods</span></code></a>()</p></td>
+<td><p>Returns the default regrid methods for this package.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="generated/msw/imod.msw.MetaSwapModel.clip_box.html#imod.msw.MetaSwapModel.clip_box" title="imod.msw.MetaSwapModel.clip_box"><code class="xref py py-obj docutils literal notranslate"><span class="pre">MetaSwapModel.clip_box</span></code></a>([time_min, time_max, ...])</p></td>
-<td><p>Clip a model by a bounding box (time, y, x).</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="generated/msw/imod.msw.CouplerMapping.write.html#imod.msw.CouplerMapping.write" title="imod.msw.CouplerMapping.write"><code class="xref py py-obj docutils literal notranslate"><span class="pre">CouplerMapping.write</span></code></a>(directory, index, svat, ...)</p></td>
+<td><p>Write MetaSWAP package to its corresponding fixed format file.</p></td>
 </tr>
 </tbody>
 </table>
@@ -948,11 +1156,11 @@
       </div>
     </a>
     <a class="right-next"
-       href="generated/msw/imod.msw.GridData.html"
+       href="generated/msw/imod.msw.MetaSwapModel.html"
        title="next page">
       <div class="prev-next-info">
         <p class="prev-next-subtitle">next</p>
-        <p class="prev-next-title">imod.msw.GridData</p>
+        <p class="prev-next-title">imod.msw.MetaSwapModel</p>
       </div>
       <i class="fa-solid fa-angle-right"></i>
     </a>
@@ -966,6 +1174,29 @@
                 <dialog id="pst-secondary-sidebar-modal"></dialog>
                 <div id="pst-secondary-sidebar" class="bd-sidebar-secondary bd-toc"><div class="sidebar-secondary-items sidebar-secondary__inner">
 
+
+  <div class="sidebar-secondary-item">
+<div
+    id="pst-page-navigation-heading-2"
+    class="page-toc tocsection onthispage">
+    <i class="fa-solid fa-list"></i> On this page
+  </div>
+  <nav class="bd-toc-nav page-toc" aria-labelledby="pst-page-navigation-heading-2">
+    <ul class="visible nav section-nav flex-column">
+<li class="toc-h1 nav-item toc-entry"><a class="reference internal nav-link" href="#">MetaSWAP</a><ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#model-objects-methods">Model objects &amp; methods</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#packages">Packages</a></li>
+</ul>
+</li>
+<li class="toc-h1 nav-item toc-entry"><a class="reference internal nav-link" href="#grid-packages">Grid packages</a></li>
+<li class="toc-h1 nav-item toc-entry"><a class="reference internal nav-link" href="#initial-conditions">Initial conditions</a></li>
+<li class="toc-h1 nav-item toc-entry"><a class="reference internal nav-link" href="#output-control">Output control</a></li>
+<li class="toc-h1 nav-item toc-entry"><a class="reference internal nav-link" href="#parameter-packages">Parameter packages</a></li>
+<li class="toc-h1 nav-item toc-entry"><a class="reference internal nav-link" href="#meteorology-packages">Meteorology packages</a></li>
+<li class="toc-h1 nav-item toc-entry"><a class="reference internal nav-link" href="#mappings">Mappings</a></li>
+</ul>
+
+  </nav></div>
 
   <div class="sidebar-secondary-item">
   <div role="note" aria-label="source link">

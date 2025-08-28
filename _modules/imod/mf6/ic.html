@@ -7,7 +7,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>imod.mf6.ic &#8212; iMOD Python 1.0.0rc4 documentation</title>
+    <title>imod.mf6.ic &#8212; iMOD Python 1.0.0rc6 documentation</title>
   
   
   
@@ -41,7 +41,7 @@
   <link rel="preload" as="script" href="../../../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
 <link rel="preload" as="script" href="../../../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
 
-    <script src="../../../_static/documentation_options.js?v=2fc85bd2"></script>
+    <script src="../../../_static/documentation_options.js?v=bc4855a1"></script>
     <script src="../../../_static/doctools.js?v=9bcbadda"></script>
     <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script>DOCUMENTATION_OPTIONS.pagename = '_modules/imod/mf6/ic';</script>
@@ -50,7 +50,7 @@
     <link rel="search" title="Search" href="../../../search.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
-  <meta name="docsearch:version" content="1.0.0rc4.dev" />
+  <meta name="docsearch:version" content="1.0.0rc6.dev" />
   </head>
   
   
@@ -114,8 +114,8 @@
     
     
     
-    <img src="../../../_static/imod-python-logo-light.svg" class="logo__image only-light" alt="iMOD Python 1.0.0rc4 documentation - Home"/>
-    <img src="../../../_static/imod-python-logo-dark.svg" class="logo__image only-dark pst-js-only" alt="iMOD Python 1.0.0rc4 documentation - Home"/>
+    <img src="../../../_static/imod-python-logo-light.svg" class="logo__image only-light" alt="iMOD Python 1.0.0rc6 documentation - Home"/>
+    <img src="../../../_static/imod-python-logo-dark.svg" class="logo__image only-dark pst-js-only" alt="iMOD Python 1.0.0rc6 documentation - Home"/>
   
   
 </a></div>
@@ -153,7 +153,7 @@
 
 <li class="nav-item ">
   <a class="nav-link nav-internal" href="../../../api/index.html">
-    API Reference
+    API
   </a>
 </li>
 
@@ -303,7 +303,7 @@
 
 <li class="nav-item ">
   <a class="nav-link nav-internal" href="../../../api/index.html">
-    API Reference
+    API
   </a>
 </li>
 
@@ -427,13 +427,14 @@
                 <article class="bd-article">
                   
   <h1>Source code for imod.mf6.ic</h1><div class="highlight"><pre>
-<span></span><span class="kn">import</span><span class="w"> </span><span class="nn">warnings</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">copy</span><span class="w"> </span><span class="kn">import</span> <span class="n">deepcopy</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Any</span><span class="p">,</span> <span class="n">Optional</span>
+<span></span><span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Any</span><span class="p">,</span> <span class="n">Optional</span>
 
 <span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
 
 <span class="kn">from</span><span class="w"> </span><span class="nn">imod.common.interfaces.iregridpackage</span><span class="w"> </span><span class="kn">import</span> <span class="n">IRegridPackage</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">imod.common.utilities.dataclass_type</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
+    <span class="n">DataclassType</span><span class="p">,</span>
+<span class="p">)</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">imod.common.utilities.regrid</span><span class="w"> </span><span class="kn">import</span> <span class="n">_regrid_package_data</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">imod.logging</span><span class="w"> </span><span class="kn">import</span> <span class="n">init_log_decorator</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">imod.mf6.package</span><span class="w"> </span><span class="kn">import</span> <span class="n">Package</span>
@@ -462,9 +463,6 @@
 
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
-<span class="sd">    head: array of floats (xr.DataArray)</span>
-<span class="sd">        for backwards compatibility this argument is maintained, but please use</span>
-<span class="sd">        the start-argument instead.</span>
 <span class="sd">    start: array of floats (xr.DataArray)</span>
 <span class="sd">        is the initial (starting) head or concentration—that is, the simulation&#39;s</span>
 <span class="sd">        initial state.</span>
@@ -483,10 +481,9 @@
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="n">_pkg_id</span> <span class="o">=</span> <span class="s2">&quot;ic&quot;</span>
-    <span class="n">_grid_data</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;head&quot;</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">}</span>
-    <span class="n">_keyword_map</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;head&quot;</span><span class="p">:</span> <span class="s2">&quot;strt&quot;</span><span class="p">}</span>
+    <span class="n">_grid_data</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;start&quot;</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">}</span>
+    <span class="n">_keyword_map</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;start&quot;</span><span class="p">:</span> <span class="s2">&quot;strt&quot;</span><span class="p">}</span>
     <span class="n">_template</span> <span class="o">=</span> <span class="n">Package</span><span class="o">.</span><span class="n">_initialize_template</span><span class="p">(</span><span class="n">_pkg_id</span><span class="p">)</span>
-
     <span class="n">_init_schemata</span> <span class="o">=</span> <span class="p">{</span>
         <span class="s2">&quot;start&quot;</span><span class="p">:</span> <span class="p">[</span>
             <span class="n">DTypeSchema</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">floating</span><span class="p">),</span>
@@ -500,34 +497,18 @@
             <span class="n">IdentityNoDataSchema</span><span class="p">(</span><span class="n">other</span><span class="o">=</span><span class="s2">&quot;idomain&quot;</span><span class="p">,</span> <span class="n">is_other_notnull</span><span class="o">=</span><span class="p">(</span><span class="s2">&quot;&gt;&quot;</span><span class="p">,</span> <span class="mi">0</span><span class="p">)),</span>
         <span class="p">],</span>
     <span class="p">}</span>
-
-    <span class="n">_grid_data</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;start&quot;</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">}</span>
-    <span class="n">_keyword_map</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;start&quot;</span><span class="p">:</span> <span class="s2">&quot;strt&quot;</span><span class="p">}</span>
-    <span class="n">_template</span> <span class="o">=</span> <span class="n">Package</span><span class="o">.</span><span class="n">_initialize_template</span><span class="p">(</span><span class="n">_pkg_id</span><span class="p">)</span>
     <span class="n">_regrid_method</span> <span class="o">=</span> <span class="n">InitialConditionsRegridMethod</span><span class="p">()</span>
 
 <div class="viewcode-block" id="InitialConditions.__init__">
 <a class="viewcode-back" href="../../../api/generated/mf6/imod.mf6.InitialConditions.html#imod.mf6.InitialConditions.__init__">[docs]</a>
     <span class="nd">@init_log_decorator</span><span class="p">()</span>
-    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">start</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">head</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">validate</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">):</span>
-        <span class="k">if</span> <span class="n">start</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="n">start</span> <span class="o">=</span> <span class="n">head</span>
-            <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span>
-                <span class="s1">&#39;The keyword argument &quot;head&quot; is deprecated. Please use the start argument.&#39;</span><span class="p">,</span>
-                <span class="ne">DeprecationWarning</span><span class="p">,</span>
-            <span class="p">)</span>
-            <span class="k">if</span> <span class="n">head</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;start and head arguments cannot both be None&quot;</span><span class="p">)</span>
-        <span class="k">else</span><span class="p">:</span>
-            <span class="k">if</span> <span class="n">head</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;start and head arguments cannot both be defined&quot;</span><span class="p">)</span>
-
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">start</span><span class="p">,</span> <span class="n">validate</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">):</span>
         <span class="n">dict_dataset</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;start&quot;</span><span class="p">:</span> <span class="n">start</span><span class="p">}</span>
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">dict_dataset</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_validate_init_schemata</span><span class="p">(</span><span class="n">validate</span><span class="p">)</span></div>
 
 
-    <span class="k">def</span><span class="w"> </span><span class="nf">render</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">directory</span><span class="p">,</span> <span class="n">pkgname</span><span class="p">,</span> <span class="n">globaltimes</span><span class="p">,</span> <span class="n">binary</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_render</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">directory</span><span class="p">,</span> <span class="n">pkgname</span><span class="p">,</span> <span class="n">globaltimes</span><span class="p">,</span> <span class="n">binary</span><span class="p">):</span>
         <span class="n">d</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]</span> <span class="o">=</span> <span class="p">{}</span>
 
         <span class="n">icdirectory</span> <span class="o">=</span> <span class="n">directory</span> <span class="o">/</span> <span class="n">pkgname</span>
@@ -543,7 +524,7 @@
         <span class="bp">cls</span><span class="p">,</span>
         <span class="n">imod5_data</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">GridDataArray</span><span class="p">]],</span>
         <span class="n">target_grid</span><span class="p">:</span> <span class="n">GridDataArray</span><span class="p">,</span>
-        <span class="n">regridder_types</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">InitialConditionsRegridMethod</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">regridder_types</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">DataclassType</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
         <span class="n">regrid_cache</span><span class="p">:</span> <span class="n">RegridderWeightsCache</span> <span class="o">=</span> <span class="n">RegridderWeightsCache</span><span class="p">(),</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="s2">&quot;InitialConditions&quot;</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
@@ -579,17 +560,13 @@
         <span class="p">}</span>
 
         <span class="k">if</span> <span class="n">regridder_types</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="n">regridder_types</span> <span class="o">=</span> <span class="n">InitialConditions</span><span class="o">.</span><span class="n">get_regrid_methods</span><span class="p">()</span>
+            <span class="n">regridder_types</span> <span class="o">=</span> <span class="bp">cls</span><span class="o">.</span><span class="n">get_regrid_methods</span><span class="p">()</span>
 
         <span class="n">new_package_data</span> <span class="o">=</span> <span class="n">_regrid_package_data</span><span class="p">(</span>
             <span class="n">data</span><span class="p">,</span> <span class="n">target_grid</span><span class="p">,</span> <span class="n">regridder_types</span><span class="p">,</span> <span class="n">regrid_cache</span><span class="p">,</span> <span class="p">{}</span>
         <span class="p">)</span>
         <span class="k">return</span> <span class="bp">cls</span><span class="p">(</span><span class="o">**</span><span class="n">new_package_data</span><span class="p">,</span> <span class="n">validate</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span></div>
-
-
-    <span class="nd">@classmethod</span>
-    <span class="k">def</span><span class="w"> </span><span class="nf">get_regrid_methods</span><span class="p">(</span><span class="bp">cls</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">InitialConditionsRegridMethod</span><span class="p">:</span>
-        <span class="k">return</span> <span class="n">deepcopy</span><span class="p">(</span><span class="bp">cls</span><span class="o">.</span><span class="n">_regrid_method</span><span class="p">)</span></div>
+</div>
 
 </pre></div>
 

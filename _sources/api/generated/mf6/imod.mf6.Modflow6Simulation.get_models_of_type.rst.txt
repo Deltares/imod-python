@@ -1,0 +1,6 @@
+﻿imod.mf6.Modflow6Simulation.get\_models\_of\_type
+=================================================
+
+.. currentmodule:: imod.mf6
+
+.. automethod:: Modflow6Simulation.get_models_of_type

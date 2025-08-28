@@ -8,7 +8,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>Lake package example &#8212; iMOD Python 1.0.0rc4 documentation</title>
+    <title>Lake package example &#8212; iMOD Python 1.0.0rc6 documentation</title>
   
   
   
@@ -42,7 +42,7 @@
   <link rel="preload" as="script" href="../../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
 <link rel="preload" as="script" href="../../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
 
-    <script src="../../_static/documentation_options.js?v=2fc85bd2"></script>
+    <script src="../../_static/documentation_options.js?v=bc4855a1"></script>
     <script src="../../_static/doctools.js?v=9bcbadda"></script>
     <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script>DOCUMENTATION_OPTIONS.pagename = 'examples/mf6/lake';</script>
@@ -53,7 +53,7 @@
     <link rel="prev" title="Partitioning a regional model" href="hondsrug_partitioning.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
-  <meta name="docsearch:version" content="1.0.0rc4.dev" />
+  <meta name="docsearch:version" content="1.0.0rc6.dev" />
   </head>
   
   
@@ -117,8 +117,8 @@
     
     
     
-    <img src="../../_static/imod-python-logo-light.svg" class="logo__image only-light" alt="iMOD Python 1.0.0rc4 documentation - Home"/>
-    <img src="../../_static/imod-python-logo-dark.svg" class="logo__image only-dark pst-js-only" alt="iMOD Python 1.0.0rc4 documentation - Home"/>
+    <img src="../../_static/imod-python-logo-light.svg" class="logo__image only-light" alt="iMOD Python 1.0.0rc6 documentation - Home"/>
+    <img src="../../_static/imod-python-logo-dark.svg" class="logo__image only-dark pst-js-only" alt="iMOD Python 1.0.0rc6 documentation - Home"/>
   
   
 </a></div>
@@ -156,7 +156,7 @@
 
 <li class="nav-item ">
   <a class="nav-link nav-internal" href="../../api/index.html">
-    API Reference
+    API
   </a>
 </li>
 
@@ -308,7 +308,7 @@
 
 <li class="nav-item ">
   <a class="nav-link nav-internal" href="../../api/index.html">
-    API Reference
+    API
   </a>
 </li>
 
@@ -555,7 +555,7 @@ structured model, we can make due with few packages.</p>
 <span class="n">is_lake</span><span class="o">.</span><span class="n">sel</span><span class="p">(</span><span class="n">layer</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span><span class="o">.</span><span class="n">plot</span><span class="o">.</span><span class="n">imshow</span><span class="p">()</span>
 </pre></div>
 </div>
-<img src="../../_images/sphx_glr_lake_001.png" srcset="../../_images/sphx_glr_lake_001.png" alt="layer = 1" class = "sphx-glr-single-img"/><div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>&lt;matplotlib.image.AxesImage object at 0x0000016F4406C260&gt;
+<img src="../../_images/sphx_glr_lake_001.png" srcset="../../_images/sphx_glr_lake_001.png" alt="layer = 1" class = "sphx-glr-single-img"/><div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>&lt;matplotlib.image.AxesImage object at 0x00000251C8E9BC50&gt;
 </pre></div>
 </div>
 <div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="n">VERTICAL</span> <span class="o">=</span> <span class="mi">1</span>
@@ -635,7 +635,7 @@ parameters. The model is characterized by:</p>
 <span class="n">gwf_model</span><span class="p">[</span><span class="s2">&quot;chd&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">imod</span><span class="o">.</span><span class="n">mf6</span><span class="o">.</span><span class="n">ConstantHead</span><span class="p">(</span>
     <span class="n">constant_head</span><span class="p">,</span> <span class="n">print_input</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">print_flows</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">save_flows</span><span class="o">=</span><span class="kc">True</span>
 <span class="p">)</span>
-<span class="n">gwf_model</span><span class="p">[</span><span class="s2">&quot;ic&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">imod</span><span class="o">.</span><span class="n">mf6</span><span class="o">.</span><span class="n">InitialConditions</span><span class="p">(</span><span class="n">head</span><span class="o">=</span><span class="mf">0.0</span><span class="p">)</span>
+<span class="n">gwf_model</span><span class="p">[</span><span class="s2">&quot;ic&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">imod</span><span class="o">.</span><span class="n">mf6</span><span class="o">.</span><span class="n">InitialConditions</span><span class="p">(</span><span class="n">start</span><span class="o">=</span><span class="mf">0.0</span><span class="p">)</span>
 <span class="n">gwf_model</span><span class="p">[</span><span class="s2">&quot;npf&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">imod</span><span class="o">.</span><span class="n">mf6</span><span class="o">.</span><span class="n">NodePropertyFlow</span><span class="p">(</span>
     <span class="n">icelltype</span><span class="o">=</span><span class="n">icelltype</span><span class="p">,</span>
     <span class="n">k</span><span class="o">=</span><span class="n">k</span><span class="p">,</span>
@@ -720,10 +720,10 @@ describes how to add it to yours.</p>
 <div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="n">head</span><span class="o">.</span><span class="n">isel</span><span class="p">(</span><span class="n">layer</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">time</span><span class="o">=</span><span class="mi">4</span><span class="p">)</span><span class="o">.</span><span class="n">plot</span><span class="o">.</span><span class="n">contourf</span><span class="p">()</span>
 </pre></div>
 </div>
-<img src="../../_images/sphx_glr_lake_002.png" srcset="../../_images/sphx_glr_lake_002.png" alt="dx = 5e+03, dy = -5e+03, layer = 1, time = 4.90..." class = "sphx-glr-single-img"/><div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>&lt;matplotlib.contour.QuadContourSet object at 0x0000016F4BFDD7F0&gt;
+<img src="../../_images/sphx_glr_lake_002.png" srcset="../../_images/sphx_glr_lake_002.png" alt="dx = 5e+03, dy = -5e+03, layer = 1, time = 4.90..." class = "sphx-glr-single-img"/><div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>&lt;matplotlib.contour.QuadContourSet object at 0x00000251D2E6B3E0&gt;
 </pre></div>
 </div>
-<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> (0 minutes 0.750 seconds)</p>
+<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> (0 minutes 0.833 seconds)</p>
 <div class="sphx-glr-footer sphx-glr-footer-example docutils container" id="sphx-glr-download-examples-mf6-lake-py">
 <div class="sphx-glr-download sphx-glr-download-jupyter docutils container">
 <p><a class="reference download internal" download="" href="../../_downloads/3e561bea3b8b74fe958e91a442daed49/lake.ipynb"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Jupyter</span> <span class="pre">notebook:</span> <span class="pre">lake.ipynb</span></code></a></p>

@@ -1,0 +1,6 @@
+﻿imod.msw.TimeOutputControl.write
+================================
+
+.. currentmodule:: imod.msw
+
+.. automethod:: TimeOutputControl.write

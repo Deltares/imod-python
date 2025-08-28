@@ -1,0 +1,6 @@
+﻿imod.mf6.Well.is\_empty
+=======================
+
+.. currentmodule:: imod.mf6
+
+.. automethod:: Well.is_empty

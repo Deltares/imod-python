@@ -19,26 +19,14 @@
       ~SingleLayerHorizontalFlowBarrierResistance.copy
       ~SingleLayerHorizontalFlowBarrierResistance.from_file
       ~SingleLayerHorizontalFlowBarrierResistance.from_imod5_data
-      ~SingleLayerHorizontalFlowBarrierResistance.get_non_grid_data
-      ~SingleLayerHorizontalFlowBarrierResistance.get_period_varnames
       ~SingleLayerHorizontalFlowBarrierResistance.get_regrid_methods
-      ~SingleLayerHorizontalFlowBarrierResistance.is_clipping_supported
       ~SingleLayerHorizontalFlowBarrierResistance.is_empty
-      ~SingleLayerHorizontalFlowBarrierResistance.is_grid_agnostic_package
-      ~SingleLayerHorizontalFlowBarrierResistance.is_regridding_supported
-      ~SingleLayerHorizontalFlowBarrierResistance.is_splitting_supported
-      ~SingleLayerHorizontalFlowBarrierResistance.isel
       ~SingleLayerHorizontalFlowBarrierResistance.mask
       ~SingleLayerHorizontalFlowBarrierResistance.regrid_like
-      ~SingleLayerHorizontalFlowBarrierResistance.render
-      ~SingleLayerHorizontalFlowBarrierResistance.sel
-      ~SingleLayerHorizontalFlowBarrierResistance.set_repeat_stress
+      ~SingleLayerHorizontalFlowBarrierResistance.snap_to_grid
       ~SingleLayerHorizontalFlowBarrierResistance.to_mf6_pkg
       ~SingleLayerHorizontalFlowBarrierResistance.to_netcdf
       ~SingleLayerHorizontalFlowBarrierResistance.write
-      ~SingleLayerHorizontalFlowBarrierResistance.write_binary_griddata
-      ~SingleLayerHorizontalFlowBarrierResistance.write_blockfile
-      ~SingleLayerHorizontalFlowBarrierResistance.write_text_griddata
    
    
 

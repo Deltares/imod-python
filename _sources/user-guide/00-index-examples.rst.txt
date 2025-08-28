@@ -87,7 +87,7 @@ Make structured grid
  .. code-block:: none
 
 
-    <matplotlib.image.AxesImage object at 0x0000016F389124B0>
+    <matplotlib.image.AxesImage object at 0x00000251CA7C07A0>
 
 
 
@@ -391,7 +391,7 @@ set as heads at the boundaries of clipped parts.
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** (1 minutes 3.201 seconds)
+   **Total running time of the script:** (1 minutes 0.353 seconds)
 
 
 .. _sphx_glr_download_user-guide_00-index-examples.py:

@@ -1,0 +1,6 @@
+﻿imod.msw.GridData.write
+=======================
+
+.. currentmodule:: imod.msw
+
+.. automethod:: GridData.write

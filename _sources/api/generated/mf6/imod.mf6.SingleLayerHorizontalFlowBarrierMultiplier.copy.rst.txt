@@ -1,0 +1,6 @@
+﻿imod.mf6.SingleLayerHorizontalFlowBarrierMultiplier.copy
+========================================================
+
+.. currentmodule:: imod.mf6
+
+.. automethod:: SingleLayerHorizontalFlowBarrierMultiplier.copy

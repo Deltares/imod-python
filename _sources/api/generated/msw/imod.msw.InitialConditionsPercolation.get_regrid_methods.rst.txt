@@ -1,0 +1,6 @@
+﻿imod.msw.InitialConditionsPercolation.get\_regrid\_methods
+==========================================================
+
+.. currentmodule:: imod.msw
+
+.. automethod:: InitialConditionsPercolation.get_regrid_methods

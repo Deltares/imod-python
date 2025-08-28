@@ -7,7 +7,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>imod.msw.meteo_mapping &#8212; iMOD Python 1.0.0rc4 documentation</title>
+    <title>imod.msw.meteo_mapping &#8212; iMOD Python 1.0.0rc6 documentation</title>
   
   
   
@@ -41,7 +41,7 @@
   <link rel="preload" as="script" href="../../../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
 <link rel="preload" as="script" href="../../../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
 
-    <script src="../../../_static/documentation_options.js?v=2fc85bd2"></script>
+    <script src="../../../_static/documentation_options.js?v=bc4855a1"></script>
     <script src="../../../_static/doctools.js?v=9bcbadda"></script>
     <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script>DOCUMENTATION_OPTIONS.pagename = '_modules/imod/msw/meteo_mapping';</script>
@@ -50,7 +50,7 @@
     <link rel="search" title="Search" href="../../../search.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
-  <meta name="docsearch:version" content="1.0.0rc4.dev" />
+  <meta name="docsearch:version" content="1.0.0rc6.dev" />
   </head>
   
   
@@ -114,8 +114,8 @@
     
     
     
-    <img src="../../../_static/imod-python-logo-light.svg" class="logo__image only-light" alt="iMOD Python 1.0.0rc4 documentation - Home"/>
-    <img src="../../../_static/imod-python-logo-dark.svg" class="logo__image only-dark pst-js-only" alt="iMOD Python 1.0.0rc4 documentation - Home"/>
+    <img src="../../../_static/imod-python-logo-light.svg" class="logo__image only-light" alt="iMOD Python 1.0.0rc6 documentation - Home"/>
+    <img src="../../../_static/imod-python-logo-dark.svg" class="logo__image only-dark pst-js-only" alt="iMOD Python 1.0.0rc6 documentation - Home"/>
   
   
 </a></div>
@@ -153,7 +153,7 @@
 
 <li class="nav-item ">
   <a class="nav-link nav-internal" href="../../../api/index.html">
-    API Reference
+    API
   </a>
 </li>
 
@@ -303,7 +303,7 @@
 
 <li class="nav-item ">
   <a class="nav-link nav-internal" href="../../../api/index.html">
-    API Reference
+    API
   </a>
 </li>
 
@@ -439,7 +439,7 @@
 
 <span class="kn">import</span><span class="w"> </span><span class="nn">imod</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">imod.common.utilities.clip</span><span class="w"> </span><span class="kn">import</span> <span class="n">clip_spatial_box</span><span class="p">,</span> <span class="n">clip_time_slice</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">imod.common.utilities.regrid_method_type</span><span class="w"> </span><span class="kn">import</span> <span class="n">RegridMethodType</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">imod.common.utilities.dataclass_type</span><span class="w"> </span><span class="kn">import</span> <span class="n">DataclassType</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">imod.msw.fixed_format</span><span class="w"> </span><span class="kn">import</span> <span class="n">VariableMetaData</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">imod.msw.pkgbase</span><span class="w"> </span><span class="kn">import</span> <span class="n">MetaSwapPackage</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">imod.msw.utilities.common</span><span class="w"> </span><span class="kn">import</span> <span class="n">find_in_file_list</span>
@@ -515,7 +515,7 @@
     <span class="p">):</span>
         <span class="n">data_dict</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;svat&quot;</span><span class="p">:</span> <span class="n">svat</span><span class="o">.</span><span class="n">values</span><span class="o">.</span><span class="n">ravel</span><span class="p">()[</span><span class="n">index</span><span class="p">]}</span>
 
-        <span class="n">row</span><span class="p">,</span> <span class="n">column</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">grid_mapping</span><span class="p">(</span><span class="n">svat</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">meteo</span><span class="p">)</span>
+        <span class="n">row</span><span class="p">,</span> <span class="n">column</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_grid_mapping</span><span class="p">(</span><span class="n">svat</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">meteo</span><span class="p">)</span>
 
         <span class="n">data_dict</span><span class="p">[</span><span class="s2">&quot;row&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">row</span><span class="p">[</span><span class="n">index</span><span class="p">]</span>
         <span class="n">data_dict</span><span class="p">[</span><span class="s2">&quot;column&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">column</span><span class="p">[</span><span class="n">index</span><span class="p">]</span>
@@ -526,10 +526,10 @@
 
         <span class="bp">self</span><span class="o">.</span><span class="n">_check_range</span><span class="p">(</span><span class="n">dataframe</span><span class="p">)</span>
 
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">write_dataframe_fixed_width</span><span class="p">(</span><span class="n">file</span><span class="p">,</span> <span class="n">dataframe</span><span class="p">)</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_write_dataframe_fixed_width</span><span class="p">(</span><span class="n">file</span><span class="p">,</span> <span class="n">dataframe</span><span class="p">)</span>
 
     <span class="nd">@staticmethod</span>
-    <span class="k">def</span><span class="w"> </span><span class="nf">grid_mapping</span><span class="p">(</span><span class="n">svat</span><span class="p">:</span> <span class="n">xr</span><span class="o">.</span><span class="n">DataArray</span><span class="p">,</span> <span class="n">meteo_grid</span><span class="p">:</span> <span class="n">xr</span><span class="o">.</span><span class="n">DataArray</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_grid_mapping</span><span class="p">(</span><span class="n">svat</span><span class="p">:</span> <span class="n">xr</span><span class="o">.</span><span class="n">DataArray</span><span class="p">,</span> <span class="n">meteo_grid</span><span class="p">:</span> <span class="n">xr</span><span class="o">.</span><span class="n">DataArray</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">:</span>
         <span class="n">flip_meteo_x</span> <span class="o">=</span> <span class="n">meteo_grid</span><span class="o">.</span><span class="n">indexes</span><span class="p">[</span><span class="s2">&quot;x&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">is_monotonic_decreasing</span>
         <span class="n">flip_meteo_y</span> <span class="o">=</span> <span class="n">meteo_grid</span><span class="o">.</span><span class="n">indexes</span><span class="p">[</span><span class="s2">&quot;y&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">is_monotonic_decreasing</span>
         <span class="n">nrow</span> <span class="o">=</span> <span class="n">meteo_grid</span><span class="p">[</span><span class="s2">&quot;y&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">size</span>
@@ -568,9 +568,14 @@
     <span class="k">def</span><span class="w"> </span><span class="nf">regrid_like</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">target_grid</span><span class="p">:</span> <span class="n">GridDataArray</span><span class="p">,</span>
-        <span class="n">regrid_context</span><span class="p">:</span> <span class="n">RegridderWeightsCache</span><span class="p">,</span>
-        <span class="n">regridder_types</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">RegridMethodType</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">regrid_cache</span><span class="p">:</span> <span class="n">RegridderWeightsCache</span><span class="p">,</span>
+        <span class="n">regridder_types</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">DataclassType</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Returns a deepcopy of this instance, as regridding this package is</span>
+<span class="sd">        irrelevant: The meteo data is not on model grid and the mapping is</span>
+<span class="sd">        determined upon writing.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="n">deepcopy</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
 
     <span class="k">def</span><span class="w"> </span><span class="nf">clip_box</span><span class="p">(</span>
@@ -582,7 +587,52 @@
         <span class="n">y_min</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">float</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
         <span class="n">y_max</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">float</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Clip meteo grid to a box defined by time and space.&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Clip a package by a bounding box (time, y, x).</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        time_min: optional, np.datetime64</span>
+<span class="sd">            Start time to select. Data will be forward filled to this date. If</span>
+<span class="sd">            time_min is before the start time of the dataset, data is</span>
+<span class="sd">            backfilled.</span>
+<span class="sd">        time_max: optional</span>
+<span class="sd">            End time to select.</span>
+<span class="sd">        x_min: optional, float</span>
+<span class="sd">            Minimum x-coordinate to select.</span>
+<span class="sd">        x_max: optional, float</span>
+<span class="sd">            Maximum x-coordinate to select.</span>
+<span class="sd">        y_min: optional, float</span>
+<span class="sd">            Minimum y-coordinate to select.</span>
+<span class="sd">        y_max: optional, float</span>
+<span class="sd">            Maximum y-coordinate to select.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        clipped : Package</span>
+<span class="sd">            A new package that is clipped to the specified bounding box.</span>
+
+<span class="sd">        Examples</span>
+<span class="sd">        --------</span>
+<span class="sd">        Slicing intervals may be half-bounded, by providing None:</span>
+
+<span class="sd">        To select 500.0 &lt;= x &lt;= 1000.0:</span>
+
+<span class="sd">        &gt;&gt;&gt; pkg.clip_box(x_min=500.0, x_max=1000.0)</span>
+
+<span class="sd">        To select x &lt;= 1000.0:</span>
+
+<span class="sd">        &gt;&gt;&gt; pkg.clip_box(x_max=1000.0)``</span>
+
+<span class="sd">        To select x &gt;= 500.0:</span>
+
+<span class="sd">        &gt;&gt;&gt; pkg.clip_box(x_min=500.0)</span>
+
+<span class="sd">        To select a time interval, you can use datetime64:</span>
+
+<span class="sd">        &gt;&gt;&gt; pkg.clip_box(time_min=np.datetime64(&quot;2020-01-01&quot;), time_max=np.datetime64(&quot;2020-12-31&quot;))</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">selection</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">meteo</span><span class="o">.</span><span class="n">to_dataset</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s2">&quot;meteo&quot;</span><span class="p">)</span>  <span class="c1"># Force to dataset</span>
         <span class="n">selection</span> <span class="o">=</span> <span class="n">clip_time_slice</span><span class="p">(</span><span class="n">selection</span><span class="p">,</span> <span class="n">time_min</span><span class="o">=</span><span class="n">time_min</span><span class="p">,</span> <span class="n">time_max</span><span class="o">=</span><span class="n">time_max</span><span class="p">)</span>
         <span class="n">selection</span> <span class="o">=</span> <span class="n">clip_spatial_box</span><span class="p">(</span>

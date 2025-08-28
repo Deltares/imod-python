@@ -1,0 +1,6 @@
+﻿imod.mf6.GroundwaterFlowModel.validate
+======================================
+
+.. currentmodule:: imod.mf6
+
+.. automethod:: GroundwaterFlowModel.validate

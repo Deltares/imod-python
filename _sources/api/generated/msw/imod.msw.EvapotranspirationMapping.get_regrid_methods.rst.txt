@@ -1,0 +1,6 @@
+﻿imod.msw.EvapotranspirationMapping.get\_regrid\_methods
+=======================================================
+
+.. currentmodule:: imod.msw
+
+.. automethod:: EvapotranspirationMapping.get_regrid_methods

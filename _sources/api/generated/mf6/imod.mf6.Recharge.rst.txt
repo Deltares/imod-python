@@ -14,32 +14,19 @@
    .. autosummary::
    
       ~Recharge.__init__
-      ~Recharge.allocate_planar_data
-      ~Recharge.cleanup
+      ~Recharge.aggregate_layers
       ~Recharge.clip_box
       ~Recharge.copy
       ~Recharge.from_file
       ~Recharge.from_imod5_cap_data
       ~Recharge.from_imod5_data
-      ~Recharge.get_non_grid_data
-      ~Recharge.get_period_varnames
       ~Recharge.get_regrid_methods
-      ~Recharge.is_clipping_supported
       ~Recharge.is_empty
-      ~Recharge.is_grid_agnostic_package
-      ~Recharge.is_regridding_supported
-      ~Recharge.is_splitting_supported
-      ~Recharge.isel
       ~Recharge.mask
+      ~Recharge.reallocate
       ~Recharge.regrid_like
-      ~Recharge.render
-      ~Recharge.sel
-      ~Recharge.set_repeat_stress
       ~Recharge.to_netcdf
       ~Recharge.write
-      ~Recharge.write_binary_griddata
-      ~Recharge.write_blockfile
-      ~Recharge.write_text_griddata
    
    
 

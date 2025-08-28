@@ -7,7 +7,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>imod.mf6.timedis &#8212; iMOD Python 1.0.0rc4 documentation</title>
+    <title>imod.mf6.timedis &#8212; iMOD Python 1.0.0rc6 documentation</title>
   
   
   
@@ -41,7 +41,7 @@
   <link rel="preload" as="script" href="../../../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
 <link rel="preload" as="script" href="../../../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
 
-    <script src="../../../_static/documentation_options.js?v=2fc85bd2"></script>
+    <script src="../../../_static/documentation_options.js?v=bc4855a1"></script>
     <script src="../../../_static/doctools.js?v=9bcbadda"></script>
     <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script>DOCUMENTATION_OPTIONS.pagename = '_modules/imod/mf6/timedis';</script>
@@ -50,7 +50,7 @@
     <link rel="search" title="Search" href="../../../search.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
-  <meta name="docsearch:version" content="1.0.0rc4.dev" />
+  <meta name="docsearch:version" content="1.0.0rc6.dev" />
   </head>
   
   
@@ -114,8 +114,8 @@
     
     
     
-    <img src="../../../_static/imod-python-logo-light.svg" class="logo__image only-light" alt="iMOD Python 1.0.0rc4 documentation - Home"/>
-    <img src="../../../_static/imod-python-logo-dark.svg" class="logo__image only-dark pst-js-only" alt="iMOD Python 1.0.0rc4 documentation - Home"/>
+    <img src="../../../_static/imod-python-logo-light.svg" class="logo__image only-light" alt="iMOD Python 1.0.0rc6 documentation - Home"/>
+    <img src="../../../_static/imod-python-logo-dark.svg" class="logo__image only-dark pst-js-only" alt="iMOD Python 1.0.0rc6 documentation - Home"/>
   
   
 </a></div>
@@ -153,7 +153,7 @@
 
 <li class="nav-item ">
   <a class="nav-link nav-internal" href="../../../api/index.html">
-    API Reference
+    API
   </a>
 </li>
 
@@ -303,7 +303,7 @@
 
 <li class="nav-item ">
   <a class="nav-link nav-internal" href="../../../api/index.html">
-    API Reference
+    API
   </a>
 </li>
 
@@ -432,6 +432,7 @@
 
 <span class="kn">from</span><span class="w"> </span><span class="nn">imod.logging</span><span class="w"> </span><span class="kn">import</span> <span class="n">init_log_decorator</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">imod.mf6.package</span><span class="w"> </span><span class="kn">import</span> <span class="n">Package</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">imod.mf6.write_context</span><span class="w"> </span><span class="kn">import</span> <span class="n">WriteContext</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">imod.schemata</span><span class="w"> </span><span class="kn">import</span> <span class="n">DimsSchema</span><span class="p">,</span> <span class="n">DTypeSchema</span>
 
 
@@ -505,12 +506,14 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">_validate_init_schemata</span><span class="p">(</span><span class="n">validate</span><span class="p">)</span></div>
 
 
-    <span class="k">def</span><span class="w"> </span><span class="nf">render</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">directory</span><span class="p">,</span> <span class="n">pkgname</span><span class="p">,</span> <span class="n">globaltimes</span><span class="p">,</span> <span class="n">binary</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_render</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">directory</span><span class="p">,</span> <span class="n">pkgname</span><span class="p">,</span> <span class="n">globaltimes</span><span class="p">,</span> <span class="n">binary</span><span class="p">):</span>
         <span class="n">start_date_time</span> <span class="o">=</span> <span class="n">iso8601</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">dataset</span><span class="p">[</span><span class="s2">&quot;time&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">values</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
         <span class="n">d</span> <span class="o">=</span> <span class="p">{</span>
             <span class="s2">&quot;time_units&quot;</span><span class="p">:</span> <span class="s2">&quot;days&quot;</span><span class="p">,</span>
             <span class="s2">&quot;start_date_time&quot;</span><span class="p">:</span> <span class="n">start_date_time</span><span class="p">,</span>
         <span class="p">}</span>
+        <span class="k">if</span> <span class="s2">&quot;ats_filename&quot;</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">dataset</span><span class="p">:</span>
+            <span class="n">d</span><span class="p">[</span><span class="s2">&quot;ats_filename&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">dataset</span><span class="p">[</span><span class="s2">&quot;ats_filename&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">item</span><span class="p">()</span>
         <span class="n">timestep_duration</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">dataset</span><span class="p">[</span><span class="s2">&quot;timestep_duration&quot;</span><span class="p">]</span>
         <span class="n">n_timesteps</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">dataset</span><span class="p">[</span><span class="s2">&quot;n_timesteps&quot;</span><span class="p">]</span>
         <span class="n">timestep_multiplier</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">dataset</span><span class="p">[</span><span class="s2">&quot;timestep_multiplier&quot;</span><span class="p">]</span>
@@ -552,8 +555,16 @@
                 <span class="sa">f</span><span class="s2">&quot;Got </span><span class="si">{</span><span class="n">da</span><span class="o">.</span><span class="n">dims</span><span class="si">}</span><span class="s2">. Can be at max (&#39;time&#39;, ).&quot;</span>
             <span class="p">)</span>
 
+    <span class="k">def</span><span class="w"> </span><span class="nf">_set_ats_filename</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">ats_pkgname</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">write_context</span><span class="p">:</span> <span class="n">WriteContext</span><span class="p">):</span>
+        <span class="n">ats_path</span> <span class="o">=</span> <span class="n">write_context</span><span class="o">.</span><span class="n">get_formatted_write_directory</span><span class="p">()</span> <span class="o">/</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">ats_pkgname</span><span class="si">}</span><span class="s2">.ats&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">dataset</span><span class="p">[</span><span class="s2">&quot;ats_filename&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">ats_path</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_clear_ats_filename</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">if</span> <span class="s2">&quot;ats_filename&quot;</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">dataset</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
+            <span class="k">del</span> <span class="bp">self</span><span class="o">.</span><span class="n">dataset</span><span class="p">[</span><span class="s2">&quot;ats_filename&quot;</span><span class="p">]</span>
+
     <span class="k">def</span><span class="w"> </span><span class="nf">_write</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">pkgname</span><span class="p">,</span> <span class="n">globaltimes</span><span class="p">,</span> <span class="n">write_context</span><span class="p">):</span>
-        <span class="n">timedis_content</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">render</span><span class="p">(</span>
+        <span class="n">timedis_content</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_render</span><span class="p">(</span>
             <span class="n">write_context</span><span class="o">.</span><span class="n">write_directory</span><span class="p">,</span>
             <span class="n">pkgname</span><span class="p">,</span>
             <span class="n">globaltimes</span><span class="p">,</span>

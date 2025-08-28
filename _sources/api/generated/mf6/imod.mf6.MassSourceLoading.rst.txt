@@ -14,29 +14,15 @@
    .. autosummary::
    
       ~MassSourceLoading.__init__
-      ~MassSourceLoading.cleanup
       ~MassSourceLoading.clip_box
       ~MassSourceLoading.copy
       ~MassSourceLoading.from_file
-      ~MassSourceLoading.get_non_grid_data
-      ~MassSourceLoading.get_period_varnames
       ~MassSourceLoading.get_regrid_methods
-      ~MassSourceLoading.is_clipping_supported
       ~MassSourceLoading.is_empty
-      ~MassSourceLoading.is_grid_agnostic_package
-      ~MassSourceLoading.is_regridding_supported
-      ~MassSourceLoading.is_splitting_supported
-      ~MassSourceLoading.isel
       ~MassSourceLoading.mask
       ~MassSourceLoading.regrid_like
-      ~MassSourceLoading.render
-      ~MassSourceLoading.sel
-      ~MassSourceLoading.set_repeat_stress
       ~MassSourceLoading.to_netcdf
       ~MassSourceLoading.write
-      ~MassSourceLoading.write_binary_griddata
-      ~MassSourceLoading.write_blockfile
-      ~MassSourceLoading.write_text_griddata
    
    
 

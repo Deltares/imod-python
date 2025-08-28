@@ -1,0 +1,774 @@
+
+<!DOCTYPE html>
+
+
+<html lang="en" data-content_root="../" data-theme="light">
+
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>iMOD Python test plan &#8212; iMOD Python 1.0.0rc6 documentation</title>
+  
+  
+  
+  <script data-cfasync="false">
+    document.documentElement.dataset.mode = localStorage.getItem("mode") || "light";
+    document.documentElement.dataset.theme = localStorage.getItem("theme") || "light";
+  </script>
+  <!--
+    this give us a css class that will be invisible only if js is disabled
+  -->
+  <noscript>
+    <style>
+      .pst-js-only { display: none !important; }
+
+    </style>
+  </noscript>
+  
+  <!-- Loaded before other Sphinx assets -->
+  <link href="../_static/styles/theme.css?digest=8878045cc6db502f8baf" rel="stylesheet" />
+<link href="../_static/styles/pydata-sphinx-theme.css?digest=8878045cc6db502f8baf" rel="stylesheet" />
+
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=03e43079" />
+    <link rel="stylesheet" type="text/css" href="../_static/sg_gallery.css?v=d2d258e8" />
+    <link rel="stylesheet" type="text/css" href="../_static/sg_gallery-binder.css?v=f4aeca0c" />
+    <link rel="stylesheet" type="text/css" href="../_static/sg_gallery-dataframe.css?v=2082cf3c" />
+    <link rel="stylesheet" type="text/css" href="../_static/sg_gallery-rendered-html.css?v=1277b6f3" />
+  
+  <!-- So that users can add custom icons -->
+  <script src="../_static/scripts/fontawesome.js?digest=8878045cc6db502f8baf"></script>
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
+<link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
+
+    <script src="../_static/documentation_options.js?v=bc4855a1"></script>
+    <script src="../_static/doctools.js?v=9bcbadda"></script>
+    <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script>DOCUMENTATION_OPTIONS.pagename = 'developing/test-plan';</script>
+    <script src="../_static/deltares.js?v=8d5578be"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="prev" title="Docker build image" href="docker.html" />
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <meta name="docsearch:language" content="en"/>
+  <meta name="docsearch:version" content="1.0.0rc6.dev" />
+  </head>
+  
+  
+  <body data-bs-spy="scroll" data-bs-target=".bd-toc-nav" data-offset="180" data-bs-root-margin="0px 0px -60%" data-default-mode="light">
+
+  
+  
+  <div id="pst-skip-link" class="skip-link d-print-none"><a href="#main-content">Skip to main content</a></div>
+  
+  <div id="pst-scroll-pixel-helper"></div>
+  
+  <button type="button" class="btn rounded-pill" id="pst-back-to-top">
+    <i class="fa-solid fa-arrow-up"></i>Back to top</button>
+
+  
+  <dialog id="pst-search-dialog">
+    
+<form class="bd-search d-flex align-items-center"
+      action="../search.html"
+      method="get">
+  <i class="fa-solid fa-magnifying-glass"></i>
+  <input type="search"
+         class="form-control"
+         name="q"
+         placeholder="Search the docs ..."
+         aria-label="Search the docs ..."
+         autocomplete="off"
+         autocorrect="off"
+         autocapitalize="off"
+         spellcheck="false"/>
+  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
+</form>
+  </dialog>
+
+  <div class="pst-async-banner-revealer d-none">
+  <aside id="bd-header-version-warning" class="d-none d-print-none" aria-label="Version warning"></aside>
+</div>
+
+  
+    <header class="bd-header navbar navbar-expand-lg bd-navbar d-print-none">
+<div class="bd-header__inner bd-page-width">
+  <button class="pst-navbar-icon sidebar-toggle primary-toggle" aria-label="Site navigation">
+    <span class="fa-solid fa-bars"></span>
+  </button>
+  
+  
+  <div class="col-lg-3 navbar-header-items__start">
+    
+      <div class="navbar-item">
+
+  
+    
+  
+
+<a class="navbar-brand logo" href="../index.html">
+  
+  
+  
+  
+  
+    
+    
+    
+    <img src="../_static/imod-python-logo-light.svg" class="logo__image only-light" alt="iMOD Python 1.0.0rc6 documentation - Home"/>
+    <img src="../_static/imod-python-logo-dark.svg" class="logo__image only-dark pst-js-only" alt="iMOD Python 1.0.0rc6 documentation - Home"/>
+  
+  
+</a></div>
+    
+  </div>
+  
+  <div class="col-lg-9 navbar-header-items">
+    
+    <div class="me-auto navbar-header-items__center">
+      
+        <div class="navbar-item">
+<nav>
+  <ul class="bd-navbar-elements navbar-nav">
+    
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../installation.html">
+    Installing
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../user-guide/index.html">
+    User Guide
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../examples/index.html">
+    Examples
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../api/index.html">
+    API
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../faq/index.html">
+    FAQ
+  </a>
+</li>
+
+            <li class="nav-item dropdown">
+                <button class="btn dropdown-toggle nav-item" type="button"
+                data-bs-toggle="dropdown" aria-expanded="false"
+                aria-controls="pst-nav-more-links">
+                    More
+                </button>
+                <ul id="pst-nav-more-links" class="dropdown-menu">
+                    
+<li class=" current active">
+  <a class="nav-link dropdown-item nav-internal" href="index.html">
+    Developing
+  </a>
+</li>
+
+                </ul>
+            </li>
+            
+  </ul>
+</nav></div>
+      
+    </div>
+    
+    
+    <div class="navbar-header-items__end">
+      
+        <div class="navbar-item navbar-persistent--container">
+          
+
+<button class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+ <i class="fa-solid fa-magnifying-glass"></i>
+ <span class="search-button__default-text">Search</span>
+ <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+</button>
+        </div>
+      
+      
+        <div class="navbar-item">
+
+<button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button pst-js-only" aria-label="Color mode" data-bs-title="Color mode"  data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <i class="theme-switch fa-solid fa-sun                fa-lg" data-mode="light" title="Light"></i>
+  <i class="theme-switch fa-solid fa-moon               fa-lg" data-mode="dark"  title="Dark"></i>
+  <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg" data-mode="auto"  title="System Settings"></i>
+</button></div>
+      
+        <div class="navbar-item"><ul class="navbar-icon-links"
+    aria-label="Icon Links">
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://www.deltares.nl/en/" title="Deltares" class="nav-link pst-navbar-icon" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><i class="fa-custom fa-deltares fa-lg" aria-hidden="true"></i>
+            <span class="sr-only">Deltares</span></a>
+        </li>
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://github.com/Deltares/imod-python" title="GitHub" class="nav-link pst-navbar-icon" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><i class="fab fa-github fa-lg" aria-hidden="true"></i>
+            <span class="sr-only">GitHub</span></a>
+        </li>
+</ul></div>
+      
+    </div>
+    
+  </div>
+  
+  
+    <div class="navbar-persistent--mobile">
+
+<button class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+ <i class="fa-solid fa-magnifying-glass"></i>
+ <span class="search-button__default-text">Search</span>
+ <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+</button>
+    </div>
+  
+
+  
+    <button class="pst-navbar-icon sidebar-toggle secondary-toggle" aria-label="On this page">
+      <span class="fa-solid fa-outdent"></span>
+    </button>
+  
+</div>
+
+    </header>
+  
+
+  <div class="bd-container">
+    <div class="bd-container__inner bd-page-width">
+      
+      
+      
+      <dialog id="pst-primary-sidebar-modal"></dialog>
+      <div id="pst-primary-sidebar" class="bd-sidebar-primary bd-sidebar">
+        
+
+  
+  <div class="sidebar-header-items sidebar-primary__section">
+    
+    
+      <div class="sidebar-header-items__center">
+        
+          
+          
+            <div class="navbar-item">
+<nav>
+  <ul class="bd-navbar-elements navbar-nav">
+    
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../installation.html">
+    Installing
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../user-guide/index.html">
+    User Guide
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../examples/index.html">
+    Examples
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../api/index.html">
+    API
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../faq/index.html">
+    FAQ
+  </a>
+</li>
+
+
+<li class="nav-item current active">
+  <a class="nav-link nav-internal" href="index.html">
+    Developing
+  </a>
+</li>
+
+  </ul>
+</nav></div>
+          
+        
+      </div>
+    
+    
+    
+      <div class="sidebar-header-items__end">
+        
+          <div class="navbar-item">
+
+<button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button pst-js-only" aria-label="Color mode" data-bs-title="Color mode"  data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <i class="theme-switch fa-solid fa-sun                fa-lg" data-mode="light" title="Light"></i>
+  <i class="theme-switch fa-solid fa-moon               fa-lg" data-mode="dark"  title="Dark"></i>
+  <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg" data-mode="auto"  title="System Settings"></i>
+</button></div>
+        
+          <div class="navbar-item"><ul class="navbar-icon-links"
+    aria-label="Icon Links">
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://www.deltares.nl/en/" title="Deltares" class="nav-link pst-navbar-icon" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><i class="fa-custom fa-deltares fa-lg" aria-hidden="true"></i>
+            <span class="sr-only">Deltares</span></a>
+        </li>
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://github.com/Deltares/imod-python" title="GitHub" class="nav-link pst-navbar-icon" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><i class="fab fa-github fa-lg" aria-hidden="true"></i>
+            <span class="sr-only">GitHub</span></a>
+        </li>
+</ul></div>
+        
+      </div>
+    
+  </div>
+  
+    <div class="sidebar-primary-items__start sidebar-primary__section">
+        <div class="sidebar-primary-item">
+<nav class="bd-docs-nav bd-links"
+     aria-label="Section Navigation">
+  <p class="bd-links__title" role="heading" aria-level="1">Section Navigation</p>
+  <div class="bd-toc-item navbar-nav"><ul class="current nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="contributing.html">Contributing Code</a></li>
+<li class="toctree-l1"><a class="reference internal" href="examples.html">Developing examples</a></li>
+<li class="toctree-l1"><a class="reference internal" href="documentation.html">Building documentation and examples</a></li>
+<li class="toctree-l1"><a class="reference internal" href="ci.html">Debugging Continuous Integration</a></li>
+
+
+<li class="toctree-l1"><a class="reference internal" href="releasing.html">How to release a new version</a></li>
+<li class="toctree-l1"><a class="reference internal" href="docker.html">Docker build image</a></li>
+
+
+
+<li class="toctree-l1 current active"><a class="current reference internal" href="#">iMOD Python test plan</a></li>
+</ul>
+</div>
+</nav></div>
+    </div>
+  
+  
+  <div class="sidebar-primary-items__end sidebar-primary__section">
+      <div class="sidebar-primary-item">
+<div id="ethical-ad-placement"
+      class="flat"
+      data-ea-publisher="readthedocs"
+      data-ea-type="readthedocs-sidebar"
+      data-ea-manual="true">
+</div></div>
+  </div>
+
+
+      </div>
+      
+      <main id="main-content" class="bd-main" role="main">
+        
+        
+          <div class="bd-content">
+            <div class="bd-article-container">
+              
+              <div class="bd-header-article d-print-none">
+<div class="header-article-items header-article__inner">
+  
+    <div class="header-article-items__start">
+      
+        <div class="header-article-item">
+
+<nav aria-label="Breadcrumb" class="d-print-none">
+  <ul class="bd-breadcrumbs">
+    
+    <li class="breadcrumb-item breadcrumb-home">
+      <a href="../index.html" class="nav-link" aria-label="Home">
+        <i class="fa-solid fa-home"></i>
+      </a>
+    </li>
+    
+    <li class="breadcrumb-item"><a href="index.html" class="nav-link">Developing</a></li>
+    
+    <li class="breadcrumb-item active" aria-current="page"><span class="ellipsis">iMOD Python test plan</span></li>
+  </ul>
+</nav>
+</div>
+      
+    </div>
+  
+  
+</div>
+</div>
+              
+              
+              
+                
+<div id="searchbox"></div>
+                <article class="bd-article">
+                  
+  <section id="imod-python-test-plan">
+<h1>iMOD Python test plan<a class="headerlink" href="#imod-python-test-plan" title="Link to this heading">#</a></h1>
+<p>This document describes how and when to perform tests for iMOD Python.</p>
+<p>Known shortcomings and issues can be documented <a class="reference external" href="https://deltares.github.io/imod-python/faq/known-issues.html">here</a> . Bugs can be
+reported on <a class="reference external" href="https://github.com/Deltares/imod-python/issues">GitHub</a> .</p>
+<section id="functional-tests">
+<h2>Functional tests<a class="headerlink" href="#functional-tests" title="Link to this heading">#</a></h2>
+<p>The functional tests are run as part of the CI pipeline, and consist of
+unittests and short examples which will be contained in the documentation. They
+can be run locally by running the following commands in the root of the
+repository:</p>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="go">pixi run tests</span>
+<span class="go">pixi run examples</span>
+</pre></div>
+</div>
+<p>These tests are run automatically on every push to the repository, and on every
+pull request. They will therefore presumably work as they are run regularly, but
+a final check can’t harm anyway.</p>
+<p>Some extra edge cases are not covered by the CI, and these should be
+checked manually before a release. These are:</p>
+<ul>
+<li><p>Installing iMOD Python and running tests in a folder with curly braces <code class="docutils literal notranslate"><span class="pre">{}</span></code>
+in the name, like is unavoidable on the Windows Computational Facilities
+(WCF).</p>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="go">mkdir &quot;{WCF}&quot;</span>
+<span class="go">cd &quot;{WCF}&quot;</span>
+<span class="go">git clone https://github.com/Deltares/imod-python.git</span>
+<span class="go">cd imod-python</span>
+<span class="go">pixi run tests</span>
+</pre></div>
+</div>
+</li>
+<li><p>Installing iMOD Python with the iMODforge distribution on a machine
+disconnected from the internet, like Deltares’ LHM server. Examples that use
+the <code class="docutils literal notranslate"><span class="pre">imod.data</span></code> module here will not work, as these require an internet
+connection to download the data. Therefore we’ll run test an example that
+doesn’t require internet connection. Install the <a class="reference external" href="https://deltares.github.io/iMOD-Documentation/deltaforge_install.html">iMODforge distribution</a>
+Next, open the <em>iMODforge prompt</em>. Copy <a class="reference external" href="https://github.com/Deltares/imod-python/blob/master/examples/mf6/ex01_twri.py">the TWRI example</a>
+and run the following command to test if the example works:</p>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="go">python ``ex01_twri.py``</span>
+</pre></div>
+</div>
+</li>
+<li><p>Installing iMOD Python on Linux. This is less commonly used by iMOD Python
+users and developers, therefore might lead to missed edge cases. Call the
+following and see if the tests run without errors:</p>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="go">git clone https://github.com/Deltares/imod-python.git</span>
+<span class="go">cd imod-python</span>
+<span class="go">pixi run tests</span>
+</pre></div>
+</div>
+</li>
+</ul>
+<p>If these edge cases fail, they should be documented in the
+<a class="reference internal" href="../faq/known-issues.html"><span class="doc">Known Issues</span></a> page with a workaround (if possible), and an issue
+should be opened on <a class="reference external" href="https://github.com/Deltares/imod-python/issues">GitHub</a> .</p>
+</section>
+<section id="user-acceptance-tests">
+<h2>User acceptance tests<a class="headerlink" href="#user-acceptance-tests" title="Link to this heading">#</a></h2>
+<p>The user acceptance tests are not run as part of the CI pipeline, because they
+are are either too slow or require too much manual input to be part of our CI.
+These therefore require extra attention before a release.</p>
+<section id="performance-tests">
+<h3>Performance tests<a class="headerlink" href="#performance-tests" title="Link to this heading">#</a></h3>
+<p>These are stress tests that tests the capabilities of iMOD Python in dealing
+with large groundwater models. The model currently used for the performance
+tests is <a class="reference external" href="https://nhi.nu/modellen/lhm/">the LHM model</a>, but more models might
+be added in the future.</p>
+<p>Run the performance tests locally on a Windows machine by following these steps:</p>
+<ol class="arabic simple">
+<li><p>First contact <a class="reference external" href="mailto:imod&#46;support&#37;&#52;&#48;deltares&#46;nl">imod<span>&#46;</span>support<span>&#64;</span>deltares<span>&#46;</span>nl</a> and ask for an access key to access
+the iMOD Python test data. They will contact you and send you a key. Make
+sure you don’t share this key with others!</p></li>
+<li><p>Activate the user acceptance environment by running the following command in the root
+of the repository:</p></li>
+</ol>
+<blockquote>
+<div><div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="go">pixi shell -e user-acceptance</span>
+</pre></div>
+</div>
+</div></blockquote>
+<ol class="arabic simple" start="3">
+<li><p>Add your key to the DVC configuration by running the following command in the root
+of the repository:</p></li>
+</ol>
+<blockquote>
+<div><div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="go">dvc remote modify --local minio access_key_id &lt;your_access_key&gt;</span>
+<span class="go">dvc remote modify --local minio secret_access_key &lt;your_secret_access_key&gt;</span>
+</pre></div>
+</div>
+<p>Don’t forget the <code class="docutils literal notranslate"><span class="pre">--local</span></code> flag, as this will store the key in the
+<code class="docutils literal notranslate"><span class="pre">.dvc/config.local</span></code> file, which is not committed to the repository.</p>
+</div></blockquote>
+<ol class="arabic simple" start="4">
+<li><p>Pull the data from the DVC remote by running the following command in the root
+of the repository:</p></li>
+</ol>
+<blockquote>
+<div><div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="go">pixi run fetch_lhm</span>
+</pre></div>
+</div>
+<p>This will unpack the LHM model data, which is used in the user acceptance
+tests.</p>
+</div></blockquote>
+<ol class="arabic simple" start="5">
+<li><p>Run the user acceptance tests by running the following command in the root
+of the repository:</p></li>
+</ol>
+<blockquote>
+<div><div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="go">pixi run user_acceptance</span>
+</pre></div>
+</div>
+<p>This will write the MODFLOW6 input files to the
+<code class="docutils literal notranslate"><span class="pre">imod/tests/user_acceptance_data/mf6_imod-python</span></code> folder and the MetaSWAP
+files to <code class="docutils literal notranslate"><span class="pre">imod/tests/user_acceptance_data/msp_imod-python</span></code>.</p>
+</div></blockquote>
+<ol class="arabic" start="6">
+<li><p>Run the iMOD5 conversion which is the reference by running the following
+command in the root of the repository. This needs to be run on a Windows
+machine.</p>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="go">pixi run run_imod5</span>
+</pre></div>
+</div>
+</li>
+</ol>
+<blockquote>
+<div><p>This will write the MODFLOW6 and MetaSWAP input files to the
+<code class="docutils literal notranslate"><span class="pre">imod/tests/user_acceptance_data/MF6-MSP_IMOD-5</span></code> folder.</p>
+</div></blockquote>
+<p>Criteria for user acceptance tests of the 1.0 release are:</p>
+<ul class="simple">
+<li><p>The tests should run without errors.</p></li>
+<li><p>The tests should run without warnings from iMOD Python, unless unavoidable.</p></li>
+<li><p>The conversion of the transient LHM model run of 1 year on a daily timestep
+(365 stress-periods) should run without memory overflow on a machine with 32
+GB and write a model within 15 minutes.</p></li>
+<li><p>The MODFLOW6 and MetaSWAP input files written by iMOD Python should be the
+same as iMOD5 (accounting for differences in row sorting.), unless there was a
+conscious decision to divert from this. These will be mentioned in
+<a class="reference internal" href="../faq/imod5_backwards_compatibility.html"><span class="doc">iMOD5 backwards compatibility</span></a>.</p></li>
+<li><p>The conversion of the transient LHM model should not be slower than doing the
+same conversion with iMOD5.</p></li>
+</ul>
+</section>
+<section id="manual-checks">
+<h3>Manual checks<a class="headerlink" href="#manual-checks" title="Link to this heading">#</a></h3>
+<section id="qgis-export">
+<h4>QGIS export<a class="headerlink" href="#qgis-export" title="Link to this heading">#</a></h4>
+<ol class="arabic">
+<li><p>Run the pixi task written:</p>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="go">pixi run export_qgis</span>
+</pre></div>
+</div>
+<p>This will export a simulation to a TOML file and a set of UGRID netCDFs twice,
+once for a model with a structured grid, once for a model with an unstructured
+grid. The location of the exported files will be printed in the terminal.</p>
+</li>
+<li><p><a class="reference external" href="https://qgis.org/download/">Download the latest version of QGIS</a>.</p></li>
+<li><p>Open QGIS.</p></li>
+<li><p>Set the coordinate reference system (CRS) of the project to EPSG:28992, the
+same CRS as the exported files.</p></li>
+<li><p>Click <code class="docutils literal notranslate"><span class="pre">&quot;Layers&quot;</span> <span class="pre">&gt;</span> <span class="pre">&quot;Add</span> <span class="pre">Layer&quot;</span> <span class="pre">&gt;</span> <span class="pre">&quot;Add</span> <span class="pre">mesh&quot;</span></code>. Insert the path printed in the
+terminal in the text box. <code class="docutils literal notranslate"><span class="pre">{path_printed_in_terminal}/hondsrug_MDAL/riv.nc</span></code>
+This will import the mesh.</p></li>
+<li><p>Verify if the mesh is rendered in two dimensions, and not as a single
+line of cells. If not, <a class="reference external" href="https://github.com/Deltares/imod-python/issues">open an issue on GitHub</a> .</p></li>
+</ol>
+</section>
+<section id="tutorial">
+<h4>Tutorial<a class="headerlink" href="#tutorial" title="Link to this heading">#</a></h4>
+<ol class="arabic simple">
+<li><p><a class="reference external" href="https://deltares.github.io/iMOD-Documentation/tutorial_Hondsrug.html/">Open the tutorial material here</a> .</p></li>
+<li><p>Run each jupyter notebook and assure it runs without errors.</p></li>
+<li><p>If there are any errors, open an issue on <a class="reference external" href="https://github.com/Deltares/iMOD-Documentation/issues">iMOD Documentation repository
+Github</a> .</p></li>
+</ol>
+</section>
+</section>
+<section id="documentation">
+<h3>Documentation<a class="headerlink" href="#documentation" title="Link to this heading">#</a></h3>
+<p>Build the documentation locally by running the following command in the root of
+the repository:</p>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="go">pixi run docs</span>
+</pre></div>
+</div>
+<p>Check if the documentation builds without errors and warnings. If there are
+errors or warnings, fix them before releasing in <a class="reference external" href="https://github.com/Deltares/imod-python/pulls">a pull request on Github</a> . Next, check if the
+documentation pages are rendered correctly and if the information on them is not
+outdated. You can do this by opening the HTML files in the <code class="docutils literal notranslate"><span class="pre">docs/_build/html</span></code>.
+Focus on the following pages for the 1.0 release:</p>
+<ul class="simple">
+<li><p>The <a class="reference external" href="https://deltares.github.io/imod-python/installation/">Install documentation</a></p></li>
+<li><p>The <a class="reference external" href="https://deltares.github.io/imod-python/api/">iMOD Python API documentation</a>, focus on whether all classes,
+methods, and functions that are part of the public API are documented.</p></li>
+<li><p>The <a class="reference external" href="faq/imod5_backwards_compatibility.html">iMOD5 Backwards compatibility documentation</a></p></li>
+</ul>
+</section>
+</section>
+</section>
+
+
+                </article>
+              
+              
+              
+              
+              
+                <footer class="prev-next-footer d-print-none">
+                  
+<div class="prev-next-area">
+    <a class="left-prev"
+       href="docker.html"
+       title="previous page">
+      <i class="fa-solid fa-angle-left"></i>
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">previous</p>
+        <p class="prev-next-title">Docker build image</p>
+      </div>
+    </a>
+</div>
+                </footer>
+              
+            </div>
+            
+            
+              
+                <dialog id="pst-secondary-sidebar-modal"></dialog>
+                <div id="pst-secondary-sidebar" class="bd-sidebar-secondary bd-toc"><div class="sidebar-secondary-items sidebar-secondary__inner">
+
+
+  <div class="sidebar-secondary-item">
+<div
+    id="pst-page-navigation-heading-2"
+    class="page-toc tocsection onthispage">
+    <i class="fa-solid fa-list"></i> On this page
+  </div>
+  <nav class="bd-toc-nav page-toc" aria-labelledby="pst-page-navigation-heading-2">
+    <ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#functional-tests">Functional tests</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#user-acceptance-tests">User acceptance tests</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#performance-tests">Performance tests</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#manual-checks">Manual checks</a><ul class="nav section-nav flex-column">
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#qgis-export">QGIS export</a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#tutorial">Tutorial</a></li>
+</ul>
+</li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#documentation">Documentation</a></li>
+</ul>
+</li>
+</ul>
+  </nav></div>
+
+  <div class="sidebar-secondary-item">
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="../_sources/developing/test-plan.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div></div>
+
+</div></div>
+              
+            
+          </div>
+          <footer class="bd-footer-content">
+            
+          </footer>
+        
+      </main>
+    </div>
+  </div>
+  
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script defer src="../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf"></script>
+<script defer src="../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf"></script>
+
+  <footer class="bd-footer">
+<div class="bd-footer__inner bd-page-width">
+  
+    <div class="footer-items__start">
+      
+        <div class="footer-item">
+
+  <p class="copyright">
+    
+      © Copyright Deltares.
+      <br/>
+    
+  </p>
+</div>
+      
+        <div class="footer-item">
+
+  <p class="sphinx-version">
+    Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 8.2.3.
+    <br/>
+  </p>
+</div>
+      
+    </div>
+  
+  
+  
+    <div class="footer-items__end">
+      
+        <div class="footer-item">
+<p class="theme-version">
+  <!-- # L10n: Setting the PST URL as an argument as this does not need to be localized -->
+  Built with the <a href="https://pydata-sphinx-theme.readthedocs.io/en/stable/index.html">PyData Sphinx Theme</a> 0.16.1.
+</p></div>
+      
+    </div>
+  
+</div>
+
+  </footer>
+  </body>
+</html>

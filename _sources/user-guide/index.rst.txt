@@ -220,6 +220,40 @@ structures. Secondly, it will demonstrate how a modeling workflow is set up.
     </div>
 
 
+.. raw:: html
+
+    <div class="sphx-glr-thumbcontainer" tooltip="This example demonstrates how to work with iMOD5 files in Python using the imod package. It shows how to save, read, and manipulate iMOD5 files, including handling temporary directories and glob patterns for file selection.">
+
+.. only:: html
+
+  .. image:: /user-guide/images/thumb/sphx_glr_11-imod5-files_thumb.png
+    :alt:
+
+  :ref:`sphx_glr_user-guide_11-imod5-files.py`
+
+.. raw:: html
+
+      <div class="sphx-glr-thumbnail-title">Reading and writing iMOD5 files in Python</div>
+    </div>
+
+
+.. raw:: html
+
+    <div class="sphx-glr-thumbcontainer" tooltip="This example shows how to work with iMOD5 models in MODFLOW 6. It demonstrates how to convert an iMOD5 model to a MODFLOW 6 model using the imod package. The example fetches an iMOD5 model, converts it to a MODFLOW 6 model, regrids it to an unstructured grid, and compares differences in output between the structured and unstructured grids.">
+
+.. only:: html
+
+  .. image:: /user-guide/images/thumb/sphx_glr_12-imod5-model-to-modflow6_thumb.png
+    :alt:
+
+  :ref:`sphx_glr_user-guide_12-imod5-model-to-modflow6.py`
+
+.. raw:: html
+
+      <div class="sphx-glr-thumbnail-title">Working with iMOD5 models in MODFLOW 6</div>
+    </div>
+
+
 .. thumbnail-parent-div-close
 
 .. raw:: html
@@ -240,6 +274,8 @@ structures. Secondly, it will demonstrate how a modeling workflow is set up.
    /user-guide/08-regridding
    /user-guide/09-topsystem
    /user-guide/10-cleanup
+   /user-guide/11-imod5-files
+   /user-guide/12-imod5-model-to-modflow6
 
 
 .. only:: html

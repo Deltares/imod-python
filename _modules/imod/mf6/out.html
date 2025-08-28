@@ -7,7 +7,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>imod.mf6.out &#8212; iMOD Python 1.0.0rc4 documentation</title>
+    <title>imod.mf6.out &#8212; iMOD Python 1.0.0rc6 documentation</title>
   
   
   
@@ -41,7 +41,7 @@
   <link rel="preload" as="script" href="../../../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
 <link rel="preload" as="script" href="../../../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
 
-    <script src="../../../_static/documentation_options.js?v=2fc85bd2"></script>
+    <script src="../../../_static/documentation_options.js?v=bc4855a1"></script>
     <script src="../../../_static/doctools.js?v=9bcbadda"></script>
     <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script>DOCUMENTATION_OPTIONS.pagename = '_modules/imod/mf6/out';</script>
@@ -50,7 +50,7 @@
     <link rel="search" title="Search" href="../../../search.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
-  <meta name="docsearch:version" content="1.0.0rc4.dev" />
+  <meta name="docsearch:version" content="1.0.0rc6.dev" />
   </head>
   
   
@@ -114,8 +114,8 @@
     
     
     
-    <img src="../../../_static/imod-python-logo-light.svg" class="logo__image only-light" alt="iMOD Python 1.0.0rc4 documentation - Home"/>
-    <img src="../../../_static/imod-python-logo-dark.svg" class="logo__image only-dark pst-js-only" alt="iMOD Python 1.0.0rc4 documentation - Home"/>
+    <img src="../../../_static/imod-python-logo-light.svg" class="logo__image only-light" alt="iMOD Python 1.0.0rc6 documentation - Home"/>
+    <img src="../../../_static/imod-python-logo-dark.svg" class="logo__image only-dark pst-js-only" alt="iMOD Python 1.0.0rc6 documentation - Home"/>
   
   
 </a></div>
@@ -153,7 +153,7 @@
 
 <li class="nav-item ">
   <a class="nav-link nav-internal" href="../../../api/index.html">
-    API Reference
+    API
   </a>
 </li>
 
@@ -303,7 +303,7 @@
 
 <li class="nav-item ">
   <a class="nav-link nav-internal" href="../../../api/index.html">
-    API Reference
+    API
   </a>
 </li>
 
@@ -514,6 +514,8 @@
     <span class="k">return</span> <span class="n">func</span>
 
 
+<div class="viewcode-block" id="read_grb">
+<a class="viewcode-back" href="../../../api/generated/mf6/imod.mf6.read_grb.html#imod.mf6.read_grb">[docs]</a>
 <span class="k">def</span><span class="w"> </span><span class="nf">read_grb</span><span class="p">(</span><span class="n">path</span><span class="p">:</span> <span class="n">FilePath</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Read the data in a MODFLOW6 binary grid (.grb) file.</span>
@@ -525,6 +527,12 @@
 <span class="sd">    Returns</span>
 <span class="sd">    -------</span>
 <span class="sd">    grb_content: Dict[str, Any]</span>
+
+<span class="sd">    Examples</span>
+<span class="sd">    --------</span>
+<span class="sd">    Read the grb file:</span>
+
+<span class="sd">    &gt;&gt;&gt; grb_content = imod.mf6.read_grb(&quot;my-model.grb&quot;)</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="s2">&quot;rb&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
         <span class="n">h1</span> <span class="o">=</span> <span class="n">_grb_text</span><span class="p">(</span><span class="n">f</span><span class="p">)</span>
@@ -535,7 +543,8 @@
         <span class="n">ntxt</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">_grb_text</span><span class="p">(</span><span class="n">f</span><span class="p">)</span><span class="o">.</span><span class="n">split</span><span class="p">()[</span><span class="mi">1</span><span class="p">])</span>
         <span class="n">lentxt</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">_grb_text</span><span class="p">(</span><span class="n">f</span><span class="p">)</span><span class="o">.</span><span class="n">split</span><span class="p">()[</span><span class="mi">1</span><span class="p">])</span>
         <span class="n">d</span> <span class="o">=</span> <span class="n">_read</span><span class="p">(</span><span class="n">f</span><span class="p">,</span> <span class="n">ntxt</span><span class="p">,</span> <span class="n">lentxt</span><span class="p">)</span>
-    <span class="k">return</span> <span class="n">d</span>
+    <span class="k">return</span> <span class="n">d</span></div>
+
 
 
 <div class="viewcode-block" id="open_hds">
@@ -582,6 +591,27 @@
 <span class="sd">    Returns</span>
 <span class="sd">    -------</span>
 <span class="sd">    head: Union[xr.DataArray, xu.UgridDataArray]</span>
+
+<span class="sd">    Examples</span>
+<span class="sd">    --------</span>
+<span class="sd">    When you completed MODFLOW6 simulation, you can open the head file:</span>
+
+<span class="sd">    &gt;&gt;&gt; head = imod.mf6.open_hds(&quot;my-model.hds&quot;, &quot;my-model.grb&quot;)</span>
+
+<span class="sd">    This will return a DataArray with the head values for each cell in the</span>
+<span class="sd">    model, with dimensions (&quot;time&quot;, &quot;layer&quot;, &quot;y&quot;, &quot;x&quot;). The time coordinate will</span>
+<span class="sd">    only be the incremental time steps (1.0, 2.0, ...), unless you provide the</span>
+<span class="sd">    ``simulation_start_time`` and ``time_unit`` arguments. This will convert the</span>
+<span class="sd">    time coordinate to calendar time, starting from the provided simulation</span>
+<span class="sd">    start time:</span>
+
+<span class="sd">    &gt;&gt;&gt; head = imod.mf6.open_hds(</span>
+<span class="sd">    ...     &quot;my-model.hds&quot;,</span>
+<span class="sd">    ...     &quot;my-model.grb&quot;,</span>
+<span class="sd">    ...     simulation_start_time=np.datetime64(&quot;2023-01-01T00:00:00&quot;),</span>
+<span class="sd">    ...     time_unit=&quot;d&quot;,</span>
+<span class="sd">    ... )</span>
+
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">grb_content</span> <span class="o">=</span> <span class="n">read_grb</span><span class="p">(</span><span class="n">grb_path</span><span class="p">)</span>
     <span class="n">grb_content</span><span class="p">[</span><span class="s2">&quot;name&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;head&quot;</span>
@@ -611,7 +641,7 @@
 
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
-<span class="sd">    dsv_path: Union[str, pathlib.Path]</span>
+<span class="sd">    dvs_path: Union[str, pathlib.Path]</span>
 <span class="sd">    grb_path: Union[str, pathlib.Path]</span>
 <span class="sd">    indices: np.ndarray</span>
 <span class="sd">        The indices to map dvs variable to model nodes</span>
@@ -635,6 +665,27 @@
 <span class="sd">    Returns</span>
 <span class="sd">    -------</span>
 <span class="sd">    dvs : Union[xr.DataArray, xu.UgridDataArray]</span>
+
+<span class="sd">    Examples</span>
+<span class="sd">    --------</span>
+<span class="sd">    When you completed MODFLOW6 simulation, you can open the dvs file:</span>
+
+<span class="sd">    &gt;&gt;&gt; dvs = imod.mf6.open_dvs(&quot;my-model.dvs&quot;, &quot;my-model.grb&quot;)</span>
+
+<span class="sd">    This will return a DataArray with the dvs values for each cell in the</span>
+<span class="sd">    model, with dimensions (&quot;time&quot;, &quot;layer&quot;, &quot;y&quot;, &quot;x&quot;). The time coordinate will</span>
+<span class="sd">    only be the incremental time steps (1.0, 2.0, ...), unless you provide the</span>
+<span class="sd">    ``simulation_start_time`` and ``time_unit`` arguments. This will convert the</span>
+<span class="sd">    time coordinate to calendar time, starting from the provided simulation</span>
+<span class="sd">    start time:</span>
+
+<span class="sd">    &gt;&gt;&gt; dvs = imod.mf6.open_dvs(</span>
+<span class="sd">    ...     &quot;my-model.dvs&quot;,</span>
+<span class="sd">    ...     &quot;my-model.grb&quot;,</span>
+<span class="sd">    ...     simulation_start_time=np.datetime64(&quot;2023-01-01T00:00:00&quot;),</span>
+<span class="sd">    ...     time_unit=&quot;d&quot;,</span>
+<span class="sd">    ... )</span>
+
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">grb_content</span> <span class="o">=</span> <span class="n">read_grb</span><span class="p">(</span><span class="n">grb_path</span><span class="p">)</span>
     <span class="n">distype</span> <span class="o">=</span> <span class="n">grb_content</span><span class="p">[</span><span class="s2">&quot;distype&quot;</span><span class="p">]</span>
@@ -643,6 +694,8 @@
 
 
 
+<div class="viewcode-block" id="open_conc">
+<a class="viewcode-back" href="../../../api/generated/mf6/imod.mf6.open_conc.html#imod.mf6.open_conc">[docs]</a>
 <span class="k">def</span><span class="w"> </span><span class="nf">open_conc</span><span class="p">(</span>
     <span class="n">ucn_path</span><span class="p">:</span> <span class="n">FilePath</span><span class="p">,</span>
     <span class="n">grb_path</span><span class="p">:</span> <span class="n">FilePath</span><span class="p">,</span>
@@ -684,12 +737,34 @@
 <span class="sd">    Returns</span>
 <span class="sd">    -------</span>
 <span class="sd">    concentration: Union[xr.DataArray, xu.UgridDataArray]</span>
+
+<span class="sd">    Examples</span>
+<span class="sd">    --------</span>
+<span class="sd">    When you completed MODFLOW6 simulation, you can open the ucn file:</span>
+
+<span class="sd">    &gt;&gt;&gt; concentration = imod.mf6.open_conc(&quot;my-model.ucn&quot;, &quot;my-model.grb&quot;)</span>
+
+<span class="sd">    This will return a DataArray with the concentration values for each cell in</span>
+<span class="sd">    the model, with dimensions (&quot;time&quot;, &quot;layer&quot;, &quot;y&quot;, &quot;x&quot;). The time coordinate</span>
+<span class="sd">    will only be the incremental time steps (1.0, 2.0, ...), unless you provide</span>
+<span class="sd">    the ``simulation_start_time`` and ``time_unit`` arguments. This will convert</span>
+<span class="sd">    the time coordinate to calendar time, starting from the provided simulation</span>
+<span class="sd">    start time:</span>
+
+<span class="sd">    &gt;&gt;&gt; concentration = imod.mf6.open_conc(</span>
+<span class="sd">    ...     &quot;my-model.ucn&quot;,</span>
+<span class="sd">    ...     &quot;my-model.grb&quot;,</span>
+<span class="sd">    ...     simulation_start_time=np.datetime64(&quot;2023-01-01T00:00:00&quot;),</span>
+<span class="sd">    ...     time_unit=&quot;d&quot;,</span>
+<span class="sd">    ... )</span>
+
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">grb_content</span> <span class="o">=</span> <span class="n">read_grb</span><span class="p">(</span><span class="n">grb_path</span><span class="p">)</span>
     <span class="n">grb_content</span><span class="p">[</span><span class="s2">&quot;name&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;concentration&quot;</span>
     <span class="n">distype</span> <span class="o">=</span> <span class="n">grb_content</span><span class="p">[</span><span class="s2">&quot;distype&quot;</span><span class="p">]</span>
     <span class="n">_open</span> <span class="o">=</span> <span class="n">_get_function</span><span class="p">(</span><span class="n">_OPEN_HDS</span><span class="p">,</span> <span class="n">distype</span><span class="p">)</span>
-    <span class="k">return</span> <span class="n">_open</span><span class="p">(</span><span class="n">ucn_path</span><span class="p">,</span> <span class="n">grb_content</span><span class="p">,</span> <span class="n">dry_nan</span><span class="p">,</span> <span class="n">simulation_start_time</span><span class="p">,</span> <span class="n">time_unit</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">_open</span><span class="p">(</span><span class="n">ucn_path</span><span class="p">,</span> <span class="n">grb_content</span><span class="p">,</span> <span class="n">dry_nan</span><span class="p">,</span> <span class="n">simulation_start_time</span><span class="p">,</span> <span class="n">time_unit</span><span class="p">)</span></div>
+
 
 
 <span class="k">def</span><span class="w"> </span><span class="nf">open_hds_like</span><span class="p">(</span>
@@ -813,6 +888,19 @@
 <span class="sd">    &gt;&gt;&gt; drn_budget = cbc_content[&quot;drn]</span>
 <span class="sd">    &gt;&gt;&gt; mean = drn_budget.sel(layer=1).mean(&quot;time&quot;)</span>
 
+<span class="sd">    This will return a DataArray with the drain budget values for each cell in the</span>
+<span class="sd">    model, with dimensions (&quot;time&quot;, &quot;layer&quot;, &quot;y&quot;, &quot;x&quot;). The time coordinate will</span>
+<span class="sd">    only be the incremental time steps (1.0, 2.0, ...), unless you provide the</span>
+<span class="sd">    ``simulation_start_time`` and ``time_unit`` arguments. This will convert the</span>
+<span class="sd">    time coordinate to calendar time, starting from the provided simulation</span>
+<span class="sd">    start time:</span>
+
+<span class="sd">    &gt;&gt;&gt; cbc_content = imod.mf6.open_cbc(</span>
+<span class="sd">    ...     &quot;my-model.cbc&quot;,</span>
+<span class="sd">    ...     &quot;my-model.grb&quot;,</span>
+<span class="sd">    ...     simulation_start_time=np.datetime64(&quot;2023-01-01T00:00:00&quot;),</span>
+<span class="sd">    ...     time_unit=&quot;d&quot;,</span>
+<span class="sd">    ... )</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">grb_content</span> <span class="o">=</span> <span class="n">read_grb</span><span class="p">(</span><span class="n">grb_path</span><span class="p">)</span>
     <span class="n">distype</span> <span class="o">=</span> <span class="n">grb_content</span><span class="p">[</span><span class="s2">&quot;distype&quot;</span><span class="p">]</span>

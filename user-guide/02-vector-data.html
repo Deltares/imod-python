@@ -8,7 +8,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>Vector data and Geopandas &#8212; iMOD Python 1.0.0rc4 documentation</title>
+    <title>Vector data and Geopandas &#8212; iMOD Python 1.0.0rc6 documentation</title>
   
   
   
@@ -42,7 +42,7 @@
   <link rel="preload" as="script" href="../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
 <link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
 
-    <script src="../_static/documentation_options.js?v=2fc85bd2"></script>
+    <script src="../_static/documentation_options.js?v=bc4855a1"></script>
     <script src="../_static/doctools.js?v=9bcbadda"></script>
     <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script>DOCUMENTATION_OPTIONS.pagename = 'user-guide/02-vector-data';</script>
@@ -53,7 +53,7 @@
     <link rel="prev" title="Raster data and xarray" href="01-raster-data.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
-  <meta name="docsearch:version" content="1.0.0rc4.dev" />
+  <meta name="docsearch:version" content="1.0.0rc6.dev" />
   </head>
   
   
@@ -117,8 +117,8 @@
     
     
     
-    <img src="../_static/imod-python-logo-light.svg" class="logo__image only-light" alt="iMOD Python 1.0.0rc4 documentation - Home"/>
-    <img src="../_static/imod-python-logo-dark.svg" class="logo__image only-dark pst-js-only" alt="iMOD Python 1.0.0rc4 documentation - Home"/>
+    <img src="../_static/imod-python-logo-light.svg" class="logo__image only-light" alt="iMOD Python 1.0.0rc6 documentation - Home"/>
+    <img src="../_static/imod-python-logo-dark.svg" class="logo__image only-dark pst-js-only" alt="iMOD Python 1.0.0rc6 documentation - Home"/>
   
   
 </a></div>
@@ -156,7 +156,7 @@
 
 <li class="nav-item ">
   <a class="nav-link nav-internal" href="../api/index.html">
-    API Reference
+    API
   </a>
 </li>
 
@@ -308,7 +308,7 @@
 
 <li class="nav-item ">
   <a class="nav-link nav-internal" href="../api/index.html">
-    API Reference
+    API
   </a>
 </li>
 
@@ -390,16 +390,10 @@
 <li class="toctree-l1"><a class="reference internal" href="06-lazy-evaluation.html">Lazy evaluation</a></li>
 <li class="toctree-l1"><a class="reference internal" href="07-time-discretization.html">Model time discretization</a></li>
 <li class="toctree-l1"><a class="reference internal" href="08-regridding.html">Regridding</a></li>
-
-
-
-
-
-
-
-
 <li class="toctree-l1"><a class="reference internal" href="09-topsystem.html">Topsystem: from 2D map to 3D model</a></li>
 <li class="toctree-l1"><a class="reference internal" href="10-cleanup.html">Data cleanup</a></li>
+<li class="toctree-l1"><a class="reference internal" href="11-imod5-files.html">Reading and writing iMOD5 files in Python</a></li>
+<li class="toctree-l1"><a class="reference internal" href="12-imod5-model-to-modflow6.html">Working with iMOD5 models in MODFLOW 6</a></li>
 </ul>
 </div>
 </nav></div>
@@ -830,11 +824,542 @@ points.gpkg
 <section id="conversion-to-raster">
 <h2>Conversion to raster<a class="headerlink" href="#conversion-to-raster" title="Link to this heading">#</a></h2>
 <p>From the perspective of MODFLOW groundwater modeling, we are often interested
-in the properties of cells in specific polygons or zones. Refer to the
-examples or the API reference for <code class="docutils literal notranslate"><span class="pre">imod.prepare</span></code>.</p>
+in the properties of cells in specific polygons or zones. This often means
+having to rasterize shapefiles or sometimes polygonizing raster files. For
+examples, see <a class="reference internal" href="../examples/prepare/rasterize_shp.html"><span class="doc">Rasterize shapefiles</span></a> and
+<a class="reference internal" href="../examples/prepare/polygonize_raster.html"><span class="doc">Polygonize raster</span></a>.</p>
 <p>GeoPandas provides a full suite of vector based GIS operations, such as
 intersections, spatial joins, or plotting.</p>
-<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> (0 minutes 1.554 seconds)</p>
+</section>
+<section id="modflow-6">
+<h2>MODFLOW 6<a class="headerlink" href="#modflow-6" title="Link to this heading">#</a></h2>
+<p>iMOD Python’s MODFLOW 6 module requires vector line data for the horizontal
+flow barrier packages (HFB). The simplest form of such a package is to add a
+HFB package for a single layer. For that we have to create some linestrings
+first with shapely. Next, we need to assign data to the linestrings: a layer
+number and a resistance value.</p>
+<div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">shapely</span><span class="w"> </span><span class="kn">import</span> <span class="n">linestrings</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">imod.mf6</span><span class="w"> </span><span class="kn">import</span> <span class="n">SingleLayerHorizontalFlowBarrierResistance</span>
+
+<span class="n">barrier_linestrings</span> <span class="o">=</span> <span class="n">linestrings</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">)</span>
+<span class="n">geometry</span> <span class="o">=</span> <span class="n">gpd</span><span class="o">.</span><span class="n">GeoDataFrame</span><span class="p">(</span>
+    <span class="n">geometry</span><span class="o">=</span><span class="p">[</span><span class="n">barrier_linestrings</span><span class="p">],</span>
+    <span class="n">data</span><span class="o">=</span><span class="p">{</span>
+        <span class="s2">&quot;resistance&quot;</span><span class="p">:</span> <span class="p">[</span><span class="mf">100.0</span><span class="p">],</span>
+        <span class="s2">&quot;layer&quot;</span><span class="p">:</span> <span class="p">[</span><span class="mi">1</span><span class="p">],</span>
+    <span class="p">},</span>
+<span class="p">)</span>
+
+<span class="n">hfb</span> <span class="o">=</span> <span class="n">SingleLayerHorizontalFlowBarrierResistance</span><span class="p">(</span><span class="n">geometry</span><span class="p">)</span>
+<span class="n">hfb</span>
+</pre></div>
+</div>
+<div class="output_subarea output_html rendered_html output_result">
+<div>SingleLayerHorizontalFlowBarrierResistance</div><div><svg style="position: absolute; width: 0; height: 0; overflow: hidden">
+<defs>
+<symbol id="icon-database" viewBox="0 0 32 32">
+<path d="M16 0c-8.837 0-16 2.239-16 5v4c0 2.761 7.163 5 16 5s16-2.239 16-5v-4c0-2.761-7.163-5-16-5z"></path>
+<path d="M16 17c-8.837 0-16-2.239-16-5v6c0 2.761 7.163 5 16 5s16-2.239 16-5v-6c0 2.761-7.163 5-16 5z"></path>
+<path d="M16 26c-8.837 0-16-2.239-16-5v6c0 2.761 7.163 5 16 5s16-2.239 16-5v-6c0 2.761-7.163 5-16 5z"></path>
+</symbol>
+<symbol id="icon-file-text2" viewBox="0 0 32 32">
+<path d="M28.681 7.159c-0.694-0.947-1.662-2.053-2.724-3.116s-2.169-2.030-3.116-2.724c-1.612-1.182-2.393-1.319-2.841-1.319h-15.5c-1.378 0-2.5 1.121-2.5 2.5v27c0 1.378 1.122 2.5 2.5 2.5h23c1.378 0 2.5-1.122 2.5-2.5v-19.5c0-0.448-0.137-1.23-1.319-2.841zM24.543 5.457c0.959 0.959 1.712 1.825 2.268 2.543h-4.811v-4.811c0.718 0.556 1.584 1.309 2.543 2.268zM28 29.5c0 0.271-0.229 0.5-0.5 0.5h-23c-0.271 0-0.5-0.229-0.5-0.5v-27c0-0.271 0.229-0.5 0.5-0.5 0 0 15.499-0 15.5 0v7c0 0.552 0.448 1 1 1h7v19.5z"></path>
+<path d="M23 26h-14c-0.552 0-1-0.448-1-1s0.448-1 1-1h14c0.552 0 1 0.448 1 1s-0.448 1-1 1z"></path>
+<path d="M23 22h-14c-0.552 0-1-0.448-1-1s0.448-1 1-1h14c0.552 0 1 0.448 1 1s-0.448 1-1 1z"></path>
+<path d="M23 18h-14c-0.552 0-1-0.448-1-1s0.448-1 1-1h14c0.552 0 1 0.448 1 1s-0.448 1-1 1z"></path>
+</symbol>
+</defs>
+</svg>
+<style>/* CSS stylesheet for displaying xarray objects in jupyterlab.
+ *
+ */
+
+:root {
+  --xr-font-color0: var(
+    --jp-content-font-color0,
+    var(--pst-color-text-base rgba(0, 0, 0, 1))
+  );
+  --xr-font-color2: var(
+    --jp-content-font-color2,
+    var(--pst-color-text-base, rgba(0, 0, 0, 0.54))
+  );
+  --xr-font-color3: var(
+    --jp-content-font-color3,
+    var(--pst-color-text-base, rgba(0, 0, 0, 0.38))
+  );
+  --xr-border-color: var(
+    --jp-border-color2,
+    hsl(from var(--pst-color-on-background, white) h s calc(l - 10))
+  );
+  --xr-disabled-color: var(
+    --jp-layout-color3,
+    hsl(from var(--pst-color-on-background, white) h s calc(l - 40))
+  );
+  --xr-background-color: var(
+    --jp-layout-color0,
+    var(--pst-color-on-background, white)
+  );
+  --xr-background-color-row-even: var(
+    --jp-layout-color1,
+    hsl(from var(--pst-color-on-background, white) h s calc(l - 5))
+  );
+  --xr-background-color-row-odd: var(
+    --jp-layout-color2,
+    hsl(from var(--pst-color-on-background, white) h s calc(l - 15))
+  );
+}
+
+html[theme="dark"],
+html[data-theme="dark"],
+body[data-theme="dark"],
+body.vscode-dark {
+  --xr-font-color0: var(
+    --jp-content-font-color0,
+    var(--pst-color-text-base, rgba(255, 255, 255, 1))
+  );
+  --xr-font-color2: var(
+    --jp-content-font-color2,
+    var(--pst-color-text-base, rgba(255, 255, 255, 0.54))
+  );
+  --xr-font-color3: var(
+    --jp-content-font-color3,
+    var(--pst-color-text-base, rgba(255, 255, 255, 0.38))
+  );
+  --xr-border-color: var(
+    --jp-border-color2,
+    hsl(from var(--pst-color-on-background, #111111) h s calc(l + 10))
+  );
+  --xr-disabled-color: var(
+    --jp-layout-color3,
+    hsl(from var(--pst-color-on-background, #111111) h s calc(l + 40))
+  );
+  --xr-background-color: var(
+    --jp-layout-color0,
+    var(--pst-color-on-background, #111111)
+  );
+  --xr-background-color-row-even: var(
+    --jp-layout-color1,
+    hsl(from var(--pst-color-on-background, #111111) h s calc(l + 5))
+  );
+  --xr-background-color-row-odd: var(
+    --jp-layout-color2,
+    hsl(from var(--pst-color-on-background, #111111) h s calc(l + 15))
+  );
+}
+
+.xr-wrap {
+  display: block !important;
+  min-width: 300px;
+  max-width: 700px;
+}
+
+.xr-text-repr-fallback {
+  /* fallback to plain text repr when CSS is not injected (untrusted notebook) */
+  display: none;
+}
+
+.xr-header {
+  padding-top: 6px;
+  padding-bottom: 6px;
+  margin-bottom: 4px;
+  border-bottom: solid 1px var(--xr-border-color);
+}
+
+.xr-header > div,
+.xr-header > ul {
+  display: inline;
+  margin-top: 0;
+  margin-bottom: 0;
+}
+
+.xr-obj-type,
+.xr-array-name {
+  margin-left: 2px;
+  margin-right: 10px;
+}
+
+.xr-obj-type {
+  color: var(--xr-font-color2);
+}
+
+.xr-sections {
+  padding-left: 0 !important;
+  display: grid;
+  grid-template-columns: 150px auto auto 1fr 0 20px 0 20px;
+}
+
+.xr-section-item {
+  display: contents;
+}
+
+.xr-section-item input {
+  display: inline-block;
+  opacity: 0;
+  height: 0;
+}
+
+.xr-section-item input + label {
+  color: var(--xr-disabled-color);
+  border: 2px solid transparent !important;
+}
+
+.xr-section-item input:enabled + label {
+  cursor: pointer;
+  color: var(--xr-font-color2);
+}
+
+.xr-section-item input:focus + label {
+  border: 2px solid var(--xr-font-color0) !important;
+}
+
+.xr-section-item input:enabled + label:hover {
+  color: var(--xr-font-color0);
+}
+
+.xr-section-summary {
+  grid-column: 1;
+  color: var(--xr-font-color2);
+  font-weight: 500;
+}
+
+.xr-section-summary > span {
+  display: inline-block;
+  padding-left: 0.5em;
+}
+
+.xr-section-summary-in:disabled + label {
+  color: var(--xr-font-color2);
+}
+
+.xr-section-summary-in + label:before {
+  display: inline-block;
+  content: "►";
+  font-size: 11px;
+  width: 15px;
+  text-align: center;
+}
+
+.xr-section-summary-in:disabled + label:before {
+  color: var(--xr-disabled-color);
+}
+
+.xr-section-summary-in:checked + label:before {
+  content: "▼";
+}
+
+.xr-section-summary-in:checked + label > span {
+  display: none;
+}
+
+.xr-section-summary,
+.xr-section-inline-details {
+  padding-top: 4px;
+  padding-bottom: 4px;
+}
+
+.xr-section-inline-details {
+  grid-column: 2 / -1;
+}
+
+.xr-section-details {
+  display: none;
+  grid-column: 1 / -1;
+  margin-bottom: 5px;
+}
+
+.xr-section-summary-in:checked ~ .xr-section-details {
+  display: contents;
+}
+
+.xr-array-wrap {
+  grid-column: 1 / -1;
+  display: grid;
+  grid-template-columns: 20px auto;
+}
+
+.xr-array-wrap > label {
+  grid-column: 1;
+  vertical-align: top;
+}
+
+.xr-preview {
+  color: var(--xr-font-color3);
+}
+
+.xr-array-preview,
+.xr-array-data {
+  padding: 0 5px !important;
+  grid-column: 2;
+}
+
+.xr-array-data,
+.xr-array-in:checked ~ .xr-array-preview {
+  display: none;
+}
+
+.xr-array-in:checked ~ .xr-array-data,
+.xr-array-preview {
+  display: inline-block;
+}
+
+.xr-dim-list {
+  display: inline-block !important;
+  list-style: none;
+  padding: 0 !important;
+  margin: 0;
+}
+
+.xr-dim-list li {
+  display: inline-block;
+  padding: 0;
+  margin: 0;
+}
+
+.xr-dim-list:before {
+  content: "(";
+}
+
+.xr-dim-list:after {
+  content: ")";
+}
+
+.xr-dim-list li:not(:last-child):after {
+  content: ",";
+  padding-right: 5px;
+}
+
+.xr-has-index {
+  font-weight: bold;
+}
+
+.xr-var-list,
+.xr-var-item {
+  display: contents;
+}
+
+.xr-var-item > div,
+.xr-var-item label,
+.xr-var-item > .xr-var-name span {
+  background-color: var(--xr-background-color-row-even);
+  border-color: var(--xr-background-color-row-odd);
+  margin-bottom: 0;
+  padding-top: 2px;
+}
+
+.xr-var-item > .xr-var-name:hover span {
+  padding-right: 5px;
+}
+
+.xr-var-list > li:nth-child(odd) > div,
+.xr-var-list > li:nth-child(odd) > label,
+.xr-var-list > li:nth-child(odd) > .xr-var-name span {
+  background-color: var(--xr-background-color-row-odd);
+  border-color: var(--xr-background-color-row-even);
+}
+
+.xr-var-name {
+  grid-column: 1;
+}
+
+.xr-var-dims {
+  grid-column: 2;
+}
+
+.xr-var-dtype {
+  grid-column: 3;
+  text-align: right;
+  color: var(--xr-font-color2);
+}
+
+.xr-var-preview {
+  grid-column: 4;
+}
+
+.xr-index-preview {
+  grid-column: 2 / 5;
+  color: var(--xr-font-color2);
+}
+
+.xr-var-name,
+.xr-var-dims,
+.xr-var-dtype,
+.xr-preview,
+.xr-attrs dt {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  padding-right: 10px;
+}
+
+.xr-var-name:hover,
+.xr-var-dims:hover,
+.xr-var-dtype:hover,
+.xr-attrs dt:hover {
+  overflow: visible;
+  width: auto;
+  z-index: 1;
+}
+
+.xr-var-attrs,
+.xr-var-data,
+.xr-index-data {
+  display: none;
+  border-top: 2px dotted var(--xr-background-color);
+  padding-bottom: 20px !important;
+  padding-top: 10px !important;
+}
+
+.xr-var-attrs-in + label,
+.xr-var-data-in + label,
+.xr-index-data-in + label {
+  padding: 0 1px;
+}
+
+.xr-var-attrs-in:checked ~ .xr-var-attrs,
+.xr-var-data-in:checked ~ .xr-var-data,
+.xr-index-data-in:checked ~ .xr-index-data {
+  display: block;
+}
+
+.xr-var-data > table {
+  float: right;
+}
+
+.xr-var-data > pre,
+.xr-index-data > pre,
+.xr-var-data > table > tbody > tr {
+  background-color: transparent !important;
+}
+
+.xr-var-name span,
+.xr-var-data,
+.xr-index-name div,
+.xr-index-data,
+.xr-attrs {
+  padding-left: 25px !important;
+}
+
+.xr-attrs,
+.xr-var-attrs,
+.xr-var-data,
+.xr-index-data {
+  grid-column: 1 / -1;
+}
+
+dl.xr-attrs {
+  padding: 0;
+  margin: 0;
+  display: grid;
+  grid-template-columns: 125px auto;
+}
+
+.xr-attrs dt,
+.xr-attrs dd {
+  padding: 0;
+  margin: 0;
+  float: left;
+  padding-right: 10px;
+  width: auto;
+}
+
+.xr-attrs dt {
+  font-weight: normal;
+  grid-column: 1;
+}
+
+.xr-attrs dt:hover span {
+  display: inline-block;
+  background: var(--xr-background-color);
+  padding-right: 10px;
+}
+
+.xr-attrs dd {
+  grid-column: 2;
+  white-space: pre-wrap;
+  word-break: break-all;
+}
+
+.xr-icon-database,
+.xr-icon-file-text2,
+.xr-no-icon {
+  display: inline-block;
+  vertical-align: middle;
+  width: 1em;
+  height: 1.5em !important;
+  stroke-width: 0;
+  stroke: currentColor;
+  fill: currentColor;
+}
+
+.xr-var-attrs-in:checked + label > .xr-icon-file-text2,
+.xr-var-data-in:checked + label > .xr-icon-database,
+.xr-index-data-in:checked + label > .xr-icon-database {
+  color: var(--xr-font-color0);
+  filter: drop-shadow(1px 1px 5px var(--xr-font-color2));
+  stroke-width: 0.8px;
+}
+</style><pre class='xr-text-repr-fallback'>&lt;xarray.Dataset&gt; Size: 33B
+Dimensions:      (index: 1)
+Coordinates:
+  * index        (index) int64 8B 0
+Data variables:
+    print_input  bool 1B False
+    resistance   (index) float64 8B 100.0
+    layer        (index) int64 8B 1
+    geometry     (index) geometry 8B LINESTRING (90000 450000, 91000 451000, ...</pre><div class='xr-wrap' style='display:none'><div class='xr-header'><div class='xr-obj-type'>xarray.Dataset</div></div><ul class='xr-sections'><li class='xr-section-item'><input id='section-1c98f331-1580-4d35-95cd-ecb08d9319ea' class='xr-section-summary-in' type='checkbox' disabled ><label for='section-1c98f331-1580-4d35-95cd-ecb08d9319ea' class='xr-section-summary'  title='Expand/collapse section'>Dimensions:</label><div class='xr-section-inline-details'><ul class='xr-dim-list'><li><span class='xr-has-index'>index</span>: 1</li></ul></div><div class='xr-section-details'></div></li><li class='xr-section-item'><input id='section-3bef6090-8eba-4c60-b1ec-48c4fee05608' class='xr-section-summary-in' type='checkbox'  checked><label for='section-3bef6090-8eba-4c60-b1ec-48c4fee05608' class='xr-section-summary' >Coordinates: <span>(1)</span></label><div class='xr-section-inline-details'></div><div class='xr-section-details'><ul class='xr-var-list'><li class='xr-var-item'><div class='xr-var-name'><span class='xr-has-index'>index</span></div><div class='xr-var-dims'>(index)</div><div class='xr-var-dtype'>int64</div><div class='xr-var-preview xr-preview'>0</div><input id='attrs-bd253579-46ee-4632-b70f-bcbb7ac43898' class='xr-var-attrs-in' type='checkbox' disabled><label for='attrs-bd253579-46ee-4632-b70f-bcbb7ac43898' title='Show/Hide attributes'><svg class='icon xr-icon-file-text2'><use xlink:href='#icon-file-text2'></use></svg></label><input id='data-875f785c-48f7-43a0-b1e6-a115751f10d2' class='xr-var-data-in' type='checkbox'><label for='data-875f785c-48f7-43a0-b1e6-a115751f10d2' title='Show/Hide data repr'><svg class='icon xr-icon-database'><use xlink:href='#icon-database'></use></svg></label><div class='xr-var-attrs'><dl class='xr-attrs'></dl></div><div class='xr-var-data'><pre>[1 values with dtype=int64]</pre></div></li></ul></div></li><li class='xr-section-item'><input id='section-2bde6cdd-ba5d-4ad6-a76b-62ec8a41364a' class='xr-section-summary-in' type='checkbox'  checked><label for='section-2bde6cdd-ba5d-4ad6-a76b-62ec8a41364a' class='xr-section-summary' >Data variables: <span>(4)</span></label><div class='xr-section-inline-details'></div><div class='xr-section-details'><ul class='xr-var-list'><li class='xr-var-item'><div class='xr-var-name'><span>print_input</span></div><div class='xr-var-dims'>()</div><div class='xr-var-dtype'>bool</div><div class='xr-var-preview xr-preview'>False</div><input id='attrs-c6a77189-3ea7-414b-8086-774974b52fd9' class='xr-var-attrs-in' type='checkbox' disabled><label for='attrs-c6a77189-3ea7-414b-8086-774974b52fd9' title='Show/Hide attributes'><svg class='icon xr-icon-file-text2'><use xlink:href='#icon-file-text2'></use></svg></label><input id='data-e842f732-058b-489d-9206-760ac5dcfc22' class='xr-var-data-in' type='checkbox'><label for='data-e842f732-058b-489d-9206-760ac5dcfc22' title='Show/Hide data repr'><svg class='icon xr-icon-database'><use xlink:href='#icon-database'></use></svg></label><div class='xr-var-attrs'><dl class='xr-attrs'></dl></div><div class='xr-var-data'><pre>array(False)</pre></div></li><li class='xr-var-item'><div class='xr-var-name'><span>resistance</span></div><div class='xr-var-dims'>(index)</div><div class='xr-var-dtype'>float64</div><div class='xr-var-preview xr-preview'>100.0</div><input id='attrs-56c45f5c-4a36-434f-9912-6c1464496956' class='xr-var-attrs-in' type='checkbox' disabled><label for='attrs-56c45f5c-4a36-434f-9912-6c1464496956' title='Show/Hide attributes'><svg class='icon xr-icon-file-text2'><use xlink:href='#icon-file-text2'></use></svg></label><input id='data-9ede584e-36ee-4af8-9b13-a8cb7f584569' class='xr-var-data-in' type='checkbox'><label for='data-9ede584e-36ee-4af8-9b13-a8cb7f584569' title='Show/Hide data repr'><svg class='icon xr-icon-database'><use xlink:href='#icon-database'></use></svg></label><div class='xr-var-attrs'><dl class='xr-attrs'></dl></div><div class='xr-var-data'><pre>array([100.])</pre></div></li><li class='xr-var-item'><div class='xr-var-name'><span>layer</span></div><div class='xr-var-dims'>(index)</div><div class='xr-var-dtype'>int64</div><div class='xr-var-preview xr-preview'>1</div><input id='attrs-3c4fcd65-95ac-4521-9150-098e19956f69' class='xr-var-attrs-in' type='checkbox' disabled><label for='attrs-3c4fcd65-95ac-4521-9150-098e19956f69' title='Show/Hide attributes'><svg class='icon xr-icon-file-text2'><use xlink:href='#icon-file-text2'></use></svg></label><input id='data-cf3ee7ac-abb9-4272-ab9c-ed7d6ef644e7' class='xr-var-data-in' type='checkbox'><label for='data-cf3ee7ac-abb9-4272-ab9c-ed7d6ef644e7' title='Show/Hide data repr'><svg class='icon xr-icon-database'><use xlink:href='#icon-database'></use></svg></label><div class='xr-var-attrs'><dl class='xr-attrs'></dl></div><div class='xr-var-data'><pre>array([1])</pre></div></li><li class='xr-var-item'><div class='xr-var-name'><span>geometry</span></div><div class='xr-var-dims'>(index)</div><div class='xr-var-dtype'>geometry</div><div class='xr-var-preview xr-preview'>LINESTRING (90000 450000, 91000 ...</div><input id='attrs-232bef99-cd47-4f5f-8001-96a3ce76c2c0' class='xr-var-attrs-in' type='checkbox' disabled><label for='attrs-232bef99-cd47-4f5f-8001-96a3ce76c2c0' title='Show/Hide attributes'><svg class='icon xr-icon-file-text2'><use xlink:href='#icon-file-text2'></use></svg></label><input id='data-604c95f6-a939-40d2-a452-071f8ca5b339' class='xr-var-data-in' type='checkbox'><label for='data-604c95f6-a939-40d2-a452-071f8ca5b339' title='Show/Hide data repr'><svg class='icon xr-icon-database'><use xlink:href='#icon-database'></use></svg></label><div class='xr-var-attrs'><dl class='xr-attrs'></dl></div><div class='xr-var-data'><pre>&lt;GeometryArray&gt;
+[&lt;LINESTRING (90000 450000, 91000 451000, 92000 452000, 93000 453000, 94000 4...&gt;]
+Length: 1, dtype: geometry</pre></div></li></ul></div></li><li class='xr-section-item'><input id='section-7086504c-ea57-49c2-8fe7-96574beac420' class='xr-section-summary-in' type='checkbox'  ><label for='section-7086504c-ea57-49c2-8fe7-96574beac420' class='xr-section-summary' >Indexes: <span>(1)</span></label><div class='xr-section-inline-details'></div><div class='xr-section-details'><ul class='xr-var-list'><li class='xr-var-item'><div class='xr-index-name'><div>index</div></div><div class='xr-index-preview'>PandasIndex</div><input type='checkbox' disabled/><label></label><input id='index-6cb0c100-9739-4004-b068-e62a3ce99f3e' class='xr-index-data-in' type='checkbox'/><label for='index-6cb0c100-9739-4004-b068-e62a3ce99f3e' title='Show/Hide index repr'><svg class='icon xr-icon-database'><use xlink:href='#icon-database'></use></svg></label><div class='xr-index-data'><pre>PandasIndex(RangeIndex(start=0, stop=1, step=1, name=&#x27;index&#x27;))</pre></div></li></ul></div></li><li class='xr-section-item'><input id='section-465e3dd2-c6db-49a1-8463-dc96ecffb429' class='xr-section-summary-in' type='checkbox' disabled ><label for='section-465e3dd2-c6db-49a1-8463-dc96ecffb429' class='xr-section-summary'  title='Expand/collapse section'>Attributes: <span>(0)</span></label><div class='xr-section-inline-details'></div><div class='xr-section-details'><dl class='xr-attrs'></dl></div></li></ul></div></div>
+</div>
+<br />
+<br /><p>You can see the GeoDataFrame has been converted to an xr.Dataset. To access
+the data as a geodataframe again use the line_data property:</p>
+<div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="n">hfb</span><span class="o">.</span><span class="n">line_data</span>
+</pre></div>
+</div>
+<div class="output_subarea output_html rendered_html output_result">
+<div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>resistance</th>
+      <th>geometry</th>
+      <th>layer</th>
+    </tr>
+    <tr>
+      <th>index</th>
+      <th></th>
+      <th></th>
+      <th></th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>100.0</td>
+      <td>LINESTRING (90000 450000, 91000 451000, 92000 ...</td>
+      <td>1</td>
+    </tr>
+  </tbody>
+</table>
+</div>
+</div>
+<br />
+<br /><p class="sphx-glr-timing"><strong>Total running time of the script:</strong> (0 minutes 1.474 seconds)</p>
 <div class="sphx-glr-footer sphx-glr-footer-example docutils container" id="sphx-glr-download-user-guide-02-vector-data-py">
 <div class="sphx-glr-download sphx-glr-download-jupyter docutils container">
 <p><a class="reference download internal" download="" href="../_downloads/c5285c4c8db8c3bfdc970b48d3f5250f/02-vector-data.ipynb"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Jupyter</span> <span class="pre">notebook:</span> <span class="pre">02-vector-data.ipynb</span></code></a></p>
@@ -899,6 +1424,7 @@ intersections, spatial joins, or plotting.</p>
     <ul class="visible nav section-nav flex-column">
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#input-and-output">Input and output</a></li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#conversion-to-raster">Conversion to raster</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#modflow-6">MODFLOW 6</a></li>
 </ul>
   </nav></div>
 

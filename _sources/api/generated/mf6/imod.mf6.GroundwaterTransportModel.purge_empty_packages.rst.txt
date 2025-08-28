@@ -1,0 +1,6 @@
+﻿imod.mf6.GroundwaterTransportModel.purge\_empty\_packages
+=========================================================
+
+.. currentmodule:: imod.mf6
+
+.. automethod:: GroundwaterTransportModel.purge_empty_packages

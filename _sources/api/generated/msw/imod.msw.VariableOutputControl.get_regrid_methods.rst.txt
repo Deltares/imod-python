@@ -1,0 +1,6 @@
+﻿imod.msw.VariableOutputControl.get\_regrid\_methods
+===================================================
+
+.. currentmodule:: imod.msw
+
+.. automethod:: VariableOutputControl.get_regrid_methods

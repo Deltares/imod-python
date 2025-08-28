@@ -1,0 +1,6 @@
+﻿imod.mf6.InitialConditions.is\_empty
+====================================
+
+.. currentmodule:: imod.mf6
+
+.. automethod:: InitialConditions.is_empty

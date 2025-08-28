@@ -14,27 +14,15 @@
    .. autosummary::
    
       ~VerticesDiscretization.__init__
-      ~VerticesDiscretization.cleanup
       ~VerticesDiscretization.clip_box
       ~VerticesDiscretization.copy
       ~VerticesDiscretization.from_file
-      ~VerticesDiscretization.get_non_grid_data
       ~VerticesDiscretization.get_regrid_methods
-      ~VerticesDiscretization.is_clipping_supported
       ~VerticesDiscretization.is_empty
-      ~VerticesDiscretization.is_grid_agnostic_package
-      ~VerticesDiscretization.is_regridding_supported
-      ~VerticesDiscretization.is_splitting_supported
-      ~VerticesDiscretization.isel
       ~VerticesDiscretization.mask
       ~VerticesDiscretization.regrid_like
-      ~VerticesDiscretization.render
-      ~VerticesDiscretization.sel
       ~VerticesDiscretization.to_netcdf
       ~VerticesDiscretization.write
-      ~VerticesDiscretization.write_binary_griddata
-      ~VerticesDiscretization.write_blockfile
-      ~VerticesDiscretization.write_text_griddata
    
    
 

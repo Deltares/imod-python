@@ -7,7 +7,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>imod.msw.model &#8212; iMOD Python 1.0.0rc4 documentation</title>
+    <title>imod.msw.model &#8212; iMOD Python 1.0.0rc6 documentation</title>
   
   
   
@@ -41,7 +41,7 @@
   <link rel="preload" as="script" href="../../../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
 <link rel="preload" as="script" href="../../../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
 
-    <script src="../../../_static/documentation_options.js?v=2fc85bd2"></script>
+    <script src="../../../_static/documentation_options.js?v=bc4855a1"></script>
     <script src="../../../_static/doctools.js?v=9bcbadda"></script>
     <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script>DOCUMENTATION_OPTIONS.pagename = '_modules/imod/msw/model';</script>
@@ -50,7 +50,7 @@
     <link rel="search" title="Search" href="../../../search.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
-  <meta name="docsearch:version" content="1.0.0rc4.dev" />
+  <meta name="docsearch:version" content="1.0.0rc6.dev" />
   </head>
   
   
@@ -114,8 +114,8 @@
     
     
     
-    <img src="../../../_static/imod-python-logo-light.svg" class="logo__image only-light" alt="iMOD Python 1.0.0rc4 documentation - Home"/>
-    <img src="../../../_static/imod-python-logo-dark.svg" class="logo__image only-dark pst-js-only" alt="iMOD Python 1.0.0rc4 documentation - Home"/>
+    <img src="../../../_static/imod-python-logo-light.svg" class="logo__image only-light" alt="iMOD Python 1.0.0rc6 documentation - Home"/>
+    <img src="../../../_static/imod-python-logo-dark.svg" class="logo__image only-dark pst-js-only" alt="iMOD Python 1.0.0rc6 documentation - Home"/>
   
   
 </a></div>
@@ -153,7 +153,7 @@
 
 <li class="nav-item ">
   <a class="nav-link nav-internal" href="../../../api/index.html">
-    API Reference
+    API
   </a>
 </li>
 
@@ -303,7 +303,7 @@
 
 <li class="nav-item ">
   <a class="nav-link nav-internal" href="../../../api/index.html">
-    API Reference
+    API
   </a>
 </li>
 
@@ -428,10 +428,11 @@
                   
   <h1>Source code for imod.msw.model</h1><div class="highlight"><pre>
 <span></span><span class="kn">import</span><span class="w"> </span><span class="nn">collections</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">warnings</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">copy</span><span class="w"> </span><span class="kn">import</span> <span class="n">copy</span><span class="p">,</span> <span class="n">deepcopy</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">datetime</span><span class="w"> </span><span class="kn">import</span> <span class="n">datetime</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">pathlib</span><span class="w"> </span><span class="kn">import</span> <span class="n">Path</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Any</span><span class="p">,</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">Tuple</span><span class="p">,</span> <span class="n">Union</span><span class="p">,</span> <span class="n">cast</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Any</span><span class="p">,</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">Union</span><span class="p">,</span> <span class="n">cast</span>
 
 <span class="kn">import</span><span class="w"> </span><span class="nn">cftime</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">jinja2</span>
@@ -461,6 +462,7 @@
     <span class="n">PrecipitationMapping</span><span class="p">,</span>
 <span class="p">)</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">imod.msw.output_control</span><span class="w"> </span><span class="kn">import</span> <span class="n">TimeOutputControl</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">imod.msw.pkgbase</span><span class="w"> </span><span class="kn">import</span> <span class="n">MetaSwapPackage</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">imod.msw.ponding</span><span class="w"> </span><span class="kn">import</span> <span class="n">Ponding</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">imod.msw.scaling_factors</span><span class="w"> </span><span class="kn">import</span> <span class="n">ScalingFactors</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">imod.msw.sprinkling</span><span class="w"> </span><span class="kn">import</span> <span class="n">Sprinkling</span>
@@ -472,7 +474,7 @@
 <span class="kn">from</span><span class="w"> </span><span class="nn">imod.msw.vegetation</span><span class="w"> </span><span class="kn">import</span> <span class="n">AnnualCropFactors</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">imod.typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Imod5DataDict</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">imod.util.dims</span><span class="w"> </span><span class="kn">import</span> <span class="n">drop_layer_dim_cap_data</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">imod.util.regrid</span><span class="w"> </span><span class="kn">import</span> <span class="n">RegridderType</span><span class="p">,</span> <span class="n">RegridderWeightsCache</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">imod.util.regrid</span><span class="w"> </span><span class="kn">import</span> <span class="n">RegridderWeightsCache</span>
 
 <span class="n">REQUIRED_PACKAGES</span> <span class="o">=</span> <span class="p">(</span>
     <span class="n">GridData</span><span class="p">,</span>
@@ -597,8 +599,8 @@
             <span class="p">)</span>
 
     <span class="k">def</span><span class="w"> </span><span class="nf">_check_landuse_indices_in_lookup_options</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="n">grid_key</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_pkg_key</span><span class="p">(</span><span class="n">GridData</span><span class="p">)</span>
-        <span class="n">landuse_options_key</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_pkg_key</span><span class="p">(</span><span class="n">LanduseOptions</span><span class="p">)</span>
+        <span class="n">grid_key</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_pkgkey</span><span class="p">(</span><span class="n">GridData</span><span class="p">)</span>
+        <span class="n">landuse_options_key</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_pkgkey</span><span class="p">(</span><span class="n">LanduseOptions</span><span class="p">)</span>
 
         <span class="n">indices_in_grid</span> <span class="o">=</span> <span class="nb">set</span><span class="p">(</span><span class="bp">self</span><span class="p">[</span><span class="n">grid_key</span><span class="p">][</span><span class="s2">&quot;landuse&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">values</span><span class="o">.</span><span class="n">ravel</span><span class="p">())</span>
         <span class="n">indices_in_options</span> <span class="o">=</span> <span class="nb">set</span><span class="p">(</span>
@@ -614,8 +616,8 @@
             <span class="p">)</span>
 
     <span class="k">def</span><span class="w"> </span><span class="nf">_check_vegetation_indices_in_annual_crop_factors</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="n">landuse_options_key</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_pkg_key</span><span class="p">(</span><span class="n">LanduseOptions</span><span class="p">)</span>
-        <span class="n">annual_crop_factors_key</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_pkg_key</span><span class="p">(</span><span class="n">AnnualCropFactors</span><span class="p">)</span>
+        <span class="n">landuse_options_key</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_pkgkey</span><span class="p">(</span><span class="n">LanduseOptions</span><span class="p">)</span>
+        <span class="n">annual_crop_factors_key</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_pkgkey</span><span class="p">(</span><span class="n">AnnualCropFactors</span><span class="p">)</span>
 
         <span class="n">indices_in_options</span> <span class="o">=</span> <span class="nb">set</span><span class="p">(</span>
             <span class="n">np</span><span class="o">.</span><span class="n">unique</span><span class="p">(</span><span class="bp">self</span><span class="p">[</span><span class="n">landuse_options_key</span><span class="p">][</span><span class="s2">&quot;vegetation_index&quot;</span><span class="p">])</span>
@@ -632,7 +634,7 @@
                 <span class="sa">f</span><span class="s2">&quot;which were not in AnnualCropGrowth: </span><span class="si">{</span><span class="n">missing_indices</span><span class="si">}</span><span class="s2">&quot;</span>
             <span class="p">)</span>
 
-    <span class="k">def</span><span class="w"> </span><span class="nf">has_file_copier</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_has_file_copier</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
         <span class="n">pkg_types_included</span> <span class="o">=</span> <span class="p">{</span><span class="nb">type</span><span class="p">(</span><span class="n">pkg</span><span class="p">)</span> <span class="k">for</span> <span class="n">pkg</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">values</span><span class="p">()}</span>
         <span class="k">return</span> <span class="n">FileCopier</span> <span class="ow">in</span> <span class="n">pkg_types_included</span>
 
@@ -659,7 +661,28 @@
 
         <span class="k">return</span> <span class="n">year</span><span class="p">,</span> <span class="n">time_since_start_year</span>
 
-    <span class="k">def</span><span class="w"> </span><span class="nf">_get_pkg_key</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">pkg_type</span><span class="p">:</span> <span class="nb">type</span><span class="p">,</span> <span class="n">optional_package</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">):</span>
+<div class="viewcode-block" id="MetaSwapModel.get_pkgkey">
+<a class="viewcode-back" href="../../../api/generated/msw/imod.msw.MetaSwapModel.get_pkgkey.html#imod.msw.MetaSwapModel.get_pkgkey">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_pkgkey</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span> <span class="n">pkg_type</span><span class="p">:</span> <span class="nb">type</span><span class="p">[</span><span class="n">MetaSwapPackage</span><span class="p">],</span> <span class="n">optional_package</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Get the package key for a package of type ``pkg_type``. Returns the</span>
+<span class="sd">        first occurrence of the package type.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        pkg_type: type[MetaSwapPackage]</span>
+<span class="sd">            Type of the package to get the key for.</span>
+<span class="sd">        optional_package: bool</span>
+<span class="sd">            If True, the method will not raise an error if the package is not</span>
+<span class="sd">            found. Method returns None in this case.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        str</span>
+<span class="sd">            The key of the package of type ``pkg_type``.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">for</span> <span class="n">pkg_key</span><span class="p">,</span> <span class="n">pkg</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
             <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">pkg</span><span class="p">,</span> <span class="n">pkg_type</span><span class="p">):</span>
                 <span class="k">return</span> <span class="n">pkg_key</span>
@@ -667,8 +690,23 @@
         <span class="k">if</span> <span class="ow">not</span> <span class="n">optional_package</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">KeyError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Could not find package of type: </span><span class="si">{</span><span class="n">pkg_type</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
 
+        <span class="k">return</span> <span class="kc">None</span></div>
+
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_get_pkg_key</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span> <span class="n">pkg_type</span><span class="p">:</span> <span class="nb">type</span><span class="p">[</span><span class="n">MetaSwapPackage</span><span class="p">],</span> <span class="n">optional_package</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot; &quot;</span>
+<span class="sd">        Preserves backwards compatibility with old code (primod) that used this.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span>
+            <span class="s2">&quot;Method &#39;_get_pkg_key&#39; is deprecated, use &#39;get_pkgkey&#39; instead.&quot;</span><span class="p">,</span>
+            <span class="ne">DeprecationWarning</span><span class="p">,</span>
+        <span class="p">)</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_pkgkey</span><span class="p">(</span><span class="n">pkg_type</span><span class="p">,</span> <span class="n">optional_package</span><span class="p">)</span>
+
     <span class="k">def</span><span class="w"> </span><span class="nf">_model_checks</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">validate</span><span class="p">:</span> <span class="nb">bool</span><span class="p">):</span>
-        <span class="k">if</span> <span class="n">validate</span> <span class="ow">and</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">has_file_copier</span><span class="p">():</span>
+        <span class="k">if</span> <span class="n">validate</span> <span class="ow">and</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">_has_file_copier</span><span class="p">():</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_check_required_packages</span><span class="p">()</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_check_vegetation_indices_in_annual_crop_factors</span><span class="p">()</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_check_landuse_indices_in_lookup_options</span><span class="p">()</span>
@@ -691,8 +729,9 @@
         <span class="n">simulation_settings</span><span class="p">[</span><span class="s2">&quot;tdbg&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">time_since_start_year</span>
 
         <span class="c1"># Add IdfMapping settings</span>
-        <span class="n">idf_key</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_pkg_key</span><span class="p">(</span><span class="n">IdfMapping</span><span class="p">)</span>
-        <span class="n">simulation_settings</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="bp">self</span><span class="p">[</span><span class="n">idf_key</span><span class="p">]</span><span class="o">.</span><span class="n">get_output_settings</span><span class="p">())</span>
+        <span class="n">idf_key</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_pkgkey</span><span class="p">(</span><span class="n">IdfMapping</span><span class="p">)</span>
+        <span class="n">idf_pkg</span> <span class="o">=</span> <span class="n">cast</span><span class="p">(</span><span class="n">IdfMapping</span><span class="p">,</span> <span class="bp">self</span><span class="p">[</span><span class="n">idf_key</span><span class="p">])</span>
+        <span class="n">simulation_settings</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">idf_pkg</span><span class="o">.</span><span class="n">_get_output_settings</span><span class="p">())</span>
 
         <span class="n">simulation_settings</span><span class="p">[</span><span class="s2">&quot;unsa_svat_path&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_render_unsaturated_database_path</span><span class="p">(</span>
             <span class="n">simulation_settings</span><span class="p">[</span><span class="s2">&quot;unsa_svat_path&quot;</span><span class="p">]</span>
@@ -734,8 +773,9 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">_write_simulation_settings</span><span class="p">(</span><span class="n">directory</span><span class="p">)</span>
 
         <span class="c1"># Get index and svat</span>
-        <span class="n">grid_key</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_pkg_key</span><span class="p">(</span><span class="n">GridData</span><span class="p">)</span>
-        <span class="n">index</span><span class="p">,</span> <span class="n">svat</span> <span class="o">=</span> <span class="bp">self</span><span class="p">[</span><span class="n">grid_key</span><span class="p">]</span><span class="o">.</span><span class="n">generate_index_array</span><span class="p">()</span>
+        <span class="n">grid_key</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_pkgkey</span><span class="p">(</span><span class="n">GridData</span><span class="p">)</span>
+        <span class="n">grid_pkg</span> <span class="o">=</span> <span class="n">cast</span><span class="p">(</span><span class="n">GridData</span><span class="p">,</span> <span class="bp">self</span><span class="p">[</span><span class="n">grid_key</span><span class="p">])</span>
+        <span class="n">index</span><span class="p">,</span> <span class="n">svat</span> <span class="o">=</span> <span class="n">grid_pkg</span><span class="o">.</span><span class="n">generate_index_array</span><span class="p">()</span>
 
         <span class="c1"># write package contents</span>
         <span class="k">for</span> <span class="n">pkgname</span> <span class="ow">in</span> <span class="bp">self</span><span class="p">:</span>
@@ -747,9 +787,31 @@
     <span class="k">def</span><span class="w"> </span><span class="nf">regrid_like</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">mf6_regridded_dis</span><span class="p">:</span> <span class="n">StructuredDiscretization</span><span class="p">,</span>
-        <span class="n">regrid_context</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">RegridderWeightsCache</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-        <span class="n">regridder_types</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Tuple</span><span class="p">[</span><span class="n">RegridderType</span><span class="p">,</span> <span class="nb">str</span><span class="p">]]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">regrid_cache</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">RegridderWeightsCache</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="s2">&quot;MetaSwapModel&quot;</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Creates a model by regridding the packages of this model to another</span>
+<span class="sd">        discretization. It regrids all the arrays in the package using the</span>
+<span class="sd">        default regridding methods. At the moment only regridding to a different</span>
+<span class="sd">        planar grid is supported, meaning ``target_grid`` has different ``&quot;x&quot;``</span>
+<span class="sd">        and ``&quot;y&quot;`` or different ``cell2d`` coords.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        mf6_regridded_dis: StructuredDiscretization</span>
+<span class="sd">            Modflow6 Discretization with same discretization as the one we want</span>
+<span class="sd">            to regrid the package to.</span>
+<span class="sd">        regrid_cache: RegridderWeightsCache, optional</span>
+<span class="sd">            stores regridder weights for different regridders. Can be used to</span>
+<span class="sd">            speed up regridding, if the same regridders are used several times</span>
+<span class="sd">            for regridding different arrays.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        A model with similar packages to the input model, and with all the</span>
+<span class="sd">        data-arrays regridded to another discretization, similar to the one used</span>
+<span class="sd">        in input argument &quot;mf6_regridded_dis&quot;</span>
+<span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">unsat_database</span> <span class="o">=</span> <span class="n">cast</span><span class="p">(</span><span class="nb">str</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">simulation_settings</span><span class="p">[</span><span class="s2">&quot;unsa_svat_path&quot;</span><span class="p">])</span>
         <span class="n">regridded_model</span> <span class="o">=</span> <span class="n">MetaSwapModel</span><span class="p">(</span><span class="n">unsat_database</span><span class="p">)</span>
 
@@ -762,11 +824,10 @@
             <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">msw_package</span><span class="p">,</span> <span class="n">CouplerMapping</span><span class="p">):</span>
                 <span class="c1"># there can be only one couplermapping</span>
                 <span class="n">mod2svat_name</span> <span class="o">=</span> <span class="n">pkgname</span>
-            <span class="k">elif</span> <span class="n">msw_package</span><span class="o">.</span><span class="n">is_regridding_supported</span><span class="p">():</span>
+            <span class="k">elif</span> <span class="n">msw_package</span><span class="o">.</span><span class="n">_is_regridding_supported</span><span class="p">():</span>
                 <span class="n">regridded_package</span> <span class="o">=</span> <span class="n">msw_package</span><span class="o">.</span><span class="n">regrid_like</span><span class="p">(</span>
-                    <span class="n">target_grid</span><span class="p">,</span> <span class="n">regrid_context</span><span class="p">,</span> <span class="n">regridder_types</span>
+                    <span class="n">target_grid</span><span class="p">,</span> <span class="n">regrid_cache</span><span class="p">,</span> <span class="kc">None</span>
                 <span class="p">)</span>
-
             <span class="k">else</span><span class="p">:</span>
                 <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;package </span><span class="si">{</span><span class="n">pkgname</span><span class="si">}</span><span class="s2"> cannot be  regridded&quot;</span><span class="p">)</span>
             <span class="n">regridded_model</span><span class="p">[</span><span class="n">pkgname</span><span class="p">]</span> <span class="o">=</span> <span class="n">regridded_package</span>
@@ -796,28 +857,48 @@
 <span class="sd">        ``mete_grid.inp`` copied by :class:`imod.msw.MeteoGridCopy` would be</span>
 <span class="sd">        computed.</span>
 
-<span class="sd">        Slicing intervals may be half-bounded, by providing None:</span>
-
-<span class="sd">        * To select 500.0 &lt;= x &lt;= 1000.0:</span>
-<span class="sd">          ``clip_box(x_min=500.0, x_max=1000.0)``.</span>
-<span class="sd">        * To select x &lt;= 1000.0: ``clip_box(x_min=None, x_max=1000.0)``</span>
-<span class="sd">          or ``clip_box(x_max=1000.0)``.</span>
-<span class="sd">        * To select x &gt;= 500.0: ``clip_box(x_min = 500.0, x_max=None.0)``</span>
-<span class="sd">          or ``clip_box(x_min=1000.0)``.</span>
-
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
-<span class="sd">        time_min: optional</span>
+<span class="sd">        time_min: optional, np.datetime64</span>
+<span class="sd">            Start time to select. Data will be forward filled to this date. If</span>
+<span class="sd">            time_min is before the start time of the dataset, data is</span>
+<span class="sd">            backfilled.</span>
 <span class="sd">        time_max: optional</span>
+<span class="sd">            End time to select.</span>
 <span class="sd">        x_min: optional, float</span>
+<span class="sd">            Minimum x-coordinate to select.</span>
 <span class="sd">        x_max: optional, float</span>
+<span class="sd">            Maximum x-coordinate to select.</span>
 <span class="sd">        y_min: optional, float</span>
+<span class="sd">            Minimum y-coordinate to select.</span>
 <span class="sd">        y_max: optional, float</span>
+<span class="sd">            Maximum y-coordinate to select.</span>
 
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
-<span class="sd">        MetaSwapModel</span>
-<span class="sd">            Clipped model.</span>
+<span class="sd">        clipped : MetaSwapModel</span>
+<span class="sd">            A new model that is clipped to the specified bounding box.</span>
+
+<span class="sd">        Examples</span>
+<span class="sd">        --------</span>
+<span class="sd">        Slicing intervals may be half-bounded, by providing None:</span>
+
+<span class="sd">        To select 500.0 &lt;= x &lt;= 1000.0:</span>
+
+<span class="sd">        &gt;&gt;&gt; msw_model.clip_box(x_min=500.0, x_max=1000.0)</span>
+
+<span class="sd">        To select x &lt;= 1000.0:</span>
+
+<span class="sd">        &gt;&gt;&gt; msw_model.clip_box(x_max=1000.0)``</span>
+
+<span class="sd">        To select x &gt;= 500.0:</span>
+
+<span class="sd">        &gt;&gt;&gt; msw_model.clip_box(x_min=500.0)</span>
+
+<span class="sd">        To select a time interval, you can use datetime64:</span>
+
+<span class="sd">        &gt;&gt;&gt; msw_model.clip_box(time_min=np.datetime64(&quot;2020-01-01&quot;), time_max=np.datetime64(&quot;2020-12-31&quot;))</span>
+
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">settings</span> <span class="o">=</span> <span class="n">deepcopy</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">simulation_settings</span><span class="p">)</span>
         <span class="n">unsa_svat_path</span> <span class="o">=</span> <span class="n">settings</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s2">&quot;unsa_svat_path&quot;</span><span class="p">)</span>

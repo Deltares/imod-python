@@ -16,15 +16,9 @@
       ~Ponding.__init__
       ~Ponding.clip_box
       ~Ponding.from_imod5_data
-      ~Ponding.get_non_grid_data
       ~Ponding.get_regrid_methods
-      ~Ponding.is_clipping_supported
-      ~Ponding.is_regridding_supported
-      ~Ponding.isel
       ~Ponding.regrid_like
-      ~Ponding.sel
       ~Ponding.write
-      ~Ponding.write_dataframe_fixed_width
    
    
 

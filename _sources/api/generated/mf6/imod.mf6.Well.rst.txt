@@ -19,28 +19,13 @@
       ~Well.copy
       ~Well.from_file
       ~Well.from_imod5_data
-      ~Well.gather_filtered_well_ids
-      ~Well.get_non_grid_data
-      ~Well.get_period_varnames
       ~Well.get_regrid_methods
-      ~Well.is_clipping_supported
       ~Well.is_empty
-      ~Well.is_grid_agnostic_package
-      ~Well.is_regridding_supported
-      ~Well.is_splitting_supported
-      ~Well.isel
       ~Well.mask
       ~Well.regrid_like
-      ~Well.render
-      ~Well.sel
-      ~Well.set_repeat_stress
-      ~Well.to_mf6_package_information
       ~Well.to_mf6_pkg
       ~Well.to_netcdf
       ~Well.write
-      ~Well.write_binary_griddata
-      ~Well.write_blockfile
-      ~Well.write_text_griddata
    
    
 

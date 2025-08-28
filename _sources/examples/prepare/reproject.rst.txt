@@ -162,7 +162,7 @@ Importing the original file, which has a cellsize of 100.0 m and its EPSG is 289
  .. code-block:: none
 
 
-    <matplotlib.image.AxesImage object at 0x0000016F3BD1D310>
+    <matplotlib.image.AxesImage object at 0x00000251C793B7A0>
 
 
 
@@ -273,7 +273,7 @@ reprojection.
  .. code-block:: none
 
 
-    <matplotlib.image.AxesImage object at 0x0000016F3BF952B0>
+    <matplotlib.image.AxesImage object at 0x00000251DDAA3B90>
 
 
 
@@ -313,7 +313,7 @@ it's coordinate system will be EPSG:32631:
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** (0 minutes 0.891 seconds)
+   **Total running time of the script:** (0 minutes 0.828 seconds)
 
 
 .. _sphx_glr_download_examples_prepare_reproject.py:

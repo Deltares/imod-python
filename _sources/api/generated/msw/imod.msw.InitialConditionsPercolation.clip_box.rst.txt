@@ -1,0 +1,6 @@
+﻿imod.msw.InitialConditionsPercolation.clip\_box
+===============================================
+
+.. currentmodule:: imod.msw
+
+.. automethod:: InitialConditionsPercolation.clip_box

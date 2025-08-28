@@ -16,15 +16,9 @@
       ~LanduseOptions.__init__
       ~LanduseOptions.clip_box
       ~LanduseOptions.from_imod5_data
-      ~LanduseOptions.get_non_grid_data
       ~LanduseOptions.get_regrid_methods
-      ~LanduseOptions.is_clipping_supported
-      ~LanduseOptions.is_regridding_supported
-      ~LanduseOptions.isel
       ~LanduseOptions.regrid_like
-      ~LanduseOptions.sel
       ~LanduseOptions.write
-      ~LanduseOptions.write_dataframe_fixed_width
    
    
 

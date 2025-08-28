@@ -1,0 +1,6 @@
+﻿imod.mf6.River.aggregate\_layers
+================================
+
+.. currentmodule:: imod.mf6
+
+.. automethod:: River.aggregate_layers

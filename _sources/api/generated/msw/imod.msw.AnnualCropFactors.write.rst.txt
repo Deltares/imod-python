@@ -1,0 +1,6 @@
+﻿imod.msw.AnnualCropFactors.write
+================================
+
+.. currentmodule:: imod.msw
+
+.. automethod:: AnnualCropFactors.write

@@ -1,0 +1,6 @@
+﻿imod.msw.IdfMapping.write
+=========================
+
+.. currentmodule:: imod.msw
+
+.. automethod:: IdfMapping.write

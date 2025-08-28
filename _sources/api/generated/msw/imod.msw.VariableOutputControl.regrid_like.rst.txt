@@ -1,0 +1,6 @@
+﻿imod.msw.VariableOutputControl.regrid\_like
+===========================================
+
+.. currentmodule:: imod.msw
+
+.. automethod:: VariableOutputControl.regrid_like

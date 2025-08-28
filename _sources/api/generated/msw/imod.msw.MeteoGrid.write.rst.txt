@@ -1,0 +1,6 @@
+﻿imod.msw.MeteoGrid.write
+========================
+
+.. currentmodule:: imod.msw
+
+.. automethod:: MeteoGrid.write

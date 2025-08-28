@@ -14,28 +14,16 @@
    .. autosummary::
    
       ~SpecificStorage.__init__
-      ~SpecificStorage.cleanup
       ~SpecificStorage.clip_box
       ~SpecificStorage.copy
       ~SpecificStorage.from_file
-      ~SpecificStorage.get_non_grid_data
       ~SpecificStorage.get_options
       ~SpecificStorage.get_regrid_methods
-      ~SpecificStorage.is_clipping_supported
       ~SpecificStorage.is_empty
-      ~SpecificStorage.is_grid_agnostic_package
-      ~SpecificStorage.is_regridding_supported
-      ~SpecificStorage.is_splitting_supported
-      ~SpecificStorage.isel
       ~SpecificStorage.mask
       ~SpecificStorage.regrid_like
-      ~SpecificStorage.render
-      ~SpecificStorage.sel
       ~SpecificStorage.to_netcdf
       ~SpecificStorage.write
-      ~SpecificStorage.write_binary_griddata
-      ~SpecificStorage.write_blockfile
-      ~SpecificStorage.write_text_griddata
    
    
 

@@ -1,0 +1,6 @@
+﻿imod.msw.EvapotranspirationMapping.write
+========================================
+
+.. currentmodule:: imod.msw
+
+.. automethod:: EvapotranspirationMapping.write

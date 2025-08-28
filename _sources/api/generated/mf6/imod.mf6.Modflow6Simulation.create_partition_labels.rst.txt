@@ -1,0 +1,6 @@
+﻿imod.mf6.Modflow6Simulation.create\_partition\_labels
+=====================================================
+
+.. currentmodule:: imod.mf6
+
+.. automethod:: Modflow6Simulation.create_partition_labels

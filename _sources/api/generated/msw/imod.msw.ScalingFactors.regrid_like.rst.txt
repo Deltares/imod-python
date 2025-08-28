@@ -1,0 +1,6 @@
+﻿imod.msw.ScalingFactors.regrid\_like
+====================================
+
+.. currentmodule:: imod.msw
+
+.. automethod:: ScalingFactors.regrid_like

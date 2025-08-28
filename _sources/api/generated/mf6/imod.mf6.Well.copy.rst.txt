@@ -1,0 +1,6 @@
+﻿imod.mf6.Well.copy
+==================
+
+.. currentmodule:: imod.mf6
+
+.. automethod:: Well.copy
