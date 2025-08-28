@@ -37,7 +37,7 @@ def test_mf6_simulation_regrid_with_lakes(rectangle_with_lakes, tmp_path):
     new_grid = finer_grid(simulation["GWF_1"].domain)
 
     with pytest.raises(ValueError, match="simulation(.+)lake(.+)GWF_1"):
-        _ = simulation.regrid_like("regridded_simulation", new_grid, True)
+        _ = simulation.regrid_like("regridded_simulation", new_grid)
 
 
 def test_mf6_model_regrid_with_lakes(rectangle_with_lakes, tmp_path):
@@ -46,7 +46,7 @@ def test_mf6_model_regrid_with_lakes(rectangle_with_lakes, tmp_path):
     new_grid = finer_grid(simulation["GWF_1"].domain)
 
     with pytest.raises(ValueError, match="model(.+)lake"):
-        _ = model.regrid_like(new_grid, True)
+        _ = model.regrid_like(new_grid)
 
 
 def test_mf6_package_regrid_with_lakes(rectangle_with_lakes, tmp_path):

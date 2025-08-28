@@ -442,7 +442,7 @@ class TestModflow6Simulation:
         # Act
         with pytest.raises(ValueError):
             _ = structured_flow_simulation_2_flow_models.regrid_like(
-                "regridded_model", finer_idomain, False
+                "regridded_model", finer_idomain
             )
 
     def test_clip_multiple_flow_models(self, structured_flow_simulation_2_flow_models):
