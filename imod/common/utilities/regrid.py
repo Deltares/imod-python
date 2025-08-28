@@ -15,12 +15,9 @@ from imod.common.interfaces.ipackage import IPackage
 from imod.common.interfaces.ipointdatapackage import IPointDataPackage
 from imod.common.interfaces.iregridpackage import IRegridPackage
 from imod.common.interfaces.isimulation import ISimulation
-from imod.common.statusinfo import NestedStatusInfo
 from imod.common.utilities.clip import clip_by_grid
 from imod.common.utilities.dataclass_type import DataclassType, EmptyRegridMethod
 from imod.common.utilities.value_filters import is_valid
-from imod.mf6.validation_settings import ValidationSettings
-from imod.schemata import ValidationError
 from imod.typing.grid import (
     GridDataArray,
     GridDataset,
@@ -268,7 +265,6 @@ def _regrid_like(
 def _regrid_like(
     model: IModel,
     target_grid: GridDataArray,
-    validate: bool = True,
     regrid_cache: Optional[RegridderWeightsCache] = None,
 ) -> IModel:
     """
@@ -283,8 +279,6 @@ def _regrid_like(
     target_grid: xr.DataArray or xu.UgridDataArray
         a grid defined using the same discretization as the one we want to
         regrid the package to
-    validate: bool
-        set to true to validate the regridded packages
     regrid_cache: RegridderWeightsCache, optional
         stores regridder weights for different regridders. Can be used to speed
         up regridding, if the same regridders are used several times for
@@ -328,12 +322,6 @@ def _regrid_like(
     output_domain = handle_extra_coords("dx", target_grid, output_domain)
     output_domain = handle_extra_coords("dy", target_grid, output_domain)
     new_model.mask_all_packages(output_domain)
-    if validate:
-        validation_context = ValidationSettings(validate=validate)
-        status_info = NestedStatusInfo("Model validation status")
-        status_info.add(new_model.validate("Regridded model", validation_context))
-        if status_info.has_errors():
-            raise ValidationError("\n" + status_info.to_string())
     return new_model
 
 
@@ -342,7 +330,6 @@ def _regrid_like(
     simulation: ISimulation,
     regridded_simulation_name: str,
     target_grid: GridDataArray,
-    validate: bool = True,
 ) -> ISimulation:
     """
     This method creates a new simulation object. The models contained in the new simulation are regridded versions
@@ -355,8 +342,6 @@ def _regrid_like(
         name given to the output simulation
     target_grid: xr.DataArray or  xu.UgridDataArray
         discretization onto which the models  in this simulation will be regridded
-    validate: bool
-        set to true to validate the regridded packages
 
     Returns
     -------
@@ -385,7 +370,7 @@ def _regrid_like(
     result = simulation.__class__(regridded_simulation_name)
     for key, item in simulation.items():
         if isinstance(item, IModel):
-            result[key] = item.regrid_like(target_grid, validate, regrid_cache)
+            result[key] = item.regrid_like(target_grid, regrid_cache)
         elif key == "gwtgwf_exchanges":
             pass
         elif isinstance(item, IPackage) and not isinstance(item, IRegridPackage):

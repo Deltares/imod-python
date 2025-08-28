@@ -247,9 +247,7 @@ voronoi_uda = ones_like_ugrid(voronoi_grid)
 # Now that we have a Voronoi grid, we can regrid the MODFLOW 6 simulation to this
 # grid.
 
-mf6_unstructured = mf6_sim.regrid_like(
-    "unstructured_example", voronoi_uda, validate=False
-)
+mf6_unstructured = mf6_sim.regrid_like("unstructured_example", voronoi_uda)
 mf6_unstructured
 
 # %%
