@@ -1508,6 +1508,10 @@ class Modflow6Simulation(collections.UserDict, ISimulation):
             for i in [1, 2]:
                 self._filter_inactive_cells_exchange_domain(ex, i)
 
+            # Remove exchange if no cells are left
+            if ex.dataset.sizes["index"] == 0:
+                self["split_exchanges"].remove(ex)
+
     def _filter_inactive_cells_exchange_domain(self, ex: GWFGWF, i: int) -> None:
         """Filters inactive cells from one exchange domain inplace"""
         modelname = ex[f"model_name_{i}"].values[()]
