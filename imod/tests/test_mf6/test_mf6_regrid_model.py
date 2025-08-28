@@ -109,7 +109,7 @@ def test_model_regridding_can_skip_validation(
     structured_flow_model: imod.mf6.GroundwaterFlowModel,
 ):
     """
-    This tests if an invalid model can be regridded by turning off validation
+    This tests if an invalid model can be regridded.
     """
 
     # create a sto package with a negative storage coefficient. This would trigger a validation error if it were turned on.
@@ -128,7 +128,7 @@ def test_model_regridding_can_skip_validation(
 
     # Regrid the package to a finer domain
     new_grid = grid_data_structured(np.float64, 1.0, 0.025)
-    regridded_model = structured_flow_model.regrid_like(new_grid, validate=False)
+    regridded_model = structured_flow_model.regrid_like(new_grid)
 
     # Check that write validation still fails for the regridded package
     new_bottom = deepcopy(new_grid)
@@ -153,31 +153,3 @@ def test_model_regridding_can_skip_validation(
         str(pkg_errors["specific_yield"])
         == "[ValidationError('not all values comply with criterion: >= 0.0')]"
     )
-
-
-def test_model_regridding_can_validate(
-    structured_flow_model: imod.mf6.GroundwaterFlowModel,
-):
-    """
-    This tests if an invalid model will throw a validation error on regridding if validation is turned on
-    """
-
-    # Create a storage package with a negative storage coefficient. This would trigger a validation error if it were turned on.
-    storage_coefficient = grid_data_structured(np.float64, -20, 2.0)
-    specific_yield = grid_data_structured(np.float64, -30, 2.0)
-    sto_package = imod.mf6.StorageCoefficient(
-        storage_coefficient,
-        specific_yield,
-        transient=True,
-        convertible=False,
-        save_flows=True,
-        validate=False,
-    )
-    structured_flow_model["sto"] = sto_package
-
-    # Create  a finer domain to regrid to
-    new_grid = grid_data_structured(np.float64, 1, 0.025)
-
-    # Check that a validation error is thrown while regridding
-    with pytest.raises(imod.schemata.ValidationError):
-        _ = structured_flow_model.regrid_like(new_grid, validate=True)

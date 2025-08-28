@@ -19,6 +19,7 @@ from imod.typing.grid import (
 
 TRANSPORT_PACKAGES = ("adv", "dsp", "ssm", "mst", "ist", "src")
 EXCHANGE_PACKAGES = ("gwfgwf", "gwfgwt", "gwtgwt")
+UTIL_PACKAGES = ("ats", "hpc")
 
 
 def _is_scalar_nan(da: GridDataArray):

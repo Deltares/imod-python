@@ -1,9 +1,9 @@
 begin options
 {% if print_option is defined %}  print_option {{print_option}}
 {% endif %}
-{%- if outer_csvfile is defined %}  outer_csvfile fileout {{outer_csvfile}}
+{%- if outer_csvfile is defined %}  csv_outer_output fileout {{outer_csvfile}}
 {% endif %}
-{%- if inner_csvfile is defined %}  inner_csvfile fileout {{inner_csvfile}}
+{%- if inner_csvfile is defined %}  csv_inner_output fileout {{inner_csvfile}}
 {% endif %}
 {%- if no_ptc is defined %}  no_ptc {{no_ptc}}
 {% endif -%}
