@@ -9,18 +9,18 @@ from imod.typing.grid import preserve_gridtype
 @preserve_gridtype
 def get_upper_active_layer_number(active: GridDataArray) -> GridDataArray:
     """
-    Returns planar grid of integers with the layer number of the uppermost
-    active cell.
+    Returns planar grid of integers with the layer number of the lower
+    most active cell.
 
     Parameters
     ----------
     active: {xr.DataArray, xu.UgridDataArray}
-        Grid of booleans (layer, y, x) designating active cell.
+        Grid of booleans (..., layer, y, x) designating active cell.
 
     Returns
     -------
     upper_active_layer: {xr.DataArray, xu.UgridDataArray}
-        2D grid of integers (y, x) with the layer number of the uppermost
+        planar grid of integers (..., y, x) with the layer number of the uppermost
         active cell.
 
     Examples
@@ -52,12 +52,12 @@ def get_upper_active_grid_cells(active: GridDataArray) -> GridDataArray:
     Parameters
     ----------
     active: {xr.DataArray, xu.UgridDataArray}
-        Grid of booleans (layer, y, x) designating active cell.
+        Grid of booleans (..., layer, y, x) designating active cell.
     
     Returns
     -------
     upper_active_grid_cells: {xr.DataArray, xu.UgridDataArray}
-        Grid of booleans (layer, y, x) designating location of the uppermost
+        Grid of booleans (..., layer, y, x) designating location of the uppermost
         active grid cell.
 
     Examples
@@ -84,18 +84,18 @@ def get_upper_active_grid_cells(active: GridDataArray) -> GridDataArray:
 @preserve_gridtype
 def get_lower_active_layer_number(active: GridDataArray) -> GridDataArray:
     """
-    Returns two-dimensional grid of integers with the layer number of the lower
+    Returns planar grid of integers with the layer number of the lower
     most active cell.
 
     Parameters
     ----------
     active: {xr.DataArray, xu.UgridDataArray}
-        Grid of booleans designating active cell.
+        Grid of booleans (..., layer, y, x) designating active cell.
 
     Returns
     -------
     lower_active_layer: {xr.DataArray, xu.UgridDataArray}
-        2D grid of integers (y, x) with the layer number of the lowermost
+        Planar grid of integers (..., y, x) with the layer number of the lowermost
         active cell.
 
     Examples
@@ -127,12 +127,13 @@ def get_lower_active_grid_cells(active: GridDataArray) -> GridDataArray:
     Parameters
     ----------
     active: {xr.DataArray, xu.UgridDataArray}
-        Grid of booleans designating active cell.
+        Grid of booleans (..., layer, y, x) designating active cell.
     
     Returns
     -------
     lower_active_grid_cells: {xr.DataArray, xu.UgridDataArray}
-        Grid of booleans designating location of the lowermost active grid cell.
+        Grid of booleans (..., layer, y, x) designating location of the
+        lowermost active grid cell.
 
     Examples
     --------
