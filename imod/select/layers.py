@@ -53,7 +53,7 @@ def get_upper_active_grid_cells(active: GridDataArray) -> GridDataArray:
     ----------
     active: {xr.DataArray, xu.UgridDataArray}
         Grid of booleans (..., layer, y, x) designating active cell.
-    
+
     Returns
     -------
     upper_active_grid_cells: {xr.DataArray, xu.UgridDataArray}
@@ -128,7 +128,7 @@ def get_lower_active_grid_cells(active: GridDataArray) -> GridDataArray:
     ----------
     active: {xr.DataArray, xu.UgridDataArray}
         Grid of booleans (..., layer, y, x) designating active cell.
-    
+
     Returns
     -------
     lower_active_grid_cells: {xr.DataArray, xu.UgridDataArray}
@@ -142,7 +142,7 @@ def get_lower_active_grid_cells(active: GridDataArray) -> GridDataArray:
     >>> active = idomain > 0
     >>> lower_active = get_lower_active_grid_cells(active)
     >>> idomain_lower = idomain.where(lower_active, 0)
-    
+
     To get the lowermost active grid cells of data grid with floats, where
     ``np.nan`` indicates inactive cells:
 
