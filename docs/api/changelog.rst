@@ -18,6 +18,17 @@ Changed
 - :class:`imod.mf6.River` now ignore confined cells (``icelltype == 0``) when
   validating whether the river bottom elevation is below the model bottom
   elevation.
+- Moved :func:`imod.select.get_upper_active_layer_number`,
+  :func:`imod.select.get_upper_active_cells`,
+  :func:`imod.select.get_lower_active_cells`, and
+  :func:`imod.select.get_lower_active_layer_number` from :mod:`imod.prepare`. to
+  :mod:`imod.select`.
+
+Removed
+~~~~~~~
+
+- Removed ``imod.select.upper_active_layer`` function, use
+  :func:`imod.select.get_upper_active_layer_number` instead.
 
 Fixed
 ~~~~~

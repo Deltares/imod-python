@@ -5,7 +5,6 @@ import xugrid as xu
 from imod.logging import init_log_decorator
 from imod.mf6.boundary_condition import AdvancedBoundaryCondition, BoundaryCondition
 from imod.mf6.validation import BOUNDARY_DIMS_SCHEMA
-from imod.prepare.layer import get_upper_active_grid_cells
 from imod.schemata import (
     AllCoordsValueSchema,
     AllInsideNoDataSchema,
@@ -18,6 +17,7 @@ from imod.schemata import (
     IndexesSchema,
     OtherCoordsSchema,
 )
+from imod.select.layers import get_upper_active_grid_cells
 
 
 class UnsaturatedZoneFlow(AdvancedBoundaryCondition):
