@@ -41,6 +41,8 @@ class ActiveLayerCases:
         return active_unstructured, upper_layer_number, lower_layer_number
 
     def case_structured(self, active_structured):
+        # Deactivate some cells in different layers to create a more complex
+        # pattern.
         active_structured[0, :, 1] = False
         active_structured[1, :, 2] = False
         active_structured[0, :, 3] = False
@@ -57,6 +59,8 @@ class ActiveLayerCases:
         return active_structured, upper_layer_number, lower_layer_number
 
     def case_unstructured(self, active_unstructured):
+        # Deactivate some cells in different layers to create a more complex
+        # pattern.
         active_unstructured[0, 1] = False
         active_unstructured[1, 2] = False
         active_unstructured[0, 3] = False
