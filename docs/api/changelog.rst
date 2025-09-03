@@ -23,6 +23,8 @@ Changed
   :func:`imod.select.get_lower_active_cells`, and
   :func:`imod.select.get_lower_active_layer_number` from :mod:`imod.prepare`. to
   :mod:`imod.select`.
+- :class:`imod.mf6.Dispersion` now is not a required package for
+  :class:`imod.mf6.GroundwaterTransportModel` anymore.
 
 Removed
 ~~~~~~~
