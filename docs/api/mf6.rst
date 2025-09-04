@@ -43,6 +43,7 @@ Model objects & methods
     Modflow6Simulation.get_models_of_type
     Modflow6Simulation.get_models
     Modflow6Simulation.create_partition_labels
+    Modflow6Simulation.set_validation_settings
     GroundwaterFlowModel
     GroundwaterFlowModel.mask_all_packages
     GroundwaterFlowModel.prepare_wel_for_mf6
