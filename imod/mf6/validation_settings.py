@@ -40,6 +40,11 @@ class ValidationSettings:
     You can provide the settings to :class:`imod.mf6.Modflow6Simulations`:
 
     >>> sim = imod.mf6.Modflow6Simulation(validation_context=settings)
+
+    or provide it to :meth:`imod.mf6.Modflow6Simulation.set_validation_settings`:
+
+    >>> sim = imod.mf6.Modflow6Simulation()
+    >>> sim.set_validation_settings(settings)
     """
 
     validate: bool = True
