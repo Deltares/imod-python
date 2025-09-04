@@ -182,7 +182,11 @@ def structured_flow_simulation(
     structured_flow_model: imod.mf6.GroundwaterFlowModel,
     solution_settings: imod.mf6.Solution,
 ) -> imod.mf6.Modflow6Simulation:
-    simulation = imod.mf6.Modflow6Simulation("original_simulation")
+    validation_settings = imod.mf6.ValidationSettings(
+        strict_well_validation=False,
+        strict_hfb_validation=False,
+    )
+    simulation = imod.mf6.Modflow6Simulation("original_simulation", validation_settings)
     simulation["flow"] = structured_flow_model
     simulation["solution"] = solution_settings
     simulation.create_time_discretization(
@@ -208,7 +212,11 @@ def unstructured_flow_simulation(
     unstructured_flow_model: imod.mf6.GroundwaterFlowModel,
     solution_settings: imod.mf6.Solution,
 ) -> imod.mf6.Modflow6Simulation:
-    simulation = imod.mf6.Modflow6Simulation("original_simulation")
+    validation_settings = imod.mf6.ValidationSettings(
+        strict_well_validation=False,
+        strict_hfb_validation=False,
+    )
+    simulation = imod.mf6.Modflow6Simulation("original_simulation", validation_settings)
     simulation["flow"] = unstructured_flow_model
     simulation["solution"] = solution_settings
     simulation.create_time_discretization(
