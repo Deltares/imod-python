@@ -9,6 +9,13 @@ The format is based on `Keep a Changelog`_, and this project adheres to
 [Unreleased]
 ------------
 
+Added
+~~~~~
+
+- :meth:`imod.mf6.Modflow6Simulation.set_validation_settings` to set validation
+  settings for a MODFLOW 6 simulation. See :class:`imod.mf6.ValidationSettings`
+  for more information.
+
 Changed
 ~~~~~~~
 
@@ -42,6 +49,10 @@ Fixed
   empty exchanges being present in the ``split_exchanges`` package list, when
   two models were isolated by inactive cells from each other. These empty
   exchanges are now removed.
+- Fixed bug where :meth:`imod.mf6.Modflow6Simulation.split`,
+  :meth:`imod.mf6.Modflow6Simulation.regrid_like`, and
+  :meth:`imod.mf6.Modflow6Simulation.clip_box` would not copy
+  :class:`imod.mf6.ValidationSettings`. 
 
 [1.0.0rc6] - 2025-08-28
 -----------------------
