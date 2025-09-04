@@ -367,7 +367,9 @@ def _regrid_like(
                 f"Unable to regrid simulation, due to the presence of package '{error_with_object_name}' in model {model_name} "
             )
 
-    result = simulation.__class__(regridded_simulation_name)
+    result = simulation.__class__(
+        regridded_simulation_name, validation_settings=simulation._validation_context
+    )
     for key, item in simulation.items():
         if isinstance(item, IModel):
             result[key] = item.regrid_like(target_grid, regrid_cache)
