@@ -142,10 +142,11 @@ class Modflow6Simulation(collections.UserDict, ISimulation):
         self.name = name
         self.directory = None
         self._initialize_template()
+        self._validation_context: ValidationSettings
         if validation_settings is None:
-            self._validation_context = ValidationSettings()
+            self.set_validation_settings(ValidationSettings())
         else:
-            self._validation_context = validation_settings
+            self.set_validation_settings(validation_settings)
 
     def __setitem__(self, key, value):
         super().__setitem__(key, value)
@@ -403,6 +404,42 @@ class Modflow6Simulation(collections.UserDict, ISimulation):
             raise ValidationError("\n" + status_info.to_string())
 
         self.directory = directory
+
+    def set_validation_settings(self, validation_settings: ValidationSettings):
+        """
+        Set validation settings for the simulation. Configuring
+        :class:`imod.mf6.ValidationSettings` can help performance or reduce the
+        strictness of validation for some packages, namely the Well and HFB
+        packages.
+
+        Parameters
+        ----------
+        validation_settings: ValidationSettings
+            Settings for validation of the simulation. These settings can be
+            used to control whether the simulation is validated at write time,
+            and whether strict validation rules are applied.
+
+        Examples
+        --------
+
+        Configure the validation settings for the simulation as follows. Turn
+        off valdation for each timestep to boost performance for models with
+        many timesteps:
+
+        >>> validation_settings = imod.mf6.ValidationSettings(ignore_time=True)
+        >>> simulation.set_validation_settings(validation_settings)
+
+        Less strict model validation for horizontal flow barriers and wells:
+
+        >>> validation_settings = imod.mf6.ValidationSettings(
+        ...     strict_well_validation=False, strict_hfb_validation=False
+        ... )
+        >>> simulation.set_validation_settings(validation_settings)
+
+        See :class:`imod.mf6.ValidationSettings` for futher information on how
+        to configure validation settings.
+        """
+        self._validation_context = validation_settings
 
     @standard_log_decorator()
     def run(self, mf6path: Union[str, Path] = "mf6") -> None:
@@ -1219,7 +1256,9 @@ class Modflow6Simulation(collections.UserDict, ISimulation):
                     f"simulation cannot be clipped due to presence of package '{error_with_object}' in model '{model_name}'"
                 )
 
-        clipped = type(self)(name=self.name)
+        clipped = type(self)(
+            name=self.name, validation_settings=self._validation_context
+        )
         for key, value in self.items():
             state_for_boundary = (
                 None if states_for_boundary is None else states_for_boundary.get(key)
@@ -1387,7 +1426,9 @@ class Modflow6Simulation(collections.UserDict, ISimulation):
                 submodel_labels, partition_info
             )
 
-        new_simulation = imod.mf6.Modflow6Simulation(f"{self.name}_partioned")
+        new_simulation = imod.mf6.Modflow6Simulation(
+            f"{self.name}_partioned", validation_settings=self._validation_context
+        )
         for package_name, package in {**original_packages}.items():
             new_simulation[package_name] = deepcopy(package)
 
@@ -1746,9 +1787,13 @@ class Modflow6Simulation(collections.UserDict, ISimulation):
         if regridder_types is None:
             regridder_types = {}
 
-        simulation = Modflow6Simulation("imported_simulation")
-        simulation._validation_context.strict_well_validation = False
-        simulation._validation_context.strict_hfb_validation = False
+        validation_settings = ValidationSettings(
+            strict_well_validation=False,
+            strict_hfb_validation=False,
+        )
+        simulation = Modflow6Simulation(
+            "imported_simulation", validation_settings=validation_settings
+        )
 
         # import GWF model,
         gwf_model = GroundwaterFlowModel.from_imod5_data(

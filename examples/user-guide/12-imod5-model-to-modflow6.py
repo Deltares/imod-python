@@ -296,18 +296,6 @@ gwf_unstructured["riv-2drn"].cleanup(dis)
 
 # %%
 #
-# Finally, we need to set the HFB validation settings to less strict. Otherwise,
-# we'll get errors about hfb's being connected to inactive cells. Normally, you
-# would set this when creating a new Modflow6Simulation, but since we created
-# one from an iMOD5 model, these settings cannot be set upon creation. We can
-# however set the validation settings directly by changing this attribute:
-
-from imod.mf6 import ValidationSettings
-
-mf6_unstructured._validation_context = ValidationSettings(strict_hfb_validation=False)
-
-# %%
-#
 # We'll now be able to finally write the unstructured model.
 
 mf6_unstructured.write(mf6_dir)
