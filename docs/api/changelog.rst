@@ -25,6 +25,9 @@ Changed
   :mod:`imod.select`.
 - :class:`imod.mf6.Dispersion` now is not a required package for
   :class:`imod.mf6.GroundwaterTransportModel` anymore.
+- No validation anymore for ``icelltype`` upon writing
+  :class:`imod.mf6.SpecificStorage` and :class:`imod.mf6.StorageCoefficient`.
+
 
 Removed
 ~~~~~~~

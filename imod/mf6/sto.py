@@ -161,9 +161,6 @@ class SpecificStorage(StorageBase):
             AllValueSchema(">=", 0.0),
             IdentityNoDataSchema(other="idomain", is_other_notnull=(">", 0)),
         ),
-        "convertible": (
-            IdentityNoDataSchema(other="idomain", is_other_notnull=(">", 0)),
-        ),
     }
 
     _template = Package._initialize_template(_pkg_id)
