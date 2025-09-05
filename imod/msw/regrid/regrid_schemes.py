@@ -78,11 +78,11 @@ class GridDataRegridMethod(DataclassType):
     Parameters
     ----------
     area: tuple, default (RegridderType.RELATIVEOVERLAP, "conductance")
-    landuse: tuple, default (RegridderType.OVERLAP, "mean")
+    landuse: tuple, default (RegridderType.OVERLAP, "mode")
     rootzone_depth:  tuple, default (RegridderType.OVERLAP, "mean")
     surface_elevation: tuple, default  (RegridderType.OVERLAP, "mean")
-    soil_physical_unit: tuple, default  (RegridderType.OVERLAP, "mean")
-    active: tuple, default (RegridderType.OVERLAP, "mean")
+    soil_physical_unit: tuple, default  (RegridderType.OVERLAP, "mode")
+    active: tuple, default (RegridderType.OVERLAP, "mode")
 
     Examples
     --------
@@ -98,11 +98,11 @@ class GridDataRegridMethod(DataclassType):
     """
 
     area: RegridVarType = (RegridderType.RELATIVEOVERLAP, "conductance")
-    landuse: RegridVarType = (RegridderType.OVERLAP, "mean")
+    landuse: RegridVarType = (RegridderType.OVERLAP, "mode")
     rootzone_depth: RegridVarType = (RegridderType.OVERLAP, "mean")
     surface_elevation: RegridVarType = (RegridderType.OVERLAP, "mean")
-    soil_physical_unit: RegridVarType = (RegridderType.OVERLAP, "mean")
-    active: RegridVarType = (RegridderType.OVERLAP, "mean")
+    soil_physical_unit: RegridVarType = (RegridderType.OVERLAP, "mode")
+    active: RegridVarType = (RegridderType.OVERLAP, "mode")
 
 
 @dataclass(config=_CONFIG)
