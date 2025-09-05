@@ -53,6 +53,9 @@ Fixed
   :meth:`imod.mf6.Modflow6Simulation.regrid_like`, and
   :meth:`imod.mf6.Modflow6Simulation.clip_box` would not copy
   :class:`imod.mf6.ValidationSettings`. 
+- ``landuse``, ``soil_physical_unit``, ``active`` for :class:`imod.msw.GridData`
+  are now properly regridded with the ``mode`` statistic when using
+  :meth:`imod.msw.GridData.regrid_like`.
 
 [1.0.0rc6] - 2025-08-28
 -----------------------
