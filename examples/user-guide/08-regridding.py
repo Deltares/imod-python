@@ -447,6 +447,7 @@ from dataclasses import asdict
 
 import pandas as pd
 
+
 def collect_regrid_methods(classes: list):
     """Collect all regrid methods from all list of package classes."""
     regrid_method_setup = {
@@ -478,6 +479,7 @@ def collect_regrid_methods(classes: list):
     regrid_method_table = regrid_method_table.set_index(["package name", "array name"])
     return regrid_method_table
 
+
 # Get all classes in the imod.mf6 module (e.g.
 # :class:`imod.mf6.NodePropertyFlow`, :class:`imod.mf6.GroundwaterFlowModel`,
 # :class:`imod.mf6.River`)
@@ -495,7 +497,7 @@ pd.set_option("display.max_rows", nrows + 1)
 mf6_regrid_methods
 
 # %%
-# 
+#
 # MetaSWAP
 # ^^^^^^^^^
 #
