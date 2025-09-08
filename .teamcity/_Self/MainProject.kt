@@ -4,6 +4,7 @@ import Deploy.DeployProject
 import Nightly.NightlyProject
 import Pixi.PixiProject
 import Templates.*
+import Weekly.WeeklyProject
 import jetbrains.buildServer.configs.kotlin.*
 import jetbrains.buildServer.configs.kotlin.buildFeatures.PullRequests
 import jetbrains.buildServer.configs.kotlin.buildFeatures.pullRequests
@@ -63,6 +64,7 @@ object MainProject : Project({
 
     subProject(DeployProject)
     subProject(NightlyProject)
+    subProject(WeeklyProject)
     subProject(PixiProject)
 })
 

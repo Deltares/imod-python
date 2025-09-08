@@ -177,14 +177,14 @@ dvc-s3 = "*"
 
 [feature.user-acceptance.tasks]
 pull_data = "dvc pull --remote minio"
-fetch_lhm = {cmd = "7z x LHM_transient.zip -oLHM_transient -y", depends-on = ["pull_data"], cwd = "imod/tests/user_acceptance_data"}
+fetch_lhm = {cmd = "7z x LHM_transient.zip -o. -y", depends-on = ["pull_data"], cwd = "imod/tests/user_acceptance_data"}
 user_acceptance = { cmd = [
     "pytest",
     "-m", "user_acceptance",
     "--cache-clear",
     "--verbose",
     "--junitxml=user_acceptance_report.xml",
-], depends-on = ["install"], cwd = "imod/tests", env = { USER_ACCEPTANCE_DIR = "user_acceptance_data"} }
+], depends-on = ["install", "fetch_lhm"], cwd = "imod/tests", env = { USER_ACCEPTANCE_DIR = "user_acceptance_data"} }
 run_imod5 = {cmd = ["prepare_mf6_transient_imod5.bat"], cwd = "imod/tests/user_acceptance_data/LHM_transient/scripts_imod-5"}
 qgis_export ={ cmd = [
     "pytest", "-s",
