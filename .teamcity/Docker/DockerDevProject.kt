@@ -5,12 +5,13 @@ import jetbrains.buildServer.configs.kotlin.Project
 import jetbrains.buildServer.configs.kotlin.PublishMode
 
 object DockerProject  : Project({
-    name = "Docker"
+    name = "Docker dev project"
 
-    buildType(DeployDockerImage)
+    buildType(DeployDockerDevImage)
 })
 
-object DeployDockerImage : BuildType({
+object DeployDockerDevImage : BuildType({
+    name = "Deploy docker dev image"
 
     enablePersonalBuilds = false
     type = Type.DEPLOYMENT
