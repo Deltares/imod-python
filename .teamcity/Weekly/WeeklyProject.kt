@@ -1,5 +1,6 @@
 package Weekly
 
+import Nightly.NightlyPipPython
 import Templates.*
 import jetbrains.buildServer.configs.kotlin.AbsoluteId
 import jetbrains.buildServer.configs.kotlin.BuildType
@@ -13,6 +14,7 @@ import jetbrains.buildServer.configs.kotlin.triggers.schedule
 object WeeklyProject : Project({
     name = "Weekly"
 
+    buildType(AcceptanceTests)
     buildType(WeeklyTests)
 
 })
@@ -80,6 +82,12 @@ object  WeeklyTests : BuildType({
             }
             buildFailedToStart = true
             buildFailed = true
+        }
+    }
+
+    dependencies {
+        snapshot(AcceptanceTests) {
+            onDependencyFailure = FailureAction.FAIL_TO_START
         }
     }
 })
