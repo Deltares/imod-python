@@ -1,6 +1,7 @@
 package _Self
 
 import Deploy.DeployProject
+import Docker.DockerProject
 import Nightly.NightlyProject
 import Pixi.PixiProject
 import Templates.*
@@ -67,6 +68,7 @@ object MainProject : Project({
     subProject(NightlyProject)
     subProject(WeeklyProject)
     subProject(PixiProject)
+    subProject(DockerProject)
 })
 
 object Lint : BuildType({
