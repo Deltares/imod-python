@@ -2,6 +2,8 @@ package Templates
 
 import jetbrains.buildServer.configs.kotlin.DslContext
 import jetbrains.buildServer.configs.kotlin.Template
+import jetbrains.buildServer.configs.kotlin.buildFeatures.XmlReport
+import jetbrains.buildServer.configs.kotlin.buildFeatures.xmlReport
 import jetbrains.buildServer.configs.kotlin.buildSteps.ScriptBuildStep
 import jetbrains.buildServer.configs.kotlin.buildSteps.script
 
@@ -9,18 +11,17 @@ object AcceptanceTestsTemplate : Template({
     name = "AcceptanceTestsTemplate"
 
     allowExternalStatus = true
+    detectHangingBuilds = false
 
     vcs {
         root(DslContext.settingsRoot, "+:. => imod-python")
         cleanCheckout = true
     }
 
-
     params {
         password("env.access_key", "credentialsJSON:2978988a-493b-44ed-9fcb-6cd6d2c2c673")
         password("env.secret_access_key", "credentialsJSON:409a55c0-b2e7-438c-98dd-f0404b83cabb")
     }
-
 
     steps {
         script {
@@ -43,4 +44,10 @@ object AcceptanceTestsTemplate : Template({
         }
     }
 
+    features {
+        xmlReport {
+            reportType = XmlReport.XmlReportType.JUNIT
+            rules = "imod-python/imod/tests/*report.xml"
+        }
+    }
 })
