@@ -17,8 +17,8 @@ object AcceptanceTestsTemplate : Template({
 
 
     params {
-        param("env.access_key", "%credentialsJSON:2978988a-493b-44ed-9fcb-6cd6d2c2c673%")
-        param("env.secret_access_key", "%credentialsJSON:409a55c0-b2e7-438c-98dd-f0404b83cabb%")
+        password("env.access_key", "credentialsJSON:2978988a-493b-44ed-9fcb-6cd6d2c2c673")
+        password("env.secret_access_key", "credentialsJSON:409a55c0-b2e7-438c-98dd-f0404b83cabb")
     }
 
 

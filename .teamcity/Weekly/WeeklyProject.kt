@@ -1,11 +1,7 @@
 package Weekly
 
 import Templates.*
-import jetbrains.buildServer.configs.kotlin.AbsoluteId
-import jetbrains.buildServer.configs.kotlin.BuildType
-import jetbrains.buildServer.configs.kotlin.DslContext
-import jetbrains.buildServer.configs.kotlin.FailureAction
-import jetbrains.buildServer.configs.kotlin.Project
+import jetbrains.buildServer.configs.kotlin.*
 import jetbrains.buildServer.configs.kotlin.buildFeatures.notifications
 import jetbrains.buildServer.configs.kotlin.triggers.ScheduleTrigger
 import jetbrains.buildServer.configs.kotlin.triggers.schedule
@@ -13,8 +9,8 @@ import jetbrains.buildServer.configs.kotlin.triggers.schedule
 object WeeklyProject : Project({
     name = "Weekly"
 
+    buildType(AcceptanceTests)
     buildType(WeeklyTests)
-
 })
 
 object AcceptanceTests : BuildType({
@@ -80,6 +76,12 @@ object  WeeklyTests : BuildType({
             }
             buildFailedToStart = true
             buildFailed = true
+        }
+    }
+
+    dependencies {
+        snapshot(AcceptanceTests) {
+            onDependencyFailure = FailureAction.FAIL_TO_START
         }
     }
 })

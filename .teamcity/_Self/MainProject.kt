@@ -34,6 +34,7 @@ object MainProject : Project({
     template(UnitTestsTemplate)
     template(ExamplesTemplate)
     template(PipPythonTemplate)
+    template(AcceptanceTestsTemplate)
 
     features {
         dockerRegistry {
