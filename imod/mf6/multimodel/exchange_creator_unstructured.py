@@ -4,8 +4,7 @@ import numpy as np
 import pandas as pd
 import xarray as xr
 
-from imod.mf6.multimodel.exchange_creator import ExchangeCreator
-from imod.mf6.multimodel.modelsplitter import PartitionInfo
+from imod.mf6.multimodel.exchange_creator import ExchangeCreator, PartitionInfo
 from imod.typing import GridDataArray
 
 
@@ -122,7 +121,7 @@ class ExchangeCreator_Unstructured(ExchangeCreator):
                 compat="override",
             )["label"]
 
-            model_id = submodel_partition_info.id
+            model_id = submodel_partition_info.partition_id
             global_to_local_idx[model_id] = pd.DataFrame(
                 {
                     "global_idx": overlap.values.flatten(),

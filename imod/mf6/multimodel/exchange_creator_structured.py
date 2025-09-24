@@ -1,4 +1,4 @@
-from typing import Dict, List
+from typing import Dict, List, NamedTuple
 
 import numpy as np
 import pandas as pd
@@ -6,10 +6,14 @@ import xarray as xr
 
 from imod.common.utilities.grid import create_geometric_grid_info
 from imod.mf6.multimodel.exchange_creator import ExchangeCreator
-from imod.mf6.multimodel.modelsplitter import PartitionInfo
 from imod.typing import GridDataArray
 
 NOT_CONNECTED_VALUE = -999
+
+
+class PartitionInfo(NamedTuple):
+    active_domain: GridDataArray
+    partition_id: int
 
 
 class ExchangeCreator_Structured(ExchangeCreator):
@@ -130,7 +134,7 @@ class ExchangeCreator_Structured(ExchangeCreator):
                 compat="override",
             )["label"]
 
-            model_id = submodel_partition_info.id
+            model_id = submodel_partition_info.partition_id
             global_to_local_idx[model_id] = pd.DataFrame(
                 {
                     "global_idx": overlap.values.flatten(),

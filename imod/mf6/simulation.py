@@ -39,11 +39,7 @@ from imod.mf6.ims import Solution, SolutionPresetModerate
 from imod.mf6.model import Modflow6Model
 from imod.mf6.model_gwf import GroundwaterFlowModel
 from imod.mf6.model_gwt import GroundwaterTransportModel
-from imod.mf6.multimodel.exchange_creator_structured import ExchangeCreator_Structured
-from imod.mf6.multimodel.exchange_creator_unstructured import (
-    ExchangeCreator_Unstructured,
-)
-from imod.mf6.multimodel.modelsplitter import create_partition_info, slice_model
+from imod.mf6.multimodel.modelsplitter import ModelSplitter, PartitionModels
 from imod.mf6.out import open_cbc, open_conc, open_hds
 from imod.mf6.package import Package
 from imod.mf6.ssm import SourceSinkMixing
@@ -90,6 +86,12 @@ def get_packages(simulation: Modflow6Simulation) -> dict[str, Package]:
         for pkg_name, pkg in simulation.items()
         if isinstance(pkg, Package)
     }
+
+
+def force_load_dis(model):
+    key = model.get_diskey()
+    model[key].dataset.load()
+    return
 
 
 class Modflow6Simulation(collections.UserDict, ISimulation):
@@ -1412,57 +1414,53 @@ class Modflow6Simulation(collections.UserDict, ISimulation):
                     f"simulation cannot be split due to presence of package '{error_with_object}' in model '{model_name}'"
                 )
 
+        # Make sure the DIS package is available in memory and not lazily evaluated,
+        # since we need its values repeatedly.
+        for model in original_models.values():
+            force_load_dis(model)
+
         original_packages = get_packages(self)
-
-        partition_info = create_partition_info(submodel_labels)
-
-        exchange_creator: ExchangeCreator_Unstructured | ExchangeCreator_Structured
-        if is_unstructured(submodel_labels):
-            exchange_creator = ExchangeCreator_Unstructured(
-                submodel_labels, partition_info
-            )
-        else:
-            exchange_creator = ExchangeCreator_Structured(
-                submodel_labels, partition_info
-            )
-
         new_simulation = imod.mf6.Modflow6Simulation(
             f"{self.name}_partioned", validation_settings=self._validation_context
         )
         for package_name, package in {**original_packages}.items():
             new_simulation[package_name] = deepcopy(package)
 
-        for model_name, model in original_models.items():
+        model_splitter = ModelSplitter(
+            flow_models,
+            transport_models,
+            submodel_labels,
+            ignore_time_purge_empty,
+        )
+
+        # TODO: isn't it cleaner to just construct a new Solution object instead?
+        # We know none of the original models will remain?
+        # And the new models is just the list of newly generated ones.
+        for model_name in model_splitter.modelnames:
             solution_name = self.get_solution_name(model_name)
             solution = cast(Solution, new_simulation[solution_name])
             solution._remove_model_from_solution(model_name)
-            for submodel_partition_info in partition_info:
-                new_model_name = f"{model_name}_{submodel_partition_info.id}"
-                new_simulation[new_model_name] = slice_model(
-                    submodel_partition_info, model
-                )
-                new_simulation[new_model_name].purge_empty_packages(
-                    ignore_time=ignore_time_purge_empty
-                )
-                solution._add_model_to_solution(new_model_name)
 
-        exchanges: list[Any] = []
+        partition_models = model_splitter.split()
+        chained = {
+            **partition_models.flow_models,
+            **partition_models.flat_transport_models,
+        }
+        for partition_model_name, partition_model in chained.items():
+            new_simulation[partition_model_name] = partition_model
+            # TODO: see to do above.
+            solution._add_model_to_solution(partition_model_name)
 
-        for flow_model_name, flow_model in flow_models.items():
-            exchanges += exchange_creator.create_gwfgwf_exchanges(
-                flow_model_name, flow_model.domain.layer
-            )
-
-        if any(transport_models):
-            for tpt_model_name in transport_models:
-                exchanges += exchange_creator.create_gwtgwt_exchanges(
-                    tpt_model_name, flow_model_name, model.domain.layer
-                )
+        # Add exchanges
+        exchanges: list[Any] = (
+            model_splitter.create_gwfgwf_exchanges()
+            + model_splitter.create_gwtgwt_exchanges()
+        )
         new_simulation._add_modelsplit_exchanges(exchanges)
-        new_simulation._update_buoyancy_packages()
+        new_simulation._update_buoyancy_packages(partition_models)
         new_simulation._set_flow_exchange_options()
         new_simulation._set_transport_exchange_options()
-        new_simulation._update_ssm_packages()
+        new_simulation._update_ssm_packages(partition_models)
 
         new_simulation._filter_inactive_cells_from_exchanges()
         return new_simulation
@@ -1506,6 +1504,7 @@ class Modflow6Simulation(collections.UserDict, ISimulation):
         if not self.is_split():
             self["split_exchanges"] = []
         self["split_exchanges"].extend(exchanges_list)
+        return
 
     def _set_flow_exchange_options(self) -> None:
         # collect some options that we will auto-set
@@ -1520,6 +1519,7 @@ class Modflow6Simulation(collections.UserDict, ISimulation):
                     xt3d=model_1["npf"].get_xt3d_option(),
                     newton=model_1.is_use_newton(),
                 )
+        return
 
     def _set_transport_exchange_options(self) -> None:
         for exchange in self["split_exchanges"]:
@@ -1552,6 +1552,7 @@ class Modflow6Simulation(collections.UserDict, ISimulation):
             # Remove exchange if no cells are left
             if ex.dataset.sizes["index"] == 0:
                 self["split_exchanges"].remove(ex)
+        return
 
     def _filter_inactive_cells_exchange_domain(self, ex: GWFGWF, i: int) -> None:
         """Filters inactive cells from one exchange domain inplace"""
@@ -1575,6 +1576,7 @@ class Modflow6Simulation(collections.UserDict, ISimulation):
         active_exchange_domain = exchange_domain.where(exchange_domain > 0)
         active_exchange_domain = active_exchange_domain.dropna("index")
         ex.dataset = ex.dataset.sel(index=active_exchange_domain["index"])
+        return
 
     def get_solution_name(self, model_name: str) -> Optional[str]:
         for k, v in self.items():
@@ -1616,25 +1618,21 @@ class Modflow6Simulation(collections.UserDict, ISimulation):
                     result[flow_model_name].append(tpt_model_name)
         return result
 
-    def _generate_gwfgwt_exchanges(self) -> list[GWFGWT]:
+    def _generate_gwfgwt_exchanges(
+        self, partition_models: PartitionModels
+    ) -> list[GWFGWT]:
         exchanges = []
-        flow_transport_mapping = self._get_transport_models_per_flow_model()
-        for flow_name, tpt_models_of_flow_model in flow_transport_mapping.items():
-            if len(tpt_models_of_flow_model) > 0:
-                for transport_model_name in tpt_models_of_flow_model:
-                    exchanges.append(GWFGWT(flow_name, transport_model_name))
-
+        for flow_name, transport_model_names in partition_models.paired_keys():
+            for transport_name in transport_model_names:
+                exchanges.append(GWFGWT(flow_name, transport_name))
         return exchanges
 
-    def _update_ssm_packages(self) -> None:
-        flow_transport_mapping = self._get_transport_models_per_flow_model()
-        for flow_name, tpt_models_of_flow_model in flow_transport_mapping.items():
-            flow_model = self[flow_name]
-            for tpt_model_name in tpt_models_of_flow_model:
-                tpt_model = self[tpt_model_name]
-                ssm_key = tpt_model._get_pkgkey("ssm")
+    def _update_ssm_packages(self, partition_models: PartitionModels) -> None:
+        for flow_model, paired_transport_models in partition_models.paired_models():
+            for transport_model in paired_transport_models:
+                ssm_key = transport_model._get_pkgkey("ssm")
                 if ssm_key is not None:
-                    old_ssm_package = tpt_model.pop(ssm_key)
+                    old_ssm_package = transport_model.pop(ssm_key)
                     state_variable_name = old_ssm_package.dataset[
                         "auxiliary_variable_name"
                     ].values[0]
@@ -1642,13 +1640,13 @@ class Modflow6Simulation(collections.UserDict, ISimulation):
                         flow_model, state_variable_name, is_split=self.is_split()
                     )
                     if ssm_package is not None:
-                        tpt_model[ssm_key] = ssm_package
+                        transport_model[ssm_key] = ssm_package
+        return
 
-    def _update_buoyancy_packages(self) -> None:
-        flow_transport_mapping = self._get_transport_models_per_flow_model()
-        for flow_name, tpt_models_of_flow_model in flow_transport_mapping.items():
-            flow_model = cast(GroundwaterFlowModel, self[flow_name])
-            flow_model._update_buoyancy_package(tpt_models_of_flow_model)
+    def _update_buoyancy_packages(self, partition_models: PartitionModels) -> None:
+        for (_, flow_model), (names, _) in partition_models.paired_items():
+            flow_model._update_buoyancy_package(names)
+        return
 
     def is_split(self) -> bool:
         """
