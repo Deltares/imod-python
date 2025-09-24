@@ -1618,13 +1618,14 @@ class Modflow6Simulation(collections.UserDict, ISimulation):
                     result[flow_model_name].append(tpt_model_name)
         return result
 
-    def _generate_gwfgwt_exchanges(
-        self, partition_models: PartitionModels
-    ) -> list[GWFGWT]:
+    def _generate_gwfgwt_exchanges(self) -> list[GWFGWT]:
         exchanges = []
-        for flow_name, transport_model_names in partition_models.paired_keys():
-            for transport_name in transport_model_names:
-                exchanges.append(GWFGWT(flow_name, transport_name))
+        flow_transport_mapping = self._get_transport_models_per_flow_model()
+        for flow_name, tpt_models_of_flow_model in flow_transport_mapping.items():
+            if len(tpt_models_of_flow_model) > 0:
+                for transport_model_name in tpt_models_of_flow_model:
+                    exchanges.append(GWFGWT(flow_name, transport_model_name))
+
         return exchanges
 
     def _update_ssm_packages(self, partition_models: PartitionModels) -> None:
