@@ -212,7 +212,13 @@ class BoundaryCondition(Package, abc.ABC):
         for varname in self.dataset.data_vars.keys():  # pylint:disable=no-member
             if varname in not_options:
                 continue
-            v = self.dataset[varname].item()
+            # TODO: can we easily avoid this try-except?
+            # On which keys does it fail?
+            try:
+                v = self.dataset[varname].item()
+            except ValueError:
+                # Apparently not a scalar, therefore not an option entry.
+                pass
             options[varname] = v
         return options
 
