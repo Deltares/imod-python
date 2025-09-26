@@ -178,10 +178,6 @@ class ModelSplitter:
 
         self._count_boundary_activity_per_partition()
 
-    @property
-    def modelnames(self):
-        return list(self.models.keys())
-
     @staticmethod
     def _validate_submodel_label_array(submodel_labels: GridDataArray) -> None:
         unique_labels = np.unique(submodel_labels)
@@ -258,6 +254,7 @@ class ModelSplitter:
 
     def _split(self, models, nest: bool):
         partition_models = collections.defaultdict(dict)
+        model_names = collections.defaultdict(list)
         for model_name, model in models.items():
             for info in self.partition_info:
                 new_model = self.slice_model(
@@ -268,14 +265,19 @@ class ModelSplitter:
                     partition_models[info.partition_id][new_model_name] = new_model
                 else:
                     partition_models[new_model_name] = new_model
-        return partition_models
+
+                model_names[model_name].append(new_model_name)
+        return partition_models, model_names
 
     def split(self):
         # FUTURE: we may currently assume there is a single flow model. See check above.
         # And each separate transport model represents a different species.
-        flow_models = self._split(self.flow_models, nest=False)
-        transport_models = self._split(self.transport_models, nest=True)
-        return PartitionModels(flow_models, transport_models)
+        flow_models, flow_names = self._split(self.flow_models, nest=False)
+        transport_models, transport_names = self._split(
+            self.transport_models, nest=True
+        )
+        names = {**flow_names, **transport_names}
+        return PartitionModels(flow_models, transport_models), names
 
     def create_gwfgwf_exchanges(self):
         exchanges: list[Any] = []

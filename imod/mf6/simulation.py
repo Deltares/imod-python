@@ -1419,37 +1419,34 @@ class Modflow6Simulation(collections.UserDict, ISimulation):
         for model in original_models.values():
             force_load_dis(model)
 
-        original_packages = get_packages(self)
-        new_simulation = imod.mf6.Modflow6Simulation(
-            f"{self.name}_partioned", validation_settings=self._validation_context
-        )
-        for package_name, package in {**original_packages}.items():
-            new_simulation[package_name] = deepcopy(package)
-
         model_splitter = ModelSplitter(
             flow_models,
             transport_models,
             submodel_labels,
             ignore_time_purge_empty,
         )
+        partition_models, model_names = model_splitter.split()
 
-        # TODO: isn't it cleaner to just construct a new Solution object instead?
-        # We know none of the original models will remain?
-        # And the new models is just the list of newly generated ones.
-        for model_name in model_splitter.modelnames:
-            solution_name = self.get_solution_name(model_name)
-            solution = cast(Solution, new_simulation[solution_name])
-            solution._remove_model_from_solution(model_name)
-
-        partition_models = model_splitter.split()
-        chained = {
+        # Create new simulation object and add the partitioned models.
+        new_simulation = imod.mf6.Modflow6Simulation(
+            f"{self.name}_partioned", validation_settings=self._validation_context
+        )
+        chained = {  # ChainMap reverses order, annoyingly...
             **partition_models.flow_models,
             **partition_models.flat_transport_models,
         }
         for partition_model_name, partition_model in chained.items():
             new_simulation[partition_model_name] = partition_model
-            # TODO: see to do above.
-            solution._add_model_to_solution(partition_model_name)
+
+        # Add solution, time_discretization, etc.
+        # Replace the single model name by the partition model names.
+        original_packages = get_packages(self)
+        for package_name, package in original_packages.items():
+            new_package = deepcopy(package)
+            if isinstance(package, Solution):
+                old_name = package.dataset["modelnames"].item()
+                new_package["modelnames"] = xr.DataArray(model_names[old_name])
+            new_simulation[package_name] = new_package
 
         # Add exchanges
         exchanges: list[Any] = (
