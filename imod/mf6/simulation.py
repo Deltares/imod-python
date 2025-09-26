@@ -43,6 +43,7 @@ from imod.mf6.multimodel.modelsplitter import ModelSplitter, PartitionModels
 from imod.mf6.out import open_cbc, open_conc, open_hds
 from imod.mf6.package import Package
 from imod.mf6.ssm import SourceSinkMixing
+from imod.mf6.utilities.zarr_helper import to_zarr
 from imod.mf6.validation_settings import ValidationSettings
 from imod.mf6.write_context import WriteContext
 from imod.prepare.partition import create_partition_labels
@@ -971,6 +972,7 @@ class Modflow6Simulation(collections.UserDict, ISimulation):
         validate: bool = True,
         mdal_compliant: bool = False,
         crs=None,
+        engine="netCDF4",
     ) -> None:
         """
         Dump simulation to files. Writes a model definition as .TOML file, which
@@ -992,6 +994,8 @@ class Modflow6Simulation(collections.UserDict, ISimulation):
         crs: Any, optional
             Anything accepted by rasterio.crs.CRS.from_user_input
             Requires ``rioxarray`` installed.
+        engine: str, optional
+            "netCDF4" or "zarr" or "zarr.zip". Defaults to "netCDF4".
 
         Examples
         --------
@@ -1017,16 +1021,27 @@ class Modflow6Simulation(collections.UserDict, ISimulation):
         directory = pathlib.Path(directory)
         directory.mkdir(parents=True, exist_ok=True)
 
+        match engine:
+            case "netCDF4":
+                ext = "nc"
+            case "zarr":
+                ext = "zarr"
+            case "zarr.zip":
+                ext = "zarr.zip"
+            case _:
+                raise ValueError(f"Unknown engine: {engine}")
+
         toml_content: DefaultDict[str, dict] = collections.defaultdict(dict)
         # Dump version number
         version = get_version()
         toml_content["version"] = {"imod-python": version}
+
         # Dump models and exchanges
         for key, value in self.items():
             cls_name = type(value).__name__
             if isinstance(value, Modflow6Model):
                 model_toml_path = value.dump(
-                    directory, key, validate, mdal_compliant, crs
+                    directory, key, validate, mdal_compliant, crs, engine=engine
                 )
                 toml_content[cls_name][key] = model_toml_path.relative_to(
                     directory
@@ -1036,13 +1051,23 @@ class Modflow6Simulation(collections.UserDict, ISimulation):
                 for exchange_package in self[key]:
                     _, filename, _, _ = exchange_package.get_specification()
                     exchange_class_short = type(exchange_package).__name__
-                    path = f"{filename}.nc"
-                    exchange_package.dataset.to_netcdf(directory / path)
+                    path = f"{filename}.{ext}"
+
+                    if engine == "netCDF4":
+                        exchange_package.dataset.to_netcdf(directory / path)
+                    else:
+                        to_zarr(
+                            exchange_package.dataset, directory / path, engine=engine
+                        )
+
                     toml_content[key][exchange_class_short].append(path)
 
             else:
-                path = f"{key}.nc"
-                value.dataset.to_netcdf(directory / path)
+                path = f"{key}.{ext}"
+                if engine == "netCDF4":
+                    value.dataset.to_netcdf(directory / path)
+                else:
+                    to_zarr(value.dataset, directory / path, engine=engine)
                 toml_content[cls_name][key] = path
 
         with open(directory / f"{self.name}.toml", "wb") as f:
