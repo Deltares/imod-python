@@ -10,6 +10,7 @@ from xarray.core.utils import is_scalar
 
 import imod
 from imod.common.interfaces.ipackagebase import IPackageBase
+from imod.mf6.utilities.zarr_helper import to_zarr
 from imod.typing.grid import (
     GridDataArray,
     GridDataset,
@@ -108,6 +109,9 @@ class PackageBase(IPackageBase, abc.ABC):
                 dataset = imod.util.spatial.gdal_compliant_grid(dataset, crs=crs)
             dataset.to_netcdf(*args, **kwargs)
 
+    def to_zarr(self, path, engine, **kwargs):
+        to_zarr(self.dataset, path, engine, **kwargs)
+
     def _netcdf_encoding(self) -> dict:
         """
 
@@ -163,10 +167,16 @@ class PackageBase(IPackageBase, abc.ABC):
 
         Refer to the xarray documentation for the possible keyword arguments.
         """
+
         path = Path(path)
         if path.suffix in (".zip", ".zarr"):
-            # TODO: seems like a bug? Remove str() call if fixed in xarray/zarr
-            dataset = xr.open_zarr(str(path), **kwargs)
+            import zarr
+
+            if path.suffix == ".zip":
+                with zarr.storage.ZipStore(path, mode="r") as store:
+                    dataset = xr.open_zarr(store, **kwargs)
+            else:
+                dataset = xr.open_zarr(str(path), **kwargs)
         else:
             dataset = xr.open_dataset(path, **kwargs)
 

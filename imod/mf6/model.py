@@ -592,6 +592,7 @@ class Modflow6Model(collections.UserDict, IModel, abc.ABC):
         validate: bool = True,
         mdal_compliant: bool = False,
         crs: Optional[Any] = None,
+        engine="netCDF4",
     ):
         """
         Dump simulation to files. Writes a model definition as .TOML file, which
@@ -615,6 +616,8 @@ class Modflow6Model(collections.UserDict, IModel, abc.ABC):
         crs: Any, optional
             Anything accepted by rasterio.crs.CRS.from_user_input
             Requires ``rioxarray`` installed.
+        engine: str, optional
+            "netCDF4" or "zarr" or "zarr.zip". Defaults to "netCDF4".
         """
         modeldirectory = pathlib.Path(directory) / modelname
         modeldirectory.mkdir(exist_ok=True, parents=True)
@@ -624,13 +627,26 @@ class Modflow6Model(collections.UserDict, IModel, abc.ABC):
             if statusinfo.has_errors():
                 raise ValidationError(statusinfo.to_string())
 
+        match engine:
+            case "netCDF4":
+                ext = "nc"
+            case "zarr":
+                ext = "zarr"
+            case "zarr.zip":
+                ext = "zarr.zip"
+            case _:
+                raise ValueError(f"Unknown engine: {engine}")
+
         toml_content: dict = collections.defaultdict(dict)
         for pkgname, pkg in self.items():
-            pkg_path = f"{pkgname}.nc"
+            pkg_path = f"{pkgname}.{ext}"
             toml_content[type(pkg).__name__][pkgname] = pkg_path
-            pkg.to_netcdf(
-                modeldirectory / pkg_path, crs=crs, mdal_compliant=mdal_compliant
-            )
+            if engine == "netCDF4":
+                pkg.to_netcdf(
+                    modeldirectory / pkg_path, crs=crs, mdal_compliant=mdal_compliant
+                )
+            else:
+                pkg.to_zarr(modeldirectory / pkg_path, engine=engine)
 
         toml_path = modeldirectory / f"{modelname}.toml"
         with open(toml_path, "wb") as f:

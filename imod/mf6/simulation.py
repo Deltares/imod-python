@@ -39,14 +39,11 @@ from imod.mf6.ims import Solution, SolutionPresetModerate
 from imod.mf6.model import Modflow6Model
 from imod.mf6.model_gwf import GroundwaterFlowModel
 from imod.mf6.model_gwt import GroundwaterTransportModel
-from imod.mf6.multimodel.exchange_creator_structured import ExchangeCreator_Structured
-from imod.mf6.multimodel.exchange_creator_unstructured import (
-    ExchangeCreator_Unstructured,
-)
-from imod.mf6.multimodel.modelsplitter import create_partition_info, slice_model
+from imod.mf6.multimodel.modelsplitter import ModelSplitter, PartitionModels
 from imod.mf6.out import open_cbc, open_conc, open_hds
 from imod.mf6.package import Package
 from imod.mf6.ssm import SourceSinkMixing
+from imod.mf6.utilities.zarr_helper import to_zarr
 from imod.mf6.validation_settings import ValidationSettings
 from imod.mf6.write_context import WriteContext
 from imod.prepare.partition import create_partition_labels
@@ -90,6 +87,12 @@ def get_packages(simulation: Modflow6Simulation) -> dict[str, Package]:
         for pkg_name, pkg in simulation.items()
         if isinstance(pkg, Package)
     }
+
+
+def force_load_dis(model):
+    key = model.get_diskey()
+    model[key].dataset.load()
+    return
 
 
 class Modflow6Simulation(collections.UserDict, ISimulation):
@@ -969,6 +972,7 @@ class Modflow6Simulation(collections.UserDict, ISimulation):
         validate: bool = True,
         mdal_compliant: bool = False,
         crs=None,
+        engine="netCDF4",
     ) -> None:
         """
         Dump simulation to files. Writes a model definition as .TOML file, which
@@ -990,6 +994,8 @@ class Modflow6Simulation(collections.UserDict, ISimulation):
         crs: Any, optional
             Anything accepted by rasterio.crs.CRS.from_user_input
             Requires ``rioxarray`` installed.
+        engine: str, optional
+            "netCDF4" or "zarr" or "zarr.zip". Defaults to "netCDF4".
 
         Examples
         --------
@@ -1015,16 +1021,27 @@ class Modflow6Simulation(collections.UserDict, ISimulation):
         directory = pathlib.Path(directory)
         directory.mkdir(parents=True, exist_ok=True)
 
+        match engine:
+            case "netCDF4":
+                ext = "nc"
+            case "zarr":
+                ext = "zarr"
+            case "zarr.zip":
+                ext = "zarr.zip"
+            case _:
+                raise ValueError(f"Unknown engine: {engine}")
+
         toml_content: DefaultDict[str, dict] = collections.defaultdict(dict)
         # Dump version number
         version = get_version()
         toml_content["version"] = {"imod-python": version}
+
         # Dump models and exchanges
         for key, value in self.items():
             cls_name = type(value).__name__
             if isinstance(value, Modflow6Model):
                 model_toml_path = value.dump(
-                    directory, key, validate, mdal_compliant, crs
+                    directory, key, validate, mdal_compliant, crs, engine=engine
                 )
                 toml_content[cls_name][key] = model_toml_path.relative_to(
                     directory
@@ -1034,13 +1051,23 @@ class Modflow6Simulation(collections.UserDict, ISimulation):
                 for exchange_package in self[key]:
                     _, filename, _, _ = exchange_package.get_specification()
                     exchange_class_short = type(exchange_package).__name__
-                    path = f"{filename}.nc"
-                    exchange_package.dataset.to_netcdf(directory / path)
+                    path = f"{filename}.{ext}"
+
+                    if engine == "netCDF4":
+                        exchange_package.dataset.to_netcdf(directory / path)
+                    else:
+                        to_zarr(
+                            exchange_package.dataset, directory / path, engine=engine
+                        )
+
                     toml_content[key][exchange_class_short].append(path)
 
             else:
-                path = f"{key}.nc"
-                value.dataset.to_netcdf(directory / path)
+                path = f"{key}.{ext}"
+                if engine == "netCDF4":
+                    value.dataset.to_netcdf(directory / path)
+                else:
+                    to_zarr(value.dataset, directory / path, engine=engine)
                 toml_content[cls_name][key] = path
 
         with open(directory / f"{self.name}.toml", "wb") as f:
@@ -1412,57 +1439,50 @@ class Modflow6Simulation(collections.UserDict, ISimulation):
                     f"simulation cannot be split due to presence of package '{error_with_object}' in model '{model_name}'"
                 )
 
-        original_packages = get_packages(self)
+        # Make sure the DIS package is available in memory and not lazily evaluated,
+        # since we need its values repeatedly.
+        for model in original_models.values():
+            force_load_dis(model)
 
-        partition_info = create_partition_info(submodel_labels)
+        model_splitter = ModelSplitter(
+            flow_models,
+            transport_models,
+            submodel_labels,
+            ignore_time_purge_empty,
+        )
+        partition_models, model_names = model_splitter.split()
 
-        exchange_creator: ExchangeCreator_Unstructured | ExchangeCreator_Structured
-        if is_unstructured(submodel_labels):
-            exchange_creator = ExchangeCreator_Unstructured(
-                submodel_labels, partition_info
-            )
-        else:
-            exchange_creator = ExchangeCreator_Structured(
-                submodel_labels, partition_info
-            )
-
+        # Create new simulation object and add the partitioned models.
         new_simulation = imod.mf6.Modflow6Simulation(
             f"{self.name}_partioned", validation_settings=self._validation_context
         )
-        for package_name, package in {**original_packages}.items():
-            new_simulation[package_name] = deepcopy(package)
+        chained = {  # ChainMap reverses order, annoyingly...
+            **partition_models.flow_models,
+            **partition_models.flat_transport_models,
+        }
+        for partition_model_name, partition_model in chained.items():
+            new_simulation[partition_model_name] = partition_model
 
-        for model_name, model in original_models.items():
-            solution_name = self.get_solution_name(model_name)
-            solution = cast(Solution, new_simulation[solution_name])
-            solution._remove_model_from_solution(model_name)
-            for submodel_partition_info in partition_info:
-                new_model_name = f"{model_name}_{submodel_partition_info.id}"
-                new_simulation[new_model_name] = slice_model(
-                    submodel_partition_info, model
-                )
-                new_simulation[new_model_name].purge_empty_packages(
-                    ignore_time=ignore_time_purge_empty
-                )
-                solution._add_model_to_solution(new_model_name)
+        # Add solution, time_discretization, etc.
+        # Replace the single model name by the partition model names.
+        original_packages = get_packages(self)
+        for package_name, package in original_packages.items():
+            new_package = deepcopy(package)
+            if isinstance(package, Solution):
+                old_name = package.dataset["modelnames"].item()
+                new_package["modelnames"] = xr.DataArray(model_names[old_name])
+            new_simulation[package_name] = new_package
 
-        exchanges: list[Any] = []
-
-        for flow_model_name, flow_model in flow_models.items():
-            exchanges += exchange_creator.create_gwfgwf_exchanges(
-                flow_model_name, flow_model.domain.layer
-            )
-
-        if any(transport_models):
-            for tpt_model_name in transport_models:
-                exchanges += exchange_creator.create_gwtgwt_exchanges(
-                    tpt_model_name, flow_model_name, model.domain.layer
-                )
+        # Add exchanges
+        exchanges: list[Any] = (
+            model_splitter.create_gwfgwf_exchanges()
+            + model_splitter.create_gwtgwt_exchanges()
+        )
         new_simulation._add_modelsplit_exchanges(exchanges)
-        new_simulation._update_buoyancy_packages()
+        new_simulation._update_buoyancy_packages(partition_models)
         new_simulation._set_flow_exchange_options()
         new_simulation._set_transport_exchange_options()
-        new_simulation._update_ssm_packages()
+        new_simulation._update_ssm_packages(partition_models)
 
         new_simulation._filter_inactive_cells_from_exchanges()
         return new_simulation
@@ -1506,6 +1526,7 @@ class Modflow6Simulation(collections.UserDict, ISimulation):
         if not self.is_split():
             self["split_exchanges"] = []
         self["split_exchanges"].extend(exchanges_list)
+        return
 
     def _set_flow_exchange_options(self) -> None:
         # collect some options that we will auto-set
@@ -1520,6 +1541,7 @@ class Modflow6Simulation(collections.UserDict, ISimulation):
                     xt3d=model_1["npf"].get_xt3d_option(),
                     newton=model_1.is_use_newton(),
                 )
+        return
 
     def _set_transport_exchange_options(self) -> None:
         for exchange in self["split_exchanges"]:
@@ -1552,6 +1574,7 @@ class Modflow6Simulation(collections.UserDict, ISimulation):
             # Remove exchange if no cells are left
             if ex.dataset.sizes["index"] == 0:
                 self["split_exchanges"].remove(ex)
+        return
 
     def _filter_inactive_cells_exchange_domain(self, ex: GWFGWF, i: int) -> None:
         """Filters inactive cells from one exchange domain inplace"""
@@ -1575,6 +1598,7 @@ class Modflow6Simulation(collections.UserDict, ISimulation):
         active_exchange_domain = exchange_domain.where(exchange_domain > 0)
         active_exchange_domain = active_exchange_domain.dropna("index")
         ex.dataset = ex.dataset.sel(index=active_exchange_domain["index"])
+        return
 
     def get_solution_name(self, model_name: str) -> Optional[str]:
         for k, v in self.items():
@@ -1626,15 +1650,12 @@ class Modflow6Simulation(collections.UserDict, ISimulation):
 
         return exchanges
 
-    def _update_ssm_packages(self) -> None:
-        flow_transport_mapping = self._get_transport_models_per_flow_model()
-        for flow_name, tpt_models_of_flow_model in flow_transport_mapping.items():
-            flow_model = self[flow_name]
-            for tpt_model_name in tpt_models_of_flow_model:
-                tpt_model = self[tpt_model_name]
-                ssm_key = tpt_model._get_pkgkey("ssm")
+    def _update_ssm_packages(self, partition_models: PartitionModels) -> None:
+        for flow_model, paired_transport_models in partition_models.paired_models():
+            for transport_model in paired_transport_models:
+                ssm_key = transport_model._get_pkgkey("ssm")
                 if ssm_key is not None:
-                    old_ssm_package = tpt_model.pop(ssm_key)
+                    old_ssm_package = transport_model.pop(ssm_key)
                     state_variable_name = old_ssm_package.dataset[
                         "auxiliary_variable_name"
                     ].values[0]
@@ -1642,13 +1663,13 @@ class Modflow6Simulation(collections.UserDict, ISimulation):
                         flow_model, state_variable_name, is_split=self.is_split()
                     )
                     if ssm_package is not None:
-                        tpt_model[ssm_key] = ssm_package
+                        transport_model[ssm_key] = ssm_package
+        return
 
-    def _update_buoyancy_packages(self) -> None:
-        flow_transport_mapping = self._get_transport_models_per_flow_model()
-        for flow_name, tpt_models_of_flow_model in flow_transport_mapping.items():
-            flow_model = cast(GroundwaterFlowModel, self[flow_name])
-            flow_model._update_buoyancy_package(tpt_models_of_flow_model)
+    def _update_buoyancy_packages(self, partition_models: PartitionModels) -> None:
+        for (_, flow_model), (names, _) in partition_models.paired_items():
+            flow_model._update_buoyancy_package(names)
+        return
 
     def is_split(self) -> bool:
         """
