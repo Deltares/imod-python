@@ -1,8 +1,19 @@
+import shutil
+from pathlib import Path
+
 import xugrid as xu
 
 
-def to_zarr(dataset, path, engine, **kwargs):
+def to_zarr(dataset, path: str | Path, engine: str, **kwargs):
     import zarr
+
+    path = Path(path)
+    if path.exists():
+        # Check if directory (ordinary .zarr, directory) or ZipStore (zip file).
+        if path.is_dir():
+            shutil.rmtree(path)
+        else:
+            path.unlink()
 
     match engine:
         case "zarr":
