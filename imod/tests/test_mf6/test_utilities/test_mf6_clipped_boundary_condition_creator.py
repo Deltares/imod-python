@@ -69,7 +69,7 @@ class TestClippedBoundaryConditionCreator:
             number_clipped_head_locations = np.count_nonzero(
                 ~np.isnan(result_clipped_head.sel(layer=layer_index))
             )
-            assert number_clipped_head_locations is n_clipped_cells
+            assert number_clipped_head_locations == n_clipped_cells
 
     @pytest.mark.parametrize(
         "dis, grid_data_array", [("basic_unstructured_dis", xu), ("basic_dis", xr)]
@@ -117,4 +117,4 @@ class TestClippedBoundaryConditionCreator:
         number_clipped_head_locations = np.count_nonzero(
             ~np.isnan(result_clipped_head.sel(layer=1))
         )
-        assert number_clipped_head_locations is n_clipped_cells
+        assert number_clipped_head_locations == n_clipped_cells
