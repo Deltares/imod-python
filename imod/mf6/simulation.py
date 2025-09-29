@@ -238,13 +238,13 @@ class Modflow6Simulation(collections.UserDict, ISimulation):
                 times.extend(model._yield_times())
 
         # np.unique also sorts
-        times = np.unique(np.hstack(times))
+        unique_times = np.unique(np.hstack(times))
 
-        duration = imod.util.time.timestep_duration(times, self.use_cftime)
+        duration = imod.util.time.timestep_duration(unique_times, self.use_cftime)
         # Generate time discretization, just rely on default arguments
         # Probably won't be used that much anyway?
         timestep_duration = xr.DataArray(
-            duration, coords={"time": np.array(times)[:-1]}, dims=("time",)
+            duration, coords={"time": unique_times[:-1]}, dims=("time",)
         )
         self["time_discretization"] = imod.mf6.TimeDiscretization(
             timestep_duration=timestep_duration, validate=validate
