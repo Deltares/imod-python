@@ -135,7 +135,7 @@ def merge_arrays(
     return out
 
 
-def _unique_coords(das: List[xr.DataArray], dim: str) -> xr.DataArray:
+def _unique_coords(das: List[xr.DataArray], dim: str) -> np.ndarray:
     """Collect unique coords in list of dataarrays"""
     return np.unique(np.concatenate([da.coords[dim].values for da in das]))
 
