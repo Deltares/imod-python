@@ -21,13 +21,13 @@ class ExchangeBase(Package):
     def model_name1(self) -> str:
         if "model_name_1" not in self.dataset:
             raise ValueError("model_name_1 not present in dataset")
-        return self.dataset["model_name_1"].values[()].take(0)
+        return self.dataset["model_name_1"].item()
 
     @property
     def model_name2(self) -> str:
         if "model_name_2" not in self.dataset:
             raise ValueError("model_name_2 not present in dataset")
-        return self.dataset["model_name_2"].values[()].take(0)
+        return self.dataset["model_name_2"].item()
 
     def package_name(self) -> str:
         return f"{self.model_name1}_{self.model_name2}"

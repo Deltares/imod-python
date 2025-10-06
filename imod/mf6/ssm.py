@@ -1,3 +1,6 @@
+from pathlib import Path
+from typing import Self
+
 import numpy as np
 
 from imod.common.interfaces.iregridpackage import IRegridPackage
@@ -8,12 +11,12 @@ from imod.mf6.package import Package
 from imod.schemata import DTypeSchema
 
 
-def with_index_dim(array_like):
+def with_index_dim(array_like) -> tuple[str, list]:
     # At least1d will also extract the values if array_like is a DataArray.
     arr1d = np.atleast_1d(array_like)
     if arr1d.ndim > 1:
         raise ValueError("array must be 1d")
-    return ("index", arr1d)
+    return ("index", arr1d.tolist())
 
 
 def is_concentration_package(package: Package) -> bool:
@@ -83,6 +86,23 @@ class SourceSinkMixing(BoundaryCondition, IRegridPackage):
         }
         super().__init__(dict_dataset)
         self._validate_init_schemata(validate)
+
+    @classmethod
+    def from_file(cls, path: str | Path, **kwargs) -> Self:
+        instance = super().from_file(path, **kwargs)
+
+        # to_netcdf converts strings into  NetCDF “variable‑length UTF‑8 strings”
+        # which are loaded as dtype=object arrays.
+        # This will convert them back to str.
+        vars = [
+            "package_names",
+            "concentration_boundary_type",
+            "auxiliary_variable_name",
+        ]
+        for var in vars:
+            instance.dataset[var] = instance.dataset[var].astype(str)
+
+        return instance
 
     def _render(self, directory, pkgname, globaltimes, binary):
         d = {
