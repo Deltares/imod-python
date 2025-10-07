@@ -33,6 +33,7 @@ from imod.mf6.dis import StructuredDiscretization
 from imod.mf6.disv import VerticesDiscretization
 from imod.mf6.mf6_hfb_adapter import Mf6HorizontalFlowBarrier
 from imod.mf6.package import Package
+from imod.mf6.utilities.zarr_helper import to_zarr
 from imod.mf6.validation_settings import ValidationSettings
 from imod.prepare.cleanup import cleanup_hfb
 from imod.schemata import (
@@ -561,6 +562,11 @@ class HorizontalFlowBarrierBase(BoundaryCondition, ILineDataPackage):
         new = deepcopy(self)
         new.dataset["geometry"] = new.line_data.to_json()
         new.dataset.to_netcdf(*args, **kwargs)
+
+    def to_zarr(self, path, engine: str, **kwargs):
+        new = deepcopy(self)
+        new.dataset["geometry"] = new.line_data.to_json()
+        to_zarr(new.dataset, path, engine, **kwargs)
 
     def _netcdf_encoding(self):
         return {"geometry": {"dtype": "str"}}

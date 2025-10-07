@@ -1,5 +1,5 @@
 import abc
-from typing import Dict
+from typing import Dict, NamedTuple
 
 import numpy as np
 import pandas as pd
@@ -8,8 +8,12 @@ import xarray as xr
 from imod.common.utilities.grid import get_active_domain_slice, to_cell_idx
 from imod.mf6.gwfgwf import GWFGWF
 from imod.mf6.gwtgwt import GWTGWT
-from imod.mf6.multimodel.modelsplitter import PartitionInfo
 from imod.typing import GridDataArray
+
+
+class PartitionInfo(NamedTuple):
+    active_domain: GridDataArray
+    partition_id: int
 
 
 def _adjust_gridblock_indexing(connected_cells: xr.Dataset) -> xr.Dataset:
@@ -25,8 +29,7 @@ class ExchangeCreator(abc.ABC):
     """
     Creates the GroundWaterFlow to GroundWaterFlow exchange package (gwfgwf) as a function of a submodel label array
     and a PartitionInfo object. This file contains the cell indices of coupled cells. With coupled cells we mean
-    cells that are adjacent but that are located in different subdomains.  At the moment only structured grids are
-    supported, for unstructured grids the geometric information is still set to default values.
+    cells that are adjacent but that are located in different subdomains.
 
     The submodel_labels array should have the same topology as the domain being partitioned. The array will be used
     to determine the connectivity of the submodels after the split operation has been performed.
@@ -248,7 +251,7 @@ class ExchangeCreator(abc.ABC):
 
         mapping = {}
         for submodel_partition_info in partition_info:
-            model_id = submodel_partition_info.id
+            model_id = submodel_partition_info.partition_id
             mapping[model_id] = pd.merge(
                 global_to_local_idx[model_id], local_cell_idx_to_id[model_id]
             )
@@ -268,7 +271,7 @@ class ExchangeCreator(abc.ABC):
     def _local_cell_idx_to_id(cls, partition_info) -> Dict[int, pd.DataFrame]:
         local_cell_idx_to_id = {}
         for submodel_partition_info in partition_info:
-            model_id = submodel_partition_info.id
+            model_id = submodel_partition_info.partition_id
 
             local_cell_indices = cls._get_local_cell_indices(submodel_partition_info)
             local_cell_id = list(np.ndindex(local_cell_indices.shape))

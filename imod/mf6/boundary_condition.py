@@ -202,12 +202,23 @@ class BoundaryCondition(Package, abc.ABC):
         options = copy(predefined_options)
 
         if not_options is None:
-            not_options = self._get_period_varnames()
+            not_options = []
+            if hasattr(self, "_period_data"):
+                not_options.extend(self._period_data)
+            if hasattr(self, "_auxiliary_data"):
+                not_options.extend(get_variable_names(self))
+                not_options.extend(self._auxiliary_data.keys())
 
         for varname in self.dataset.data_vars.keys():  # pylint:disable=no-member
             if varname in not_options:
                 continue
-            v = self.dataset[varname].values[()]
+            # TODO: can we easily avoid this try-except?
+            # On which keys does it fail?
+            try:
+                v = self.dataset[varname].item()
+            except ValueError:
+                # Apparently not a scalar, therefore not an option entry.
+                pass
             options[varname] = v
         return options
 
