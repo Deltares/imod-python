@@ -91,7 +91,7 @@ class SourceSinkMixing(BoundaryCondition, IRegridPackage):
     def from_file(cls, path: str | Path, **kwargs) -> Self:
         instance = super().from_file(path, **kwargs)
 
-        # to_netcdf converts strings into  NetCDF “variable‑length UTF‑8 strings”
+        # to_netcdf converts strings into  NetCDF "variable‑length UTF‑8 strings"
         # which are loaded as dtype=object arrays.
         # This will convert them back to str.
         vars = [
