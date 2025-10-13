@@ -43,7 +43,10 @@ from imod.mf6.multimodel.exchange_creator_structured import ExchangeCreator_Stru
 from imod.mf6.multimodel.exchange_creator_unstructured import (
     ExchangeCreator_Unstructured,
 )
-from imod.mf6.multimodel.modelsplitter import create_partition_info, slice_model
+from imod.mf6.multimodel.modelsplitter import (
+    ModelSplitter,
+    create_partition_info,
+)
 from imod.mf6.out import open_cbc, open_conc, open_hds
 from imod.mf6.package import Package
 from imod.mf6.ssm import SourceSinkMixing
@@ -90,6 +93,12 @@ def get_packages(simulation: Modflow6Simulation) -> dict[str, Package]:
         for pkg_name, pkg in simulation.items()
         if isinstance(pkg, Package)
     }
+
+
+def force_load_dis(model):
+    key = model.get_diskey()
+    model[key].dataset.load()
+    return
 
 
 class Modflow6Simulation(collections.UserDict, ISimulation):
@@ -1432,18 +1441,16 @@ class Modflow6Simulation(collections.UserDict, ISimulation):
         for package_name, package in {**original_packages}.items():
             new_simulation[package_name] = deepcopy(package)
 
+        modelsplitter = ModelSplitter(partition_info)
         for model_name, model in original_models.items():
+            force_load_dis(model)
             solution_name = self.get_solution_name(model_name)
             solution = cast(Solution, new_simulation[solution_name])
             solution._remove_model_from_solution(model_name)
-            for submodel_partition_info in partition_info:
-                new_model_name = f"{model_name}_{submodel_partition_info.id}"
-                new_simulation[new_model_name] = slice_model(
-                    submodel_partition_info, model
-                )
-                new_simulation[new_model_name].purge_empty_packages(
-                    ignore_time=ignore_time_purge_empty
-                )
+
+            partition_models_dict = modelsplitter.split(model_name, model)
+            for new_model_name, new_model in partition_models_dict.items():
+                new_simulation[new_model_name] = new_model
                 solution._add_model_to_solution(new_model_name)
 
         exchanges: list[Any] = []

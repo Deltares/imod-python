@@ -1,13 +1,13 @@
 from abc import abstractmethod
 from typing import TYPE_CHECKING
 
-from imod.common.interfaces.ipackagebase import IPackageBase
+from imod.common.interfaces.iagnosticpackage import IAgnosticPackage
 
 if TYPE_CHECKING:
     import geopandas as gpd
 
 
-class ILineDataPackage(IPackageBase):
+class ILineDataPackage(IAgnosticPackage):
     """
     Interface for packages for which the data is defined by lines independent of the domain definition.
     """

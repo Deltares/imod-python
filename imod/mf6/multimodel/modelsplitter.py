@@ -2,6 +2,7 @@ from typing import List, NamedTuple
 
 import numpy as np
 
+from imod.common.interfaces.iagnosticpackage import IAgnosticPackage
 from imod.common.interfaces.imodel import IModel
 from imod.common.utilities.clip import clip_by_grid
 from imod.mf6.auxiliary_variables import (
@@ -83,3 +84,83 @@ def slice_model(partition_info: PartitionInfo, model: IModel) -> IModel:
         if isinstance(package, BoundaryCondition):
             expand_transient_auxiliary_variables(sliced_package)
     return new_model
+
+
+class ModelSplitter:
+    def __init__(self, partition_info: List[PartitionInfo]) -> None:
+        self.partition_info = partition_info
+
+    def split(self, model_name: str, model: IModel) -> dict[str, IModel]:
+        modelclass = type(model)
+        partitioned_models = {}
+        model_to_partition = {}
+
+        # Create empty model for each partition
+        for submodel_partition_info in self.partition_info:
+            new_model_name = f"{model_name}_{submodel_partition_info.id}"
+
+            new_model = modelclass(**model.options)
+            partitioned_models[new_model_name] = new_model
+            model_to_partition[new_model_name] = submodel_partition_info
+
+        # Create pkg_id to variable mapping
+        # We don't want to add packages that do not have any active cells in the partition
+        # We determine if a package has active cells in the partition based on the variable
+        # that defines the active cells for that package
+        pkg_id_to_var_mapping = {
+            "chd": "head",
+            "cnc": "concentration",
+            "evt": "rate",
+            "dis": "idomain",
+            "drn": "elevation",
+            "ghb": "head",
+            "src": "rate",
+            "rch": "rate",
+            "riv": "conductance",
+            "uzf": "infiltration_rate",
+            "wel": "rate",
+        }
+        # Add packages to models
+        for pkg_name, package in model.items():
+            pkg_id = package._pkg_id
+
+            # Determine the active cells of boundary package
+            if isinstance(package, IAgnosticPackage):
+                pass
+            elif pkg_id in ["ssm", "lak"]:
+                pass
+            elif isinstance(package, BoundaryCondition):
+                active_package_domain = package[pkg_id_to_var_mapping[pkg_id]].notnull()
+            else:
+                pass  # Other packages don't need special treatment
+
+            for new_model_name, new_model in partitioned_models.items():
+                partition_info = model_to_partition[new_model_name]
+
+                # Check if package has any active cells in the partition
+                # If not, skip adding the package to the partitioned model
+                if isinstance(package, IAgnosticPackage):
+                    pass
+                elif pkg_id in ["ssm", "lak"]:  # No checks are done for these packages
+                    pass
+                elif isinstance(package, BoundaryCondition):
+                    has_overlap = (
+                        active_package_domain & (partition_info.active_domain == 1)
+                    ).any()
+                    if not has_overlap:
+                        continue
+
+                # Slice and add the package to the partitioned model
+                sliced_package = clip_by_grid(package, partition_info.active_domain)
+
+                if isinstance(package, IAgnosticPackage):
+                    if sliced_package["index"].size == 0:
+                        sliced_package = None
+
+                if sliced_package is not None:
+                    new_model[pkg_name] = sliced_package
+
+        return partitioned_models
+
+    def num_partitions(self) -> int:
+        return len(self.partition_info)

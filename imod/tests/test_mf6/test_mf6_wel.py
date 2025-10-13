@@ -497,9 +497,9 @@ def test_to_mf6_pkg__error_on_well_removal(dis, well_high_lvl_test_data_transien
         k.loc[{"x": 85.0}] = 1e-3
 
     with pytest.raises(ValidationError, match="x = 81"):
-        wel.to_mf6_pkg(active, top, bottom, k, strict_well_validation=True)
+        wel.to_mf6_pkg(active, top, bottom, k, strict_validation=True)
 
-    mf6_wel = wel.to_mf6_pkg(active, top, bottom, k, strict_well_validation=False)
+    mf6_wel = wel.to_mf6_pkg(active, top, bottom, k, strict_validation=False)
     assert mf6_wel.dataset.sizes["ncellid"] < wel.dataset.sizes["index"]
 
 

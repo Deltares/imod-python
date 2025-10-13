@@ -540,7 +540,7 @@ def test_to_mf6_layered_hfb__error_geometry_type():
     indirect=True,
 )
 @pytest.mark.parametrize("inactivity_marker", [0, -1])
-@pytest.mark.parametrize("strict_hfb_validation", [True, False])
+@pytest.mark.parametrize("strict_validation", [True, False])
 @patch("imod.mf6.mf6_hfb_adapter.Mf6HorizontalFlowBarrier.__new__", autospec=True)
 def test_to_mf6_remove_invalid_edges(
     mf6_flow_barrier_mock,
@@ -548,7 +548,7 @@ def test_to_mf6_remove_invalid_edges(
     inactivity_marker,
     barrier_x_loc,
     expected_number_barriers,
-    strict_hfb_validation,
+    strict_validation,
 ):
     # Arrange.
     idomain, top, bottom = parameterizable_basic_dis
@@ -576,12 +576,10 @@ def test_to_mf6_remove_invalid_edges(
     hfb = HorizontalFlowBarrierResistance(geometry)
 
     # Act.
-    if strict_hfb_validation and (expected_number_barriers == 0):
+    if strict_validation and (expected_number_barriers == 0):
         pytest.xfail("Test expected to fail if expected number barriers = 0")
 
-    _ = hfb.to_mf6_pkg(
-        idomain, top, bottom, k, strict_hfb_validation=strict_hfb_validation
-    )
+    _ = hfb.to_mf6_pkg(idomain, top, bottom, k, strict_validation=strict_validation)
 
     # Assert.
     _, args = mf6_flow_barrier_mock.call_args
