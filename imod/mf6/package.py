@@ -566,6 +566,10 @@ class Package(PackageBase, IPackage, abc.ABC):
         :class:`imod.mf6.wel.Wel` package.
         """
         return False
+    
+    @property
+    def pkg_id(self) -> str:
+        return self._pkg_id
 
     def __repr__(self) -> str:
         typename = type(self).__name__

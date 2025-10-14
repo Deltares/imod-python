@@ -4,6 +4,7 @@ import numpy as np
 
 from imod.common.interfaces.iagnosticpackage import IAgnosticPackage
 from imod.common.interfaces.imodel import IModel
+from imod.common.interfaces.ipackage import IPackage
 from imod.common.utilities.clip import clip_by_grid
 from imod.mf6.boundary_condition import BoundaryCondition
 from imod.typing import GridDataArray
@@ -77,7 +78,7 @@ class ModelSplitter:
 
     # Some boundary packages don't have a variable that defines active cells
     # For these packages we skip the check if the package has any active cells in the partition
-    _pkg_id_skip_active_check = ["ssm", "lak"]
+    _pkg_id_skip_active_domain_check = ["ssm", "lak"]
 
     def __init__(self, partition_info: List[PartitionInfo]) -> None:
         self.partition_info = partition_info
@@ -99,39 +100,23 @@ class ModelSplitter:
 
         # Add packages to models
         for pkg_name, package in model.items():
-            pkg_id = package._pkg_id
 
             # Determine active domain for boundary packages
-            if isinstance(package, BoundaryCondition):
-                # Checks are done after slicing
-                if isinstance(package, IAgnosticPackage):
-                    pass
-                # No checks are done for these packages
-                elif pkg_id in self._pkg_id_skip_active_check:
-                    pass
-                else:
-                    active_package_domain = package[
-                        self._pkg_id_to_var_mapping[pkg_id]
-                    ].notnull()
+            active_package_domain = (
+                self._get_package_domain(package)
+                if isinstance(package, BoundaryCondition)
+                else None
+            )
 
             # Add package to each partitioned model
             for new_model_name, new_model in partitioned_models.items():
                 partition_info = model_to_partition[new_model_name]
 
-                # For boundary packages, check if the package has any active cells in the partition
-                if isinstance(package, BoundaryCondition):
-                    # Checks are done after slicing
-                    if isinstance(package, IAgnosticPackage):
-                        pass
-                    # No checks are done for these packages
-                    elif pkg_id in self._pkg_id_skip_active_check:
-                        pass
-                    else:
-                        has_overlap = (
-                            active_package_domain & (partition_info.active_domain == 1)
-                        ).any()
-                        if not has_overlap:
-                            continue
+                has_overlap = self._has_package_data_in_domain(
+                    package, active_package_domain, partition_info
+                )
+                if not has_overlap:
+                    continue
 
                 # Slice and add the package to the partitioned model
                 sliced_package = clip_by_grid(package, partition_info.active_domain)
@@ -151,3 +136,42 @@ class ModelSplitter:
         key = model.get_diskey()
         model[key].dataset.load()
         return
+
+    def _get_package_domain(self, package: IPackage) -> GridDataArray | None:
+        pkg_id = package.pkg_id
+        active_package_domain = None
+
+        if isinstance(package, BoundaryCondition):
+            # Checks are done after slicing
+            if isinstance(package, IAgnosticPackage):
+                pass
+            # No checks are done for these packages
+            elif pkg_id in self._pkg_id_skip_active_domain_check:
+                pass
+            else:
+                active_package_domain = package[
+                    self._pkg_id_to_var_mapping[pkg_id]
+                ].notnull()
+        return active_package_domain
+
+    def _has_package_data_in_domain(
+        self,
+        package: IPackage,
+        active_package_domain: GridDataArray,
+        partition_info: PartitionInfo,
+    ) -> bool:
+        pkg_id = package.pkg_id
+        has_overlap = True
+        if isinstance(package, BoundaryCondition):
+            # Checks are done after slicing
+            if isinstance(package, IAgnosticPackage):
+                pass
+            # No checks are done for these packages
+            elif pkg_id in self._pkg_id_skip_active_domain_check:
+                pass
+            else:
+                has_overlap = (
+                    active_package_domain & (partition_info.active_domain == 1)
+                ).any().item()
+
+        return has_overlap
