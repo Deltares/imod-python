@@ -5,10 +5,6 @@ import numpy as np
 from imod.common.interfaces.iagnosticpackage import IAgnosticPackage
 from imod.common.interfaces.imodel import IModel
 from imod.common.utilities.clip import clip_by_grid
-from imod.mf6.auxiliary_variables import (
-    expand_transient_auxiliary_variables,
-    remove_expanded_auxiliary_variables_from_dataset,
-)
 from imod.mf6.boundary_condition import BoundaryCondition
 from imod.mf6.hfb import HorizontalFlowBarrierBase
 from imod.mf6.wel import Well
@@ -61,29 +57,6 @@ def _validate_submodel_label_array(submodel_labels: GridDataArray) -> None:
             "The submodel_label  array should be integer and contain all the numbers between 0 and the number of "
             "partitions minus 1."
         )
-
-
-def slice_model(partition_info: PartitionInfo, model: IModel) -> IModel:
-    """
-    This function slices a Modflow6Model. A sliced model is a model that
-    consists of packages of the original model that are sliced using the
-    domain_slice. A domain_slice can be created using the
-    :func:`imod.mf6.modelsplitter.create_domain_slices` function.
-    """
-    modelclass = type(model)
-    new_model = modelclass(**model.options)
-
-    for pkg_name, package in model.items():
-        if isinstance(package, BoundaryCondition):
-            remove_expanded_auxiliary_variables_from_dataset(package)
-
-        sliced_package = clip_by_grid(package, partition_info.active_domain)
-        if sliced_package is not None:
-            new_model[pkg_name] = sliced_package
-
-        if isinstance(package, BoundaryCondition):
-            expand_transient_auxiliary_variables(sliced_package)
-    return new_model
 
 
 class ModelSplitter:

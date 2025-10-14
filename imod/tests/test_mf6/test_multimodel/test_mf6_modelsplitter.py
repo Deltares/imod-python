@@ -1,11 +1,11 @@
 import numpy as np
 
-from imod.mf6.multimodel.modelsplitter import create_partition_info, slice_model
+from imod.mf6.multimodel.modelsplitter import ModelSplitter, create_partition_info
 from imod.tests.fixtures.mf6_modelrun_fixture import assert_simulation_can_run
 from imod.typing.grid import zeros_like
 
 
-def test_slice_model_structured(twri_model):
+def test_split_model_structured(twri_model):
     """
     Create a sub model array for the twri model.
     Fill the first half of the array, in the y-direction, with 0's and the second half with 1's
@@ -22,25 +22,26 @@ def test_slice_model_structured(twri_model):
         1,
     )
 
-    # Act.
     partition_info = create_partition_info(submodel_labels)
-    new_models = [
-        slice_model(model_partition_info, model)
-        for model_partition_info in partition_info
-    ]
+    modelsplitter = ModelSplitter(partition_info)
+
+    # Act.
+    partition_models_dict = modelsplitter.split("GWF_1", model)
 
     # Assert.
-    assert len(new_models) == 2
+    assert len(partition_models_dict) == 2
 
     # verify that the number of active cells in each submodel is the same as the number of labels
     unique_labels, label_counts = np.unique(submodel_labels.values, return_counts=True)
-    for submodel_label in unique_labels:
-        active = new_models[submodel_label].domain.sel({"layer": 1})
+    for submodel_label, (new_model_name, new_model) in enumerate(
+        partition_models_dict.items()
+    ):
+        active = new_model.domain.sel({"layer": 1})
         active_count = active.where(active > 0).count()
         assert label_counts[submodel_label] == active_count.values
 
 
-def test_slice_model_unstructured(circle_model):
+def test_split_model_unstructured(circle_model):
     """
     Create a sub model array for the circle model.
     Fill the first half of the array, in the y-direction, with 0's and the second half with 1's
@@ -54,24 +55,25 @@ def test_slice_model_unstructured(circle_model):
     domain_center_y = y_bounds.mean()
     submodel_labels = zeros_like(active).where(active.grid.face_y > domain_center_y, 1)
 
-    # Act.
     partition_info = create_partition_info(submodel_labels)
-    new_models = [
-        slice_model(model_partition_info, model)
-        for model_partition_info in partition_info
-    ]
+    modelsplitter = ModelSplitter(partition_info)
+
+    # Act.
+    partition_models_dict = modelsplitter.split("GWF_1", model)
 
     # Assert.
-    assert len(new_models) == 2
+    assert len(partition_models_dict) == 2
 
     # verify that the number of active cells in each submodel is the same as the number of labels
     unique_labels, label_counts = np.unique(submodel_labels.values, return_counts=True)
-    for submodel_label in unique_labels:
-        active_count = new_models[submodel_label].domain.sel({"layer": 1}).count()
+    for submodel_label, (new_model_name, new_model) in enumerate(
+        partition_models_dict.items()
+    ):
+        active_count = new_model.domain.sel({"layer": 1}).count()
         assert label_counts[submodel_label] == active_count.values
 
 
-def test_slice_model_with_auxiliary_variables(tmp_path, flow_transport_simulation):
+def test_slice_simulation_with_auxiliary_variables(tmp_path, flow_transport_simulation):
     flow_simulation = flow_transport_simulation
     flow_simulation.pop("tpt_a")
     flow_simulation.pop("tpt_b")

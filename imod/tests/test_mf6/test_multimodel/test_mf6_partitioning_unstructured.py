@@ -601,7 +601,7 @@ def test_partition_transport_multispecies(
         )
 
 
-def test_slice_model_twice(tmp_path, circle_model):
+def test_slice_simulation_twice(tmp_path, circle_model):
     flow_model = circle_model["GWF_1"]
     active = flow_model.domain
 
