@@ -22,8 +22,6 @@ def test_slice_model_structured(flow_transport_simulation: Modflow6Simulation):
     partition_info = create_partition_info(submodel_labels)
     modelsplitter = ModelSplitter(partition_info)
 
-    submodel_list = []
-
     # Act
     partition_models_dict = modelsplitter.split("tpt_a", transport_model)
 

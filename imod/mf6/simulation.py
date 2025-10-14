@@ -95,12 +95,6 @@ def get_packages(simulation: Modflow6Simulation) -> dict[str, Package]:
     }
 
 
-def force_load_dis(model):
-    key = model.get_diskey()
-    model[key].dataset.load()
-    return
-
-
 class Modflow6Simulation(collections.UserDict, ISimulation):
     """
     Modflow6Simulation is a class that represents a Modflow 6 simulation. It
@@ -1443,7 +1437,6 @@ class Modflow6Simulation(collections.UserDict, ISimulation):
 
         modelsplitter = ModelSplitter(partition_info)
         for model_name, model in original_models.items():
-            force_load_dis(model)
             solution_name = self.get_solution_name(model_name)
             solution = cast(Solution, new_simulation[solution_name])
             solution._remove_model_from_solution(model_name)
