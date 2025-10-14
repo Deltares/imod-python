@@ -1,11 +1,11 @@
 import abc
 from typing import Optional
 
-from imod.common.interfaces.ipackagebase import IPackageBase
+from imod.common.interfaces.ipackage import IPackage
 from imod.common.utilities.dataclass_type import DataclassType
 
 
-class IRegridPackage(IPackageBase, abc.ABC):
+class IRegridPackage(IPackage, abc.ABC):
     """
     Interface for packages that support regridding
     """
