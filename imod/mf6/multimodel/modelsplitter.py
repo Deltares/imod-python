@@ -84,6 +84,22 @@ class ModelSplitter:
         self.partition_info = partition_info
 
     def split(self, model_name: str, model: IModel) -> dict[str, IModel]:
+        """
+        Split a model into multiple partitioned models based on configured partition information.
+        Parameters
+        ----------
+        model_name : str
+            Base name of the input model; partition identifiers are appended to create
+            names for each resulting submodel.
+        model : IModel
+            The input model instance to partition.
+        Returns
+        -------
+        dict[str, IModel]
+            A mapping from generated submodel names to the corresponding partitioned
+            model instances, each containing only the packages and data relevant to its
+            active domain.
+        """
         modelclass = type(model)
         partitioned_models = {}
         model_to_partition = {}
@@ -100,7 +116,6 @@ class ModelSplitter:
 
         # Add packages to models
         for pkg_name, package in model.items():
-
             # Determine active domain for boundary packages
             active_package_domain = (
                 self._get_package_domain(package)
@@ -171,7 +186,9 @@ class ModelSplitter:
                 pass
             else:
                 has_overlap = (
-                    active_package_domain & (partition_info.active_domain == 1)
-                ).any().item()
+                    (active_package_domain & (partition_info.active_domain == 1))
+                    .any()
+                    .item()
+                )
 
         return has_overlap
