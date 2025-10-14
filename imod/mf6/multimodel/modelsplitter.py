@@ -185,10 +185,8 @@ class ModelSplitter:
             elif pkg_id in self._pkg_id_skip_active_domain_check:
                 pass
             else:
-                has_overlap = (
-                    (active_package_domain & (partition_info.active_domain == 1))
-                    .any()
-                    .item()
-                )
+                active_partition_domain = partition_info.active_domain == 1
+                overlap_check = active_package_domain & active_partition_domain
+                has_overlap = np.any(overlap_check.values).astype(bool)
 
         return has_overlap
