@@ -166,9 +166,9 @@ class PackageBase(IPackageBase, abc.ABC):
         path = Path(path)
         if path.suffix in (".zip", ".zarr"):
             # TODO: seems like a bug? Remove str() call if fixed in xarray/zarr
-            dataset = xr.open_zarr(str(path), **kwargs)
+            dataset = xr.open_zarr(str(path), consolidated=True, chunks=None, **kwargs)
         else:
-            dataset = xr.open_dataset(path, **kwargs)
+            dataset = xr.open_dataset(path, **kwargs, chunks="auto", cache=False)
 
         if dataset.ugrid_roles.topology:
             dataset = xu.UgridDataset(dataset)
