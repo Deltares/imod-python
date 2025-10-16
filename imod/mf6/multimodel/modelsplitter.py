@@ -167,19 +167,17 @@ class ModelSplitter:
             elif pkg_id in self._pkg_id_skip_active_domain_check:
                 pass
             else:
-                active_package_domain = package[
-                    self._pkg_id_to_var_mapping[pkg_id]
-                ].notnull()
-
+                ds = package[self._pkg_id_to_var_mapping[pkg_id]]
+                
                 # Drop non-spatial dimensions and layer dimension if present
-                dims_to_be_removed = get_non_spatial_dimension_names(
-                    active_package_domain
-                )
-                if "layer" in active_package_domain.dims:
+                dims_to_be_removed = get_non_spatial_dimension_names(ds)
+                if "layer" in ds.dims:
                     dims_to_be_removed.append("layer")
-                active_package_domain = active_package_domain.drop_vars(
+                ds = ds.drop_vars(
                     dims_to_be_removed
                 )
+                
+                active_package_domain = ds.notnull()
 
         return active_package_domain
 
