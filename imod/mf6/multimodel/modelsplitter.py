@@ -168,15 +168,13 @@ class ModelSplitter:
                 pass
             else:
                 ds = package[self._pkg_id_to_var_mapping[pkg_id]]
-                
+
                 # Drop non-spatial dimensions and layer dimension if present
                 dims_to_be_removed = get_non_spatial_dimension_names(ds)
                 if "layer" in ds.dims:
                     dims_to_be_removed.append("layer")
-                ds = ds.drop_vars(
-                    dims_to_be_removed
-                )
-                
+                ds = ds.drop_vars(dims_to_be_removed)
+
                 active_package_domain = ds.notnull()
 
         return active_package_domain
