@@ -8,7 +8,10 @@ from imod.common.interfaces.ipackage import IPackage
 from imod.common.utilities.clip import clip_by_grid
 from imod.mf6.boundary_condition import BoundaryCondition
 from imod.typing import GridDataArray
-from imod.typing.grid import ones_like
+from imod.typing.grid import (
+    get_non_spatial_dimension_names,
+    ones_like,
+)
 
 
 class PartitionInfo(NamedTuple):
@@ -167,6 +170,17 @@ class ModelSplitter:
                 active_package_domain = package[
                     self._pkg_id_to_var_mapping[pkg_id]
                 ].notnull()
+
+                # Drop non-spatial dimensions and layer dimension if present
+                dims_to_be_removed = get_non_spatial_dimension_names(
+                    active_package_domain
+                )
+                if "layer" in active_package_domain.dims:
+                    dims_to_be_removed.append("layer")
+                active_package_domain = active_package_domain.drop_vars(
+                    dims_to_be_removed
+                )
+
         return active_package_domain
 
     def _has_package_data_in_domain(
