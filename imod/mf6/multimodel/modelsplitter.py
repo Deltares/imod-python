@@ -90,6 +90,7 @@ class ModelSplitter:
     def __init__(self, partition_info: List[PartitionInfo]) -> None:
         self.partition_info = partition_info
 
+        # Initialize mapping from original model names to partitioned models
         self._model_to_partitioned_model: dict[str, dict[str, IModel]] = {}
 
         # Initialize mapping from partition IDs to models
@@ -97,91 +98,28 @@ class ModelSplitter:
         for submodel_partition_info in self.partition_info:
             self._partition_id_to_models[submodel_partition_info.id] = {}
 
-    def update_packages(self) -> None:
-        """
-        Update packages that need to be updated after partitioning.
-        This includes for example the transport model names in the buoyancy package.
-        """
-        # Update buoyancy packages
-        for _, models in self._partition_id_to_models.items():
-            flow_model = next(
-                (
-                    model
-                    for model_name, model in models.items()
-                    if isinstance(model, GroundwaterFlowModel)
-                ),
-                None,
-            )
-            transport_model_names = [
-                model_name
-                for model_name, model in models.items()
-                if isinstance(model, GroundwaterTransportModel)
-            ]
-            if flow_model is None:
-                raise ValueError(
-                    "Could not find a groundwater flow model for updating the buoyancy package."
-                )
-
-            flow_model._update_buoyancy_package(transport_model_names)
-
-        # Update ssm packages
-        for _, models in self._partition_id_to_models.items():
-            flow_model = next(
-                (
-                    model
-                    for model_name, model in models.items()
-                    if isinstance(model, GroundwaterFlowModel)
-                ),
-                None,
-            )
-            transport_models = [
-                model
-                for model_name, model in models.items()
-                if isinstance(model, GroundwaterTransportModel)
-            ]
-
-            for transport_model in transport_models:
-                ssm_key = transport_model._get_pkgkey("ssm")
-                if ssm_key is None:
-                    continue
-                old_ssm_package = transport_model.pop(ssm_key)
-                state_variable_name = old_ssm_package.dataset[
-                    "auxiliary_variable_name"
-                ].values[0]
-                ssm_package = SourceSinkMixing.from_flow_model(
-                    flow_model, state_variable_name, is_split=True
-                )
-                if ssm_package is not None:
-                    transport_model[ssm_key] = ssm_package
-
-    def update_solutions(
-        self, original_model_name_to_solution: dict[str, Solution]
-    ) -> None:
-        """
-        Update the solutions to refer to the new partitioned models.
-        """
-        for model_name, new_models in self._model_to_partitioned_model.items():
-            solution = original_model_name_to_solution[model_name]
-            solution._remove_model_from_solution(model_name)
-            for new_model_name, new_model in new_models.items():
-                solution._add_model_to_solution(new_model_name)
-
     def split(self, model_name: str, model: IModel) -> dict[str, IModel]:
         """
-        Split a model into multiple partitioned models based on configured partition information.
+        Split a model into multiple partitioned models based on partition information.
+
+        Each partition creates a separate submodel containing:
+        - All non-boundary packages from the original model, clipped to the partition's domain
+        - Boundary packages that have active cells within the partition's domain, clipped accordingly
+        - IAgnosticPackages are excluded if they contain no data after clipping
+
         Parameters
         ----------
         model_name : str
-            Base name of the input model; partition identifiers are appended to create
-            names for each resulting submodel.
+            Base name of the input model. Partition IDs are appended to create
+            unique names for each submodel (e.g., "model_0", "model_1").
         model : IModel
             The input model instance to partition.
+
         Returns
         -------
         dict[str, IModel]
             A mapping from generated submodel names to the corresponding partitioned
-            model instances, each containing only the packages and data relevant to its
-            active domain.
+            model instances, each clipped to its respective active domain.
         """
         modelclass = type(model)
         partitioned_models = {}
@@ -233,7 +171,79 @@ class ModelSplitter:
 
         return partitioned_models
 
+    def update_packages(self) -> None:
+        """
+        Update packages that reference other models after partitioning.
+
+        This method performs two updates:
+        1. Updates buoyancy packages in flow models to reference the correct
+        partitioned transport model names.
+        2. Recreates Source Sink Mixing (SSM) packages in transport models
+        based on the partitioned flow model data.
+        """
+        # Update buoyancy packages
+        for _, models in self._partition_id_to_models.items():
+            flow_model = self._get_flow_model(models)
+            transport_model_names = self._get_transport_model_names(models)
+
+            flow_model._update_buoyancy_package(transport_model_names)
+
+        # Update ssm packages
+        for _, models in self._partition_id_to_models.items():
+            flow_model = self._get_flow_model(models)
+            transport_models = self._get_transport_models(models)
+
+            for transport_model in transport_models:
+                ssm_key = transport_model._get_pkgkey("ssm")
+                if ssm_key is None:
+                    continue
+                old_ssm_package = transport_model.pop(ssm_key)
+                state_variable_name = old_ssm_package.dataset[
+                    "auxiliary_variable_name"
+                ].values[0]
+                ssm_package = SourceSinkMixing.from_flow_model(
+                    flow_model, state_variable_name, is_split=True
+                )
+                if ssm_package is not None:
+                    transport_model[ssm_key] = ssm_package
+
+    def update_solutions(
+        self, original_model_name_to_solution: dict[str, Solution]
+    ) -> None:
+        """
+        Update solution objects to reference partitioned models instead of original models.
+
+        For each original model that was split:
+        1. Removes the original model reference from its solution (This was a deepcopy of the original solution and thus references the original model).
+        2. Adds all partitioned submodel references to the same solution
+
+        This ensures that the Solution objects correctly reference the new partitioned
+        model names after splitting.
+        """
+        for model_name, new_models in self._model_to_partitioned_model.items():
+            solution = original_model_name_to_solution[model_name]
+            solution._remove_model_from_solution(model_name)
+            for new_model_name, new_model in new_models.items():
+                solution._add_model_to_solution(new_model_name)
+
     def _get_package_domain(self, package: IPackage) -> GridDataArray | None:
+        """
+        Extract the active domain of a boundary condition package.
+
+        For boundary condition packages, this method identifies which cells contain
+        active boundary data by checking the package's defining variable (e.g.,
+        "head" for CHD, "rate" for WEL). Non-boundary packages return None.
+
+        The active domain is determined by:
+        1. Retrieving the variable that defines active cells (from _pkg_id_to_var_mapping)
+        2. Removing non-spatial dimensions and the layer dimension
+        3. Creating a boolean mask where non-null values indicate active cells
+
+        Special cases:
+        - IAgnosticPackages: No domain check (return None)
+        - Packages in _pkg_id_skip_active_domain_check: No domain check (return None)
+        - Non-boundary packages: Return None
+        """
         pkg_id = package.pkg_id
         active_package_domain = None
 
@@ -263,6 +273,19 @@ class ModelSplitter:
         active_package_domain: GridDataArray,
         partition_info: PartitionInfo,
     ) -> bool:
+        """
+        Check if a package has any active data within a partition's domain.
+
+        For boundary condition packages, this method determines whether the package
+        should be included in a partitioned model by checking if its active cells
+        overlap with the partition's active domain.
+
+        The method returns True in the following cases:
+        - Package is not a BoundaryCondition (non-boundary packages are always included)
+        - Package is an IAgnosticPackage (overlap check deferred until after slicing)
+        - Package is in _pkg_id_skip_active_domain_check (e.g., SSM, LAK packages)
+        - Package has at least one active cell overlapping with the partition domain
+        """
         pkg_id = package.pkg_id
         has_overlap = True
         if isinstance(package, BoundaryCondition):
@@ -278,3 +301,36 @@ class ModelSplitter:
                 ).any()  # type: ignore
 
         return has_overlap
+
+    def _get_flow_model(self, models: dict[str, IModel]) -> GroundwaterFlowModel:
+        flow_model = next(
+            (
+                model
+                for model_name, model in models.items()
+                if isinstance(model, GroundwaterFlowModel)
+            ),
+            None,
+        )
+
+        if flow_model is None:
+            raise ValueError(
+                "Could not find a groundwater flow model for updating the buoyancy package."
+            )
+
+        return flow_model
+
+    def _get_transport_model_names(self, models: dict[str, IModel]) -> List[str]:
+        return [
+            model_name
+            for model_name, model in models.items()
+            if isinstance(model, GroundwaterTransportModel)
+        ]
+
+    def _get_transport_models(
+        self, models: dict[str, IModel]
+    ) -> List[GroundwaterTransportModel]:
+        return [
+            model
+            for model_name, model in models.items()
+            if isinstance(model, GroundwaterTransportModel)
+        ]
