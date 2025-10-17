@@ -49,7 +49,6 @@ from imod.mf6.multimodel.modelsplitter import (
 )
 from imod.mf6.out import open_cbc, open_conc, open_hds
 from imod.mf6.package import Package
-from imod.mf6.ssm import SourceSinkMixing
 from imod.mf6.validation_settings import ValidationSettings
 from imod.mf6.write_context import WriteContext
 from imod.prepare.partition import create_partition_labels
@@ -1390,6 +1389,8 @@ class Modflow6Simulation(collections.UserDict, ISimulation):
         >>> submodel_labels = mf6_sim.create_partition_labels(n_partitions=4)
         >>> m6_splitted = mf6_sim.split(submodel_labels)
         """
+
+        # Validation
         if self.is_split():
             raise RuntimeError(
                 "Unable to split simulation. Splitting can only be done on simulations that haven't been split."
@@ -1415,9 +1416,38 @@ class Modflow6Simulation(collections.UserDict, ISimulation):
                     f"simulation cannot be split due to presence of package '{error_with_object}' in model '{model_name}'"
                 )
 
-        original_packages = get_packages(self)
-
+        # Create partition info
         partition_info = create_partition_info(submodel_labels)
+
+        # Create new simulation
+        new_simulation = imod.mf6.Modflow6Simulation(
+            f"{self.name}_partioned", validation_settings=self._validation_context
+        )
+
+        # Copy simulation level packages to new simulation
+        original_packages = get_packages(self)
+        for package_name, package in {**original_packages}.items():
+            new_simulation[package_name] = deepcopy(package)
+
+        # Create a mapping from original model names to new solution objects
+        original_model_name_to_solution: dict[str, Solution] = {}
+        for model_name, model in original_models.items():
+            solution_name = self.get_solution_name(model_name)
+            solution = cast(Solution, new_simulation[solution_name])
+            original_model_name_to_solution[model_name] = solution
+
+        # Split models and add to new simulation
+        modelsplitter = ModelSplitter(partition_info)
+        for model_name, model in original_models.items():
+            partition_models_dict = modelsplitter.split(model_name, model)
+            for new_model_name, new_model in partition_models_dict.items():
+                new_simulation[new_model_name] = new_model
+
+        modelsplitter.update_solutions(original_model_name_to_solution)
+        modelsplitter.update_packages()
+
+        # Create exchanges
+        exchanges: list[Any] = []
 
         exchange_creator: ExchangeCreator_Unstructured | ExchangeCreator_Structured
         if is_unstructured(submodel_labels):
@@ -1429,25 +1459,6 @@ class Modflow6Simulation(collections.UserDict, ISimulation):
                 submodel_labels, partition_info
             )
 
-        new_simulation = imod.mf6.Modflow6Simulation(
-            f"{self.name}_partioned", validation_settings=self._validation_context
-        )
-        for package_name, package in {**original_packages}.items():
-            new_simulation[package_name] = deepcopy(package)
-
-        modelsplitter = ModelSplitter(partition_info)
-        for model_name, model in original_models.items():
-            solution_name = self.get_solution_name(model_name)
-            solution = cast(Solution, new_simulation[solution_name])
-            solution._remove_model_from_solution(model_name)
-
-            partition_models_dict = modelsplitter.split(model_name, model)
-            for new_model_name, new_model in partition_models_dict.items():
-                new_simulation[new_model_name] = new_model
-                solution._add_model_to_solution(new_model_name)
-
-        exchanges: list[Any] = []
-
         for flow_model_name, flow_model in flow_models.items():
             exchanges += exchange_creator.create_gwfgwf_exchanges(
                 flow_model_name, flow_model.domain.layer
@@ -1458,13 +1469,12 @@ class Modflow6Simulation(collections.UserDict, ISimulation):
                 exchanges += exchange_creator.create_gwtgwt_exchanges(
                     tpt_model_name, flow_model_name, model.domain.layer
                 )
+
         new_simulation._add_modelsplit_exchanges(exchanges)
-        new_simulation._update_buoyancy_packages()
         new_simulation._set_flow_exchange_options()
         new_simulation._set_transport_exchange_options()
-        new_simulation._update_ssm_packages()
-
         new_simulation._filter_inactive_cells_from_exchanges()
+
         return new_simulation
 
     @standard_log_decorator()
@@ -1625,30 +1635,6 @@ class Modflow6Simulation(collections.UserDict, ISimulation):
                     exchanges.append(GWFGWT(flow_name, transport_model_name))
 
         return exchanges
-
-    def _update_ssm_packages(self) -> None:
-        flow_transport_mapping = self._get_transport_models_per_flow_model()
-        for flow_name, tpt_models_of_flow_model in flow_transport_mapping.items():
-            flow_model = self[flow_name]
-            for tpt_model_name in tpt_models_of_flow_model:
-                tpt_model = self[tpt_model_name]
-                ssm_key = tpt_model._get_pkgkey("ssm")
-                if ssm_key is not None:
-                    old_ssm_package = tpt_model.pop(ssm_key)
-                    state_variable_name = old_ssm_package.dataset[
-                        "auxiliary_variable_name"
-                    ].values[0]
-                    ssm_package = SourceSinkMixing.from_flow_model(
-                        flow_model, state_variable_name, is_split=self.is_split()
-                    )
-                    if ssm_package is not None:
-                        tpt_model[ssm_key] = ssm_package
-
-    def _update_buoyancy_packages(self) -> None:
-        flow_transport_mapping = self._get_transport_models_per_flow_model()
-        for flow_name, tpt_models_of_flow_model in flow_transport_mapping.items():
-            flow_model = cast(GroundwaterFlowModel, self[flow_name])
-            flow_model._update_buoyancy_package(tpt_models_of_flow_model)
 
     def is_split(self) -> bool:
         """

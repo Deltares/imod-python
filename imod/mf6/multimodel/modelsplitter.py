@@ -7,6 +7,10 @@ from imod.common.interfaces.imodel import IModel
 from imod.common.interfaces.ipackage import IPackage
 from imod.common.utilities.clip import clip_by_grid
 from imod.mf6.boundary_condition import BoundaryCondition
+from imod.mf6.ims import Solution
+from imod.mf6.model_gwf import GroundwaterFlowModel
+from imod.mf6.model_gwt import GroundwaterTransportModel
+from imod.mf6.ssm import SourceSinkMixing
 from imod.typing import GridDataArray
 from imod.typing.grid import (
     get_non_spatial_dimension_names,
@@ -86,6 +90,82 @@ class ModelSplitter:
     def __init__(self, partition_info: List[PartitionInfo]) -> None:
         self.partition_info = partition_info
 
+        self._model_to_partitioned_model: dict[str, dict[str, IModel]] = {}
+
+        # Initialize mapping from partition IDs to models
+        self._partition_id_to_models: dict[int, dict[str, IModel]] = {}
+        for submodel_partition_info in self.partition_info:
+            self._partition_id_to_models[submodel_partition_info.id] = {}
+
+    def update_packages(self) -> None:
+        """
+        Update packages that need to be updated after partitioning.
+        This includes for example the transport model names in the buoyancy package.
+        """
+        # Update buoyancy packages
+        for _, models in self._partition_id_to_models.items():
+            flow_model = next(
+                (
+                    model
+                    for model_name, model in models.items()
+                    if isinstance(model, GroundwaterFlowModel)
+                ),
+                None,
+            )
+            transport_model_names = [
+                model_name
+                for model_name, model in models.items()
+                if isinstance(model, GroundwaterTransportModel)
+            ]
+            if flow_model is None:
+                raise ValueError(
+                    "Could not find a groundwater flow model for updating the buoyancy package."
+                )
+
+            flow_model._update_buoyancy_package(transport_model_names)
+
+        # Update ssm packages
+        for _, models in self._partition_id_to_models.items():
+            flow_model = next(
+                (
+                    model
+                    for model_name, model in models.items()
+                    if isinstance(model, GroundwaterFlowModel)
+                ),
+                None,
+            )
+            transport_models = [
+                model
+                for model_name, model in models.items()
+                if isinstance(model, GroundwaterTransportModel)
+            ]
+
+            for transport_model in transport_models:
+                ssm_key = transport_model._get_pkgkey("ssm")
+                if ssm_key is None:
+                    continue
+                old_ssm_package = transport_model.pop(ssm_key)
+                state_variable_name = old_ssm_package.dataset[
+                    "auxiliary_variable_name"
+                ].values[0]
+                ssm_package = SourceSinkMixing.from_flow_model(
+                    flow_model, state_variable_name, is_split=True
+                )
+                if ssm_package is not None:
+                    transport_model[ssm_key] = ssm_package
+
+    def update_solutions(
+        self, original_model_name_to_solution: dict[str, Solution]
+    ) -> None:
+        """
+        Update the solutions to refer to the new partitioned models.
+        """
+        for model_name, new_models in self._model_to_partitioned_model.items():
+            solution = original_model_name_to_solution[model_name]
+            solution._remove_model_from_solution(model_name)
+            for new_model_name, new_model in new_models.items():
+                solution._add_model_to_solution(new_model_name)
+
     def split(self, model_name: str, model: IModel) -> dict[str, IModel]:
         """
         Split a model into multiple partitioned models based on configured partition information.
@@ -107,8 +187,6 @@ class ModelSplitter:
         partitioned_models = {}
         model_to_partition = {}
 
-        self._force_load_dis(model)
-
         # Create empty model for each partition
         for submodel_partition_info in self.partition_info:
             new_model_name = f"{model_name}_{submodel_partition_info.id}"
@@ -116,6 +194,11 @@ class ModelSplitter:
             new_model = modelclass(**model.options)
             partitioned_models[new_model_name] = new_model
             model_to_partition[new_model_name] = submodel_partition_info
+            self._partition_id_to_models[submodel_partition_info.id][new_model_name] = (
+                new_model
+            )
+
+        self._model_to_partitioned_model[model_name] = partitioned_models
 
         # Add packages to models
         for pkg_name, package in model.items():
@@ -149,11 +232,6 @@ class ModelSplitter:
                     new_model[pkg_name] = sliced_package
 
         return partitioned_models
-
-    def _force_load_dis(self, model) -> None:
-        key = model.get_diskey()
-        model[key].dataset.load()
-        return
 
     def _get_package_domain(self, package: IPackage) -> GridDataArray | None:
         pkg_id = package.pkg_id
