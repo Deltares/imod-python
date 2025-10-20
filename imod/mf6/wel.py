@@ -540,7 +540,7 @@ class GridAgnosticWell(BoundaryCondition, IPointDataPackage, abc.ABC):
         else:
             message += " The first 10 unplaced wells are: \n"
 
-        is_filtered = self.dataset["id"].isin([filtered_wells])
+        is_filtered = self.dataset["id"].compute().isin(filtered_wells)
         for i in range(min(10, len(filtered_wells))):
             ids = filtered_wells[i]
             x = self.dataset["x"].data[is_filtered][i]
@@ -1076,7 +1076,7 @@ class Well(GridAgnosticWell):
         like = ones_like(active)
         bottom = like * bottom
         top_2d = (like * top).sel(layer=1)
-        top_3d = bottom.shift(layer=1).fillna(top_2d)
+        top_3d = bottom.compute().shift(layer=1).fillna(top_2d)
         k = like * k
 
         index_names = wells_df.index.names

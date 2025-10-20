@@ -1,5 +1,6 @@
 from datetime import datetime
-from typing import Optional
+from pathlib import Path
+from typing import Optional, Self
 
 import numpy as np
 import xarray as xr
@@ -165,6 +166,22 @@ class Recharge(TopSystemBoundaryCondition, IRegridPackage):
         }
         super().__init__(dict_dataset)
         self._validate_init_schemata(validate)
+
+    @classmethod
+    def from_file(cls, path: str | Path, **kwargs) -> Self:
+        instance = super().from_file(path, **kwargs)
+
+        # to_netcdf converts strings into  NetCDF "variable‑length UTF‑8 strings"
+        # which are loaded as dtype=object arrays.
+        # This will convert them back to str.
+        vars = [
+            "species",
+        ]
+        for var in vars:
+            if var in instance.dataset:
+                instance.dataset[var] = instance.dataset[var].astype(str)
+
+        return instance
 
     def _validate(self, schemata, **kwargs):
         # Insert additional kwargs
