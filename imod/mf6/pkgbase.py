@@ -92,8 +92,20 @@ class PackageBase(IPackageBase, abc.ABC):
 
         """
         kwargs.update({"encoding": self._netcdf_encoding()})
+        kwargs.update({"format": "NETCDF4"})
 
         dataset = self.dataset
+
+        # Create encoding dict for float16 variables
+        for var in dataset.data_vars:
+            if dataset[var].dtype == np.float16:
+                kwargs["encoding"][var] = {"dtype": "float32"}
+
+        # Also check coordinates
+        for coord in dataset.coords:
+            if dataset[coord].dtype == np.float16:
+                kwargs["encoding"][coord] = {"dtype": "float32"}
+
         if isinstance(dataset, xu.UgridDataset):
             if mdal_compliant:
                 dataset = dataset.ugrid.to_dataset()
@@ -168,7 +180,7 @@ class PackageBase(IPackageBase, abc.ABC):
             # TODO: seems like a bug? Remove str() call if fixed in xarray/zarr
             dataset = xr.open_zarr(str(path), **kwargs)
         else:
-            dataset = xr.open_dataset(path, **kwargs)
+            dataset = xr.open_dataset(path, chunks="auto", **kwargs)
 
         if dataset.ugrid_roles.topology:
             dataset = xu.UgridDataset(dataset)

@@ -172,7 +172,7 @@ class OutputControl(Package, IRegridPackage):
                 package_times = self.dataset[datavar].coords["time"].values
                 starts = np.searchsorted(globaltimes, package_times) + 1
                 for i, s in enumerate(starts):
-                    setting = self.dataset[datavar].isel(time=i).item()
+                    setting = self.dataset[datavar].isel(time=i).values[()]
                     periods[s][key] = self._get_ocsetting(setting)
 
             else:

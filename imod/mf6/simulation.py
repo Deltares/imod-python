@@ -60,7 +60,7 @@ from imod.schemata import ValidationError
 from imod.typing import GridDataArray, GridDataset
 from imod.typing.grid import (
     concat,
-    is_equal,
+    is_same_domain,
     is_unstructured,
     merge_partitions,
 )
@@ -1037,12 +1037,14 @@ class Modflow6Simulation(collections.UserDict, ISimulation):
                     _, filename, _, _ = exchange_package.get_specification()
                     exchange_class_short = type(exchange_package).__name__
                     path = f"{filename}.nc"
-                    exchange_package.dataset.to_netcdf(directory / path)
+                    exchange_package.dataset.to_netcdf(
+                        directory / path, format="NETCDF4"
+                    )
                     toml_content[key][exchange_class_short].append(path)
 
             else:
                 path = f"{key}.nc"
-                value.dataset.to_netcdf(directory / path)
+                value.dataset.to_netcdf(directory / path, format="NETCDF4")
                 toml_content[cls_name][key] = path
 
         with open(directory / f"{self.name}.toml", "wb") as f:
@@ -1620,10 +1622,16 @@ class Modflow6Simulation(collections.UserDict, ISimulation):
 
         for flow_model_name in flow_models:
             flow_model = self[flow_model_name]
+
+            matched_tsp_models = []
             for tpt_model_name in transport_models:
                 tpt_model = self[tpt_model_name]
-                if is_equal(tpt_model.domain, flow_model.domain):
+                if is_same_domain(tpt_model.domain, flow_model.domain):
                     result[flow_model_name].append(tpt_model_name)
+                    matched_tsp_models.append(tpt_model_name)
+            for tpt_model_name in matched_tsp_models:
+                transport_models.pop(tpt_model_name)
+
         return result
 
     def _generate_gwfgwt_exchanges(self) -> list[GWFGWT]:
