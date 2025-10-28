@@ -11,7 +11,7 @@ from imod.mf6.ims import Solution
 from imod.mf6.model_gwf import GroundwaterFlowModel
 from imod.mf6.model_gwt import GroundwaterTransportModel
 from imod.mf6.ssm import SourceSinkMixing
-from imod.mf6.validation_settings import trim_time_dimension, ValidationSettings
+from imod.mf6.validation_settings import ValidationSettings, trim_time_dimension
 from imod.typing import GridDataArray
 from imod.typing.grid import (
     get_non_spatial_dimension_names,
@@ -101,7 +101,9 @@ class ModelSplitter:
         for submodel_partition_info in self.partition_info:
             self._partition_id_to_models[submodel_partition_info.id] = {}
 
-    def split(self, model_name: str, model: IModel, ignore_time: bool = True) -> dict[str, IModel]:
+    def split(
+        self, model_name: str, model: IModel, ignore_time: bool = True
+    ) -> dict[str, IModel]:
         """
         Split a model into multiple partitioned models based on partition
         information.
@@ -168,7 +170,9 @@ class ModelSplitter:
 
                 # For agnostic packages, if the sliced package has no data, do
                 # not add it to the model
-                if isinstance(package, IAgnosticPackage) and sliced_package.is_empty(ignore_time=ignore_time):
+                if isinstance(package, IAgnosticPackage) and sliced_package.is_empty(
+                    ignore_time=ignore_time
+                ):
                     sliced_package = None
 
                 # Add package to model if it has data
@@ -235,7 +239,6 @@ class ModelSplitter:
             for new_model_name, new_model in new_models.items():
                 solution._add_model_to_solution(new_model_name)
 
-
     def _is_package_to_skip(self, package: IPackage) -> bool:
         """
         Determine if a package should be skipped in grid checks.
@@ -255,10 +258,9 @@ class ModelSplitter:
             pkg_id in self._pkg_id_skip_active_domain_check
         )
 
-
     def _get_package_domain(
-            self, package: IPackage, ignore_time: bool = True
-        ) -> GridDataArray | None:
+        self, package: IPackage, ignore_time: bool = True
+    ) -> GridDataArray | None:
         """
         Extract the active domain of a boundary condition package.
 
