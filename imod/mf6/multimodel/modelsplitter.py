@@ -25,11 +25,13 @@ class PartitionInfo(NamedTuple):
 
 def create_partition_info(submodel_labels: GridDataArray) -> List[PartitionInfo]:
     """
-    A PartitionInfo is used to partition a model or package. The partition info's of a domain are created using a
-    submodel_labels array. The submodel_labels provided as input should have the same shape as a single layer of the
-    model grid (all layers are split the same way), and contains an integer value in each cell. Each cell in the
-    model grid will end up in the submodel with the index specified by the corresponding label of that cell. The
-    labels should be numbers between 0 and the number of partitions.
+    A PartitionInfo is used to partition a model or package. The partition
+    info's of a domain are created using a submodel_labels array. The
+    submodel_labels provided as input should have the same shape as a single
+    layer of the model grid (all layers are split the same way), and contains an
+    integer value in each cell. Each cell in the model grid will end up in the
+    submodel with the index specified by the corresponding label of that cell.
+    The labels should be numbers between 0 and the number of partitions.
     """
     _validate_submodel_label_array(submodel_labels)
 
@@ -64,11 +66,11 @@ def _validate_submodel_label_array(submodel_labels: GridDataArray) -> None:
 
 
 class ModelSplitter:
-    # pkg_id to variable mapping.
-    # For boundary packages we need to check if the package has any active cells in the partition
-    # We do this based on the variable that defines the active cells for that package
-    # This mapping is used to get that variable name based on the package id
-    # If a package is not in this mapping, we assume it does not need special treatment
+    # pkg_id to variable mapping. For boundary packages we need to check if the
+    # package has any active cells in the partition We do this based on the
+    # variable that defines the active cells for that package This mapping is
+    # used to get that variable name based on the package id If a package is not
+    # in this mapping, we assume it does not need special treatment
     _pkg_id_to_var_mapping = {
         "chd": "head",
         "cnc": "concentration",
@@ -100,11 +102,14 @@ class ModelSplitter:
 
     def split(self, model_name: str, model: IModel) -> dict[str, IModel]:
         """
-        Split a model into multiple partitioned models based on partition information.
+        Split a model into multiple partitioned models based on partition
+        information.
 
         Each partition creates a separate submodel containing:
-        - All non-boundary packages from the original model, clipped to the partition's domain
-        - Boundary packages that have active cells within the partition's domain, clipped accordingly
+        - All non-boundary packages from the original model, clipped to the
+          partition's domain
+        - Boundary packages that have active cells within the partition's
+          domain, clipped accordingly
         - IAgnosticPackages are excluded if they contain no data after clipping
 
         Parameters
@@ -160,7 +165,8 @@ class ModelSplitter:
                 # Slice and add the package to the partitioned model
                 sliced_package = clip_by_grid(package, partition_info.active_domain)
 
-                # For agnostic packages, if the sliced package has no data, do not add it to the model
+                # For agnostic packages, if the sliced package has no data, do
+                # not add it to the model
                 if isinstance(package, IAgnosticPackage):
                     if sliced_package["index"].size == 0:
                         sliced_package = None
@@ -211,10 +217,13 @@ class ModelSplitter:
         self, original_model_name_to_solution: dict[str, Solution]
     ) -> None:
         """
-        Update solution objects to reference partitioned models instead of original models.
+        Update solution objects to reference partitioned models instead of
+        original models.
 
         For each original model that was split:
-        1. Removes the original model reference from its solution (This was a deepcopy of the original solution and thus references the original model).
+        1. Removes the original model reference from its solution (This was a
+           deepcopy of the original solution and thus references the original
+           model).
         2. Adds all partitioned submodel references to the same solution
 
         This ensures that the Solution objects correctly reference the new partitioned
@@ -232,9 +241,12 @@ class ModelSplitter:
         Determine if a package should be skipped in grid checks.
 
         Package can be skipped in the following cases:
-        - Package is not a BoundaryCondition (non-boundary packages are always included)
-        - Package is an IAgnosticPackage (overlap check deferred until after slicing)
-        - Package is in _pkg_id_skip_active_domain_check (e.g., SSM, LAK packages)
+        - Package is not a BoundaryCondition (non-boundary packages are always
+          included)
+        - Package is an IAgnosticPackage (overlap check deferred until after
+          slicing)
+        - Package is in _pkg_id_skip_active_domain_check (e.g., SSM, LAK
+          packages)
         """
         pkg_id = package.pkg_id
         if not isinstance(package, BoundaryCondition):
@@ -248,16 +260,19 @@ class ModelSplitter:
         """
         Extract the active domain of a boundary condition package.
 
-        For boundary condition packages, this method identifies which cells contain
-        active boundary data by checking the package's defining variable (e.g.,
-        "head" for CHD, "rate" for WEL). Non-boundary packages return None.
+        For boundary condition packages, this method identifies which cells
+        contain active boundary data by checking the package's defining variable
+        (e.g., "head" for CHD, "rate" for WEL). Non-boundary packages return
+        None.
 
         The active domain is determined by:
-        1. Retrieving the variable that defines active cells (from _pkg_id_to_var_mapping)
+        1. Retrieving the variable that defines active cells (from
+           _pkg_id_to_var_mapping)
         2. Removing non-spatial dimensions
         3. Creating a boolean mask where non-null values indicate active cells
 
-        Returns None if the package is not a boundary condition or should be skipped.
+        Returns None if the package is not a boundary condition or should be
+        skipped.
         """
         if self._is_package_to_skip(package):
             return None
@@ -281,13 +296,14 @@ class ModelSplitter:
         """
         Check if a package has any active data within a partition's domain.
 
-        For boundary condition packages, this method determines whether the package
-        should be included in a partitioned model by checking if its active cells
-        overlap with the partition's active domain.
+        For boundary condition packages, this method determines whether the
+        package should be included in a partitioned model by checking if its
+        active cells overlap with the partition's active domain.
 
         The method returns True in the following cases:
         - Package should be skipped in grid checks.
-        - Package has at least one active cell overlapping with the partition domain
+        - Package has at least one active cell overlapping with the partition
+          domain
         """
         if self._is_package_to_skip(package):
             return True
