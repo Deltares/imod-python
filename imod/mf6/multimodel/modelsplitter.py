@@ -171,7 +171,7 @@ class ModelSplitter:
 
         return partitioned_models
 
-    def update_packages(self) -> None:
+    def update_dependent_packages(self) -> None:
         """
         Update packages that reference other models after partitioning.
 

@@ -1444,7 +1444,7 @@ class Modflow6Simulation(collections.UserDict, ISimulation):
                 new_simulation[new_model_name] = new_model
 
         modelsplitter.update_solutions(original_model_name_to_solution)
-        modelsplitter.update_packages()
+        modelsplitter.update_dependent_packages()
 
         # Create exchanges
         exchanges: list[Any] = []
