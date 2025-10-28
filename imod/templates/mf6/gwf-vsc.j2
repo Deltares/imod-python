@@ -12,7 +12,7 @@ begin options
 {%- if thermal_a4 is defined %}
   thermal_a4 {{thermal_a4}}{% endif %}
 {%- if viscosityfile is defined %}
-  density fileout {{viscosityfile}}{% endif %}
+  viscosity fileout {{viscosityfile}}{% endif %}
 end options
 
 begin dimensions
