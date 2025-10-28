@@ -89,6 +89,7 @@ def test_slice_model_with_auxiliary_variables(tmp_path, flow_transport_simulatio
 
     flow_simulation.write(tmp_path, binary=False)
     split_simulation = flow_simulation.split(submodel_labels)
+    assert split_simulation._validation_context == flow_simulation._validation_context
     split_simulation.write(tmp_path, binary=False)
     assert_simulation_can_run(split_simulation, tmp_path)
     assert "species_d" in list(split_simulation["flow_0"]["chd"].dataset.keys())

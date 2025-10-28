@@ -1,4 +1,5 @@
 import collections
+import warnings
 from copy import copy, deepcopy
 from datetime import datetime
 from pathlib import Path
@@ -32,6 +33,7 @@ from imod.msw.meteo_mapping import (
     PrecipitationMapping,
 )
 from imod.msw.output_control import TimeOutputControl
+from imod.msw.pkgbase import MetaSwapPackage
 from imod.msw.ponding import Ponding
 from imod.msw.scaling_factors import ScalingFactors
 from imod.msw.sprinkling import Sprinkling
@@ -163,8 +165,8 @@ class MetaSwapModel(Model):
             )
 
     def _check_landuse_indices_in_lookup_options(self):
-        grid_key = self._get_pkg_key(GridData)
-        landuse_options_key = self._get_pkg_key(LanduseOptions)
+        grid_key = self.get_pkgkey(GridData)
+        landuse_options_key = self.get_pkgkey(LanduseOptions)
 
         indices_in_grid = set(self[grid_key]["landuse"].values.ravel())
         indices_in_options = set(
@@ -180,8 +182,8 @@ class MetaSwapModel(Model):
             )
 
     def _check_vegetation_indices_in_annual_crop_factors(self):
-        landuse_options_key = self._get_pkg_key(LanduseOptions)
-        annual_crop_factors_key = self._get_pkg_key(AnnualCropFactors)
+        landuse_options_key = self.get_pkgkey(LanduseOptions)
+        annual_crop_factors_key = self.get_pkgkey(AnnualCropFactors)
 
         indices_in_options = set(
             np.unique(self[landuse_options_key]["vegetation_index"])
@@ -225,13 +227,46 @@ class MetaSwapModel(Model):
 
         return year, time_since_start_year
 
-    def _get_pkg_key(self, pkg_type: type, optional_package: bool = False):
+    def get_pkgkey(
+        self, pkg_type: type[MetaSwapPackage], optional_package: bool = False
+    ) -> str | None:
+        """
+        Get the package key for a package of type ``pkg_type``. Returns the
+        first occurrence of the package type.
+
+        Parameters
+        ----------
+        pkg_type: type[MetaSwapPackage]
+            Type of the package to get the key for.
+        optional_package: bool
+            If True, the method will not raise an error if the package is not
+            found. Method returns None in this case.
+
+        Returns
+        -------
+        str
+            The key of the package of type ``pkg_type``.
+        """
         for pkg_key, pkg in self.items():
             if isinstance(pkg, pkg_type):
                 return pkg_key
 
         if not optional_package:
             raise KeyError(f"Could not find package of type: {pkg_type}")
+
+        return None
+
+    def _get_pkg_key(
+        self, pkg_type: type[MetaSwapPackage], optional_package: bool = False
+    ) -> str | None:
+        """ "
+        Preserves backwards compatibility with old code (primod) that used this.
+        """
+        warnings.warn(
+            "Method '_get_pkg_key' is deprecated, use 'get_pkgkey' instead.",
+            DeprecationWarning,
+        )
+        return self.get_pkgkey(pkg_type, optional_package)
 
     def _model_checks(self, validate: bool):
         if validate and not self._has_file_copier():
@@ -257,7 +292,7 @@ class MetaSwapModel(Model):
         simulation_settings["tdbg"] = time_since_start_year
 
         # Add IdfMapping settings
-        idf_key = self._get_pkg_key(IdfMapping)
+        idf_key = self.get_pkgkey(IdfMapping)
         idf_pkg = cast(IdfMapping, self[idf_key])
         simulation_settings.update(idf_pkg._get_output_settings())
 
@@ -299,9 +334,9 @@ class MetaSwapModel(Model):
         self._write_simulation_settings(directory)
 
         # Get index and svat
-        grid_key = self._get_pkg_key(GridData)
+        grid_key = self.get_pkgkey(GridData)
         grid_pkg = cast(GridData, self[grid_key])
-        index, svat = grid_pkg._generate_index_array()
+        index, svat = grid_pkg.generate_index_array()
 
         # write package contents
         for pkgname in self:

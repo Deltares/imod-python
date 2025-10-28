@@ -306,7 +306,7 @@ def test_partitioning_unstructured_voronoi_conversion(
     voronoi_partition_array.name = "idomain"
 
     # regrid original model to voronoi grid
-    voronoi_simulation = circle_model.regrid_like("regridded", voronoi_idomain, True)
+    voronoi_simulation = circle_model.regrid_like("regridded", voronoi_idomain)
 
     # Run the original example, so without partitioning, and save the simulation
     # results

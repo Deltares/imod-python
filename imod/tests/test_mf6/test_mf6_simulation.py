@@ -273,6 +273,15 @@ def test_write_circle_model_twice(circle_model, tmp_path):
     assert len(diff.right_only) == 0
 
 
+def test_simulation_clip_box__validation_settings_preserved(circle_model):
+    simulation = circle_model
+    simulation.set_validation_settings(
+        imod.mf6.ValidationSettings(strict_hfb_validation=False)
+    )
+    clipped_simulation = simulation.clip_box(y_min=-50, y_max=0)
+    assert simulation._validation_context == clipped_simulation._validation_context
+
+
 def test_simulation_open_concentration_fail(circle_model, tmp_path):
     """No transport model is assigned, so should throw error when opening concentrations"""
     simulation = circle_model
@@ -442,7 +451,7 @@ class TestModflow6Simulation:
         # Act
         with pytest.raises(ValueError):
             _ = structured_flow_simulation_2_flow_models.regrid_like(
-                "regridded_model", finer_idomain, False
+                "regridded_model", finer_idomain
             )
 
     def test_clip_multiple_flow_models(self, structured_flow_simulation_2_flow_models):

@@ -29,7 +29,7 @@ def convert_imod5_to_mf6_sim(lhm_prjfile: Path, times: list) -> Modflow6Simulati
         period_data,
         times,
     )
-    simulation._validation_context = imod.mf6.ValidationSettings(ignore_time=True)
+    simulation.set_validation_settings(imod.mf6.ValidationSettings(ignore_time=True))
     # Set settings so that the simulation behaves like iMOD5
     simulation["imported_model"]["oc"] = OutputControl(
         save_head="last", save_budget="last"

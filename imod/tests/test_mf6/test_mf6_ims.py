@@ -125,8 +125,8 @@ def test_ims_options():
         """\
         begin options
           print_option summary
-          outer_csvfile fileout outer.csv
-          inner_csvfile fileout inner.csv
+          csv_outer_output fileout outer.csv
+          csv_inner_output fileout inner.csv
           no_ptc first
           ats_outer_maximum_fraction 0.25
         end options

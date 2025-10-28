@@ -234,8 +234,9 @@ def reproject(
             dst_transform, dst = _reproject_dst(source, src_crs, dst_crs, src_transform)
         else:
             dst_transform = imod.util.spatial.transform(like)
+            empty_data = np.nan * np.ones(like.shape, dtype=source.dtype)
             dst = xr.DataArray(
-                data=np.zeros(like.shape, source.dtype),
+                data=empty_data,
                 coords={"y": like.y, "x": like.x},
                 dims=("y", "x"),
             )

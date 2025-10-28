@@ -4,15 +4,14 @@ import textwrap
 from datetime import datetime
 from typing import Optional, cast
 
-import cftime
 import numpy as np
 
+from imod.common.statusinfo import StatusInfo, StatusInfoBase
 from imod.common.utilities.dataclass_type import DataclassType
 from imod.logging import init_log_decorator
 from imod.logging.logging_decorators import standard_log_decorator
 from imod.mf6.buy import Buoyancy
 from imod.mf6.chd import ConstantHead
-from imod.mf6.clipped_boundary_condition_creator import create_clipped_boundary
 from imod.mf6.dis import StructuredDiscretization
 from imod.mf6.drn import Drainage
 from imod.mf6.ghb import GeneralHeadBoundary
@@ -35,6 +34,7 @@ from imod.mf6.regrid.regrid_schemes import (
 from imod.mf6.riv import River
 from imod.mf6.sto import StorageCoefficient
 from imod.mf6.utilities.chd_concat import concat_layered_chd_packages
+from imod.mf6.validation_settings import ValidationSettings
 from imod.mf6.wel import LayeredWell, Well
 from imod.prepare.topsystem.default_allocation_methods import (
     SimulationAllocationOptions,
@@ -83,6 +83,7 @@ class GroundwaterFlowModel(Modflow6Model):
     _mandatory_packages = ("npf", "ic", "oc", "sto")
     _model_id = "gwf6"
     _template = Modflow6Model._initialize_template("gwf-nam.j2")
+    _boundary_state_pkg_type = ConstantHead
 
     _init_schemata = {
         "listing_file": [TypeSchema(str)],
@@ -114,130 +115,6 @@ class GroundwaterFlowModel(Modflow6Model):
             "under_relaxation": under_relaxation,
         }
         self._validate_init_schemata_options(validate)
-
-    def clip_box(
-        self,
-        time_min: Optional[cftime.datetime | np.datetime64 | str] = None,
-        time_max: Optional[cftime.datetime | np.datetime64 | str] = None,
-        layer_min: Optional[int] = None,
-        layer_max: Optional[int] = None,
-        x_min: Optional[float] = None,
-        x_max: Optional[float] = None,
-        y_min: Optional[float] = None,
-        y_max: Optional[float] = None,
-        state_for_boundary: Optional[GridDataArray] = None,
-    ):
-        """
-        Clip a model by a bounding box (time, layer, y, x).
-
-        Parameters
-        ----------
-        time_min: optional, np.datetime64
-            Start time to select. Data will be forward filled to this date. If
-            time_min is before the start time of the dataset, data is
-            backfilled.
-        time_max: optional
-            End time to select.
-        layer_min: optional, int
-            Minimum layer to select.
-        layer_max: optional, int
-            Maximum layer to select.
-        x_min: optional, float
-            Minimum x-coordinate to select.
-        x_max: optional, float
-            Maximum x-coordinate to select.
-        y_min: optional, float
-            Minimum y-coordinate to select.
-        y_max: optional, float
-            Maximum y-coordinate to select.
-        state_for_boundary : optional, Union[xr.DataArray, xu.UgridDataArray]
-            A grids with states that are used to put as boundary values. This
-            model will get a :class:`imod.mf6.ConstantHead`.
-
-        Returns
-        -------
-        clipped : GroundwaterFlowModel
-            A new model that is clipped to the specified bounding box.
-
-        Examples
-        --------
-        Slicing intervals may be half-bounded, by providing None:
-
-        To select 500.0 <= x <= 1000.0:
-
-        >>> gwf.clip_box(x_min=500.0, x_max=1000.0)
-
-        To select x <= 1000.0:
-
-        >>> gwf.clip_box(x_max=1000.0)``
-
-        To select x >= 500.0:
-
-        >>> gwf.clip_box(x_min=500.0)
-
-        To select a time interval, you can use datetime64:
-
-        >>> gwf.clip_box(time_min=np.datetime64("2020-01-01"), time_max=np.datetime64("2020-12-31"))
-
-        To clip an area and set a boundary condition at the clipped boundary:
-
-        >>> clipped_gwf = gwf.clip_box(
-        ...     x_min=500.0, x_max=1000.0, y_min=500.0, y_max=1000.0,
-        ...     state_for_boundary=heads
-        ... )
-        """
-        clipped = super().clip_box(
-            time_min, time_max, layer_min, layer_max, x_min, x_max, y_min, y_max
-        )
-
-        clipped_boundary_condition = self._create_boundary_condition_clipped_boundary(
-            self, clipped, state_for_boundary
-        )
-        if clipped_boundary_condition is not None:
-            clipped["chd_clipped"] = clipped_boundary_condition
-
-        clipped.purge_empty_packages()
-
-        return clipped
-
-    def _create_boundary_condition_clipped_boundary(
-        self,
-        original_model: Modflow6Model,
-        clipped_model: Modflow6Model,
-        state_for_boundary: Optional[GridDataArray],
-    ):
-        unassigned_boundary_original_domain = (
-            self._create_boundary_condition_for_unassigned_boundary(
-                original_model, state_for_boundary
-            )
-        )
-
-        return self._create_boundary_condition_for_unassigned_boundary(
-            clipped_model, state_for_boundary, [unassigned_boundary_original_domain]
-        )
-
-    @staticmethod
-    def _create_boundary_condition_for_unassigned_boundary(
-        model: Modflow6Model,
-        state_for_boundary: Optional[GridDataArray],
-        additional_boundaries: Optional[list[ConstantHead]] = None,
-    ):
-        if state_for_boundary is None:
-            return None
-
-        constant_head_packages = [
-            pkg for name, pkg in model.items() if isinstance(pkg, ConstantHead)
-        ]
-
-        additional_boundaries = [
-            item for item in additional_boundaries or [] if item is not None
-        ]
-
-        constant_head_packages.extend(additional_boundaries)
-
-        return create_clipped_boundary(
-            model.domain, state_for_boundary, constant_head_packages
-        )
 
     def is_use_newton(self):
         """
@@ -275,6 +152,46 @@ class GroundwaterFlowModel(Modflow6Model):
         transport_models_old = buoyancy_package._get_transport_model_names()
         if len(transport_models_old) == len(transport_models_per_flow_model):
             buoyancy_package._update_transport_models(transport_models_per_flow_model)
+
+    def validate(
+        self,
+        model_name: str = "",
+        validation_context: Optional[ValidationSettings] = None,
+        **kwargs,
+    ) -> StatusInfoBase:
+        """
+        Validate model.
+
+        Parameters
+        ----------
+        model_name: str, optional
+            Name of the model, used for status info.
+        validation_context: ValidationSettings, optional
+            Validation settings, which can be used to control the validation
+            process. If not provided, defaults to ValidationSettings(validate=True).
+        **kwargs: dict
+            Additional keyword arguments passed to Package._validate
+
+        Returns
+        -------
+        NestedStatusInfo
+            Status information about the validation process, including any errors
+            or warnings encountered during validation.
+        """
+        try:
+            npfkey = self._get_pkgkey(NodePropertyFlow._pkg_id)
+        except Exception as e:
+            status_info = StatusInfo(f"{model_name} model")
+            status_info.add_error(str(e))
+            return status_info
+
+        icelltype = self[npfkey]["icelltype"]
+        return super().validate(
+            model_name=model_name,
+            validation_context=validation_context,
+            icelltype=icelltype,
+            **kwargs,
+        )
 
     @classmethod
     @standard_log_decorator()

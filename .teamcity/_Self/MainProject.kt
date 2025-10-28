@@ -1,9 +1,11 @@
 package _Self
 
 import Deploy.DeployProject
+import Docker.DockerProject
 import Nightly.NightlyProject
 import Pixi.PixiProject
 import Templates.*
+import Weekly.WeeklyProject
 import jetbrains.buildServer.configs.kotlin.*
 import jetbrains.buildServer.configs.kotlin.buildFeatures.PullRequests
 import jetbrains.buildServer.configs.kotlin.buildFeatures.pullRequests
@@ -33,6 +35,7 @@ object MainProject : Project({
     template(UnitTestsTemplate)
     template(ExamplesTemplate)
     template(PipPythonTemplate)
+    template(AcceptanceTestsTemplate)
 
     features {
         dockerRegistry {
@@ -63,7 +66,9 @@ object MainProject : Project({
 
     subProject(DeployProject)
     subProject(NightlyProject)
+    subProject(WeeklyProject)
     subProject(PixiProject)
+    subProject(DockerProject)
 })
 
 object Lint : BuildType({
@@ -94,7 +99,7 @@ object UnitTests : BuildType({
     name = "UnitTests"
 
     params {
-        param("reverse.dep.Modflow_Modflow6Release.MODFLOW6_Version", "6.5.0")
+        param("reverse.dep.Modflow_Modflow6Release.MODFLOW6_Version", "6.6.2")
         param("reverse.dep.Modflow_Modflow6Release.MODFLOW6_Platform", "win64")
     }
     templates(UnitTestsTemplate, GitHubIntegrationTemplate)
@@ -123,7 +128,7 @@ object Examples : BuildType({
     name = "Examples"
 
     params {
-        param("reverse.dep.Modflow_Modflow6Release.MODFLOW6_Version", "6.5.0")
+        param("reverse.dep.Modflow_Modflow6Release.MODFLOW6_Version", "6.6.2")
         param("reverse.dep.Modflow_Modflow6Release.MODFLOW6_Platform", "win64")
     }
 

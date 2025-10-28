@@ -23,7 +23,10 @@ def test_regrid_structured_simulation_to_structured_simulation(
     new_simulation = structured_flow_simulation.regrid_like(
         "regridded_simulation", finer_idomain
     )
-
+    assert (
+        structured_flow_simulation._validation_context
+        == new_simulation._validation_context
+    )
     assert_simulation_can_run(new_simulation, tmp_path)
 
 
@@ -36,7 +39,10 @@ def test_regrid_unstructured_simulation_to_unstructured_simulation(
     new_simulation = unstructured_flow_simulation.regrid_like(
         "regridded_simulation", finer_idomain
     )
-
+    assert (
+        unstructured_flow_simulation._validation_context
+        == new_simulation._validation_context
+    )
     # Test that the newly regridded simulation can run
     assert_simulation_can_run(new_simulation, tmp_path)
 
@@ -51,7 +57,10 @@ def test_regrid_structured_simulation_to_unstructured_simulation(
         "regridded_simulation", finer_idomain
     )
     assert isinstance(new_simulation["flow"]["dis"], VerticesDiscretization)
-
+    assert (
+        structured_flow_simulation._validation_context
+        == new_simulation._validation_context
+    )
     # Test that the newly regridded simulation can run
     assert_simulation_can_run(new_simulation, tmp_path)
 
@@ -73,7 +82,10 @@ def test_regridded_simulation_has_required_packages(
     new_simulation = unstructured_flow_simulation.regrid_like(
         "regridded_simulation", finer_idomain
     )
-
+    assert (
+        unstructured_flow_simulation._validation_context
+        == new_simulation._validation_context
+    )
     assert isinstance(new_simulation["solution"], imod.mf6.Solution)
     assert isinstance(
         new_simulation["time_discretization"], imod.mf6.TimeDiscretization

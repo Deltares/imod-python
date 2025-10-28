@@ -27,12 +27,6 @@ from imod.prepare.hfb import (
     linestring_to_square_zpolygons,
     linestring_to_trapezoid_zpolygons,
 )
-from imod.prepare.layer import (
-    get_lower_active_grid_cells,
-    get_lower_active_layer_number,
-    get_upper_active_grid_cells,
-    get_upper_active_layer_number,
-)
 from imod.prepare.layerregrid import LayerRegridder
 from imod.prepare.partition import create_partition_labels
 from imod.prepare.regrid import Regridder

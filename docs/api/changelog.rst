@@ -10,6 +10,70 @@ The format is based on `Keep a Changelog`_, and this project adheres to
 ------------
 
 Added
+-----
+- Added :class:`imod.mf6.Viscosity` package to specify the viscosity of the
+  groundwater flow model.
+
+[1.0.0rc7] - 2025-10-28
+-----------------------
+
+Added
+~~~~~
+
+- :meth:`imod.mf6.Modflow6Simulation.set_validation_settings` to set validation
+  settings for a MODFLOW 6 simulation. See :class:`imod.mf6.ValidationSettings`
+  for more information.
+
+Changed
+~~~~~~~
+
+- No automatic validation upon calling :meth:`imod.mf6.Modflow6Simulation.regrid_like` anymore.
+  Use the ``validate`` argument of :meth:`imod.mf6.Modflow6Simulation.write` to
+  validate the regridded model upon writing instead.
+- :class:`imod.mf6.River` now ignore confined cells (``icelltype == 0``) when
+  validating whether the river bottom elevation is below the model bottom
+  elevation.
+- Moved :func:`imod.select.get_upper_active_layer_number`,
+  :func:`imod.select.get_upper_active_cells`,
+  :func:`imod.select.get_lower_active_cells`, and
+  :func:`imod.select.get_lower_active_layer_number` from :mod:`imod.prepare`. to
+  :mod:`imod.select`.
+- :class:`imod.mf6.Dispersion` now is not a required package for
+  :class:`imod.mf6.GroundwaterTransportModel` anymore.
+- No validation anymore for ``icelltype`` upon writing
+  :class:`imod.mf6.SpecificStorage` and :class:`imod.mf6.StorageCoefficient`.
+
+
+Removed
+~~~~~~~
+
+- Removed ``imod.select.upper_active_layer`` function, use
+  :func:`imod.select.get_upper_active_layer_number` instead.
+
+Fixed
+~~~~~
+
+- Fixed bug where :meth:`imod.mf6.Modflow6Simulation.split` could result in
+  empty exchanges being present in the ``split_exchanges`` package list, when
+  two models were isolated by inactive cells from each other. These empty
+  exchanges are now removed.
+- Fixed bug where :meth:`imod.mf6.Modflow6Simulation.split`,
+  :meth:`imod.mf6.Modflow6Simulation.regrid_like`, and
+  :meth:`imod.mf6.Modflow6Simulation.clip_box` would not copy
+  :class:`imod.mf6.ValidationSettings`. 
+- ``landuse``, ``soil_physical_unit``, ``active`` for :class:`imod.msw.GridData`
+  are now properly regridded with the ``mode`` statistic when using
+  :meth:`imod.msw.GridData.regrid_like`.
+
+[1.0.0rc6] - 2025-08-28
+-----------------------
+
+Small post-release to fix rendering of documentation online.
+
+[1.0.0rc5] - 2025-08-27
+-----------------------
+
+Added
 ~~~~~
 
 - :meth:`imod.mf6.River.reallocate`, :meth:`imod.mf6.Drainage.reallocate`,
@@ -24,8 +88,12 @@ Added
 - Added :meth:`imod.mf6.Modflow6Simulation.create_partition_labels` to create
   partition labels for a MODFLOW 6 simulation from its idomain. This is useful
   for splitting a simulation into multiple submodels.
-- Added :class:`imod.mf6.Viscosity` package to specify the viscosity of the
-  groundwater flow model.
+- :class:`imod.mf6.AdaptiveTimeStepping` to specify adaptive time stepping
+  settings for MODFLOW 6 simulations.
+- The ``ats_percel`` argument to :class:`imod.mf6.AdvectionTVD`,
+  :class:`imod.mf6.AdvectionUpstream`, :class:`imod.mf6.AdvectionCentral` to
+  adapt the time step based on the maximum fraction of a cell that a solute
+  parcel is allowed to travel.
 
 Fixed
 ~~~~~
@@ -43,9 +111,16 @@ Fixed
   :class:`imod.mf6.SingleLayerHorizontalFlowBarrierResistance` and other HFB
   packages would have resistances that were double the expected value with
   xugrid >= 0.14.2
+- The ``states_for_boundary`` argument now also works for tranport models in
+  :meth:`imod.mf6.Modflow6Simulation.clip_box`.
+- Fix bug where :meth:`imod.mf6.Modflow6Simulation.clip_box` and the
+  ``states_for_boundary`` argument would place these bc at the
+  incorrect places with unstructured grids.
 - Fixed bug where :meth:`imod.mf6.SourceSinkMixing.from_flow_model` would return
   an error upon adding a package which cannot have a ``concentration``, such as 
   :class:`imod.mf6.HorizontalFlowBarrierResistance`.
+- Broken names for ``outer_csvfile`` and ``inner_csvfile`` in the
+  :class:`imod.mf6.Solution` MODFLOW 6 template file.
 
 Changed
 ~~~~~~~

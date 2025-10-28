@@ -43,6 +43,7 @@ Model objects & methods
     Modflow6Simulation.get_models_of_type
     Modflow6Simulation.get_models
     Modflow6Simulation.create_partition_labels
+    Modflow6Simulation.set_validation_settings
     GroundwaterFlowModel
     GroundwaterFlowModel.mask_all_packages
     GroundwaterFlowModel.prepare_wel_for_mf6
@@ -56,6 +57,7 @@ Model objects & methods
     GroundwaterFlowModel.validate
     GroundwaterFlowModel.set_newton
     GroundwaterFlowModel.write
+    GroundwaterFlowModel.get_diskey
     GroundwaterTransportModel
     GroundwaterTransportModel.mask_all_packages
     GroundwaterTransportModel.dump
@@ -66,6 +68,7 @@ Model objects & methods
     GroundwaterTransportModel.validate
     GroundwaterTransportModel.is_use_newton
     GroundwaterTransportModel.write
+    GroundwaterTransportModel.get_diskey
 
 Discretization
 --------------
@@ -104,6 +107,16 @@ Discretization
     TimeDiscretization.regrid_like
     TimeDiscretization.is_empty
     TimeDiscretization.get_regrid_methods
+    AdaptiveTimeStepping
+    AdaptiveTimeStepping.write
+    AdaptiveTimeStepping.from_file
+    AdaptiveTimeStepping.to_netcdf
+    AdaptiveTimeStepping.copy
+    AdaptiveTimeStepping.clip_box
+    AdaptiveTimeStepping.mask
+    AdaptiveTimeStepping.regrid_like
+    AdaptiveTimeStepping.is_empty
+    AdaptiveTimeStepping.get_regrid_methods
 
 Model settings
 --------------

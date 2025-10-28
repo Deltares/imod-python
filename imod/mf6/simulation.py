@@ -142,10 +142,11 @@ class Modflow6Simulation(collections.UserDict, ISimulation):
         self.name = name
         self.directory = None
         self._initialize_template()
+        self._validation_context: ValidationSettings
         if validation_settings is None:
-            self._validation_context = ValidationSettings()
+            self.set_validation_settings(ValidationSettings())
         else:
-            self._validation_context = validation_settings
+            self.set_validation_settings(validation_settings)
 
     def __setitem__(self, key, value):
         super().__setitem__(key, value)
@@ -153,6 +154,24 @@ class Modflow6Simulation(collections.UserDict, ISimulation):
     def update(self, *args, **kwargs):
         for k, v in dict(*args, **kwargs).items():
             self[k] = v
+
+    def _get_pkgkey(self, pkg_id):
+        """
+        Get package key that belongs to a certain pkg_id, since the keys are
+        user specified.
+        """
+        key = [
+            pkgname
+            for pkgname, pkg in self.items()
+            if isinstance(pkg, Package) and (pkg._pkg_id == pkg_id)
+        ]
+        nkey = len(key)
+        if nkey > 1:
+            raise ValueError(f"Multiple instances of {key} detected")
+        elif nkey == 1:
+            return key[0]
+        else:
+            return None
 
     @standard_log_decorator()
     def create_time_discretization(self, additional_times, validate: bool = True):
@@ -219,13 +238,13 @@ class Modflow6Simulation(collections.UserDict, ISimulation):
                 times.extend(model._yield_times())
 
         # np.unique also sorts
-        times = np.unique(np.hstack(times))
+        unique_times = np.unique(np.hstack(times))
 
-        duration = imod.util.time.timestep_duration(times, self.use_cftime)
+        duration = imod.util.time.timestep_duration(unique_times, self.use_cftime)
         # Generate time discretization, just rely on default arguments
         # Probably won't be used that much anyway?
         timestep_duration = xr.DataArray(
-            duration, coords={"time": np.array(times)[:-1]}, dims=("time",)
+            duration, coords={"time": unique_times[:-1]}, dims=("time",)
         )
         self["time_discretization"] = imod.mf6.TimeDiscretization(
             timestep_duration=timestep_duration, validate=validate
@@ -266,6 +285,20 @@ class Modflow6Simulation(collections.UserDict, ISimulation):
 
         d["solutiongroups"] = [solutiongroups]
         return self._template.render(d)
+
+    def _write_tdis_package(self, globaltimes, write_context):
+        """Write time discretization package, and set/clear ats filename if needed"""
+        ats_pkgname = self._get_pkgkey("ats")
+        if ats_pkgname:
+            self["time_discretization"]._set_ats_filename(ats_pkgname, write_context)
+        else:
+            # Make sure no ats_filename is set (in case it was set before)
+            self["time_discretization"]._clear_ats_filename()
+        self["time_discretization"]._write(
+            pkgname="time_discretization",
+            globaltimes=globaltimes,
+            write_context=write_context,
+        )
 
     @standard_log_decorator()
     def write(
@@ -332,11 +365,7 @@ class Modflow6Simulation(collections.UserDict, ISimulation):
 
         # Write time discretization file
         globaltimes = self["time_discretization"]["time"].values
-        self["time_discretization"]._write(
-            pkgname="time_discretization",
-            globaltimes=globaltimes,
-            write_context=write_context,
-        )
+        self._write_tdis_package(globaltimes, write_context)
 
         # Write individual models
         status_info = NestedStatusInfo("Simulation validation status")
@@ -356,11 +385,14 @@ class Modflow6Simulation(collections.UserDict, ISimulation):
                     )
                 )
             elif isinstance(value, Package):
-                if value._pkg_id == "ims":
-                    ims_write_context = write_context.copy_with_new_write_directory(
+                if value._pkg_id in ["ims", "ats"]:
+                    # Copy write_context again for packages to avoid changing it
+                    # down the line and risk clashing with the model write
+                    # context.
+                    pkg_write_context = write_context.copy_with_new_write_directory(
                         write_context.simulation_directory
                     )
-                    value._write(key, globaltimes, ims_write_context)
+                    value._write(key, globaltimes, pkg_write_context)
             elif isinstance(value, list):
                 for exchange in value:
                     if isinstance(exchange, imod.mf6.exchangebase.ExchangeBase):
@@ -372,6 +404,42 @@ class Modflow6Simulation(collections.UserDict, ISimulation):
             raise ValidationError("\n" + status_info.to_string())
 
         self.directory = directory
+
+    def set_validation_settings(self, validation_settings: ValidationSettings):
+        """
+        Set validation settings for the simulation. Configuring
+        :class:`imod.mf6.ValidationSettings` can help performance or reduce the
+        strictness of validation for some packages, namely the Well and HFB
+        packages.
+
+        Parameters
+        ----------
+        validation_settings: ValidationSettings
+            Settings for validation of the simulation. These settings can be
+            used to control whether the simulation is validated at write time,
+            and whether strict validation rules are applied.
+
+        Examples
+        --------
+
+        Configure the validation settings for the simulation as follows. Turn
+        off valdation for each timestep to boost performance for models with
+        many timesteps:
+
+        >>> validation_settings = imod.mf6.ValidationSettings(ignore_time=True)
+        >>> simulation.set_validation_settings(validation_settings)
+
+        Less strict model validation for horizontal flow barriers and wells:
+
+        >>> validation_settings = imod.mf6.ValidationSettings(
+        ...     strict_well_validation=False, strict_hfb_validation=False
+        ... )
+        >>> simulation.set_validation_settings(validation_settings)
+
+        See :class:`imod.mf6.ValidationSettings` for futher information on how
+        to configure validation settings.
+        """
+        self._validation_context = validation_settings
 
     @standard_log_decorator()
     def run(self, mf6path: Union[str, Path] = "mf6") -> None:
@@ -890,7 +958,7 @@ class Modflow6Simulation(collections.UserDict, ISimulation):
         else:
             flow_model_path = self.directory / modelname
 
-        diskey = model._get_diskey()
+        diskey = model.get_diskey()
         dis_id = model[diskey]._pkg_id
         return flow_model_path / f"{diskey}.{dis_id}.grb"
 
@@ -1188,7 +1256,9 @@ class Modflow6Simulation(collections.UserDict, ISimulation):
                     f"simulation cannot be clipped due to presence of package '{error_with_object}' in model '{model_name}'"
                 )
 
-        clipped = type(self)(name=self.name)
+        clipped = type(self)(
+            name=self.name, validation_settings=self._validation_context
+        )
         for key, value in self.items():
             state_for_boundary = (
                 None if states_for_boundary is None else states_for_boundary.get(key)
@@ -1216,8 +1286,14 @@ class Modflow6Simulation(collections.UserDict, ISimulation):
                     y_min=y_min,
                     y_max=y_max,
                 )
+            elif isinstance(value, list) and all(
+                isinstance(item, GWFGWT) for item in value
+            ):
+                continue
             else:
-                raise ValueError(f"object of type {type(value)} cannot be clipped.")
+                raise ValueError(
+                    f"object {key} of type {type(value)} cannot be clipped."
+                )
         return clipped
 
     def create_partition_labels(
@@ -1350,7 +1426,9 @@ class Modflow6Simulation(collections.UserDict, ISimulation):
                 submodel_labels, partition_info
             )
 
-        new_simulation = imod.mf6.Modflow6Simulation(f"{self.name}_partioned")
+        new_simulation = imod.mf6.Modflow6Simulation(
+            f"{self.name}_partioned", validation_settings=self._validation_context
+        )
         for package_name, package in {**original_packages}.items():
             new_simulation[package_name] = deepcopy(package)
 
@@ -1394,7 +1472,6 @@ class Modflow6Simulation(collections.UserDict, ISimulation):
         self,
         regridded_simulation_name: str,
         target_grid: GridDataArray,
-        validate: bool = True,
     ) -> "Modflow6Simulation":
         """
         This method creates a new simulation object. The models contained in the
@@ -1407,8 +1484,6 @@ class Modflow6Simulation(collections.UserDict, ISimulation):
             name given to the output simulation
         target_grid: xr.DataArray or  xu.UgridDataArray
             discretization onto which the models  in this simulation will be regridded
-        validate: bool
-            set to true to validate the regridded packages
 
         Returns
         -------
@@ -1425,7 +1500,7 @@ class Modflow6Simulation(collections.UserDict, ISimulation):
         ... )
         """
 
-        return _regrid_like(self, regridded_simulation_name, target_grid, validate)
+        return _regrid_like(self, regridded_simulation_name, target_grid)
 
     def _add_modelsplit_exchanges(self, exchanges_list: list[GWFGWF]) -> None:
         if not self.is_split():
@@ -1473,6 +1548,10 @@ class Modflow6Simulation(collections.UserDict, ISimulation):
         for ex in self["split_exchanges"]:
             for i in [1, 2]:
                 self._filter_inactive_cells_exchange_domain(ex, i)
+
+            # Remove exchange if no cells are left
+            if ex.dataset.sizes["index"] == 0:
+                self["split_exchanges"].remove(ex)
 
     def _filter_inactive_cells_exchange_domain(self, ex: GWFGWF, i: int) -> None:
         """Filters inactive cells from one exchange domain inplace"""
@@ -1708,9 +1787,13 @@ class Modflow6Simulation(collections.UserDict, ISimulation):
         if regridder_types is None:
             regridder_types = {}
 
-        simulation = Modflow6Simulation("imported_simulation")
-        simulation._validation_context.strict_well_validation = False
-        simulation._validation_context.strict_hfb_validation = False
+        validation_settings = ValidationSettings(
+            strict_well_validation=False,
+            strict_hfb_validation=False,
+        )
+        simulation = Modflow6Simulation(
+            "imported_simulation", validation_settings=validation_settings
+        )
 
         # import GWF model,
         gwf_model = GroundwaterFlowModel.from_imod5_data(

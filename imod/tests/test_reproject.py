@@ -307,3 +307,21 @@ def test_reproject_rotation__use_src_attrs(write_tif, tmp_path):
         src_nodata=np.nan,
     )
     assert np.allclose(newda.values, newarr, equal_nan=True)
+
+
+def test_reproject_nan_border():
+    da = xr.ones_like(
+        imod.util.empty_2d(17.0, 17000.0, 264000.0, -17.0, 148000.0, 250000.0)
+    )
+    like = xr.ones_like(
+        imod.util.empty_2d(102.0, 60000.0, 210250.0, -114.0, 322500.0, 435000.0)
+    )
+    out = imod.prepare.reproject(
+        source=da,
+        like=like,
+        method="bilinear",
+        src_crs="epsg:31370",
+        dst_crs="epsg:28992",
+    )
+    assert not (out == 0.0).any()
+    assert np.isnan(out.values).any()

@@ -210,6 +210,30 @@ def bounding_polygon_from_line_data_and_clip_box(
     return gpd.GeoDataFrame([dummy_value], geometry=[bbox])
 
 
+def clip_box_dataset(
+    dataset: GridDataset,
+    time_min: Optional[cftime.datetime | np.datetime64 | str] = None,
+    time_max: Optional[cftime.datetime | np.datetime64 | str] = None,
+    layer_min: Optional[int] = None,
+    layer_max: Optional[int] = None,
+    x_min: Optional[float] = None,
+    x_max: Optional[float] = None,
+    y_min: Optional[float] = None,
+    y_max: Optional[float] = None,
+):
+    selection = dataset.copy()
+    selection = clip_time_slice(selection, time_min=time_min, time_max=time_max)
+    selection = clip_layer_slice(selection, layer_min=layer_min, layer_max=layer_max)
+    selection = clip_spatial_box(
+        selection,
+        x_min=x_min,
+        x_max=x_max,
+        y_min=y_min,
+        y_max=y_max,
+    )
+    return selection
+
+
 def clip_time_indexer(
     time: np.ndarray,
     time_start: Optional[cftime.datetime | np.datetime64 | str] = None,

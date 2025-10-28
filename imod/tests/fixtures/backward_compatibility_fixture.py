@@ -5,6 +5,7 @@ from zipfile import ZipFile
 
 import pytest
 import xarray as xr
+from filelock import FileLock
 
 import imod
 from imod.data.sample_data import REGISTRY
@@ -41,13 +42,15 @@ def imod5_dataset_periods() -> tuple[dict[str, Any], dict[str, list[datetime]]]:
     tmp_path = imod.util.temporary_directory()
     fname_model = REGISTRY.fetch("iMOD5_model.zip")
 
-    with ZipFile(fname_model) as archive:
-        archive.extractall(tmp_path)
+    lock = FileLock(REGISTRY.path / "iMOD5_model.zip.lock")
+    with lock:
+        with ZipFile(fname_model) as archive:
+            archive.extractall(tmp_path)
 
-    with open(tmp_path / "iMOD5_model_pooch" / "iMOD5_model.prj", "w") as f:
-        f.write(period_prj)
+        with open(tmp_path / "iMOD5_model_pooch" / "iMOD5_model.prj", "w") as f:
+            f.write(period_prj)
 
-    data = open_projectfile_data(tmp_path / "iMOD5_model_pooch" / "iMOD5_model.prj")
+        data = open_projectfile_data(tmp_path / "iMOD5_model_pooch" / "iMOD5_model.prj")
 
     grid_data = data[0]
     period_data = data[1]

@@ -8,11 +8,11 @@ from typing import Optional
 import numpy as np
 
 from imod.common.utilities.layer import create_layered_top
-from imod.prepare.layer import (
+from imod.schemata import DimsSchema
+from imod.select.layers import (
     get_upper_active_grid_cells,
     get_upper_active_layer_number,
 )
-from imod.schemata import DimsSchema
 from imod.typing import GridDataArray
 from imod.util.dims import enforced_dim_order
 

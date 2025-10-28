@@ -25,9 +25,7 @@ import xugrid as xu
 
 from imod.common.interfaces.ipackage import IPackage
 from imod.common.utilities.clip import (
-    clip_layer_slice,
-    clip_spatial_box,
-    clip_time_slice,
+    clip_box_dataset,
 )
 from imod.common.utilities.dataclass_type import DataclassType, EmptyRegridMethod
 from imod.common.utilities.mask import mask_package
@@ -50,6 +48,7 @@ from imod.mf6.auxiliary_variables import (
 from imod.mf6.pkgbase import (
     EXCHANGE_PACKAGES,
     TRANSPORT_PACKAGES,
+    UTIL_PACKAGES,
     PackageBase,
 )
 from imod.mf6.validation_settings import ValidationSettings, trim_time_dimension
@@ -112,6 +111,8 @@ class Package(PackageBase, IPackage, abc.ABC):
             fname = f"gwt-{pkg_id}.j2"
         elif pkg_id in EXCHANGE_PACKAGES:
             fname = f"exg-{pkg_id}.j2"
+        elif pkg_id in UTIL_PACKAGES:
+            fname = f"utl-{pkg_id}.j2"
         elif pkg_id == "api":
             fname = f"{pkg_id}.j2"
         else:
@@ -301,7 +302,7 @@ class Package(PackageBase, IPackage, abc.ABC):
         pkgname: str,
         globaltimes: Union[list[np.datetime64], np.ndarray],
         write_context: WriteContext,
-    ):
+    ) -> None:
         directory = write_context.write_directory
         binary = write_context.use_binary
         self._write_blockfile(pkgname, globaltimes, write_context)
@@ -447,17 +448,16 @@ class Package(PackageBase, IPackage, abc.ABC):
         if not self._is_clipping_supported():
             raise ValueError("this package does not support clipping.")
 
-        selection = self.dataset
-        selection = clip_time_slice(selection, time_min=time_min, time_max=time_max)
-        selection = clip_layer_slice(
-            selection, layer_min=layer_min, layer_max=layer_max
-        )
-        selection = clip_spatial_box(
-            selection,
-            x_min=x_min,
-            x_max=x_max,
-            y_min=y_min,
-            y_max=y_max,
+        selection = clip_box_dataset(
+            self.dataset,
+            time_min,
+            time_max,
+            layer_min,
+            layer_max,
+            x_min,
+            x_max,
+            y_min,
+            y_max,
         )
 
         cls = type(self)
