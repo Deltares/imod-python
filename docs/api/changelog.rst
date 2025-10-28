@@ -6,6 +6,16 @@ All notable changes to this project will be documented in this file.
 The format is based on `Keep a Changelog`_, and this project adheres to
 `Semantic Versioning`_.
 
+[Unreleased]
+------------
+
+Fixed
+~~~~~
+
+- Improved performance of :meth:`imod.mf6.Modflow6Simulation.split` for large
+  models loaded lazily into memory. Reduced a splitting operation of 2 hours to
+  a few minutes for a test case.
+
 [1.0.0rc7] - 2025-10-28
 -----------------------
 
