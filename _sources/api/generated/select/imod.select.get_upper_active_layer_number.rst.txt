@@ -1,0 +1,6 @@
+﻿imod.select.get\_upper\_active\_layer\_number
+=============================================
+
+.. currentmodule:: imod.select
+
+.. autofunction:: get_upper_active_layer_number

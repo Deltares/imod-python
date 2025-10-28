@@ -247,9 +247,7 @@ voronoi_uda = ones_like_ugrid(voronoi_grid)
 # Now that we have a Voronoi grid, we can regrid the MODFLOW 6 simulation to this
 # grid.
 
-mf6_unstructured = mf6_sim.regrid_like(
-    "unstructured_example", voronoi_uda, validate=False
-)
+mf6_unstructured = mf6_sim.regrid_like("unstructured_example", voronoi_uda)
 mf6_unstructured
 
 # %%
@@ -295,18 +293,6 @@ gwf_unstructured["riv-1riv"].cleanup(dis)
 gwf_unstructured["riv-2riv"].cleanup(dis)
 gwf_unstructured["riv-1drn"].cleanup(dis)
 gwf_unstructured["riv-2drn"].cleanup(dis)
-
-# %%
-#
-# Finally, we need to set the HFB validation settings to less strict. Otherwise,
-# we'll get errors about hfb's being connected to inactive cells. Normally, you
-# would set this when creating a new Modflow6Simulation, but since we created
-# one from an iMOD5 model, these settings cannot be set upon creation. We can
-# however set the validation settings directly by changing this attribute:
-
-from imod.mf6 import ValidationSettings
-
-mf6_unstructured._validation_context = ValidationSettings(strict_hfb_validation=False)
 
 # %%
 #

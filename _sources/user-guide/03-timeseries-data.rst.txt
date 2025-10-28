@@ -525,7 +525,7 @@ when calling :meth:`imod.mf6.Well.from_imod5_data` or
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** (0 minutes 1.397 seconds)
+   **Total running time of the script:** (0 minutes 1.107 seconds)
 
 
 .. _sphx_glr_download_user-guide_03-timeseries-data.py:

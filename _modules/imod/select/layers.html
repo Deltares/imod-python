@@ -7,7 +7,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>imod.select.layers &#8212; iMOD Python 1.0.0rc6 documentation</title>
+    <title>imod.select.layers &#8212; iMOD Python 1.0.0rc7 documentation</title>
   
   
   
@@ -41,16 +41,16 @@
   <link rel="preload" as="script" href="../../../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
 <link rel="preload" as="script" href="../../../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
 
-    <script src="../../../_static/documentation_options.js?v=bc4855a1"></script>
+    <script src="../../../_static/documentation_options.js?v=1830d1b8"></script>
     <script src="../../../_static/doctools.js?v=9bcbadda"></script>
     <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script>DOCUMENTATION_OPTIONS.pagename = '_modules/imod/select/layers';</script>
-    <script src="../../../_static/deltares.js?v=8d5578be"></script>
+    <script src="../../../_static/deltares.js?v=a1037e22"></script>
     <link rel="index" title="Index" href="../../../genindex.html" />
     <link rel="search" title="Search" href="../../../search.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
-  <meta name="docsearch:version" content="1.0.0rc6.dev" />
+  <meta name="docsearch:version" content="1.0.0rc7.dev" />
   </head>
   
   
@@ -114,8 +114,8 @@
     
     
     
-    <img src="../../../_static/imod-python-logo-light.svg" class="logo__image only-light" alt="iMOD Python 1.0.0rc6 documentation - Home"/>
-    <img src="../../../_static/imod-python-logo-dark.svg" class="logo__image only-dark pst-js-only" alt="iMOD Python 1.0.0rc6 documentation - Home"/>
+    <img src="../../../_static/imod-python-logo-light.svg" class="logo__image only-light" alt="iMOD Python 1.0.0rc7 documentation - Home"/>
+    <img src="../../../_static/imod-python-logo-dark.svg" class="logo__image only-dark pst-js-only" alt="iMOD Python 1.0.0rc7 documentation - Home"/>
   
   
 </a></div>
@@ -427,49 +427,172 @@
                 <article class="bd-article">
                   
   <h1>Source code for imod.select.layers</h1><div class="highlight"><pre>
-<div class="viewcode-block" id="upper_active_layer">
-<a class="viewcode-back" href="../../../api/generated/select/imod.select.upper_active_layer.html#imod.select.upper_active_layer">[docs]</a>
-<span></span><span class="k">def</span><span class="w"> </span><span class="nf">upper_active_layer</span><span class="p">(</span><span class="n">da</span><span class="p">,</span> <span class="n">is_ibound</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">include_constant_head</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+<span></span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">This module contains all kinds of utilities to work with layers.</span>
+<span class="sd">&quot;&quot;&quot;</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">imod.typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">GridDataArray</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">imod.typing.grid</span><span class="w"> </span><span class="kn">import</span> <span class="n">preserve_gridtype</span>
+
+
+<div class="viewcode-block" id="get_upper_active_layer_number">
+<a class="viewcode-back" href="../../../api/generated/select/imod.select.get_upper_active_layer_number.html#imod.select.get_upper_active_layer_number">[docs]</a>
+<span class="nd">@preserve_gridtype</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">get_upper_active_layer_number</span><span class="p">(</span><span class="n">active</span><span class="p">:</span> <span class="n">GridDataArray</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">GridDataArray</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Function to get the upper active layer from ibound xarray.DataArray</span>
+<span class="sd">    Returns planar grid of integers with the layer number of the lower</span>
+<span class="sd">    most active cell.</span>
 
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
-<span class="sd">    da : xarray.DataArray</span>
-<span class="sd">        A 3D DataArray</span>
-<span class="sd">    is_ibound: bool, optional</span>
-<span class="sd">        If True, ``da`` is interpreted as ibound, with values 0: inactive, 1: active, -1 constant head.</span>
-<span class="sd">        If False, ``upper_active_layer`` is interpreted as first layer that has data.</span>
-<span class="sd">        Default is True.</span>
-<span class="sd">    include_constant_head : bool, optional</span>
-<span class="sd">        If True and ``is_ibound``, also include constant head cells.</span>
-<span class="sd">        Default is False.</span>
+<span class="sd">    active: {xr.DataArray, xu.UgridDataArray}</span>
+<span class="sd">        Grid of booleans (..., layer, y, x) designating active cell.</span>
 
 <span class="sd">    Returns</span>
 <span class="sd">    -------</span>
-<span class="sd">    2d xr.DataArray of layernumber of upper active model layer</span>
+<span class="sd">    upper_active_layer: {xr.DataArray, xu.UgridDataArray}</span>
+<span class="sd">        planar grid of integers (..., y, x) with the layer number of the uppermost</span>
+<span class="sd">        active cell.</span>
+
+<span class="sd">    Examples</span>
+<span class="sd">    --------</span>
+<span class="sd">    To get the layer numbers of the uppermost active cells for an idomain grid:</span>
+
+<span class="sd">    &gt;&gt;&gt; active = idomain &gt; 0</span>
+<span class="sd">    &gt;&gt;&gt; upper_active_layer = get_upper_active_layer_number(active)</span>
+
+<span class="sd">    To get the layer numbers of the uppermost active cells for a data grid with</span>
+<span class="sd">    floats, where ``np.nan`` indicates inactive cells:</span>
+
+<span class="sd">    &gt;&gt;&gt; active = data.notnull()</span>
+<span class="sd">    &gt;&gt;&gt; upper_active_layer = get_upper_active_layer_number(active)</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="n">da</span> <span class="o">=</span> <span class="n">da</span><span class="o">.</span><span class="n">load</span><span class="p">()</span>
-    <span class="k">if</span> <span class="n">is_ibound</span><span class="p">:</span>
-        <span class="c1"># check if indeed ibound: convertible to int</span>
-        <span class="k">if</span> <span class="ow">not</span> <span class="n">da</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">int</span><span class="p">)</span><span class="o">.</span><span class="n">equals</span><span class="p">(</span><span class="n">da</span><span class="p">):</span>
-            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
-                <span class="s2">&quot;Passed DataArray is no ibound, while is_bound was set to True&quot;</span>
-            <span class="p">)</span>
-        <span class="c1"># include constant head cells (?)</span>
-        <span class="k">if</span> <span class="n">include_constant_head</span><span class="p">:</span>
-            <span class="n">is_active</span> <span class="o">=</span> <span class="n">da</span><span class="o">.</span><span class="n">fillna</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span> <span class="o">!=</span> <span class="mi">0</span>  <span class="c1"># must be filled for argmax</span>
-        <span class="k">else</span><span class="p">:</span>
-            <span class="n">is_active</span> <span class="o">=</span> <span class="n">da</span><span class="o">.</span><span class="n">fillna</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span>
-    <span class="k">else</span><span class="p">:</span>
-        <span class="n">is_active</span> <span class="o">=</span> <span class="o">~</span><span class="n">da</span><span class="o">.</span><span class="n">isnull</span><span class="p">()</span>
+    <span class="n">layer</span> <span class="o">=</span> <span class="n">active</span><span class="o">.</span><span class="n">coords</span><span class="p">[</span><span class="s2">&quot;layer&quot;</span><span class="p">]</span>
+    <span class="c1"># Set nodata to sentinel value to prevent a dtype shift from integer to</span>
+    <span class="c1"># float as np.nan forces float.</span>
+    <span class="n">nodata</span> <span class="o">=</span> <span class="n">layer</span><span class="o">.</span><span class="n">max</span><span class="p">()</span> <span class="o">+</span> <span class="mi">1</span>
+    <span class="k">return</span> <span class="n">layer</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">active</span><span class="p">,</span> <span class="n">nodata</span><span class="p">)</span><span class="o">.</span><span class="n">min</span><span class="p">(</span><span class="s2">&quot;layer&quot;</span><span class="p">)</span></div>
 
-    <span class="c1"># get layer of upper active cell</span>
-    <span class="n">da</span> <span class="o">=</span> <span class="n">is_active</span><span class="o">.</span><span class="n">layer</span><span class="o">.</span><span class="n">isel</span><span class="p">(</span><span class="n">layer</span><span class="o">=</span><span class="n">is_active</span><span class="o">.</span><span class="n">argmax</span><span class="p">(</span><span class="n">dim</span><span class="o">=</span><span class="s2">&quot;layer&quot;</span><span class="p">))</span>
-    <span class="n">da</span> <span class="o">=</span> <span class="n">da</span><span class="o">.</span><span class="n">drop_vars</span><span class="p">(</span><span class="s2">&quot;layer&quot;</span><span class="p">)</span>
 
-    <span class="c1"># skip where no active cells</span>
-    <span class="k">return</span> <span class="n">da</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">is_active</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">dim</span><span class="o">=</span><span class="s2">&quot;layer&quot;</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="get_upper_active_grid_cells">
+<a class="viewcode-back" href="../../../api/generated/select/imod.select.get_upper_active_grid_cells.html#imod.select.get_upper_active_grid_cells">[docs]</a>
+<span class="nd">@preserve_gridtype</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">get_upper_active_grid_cells</span><span class="p">(</span><span class="n">active</span><span class="p">:</span> <span class="n">GridDataArray</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">GridDataArray</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Returns grid of booleans designating location of the uppermost active grid</span>
+<span class="sd">    cell.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    active: {xr.DataArray, xu.UgridDataArray}</span>
+<span class="sd">        Grid of booleans (..., layer, y, x) designating active cell.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    upper_active_grid_cells: {xr.DataArray, xu.UgridDataArray}</span>
+<span class="sd">        Grid of booleans (..., layer, y, x) designating location of the uppermost</span>
+<span class="sd">        active grid cell.</span>
+
+<span class="sd">    Examples</span>
+<span class="sd">    --------</span>
+<span class="sd">    To get the uppermost active grid cells of an idomain grid and mask idomain</span>
+<span class="sd">    with it:</span>
+
+<span class="sd">    &gt;&gt;&gt; active = idomain &gt; 0</span>
+<span class="sd">    &gt;&gt;&gt; upper_active = get_upper_active_grid_cells(active)</span>
+<span class="sd">    &gt;&gt;&gt; idomain_upper = idomain.where(upper_active, 0)</span>
+
+<span class="sd">    To get the uppermost active grid cells of data grid with floats, where</span>
+<span class="sd">    ``np.nan`` indicates inactive cells and use it to mask data:</span>
+
+<span class="sd">    &gt;&gt;&gt; active = data.notnull()</span>
+<span class="sd">    &gt;&gt;&gt; upper_active = get_upper_active_grid_cells(active)</span>
+<span class="sd">    &gt;&gt;&gt; data_upper = data.where(upper_active)</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">layer</span> <span class="o">=</span> <span class="n">active</span><span class="o">.</span><span class="n">coords</span><span class="p">[</span><span class="s2">&quot;layer&quot;</span><span class="p">]</span>
+    <span class="n">upper_active_layer</span> <span class="o">=</span> <span class="n">get_upper_active_layer_number</span><span class="p">(</span><span class="n">active</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">layer</span> <span class="o">==</span> <span class="n">upper_active_layer</span></div>
+
+
+
+<div class="viewcode-block" id="get_lower_active_layer_number">
+<a class="viewcode-back" href="../../../api/generated/select/imod.select.get_lower_active_layer_number.html#imod.select.get_lower_active_layer_number">[docs]</a>
+<span class="nd">@preserve_gridtype</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">get_lower_active_layer_number</span><span class="p">(</span><span class="n">active</span><span class="p">:</span> <span class="n">GridDataArray</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">GridDataArray</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Returns planar grid of integers with the layer number of the lower</span>
+<span class="sd">    most active cell.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    active: {xr.DataArray, xu.UgridDataArray}</span>
+<span class="sd">        Grid of booleans (..., layer, y, x) designating active cell.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    lower_active_layer: {xr.DataArray, xu.UgridDataArray}</span>
+<span class="sd">        Planar grid of integers (..., y, x) with the layer number of the lowermost</span>
+<span class="sd">        active cell.</span>
+
+<span class="sd">    Examples</span>
+<span class="sd">    --------</span>
+<span class="sd">    To get the layer numbers of the lowermost active cells for an idomain grid:</span>
+
+<span class="sd">    &gt;&gt;&gt; active = idomain &gt; 0</span>
+<span class="sd">    &gt;&gt;&gt; lower_active_layer = get_lower_active_layer_number(active)</span>
+
+<span class="sd">    To get the layer numbers of the lowermost active cells for a data grid with</span>
+<span class="sd">    floats, where ``np.nan`` indicates inactive cells:</span>
+
+<span class="sd">    &gt;&gt;&gt; active = data.notnull()</span>
+<span class="sd">    &gt;&gt;&gt; lower_active_layer = get_lower_active_layer_number(active)</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">layer</span> <span class="o">=</span> <span class="n">active</span><span class="o">.</span><span class="n">coords</span><span class="p">[</span><span class="s2">&quot;layer&quot;</span><span class="p">]</span>
+    <span class="c1"># Set nodata to sentinel value to prevent a dtype shift from integer to</span>
+    <span class="c1"># float as np.nan forces float.</span>
+    <span class="n">nodata</span> <span class="o">=</span> <span class="n">layer</span><span class="o">.</span><span class="n">min</span><span class="p">()</span> <span class="o">-</span> <span class="mi">1</span>
+    <span class="k">return</span> <span class="n">layer</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">active</span><span class="p">,</span> <span class="n">nodata</span><span class="p">)</span><span class="o">.</span><span class="n">max</span><span class="p">(</span><span class="s2">&quot;layer&quot;</span><span class="p">)</span></div>
+
+
+
+<div class="viewcode-block" id="get_lower_active_grid_cells">
+<a class="viewcode-back" href="../../../api/generated/select/imod.select.get_lower_active_grid_cells.html#imod.select.get_lower_active_grid_cells">[docs]</a>
+<span class="nd">@preserve_gridtype</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">get_lower_active_grid_cells</span><span class="p">(</span><span class="n">active</span><span class="p">:</span> <span class="n">GridDataArray</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">GridDataArray</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Returns grid of booleans designating location of the lowermost active grid</span>
+<span class="sd">    cell.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    active: {xr.DataArray, xu.UgridDataArray}</span>
+<span class="sd">        Grid of booleans (..., layer, y, x) designating active cell.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    lower_active_grid_cells: {xr.DataArray, xu.UgridDataArray}</span>
+<span class="sd">        Grid of booleans (..., layer, y, x) designating location of the</span>
+<span class="sd">        lowermost active grid cell.</span>
+
+<span class="sd">    Examples</span>
+<span class="sd">    --------</span>
+<span class="sd">    To get the lowermost active grid cells of an idomain grid:</span>
+
+<span class="sd">    &gt;&gt;&gt; active = idomain &gt; 0</span>
+<span class="sd">    &gt;&gt;&gt; lower_active = get_lower_active_grid_cells(active)</span>
+<span class="sd">    &gt;&gt;&gt; idomain_lower = idomain.where(lower_active, 0)</span>
+
+<span class="sd">    To get the lowermost active grid cells of data grid with floats, where</span>
+<span class="sd">    ``np.nan`` indicates inactive cells:</span>
+
+<span class="sd">    &gt;&gt;&gt; active = data.notnull()</span>
+<span class="sd">    &gt;&gt;&gt; lower_active = get_lower_active_grid_cells(active)</span>
+<span class="sd">    &gt;&gt;&gt; data_lower = data.where(lower_active)</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">layer</span> <span class="o">=</span> <span class="n">active</span><span class="o">.</span><span class="n">coords</span><span class="p">[</span><span class="s2">&quot;layer&quot;</span><span class="p">]</span>
+    <span class="n">lower_active_layer</span> <span class="o">=</span> <span class="n">get_lower_active_layer_number</span><span class="p">(</span><span class="n">active</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">layer</span> <span class="o">==</span> <span class="n">lower_active_layer</span></div>
 
 </pre></div>
 

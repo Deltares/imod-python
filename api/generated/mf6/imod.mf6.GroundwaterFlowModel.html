@@ -8,7 +8,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>imod.mf6.GroundwaterFlowModel &#8212; iMOD Python 1.0.0rc6 documentation</title>
+    <title>imod.mf6.GroundwaterFlowModel &#8212; iMOD Python 1.0.0rc7 documentation</title>
   
   
   
@@ -42,18 +42,18 @@
   <link rel="preload" as="script" href="../../../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
 <link rel="preload" as="script" href="../../../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
 
-    <script src="../../../_static/documentation_options.js?v=bc4855a1"></script>
+    <script src="../../../_static/documentation_options.js?v=1830d1b8"></script>
     <script src="../../../_static/doctools.js?v=9bcbadda"></script>
     <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script>DOCUMENTATION_OPTIONS.pagename = 'api/generated/mf6/imod.mf6.GroundwaterFlowModel';</script>
-    <script src="../../../_static/deltares.js?v=8d5578be"></script>
+    <script src="../../../_static/deltares.js?v=a1037e22"></script>
     <link rel="index" title="Index" href="../../../genindex.html" />
     <link rel="search" title="Search" href="../../../search.html" />
     <link rel="next" title="imod.mf6.GroundwaterFlowModel.mask_all_packages" href="imod.mf6.GroundwaterFlowModel.mask_all_packages.html" />
-    <link rel="prev" title="imod.mf6.Modflow6Simulation.create_partition_labels" href="imod.mf6.Modflow6Simulation.create_partition_labels.html" />
+    <link rel="prev" title="imod.mf6.Modflow6Simulation.set_validation_settings" href="imod.mf6.Modflow6Simulation.set_validation_settings.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
-  <meta name="docsearch:version" content="1.0.0rc6.dev" />
+  <meta name="docsearch:version" content="1.0.0rc7.dev" />
   </head>
   
   
@@ -117,8 +117,8 @@
     
     
     
-    <img src="../../../_static/imod-python-logo-light.svg" class="logo__image only-light" alt="iMOD Python 1.0.0rc6 documentation - Home"/>
-    <img src="../../../_static/imod-python-logo-dark.svg" class="logo__image only-dark pst-js-only" alt="iMOD Python 1.0.0rc6 documentation - Home"/>
+    <img src="../../../_static/imod-python-logo-light.svg" class="logo__image only-light" alt="iMOD Python 1.0.0rc7 documentation - Home"/>
+    <img src="../../../_static/imod-python-logo-dark.svg" class="logo__image only-dark pst-js-only" alt="iMOD Python 1.0.0rc7 documentation - Home"/>
   
   
 </a></div>
@@ -422,10 +422,6 @@
 <li class="toctree-l2"><a class="reference internal" href="../prepare/imod.prepare.linestring_to_square_zpolygons.html">imod.prepare.linestring_to_square_zpolygons</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../prepare/imod.prepare.linestring_to_trapezoid_zpolygons.html">imod.prepare.linestring_to_trapezoid_zpolygons</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../prepare/imod.prepare.assign_wells.html">imod.prepare.assign_wells</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../prepare/imod.prepare.get_lower_active_grid_cells.html">imod.prepare.get_lower_active_grid_cells</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../prepare/imod.prepare.get_lower_active_layer_number.html">imod.prepare.get_lower_active_layer_number</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../prepare/imod.prepare.get_upper_active_grid_cells.html">imod.prepare.get_upper_active_grid_cells</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../prepare/imod.prepare.get_upper_active_layer_number.html">imod.prepare.get_upper_active_layer_number</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../prepare/imod.prepare.create_layered_top.html">imod.prepare.create_layered_top</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../prepare/imod.prepare.ALLOCATION_OPTION.html">imod.prepare.ALLOCATION_OPTION</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../prepare/imod.prepare.DISTRIBUTING_OPTION.html">imod.prepare.DISTRIBUTING_OPTION</a></li>
@@ -457,7 +453,10 @@
 <li class="toctree-l2"><a class="reference internal" href="../select/imod.select.points_values.html">imod.select.points_values</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../select/imod.select.points_set_values.html">imod.select.points_set_values</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../select/imod.select.points_indices.html">imod.select.points_indices</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../select/imod.select.upper_active_layer.html">imod.select.upper_active_layer</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../select/imod.select.get_lower_active_grid_cells.html">imod.select.get_lower_active_grid_cells</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../select/imod.select.get_lower_active_layer_number.html">imod.select.get_lower_active_layer_number</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../select/imod.select.get_upper_active_grid_cells.html">imod.select.get_upper_active_grid_cells</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../select/imod.select.get_upper_active_layer_number.html">imod.select.get_upper_active_layer_number</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../select/imod.select.grid_boundary_xy.html">imod.select.grid_boundary_xy</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../select/imod.select.active_grid_boundary_xy.html">imod.select.active_grid_boundary_xy</a></li>
 </ul>
@@ -809,7 +808,7 @@ default, Newton-Raphson UNDER_RELAXATION is not applied.</p></li>
 <tr class="row-odd"><td><p><a class="reference internal" href="imod.mf6.GroundwaterFlowModel.purge_empty_packages.html#imod.mf6.GroundwaterFlowModel.purge_empty_packages" title="imod.mf6.GroundwaterFlowModel.purge_empty_packages"><code class="xref py py-obj docutils literal notranslate"><span class="pre">purge_empty_packages</span></code></a>([model_name, ignore_time])</p></td>
 <td><p>This method removes empty packages from the model in place.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="imod.mf6.GroundwaterFlowModel.regrid_like.html#imod.mf6.GroundwaterFlowModel.regrid_like" title="imod.mf6.GroundwaterFlowModel.regrid_like"><code class="xref py py-obj docutils literal notranslate"><span class="pre">regrid_like</span></code></a>(target_grid[, validate, ...])</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="imod.mf6.GroundwaterFlowModel.regrid_like.html#imod.mf6.GroundwaterFlowModel.regrid_like" title="imod.mf6.GroundwaterFlowModel.regrid_like"><code class="xref py py-obj docutils literal notranslate"><span class="pre">regrid_like</span></code></a>(target_grid[, regrid_cache])</p></td>
 <td><p>Creates a model by regridding the packages of this model to another discretization.</p></td>
 </tr>
 <tr class="row-odd"><td><p><a class="reference internal" href="imod.mf6.GroundwaterFlowModel.set_newton.html#imod.mf6.GroundwaterFlowModel.set_newton" title="imod.mf6.GroundwaterFlowModel.set_newton"><code class="xref py py-obj docutils literal notranslate"><span class="pre">set_newton</span></code></a>(is_newton)</p></td>
@@ -866,12 +865,12 @@ default, Newton-Raphson UNDER_RELAXATION is not applied.</p></li>
                   
 <div class="prev-next-area">
     <a class="left-prev"
-       href="imod.mf6.Modflow6Simulation.create_partition_labels.html"
+       href="imod.mf6.Modflow6Simulation.set_validation_settings.html"
        title="previous page">
       <i class="fa-solid fa-angle-left"></i>
       <div class="prev-next-info">
         <p class="prev-next-subtitle">previous</p>
-        <p class="prev-next-title">imod.mf6.Modflow6Simulation.create_partition_labels</p>
+        <p class="prev-next-title">imod.mf6.Modflow6Simulation.set_validation_settings</p>
       </div>
     </a>
     <a class="right-next"

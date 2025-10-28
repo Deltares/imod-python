@@ -41,6 +41,7 @@
       ~Modflow6Simulation.popitem
       ~Modflow6Simulation.regrid_like
       ~Modflow6Simulation.run
+      ~Modflow6Simulation.set_validation_settings
       ~Modflow6Simulation.setdefault
       ~Modflow6Simulation.split
       ~Modflow6Simulation.update

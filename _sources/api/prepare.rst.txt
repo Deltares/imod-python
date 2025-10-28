@@ -30,10 +30,6 @@ Prepare model input
 
     assign_wells
 
-    get_lower_active_grid_cells
-    get_lower_active_layer_number
-    get_upper_active_grid_cells
-    get_upper_active_layer_number
     create_layered_top
 
     ALLOCATION_OPTION

@@ -8,7 +8,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>imod.prepare.get_upper_active_layer_number &#8212; iMOD Python 1.0.0rc6 documentation</title>
+    <title>imod.select.get_upper_active_grid_cells &#8212; iMOD Python 1.0.0rc7 documentation</title>
   
   
   
@@ -42,18 +42,18 @@
   <link rel="preload" as="script" href="../../../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
 <link rel="preload" as="script" href="../../../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
 
-    <script src="../../../_static/documentation_options.js?v=bc4855a1"></script>
+    <script src="../../../_static/documentation_options.js?v=1830d1b8"></script>
     <script src="../../../_static/doctools.js?v=9bcbadda"></script>
     <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
-    <script>DOCUMENTATION_OPTIONS.pagename = 'api/generated/prepare/imod.prepare.get_upper_active_layer_number';</script>
-    <script src="../../../_static/deltares.js?v=8d5578be"></script>
+    <script>DOCUMENTATION_OPTIONS.pagename = 'api/generated/select/imod.select.get_upper_active_grid_cells';</script>
+    <script src="../../../_static/deltares.js?v=a1037e22"></script>
     <link rel="index" title="Index" href="../../../genindex.html" />
     <link rel="search" title="Search" href="../../../search.html" />
-    <link rel="next" title="imod.prepare.create_layered_top" href="imod.prepare.create_layered_top.html" />
-    <link rel="prev" title="imod.prepare.get_upper_active_grid_cells" href="imod.prepare.get_upper_active_grid_cells.html" />
+    <link rel="next" title="imod.select.get_upper_active_layer_number" href="imod.select.get_upper_active_layer_number.html" />
+    <link rel="prev" title="imod.select.get_lower_active_layer_number" href="imod.select.get_lower_active_layer_number.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
-  <meta name="docsearch:version" content="1.0.0rc6.dev" />
+  <meta name="docsearch:version" content="1.0.0rc7.dev" />
   </head>
   
   
@@ -117,8 +117,8 @@
     
     
     
-    <img src="../../../_static/imod-python-logo-light.svg" class="logo__image only-light" alt="iMOD Python 1.0.0rc6 documentation - Home"/>
-    <img src="../../../_static/imod-python-logo-dark.svg" class="logo__image only-dark pst-js-only" alt="iMOD Python 1.0.0rc6 documentation - Home"/>
+    <img src="../../../_static/imod-python-logo-light.svg" class="logo__image only-light" alt="iMOD Python 1.0.0rc7 documentation - Home"/>
+    <img src="../../../_static/imod-python-logo-dark.svg" class="logo__image only-dark pst-js-only" alt="iMOD Python 1.0.0rc7 documentation - Home"/>
   
   
 </a></div>
@@ -405,61 +405,60 @@
 <li class="toctree-l2"><a class="reference internal" href="../io/imod.formats.prj.read_timfile.html">imod.formats.prj.read_timfile</a></li>
 </ul>
 </details></li>
-<li class="toctree-l1 current active has-children"><a class="reference internal" href="../../prepare.html">Prepare model input</a><details open="open"><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul class="current">
-<li class="toctree-l2"><a class="reference internal" href="imod.prepare.Regridder.html">imod.prepare.Regridder</a></li>
-<li class="toctree-l2"><a class="reference internal" href="imod.prepare.LayerRegridder.html">imod.prepare.LayerRegridder</a></li>
-<li class="toctree-l2"><a class="reference internal" href="imod.prepare.Voxelizer.html">imod.prepare.Voxelizer</a></li>
-<li class="toctree-l2"><a class="reference internal" href="imod.prepare.fill.html">imod.prepare.fill</a></li>
-<li class="toctree-l2"><a class="reference internal" href="imod.prepare.laplace_interpolate.html">imod.prepare.laplace_interpolate</a></li>
-<li class="toctree-l2"><a class="reference internal" href="imod.prepare.polygonize.html">imod.prepare.polygonize</a></li>
-<li class="toctree-l2"><a class="reference internal" href="imod.prepare.reproject.html">imod.prepare.reproject</a></li>
-<li class="toctree-l2"><a class="reference internal" href="imod.prepare.rasterize.html">imod.prepare.rasterize</a></li>
-<li class="toctree-l2"><a class="reference internal" href="imod.prepare.gdal_rasterize.html">imod.prepare.gdal_rasterize</a></li>
-<li class="toctree-l2"><a class="reference internal" href="imod.prepare.celltable.html">imod.prepare.celltable</a></li>
-<li class="toctree-l2"><a class="reference internal" href="imod.prepare.rasterize_celltable.html">imod.prepare.rasterize_celltable</a></li>
-<li class="toctree-l2"><a class="reference internal" href="imod.prepare.zonal_aggregate_polygons.html">imod.prepare.zonal_aggregate_polygons</a></li>
-<li class="toctree-l2"><a class="reference internal" href="imod.prepare.zonal_aggregate_raster.html">imod.prepare.zonal_aggregate_raster</a></li>
-<li class="toctree-l2"><a class="reference internal" href="imod.prepare.linestring_to_square_zpolygons.html">imod.prepare.linestring_to_square_zpolygons</a></li>
-<li class="toctree-l2"><a class="reference internal" href="imod.prepare.linestring_to_trapezoid_zpolygons.html">imod.prepare.linestring_to_trapezoid_zpolygons</a></li>
-<li class="toctree-l2"><a class="reference internal" href="imod.prepare.assign_wells.html">imod.prepare.assign_wells</a></li>
-<li class="toctree-l2"><a class="reference internal" href="imod.prepare.get_lower_active_grid_cells.html">imod.prepare.get_lower_active_grid_cells</a></li>
-<li class="toctree-l2"><a class="reference internal" href="imod.prepare.get_lower_active_layer_number.html">imod.prepare.get_lower_active_layer_number</a></li>
-<li class="toctree-l2"><a class="reference internal" href="imod.prepare.get_upper_active_grid_cells.html">imod.prepare.get_upper_active_grid_cells</a></li>
-<li class="toctree-l2 current active"><a class="current reference internal" href="#">imod.prepare.get_upper_active_layer_number</a></li>
-<li class="toctree-l2"><a class="reference internal" href="imod.prepare.create_layered_top.html">imod.prepare.create_layered_top</a></li>
-<li class="toctree-l2"><a class="reference internal" href="imod.prepare.ALLOCATION_OPTION.html">imod.prepare.ALLOCATION_OPTION</a></li>
-<li class="toctree-l2"><a class="reference internal" href="imod.prepare.DISTRIBUTING_OPTION.html">imod.prepare.DISTRIBUTING_OPTION</a></li>
-<li class="toctree-l2"><a class="reference internal" href="imod.prepare.SimulationAllocationOptions.html">imod.prepare.SimulationAllocationOptions</a></li>
-<li class="toctree-l2"><a class="reference internal" href="imod.prepare.SimulationDistributingOptions.html">imod.prepare.SimulationDistributingOptions</a></li>
-<li class="toctree-l2"><a class="reference internal" href="imod.prepare.allocate_drn_cells.html">imod.prepare.allocate_drn_cells</a></li>
-<li class="toctree-l2"><a class="reference internal" href="imod.prepare.allocate_ghb_cells.html">imod.prepare.allocate_ghb_cells</a></li>
-<li class="toctree-l2"><a class="reference internal" href="imod.prepare.allocate_rch_cells.html">imod.prepare.allocate_rch_cells</a></li>
-<li class="toctree-l2"><a class="reference internal" href="imod.prepare.allocate_riv_cells.html">imod.prepare.allocate_riv_cells</a></li>
-<li class="toctree-l2"><a class="reference internal" href="imod.prepare.c_leakage.html">imod.prepare.c_leakage</a></li>
-<li class="toctree-l2"><a class="reference internal" href="imod.prepare.c_radial.html">imod.prepare.c_radial</a></li>
-<li class="toctree-l2"><a class="reference internal" href="imod.prepare.distribute_drn_conductance.html">imod.prepare.distribute_drn_conductance</a></li>
-<li class="toctree-l2"><a class="reference internal" href="imod.prepare.distribute_ghb_conductance.html">imod.prepare.distribute_ghb_conductance</a></li>
-<li class="toctree-l2"><a class="reference internal" href="imod.prepare.distribute_riv_conductance.html">imod.prepare.distribute_riv_conductance</a></li>
-<li class="toctree-l2"><a class="reference internal" href="imod.prepare.split_conductance_with_infiltration_factor.html">imod.prepare.split_conductance_with_infiltration_factor</a></li>
-<li class="toctree-l2"><a class="reference internal" href="imod.prepare.cleanup_drn.html">imod.prepare.cleanup_drn</a></li>
-<li class="toctree-l2"><a class="reference internal" href="imod.prepare.cleanup_ghb.html">imod.prepare.cleanup_ghb</a></li>
-<li class="toctree-l2"><a class="reference internal" href="imod.prepare.cleanup_riv.html">imod.prepare.cleanup_riv</a></li>
-<li class="toctree-l2"><a class="reference internal" href="imod.prepare.cleanup_wel.html">imod.prepare.cleanup_wel</a></li>
-<li class="toctree-l2"><a class="reference internal" href="imod.prepare.cleanup_wel_layered.html">imod.prepare.cleanup_wel_layered</a></li>
-<li class="toctree-l2"><a class="reference internal" href="imod.prepare.cleanup_hfb.html">imod.prepare.cleanup_hfb</a></li>
-<li class="toctree-l2"><a class="reference internal" href="imod.prepare.create_partition_labels.html">imod.prepare.create_partition_labels</a></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../../prepare.html">Prepare model input</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="../prepare/imod.prepare.Regridder.html">imod.prepare.Regridder</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../prepare/imod.prepare.LayerRegridder.html">imod.prepare.LayerRegridder</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../prepare/imod.prepare.Voxelizer.html">imod.prepare.Voxelizer</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../prepare/imod.prepare.fill.html">imod.prepare.fill</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../prepare/imod.prepare.laplace_interpolate.html">imod.prepare.laplace_interpolate</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../prepare/imod.prepare.polygonize.html">imod.prepare.polygonize</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../prepare/imod.prepare.reproject.html">imod.prepare.reproject</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../prepare/imod.prepare.rasterize.html">imod.prepare.rasterize</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../prepare/imod.prepare.gdal_rasterize.html">imod.prepare.gdal_rasterize</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../prepare/imod.prepare.celltable.html">imod.prepare.celltable</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../prepare/imod.prepare.rasterize_celltable.html">imod.prepare.rasterize_celltable</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../prepare/imod.prepare.zonal_aggregate_polygons.html">imod.prepare.zonal_aggregate_polygons</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../prepare/imod.prepare.zonal_aggregate_raster.html">imod.prepare.zonal_aggregate_raster</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../prepare/imod.prepare.linestring_to_square_zpolygons.html">imod.prepare.linestring_to_square_zpolygons</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../prepare/imod.prepare.linestring_to_trapezoid_zpolygons.html">imod.prepare.linestring_to_trapezoid_zpolygons</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../prepare/imod.prepare.assign_wells.html">imod.prepare.assign_wells</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../prepare/imod.prepare.create_layered_top.html">imod.prepare.create_layered_top</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../prepare/imod.prepare.ALLOCATION_OPTION.html">imod.prepare.ALLOCATION_OPTION</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../prepare/imod.prepare.DISTRIBUTING_OPTION.html">imod.prepare.DISTRIBUTING_OPTION</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../prepare/imod.prepare.SimulationAllocationOptions.html">imod.prepare.SimulationAllocationOptions</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../prepare/imod.prepare.SimulationDistributingOptions.html">imod.prepare.SimulationDistributingOptions</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../prepare/imod.prepare.allocate_drn_cells.html">imod.prepare.allocate_drn_cells</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../prepare/imod.prepare.allocate_ghb_cells.html">imod.prepare.allocate_ghb_cells</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../prepare/imod.prepare.allocate_rch_cells.html">imod.prepare.allocate_rch_cells</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../prepare/imod.prepare.allocate_riv_cells.html">imod.prepare.allocate_riv_cells</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../prepare/imod.prepare.c_leakage.html">imod.prepare.c_leakage</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../prepare/imod.prepare.c_radial.html">imod.prepare.c_radial</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../prepare/imod.prepare.distribute_drn_conductance.html">imod.prepare.distribute_drn_conductance</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../prepare/imod.prepare.distribute_ghb_conductance.html">imod.prepare.distribute_ghb_conductance</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../prepare/imod.prepare.distribute_riv_conductance.html">imod.prepare.distribute_riv_conductance</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../prepare/imod.prepare.split_conductance_with_infiltration_factor.html">imod.prepare.split_conductance_with_infiltration_factor</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../prepare/imod.prepare.cleanup_drn.html">imod.prepare.cleanup_drn</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../prepare/imod.prepare.cleanup_ghb.html">imod.prepare.cleanup_ghb</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../prepare/imod.prepare.cleanup_riv.html">imod.prepare.cleanup_riv</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../prepare/imod.prepare.cleanup_wel.html">imod.prepare.cleanup_wel</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../prepare/imod.prepare.cleanup_wel_layered.html">imod.prepare.cleanup_wel_layered</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../prepare/imod.prepare.cleanup_hfb.html">imod.prepare.cleanup_hfb</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../prepare/imod.prepare.create_partition_labels.html">imod.prepare.create_partition_labels</a></li>
 </ul>
 </details></li>
-<li class="toctree-l1 has-children"><a class="reference internal" href="../../select.html">Select points and cross sections</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
-<li class="toctree-l2"><a class="reference internal" href="../select/imod.select.cross_section_line.html">imod.select.cross_section_line</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../select/imod.select.cross_section_linestring.html">imod.select.cross_section_linestring</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../select/imod.select.points_in_bounds.html">imod.select.points_in_bounds</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../select/imod.select.points_values.html">imod.select.points_values</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../select/imod.select.points_set_values.html">imod.select.points_set_values</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../select/imod.select.points_indices.html">imod.select.points_indices</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../select/imod.select.upper_active_layer.html">imod.select.upper_active_layer</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../select/imod.select.grid_boundary_xy.html">imod.select.grid_boundary_xy</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../select/imod.select.active_grid_boundary_xy.html">imod.select.active_grid_boundary_xy</a></li>
+<li class="toctree-l1 current active has-children"><a class="reference internal" href="../../select.html">Select points and cross sections</a><details open="open"><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="imod.select.cross_section_line.html">imod.select.cross_section_line</a></li>
+<li class="toctree-l2"><a class="reference internal" href="imod.select.cross_section_linestring.html">imod.select.cross_section_linestring</a></li>
+<li class="toctree-l2"><a class="reference internal" href="imod.select.points_in_bounds.html">imod.select.points_in_bounds</a></li>
+<li class="toctree-l2"><a class="reference internal" href="imod.select.points_values.html">imod.select.points_values</a></li>
+<li class="toctree-l2"><a class="reference internal" href="imod.select.points_set_values.html">imod.select.points_set_values</a></li>
+<li class="toctree-l2"><a class="reference internal" href="imod.select.points_indices.html">imod.select.points_indices</a></li>
+<li class="toctree-l2"><a class="reference internal" href="imod.select.get_lower_active_grid_cells.html">imod.select.get_lower_active_grid_cells</a></li>
+<li class="toctree-l2"><a class="reference internal" href="imod.select.get_lower_active_layer_number.html">imod.select.get_lower_active_layer_number</a></li>
+<li class="toctree-l2 current active"><a class="current reference internal" href="#">imod.select.get_upper_active_grid_cells</a></li>
+<li class="toctree-l2"><a class="reference internal" href="imod.select.get_upper_active_layer_number.html">imod.select.get_upper_active_layer_number</a></li>
+<li class="toctree-l2"><a class="reference internal" href="imod.select.grid_boundary_xy.html">imod.select.grid_boundary_xy</a></li>
+<li class="toctree-l2"><a class="reference internal" href="imod.select.active_grid_boundary_xy.html">imod.select.active_grid_boundary_xy</a></li>
 </ul>
 </details></li>
 <li class="toctree-l1 has-children"><a class="reference internal" href="../../evaluate.html">Evaluate model output</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
@@ -694,9 +693,9 @@
     <li class="breadcrumb-item"><a href="../../index.html" class="nav-link">API</a></li>
     
     
-    <li class="breadcrumb-item"><a href="../../prepare.html" class="nav-link">Prepare model input</a></li>
+    <li class="breadcrumb-item"><a href="../../select.html" class="nav-link">Select points and cross sections</a></li>
     
-    <li class="breadcrumb-item active" aria-current="page"><span class="ellipsis">imod.prepare.get_upper_active_layer_number</span></li>
+    <li class="breadcrumb-item active" aria-current="page"><span class="ellipsis">imod.select.get_upper_active_grid_cells</span></li>
   </ul>
 </nav>
 </div>
@@ -713,18 +712,40 @@
 <div id="searchbox"></div>
                 <article class="bd-article">
                   
-  <section id="imod-prepare-get-upper-active-layer-number">
-<h1>imod.prepare.get_upper_active_layer_number<a class="headerlink" href="#imod-prepare-get-upper-active-layer-number" title="Link to this heading">#</a></h1>
+  <section id="imod-select-get-upper-active-grid-cells">
+<h1>imod.select.get_upper_active_grid_cells<a class="headerlink" href="#imod-select-get-upper-active-grid-cells" title="Link to this heading">#</a></h1>
 <dl class="py function">
-<dt class="sig sig-object py" id="imod.prepare.get_upper_active_layer_number">
-<span class="sig-prename descclassname"><span class="pre">imod.prepare.</span></span><span class="sig-name descname"><span class="pre">get_upper_active_layer_number</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">active</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">DataArray</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">UgridDataArray</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">DataArray</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">UgridDataArray</span></span></span><a class="reference internal" href="../../../_modules/imod/prepare/layer.html#get_upper_active_layer_number"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#imod.prepare.get_upper_active_layer_number" title="Link to this definition">#</a></dt>
-<dd><p>Returns planar grid of integers with the layer number of the upper most
-active cell.</p>
+<dt class="sig sig-object py" id="imod.select.get_upper_active_grid_cells">
+<span class="sig-prename descclassname"><span class="pre">imod.select.</span></span><span class="sig-name descname"><span class="pre">get_upper_active_grid_cells</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">active</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">DataArray</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">UgridDataArray</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">DataArray</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">UgridDataArray</span></span></span><a class="reference internal" href="../../../_modules/imod/select/layers.html#get_upper_active_grid_cells"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#imod.select.get_upper_active_grid_cells" title="Link to this definition">#</a></dt>
+<dd><p>Returns grid of booleans designating location of the uppermost active grid
+cell.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>active</strong> (<em>{DataArray</em><em>, </em><em>UgridDataArray}</em>) – Grid of booleans designating active cell.</p>
+<dd class="field-odd"><p><strong>active</strong> (<em>{xr.DataArray</em><em>, </em><em>xu.UgridDataArray}</em>) – Grid of booleans (…, layer, y, x) designating active cell.</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>upper_active_grid_cells</strong> – Grid of booleans (…, layer, y, x) designating location of the uppermost
+active grid cell.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>{xr.DataArray, xu.UgridDataArray}</p>
 </dd>
 </dl>
+<p class="rubric">Examples</p>
+<p>To get the uppermost active grid cells of an idomain grid and mask idomain
+with it:</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">active</span> <span class="o">=</span> <span class="n">idomain</span> <span class="o">&gt;</span> <span class="mi">0</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">upper_active</span> <span class="o">=</span> <span class="n">get_upper_active_grid_cells</span><span class="p">(</span><span class="n">active</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">idomain_upper</span> <span class="o">=</span> <span class="n">idomain</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">upper_active</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>To get the uppermost active grid cells of data grid with floats, where
+<code class="docutils literal notranslate"><span class="pre">np.nan</span></code> indicates inactive cells and use it to mask data:</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">active</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">notnull</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">upper_active</span> <span class="o">=</span> <span class="n">get_upper_active_grid_cells</span><span class="p">(</span><span class="n">active</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">data_upper</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">upper_active</span><span class="p">)</span>
+</pre></div>
+</div>
 </dd></dl>
 
 </section>
@@ -740,20 +761,20 @@ active cell.</p>
                   
 <div class="prev-next-area">
     <a class="left-prev"
-       href="imod.prepare.get_upper_active_grid_cells.html"
+       href="imod.select.get_lower_active_layer_number.html"
        title="previous page">
       <i class="fa-solid fa-angle-left"></i>
       <div class="prev-next-info">
         <p class="prev-next-subtitle">previous</p>
-        <p class="prev-next-title">imod.prepare.get_upper_active_grid_cells</p>
+        <p class="prev-next-title">imod.select.get_lower_active_layer_number</p>
       </div>
     </a>
     <a class="right-next"
-       href="imod.prepare.create_layered_top.html"
+       href="imod.select.get_upper_active_layer_number.html"
        title="next page">
       <div class="prev-next-info">
         <p class="prev-next-subtitle">next</p>
-        <p class="prev-next-title">imod.prepare.create_layered_top</p>
+        <p class="prev-next-title">imod.select.get_upper_active_layer_number</p>
       </div>
       <i class="fa-solid fa-angle-right"></i>
     </a>
@@ -776,7 +797,7 @@ active cell.</p>
   </div>
   <nav class="bd-toc-nav page-toc" aria-labelledby="pst-page-navigation-heading-2">
     <ul class="visible nav section-nav flex-column">
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#imod.prepare.get_upper_active_layer_number"><code class="docutils literal notranslate"><span class="pre">get_upper_active_layer_number()</span></code></a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#imod.select.get_upper_active_grid_cells"><code class="docutils literal notranslate"><span class="pre">get_upper_active_grid_cells()</span></code></a></li>
 </ul>
   </nav></div>
 
@@ -784,7 +805,7 @@ active cell.</p>
   <div role="note" aria-label="source link">
     <h3>This Page</h3>
     <ul class="this-page-menu">
-      <li><a href="../../../_sources/api/generated/prepare/imod.prepare.get_upper_active_layer_number.rst.txt"
+      <li><a href="../../../_sources/api/generated/select/imod.select.get_upper_active_grid_cells.rst.txt"
             rel="nofollow">Show Source</a></li>
     </ul>
    </div></div>

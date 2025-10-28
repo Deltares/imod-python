@@ -369,9 +369,7 @@ First, we'll open the heads (.hds) file.
     </symbol>
     </defs>
     </svg>
-    <style>/* CSS stylesheet for displaying xarray objects in jupyterlab.
-     *
-     */
+    <style>/* CSS stylesheet for displaying xarray objects in notebooks */
 
     :root {
       --xr-font-color0: var(
@@ -450,6 +448,7 @@ First, we'll open the heads (.hds) file.
       display: block !important;
       min-width: 300px;
       max-width: 700px;
+      line-height: 1.6;
     }
 
     .xr-text-repr-fallback {
@@ -472,11 +471,18 @@ First, we'll open the heads (.hds) file.
     }
 
     .xr-obj-type,
-    .xr-array-name {
+    .xr-obj-name,
+    .xr-group-name {
       margin-left: 2px;
       margin-right: 10px;
     }
 
+    .xr-group-name::before {
+      content: "📁";
+      padding-right: 0.3em;
+    }
+
+    .xr-group-name,
     .xr-obj-type {
       color: var(--xr-font-color2);
     }
@@ -485,6 +491,8 @@ First, we'll open the heads (.hds) file.
       padding-left: 0 !important;
       display: grid;
       grid-template-columns: 150px auto auto 1fr 0 20px 0 20px;
+      margin-block-start: 0;
+      margin-block-end: 0;
     }
 
     .xr-section-item {
@@ -495,6 +503,7 @@ First, we'll open the heads (.hds) file.
       display: inline-block;
       opacity: 0;
       height: 0;
+      margin: 0;
     }
 
     .xr-section-item input + label {
@@ -553,7 +562,6 @@ First, we'll open the heads (.hds) file.
     .xr-section-summary,
     .xr-section-inline-details {
       padding-top: 4px;
-      padding-bottom: 4px;
     }
 
     .xr-section-inline-details {
@@ -563,11 +571,38 @@ First, we'll open the heads (.hds) file.
     .xr-section-details {
       display: none;
       grid-column: 1 / -1;
+      margin-top: 4px;
       margin-bottom: 5px;
     }
 
     .xr-section-summary-in:checked ~ .xr-section-details {
       display: contents;
+    }
+
+    .xr-group-box {
+      display: inline-grid;
+      grid-template-columns: 0px 20px auto;
+      width: 100%;
+    }
+
+    .xr-group-box-vline {
+      grid-column-start: 1;
+      border-right: 0.2em solid;
+      border-color: var(--xr-border-color);
+      width: 0px;
+    }
+
+    .xr-group-box-hline {
+      grid-column-start: 2;
+      grid-row-start: 1;
+      height: 1em;
+      width: 20px;
+      border-bottom: 0.2em solid;
+      border-color: var(--xr-border-color);
+    }
+
+    .xr-group-box-contents {
+      grid-column-start: 3;
     }
 
     .xr-array-wrap {
@@ -800,9 +835,9 @@ First, we'll open the heads (.hds) file.
     </style><pre class='xr-text-repr-fallback'>&lt;xarray.DataArray &#x27;head&#x27; (time: 1, layer: 2, mesh2d_nFaces: 216)&gt; Size: 3kB
     dask.array&lt;stack, shape=(1, 2, 216), dtype=float64, chunksize=(1, 2, 216), chunktype=numpy.ndarray&gt;
     Coordinates:
-      * layer          (layer) int64 16B 1 2
       * time           (time) float64 8B 1.0
-      * mesh2d_nFaces  (mesh2d_nFaces) int64 2kB 0 1 2 3 4 5 ... 211 212 213 214 215</pre><div class='xr-wrap' style='display:none'><div class='xr-header'><div class='xr-obj-type'>xarray.DataArray</div><div class='xr-array-name'>'head'</div><ul class='xr-dim-list'><li><span class='xr-has-index'>time</span>: 1</li><li><span class='xr-has-index'>layer</span>: 2</li><li><span class='xr-has-index'>mesh2d_nFaces</span>: 216</li></ul></div><ul class='xr-sections'><li class='xr-section-item'><div class='xr-array-wrap'><input id='section-eebe1c5c-58ef-4d34-8e4d-c3fb38252a38' class='xr-array-in' type='checkbox' checked><label for='section-eebe1c5c-58ef-4d34-8e4d-c3fb38252a38' title='Show/hide data repr'><svg class='icon xr-icon-database'><use xlink:href='#icon-database'></use></svg></label><div class='xr-array-preview xr-preview'><span>dask.array&lt;chunksize=(1, 2, 216), meta=np.ndarray&gt;</span></div><div class='xr-array-data'><table>
+      * layer          (layer) int64 16B 1 2
+      * mesh2d_nFaces  (mesh2d_nFaces) int64 2kB 0 1 2 3 4 5 ... 211 212 213 214 215</pre><div class='xr-wrap' style='display:none'><div class='xr-header'><div class='xr-obj-type'>xarray.DataArray</div><div class='xr-obj-name'>&#x27;head&#x27;</div><ul class='xr-dim-list'><li><span class='xr-has-index'>time</span>: 1</li><li><span class='xr-has-index'>layer</span>: 2</li><li><span class='xr-has-index'>mesh2d_nFaces</span>: 216</li></ul></div><ul class='xr-sections'><li class='xr-section-item'><div class='xr-array-wrap'><input id='section-4c71d6a6-4b42-4f7f-85a0-266cd754f7b1' class='xr-array-in' type='checkbox' checked><label for='section-4c71d6a6-4b42-4f7f-85a0-266cd754f7b1' title='Show/hide data repr'><svg class='icon xr-icon-database'><use xlink:href='#icon-database'></use></svg></label><div class='xr-array-preview xr-preview'><span>dask.array&lt;chunksize=(1, 2, 216), meta=np.ndarray&gt;</span></div><div class='xr-array-data'><table>
         <tr>
             <td>
                 <table style="border-collapse: collapse;">
@@ -880,7 +915,7 @@ First, we'll open the heads (.hds) file.
     </svg>
             </td>
         </tr>
-    </table></div></div></li><li class='xr-section-item'><input id='section-250bd448-b7f9-4f28-8f34-1ee1061f6666' class='xr-section-summary-in' type='checkbox'  checked><label for='section-250bd448-b7f9-4f28-8f34-1ee1061f6666' class='xr-section-summary' >Coordinates: <span>(3)</span></label><div class='xr-section-inline-details'></div><div class='xr-section-details'><ul class='xr-var-list'><li class='xr-var-item'><div class='xr-var-name'><span class='xr-has-index'>layer</span></div><div class='xr-var-dims'>(layer)</div><div class='xr-var-dtype'>int64</div><div class='xr-var-preview xr-preview'>1 2</div><input id='attrs-76023338-a8da-42d2-8f98-638c1a22d4c3' class='xr-var-attrs-in' type='checkbox' disabled><label for='attrs-76023338-a8da-42d2-8f98-638c1a22d4c3' title='Show/Hide attributes'><svg class='icon xr-icon-file-text2'><use xlink:href='#icon-file-text2'></use></svg></label><input id='data-941a5ce9-ff30-470b-82f0-d3463a13897b' class='xr-var-data-in' type='checkbox'><label for='data-941a5ce9-ff30-470b-82f0-d3463a13897b' title='Show/Hide data repr'><svg class='icon xr-icon-database'><use xlink:href='#icon-database'></use></svg></label><div class='xr-var-attrs'><dl class='xr-attrs'></dl></div><div class='xr-var-data'><pre>array([1, 2])</pre></div></li><li class='xr-var-item'><div class='xr-var-name'><span class='xr-has-index'>time</span></div><div class='xr-var-dims'>(time)</div><div class='xr-var-dtype'>float64</div><div class='xr-var-preview xr-preview'>1.0</div><input id='attrs-01ff1869-a13c-4d74-807b-0dba02134c7f' class='xr-var-attrs-in' type='checkbox' disabled><label for='attrs-01ff1869-a13c-4d74-807b-0dba02134c7f' title='Show/Hide attributes'><svg class='icon xr-icon-file-text2'><use xlink:href='#icon-file-text2'></use></svg></label><input id='data-223e1172-3dfe-4488-ba22-aa9cf6e3d17e' class='xr-var-data-in' type='checkbox'><label for='data-223e1172-3dfe-4488-ba22-aa9cf6e3d17e' title='Show/Hide data repr'><svg class='icon xr-icon-database'><use xlink:href='#icon-database'></use></svg></label><div class='xr-var-attrs'><dl class='xr-attrs'></dl></div><div class='xr-var-data'><pre>array([1.])</pre></div></li><li class='xr-var-item'><div class='xr-var-name'><span class='xr-has-index'>mesh2d_nFaces</span></div><div class='xr-var-dims'>(mesh2d_nFaces)</div><div class='xr-var-dtype'>int64</div><div class='xr-var-preview xr-preview'>0 1 2 3 4 5 ... 211 212 213 214 215</div><input id='attrs-4b47ddc5-910b-405d-897a-3f76cb1164a0' class='xr-var-attrs-in' type='checkbox' disabled><label for='attrs-4b47ddc5-910b-405d-897a-3f76cb1164a0' title='Show/Hide attributes'><svg class='icon xr-icon-file-text2'><use xlink:href='#icon-file-text2'></use></svg></label><input id='data-ca35812d-09d5-4e81-818f-04c0d406d2a8' class='xr-var-data-in' type='checkbox'><label for='data-ca35812d-09d5-4e81-818f-04c0d406d2a8' title='Show/Hide data repr'><svg class='icon xr-icon-database'><use xlink:href='#icon-database'></use></svg></label><div class='xr-var-attrs'><dl class='xr-attrs'></dl></div><div class='xr-var-data'><pre>[216 values with dtype=int64]</pre></div></li></ul></div></li><li class='xr-section-item'><input id='section-e045dac4-beda-4b41-84e4-3d1479a9eeea' class='xr-section-summary-in' type='checkbox'  ><label for='section-e045dac4-beda-4b41-84e4-3d1479a9eeea' class='xr-section-summary' >Indexes: <span>(3)</span></label><div class='xr-section-inline-details'></div><div class='xr-section-details'><ul class='xr-var-list'><li class='xr-var-item'><div class='xr-index-name'><div>layer</div></div><div class='xr-index-preview'>PandasIndex</div><input type='checkbox' disabled/><label></label><input id='index-db3ed9df-3502-45ba-8ef7-a34a560d2a80' class='xr-index-data-in' type='checkbox'/><label for='index-db3ed9df-3502-45ba-8ef7-a34a560d2a80' title='Show/Hide index repr'><svg class='icon xr-icon-database'><use xlink:href='#icon-database'></use></svg></label><div class='xr-index-data'><pre>PandasIndex(Index([1, 2], dtype=&#x27;int64&#x27;, name=&#x27;layer&#x27;))</pre></div></li><li class='xr-var-item'><div class='xr-index-name'><div>time</div></div><div class='xr-index-preview'>PandasIndex</div><input type='checkbox' disabled/><label></label><input id='index-5982f0c4-97ba-464b-8e85-e7b140de3f55' class='xr-index-data-in' type='checkbox'/><label for='index-5982f0c4-97ba-464b-8e85-e7b140de3f55' title='Show/Hide index repr'><svg class='icon xr-icon-database'><use xlink:href='#icon-database'></use></svg></label><div class='xr-index-data'><pre>PandasIndex(Index([1.0], dtype=&#x27;float64&#x27;, name=&#x27;time&#x27;))</pre></div></li><li class='xr-var-item'><div class='xr-index-name'><div>mesh2d_nFaces</div></div><div class='xr-index-preview'>PandasIndex</div><input type='checkbox' disabled/><label></label><input id='index-54feb7b2-2052-472f-b322-9467aa9e5f6b' class='xr-index-data-in' type='checkbox'/><label for='index-54feb7b2-2052-472f-b322-9467aa9e5f6b' title='Show/Hide index repr'><svg class='icon xr-icon-database'><use xlink:href='#icon-database'></use></svg></label><div class='xr-index-data'><pre>PandasIndex(RangeIndex(start=0, stop=216, step=1, name=&#x27;mesh2d_nFaces&#x27;))</pre></div></li></ul></div></li><li class='xr-section-item'><input id='section-e93ca3d6-84d0-4a74-bb9c-69108622301f' class='xr-section-summary-in' type='checkbox' disabled ><label for='section-e93ca3d6-84d0-4a74-bb9c-69108622301f' class='xr-section-summary'  title='Expand/collapse section'>Attributes: <span>(0)</span></label><div class='xr-section-inline-details'></div><div class='xr-section-details'><dl class='xr-attrs'></dl></div></li></ul></div></div>
+    </table></div></div></li><li class='xr-section-item'><input id='section-bd3dbd60-5ef7-463e-a18f-62283b13f950' class='xr-section-summary-in' type='checkbox'  checked><label for='section-bd3dbd60-5ef7-463e-a18f-62283b13f950' class='xr-section-summary' >Coordinates: <span>(3)</span></label><div class='xr-section-inline-details'></div><div class='xr-section-details'><ul class='xr-var-list'><li class='xr-var-item'><div class='xr-var-name'><span class='xr-has-index'>time</span></div><div class='xr-var-dims'>(time)</div><div class='xr-var-dtype'>float64</div><div class='xr-var-preview xr-preview'>1.0</div><input id='attrs-6fd41997-6ec7-43cf-b550-6229e9498fc8' class='xr-var-attrs-in' type='checkbox' disabled><label for='attrs-6fd41997-6ec7-43cf-b550-6229e9498fc8' title='Show/Hide attributes'><svg class='icon xr-icon-file-text2'><use xlink:href='#icon-file-text2'></use></svg></label><input id='data-0023b5e3-f61d-468d-8f6f-0e62d13b5b8e' class='xr-var-data-in' type='checkbox'><label for='data-0023b5e3-f61d-468d-8f6f-0e62d13b5b8e' title='Show/Hide data repr'><svg class='icon xr-icon-database'><use xlink:href='#icon-database'></use></svg></label><div class='xr-var-attrs'><dl class='xr-attrs'></dl></div><div class='xr-var-data'><pre>array([1.])</pre></div></li><li class='xr-var-item'><div class='xr-var-name'><span class='xr-has-index'>layer</span></div><div class='xr-var-dims'>(layer)</div><div class='xr-var-dtype'>int64</div><div class='xr-var-preview xr-preview'>1 2</div><input id='attrs-507dfda8-df13-4028-a444-2c324c923d2d' class='xr-var-attrs-in' type='checkbox' disabled><label for='attrs-507dfda8-df13-4028-a444-2c324c923d2d' title='Show/Hide attributes'><svg class='icon xr-icon-file-text2'><use xlink:href='#icon-file-text2'></use></svg></label><input id='data-e14f3226-ea5f-4126-b91c-51705d3b0338' class='xr-var-data-in' type='checkbox'><label for='data-e14f3226-ea5f-4126-b91c-51705d3b0338' title='Show/Hide data repr'><svg class='icon xr-icon-database'><use xlink:href='#icon-database'></use></svg></label><div class='xr-var-attrs'><dl class='xr-attrs'></dl></div><div class='xr-var-data'><pre>array([1, 2])</pre></div></li><li class='xr-var-item'><div class='xr-var-name'><span class='xr-has-index'>mesh2d_nFaces</span></div><div class='xr-var-dims'>(mesh2d_nFaces)</div><div class='xr-var-dtype'>int64</div><div class='xr-var-preview xr-preview'>0 1 2 3 4 5 ... 211 212 213 214 215</div><input id='attrs-b1700ca2-80a6-46e4-8add-376f4277413f' class='xr-var-attrs-in' type='checkbox' disabled><label for='attrs-b1700ca2-80a6-46e4-8add-376f4277413f' title='Show/Hide attributes'><svg class='icon xr-icon-file-text2'><use xlink:href='#icon-file-text2'></use></svg></label><input id='data-7fb8c404-3605-4e70-b3d2-d078ca8bb959' class='xr-var-data-in' type='checkbox'><label for='data-7fb8c404-3605-4e70-b3d2-d078ca8bb959' title='Show/Hide data repr'><svg class='icon xr-icon-database'><use xlink:href='#icon-database'></use></svg></label><div class='xr-var-attrs'><dl class='xr-attrs'></dl></div><div class='xr-var-data'><pre>[216 values with dtype=int64]</pre></div></li></ul></div></li></ul></div></div>
     </div>
     <br />
     <br />
@@ -916,8 +951,8 @@ We may also open the cell-by-cell flows (.cbc) file.
     Coordinates:
       * layer                   (layer) int64 16B 1 2
       * time                    (time) float64 8B 1.0
-      * mesh2d_nFaces           (mesh2d_nFaces) int64 2kB 0 1 2 3 ... 213 214 215
       * mesh2d_nEdges           (mesh2d_nEdges) int64 3kB 0 1 2 3 ... 339 340 341
+      * mesh2d_nFaces           (mesh2d_nFaces) int64 2kB 0 1 2 3 ... 213 214 215
     Data variables:
         flow-horizontal-face    (time, layer, mesh2d_nEdges) float64 5kB dask.array<chunksize=(1, 2, 342), meta=np.ndarray>
         flow-horizontal-face-x  (time, layer, mesh2d_nEdges) float64 5kB dask.array<chunksize=(1, 2, 342), meta=np.ndarray>
@@ -1109,7 +1144,7 @@ plot computed heads
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** (0 minutes 2.570 seconds)
+   **Total running time of the script:** (0 minutes 2.942 seconds)
 
 
 .. _sphx_glr_download_examples_mf6_circle.py:

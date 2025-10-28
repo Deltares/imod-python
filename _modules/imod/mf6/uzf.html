@@ -7,7 +7,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>imod.mf6.uzf &#8212; iMOD Python 1.0.0rc6 documentation</title>
+    <title>imod.mf6.uzf &#8212; iMOD Python 1.0.0rc7 documentation</title>
   
   
   
@@ -41,16 +41,16 @@
   <link rel="preload" as="script" href="../../../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
 <link rel="preload" as="script" href="../../../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
 
-    <script src="../../../_static/documentation_options.js?v=bc4855a1"></script>
+    <script src="../../../_static/documentation_options.js?v=1830d1b8"></script>
     <script src="../../../_static/doctools.js?v=9bcbadda"></script>
     <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script>DOCUMENTATION_OPTIONS.pagename = '_modules/imod/mf6/uzf';</script>
-    <script src="../../../_static/deltares.js?v=8d5578be"></script>
+    <script src="../../../_static/deltares.js?v=a1037e22"></script>
     <link rel="index" title="Index" href="../../../genindex.html" />
     <link rel="search" title="Search" href="../../../search.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
-  <meta name="docsearch:version" content="1.0.0rc6.dev" />
+  <meta name="docsearch:version" content="1.0.0rc7.dev" />
   </head>
   
   
@@ -114,8 +114,8 @@
     
     
     
-    <img src="../../../_static/imod-python-logo-light.svg" class="logo__image only-light" alt="iMOD Python 1.0.0rc6 documentation - Home"/>
-    <img src="../../../_static/imod-python-logo-dark.svg" class="logo__image only-dark pst-js-only" alt="iMOD Python 1.0.0rc6 documentation - Home"/>
+    <img src="../../../_static/imod-python-logo-light.svg" class="logo__image only-light" alt="iMOD Python 1.0.0rc7 documentation - Home"/>
+    <img src="../../../_static/imod-python-logo-dark.svg" class="logo__image only-dark pst-js-only" alt="iMOD Python 1.0.0rc7 documentation - Home"/>
   
   
 </a></div>
@@ -434,7 +434,6 @@
 <span class="kn">from</span><span class="w"> </span><span class="nn">imod.logging</span><span class="w"> </span><span class="kn">import</span> <span class="n">init_log_decorator</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">imod.mf6.boundary_condition</span><span class="w"> </span><span class="kn">import</span> <span class="n">AdvancedBoundaryCondition</span><span class="p">,</span> <span class="n">BoundaryCondition</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">imod.mf6.validation</span><span class="w"> </span><span class="kn">import</span> <span class="n">BOUNDARY_DIMS_SCHEMA</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">imod.prepare.layer</span><span class="w"> </span><span class="kn">import</span> <span class="n">get_upper_active_grid_cells</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">imod.schemata</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
     <span class="n">AllCoordsValueSchema</span><span class="p">,</span>
     <span class="n">AllInsideNoDataSchema</span><span class="p">,</span>
@@ -447,6 +446,7 @@
     <span class="n">IndexesSchema</span><span class="p">,</span>
     <span class="n">OtherCoordsSchema</span><span class="p">,</span>
 <span class="p">)</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">imod.select.layers</span><span class="w"> </span><span class="kn">import</span> <span class="n">get_upper_active_grid_cells</span>
 
 
 <div class="viewcode-block" id="UnsaturatedZoneFlow">

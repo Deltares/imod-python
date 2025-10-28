@@ -171,7 +171,7 @@ structures. Secondly, it will demonstrate how a modeling workflow is set up.
 
 .. raw:: html
 
-    <div class="sphx-glr-thumbcontainer" tooltip="Most MF6 packages have spatial data arrays as input. These arrays are discrete: they are defined over the simulation grid and contain values associated to each cell.">
+    <div class="sphx-glr-thumbcontainer" tooltip="Introduction ------------">
 
 .. only:: html
 

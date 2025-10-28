@@ -8,7 +8,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>Vector data and Geopandas &#8212; iMOD Python 1.0.0rc6 documentation</title>
+    <title>Vector data and Geopandas &#8212; iMOD Python 1.0.0rc7 documentation</title>
   
   
   
@@ -42,18 +42,18 @@
   <link rel="preload" as="script" href="../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
 <link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
 
-    <script src="../_static/documentation_options.js?v=bc4855a1"></script>
+    <script src="../_static/documentation_options.js?v=1830d1b8"></script>
     <script src="../_static/doctools.js?v=9bcbadda"></script>
     <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script>DOCUMENTATION_OPTIONS.pagename = 'user-guide/02-vector-data';</script>
-    <script src="../_static/deltares.js?v=8d5578be"></script>
+    <script src="../_static/deltares.js?v=a1037e22"></script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
     <link rel="next" title="Time series data and Pandas" href="03-timeseries-data.html" />
     <link rel="prev" title="Raster data and xarray" href="01-raster-data.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
-  <meta name="docsearch:version" content="1.0.0rc6.dev" />
+  <meta name="docsearch:version" content="1.0.0rc7.dev" />
   </head>
   
   
@@ -117,8 +117,8 @@
     
     
     
-    <img src="../_static/imod-python-logo-light.svg" class="logo__image only-light" alt="iMOD Python 1.0.0rc6 documentation - Home"/>
-    <img src="../_static/imod-python-logo-dark.svg" class="logo__image only-dark pst-js-only" alt="iMOD Python 1.0.0rc6 documentation - Home"/>
+    <img src="../_static/imod-python-logo-light.svg" class="logo__image only-light" alt="iMOD Python 1.0.0rc7 documentation - Home"/>
+    <img src="../_static/imod-python-logo-dark.svg" class="logo__image only-dark pst-js-only" alt="iMOD Python 1.0.0rc7 documentation - Home"/>
   
   
 </a></div>
@@ -871,9 +871,7 @@ number and a resistance value.</p>
 </symbol>
 </defs>
 </svg>
-<style>/* CSS stylesheet for displaying xarray objects in jupyterlab.
- *
- */
+<style>/* CSS stylesheet for displaying xarray objects in notebooks */
 
 :root {
   --xr-font-color0: var(
@@ -952,6 +950,7 @@ body.vscode-dark {
   display: block !important;
   min-width: 300px;
   max-width: 700px;
+  line-height: 1.6;
 }
 
 .xr-text-repr-fallback {
@@ -974,11 +973,18 @@ body.vscode-dark {
 }
 
 .xr-obj-type,
-.xr-array-name {
+.xr-obj-name,
+.xr-group-name {
   margin-left: 2px;
   margin-right: 10px;
 }
 
+.xr-group-name::before {
+  content: "📁";
+  padding-right: 0.3em;
+}
+
+.xr-group-name,
 .xr-obj-type {
   color: var(--xr-font-color2);
 }
@@ -987,6 +993,8 @@ body.vscode-dark {
   padding-left: 0 !important;
   display: grid;
   grid-template-columns: 150px auto auto 1fr 0 20px 0 20px;
+  margin-block-start: 0;
+  margin-block-end: 0;
 }
 
 .xr-section-item {
@@ -997,6 +1005,7 @@ body.vscode-dark {
   display: inline-block;
   opacity: 0;
   height: 0;
+  margin: 0;
 }
 
 .xr-section-item input + label {
@@ -1055,7 +1064,6 @@ body.vscode-dark {
 .xr-section-summary,
 .xr-section-inline-details {
   padding-top: 4px;
-  padding-bottom: 4px;
 }
 
 .xr-section-inline-details {
@@ -1065,11 +1073,38 @@ body.vscode-dark {
 .xr-section-details {
   display: none;
   grid-column: 1 / -1;
+  margin-top: 4px;
   margin-bottom: 5px;
 }
 
 .xr-section-summary-in:checked ~ .xr-section-details {
   display: contents;
+}
+
+.xr-group-box {
+  display: inline-grid;
+  grid-template-columns: 0px 20px auto;
+  width: 100%;
+}
+
+.xr-group-box-vline {
+  grid-column-start: 1;
+  border-right: 0.2em solid;
+  border-color: var(--xr-border-color);
+  width: 0px;
+}
+
+.xr-group-box-hline {
+  grid-column-start: 2;
+  grid-row-start: 1;
+  height: 1em;
+  width: 20px;
+  border-bottom: 0.2em solid;
+  border-color: var(--xr-border-color);
+}
+
+.xr-group-box-contents {
+  grid-column-start: 3;
 }
 
 .xr-array-wrap {
@@ -1307,9 +1342,9 @@ Data variables:
     print_input  bool 1B False
     resistance   (index) float64 8B 100.0
     layer        (index) int64 8B 1
-    geometry     (index) geometry 8B LINESTRING (90000 450000, 91000 451000, ...</pre><div class='xr-wrap' style='display:none'><div class='xr-header'><div class='xr-obj-type'>xarray.Dataset</div></div><ul class='xr-sections'><li class='xr-section-item'><input id='section-1c98f331-1580-4d35-95cd-ecb08d9319ea' class='xr-section-summary-in' type='checkbox' disabled ><label for='section-1c98f331-1580-4d35-95cd-ecb08d9319ea' class='xr-section-summary'  title='Expand/collapse section'>Dimensions:</label><div class='xr-section-inline-details'><ul class='xr-dim-list'><li><span class='xr-has-index'>index</span>: 1</li></ul></div><div class='xr-section-details'></div></li><li class='xr-section-item'><input id='section-3bef6090-8eba-4c60-b1ec-48c4fee05608' class='xr-section-summary-in' type='checkbox'  checked><label for='section-3bef6090-8eba-4c60-b1ec-48c4fee05608' class='xr-section-summary' >Coordinates: <span>(1)</span></label><div class='xr-section-inline-details'></div><div class='xr-section-details'><ul class='xr-var-list'><li class='xr-var-item'><div class='xr-var-name'><span class='xr-has-index'>index</span></div><div class='xr-var-dims'>(index)</div><div class='xr-var-dtype'>int64</div><div class='xr-var-preview xr-preview'>0</div><input id='attrs-bd253579-46ee-4632-b70f-bcbb7ac43898' class='xr-var-attrs-in' type='checkbox' disabled><label for='attrs-bd253579-46ee-4632-b70f-bcbb7ac43898' title='Show/Hide attributes'><svg class='icon xr-icon-file-text2'><use xlink:href='#icon-file-text2'></use></svg></label><input id='data-875f785c-48f7-43a0-b1e6-a115751f10d2' class='xr-var-data-in' type='checkbox'><label for='data-875f785c-48f7-43a0-b1e6-a115751f10d2' title='Show/Hide data repr'><svg class='icon xr-icon-database'><use xlink:href='#icon-database'></use></svg></label><div class='xr-var-attrs'><dl class='xr-attrs'></dl></div><div class='xr-var-data'><pre>[1 values with dtype=int64]</pre></div></li></ul></div></li><li class='xr-section-item'><input id='section-2bde6cdd-ba5d-4ad6-a76b-62ec8a41364a' class='xr-section-summary-in' type='checkbox'  checked><label for='section-2bde6cdd-ba5d-4ad6-a76b-62ec8a41364a' class='xr-section-summary' >Data variables: <span>(4)</span></label><div class='xr-section-inline-details'></div><div class='xr-section-details'><ul class='xr-var-list'><li class='xr-var-item'><div class='xr-var-name'><span>print_input</span></div><div class='xr-var-dims'>()</div><div class='xr-var-dtype'>bool</div><div class='xr-var-preview xr-preview'>False</div><input id='attrs-c6a77189-3ea7-414b-8086-774974b52fd9' class='xr-var-attrs-in' type='checkbox' disabled><label for='attrs-c6a77189-3ea7-414b-8086-774974b52fd9' title='Show/Hide attributes'><svg class='icon xr-icon-file-text2'><use xlink:href='#icon-file-text2'></use></svg></label><input id='data-e842f732-058b-489d-9206-760ac5dcfc22' class='xr-var-data-in' type='checkbox'><label for='data-e842f732-058b-489d-9206-760ac5dcfc22' title='Show/Hide data repr'><svg class='icon xr-icon-database'><use xlink:href='#icon-database'></use></svg></label><div class='xr-var-attrs'><dl class='xr-attrs'></dl></div><div class='xr-var-data'><pre>array(False)</pre></div></li><li class='xr-var-item'><div class='xr-var-name'><span>resistance</span></div><div class='xr-var-dims'>(index)</div><div class='xr-var-dtype'>float64</div><div class='xr-var-preview xr-preview'>100.0</div><input id='attrs-56c45f5c-4a36-434f-9912-6c1464496956' class='xr-var-attrs-in' type='checkbox' disabled><label for='attrs-56c45f5c-4a36-434f-9912-6c1464496956' title='Show/Hide attributes'><svg class='icon xr-icon-file-text2'><use xlink:href='#icon-file-text2'></use></svg></label><input id='data-9ede584e-36ee-4af8-9b13-a8cb7f584569' class='xr-var-data-in' type='checkbox'><label for='data-9ede584e-36ee-4af8-9b13-a8cb7f584569' title='Show/Hide data repr'><svg class='icon xr-icon-database'><use xlink:href='#icon-database'></use></svg></label><div class='xr-var-attrs'><dl class='xr-attrs'></dl></div><div class='xr-var-data'><pre>array([100.])</pre></div></li><li class='xr-var-item'><div class='xr-var-name'><span>layer</span></div><div class='xr-var-dims'>(index)</div><div class='xr-var-dtype'>int64</div><div class='xr-var-preview xr-preview'>1</div><input id='attrs-3c4fcd65-95ac-4521-9150-098e19956f69' class='xr-var-attrs-in' type='checkbox' disabled><label for='attrs-3c4fcd65-95ac-4521-9150-098e19956f69' title='Show/Hide attributes'><svg class='icon xr-icon-file-text2'><use xlink:href='#icon-file-text2'></use></svg></label><input id='data-cf3ee7ac-abb9-4272-ab9c-ed7d6ef644e7' class='xr-var-data-in' type='checkbox'><label for='data-cf3ee7ac-abb9-4272-ab9c-ed7d6ef644e7' title='Show/Hide data repr'><svg class='icon xr-icon-database'><use xlink:href='#icon-database'></use></svg></label><div class='xr-var-attrs'><dl class='xr-attrs'></dl></div><div class='xr-var-data'><pre>array([1])</pre></div></li><li class='xr-var-item'><div class='xr-var-name'><span>geometry</span></div><div class='xr-var-dims'>(index)</div><div class='xr-var-dtype'>geometry</div><div class='xr-var-preview xr-preview'>LINESTRING (90000 450000, 91000 ...</div><input id='attrs-232bef99-cd47-4f5f-8001-96a3ce76c2c0' class='xr-var-attrs-in' type='checkbox' disabled><label for='attrs-232bef99-cd47-4f5f-8001-96a3ce76c2c0' title='Show/Hide attributes'><svg class='icon xr-icon-file-text2'><use xlink:href='#icon-file-text2'></use></svg></label><input id='data-604c95f6-a939-40d2-a452-071f8ca5b339' class='xr-var-data-in' type='checkbox'><label for='data-604c95f6-a939-40d2-a452-071f8ca5b339' title='Show/Hide data repr'><svg class='icon xr-icon-database'><use xlink:href='#icon-database'></use></svg></label><div class='xr-var-attrs'><dl class='xr-attrs'></dl></div><div class='xr-var-data'><pre>&lt;GeometryArray&gt;
+    geometry     (index) geometry 8B LINESTRING (90000 450000, 91000 451000, ...</pre><div class='xr-wrap' style='display:none'><div class='xr-header'><div class='xr-obj-type'>xarray.Dataset</div></div><ul class='xr-sections'><li class='xr-section-item'><input id='section-f9dd19e5-bc6b-4174-a424-17de8cc02771' class='xr-section-summary-in' type='checkbox' disabled ><label for='section-f9dd19e5-bc6b-4174-a424-17de8cc02771' class='xr-section-summary'  title='Expand/collapse section'>Dimensions:</label><div class='xr-section-inline-details'><ul class='xr-dim-list'><li><span class='xr-has-index'>index</span>: 1</li></ul></div><div class='xr-section-details'></div></li><li class='xr-section-item'><input id='section-920f2dee-5d3a-4f0a-b34f-6f8430d78f8f' class='xr-section-summary-in' type='checkbox'  checked><label for='section-920f2dee-5d3a-4f0a-b34f-6f8430d78f8f' class='xr-section-summary' >Coordinates: <span>(1)</span></label><div class='xr-section-inline-details'></div><div class='xr-section-details'><ul class='xr-var-list'><li class='xr-var-item'><div class='xr-var-name'><span class='xr-has-index'>index</span></div><div class='xr-var-dims'>(index)</div><div class='xr-var-dtype'>int64</div><div class='xr-var-preview xr-preview'>0</div><input id='attrs-805be161-b57b-4d20-aa66-1724eae906ca' class='xr-var-attrs-in' type='checkbox' disabled><label for='attrs-805be161-b57b-4d20-aa66-1724eae906ca' title='Show/Hide attributes'><svg class='icon xr-icon-file-text2'><use xlink:href='#icon-file-text2'></use></svg></label><input id='data-3a5bf721-7420-43a9-935d-fa2714089d51' class='xr-var-data-in' type='checkbox'><label for='data-3a5bf721-7420-43a9-935d-fa2714089d51' title='Show/Hide data repr'><svg class='icon xr-icon-database'><use xlink:href='#icon-database'></use></svg></label><div class='xr-var-attrs'><dl class='xr-attrs'></dl></div><div class='xr-var-data'><pre>[1 values with dtype=int64]</pre></div></li></ul></div></li><li class='xr-section-item'><input id='section-18f89608-ba8e-4ccf-9686-da3c20d31114' class='xr-section-summary-in' type='checkbox'  checked><label for='section-18f89608-ba8e-4ccf-9686-da3c20d31114' class='xr-section-summary' >Data variables: <span>(4)</span></label><div class='xr-section-inline-details'></div><div class='xr-section-details'><ul class='xr-var-list'><li class='xr-var-item'><div class='xr-var-name'><span>print_input</span></div><div class='xr-var-dims'>()</div><div class='xr-var-dtype'>bool</div><div class='xr-var-preview xr-preview'>False</div><input id='attrs-76869009-0a7d-40db-be4f-bee1a1f2dd94' class='xr-var-attrs-in' type='checkbox' disabled><label for='attrs-76869009-0a7d-40db-be4f-bee1a1f2dd94' title='Show/Hide attributes'><svg class='icon xr-icon-file-text2'><use xlink:href='#icon-file-text2'></use></svg></label><input id='data-f733bb33-ac76-4100-8bfe-c17a842fd3b5' class='xr-var-data-in' type='checkbox'><label for='data-f733bb33-ac76-4100-8bfe-c17a842fd3b5' title='Show/Hide data repr'><svg class='icon xr-icon-database'><use xlink:href='#icon-database'></use></svg></label><div class='xr-var-attrs'><dl class='xr-attrs'></dl></div><div class='xr-var-data'><pre>array(False)</pre></div></li><li class='xr-var-item'><div class='xr-var-name'><span>resistance</span></div><div class='xr-var-dims'>(index)</div><div class='xr-var-dtype'>float64</div><div class='xr-var-preview xr-preview'>100.0</div><input id='attrs-c9327a84-25aa-4dd2-8b0d-30fb748649b2' class='xr-var-attrs-in' type='checkbox' disabled><label for='attrs-c9327a84-25aa-4dd2-8b0d-30fb748649b2' title='Show/Hide attributes'><svg class='icon xr-icon-file-text2'><use xlink:href='#icon-file-text2'></use></svg></label><input id='data-917fbbe0-dfe9-4824-a9a0-008ad920442b' class='xr-var-data-in' type='checkbox'><label for='data-917fbbe0-dfe9-4824-a9a0-008ad920442b' title='Show/Hide data repr'><svg class='icon xr-icon-database'><use xlink:href='#icon-database'></use></svg></label><div class='xr-var-attrs'><dl class='xr-attrs'></dl></div><div class='xr-var-data'><pre>array([100.])</pre></div></li><li class='xr-var-item'><div class='xr-var-name'><span>layer</span></div><div class='xr-var-dims'>(index)</div><div class='xr-var-dtype'>int64</div><div class='xr-var-preview xr-preview'>1</div><input id='attrs-e2d79dec-2ca9-49e9-b378-3ef27173497f' class='xr-var-attrs-in' type='checkbox' disabled><label for='attrs-e2d79dec-2ca9-49e9-b378-3ef27173497f' title='Show/Hide attributes'><svg class='icon xr-icon-file-text2'><use xlink:href='#icon-file-text2'></use></svg></label><input id='data-f11a61d6-a91f-4131-a339-cef266c9b342' class='xr-var-data-in' type='checkbox'><label for='data-f11a61d6-a91f-4131-a339-cef266c9b342' title='Show/Hide data repr'><svg class='icon xr-icon-database'><use xlink:href='#icon-database'></use></svg></label><div class='xr-var-attrs'><dl class='xr-attrs'></dl></div><div class='xr-var-data'><pre>array([1])</pre></div></li><li class='xr-var-item'><div class='xr-var-name'><span>geometry</span></div><div class='xr-var-dims'>(index)</div><div class='xr-var-dtype'>geometry</div><div class='xr-var-preview xr-preview'>LINESTRING (90000 450000, 91000 ...</div><input id='attrs-224ae4b0-fa33-4047-8060-dad5c2a0e673' class='xr-var-attrs-in' type='checkbox' disabled><label for='attrs-224ae4b0-fa33-4047-8060-dad5c2a0e673' title='Show/Hide attributes'><svg class='icon xr-icon-file-text2'><use xlink:href='#icon-file-text2'></use></svg></label><input id='data-48c85ce6-5533-40df-ba28-5b6e612de201' class='xr-var-data-in' type='checkbox'><label for='data-48c85ce6-5533-40df-ba28-5b6e612de201' title='Show/Hide data repr'><svg class='icon xr-icon-database'><use xlink:href='#icon-database'></use></svg></label><div class='xr-var-attrs'><dl class='xr-attrs'></dl></div><div class='xr-var-data'><pre>&lt;GeometryArray&gt;
 [&lt;LINESTRING (90000 450000, 91000 451000, 92000 452000, 93000 453000, 94000 4...&gt;]
-Length: 1, dtype: geometry</pre></div></li></ul></div></li><li class='xr-section-item'><input id='section-7086504c-ea57-49c2-8fe7-96574beac420' class='xr-section-summary-in' type='checkbox'  ><label for='section-7086504c-ea57-49c2-8fe7-96574beac420' class='xr-section-summary' >Indexes: <span>(1)</span></label><div class='xr-section-inline-details'></div><div class='xr-section-details'><ul class='xr-var-list'><li class='xr-var-item'><div class='xr-index-name'><div>index</div></div><div class='xr-index-preview'>PandasIndex</div><input type='checkbox' disabled/><label></label><input id='index-6cb0c100-9739-4004-b068-e62a3ce99f3e' class='xr-index-data-in' type='checkbox'/><label for='index-6cb0c100-9739-4004-b068-e62a3ce99f3e' title='Show/Hide index repr'><svg class='icon xr-icon-database'><use xlink:href='#icon-database'></use></svg></label><div class='xr-index-data'><pre>PandasIndex(RangeIndex(start=0, stop=1, step=1, name=&#x27;index&#x27;))</pre></div></li></ul></div></li><li class='xr-section-item'><input id='section-465e3dd2-c6db-49a1-8463-dc96ecffb429' class='xr-section-summary-in' type='checkbox' disabled ><label for='section-465e3dd2-c6db-49a1-8463-dc96ecffb429' class='xr-section-summary'  title='Expand/collapse section'>Attributes: <span>(0)</span></label><div class='xr-section-inline-details'></div><div class='xr-section-details'><dl class='xr-attrs'></dl></div></li></ul></div></div>
+Length: 1, dtype: geometry</pre></div></li></ul></div></li></ul></div></div>
 </div>
 <br />
 <br /><p>You can see the GeoDataFrame has been converted to an xr.Dataset. To access
@@ -1359,7 +1394,7 @@ the data as a geodataframe again use the line_data property:</p>
 </div>
 </div>
 <br />
-<br /><p class="sphx-glr-timing"><strong>Total running time of the script:</strong> (0 minutes 1.474 seconds)</p>
+<br /><p class="sphx-glr-timing"><strong>Total running time of the script:</strong> (0 minutes 1.308 seconds)</p>
 <div class="sphx-glr-footer sphx-glr-footer-example docutils container" id="sphx-glr-download-user-guide-02-vector-data-py">
 <div class="sphx-glr-download sphx-glr-download-jupyter docutils container">
 <p><a class="reference download internal" download="" href="../_downloads/c5285c4c8db8c3bfdc970b48d3f5250f/02-vector-data.ipynb"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Jupyter</span> <span class="pre">notebook:</span> <span class="pre">02-vector-data.ipynb</span></code></a></p>

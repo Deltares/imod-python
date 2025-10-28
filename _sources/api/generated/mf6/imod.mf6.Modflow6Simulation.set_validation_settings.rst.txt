@@ -1,0 +1,6 @@
+﻿imod.mf6.Modflow6Simulation.set\_validation\_settings
+=====================================================
+
+.. currentmodule:: imod.mf6
+
+.. automethod:: Modflow6Simulation.set_validation_settings

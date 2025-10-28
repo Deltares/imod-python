@@ -8,7 +8,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>Hydrocoin &#8212; iMOD Python 1.0.0rc6 documentation</title>
+    <title>Hydrocoin &#8212; iMOD Python 1.0.0rc7 documentation</title>
   
   
   
@@ -42,18 +42,18 @@
   <link rel="preload" as="script" href="../../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
 <link rel="preload" as="script" href="../../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
 
-    <script src="../../_static/documentation_options.js?v=bc4855a1"></script>
+    <script src="../../_static/documentation_options.js?v=1830d1b8"></script>
     <script src="../../_static/doctools.js?v=9bcbadda"></script>
     <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script>DOCUMENTATION_OPTIONS.pagename = 'examples/imod-wq/Hydrocoin';</script>
-    <script src="../../_static/deltares.js?v=8d5578be"></script>
+    <script src="../../_static/deltares.js?v=a1037e22"></script>
     <link rel="index" title="Index" href="../../genindex.html" />
     <link rel="search" title="Search" href="../../search.html" />
     <link rel="next" title="Saltwater Pocket" href="SaltwaterPocket.html" />
     <link rel="prev" title="Henry" href="Henry-wq.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
-  <meta name="docsearch:version" content="1.0.0rc6.dev" />
+  <meta name="docsearch:version" content="1.0.0rc7.dev" />
   </head>
   
   
@@ -117,8 +117,8 @@
     
     
     
-    <img src="../../_static/imod-python-logo-light.svg" class="logo__image only-light" alt="iMOD Python 1.0.0rc6 documentation - Home"/>
-    <img src="../../_static/imod-python-logo-dark.svg" class="logo__image only-dark pst-js-only" alt="iMOD Python 1.0.0rc6 documentation - Home"/>
+    <img src="../../_static/imod-python-logo-light.svg" class="logo__image only-light" alt="iMOD Python 1.0.0rc7 documentation - Home"/>
+    <img src="../../_static/imod-python-logo-dark.svg" class="logo__image only-dark pst-js-only" alt="iMOD Python 1.0.0rc7 documentation - Home"/>
   
   
 </a></div>
@@ -564,7 +564,7 @@ The model is a 2D cross-section, hence <code class="docutils literal notranslate
 <span class="n">bnd</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">y</span><span class="o">=</span><span class="s2">&quot;layer&quot;</span><span class="p">,</span> <span class="n">yincrease</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="n">ax</span><span class="p">)</span>
 </pre></div>
 </div>
-<img src="../../_images/sphx_glr_Hydrocoin_001.png" srcset="../../_images/sphx_glr_Hydrocoin_001.png" alt="y = 0.5, dx = 20.0, dy = -20.0" class = "sphx-glr-single-img"/><div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>&lt;matplotlib.collections.QuadMesh object at 0x00000251D7B15010&gt;
+<img src="../../_images/sphx_glr_Hydrocoin_001.png" srcset="../../_images/sphx_glr_Hydrocoin_001.png" alt="y = 0.5, dx = 20.0, dy = -20.0" class = "sphx-glr-single-img"/><div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>&lt;matplotlib.collections.QuadMesh object at 0x0000025745C72990&gt;
 </pre></div>
 </div>
 </section>
@@ -579,7 +579,7 @@ that is: <code class="docutils literal notranslate"><span class="pre">bnd[index]
 <span class="n">bnd</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">y</span><span class="o">=</span><span class="s2">&quot;layer&quot;</span><span class="p">,</span> <span class="n">yincrease</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="n">ax</span><span class="p">)</span>
 </pre></div>
 </div>
-<img src="../../_images/sphx_glr_Hydrocoin_002.png" srcset="../../_images/sphx_glr_Hydrocoin_002.png" alt="y = 0.5, dx = 20.0, dy = -20.0" class = "sphx-glr-single-img"/><div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>&lt;matplotlib.collections.QuadMesh object at 0x00000251D7B34770&gt;
+<img src="../../_images/sphx_glr_Hydrocoin_002.png" srcset="../../_images/sphx_glr_Hydrocoin_002.png" alt="y = 0.5, dx = 20.0, dy = -20.0" class = "sphx-glr-single-img"/><div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>&lt;matplotlib.collections.QuadMesh object at 0x0000025743C72D80&gt;
 </pre></div>
 </div>
 <p>Define WEL data, need to define the x, y, and pumping rate (q)</p>
@@ -613,7 +613,7 @@ And, on both sides, the outer 15 cells of the top row are inactive in the transp
 <span class="n">icbund</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">y</span><span class="o">=</span><span class="s2">&quot;layer&quot;</span><span class="p">,</span> <span class="n">yincrease</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="n">ax</span><span class="p">)</span>
 </pre></div>
 </div>
-<img src="../../_images/sphx_glr_Hydrocoin_003.png" srcset="../../_images/sphx_glr_Hydrocoin_003.png" alt="y = 0.5, dx = 20.0, dy = -20.0" class = "sphx-glr-single-img"/><div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>&lt;matplotlib.collections.QuadMesh object at 0x00000251DD2080E0&gt;
+<img src="../../_images/sphx_glr_Hydrocoin_003.png" srcset="../../_images/sphx_glr_Hydrocoin_003.png" alt="y = 0.5, dx = 20.0, dy = -20.0" class = "sphx-glr-single-img"/><div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>&lt;matplotlib.collections.QuadMesh object at 0x0000025749DB8380&gt;
 </pre></div>
 </div>
 </section>
@@ -638,7 +638,7 @@ And, on both sides, the outer 15 cells of the top row are inactive in the transp
 <span class="n">sconc</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">y</span><span class="o">=</span><span class="s2">&quot;layer&quot;</span><span class="p">,</span> <span class="n">yincrease</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="n">ax</span><span class="p">)</span>
 </pre></div>
 </div>
-<img src="../../_images/sphx_glr_Hydrocoin_004.png" srcset="../../_images/sphx_glr_Hydrocoin_004.png" alt="y = 0.5, dx = 20.0, dy = -20.0" class = "sphx-glr-single-img"/><div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>&lt;matplotlib.collections.QuadMesh object at 0x00000251DD21F7D0&gt;
+<img src="../../_images/sphx_glr_Hydrocoin_004.png" srcset="../../_images/sphx_glr_Hydrocoin_004.png" alt="y = 0.5, dx = 20.0, dy = -20.0" class = "sphx-glr-single-img"/><div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>&lt;matplotlib.collections.QuadMesh object at 0x000002573A082B10&gt;
 </pre></div>
 </div>
 <p>Define starting heads, these will be inserted in the Basic Flow (BAS) package</p>
@@ -708,7 +708,7 @@ And, on both sides, the outer 15 cells of the top row are inactive in the transp
 <span class="n">shd</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">y</span><span class="o">=</span><span class="s2">&quot;layer&quot;</span><span class="p">,</span> <span class="n">yincrease</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="n">ax</span><span class="p">)</span>
 </pre></div>
 </div>
-<img src="../../_images/sphx_glr_Hydrocoin_005.png" srcset="../../_images/sphx_glr_Hydrocoin_005.png" alt="y = 0.5, dx = 20.0, dy = -20.0" class = "sphx-glr-single-img"/><div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>&lt;matplotlib.collections.QuadMesh object at 0x00000251DD2AC2F0&gt;
+<img src="../../_images/sphx_glr_Hydrocoin_005.png" srcset="../../_images/sphx_glr_Hydrocoin_005.png" alt="y = 0.5, dx = 20.0, dy = -20.0" class = "sphx-glr-single-img"/><div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>&lt;matplotlib.collections.QuadMesh object at 0x000002574A0C69F0&gt;
 </pre></div>
 </div>
 </section>
@@ -733,7 +733,7 @@ And, on both sides, the outer 15 cells of the top row are inactive in the transp
 <span class="n">khv</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">y</span><span class="o">=</span><span class="s2">&quot;layer&quot;</span><span class="p">,</span> <span class="n">yincrease</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="n">ax</span><span class="p">)</span>
 </pre></div>
 </div>
-<img src="../../_images/sphx_glr_Hydrocoin_006.png" srcset="../../_images/sphx_glr_Hydrocoin_006.png" alt="y = 0.5, dx = 20.0, dy = -20.0" class = "sphx-glr-single-img"/><div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>&lt;matplotlib.collections.QuadMesh object at 0x00000251DD20B470&gt;
+<img src="../../_images/sphx_glr_Hydrocoin_006.png" srcset="../../_images/sphx_glr_Hydrocoin_006.png" alt="y = 0.5, dx = 20.0, dy = -20.0" class = "sphx-glr-single-img"/><div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>&lt;matplotlib.collections.QuadMesh object at 0x0000025749E92E10&gt;
 </pre></div>
 </div>
 </section>
@@ -803,7 +803,7 @@ plot results as follows:</p>
 <span class="n">conc</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">levels</span><span class="o">=</span><span class="nb">range</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">35</span><span class="p">,</span> <span class="mi">5</span><span class="p">),</span> <span class="n">yincrease</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="n">ax</span><span class="p">)</span>
 </pre></div>
 </div>
-<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> (0 minutes 2.891 seconds)</p>
+<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> (0 minutes 3.562 seconds)</p>
 <div class="sphx-glr-footer sphx-glr-footer-example docutils container" id="sphx-glr-download-examples-imod-wq-hydrocoin-py">
 <div class="sphx-glr-download sphx-glr-download-jupyter docutils container">
 <p><a class="reference download internal" download="" href="../../_downloads/c0eacaf36caa468956ae86e0b80de203/Hydrocoin.ipynb"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Jupyter</span> <span class="pre">notebook:</span> <span class="pre">Hydrocoin.ipynb</span></code></a></p>

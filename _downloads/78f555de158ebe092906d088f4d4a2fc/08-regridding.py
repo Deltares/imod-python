@@ -2,23 +2,27 @@
 Regridding
 ==========
 
-Most MF6 packages have spatial data arrays as input. These arrays
-are discrete: they are defined over the simulation grid and contain
-values associated to each cell.
+Introduction
+------------
 
-Regridding these package means: create a new package with
-spatial data arrays defined over a different grid. Computing what
-the values in these new arrays should be, is done by xugrid.
+Most MODFLOW 6 packages have spatial data arrays as input. These arrays are
+discrete: they are defined over the simulation grid and contain values
+associated to each cell.
+
+Regridding these package means: create a new package with spatial data arrays
+defined over a different grid. Computing what the values in these new arrays
+should be, is done by xugrid.
 
 xugrid will compute a regridded array based on:
 
 - the original array
-- the original discretization (this is described in the coordinates of the original arry)
+- the original discretization (this is described in the coordinates of the
+  original arry)
 - the new discretization
 - a regridding method
 
-More information on the available regridding methods can be found in the xugrid documentation
-https://deltares.github.io/xugrid/user_guide.html
+More information on the available regridding methods can be found in the xugrid
+documentation https://deltares.github.io/xugrid/user_guide.html
 
 The regridding method that should be used depends on the property being
 regridded. For example a point-based property (whose value do not depend
@@ -46,13 +50,13 @@ same number of layers as the input array.
 # -----------------------------
 #
 # In many real-world models, some cells will be inactive or marked as "vertical
-# passthrough" (VPT) in the idomain array of the simulation. Some packages require
-# that all cells that are inactictive or VPT in idomain are excluded from the
-# package as well. An example is the npf package: cells that are inactive or VPT
-# in idomain, should not have conductivity data in the npf package. Therefore at
-# the end of the regridding process, a final step consists in enforcing
-# consistency between those of idomain and all the packages. This is a 2-step
-# process:
+# passthrough" (VPT) in the idomain array of the simulation. Some packages
+# require that all cells that are inactictive or VPT in idomain are excluded
+# from the package as well. An example is the :class:`imod.mf6.NodePropertyFlow`
+# package: cells that are inactive or VPT in idomain, should not have
+# conductivity data in the npf package. Therefore at the end of the regridding
+# process, a final step consists in enforcing consistency between those of
+# idomain and all the packages. This is a 2-step process:
 #
 # 1) for cells that do not have inputs in crucial packages like npf or storage,
 #    idomain will be set to inactive.
@@ -82,8 +86,8 @@ same number of layers as the input array.
 # --------------------------------
 #
 # The regrid_like function is available on packages, models and simulations.
-# When the default methods are acceptable, regridding the whole simulation is the most convenient
-# from a user-perspective.
+# When the default methods are acceptable, regridding the whole simulation is
+# the most convenient from a user-perspective.
 
 import imod
 
@@ -166,22 +170,25 @@ axes[1].set_ylabel("regridded")
 # When non-default methods are used for one or more packages, these should be
 # regridded separately. In that case, the most convenient approach is likely:
 #
-# - pop the packages that should use non-default methods from the source simulation (the
-#   popping is optional, and is only recommended for packages whose presence is not
-#   mandatory for validation.)
-# - regrid the source simulation: this takes care of all the packages that should use default methods.
-# - regrid the package(s) where you want to use non-standard rergridding methods indivudually starting from the
-#   packages in the source simulation
-# - insert the custom-regridded packages to the
-#   regridded simulation (or replace the package regridded with default methods with
-#   the one you just regridded with non-default methods if it was not popped)
+# - pop the packages that should use non-default methods from the source
+#   simulation (the popping is optional, and is only recommended for packages
+#   whose presence is not mandatory for validation.)
+# - regrid the source simulation: this takes care of all the packages that
+#   should use default methods.
+# - regrid the package(s) where you want to use non-standard rergridding methods
+#   indivudually starting from the packages in the source simulation
+# - insert the custom-regridded packages to the regridded simulation (or replace
+#   the package regridded with default methods with the one you just regridded
+#   with non-default methods if it was not popped)
 #
-# In code, consider an example where we want to regrid the recharge package using non default methods
-# then we would do the following. First we'll load some example simulation.
-# There is a separate example contained in :doc:`/examples/mf6/hondsrug`
-# that you should look at if you are interested in the model building
+# In code, consider an example where we want to regrid the recharge package
+# using non default methods then we would do the following. First we'll load
+# some example simulation. There is a separate example contained in
+# :doc:`/examples/mf6/hondsrug` that you should look at if you are interested in
+# the model building
 
 # %%
+#
 # Set up the input needed for custom regridding. Create a regridder
 # weight-cache. This object can (and should) be reused for all the packages that
 # undergo custom regridding at this stage.
@@ -192,16 +199,19 @@ regrid_cache = RegridderWeightsCache()
 regrid_cache
 
 # %%
-# Next, we'll remove the recharge package and obtain it as a variable. We'll do this for later use.
+#
+# Next, we'll remove the recharge package and obtain it as a variable. We'll do
+# this for later use.
 
 original_rch_package = original_simulation["GWF"].pop("rch")
 
 original_rch_package
 
 # %%
-# Regrid the recharge package with a custom regridder. In this case we opt
-# for the centroid locator regridder. This regridder is similar to using a
-# "nearest neighbour" lookup.
+#
+# Regrid the recharge package with a custom regridder. In this case we opt for
+# the centroid locator regridder. This regridder is similar to using a "nearest
+# neighbour" lookup.
 from imod.common.utilities.regrid import RegridderType
 from imod.mf6.regrid import RechargeRegridMethod
 
@@ -226,10 +236,11 @@ original_simulation["GWF"]["rch"] = original_rch_package
 # Comparison with histograms
 # --------------------------
 #
-# In the next segment we will compare the input of the models on different grids.
-# We advice to always check how your input is regridded. In this example we upscaled grid,
-# many input parameters are regridded with a ``mean`` method. This means that their input
-# range is reduced, which can be seen in tailings in the histograms becoming shorter
+# In the next segment we will compare the input of the models on different
+# grids. We advice to always check how your input is regridded. In this example
+# we upscaled grid, many input parameters are regridded with a ``mean`` method.
+# This means that their input range is reduced, which can be seen in tailings in
+# the histograms becoming shorter
 
 
 def plot_histograms_side_by_side(array_original, array_regridded, title):
@@ -321,6 +332,10 @@ plot_histograms_side_by_side(
 )
 
 # %%
+#
+# Compare simulation outputs
+# --------------------------
+#
 # Let's compare outputs now.
 
 # Write simulation
@@ -356,40 +371,43 @@ axes[1].set_ylabel("regridded")
 # %%
 # A note on regridding conductivity
 # ---------------------------------
-# In the npf package, it is possible to use for definining the conductivity tensor:
+#
+# In the npf package, it is possible to use for definining the conductivity
+# tensor:
 #
 # - 1 array (K)
 # - 2 arrays (K and K22)
 # - 3 arrays (K, K22, K33)
 #
-# If 1 array is given the tensor
-# is called isotropic. Defining only K gives the same behavior as specifying K,
-# K22 and K33 with the same value. When regridding, K33 has a default method
-# different from that of K and K22, but it can only be applied if K33 exists in
-# the source model in the first place. So it is recommended to introduce K33 as a
-# separate array in the source model even if it is isotropic.
-# Also note that default regridding methods were chosen assuming that K and K22
-# are roughly horizontal and K33 roughly vertical. But this may not be the case
-# if the input arrays angle2 and/or angle3 have large values.
+# If 1 array is given the tensor is called isotropic. Defining only K gives the
+# same behavior as specifying K, K22 and K33 with the same value. When
+# regridding, K33 has a default method different from that of K and K22, but it
+# can only be applied if K33 exists in the source model in the first place. So
+# it is recommended to introduce K33 as a separate array in the source model
+# even if it is isotropic. Also note that default regridding methods were chosen
+# assuming that K and K22 are roughly horizontal and K33 roughly vertical. But
+# this may not be the case if the input arrays angle2 and/or angle3 have large
+# values.
 #
 # Regridding boundary conditions
 # ------------------------------
+#
 # Special care must be taken when regridding boundary conditions, and it is
 # recommended that users verify the balance output of a regridded simulation and
 # compare it to the original model. If the regridded simulation is a good
-# representation of the original simulation, the mass contributions on the balance
-# by the different boundary conditions should be comparable in both simulations.
-# To achieve this, it may be necessary to tweak the input or the regridding
-# methods. An example of this is upscaling recharge (so the target grid has
-# coarser cells than the source grid). Its default method is averaging, with the
-# following rules:
+# representation of the original simulation, the mass contributions on the
+# balance by the different boundary conditions should be comparable in both
+# simulations. To achieve this, it may be necessary to tweak the input or the
+# regridding methods. An example of this is upscaling recharge (so the target
+# grid has coarser cells than the source grid). Its default method is averaging,
+# with the following rules:
 #
 # - if a cell in the source grid is inactive in the source recharge package
 #   (meaning no recharge), it will not count when averaging. So if a target cell
-#   has partial overlap with one source recharge cell, and the rest of the target
-#   cell has no overlap with any source active recharge cell, it will get the
-#   recharge of the one cell it has overlap with. But since the target cell is
-#   larger, this effectively means the regridded recharge will be more in the
+#   has partial overlap with one source recharge cell, and the rest of the
+#   target cell has no overlap with any source active recharge cell, it will get
+#   the recharge of the one cell it has overlap with. But since the target cell
+#   is larger, this effectively means the regridded recharge will be more in the
 #   regridded simulation than it was in the source simulation
 # - but we do the same regridding this time assigning a zero recharge to cells
 #   without recharge then the averaging will take the zero-recharge cells into
@@ -398,22 +416,29 @@ axes[1].set_ylabel("regridded")
 #
 # A note on regridding transport
 # ------------------------------
-# Transport simulations can be unstable if constraints related to the grid Peclet
-# number and the courant number are exceeded. This can easily happen when
+#
+# Transport simulations can be unstable if constraints related to the grid
+# Peclet number and the courant number are exceeded. This can easily happen when
 # regridding. It may be necessary to reduce the simulation's time step size
 # especially when downscaling, to prevent numerical issues. Increasing
 # dispersivities or the molecular diffusion constant can also help to stabilize
-# the simulation. Inversely, when upscaling, a larger time step size can be acceptable.
+# the simulation. Inversely, when upscaling, a larger time step size can be
+# acceptable.
 #
 #
 # Unsupported packages
 # --------------------
+#
 # Some packages cannot be regridded. This includes the Lake package and the UZF
-# package. Such packages should be removed from the simulation before regridding,
-# and then new packages should be created by the user and then added to the
-# regridded simulation.
+# package. Such packages should be removed from the simulation before
+# regridding, and then new packages should be created by the user and then added
+# to the regridded simulation.
 #
+# Listing all default regridding methods
+# --------------------------------------
 #
+# MODFLOW 6
+# ^^^^^^^^^
 # This code snippet prints all default methods:
 #
 import inspect
@@ -422,44 +447,68 @@ from dataclasses import asdict
 
 import pandas as pd
 
-regrid_method_setup = {
-    "package name": [],
-    "array name": [],
-    "method name": [],
-    "function name": [],
-}
-regrid_method_table = pd.DataFrame(regrid_method_setup)
-# Get all classes in the imod.mf6 module (e.g. imod.mf6.NodePropertyFlow,
-# imod.mf6.GroundwaterFlowModel, imod.mf6.River)
+
+def collect_regrid_methods(classes: list):
+    """Collect all regrid methods from all list of package classes."""
+    regrid_method_setup = {
+        "package name": [],
+        "array name": [],
+        "method name": [],
+        "function name": [],
+    }
+    regrid_method_table = pd.DataFrame(regrid_method_setup)
+    counter = 0
+    for obj in classes:
+        if hasattr(obj, "_regrid_method"):
+            package_name = obj.__name__
+            regrid_methods = asdict(obj.get_regrid_methods())
+            for array_name in regrid_methods.keys():
+                method_name = regrid_methods[array_name][0].name
+                function_name = ""
+                if len(regrid_methods[array_name]) > 0:
+                    function_name = regrid_methods[array_name][1]
+                regrid_method_table.loc[counter] = (
+                    package_name,
+                    array_name,
+                    method_name,
+                    function_name,
+                )
+                counter = counter + 1
+
+    # Set multi index to group with packages
+    regrid_method_table = regrid_method_table.set_index(["package name", "array name"])
+    return regrid_method_table
+
+
+# Get all classes in the imod.mf6 module (e.g.
+# :class:`imod.mf6.NodePropertyFlow`, :class:`imod.mf6.GroundwaterFlowModel`,
+# :class:`imod.mf6.River`)
 mf6_classes = [
     obj for _, obj in inspect.getmembers(sys.modules["imod.mf6"], inspect.isclass)
 ]
 
-counter = 0
-for obj in mf6_classes:
-    if hasattr(obj, "_regrid_method"):
-        package_name = obj.__name__
-        regrid_methods = asdict(obj.get_regrid_methods())
-        for array_name in regrid_methods.keys():
-            method_name = regrid_methods[array_name][0].name
-            function_name = ""
-            if len(regrid_methods[array_name]) > 0:
-                function_name = regrid_methods[array_name][1]
-            regrid_method_table.loc[counter] = (
-                package_name,
-                array_name,
-                method_name,
-                function_name,
-            )
-            counter = counter + 1
+mf6_regrid_methods = collect_regrid_methods(mf6_classes)
 
-# Set multi index to group with packages
-regrid_method_table = regrid_method_table.set_index(["package name", "array name"])
 # Pandas by default displays at max 60 rows, which this table exceeds.
-nrows = regrid_method_table.shape[0]
+nrows = mf6_regrid_methods.shape[0]
 # Configure pandas to increase the max amount of displayable rows.
 pd.set_option("display.max_rows", nrows + 1)
 # Display rows:
-regrid_method_table
+mf6_regrid_methods
+
+# %%
+#
+# MetaSWAP
+# ^^^^^^^^^
+#
+# Let's list all default regridding methods for all MetaSWAP packages:
+
+msw_classes = [
+    obj for _, obj in inspect.getmembers(sys.modules["imod.msw"], inspect.isclass)
+]
+
+msw_regrid_methods = collect_regrid_methods(msw_classes)
+
+msw_regrid_methods
 
 # %%

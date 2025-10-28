@@ -1,0 +1,6 @@
+﻿imod.select.get\_upper\_active\_grid\_cells
+===========================================
+
+.. currentmodule:: imod.select
+
+.. autofunction:: get_upper_active_grid_cells

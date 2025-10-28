@@ -6,6 +6,57 @@ All notable changes to this project will be documented in this file.
 The format is based on `Keep a Changelog`_, and this project adheres to
 `Semantic Versioning`_.
 
+[1.0.0rc7] - 2025-10-28
+-----------------------
+
+Added
+~~~~~
+
+- :meth:`imod.mf6.Modflow6Simulation.set_validation_settings` to set validation
+  settings for a MODFLOW 6 simulation. See :class:`imod.mf6.ValidationSettings`
+  for more information.
+
+Changed
+~~~~~~~
+
+- No automatic validation upon calling :meth:`imod.mf6.Modflow6Simulation.regrid_like` anymore.
+  Use the ``validate`` argument of :meth:`imod.mf6.Modflow6Simulation.write` to
+  validate the regridded model upon writing instead.
+- :class:`imod.mf6.River` now ignore confined cells (``icelltype == 0``) when
+  validating whether the river bottom elevation is below the model bottom
+  elevation.
+- Moved :func:`imod.select.get_upper_active_layer_number`,
+  :func:`imod.select.get_upper_active_cells`,
+  :func:`imod.select.get_lower_active_cells`, and
+  :func:`imod.select.get_lower_active_layer_number` from :mod:`imod.prepare`. to
+  :mod:`imod.select`.
+- :class:`imod.mf6.Dispersion` now is not a required package for
+  :class:`imod.mf6.GroundwaterTransportModel` anymore.
+- No validation anymore for ``icelltype`` upon writing
+  :class:`imod.mf6.SpecificStorage` and :class:`imod.mf6.StorageCoefficient`.
+
+
+Removed
+~~~~~~~
+
+- Removed ``imod.select.upper_active_layer`` function, use
+  :func:`imod.select.get_upper_active_layer_number` instead.
+
+Fixed
+~~~~~
+
+- Fixed bug where :meth:`imod.mf6.Modflow6Simulation.split` could result in
+  empty exchanges being present in the ``split_exchanges`` package list, when
+  two models were isolated by inactive cells from each other. These empty
+  exchanges are now removed.
+- Fixed bug where :meth:`imod.mf6.Modflow6Simulation.split`,
+  :meth:`imod.mf6.Modflow6Simulation.regrid_like`, and
+  :meth:`imod.mf6.Modflow6Simulation.clip_box` would not copy
+  :class:`imod.mf6.ValidationSettings`. 
+- ``landuse``, ``soil_physical_unit``, ``active`` for :class:`imod.msw.GridData`
+  are now properly regridded with the ``mode`` statistic when using
+  :meth:`imod.msw.GridData.regrid_like`.
+
 [1.0.0rc6] - 2025-08-28
 -----------------------
 

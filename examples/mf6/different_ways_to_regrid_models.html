@@ -8,7 +8,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>Different ways to regrid models &#8212; iMOD Python 1.0.0rc6 documentation</title>
+    <title>Different ways to regrid models &#8212; iMOD Python 1.0.0rc7 documentation</title>
   
   
   
@@ -42,18 +42,18 @@
   <link rel="preload" as="script" href="../../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
 <link rel="preload" as="script" href="../../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
 
-    <script src="../../_static/documentation_options.js?v=bc4855a1"></script>
+    <script src="../../_static/documentation_options.js?v=1830d1b8"></script>
     <script src="../../_static/doctools.js?v=9bcbadda"></script>
     <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script>DOCUMENTATION_OPTIONS.pagename = 'examples/mf6/different_ways_to_regrid_models';</script>
-    <script src="../../_static/deltares.js?v=8d5578be"></script>
+    <script src="../../_static/deltares.js?v=a1037e22"></script>
     <link rel="index" title="Index" href="../../genindex.html" />
     <link rel="search" title="Search" href="../../search.html" />
     <link rel="next" title="TWRI" href="ex01_twri.html" />
     <link rel="prev" title="Freshwater lens (circle)" href="circle_transport.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
-  <meta name="docsearch:version" content="1.0.0rc6.dev" />
+  <meta name="docsearch:version" content="1.0.0rc7.dev" />
   </head>
   
   
@@ -117,8 +117,8 @@
     
     
     
-    <img src="../../_static/imod-python-logo-light.svg" class="logo__image only-light" alt="iMOD Python 1.0.0rc6 documentation - Home"/>
-    <img src="../../_static/imod-python-logo-dark.svg" class="logo__image only-dark pst-js-only" alt="iMOD Python 1.0.0rc6 documentation - Home"/>
+    <img src="../../_static/imod-python-logo-light.svg" class="logo__image only-light" alt="iMOD Python 1.0.0rc7 documentation - Home"/>
+    <img src="../../_static/imod-python-logo-dark.svg" class="logo__image only-dark pst-js-only" alt="iMOD Python 1.0.0rc7 documentation - Home"/>
   
   
 </a></div>
@@ -540,7 +540,7 @@ To better illustrate the regridding, we replace the K field with a lognormal ran
 <span class="n">heterogeneous_k</span><span class="o">.</span><span class="n">sel</span><span class="p">(</span><span class="n">layer</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">y</span><span class="o">=</span><span class="s2">&quot;y&quot;</span><span class="p">,</span> <span class="n">yincrease</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="n">ax</span><span class="p">)</span>
 </pre></div>
 </div>
-<img src="../../_images/sphx_glr_different_ways_to_regrid_models_001.png" srcset="../../_images/sphx_glr_different_ways_to_regrid_models_001.png" alt="layer = 1, dx = 5e+03, dy = -5e+03" class = "sphx-glr-single-img"/><div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>&lt;matplotlib.collections.QuadMesh object at 0x00000251D01A5400&gt;
+<img src="../../_images/sphx_glr_different_ways_to_regrid_models_001.png" srcset="../../_images/sphx_glr_different_ways_to_regrid_models_001.png" alt="layer = 1, dx = 5e+03, dy = -5e+03" class = "sphx-glr-single-img"/><div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>&lt;matplotlib.collections.QuadMesh object at 0x0000025743C422D0&gt;
 </pre></div>
 </div>
 <p>Now we create a new grid for this simulation. It has 3 layers,  45 rows and 20 columns.
@@ -579,7 +579,7 @@ specifies that field “k” uses an OVERLAP regridder in combination with the a
 <span class="n">regridded_k_1</span><span class="o">.</span><span class="n">sel</span><span class="p">(</span><span class="n">layer</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">y</span><span class="o">=</span><span class="s2">&quot;y&quot;</span><span class="p">,</span> <span class="n">yincrease</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="n">ax</span><span class="p">)</span>
 </pre></div>
 </div>
-<img src="../../_images/sphx_glr_different_ways_to_regrid_models_002.png" srcset="../../_images/sphx_glr_different_ways_to_regrid_models_002.png" alt="layer = 1, dx = 6251, dy = -3572" class = "sphx-glr-single-img"/><div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>&lt;matplotlib.collections.QuadMesh object at 0x00000251D23F9D60&gt;
+<img src="../../_images/sphx_glr_different_ways_to_regrid_models_002.png" srcset="../../_images/sphx_glr_different_ways_to_regrid_models_002.png" alt="layer = 1, dx = 6251, dy = -3572" class = "sphx-glr-single-img"/><div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>&lt;matplotlib.collections.QuadMesh object at 0x0000025743C4AB10&gt;
 </pre></div>
 </div>
 <p>A second way to regrid TWRI is to regrid the groundwater flow model.</p>
@@ -591,7 +591,7 @@ specifies that field “k” uses an OVERLAP regridder in combination with the a
 <span class="n">regridded_k_2</span><span class="o">.</span><span class="n">sel</span><span class="p">(</span><span class="n">layer</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">y</span><span class="o">=</span><span class="s2">&quot;y&quot;</span><span class="p">,</span> <span class="n">yincrease</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="n">ax</span><span class="p">)</span>
 </pre></div>
 </div>
-<img src="../../_images/sphx_glr_different_ways_to_regrid_models_003.png" srcset="../../_images/sphx_glr_different_ways_to_regrid_models_003.png" alt="layer = 1, dx = 6251, dy = -3572" class = "sphx-glr-single-img"/><div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>&lt;matplotlib.collections.QuadMesh object at 0x00000251D23DADB0&gt;
+<img src="../../_images/sphx_glr_different_ways_to_regrid_models_003.png" srcset="../../_images/sphx_glr_different_ways_to_regrid_models_003.png" alt="layer = 1, dx = 6251, dy = -3572" class = "sphx-glr-single-img"/><div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>&lt;matplotlib.collections.QuadMesh object at 0x0000025745CB2E10&gt;
 </pre></div>
 </div>
 <p>regridding method as well. in this example we’ll regrid the npf package
@@ -615,10 +615,10 @@ because initializing a regridder is costly.</p>
 <span class="n">regridded_k_3</span><span class="o">.</span><span class="n">sel</span><span class="p">(</span><span class="n">layer</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">y</span><span class="o">=</span><span class="s2">&quot;y&quot;</span><span class="p">,</span> <span class="n">yincrease</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="n">ax</span><span class="p">)</span>
 </pre></div>
 </div>
-<img src="../../_images/sphx_glr_different_ways_to_regrid_models_004.png" srcset="../../_images/sphx_glr_different_ways_to_regrid_models_004.png" alt="layer = 1, dx = 6251, dy = -3572" class = "sphx-glr-single-img"/><div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>&lt;matplotlib.collections.QuadMesh object at 0x00000251D0166570&gt;
+<img src="../../_images/sphx_glr_different_ways_to_regrid_models_004.png" srcset="../../_images/sphx_glr_different_ways_to_regrid_models_004.png" alt="layer = 1, dx = 6251, dy = -3572" class = "sphx-glr-single-img"/><div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>&lt;matplotlib.collections.QuadMesh object at 0x0000025743C9A780&gt;
 </pre></div>
 </div>
-<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> (0 minutes 1.250 seconds)</p>
+<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> (0 minutes 1.234 seconds)</p>
 <div class="sphx-glr-footer sphx-glr-footer-example docutils container" id="sphx-glr-download-examples-mf6-different-ways-to-regrid-models-py">
 <div class="sphx-glr-download sphx-glr-download-jupyter docutils container">
 <p><a class="reference download internal" download="" href="../../_downloads/f256ac396944cfb800f53ea6e7935675/different_ways_to_regrid_models.ipynb"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Jupyter</span> <span class="pre">notebook:</span> <span class="pre">different_ways_to_regrid_models.ipynb</span></code></a></p>

@@ -1,6 +1,0 @@
-﻿imod.select.upper\_active\_layer
-================================
-
-.. currentmodule:: imod.select
-
-.. autofunction:: upper_active_layer

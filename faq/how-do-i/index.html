@@ -8,7 +8,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>How do I … &#8212; iMOD Python 1.0.0rc6 documentation</title>
+    <title>How do I … &#8212; iMOD Python 1.0.0rc7 documentation</title>
   
   
   
@@ -42,18 +42,18 @@
   <link rel="preload" as="script" href="../../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
 <link rel="preload" as="script" href="../../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
 
-    <script src="../../_static/documentation_options.js?v=bc4855a1"></script>
+    <script src="../../_static/documentation_options.js?v=1830d1b8"></script>
     <script src="../../_static/doctools.js?v=9bcbadda"></script>
     <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script>DOCUMENTATION_OPTIONS.pagename = 'faq/how-do-i/index';</script>
-    <script src="../../_static/deltares.js?v=8d5578be"></script>
+    <script src="../../_static/deltares.js?v=a1037e22"></script>
     <link rel="index" title="Index" href="../../genindex.html" />
     <link rel="search" title="Search" href="../../search.html" />
     <link rel="next" title="Installing Python and packages" href="../python.html" />
     <link rel="prev" title="General Questions" href="../general.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
-  <meta name="docsearch:version" content="1.0.0rc6.dev" />
+  <meta name="docsearch:version" content="1.0.0rc7.dev" />
   </head>
   
   
@@ -117,8 +117,8 @@
     
     
     
-    <img src="../../_static/imod-python-logo-light.svg" class="logo__image only-light" alt="iMOD Python 1.0.0rc6 documentation - Home"/>
-    <img src="../../_static/imod-python-logo-dark.svg" class="logo__image only-dark pst-js-only" alt="iMOD Python 1.0.0rc6 documentation - Home"/>
+    <img src="../../_static/imod-python-logo-light.svg" class="logo__image only-light" alt="iMOD Python 1.0.0rc7 documentation - Home"/>
+    <img src="../../_static/imod-python-logo-dark.svg" class="logo__image only-dark pst-js-only" alt="iMOD Python 1.0.0rc7 documentation - Home"/>
   
   
 </a></div>
@@ -643,10 +643,24 @@ integer or float), use <code class="docutils literal notranslate"><span class="p
 </pre></div>
 </div>
 </section>
+<section id="flip-the-y-coordinates">
+<h3>Flip the y-coordinates<a class="headerlink" href="#flip-the-y-coordinates" title="Link to this heading">#</a></h3>
+<p>Xarray sorts coordinates in ascending order in some methods (see <code class="docutils literal notranslate"><span class="pre">align</span></code>
+example below), which you need to correct afterwards. We want y to be
+descending. The most efficient way to do this:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">da</span> <span class="o">=</span> <span class="n">da</span><span class="o">.</span><span class="n">reindex</span><span class="p">(</span><span class="n">y</span><span class="o">=</span><span class="n">da</span><span class="o">.</span><span class="n">y</span><span class="p">[::</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span>
+</pre></div>
+</div>
+</section>
 <section id="increase-the-extent-of-a-raster">
 <h3>Increase the extent of a raster<a class="headerlink" href="#increase-the-extent-of-a-raster" title="Link to this heading">#</a></h3>
 <p>Use another raster with appropriate extent, and use <code class="docutils literal notranslate"><span class="pre">align</span></code>:</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">small_aligned</span><span class="p">,</span> <span class="n">big_aligned</span> <span class="o">=</span> <span class="n">xr</span><span class="o">.</span><span class="n">align</span><span class="p">(</span><span class="n">small</span><span class="p">,</span> <span class="n">big</span><span class="p">,</span> <span class="n">join</span><span class="o">=</span><span class="s2">&quot;outer&quot;</span><span class="p">)</span>
+<span class="c1"># Flip y-coordinates. Xarray sorts coordinates in ascending order.</span>
+<span class="c1"># We want y to be descending.</span>
+<span class="n">y_descending</span> <span class="o">=</span> <span class="n">big_aligned</span><span class="o">.</span><span class="n">y</span><span class="p">[::</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+<span class="n">small_aligned</span> <span class="o">=</span> <span class="n">small_aligned</span><span class="o">.</span><span class="n">reindex</span><span class="p">(</span><span class="n">y</span><span class="o">=</span><span class="n">y_descending</span><span class="p">)</span>
+<span class="n">big_aligned</span> <span class="o">=</span> <span class="n">big_aligned</span><span class="o">.</span><span class="n">reindex</span><span class="p">(</span><span class="n">y</span><span class="o">=</span><span class="n">y_descending</span><span class="p">)</span>
 </pre></div>
 </div>
 <p>Make sure the cell size is the same, or the result will be non-equidistant.</p>
@@ -937,6 +951,7 @@ model with constant conductivity):</p>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#select-along-a-single-layer">Select along a single layer</a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#select-part-of-the-data">Select part of the data</a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#get-a-single-value-e-g-a-summary-statistic">Get a single value (e.g. a summary statistic)</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#flip-the-y-coordinates">Flip the y-coordinates</a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#increase-the-extent-of-a-raster">Increase the extent of a raster</a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#create-an-empty-raster">Create an empty raster</a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#fill-interpolate-nodata">Fill/Interpolate nodata</a></li>
