@@ -226,6 +226,24 @@ class ModelSplitter:
             for new_model_name, new_model in new_models.items():
                 solution._add_model_to_solution(new_model_name)
 
+
+    def _is_package_to_skip(self, package: IPackage) -> bool:
+        """
+        Determine if a package should be skipped in grid checks.
+
+        Package can be skipped in the following cases:
+        - Package is not a BoundaryCondition (non-boundary packages are always included)
+        - Package is an IAgnosticPackage (overlap check deferred until after slicing)
+        - Package is in _pkg_id_skip_active_domain_check (e.g., SSM, LAK packages)
+        """
+        pkg_id = package.pkg_id
+        if not isinstance(package, BoundaryCondition):
+            return True
+        return isinstance(package, IAgnosticPackage) or (
+            pkg_id in self._pkg_id_skip_active_domain_check
+        )
+
+
     def _get_package_domain(self, package: IPackage) -> GridDataArray | None:
         """
         Extract the active domain of a boundary condition package.
@@ -236,35 +254,22 @@ class ModelSplitter:
 
         The active domain is determined by:
         1. Retrieving the variable that defines active cells (from _pkg_id_to_var_mapping)
-        2. Removing non-spatial dimensions and the layer dimension
+        2. Removing non-spatial dimensions
         3. Creating a boolean mask where non-null values indicate active cells
 
-        Special cases:
-        - IAgnosticPackages: No domain check (return None)
-        - Packages in _pkg_id_skip_active_domain_check: No domain check (return None)
-        - Non-boundary packages: Return None
+        Returns None if the package is not a boundary condition or should be skipped.
         """
+        if self._is_package_to_skip(package):
+            return None
+
         pkg_id = package.pkg_id
-        active_package_domain = None
+        ds = package[self._pkg_id_to_var_mapping[pkg_id]]
 
-        if isinstance(package, BoundaryCondition):
-            # Checks are done after slicing
-            if isinstance(package, IAgnosticPackage):
-                pass
-            # No checks are done for these packages
-            elif pkg_id in self._pkg_id_skip_active_domain_check:
-                pass
-            else:
-                ds = package[self._pkg_id_to_var_mapping[pkg_id]]
+        # Drop non-spatial dimensions if present
+        dims_to_be_removed = get_non_spatial_dimension_names(ds)
+        ds = ds.drop_vars(dims_to_be_removed)
 
-                # Drop non-spatial dimensions and layer dimension if present
-                dims_to_be_removed = get_non_spatial_dimension_names(ds)
-                if "layer" in ds.dims:
-                    dims_to_be_removed.append("layer")
-                ds = ds.drop_vars(dims_to_be_removed)
-
-                active_package_domain = ds.notnull()
-
+        active_package_domain = ds.notnull()
         return active_package_domain
 
     def _has_package_data_in_domain(
@@ -281,24 +286,15 @@ class ModelSplitter:
         overlap with the partition's active domain.
 
         The method returns True in the following cases:
-        - Package is not a BoundaryCondition (non-boundary packages are always included)
-        - Package is an IAgnosticPackage (overlap check deferred until after slicing)
-        - Package is in _pkg_id_skip_active_domain_check (e.g., SSM, LAK packages)
+        - Package should be skipped in grid checks.
         - Package has at least one active cell overlapping with the partition domain
         """
-        pkg_id = package.pkg_id
-        has_overlap = True
-        if isinstance(package, BoundaryCondition):
-            # Checks are done after slicing
-            if isinstance(package, IAgnosticPackage):
-                pass
-            # No checks are done for these packages
-            elif pkg_id in self._pkg_id_skip_active_domain_check:
-                pass
-            else:
-                has_overlap = (
-                    active_package_domain & partition_info.active_domain.astype(bool)
-                ).any()  # type: ignore
+        if self._is_package_to_skip(package):
+            return True
+
+        has_overlap = (
+            active_package_domain & partition_info.active_domain.astype(bool)
+        ).any()  # type: ignore
 
         return has_overlap
 
