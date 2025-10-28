@@ -167,9 +167,8 @@ class ModelSplitter:
 
                 # For agnostic packages, if the sliced package has no data, do
                 # not add it to the model
-                if isinstance(package, IAgnosticPackage):
-                    if sliced_package["index"].size == 0:
-                        sliced_package = None
+                if isinstance(package, IAgnosticPackage) and sliced_package.is_empty():
+                    sliced_package = None
 
                 # Add package to model if it has data
                 if sliced_package is not None:
@@ -226,8 +225,8 @@ class ModelSplitter:
            model).
         2. Adds all partitioned submodel references to the same solution
 
-        This ensures that the Solution objects correctly reference the new partitioned
-        model names after splitting.
+        This ensures that the Solution objects correctly reference the new
+        partitioned model names after splitting.
         """
         for model_name, new_models in self._model_to_partitioned_model.items():
             solution = original_model_name_to_solution[model_name]
