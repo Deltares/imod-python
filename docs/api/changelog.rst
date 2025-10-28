@@ -10,7 +10,8 @@ The format is based on `Keep a Changelog`_, and this project adheres to
 ------------
 
 Added
------
+~~~~~
+
 - Added :class:`imod.mf6.Viscosity` package to specify the viscosity of the
   groundwater flow model.
 
