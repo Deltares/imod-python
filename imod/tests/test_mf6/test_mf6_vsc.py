@@ -54,6 +54,7 @@ def test_viscosity_package_full():
         thermal_a2=20.0,
         thermal_a3=348.37,
         thermal_a4=233.15,
+        viscosityfile="testfile.vsc"
     )
 
     directory = pathlib.Path("mymodel")
@@ -68,6 +69,7 @@ def test_viscosity_package_full():
       thermal_a2 20.0
       thermal_a3 348.37
       thermal_a4 233.15
+      viscosity fileout testfile.vsc
     end options
 
     begin dimensions
