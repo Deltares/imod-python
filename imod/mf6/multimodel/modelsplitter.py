@@ -11,6 +11,7 @@ from imod.mf6.ims import Solution
 from imod.mf6.model_gwf import GroundwaterFlowModel
 from imod.mf6.model_gwt import GroundwaterTransportModel
 from imod.mf6.ssm import SourceSinkMixing
+from imod.mf6.validation_settings import trim_time_dimension, ValidationSettings
 from imod.typing import GridDataArray
 from imod.typing.grid import (
     get_non_spatial_dimension_names,
@@ -100,7 +101,7 @@ class ModelSplitter:
         for submodel_partition_info in self.partition_info:
             self._partition_id_to_models[submodel_partition_info.id] = {}
 
-    def split(self, model_name: str, model: IModel) -> dict[str, IModel]:
+    def split(self, model_name: str, model: IModel, ignore_time: bool = True) -> dict[str, IModel]:
         """
         Split a model into multiple partitioned models based on partition
         information.
@@ -147,7 +148,7 @@ class ModelSplitter:
         for pkg_name, package in model.items():
             # Determine active domain for boundary packages
             active_package_domain = (
-                self._get_package_domain(package)
+                self._get_package_domain(package, ignore_time=ignore_time)
                 if isinstance(package, BoundaryCondition)
                 else None
             )
@@ -167,7 +168,7 @@ class ModelSplitter:
 
                 # For agnostic packages, if the sliced package has no data, do
                 # not add it to the model
-                if isinstance(package, IAgnosticPackage) and sliced_package.is_empty():
+                if isinstance(package, IAgnosticPackage) and sliced_package.is_empty(ignore_time=ignore_time):
                     sliced_package = None
 
                 # Add package to model if it has data
@@ -255,7 +256,9 @@ class ModelSplitter:
         )
 
 
-    def _get_package_domain(self, package: IPackage) -> GridDataArray | None:
+    def _get_package_domain(
+            self, package: IPackage, ignore_time: bool = True
+        ) -> GridDataArray | None:
         """
         Extract the active domain of a boundary condition package.
 
@@ -280,6 +283,9 @@ class ModelSplitter:
         ds = package[self._pkg_id_to_var_mapping[pkg_id]]
 
         # Drop non-spatial dimensions if present
+        if "time" in ds.dims:
+            trim_settings = ValidationSettings(ignore_time=ignore_time)
+            ds = trim_time_dimension(ds, validation_context=trim_settings)
         dims_to_be_removed = get_non_spatial_dimension_names(ds)
         ds = ds.drop_vars(dims_to_be_removed)
 
