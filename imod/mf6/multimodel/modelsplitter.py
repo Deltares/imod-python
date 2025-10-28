@@ -1,4 +1,4 @@
-from typing import List, NamedTuple
+from typing import List, NamedTuple, cast
 
 import numpy as np
 
@@ -282,16 +282,16 @@ class ModelSplitter:
             return None
 
         pkg_id = package.pkg_id
-        ds = package[self._pkg_id_to_var_mapping[pkg_id]]
+        da = cast(GridDataArray, package.dataset[self._pkg_id_to_var_mapping[pkg_id]])
 
         # Drop non-spatial dimensions if present
-        if "time" in ds.dims:
+        if "time" in da.dims:
             trim_settings = ValidationSettings(ignore_time=ignore_time)
-            ds = trim_time_dimension(ds, validation_context=trim_settings)
-        dims_to_be_removed = get_non_spatial_dimension_names(ds)
-        ds = ds.drop_vars(dims_to_be_removed)
+            da = trim_time_dimension(da, validation_context=trim_settings)
+        dims_to_be_removed = get_non_spatial_dimension_names(da)
+        da = cast(GridDataArray, da.drop_vars(dims_to_be_removed))
 
-        active_package_domain = ds.notnull()
+        active_package_domain = da.notnull()
         return active_package_domain
 
     def _has_package_data_in_domain(
@@ -315,9 +315,8 @@ class ModelSplitter:
         if self._is_package_to_skip(package):
             return True
 
-        has_overlap = (
-            active_package_domain & partition_info.active_domain.astype(bool)
-        ).any()  # type: ignore
+        overlap_grid = active_package_domain & partition_info.active_domain.astype(bool)
+        has_overlap = cast(bool, overlap_grid.any())
 
         return has_overlap
 

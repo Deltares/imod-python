@@ -1,7 +1,7 @@
 from dataclasses import dataclass
-from typing import cast
+from typing import cast, overload
 
-from imod.typing import GridDataset
+from imod.typing import GridDataArray, GridDataset
 
 
 @dataclass
@@ -53,7 +53,17 @@ class ValidationSettings:
     ignore_time: bool = False
 
 
-def trim_time_dimension(ds: GridDataset, **kwargs) -> GridDataset:
+@overload
+def trim_time_dimension(ds: GridDataset, **kwargs) -> GridDataset: ...
+
+
+@overload
+def trim_time_dimension(ds: GridDataArray, **kwargs) -> GridDataArray: ...
+
+
+def trim_time_dimension(
+    ds: GridDataArray | GridDataset, **kwargs
+) -> GridDataArray | GridDataset:
     """
     Prepare object for validation, drop time dimension if
     ignore_time_no_data is set in validation context.
