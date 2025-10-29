@@ -35,6 +35,7 @@ def test_validate_false():
     imod.mf6.InitialConditions(start=0, validate=False)
 
 
+@pytest.mark.unittest_jit
 def test_from_imod5(imod5_dataset, tmp_path):
     data = deepcopy(imod5_dataset[0])
 

@@ -2,6 +2,7 @@ from copy import deepcopy
 from datetime import datetime
 
 import numpy as np
+import pytest
 import xarray as xr
 
 import imod
@@ -12,6 +13,7 @@ from imod.prepare.topsystem.allocation import ALLOCATION_OPTION
 from imod.prepare.topsystem.conductance import DISTRIBUTING_OPTION
 
 
+@pytest.mark.unittest_jit
 def test_from_imod5_non_planar(imod5_dataset_periods, tmp_path):
     period_data = imod5_dataset_periods[1]
     imod5_dataset = imod5_dataset_periods[0]
@@ -52,6 +54,7 @@ def test_from_imod5_non_planar(imod5_dataset_periods, tmp_path):
     ghb._write("ghb", [1], write_context)
 
 
+@pytest.mark.unittest_jit
 def test_from_imod5_and_cleanup_non_planar(imod5_dataset_periods, tmp_path):
     period_data = imod5_dataset_periods[1]
     imod5_dataset = imod5_dataset_periods[0]
@@ -75,6 +78,7 @@ def test_from_imod5_and_cleanup_non_planar(imod5_dataset_periods, tmp_path):
     ghb.cleanup(target_dis)
 
 
+@pytest.mark.unittest_jit
 def test_from_imod5_constant(imod5_dataset_periods, tmp_path):
     period_data = imod5_dataset_periods[1]
     imod5_dataset = imod5_dataset_periods[0]
@@ -122,6 +126,7 @@ def test_from_imod5_constant(imod5_dataset_periods, tmp_path):
     imod5_dataset["ghb"] = original_ghb
 
 
+@pytest.mark.unittest_jit
 def test_from_imod5_and_cleanup_constant(imod5_dataset_periods, tmp_path):
     period_data = imod5_dataset_periods[1]
     imod5_dataset = imod5_dataset_periods[0]
@@ -151,6 +156,7 @@ def test_from_imod5_and_cleanup_constant(imod5_dataset_periods, tmp_path):
     imod5_dataset["ghb"] = original_ghb
 
 
+@pytest.mark.unittest_jit
 def test_from_imod5_planar(imod5_dataset_periods, tmp_path):
     period_data = imod5_dataset_periods[1]
     imod5_dataset = imod5_dataset_periods[0]
@@ -200,6 +206,7 @@ def test_from_imod5_planar(imod5_dataset_periods, tmp_path):
     imod5_dataset["ghb"] = original_ghb
 
 
+@pytest.mark.unittest_jit
 def test_from_imod5_and_cleanup_planar(imod5_dataset_periods, tmp_path):
     period_data = imod5_dataset_periods[1]
     imod5_dataset = imod5_dataset_periods[0]

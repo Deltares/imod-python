@@ -506,6 +506,7 @@ class AllocationSettings:
         return ALLOCATION_OPTION.at_elevation, DISTRIBUTING_OPTION.by_crosscut_thickness
 
 
+@pytest.mark.unittest_jit
 @parametrize_with_cases(
     ["allocation_setting", "distribution_setting"], cases=AllocationSettings
 )
@@ -559,6 +560,7 @@ def test_from_imod5(
     drn_2._write("mydrn", [1], write_context)
 
 
+@pytest.mark.unittest_jit
 @parametrize_with_cases(
     ["allocation_setting", "distribution_setting"], cases=AllocationSettings
 )
@@ -588,6 +590,7 @@ def test_from_imod5_and_cleanup(
     drn_2.cleanup(target_dis)
 
 
+@pytest.mark.unittest_jit
 @parametrize_with_cases(
     ["allocation_setting", "distribution_setting"], cases=AllocationSettings
 )
@@ -633,6 +636,7 @@ def test_from_imod5__with_constant(
     imod5_dataset["drn-2"] = original_drn_2
 
 
+@pytest.mark.unittest_jit
 @parametrize_with_cases(
     ["allocation_setting", "distribution_setting"], cases=AllocationSettings
 )
@@ -670,6 +674,7 @@ def test_from_imod5_and_cleanup__with_constant(
     imod5_dataset["drn-2"] = original_drn_2
 
 
+@pytest.mark.unittest_jit
 def test_from_imod5__negative_layer(imod5_dataset_periods, tmp_path):
     period_data = imod5_dataset_periods[1]
     imod5_dataset = imod5_dataset_periods[0]
@@ -728,6 +733,7 @@ def test_from_imod5__negative_layer(imod5_dataset_periods, tmp_path):
     imod5_dataset["drn-2"] = original_drn_2
 
 
+@pytest.mark.unittest_jit
 def test_from_imod5_and_cleanup__negative_layer(imod5_dataset_periods, tmp_path):
     period_data = imod5_dataset_periods[1]
     imod5_dataset = imod5_dataset_periods[0]

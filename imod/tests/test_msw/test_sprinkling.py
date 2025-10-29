@@ -362,11 +362,13 @@ def test_simple_model_1_subunit(fixed_format_parser):
     assert_equal(results["svat_groundwater"], np.array([1, 2]))
 
 
+@pytest.mark.unittest_jit
 def test_sprinkling_from_imod5_data__points(cap_data_sprinkling_points):
     with pytest.raises(NotImplementedError):
         msw.Sprinkling.from_imod5_data(cap_data_sprinkling_points)
 
 
+@pytest.mark.unittest_jit
 def test_sprinkling_from_imod5_data__grid(cap_data_sprinkling_grid):
     # Arrange
     # Convert unit from m3/d to mm/d

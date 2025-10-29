@@ -2,6 +2,7 @@ import tempfile
 from pathlib import Path
 
 import numpy as np
+import pytest
 import xarray as xr
 from numpy import nan
 from numpy.testing import assert_almost_equal, assert_equal
@@ -118,6 +119,7 @@ def test_clip_box():
     xr.testing.assert_allclose(ponding_selected.dataset["ponding_depth"], expected)
 
 
+@pytest.mark.unittest_jit
 def test_from_imod5_data():
     data_ponding, _, _ = setup_ponding()
     expected_ponding = Ponding(**data_ponding)

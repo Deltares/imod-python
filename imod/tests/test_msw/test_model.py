@@ -299,6 +299,7 @@ class Imod5DataCases:
         return imod5_cap_data, has_scaling_factor
 
 
+@pytest.mark.unittest_jit
 @parametrize_with_cases("imod5_data, has_scaling_factor", cases=Imod5DataCases)
 def test_import_from_imod5(
     imod5_data: Imod5DataDict,
@@ -340,6 +341,7 @@ def test_import_from_imod5(
     assert ("scaling_factor" in model.keys()) == has_scaling_factor
 
 
+@pytest.mark.unittest_jit
 @parametrize_with_cases("imod5_data, has_scaling_factor", cases=Imod5DataCases)
 def test_import_from_imod5_and_write(
     imod5_data: Imod5DataDict,
@@ -370,6 +372,7 @@ def test_import_from_imod5_and_write(
     assert len(list(modeldir.rglob(r"*.inp"))) == expected_n_files
 
 
+@pytest.mark.unittest_jit
 @parametrize_with_cases("imod5_data, has_scaling_factor", cases=Imod5DataCases)
 def test_import_from_imod5_and_clip(
     imod5_data: Imod5DataDict,

@@ -2,6 +2,7 @@ import tempfile
 from pathlib import Path
 
 import numpy as np
+import pytest
 import xarray as xr
 from numpy import nan
 from numpy.testing import assert_almost_equal, assert_equal
@@ -130,6 +131,7 @@ def test_clip_box():
     xr.testing.assert_allclose(clipped.dataset["scale_soil_moisture"], expected)
 
 
+@pytest.mark.unittest_jit
 def test_from_imod5_data(fixed_format_parser):
     scale, depth_perched_water_table, index, svat = setup_scaling_factor_grids()
 

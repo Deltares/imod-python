@@ -394,6 +394,7 @@ def test_reallocate(rch_dict, allocation_option):
         assert rch_reallocated.dataset.equals(rch.dataset)
 
 
+@pytest.mark.unittest_jit
 def test_planar_rch_from_imod5_constant(imod5_dataset, tmp_path):
     data = deepcopy(imod5_dataset[0])
     period_data = imod5_dataset[1]
@@ -426,6 +427,7 @@ def test_planar_rch_from_imod5_constant(imod5_dataset, tmp_path):
     data["rch"]["rate"]["layer"].values[0] = 1
 
 
+@pytest.mark.unittest_jit
 def test_planar_rch_from_imod5_transient(imod5_dataset, tmp_path):
     data = deepcopy(imod5_dataset[0])
     period_data = imod5_dataset[1]
@@ -470,6 +472,7 @@ def test_planar_rch_from_imod5_transient(imod5_dataset, tmp_path):
     assert "maxbound 33856" in rendered_rch
 
 
+@pytest.mark.unittest_jit
 def test_non_planar_rch_from_imod5_constant(imod5_dataset, tmp_path):
     data = deepcopy(imod5_dataset[0])
     period_data = imod5_dataset[1]
@@ -514,6 +517,7 @@ def test_non_planar_rch_from_imod5_constant(imod5_dataset, tmp_path):
     data["rch"]["rate"] = original_rch
 
 
+@pytest.mark.unittest_jit
 def test_non_planar_rch_from_imod5_transient(imod5_dataset, tmp_path):
     data = deepcopy(imod5_dataset[0])
     period_data = imod5_dataset[1]
@@ -560,6 +564,7 @@ def test_non_planar_rch_from_imod5_transient(imod5_dataset, tmp_path):
     assert "maxbound 33856" in rendered_rch
 
 
+@pytest.mark.unittest_jit
 def test_from_imod5_cap_data(imod5_dataset):
     # Arrange
     data = deepcopy(imod5_dataset[0])

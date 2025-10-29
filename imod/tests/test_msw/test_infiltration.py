@@ -272,6 +272,7 @@ def test_clip_box(infiltration_data):
     )
 
 
+@pytest.mark.unittest_jit
 @parametrize_with_cases("data_infiltration", cases=".")
 def test_from_imod5_data(data_infiltration):
     expected_pkg = Infiltration(**data_infiltration)
