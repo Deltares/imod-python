@@ -173,11 +173,10 @@ class ModelSplitter:
                 if isinstance(package, IAgnosticPackage) and sliced_package.is_empty(
                     ignore_time=ignore_time
                 ):
-                    sliced_package = None
+                    continue
 
                 # Add package to model if it has data
-                if sliced_package is not None:
-                    new_model[pkg_name] = sliced_package
+                new_model[pkg_name] = sliced_package
 
         return partitioned_models
 
