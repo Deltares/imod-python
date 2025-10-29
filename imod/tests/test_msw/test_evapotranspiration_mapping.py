@@ -185,6 +185,7 @@ class MeteGridCases:
         return r'"meteo_grids\\(\w+)_([0-9]+).asc"'
 
 
+@pytest.mark.unittest_jit
 @parametrize_with_cases("replace_string", cases=MeteGridCases)
 def test_evapotranspiration_from_imod5(tmpdir_factory, replace_string, request):
     datadir = Path(tmpdir_factory.mktemp("evapotranspiration_mapping"))

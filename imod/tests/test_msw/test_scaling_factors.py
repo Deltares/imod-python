@@ -1,5 +1,6 @@
 import tempfile
 from pathlib import Path
+import pytest
 
 import numpy as np
 import xarray as xr
@@ -130,6 +131,7 @@ def test_clip_box():
     xr.testing.assert_allclose(clipped.dataset["scale_soil_moisture"], expected)
 
 
+@pytest.mark.unittest_jit
 def test_from_imod5_data(fixed_format_parser):
     scale, depth_perched_water_table, index, svat = setup_scaling_factor_grids()
 

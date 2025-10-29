@@ -1,5 +1,6 @@
 import tempfile
 from pathlib import Path
+import pytest
 
 import numpy as np
 import xarray as xr
@@ -118,6 +119,7 @@ def test_clip_box():
     xr.testing.assert_allclose(ponding_selected.dataset["ponding_depth"], expected)
 
 
+@pytest.mark.unittest_jit
 def test_from_imod5_data():
     data_ponding, _, _ = setup_ponding()
     expected_ponding = Ponding(**data_ponding)

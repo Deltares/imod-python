@@ -202,6 +202,7 @@ def test_write_concentration_period_data(head_fc, concentration_fc):
             )  # the number 2 is in the concentration data, and in the cell indices.
 
 
+@pytest.mark.unittest_jit
 def test_from_imod5(imod5_dataset, tmp_path):
     imod5_data = imod5_dataset[0]
     period_data = imod5_dataset[1]
@@ -226,6 +227,7 @@ def test_from_imod5(imod5_dataset, tmp_path):
     chd3.write("chd3", [1], tmp_path, use_binary=False)
 
 
+@pytest.mark.unittest_jit
 def test_from_imod5_shd(imod5_dataset, tmp_path):
     imod5_data = imod5_dataset[0]
     period_data = imod5_dataset[1]
