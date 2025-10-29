@@ -6,7 +6,7 @@ import pytest
 
 from imod.mf6 import AdvectionCentral, AdvectionTVD, AdvectionUpstream
 from imod.mf6.dsp import Dispersion
-from imod.mf6.multimodel.modelsplitter import create_partition_info, slice_model
+from imod.mf6.multimodel.modelsplitter import ModelSplitter, create_partition_info
 from imod.mf6.package import Package
 from imod.mf6.simulation import Modflow6Simulation
 from imod.tests.fixtures.mf6_modelrun_fixture import assert_simulation_can_run
@@ -20,18 +20,16 @@ def test_slice_model_structured(flow_transport_simulation: Modflow6Simulation):
     submodel_labels[:, :, 30:] = 1
 
     partition_info = create_partition_info(submodel_labels)
-
-    submodel_list = []
+    modelsplitter = ModelSplitter(partition_info)
 
     # Act
-    for submodel_partition_info in partition_info:
-        submodel_list.append(slice_model(submodel_partition_info, transport_model))
+    partition_models_dict = modelsplitter.split("tpt_a", transport_model)
 
     # Assert
-    assert len(submodel_list) == 2
-    for submodel in submodel_list:
+    assert len(partition_models_dict) == 2
+    for new_model_name, new_model in partition_models_dict.items():
         for package_name in list(transport_model.keys()):
-            assert package_name in list(submodel.keys())
+            assert package_name in list(new_model.keys())
 
 
 def test_split_dump(

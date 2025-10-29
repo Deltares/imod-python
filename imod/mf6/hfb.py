@@ -713,7 +713,7 @@ class HorizontalFlowBarrierBase(BoundaryCondition, ILineDataPackage):
         bottom: GridDataArray,
         k: GridDataArray,
         validate=True,
-        strict_hfb_validation=True,
+        strict_validation=True,
     ) -> Mf6HorizontalFlowBarrier:
         """
         Write package to Modflow 6 package.
@@ -734,7 +734,7 @@ class HorizontalFlowBarrierBase(BoundaryCondition, ILineDataPackage):
             Grid with hydraulic conductivities.
         validate: bool
             Validate HorizontalFlowBarrier upon calling this method.
-        strict_hfb_validation: bool
+        strict_validation: bool
             Turn on strict horizontal flow barrier validation.
 
         Returns
@@ -743,7 +743,7 @@ class HorizontalFlowBarrierBase(BoundaryCondition, ILineDataPackage):
             Low level representation of the HFB package as MODFLOW 6 expects it.
         """
         validation_context = ValidationSettings(
-            validate=validate, strict_hfb_validation=strict_hfb_validation
+            validate=validate, strict_hfb_validation=strict_validation
         )
 
         return self._to_mf6_pkg(idomain, top, bottom, k, validation_context)

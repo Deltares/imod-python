@@ -215,6 +215,10 @@ class MetaSwapPackage(abc.ABC):
         """
         return False
 
+    @property
+    def pkg_id(self) -> str:
+        raise NotImplementedError
+
     def regrid_like(
         self,
         target_grid: GridDataArray,

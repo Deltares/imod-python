@@ -567,6 +567,10 @@ class Package(PackageBase, IPackage, abc.ABC):
         """
         return False
 
+    @property
+    def pkg_id(self) -> str:
+        return self._pkg_id
+
     def __repr__(self) -> str:
         typename = type(self).__name__
         return f"{typename}\n{self.dataset.__repr__()}"

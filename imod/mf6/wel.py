@@ -412,12 +412,12 @@ class GridAgnosticWell(BoundaryCondition, IPointDataPackage, abc.ABC):
 
     def to_mf6_pkg(
         self,
-        active: GridDataArray,
+        idomain: GridDataArray,
         top: GridDataArray,
         bottom: GridDataArray,
         k: GridDataArray,
         validate: bool = False,
-        strict_well_validation: bool = True,
+        strict_validation: bool = True,
     ) -> Mf6Wel:
         """
         Write package to Modflow 6 package.
@@ -436,7 +436,7 @@ class GridAgnosticWell(BoundaryCondition, IPointDataPackage, abc.ABC):
 
         Parameters
         ----------
-        active: {xarry.DataArray, xugrid.UgridDataArray}
+        idomain: {xarry.DataArray, xugrid.UgridDataArray}
             Grid with active cells.
         top: {xarry.DataArray, xugrid.UgridDataArray}
             Grid with top of model layers.
@@ -446,7 +446,7 @@ class GridAgnosticWell(BoundaryCondition, IPointDataPackage, abc.ABC):
             Grid with hydraulic conductivities.
         validate: bool, default True
             Run validation before converting
-        strict_well_validation: bool, default True
+        strict_validation: bool, default True
             Set well validation strict:
             Throw error if well is removed entirely during its assignment to
             layers.
@@ -457,13 +457,13 @@ class GridAgnosticWell(BoundaryCondition, IPointDataPackage, abc.ABC):
             Object with wells as list based input.
         """
         validation_context = ValidationSettings(
-            validate=validate, strict_well_validation=strict_well_validation
+            validate=validate, strict_well_validation=strict_validation
         )
-        return self._to_mf6_pkg(active, top, bottom, k, validation_context)
+        return self._to_mf6_pkg(idomain, top, bottom, k, validation_context)
 
     def _to_mf6_pkg(
         self,
-        active: GridDataArray,
+        idomain: GridDataArray,
         top: GridDataArray,
         bottom: GridDataArray,
         k: GridDataArray,
@@ -482,7 +482,7 @@ class GridAgnosticWell(BoundaryCondition, IPointDataPackage, abc.ABC):
                 "No wells were assigned in package. None were present."
             )
 
-        assigned_wells = self._assign_wells_to_layers(wells_df, active, top, bottom, k)
+        assigned_wells = self._assign_wells_to_layers(wells_df, idomain, top, bottom, k)
         filtered_assigned_well_ids = self._gather_filtered_well_ids(
             assigned_wells, wells_df
         )
@@ -495,12 +495,12 @@ class GridAgnosticWell(BoundaryCondition, IPointDataPackage, abc.ABC):
             raise ValidationError(message_assign)
 
         ds = xr.Dataset()
-        ds["cellid"] = self._create_cellid(assigned_wells, active)
+        ds["cellid"] = self._create_cellid(assigned_wells, idomain)
 
         ds_vars = self._create_dataset_vars(assigned_wells, ds["cellid"])
         ds = ds.assign(**ds_vars.data_vars)  # type: ignore[arg-type]
 
-        ds = remove_inactive(ds, active)
+        ds = remove_inactive(ds, idomain)
         ds["save_flows"] = self["save_flows"].values[()]
         ds["print_flows"] = self["print_flows"].values[()]
         ds["print_input"] = self["print_input"].values[()]

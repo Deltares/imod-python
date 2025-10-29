@@ -3,10 +3,10 @@ from abc import abstractmethod
 import numpy as np
 from numpy.typing import NDArray
 
-from imod.common.interfaces.ipackagebase import IPackageBase
+from imod.common.interfaces.iagnosticpackage import IAgnosticPackage
 
 
-class IPointDataPackage(IPackageBase):
+class IPointDataPackage(IAgnosticPackage):
     """
     Interface for packages for which the data is defined by x and y coordinates independent of the domain definition.
     """

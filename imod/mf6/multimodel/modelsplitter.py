@@ -1,20 +1,22 @@
-from typing import List, NamedTuple
+from typing import List, NamedTuple, cast
 
 import numpy as np
 
+from imod.common.interfaces.iagnosticpackage import IAgnosticPackage
 from imod.common.interfaces.imodel import IModel
+from imod.common.interfaces.ipackage import IPackage
 from imod.common.utilities.clip import clip_by_grid
-from imod.mf6.auxiliary_variables import (
-    expand_transient_auxiliary_variables,
-    remove_expanded_auxiliary_variables_from_dataset,
-)
 from imod.mf6.boundary_condition import BoundaryCondition
-from imod.mf6.hfb import HorizontalFlowBarrierBase
-from imod.mf6.wel import Well
+from imod.mf6.ims import Solution
+from imod.mf6.model_gwf import GroundwaterFlowModel
+from imod.mf6.model_gwt import GroundwaterTransportModel
+from imod.mf6.ssm import SourceSinkMixing
+from imod.mf6.validation_settings import ValidationSettings, trim_time_dimension
 from imod.typing import GridDataArray
-from imod.typing.grid import ones_like
-
-HIGH_LEVEL_PKGS = (HorizontalFlowBarrierBase, Well)
+from imod.typing.grid import (
+    get_non_spatial_dimension_names,
+    ones_like,
+)
 
 
 class PartitionInfo(NamedTuple):
@@ -24,11 +26,13 @@ class PartitionInfo(NamedTuple):
 
 def create_partition_info(submodel_labels: GridDataArray) -> List[PartitionInfo]:
     """
-    A PartitionInfo is used to partition a model or package. The partition info's of a domain are created using a
-    submodel_labels array. The submodel_labels provided as input should have the same shape as a single layer of the
-    model grid (all layers are split the same way), and contains an integer value in each cell. Each cell in the
-    model grid will end up in the submodel with the index specified by the corresponding label of that cell. The
-    labels should be numbers between 0 and the number of partitions.
+    A PartitionInfo is used to partition a model or package. The partition
+    info's of a domain are created using a submodel_labels array. The
+    submodel_labels provided as input should have the same shape as a single
+    layer of the model grid (all layers are split the same way), and contains an
+    integer value in each cell. Each cell in the model grid will end up in the
+    submodel with the index specified by the corresponding label of that cell.
+    The labels should be numbers between 0 and the number of partitions.
     """
     _validate_submodel_label_array(submodel_labels)
 
@@ -62,24 +66,288 @@ def _validate_submodel_label_array(submodel_labels: GridDataArray) -> None:
         )
 
 
-def slice_model(partition_info: PartitionInfo, model: IModel) -> IModel:
-    """
-    This function slices a Modflow6Model. A sliced model is a model that
-    consists of packages of the original model that are sliced using the
-    domain_slice. A domain_slice can be created using the
-    :func:`imod.mf6.modelsplitter.create_domain_slices` function.
-    """
-    modelclass = type(model)
-    new_model = modelclass(**model.options)
+class ModelSplitter:
+    # pkg_id to variable mapping. For boundary packages we need to check if the
+    # package has any active cells in the partition We do this based on the
+    # variable that defines the active cells for that package This mapping is
+    # used to get that variable name based on the package id If a package is not
+    # in this mapping, we assume it does not need special treatment
+    _pkg_id_to_var_mapping = {
+        "chd": "head",
+        "cnc": "concentration",
+        "evt": "rate",
+        "dis": "idomain",
+        "drn": "elevation",
+        "ghb": "head",
+        "src": "rate",
+        "rch": "rate",
+        "riv": "conductance",
+        "uzf": "infiltration_rate",
+        "wel": "rate",
+    }
 
-    for pkg_name, package in model.items():
-        if isinstance(package, BoundaryCondition):
-            remove_expanded_auxiliary_variables_from_dataset(package)
+    # Some boundary packages don't have a variable that defines active cells
+    # For these packages we skip the check if the package has any active cells in the partition
+    _pkg_id_skip_active_domain_check = ["ssm", "lak"]
 
-        sliced_package = clip_by_grid(package, partition_info.active_domain)
-        if sliced_package is not None:
-            new_model[pkg_name] = sliced_package
+    def __init__(self, partition_info: List[PartitionInfo]) -> None:
+        self.partition_info = partition_info
 
-        if isinstance(package, BoundaryCondition):
-            expand_transient_auxiliary_variables(sliced_package)
-    return new_model
+        # Initialize mapping from original model names to partitioned models
+        self._model_to_partitioned_model: dict[str, dict[str, IModel]] = {}
+
+        # Initialize mapping from partition IDs to models
+        self._partition_id_to_models: dict[int, dict[str, IModel]] = {}
+        for submodel_partition_info in self.partition_info:
+            self._partition_id_to_models[submodel_partition_info.id] = {}
+
+    def split(
+        self, model_name: str, model: IModel, ignore_time: bool = True
+    ) -> dict[str, IModel]:
+        """
+        Split a model into multiple partitioned models based on partition
+        information.
+
+        Each partition creates a separate submodel containing:
+        - All non-boundary packages from the original model, clipped to the
+          partition's domain
+        - Boundary packages that have active cells within the partition's
+          domain, clipped accordingly
+        - IAgnosticPackages are excluded if they contain no data after clipping
+
+        Parameters
+        ----------
+        model_name : str
+            Base name of the input model. Partition IDs are appended to create
+            unique names for each submodel (e.g., "model_0", "model_1").
+        model : IModel
+            The input model instance to partition.
+
+        Returns
+        -------
+        dict[str, IModel]
+            A mapping from generated submodel names to the corresponding partitioned
+            model instances, each clipped to its respective active domain.
+        """
+        modelclass = type(model)
+        partitioned_models = {}
+        model_to_partition = {}
+
+        # Create empty model for each partition
+        for submodel_partition_info in self.partition_info:
+            new_model_name = f"{model_name}_{submodel_partition_info.id}"
+
+            new_model = modelclass(**model.options)
+            partitioned_models[new_model_name] = new_model
+            model_to_partition[new_model_name] = submodel_partition_info
+            self._partition_id_to_models[submodel_partition_info.id][new_model_name] = (
+                new_model
+            )
+
+        self._model_to_partitioned_model[model_name] = partitioned_models
+
+        # Add packages to models
+        for pkg_name, package in model.items():
+            # Determine active domain for boundary packages
+            active_package_domain = (
+                self._get_package_domain(package, ignore_time=ignore_time)
+                if isinstance(package, BoundaryCondition)
+                else None
+            )
+
+            # Add package to each partitioned model
+            for new_model_name, new_model in partitioned_models.items():
+                partition_info = model_to_partition[new_model_name]
+
+                has_overlap = self._has_package_data_in_domain(
+                    package, active_package_domain, partition_info
+                )
+                if not has_overlap:
+                    continue
+
+                # Slice and add the package to the partitioned model
+                sliced_package = clip_by_grid(package, partition_info.active_domain)
+
+                # For agnostic packages, if the sliced package has no data, do
+                # not add it to the model
+                if isinstance(package, IAgnosticPackage) and sliced_package.is_empty(
+                    ignore_time=ignore_time
+                ):
+                    continue
+
+                # Add package to model if it has data
+                new_model[pkg_name] = sliced_package
+
+        return partitioned_models
+
+    def update_dependent_packages(self) -> None:
+        """
+        Update packages that reference other models after partitioning.
+
+        This method performs two updates:
+        1. Updates buoyancy packages in flow models to reference the correct
+        partitioned transport model names.
+        2. Recreates Source Sink Mixing (SSM) packages in transport models
+        based on the partitioned flow model data.
+        """
+        # Update buoyancy packages
+        for _, models in self._partition_id_to_models.items():
+            flow_model = self._get_flow_model(models)
+            transport_model_names = self._get_transport_model_names(models)
+
+            flow_model._update_buoyancy_package(transport_model_names)
+
+        # Update ssm packages
+        for _, models in self._partition_id_to_models.items():
+            flow_model = self._get_flow_model(models)
+            transport_models = self._get_transport_models(models)
+
+            for transport_model in transport_models:
+                ssm_key = transport_model._get_pkgkey("ssm")
+                if ssm_key is None:
+                    continue
+                old_ssm_package = transport_model.pop(ssm_key)
+                state_variable_name = old_ssm_package.dataset[
+                    "auxiliary_variable_name"
+                ].values[0]
+                ssm_package = SourceSinkMixing.from_flow_model(
+                    flow_model, state_variable_name, is_split=True
+                )
+                if ssm_package is not None:
+                    transport_model[ssm_key] = ssm_package
+
+    def update_solutions(
+        self, original_model_name_to_solution: dict[str, Solution]
+    ) -> None:
+        """
+        Update solution objects to reference partitioned models instead of
+        original models.
+
+        For each original model that was split:
+        1. Removes the original model reference from its solution (This was a
+           deepcopy of the original solution and thus references the original
+           model).
+        2. Adds all partitioned submodel references to the same solution
+
+        This ensures that the Solution objects correctly reference the new
+        partitioned model names after splitting.
+        """
+        for model_name, new_models in self._model_to_partitioned_model.items():
+            solution = original_model_name_to_solution[model_name]
+            solution._remove_model_from_solution(model_name)
+            for new_model_name, new_model in new_models.items():
+                solution._add_model_to_solution(new_model_name)
+
+    def _is_package_to_skip(self, package: IPackage) -> bool:
+        """
+        Determine if a package should be skipped in grid checks.
+
+        Package can be skipped in the following cases:
+        - Package is not a BoundaryCondition (non-boundary packages are always
+          included)
+        - Package is an IAgnosticPackage (overlap check deferred until after
+          slicing)
+        - Package is in _pkg_id_skip_active_domain_check (e.g., SSM, LAK
+          packages)
+        """
+        pkg_id = package.pkg_id
+        if not isinstance(package, BoundaryCondition):
+            return True
+        return isinstance(package, IAgnosticPackage) or (
+            pkg_id in self._pkg_id_skip_active_domain_check
+        )
+
+    def _get_package_domain(
+        self, package: IPackage, ignore_time: bool = True
+    ) -> GridDataArray | None:
+        """
+        Extract the active domain of a boundary condition package.
+
+        For boundary condition packages, this method identifies which cells
+        contain active boundary data by checking the package's defining variable
+        (e.g., "head" for CHD, "rate" for WEL). Non-boundary packages return
+        None.
+
+        The active domain is determined by:
+        1. Retrieving the variable that defines active cells (from
+           _pkg_id_to_var_mapping)
+        2. Removing non-spatial dimensions
+        3. Creating a boolean mask where non-null values indicate active cells
+
+        Returns None if the package is not a boundary condition or should be
+        skipped.
+        """
+        if self._is_package_to_skip(package):
+            return None
+
+        pkg_id = package.pkg_id
+        da = cast(GridDataArray, package.dataset[self._pkg_id_to_var_mapping[pkg_id]])
+
+        # Drop non-spatial dimensions if present
+        if "time" in da.dims:
+            trim_settings = ValidationSettings(ignore_time=ignore_time)
+            da = trim_time_dimension(da, validation_context=trim_settings)
+        dims_to_be_removed = get_non_spatial_dimension_names(da)
+        da = cast(GridDataArray, da.drop_vars(dims_to_be_removed))
+
+        active_package_domain = da.notnull()
+        return active_package_domain
+
+    def _has_package_data_in_domain(
+        self,
+        package: IPackage,
+        active_package_domain: GridDataArray,
+        partition_info: PartitionInfo,
+    ) -> bool:
+        """
+        Check if a package has any active data within a partition's domain.
+
+        For boundary condition packages, this method determines whether the
+        package should be included in a partitioned model by checking if its
+        active cells overlap with the partition's active domain.
+
+        The method returns True in the following cases:
+        - Package should be skipped in grid checks.
+        - Package has at least one active cell overlapping with the partition
+          domain
+        """
+        if self._is_package_to_skip(package):
+            return True
+
+        overlap_grid = active_package_domain & partition_info.active_domain.astype(bool)
+        has_overlap = cast(bool, overlap_grid.any())
+
+        return has_overlap
+
+    def _get_flow_model(self, models: dict[str, IModel]) -> GroundwaterFlowModel:
+        flow_model = next(
+            (
+                model
+                for model_name, model in models.items()
+                if isinstance(model, GroundwaterFlowModel)
+            ),
+            None,
+        )
+
+        if flow_model is None:
+            raise ValueError(
+                "Could not find a groundwater flow model for updating the buoyancy package."
+            )
+
+        return flow_model
+
+    def _get_transport_model_names(self, models: dict[str, IModel]) -> List[str]:
+        return [
+            model_name
+            for model_name, model in models.items()
+            if isinstance(model, GroundwaterTransportModel)
+        ]
+
+    def _get_transport_models(
+        self, models: dict[str, IModel]
+    ) -> List[GroundwaterTransportModel]:
+        return [
+            model
+            for model_name, model in models.items()
+            if isinstance(model, GroundwaterTransportModel)
+        ]

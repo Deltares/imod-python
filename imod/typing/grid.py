@@ -362,6 +362,11 @@ def get_spatial_dimension_names(grid: Any) -> list[str]:  # noqa: F811
     return []
 
 
+def get_non_spatial_dimension_names(grid: GridDataArray) -> list[str]:
+    spatial_dims = get_spatial_dimension_names(grid)
+    return [str(dim) for dim in grid.dims if dim not in spatial_dims]
+
+
 @dispatch
 def get_grid_geometry_hash(grid: xr.DataArray) -> tuple[int, int]:
     hash_x = hash(pickle.dumps(grid["x"].values))
