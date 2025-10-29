@@ -53,3 +53,16 @@ def assign_datetime_coords(
         da["time"], unit=time_unit
     )
     return da.assign_coords(time=time)
+
+
+def assign_index(arg):
+    if isinstance(arg, xr.DataArray):
+        arg = arg.values
+    elif not isinstance(arg, (np.ndarray, list, tuple)):
+        raise TypeError("should be a tuple, list, or numpy array")
+
+    arr = np.array(arg)
+    if arr.ndim != 1:
+        raise ValueError("should be 1D")
+
+    return xr.DataArray(arr, dims=("index",))

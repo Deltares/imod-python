@@ -16,6 +16,12 @@ Fixed
   models loaded lazily into memory. Reduced a splitting operation of 2 hours to
   a few minutes for a test case.
 
+Added
+~~~~~
+
+- Added :class:`imod.mf6.Viscosity` package to specify the viscosity of the
+  groundwater flow model.
+
 [1.0.0rc7] - 2025-10-28
 -----------------------
 

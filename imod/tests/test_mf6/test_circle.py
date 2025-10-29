@@ -156,6 +156,29 @@ def test_simulation_write_and_run_transport(circle_model_transport, tmp_path):
     assert concentration.shape == (52, 2, 216)
 
 
+def test_simulation_write_and_run_transport_vsc(circle_model_transport_vsc, tmp_path):
+    simulation = circle_model_transport_vsc
+
+    with pytest.raises(
+        RuntimeError, match="Simulation circle has not been written yet."
+    ):
+        circle_model_transport_vsc.run()
+
+    modeldir = tmp_path / "circle_transport"
+    simulation.write(modeldir)
+    simulation.run()
+    head = simulation.open_head()
+    concentration = simulation.open_concentration()
+
+    assert isinstance(head, xu.UgridDataArray)
+    assert head.dims == ("time", "layer", "mesh2d_nFaces")
+    assert head.shape == (52, 2, 216)
+
+    assert isinstance(concentration, xu.UgridDataArray)
+    assert concentration.dims == ("time", "layer", "mesh2d_nFaces")
+    assert concentration.shape == (52, 2, 216)
+
+
 def test_simulation_clip_and_state_at_boundary(circle_model_transport, tmp_path):
     # Arrange
     simulation = circle_model_transport
