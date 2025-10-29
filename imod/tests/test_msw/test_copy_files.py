@@ -1,5 +1,4 @@
 import pytest
-
 from pytest_cases import parametrize_with_cases
 
 from imod.msw.copy_files import FileCopier

@@ -1,8 +1,8 @@
 from copy import deepcopy
 from datetime import datetime
 
-import pytest
 import numpy as np
+import pytest
 import xarray as xr
 
 import imod
