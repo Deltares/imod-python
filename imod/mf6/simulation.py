@@ -1441,12 +1441,14 @@ class Modflow6Simulation(collections.UserDict, ISimulation):
         # Split models and add to new simulation
         modelsplitter = ModelSplitter(partition_info)
         for model_name, model in original_models.items():
-            partition_models_dict = modelsplitter.split(model_name, model)
+            partition_models_dict = modelsplitter.split(
+                model_name, model, ignore_time=ignore_time_purge_empty
+            )
             for new_model_name, new_model in partition_models_dict.items():
                 new_simulation[new_model_name] = new_model
 
         modelsplitter.update_solutions(original_model_name_to_solution)
-        modelsplitter.update_packages()
+        modelsplitter.update_dependent_packages()
 
         # Create exchanges
         exchanges: list[Any] = []

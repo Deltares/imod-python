@@ -9,6 +9,22 @@ The format is based on `Keep a Changelog`_, and this project adheres to
 [Unreleased]
 ------------
 
+Fixed
+~~~~~
+
+- Improved performance of :meth:`imod.mf6.Modflow6Simulation.split` for large
+  models loaded lazily into memory. Reduced a splitting operation of 2 hours to
+  a few minutes for a test case.
+
+Added
+~~~~~
+
+- Added :class:`imod.mf6.Viscosity` package to specify the viscosity of the
+  groundwater flow model.
+
+[1.0.0rc7] - 2025-10-28
+-----------------------
+
 Added
 ~~~~~
 

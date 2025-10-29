@@ -35,8 +35,7 @@ def test_buoyancy_package_simple():
     end packagedata"""
     )
     actual = buy._render(directory, "buy", globaltimes, False)
-    print(actual)
-    print(expected)
+
     assert actual == expected
 
 
@@ -71,8 +70,7 @@ def test_buoyancy_package_full():
         end packagedata"""
     )
     actual = buy._render(directory, "buy", globaltimes, False)
-    print(actual)
-    print(expected)
+
     assert actual == expected
 
 
