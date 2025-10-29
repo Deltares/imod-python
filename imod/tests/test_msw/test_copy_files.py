@@ -1,3 +1,4 @@
+import pytest
 from pytest_cases import parametrize_with_cases
 
 from imod.msw.copy_files import FileCopier
@@ -67,6 +68,7 @@ def test_copyfile_write(src_files, tmp_path):
     assert len(diff) == 0
 
 
+@pytest.mark.unittest_jit
 @parametrize_with_cases("src_files", cases=".")
 def test_from_imod5_data(src_files):
     # Arrange

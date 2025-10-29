@@ -870,6 +870,7 @@ def test_derive_cellid_from_points(basic_dis, well_high_lvl_test_data_stationary
     np.testing.assert_equal(cellid.coords["dim_cellid"].values, dim_cellid_expected)
 
 
+@pytest.mark.unittest_jit
 @parametrize("wel_class", [Well, LayeredWell])
 def test_import_and_convert_to_mf6(imod5_dataset, tmp_path, wel_class):
     data = imod5_dataset[0]
@@ -913,6 +914,7 @@ def test_import__as_steady_state(imod5_dataset, wel_class):
     np.testing.assert_almost_equal(wel.dataset["rate"].values, -323.89361702)
 
 
+@pytest.mark.unittest_jit
 @parametrize("wel_class", [Well])
 def test_import_and_cleanup(imod5_dataset, wel_class: Well):
     data = imod5_dataset[0]
@@ -932,6 +934,7 @@ def test_import_and_cleanup(imod5_dataset, wel_class: Well):
     assert len(wel.dataset.coords["time"]) == ntimes
 
 
+@pytest.mark.unittest_jit
 @parametrize("wel_class", [Well, LayeredWell])
 def test_import_simple_wells__steady_state(
     well_simple_import_prj__steady_state, wel_class
@@ -952,6 +955,7 @@ def test_import_simple_wells__steady_state(
     np.testing.assert_allclose(wel2.dataset["rate"].values, expected)
 
 
+@pytest.mark.unittest_jit
 @parametrize("wel_class", [Well, LayeredWell])
 def test_import_simple_wells__transient(well_simple_import_prj__transient, wel_class):
     imod5dict, _ = open_projectfile_data(well_simple_import_prj__transient)
@@ -977,6 +981,7 @@ def test_import_simple_wells__transient(well_simple_import_prj__transient, wel_c
     np.testing.assert_allclose(wel2.dataset["rate"].values[0], expected)
 
 
+@pytest.mark.unittest_jit
 @parametrize("wel_class", [Well, LayeredWell])
 def test_import_multiple_wells(well_regular_import_prj, wel_class):
     imod5dict, _ = open_projectfile_data(well_regular_import_prj)
@@ -1002,6 +1007,7 @@ def test_import_multiple_wells(well_regular_import_prj, wel_class):
     assert wel2.dataset["rate"].shape == (5, 3)
 
 
+@pytest.mark.unittest_jit
 @parametrize("wel_class", [Well, LayeredWell])
 def test_import_from_imod5_with_duplication(well_duplication_import_prj, wel_class):
     imod5dict, _ = open_projectfile_data(well_duplication_import_prj)
@@ -1067,6 +1073,7 @@ def test_logmessage_for_layer_assignment_import_imod5(
         assert message_required == message_present
 
 
+@pytest.mark.unittest_jit
 @pytest.mark.parametrize("remove", ["filt_top", "filt_bot", None])
 def test_logmessage_for_missing_filter_settings(
     tmp_path, well_regular_import_prj, remove
@@ -1112,6 +1119,7 @@ def test_logmessage_for_missing_filter_settings(
         assert message_required == message_present
 
 
+@pytest.mark.unittest_jit
 def test_from_imod5_cap_data__grid(cap_data_sprinkling_grid):
     # Arrange
     expected_layer = np.array([2, 1, 2, 1, 2, 1])
@@ -1129,6 +1137,7 @@ def test_from_imod5_cap_data__grid(cap_data_sprinkling_grid):
     np.testing.assert_array_equal(ds["y"].to_numpy(), expected_y)
 
 
+@pytest.mark.unittest_jit
 @pytest.mark.timeout(300)
 def test_from_imod5_cap_data__big_grid(cap_data_sprinkling_grid__big):
     """Test if performance is acceptable for large grids."""
@@ -1143,6 +1152,7 @@ def test_from_imod5_cap_data__big_grid(cap_data_sprinkling_grid__big):
     assert mf6_wel.dataset.sizes["ncellid"] == bnd_2d.size
 
 
+@pytest.mark.unittest_jit
 def test_from_imod5_cap_data__points(cap_data_sprinkling_points):
     with pytest.raises(NotImplementedError):
         LayeredWell.from_imod5_cap_data(cap_data_sprinkling_points)

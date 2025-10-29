@@ -420,6 +420,7 @@ def test_check_nan_in_active_cell(sy_layered, convertible, dis):
         assert var == "storage_coefficient"
 
 
+@pytest.mark.unittest_jit
 def test_from_imod5(imod5_dataset, tmp_path):
     data = imod5_dataset[0]
 
@@ -437,6 +438,7 @@ def test_from_imod5(imod5_dataset, tmp_path):
     assert "ss" in rendered_sto
 
 
+@pytest.mark.unittest_jit
 def test_from_imod5_steady_state(imod5_dataset):
     data = imod5_dataset[0]
 

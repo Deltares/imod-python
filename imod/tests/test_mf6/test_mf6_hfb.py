@@ -712,6 +712,7 @@ def test_set_options(print_input, parameterizable_basic_dis):
     assert mf6_package.dataset["print_input"].values[()] == print_input
 
 
+@pytest.mark.unittest_jit
 def test_hfb_from_imod5(imod5_dataset, tmp_path):
     imod5_data = imod5_dataset[0]
     target_dis = StructuredDiscretization.from_imod5_data(imod5_data)

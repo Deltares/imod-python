@@ -109,6 +109,7 @@ def test_meteogridcopy_write(meteo_grids, tmp_path):
     assert filecmp.cmp(grid_dir / "mete_grid.inp", copy_dir / "mete_grid.inp")
 
 
+@pytest.mark.unittest_jit
 def test_meteogridcopy_from_imod5(meteo_grids, tmp_path):
     # Arrange
     grid_dir = setup_written_meteo_grids(meteo_grids, tmp_path)

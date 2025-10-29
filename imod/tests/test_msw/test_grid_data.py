@@ -459,6 +459,7 @@ def test_clip_box(grid_data_dict: dict[str, xr.DataArray]):
     xr.testing.assert_allclose(grid_data_selected.dataset["area"], expected_area)
 
 
+@pytest.mark.unittest_jit
 @parametrize_with_cases("grid_data_dict", cases=".")
 def test_from_imod5_data(grid_data_dict: dict[str, xr.DataArray]):
     cap_data = {}

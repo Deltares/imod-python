@@ -212,6 +212,7 @@ def test_configure_xt3d(tmp_path):
     assert not npf.get_xt3d_option()
 
 
+@pytest.mark.unittest_jit
 def test_npf_from_imod5_isotropic(imod5_dataset, tmp_path):
     data = deepcopy(imod5_dataset[0])
     # throw out kva (=vertical anisotropy array) and ani (=horizontal anisotropy array)
@@ -233,6 +234,7 @@ def test_npf_from_imod5_isotropic(imod5_dataset, tmp_path):
     assert "angle3" not in rendered_npf
 
 
+@pytest.mark.unittest_jit
 def test_npf_from_imod5_horizontal_anisotropy(imod5_dataset, tmp_path):
     data = deepcopy(imod5_dataset[0])
     # throw out kva (=vertical anisotropy array)
@@ -266,6 +268,7 @@ def test_npf_from_imod5_horizontal_anisotropy(imod5_dataset, tmp_path):
     assert "angle3" not in rendered_npf
 
 
+@pytest.mark.unittest_jit
 def test_npf_from_imod5_vertical_anisotropy(imod5_dataset, tmp_path):
     data = deepcopy(imod5_dataset[0])
     # throw out ani (=horizontal anisotropy array)
@@ -293,6 +296,7 @@ def test_npf_from_imod5_vertical_anisotropy(imod5_dataset, tmp_path):
     assert "angle3" not in rendered_npf
 
 
+@pytest.mark.unittest_jit
 def test_npf_from_imod5_settings(imod5_dataset, tmp_path):
     data = deepcopy(imod5_dataset[0])
 
