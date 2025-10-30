@@ -92,7 +92,6 @@ class PackageBase(IPackageBase, abc.ABC):
 
         """
         kwargs.update({"encoding": self._netcdf_encoding()})
-        kwargs.update({"format": "NETCDF4"})
 
         dataset = self.dataset
 
@@ -194,5 +193,13 @@ class PackageBase(IPackageBase, abc.ABC):
         for key, value in dataset.items():
             if _is_scalar_nan(value):
                 dataset[key] = None
+
+        # to_netcdf converts strings into NetCDF "variable‑length UTF‑8 strings"
+        # which are loaded as dtype=object arrays. This will convert them back
+        # to str.
+        vars = ["species"]
+        for var in vars:
+            if var in dataset:
+                dataset[var] = dataset[var].astype(str)
 
         return cls._from_dataset(dataset)

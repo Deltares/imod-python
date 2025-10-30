@@ -1037,14 +1037,12 @@ class Modflow6Simulation(collections.UserDict, ISimulation):
                     _, filename, _, _ = exchange_package.get_specification()
                     exchange_class_short = type(exchange_package).__name__
                     path = f"{filename}.nc"
-                    exchange_package.dataset.to_netcdf(
-                        directory / path, format="NETCDF4"
-                    )
+                    exchange_package.dataset.to_netcdf(directory / path)
                     toml_content[key][exchange_class_short].append(path)
 
             else:
                 path = f"{key}.nc"
-                value.dataset.to_netcdf(directory / path, format="NETCDF4")
+                value.dataset.to_netcdf(directory / path)
                 toml_content[cls_name][key] = path
 
         with open(directory / f"{self.name}.toml", "wb") as f:
