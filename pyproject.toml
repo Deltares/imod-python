@@ -80,7 +80,6 @@ ignore = [
     "E501", # line-too-long. This rule can't be fullfilled by the ruff formatter. The same behavior as black.
     "PD003",
     "PD004",
-    "PD901",
     "PD011",
     "PD013",
     "PD015",
