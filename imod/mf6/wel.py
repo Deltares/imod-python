@@ -1074,9 +1074,9 @@ class Well(GridAgnosticWell):
         # Ensure top, bottom & k
         # are broadcasted to 3d grid
         like = ones_like(active)
-        bottom = like * bottom
-        top_2d = (like * top).sel(layer=1)
-        top_3d = bottom.compute().shift(layer=1).fillna(top_2d)
+        bottom = like * bottom.compute()
+        top_2d = (like * top.compute()).sel(layer=1)
+        top_3d = bottom.shift(layer=1).fillna(top_2d)
         k = like * k
 
         index_names = wells_df.index.names
