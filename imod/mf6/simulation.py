@@ -1016,6 +1016,10 @@ class Modflow6Simulation(collections.UserDict, ISimulation):
         loaded into QGIS, you can set ``mdal_compliant=True``:
 
         >>> mf6_sim.dump("path/to/directory", mdal_compliant=True, crs="EPSG:4326")
+
+        For big data, storing to ``"zarr"`` or ``"zarr.zip"`` is more efficient:
+
+        >>> mf6_sim.dump("path/to/directory", engine="zarr")
         """
         directory = pathlib.Path(directory)
         directory.mkdir(parents=True, exist_ok=True)
