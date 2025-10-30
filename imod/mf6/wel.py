@@ -1073,7 +1073,7 @@ class Well(GridAgnosticWell):
     ) -> pd.DataFrame:
         # Ensure top, bottom & k
         # are broadcasted to 3d grid
-        like = ones_like(active)
+        like = ones_like(active.compute())
         bottom = like * bottom.compute()
         top_2d = (like * top.compute()).sel(layer=1)
         top_3d = bottom.shift(layer=1).fillna(top_2d)
