@@ -60,7 +60,7 @@ from imod.schemata import ValidationError
 from imod.typing import GridDataArray, GridDataset
 from imod.typing.grid import (
     concat,
-    is_equal,
+    is_same_domain,
     is_unstructured,
     merge_partitions,
 )
@@ -1622,10 +1622,16 @@ class Modflow6Simulation(collections.UserDict, ISimulation):
 
         for flow_model_name in flow_models:
             flow_model = self[flow_model_name]
+
+            matched_tsp_models = []
             for tpt_model_name in transport_models:
                 tpt_model = self[tpt_model_name]
-                if is_equal(tpt_model.domain, flow_model.domain):
+                if is_same_domain(tpt_model.domain, flow_model.domain):
                     result[flow_model_name].append(tpt_model_name)
+                    matched_tsp_models.append(tpt_model_name)
+            for tpt_model_name in matched_tsp_models:
+                transport_models.pop(tpt_model_name)
+
         return result
 
     def _generate_gwfgwt_exchanges(self) -> list[GWFGWT]:

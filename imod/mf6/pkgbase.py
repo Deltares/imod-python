@@ -94,6 +94,17 @@ class PackageBase(IPackageBase, abc.ABC):
         kwargs.update({"encoding": self._netcdf_encoding()})
 
         dataset = self.dataset
+
+        # Create encoding dict for float16 variables
+        for var in dataset.data_vars:
+            if dataset[var].dtype == np.float16:
+                kwargs["encoding"][var] = {"dtype": "float32"}
+
+        # Also check coordinates
+        for coord in dataset.coords:
+            if dataset[coord].dtype == np.float16:
+                kwargs["encoding"][coord] = {"dtype": "float32"}
+
         if isinstance(dataset, xu.UgridDataset):
             if mdal_compliant:
                 dataset = dataset.ugrid.to_dataset()
@@ -168,7 +179,7 @@ class PackageBase(IPackageBase, abc.ABC):
             # TODO: seems like a bug? Remove str() call if fixed in xarray/zarr
             dataset = xr.open_zarr(str(path), **kwargs)
         else:
-            dataset = xr.open_dataset(path, **kwargs)
+            dataset = xr.open_dataset(path, chunks="auto", **kwargs)
 
         if dataset.ugrid_roles.topology:
             dataset = xu.UgridDataset(dataset)
@@ -182,5 +193,13 @@ class PackageBase(IPackageBase, abc.ABC):
         for key, value in dataset.items():
             if _is_scalar_nan(value):
                 dataset[key] = None
+
+        # to_netcdf converts strings into NetCDF "variable‑length UTF‑8 strings"
+        # which are loaded as dtype=object arrays. This will convert them back
+        # to str.
+        vars = ["species"]
+        for var in vars:
+            if var in dataset:
+                dataset[var] = dataset[var].astype(str)
 
         return cls._from_dataset(dataset)

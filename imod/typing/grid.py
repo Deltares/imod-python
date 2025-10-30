@@ -316,11 +316,15 @@ def is_spatial_grid(_: Any) -> bool:  # noqa: F811
 
 @dispatch
 def is_equal(array1: xu.UgridDataArray, array2: xu.UgridDataArray) -> bool:
+    if not is_same_domain(array1, array2):
+        return False
     return array1.equals(array2) and array1.ugrid.grid.equals(array2.ugrid.grid)
 
 
 @dispatch  # type: ignore[no-redef]
 def is_equal(array1: xr.DataArray, array2: xr.DataArray) -> bool:  # noqa: F811
+    if not is_same_domain(array1, array2):
+        return False
     return array1.equals(array2)
 
 
