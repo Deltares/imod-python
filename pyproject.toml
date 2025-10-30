@@ -133,28 +133,18 @@ check_untyped_defs = false
 
 [[tool.mypy.overrides]]
 module = [
+    # No stubs available
     "affine.*",
-    "bottleneck.*",
     "cftime.*",
-    "contextily.*",
-    "dateutil.*",
-    "flopy.*",
-    "plum-dispatch.*",
-    "geopandas.*",
-    "matplotlib.*",
-    "mpl_toolkits.*",
     "numba.*",
     "osgeo.*",
-    "pandas.*",
-    "pooch.*",
-    "pyproj.*",
     "rasterio.*",
+    "xugrid.*",
+    # Stubs available, but too much work to fix right now
+    "geopandas.*",
+    "pandas.*",
     "scipy.*",
     "shapely.*",
-    "tomllib.*",
-    "tqdm.*",
-    "vtk.*",
-    "xugrid.*",
 ]
 ignore_missing_imports = true
 
