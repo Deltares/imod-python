@@ -141,6 +141,7 @@ module = [
     "rasterio.*",
     "xugrid.*",
     # Stubs available, but too much work to fix right now
+    "dateutil.*",
     "geopandas.*",
     "pandas.*",
     "scipy.*",
