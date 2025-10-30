@@ -10,7 +10,7 @@ from xarray.core.utils import is_scalar
 
 import imod
 from imod.common.interfaces.ipackagebase import IPackageBase
-from imod.common.utilities.file_engines import to_zarr
+from imod.common.utilities.file_engines import EngineType, to_zarr
 from imod.typing.grid import (
     GridDataArray,
     GridDataset,
@@ -67,7 +67,7 @@ class PackageBase(IPackageBase, abc.ABC):
     def __setitem__(self, key, value):
         self.dataset.__setitem__(key, value)
 
-    def to_zarr(self, path: str | Path, engine: str, **kwargs) -> None:
+    def to_zarr(self, path: str | Path, engine: EngineType, **kwargs) -> None:
         """
         Write dataset contents to a zarr file.
 

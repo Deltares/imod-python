@@ -21,7 +21,7 @@ from imod.common.utilities.clip import (
     clip_line_gdf_by_bounding_polygon,
     clip_line_gdf_by_grid,
 )
-from imod.common.utilities.file_engines import to_zarr
+from imod.common.utilities.file_engines import EngineType, to_zarr
 from imod.common.utilities.grid import broadcast_to_full_domain
 from imod.common.utilities.line_data import (
     _create_zbound_gdf_from_zbound_df,
@@ -532,7 +532,7 @@ class HorizontalFlowBarrierBase(BoundaryCondition, ILineDataPackage):
             package, first convert to a Modflow6 package by calling pkg.to_mf6_pkg()"""
         )
 
-    def to_zarr(self, path: str | Path, engine: str, **kwargs) -> None:
+    def to_zarr(self, path: str | Path, engine: EngineType, **kwargs) -> None:
         """
         Write dataset contents to a zarr file.
 

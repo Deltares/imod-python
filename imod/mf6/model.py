@@ -21,7 +21,7 @@ import imod
 from imod.common.interfaces.imodel import IModel
 from imod.common.statusinfo import NestedStatusInfo, StatusInfo, StatusInfoBase
 from imod.common.utilities.clip import clip_box_dataset
-from imod.common.utilities.file_engines import engine_to_ext
+from imod.common.utilities.file_engines import EngineType, engine_to_ext
 from imod.common.utilities.mask import _mask_all_packages
 from imod.common.utilities.regrid import _regrid_like
 from imod.common.utilities.schemata import (
@@ -593,7 +593,7 @@ class Modflow6Model(collections.UserDict, IModel, abc.ABC):
         validate: bool = True,
         mdal_compliant: bool = False,
         crs: Optional[Any] = None,
-        engine="netcdf4",
+        engine: EngineType = "netcdf4",
     ) -> Path:
         """
         Dump simulation to files. Writes a model definition as .TOML file, which

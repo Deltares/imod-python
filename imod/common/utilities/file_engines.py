@@ -1,12 +1,15 @@
 import shutil
 from pathlib import Path
+from typing import Literal, TypeAlias
 
 import xugrid as xu
 
 from imod.typing import GridDataset
 
+EngineType: TypeAlias = Literal["netcdf4", "zarr", "zarr.zip"]
 
-def engine_to_ext(engine: str) -> str:
+
+def engine_to_ext(engine: EngineType) -> str:
     """Get file extension for a given file engine.
 
     Parameters
@@ -39,7 +42,9 @@ def engine_to_ext(engine: str) -> str:
         )
 
 
-def to_zarr(dataset: GridDataset, path: str | Path, engine: str, **kwargs) -> None:
+def to_zarr(
+    dataset: GridDataset, path: str | Path, engine: EngineType, **kwargs
+) -> None:
     import zarr
 
     path = Path(path)
@@ -68,7 +73,9 @@ def to_zarr(dataset: GridDataset, path: str | Path, engine: str, **kwargs) -> No
             )
 
 
-def to_file(dataset: GridDataset, path: str | Path, engine: str, **kwargs) -> None:
+def to_file(
+    dataset: GridDataset, path: str | Path, engine: EngineType, **kwargs
+) -> None:
     if engine.lower() == "netcdf4":
         dataset.to_netcdf(path, **kwargs)
     else:
