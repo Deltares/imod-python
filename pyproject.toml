@@ -97,14 +97,17 @@ convention = "numpy"
 "examples/*" = ["E402"]
 
 [tool.mypy]
-files = [
-    "imod/logging/**/**.py",
-    "imod/mf6/**/**.py",
-    "imod/msw/**/**.py",
-    "imod/prepare/**/**.py",
-    "imod/select/**/**.py",
-    "imod/typing/**/**.py",
-    "imod/util/**/**.py",
+packages = ["imod"]
+exclude = [
+    "imod/common",
+    "imod/data",
+    "imod/evaluate",
+    "imod/formats",
+    "imod/schemata.py",
+    "imod/templates",
+    "imod/tests",
+    "imod/visualize",
+    "imod/wq",
 ]
 follow_imports = "normal"
 strict = true
