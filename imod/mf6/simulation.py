@@ -23,7 +23,7 @@ from imod.common.interfaces.imodel import IModel
 from imod.common.interfaces.isimulation import ISimulation
 from imod.common.statusinfo import NestedStatusInfo
 from imod.common.utilities.dataclass_type import DataclassType
-from imod.common.utilities.file_engines import engine_to_ext, to_zarr
+from imod.common.utilities.file_engines import engine_to_ext, to_file
 from imod.common.utilities.mask import _mask_all_models
 from imod.common.utilities.regrid import _regrid_like
 from imod.common.utilities.version import (
@@ -1042,20 +1042,12 @@ class Modflow6Simulation(collections.UserDict, ISimulation):
                     exchange_class_short = type(exchange_package).__name__
                     path = f"{filename}.{ext}"
                     toml_content[key][exchange_class_short].append(path)
-                    if engine.lower() == "netcdf4":
-                        exchange_package.dataset.to_netcdf(directory / path)
-                    else:
-                        to_zarr(
-                            exchange_package.dataset, directory / path, engine=engine
-                        )
+                    to_file(exchange_package.dataset, directory / path, engine=engine)
 
             else:
                 path = f"{key}.{ext}"
                 toml_content[cls_name][key] = path
-                if engine.lower() == "netcdf4":
-                    value.dataset.to_netcdf(directory / path)
-                else:
-                    to_zarr(value.dataset, directory / path, engine=engine)
+                to_file(value.dataset, directory / path, engine=engine)
 
         with open(directory / f"{self.name}.toml", "wb") as f:
             tomli_w.dump(toml_content, f)

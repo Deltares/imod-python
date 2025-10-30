@@ -66,3 +66,10 @@ def to_zarr(dataset: GridDataset, path: str | Path, engine: str, **kwargs) -> No
             raise ValueError(
                 f'Expected engine to be "zarr" or "zarr.zip", got: {engine}'
             )
+
+
+def to_file(dataset: GridDataset, path: str | Path, engine: str, **kwargs) -> None:
+    if engine.lower() == "netcdf4":
+        dataset.to_netcdf(path, **kwargs)
+    else:
+        to_zarr(dataset, path, engine=engine, **kwargs)
