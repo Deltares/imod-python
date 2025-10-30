@@ -18,12 +18,12 @@ import xarray as xr
 import xugrid as xu
 
 import imod
-import imod.logging
 import imod.mf6.exchangebase
 from imod.common.interfaces.imodel import IModel
 from imod.common.interfaces.isimulation import ISimulation
 from imod.common.statusinfo import NestedStatusInfo
 from imod.common.utilities.dataclass_type import DataclassType
+from imod.common.utilities.file_engines import engine_to_ext, to_zarr
 from imod.common.utilities.mask import _mask_all_models
 from imod.common.utilities.regrid import _regrid_like
 from imod.common.utilities.version import (
@@ -971,6 +971,7 @@ class Modflow6Simulation(collections.UserDict, ISimulation):
         validate: bool = True,
         mdal_compliant: bool = False,
         crs=None,
+        engine: str = "netcdf4",
     ) -> None:
         """
         Dump simulation to files. Writes a model definition as .TOML file, which
@@ -992,6 +993,8 @@ class Modflow6Simulation(collections.UserDict, ISimulation):
         crs: Any, optional
             Anything accepted by rasterio.crs.CRS.from_user_input
             Requires ``rioxarray`` installed.
+        engine : str, optional
+            The file engine. Options are 'netcdf4', 'zarr', and 'zarr.zip'.
 
         Examples
         --------
@@ -1021,12 +1024,13 @@ class Modflow6Simulation(collections.UserDict, ISimulation):
         # Dump version number
         version = get_version()
         toml_content["version"] = {"imod-python": version}
+        ext = engine_to_ext(engine)
         # Dump models and exchanges
         for key, value in self.items():
             cls_name = type(value).__name__
             if isinstance(value, Modflow6Model):
                 model_toml_path = value.dump(
-                    directory, key, validate, mdal_compliant, crs
+                    directory, key, validate, mdal_compliant, crs, engine=engine
                 )
                 toml_content[cls_name][key] = model_toml_path.relative_to(
                     directory
@@ -1036,14 +1040,22 @@ class Modflow6Simulation(collections.UserDict, ISimulation):
                 for exchange_package in self[key]:
                     _, filename, _, _ = exchange_package.get_specification()
                     exchange_class_short = type(exchange_package).__name__
-                    path = f"{filename}.nc"
-                    exchange_package.dataset.to_netcdf(directory / path)
+                    path = f"{filename}.{ext}"
                     toml_content[key][exchange_class_short].append(path)
+                    if engine.lower() == "netcdf4":
+                        exchange_package.dataset.to_netcdf(directory / path)
+                    else:
+                        to_zarr(
+                            exchange_package.dataset, directory / path, engine=engine
+                        )
 
             else:
-                path = f"{key}.nc"
-                value.dataset.to_netcdf(directory / path)
+                path = f"{key}.{ext}"
                 toml_content[cls_name][key] = path
+                if engine.lower() == "netcdf4":
+                    value.dataset.to_netcdf(directory / path)
+                else:
+                    to_zarr(value.dataset, directory / path, engine=engine)
 
         with open(directory / f"{self.name}.toml", "wb") as f:
             tomli_w.dump(toml_content, f)

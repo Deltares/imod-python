@@ -10,6 +10,7 @@ from xarray.core.utils import is_scalar
 
 import imod
 from imod.common.interfaces.ipackagebase import IPackageBase
+from imod.common.utilities.file_engines import to_zarr
 from imod.typing.grid import (
     GridDataArray,
     GridDataset,
@@ -65,6 +66,22 @@ class PackageBase(IPackageBase, abc.ABC):
 
     def __setitem__(self, key, value):
         self.dataset.__setitem__(key, value)
+
+    def to_zarr(self, path: str | Path, engine: str, **kwargs) -> None:
+        """
+        Write dataset contents to a zarr file.
+
+        Parameters
+        ----------
+        path : str, pathlib.Path
+            Path to the zarr file or directory.
+        engine : str
+            The file engine. Options are 'zarr' and 'zarr.zip'.
+        **kwargs : keyword arguments
+            Will be passed on to ``xarray.Dataset.to_zarr()`` or
+            ``xugrid.UgridDataset.to_zarr()``.
+        """
+        to_zarr(self.dataset, path, engine, **kwargs)
 
     def to_netcdf(
         self, *args, mdal_compliant: bool = False, crs: Optional[Any] = None, **kwargs
@@ -176,8 +193,13 @@ class PackageBase(IPackageBase, abc.ABC):
         """
         path = Path(path)
         if path.suffix in (".zip", ".zarr"):
-            # TODO: seems like a bug? Remove str() call if fixed in xarray/zarr
-            dataset = xr.open_zarr(str(path), **kwargs)
+            import zarr
+
+            if path.suffix == ".zip":
+                with zarr.storage.ZipStore(path, mode="r") as store:
+                    dataset = xr.open_zarr(store, **kwargs)
+            else:
+                dataset = xr.open_zarr(str(path), **kwargs)
         else:
             dataset = xr.open_dataset(path, chunks="auto", **kwargs)
 

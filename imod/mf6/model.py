@@ -21,6 +21,7 @@ import imod
 from imod.common.interfaces.imodel import IModel
 from imod.common.statusinfo import NestedStatusInfo, StatusInfo, StatusInfoBase
 from imod.common.utilities.clip import clip_box_dataset
+from imod.common.utilities.file_engines import engine_to_ext
 from imod.common.utilities.mask import _mask_all_packages
 from imod.common.utilities.regrid import _regrid_like
 from imod.common.utilities.schemata import (
@@ -592,7 +593,8 @@ class Modflow6Model(collections.UserDict, IModel, abc.ABC):
         validate: bool = True,
         mdal_compliant: bool = False,
         crs: Optional[Any] = None,
-    ):
+        engine="netcdf4",
+    ) -> Path:
         """
         Dump simulation to files. Writes a model definition as .TOML file, which
         points to data for each package. Each package is stored as a separate
@@ -615,6 +617,8 @@ class Modflow6Model(collections.UserDict, IModel, abc.ABC):
         crs: Any, optional
             Anything accepted by rasterio.crs.CRS.from_user_input
             Requires ``rioxarray`` installed.
+        engine : str, optional
+            The file engine. Options are 'netcdf4', 'zarr', and 'zarr.zip'.
         """
         modeldirectory = pathlib.Path(directory) / modelname
         modeldirectory.mkdir(exist_ok=True, parents=True)
@@ -625,12 +629,16 @@ class Modflow6Model(collections.UserDict, IModel, abc.ABC):
                 raise ValidationError(statusinfo.to_string())
 
         toml_content: dict = collections.defaultdict(dict)
+        ext = engine_to_ext(engine)
         for pkgname, pkg in self.items():
-            pkg_path = f"{pkgname}.nc"
+            pkg_path = f"{pkgname}.{ext}"
             toml_content[type(pkg).__name__][pkgname] = pkg_path
-            pkg.to_netcdf(
-                modeldirectory / pkg_path, crs=crs, mdal_compliant=mdal_compliant
-            )
+            if engine.lower() == "netcdf4":
+                pkg.to_netcdf(
+                    modeldirectory / pkg_path, crs=crs, mdal_compliant=mdal_compliant
+                )
+            else:
+                pkg.to_zarr(modeldirectory / pkg_path, engine=engine)
 
         toml_path = modeldirectory / f"{modelname}.toml"
         with open(toml_path, "wb") as f:

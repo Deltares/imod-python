@@ -32,7 +32,9 @@ def test_slice_model_structured(flow_transport_simulation: Modflow6Simulation):
             assert package_name in list(new_model.keys())
 
 
+@pytest.mark.parametrize("engine", ["netcdf4", "zarr", "zarr.zip"])
 def test_split_dump(
+    engine: str,
     tmp_path: Path,
     flow_transport_simulation: Modflow6Simulation,
 ):
@@ -48,7 +50,7 @@ def test_split_dump(
     split_simulation.write(
         tmp_path / "split/original"
     )  # a write is necessary before the dump to generate the gwtgwf packages
-    split_simulation.dump(tmp_path / "split")
+    split_simulation.dump(tmp_path / "split", engine=engine)
     reloaded_split = Modflow6Simulation.from_file(
         tmp_path / "split/1d_tpt_benchmark_partioned.toml"
     )
