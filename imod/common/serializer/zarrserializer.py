@@ -1,7 +1,7 @@
 import shutil
+from contextlib import nullcontext
 from copy import deepcopy
 from pathlib import Path
-from contextlib import nullcontext
 
 import xugrid as xu
 import zarr

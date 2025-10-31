@@ -18,7 +18,6 @@ import numpy as np
 import pytest
 
 import imod
-from imod.common.serializer import create_package_serializer
 from imod.mf6.boundary_condition import AdvancedBoundaryCondition, BoundaryCondition
 from imod.mf6.package import Package
 from imod.tests.fixtures.package_instance_creation import ALL_PACKAGE_INSTANCES

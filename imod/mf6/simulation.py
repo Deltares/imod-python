@@ -21,7 +21,7 @@ import imod
 import imod.mf6.exchangebase
 from imod.common.interfaces.imodel import IModel
 from imod.common.interfaces.isimulation import ISimulation
-from imod.common.serializer import EngineType, create_package_serializer
+from imod.common.serializer import EngineType
 from imod.common.statusinfo import NestedStatusInfo
 from imod.common.utilities.dataclass_type import DataclassType
 from imod.common.utilities.mask import _mask_all_models
@@ -1051,13 +1051,23 @@ class Modflow6Simulation(collections.UserDict, ISimulation):
                     _, filename, _, _ = exchange_package.get_specification()
                     exchange_class_short = type(exchange_package).__name__
                     path = exchange_package.to_file(
-                        directory, filename, mdal_compliant=mdal_compliant, crs=crs, engine=engine
+                        directory,
+                        filename,
+                        mdal_compliant=mdal_compliant,
+                        crs=crs,
+                        engine=engine,
                     )
 
                     toml_content[key][exchange_class_short].append(path.name)
 
             else:
-                path = value.to_file(directory, key, mdal_compliant=mdal_compliant, crs=crs, engine=engine)
+                path = value.to_file(
+                    directory,
+                    key,
+                    mdal_compliant=mdal_compliant,
+                    crs=crs,
+                    engine=engine,
+                )
                 toml_content[cls_name][key] = path.name
 
         with open(directory / f"{self.name}.toml", "wb") as f:

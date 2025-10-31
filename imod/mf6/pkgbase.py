@@ -1,7 +1,7 @@
 import abc
 import numbers
 from pathlib import Path
-from typing import Mapping, Self, final, Optional, Any
+from typing import Any, Mapping, Optional, Self, final
 
 import numpy as np
 import xarray as xr
@@ -10,12 +10,12 @@ from xarray.core.utils import is_scalar
 
 import imod
 from imod.common.interfaces.ipackagebase import IPackageBase
+from imod.common.serializer import EngineType, create_package_serializer
 from imod.typing.grid import (
     GridDataArray,
     GridDataset,
     merge_with_dictionary,
 )
-from imod.common.serializer import EngineType, create_package_serializer
 
 TRANSPORT_PACKAGES = ("adv", "dsp", "ssm", "mst", "ist", "src")
 EXCHANGE_PACKAGES = ("gwfgwf", "gwfgwt", "gwtgwt")
@@ -155,16 +155,16 @@ class PackageBase(IPackageBase, abc.ABC):
 
     @final
     def to_file(
-            self, 
-            modeldirectory: Path,
-            pkgname: str,
-            mdal_compliant: bool = False,
-            crs: Optional[Any] = None,
-            engine: EngineType = "netcdf4",
-            **kwargs
+        self,
+        modeldirectory: Path,
+        pkgname: str,
+        mdal_compliant: bool = False,
+        crs: Optional[Any] = None,
+        engine: EngineType = "netcdf4",
+        **kwargs,
     ) -> Path:
         """
-        Write package to file. 
+        Write package to file.
 
         Parameters
         ----------
@@ -189,7 +189,7 @@ class PackageBase(IPackageBase, abc.ABC):
         **kwargs : keyword arguments
             Additional keyword arguments forwarded to the package serializer's
             `to_file` method.
-        
+
         Returns
         -------
         pathlib.Path

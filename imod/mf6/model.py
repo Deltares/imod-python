@@ -19,7 +19,7 @@ from jinja2 import Template
 
 import imod
 from imod.common.interfaces.imodel import IModel
-from imod.common.serializer import EngineType, create_package_serializer
+from imod.common.serializer import EngineType
 from imod.common.statusinfo import NestedStatusInfo, StatusInfo, StatusInfoBase
 from imod.common.utilities.clip import clip_box_dataset
 from imod.common.utilities.mask import _mask_all_packages
@@ -638,7 +638,13 @@ class Modflow6Model(collections.UserDict, IModel, abc.ABC):
         toml_content: dict = collections.defaultdict(dict)
 
         for pkgname, pkg in self.items():
-            pkg_path = pkg.to_file(modeldirectory, pkgname, mdal_compliant=mdal_compliant, crs=crs, engine=engine)
+            pkg_path = pkg.to_file(
+                modeldirectory,
+                pkgname,
+                mdal_compliant=mdal_compliant,
+                crs=crs,
+                engine=engine,
+            )
             toml_content[type(pkg).__name__][pkgname] = pkg_path.name
 
         toml_path = modeldirectory / f"{modelname}.toml"
