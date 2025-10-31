@@ -81,8 +81,7 @@ Discretization
     StructuredDiscretization.get_regrid_methods
     StructuredDiscretization.regrid_like
     StructuredDiscretization.from_file
-    StructuredDiscretization.to_netcdf
-    StructuredDiscretization.to_zarr
+    StructuredDiscretization.to_file
     StructuredDiscretization.copy
     StructuredDiscretization.clip_box
     StructuredDiscretization.mask
@@ -92,8 +91,7 @@ Discretization
     VerticesDiscretization.get_regrid_methods
     VerticesDiscretization.regrid_like
     VerticesDiscretization.from_file
-    VerticesDiscretization.to_netcdf
-    VerticesDiscretization.to_zarr
+    VerticesDiscretization.to_file
     VerticesDiscretization.copy
     VerticesDiscretization.clip_box
     VerticesDiscretization.mask
@@ -102,8 +100,7 @@ Discretization
     TimeDiscretization
     TimeDiscretization.write
     TimeDiscretization.from_file
-    TimeDiscretization.to_netcdf
-    TimeDiscretization.to_zarr
+    TimeDiscretization.to_file
     TimeDiscretization.copy
     TimeDiscretization.clip_box
     TimeDiscretization.mask
@@ -113,8 +110,7 @@ Discretization
     AdaptiveTimeStepping
     AdaptiveTimeStepping.write
     AdaptiveTimeStepping.from_file
-    AdaptiveTimeStepping.to_netcdf
-    AdaptiveTimeStepping.to_zarr
+    AdaptiveTimeStepping.to_file
     AdaptiveTimeStepping.copy
     AdaptiveTimeStepping.clip_box
     AdaptiveTimeStepping.mask
@@ -132,8 +128,7 @@ Model settings
     OutputControl.is_budget_output
     OutputControl.write
     OutputControl.from_file
-    OutputControl.to_netcdf
-    OutputControl.to_zarr
+    OutputControl.to_file
     OutputControl.copy
     OutputControl.clip_box
     OutputControl.mask
@@ -143,8 +138,7 @@ Model settings
     Solution
     Solution.write
     Solution.from_file
-    Solution.to_netcdf
-    Solution.to_zarr
+    Solution.to_file
     Solution.copy
     Solution.clip_box
     Solution.mask
@@ -165,8 +159,7 @@ Flow Packages
     ApiPackage
     ApiPackage.write
     ApiPackage.from_file
-    ApiPackage.to_netcdf
-    ApiPackage.to_zarr
+    ApiPackage.to_file
     ApiPackage.copy
     ApiPackage.is_empty
     ApiPackage.get_regrid_methods
@@ -176,8 +169,7 @@ Flow Packages
     Buoyancy
     Buoyancy.write
     Buoyancy.from_file
-    Buoyancy.to_netcdf
-    Buoyancy.to_zarr
+    Buoyancy.to_file
     Buoyancy.copy
     Buoyancy.is_empty
     Buoyancy.get_regrid_methods
@@ -192,8 +184,7 @@ Flow Packages
     ConstantHead.clip_box
     ConstantHead.write
     ConstantHead.from_file
-    ConstantHead.to_netcdf
-    ConstantHead.to_zarr
+    ConstantHead.to_file
     ConstantHead.copy
     ConstantHead.is_empty
     ConstantHead.get_regrid_methods
@@ -205,8 +196,7 @@ Flow Packages
     Drainage.clip_box
     Drainage.write
     Drainage.from_file
-    Drainage.to_netcdf
-    Drainage.to_zarr
+    Drainage.to_file
     Drainage.copy
     Drainage.is_empty
     Drainage.get_regrid_methods
@@ -218,8 +208,7 @@ Flow Packages
     Evapotranspiration.clip_box
     Evapotranspiration.write
     Evapotranspiration.from_file
-    Evapotranspiration.to_netcdf
-    Evapotranspiration.to_zarr
+    Evapotranspiration.to_file
     Evapotranspiration.copy
     Evapotranspiration.is_empty
     Evapotranspiration.get_regrid_methods
@@ -231,8 +220,7 @@ Flow Packages
     GeneralHeadBoundary.clip_box
     GeneralHeadBoundary.write
     GeneralHeadBoundary.from_file
-    GeneralHeadBoundary.to_netcdf
-    GeneralHeadBoundary.to_zarr
+    GeneralHeadBoundary.to_file
     GeneralHeadBoundary.copy
     GeneralHeadBoundary.is_empty
     GeneralHeadBoundary.get_regrid_methods
@@ -244,8 +232,7 @@ Flow Packages
     HorizontalFlowBarrierHydraulicCharacteristic.snap_to_grid
     HorizontalFlowBarrierHydraulicCharacteristic.write
     HorizontalFlowBarrierHydraulicCharacteristic.from_file
-    HorizontalFlowBarrierHydraulicCharacteristic.to_netcdf
-    HorizontalFlowBarrierHydraulicCharacteristic.to_zarr
+    HorizontalFlowBarrierHydraulicCharacteristic.to_file
     HorizontalFlowBarrierHydraulicCharacteristic.copy
     HorizontalFlowBarrierHydraulicCharacteristic.is_empty
     HorizontalFlowBarrierHydraulicCharacteristic.get_regrid_methods
@@ -257,8 +244,7 @@ Flow Packages
     HorizontalFlowBarrierMultiplier.snap_to_grid
     HorizontalFlowBarrierMultiplier.write
     HorizontalFlowBarrierMultiplier.from_file
-    HorizontalFlowBarrierMultiplier.to_netcdf
-    HorizontalFlowBarrierMultiplier.to_zarr
+    HorizontalFlowBarrierMultiplier.to_file
     HorizontalFlowBarrierMultiplier.copy
     HorizontalFlowBarrierMultiplier.is_empty
     HorizontalFlowBarrierMultiplier.get_regrid_methods
@@ -271,8 +257,7 @@ Flow Packages
     HorizontalFlowBarrierResistance.snap_to_grid
     HorizontalFlowBarrierResistance.write
     HorizontalFlowBarrierResistance.from_file
-    HorizontalFlowBarrierResistance.to_netcdf
-    HorizontalFlowBarrierResistance.to_zarr
+    HorizontalFlowBarrierResistance.to_file
     HorizontalFlowBarrierResistance.copy
     HorizontalFlowBarrierResistance.is_empty
     HorizontalFlowBarrierResistance.get_regrid_methods
@@ -288,8 +273,7 @@ Flow Packages
     LayeredWell.clip_box
     LayeredWell.write
     LayeredWell.from_file
-    LayeredWell.to_netcdf
-    LayeredWell.to_zarr
+    LayeredWell.to_file
     LayeredWell.copy
     LayeredWell.is_empty
     LayeredWell.get_regrid_methods
@@ -300,8 +284,7 @@ Flow Packages
     InitialConditions.clip_box
     InitialConditions.write
     InitialConditions.from_file
-    InitialConditions.to_netcdf
-    InitialConditions.to_zarr
+    InitialConditions.to_file
     InitialConditions.copy
     InitialConditions.is_empty
     InitialConditions.get_regrid_methods
@@ -312,8 +295,7 @@ Flow Packages
     NodePropertyFlow.clip_box
     NodePropertyFlow.write
     NodePropertyFlow.from_file
-    NodePropertyFlow.to_netcdf
-    NodePropertyFlow.to_zarr
+    NodePropertyFlow.to_file
     NodePropertyFlow.copy
     NodePropertyFlow.is_empty
     NodePropertyFlow.get_regrid_methods
@@ -325,8 +307,7 @@ Flow Packages
     Recharge.clip_box
     Recharge.write
     Recharge.from_file
-    Recharge.to_netcdf
-    Recharge.to_zarr
+    Recharge.to_file
     Recharge.copy
     Recharge.is_empty
     Recharge.get_regrid_methods
@@ -340,8 +321,7 @@ Flow Packages
     River.clip_box
     River.write
     River.from_file
-    River.to_netcdf
-    River.to_zarr
+    River.to_file
     River.copy
     River.is_empty
     River.get_regrid_methods
@@ -353,8 +333,7 @@ Flow Packages
     SingleLayerHorizontalFlowBarrierHydraulicCharacteristic.snap_to_grid
     SingleLayerHorizontalFlowBarrierHydraulicCharacteristic.write
     SingleLayerHorizontalFlowBarrierHydraulicCharacteristic.from_file
-    SingleLayerHorizontalFlowBarrierHydraulicCharacteristic.to_netcdf
-    SingleLayerHorizontalFlowBarrierHydraulicCharacteristic.to_zarr
+    SingleLayerHorizontalFlowBarrierHydraulicCharacteristic.to_file
     SingleLayerHorizontalFlowBarrierHydraulicCharacteristic.copy
     SingleLayerHorizontalFlowBarrierHydraulicCharacteristic.is_empty
     SingleLayerHorizontalFlowBarrierHydraulicCharacteristic.get_regrid_methods
@@ -366,8 +345,7 @@ Flow Packages
     SingleLayerHorizontalFlowBarrierMultiplier.snap_to_grid
     SingleLayerHorizontalFlowBarrierMultiplier.write
     SingleLayerHorizontalFlowBarrierMultiplier.from_file
-    SingleLayerHorizontalFlowBarrierMultiplier.to_netcdf
-    SingleLayerHorizontalFlowBarrierMultiplier.to_zarr
+    SingleLayerHorizontalFlowBarrierMultiplier.to_file
     SingleLayerHorizontalFlowBarrierMultiplier.copy
     SingleLayerHorizontalFlowBarrierMultiplier.is_empty
     SingleLayerHorizontalFlowBarrierMultiplier.get_regrid_methods
@@ -381,8 +359,7 @@ Flow Packages
     SingleLayerHorizontalFlowBarrierResistance.snap_to_grid
     SingleLayerHorizontalFlowBarrierResistance.write
     SingleLayerHorizontalFlowBarrierResistance.from_file
-    SingleLayerHorizontalFlowBarrierResistance.to_netcdf
-    SingleLayerHorizontalFlowBarrierResistance.to_zarr
+    SingleLayerHorizontalFlowBarrierResistance.to_file
     SingleLayerHorizontalFlowBarrierResistance.copy
     SingleLayerHorizontalFlowBarrierResistance.is_empty
     SingleLayerHorizontalFlowBarrierResistance.get_regrid_methods
@@ -394,8 +371,7 @@ Flow Packages
     SpecificStorage.clip_box
     SpecificStorage.write
     SpecificStorage.from_file
-    SpecificStorage.to_netcdf
-    SpecificStorage.to_zarr
+    SpecificStorage.to_file
     SpecificStorage.copy
     SpecificStorage.is_empty
     SpecificStorage.get_regrid_methods
@@ -406,8 +382,7 @@ Flow Packages
     StorageCoefficient.clip_box
     StorageCoefficient.write
     StorageCoefficient.from_file
-    StorageCoefficient.to_netcdf
-    StorageCoefficient.to_zarr
+    StorageCoefficient.to_file
     StorageCoefficient.copy
     StorageCoefficient.is_empty
     StorageCoefficient.get_regrid_methods
@@ -417,16 +392,14 @@ Flow Packages
     UnsaturatedZoneFlow.regrid_like
     UnsaturatedZoneFlow.write
     UnsaturatedZoneFlow.from_file
-    UnsaturatedZoneFlow.to_netcdf
-    UnsaturatedZoneFlow.to_zarr
+    UnsaturatedZoneFlow.to_file
     UnsaturatedZoneFlow.copy
     UnsaturatedZoneFlow.is_empty
     UnsaturatedZoneFlow.get_regrid_methods
     Viscosity
     Viscosity.write
     Viscosity.from_file
-    Viscosity.to_netcdf
-    Viscosity.to_zarr
+    Viscosity.to_file
     Viscosity.copy
     Viscosity.is_empty
     Viscosity.get_regrid_methods
@@ -442,8 +415,7 @@ Flow Packages
     Well.clip_box
     Well.write
     Well.from_file
-    Well.to_netcdf
-    Well.to_zarr
+    Well.to_file
     Well.copy
     Well.is_empty
     Well.get_regrid_methods
@@ -458,64 +430,56 @@ Transport Packages
     AdvectionCentral
     AdvectionCentral.write
     AdvectionCentral.from_file
-    AdvectionCentral.to_netcdf
-    AdvectionCentral.to_zarr
+    AdvectionCentral.to_file
     AdvectionCentral.copy
     AdvectionCentral.is_empty
     AdvectionCentral.get_regrid_methods
     AdvectionTVD
     AdvectionTVD.write
     AdvectionTVD.from_file
-    AdvectionTVD.to_netcdf
-    AdvectionTVD.to_zarr
+    AdvectionTVD.to_file
     AdvectionTVD.copy
     AdvectionTVD.is_empty
     AdvectionTVD.get_regrid_methods
     AdvectionUpstream
     AdvectionUpstream.write
     AdvectionUpstream.from_file
-    AdvectionUpstream.to_netcdf
-    AdvectionUpstream.to_zarr
+    AdvectionUpstream.to_file
     AdvectionUpstream.copy
     AdvectionUpstream.is_empty
     AdvectionUpstream.get_regrid_methods
     ConstantConcentration
     ConstantConcentration.write
     ConstantConcentration.from_file
-    ConstantConcentration.to_netcdf
-    ConstantConcentration.to_zarr
+    ConstantConcentration.to_file
     ConstantConcentration.copy
     ConstantConcentration.is_empty
     ConstantConcentration.get_regrid_methods
     Dispersion
     Dispersion.write
     Dispersion.from_file
-    Dispersion.to_netcdf
-    Dispersion.to_zarr
+    Dispersion.to_file
     Dispersion.copy
     Dispersion.is_empty
     Dispersion.get_regrid_methods
     ImmobileStorageTransfer
     ImmobileStorageTransfer.write
     ImmobileStorageTransfer.from_file
-    ImmobileStorageTransfer.to_netcdf
-    ImmobileStorageTransfer.to_zarr
+    ImmobileStorageTransfer.to_file
     ImmobileStorageTransfer.copy
     ImmobileStorageTransfer.is_empty
     ImmobileStorageTransfer.get_regrid_methods
     MobileStorageTransfer
     MobileStorageTransfer.write
     MobileStorageTransfer.from_file
-    MobileStorageTransfer.to_netcdf
-    MobileStorageTransfer.to_zarr
+    MobileStorageTransfer.to_file
     MobileStorageTransfer.copy
     MobileStorageTransfer.is_empty
     MobileStorageTransfer.get_regrid_methods
     MassSourceLoading
     MassSourceLoading.write
     MassSourceLoading.from_file
-    MassSourceLoading.to_netcdf
-    MassSourceLoading.to_zarr
+    MassSourceLoading.to_file
     MassSourceLoading.copy
     MassSourceLoading.is_empty
     MassSourceLoading.get_regrid_methods
@@ -523,8 +487,7 @@ Transport Packages
     SourceSinkMixing.from_flow_model
     SourceSinkMixing.write
     SourceSinkMixing.from_file
-    SourceSinkMixing.to_netcdf
-    SourceSinkMixing.to_zarr
+    SourceSinkMixing.to_file
     SourceSinkMixing.copy
     SourceSinkMixing.is_empty
     SourceSinkMixing.get_regrid_methods
