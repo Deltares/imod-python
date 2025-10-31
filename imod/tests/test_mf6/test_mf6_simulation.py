@@ -44,32 +44,37 @@ from imod.tests.fixtures.mf6_small_models_fixture import (
 from imod.typing.grid import zeros_like
 
 
-def roundtrip(simulation, tmpdir_factory, name):
+def roundtrip(simulation, tmpdir_factory, name, engine):
     # TODO: look at the values?
     tmp_path = tmpdir_factory.mktemp(name)
-    simulation.dump(tmp_path)
+    simulation.dump(tmp_path, engine=engine)
     back = imod.mf6.Modflow6Simulation.from_file(tmp_path / f"{simulation.name}.toml")
     assert isinstance(back, imod.mf6.Modflow6Simulation)
 
 
-def test_twri_roundtrip(twri_model, tmpdir_factory):
-    roundtrip(twri_model, tmpdir_factory, "twri")
+@pytest.mark.parametrize("engine", ["netcdf4", "zarr", "zarr.zip"])
+def test_twri_roundtrip(twri_model, tmpdir_factory, engine):
+    roundtrip(twri_model, tmpdir_factory, "twri", engine)
 
 
-def test_twri_hfb_roundtrip(twri_model_hfb, tmpdir_factory):
-    roundtrip(twri_model_hfb, tmpdir_factory, "twri")
+@pytest.mark.parametrize("engine", ["netcdf4", "zarr", "zarr.zip"])
+def test_twri_hfb_roundtrip(twri_model_hfb, tmpdir_factory, engine):
+    roundtrip(twri_model_hfb, tmpdir_factory, "twri", engine)
 
 
-def test_twri_transient_roundtrip(transient_twri_model, tmpdir_factory):
-    roundtrip(transient_twri_model, tmpdir_factory, "twri_transient")
+@pytest.mark.parametrize("engine", ["netcdf4", "zarr", "zarr.zip"])
+def test_twri_transient_roundtrip(transient_twri_model, tmpdir_factory, engine):
+    roundtrip(transient_twri_model, tmpdir_factory, "twri_transient", engine)
 
 
-def test_twri_disv_roundtrip(twri_disv_model, tmpdir_factory):
-    roundtrip(twri_disv_model, tmpdir_factory, "twri_disv")
+@pytest.mark.parametrize("engine", ["netcdf4", "zarr", "zarr.zip"])
+def test_twri_disv_roundtrip(twri_disv_model, tmpdir_factory, engine):
+    roundtrip(twri_disv_model, tmpdir_factory, "twri_disv", engine)
 
 
-def test_circle_roundtrip(circle_model, tmpdir_factory):
-    roundtrip(circle_model, tmpdir_factory, "circle")
+@pytest.mark.parametrize("engine", ["netcdf4", "zarr", "zarr.zip"])
+def test_circle_roundtrip(circle_model, tmpdir_factory, engine):
+    roundtrip(circle_model, tmpdir_factory, "circle", engine)
 
 
 def test_dump_version_number__version_written(twri_model, tmpdir_factory):

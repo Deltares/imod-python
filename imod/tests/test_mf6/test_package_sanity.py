@@ -97,10 +97,10 @@ def test_render_twice(instance, tmp_path):
 
 
 @pytest.mark.parametrize("instance", ALL_PACKAGE_INSTANCES)
-def test_save_and_load(instance, tmp_path):
+@pytest.mark.parametrize("engine", ["netcdf4", "zarr", "zarr.zip"])
+def test_save_and_load(instance, engine, tmp_path):
     pkg_class = type(instance)
-    path = tmp_path / f"{instance._pkg_id}.nc"
-    instance.to_netcdf(path)
+    path = instance.to_file(tmp_path, instance._pkg_id, engine=engine)
     back = pkg_class.from_file(path)
     assert instance.dataset.equals(back.dataset)
 

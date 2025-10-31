@@ -21,6 +21,10 @@ Added
 
 - Added :class:`imod.mf6.Viscosity` package to specify the viscosity of the
   groundwater flow model.
+- Functionality to dump and load MODFLOW 6 simulations to/from zarr and zipstore
+  formats. See :meth:`imod.mf6.Modflow6Simulation.dump` and
+  :meth:`imod.mf6.Modflow6Simulation.from_file` for more information.
+
 
 [1.0.0rc7] - 2025-10-28
 -----------------------

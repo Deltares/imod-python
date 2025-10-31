@@ -19,6 +19,7 @@ from jinja2 import Template
 
 import imod
 from imod.common.interfaces.imodel import IModel
+from imod.common.serializer import EngineType
 from imod.common.statusinfo import NestedStatusInfo, StatusInfo, StatusInfoBase
 from imod.common.utilities.clip import clip_box_dataset
 from imod.common.utilities.mask import _mask_all_packages
@@ -592,7 +593,8 @@ class Modflow6Model(collections.UserDict, IModel, abc.ABC):
         validate: bool = True,
         mdal_compliant: bool = False,
         crs: Optional[Any] = None,
-    ):
+        engine: EngineType = "netcdf4",
+    ) -> Path:
         """
         Dump simulation to files. Writes a model definition as .TOML file, which
         points to data for each package. Each package is stored as a separate
@@ -615,6 +617,15 @@ class Modflow6Model(collections.UserDict, IModel, abc.ABC):
         crs: Any, optional
             Anything accepted by rasterio.crs.CRS.from_user_input
             Requires ``rioxarray`` installed.
+        engine : str, optional
+            File engine used to write packages. Options are ``'netcdf4'``,
+            ``'zarr'``, and ``'zarr.zip'``. NetCDF4 is readable by many other
+            softwares, for example QGIS. Zarr is optimized for big data, cloud
+            storage and parallel access. The ``'zarr.zip'`` option is an
+            experimental option which creates a zipped zarr store in a single
+            file, which is easier to copy and automatically compresses data as
+            well. Default is ``'netcdf4'``.
+
         """
         modeldirectory = pathlib.Path(directory) / modelname
         modeldirectory.mkdir(exist_ok=True, parents=True)
@@ -625,12 +636,16 @@ class Modflow6Model(collections.UserDict, IModel, abc.ABC):
                 raise ValidationError(statusinfo.to_string())
 
         toml_content: dict = collections.defaultdict(dict)
+
         for pkgname, pkg in self.items():
-            pkg_path = f"{pkgname}.nc"
-            toml_content[type(pkg).__name__][pkgname] = pkg_path
-            pkg.to_netcdf(
-                modeldirectory / pkg_path, crs=crs, mdal_compliant=mdal_compliant
+            pkg_path = pkg.to_file(
+                modeldirectory,
+                pkgname,
+                mdal_compliant=mdal_compliant,
+                crs=crs,
+                engine=engine,
             )
+            toml_content[type(pkg).__name__][pkgname] = pkg_path.name
 
         toml_path = modeldirectory / f"{modelname}.toml"
         with open(toml_path, "wb") as f:

@@ -5,7 +5,7 @@ import typing
 from copy import deepcopy
 from enum import Enum
 from pathlib import Path
-from typing import TYPE_CHECKING, Any, Dict, List, Optional, Self, Tuple
+from typing import TYPE_CHECKING, Dict, List, Optional, Self, Tuple
 
 import cftime
 import numpy as np
@@ -530,40 +530,6 @@ class HorizontalFlowBarrierBase(BoundaryCondition, ILineDataPackage):
             f"""{self.__class__.__name__} is a grid-agnostic package and does not have a render method. To render the
             package, first convert to a Modflow6 package by calling pkg.to_mf6_pkg()"""
         )
-
-    def to_netcdf(
-        self, *args, mdal_compliant: bool = False, crs: Optional[Any] = None, **kwargs
-    ):
-        """
-        Write dataset contents to a netCDF file. Custom encoding rules can be
-        provided on package level by overriding the _netcdf_encoding in the
-        package
-
-        Parameters
-        ----------
-        *args:
-            Will be passed on to ``xr.Dataset.to_netcdf`` or
-            ``xu.UgridDataset.to_netcdf``.
-        mdal_compliant: bool, optional
-            Convert data with
-            :func:`imod.prepare.spatial.mdal_compliant_ugrid2d` to MDAL
-            compliant unstructured grids. Defaults to False.
-        crs: Any, optional
-            Anything accepted by rasterio.crs.CRS.from_user_input
-            Requires ``rioxarray`` installed.
-        **kwargs:
-            Will be passed on to ``xr.Dataset.to_netcdf`` or
-            ``xu.UgridDataset.to_netcdf``.
-
-        """
-        kwargs.update({"encoding": self._netcdf_encoding()})
-
-        new = deepcopy(self)
-        new.dataset["geometry"] = new.line_data.to_json()
-        new.dataset.to_netcdf(*args, **kwargs)
-
-    def _netcdf_encoding(self):
-        return {"geometry": {"dtype": "str"}}
 
     @classmethod
     def from_file(cls, path: str | Path, **kwargs) -> Self:
