@@ -2,14 +2,23 @@ import shutil
 from contextlib import nullcontext
 from copy import deepcopy
 from pathlib import Path
+from typing import TYPE_CHECKING
 
 import xugrid as xu
-import zarr
 
 from imod.common.interfaces.ilinedatapackage import ILineDataPackage
 from imod.common.interfaces.ipackagebase import IPackageBase
 from imod.common.interfaces.ipackageserializer import IPackageSerializer
 from imod.typing import GridDataset
+from imod.util.imports import MissingOptionalModule
+
+if TYPE_CHECKING:
+    import zarr
+else:
+    try:
+        import zarr
+    except ImportError:
+        zarr = MissingOptionalModule("zarr")
 
 
 class ZarrSerializer(IPackageSerializer):

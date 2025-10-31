@@ -1,7 +1,7 @@
 import abc
 import numbers
 from pathlib import Path
-from typing import Any, Mapping, Optional, Self, final
+from typing import TYPE_CHECKING, Any, Mapping, Optional, Self, final
 
 import numpy as np
 import xarray as xr
@@ -16,6 +16,16 @@ from imod.typing.grid import (
     GridDataset,
     merge_with_dictionary,
 )
+from imod.util.imports import MissingOptionalModule
+
+if TYPE_CHECKING:
+    import zarr
+else:
+    try:
+        import zarr
+    except ImportError:
+        zarr = MissingOptionalModule("zarr")
+
 
 TRANSPORT_PACKAGES = ("adv", "dsp", "ssm", "mst", "ist", "src")
 EXCHANGE_PACKAGES = ("gwfgwf", "gwfgwt", "gwtgwt")
@@ -120,8 +130,6 @@ class PackageBase(IPackageBase, abc.ABC):
         """
         path = Path(path)
         if path.suffix in (".zip", ".zarr"):
-            import zarr
-
             if path.suffix == ".zip":
                 with zarr.storage.ZipStore(path, mode="r") as store:
                     dataset = xr.open_zarr(store, **kwargs)
