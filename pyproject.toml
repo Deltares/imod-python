@@ -96,14 +96,17 @@ convention = "numpy"
 "examples/*" = ["E402"]
 
 [tool.mypy]
-files = [
-    "imod/logging/**/**.py",
-    "imod/mf6/**/**.py",
-    "imod/msw/**/**.py",
-    "imod/prepare/**/**.py",
-    "imod/select/**/**.py",
-    "imod/typing/**/**.py",
-    "imod/util/**/**.py",
+packages = ["imod"]
+exclude = [
+    "imod/common",
+    "imod/data",
+    "imod/evaluate",
+    "imod/formats",
+    "imod/schemata.py",
+    "imod/templates",
+    "imod/tests",
+    "imod/visualize",
+    "imod/wq",
 ]
 follow_imports = "normal"
 strict = true
@@ -129,28 +132,19 @@ check_untyped_defs = false
 
 [[tool.mypy.overrides]]
 module = [
+    # No stubs available
     "affine.*",
-    "bottleneck.*",
     "cftime.*",
-    "contextily.*",
-    "dateutil.*",
-    "flopy.*",
-    "plum-dispatch.*",
-    "geopandas.*",
-    "matplotlib.*",
-    "mpl_toolkits.*",
     "numba.*",
     "osgeo.*",
-    "pandas.*",
-    "pooch.*",
-    "pyproj.*",
     "rasterio.*",
+    "xugrid.*",
+    # Stubs available, but too much work to fix right now
+    "dateutil.*",
+    "geopandas.*",
+    "pandas.*",
     "scipy.*",
     "shapely.*",
-    "tomllib.*",
-    "tqdm.*",
-    "vtk.*",
-    "xugrid.*",
 ]
 ignore_missing_imports = true
 
