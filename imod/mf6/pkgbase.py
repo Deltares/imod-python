@@ -1,7 +1,7 @@
 import abc
 import numbers
 from pathlib import Path
-from typing import Any, Mapping, Optional, Self
+from typing import Mapping, Self, final, Optional, Any
 
 import numpy as np
 import xarray as xr
@@ -10,13 +10,12 @@ from xarray.core.utils import is_scalar
 
 import imod
 from imod.common.interfaces.ipackagebase import IPackageBase
-from imod.common.utilities.file_engines import EngineType, to_zarr
 from imod.typing.grid import (
     GridDataArray,
     GridDataset,
-    is_spatial_grid,
     merge_with_dictionary,
 )
+from imod.common.serializer import EngineType, create_package_serializer
 
 TRANSPORT_PACKAGES = ("adv", "dsp", "ssm", "mst", "ist", "src")
 EXCHANGE_PACKAGES = ("gwfgwf", "gwfgwt", "gwtgwt")
@@ -41,6 +40,8 @@ class PackageBase(IPackageBase, abc.ABC):
     object.dataset.to_netcdf(...)
     """
 
+    _pkg_id = ""
+
     # This method has been added to allow mock.patch to mock created objects
     # https://stackoverflow.com/questions/64737213/how-to-patch-the-new-method-of-a-class
     def __new__(cls, *_, **__):
@@ -61,89 +62,15 @@ class PackageBase(IPackageBase, abc.ABC):
     def dataset(self, value: GridDataset) -> None:
         self.__dataset = value
 
+    @property
+    def pkg_id(self) -> str:
+        return self._pkg_id
+
     def __getitem__(self, key):
         return self.dataset.__getitem__(key)
 
     def __setitem__(self, key, value):
         self.dataset.__setitem__(key, value)
-
-    def to_zarr(self, path: str | Path, engine: EngineType, **kwargs) -> None:
-        """
-        Write dataset contents to a zarr file.
-
-        Parameters
-        ----------
-        path : str, pathlib.Path
-            Path to the zarr file or directory.
-        engine : str
-            The file engine. Options are 'zarr' and 'zarr.zip'.
-        **kwargs : keyword arguments
-            Will be passed on to ``xarray.Dataset.to_zarr()`` or
-            ``xugrid.UgridDataset.to_zarr()``.
-        """
-        to_zarr(self.dataset, path, engine, **kwargs)
-
-    def to_netcdf(
-        self, *args, mdal_compliant: bool = False, crs: Optional[Any] = None, **kwargs
-    ) -> None:
-        """
-        Write dataset contents to a netCDF file. Custom encoding rules can be
-        provided on package level by overriding the _netcdf_encoding in the
-        package
-
-        Parameters
-        ----------
-        *args:
-            Will be passed on to ``xr.Dataset.to_netcdf`` or
-            ``xu.UgridDataset.to_netcdf``.
-        mdal_compliant: bool, optional
-            Convert data with
-            :func:`imod.prepare.spatial.mdal_compliant_ugrid2d` to MDAL
-            compliant unstructured grids. Defaults to False.
-        crs: Any, optional
-            Anything accepted by rasterio.crs.CRS.from_user_input
-            Requires ``rioxarray`` installed.
-        **kwargs:
-            Will be passed on to ``xr.Dataset.to_netcdf`` or
-            ``xu.UgridDataset.to_netcdf``.
-
-        """
-        kwargs.update({"encoding": self._netcdf_encoding()})
-
-        dataset = self.dataset
-
-        # Create encoding dict for float16 variables
-        for var in dataset.data_vars:
-            if dataset[var].dtype == np.float16:
-                kwargs["encoding"][var] = {"dtype": "float32"}
-
-        # Also check coordinates
-        for coord in dataset.coords:
-            if dataset[coord].dtype == np.float16:
-                kwargs["encoding"][coord] = {"dtype": "float32"}
-
-        if isinstance(dataset, xu.UgridDataset):
-            if mdal_compliant:
-                dataset = dataset.ugrid.to_dataset()
-                mdal_dataset = imod.util.spatial.mdal_compliant_ugrid2d(
-                    dataset, crs=crs
-                )
-                mdal_dataset.to_netcdf(*args, **kwargs)
-            else:
-                dataset.ugrid.to_netcdf(*args, **kwargs)
-        else:
-            if is_spatial_grid(dataset):
-                dataset = imod.util.spatial.gdal_compliant_grid(dataset, crs=crs)
-            dataset.to_netcdf(*args, **kwargs)
-
-    def _netcdf_encoding(self) -> dict:
-        """
-
-        The encoding used in the to_netcdf method
-        Override this to provide custom encoding rules
-
-        """
-        return {}
 
     @classmethod
     def _from_dataset(cls, ds: GridDataset) -> Self:
@@ -225,3 +152,54 @@ class PackageBase(IPackageBase, abc.ABC):
                 dataset[var] = dataset[var].astype(str)
 
         return cls._from_dataset(dataset)
+
+    @final
+    def to_file(
+            self, 
+            modeldirectory: Path,
+            pkgname: str,
+            mdal_compliant: bool = False,
+            crs: Optional[Any] = None,
+            engine: EngineType = "netcdf4",
+            **kwargs
+    ) -> Path:
+        """
+        Write package to file. 
+
+        Parameters
+        ----------
+        modeldirectory : pathlib.Path
+            Directory where to write the package file.
+        pkgname : str
+            Name of the package, used to create the file name.
+        mdal_compliant : bool, optional
+            Whether to write the package in MDAL-compliant format. Only used if
+            ``engine="netcdf4"``. Default is False.
+        crs : optional
+            Coordinate reference system to use when writing the package. Only
+            used if ``engine="netcdf4"`` Default is None.
+        engine : str, optional
+            File engine used to write packages. Options are ``'netcdf4'``,
+            ``'zarr'``, and ``'zarr.zip'``. NetCDF4 is readable by many other
+            softwares, for example QGIS. Zarr is optimized for big data, cloud
+            storage and parallel access. The ``'zarr.zip'`` option is an
+            experimental option which creates a zipped zarr store in a single
+            file, which is easier to copy and automatically compresses data as
+            well. Default is ``'netcdf4'``.
+        **kwargs : keyword arguments
+            Additional keyword arguments forwarded to the package serializer's
+            `to_file` method.
+        
+        Returns
+        -------
+        pathlib.Path
+            Path to the written package file.
+        """
+
+        # All serialization logic is in the package serializers do not override
+        # this method (hence final decorator).
+        filewriter = create_package_serializer(
+            engine, mdal_compliant=mdal_compliant, crs=crs
+        )
+        path = filewriter.to_file(self, modeldirectory, pkgname, **kwargs)
+        return path

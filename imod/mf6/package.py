@@ -76,7 +76,6 @@ class Package(PackageBase, IPackage, abc.ABC):
     not the list input which is used in :class:`BoundaryCondition`.
     """
 
-    _pkg_id = ""
     _init_schemata: SchemataDict = {}
     _write_schemata: SchemataDict = {}
     _keyword_map: dict[str, str] = {}
@@ -566,10 +565,6 @@ class Package(PackageBase, IPackage, abc.ABC):
         :class:`imod.mf6.wel.Wel` package.
         """
         return False
-
-    @property
-    def pkg_id(self) -> str:
-        return self._pkg_id
 
     def __repr__(self) -> str:
         typename = type(self).__name__

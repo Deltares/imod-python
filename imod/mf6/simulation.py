@@ -21,9 +21,9 @@ import imod
 import imod.mf6.exchangebase
 from imod.common.interfaces.imodel import IModel
 from imod.common.interfaces.isimulation import ISimulation
+from imod.common.serializer import EngineType, create_package_serializer
 from imod.common.statusinfo import NestedStatusInfo
 from imod.common.utilities.dataclass_type import DataclassType
-from imod.common.utilities.file_engines import EngineType, engine_to_ext, to_file
 from imod.common.utilities.mask import _mask_all_models
 from imod.common.utilities.regrid import _regrid_like
 from imod.common.utilities.version import (
@@ -994,7 +994,13 @@ class Modflow6Simulation(collections.UserDict, ISimulation):
             Anything accepted by rasterio.crs.CRS.from_user_input
             Requires ``rioxarray`` installed.
         engine : str, optional
-            The file engine. Options are 'netcdf4', 'zarr', and 'zarr.zip'.
+            File engine used to write packages. Options are ``'netcdf4'``,
+            ``'zarr'``, and ``'zarr.zip'``. NetCDF4 is readable by many other
+            softwares, for example QGIS. Zarr is optimized for big data, cloud
+            storage and parallel access. The ``'zarr.zip'`` option is an
+            experimental option which creates a zipped zarr store in a single
+            file, which is easier to copy and automatically compresses data as
+            well. Default is ``'netcdf4'``.
 
         Examples
         --------
@@ -1028,7 +1034,7 @@ class Modflow6Simulation(collections.UserDict, ISimulation):
         # Dump version number
         version = get_version()
         toml_content["version"] = {"imod-python": version}
-        ext = engine_to_ext(engine)
+
         # Dump models and exchanges
         for key, value in self.items():
             cls_name = type(value).__name__
@@ -1044,14 +1050,15 @@ class Modflow6Simulation(collections.UserDict, ISimulation):
                 for exchange_package in self[key]:
                     _, filename, _, _ = exchange_package.get_specification()
                     exchange_class_short = type(exchange_package).__name__
-                    path = f"{filename}.{ext}"
-                    toml_content[key][exchange_class_short].append(path)
-                    to_file(exchange_package.dataset, directory / path, engine=engine)
+                    path = exchange_package.to_file(
+                        directory, filename, mdal_compliant=mdal_compliant, crs=crs, engine=engine
+                    )
+
+                    toml_content[key][exchange_class_short].append(path.name)
 
             else:
-                path = f"{key}.{ext}"
-                toml_content[cls_name][key] = path
-                to_file(value.dataset, directory / path, engine=engine)
+                path = value.to_file(directory, key, mdal_compliant=mdal_compliant, crs=crs, engine=engine)
+                toml_content[cls_name][key] = path.name
 
         with open(directory / f"{self.name}.toml", "wb") as f:
             tomli_w.dump(toml_content, f)
