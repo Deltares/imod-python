@@ -34,8 +34,3 @@ class IPackage(IPackageBase, metaclass=abc.ABCMeta):
     @abstractmethod
     def _is_grid_agnostic_package(self) -> bool:
         raise NotImplementedError
-
-    @property
-    @abc.abstractmethod
-    def pkg_id(self) -> str:
-        raise NotImplementedError

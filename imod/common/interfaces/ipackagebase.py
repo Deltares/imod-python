@@ -24,3 +24,8 @@ class IPackageBase(ABC):
     @abstractmethod
     def _from_dataset(cls, ds: GridDataset):
         raise NotImplementedError
+
+    @property
+    @abstractmethod
+    def pkg_id(self) -> str:
+        raise NotImplementedError
