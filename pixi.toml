@@ -1,4 +1,4 @@
-[project]
+[workspace]
 name = "imod-python"
 version = "1.0.0rc7"
 description = "Make massive MODFLOW models"
