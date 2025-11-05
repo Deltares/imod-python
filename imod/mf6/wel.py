@@ -83,6 +83,9 @@ def _df_groups_to_da_rates(
     # Convert dataframes all groups to DataArrays
     columns = list(unique_well_groups[0].columns)
     columns.remove("rate")
+    # Enforce index to the front, to ensure gb_and_summed is correctly sorted by
+    # index first.
+    columns.insert(0,columns.pop(columns.index("index")))
     is_transient = "time" in columns
     gb_and_summed = pd.concat(unique_well_groups).groupby(columns).sum()
     if is_transient:
@@ -91,7 +94,11 @@ def _df_groups_to_da_rates(
         index_names = ["index"]
     # Unset multi-index, then set index to index_names
     df_temp = gb_and_summed.reset_index().set_index(index_names)
-    return df_temp["rate"].to_xarray()
+    da_rate = df_temp["rate"].to_xarray()
+    # For safety: if index is still incorrectly ordered, sort it.
+    if not da_rate.indexes["index"].is_monotonic_increasing:
+        da_rate = da_rate.sortby("index")
+    return da_rate
 
 
 def _prepare_well_rates_from_groups(

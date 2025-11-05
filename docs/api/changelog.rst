@@ -15,6 +15,8 @@ Fixed
 - Improved performance of :meth:`imod.mf6.Modflow6Simulation.split` for large
   models loaded lazily into memory. Reduced a splitting operation of 2 hours to
   a few minutes for a test case.
+- Issue where :meth:`imod.mf6.LayeredWell.from_imod5_data` would result in wells
+  with a mismatch between coordinates and rates.
 
 Added
 ~~~~~
