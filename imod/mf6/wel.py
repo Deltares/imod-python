@@ -85,7 +85,7 @@ def _df_groups_to_da_rates(
     columns.remove("rate")
     # Enforce index to the front, to ensure gb_and_summed is correctly sorted by
     # index first.
-    columns.insert(0,columns.pop(columns.index("index")))
+    columns.insert(0, columns.pop(columns.index("index")))
     is_transient = "time" in columns
     gb_and_summed = pd.concat(unique_well_groups).groupby(columns).sum()
     if is_transient:
