@@ -76,14 +76,14 @@ def mask_2D(package: GridAgnosticWell, domain_2d: GridDataArray) -> GridAgnostic
     cls = type(package)
     return cls._from_dataset(selection)
 
-def _move_item_to_index(
-    lst: list[str], item: str, index: int
-) -> list[str]:
+
+def _move_item_to_index(lst: list[str], item: str, index: int) -> list[str]:
     """Move item in list to specified index"""
     lst_copy = lst.copy()
     lst_copy.remove(item)
     lst_copy.insert(index, item)
     return lst_copy
+
 
 def _df_groups_to_da_rates(
     unique_well_groups: Sequence[pd.api.typing.DataFrameGroupBy],
@@ -97,7 +97,7 @@ def _df_groups_to_da_rates(
     is_transient = "time" in columns
     # Move time to front if present
     if is_transient:
-        columns =_move_item_to_index(columns, "time", 0)
+        columns = _move_item_to_index(columns, "time", 0)
         index_names = ["time", "index"]
     else:
         index_names = ["index"]
