@@ -76,6 +76,14 @@ def mask_2D(package: GridAgnosticWell, domain_2d: GridDataArray) -> GridAgnostic
     cls = type(package)
     return cls._from_dataset(selection)
 
+def _move_item_to_index(
+    lst: list[str], item: str, index: int
+) -> list[str]:
+    """Move item in list to specified index"""
+    lst_copy = lst.copy()
+    lst_copy.remove(item)
+    lst_copy.insert(index, item)
+    return lst_copy
 
 def _df_groups_to_da_rates(
     unique_well_groups: Sequence[pd.api.typing.DataFrameGroupBy],
@@ -84,18 +92,21 @@ def _df_groups_to_da_rates(
     columns = list(unique_well_groups[0].columns)
     columns.remove("rate")
     # Enforce index to the front, to ensure gb_and_summed is correctly sorted by
-    # index first.
-    columns.insert(0, columns.pop(columns.index("index")))
+    # index first, instead of y, x coords.
+    columns = _move_item_to_index(columns, "index", 0)
     is_transient = "time" in columns
-    gb_and_summed = pd.concat(unique_well_groups).groupby(columns).sum()
+    # Move time to front if present
     if is_transient:
+        columns =_move_item_to_index(columns, "time", 0)
         index_names = ["time", "index"]
     else:
         index_names = ["index"]
+
+    gb_and_summed = pd.concat(unique_well_groups).groupby(columns).sum()
     # Unset multi-index, then set index to index_names
     df_temp = gb_and_summed.reset_index().set_index(index_names)
     da_rate = df_temp["rate"].to_xarray()
-    # For safety: if index is still incorrectly ordered, sort it.
+    # For safety: if index is still unordered, sort it.
     if not da_rate.indexes["index"].is_monotonic_increasing:
         da_rate = da_rate.sortby("index")
     return da_rate
