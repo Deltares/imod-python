@@ -78,7 +78,10 @@ def compute_overlap(
     )
     D = layer_bounds[:, 1] - layer_bounds[:, 0]
     Z_c = (layer_bounds[:, 1] + layer_bounds[:, 0]) / 2.0
-    F_c =  (np.minimum(well_bounds[:, 1], layer_bounds[:, 1]) + np.maximum(well_bounds[:, 0], layer_bounds[:, 0]))/2
+    F_c = (
+        np.minimum(well_bounds[:, 1], layer_bounds[:, 1])
+        + np.maximum(well_bounds[:, 0], layer_bounds[:, 0])
+    ) / 2
     F = 1.0 - np.abs(Z_c - F_c) / (0.5 * D)
     # Set overlap 1.0 for point filters
     overlap = np.maximum(interval_filter_overlap, point_filter_overlap)
