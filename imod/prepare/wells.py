@@ -66,7 +66,6 @@ def compute_overlap(
         layer_bounds_stack.shape,
     ).reshape(-1, 2)
     layer_bounds = layer_bounds_stack.reshape(-1, 2)
-
     # Deal with filters with a nonzero length
     interval_filter_overlap = compute_vectorized_overlap(
         well_bounds,
@@ -77,7 +76,16 @@ def compute_overlap(
         well_bounds,
         layer_bounds,
     )
-    return np.maximum(interval_filter_overlap, point_filter_overlap)
+    D = layer_bounds[:, 1] - layer_bounds[:, 0]
+    Z_c = (layer_bounds[:, 1] + layer_bounds[:, 0]) / 2.0
+    F_c =  (np.minimum(well_bounds[:, 1], layer_bounds[:, 1]) + np.maximum(well_bounds[:, 0], layer_bounds[:, 0]))/2
+    F = 1.0 - np.abs(Z_c - F_c) / (0.5 * D)
+    # Set overlap 1.0 for point filters
+    overlap = np.maximum(interval_filter_overlap, point_filter_overlap)
+    # Set F to 1.0 for point filters
+    F_corrected = np.maximum(F, point_filter_overlap)
+
+    return overlap, F_corrected
 
 
 def locate_wells(
@@ -194,7 +202,7 @@ def assign_wells(
     )
     wells_in_bounds = wells.set_index("id").loc[id_in_bounds].reset_index()
     first = wells_in_bounds.groupby("id", sort=False).first()
-    overlap = compute_overlap(first, xy_top, xy_bottom)
+    overlap, F = compute_overlap(first, xy_top, xy_bottom)
 
     if isinstance(xy_k, (xr.DataArray, xu.UgridDataArray)):
         k_for_df = xy_k.values.ravel()
@@ -209,7 +217,8 @@ def assign_wells(
             "layer": np.repeat(top["layer"], n_well),
             "overlap": overlap,
             "k": k_for_df,
-            "transmissivity": overlap * k_for_df,
+            "transmissivity": overlap * k_for_df * F,
+            "F": F,
         },
     )
     # remove entries
