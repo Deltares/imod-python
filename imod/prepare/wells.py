@@ -29,6 +29,21 @@ def compute_vectorized_overlap(
     )
 
 
+def _is_point_filter_in_layer(
+    bounds_wells: npt.NDArray[np.float64], bounds_layers: npt.NDArray[np.float64]
+) -> npt.NDArray[np.bool_]:
+    # Unwrap for readability
+    wells_top = bounds_wells[:, 1]
+    wells_bottom = bounds_wells[:, 0]
+    layers_top = bounds_layers[:, 1]
+    layers_bottom = bounds_layers[:, 0]
+
+    has_zero_filter_length = wells_top == wells_bottom
+    in_layer = (layers_top >= wells_top) & (layers_bottom < wells_bottom)
+
+    return has_zero_filter_length & in_layer
+
+
 def compute_point_filter_overlap(
     bounds_wells: npt.NDArray[np.float64], bounds_layers: npt.NDArray[np.float64]
 ) -> npt.NDArray[np.float64]:
@@ -38,24 +53,46 @@ def compute_point_filter_overlap(
     are set to zero overlap.
     """
     # Unwrap for readability
-    wells_top = bounds_wells[:, 1]
-    wells_bottom = bounds_wells[:, 0]
     layers_top = bounds_layers[:, 1]
     layers_bottom = bounds_layers[:, 0]
-
-    has_zero_filter_length = wells_top == wells_bottom
-    in_layer = (layers_top >= wells_top) & (layers_bottom < wells_bottom)
     layer_thickness = layers_top - layers_bottom
+
+    point_filter_in_layer = _is_point_filter_in_layer(bounds_wells, bounds_layers)
+
     # Multiplication to set any elements not meeting the criteria to zero.
-    point_filter_overlap = (
-        has_zero_filter_length.astype(float) * in_layer.astype(float) * layer_thickness
-    )
+    point_filter_overlap = point_filter_in_layer.astype(float) * layer_thickness
     return point_filter_overlap
 
 
-def compute_overlap(
-    wells: pd.DataFrame, top: GridDataArray, bottom: GridDataArray
+def compute_penetration_mismatch_factor(
+    well_bounds: npt.NDArray[np.float64], layer_bounds: npt.NDArray[np.float64]
 ) -> npt.NDArray[np.float64]:
+    """
+    From iMOD5.6.1 manual, page 705:
+
+    Correct any ratio for a mismatch between the centre of the penetrating model
+    layer Zc and the vertical midpoint of the well screen segment Fc.
+
+    F = 1 - |Zc - Fc| / (0.5 * D)
+
+    where D is the thickness of the layer.
+
+    This function achieves a similar thing as
+    ``imod.prepare.topsystem.conductance._compute_correction_factor``, but then
+    for point data instead of grids.
+    """
+    D = layer_bounds[:, 1] - layer_bounds[:, 0]
+    Z_c = (layer_bounds[:, 1] + layer_bounds[:, 0]) / 2.0
+    F_c = (
+        np.minimum(well_bounds[:, 1], layer_bounds[:, 1])
+        + np.maximum(well_bounds[:, 0], layer_bounds[:, 0])
+    ) / 2
+    return 1.0 - np.abs(Z_c - F_c) / (0.5 * D)
+
+
+def compute_overlap_and_correction_factor(
+    wells: pd.DataFrame, top: GridDataArray, bottom: GridDataArray
+) -> tuple[npt.NDArray[np.float64], npt.NDArray[np.float64]]:
     # layer bounds stack shape of (n_well, n_layer, 2)
     layer_bounds_stack = np.stack((bottom, top), axis=-1)
     well_bounds = np.broadcast_to(
@@ -76,17 +113,12 @@ def compute_overlap(
         well_bounds,
         layer_bounds,
     )
-    D = layer_bounds[:, 1] - layer_bounds[:, 0]
-    Z_c = (layer_bounds[:, 1] + layer_bounds[:, 0]) / 2.0
-    F_c = (
-        np.minimum(well_bounds[:, 1], layer_bounds[:, 1])
-        + np.maximum(well_bounds[:, 0], layer_bounds[:, 0])
-    ) / 2
-    F = 1.0 - np.abs(Z_c - F_c) / (0.5 * D)
-    # Set overlap 1.0 for point filters
+    F = compute_penetration_mismatch_factor(well_bounds, layer_bounds)
+    # Set overlap to layer thickness for point filters
     overlap = np.maximum(interval_filter_overlap, point_filter_overlap)
     # Set F to 1.0 for point filters
-    F_corrected = np.maximum(F, point_filter_overlap)
+    is_point_filter = point_filter_overlap > 0.0
+    F_corrected = np.maximum(F, is_point_filter.astype(float))
 
     return overlap, F_corrected
 
@@ -205,7 +237,7 @@ def assign_wells(
     )
     wells_in_bounds = wells.set_index("id").loc[id_in_bounds].reset_index()
     first = wells_in_bounds.groupby("id", sort=False).first()
-    overlap, F = compute_overlap(first, xy_top, xy_bottom)
+    overlap, F = compute_overlap_and_correction_factor(first, xy_top, xy_bottom)
 
     if isinstance(xy_k, (xr.DataArray, xu.UgridDataArray)):
         k_for_df = xy_k.values.ravel()

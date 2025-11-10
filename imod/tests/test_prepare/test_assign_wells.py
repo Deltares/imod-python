@@ -52,27 +52,31 @@ def test_compute_overlap():
     # Three wells
     wells = pd.DataFrame(
         {
-            "top": [5.0, 4.0, 3.0, 0.0],
-            "bottom": [4.0, 2.0, -1.0, 0.0],
+            "top": [10.0, 6.0, 4.0, 3.0, 0.0],
+            "bottom": [0.0, 4.0, 2.0, -1.0, 0.0],
         }
     )
     top = xr.DataArray(
         data=[
-            [10.0, 10.0, 10.0, 10.0],
-            [0.0, 0.0, 0.0, 0.0],
+            [10.0, 10.0, 10.0, 10.0, 10.0],
+            [0.0, 0.0, 0.0, 0.0, 0.0],
         ],
         dims=["layer", "index"],
     )
     bottom = xr.DataArray(
         data=[
-            [0.0, 0.0, 0.0, 0.0],
-            [-10.0, -10.0, -10.0, -10.0],
+            [0.0, 0.0, 0.0, 0.0, 0.0],
+            [-10.0, -10.0, -10.0, -10.0, -10.0],
         ],
         dims=["layer", "index"],
     )
-    actual = prepwel.compute_overlap(wells, top, bottom)
-    expected = np.array([1.0, 2.0, 3.0, 0.0, 0.0, 0.0, 1.0, 10.0])
-    assert np.allclose(actual, expected)
+    actual_overlap, correction_actual = prepwel.compute_overlap_and_correction_factor(
+        wells, top, bottom
+    )
+    expected_overlap = np.array([10.0, 2.0, 2.0, 3.0, 0.0, 0.0, 0.0, 0.0, 1.0, 10.0])
+    expected_correction = np.array([1.0, 1.0, 0.6, 0.3, 0.0, 0.0, 0.0, 0.0, 0.1, 1.0])
+    assert np.allclose(actual_overlap, expected_overlap)
+    assert np.allclose(correction_actual, expected_correction)
 
 
 class AssignWellCases:
