@@ -27,6 +27,14 @@ Added
   formats. See :meth:`imod.mf6.Modflow6Simulation.dump` and
   :meth:`imod.mf6.Modflow6Simulation.from_file` for more information.
 
+Changed
+~~~~~~~
+
+- :class:`imod.mf6.Well` and :func:`imod.prepare.assign_wells` now distribute
+  the well rates over the screened cells using a correction factor based on the
+  mismatch between the well screen center and the cell center, equal to iMOD5's
+  correction factor.
+
 
 [1.0.0rc7] - 2025-10-28
 -----------------------
