@@ -52,27 +52,31 @@ def test_compute_overlap():
     # Three wells
     wells = pd.DataFrame(
         {
-            "top": [5.0, 4.0, 3.0, 0.0],
-            "bottom": [4.0, 2.0, -1.0, 0.0],
+            "top": [10.0, 6.0, 4.0, 3.0, 0.0],
+            "bottom": [0.0, 4.0, 2.0, -1.0, 0.0],
         }
     )
     top = xr.DataArray(
         data=[
-            [10.0, 10.0, 10.0, 10.0],
-            [0.0, 0.0, 0.0, 0.0],
+            [10.0, 10.0, 10.0, 10.0, 10.0],
+            [0.0, 0.0, 0.0, 0.0, 0.0],
         ],
         dims=["layer", "index"],
     )
     bottom = xr.DataArray(
         data=[
-            [0.0, 0.0, 0.0, 0.0],
-            [-10.0, -10.0, -10.0, -10.0],
+            [0.0, 0.0, 0.0, 0.0, 0.0],
+            [-10.0, -10.0, -10.0, -10.0, -10.0],
         ],
         dims=["layer", "index"],
     )
-    actual = prepwel.compute_overlap(wells, top, bottom)
-    expected = np.array([1.0, 2.0, 3.0, 0.0, 0.0, 0.0, 1.0, 10.0])
-    assert np.allclose(actual, expected)
+    actual_overlap, correction_actual = prepwel.compute_overlap_and_correction_factor(
+        wells, top, bottom
+    )
+    expected_overlap = np.array([10.0, 2.0, 2.0, 3.0, 0.0, 0.0, 0.0, 0.0, 1.0, 10.0])
+    expected_correction = np.array([1.0, 1.0, 0.6, 0.3, 0.0, 0.0, 0.0, 0.0, 0.1, 1.0])
+    assert np.allclose(actual_overlap, expected_overlap)
+    assert np.allclose(correction_actual, expected_correction)
 
 
 class AssignWellCases:
@@ -215,13 +219,15 @@ class TestAssignWell:
             {
                 "index": [0, 1, 2, 3, 4],
                 "id": [1, 2, 3, 3, 4],
+                "F": [0.9, 0.6, 0.3, 0.1, 1.0],
                 "layer": [1, 1, 1, 2, 2],
                 "bottom": [4.0, 2.0, -1.0, -1.0, 0.0],
                 "overlap": [1.0, 2.0, 3.0, 1.0, 10.0],
-                "rate": [1.0, 10.0, 75.0, 25.0, 0.1],
+                "rate": [1.0, 10.0, 90.0, 10.0, 0.1],
                 "top": [5.0, 4.0, 3.0, 3.0, 0.0],
                 "k": [1.0, 1.0, 1.0, 1.0, 1.0],
                 "transmissivity": [1.0, 2.0, 3.0, 1.0, 10.0],
+                "weights": [0.9, 1.2, 0.9, 0.1, 10.0],
                 "x": [0.6, 1.1, 2.3, 2.3, 2.6],
                 "y": [0.6, 1.1, 2.3, 2.3, 2.6],
             }
@@ -243,13 +249,15 @@ class TestAssignWell:
             {
                 "index": [0, 1, 2, 3, 4],
                 "id": [1, 2, 3, 3, 4],
+                "F": [0.9, 0.6, 0.3, 0.1, 1.0],
                 "layer": [1, 1, 1, 2, 2],
                 "bottom": [4.0, 2.0, -1.0, -1.0, 0.0],
                 "overlap": [1.0, 2.0, 3.0, 1.0, 10.0],
-                "rate": [1.0, 10.0, 60.0, 40.0, 0.1],
+                "rate": [1.0, 10.0, 100.0 * (9 / 11), 100.0 * (2 / 11), 0.1],
                 "top": [5.0, 4.0, 3.0, 3.0, 0.0],
                 "k": [10.0, 10.0, 10.0, 20.0, 20.0],
                 "transmissivity": [10.0, 20.0, 30.0, 20.0, 200.0],
+                "weights": [9.0, 12.0, 9.0, 2.0, 200.0],
                 "x": [0.6, 1.1, 2.3, 2.3, 2.6],
                 "y": [0.6, 1.1, 2.3, 2.3, 2.6],
             }
@@ -272,6 +280,7 @@ class TestAssignWell:
             {
                 "index": [0, 1, 2],
                 "id": [2, 3, 4],
+                "F": [0.6, 0.3, 1.0],
                 "layer": [1, 1, 2],
                 "bottom": [2.0, -1.0, 0.0],
                 "overlap": [2.0, 3.0, 10.0],
@@ -279,6 +288,7 @@ class TestAssignWell:
                 "top": [4.0, 3.0, 0.0],
                 "k": [10.0, 10.0, 20.0],
                 "transmissivity": [20.0, 30.0, 200.0],
+                "weights": [12.0, 9.0, 200.0],
                 "x": [1.1, 2.3, 2.6],
                 "y": [1.1, 2.3, 2.6],
             }

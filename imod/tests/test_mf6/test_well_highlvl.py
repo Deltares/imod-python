@@ -21,7 +21,7 @@ from imod.tests.fixtures.mf6_small_models_fixture import (
     grid_data_unstructured,
     grid_data_unstructured_layered,
 )
-from imod.typing.grid import ones_like
+from imod.typing.grid import zeros_like
 
 
 @pytest.fixture(scope="function")
@@ -39,10 +39,10 @@ class WriteWell:
                 # [layer, yind,, xind, rate]
                 ["1 2 1 1"],
                 ["1 2 1 2"],
-                ["1 2 2 2"],
-                ["2 2 1 1"],
-                ["2 2 2 2"],
-                ["3 2 2 1"],
+                ["1 2 2 3"],
+                ["2 2 1 2"],
+                ["2 2 2 3"],
+                ["3 2 2 3"],
             ]
         )
         return grid_data_structured, grid_data_structured_layered, expected_output
@@ -54,10 +54,10 @@ class WriteWell:
                 # [layer, faceid, rate]
                 ["1 3 1"],
                 ["1 3 2"],
-                ["1 4 2"],
-                ["2 3 1"],
-                ["2 4 2"],
-                ["3 4 1"],
+                ["1 4 3"],
+                ["2 3 2"],
+                ["2 4 3"],
+                ["3 4 3"],
             ]
         )
         return grid_data_unstructured, grid_data_unstructured_layered, expected_output
@@ -71,15 +71,15 @@ def test_write_well(tmp_path: Path, grid_data, grid_data_layered, reference_outp
         x=[1.0, 3.0, 6.0],
         y=[3.0, 3.0, 3.0],
         screen_top=[0.0, 0.0, 0.0],
-        screen_bottom=[-1, -3.0, -5.0],
-        rate=[1.0, 3.0, 5.0],
+        screen_bottom=[-1, -4.0, -6.0],
+        rate=[1.0, 4.0, 9.0],
         print_flows=True,
         validate=True,
     )
     globaltimes = [np.datetime64("2000-01-01")]
     active = grid_data(int, 1, 10)
     k = 100.0
-    top = ones_like(active.sel(layer=1), dtype=np.float64)
+    top = zeros_like(active.sel(layer=1), dtype=np.float64)
     bottom = grid_data_layered(np.float64, -2.0, 10)
     validation_context = ValidationSettings(False)
     write_context = WriteContext(tmp_path)
