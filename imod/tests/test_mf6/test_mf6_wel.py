@@ -111,7 +111,7 @@ class GridAgnosticWellCases:
             ],
             dtype=np.int64,
         )
-        rate_expected = np.array([0.25] * 6 + [0.75] * 6 + [1.0] * 6)
+        rate_expected = np.array([0.4] * 6 + [0.6] * 6 + [1.0] * 6)
         return obj, sizes_expected, cellid_expected, rate_expected
 
     def case_well_point_filter(self, well_high_lvl_test_data_stationary):
