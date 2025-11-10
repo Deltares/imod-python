@@ -196,13 +196,25 @@ def assign_wells(
 ) -> pd.DataFrame:
     """
     Distribute well pumping rate according to filter length when ``k=None``, or
-    to transmissivity of the sediments surrounding the filter. Minimum
-    thickness and minimum k should be set to avoid placing wells in clay
-    layers.
+    to transmissivity of the sediments surrounding the filter. Minimum thickness
+    and minimum k should be set to avoid placing wells in clay layers. Pumping
+    rates are adjusted using a correction factor :math:`F` based on the mismatch
+    between the depth of the well screen center :math:`F_c` and the cell center
+    :math:`Z_c`, equal to iMOD5's correction factor:
+
+    .. math::
+
+        F = 1 - \\frac{|Zc - Fc|}{0.5 * D}
+
+    where D is the thickness of the layer.
+
+    This factor is multiplied with the transmissivity (k-value * well filter
+    thickness) to weigh how rates should be distributed over the layers.
 
     Wells where well screen_top equals screen_bottom are assigned to the layer
     they are located in, without any subdivision. Wells located outside of the
-    grid are removed.
+    grid are removed. To try to automatically fix well filter misplacements, see
+    the :func:`imod.prepare.cleanup_wel` function.
 
     Parameters
     ----------
