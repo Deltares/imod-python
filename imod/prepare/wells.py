@@ -258,13 +258,16 @@ def assign_wells(
 
     # Distribute rate according to transmissivity.
     n_layer, n_well = xy_top.shape
+    transmissivity = overlap * k_for_df
+    weights = transmissivity * F
     df_factor = pd.DataFrame(
         index=pd.Index(np.tile(first.index, n_layer), name="id"),
         data={
             "layer": np.repeat(top["layer"], n_well),
             "overlap": overlap,
             "k": k_for_df,
-            "transmissivity": overlap * k_for_df * F,
+            "transmissivity": transmissivity,
+            "weights": weights,
             "F": F,
         },
     )
@@ -274,8 +277,8 @@ def assign_wells(
     df_factor = df_factor.loc[
         (df_factor["overlap"] > minimum_thickness) & (df_factor["k"] > minimum_k)
     ]
-    df_factor["rate"] = df_factor["transmissivity"] / df_factor.groupby("id")[
-        "transmissivity"
+    df_factor["rate"] = df_factor["weights"] / df_factor.groupby("id")[
+        "weights"
     ].transform("sum")
     # Create a unique index for every id-layer combination.
     df_factor["index"] = np.arange(len(df_factor))
@@ -292,7 +295,9 @@ def assign_wells(
     wells_in_bounds["index"] = 1  # N.B. integer!
     wells_in_bounds["overlap"] = 1.0
     wells_in_bounds["k"] = 1.0
+    wells_in_bounds["F"] = 1.0
     wells_in_bounds["transmissivity"] = 1.0
+    wells_in_bounds["weights"] = 1.0
     columns = list(set(wells_in_bounds.columns).difference(df_factor.columns))
 
     indexes = ["id"]
