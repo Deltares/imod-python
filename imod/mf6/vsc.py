@@ -40,7 +40,7 @@ class Viscosity(Package):
     temperature_species_name: str
         Name of the species to be interpreted as temperature. This species is
         used to calculate the temperature-dependent viscosity, using all
-        thermal_ arguments.
+        ``thermal_`` arguments.
     thermal_formulation: str, optional
         The thermal formulation to use for the temperature-dependent viscosity.
     thermal_a2: float, optional
