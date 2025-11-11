@@ -1,6 +1,6 @@
 [workspace]
 name = "imod-python"
-version = "1.0.0"
+version = "1.0.0.post1"
 description = "Make massive MODFLOW models"
 authors = ["Deltares <imod.info@deltares.nl>"]
 channels = ["conda-forge"]
@@ -14,7 +14,7 @@ repository = "https://github.com/Deltares/imod-python.git"
 
 [tasks]
 # General tasks
-docs = { cmd = "make html", depends-on = ["install"], cwd = "docs" }
+docs = { cmd = "./make.bat html", depends-on = ["install"], cwd = "docs" }
 install = "python -m pip install --no-deps --editable ."
 pypi-publish = { cmd = "rm --recursive --force dist && python -m build && twine check dist/* && twine upload dist/*" }
 
