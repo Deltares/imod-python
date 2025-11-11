@@ -227,6 +227,7 @@ Flow Packages
     GeneralHeadBoundary.aggregate_layers
     GeneralHeadBoundary.reallocate
     HorizontalFlowBarrierHydraulicCharacteristic
+    HorizontalFlowBarrierHydraulicCharacteristic.cleanup
     HorizontalFlowBarrierHydraulicCharacteristic.clip_box
     HorizontalFlowBarrierHydraulicCharacteristic.to_mf6_pkg
     HorizontalFlowBarrierHydraulicCharacteristic.snap_to_grid
@@ -239,6 +240,7 @@ Flow Packages
     HorizontalFlowBarrierHydraulicCharacteristic.mask
     HorizontalFlowBarrierHydraulicCharacteristic.regrid_like
     HorizontalFlowBarrierMultiplier
+    HorizontalFlowBarrierMultiplier.cleanup
     HorizontalFlowBarrierMultiplier.clip_box
     HorizontalFlowBarrierMultiplier.to_mf6_pkg
     HorizontalFlowBarrierMultiplier.snap_to_grid
@@ -328,6 +330,7 @@ Flow Packages
     River.aggregate_layers
     River.reallocate
     SingleLayerHorizontalFlowBarrierHydraulicCharacteristic
+    SingleLayerHorizontalFlowBarrierHydraulicCharacteristic.cleanup
     SingleLayerHorizontalFlowBarrierHydraulicCharacteristic.to_mf6_pkg
     SingleLayerHorizontalFlowBarrierHydraulicCharacteristic.clip_box
     SingleLayerHorizontalFlowBarrierHydraulicCharacteristic.snap_to_grid
@@ -340,6 +343,7 @@ Flow Packages
     SingleLayerHorizontalFlowBarrierHydraulicCharacteristic.mask
     SingleLayerHorizontalFlowBarrierHydraulicCharacteristic.regrid_like
     SingleLayerHorizontalFlowBarrierMultiplier
+    SingleLayerHorizontalFlowBarrierMultiplier.cleanup
     SingleLayerHorizontalFlowBarrierMultiplier.to_mf6_pkg
     SingleLayerHorizontalFlowBarrierMultiplier.clip_box
     SingleLayerHorizontalFlowBarrierMultiplier.snap_to_grid

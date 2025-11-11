@@ -16,12 +16,8 @@ Model objects & methods
     MetaSwapModel.clip_box
     MetaSwapModel.get_pkgkey
 
-
-Packages
-========
-
 Grid packages
--------------
+=============
 
 .. autosummary::
     :toctree: generated/msw
@@ -59,7 +55,7 @@ Grid packages
     Sprinkling.write
 
 Initial conditions
-------------------
+==================
 
 .. autosummary::
     :toctree: generated/msw
@@ -90,7 +86,7 @@ Initial conditions
     InitialConditionsSavedState.write
 
 Output control
---------------
+==============
 
 .. autosummary::
     :toctree: generated/msw
@@ -115,7 +111,7 @@ Output control
     VariableOutputControl.write
 
 Parameter packages
-------------------
+==================
 
 .. autosummary::
     :toctree: generated/msw
@@ -134,7 +130,7 @@ Parameter packages
     AnnualCropFactors.write
 
 Meteorology packages
---------------------
+====================
 
 .. autosummary::
     :toctree: generated/msw
@@ -165,7 +161,7 @@ Meteorology packages
     PrecipitationMapping.write
 
 Mappings
---------
+========
 
 .. autosummary::
     :toctree: generated/msw

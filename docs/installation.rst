@@ -4,9 +4,9 @@ Installing
 TL;DR
 -----
 
-This is for people who are in a hurry and just want to get started. We advice
-you to read the full documentation below if you are new to Python or the Python
-packaging ecosystem.
+This section is for if you are in a hurry and just want to get started. We
+advice you to read the full documentation below if you are new to Python or the
+Python packaging ecosystem.
 
 Regular install
 ^^^^^^^^^^^^^^^
@@ -43,7 +43,7 @@ Or with pip::
 Which Python?
 -------------
 
-You'll need **Python 3.10, 3.11, 3.12, or 3.13**. 
+You'll need **3.11, 3.12, or 3.13**. 
 
 The recommended way to install Python depends on your experience: Are you new to
 the Python packaging ecosystem or already got experience with it? If you already

@@ -145,12 +145,23 @@ Criteria for user acceptance tests of the 1.0 release are:
 * The conversion of the transient LHM model run of 1 year on a daily timestep
   (365 stress-periods) should run without memory overflow on a machine with 32
   GB and write a model within 15 minutes.
+* The conversion of the transient LHM model should not be slower than doing the
+  same conversion with iMOD5.
 * The MODFLOW6 and MetaSWAP input files written by iMOD Python should be the
   same as iMOD5 (accounting for differences in row sorting.), unless there was a
   conscious decision to divert from this. These will be mentioned in
-  :doc:`../faq/imod5_backwards_compatibility`.
-* The conversion of the transient LHM model should not be slower than doing the
-  same conversion with iMOD5.
+  :doc:`../faq/imod5_backwards_compatibility`. The following differences are
+  accepted:
+
+  - Different naming conventions for the output files.
+  - Different default solver settings in MODFLOW6.
+  - iMOD5 computes incorrect hydraulic characteristics for the Horizontal Flow
+    Barrier (HFB) package. This leads to head differences of <0.50 m in the
+    ouput of the simulations in the north of Limburg in the deepest model
+    layers.
+  - Some small differences in how rivers and drains are allocated and their
+    conductances are distributed. This leads to local head differences in the
+    output of the simulations in the south of Limburg.
 
 Manual checks
 *************
@@ -162,7 +173,7 @@ QGIS export
 
    .. code-block:: console
 
-     pixi run export_qgis
+     pixi run qgis_export
 
    This will export a simulation to a TOML file and a set of UGRID netCDFs twice,
    once for a model with a structured grid, once for a model with an unstructured
@@ -173,10 +184,13 @@ QGIS export
    same CRS as the exported files.
 5. Click ``"Layers" > "Add Layer" > "Add mesh"``. Insert the path printed in the
    terminal in the text box. ``{path_printed_in_terminal}/hondsrug_MDAL/riv.nc``
-   This will import the mesh. 
+   This will import the mesh. You need to do this as well for structured grids.
 6. Verify if the mesh is rendered in two dimensions, and not as a single
    line of cells. If not, `open an issue on GitHub
    <https://github.com/Deltares/imod-python/issues>`_ . 
+7. The structured grid has a slight shift in location compared to the
+   unstructured grid, this is expected. Verify if the shift is small (less than
+   1 cell size).
 
 Tutorial
 ^^^^^^^^
