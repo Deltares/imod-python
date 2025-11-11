@@ -1,6 +1,6 @@
 [workspace]
 name = "imod-python"
-version = "1.0.0rc7"
+version = "1.0.0"
 description = "Make massive MODFLOW models"
 authors = ["Deltares <imod.info@deltares.nl>"]
 channels = ["conda-forge"]

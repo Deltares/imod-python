@@ -6,34 +6,27 @@
     "creators": [
       "Tool: sbom4python-0.12.4"
     ],
-    "created": "2025-08-18T16:24:34Z",
+    "created": "2025-11-11T16:08:04Z",
     "licenseListVersion": "3.26"
   },
   "name": "Python-imod",
   "dataLicense": "CC0-1.0",
-  "documentNamespace": "http://spdx.org/spdxdocs/Python-imod-b9026ff7-0ffd-48ad-a124-26505142f302",
+  "documentNamespace": "http://spdx.org/spdxdocs/Python-imod-93b58e1c-9e37-4ef8-ad0f-4fbc4d0a9f6d",
   "packages": [
     {
       "SPDXID": "SPDXRef-1-imod",
       "name": "imod",
-      "versionInfo": "1.0.0rc4",
+      "versionInfo": "1.0.0",
       "primaryPackagePurpose": "APPLICATION",
       "supplier": "Person: Deltares (imod.info@deltares.nl)",
-      "downloadLocation": "https://pypi.org/project/imod/1.0.0rc4/#files",
+      "downloadLocation": "https://pypi.org/project/imod/1.0.0/#files",
       "filesAnalyzed": false,
       "homepage": "https://github.com/Deltares/imod-python",
-      "checksums": [
-        {
-          "algorithm": "SHA256",
-          "checksumValue": "3345b258bbb22f0f43a654e5d1bc2237bc491116f9ddc4bd7ae83d581bb637ab"
-        }
-      ],
       "licenseConcluded": "NOASSERTION",
       "licenseDeclared": "NOASSERTION",
       "licenseComments": "imod declares MIT License\n\nCopyright (c) Deltares\n\nPermission is hereby granted, free of charge, to any person obtaining a copy\nof this software and associated documentation files (the \"Software\"), to deal\nin the Software without restriction, including without limitation the rights\nto use, copy, modify, merge, publish, distribute, sublicense, and/or sell\ncopies of the Software, and to permit persons to whom the Software is\nfurnished to do so, subject to the following conditions:\n\nThe above copyright notice and this permission notice shall be included in all\ncopies or substantial portions of the Software.\n\nTHE SOFTWARE IS PROVIDED \"AS IS\", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR\nIMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,\nFITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE\nAUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER\nLIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,\nOUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE\nSOFTWARE. which is not currently a valid SPDX License identifier or expression.",
       "copyrightText": "NOASSERTION",
       "summary": "Make massive MODFLOW models!",
-      "releaseDate": "2025-06-20T15:06:50Z",
       "externalRefs": [
         {
           "referenceCategory": "OTHER",
@@ -58,12 +51,12 @@
         {
           "referenceCategory": "PACKAGE-MANAGER",
           "referenceType": "purl",
-          "referenceLocator": "pkg:pypi/imod@1.0.0rc4"
+          "referenceLocator": "pkg:pypi/imod@1.0.0"
         },
         {
           "referenceCategory": "SECURITY",
           "referenceType": "cpe23Type",
-          "referenceLocator": "cpe:2.3:a:deltares:imod:1.0.0rc4:*:*:*:*:*:*:*"
+          "referenceLocator": "cpe:2.3:a:deltares:imod:1.0.0:*:*:*:*:*:*:*"
         }
       ]
     },
@@ -141,24 +134,24 @@
     {
       "SPDXID": "SPDXRef-4-numpy",
       "name": "numpy",
-      "versionInfo": "2.2.6",
+      "versionInfo": "2.3.4",
       "primaryPackagePurpose": "LIBRARY",
       "supplier": "Organization: Travis E. Oliphant et al.",
-      "downloadLocation": "https://pypi.org/project/numpy/2.2.6/#files",
+      "downloadLocation": "https://pypi.org/project/numpy/2.3.4/#files",
       "filesAnalyzed": false,
       "homepage": "https://numpy.org",
       "checksums": [
         {
           "algorithm": "SHA256",
-          "checksumValue": "b412caa66f72040e6d268491a59f2c43bf03eb6c96dd8f0307829feb7fa2b6fb"
+          "checksumValue": "e78aecd2800b32e8347ce49316d3eaf04aed849cd5b38e0af39f829a4e59f5eb"
         }
       ],
       "licenseConcluded": "NOASSERTION",
       "licenseDeclared": "NOASSERTION",
-      "licenseComments": "numpy declares Copyright (c) 2005-2024, NumPy Developers.\n All rights reserved.\n\n Redistribution and use in source and binary forms, with or without\n modification, are permitted provided that the following conditions are\n met:\n\n     * Redistributions of source code must retain the above copyright\n        notice, this list of conditions and the following disclaimer.\n\n     * Redistributions in binary form must reproduce the above\n        copyright notice, this list of conditions and the following\n        disclaimer in the documentation and/or other materials provided\n        with the distribution.\n\n     * Neither the name of the NumPy Developers nor the names of any\n        contributors may be used to endorse or promote products derived\n        from this software without specific prior written permission.\n\n THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS\n \"AS IS\" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT\n LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR\n A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT\n OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,\n SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT\n LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,\n DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY\n THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT\n (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE\n OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.\n which is not currently a valid SPDX License identifier or expression.",
+      "licenseComments": "numpy declares Copyright (c) 2005-2025, NumPy Developers.\n All rights reserved.\n\n Redistribution and use in source and binary forms, with or without\n modification, are permitted provided that the following conditions are\n met:\n\n     * Redistributions of source code must retain the above copyright\n        notice, this list of conditions and the following disclaimer.\n\n     * Redistributions in binary form must reproduce the above\n        copyright notice, this list of conditions and the following\n        disclaimer in the documentation and/or other materials provided\n        with the distribution.\n\n     * Neither the name of the NumPy Developers nor the names of any\n        contributors may be used to endorse or promote products derived\n        from this software without specific prior written permission.\n\n THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS\n \"AS IS\" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT\n LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR\n A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT\n OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,\n SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT\n LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,\n DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY\n THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT\n (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE\n OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.\n which is not currently a valid SPDX License identifier or expression.",
       "copyrightText": "NOASSERTION",
       "summary": "Fundamental package for array computing in Python",
-      "releaseDate": "2025-05-17T21:27:58Z",
+      "releaseDate": "2025-10-15T16:15:19Z",
       "externalRefs": [
         {
           "referenceCategory": "OTHER",
@@ -188,62 +181,62 @@
         {
           "referenceCategory": "PACKAGE-MANAGER",
           "referenceType": "purl",
-          "referenceLocator": "pkg:pypi/numpy@2.2.6"
+          "referenceLocator": "pkg:pypi/numpy@2.3.4"
         },
         {
           "referenceCategory": "SECURITY",
           "referenceType": "cpe23Type",
-          "referenceLocator": "cpe:2.3:a:travis_e._oliphant_et_al.:numpy:2.2.6:*:*:*:*:*:*:*"
+          "referenceLocator": "cpe:2.3:a:travis_e._oliphant_et_al.:numpy:2.3.4:*:*:*:*:*:*:*"
         }
       ]
     },
     {
       "SPDXID": "SPDXRef-5-dask",
       "name": "dask",
-      "versionInfo": "2025.7.0",
+      "versionInfo": "2025.11.0",
       "primaryPackagePurpose": "LIBRARY",
       "supplier": "NOASSERTION",
-      "downloadLocation": "https://pypi.org/project/dask/2025.7.0/#files",
+      "downloadLocation": "https://pypi.org/project/dask/2025.11.0/#files",
       "filesAnalyzed": false,
       "homepage": "https://github.com/dask/dask/",
       "checksums": [
         {
           "algorithm": "SHA256",
-          "checksumValue": "073c29c4e99c2400a39a8a67874f35c1d15bf7af9ae3d0c30af3c7c1199f24ae"
+          "checksumValue": "08c35a8146c05c93b34f83cf651009129c42ee71762da7ca452fb7308641c2b8"
         }
       ],
-      "licenseConcluded": "BSD-3-Clause",
-      "licenseDeclared": "BSD-3-Clause",
+      "licenseConcluded": "NOASSERTION",
+      "licenseDeclared": "NOASSERTION",
       "copyrightText": "NOASSERTION",
       "summary": "Parallel PyData with Task Scheduling",
-      "releaseDate": "2025-07-14T20:03:33Z",
+      "releaseDate": "2025-11-06T16:56:44Z",
       "externalRefs": [
         {
           "referenceCategory": "PACKAGE-MANAGER",
           "referenceType": "purl",
-          "referenceLocator": "pkg:pypi/dask@2025.7.0"
+          "referenceLocator": "pkg:pypi/dask@2025.11.0"
         }
       ]
     },
     {
       "SPDXID": "SPDXRef-6-click",
       "name": "click",
-      "versionInfo": "8.2.1",
+      "versionInfo": "8.3.0",
       "primaryPackagePurpose": "LIBRARY",
       "supplier": "NOASSERTION",
-      "downloadLocation": "https://pypi.org/project/click/8.2.1/#files",
+      "downloadLocation": "https://pypi.org/project/click/8.3.0/#files",
       "filesAnalyzed": false,
       "checksums": [
         {
           "algorithm": "SHA256",
-          "checksumValue": "61a3265b914e850b85317d0b3109c7f8cd35a670f963866005d6ef1d5175a12b"
+          "checksumValue": "9b9f285302c6e3064f4330c05f05b81945b2a39544279343e6e7c5f27a9baddc"
         }
       ],
       "licenseConcluded": "NOASSERTION",
       "licenseDeclared": "NOASSERTION",
       "copyrightText": "NOASSERTION",
       "summary": "Composable command line interface toolkit",
-      "releaseDate": "2025-05-20T23:19:47Z",
+      "releaseDate": "2025-09-18T17:32:22Z",
       "externalRefs": [
         {
           "referenceCategory": "OTHER",
@@ -273,7 +266,7 @@
         {
           "referenceCategory": "PACKAGE-MANAGER",
           "referenceType": "purl",
-          "referenceLocator": "pkg:pypi/click@8.2.1"
+          "referenceLocator": "pkg:pypi/click@8.3.0"
         }
       ]
     },
@@ -313,57 +306,56 @@
     {
       "SPDXID": "SPDXRef-8-cloudpickle",
       "name": "cloudpickle",
-      "versionInfo": "3.1.1",
+      "versionInfo": "3.1.2",
       "primaryPackagePurpose": "LIBRARY",
       "supplier": "Organization: The cloudpickle developer team (cloudpipe@googlegroups.com)",
-      "downloadLocation": "https://pypi.org/project/cloudpickle/3.1.1/#files",
+      "downloadLocation": "https://pypi.org/project/cloudpickle/3.1.2/#files",
       "filesAnalyzed": false,
       "homepage": "https://github.com/cloudpipe/cloudpickle",
       "checksums": [
         {
           "algorithm": "SHA256",
-          "checksumValue": "c8c5a44295039331ee9dad40ba100a9c7297b6f988e50e87ccdf3765a668350e"
+          "checksumValue": "9acb47f6afd73f60dc1df93bb801b472f05ff42fa6c84167d25cb206be1fbf4a"
         }
       ],
       "licenseConcluded": "BSD-3-Clause",
       "licenseDeclared": "BSD-3-Clause",
       "copyrightText": "NOASSERTION",
       "summary": "Pickler class to extend the standard pickle.Pickler functionality",
-      "releaseDate": "2025-01-14T17:02:02Z",
+      "releaseDate": "2025-11-03T09:25:25Z",
       "externalRefs": [
         {
           "referenceCategory": "PACKAGE-MANAGER",
           "referenceType": "purl",
-          "referenceLocator": "pkg:pypi/cloudpickle@3.1.1"
+          "referenceLocator": "pkg:pypi/cloudpickle@3.1.2"
         },
         {
           "referenceCategory": "SECURITY",
           "referenceType": "cpe23Type",
-          "referenceLocator": "cpe:2.3:a:the_cloudpickle_developer_team:cloudpickle:3.1.1:*:*:*:*:*:*:*"
+          "referenceLocator": "cpe:2.3:a:the_cloudpickle_developer_team:cloudpickle:3.1.2:*:*:*:*:*:*:*"
         }
       ]
     },
     {
       "SPDXID": "SPDXRef-9-fsspec",
       "name": "fsspec",
-      "versionInfo": "2025.7.0",
+      "versionInfo": "2025.10.0",
       "primaryPackagePurpose": "LIBRARY",
       "supplier": "NOASSERTION",
-      "downloadLocation": "https://pypi.org/project/fsspec/2025.7.0/#files",
+      "downloadLocation": "https://pypi.org/project/fsspec/2025.10.0/#files",
       "filesAnalyzed": false,
       "homepage": "https://github.com/fsspec/filesystem_spec",
       "checksums": [
         {
           "algorithm": "SHA256",
-          "checksumValue": "8b012e39f63c7d5f10474de957f3ab793b47b45ae7d39f2fb735f8bbe25c0e21"
+          "checksumValue": "7c7712353ae7d875407f97715f0e1ffcc21e33d5b24556cb1e090ae9409ec61d"
         }
       ],
       "licenseConcluded": "NOASSERTION",
       "licenseDeclared": "NOASSERTION",
-      "licenseComments": "fsspec declares BSD 3-Clause License\n\nCopyright (c) 2018, Martin Durant\nAll rights reserved.\n\nRedistribution and use in source and binary forms, with or without\nmodification, are permitted provided that the following conditions are met:\n\n* Redistributions of source code must retain the above copyright notice, this\n  list of conditions and the following disclaimer.\n\n* Redistributions in binary form must reproduce the above copyright notice,\n  this list of conditions and the following disclaimer in the documentation\n  and/or other materials provided with the distribution.\n\n* Neither the name of the copyright holder nor the names of its\n  contributors may be used to endorse or promote products derived from\n  this software without specific prior written permission.\n\nTHIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS \"AS IS\"\nAND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE\nIMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE\nDISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE\nFOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL\nDAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR\nSERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER\nCAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,\nOR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE\nOF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. which is not currently a valid SPDX License identifier or expression.",
       "copyrightText": "NOASSERTION",
       "summary": "File-system specification",
-      "releaseDate": "2025-07-15T16:05:19Z",
+      "releaseDate": "2025-10-30T14:58:42Z",
       "externalRefs": [
         {
           "referenceCategory": "OTHER",
@@ -378,7 +370,7 @@
         {
           "referenceCategory": "PACKAGE-MANAGER",
           "referenceType": "purl",
-          "referenceLocator": "pkg:pypi/fsspec@2025.7.0"
+          "referenceLocator": "pkg:pypi/fsspec@2025.10.0"
         }
       ]
     },
@@ -490,41 +482,55 @@
     {
       "SPDXID": "SPDXRef-13-toolz",
       "name": "toolz",
-      "versionInfo": "1.0.0",
+      "versionInfo": "1.1.0",
       "primaryPackagePurpose": "LIBRARY",
-      "supplier": "Person: AUTHORS.md",
-      "downloadLocation": "https://pypi.org/project/toolz/1.0.0/#files",
+      "supplier": "Person: PyToolz Contributors",
+      "downloadLocation": "https://pypi.org/project/toolz/1.1.0/#files",
       "filesAnalyzed": false,
-      "homepage": "https://github.com/pytoolz/toolz/",
+      "homepage": "https://github.com/pytoolz/toolz",
       "checksums": [
         {
           "algorithm": "SHA256",
-          "checksumValue": "292c8f1c4e7516bf9086f8850935c799a874039c8bcf959d47b600e4c44a6236"
+          "checksumValue": "15ccc861ac51c53696de0a5d6d4607f99c210739caf987b5d2054f3efed429d8"
         }
       ],
-      "licenseConcluded": "BSD-3-Clause",
+      "licenseConcluded": "NOASSERTION",
       "licenseDeclared": "NOASSERTION",
-      "licenseComments": "toolz declares BSD which is not currently a valid SPDX License identifier or expression.",
       "copyrightText": "NOASSERTION",
       "summary": "List processing tools and functional utilities",
-      "releaseDate": "2024-10-04T16:17:01Z",
+      "releaseDate": "2025-10-17T04:03:20Z",
       "externalRefs": [
+        {
+          "referenceCategory": "OTHER",
+          "referenceType": "vcs",
+          "referenceLocator": "https://github.com/pytoolz/toolz"
+        },
+        {
+          "referenceCategory": "OTHER",
+          "referenceType": "documentation",
+          "referenceLocator": "https://toolz.readthedocs.io/en/latest/"
+        },
+        {
+          "referenceCategory": "OTHER",
+          "referenceType": "log",
+          "referenceLocator": "https://github.com/pytoolz/toolz/releases"
+        },
         {
           "referenceCategory": "PACKAGE-MANAGER",
           "referenceType": "purl",
-          "referenceLocator": "pkg:pypi/toolz@1.0.0"
+          "referenceLocator": "pkg:pypi/toolz@1.1.0"
         },
         {
           "referenceCategory": "SECURITY",
           "referenceType": "cpe23Type",
-          "referenceLocator": "cpe:2.3:a:authors.md:toolz:1.0.0:*:*:*:*:*:*:*"
+          "referenceLocator": "cpe:2.3:a:pytoolz_contributors:toolz:1.1.0:*:*:*:*:*:*:*"
         }
       ]
     },
     {
       "SPDXID": "SPDXRef-14-pyyaml",
       "name": "pyyaml",
-      "versionInfo": "6.0.2",
+      "versionInfo": "6.0.3",
       "primaryPackagePurpose": "LIBRARY",
       "supplier": "Person: Kirill Simonov (xi@resolvent.net)",
       "downloadLocation": "https://pypi.org/project/PyYAML/",
@@ -533,14 +539,14 @@
       "checksums": [
         {
           "algorithm": "SHA256",
-          "checksumValue": "0a9a2848a5b7feac301353437eb7d5957887edbf81d56e903999a75a3d743086"
+          "checksumValue": "214ed4befebe12df36bcc8bc2b64b396ca31be9304b8f59e25c11cf94a4c033b"
         }
       ],
       "licenseConcluded": "MIT",
       "licenseDeclared": "MIT",
       "copyrightText": "NOASSERTION",
       "summary": "YAML parser and emitter for Python",
-      "releaseDate": "2024-08-06T20:31:40Z",
+      "releaseDate": "2025-09-25T21:31:46Z",
       "externalRefs": [
         {
           "referenceCategory": "OTHER",
@@ -570,12 +576,12 @@
         {
           "referenceCategory": "PACKAGE-MANAGER",
           "referenceType": "purl",
-          "referenceLocator": "pkg:pypi/pyyaml@6.0.2"
+          "referenceLocator": "pkg:pypi/pyyaml@6.0.3"
         },
         {
           "referenceCategory": "SECURITY",
           "referenceType": "cpe23Type",
-          "referenceLocator": "cpe:2.3:a:kirill_simonov:pyyaml:6.0.2:*:*:*:*:*:*:*"
+          "referenceLocator": "cpe:2.3:a:kirill_simonov:pyyaml:6.0.3:*:*:*:*:*:*:*"
         }
       ]
     },
@@ -657,23 +663,23 @@
     {
       "SPDXID": "SPDXRef-17-typing-extensions",
       "name": "typing-extensions",
-      "versionInfo": "4.14.1",
+      "versionInfo": "4.15.0",
       "primaryPackagePurpose": "LIBRARY",
       "supplier": "Organization: Guido van Jukka ukasz Michael (levkivskyi@gmail.com)",
-      "downloadLocation": "https://pypi.org/project/typing-extensions/4.14.1/#files",
+      "downloadLocation": "https://pypi.org/project/typing-extensions/4.15.0/#files",
       "filesAnalyzed": false,
       "homepage": "https://github.com/python/typing_extensions",
       "checksums": [
         {
           "algorithm": "SHA256",
-          "checksumValue": "d1e1e3b58374dc93031d6eda2420a48ea44a36c2b4766a4fdeb3710755731d76"
+          "checksumValue": "f0fa19c6845758ab08074a0cfa8b7aecb71c999ca73d62883bc25cc018c4e548"
         }
       ],
       "licenseConcluded": "NOASSERTION",
       "licenseDeclared": "NOASSERTION",
       "copyrightText": "NOASSERTION",
       "summary": "Backported and Experimental Type Hints for Python 3.9+",
-      "releaseDate": "2025-07-04T13:28:32Z",
+      "releaseDate": "2025-08-25T13:49:24Z",
       "externalRefs": [
         {
           "referenceCategory": "OTHER",
@@ -703,28 +709,28 @@
         {
           "referenceCategory": "PACKAGE-MANAGER",
           "referenceType": "purl",
-          "referenceLocator": "pkg:pypi/typing-extensions@4.14.1"
+          "referenceLocator": "pkg:pypi/typing-extensions@4.15.0"
         },
         {
           "referenceCategory": "SECURITY",
           "referenceType": "cpe23Type",
-          "referenceLocator": "cpe:2.3:a:guido_van_jukka_ukasz_michael:typing-extensions:4.14.1:*:*:*:*:*:*:*"
+          "referenceLocator": "cpe:2.3:a:guido_van_jukka_ukasz_michael:typing-extensions:4.15.0:*:*:*:*:*:*:*"
         }
       ]
     },
     {
       "SPDXID": "SPDXRef-18-filelock",
       "name": "filelock",
-      "versionInfo": "3.19.1",
+      "versionInfo": "3.20.0",
       "primaryPackagePurpose": "LIBRARY",
       "supplier": "NOASSERTION",
-      "downloadLocation": "https://pypi.org/project/filelock/3.19.1/#files",
+      "downloadLocation": "https://pypi.org/project/filelock/3.20.0/#files",
       "filesAnalyzed": false,
       "homepage": "https://github.com/tox-dev/py-filelock",
       "checksums": [
         {
           "algorithm": "SHA256",
-          "checksumValue": "d38e30481def20772f5baf097c122c3babc4fcdb7e14e57049eb9d88c6dc017d"
+          "checksumValue": "339b4732ffda5cd79b13f4e2711a31b0365ce445d95d243bb996273d072546a2"
         }
       ],
       "licenseConcluded": "NOASSERTION",
@@ -732,7 +738,7 @@
       "licenseComments": "filelock declares The Unlicense (Unlicense) which is not currently a valid SPDX License identifier or expression.",
       "copyrightText": "NOASSERTION",
       "summary": "A platform independent file lock.",
-      "releaseDate": "2025-08-14T16:56:01Z",
+      "releaseDate": "2025-10-08T18:03:48Z",
       "externalRefs": [
         {
           "referenceCategory": "OTHER",
@@ -752,7 +758,7 @@
         {
           "referenceCategory": "PACKAGE-MANAGER",
           "referenceType": "purl",
-          "referenceLocator": "pkg:pypi/filelock@3.19.1"
+          "referenceLocator": "pkg:pypi/filelock@3.20.0"
         }
       ]
     },
@@ -812,23 +818,22 @@
     {
       "SPDXID": "SPDXRef-20-markupsafe",
       "name": "markupsafe",
-      "versionInfo": "3.0.2",
+      "versionInfo": "3.0.3",
       "primaryPackagePurpose": "LIBRARY",
       "supplier": "NOASSERTION",
-      "downloadLocation": "https://pypi.org/project/markupsafe/3.0.2/#files",
+      "downloadLocation": "https://pypi.org/project/markupsafe/3.0.3/#files",
       "filesAnalyzed": false,
       "checksums": [
         {
           "algorithm": "SHA256",
-          "checksumValue": "7e94c425039cde14257288fd61dcfb01963e658efbc0ff54f5306b06054700f8"
+          "checksumValue": "2f981d352f04553a7171b8e44369f2af4055f888dfb147d55e42d29e29e74559"
         }
       ],
       "licenseConcluded": "NOASSERTION",
       "licenseDeclared": "NOASSERTION",
-      "licenseComments": "markupsafe declares Copyright 2010 Pallets\n\nRedistribution and use in source and binary forms, with or without\nmodification, are permitted provided that the following conditions are\nmet:\n\n1.  Redistributions of source code must retain the above copyright\n    notice, this list of conditions and the following disclaimer.\n\n2.  Redistributions in binary form must reproduce the above copyright\n    notice, this list of conditions and the following disclaimer in the\n    documentation and/or other materials provided with the distribution.\n\n3.  Neither the name of the copyright holder nor the names of its\n    contributors may be used to endorse or promote products derived from\n    this software without specific prior written permission.\n\nTHIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS\n\"AS IS\" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT\nLIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A\nPARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT\nHOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,\nSPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED\nTO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR\nPROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF\nLIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING\nNEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS\nSOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.\n which is not currently a valid SPDX License identifier or expression.",
       "copyrightText": "NOASSERTION",
       "summary": "Safely add untrusted strings to HTML/XML markup.",
-      "releaseDate": "2024-10-18T15:20:51Z",
+      "releaseDate": "2025-09-27T18:36:05Z",
       "externalRefs": [
         {
           "referenceCategory": "OTHER",
@@ -843,7 +848,7 @@
         {
           "referenceCategory": "OTHER",
           "referenceType": "log",
-          "referenceLocator": "https://markupsafe.palletsprojects.com/changes/"
+          "referenceLocator": "https://markupsafe.palletsprojects.com/page/changes/"
         },
         {
           "referenceCategory": "OTHER",
@@ -858,7 +863,7 @@
         {
           "referenceCategory": "PACKAGE-MANAGER",
           "referenceType": "purl",
-          "referenceLocator": "pkg:pypi/markupsafe@3.0.2"
+          "referenceLocator": "pkg:pypi/markupsafe@3.0.3"
         }
       ]
     },
@@ -943,16 +948,16 @@
     {
       "SPDXID": "SPDXRef-23-matplotlib",
       "name": "matplotlib",
-      "versionInfo": "3.10.5",
+      "versionInfo": "3.10.7",
       "primaryPackagePurpose": "LIBRARY",
       "supplier": "Organization: John D. Michael Droettboom",
-      "downloadLocation": "https://pypi.org/project/matplotlib/3.10.5/#files",
+      "downloadLocation": "https://pypi.org/project/matplotlib/3.10.7/#files",
       "filesAnalyzed": false,
       "homepage": "https://matplotlib.org",
       "checksums": [
         {
           "algorithm": "SHA256",
-          "checksumValue": "5d4773a6d1c106ca05cb5a5515d277a6bb96ed09e5c8fab6b7741b8fcaa62c8f"
+          "checksumValue": "7ac81eee3b7c266dd92cee1cd658407b16c57eed08c7421fa354ed68234de380"
         }
       ],
       "licenseConcluded": "NOASSERTION",
@@ -960,7 +965,7 @@
       "licenseComments": "matplotlib declares License agreement for matplotlib versions 1.3.0 and later\n =========================================================\n\n 1. This LICENSE AGREEMENT is between the Matplotlib Development Team\n (\"MDT\"), and the Individual or Organization (\"Licensee\") accessing and\n otherwise using matplotlib software in source or binary form and its\n associated documentation.\n\n 2. Subject to the terms and conditions of this License Agreement, MDT\n hereby grants Licensee a nonexclusive, royalty-free, world-wide license\n to reproduce, analyze, test, perform and/or display publicly, prepare\n derivative works, distribute, and otherwise use matplotlib\n alone or in any derivative version, provided, however, that MDT's\n License Agreement and MDT's notice of copyright, i.e., \"Copyright (c)\n 2012- Matplotlib Development Team; All Rights Reserved\" are retained in\n matplotlib  alone or in any derivative version prepared by\n Licensee.\n\n 3. In the event Licensee prepares a derivative work that is based on or\n incorporates matplotlib or any part thereof, and wants to\n make the derivative work available to others as provided herein, then\n Licensee hereby agrees to include in any such work a brief summary of\n the changes made to matplotlib .\n\n 4. MDT is making matplotlib available to Licensee on an \"AS\n IS\" basis.  MDT MAKES NO REPRESENTATIONS OR WARRANTIES, EXPRESS OR\n IMPLIED.  BY WAY OF EXAMPLE, BUT NOT LIMITATION, MDT MAKES NO AND\n DISCLAIMS ANY REPRESENTATION OR WARRANTY OF MERCHANTABILITY OR FITNESS\n FOR ANY PARTICULAR PURPOSE OR THAT THE USE OF MATPLOTLIB\n WILL NOT INFRINGE ANY THIRD PARTY RIGHTS.\n\n 5. MDT SHALL NOT BE LIABLE TO LICENSEE OR ANY OTHER USERS OF MATPLOTLIB\n  FOR ANY INCIDENTAL, SPECIAL, OR CONSEQUENTIAL DAMAGES OR\n LOSS AS A RESULT OF MODIFYING, DISTRIBUTING, OR OTHERWISE USING\n MATPLOTLIB , OR ANY DERIVATIVE THEREOF, EVEN IF ADVISED OF\n THE POSSIBILITY THEREOF.\n\n 6. This License Agreement will automatically terminate upon a material\n breach of its terms and conditions.\n\n 7. Nothing in this License Agreement shall be deemed to create any\n relationship of agency, partnership, or joint venture between MDT and\n Licensee.  This License Agreement does not grant permission to use MDT\n trademarks or trade name in a trademark sense to endorse or promote\n products or services of Licensee, or any third party.\n\n 8. By copying, installing or otherwise using matplotlib ,\n Licensee agrees to be bound by the terms and conditions of this License\n Agreement.\n\n License agreement for matplotlib versions prior to 1.3.0\n ========================================================\n\n 1. This LICENSE AGREEMENT is between John D. Hunter (\"JDH\"), and the\n Individual or Organization (\"Licensee\") accessing and otherwise using\n matplotlib software in source or binary form and its associated\n documentation.\n\n 2. Subject to the terms and conditions of this License Agreement, JDH\n hereby grants Licensee a nonexclusive, royalty-free, world-wide license\n to reproduce, analyze, test, perform and/or display publicly, prepare\n derivative works, distribute, and otherwise use matplotlib\n alone or in any derivative version, provided, however, that JDH's\n License Agreement and JDH's notice of copyright, i.e., \"Copyright (c)\n 2002-2011 John D. Hunter; All Rights Reserved\" are retained in\n matplotlib  alone or in any derivative version prepared by\n Licensee.\n\n 3. In the event Licensee prepares a derivative work that is based on or\n incorporates matplotlib  or any part thereof, and wants to\n make the derivative work available to others as provided herein, then\n Licensee hereby agrees to include in any such work a brief summary of\n the changes made to matplotlib.\n\n 4. JDH is making matplotlib  available to Licensee on an \"AS\n IS\" basis.  JDH MAKES NO REPRESENTATIONS OR WARRANTIES, EXPRESS OR\n IMPLIED.  BY WAY OF EXAMPLE, BUT NOT LIMITATION, JDH MAKES NO AND\n DISCLAIMS ANY REPRESENTATION OR WARRANTY OF MERCHANTABILITY OR FITNESS\n FOR ANY PARTICULAR PURPOSE OR THAT THE USE OF MATPLOTLIB\n WILL NOT INFRINGE ANY THIRD PARTY RIGHTS.\n\n 5. JDH SHALL NOT BE LIABLE TO LICENSEE OR ANY OTHER USERS OF MATPLOTLIB\n  FOR ANY INCIDENTAL, SPECIAL, OR CONSEQUENTIAL DAMAGES OR\n LOSS AS A RESULT OF MODIFYING, DISTRIBUTING, OR OTHERWISE USING\n MATPLOTLIB , OR ANY DERIVATIVE THEREOF, EVEN IF ADVISED OF\n THE POSSIBILITY THEREOF.\n\n 6. This License Agreement will automatically terminate upon a material\n breach of its terms and conditions.\n\n 7. Nothing in this License Agreement shall be deemed to create any\n relationship of agency, partnership, or joint venture between JDH and\n Licensee.  This License Agreement does not grant permission to use JDH\n trademarks or trade name in a trademark sense to endorse or promote\n products or services of Licensee, or any third party.\n\n 8. By copying, installing or otherwise using matplotlib,\n Licensee agrees to be bound by the terms and conditions of this License\n Agreement. which is not currently a valid SPDX License identifier or expression.",
       "copyrightText": "NOASSERTION",
       "summary": "Python plotting package",
-      "releaseDate": "2025-07-31T18:07:36Z",
+      "releaseDate": "2025-10-09T00:26:06Z",
       "externalRefs": [
         {
           "referenceCategory": "OTHER",
@@ -995,12 +1000,12 @@
         {
           "referenceCategory": "PACKAGE-MANAGER",
           "referenceType": "purl",
-          "referenceLocator": "pkg:pypi/matplotlib@3.10.5"
+          "referenceLocator": "pkg:pypi/matplotlib@3.10.7"
         },
         {
           "referenceCategory": "SECURITY",
           "referenceType": "cpe23Type",
-          "referenceLocator": "cpe:2.3:a:john_d._michael_droettboom:matplotlib:3.10.5:*:*:*:*:*:*:*"
+          "referenceLocator": "cpe:2.3:a:john_d._michael_droettboom:matplotlib:3.10.7:*:*:*:*:*:*:*"
         }
       ]
     },
@@ -1090,33 +1095,33 @@
     {
       "SPDXID": "SPDXRef-26-fonttools",
       "name": "fonttools",
-      "versionInfo": "4.59.1",
+      "versionInfo": "4.60.1",
       "primaryPackagePurpose": "LIBRARY",
       "supplier": "Organization: Just van Rossum (just@letterror.com)",
-      "downloadLocation": "https://pypi.org/project/fonttools/4.59.1/#files",
+      "downloadLocation": "https://pypi.org/project/fonttools/4.60.1/#files",
       "filesAnalyzed": false,
       "homepage": "http://github.com/fonttools/fonttools",
       "checksums": [
         {
           "algorithm": "SHA256",
-          "checksumValue": "e90a89e52deb56b928e761bb5b5f65f13f669bfd96ed5962975debea09776a23"
+          "checksumValue": "9a52f254ce051e196b8fe2af4634c2d2f02c981756c6464dc192f1b6050b4e28"
         }
       ],
       "licenseConcluded": "MIT",
       "licenseDeclared": "MIT",
       "copyrightText": "NOASSERTION",
       "summary": "Tools to manipulate font files",
-      "releaseDate": "2025-08-14T16:26:10Z",
+      "releaseDate": "2025-09-29T21:10:59Z",
       "externalRefs": [
         {
           "referenceCategory": "PACKAGE-MANAGER",
           "referenceType": "purl",
-          "referenceLocator": "pkg:pypi/fonttools@4.59.1"
+          "referenceLocator": "pkg:pypi/fonttools@4.60.1"
         },
         {
           "referenceCategory": "SECURITY",
           "referenceType": "cpe23Type",
-          "referenceLocator": "cpe:2.3:a:just_van_rossum:fonttools:4.59.1:*:*:*:*:*:*:*"
+          "referenceLocator": "cpe:2.3:a:just_van_rossum:fonttools:4.60.1:*:*:*:*:*:*:*"
         }
       ]
     },
@@ -1235,34 +1240,33 @@
     {
       "SPDXID": "SPDXRef-29-pyparsing",
       "name": "pyparsing",
-      "versionInfo": "3.2.3",
+      "versionInfo": "3.2.5",
       "primaryPackagePurpose": "LIBRARY",
       "supplier": "Person: Paul McGuire (ptmcg.gm+pyparsing@gmail.com)",
-      "downloadLocation": "https://pypi.org/project/pyparsing/3.2.3/#files",
+      "downloadLocation": "https://pypi.org/project/pyparsing/3.2.5/#files",
       "filesAnalyzed": false,
       "homepage": "https://github.com/pyparsing/pyparsing/",
       "checksums": [
         {
           "algorithm": "SHA256",
-          "checksumValue": "a749938e02d6fd0b59b356ca504a24982314bb090c383e3cf201c95ef7e2bfcf"
+          "checksumValue": "e38a4f02064cf41fe6593d328d0512495ad1f3d8a91c4f73fc401b3079a59a5e"
         }
       ],
-      "licenseConcluded": "MIT",
+      "licenseConcluded": "NOASSERTION",
       "licenseDeclared": "NOASSERTION",
-      "licenseComments": "pyparsing declares MIT License which is not currently a valid SPDX License identifier or expression.",
       "copyrightText": "NOASSERTION",
-      "summary": "pyparsing module - Classes and methods to define and execute parsing grammars",
-      "releaseDate": "2025-03-25T05:01:24Z",
+      "summary": "pyparsing - Classes and methods to define and execute parsing grammars",
+      "releaseDate": "2025-09-21T04:11:04Z",
       "externalRefs": [
         {
           "referenceCategory": "PACKAGE-MANAGER",
           "referenceType": "purl",
-          "referenceLocator": "pkg:pypi/pyparsing@3.2.3"
+          "referenceLocator": "pkg:pypi/pyparsing@3.2.5"
         },
         {
           "referenceCategory": "SECURITY",
           "referenceType": "cpe23Type",
-          "referenceLocator": "cpe:2.3:a:paul_mcguire:pyparsing:3.2.3:*:*:*:*:*:*:*"
+          "referenceLocator": "cpe:2.3:a:paul_mcguire:pyparsing:3.2.5:*:*:*:*:*:*:*"
         }
       ]
     },
@@ -1346,16 +1350,16 @@
     {
       "SPDXID": "SPDXRef-32-numba",
       "name": "numba",
-      "versionInfo": "0.61.2",
+      "versionInfo": "0.62.1",
       "primaryPackagePurpose": "LIBRARY",
       "supplier": "NOASSERTION",
-      "downloadLocation": "https://pypi.org/project/numba/0.61.2/#files",
+      "downloadLocation": "https://pypi.org/project/numba/0.62.1/#files",
       "filesAnalyzed": false,
       "homepage": "https://numba.pydata.org",
       "checksums": [
         {
           "algorithm": "SHA256",
-          "checksumValue": "cf9f9fc00d6eca0c23fc840817ce9f439b9f03c8f03d6246c0e7f0cb15b7162a"
+          "checksumValue": "a323df9d36a0da1ca9c592a6baaddd0176d9f417ef49a65bb81951dce69d941a"
         }
       ],
       "licenseConcluded": "BSD-3-Clause",
@@ -1363,28 +1367,28 @@
       "licenseComments": "numba declares BSD which is not currently a valid SPDX License identifier or expression.",
       "copyrightText": "NOASSERTION",
       "summary": "compiling Python code using LLVM",
-      "releaseDate": "2025-04-09T02:57:34Z",
+      "releaseDate": "2025-09-29T10:43:31Z",
       "externalRefs": [
         {
           "referenceCategory": "PACKAGE-MANAGER",
           "referenceType": "purl",
-          "referenceLocator": "pkg:pypi/numba@0.61.2"
+          "referenceLocator": "pkg:pypi/numba@0.62.1"
         }
       ]
     },
     {
       "SPDXID": "SPDXRef-33-llvmlite",
       "name": "llvmlite",
-      "versionInfo": "0.44.0",
+      "versionInfo": "0.45.1",
       "primaryPackagePurpose": "LIBRARY",
       "supplier": "NOASSERTION",
-      "downloadLocation": "https://pypi.org/project/llvmlite/0.44.0/#files",
+      "downloadLocation": "https://pypi.org/project/llvmlite/0.45.1/#files",
       "filesAnalyzed": false,
       "homepage": "http://llvmlite.readthedocs.io",
       "checksums": [
         {
           "algorithm": "SHA256",
-          "checksumValue": "9fbadbfba8422123bab5535b293da1cf72f9f478a65645ecd73e781f962ca614"
+          "checksumValue": "1b1af0c910af0978aa55fa4f60bbb3e9f39b41e97c2a6d94d199897be62ba07a"
         }
       ],
       "licenseConcluded": "BSD-3-Clause",
@@ -1392,7 +1396,7 @@
       "licenseComments": "llvmlite declares BSD which is not currently a valid SPDX License identifier or expression.",
       "copyrightText": "NOASSERTION",
       "summary": "lightweight wrapper around basic LLVM functionality",
-      "releaseDate": "2025-01-20T11:12:18Z",
+      "releaseDate": "2025-10-01T18:02:58Z",
       "externalRefs": [
         {
           "referenceCategory": "OTHER",
@@ -1402,23 +1406,23 @@
         {
           "referenceCategory": "PACKAGE-MANAGER",
           "referenceType": "purl",
-          "referenceLocator": "pkg:pypi/llvmlite@0.44.0"
+          "referenceLocator": "pkg:pypi/llvmlite@0.45.1"
         }
       ]
     },
     {
       "SPDXID": "SPDXRef-34-pandas",
       "name": "pandas",
-      "versionInfo": "2.3.1",
+      "versionInfo": "2.3.3",
       "primaryPackagePurpose": "LIBRARY",
       "supplier": "NOASSERTION",
-      "downloadLocation": "https://pypi.org/project/pandas/2.3.1/#files",
+      "downloadLocation": "https://pypi.org/project/pandas/2.3.3/#files",
       "filesAnalyzed": false,
       "homepage": "https://pandas.pydata.org",
       "checksums": [
         {
           "algorithm": "SHA256",
-          "checksumValue": "22c2e866f7209ebc3a8f08d75766566aae02bcc91d196935a1d9e59c7b990ac9"
+          "checksumValue": "376c6446ae31770764215a6c937f72d917f214b43560603cd60da6408f183b6c"
         }
       ],
       "licenseConcluded": "NOASSERTION",
@@ -1426,7 +1430,7 @@
       "licenseComments": "pandas declares BSD 3-Clause License\n\n Copyright (c) 2008-2011, AQR Capital Management, LLC, Lambda Foundry, Inc. and PyData Development Team\n All rights reserved.\n\n Copyright (c) 2011-2023, Open source contributors.\n\n Redistribution and use in source and binary forms, with or without\n modification, are permitted provided that the following conditions are met:\n\n * Redistributions of source code must retain the above copyright notice, this\n   list of conditions and the following disclaimer.\n\n * Redistributions in binary form must reproduce the above copyright notice,\n   this list of conditions and the following disclaimer in the documentation\n   and/or other materials provided with the distribution.\n\n * Neither the name of the copyright holder nor the names of its\n   contributors may be used to endorse or promote products derived from\n   this software without specific prior written permission.\n\n THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS \"AS IS\"\n AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE\n IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE\n DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE\n FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL\n DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR\n SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER\n CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,\n OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE\n OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.\n which is not currently a valid SPDX License identifier or expression.",
       "copyrightText": "NOASSERTION",
       "summary": "Powerful data structures for data analysis, time series, and statistics",
-      "releaseDate": "2025-07-07T19:18:12Z",
+      "releaseDate": "2025-09-29T23:16:53Z",
       "externalRefs": [
         {
           "referenceCategory": "OTHER",
@@ -1441,7 +1445,7 @@
         {
           "referenceCategory": "PACKAGE-MANAGER",
           "referenceType": "purl",
-          "referenceLocator": "pkg:pypi/pandas@2.3.1"
+          "referenceLocator": "pkg:pypi/pandas@2.3.3"
         }
       ]
     },
@@ -1529,22 +1533,22 @@
     {
       "SPDXID": "SPDXRef-37-plum-dispatch",
       "name": "plum-dispatch",
-      "versionInfo": "2.5.7",
+      "versionInfo": "2.6.0",
       "primaryPackagePurpose": "LIBRARY",
       "supplier": "Person: Wessel Bruinsma (wessel.p.bruinsma@gmail.com)",
-      "downloadLocation": "https://pypi.org/project/plum-dispatch/2.5.7/#files",
+      "downloadLocation": "https://pypi.org/project/plum-dispatch/2.6.0/#files",
       "filesAnalyzed": false,
       "checksums": [
         {
           "algorithm": "SHA256",
-          "checksumValue": "06471782eea0b3798c1e79dca2af2165bafcfa5eb595540b514ddd81053b1ede"
+          "checksumValue": "8e9b8f20c5119f944720fa5b93f84338a9f604329f016a5132e419e4894cddf1"
         }
       ],
       "licenseConcluded": "MIT",
       "licenseDeclared": "MIT",
       "copyrightText": "NOASSERTION",
       "summary": "Multiple dispatch in Python",
-      "releaseDate": "2025-01-17T20:07:26Z",
+      "releaseDate": "2025-10-28T13:05:56Z",
       "externalRefs": [
         {
           "referenceCategory": "OTHER",
@@ -1559,35 +1563,35 @@
         {
           "referenceCategory": "PACKAGE-MANAGER",
           "referenceType": "purl",
-          "referenceLocator": "pkg:pypi/plum-dispatch@2.5.7"
+          "referenceLocator": "pkg:pypi/plum-dispatch@2.6.0"
         },
         {
           "referenceCategory": "SECURITY",
           "referenceType": "cpe23Type",
-          "referenceLocator": "cpe:2.3:a:wessel_bruinsma:plum-dispatch:2.5.7:*:*:*:*:*:*:*"
+          "referenceLocator": "cpe:2.3:a:wessel_bruinsma:plum-dispatch:2.6.0:*:*:*:*:*:*:*"
         }
       ]
     },
     {
       "SPDXID": "SPDXRef-38-beartype",
       "name": "beartype",
-      "versionInfo": "0.21.0",
+      "versionInfo": "0.22.5",
       "primaryPackagePurpose": "LIBRARY",
       "supplier": "Person: Cecil Curry (leycec@gmail.com)",
-      "downloadLocation": "https://pypi.org/project/beartype/0.21.0/#files",
+      "downloadLocation": "https://pypi.org/project/beartype/0.22.5/#files",
       "filesAnalyzed": false,
       "checksums": [
         {
           "algorithm": "SHA256",
-          "checksumValue": "b6a1bd56c72f31b0a496a36cc55df6e2f475db166ad07fa4acc7e74f4c7f34c0"
+          "checksumValue": "d9743dd7cd6d193696eaa1e025f8a70fb09761c154675679ff236e61952dfba0"
         }
       ],
       "licenseConcluded": "NOASSERTION",
       "licenseDeclared": "NOASSERTION",
       "licenseComments": "beartype declares MIT License\n\nCopyright (c) 2014-2025 Beartype authors.\n\nPermission is hereby granted, free of charge, to any person obtaining a copy\nof this software and associated documentation files (the \"Software\"), to deal\nin the Software without restriction, including without limitation the rights\nto use, copy, modify, merge, publish, distribute, sublicense, and/or sell\ncopies of the Software, and to permit persons to whom the Software is\nfurnished to do so, subject to the following conditions:\n\nThe above copyright notice and this permission notice shall be included in all\ncopies or substantial portions of the Software.\n\nTHE SOFTWARE IS PROVIDED \"AS IS\", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR\nIMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,\nFITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE\nAUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER\nLIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,\nOUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE\nSOFTWARE. which is not currently a valid SPDX License identifier or expression.",
       "copyrightText": "NOASSERTION",
-      "summary": "Unbearably fast near-real-time hybrid runtime-static type-checking in pure Python.",
-      "releaseDate": "2025-05-22T05:09:24Z",
+      "summary": "Unbearably fast near-real-time pure-Python runtime-static type-checker.",
+      "releaseDate": "2025-11-01T05:49:18Z",
       "externalRefs": [
         {
           "referenceCategory": "OTHER",
@@ -1617,35 +1621,35 @@
         {
           "referenceCategory": "PACKAGE-MANAGER",
           "referenceType": "purl",
-          "referenceLocator": "pkg:pypi/beartype@0.21.0"
+          "referenceLocator": "pkg:pypi/beartype@0.22.5"
         },
         {
           "referenceCategory": "SECURITY",
           "referenceType": "cpe23Type",
-          "referenceLocator": "cpe:2.3:a:cecil_curry:beartype:0.21.0:*:*:*:*:*:*:*"
+          "referenceLocator": "cpe:2.3:a:cecil_curry:beartype:0.22.5:*:*:*:*:*:*:*"
         }
       ]
     },
     {
       "SPDXID": "SPDXRef-39-rich",
       "name": "rich",
-      "versionInfo": "14.1.0",
+      "versionInfo": "14.2.0",
       "primaryPackagePurpose": "LIBRARY",
       "supplier": "Person: Will McGugan (willmcgugan@gmail.com)",
-      "downloadLocation": "https://pypi.org/project/rich/14.1.0/#files",
+      "downloadLocation": "https://pypi.org/project/rich/14.2.0/#files",
       "filesAnalyzed": false,
       "homepage": "https://github.com/Textualize/rich",
       "checksums": [
         {
           "algorithm": "SHA256",
-          "checksumValue": "536f5f1785986d6dbdea3c75205c473f970777b4a0d6c6dd1b696aa05a3fa04f"
+          "checksumValue": "76bc51fe2e57d2b1be1f96c524b890b816e334ab4c1e45888799bfaab0021edd"
         }
       ],
       "licenseConcluded": "MIT",
       "licenseDeclared": "MIT",
       "copyrightText": "NOASSERTION",
       "summary": "Render rich text, tables, progress bars, syntax highlighting, markdown and more to the terminal",
-      "releaseDate": "2025-07-25T07:32:56Z",
+      "releaseDate": "2025-10-09T14:16:51Z",
       "externalRefs": [
         {
           "referenceCategory": "OTHER",
@@ -1655,12 +1659,12 @@
         {
           "referenceCategory": "PACKAGE-MANAGER",
           "referenceType": "purl",
-          "referenceLocator": "pkg:pypi/rich@14.1.0"
+          "referenceLocator": "pkg:pypi/rich@14.2.0"
         },
         {
           "referenceCategory": "SECURITY",
           "referenceType": "cpe23Type",
-          "referenceLocator": "cpe:2.3:a:will_mcgugan:rich:14.1.0:*:*:*:*:*:*:*"
+          "referenceLocator": "cpe:2.3:a:will_mcgugan:rich:14.2.0:*:*:*:*:*:*:*"
         }
       ]
     },
@@ -1845,16 +1849,16 @@
     {
       "SPDXID": "SPDXRef-44-platformdirs",
       "name": "platformdirs",
-      "versionInfo": "4.3.8",
+      "versionInfo": "4.5.0",
       "primaryPackagePurpose": "LIBRARY",
       "supplier": "NOASSERTION",
-      "downloadLocation": "https://pypi.org/project/platformdirs/4.3.8/#files",
+      "downloadLocation": "https://pypi.org/project/platformdirs/4.5.0/#files",
       "filesAnalyzed": false,
       "homepage": "https://github.com/tox-dev/platformdirs",
       "checksums": [
         {
           "algorithm": "SHA256",
-          "checksumValue": "ff7059bb7eb1179e2685604f4aaf157cfd9535242bd23742eadc3c13542139b4"
+          "checksumValue": "e578a81bb873cbb89a41fcc904c7ef523cc18284b7e3b3ccf06aca1403b7ebd3"
         }
       ],
       "licenseConcluded": "MIT",
@@ -1862,7 +1866,7 @@
       "licenseComments": "platformdirs declares MIT License which is not currently a valid SPDX License identifier or expression.",
       "copyrightText": "NOASSERTION",
       "summary": "A small Python package for determining appropriate platform-specific dirs, e.g. a `user data dir`.",
-      "releaseDate": "2025-05-07T22:47:40Z",
+      "releaseDate": "2025-10-08T17:44:47Z",
       "externalRefs": [
         {
           "referenceCategory": "OTHER",
@@ -1887,30 +1891,30 @@
         {
           "referenceCategory": "PACKAGE-MANAGER",
           "referenceType": "purl",
-          "referenceLocator": "pkg:pypi/platformdirs@4.3.8"
+          "referenceLocator": "pkg:pypi/platformdirs@4.5.0"
         }
       ]
     },
     {
       "SPDXID": "SPDXRef-45-requests",
       "name": "requests",
-      "versionInfo": "2.32.4",
+      "versionInfo": "2.32.5",
       "primaryPackagePurpose": "LIBRARY",
       "supplier": "Person: Kenneth Reitz (me@kennethreitz.org)",
-      "downloadLocation": "https://pypi.org/project/requests/2.32.4/#files",
+      "downloadLocation": "https://pypi.org/project/requests/2.32.5/#files",
       "filesAnalyzed": false,
       "homepage": "https://requests.readthedocs.io",
       "checksums": [
         {
           "algorithm": "SHA256",
-          "checksumValue": "27babd3cda2a6d50b30443204ee89830707d396671944c998b5975b031ac2b2c"
+          "checksumValue": "2462f94637a34fd532264295e186976db0f5d453d1cdd31473c85a6a161affb6"
         }
       ],
       "licenseConcluded": "Apache-2.0",
       "licenseDeclared": "Apache-2.0",
       "copyrightText": "NOASSERTION",
       "summary": "Python HTTP for Humans.",
-      "releaseDate": "2025-06-09T16:43:05Z",
+      "releaseDate": "2025-08-18T20:46:00Z",
       "externalRefs": [
         {
           "referenceCategory": "OTHER",
@@ -1925,34 +1929,34 @@
         {
           "referenceCategory": "PACKAGE-MANAGER",
           "referenceType": "purl",
-          "referenceLocator": "pkg:pypi/requests@2.32.4"
+          "referenceLocator": "pkg:pypi/requests@2.32.5"
         },
         {
           "referenceCategory": "SECURITY",
           "referenceType": "cpe23Type",
-          "referenceLocator": "cpe:2.3:a:kenneth_reitz:requests:2.32.4:*:*:*:*:*:*:*"
+          "referenceLocator": "cpe:2.3:a:kenneth_reitz:requests:2.32.5:*:*:*:*:*:*:*"
         }
       ]
     },
     {
       "SPDXID": "SPDXRef-46-charset-normalizer",
       "name": "charset-normalizer",
-      "versionInfo": "3.4.3",
+      "versionInfo": "3.4.4",
       "primaryPackagePurpose": "LIBRARY",
       "supplier": "Organization: Ahmed R. (tahri.ahmed@proton.me)",
-      "downloadLocation": "https://pypi.org/project/charset-normalizer/3.4.3/#files",
+      "downloadLocation": "https://pypi.org/project/charset-normalizer/3.4.4/#files",
       "filesAnalyzed": false,
       "checksums": [
         {
           "algorithm": "SHA256",
-          "checksumValue": "fb7f67a1bfa6e40b438170ebdc8158b78dc465a5a67b6dde178a46987b244a72"
+          "checksumValue": "e824f1492727fa856dd6eda4f7cee25f8518a12f3c4a56a74e8095695089cf6d"
         }
       ],
       "licenseConcluded": "MIT",
       "licenseDeclared": "MIT",
       "copyrightText": "NOASSERTION",
       "summary": "The Real First Universal Charset Detector. Open, modern and actively maintained alternative to Chardet.",
-      "releaseDate": "2025-08-09T07:55:36Z",
+      "releaseDate": "2025-10-14T04:40:11Z",
       "externalRefs": [
         {
           "referenceCategory": "OTHER",
@@ -1977,35 +1981,34 @@
         {
           "referenceCategory": "PACKAGE-MANAGER",
           "referenceType": "purl",
-          "referenceLocator": "pkg:pypi/charset-normalizer@3.4.3"
+          "referenceLocator": "pkg:pypi/charset-normalizer@3.4.4"
         },
         {
           "referenceCategory": "SECURITY",
           "referenceType": "cpe23Type",
-          "referenceLocator": "cpe:2.3:a:ahmed_r.:charset-normalizer:3.4.3:*:*:*:*:*:*:*"
+          "referenceLocator": "cpe:2.3:a:ahmed_r.:charset-normalizer:3.4.4:*:*:*:*:*:*:*"
         }
       ]
     },
     {
       "SPDXID": "SPDXRef-47-idna",
       "name": "idna",
-      "versionInfo": "3.10",
+      "versionInfo": "3.11",
       "primaryPackagePurpose": "LIBRARY",
       "supplier": "Person: Kim Davies (kim+pypi@gumleaf.org)",
-      "downloadLocation": "https://pypi.org/project/idna/3.10/#files",
+      "downloadLocation": "https://pypi.org/project/idna/3.11/#files",
       "filesAnalyzed": false,
       "checksums": [
         {
           "algorithm": "SHA256",
-          "checksumValue": "946d195a0d259cbba61165e88e65941f16e9b36ea6ddb97f00452bae8b1287d3"
+          "checksumValue": "771a87f49d9defaf64091e6e6fe9c18d4833f140bd19464795bc32d966ca37ea"
         }
       ],
-      "licenseConcluded": "BSD-3-Clause",
+      "licenseConcluded": "NOASSERTION",
       "licenseDeclared": "NOASSERTION",
-      "licenseComments": "idna declares BSD License which is not currently a valid SPDX License identifier or expression.",
       "copyrightText": "NOASSERTION",
       "summary": "Internationalized Domain Names in Applications (IDNA)",
-      "releaseDate": "2024-09-15T18:07:37Z",
+      "releaseDate": "2025-10-12T14:55:18Z",
       "externalRefs": [
         {
           "referenceCategory": "OTHER",
@@ -2025,12 +2028,12 @@
         {
           "referenceCategory": "PACKAGE-MANAGER",
           "referenceType": "purl",
-          "referenceLocator": "pkg:pypi/idna@3.10"
+          "referenceLocator": "pkg:pypi/idna@3.11"
         },
         {
           "referenceCategory": "SECURITY",
           "referenceType": "cpe23Type",
-          "referenceLocator": "cpe:2.3:a:kim_davies:idna:3.10:*:*:*:*:*:*:*"
+          "referenceLocator": "cpe:2.3:a:kim_davies:idna:3.11:*:*:*:*:*:*:*"
         }
       ]
     },
@@ -2089,23 +2092,23 @@
     {
       "SPDXID": "SPDXRef-49-certifi",
       "name": "certifi",
-      "versionInfo": "2025.8.3",
+      "versionInfo": "2025.10.5",
       "primaryPackagePurpose": "LIBRARY",
       "supplier": "Person: Kenneth Reitz (me@kennethreitz.com)",
-      "downloadLocation": "https://pypi.org/project/certifi/2025.8.3/#files",
+      "downloadLocation": "https://pypi.org/project/certifi/2025.10.5/#files",
       "filesAnalyzed": false,
       "homepage": "https://github.com/certifi/python-certifi",
       "checksums": [
         {
           "algorithm": "SHA256",
-          "checksumValue": "f6c12493cfb1b06ba2ff328595af9350c65d6644968e5d3a2ffd78699af217a5"
+          "checksumValue": "0f212c2744a9bb6de0c56639a6f68afe01ecd92d91f14ae897c4fe7bbeeef0de"
         }
       ],
       "licenseConcluded": "MPL-2.0",
       "licenseDeclared": "MPL-2.0",
       "copyrightText": "NOASSERTION",
       "summary": "Python package for providing Mozilla's CA Bundle.",
-      "releaseDate": "2025-08-03T03:07:45Z",
+      "releaseDate": "2025-10-05T04:12:14Z",
       "externalRefs": [
         {
           "referenceCategory": "OTHER",
@@ -2115,36 +2118,35 @@
         {
           "referenceCategory": "PACKAGE-MANAGER",
           "referenceType": "purl",
-          "referenceLocator": "pkg:pypi/certifi@2025.8.3"
+          "referenceLocator": "pkg:pypi/certifi@2025.10.5"
         },
         {
           "referenceCategory": "SECURITY",
           "referenceType": "cpe23Type",
-          "referenceLocator": "cpe:2.3:a:kenneth_reitz:certifi:2025.8.3:*:*:*:*:*:*:*"
+          "referenceLocator": "cpe:2.3:a:kenneth_reitz:certifi:2025.10.5:*:*:*:*:*:*:*"
         }
       ]
     },
     {
       "SPDXID": "SPDXRef-50-pydantic",
       "name": "pydantic",
-      "versionInfo": "2.11.7",
+      "versionInfo": "2.12.4",
       "primaryPackagePurpose": "LIBRARY",
-      "supplier": "Organization: Samuel Colvin Eric Jolibois Hasan Ramezani Adrian Garcia Badaracco Terrence Dorsey David Montague Serge Matveenko Marcelo Trylesinski Sydney Runkle David Hewitt Alex Hall Victorien Plot (contact@vctrn.dev)",
-      "downloadLocation": "https://pypi.org/project/pydantic/2.11.7/#files",
+      "supplier": "Organization: Samuel Colvin Eric Jolibois Hasan Ramezani Adrian Garcia Badaracco Terrence Dorsey David Montague Serge Matveenko Marcelo Trylesinski Sydney Runkle David Hewitt Alex Hall Victorien Plot Douwe Maan (hi@douwe.me)",
+      "downloadLocation": "https://pypi.org/project/pydantic/2.12.4/#files",
       "filesAnalyzed": false,
       "homepage": "https://github.com/pydantic/pydantic",
       "checksums": [
         {
           "algorithm": "SHA256",
-          "checksumValue": "dde5df002701f6de26248661f6835bbe296a47bf73990135c7d07ce741b9623b"
+          "checksumValue": "92d3d202a745d46f9be6df459ac5a064fdaa3c1c4cd8adcfa332ccf3c05f871e"
         }
       ],
-      "licenseConcluded": "MIT",
+      "licenseConcluded": "NOASSERTION",
       "licenseDeclared": "NOASSERTION",
-      "licenseComments": "pydantic declares MIT License which is not currently a valid SPDX License identifier or expression.",
       "copyrightText": "NOASSERTION",
       "summary": "Data validation using Python type hints",
-      "releaseDate": "2025-06-14T08:33:14Z",
+      "releaseDate": "2025-11-05T10:50:06Z",
       "externalRefs": [
         {
           "referenceCategory": "OTHER",
@@ -2169,12 +2171,12 @@
         {
           "referenceCategory": "PACKAGE-MANAGER",
           "referenceType": "purl",
-          "referenceLocator": "pkg:pypi/pydantic@2.11.7"
+          "referenceLocator": "pkg:pypi/pydantic@2.12.4"
         },
         {
           "referenceCategory": "SECURITY",
           "referenceType": "cpe23Type",
-          "referenceLocator": "cpe:2.3:a:samuel_colvin_eric_jolibois_hasan_ramezani_adrian_garcia_badaracco_terrence_dorsey_david_montague_serge_matveenko_marcelo_trylesinski_sydney_runkle_david_hewitt_alex_hall_victorien_plot:pydantic:2.11.7:*:*:*:*:*:*:*"
+          "referenceLocator": "cpe:2.3:a:samuel_colvin_eric_jolibois_hasan_ramezani_adrian_garcia_badaracco_terrence_dorsey_david_montague_serge_matveenko_marcelo_trylesinski_sydney_runkle_david_hewitt_alex_hall_victorien_plot_douwe_maan:pydantic:2.12.4:*:*:*:*:*:*:*"
         }
       ]
     },
@@ -2225,14 +2227,14 @@
     {
       "SPDXID": "SPDXRef-52-pydantic-core",
       "name": "pydantic-core",
-      "versionInfo": "2.33.2",
+      "versionInfo": "2.41.5",
       "primaryPackagePurpose": "LIBRARY",
       "supplier": "Organization: Samuel Colvin Adrian Garcia Badaracco David Montague David Hewitt Sydney Runkle Victorien Plot (contact@vctrn.dev)",
-      "downloadLocation": "https://pypi.org/project/pydantic-core/2.33.2/#files",
+      "downloadLocation": "https://pypi.org/project/pydantic-core/2.41.5/#files",
       "filesAnalyzed": false,
       "homepage": "https://github.com/pydantic/pydantic-core",
-      "licenseConcluded": "MIT",
-      "licenseDeclared": "MIT",
+      "licenseConcluded": "NOASSERTION",
+      "licenseDeclared": "NOASSERTION",
       "copyrightText": "NOASSERTION",
       "summary": "Core functionality for Pydantic validation and serialization",
       "releaseDate": "2024-05-20T21:33:24Z",
@@ -2250,35 +2252,35 @@
         {
           "referenceCategory": "PACKAGE-MANAGER",
           "referenceType": "purl",
-          "referenceLocator": "pkg:pypi/pydantic-core@2.33.2"
+          "referenceLocator": "pkg:pypi/pydantic-core@2.41.5"
         },
         {
           "referenceCategory": "SECURITY",
           "referenceType": "cpe23Type",
-          "referenceLocator": "cpe:2.3:a:samuel_colvin_adrian_garcia_badaracco_david_montague_david_hewitt_sydney_runkle_victorien_plot:pydantic-core:2.33.2:*:*:*:*:*:*:*"
+          "referenceLocator": "cpe:2.3:a:samuel_colvin_adrian_garcia_badaracco_david_montague_david_hewitt_sydney_runkle_victorien_plot:pydantic-core:2.41.5:*:*:*:*:*:*:*"
         }
       ]
     },
     {
       "SPDXID": "SPDXRef-53-typing-inspection",
       "name": "typing-inspection",
-      "versionInfo": "0.4.1",
+      "versionInfo": "0.4.2",
       "primaryPackagePurpose": "LIBRARY",
       "supplier": "Person: Victorien Plot (contact@vctrn.dev)",
-      "downloadLocation": "https://pypi.org/project/typing-inspection/0.4.1/#files",
+      "downloadLocation": "https://pypi.org/project/typing-inspection/0.4.2/#files",
       "filesAnalyzed": false,
       "homepage": "https://github.com/pydantic/typing-inspection",
       "checksums": [
         {
           "algorithm": "SHA256",
-          "checksumValue": "389055682238f53b04f7badcb49b989835495a96700ced5dab2d8feae4b26f51"
+          "checksumValue": "4ed1cacbdc298c220f1bd249ed5287caa16f34d44ef4e9c3d0cbad5b521545e7"
         }
       ],
       "licenseConcluded": "NOASSERTION",
       "licenseDeclared": "NOASSERTION",
       "copyrightText": "NOASSERTION",
       "summary": "Runtime typing introspection tools",
-      "releaseDate": "2025-05-21T18:55:22Z",
+      "releaseDate": "2025-10-01T02:14:40Z",
       "externalRefs": [
         {
           "referenceCategory": "OTHER",
@@ -2298,28 +2300,28 @@
         {
           "referenceCategory": "PACKAGE-MANAGER",
           "referenceType": "purl",
-          "referenceLocator": "pkg:pypi/typing-inspection@0.4.1"
+          "referenceLocator": "pkg:pypi/typing-inspection@0.4.2"
         },
         {
           "referenceCategory": "SECURITY",
           "referenceType": "cpe23Type",
-          "referenceLocator": "cpe:2.3:a:victorien_plot:typing-inspection:0.4.1:*:*:*:*:*:*:*"
+          "referenceLocator": "cpe:2.3:a:victorien_plot:typing-inspection:0.4.2:*:*:*:*:*:*:*"
         }
       ]
     },
     {
       "SPDXID": "SPDXRef-54-scipy",
       "name": "scipy",
-      "versionInfo": "1.16.1",
+      "versionInfo": "1.16.3",
       "primaryPackagePurpose": "LIBRARY",
       "supplier": "NOASSERTION",
-      "downloadLocation": "https://pypi.org/project/scipy/1.16.1/#files",
+      "downloadLocation": "https://pypi.org/project/scipy/1.16.3/#files",
       "filesAnalyzed": false,
       "homepage": "https://scipy.org/",
       "checksums": [
         {
           "algorithm": "SHA256",
-          "checksumValue": "c033fa32bab91dc98ca59d0cf23bb876454e2bb02cbe592d5023138778f70030"
+          "checksumValue": "40be6cf99e68b6c4321e9f8782e7d5ff8265af28ef2cd56e9c9b2638fa08ad97"
         }
       ],
       "licenseConcluded": "NOASSERTION",
@@ -2327,7 +2329,7 @@
       "licenseComments": "scipy declares Copyright (c) 2001-2002 Enthought, Inc. 2003, SciPy Developers.\n All rights reserved.\n\n Redistribution and use in source and binary forms, with or without\n modification, are permitted provided that the following conditions\n are met:\n\n 1. Redistributions of source code must retain the above copyright\n    notice, this list of conditions and the following disclaimer.\n\n 2. Redistributions in binary form must reproduce the above\n    copyright notice, this list of conditions and the following\n    disclaimer in the documentation and/or other materials provided\n    with the distribution.\n\n 3. Neither the name of the copyright holder nor the names of its\n    contributors may be used to endorse or promote products derived\n    from this software without specific prior written permission.\n\n THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS\n \"AS IS\" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT\n LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR\n A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT\n OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,\n SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT\n LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,\n DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY\n THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT\n (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE\n OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.\n which is not currently a valid SPDX License identifier or expression.",
       "copyrightText": "NOASSERTION",
       "summary": "Fundamental algorithms for scientific computing in Python",
-      "releaseDate": "2025-07-27T16:26:29Z",
+      "releaseDate": "2025-10-28T17:31:47Z",
       "externalRefs": [
         {
           "referenceCategory": "OTHER",
@@ -2352,7 +2354,7 @@
         {
           "referenceCategory": "PACKAGE-MANAGER",
           "referenceType": "purl",
-          "referenceLocator": "pkg:pypi/scipy@1.16.1"
+          "referenceLocator": "pkg:pypi/scipy@1.16.3"
         }
       ]
     },
@@ -2398,24 +2400,23 @@
     {
       "SPDXID": "SPDXRef-56-tomli",
       "name": "tomli",
-      "versionInfo": "2.2.1",
+      "versionInfo": "2.3.0",
       "primaryPackagePurpose": "LIBRARY",
       "supplier": "Person: Taneli Hukkinen (hukkin@users.noreply.github.com)",
-      "downloadLocation": "https://pypi.org/project/tomli/2.2.1/#files",
+      "downloadLocation": "https://pypi.org/project/tomli/2.3.0/#files",
       "filesAnalyzed": false,
       "homepage": "https://github.com/hukkin/tomli",
       "checksums": [
         {
           "algorithm": "SHA256",
-          "checksumValue": "678e4fa69e4575eb77d103de3df8a895e1591b48e740211bd1067378c69e8249"
+          "checksumValue": "88bd15eb972f3664f5ed4b57c1634a97153b4bac4479dcb6a495f41921eb7f45"
         }
       ],
-      "licenseConcluded": "MIT",
+      "licenseConcluded": "NOASSERTION",
       "licenseDeclared": "NOASSERTION",
-      "licenseComments": "tomli declares MIT License which is not currently a valid SPDX License identifier or expression.",
       "copyrightText": "NOASSERTION",
       "summary": "A lil' TOML parser",
-      "releaseDate": "2024-11-27T22:37:54Z",
+      "releaseDate": "2025-10-08T22:01:00Z",
       "externalRefs": [
         {
           "referenceCategory": "OTHER",
@@ -2425,12 +2426,12 @@
         {
           "referenceCategory": "PACKAGE-MANAGER",
           "referenceType": "purl",
-          "referenceLocator": "pkg:pypi/tomli@2.2.1"
+          "referenceLocator": "pkg:pypi/tomli@2.3.0"
         },
         {
           "referenceCategory": "SECURITY",
           "referenceType": "cpe23Type",
-          "referenceLocator": "cpe:2.3:a:taneli_hukkinen:tomli:2.2.1:*:*:*:*:*:*:*"
+          "referenceLocator": "cpe:2.3:a:taneli_hukkinen:tomli:2.3.0:*:*:*:*:*:*:*"
         }
       ]
     },
@@ -2474,23 +2475,23 @@
     {
       "SPDXID": "SPDXRef-58-xarray",
       "name": "xarray",
-      "versionInfo": "2025.8.0",
+      "versionInfo": "2025.10.1",
       "primaryPackagePurpose": "LIBRARY",
       "supplier": "Person: xarray Developers (xarray@googlegroups.com)",
-      "downloadLocation": "https://pypi.org/project/xarray/2025.8.0/#files",
+      "downloadLocation": "https://pypi.org/project/xarray/2025.10.1/#files",
       "filesAnalyzed": false,
       "homepage": "https://xarray.dev/",
       "checksums": [
         {
           "algorithm": "SHA256",
-          "checksumValue": "1c454f32b38c93df68e450238c9473fe21248b8572d42ddd58c5170bb30934ee"
+          "checksumValue": "a4e699433b87a7fac340951bc36648645eeef72bdd915ff055ac2fd99865a73d"
         }
       ],
       "licenseConcluded": "NOASSERTION",
       "licenseDeclared": "NOASSERTION",
       "copyrightText": "NOASSERTION",
       "summary": "N-D labeled arrays and datasets in Python",
-      "releaseDate": "2025-08-14T16:52:10Z",
+      "releaseDate": "2025-10-07T20:25:54Z",
       "externalRefs": [
         {
           "referenceCategory": "OTHER",
@@ -2515,12 +2516,12 @@
         {
           "referenceCategory": "PACKAGE-MANAGER",
           "referenceType": "purl",
-          "referenceLocator": "pkg:pypi/xarray@2025.8.0"
+          "referenceLocator": "pkg:pypi/xarray@2025.10.1"
         },
         {
           "referenceCategory": "SECURITY",
           "referenceType": "cpe23Type",
-          "referenceLocator": "cpe:2.3:a:xarray_developers:xarray:2025.8.0:*:*:*:*:*:*:*"
+          "referenceLocator": "cpe:2.3:a:xarray_developers:xarray:2025.10.1:*:*:*:*:*:*:*"
         }
       ]
     },
@@ -2603,19 +2604,9 @@
   ],
   "relationships": [
     {
-      "spdxElementId": "SPDXRef-1-imod",
-      "relatedSpdxElement": "SPDXRef-13-toolz",
-      "relationshipType": "DEPENDS_ON"
-    },
-    {
-      "spdxElementId": "SPDXRef-1-imod",
-      "relatedSpdxElement": "SPDXRef-18-filelock",
-      "relationshipType": "DEPENDS_ON"
-    },
-    {
-      "spdxElementId": "SPDXRef-1-imod",
-      "relatedSpdxElement": "SPDXRef-19-jinja2",
-      "relationshipType": "DEPENDS_ON"
+      "spdxElementId": "SPDXRef-DOCUMENT",
+      "relatedSpdxElement": "SPDXRef-1-imod",
+      "relationshipType": "DESCRIBES"
     },
     {
       "spdxElementId": "SPDXRef-1-imod",
@@ -2624,42 +2615,12 @@
     },
     {
       "spdxElementId": "SPDXRef-1-imod",
-      "relatedSpdxElement": "SPDXRef-21-loguru",
-      "relationshipType": "DEPENDS_ON"
-    },
-    {
-      "spdxElementId": "SPDXRef-1-imod",
-      "relatedSpdxElement": "SPDXRef-23-matplotlib",
-      "relationshipType": "DEPENDS_ON"
-    },
-    {
-      "spdxElementId": "SPDXRef-1-imod",
       "relatedSpdxElement": "SPDXRef-3-cftime",
       "relationshipType": "DEPENDS_ON"
     },
     {
-      "spdxElementId": "SPDXRef-1-imod",
-      "relatedSpdxElement": "SPDXRef-32-numba",
-      "relationshipType": "DEPENDS_ON"
-    },
-    {
-      "spdxElementId": "SPDXRef-1-imod",
-      "relatedSpdxElement": "SPDXRef-34-pandas",
-      "relationshipType": "DEPENDS_ON"
-    },
-    {
-      "spdxElementId": "SPDXRef-1-imod",
-      "relatedSpdxElement": "SPDXRef-37-plum-dispatch",
-      "relationshipType": "DEPENDS_ON"
-    },
-    {
-      "spdxElementId": "SPDXRef-1-imod",
+      "spdxElementId": "SPDXRef-3-cftime",
       "relatedSpdxElement": "SPDXRef-4-numpy",
-      "relationshipType": "DEPENDS_ON"
-    },
-    {
-      "spdxElementId": "SPDXRef-1-imod",
-      "relatedSpdxElement": "SPDXRef-43-pooch",
       "relationshipType": "DEPENDS_ON"
     },
     {
@@ -2668,38 +2629,33 @@
       "relationshipType": "DEPENDS_ON"
     },
     {
-      "spdxElementId": "SPDXRef-1-imod",
-      "relatedSpdxElement": "SPDXRef-50-pydantic",
+      "spdxElementId": "SPDXRef-5-dask",
+      "relatedSpdxElement": "SPDXRef-6-click",
       "relationshipType": "DEPENDS_ON"
     },
     {
-      "spdxElementId": "SPDXRef-1-imod",
-      "relatedSpdxElement": "SPDXRef-54-scipy",
+      "spdxElementId": "SPDXRef-6-click",
+      "relatedSpdxElement": "SPDXRef-7-colorama",
       "relationshipType": "DEPENDS_ON"
     },
     {
-      "spdxElementId": "SPDXRef-1-imod",
-      "relatedSpdxElement": "SPDXRef-55-tomli-w",
+      "spdxElementId": "SPDXRef-5-dask",
+      "relatedSpdxElement": "SPDXRef-8-cloudpickle",
       "relationshipType": "DEPENDS_ON"
     },
     {
-      "spdxElementId": "SPDXRef-1-imod",
-      "relatedSpdxElement": "SPDXRef-56-tomli",
+      "spdxElementId": "SPDXRef-5-dask",
+      "relatedSpdxElement": "SPDXRef-9-fsspec",
       "relationshipType": "DEPENDS_ON"
     },
     {
-      "spdxElementId": "SPDXRef-1-imod",
-      "relatedSpdxElement": "SPDXRef-57-tqdm",
+      "spdxElementId": "SPDXRef-5-dask",
+      "relatedSpdxElement": "SPDXRef-10-packaging",
       "relationshipType": "DEPENDS_ON"
     },
     {
-      "spdxElementId": "SPDXRef-1-imod",
-      "relatedSpdxElement": "SPDXRef-58-xarray",
-      "relationshipType": "DEPENDS_ON"
-    },
-    {
-      "spdxElementId": "SPDXRef-1-imod",
-      "relatedSpdxElement": "SPDXRef-59-xugrid",
+      "spdxElementId": "SPDXRef-5-dask",
+      "relatedSpdxElement": "SPDXRef-11-partd",
       "relationshipType": "DEPENDS_ON"
     },
     {
@@ -2713,13 +2669,38 @@
       "relationshipType": "DEPENDS_ON"
     },
     {
+      "spdxElementId": "SPDXRef-5-dask",
+      "relatedSpdxElement": "SPDXRef-14-pyyaml",
+      "relationshipType": "DEPENDS_ON"
+    },
+    {
+      "spdxElementId": "SPDXRef-5-dask",
+      "relatedSpdxElement": "SPDXRef-13-toolz",
+      "relationshipType": "DEPENDS_ON"
+    },
+    {
+      "spdxElementId": "SPDXRef-5-dask",
+      "relatedSpdxElement": "SPDXRef-15-importlib-metadata",
+      "relationshipType": "DEPENDS_ON"
+    },
+    {
+      "spdxElementId": "SPDXRef-1-imod",
+      "relatedSpdxElement": "SPDXRef-18-filelock",
+      "relationshipType": "DEPENDS_ON"
+    },
+    {
+      "spdxElementId": "SPDXRef-1-imod",
+      "relatedSpdxElement": "SPDXRef-19-jinja2",
+      "relationshipType": "DEPENDS_ON"
+    },
+    {
       "spdxElementId": "SPDXRef-19-jinja2",
       "relatedSpdxElement": "SPDXRef-20-markupsafe",
       "relationshipType": "DEPENDS_ON"
     },
     {
-      "spdxElementId": "SPDXRef-21-loguru",
-      "relatedSpdxElement": "SPDXRef-22-win32-setctime",
+      "spdxElementId": "SPDXRef-1-imod",
+      "relatedSpdxElement": "SPDXRef-21-loguru",
       "relationshipType": "DEPENDS_ON"
     },
     {
@@ -2728,13 +2709,23 @@
       "relationshipType": "DEPENDS_ON"
     },
     {
-      "spdxElementId": "SPDXRef-23-matplotlib",
-      "relatedSpdxElement": "SPDXRef-10-packaging",
+      "spdxElementId": "SPDXRef-21-loguru",
+      "relatedSpdxElement": "SPDXRef-22-win32-setctime",
+      "relationshipType": "DEPENDS_ON"
+    },
+    {
+      "spdxElementId": "SPDXRef-1-imod",
+      "relatedSpdxElement": "SPDXRef-23-matplotlib",
       "relationshipType": "DEPENDS_ON"
     },
     {
       "spdxElementId": "SPDXRef-23-matplotlib",
       "relatedSpdxElement": "SPDXRef-24-contourpy",
+      "relationshipType": "DEPENDS_ON"
+    },
+    {
+      "spdxElementId": "SPDXRef-24-contourpy",
+      "relatedSpdxElement": "SPDXRef-4-numpy",
       "relationshipType": "DEPENDS_ON"
     },
     {
@@ -2754,6 +2745,16 @@
     },
     {
       "spdxElementId": "SPDXRef-23-matplotlib",
+      "relatedSpdxElement": "SPDXRef-4-numpy",
+      "relationshipType": "DEPENDS_ON"
+    },
+    {
+      "spdxElementId": "SPDXRef-23-matplotlib",
+      "relatedSpdxElement": "SPDXRef-10-packaging",
+      "relationshipType": "DEPENDS_ON"
+    },
+    {
+      "spdxElementId": "SPDXRef-23-matplotlib",
       "relatedSpdxElement": "SPDXRef-28-pillow",
       "relationshipType": "DEPENDS_ON"
     },
@@ -2768,23 +2769,13 @@
       "relationshipType": "DEPENDS_ON"
     },
     {
-      "spdxElementId": "SPDXRef-23-matplotlib",
-      "relatedSpdxElement": "SPDXRef-4-numpy",
-      "relationshipType": "DEPENDS_ON"
-    },
-    {
-      "spdxElementId": "SPDXRef-24-contourpy",
-      "relatedSpdxElement": "SPDXRef-4-numpy",
-      "relationshipType": "DEPENDS_ON"
-    },
-    {
-      "spdxElementId": "SPDXRef-3-cftime",
-      "relatedSpdxElement": "SPDXRef-4-numpy",
-      "relationshipType": "DEPENDS_ON"
-    },
-    {
       "spdxElementId": "SPDXRef-30-python-dateutil",
       "relatedSpdxElement": "SPDXRef-31-six",
+      "relationshipType": "DEPENDS_ON"
+    },
+    {
+      "spdxElementId": "SPDXRef-1-imod",
+      "relatedSpdxElement": "SPDXRef-32-numba",
       "relationshipType": "DEPENDS_ON"
     },
     {
@@ -2794,6 +2785,21 @@
     },
     {
       "spdxElementId": "SPDXRef-32-numba",
+      "relatedSpdxElement": "SPDXRef-4-numpy",
+      "relationshipType": "DEPENDS_ON"
+    },
+    {
+      "spdxElementId": "SPDXRef-1-imod",
+      "relatedSpdxElement": "SPDXRef-4-numpy",
+      "relationshipType": "DEPENDS_ON"
+    },
+    {
+      "spdxElementId": "SPDXRef-1-imod",
+      "relatedSpdxElement": "SPDXRef-34-pandas",
+      "relationshipType": "DEPENDS_ON"
+    },
+    {
+      "spdxElementId": "SPDXRef-34-pandas",
       "relatedSpdxElement": "SPDXRef-4-numpy",
       "relationshipType": "DEPENDS_ON"
     },
@@ -2813,13 +2819,8 @@
       "relationshipType": "DEPENDS_ON"
     },
     {
-      "spdxElementId": "SPDXRef-34-pandas",
-      "relatedSpdxElement": "SPDXRef-4-numpy",
-      "relationshipType": "DEPENDS_ON"
-    },
-    {
-      "spdxElementId": "SPDXRef-37-plum-dispatch",
-      "relatedSpdxElement": "SPDXRef-17-typing-extensions",
+      "spdxElementId": "SPDXRef-1-imod",
+      "relatedSpdxElement": "SPDXRef-37-plum-dispatch",
       "relationshipType": "DEPENDS_ON"
     },
     {
@@ -2838,23 +2839,33 @@
       "relationshipType": "DEPENDS_ON"
     },
     {
-      "spdxElementId": "SPDXRef-39-rich",
-      "relatedSpdxElement": "SPDXRef-42-pygments",
-      "relationshipType": "DEPENDS_ON"
-    },
-    {
       "spdxElementId": "SPDXRef-40-markdown-it-py",
       "relatedSpdxElement": "SPDXRef-41-mdurl",
       "relationshipType": "DEPENDS_ON"
     },
     {
-      "spdxElementId": "SPDXRef-43-pooch",
-      "relatedSpdxElement": "SPDXRef-10-packaging",
+      "spdxElementId": "SPDXRef-39-rich",
+      "relatedSpdxElement": "SPDXRef-42-pygments",
+      "relationshipType": "DEPENDS_ON"
+    },
+    {
+      "spdxElementId": "SPDXRef-37-plum-dispatch",
+      "relatedSpdxElement": "SPDXRef-17-typing-extensions",
+      "relationshipType": "DEPENDS_ON"
+    },
+    {
+      "spdxElementId": "SPDXRef-1-imod",
+      "relatedSpdxElement": "SPDXRef-43-pooch",
       "relationshipType": "DEPENDS_ON"
     },
     {
       "spdxElementId": "SPDXRef-43-pooch",
       "relatedSpdxElement": "SPDXRef-44-platformdirs",
+      "relationshipType": "DEPENDS_ON"
+    },
+    {
+      "spdxElementId": "SPDXRef-43-pooch",
+      "relatedSpdxElement": "SPDXRef-10-packaging",
       "relationshipType": "DEPENDS_ON"
     },
     {
@@ -2883,48 +2894,8 @@
       "relationshipType": "DEPENDS_ON"
     },
     {
-      "spdxElementId": "SPDXRef-5-dask",
-      "relatedSpdxElement": "SPDXRef-10-packaging",
-      "relationshipType": "DEPENDS_ON"
-    },
-    {
-      "spdxElementId": "SPDXRef-5-dask",
-      "relatedSpdxElement": "SPDXRef-11-partd",
-      "relationshipType": "DEPENDS_ON"
-    },
-    {
-      "spdxElementId": "SPDXRef-5-dask",
-      "relatedSpdxElement": "SPDXRef-13-toolz",
-      "relationshipType": "DEPENDS_ON"
-    },
-    {
-      "spdxElementId": "SPDXRef-5-dask",
-      "relatedSpdxElement": "SPDXRef-14-pyyaml",
-      "relationshipType": "DEPENDS_ON"
-    },
-    {
-      "spdxElementId": "SPDXRef-5-dask",
-      "relatedSpdxElement": "SPDXRef-15-importlib-metadata",
-      "relationshipType": "DEPENDS_ON"
-    },
-    {
-      "spdxElementId": "SPDXRef-5-dask",
-      "relatedSpdxElement": "SPDXRef-6-click",
-      "relationshipType": "DEPENDS_ON"
-    },
-    {
-      "spdxElementId": "SPDXRef-5-dask",
-      "relatedSpdxElement": "SPDXRef-8-cloudpickle",
-      "relationshipType": "DEPENDS_ON"
-    },
-    {
-      "spdxElementId": "SPDXRef-5-dask",
-      "relatedSpdxElement": "SPDXRef-9-fsspec",
-      "relationshipType": "DEPENDS_ON"
-    },
-    {
-      "spdxElementId": "SPDXRef-50-pydantic",
-      "relatedSpdxElement": "SPDXRef-17-typing-extensions",
+      "spdxElementId": "SPDXRef-1-imod",
+      "relatedSpdxElement": "SPDXRef-50-pydantic",
       "relationshipType": "DEPENDS_ON"
     },
     {
@@ -2933,18 +2904,13 @@
       "relationshipType": "DEPENDS_ON"
     },
     {
-      "spdxElementId": "SPDXRef-50-pydantic",
-      "relatedSpdxElement": "SPDXRef-52-pydantic-core",
-      "relationshipType": "DEPENDS_ON"
-    },
-    {
-      "spdxElementId": "SPDXRef-50-pydantic",
-      "relatedSpdxElement": "SPDXRef-53-typing-inspection",
-      "relationshipType": "DEPENDS_ON"
-    },
-    {
       "spdxElementId": "SPDXRef-51-annotated-types",
       "relatedSpdxElement": "SPDXRef-17-typing-extensions",
+      "relationshipType": "DEPENDS_ON"
+    },
+    {
+      "spdxElementId": "SPDXRef-50-pydantic",
+      "relatedSpdxElement": "SPDXRef-52-pydantic-core",
       "relationshipType": "DEPENDS_ON"
     },
     {
@@ -2953,8 +2919,23 @@
       "relationshipType": "DEPENDS_ON"
     },
     {
+      "spdxElementId": "SPDXRef-50-pydantic",
+      "relatedSpdxElement": "SPDXRef-17-typing-extensions",
+      "relationshipType": "DEPENDS_ON"
+    },
+    {
+      "spdxElementId": "SPDXRef-50-pydantic",
+      "relatedSpdxElement": "SPDXRef-53-typing-inspection",
+      "relationshipType": "DEPENDS_ON"
+    },
+    {
       "spdxElementId": "SPDXRef-53-typing-inspection",
       "relatedSpdxElement": "SPDXRef-17-typing-extensions",
+      "relationshipType": "DEPENDS_ON"
+    },
+    {
+      "spdxElementId": "SPDXRef-1-imod",
+      "relatedSpdxElement": "SPDXRef-54-scipy",
       "relationshipType": "DEPENDS_ON"
     },
     {
@@ -2963,8 +2944,38 @@
       "relationshipType": "DEPENDS_ON"
     },
     {
+      "spdxElementId": "SPDXRef-1-imod",
+      "relatedSpdxElement": "SPDXRef-55-tomli-w",
+      "relationshipType": "DEPENDS_ON"
+    },
+    {
+      "spdxElementId": "SPDXRef-1-imod",
+      "relatedSpdxElement": "SPDXRef-56-tomli",
+      "relationshipType": "DEPENDS_ON"
+    },
+    {
+      "spdxElementId": "SPDXRef-1-imod",
+      "relatedSpdxElement": "SPDXRef-13-toolz",
+      "relationshipType": "DEPENDS_ON"
+    },
+    {
+      "spdxElementId": "SPDXRef-1-imod",
+      "relatedSpdxElement": "SPDXRef-57-tqdm",
+      "relationshipType": "DEPENDS_ON"
+    },
+    {
       "spdxElementId": "SPDXRef-57-tqdm",
       "relatedSpdxElement": "SPDXRef-7-colorama",
+      "relationshipType": "DEPENDS_ON"
+    },
+    {
+      "spdxElementId": "SPDXRef-1-imod",
+      "relatedSpdxElement": "SPDXRef-58-xarray",
+      "relationshipType": "DEPENDS_ON"
+    },
+    {
+      "spdxElementId": "SPDXRef-58-xarray",
+      "relatedSpdxElement": "SPDXRef-4-numpy",
       "relationshipType": "DEPENDS_ON"
     },
     {
@@ -2978,8 +2989,13 @@
       "relationshipType": "DEPENDS_ON"
     },
     {
-      "spdxElementId": "SPDXRef-58-xarray",
-      "relatedSpdxElement": "SPDXRef-4-numpy",
+      "spdxElementId": "SPDXRef-1-imod",
+      "relatedSpdxElement": "SPDXRef-59-xugrid",
+      "relationshipType": "DEPENDS_ON"
+    },
+    {
+      "spdxElementId": "SPDXRef-59-xugrid",
+      "relatedSpdxElement": "SPDXRef-5-dask",
       "relationshipType": "DEPENDS_ON"
     },
     {
@@ -2989,7 +3005,17 @@
     },
     {
       "spdxElementId": "SPDXRef-59-xugrid",
-      "relatedSpdxElement": "SPDXRef-34-pandas",
+      "relatedSpdxElement": "SPDXRef-60-numba-celltree",
+      "relationshipType": "DEPENDS_ON"
+    },
+    {
+      "spdxElementId": "SPDXRef-60-numba-celltree",
+      "relatedSpdxElement": "SPDXRef-32-numba",
+      "relationshipType": "DEPENDS_ON"
+    },
+    {
+      "spdxElementId": "SPDXRef-60-numba-celltree",
+      "relatedSpdxElement": "SPDXRef-4-numpy",
       "relationshipType": "DEPENDS_ON"
     },
     {
@@ -2999,12 +3025,12 @@
     },
     {
       "spdxElementId": "SPDXRef-59-xugrid",
-      "relatedSpdxElement": "SPDXRef-43-pooch",
+      "relatedSpdxElement": "SPDXRef-34-pandas",
       "relationshipType": "DEPENDS_ON"
     },
     {
       "spdxElementId": "SPDXRef-59-xugrid",
-      "relatedSpdxElement": "SPDXRef-5-dask",
+      "relatedSpdxElement": "SPDXRef-43-pooch",
       "relationshipType": "DEPENDS_ON"
     },
     {
@@ -3016,31 +3042,6 @@
       "spdxElementId": "SPDXRef-59-xugrid",
       "relatedSpdxElement": "SPDXRef-58-xarray",
       "relationshipType": "DEPENDS_ON"
-    },
-    {
-      "spdxElementId": "SPDXRef-59-xugrid",
-      "relatedSpdxElement": "SPDXRef-60-numba-celltree",
-      "relationshipType": "DEPENDS_ON"
-    },
-    {
-      "spdxElementId": "SPDXRef-6-click",
-      "relatedSpdxElement": "SPDXRef-7-colorama",
-      "relationshipType": "DEPENDS_ON"
-    },
-    {
-      "spdxElementId": "SPDXRef-60-numba-celltree",
-      "relatedSpdxElement": "SPDXRef-32-numba",
-      "relationshipType": "DEPENDS_ON"
-    },
-    {
-      "spdxElementId": "SPDXRef-60-numba-celltree",
-      "relatedSpdxElement": "SPDXRef-4-numpy",
-      "relationshipType": "DEPENDS_ON"
-    },
-    {
-      "spdxElementId": "SPDXRef-DOCUMENT",
-      "relatedSpdxElement": "SPDXRef-1-imod",
-      "relationshipType": "DESCRIBES"
     }
   ]
 }
