@@ -111,9 +111,27 @@ def cleanup_mf6_sim(simulation: Modflow6Simulation) -> None:
     for pkgname in wel_keys:
         model[pkgname].cleanup(dis)
 
+    # Save flows
+    topsystems = [
+        key
+        for key in model.keys()
+        if ("riv-" in key) | ("drn-" in key) | ("ghb-" in key)
+    ]
+    for pkgname in topsystems:
+        model[pkgname].dataset["save_flows"] = True
+    model["npf"].dataset["save_flows"] = True
+
 
 @pytest.mark.user_acceptance
 def test_import_lhm_mf6():
+    """
+    Test import of LHM model into MODFLOW 6 using imod-python.
+
+    1. Convert iMOD5 LHM model to MODFLOW 6 using imod-python
+    2. Write MODFLOW 6 simulation files to disk
+    3. (Not in this test, part of test plan): Run MODFLOW 6 simulation and
+       compare results to conversion done with iMOD5.
+    """
     user_acceptance_dir = Path(os.environ["USER_ACCEPTANCE_DIR"])
     lhm_dir = user_acceptance_dir / "LHM_transient"
     lhm_prjfile = lhm_dir / "model" / "LHM_transient_test.PRJ"
@@ -134,6 +152,7 @@ def test_import_lhm_mf6():
             add_default_stream_handler=True,
         )
         simulation = convert_imod5_to_mf6_sim(lhm_prjfile, times)
+
         # Cleanup
         cleanup_mf6_sim(simulation)
 
