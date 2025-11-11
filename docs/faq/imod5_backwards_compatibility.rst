@@ -313,10 +313,10 @@ MF6TOIDF
 Use this post-processing function to convert standard MODFLOW6 output to IDF
 files. The eequivalent functionality in iMOD Python is mostly covered by the
 following functions: :func:`imod.mf6.open_hds`, :func:`imod.mf6.open_cbc`,
-:meth:`Modflow6Simulation.open_flow_budget`,
-:meth:`Modflow6Simulation.open_transport_budget`,
-:meth:`Modflow6Simulation.open_head`,
-:meth:`Modflow6Simulation.open_concentration`. The table below lists pointers to
+:meth:`imod.mf6.Modflow6Simulation.open_flow_budget`,
+:meth:`imod.mf6.Modflow6Simulation.open_transport_budget`,
+:meth:`imod.mf6.Modflow6Simulation.open_head`,
+:meth:`imod.mf6.Modflow6Simulation.open_concentration`. The table below lists pointers to
 the functions and arguments that can be used to achieve full feature parity with
 the iMOD5 BATCH function. You can write the data to IDF files using
 :func:`imod.formats.idf.save`.
@@ -338,7 +338,7 @@ the iMOD5 BATCH function. You can write the data to IDF files using
    WC_UZF, The output file (\*.WC) for MODFLOW6 that contains the UZF water content, :func:`imod.mf6.open_dvs`, ``dvs_path``
    IDOUBLE, Save in double precision, `xarray.DataArray.astype <https://docs.xarray.dev/en/stable/generated/xarray.DataArray.astype.html>`_, ``dtype=np.float32``
    SAVE\*, Save the results per layer, `xarray.DataArray.sel <https://docs.xarray.dev/en/stable/generated/xarray.DataArray.sel.html>`_, "``layer=[i]``"
-   IPHRLVL, Save the first active value in the vertical dimension, ":func:`get_upper_active_grid_cells <imod.prepare.get_upper_active_grid_cells>`, :func:`get_upper_active_layer_number <imod.prepare.get_upper_active_layer_number>`", 
+   IPHRLVL, Save the first active value in the vertical dimension, ":func:`get_upper_active_grid_cells <imod.select.get_upper_active_grid_cells>`, :func:`get_upper_active_layer_number <imod.select.get_upper_active_layer_number>`", 
    IFILLHEAD, Fill head values where ``idomain==-1``, :func:`imod.prepare.fill`, ``dims='layer'``
 
 Some settings previously configurable in iMOD5 are fixed in iMOD Python:
@@ -614,7 +614,7 @@ part of the functionality for step 1 in iMOD Python is found in
 :func:`imod.evaluate.facebudget`, for ISEL=3-type of behaviour of the
 facebudgets. Other water balance terms can be computed by using general xarray
 logic, for examples see below. To plot waterbalance terms, you can use
-:func:`imod.visualize.plot_waterbalance`.
+:func:`imod.visualize.waterbalance_barchart`.
 
 
 .. csv-table::
