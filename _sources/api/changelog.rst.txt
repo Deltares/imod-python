@@ -6,6 +6,36 @@ All notable changes to this project will be documented in this file.
 The format is based on `Keep a Changelog`_, and this project adheres to
 `Semantic Versioning`_.
 
+[1.0.0] - 2025-11-11
+--------------------
+
+Fixed
+~~~~~
+
+- Improved performance of :meth:`imod.mf6.Modflow6Simulation.split` for large
+  models loaded lazily into memory. Reduced a splitting operation of 2 hours to
+  a few minutes for a test case.
+- Issue where :meth:`imod.mf6.LayeredWell.from_imod5_data` would result in wells
+  with a mismatch between coordinates and rates.
+
+Added
+~~~~~
+
+- Added :class:`imod.mf6.Viscosity` package to specify the viscosity of the
+  groundwater flow model.
+- Functionality to dump and load MODFLOW 6 simulations to/from zarr and zipstore
+  formats. See :meth:`imod.mf6.Modflow6Simulation.dump` and
+  :meth:`imod.mf6.Modflow6Simulation.from_file` for more information.
+
+Changed
+~~~~~~~
+
+- :class:`imod.mf6.Well` and :func:`imod.prepare.assign_wells` now distribute
+  the well rates over the screened cells using a correction factor based on the
+  mismatch between the well screen center and the cell center, equal to iMOD5's
+  correction factor.
+
+
 [1.0.0rc7] - 2025-10-28
 -----------------------
 

@@ -25,7 +25,7 @@
       ~Drainage.mask
       ~Drainage.reallocate
       ~Drainage.regrid_like
-      ~Drainage.to_netcdf
+      ~Drainage.to_file
       ~Drainage.write
    
    
@@ -38,5 +38,6 @@
    
       ~Drainage.auxiliary_data_fields
       ~Drainage.dataset
+      ~Drainage.pkg_id
    
    

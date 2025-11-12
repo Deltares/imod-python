@@ -30,5 +30,6 @@
    
       ~IdfMapping.auxiliary_data_fields
       ~IdfMapping.dataset
+      ~IdfMapping.pkg_id
    
    

@@ -1,6 +1,0 @@
-﻿imod.mf6.Recharge.to\_netcdf
-============================
-
-.. currentmodule:: imod.mf6
-
-.. automethod:: Recharge.to_netcdf

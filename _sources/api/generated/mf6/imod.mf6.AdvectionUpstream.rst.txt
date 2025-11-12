@@ -21,7 +21,7 @@
       ~AdvectionUpstream.is_empty
       ~AdvectionUpstream.mask
       ~AdvectionUpstream.regrid_like
-      ~AdvectionUpstream.to_netcdf
+      ~AdvectionUpstream.to_file
       ~AdvectionUpstream.write
    
    
@@ -34,5 +34,6 @@
    
       ~AdvectionUpstream.auxiliary_data_fields
       ~AdvectionUpstream.dataset
+      ~AdvectionUpstream.pkg_id
    
    

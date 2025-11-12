@@ -21,7 +21,7 @@
       ~VerticesDiscretization.is_empty
       ~VerticesDiscretization.mask
       ~VerticesDiscretization.regrid_like
-      ~VerticesDiscretization.to_netcdf
+      ~VerticesDiscretization.to_file
       ~VerticesDiscretization.write
    
    
@@ -34,6 +34,7 @@
    
       ~VerticesDiscretization.auxiliary_data_fields
       ~VerticesDiscretization.dataset
+      ~VerticesDiscretization.pkg_id
       ~VerticesDiscretization.skip_variables
    
    

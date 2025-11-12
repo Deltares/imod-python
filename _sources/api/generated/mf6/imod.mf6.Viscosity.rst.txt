@@ -1,0 +1,39 @@
+﻿imod.mf6.Viscosity
+==================
+
+.. currentmodule:: imod.mf6
+
+.. autoclass:: Viscosity
+
+   
+   .. automethod:: __init__
+
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      ~Viscosity.__init__
+      ~Viscosity.clip_box
+      ~Viscosity.copy
+      ~Viscosity.from_file
+      ~Viscosity.get_regrid_methods
+      ~Viscosity.is_empty
+      ~Viscosity.mask
+      ~Viscosity.regrid_like
+      ~Viscosity.to_file
+      ~Viscosity.write
+   
+   
+
+   
+   
+   .. rubric:: Attributes
+
+   .. autosummary::
+   
+      ~Viscosity.auxiliary_data_fields
+      ~Viscosity.dataset
+      ~Viscosity.pkg_id
+   
+   

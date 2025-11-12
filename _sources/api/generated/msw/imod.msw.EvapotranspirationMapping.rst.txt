@@ -30,5 +30,6 @@
    
       ~EvapotranspirationMapping.auxiliary_data_fields
       ~EvapotranspirationMapping.dataset
+      ~EvapotranspirationMapping.pkg_id
    
    

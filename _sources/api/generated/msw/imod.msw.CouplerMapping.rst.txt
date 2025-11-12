@@ -30,5 +30,6 @@
    
       ~CouplerMapping.auxiliary_data_fields
       ~CouplerMapping.dataset
+      ~CouplerMapping.pkg_id
    
    

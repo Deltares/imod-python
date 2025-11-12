@@ -21,7 +21,7 @@
       ~AdvectionTVD.is_empty
       ~AdvectionTVD.mask
       ~AdvectionTVD.regrid_like
-      ~AdvectionTVD.to_netcdf
+      ~AdvectionTVD.to_file
       ~AdvectionTVD.write
    
    
@@ -34,5 +34,6 @@
    
       ~AdvectionTVD.auxiliary_data_fields
       ~AdvectionTVD.dataset
+      ~AdvectionTVD.pkg_id
    
    

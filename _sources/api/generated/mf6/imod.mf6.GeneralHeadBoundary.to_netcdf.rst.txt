@@ -1,6 +1,0 @@
-﻿imod.mf6.GeneralHeadBoundary.to\_netcdf
-=======================================
-
-.. currentmodule:: imod.mf6
-
-.. automethod:: GeneralHeadBoundary.to_netcdf

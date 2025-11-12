@@ -1,6 +1,0 @@
-﻿imod.mf6.Well.to\_netcdf
-========================
-
-.. currentmodule:: imod.mf6
-
-.. automethod:: Well.to_netcdf

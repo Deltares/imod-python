@@ -21,7 +21,7 @@
       ~Solution.is_empty
       ~Solution.mask
       ~Solution.regrid_like
-      ~Solution.to_netcdf
+      ~Solution.to_file
       ~Solution.write
    
    
@@ -34,5 +34,6 @@
    
       ~Solution.auxiliary_data_fields
       ~Solution.dataset
+      ~Solution.pkg_id
    
    

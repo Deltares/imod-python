@@ -21,7 +21,7 @@
       ~MobileStorageTransfer.is_empty
       ~MobileStorageTransfer.mask
       ~MobileStorageTransfer.regrid_like
-      ~MobileStorageTransfer.to_netcdf
+      ~MobileStorageTransfer.to_file
       ~MobileStorageTransfer.write
    
    
@@ -34,5 +34,6 @@
    
       ~MobileStorageTransfer.auxiliary_data_fields
       ~MobileStorageTransfer.dataset
+      ~MobileStorageTransfer.pkg_id
    
    

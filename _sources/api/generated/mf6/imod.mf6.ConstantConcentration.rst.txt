@@ -21,7 +21,7 @@
       ~ConstantConcentration.is_empty
       ~ConstantConcentration.mask
       ~ConstantConcentration.regrid_like
-      ~ConstantConcentration.to_netcdf
+      ~ConstantConcentration.to_file
       ~ConstantConcentration.write
    
    
@@ -34,5 +34,6 @@
    
       ~ConstantConcentration.auxiliary_data_fields
       ~ConstantConcentration.dataset
+      ~ConstantConcentration.pkg_id
    
    

@@ -1,6 +1,0 @@
-﻿imod.mf6.UnsaturatedZoneFlow.to\_netcdf
-=======================================
-
-.. currentmodule:: imod.mf6
-
-.. automethod:: UnsaturatedZoneFlow.to_netcdf

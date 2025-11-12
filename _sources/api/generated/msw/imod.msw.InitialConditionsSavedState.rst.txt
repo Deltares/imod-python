@@ -30,5 +30,6 @@
    
       ~InitialConditionsSavedState.auxiliary_data_fields
       ~InitialConditionsSavedState.dataset
+      ~InitialConditionsSavedState.pkg_id
    
    

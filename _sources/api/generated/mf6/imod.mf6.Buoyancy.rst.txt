@@ -21,7 +21,7 @@
       ~Buoyancy.is_empty
       ~Buoyancy.mask
       ~Buoyancy.regrid_like
-      ~Buoyancy.to_netcdf
+      ~Buoyancy.to_file
       ~Buoyancy.write
    
    
@@ -34,5 +34,6 @@
    
       ~Buoyancy.auxiliary_data_fields
       ~Buoyancy.dataset
+      ~Buoyancy.pkg_id
    
    

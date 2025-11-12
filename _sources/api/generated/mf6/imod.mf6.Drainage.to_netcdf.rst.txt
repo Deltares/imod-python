@@ -1,6 +1,0 @@
-﻿imod.mf6.Drainage.to\_netcdf
-============================
-
-.. currentmodule:: imod.mf6
-
-.. automethod:: Drainage.to_netcdf

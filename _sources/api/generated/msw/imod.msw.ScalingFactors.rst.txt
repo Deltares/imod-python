@@ -30,5 +30,6 @@
    
       ~ScalingFactors.auxiliary_data_fields
       ~ScalingFactors.dataset
+      ~ScalingFactors.pkg_id
    
    

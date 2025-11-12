@@ -30,5 +30,6 @@
    
       ~Sprinkling.auxiliary_data_fields
       ~Sprinkling.dataset
+      ~Sprinkling.pkg_id
    
    

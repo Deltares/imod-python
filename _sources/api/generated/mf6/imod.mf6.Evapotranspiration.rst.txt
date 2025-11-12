@@ -21,7 +21,7 @@
       ~Evapotranspiration.is_empty
       ~Evapotranspiration.mask
       ~Evapotranspiration.regrid_like
-      ~Evapotranspiration.to_netcdf
+      ~Evapotranspiration.to_file
       ~Evapotranspiration.write
    
    
@@ -34,5 +34,6 @@
    
       ~Evapotranspiration.auxiliary_data_fields
       ~Evapotranspiration.dataset
+      ~Evapotranspiration.pkg_id
    
    

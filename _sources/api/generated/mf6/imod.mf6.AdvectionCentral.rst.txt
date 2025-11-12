@@ -21,7 +21,7 @@
       ~AdvectionCentral.is_empty
       ~AdvectionCentral.mask
       ~AdvectionCentral.regrid_like
-      ~AdvectionCentral.to_netcdf
+      ~AdvectionCentral.to_file
       ~AdvectionCentral.write
    
    
@@ -34,5 +34,6 @@
    
       ~AdvectionCentral.auxiliary_data_fields
       ~AdvectionCentral.dataset
+      ~AdvectionCentral.pkg_id
    
    

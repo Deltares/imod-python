@@ -1,6 +1,0 @@
-﻿imod.mf6.ApiPackage.to\_netcdf
-==============================
-
-.. currentmodule:: imod.mf6
-
-.. automethod:: ApiPackage.to_netcdf

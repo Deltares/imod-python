@@ -22,7 +22,7 @@
       ~InitialConditions.is_empty
       ~InitialConditions.mask
       ~InitialConditions.regrid_like
-      ~InitialConditions.to_netcdf
+      ~InitialConditions.to_file
       ~InitialConditions.write
    
    
@@ -35,5 +35,6 @@
    
       ~InitialConditions.auxiliary_data_fields
       ~InitialConditions.dataset
+      ~InitialConditions.pkg_id
    
    

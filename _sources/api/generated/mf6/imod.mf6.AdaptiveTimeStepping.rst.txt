@@ -21,7 +21,7 @@
       ~AdaptiveTimeStepping.is_empty
       ~AdaptiveTimeStepping.mask
       ~AdaptiveTimeStepping.regrid_like
-      ~AdaptiveTimeStepping.to_netcdf
+      ~AdaptiveTimeStepping.to_file
       ~AdaptiveTimeStepping.write
    
    
@@ -34,5 +34,6 @@
    
       ~AdaptiveTimeStepping.auxiliary_data_fields
       ~AdaptiveTimeStepping.dataset
+      ~AdaptiveTimeStepping.pkg_id
    
    

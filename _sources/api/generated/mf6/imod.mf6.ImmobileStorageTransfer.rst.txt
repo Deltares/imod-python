@@ -21,7 +21,7 @@
       ~ImmobileStorageTransfer.is_empty
       ~ImmobileStorageTransfer.mask
       ~ImmobileStorageTransfer.regrid_like
-      ~ImmobileStorageTransfer.to_netcdf
+      ~ImmobileStorageTransfer.to_file
       ~ImmobileStorageTransfer.write
    
    
@@ -34,5 +34,6 @@
    
       ~ImmobileStorageTransfer.auxiliary_data_fields
       ~ImmobileStorageTransfer.dataset
+      ~ImmobileStorageTransfer.pkg_id
    
    

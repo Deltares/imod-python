@@ -25,7 +25,7 @@
       ~GeneralHeadBoundary.mask
       ~GeneralHeadBoundary.reallocate
       ~GeneralHeadBoundary.regrid_like
-      ~GeneralHeadBoundary.to_netcdf
+      ~GeneralHeadBoundary.to_file
       ~GeneralHeadBoundary.write
    
    
@@ -38,5 +38,6 @@
    
       ~GeneralHeadBoundary.auxiliary_data_fields
       ~GeneralHeadBoundary.dataset
+      ~GeneralHeadBoundary.pkg_id
    
    

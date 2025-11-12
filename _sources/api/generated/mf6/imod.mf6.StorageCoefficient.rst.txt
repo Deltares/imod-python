@@ -23,7 +23,7 @@
       ~StorageCoefficient.is_empty
       ~StorageCoefficient.mask
       ~StorageCoefficient.regrid_like
-      ~StorageCoefficient.to_netcdf
+      ~StorageCoefficient.to_file
       ~StorageCoefficient.write
    
    
@@ -36,5 +36,6 @@
    
       ~StorageCoefficient.auxiliary_data_fields
       ~StorageCoefficient.dataset
+      ~StorageCoefficient.pkg_id
    
    

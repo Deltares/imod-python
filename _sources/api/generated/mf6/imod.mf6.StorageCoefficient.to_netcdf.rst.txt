@@ -1,6 +1,0 @@
-﻿imod.mf6.StorageCoefficient.to\_netcdf
-======================================
-
-.. currentmodule:: imod.mf6
-
-.. automethod:: StorageCoefficient.to_netcdf

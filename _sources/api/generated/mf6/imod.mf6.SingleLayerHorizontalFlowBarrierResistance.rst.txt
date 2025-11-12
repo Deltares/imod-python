@@ -24,8 +24,8 @@
       ~SingleLayerHorizontalFlowBarrierResistance.mask
       ~SingleLayerHorizontalFlowBarrierResistance.regrid_like
       ~SingleLayerHorizontalFlowBarrierResistance.snap_to_grid
+      ~SingleLayerHorizontalFlowBarrierResistance.to_file
       ~SingleLayerHorizontalFlowBarrierResistance.to_mf6_pkg
-      ~SingleLayerHorizontalFlowBarrierResistance.to_netcdf
       ~SingleLayerHorizontalFlowBarrierResistance.write
    
    
@@ -39,5 +39,6 @@
       ~SingleLayerHorizontalFlowBarrierResistance.auxiliary_data_fields
       ~SingleLayerHorizontalFlowBarrierResistance.dataset
       ~SingleLayerHorizontalFlowBarrierResistance.line_data
+      ~SingleLayerHorizontalFlowBarrierResistance.pkg_id
    
    

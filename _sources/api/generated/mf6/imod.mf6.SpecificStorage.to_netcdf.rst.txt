@@ -1,6 +1,0 @@
-﻿imod.mf6.SpecificStorage.to\_netcdf
-===================================
-
-.. currentmodule:: imod.mf6
-
-.. automethod:: SpecificStorage.to_netcdf

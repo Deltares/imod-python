@@ -23,7 +23,7 @@
       ~ConstantHead.is_empty
       ~ConstantHead.mask
       ~ConstantHead.regrid_like
-      ~ConstantHead.to_netcdf
+      ~ConstantHead.to_file
       ~ConstantHead.write
    
    
@@ -36,5 +36,6 @@
    
       ~ConstantHead.auxiliary_data_fields
       ~ConstantHead.dataset
+      ~ConstantHead.pkg_id
    
    

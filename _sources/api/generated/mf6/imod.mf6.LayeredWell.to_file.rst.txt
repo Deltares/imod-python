@@ -1,0 +1,6 @@
+﻿imod.mf6.LayeredWell.to\_file
+=============================
+
+.. currentmodule:: imod.mf6
+
+.. automethod:: LayeredWell.to_file

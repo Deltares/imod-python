@@ -8,7 +8,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>iMOD Python test plan &#8212; iMOD Python 1.0.0rc7 documentation</title>
+    <title>iMOD Python test plan &#8212; iMOD Python 1.0.0.post1 documentation</title>
   
   
   
@@ -42,7 +42,7 @@
   <link rel="preload" as="script" href="../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
 <link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
 
-    <script src="../_static/documentation_options.js?v=1830d1b8"></script>
+    <script src="../_static/documentation_options.js?v=f5399c8a"></script>
     <script src="../_static/doctools.js?v=9bcbadda"></script>
     <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script>DOCUMENTATION_OPTIONS.pagename = 'developing/test-plan';</script>
@@ -52,7 +52,7 @@
     <link rel="prev" title="Docker build image" href="docker.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
-  <meta name="docsearch:version" content="1.0.0rc7.dev" />
+  <meta name="docsearch:version" content="1.0.0.dev" />
   </head>
   
   
@@ -116,8 +116,8 @@
     
     
     
-    <img src="../_static/imod-python-logo-light.svg" class="logo__image only-light" alt="iMOD Python 1.0.0rc7 documentation - Home"/>
-    <img src="../_static/imod-python-logo-dark.svg" class="logo__image only-dark pst-js-only" alt="iMOD Python 1.0.0rc7 documentation - Home"/>
+    <img src="../_static/imod-python-logo-light.svg" class="logo__image only-light" alt="iMOD Python 1.0.0.post1 documentation - Home"/>
+    <img src="../_static/imod-python-logo-dark.svg" class="logo__image only-dark pst-js-only" alt="iMOD Python 1.0.0.post1 documentation - Home"/>
   
   
 </a></div>
@@ -589,12 +589,25 @@ machine.</p>
 <li><p>The conversion of the transient LHM model run of 1 year on a daily timestep
 (365 stress-periods) should run without memory overflow on a machine with 32
 GB and write a model within 15 minutes.</p></li>
+<li><p>The conversion of the transient LHM model should not be slower than doing the
+same conversion with iMOD5.</p></li>
 <li><p>The MODFLOW6 and MetaSWAP input files written by iMOD Python should be the
 same as iMOD5 (accounting for differences in row sorting.), unless there was a
 conscious decision to divert from this. These will be mentioned in
-<a class="reference internal" href="../faq/imod5_backwards_compatibility.html"><span class="doc">iMOD5 backwards compatibility</span></a>.</p></li>
-<li><p>The conversion of the transient LHM model should not be slower than doing the
-same conversion with iMOD5.</p></li>
+<a class="reference internal" href="../faq/imod5_backwards_compatibility.html"><span class="doc">iMOD5 backwards compatibility</span></a>. The following differences are
+accepted:</p>
+<ul>
+<li><p>Different naming conventions for the output files.</p></li>
+<li><p>Different default solver settings in MODFLOW6.</p></li>
+<li><p>iMOD5 computes incorrect hydraulic characteristics for the Horizontal Flow
+Barrier (HFB) package. This leads to head differences of &lt;0.50 m in the
+ouput of the simulations in the north of Limburg in the deepest model
+layers.</p></li>
+<li><p>Some small differences in how rivers and drains are allocated and their
+conductances are distributed. This leads to local head differences in the
+output of the simulations in the south of Limburg.</p></li>
+</ul>
+</li>
 </ul>
 </section>
 <section id="manual-checks">
@@ -603,7 +616,7 @@ same conversion with iMOD5.</p></li>
 <h4>QGIS export<a class="headerlink" href="#qgis-export" title="Link to this heading">#</a></h4>
 <ol class="arabic">
 <li><p>Run the pixi task written:</p>
-<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="go">pixi run export_qgis</span>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="go">pixi run qgis_export</span>
 </pre></div>
 </div>
 <p>This will export a simulation to a TOML file and a set of UGRID netCDFs twice,
@@ -616,9 +629,12 @@ grid. The location of the exported files will be printed in the terminal.</p>
 same CRS as the exported files.</p></li>
 <li><p>Click <code class="docutils literal notranslate"><span class="pre">&quot;Layers&quot;</span> <span class="pre">&gt;</span> <span class="pre">&quot;Add</span> <span class="pre">Layer&quot;</span> <span class="pre">&gt;</span> <span class="pre">&quot;Add</span> <span class="pre">mesh&quot;</span></code>. Insert the path printed in the
 terminal in the text box. <code class="docutils literal notranslate"><span class="pre">{path_printed_in_terminal}/hondsrug_MDAL/riv.nc</span></code>
-This will import the mesh.</p></li>
+This will import the mesh. You need to do this as well for structured grids.</p></li>
 <li><p>Verify if the mesh is rendered in two dimensions, and not as a single
 line of cells. If not, <a class="reference external" href="https://github.com/Deltares/imod-python/issues">open an issue on GitHub</a> .</p></li>
+<li><p>The structured grid has a slight shift in location compared to the
+unstructured grid, this is expected. Verify if the shift is small (less than
+1 cell size).</p></li>
 </ol>
 </section>
 <section id="tutorial">

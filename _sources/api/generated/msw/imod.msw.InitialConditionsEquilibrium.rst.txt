@@ -30,5 +30,6 @@
    
       ~InitialConditionsEquilibrium.auxiliary_data_fields
       ~InitialConditionsEquilibrium.dataset
+      ~InitialConditionsEquilibrium.pkg_id
    
    

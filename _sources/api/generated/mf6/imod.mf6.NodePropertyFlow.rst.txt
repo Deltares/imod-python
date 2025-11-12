@@ -24,7 +24,7 @@
       ~NodePropertyFlow.mask
       ~NodePropertyFlow.regrid_like
       ~NodePropertyFlow.set_xt3d_option
-      ~NodePropertyFlow.to_netcdf
+      ~NodePropertyFlow.to_file
       ~NodePropertyFlow.write
    
    
@@ -39,5 +39,6 @@
       ~NodePropertyFlow.dataset
       ~NodePropertyFlow.is_dewatered
       ~NodePropertyFlow.is_variable_vertical_conductance
+      ~NodePropertyFlow.pkg_id
    
    

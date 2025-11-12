@@ -30,5 +30,6 @@
    
       ~MeteoGridCopy.auxiliary_data_fields
       ~MeteoGridCopy.dataset
+      ~MeteoGridCopy.pkg_id
    
    

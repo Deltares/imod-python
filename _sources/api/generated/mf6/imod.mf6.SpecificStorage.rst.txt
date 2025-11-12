@@ -22,7 +22,7 @@
       ~SpecificStorage.is_empty
       ~SpecificStorage.mask
       ~SpecificStorage.regrid_like
-      ~SpecificStorage.to_netcdf
+      ~SpecificStorage.to_file
       ~SpecificStorage.write
    
    
@@ -35,5 +35,6 @@
    
       ~SpecificStorage.auxiliary_data_fields
       ~SpecificStorage.dataset
+      ~SpecificStorage.pkg_id
    
    

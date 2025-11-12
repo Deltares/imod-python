@@ -22,7 +22,7 @@
       ~StructuredDiscretization.is_empty
       ~StructuredDiscretization.mask
       ~StructuredDiscretization.regrid_like
-      ~StructuredDiscretization.to_netcdf
+      ~StructuredDiscretization.to_file
       ~StructuredDiscretization.write
    
    
@@ -35,6 +35,7 @@
    
       ~StructuredDiscretization.auxiliary_data_fields
       ~StructuredDiscretization.dataset
+      ~StructuredDiscretization.pkg_id
       ~StructuredDiscretization.skip_variables
    
    

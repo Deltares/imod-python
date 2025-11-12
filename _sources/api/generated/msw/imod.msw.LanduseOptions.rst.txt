@@ -30,5 +30,6 @@
    
       ~LanduseOptions.auxiliary_data_fields
       ~LanduseOptions.dataset
+      ~LanduseOptions.pkg_id
    
    

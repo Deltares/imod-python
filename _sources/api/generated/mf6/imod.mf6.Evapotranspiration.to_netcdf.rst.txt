@@ -1,6 +1,0 @@
-﻿imod.mf6.Evapotranspiration.to\_netcdf
-======================================
-
-.. currentmodule:: imod.mf6
-
-.. automethod:: Evapotranspiration.to_netcdf

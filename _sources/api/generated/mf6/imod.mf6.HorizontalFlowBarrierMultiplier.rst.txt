@@ -23,8 +23,8 @@
       ~HorizontalFlowBarrierMultiplier.mask
       ~HorizontalFlowBarrierMultiplier.regrid_like
       ~HorizontalFlowBarrierMultiplier.snap_to_grid
+      ~HorizontalFlowBarrierMultiplier.to_file
       ~HorizontalFlowBarrierMultiplier.to_mf6_pkg
-      ~HorizontalFlowBarrierMultiplier.to_netcdf
       ~HorizontalFlowBarrierMultiplier.write
    
    
@@ -38,5 +38,6 @@
       ~HorizontalFlowBarrierMultiplier.auxiliary_data_fields
       ~HorizontalFlowBarrierMultiplier.dataset
       ~HorizontalFlowBarrierMultiplier.line_data
+      ~HorizontalFlowBarrierMultiplier.pkg_id
    
    

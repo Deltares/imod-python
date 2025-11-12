@@ -7,7 +7,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>imod.mf6.simulation &#8212; iMOD Python 1.0.0rc7 documentation</title>
+    <title>imod.mf6.simulation &#8212; iMOD Python 1.0.0.post1 documentation</title>
   
   
   
@@ -41,7 +41,7 @@
   <link rel="preload" as="script" href="../../../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
 <link rel="preload" as="script" href="../../../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
 
-    <script src="../../../_static/documentation_options.js?v=1830d1b8"></script>
+    <script src="../../../_static/documentation_options.js?v=f5399c8a"></script>
     <script src="../../../_static/doctools.js?v=9bcbadda"></script>
     <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script>DOCUMENTATION_OPTIONS.pagename = '_modules/imod/mf6/simulation';</script>
@@ -50,7 +50,7 @@
     <link rel="search" title="Search" href="../../../search.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
-  <meta name="docsearch:version" content="1.0.0rc7.dev" />
+  <meta name="docsearch:version" content="1.0.0.dev" />
   </head>
   
   
@@ -114,8 +114,8 @@
     
     
     
-    <img src="../../../_static/imod-python-logo-light.svg" class="logo__image only-light" alt="iMOD Python 1.0.0rc7 documentation - Home"/>
-    <img src="../../../_static/imod-python-logo-dark.svg" class="logo__image only-dark pst-js-only" alt="iMOD Python 1.0.0rc7 documentation - Home"/>
+    <img src="../../../_static/imod-python-logo-light.svg" class="logo__image only-light" alt="iMOD Python 1.0.0.post1 documentation - Home"/>
+    <img src="../../../_static/imod-python-logo-dark.svg" class="logo__image only-dark pst-js-only" alt="iMOD Python 1.0.0.post1 documentation - Home"/>
   
   
 </a></div>
@@ -447,10 +447,10 @@
 <span class="kn">import</span><span class="w"> </span><span class="nn">xugrid</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">xu</span>
 
 <span class="kn">import</span><span class="w"> </span><span class="nn">imod</span>
-<span class="kn">import</span><span class="w"> </span><span class="nn">imod.logging</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">imod.mf6.exchangebase</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">imod.common.interfaces.imodel</span><span class="w"> </span><span class="kn">import</span> <span class="n">IModel</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">imod.common.interfaces.isimulation</span><span class="w"> </span><span class="kn">import</span> <span class="n">ISimulation</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">imod.common.serializer</span><span class="w"> </span><span class="kn">import</span> <span class="n">EngineType</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">imod.common.statusinfo</span><span class="w"> </span><span class="kn">import</span> <span class="n">NestedStatusInfo</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">imod.common.utilities.dataclass_type</span><span class="w"> </span><span class="kn">import</span> <span class="n">DataclassType</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">imod.common.utilities.mask</span><span class="w"> </span><span class="kn">import</span> <span class="n">_mask_all_models</span>
@@ -472,10 +472,12 @@
 <span class="kn">from</span><span class="w"> </span><span class="nn">imod.mf6.multimodel.exchange_creator_unstructured</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
     <span class="n">ExchangeCreator_Unstructured</span><span class="p">,</span>
 <span class="p">)</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">imod.mf6.multimodel.modelsplitter</span><span class="w"> </span><span class="kn">import</span> <span class="n">create_partition_info</span><span class="p">,</span> <span class="n">slice_model</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">imod.mf6.multimodel.modelsplitter</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
+    <span class="n">ModelSplitter</span><span class="p">,</span>
+    <span class="n">create_partition_info</span><span class="p">,</span>
+<span class="p">)</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">imod.mf6.out</span><span class="w"> </span><span class="kn">import</span> <span class="n">open_cbc</span><span class="p">,</span> <span class="n">open_conc</span><span class="p">,</span> <span class="n">open_hds</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">imod.mf6.package</span><span class="w"> </span><span class="kn">import</span> <span class="n">Package</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">imod.mf6.ssm</span><span class="w"> </span><span class="kn">import</span> <span class="n">SourceSinkMixing</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">imod.mf6.validation_settings</span><span class="w"> </span><span class="kn">import</span> <span class="n">ValidationSettings</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">imod.mf6.write_context</span><span class="w"> </span><span class="kn">import</span> <span class="n">WriteContext</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">imod.prepare.partition</span><span class="w"> </span><span class="kn">import</span> <span class="n">create_partition_labels</span>
@@ -487,7 +489,7 @@
 <span class="kn">from</span><span class="w"> </span><span class="nn">imod.typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">GridDataArray</span><span class="p">,</span> <span class="n">GridDataset</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">imod.typing.grid</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
     <span class="n">concat</span><span class="p">,</span>
-    <span class="n">is_equal</span><span class="p">,</span>
+    <span class="n">is_same_domain</span><span class="p">,</span>
     <span class="n">is_unstructured</span><span class="p">,</span>
     <span class="n">merge_partitions</span><span class="p">,</span>
 <span class="p">)</span>
@@ -1429,6 +1431,7 @@
         <span class="n">validate</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
         <span class="n">mdal_compliant</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
         <span class="n">crs</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">engine</span><span class="p">:</span> <span class="n">EngineType</span> <span class="o">=</span> <span class="s2">&quot;netcdf4&quot;</span><span class="p">,</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Dump simulation to files. Writes a model definition as .TOML file, which</span>
@@ -1450,6 +1453,14 @@
 <span class="sd">        crs: Any, optional</span>
 <span class="sd">            Anything accepted by rasterio.crs.CRS.from_user_input</span>
 <span class="sd">            Requires ``rioxarray`` installed.</span>
+<span class="sd">        engine : str, optional</span>
+<span class="sd">            File engine used to write packages. Options are ``&#39;netcdf4&#39;``,</span>
+<span class="sd">            ``&#39;zarr&#39;``, and ``&#39;zarr.zip&#39;``. NetCDF4 is readable by many other</span>
+<span class="sd">            softwares, for example QGIS. Zarr is optimized for big data, cloud</span>
+<span class="sd">            storage and parallel access. The ``&#39;zarr.zip&#39;`` option is an</span>
+<span class="sd">            experimental option which creates a zipped zarr store in a single</span>
+<span class="sd">            file, which is easier to copy and automatically compresses data as</span>
+<span class="sd">            well. Default is ``&#39;netcdf4&#39;``.</span>
 
 <span class="sd">        Examples</span>
 <span class="sd">        --------</span>
@@ -1471,6 +1482,10 @@
 <span class="sd">        loaded into QGIS, you can set ``mdal_compliant=True``:</span>
 
 <span class="sd">        &gt;&gt;&gt; mf6_sim.dump(&quot;path/to/directory&quot;, mdal_compliant=True, crs=&quot;EPSG:4326&quot;)</span>
+
+<span class="sd">        For big data, storing to ``&quot;zarr&quot;`` or ``&quot;zarr.zip&quot;`` is more efficient:</span>
+
+<span class="sd">        &gt;&gt;&gt; mf6_sim.dump(&quot;path/to/directory&quot;, engine=&quot;zarr&quot;)</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">directory</span> <span class="o">=</span> <span class="n">pathlib</span><span class="o">.</span><span class="n">Path</span><span class="p">(</span><span class="n">directory</span><span class="p">)</span>
         <span class="n">directory</span><span class="o">.</span><span class="n">mkdir</span><span class="p">(</span><span class="n">parents</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">exist_ok</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
@@ -1479,12 +1494,13 @@
         <span class="c1"># Dump version number</span>
         <span class="n">version</span> <span class="o">=</span> <span class="n">get_version</span><span class="p">()</span>
         <span class="n">toml_content</span><span class="p">[</span><span class="s2">&quot;version&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;imod-python&quot;</span><span class="p">:</span> <span class="n">version</span><span class="p">}</span>
+
         <span class="c1"># Dump models and exchanges</span>
         <span class="k">for</span> <span class="n">key</span><span class="p">,</span> <span class="n">value</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
             <span class="n">cls_name</span> <span class="o">=</span> <span class="nb">type</span><span class="p">(</span><span class="n">value</span><span class="p">)</span><span class="o">.</span><span class="vm">__name__</span>
             <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="n">Modflow6Model</span><span class="p">):</span>
                 <span class="n">model_toml_path</span> <span class="o">=</span> <span class="n">value</span><span class="o">.</span><span class="n">dump</span><span class="p">(</span>
-                    <span class="n">directory</span><span class="p">,</span> <span class="n">key</span><span class="p">,</span> <span class="n">validate</span><span class="p">,</span> <span class="n">mdal_compliant</span><span class="p">,</span> <span class="n">crs</span>
+                    <span class="n">directory</span><span class="p">,</span> <span class="n">key</span><span class="p">,</span> <span class="n">validate</span><span class="p">,</span> <span class="n">mdal_compliant</span><span class="p">,</span> <span class="n">crs</span><span class="p">,</span> <span class="n">engine</span><span class="o">=</span><span class="n">engine</span>
                 <span class="p">)</span>
                 <span class="n">toml_content</span><span class="p">[</span><span class="n">cls_name</span><span class="p">][</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="n">model_toml_path</span><span class="o">.</span><span class="n">relative_to</span><span class="p">(</span>
                     <span class="n">directory</span>
@@ -1494,14 +1510,25 @@
                 <span class="k">for</span> <span class="n">exchange_package</span> <span class="ow">in</span> <span class="bp">self</span><span class="p">[</span><span class="n">key</span><span class="p">]:</span>
                     <span class="n">_</span><span class="p">,</span> <span class="n">filename</span><span class="p">,</span> <span class="n">_</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">exchange_package</span><span class="o">.</span><span class="n">get_specification</span><span class="p">()</span>
                     <span class="n">exchange_class_short</span> <span class="o">=</span> <span class="nb">type</span><span class="p">(</span><span class="n">exchange_package</span><span class="p">)</span><span class="o">.</span><span class="vm">__name__</span>
-                    <span class="n">path</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">filename</span><span class="si">}</span><span class="s2">.nc&quot;</span>
-                    <span class="n">exchange_package</span><span class="o">.</span><span class="n">dataset</span><span class="o">.</span><span class="n">to_netcdf</span><span class="p">(</span><span class="n">directory</span> <span class="o">/</span> <span class="n">path</span><span class="p">)</span>
-                    <span class="n">toml_content</span><span class="p">[</span><span class="n">key</span><span class="p">][</span><span class="n">exchange_class_short</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">path</span><span class="p">)</span>
+                    <span class="n">path</span> <span class="o">=</span> <span class="n">exchange_package</span><span class="o">.</span><span class="n">to_file</span><span class="p">(</span>
+                        <span class="n">directory</span><span class="p">,</span>
+                        <span class="n">filename</span><span class="p">,</span>
+                        <span class="n">mdal_compliant</span><span class="o">=</span><span class="n">mdal_compliant</span><span class="p">,</span>
+                        <span class="n">crs</span><span class="o">=</span><span class="n">crs</span><span class="p">,</span>
+                        <span class="n">engine</span><span class="o">=</span><span class="n">engine</span><span class="p">,</span>
+                    <span class="p">)</span>
+
+                    <span class="n">toml_content</span><span class="p">[</span><span class="n">key</span><span class="p">][</span><span class="n">exchange_class_short</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">path</span><span class="o">.</span><span class="n">name</span><span class="p">)</span>
 
             <span class="k">else</span><span class="p">:</span>
-                <span class="n">path</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">key</span><span class="si">}</span><span class="s2">.nc&quot;</span>
-                <span class="n">value</span><span class="o">.</span><span class="n">dataset</span><span class="o">.</span><span class="n">to_netcdf</span><span class="p">(</span><span class="n">directory</span> <span class="o">/</span> <span class="n">path</span><span class="p">)</span>
-                <span class="n">toml_content</span><span class="p">[</span><span class="n">cls_name</span><span class="p">][</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="n">path</span>
+                <span class="n">path</span> <span class="o">=</span> <span class="n">value</span><span class="o">.</span><span class="n">to_file</span><span class="p">(</span>
+                    <span class="n">directory</span><span class="p">,</span>
+                    <span class="n">key</span><span class="p">,</span>
+                    <span class="n">mdal_compliant</span><span class="o">=</span><span class="n">mdal_compliant</span><span class="p">,</span>
+                    <span class="n">crs</span><span class="o">=</span><span class="n">crs</span><span class="p">,</span>
+                    <span class="n">engine</span><span class="o">=</span><span class="n">engine</span><span class="p">,</span>
+                <span class="p">)</span>
+                <span class="n">toml_content</span><span class="p">[</span><span class="n">cls_name</span><span class="p">][</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="n">path</span><span class="o">.</span><span class="n">name</span>
 
         <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">directory</span> <span class="o">/</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2">.toml&quot;</span><span class="p">,</span> <span class="s2">&quot;wb&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
             <span class="n">tomli_w</span><span class="o">.</span><span class="n">dump</span><span class="p">(</span><span class="n">toml_content</span><span class="p">,</span> <span class="n">f</span><span class="p">)</span></div>
@@ -1868,6 +1895,8 @@
 <span class="sd">        &gt;&gt;&gt; submodel_labels = mf6_sim.create_partition_labels(n_partitions=4)</span>
 <span class="sd">        &gt;&gt;&gt; m6_splitted = mf6_sim.split(submodel_labels)</span>
 <span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="c1"># Validation</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">is_split</span><span class="p">():</span>
             <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span>
                 <span class="s2">&quot;Unable to split simulation. Splitting can only be done on simulations that haven&#39;t been split.&quot;</span>
@@ -1893,9 +1922,40 @@
                     <span class="sa">f</span><span class="s2">&quot;simulation cannot be split due to presence of package &#39;</span><span class="si">{</span><span class="n">error_with_object</span><span class="si">}</span><span class="s2">&#39; in model &#39;</span><span class="si">{</span><span class="n">model_name</span><span class="si">}</span><span class="s2">&#39;&quot;</span>
                 <span class="p">)</span>
 
-        <span class="n">original_packages</span> <span class="o">=</span> <span class="n">get_packages</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
-
+        <span class="c1"># Create partition info</span>
         <span class="n">partition_info</span> <span class="o">=</span> <span class="n">create_partition_info</span><span class="p">(</span><span class="n">submodel_labels</span><span class="p">)</span>
+
+        <span class="c1"># Create new simulation</span>
+        <span class="n">new_simulation</span> <span class="o">=</span> <span class="n">imod</span><span class="o">.</span><span class="n">mf6</span><span class="o">.</span><span class="n">Modflow6Simulation</span><span class="p">(</span>
+            <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2">_partioned&quot;</span><span class="p">,</span> <span class="n">validation_settings</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_validation_context</span>
+        <span class="p">)</span>
+
+        <span class="c1"># Copy simulation level packages to new simulation</span>
+        <span class="n">original_packages</span> <span class="o">=</span> <span class="n">get_packages</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">package_name</span><span class="p">,</span> <span class="n">package</span> <span class="ow">in</span> <span class="p">{</span><span class="o">**</span><span class="n">original_packages</span><span class="p">}</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+            <span class="n">new_simulation</span><span class="p">[</span><span class="n">package_name</span><span class="p">]</span> <span class="o">=</span> <span class="n">deepcopy</span><span class="p">(</span><span class="n">package</span><span class="p">)</span>
+
+        <span class="c1"># Create a mapping from original model names to new solution objects</span>
+        <span class="n">original_model_name_to_solution</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Solution</span><span class="p">]</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="k">for</span> <span class="n">model_name</span><span class="p">,</span> <span class="n">model</span> <span class="ow">in</span> <span class="n">original_models</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+            <span class="n">solution_name</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_solution_name</span><span class="p">(</span><span class="n">model_name</span><span class="p">)</span>
+            <span class="n">solution</span> <span class="o">=</span> <span class="n">cast</span><span class="p">(</span><span class="n">Solution</span><span class="p">,</span> <span class="n">new_simulation</span><span class="p">[</span><span class="n">solution_name</span><span class="p">])</span>
+            <span class="n">original_model_name_to_solution</span><span class="p">[</span><span class="n">model_name</span><span class="p">]</span> <span class="o">=</span> <span class="n">solution</span>
+
+        <span class="c1"># Split models and add to new simulation</span>
+        <span class="n">modelsplitter</span> <span class="o">=</span> <span class="n">ModelSplitter</span><span class="p">(</span><span class="n">partition_info</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">model_name</span><span class="p">,</span> <span class="n">model</span> <span class="ow">in</span> <span class="n">original_models</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+            <span class="n">partition_models_dict</span> <span class="o">=</span> <span class="n">modelsplitter</span><span class="o">.</span><span class="n">split</span><span class="p">(</span>
+                <span class="n">model_name</span><span class="p">,</span> <span class="n">model</span><span class="p">,</span> <span class="n">ignore_time</span><span class="o">=</span><span class="n">ignore_time_purge_empty</span>
+            <span class="p">)</span>
+            <span class="k">for</span> <span class="n">new_model_name</span><span class="p">,</span> <span class="n">new_model</span> <span class="ow">in</span> <span class="n">partition_models_dict</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+                <span class="n">new_simulation</span><span class="p">[</span><span class="n">new_model_name</span><span class="p">]</span> <span class="o">=</span> <span class="n">new_model</span>
+
+        <span class="n">modelsplitter</span><span class="o">.</span><span class="n">update_solutions</span><span class="p">(</span><span class="n">original_model_name_to_solution</span><span class="p">)</span>
+        <span class="n">modelsplitter</span><span class="o">.</span><span class="n">update_dependent_packages</span><span class="p">()</span>
+
+        <span class="c1"># Create exchanges</span>
+        <span class="n">exchanges</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="n">Any</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
 
         <span class="n">exchange_creator</span><span class="p">:</span> <span class="n">ExchangeCreator_Unstructured</span> <span class="o">|</span> <span class="n">ExchangeCreator_Structured</span>
         <span class="k">if</span> <span class="n">is_unstructured</span><span class="p">(</span><span class="n">submodel_labels</span><span class="p">):</span>
@@ -1907,28 +1967,6 @@
                 <span class="n">submodel_labels</span><span class="p">,</span> <span class="n">partition_info</span>
             <span class="p">)</span>
 
-        <span class="n">new_simulation</span> <span class="o">=</span> <span class="n">imod</span><span class="o">.</span><span class="n">mf6</span><span class="o">.</span><span class="n">Modflow6Simulation</span><span class="p">(</span>
-            <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2">_partioned&quot;</span><span class="p">,</span> <span class="n">validation_settings</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_validation_context</span>
-        <span class="p">)</span>
-        <span class="k">for</span> <span class="n">package_name</span><span class="p">,</span> <span class="n">package</span> <span class="ow">in</span> <span class="p">{</span><span class="o">**</span><span class="n">original_packages</span><span class="p">}</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
-            <span class="n">new_simulation</span><span class="p">[</span><span class="n">package_name</span><span class="p">]</span> <span class="o">=</span> <span class="n">deepcopy</span><span class="p">(</span><span class="n">package</span><span class="p">)</span>
-
-        <span class="k">for</span> <span class="n">model_name</span><span class="p">,</span> <span class="n">model</span> <span class="ow">in</span> <span class="n">original_models</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
-            <span class="n">solution_name</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_solution_name</span><span class="p">(</span><span class="n">model_name</span><span class="p">)</span>
-            <span class="n">solution</span> <span class="o">=</span> <span class="n">cast</span><span class="p">(</span><span class="n">Solution</span><span class="p">,</span> <span class="n">new_simulation</span><span class="p">[</span><span class="n">solution_name</span><span class="p">])</span>
-            <span class="n">solution</span><span class="o">.</span><span class="n">_remove_model_from_solution</span><span class="p">(</span><span class="n">model_name</span><span class="p">)</span>
-            <span class="k">for</span> <span class="n">submodel_partition_info</span> <span class="ow">in</span> <span class="n">partition_info</span><span class="p">:</span>
-                <span class="n">new_model_name</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">model_name</span><span class="si">}</span><span class="s2">_</span><span class="si">{</span><span class="n">submodel_partition_info</span><span class="o">.</span><span class="n">id</span><span class="si">}</span><span class="s2">&quot;</span>
-                <span class="n">new_simulation</span><span class="p">[</span><span class="n">new_model_name</span><span class="p">]</span> <span class="o">=</span> <span class="n">slice_model</span><span class="p">(</span>
-                    <span class="n">submodel_partition_info</span><span class="p">,</span> <span class="n">model</span>
-                <span class="p">)</span>
-                <span class="n">new_simulation</span><span class="p">[</span><span class="n">new_model_name</span><span class="p">]</span><span class="o">.</span><span class="n">purge_empty_packages</span><span class="p">(</span>
-                    <span class="n">ignore_time</span><span class="o">=</span><span class="n">ignore_time_purge_empty</span>
-                <span class="p">)</span>
-                <span class="n">solution</span><span class="o">.</span><span class="n">_add_model_to_solution</span><span class="p">(</span><span class="n">new_model_name</span><span class="p">)</span>
-
-        <span class="n">exchanges</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="n">Any</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
-
         <span class="k">for</span> <span class="n">flow_model_name</span><span class="p">,</span> <span class="n">flow_model</span> <span class="ow">in</span> <span class="n">flow_models</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
             <span class="n">exchanges</span> <span class="o">+=</span> <span class="n">exchange_creator</span><span class="o">.</span><span class="n">create_gwfgwf_exchanges</span><span class="p">(</span>
                 <span class="n">flow_model_name</span><span class="p">,</span> <span class="n">flow_model</span><span class="o">.</span><span class="n">domain</span><span class="o">.</span><span class="n">layer</span>
@@ -1939,13 +1977,12 @@
                 <span class="n">exchanges</span> <span class="o">+=</span> <span class="n">exchange_creator</span><span class="o">.</span><span class="n">create_gwtgwt_exchanges</span><span class="p">(</span>
                     <span class="n">tpt_model_name</span><span class="p">,</span> <span class="n">flow_model_name</span><span class="p">,</span> <span class="n">model</span><span class="o">.</span><span class="n">domain</span><span class="o">.</span><span class="n">layer</span>
                 <span class="p">)</span>
+
         <span class="n">new_simulation</span><span class="o">.</span><span class="n">_add_modelsplit_exchanges</span><span class="p">(</span><span class="n">exchanges</span><span class="p">)</span>
-        <span class="n">new_simulation</span><span class="o">.</span><span class="n">_update_buoyancy_packages</span><span class="p">()</span>
         <span class="n">new_simulation</span><span class="o">.</span><span class="n">_set_flow_exchange_options</span><span class="p">()</span>
         <span class="n">new_simulation</span><span class="o">.</span><span class="n">_set_transport_exchange_options</span><span class="p">()</span>
-        <span class="n">new_simulation</span><span class="o">.</span><span class="n">_update_ssm_packages</span><span class="p">()</span>
-
         <span class="n">new_simulation</span><span class="o">.</span><span class="n">_filter_inactive_cells_from_exchanges</span><span class="p">()</span>
+
         <span class="k">return</span> <span class="n">new_simulation</span></div>
 
 
@@ -2095,10 +2132,16 @@
 
         <span class="k">for</span> <span class="n">flow_model_name</span> <span class="ow">in</span> <span class="n">flow_models</span><span class="p">:</span>
             <span class="n">flow_model</span> <span class="o">=</span> <span class="bp">self</span><span class="p">[</span><span class="n">flow_model_name</span><span class="p">]</span>
+
+            <span class="n">matched_tsp_models</span> <span class="o">=</span> <span class="p">[]</span>
             <span class="k">for</span> <span class="n">tpt_model_name</span> <span class="ow">in</span> <span class="n">transport_models</span><span class="p">:</span>
                 <span class="n">tpt_model</span> <span class="o">=</span> <span class="bp">self</span><span class="p">[</span><span class="n">tpt_model_name</span><span class="p">]</span>
-                <span class="k">if</span> <span class="n">is_equal</span><span class="p">(</span><span class="n">tpt_model</span><span class="o">.</span><span class="n">domain</span><span class="p">,</span> <span class="n">flow_model</span><span class="o">.</span><span class="n">domain</span><span class="p">):</span>
+                <span class="k">if</span> <span class="n">is_same_domain</span><span class="p">(</span><span class="n">tpt_model</span><span class="o">.</span><span class="n">domain</span><span class="p">,</span> <span class="n">flow_model</span><span class="o">.</span><span class="n">domain</span><span class="p">):</span>
                     <span class="n">result</span><span class="p">[</span><span class="n">flow_model_name</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">tpt_model_name</span><span class="p">)</span>
+                    <span class="n">matched_tsp_models</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">tpt_model_name</span><span class="p">)</span>
+            <span class="k">for</span> <span class="n">tpt_model_name</span> <span class="ow">in</span> <span class="n">matched_tsp_models</span><span class="p">:</span>
+                <span class="n">transport_models</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="n">tpt_model_name</span><span class="p">)</span>
+
         <span class="k">return</span> <span class="n">result</span>
 
     <span class="k">def</span><span class="w"> </span><span class="nf">_generate_gwfgwt_exchanges</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="n">GWFGWT</span><span class="p">]:</span>
@@ -2110,30 +2153,6 @@
                     <span class="n">exchanges</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">GWFGWT</span><span class="p">(</span><span class="n">flow_name</span><span class="p">,</span> <span class="n">transport_model_name</span><span class="p">))</span>
 
         <span class="k">return</span> <span class="n">exchanges</span>
-
-    <span class="k">def</span><span class="w"> </span><span class="nf">_update_ssm_packages</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-        <span class="n">flow_transport_mapping</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_transport_models_per_flow_model</span><span class="p">()</span>
-        <span class="k">for</span> <span class="n">flow_name</span><span class="p">,</span> <span class="n">tpt_models_of_flow_model</span> <span class="ow">in</span> <span class="n">flow_transport_mapping</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
-            <span class="n">flow_model</span> <span class="o">=</span> <span class="bp">self</span><span class="p">[</span><span class="n">flow_name</span><span class="p">]</span>
-            <span class="k">for</span> <span class="n">tpt_model_name</span> <span class="ow">in</span> <span class="n">tpt_models_of_flow_model</span><span class="p">:</span>
-                <span class="n">tpt_model</span> <span class="o">=</span> <span class="bp">self</span><span class="p">[</span><span class="n">tpt_model_name</span><span class="p">]</span>
-                <span class="n">ssm_key</span> <span class="o">=</span> <span class="n">tpt_model</span><span class="o">.</span><span class="n">_get_pkgkey</span><span class="p">(</span><span class="s2">&quot;ssm&quot;</span><span class="p">)</span>
-                <span class="k">if</span> <span class="n">ssm_key</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-                    <span class="n">old_ssm_package</span> <span class="o">=</span> <span class="n">tpt_model</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="n">ssm_key</span><span class="p">)</span>
-                    <span class="n">state_variable_name</span> <span class="o">=</span> <span class="n">old_ssm_package</span><span class="o">.</span><span class="n">dataset</span><span class="p">[</span>
-                        <span class="s2">&quot;auxiliary_variable_name&quot;</span>
-                    <span class="p">]</span><span class="o">.</span><span class="n">values</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
-                    <span class="n">ssm_package</span> <span class="o">=</span> <span class="n">SourceSinkMixing</span><span class="o">.</span><span class="n">from_flow_model</span><span class="p">(</span>
-                        <span class="n">flow_model</span><span class="p">,</span> <span class="n">state_variable_name</span><span class="p">,</span> <span class="n">is_split</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">is_split</span><span class="p">()</span>
-                    <span class="p">)</span>
-                    <span class="k">if</span> <span class="n">ssm_package</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-                        <span class="n">tpt_model</span><span class="p">[</span><span class="n">ssm_key</span><span class="p">]</span> <span class="o">=</span> <span class="n">ssm_package</span>
-
-    <span class="k">def</span><span class="w"> </span><span class="nf">_update_buoyancy_packages</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-        <span class="n">flow_transport_mapping</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_transport_models_per_flow_model</span><span class="p">()</span>
-        <span class="k">for</span> <span class="n">flow_name</span><span class="p">,</span> <span class="n">tpt_models_of_flow_model</span> <span class="ow">in</span> <span class="n">flow_transport_mapping</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
-            <span class="n">flow_model</span> <span class="o">=</span> <span class="n">cast</span><span class="p">(</span><span class="n">GroundwaterFlowModel</span><span class="p">,</span> <span class="bp">self</span><span class="p">[</span><span class="n">flow_name</span><span class="p">])</span>
-            <span class="n">flow_model</span><span class="o">.</span><span class="n">_update_buoyancy_package</span><span class="p">(</span><span class="n">tpt_models_of_flow_model</span><span class="p">)</span>
 
 <div class="viewcode-block" id="Modflow6Simulation.is_split">
 <a class="viewcode-back" href="../../../api/generated/mf6/imod.mf6.Modflow6Simulation.is_split.html#imod.mf6.Modflow6Simulation.is_split">[docs]</a>

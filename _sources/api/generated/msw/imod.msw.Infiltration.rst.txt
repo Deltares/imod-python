@@ -30,5 +30,6 @@
    
       ~Infiltration.auxiliary_data_fields
       ~Infiltration.dataset
+      ~Infiltration.pkg_id
    
    

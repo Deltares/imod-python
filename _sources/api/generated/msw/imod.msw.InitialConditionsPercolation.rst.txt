@@ -30,5 +30,6 @@
    
       ~InitialConditionsPercolation.auxiliary_data_fields
       ~InitialConditionsPercolation.dataset
+      ~InitialConditionsPercolation.pkg_id
    
    

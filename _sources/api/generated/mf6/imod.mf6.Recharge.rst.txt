@@ -25,7 +25,7 @@
       ~Recharge.mask
       ~Recharge.reallocate
       ~Recharge.regrid_like
-      ~Recharge.to_netcdf
+      ~Recharge.to_file
       ~Recharge.write
    
    
@@ -38,5 +38,6 @@
    
       ~Recharge.auxiliary_data_fields
       ~Recharge.dataset
+      ~Recharge.pkg_id
    
    

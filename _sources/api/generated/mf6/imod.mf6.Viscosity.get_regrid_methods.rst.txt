@@ -1,0 +1,6 @@
+﻿imod.mf6.Viscosity.get\_regrid\_methods
+=======================================
+
+.. currentmodule:: imod.mf6
+
+.. automethod:: Viscosity.get_regrid_methods

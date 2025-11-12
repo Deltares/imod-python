@@ -30,5 +30,6 @@
    
       ~AnnualCropFactors.auxiliary_data_fields
       ~AnnualCropFactors.dataset
+      ~AnnualCropFactors.pkg_id
    
    

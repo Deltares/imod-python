@@ -21,7 +21,7 @@
       ~Dispersion.is_empty
       ~Dispersion.mask
       ~Dispersion.regrid_like
-      ~Dispersion.to_netcdf
+      ~Dispersion.to_file
       ~Dispersion.write
    
    
@@ -34,5 +34,6 @@
    
       ~Dispersion.auxiliary_data_fields
       ~Dispersion.dataset
+      ~Dispersion.pkg_id
    
    

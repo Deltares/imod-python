@@ -8,7 +8,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>iMOD5 backwards compatibility &#8212; iMOD Python 1.0.0rc7 documentation</title>
+    <title>iMOD5 backwards compatibility &#8212; iMOD Python 1.0.0.post1 documentation</title>
   
   
   
@@ -42,7 +42,7 @@
   <link rel="preload" as="script" href="../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
 <link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
 
-    <script src="../_static/documentation_options.js?v=1830d1b8"></script>
+    <script src="../_static/documentation_options.js?v=f5399c8a"></script>
     <script src="../_static/doctools.js?v=9bcbadda"></script>
     <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script>DOCUMENTATION_OPTIONS.pagename = 'faq/imod5_backwards_compatibility';</script>
@@ -53,7 +53,7 @@
     <link rel="prev" title="Known Issues" href="known-issues.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
-  <meta name="docsearch:version" content="1.0.0rc7.dev" />
+  <meta name="docsearch:version" content="1.0.0.dev" />
   </head>
   
   
@@ -117,8 +117,8 @@
     
     
     
-    <img src="../_static/imod-python-logo-light.svg" class="logo__image only-light" alt="iMOD Python 1.0.0rc7 documentation - Home"/>
-    <img src="../_static/imod-python-logo-dark.svg" class="logo__image only-dark pst-js-only" alt="iMOD Python 1.0.0rc7 documentation - Home"/>
+    <img src="../_static/imod-python-logo-light.svg" class="logo__image only-light" alt="iMOD Python 1.0.0.post1 documentation - Home"/>
+    <img src="../_static/imod-python-logo-dark.svg" class="logo__image only-dark pst-js-only" alt="iMOD Python 1.0.0.post1 documentation - Home"/>
   
   
 </a></div>
@@ -1253,10 +1253,10 @@ iMOD Python to read and grid ISG files.</p>
 <p>Use this post-processing function to convert standard MODFLOW6 output to IDF
 files. The eequivalent functionality in iMOD Python is mostly covered by the
 following functions: <a class="reference internal" href="../api/generated/mf6/imod.mf6.open_hds.html#imod.mf6.open_hds" title="imod.mf6.open_hds"><code class="xref py py-func docutils literal notranslate"><span class="pre">imod.mf6.open_hds()</span></code></a>, <a class="reference internal" href="../api/generated/mf6/imod.mf6.open_cbc.html#imod.mf6.open_cbc" title="imod.mf6.open_cbc"><code class="xref py py-func docutils literal notranslate"><span class="pre">imod.mf6.open_cbc()</span></code></a>,
-<code class="xref py py-meth docutils literal notranslate"><span class="pre">Modflow6Simulation.open_flow_budget()</span></code>,
-<code class="xref py py-meth docutils literal notranslate"><span class="pre">Modflow6Simulation.open_transport_budget()</span></code>,
-<code class="xref py py-meth docutils literal notranslate"><span class="pre">Modflow6Simulation.open_head()</span></code>,
-<code class="xref py py-meth docutils literal notranslate"><span class="pre">Modflow6Simulation.open_concentration()</span></code>. The table below lists pointers to
+<a class="reference internal" href="../api/generated/mf6/imod.mf6.Modflow6Simulation.open_flow_budget.html#imod.mf6.Modflow6Simulation.open_flow_budget" title="imod.mf6.Modflow6Simulation.open_flow_budget"><code class="xref py py-meth docutils literal notranslate"><span class="pre">imod.mf6.Modflow6Simulation.open_flow_budget()</span></code></a>,
+<a class="reference internal" href="../api/generated/mf6/imod.mf6.Modflow6Simulation.open_transport_budget.html#imod.mf6.Modflow6Simulation.open_transport_budget" title="imod.mf6.Modflow6Simulation.open_transport_budget"><code class="xref py py-meth docutils literal notranslate"><span class="pre">imod.mf6.Modflow6Simulation.open_transport_budget()</span></code></a>,
+<a class="reference internal" href="../api/generated/mf6/imod.mf6.Modflow6Simulation.open_head.html#imod.mf6.Modflow6Simulation.open_head" title="imod.mf6.Modflow6Simulation.open_head"><code class="xref py py-meth docutils literal notranslate"><span class="pre">imod.mf6.Modflow6Simulation.open_head()</span></code></a>,
+<a class="reference internal" href="../api/generated/mf6/imod.mf6.Modflow6Simulation.open_concentration.html#imod.mf6.Modflow6Simulation.open_concentration" title="imod.mf6.Modflow6Simulation.open_concentration"><code class="xref py py-meth docutils literal notranslate"><span class="pre">imod.mf6.Modflow6Simulation.open_concentration()</span></code></a>. The table below lists pointers to
 the functions and arguments that can be used to achieve full feature parity with
 the iMOD5 BATCH function. You can write the data to IDF files using
 <a class="reference internal" href="../api/generated/io/imod.formats.idf.save.html#imod.formats.idf.save" title="imod.formats.idf.save"><code class="xref py py-func docutils literal notranslate"><span class="pre">imod.formats.idf.save()</span></code></a>.</p>
@@ -1332,7 +1332,7 @@ the iMOD5 BATCH function. You can write the data to IDF files using
 </tr>
 <tr class="row-odd"><th class="stub"><p>IPHRLVL</p></th>
 <td><p>Save the first active value in the vertical dimension</p></td>
-<td><p><code class="xref py py-func docutils literal notranslate"><span class="pre">get_upper_active_grid_cells</span></code>, <code class="xref py py-func docutils literal notranslate"><span class="pre">get_upper_active_layer_number</span></code></p></td>
+<td><p><a class="reference internal" href="../api/generated/select/imod.select.get_upper_active_grid_cells.html#imod.select.get_upper_active_grid_cells" title="imod.select.get_upper_active_grid_cells"><code class="xref py py-func docutils literal notranslate"><span class="pre">get_upper_active_grid_cells</span></code></a>, <a class="reference internal" href="../api/generated/select/imod.select.get_upper_active_layer_number.html#imod.select.get_upper_active_layer_number" title="imod.select.get_upper_active_layer_number"><code class="xref py py-func docutils literal notranslate"><span class="pre">get_upper_active_layer_number</span></code></a></p></td>
 <td></td>
 </tr>
 <tr class="row-even"><th class="stub"><p>IFILLHEAD</p></th>
@@ -1930,7 +1930,7 @@ part of the functionality for step 1 in iMOD Python is found in
 <a class="reference internal" href="../api/generated/evaluate/imod.evaluate.facebudget.html#imod.evaluate.facebudget" title="imod.evaluate.facebudget"><code class="xref py py-func docutils literal notranslate"><span class="pre">imod.evaluate.facebudget()</span></code></a>, for ISEL=3-type of behaviour of the
 facebudgets. Other water balance terms can be computed by using general xarray
 logic, for examples see below. To plot waterbalance terms, you can use
-<code class="xref py py-func docutils literal notranslate"><span class="pre">imod.visualize.plot_waterbalance()</span></code>.</p>
+<a class="reference internal" href="../api/generated/visualize/imod.visualize.waterbalance_barchart.html#imod.visualize.waterbalance_barchart" title="imod.visualize.waterbalance_barchart"><code class="xref py py-func docutils literal notranslate"><span class="pre">imod.visualize.waterbalance_barchart()</span></code></a>.</p>
 <div class="pst-scrollable-table-container"><table class="table">
 <thead>
 <tr class="row-odd"><th class="head stub"><p>BATCH argument</p></th>

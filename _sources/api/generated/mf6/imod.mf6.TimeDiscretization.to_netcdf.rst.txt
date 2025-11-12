@@ -1,6 +1,0 @@
-﻿imod.mf6.TimeDiscretization.to\_netcdf
-======================================
-
-.. currentmodule:: imod.mf6
-
-.. automethod:: TimeDiscretization.to_netcdf

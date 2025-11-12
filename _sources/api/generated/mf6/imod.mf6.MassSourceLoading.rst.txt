@@ -21,7 +21,7 @@
       ~MassSourceLoading.is_empty
       ~MassSourceLoading.mask
       ~MassSourceLoading.regrid_like
-      ~MassSourceLoading.to_netcdf
+      ~MassSourceLoading.to_file
       ~MassSourceLoading.write
    
    
@@ -34,5 +34,6 @@
    
       ~MassSourceLoading.auxiliary_data_fields
       ~MassSourceLoading.dataset
+      ~MassSourceLoading.pkg_id
    
    

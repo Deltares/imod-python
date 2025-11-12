@@ -30,5 +30,6 @@
    
       ~InitialConditionsRootzonePressureHead.auxiliary_data_fields
       ~InitialConditionsRootzonePressureHead.dataset
+      ~InitialConditionsRootzonePressureHead.pkg_id
    
    

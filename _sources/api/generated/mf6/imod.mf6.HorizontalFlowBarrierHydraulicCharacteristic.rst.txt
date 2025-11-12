@@ -23,8 +23,8 @@
       ~HorizontalFlowBarrierHydraulicCharacteristic.mask
       ~HorizontalFlowBarrierHydraulicCharacteristic.regrid_like
       ~HorizontalFlowBarrierHydraulicCharacteristic.snap_to_grid
+      ~HorizontalFlowBarrierHydraulicCharacteristic.to_file
       ~HorizontalFlowBarrierHydraulicCharacteristic.to_mf6_pkg
-      ~HorizontalFlowBarrierHydraulicCharacteristic.to_netcdf
       ~HorizontalFlowBarrierHydraulicCharacteristic.write
    
    
@@ -38,5 +38,6 @@
       ~HorizontalFlowBarrierHydraulicCharacteristic.auxiliary_data_fields
       ~HorizontalFlowBarrierHydraulicCharacteristic.dataset
       ~HorizontalFlowBarrierHydraulicCharacteristic.line_data
+      ~HorizontalFlowBarrierHydraulicCharacteristic.pkg_id
    
    

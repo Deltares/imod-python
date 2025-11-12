@@ -21,7 +21,7 @@
       ~TimeDiscretization.is_empty
       ~TimeDiscretization.mask
       ~TimeDiscretization.regrid_like
-      ~TimeDiscretization.to_netcdf
+      ~TimeDiscretization.to_file
       ~TimeDiscretization.write
    
    
@@ -34,5 +34,6 @@
    
       ~TimeDiscretization.auxiliary_data_fields
       ~TimeDiscretization.dataset
+      ~TimeDiscretization.pkg_id
    
    

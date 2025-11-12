@@ -21,7 +21,7 @@
       ~ApiPackage.is_empty
       ~ApiPackage.mask
       ~ApiPackage.regrid_like
-      ~ApiPackage.to_netcdf
+      ~ApiPackage.to_file
       ~ApiPackage.write
    
    
@@ -34,5 +34,6 @@
    
       ~ApiPackage.auxiliary_data_fields
       ~ApiPackage.dataset
+      ~ApiPackage.pkg_id
    
    

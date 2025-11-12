@@ -22,7 +22,7 @@
       ~SourceSinkMixing.is_empty
       ~SourceSinkMixing.mask
       ~SourceSinkMixing.regrid_like
-      ~SourceSinkMixing.to_netcdf
+      ~SourceSinkMixing.to_file
       ~SourceSinkMixing.write
    
    
@@ -35,5 +35,6 @@
    
       ~SourceSinkMixing.auxiliary_data_fields
       ~SourceSinkMixing.dataset
+      ~SourceSinkMixing.pkg_id
    
    

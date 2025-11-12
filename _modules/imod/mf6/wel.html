@@ -7,7 +7,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>imod.mf6.wel &#8212; iMOD Python 1.0.0rc7 documentation</title>
+    <title>imod.mf6.wel &#8212; iMOD Python 1.0.0.post1 documentation</title>
   
   
   
@@ -41,7 +41,7 @@
   <link rel="preload" as="script" href="../../../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
 <link rel="preload" as="script" href="../../../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
 
-    <script src="../../../_static/documentation_options.js?v=1830d1b8"></script>
+    <script src="../../../_static/documentation_options.js?v=f5399c8a"></script>
     <script src="../../../_static/doctools.js?v=9bcbadda"></script>
     <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script>DOCUMENTATION_OPTIONS.pagename = '_modules/imod/mf6/wel';</script>
@@ -50,7 +50,7 @@
     <link rel="search" title="Search" href="../../../search.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
-  <meta name="docsearch:version" content="1.0.0rc7.dev" />
+  <meta name="docsearch:version" content="1.0.0.dev" />
   </head>
   
   
@@ -114,8 +114,8 @@
     
     
     
-    <img src="../../../_static/imod-python-logo-light.svg" class="logo__image only-light" alt="iMOD Python 1.0.0rc7 documentation - Home"/>
-    <img src="../../../_static/imod-python-logo-dark.svg" class="logo__image only-dark pst-js-only" alt="iMOD Python 1.0.0rc7 documentation - Home"/>
+    <img src="../../../_static/imod-python-logo-light.svg" class="logo__image only-light" alt="iMOD Python 1.0.0.post1 documentation - Home"/>
+    <img src="../../../_static/imod-python-logo-dark.svg" class="logo__image only-dark pst-js-only" alt="iMOD Python 1.0.0.post1 documentation - Home"/>
   
   
 </a></div>
@@ -506,21 +506,39 @@
     <span class="k">return</span> <span class="bp">cls</span><span class="o">.</span><span class="n">_from_dataset</span><span class="p">(</span><span class="n">selection</span><span class="p">)</span>
 
 
+<span class="k">def</span><span class="w"> </span><span class="nf">_move_item_to_index</span><span class="p">(</span><span class="n">lst</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span> <span class="n">item</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">index</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Move item in list to specified index&quot;&quot;&quot;</span>
+    <span class="n">lst_copy</span> <span class="o">=</span> <span class="n">lst</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+    <span class="n">lst_copy</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="n">item</span><span class="p">)</span>
+    <span class="n">lst_copy</span><span class="o">.</span><span class="n">insert</span><span class="p">(</span><span class="n">index</span><span class="p">,</span> <span class="n">item</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">lst_copy</span>
+
+
 <span class="k">def</span><span class="w"> </span><span class="nf">_df_groups_to_da_rates</span><span class="p">(</span>
     <span class="n">unique_well_groups</span><span class="p">:</span> <span class="n">Sequence</span><span class="p">[</span><span class="n">pd</span><span class="o">.</span><span class="n">api</span><span class="o">.</span><span class="n">typing</span><span class="o">.</span><span class="n">DataFrameGroupBy</span><span class="p">],</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">xr</span><span class="o">.</span><span class="n">DataArray</span><span class="p">:</span>
     <span class="c1"># Convert dataframes all groups to DataArrays</span>
     <span class="n">columns</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">unique_well_groups</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">columns</span><span class="p">)</span>
     <span class="n">columns</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="s2">&quot;rate&quot;</span><span class="p">)</span>
+    <span class="c1"># Enforce index to the front, to ensure gb_and_summed is correctly sorted by</span>
+    <span class="c1"># index first, instead of y, x coords.</span>
+    <span class="n">columns</span> <span class="o">=</span> <span class="n">_move_item_to_index</span><span class="p">(</span><span class="n">columns</span><span class="p">,</span> <span class="s2">&quot;index&quot;</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
     <span class="n">is_transient</span> <span class="o">=</span> <span class="s2">&quot;time&quot;</span> <span class="ow">in</span> <span class="n">columns</span>
-    <span class="n">gb_and_summed</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">concat</span><span class="p">(</span><span class="n">unique_well_groups</span><span class="p">)</span><span class="o">.</span><span class="n">groupby</span><span class="p">(</span><span class="n">columns</span><span class="p">)</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span>
+    <span class="c1"># Move time to front if present</span>
     <span class="k">if</span> <span class="n">is_transient</span><span class="p">:</span>
+        <span class="n">columns</span> <span class="o">=</span> <span class="n">_move_item_to_index</span><span class="p">(</span><span class="n">columns</span><span class="p">,</span> <span class="s2">&quot;time&quot;</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
         <span class="n">index_names</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;time&quot;</span><span class="p">,</span> <span class="s2">&quot;index&quot;</span><span class="p">]</span>
     <span class="k">else</span><span class="p">:</span>
         <span class="n">index_names</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;index&quot;</span><span class="p">]</span>
+
+    <span class="n">gb_and_summed</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">concat</span><span class="p">(</span><span class="n">unique_well_groups</span><span class="p">)</span><span class="o">.</span><span class="n">groupby</span><span class="p">(</span><span class="n">columns</span><span class="p">)</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span>
     <span class="c1"># Unset multi-index, then set index to index_names</span>
     <span class="n">df_temp</span> <span class="o">=</span> <span class="n">gb_and_summed</span><span class="o">.</span><span class="n">reset_index</span><span class="p">()</span><span class="o">.</span><span class="n">set_index</span><span class="p">(</span><span class="n">index_names</span><span class="p">)</span>
-    <span class="k">return</span> <span class="n">df_temp</span><span class="p">[</span><span class="s2">&quot;rate&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">to_xarray</span><span class="p">()</span>
+    <span class="n">da_rate</span> <span class="o">=</span> <span class="n">df_temp</span><span class="p">[</span><span class="s2">&quot;rate&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">to_xarray</span><span class="p">()</span>
+    <span class="c1"># For safety: if index is still unordered, sort it.</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">da_rate</span><span class="o">.</span><span class="n">indexes</span><span class="p">[</span><span class="s2">&quot;index&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">is_monotonic_increasing</span><span class="p">:</span>
+        <span class="n">da_rate</span> <span class="o">=</span> <span class="n">da_rate</span><span class="o">.</span><span class="n">sortby</span><span class="p">(</span><span class="s2">&quot;index&quot;</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">da_rate</span>
 
 
 <span class="k">def</span><span class="w"> </span><span class="nf">_prepare_well_rates_from_groups</span><span class="p">(</span>
@@ -841,12 +859,12 @@
 
     <span class="k">def</span><span class="w"> </span><span class="nf">to_mf6_pkg</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
-        <span class="n">active</span><span class="p">:</span> <span class="n">GridDataArray</span><span class="p">,</span>
+        <span class="n">idomain</span><span class="p">:</span> <span class="n">GridDataArray</span><span class="p">,</span>
         <span class="n">top</span><span class="p">:</span> <span class="n">GridDataArray</span><span class="p">,</span>
         <span class="n">bottom</span><span class="p">:</span> <span class="n">GridDataArray</span><span class="p">,</span>
         <span class="n">k</span><span class="p">:</span> <span class="n">GridDataArray</span><span class="p">,</span>
         <span class="n">validate</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
-        <span class="n">strict_well_validation</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
+        <span class="n">strict_validation</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Mf6Wel</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Write package to Modflow 6 package.</span>
@@ -865,7 +883,7 @@
 
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
-<span class="sd">        active: {xarry.DataArray, xugrid.UgridDataArray}</span>
+<span class="sd">        idomain: {xarry.DataArray, xugrid.UgridDataArray}</span>
 <span class="sd">            Grid with active cells.</span>
 <span class="sd">        top: {xarry.DataArray, xugrid.UgridDataArray}</span>
 <span class="sd">            Grid with top of model layers.</span>
@@ -875,7 +893,7 @@
 <span class="sd">            Grid with hydraulic conductivities.</span>
 <span class="sd">        validate: bool, default True</span>
 <span class="sd">            Run validation before converting</span>
-<span class="sd">        strict_well_validation: bool, default True</span>
+<span class="sd">        strict_validation: bool, default True</span>
 <span class="sd">            Set well validation strict:</span>
 <span class="sd">            Throw error if well is removed entirely during its assignment to</span>
 <span class="sd">            layers.</span>
@@ -886,13 +904,13 @@
 <span class="sd">            Object with wells as list based input.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">validation_context</span> <span class="o">=</span> <span class="n">ValidationSettings</span><span class="p">(</span>
-            <span class="n">validate</span><span class="o">=</span><span class="n">validate</span><span class="p">,</span> <span class="n">strict_well_validation</span><span class="o">=</span><span class="n">strict_well_validation</span>
+            <span class="n">validate</span><span class="o">=</span><span class="n">validate</span><span class="p">,</span> <span class="n">strict_well_validation</span><span class="o">=</span><span class="n">strict_validation</span>
         <span class="p">)</span>
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_to_mf6_pkg</span><span class="p">(</span><span class="n">active</span><span class="p">,</span> <span class="n">top</span><span class="p">,</span> <span class="n">bottom</span><span class="p">,</span> <span class="n">k</span><span class="p">,</span> <span class="n">validation_context</span><span class="p">)</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_to_mf6_pkg</span><span class="p">(</span><span class="n">idomain</span><span class="p">,</span> <span class="n">top</span><span class="p">,</span> <span class="n">bottom</span><span class="p">,</span> <span class="n">k</span><span class="p">,</span> <span class="n">validation_context</span><span class="p">)</span>
 
     <span class="k">def</span><span class="w"> </span><span class="nf">_to_mf6_pkg</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
-        <span class="n">active</span><span class="p">:</span> <span class="n">GridDataArray</span><span class="p">,</span>
+        <span class="n">idomain</span><span class="p">:</span> <span class="n">GridDataArray</span><span class="p">,</span>
         <span class="n">top</span><span class="p">:</span> <span class="n">GridDataArray</span><span class="p">,</span>
         <span class="n">bottom</span><span class="p">:</span> <span class="n">GridDataArray</span><span class="p">,</span>
         <span class="n">k</span><span class="p">:</span> <span class="n">GridDataArray</span><span class="p">,</span>
@@ -911,7 +929,7 @@
                 <span class="s2">&quot;No wells were assigned in package. None were present.&quot;</span>
             <span class="p">)</span>
 
-        <span class="n">assigned_wells</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_assign_wells_to_layers</span><span class="p">(</span><span class="n">wells_df</span><span class="p">,</span> <span class="n">active</span><span class="p">,</span> <span class="n">top</span><span class="p">,</span> <span class="n">bottom</span><span class="p">,</span> <span class="n">k</span><span class="p">)</span>
+        <span class="n">assigned_wells</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_assign_wells_to_layers</span><span class="p">(</span><span class="n">wells_df</span><span class="p">,</span> <span class="n">idomain</span><span class="p">,</span> <span class="n">top</span><span class="p">,</span> <span class="n">bottom</span><span class="p">,</span> <span class="n">k</span><span class="p">)</span>
         <span class="n">filtered_assigned_well_ids</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_gather_filtered_well_ids</span><span class="p">(</span>
             <span class="n">assigned_wells</span><span class="p">,</span> <span class="n">wells_df</span>
         <span class="p">)</span>
@@ -924,12 +942,12 @@
             <span class="k">raise</span> <span class="n">ValidationError</span><span class="p">(</span><span class="n">message_assign</span><span class="p">)</span>
 
         <span class="n">ds</span> <span class="o">=</span> <span class="n">xr</span><span class="o">.</span><span class="n">Dataset</span><span class="p">()</span>
-        <span class="n">ds</span><span class="p">[</span><span class="s2">&quot;cellid&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_create_cellid</span><span class="p">(</span><span class="n">assigned_wells</span><span class="p">,</span> <span class="n">active</span><span class="p">)</span>
+        <span class="n">ds</span><span class="p">[</span><span class="s2">&quot;cellid&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_create_cellid</span><span class="p">(</span><span class="n">assigned_wells</span><span class="p">,</span> <span class="n">idomain</span><span class="p">)</span>
 
         <span class="n">ds_vars</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_create_dataset_vars</span><span class="p">(</span><span class="n">assigned_wells</span><span class="p">,</span> <span class="n">ds</span><span class="p">[</span><span class="s2">&quot;cellid&quot;</span><span class="p">])</span>
         <span class="n">ds</span> <span class="o">=</span> <span class="n">ds</span><span class="o">.</span><span class="n">assign</span><span class="p">(</span><span class="o">**</span><span class="n">ds_vars</span><span class="o">.</span><span class="n">data_vars</span><span class="p">)</span>  <span class="c1"># type: ignore[arg-type]</span>
 
-        <span class="n">ds</span> <span class="o">=</span> <span class="n">remove_inactive</span><span class="p">(</span><span class="n">ds</span><span class="p">,</span> <span class="n">active</span><span class="p">)</span>
+        <span class="n">ds</span> <span class="o">=</span> <span class="n">remove_inactive</span><span class="p">(</span><span class="n">ds</span><span class="p">,</span> <span class="n">idomain</span><span class="p">)</span>
         <span class="n">ds</span><span class="p">[</span><span class="s2">&quot;save_flows&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="p">[</span><span class="s2">&quot;save_flows&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">values</span><span class="p">[()]</span>
         <span class="n">ds</span><span class="p">[</span><span class="s2">&quot;print_flows&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="p">[</span><span class="s2">&quot;print_flows&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">values</span><span class="p">[()]</span>
         <span class="n">ds</span><span class="p">[</span><span class="s2">&quot;print_input&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="p">[</span><span class="s2">&quot;print_input&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">values</span><span class="p">[()]</span>
@@ -969,7 +987,7 @@
         <span class="k">else</span><span class="p">:</span>
             <span class="n">message</span> <span class="o">+=</span> <span class="s2">&quot; The first 10 unplaced wells are: </span><span class="se">\n</span><span class="s2">&quot;</span>
 
-        <span class="n">is_filtered</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">dataset</span><span class="p">[</span><span class="s2">&quot;id&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">isin</span><span class="p">([</span><span class="n">filtered_wells</span><span class="p">])</span>
+        <span class="n">is_filtered</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">dataset</span><span class="p">[</span><span class="s2">&quot;id&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">compute</span><span class="p">()</span><span class="o">.</span><span class="n">isin</span><span class="p">(</span><span class="n">filtered_wells</span><span class="p">)</span>
         <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">min</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">filtered_wells</span><span class="p">))):</span>
             <span class="n">ids</span> <span class="o">=</span> <span class="n">filtered_wells</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
             <span class="n">x</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">dataset</span><span class="p">[</span><span class="s2">&quot;x&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">data</span><span class="p">[</span><span class="n">is_filtered</span><span class="p">][</span><span class="n">i</span><span class="p">]</span>
@@ -1510,9 +1528,9 @@
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">:</span>
         <span class="c1"># Ensure top, bottom &amp; k</span>
         <span class="c1"># are broadcasted to 3d grid</span>
-        <span class="n">like</span> <span class="o">=</span> <span class="n">ones_like</span><span class="p">(</span><span class="n">active</span><span class="p">)</span>
-        <span class="n">bottom</span> <span class="o">=</span> <span class="n">like</span> <span class="o">*</span> <span class="n">bottom</span>
-        <span class="n">top_2d</span> <span class="o">=</span> <span class="p">(</span><span class="n">like</span> <span class="o">*</span> <span class="n">top</span><span class="p">)</span><span class="o">.</span><span class="n">sel</span><span class="p">(</span><span class="n">layer</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+        <span class="n">like</span> <span class="o">=</span> <span class="n">ones_like</span><span class="p">(</span><span class="n">active</span><span class="o">.</span><span class="n">compute</span><span class="p">())</span>
+        <span class="n">bottom</span> <span class="o">=</span> <span class="n">like</span> <span class="o">*</span> <span class="n">bottom</span><span class="o">.</span><span class="n">compute</span><span class="p">()</span>
+        <span class="n">top_2d</span> <span class="o">=</span> <span class="p">(</span><span class="n">like</span> <span class="o">*</span> <span class="n">top</span><span class="o">.</span><span class="n">compute</span><span class="p">())</span><span class="o">.</span><span class="n">sel</span><span class="p">(</span><span class="n">layer</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
         <span class="n">top_3d</span> <span class="o">=</span> <span class="n">bottom</span><span class="o">.</span><span class="n">shift</span><span class="p">(</span><span class="n">layer</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span><span class="o">.</span><span class="n">fillna</span><span class="p">(</span><span class="n">top_2d</span><span class="p">)</span>
         <span class="n">k</span> <span class="o">=</span> <span class="n">like</span> <span class="o">*</span> <span class="n">k</span>
 

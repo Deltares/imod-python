@@ -25,7 +25,7 @@
       ~River.mask
       ~River.reallocate
       ~River.regrid_like
-      ~River.to_netcdf
+      ~River.to_file
       ~River.write
    
    
@@ -38,5 +38,6 @@
    
       ~River.auxiliary_data_fields
       ~River.dataset
+      ~River.pkg_id
    
    

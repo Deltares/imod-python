@@ -31,5 +31,6 @@
    
       ~GridData.auxiliary_data_fields
       ~GridData.dataset
+      ~GridData.pkg_id
    
    

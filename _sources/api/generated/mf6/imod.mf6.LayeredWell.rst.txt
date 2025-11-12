@@ -24,8 +24,8 @@
       ~LayeredWell.is_empty
       ~LayeredWell.mask
       ~LayeredWell.regrid_like
+      ~LayeredWell.to_file
       ~LayeredWell.to_mf6_pkg
-      ~LayeredWell.to_netcdf
       ~LayeredWell.write
    
    
@@ -38,6 +38,7 @@
    
       ~LayeredWell.auxiliary_data_fields
       ~LayeredWell.dataset
+      ~LayeredWell.pkg_id
       ~LayeredWell.x
       ~LayeredWell.y
    

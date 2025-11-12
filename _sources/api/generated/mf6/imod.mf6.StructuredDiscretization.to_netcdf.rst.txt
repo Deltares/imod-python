@@ -1,6 +1,0 @@
-﻿imod.mf6.StructuredDiscretization.to\_netcdf
-============================================
-
-.. currentmodule:: imod.mf6
-
-.. automethod:: StructuredDiscretization.to_netcdf

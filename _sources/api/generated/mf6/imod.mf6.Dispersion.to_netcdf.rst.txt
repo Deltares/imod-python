@@ -1,6 +1,0 @@
-﻿imod.mf6.Dispersion.to\_netcdf
-==============================
-
-.. currentmodule:: imod.mf6
-
-.. automethod:: Dispersion.to_netcdf

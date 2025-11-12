@@ -87,7 +87,7 @@ Make structured grid
  .. code-block:: none
 
 
-    <matplotlib.image.AxesImage object at 0x0000025739C255B0>
+    <matplotlib.image.AxesImage object at 0x0000019B1F3A8320>
 
 
 
@@ -216,10 +216,10 @@ layer, row and column:
         x           (ncellid) float64 32B 1.502e+05 1.608e+05 1.502e+05 1.608e+05
         y           (ncellid) float64 32B 4.503e+05 4.602e+05 4.503e+05 4.602e+05
     <xarray.DataArray 'rate' (ncellid: 4, time: 2)> Size: 64B
-    array([[0.28073287, 1.40366435],
-           [0.58867207, 1.7660162 ],
-           [0.21926713, 1.09633565],
-           [0.41132793, 1.2339838 ]])
+    array([[0.38313543, 1.91567716],
+           [0.80378237, 2.41134711],
+           [0.11686457, 0.58432284],
+           [0.19621763, 0.58865289]])
     Coordinates:
       * ncellid  (ncellid) int64 32B 0 1 2 3
       * time     (time) datetime64[ns] 16B 2000-01-01 2000-01-03
@@ -391,7 +391,7 @@ set as heads at the boundaries of clipped parts.
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** (1 minutes 5.989 seconds)
+   **Total running time of the script:** (1 minutes 5.791 seconds)
 
 
 .. _sphx_glr_download_user-guide_00-index-examples.py:

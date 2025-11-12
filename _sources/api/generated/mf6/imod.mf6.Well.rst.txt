@@ -23,8 +23,8 @@
       ~Well.is_empty
       ~Well.mask
       ~Well.regrid_like
+      ~Well.to_file
       ~Well.to_mf6_pkg
-      ~Well.to_netcdf
       ~Well.write
    
    
@@ -37,6 +37,7 @@
    
       ~Well.auxiliary_data_fields
       ~Well.dataset
+      ~Well.pkg_id
       ~Well.x
       ~Well.y
    

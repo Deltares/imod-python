@@ -23,8 +23,8 @@
       ~HorizontalFlowBarrierResistance.mask
       ~HorizontalFlowBarrierResistance.regrid_like
       ~HorizontalFlowBarrierResistance.snap_to_grid
+      ~HorizontalFlowBarrierResistance.to_file
       ~HorizontalFlowBarrierResistance.to_mf6_pkg
-      ~HorizontalFlowBarrierResistance.to_netcdf
       ~HorizontalFlowBarrierResistance.write
    
    
@@ -38,5 +38,6 @@
       ~HorizontalFlowBarrierResistance.auxiliary_data_fields
       ~HorizontalFlowBarrierResistance.dataset
       ~HorizontalFlowBarrierResistance.line_data
+      ~HorizontalFlowBarrierResistance.pkg_id
    
    

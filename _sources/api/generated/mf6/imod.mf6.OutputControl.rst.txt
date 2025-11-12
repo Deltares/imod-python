@@ -21,7 +21,7 @@
       ~OutputControl.is_empty
       ~OutputControl.mask
       ~OutputControl.regrid_like
-      ~OutputControl.to_netcdf
+      ~OutputControl.to_file
       ~OutputControl.write
    
    
@@ -35,5 +35,6 @@
       ~OutputControl.auxiliary_data_fields
       ~OutputControl.dataset
       ~OutputControl.is_budget_output
+      ~OutputControl.pkg_id
    
    

@@ -30,5 +30,6 @@
    
       ~VariableOutputControl.auxiliary_data_fields
       ~VariableOutputControl.dataset
+      ~VariableOutputControl.pkg_id
    
    

@@ -30,5 +30,6 @@
    
       ~PrecipitationMapping.auxiliary_data_fields
       ~PrecipitationMapping.dataset
+      ~PrecipitationMapping.pkg_id
    
    

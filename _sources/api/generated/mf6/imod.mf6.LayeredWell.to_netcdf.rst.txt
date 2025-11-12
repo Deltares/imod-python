@@ -1,6 +1,0 @@
-﻿imod.mf6.LayeredWell.to\_netcdf
-===============================
-
-.. currentmodule:: imod.mf6
-
-.. automethod:: LayeredWell.to_netcdf

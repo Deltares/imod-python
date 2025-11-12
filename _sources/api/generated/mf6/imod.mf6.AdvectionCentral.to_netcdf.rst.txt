@@ -1,6 +1,0 @@
-﻿imod.mf6.AdvectionCentral.to\_netcdf
-====================================
-
-.. currentmodule:: imod.mf6
-
-.. automethod:: AdvectionCentral.to_netcdf
