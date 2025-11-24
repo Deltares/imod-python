@@ -7,6 +7,7 @@ import numpy as np
 import pandas as pd
 import scipy.ndimage
 import xarray as xr
+import xugrid as xu
 from numpy.typing import DTypeLike
 
 import imod
@@ -120,7 +121,10 @@ def fill(da: xr.DataArray, dims: Optional[tuple[str, ...]] = None) -> xr.DataArr
 
 def laplace_interpolate(
     source: xr.DataArray,
-    dims: tuple[str, ...] = ("y", "x"),
+    dims: tuple[str, ...] | None = None,
+    neumann_value: xr.DataArray | None = None,
+    robin_coefficient: xr.DataArray | None = None,
+    robin_value: xr.DataArray | None = None,
     direct: bool = False,
     delta: float = 0.0,
     relax: float = 0.97,
@@ -135,12 +139,23 @@ def laplace_interpolate(
     Parameters
     ----------
     source : xr.DataArray of floats
-        Data values to interpolate.
-    dims: sequence of str, default is ``("y", "x")``.
+        Data values to interpolate. Known values are treated as a Dirichlet
+        boundary (fixed value; constant head in MODFLOW).
+    dims: sequence of str, optional
         Dimensions along which to search for nearest neighbors. For example,
         ("y", "x") will perform 2D interpolation in the horizontal plane, while
         ("layer", "y", "x") will perform 3D interpolation including the
-        vertical dimension.
+        vertical dimension. For DataArray, default is ``("y", "x")``; for
+        UgridDatArray, default is the face dimension.
+    neumann_value: xr.DataArray, optional
+        Specifies the right hand side value of a Neumann boundary condition
+        (fixed rate such as well or recharge in MODFLOW).
+    robin_coefficient: xr.DataArray, optional
+        Specifies the multiplication coefficient of a Robin boundary condition
+        (conductance of general head boundary in MODFLOW).
+    robin_value: xr.DataArray, optional
+        Specifies the right hand side value of a Robin boundary condition (head
+        of general head boundary in MODFLOW).
     direct: bool, optional, default ``False``
         Whether to use a direct or an iterative solver or a conjugate gradient
         solver. Direct method provides an exact answer, but are unsuitable
@@ -161,33 +176,91 @@ def laplace_interpolate(
     interpolated : xr.DataArray
         source, with interpolated values.
     """
+    if isinstance(source, xu.UgridDataArray):
+        is_ugrid = True
+        dims = dims or source.ugrid.grid.face_dimension
+    elif isinstance(source, xr.DataArray):
+        is_ugrid = False
+        dims = dims or ("y", "x")
+    else:
+        raise TypeError(
+            "Expected xarray.DataArray or xugrid.UgridDataArray, received "
+            f"instead: {type(source).__name__}"
+        )
+
     missing_dims = set(dims) - set(cast(tuple[str, ...], source.dims))
     if missing_dims:
         raise ValueError(f"Dimensions not in source: {missing_dims}")
     # Ensure order matches the order in source.
     dims = tuple(cast(str, dim) for dim in source.dims if dim in dims)
-    shape = tuple(source.sizes[d] for d in dims)
-    connectivity = laplace._build_connectivity(shape)
+
+    if is_ugrid:
+        shape = tuple(source.sizes[d] for d in dims)
+        connectivity = laplace._broadcast_connectivity(
+            source.ugrid.grid.face_face_connectivity, shape
+        )
+    else:
+        shape = tuple(source.sizes[d] for d in dims)
+        connectivity = laplace._build_connectivity(shape)
+
+    def boundary_helper(a, dims):
+        # Make sure if system is present it's the first dim.
+        # Fill NaN values with zero.
+        a_dims = [cast(str, dim) for dim in a.dims if dim in dims]
+        if "system" in a.dims:
+            a_dims.insert(0, "system")
+            a_T = a.transpose("system", ...)
+        else:
+            a_T = a
+        return a_T.fillna(0.0), a_dims
+
+    # Note that core dimensions are moved to the back by default.
+    args = (source,)
+    input_core_dims = [dims]
+    if neumann_value is not None:
+        args += (neumann_value.fillna(0.0),)
+        input_core_dims.append([d for d in neumann_value.dims if d in dims])
+    # Add a dummy float argument so apply_ufunc keeps working with
+    # these optional arguments.
+    else:
+        args += (0.0,)
+        input_core_dims.append(())
+
+    if robin_coefficient is not None and robin_value is not None:
+        coef_T, coef_dims = boundary_helper(robin_coefficient, dims)
+        value_T, value_dims = boundary_helper(robin_value, dims)
+        args += (coef_T, value_T)
+        input_core_dims.extend((coef_dims, value_dims))
+    else:
+        args += (0.0, 0.0)
+        input_core_dims.extend(((), ()))
+
+    kwargs = {
+        "connectivity": connectivity,
+        "direct": direct,
+        "delta": delta,
+        "relax": relax,
+        "atol": atol,
+        "rtol": rtol,
+        "maxiter": maxiter,
+    }
+
     arr = xr.apply_ufunc(
         laplace._interpolate,
-        source,
-        input_core_dims=[dims],
+        *args,
+        input_core_dims=input_core_dims,
         output_core_dims=[dims],
         output_dtypes=[source.dtype],
         dask="parallelized",
         vectorize=True,
         keep_attrs=True,
-        kwargs={
-            "connectivity": connectivity,
-            "direct": direct,
-            "delta": delta,
-            "relax": relax,
-            "atol": atol,
-            "rtol": rtol,
-            "maxiter": maxiter,
-        },
+        kwargs=kwargs,
     ).transpose(*source.dims)
-    return arr
+
+    if is_ugrid:
+        return xu.UgridDataArray(arr, source.ugrid.grid)
+    else:
+        return arr
 
 
 def rasterize(
