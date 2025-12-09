@@ -657,7 +657,8 @@ class HorizontalFlowBarrierBase(BoundaryCondition, ILineDataPackage):
         """
         barrier_dataset["print_input"] = self.dataset["print_input"]
         barrier_dataset = _prepare_barrier_dataset_for_mf6_adapter(barrier_dataset)
-        return Mf6HorizontalFlowBarrier(**barrier_dataset.data_vars)
+        data_vars_dict = {str(k): v for k, v in barrier_dataset.data_vars.items()}
+        return Mf6HorizontalFlowBarrier(**data_vars_dict)
 
     def _to_mf6_pkg(
         self,

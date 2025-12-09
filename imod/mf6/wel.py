@@ -516,7 +516,8 @@ class GridAgnosticWell(BoundaryCondition, IPointDataPackage, abc.ABC):
         ds["cellid"] = self._create_cellid(assigned_wells, idomain)
 
         ds_vars = self._create_dataset_vars(assigned_wells, ds["cellid"])
-        ds = ds.assign(**ds_vars.data_vars)  # type: ignore[arg-type]
+        data_vars_dict = {str(k): v for k, v in ds_vars.data_vars.items()}
+        ds = ds.assign(**data_vars_dict)  # type: ignore[arg-type]
 
         ds = remove_inactive(ds, idomain)
         ds["save_flows"] = self["save_flows"].values[()]
@@ -533,7 +534,8 @@ class GridAgnosticWell(BoundaryCondition, IPointDataPackage, abc.ABC):
 
         ds = ds.drop_vars("id")
 
-        return Mf6Wel(**ds.data_vars)  # type: ignore[arg-type]
+        data_vars_dict = {str(k): v for k, v in ds_vars.data_vars.items()}
+        return Mf6Wel(**data_vars_dict)  # type: ignore[arg-type]
 
     def _gather_filtered_well_ids(
         self, well_data_filtered: pd.DataFrame | xr.Dataset, well_data: pd.DataFrame
