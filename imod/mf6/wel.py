@@ -534,7 +534,7 @@ class GridAgnosticWell(BoundaryCondition, IPointDataPackage, abc.ABC):
 
         ds = ds.drop_vars("id")
 
-        data_vars_dict = {str(k): v for k, v in ds_vars.data_vars.items()}
+        data_vars_dict = {str(k): v for k, v in ds.data_vars.items()}
         return Mf6Wel(**data_vars_dict)  # type: ignore[arg-type]
 
     def _gather_filtered_well_ids(
