@@ -78,6 +78,6 @@ def merge_hfb_packages(
     barrier_dataset_merged = _prepare_barrier_dataset_for_mf6_adapter(
         barrier_dataset_merged
     )
-    
+
     data_vars_dict = {str(k): v for k, v in barrier_dataset_merged.data_vars.items()}
     return Mf6HorizontalFlowBarrier(**data_vars_dict)
