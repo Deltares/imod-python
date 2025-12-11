@@ -22,8 +22,7 @@ from imod.schemata import (
 from imod.util.spatial import unstack_dim_into_variable
 
 SEGMENT_BOUNDARY_DIMS_SCHEMA = (
-    BOUNDARY_DIMS_SCHEMA
-    | DimsSchema("segment", "time", "layer", "y", "x")
+    DimsSchema("segment", "time", "layer", "y", "x")
     | DimsSchema("segment", "layer", "y", "x")
     | DimsSchema("segment", "time", "layer", "{face_dim}")
     | DimsSchema("segment", "layer", "{face_dim}")
@@ -45,19 +44,17 @@ class Evapotranspiration(BoundaryCondition, IRegridPackage):
     Parameters
     ----------
     surface: array of floats (xr.DataArray)
-        is the elevation of the ET surface (L). A time-series name may be
-        specified.
+        Is the elevation of the ET surface (L).
     rate: array of floats (xr.DataArray)
-        is the maximum ET flux rate (LT −1). A time-series name may be
-        specified.
+        Is the maximum ET flux rate (L/T).
     depth: array of floats (xr.DataArray)
-        is the ET extinction depth (L). A time-series name may be specified.
-    proportion_rate: array of floats (xr.DataArray)
-        is the proportion of the maximum ET flux rate at the bottom of a segment
-        (dimensionless). A time-series name may be specified. (petm)
-    proportion_depth: array of floats (xr.DataArray)
-        is the proportion of the ET extinction depth at the bottom of a segment
-        (dimensionless). A timeseries name may be specified. (pxdp)
+        Is the ET extinction depth (L).
+    proportion_rate: array of floats (xr.DataArray, optional)
+        Is the proportion of the maximum ET flux rate at the bottom of a segment
+        (dimensionless). "petm" in MODFLOW 6. Requires a "segment" dimension. 
+    proportion_depth: array of floats (xr.DataArray, optional)
+        Is the proportion of the ET extinction depth at the bottom of a segment
+        (dimensionless). "pxdp" in MODFLOW 6. Requires a "segment" dimension
     concentration: array of floats (xr.DataArray, optional)
         if this flow package is used in simulations also involving transport, then this array is used
         as the  concentration for inflow over this boundary.
@@ -98,6 +95,31 @@ class Evapotranspiration(BoundaryCondition, IRegridPackage):
         The ``repeat_items`` dimension should have size 2: the first value is
         the "key", the second value is the "value". For the "key" datetime, the
         data of the "value" datetime will be used.
+    
+    Examples
+    --------
+
+    Without ET extinction depth:
+
+    >>> evt = Evapotranspiration(surface=surface, rate=rate, depth=depth)
+
+    With ET extinction depth and segments:
+
+    >>> segments = xr.DataArray(
+    ...     data=[1, 2, 3], coords={"segment": [1, 2, 3]}, dims=("segment",)
+    ... )
+    >>> segments_reversed = segments.copy()
+    >>> segments_reversed.values = [3, 2, 1]
+    >>> proportion_depth = segments * xr.full_like(like, 0.3)
+    >>> proportion_rate = segments_reversed * xr.full_like(like, 0.3)
+
+    >>> evt = Evapotranspiration(
+    ...     surface=surface,
+    ...     rate=rate,
+    ...     depth=depth,
+    ...     proportion_rate=proportion_rate,
+    ...     proportion_depth=proportion_depth,
+    ... )
     """
 
     _pkg_id = "evt"
@@ -168,7 +190,8 @@ class Evapotranspiration(BoundaryCondition, IRegridPackage):
         "concentration": [IdentityNoDataSchema("surface"), AllValueSchema(">=", 0.0)],
     }
 
-    _period_data = ("surface", "rate", "depth", "proportion_depth", "proportion_rate")
+    _period_data = ("surface", "rate", "depth")
+    _optional_data = ("proportion_depth", "proportion_rate")
     _keyword_map = {}
     _template = BoundaryCondition._initialize_template(_pkg_id)
     _auxiliary_data = {"concentration": "species"}
@@ -180,8 +203,8 @@ class Evapotranspiration(BoundaryCondition, IRegridPackage):
         surface,
         rate,
         depth,
-        proportion_rate,
-        proportion_depth,
+        proportion_rate=None,
+        proportion_depth=None,
         concentration=None,
         concentration_boundary_type="auxmixed",
         fixed_cell=False,
@@ -192,10 +215,10 @@ class Evapotranspiration(BoundaryCondition, IRegridPackage):
         validate: bool = True,
         repeat_stress=None,
     ):
-        if ("segment" in proportion_rate.dims) ^ ("segment" in proportion_depth.dims):
+        if (proportion_rate is None) ^ (proportion_depth is None):
             raise ValueError(
-                "Segment must be provided for both proportion_rate and"
-                " proportion_depth, or for none at all."
+                "proportion_rate and proportion_depth must both be provided,"
+                " or neither of them."
             )
         dict_dataset = {
             "surface": surface,
@@ -212,6 +235,10 @@ class Evapotranspiration(BoundaryCondition, IRegridPackage):
             "observations": observations,
             "repeat_stress": repeat_stress,
         }
+        # Remove optional data if None
+        for key in self._optional_data:
+            if dict_dataset[key] is None:
+                del dict_dataset[key]
         super().__init__(dict_dataset)
         self._validate_init_schemata(validate)
 

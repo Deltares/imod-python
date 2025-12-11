@@ -312,6 +312,10 @@ class BoundaryCondition(Package, abc.ABC):
         result = []
         if hasattr(self, "_period_data"):
             result.extend(self._period_data)
+        if hasattr(self, "_optional_data"):
+            for varname in self._optional_data:
+                if varname in self.dataset.data_vars:
+                    result.append(varname)
         if hasattr(self, "_auxiliary_data"):
             result.extend(get_variable_names(self))
 

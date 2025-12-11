@@ -80,7 +80,6 @@ def test_gwfmodel_render(circle_model, tmp_path):
     assert (tmp_path / "GWF_1" / "GWF_1.nam").is_file()
     assert (tmp_path / "GWF_1").is_dir()
 
-
 def test_simulation_write_and_run_evt(circle_model_evt, tmp_path):
     simulation = circle_model_evt
 
@@ -99,6 +98,32 @@ def test_simulation_write_and_run_evt(circle_model_evt, tmp_path):
     assert isinstance(head, xu.UgridDataArray)
     assert head.dims == ("time", "layer", "mesh2d_nFaces")
     assert head.shape == (52, 2, 216)
+
+def test_simulation_write_and_run_evt__no_segments(circle_model_evt, tmp_path):
+    simulation = circle_model_evt
+
+    evt = circle_model_evt["GWF_1"].pop("evt")
+    evt_ds = evt.dataset
+    evt_ds = evt_ds.drop_vars(["proportion_rate", "proportion_depth"])
+    evt_dict = {key: evt_ds[key] for key in evt_ds.keys()}
+    circle_model_evt["GWF_1"]["evt"] = imod.mf6.Evapotranspiration(**evt_dict)
+
+    with pytest.raises(
+        RuntimeError, match="Simulation circle has not been written yet."
+    ):
+        circle_model_evt.run()
+
+    modeldir = tmp_path / "circle_evt"
+    simulation.write(modeldir, binary=False)
+    simulation.run()
+
+    head = imod.mf6.open_hds(
+        modeldir / "GWF_1/GWF_1.hds", modeldir / "GWF_1/disv.disv.grb"
+    )
+    assert isinstance(head, xu.UgridDataArray)
+    assert head.dims == ("time", "layer", "mesh2d_nFaces")
+    assert head.shape == (52, 2, 216)
+
 
 
 def test_gwfmodel_render_evt(circle_model_evt, tmp_path):
