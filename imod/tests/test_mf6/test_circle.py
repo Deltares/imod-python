@@ -89,7 +89,7 @@ def test_simulation_write_and_run_evt(circle_model_evt, tmp_path):
         circle_model_evt.run()
 
     modeldir = tmp_path / "circle_evt"
-    simulation.write(modeldir, binary=False)
+    simulation.write(modeldir, binary=True)
     simulation.run()
 
     head = imod.mf6.open_hds(
@@ -114,7 +114,7 @@ def test_simulation_write_and_run_evt__no_segments(circle_model_evt, tmp_path):
         circle_model_evt.run()
 
     modeldir = tmp_path / "circle_evt"
-    simulation.write(modeldir, binary=False)
+    simulation.write(modeldir, binary=True)
     simulation.run()
 
     head = imod.mf6.open_hds(
