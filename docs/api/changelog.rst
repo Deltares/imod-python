@@ -12,9 +12,9 @@ The format is based on `Keep a Changelog`_, and this project adheres to
 Fixed
 ~~~~~
 
-- Fixed bug where :class:`imod.mf6.Evapotranspiration` package could not be
-  understood as binary for MODFLOW 6 when ``proportion_depth`` and
-  ``proportion_rate`` were provided without segments.
+- Fixed bug where :class:`imod.mf6.Evapotranspiration` package would write files
+  to binary, which could not be parsed by MODFLOW 6 when ``proportion_depth``
+  and ``proportion_rate`` were provided without segments.
 
 Changed
 ~~~~~~~
