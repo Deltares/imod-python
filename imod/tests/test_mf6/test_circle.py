@@ -80,6 +80,7 @@ def test_gwfmodel_render(circle_model, tmp_path):
     assert (tmp_path / "GWF_1" / "GWF_1.nam").is_file()
     assert (tmp_path / "GWF_1").is_dir()
 
+
 def test_simulation_write_and_run_evt(circle_model_evt, tmp_path):
     simulation = circle_model_evt
 
@@ -98,6 +99,7 @@ def test_simulation_write_and_run_evt(circle_model_evt, tmp_path):
     assert isinstance(head, xu.UgridDataArray)
     assert head.dims == ("time", "layer", "mesh2d_nFaces")
     assert head.shape == (52, 2, 216)
+
 
 def test_simulation_write_and_run_evt__no_segments(circle_model_evt, tmp_path):
     simulation = circle_model_evt
@@ -123,7 +125,6 @@ def test_simulation_write_and_run_evt__no_segments(circle_model_evt, tmp_path):
     assert isinstance(head, xu.UgridDataArray)
     assert head.dims == ("time", "layer", "mesh2d_nFaces")
     assert head.shape == (52, 2, 216)
-
 
 
 def test_gwfmodel_render_evt(circle_model_evt, tmp_path):

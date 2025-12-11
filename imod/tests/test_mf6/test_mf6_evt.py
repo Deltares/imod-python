@@ -9,9 +9,7 @@ import imod
 from imod.schemata import ValidationError
 
 
-def test_render_simple(
-    rate_fc, elevation_fc, concentration_fc
-):
+def test_render_simple(rate_fc, elevation_fc, concentration_fc):
     # Arrange
     directory = pathlib.Path("mymodel")
     globaltimes = np.array(
@@ -59,9 +57,7 @@ def test_render_simple(
     assert actual == expected
 
 
-def test_get_options__no_segments(
-    rate_fc, elevation_fc
-):
+def test_get_options__no_segments(rate_fc, elevation_fc):
     """Test with no segments specified, this means there implicitly is 1 segment
     in the Modflow 6 input."""
 
@@ -112,9 +108,7 @@ def test_get_options__with_segments(
     assert options["nseg"] == 4
 
 
-def test_get_bin_ds__no_segments(
-    rate_fc, elevation_fc
-):
+def test_get_bin_ds__no_segments(rate_fc, elevation_fc):
     # Arrange
     evt = imod.mf6.Evapotranspiration(
         surface=elevation_fc,

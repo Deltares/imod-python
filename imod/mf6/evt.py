@@ -51,7 +51,7 @@ class Evapotranspiration(BoundaryCondition, IRegridPackage):
         Is the ET extinction depth (L).
     proportion_rate: array of floats (xr.DataArray, optional)
         Is the proportion of the maximum ET flux rate at the bottom of a segment
-        (dimensionless). "petm" in MODFLOW 6. Requires a "segment" dimension. 
+        (dimensionless). "petm" in MODFLOW 6. Requires a "segment" dimension.
     proportion_depth: array of floats (xr.DataArray, optional)
         Is the proportion of the ET extinction depth at the bottom of a segment
         (dimensionless). "pxdp" in MODFLOW 6. Requires a "segment" dimension
@@ -95,7 +95,7 @@ class Evapotranspiration(BoundaryCondition, IRegridPackage):
         The ``repeat_items`` dimension should have size 2: the first value is
         the "key", the second value is the "value". For the "key" datetime, the
         data of the "value" datetime will be used.
-    
+
     Examples
     --------
 
