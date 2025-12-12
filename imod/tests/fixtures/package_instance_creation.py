@@ -151,6 +151,10 @@ def create_instance_boundary_condition_packages(is_unstructured):
     """
     creates instances of those modflow packages that are boundary conditions.
     """
+    segments = xr.DataArray(
+        data=[1, 1, 1], coords={"segment": [1, 2, 3]}, dims=("segment",)
+    )
+    segment_data = segments * get_grid_da(is_unstructured, np.float64, 0.2)
     return [
         imod.mf6.ConstantConcentration(
             get_grid_da(is_unstructured, np.float32, 2),
@@ -172,8 +176,8 @@ def create_instance_boundary_condition_packages(is_unstructured):
             surface=get_grid_da(is_unstructured, np.float64, 3),
             rate=get_grid_da(is_unstructured, np.float64, 2),
             depth=get_grid_da(is_unstructured, np.float64, 1),
-            proportion_rate=get_grid_da(is_unstructured, np.float64, 0.2),
-            proportion_depth=get_grid_da(is_unstructured, np.float64, 0.2),
+            proportion_rate=segment_data,
+            proportion_depth=segment_data,
             fixed_cell=True,
         ),
         imod.mf6.GeneralHeadBoundary(

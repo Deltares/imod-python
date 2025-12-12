@@ -238,7 +238,7 @@ def make_circle_model_evt():
     return simulation
 
 
-@pytest.fixture(scope="session")
+@pytest.fixture(scope="function")
 def circle_model_evt():
     return make_circle_model_evt()
 

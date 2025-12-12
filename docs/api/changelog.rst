@@ -6,6 +6,25 @@ All notable changes to this project will be documented in this file.
 The format is based on `Keep a Changelog`_, and this project adheres to
 `Semantic Versioning`_.
 
+[Unreleased]
+------------
+
+Fixed
+~~~~~
+
+- Fixed bug where :class:`imod.mf6.Evapotranspiration` package would write files
+  to binary, which could not be parsed by MODFLOW 6 when ``proportion_depth``
+  and ``proportion_rate`` were provided without segments.
+
+Changed
+~~~~~~~
+
+- ``proportion_depth`` and ``proportion_rate`` in
+  :class:`imod.mf6.Evapotranspiration` are now optional variables. If provided,
+  now require ``"segment"`` dimension when ``proportion_depth`` and
+  ``proportion_rate``. 
+
+
 [1.0.0] - 2025-11-11
 --------------------
 
