@@ -108,7 +108,53 @@ def test_get_options__with_segments(
     assert options["nseg"] == 4
 
 
-def test_get_bin_ds__no_segments(rate_fc, elevation_fc):
+def test_init__error_no_segment_dim(
+    rate_fc, elevation_fc, proportion_rate_fc, proportion_depth_fc
+):
+    """Test without segment dimension in proportion arrays, should raise ValidationError.
+    Proportion array fixtures miss a segmnent dimension"""
+
+    with pytest.raises(ValidationError, match="segment"):
+        imod.mf6.Evapotranspiration(
+            surface=elevation_fc,
+            rate=rate_fc,
+            depth=elevation_fc,
+            proportion_rate=proportion_rate_fc,
+            proportion_depth=proportion_depth_fc,
+        )
+
+
+def test_init__error_only_one_proportion_var(
+    rate_fc, elevation_fc, proportion_rate_fc, proportion_depth_fc
+):
+    """Test with only one proportion variable, should raise ValueError."""
+
+    with pytest.raises(
+        ValueError,
+        match="Both 'proportion_rate' and 'proportion_depth' must both be provided",
+    ):
+        imod.mf6.Evapotranspiration(
+            surface=elevation_fc,
+            rate=rate_fc,
+            depth=elevation_fc,
+            proportion_rate=proportion_rate_fc,
+            proportion_depth=None,
+        )
+
+    with pytest.raises(
+        ValueError,
+        match="Both 'proportion_rate' and 'proportion_depth' must both be provided",
+    ):
+        imod.mf6.Evapotranspiration(
+            surface=elevation_fc,
+            rate=rate_fc,
+            depth=elevation_fc,
+            proportion_rate=None,
+            proportion_depth=proportion_depth_fc,
+        )
+
+
+def test_get_bin_ds__no_proportion_vars(rate_fc, elevation_fc):
     # Arrange
     evt = imod.mf6.Evapotranspiration(
         surface=elevation_fc,
@@ -133,7 +179,7 @@ def test_get_bin_ds__no_segments(rate_fc, elevation_fc):
     assert list(bin_ds.keys()) == expected_variables
 
 
-def test_get_bin_ds__with_segments(
+def test_get_bin_ds__with_proportion_vars(
     rate_fc, elevation_fc, proportion_rate_fc, proportion_depth_fc
 ):
     # Arrange

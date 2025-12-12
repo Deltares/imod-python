@@ -217,7 +217,7 @@ class Evapotranspiration(BoundaryCondition, IRegridPackage):
     ):
         if (proportion_rate is None) ^ (proportion_depth is None):
             raise ValueError(
-                "proportion_rate and proportion_depth must both be provided,"
+                "Both 'proportion_rate' and 'proportion_depth' must both be provided,"
                 " or neither of them."
             )
         dict_dataset = {
