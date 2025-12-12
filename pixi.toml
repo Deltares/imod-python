@@ -164,20 +164,13 @@ test_import = { cmd = [
 ], depends-on = ["install_with_deps"]}
 install_with_deps = "python -m pip install --editable ."
 
-
-[target.win-64.dependencies]
-7zip = "*"
-
-[target.linux-64.dependencies]
-p7zip = "*"
-
 [feature.user-acceptance.dependencies]
 dvc = "*"
 dvc-s3 = "*"
 
 [feature.user-acceptance.tasks]
 pull_data = "dvc pull --remote minio"
-fetch_lhm = {cmd = "7z x LHM_transient.zip -o. -y", depends-on = ["pull_data"], cwd = "imod/tests/user_acceptance_data"}
+fetch_lhm = {cmd = "tar -xf LHM_transient.zip", depends-on = ["pull_data"], cwd = "imod/tests/user_acceptance_data"}
 user_acceptance = { cmd = [
     "pytest",
     "-m", "user_acceptance",
