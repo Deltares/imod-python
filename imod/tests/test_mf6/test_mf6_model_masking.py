@@ -293,7 +293,9 @@ def test_mask_structured(
         mask.values[*cell] = inactivity_marker
 
     # Act
-    structured_flow_model.mask_all_packages(mask, ignore_time_purge_empty=ignore_time_purge_empty)
+    structured_flow_model.mask_all_packages(
+        mask, ignore_time_purge_empty=ignore_time_purge_empty
+    )
 
     # Assert
     unique, counts = np.unique(

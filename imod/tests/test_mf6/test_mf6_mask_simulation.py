@@ -8,6 +8,7 @@ import xarray as xr
 import imod
 from imod.tests.fixtures.mf6_modelrun_fixture import assert_simulation_can_run
 
+
 @pytest.mark.parametrize("ignore_time", [True, False])
 def test_mask_simulation(
     tmp_path: Path,
