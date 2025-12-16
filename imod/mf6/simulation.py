@@ -1202,6 +1202,7 @@ class Modflow6Simulation(collections.UserDict, ISimulation):
         y_min: Optional[float] = None,
         y_max: Optional[float] = None,
         states_for_boundary: Optional[dict[str, GridDataArray]] = None,
+        ignore_time_purge_empty: Optional[bool] = None,
     ) -> Modflow6Simulation:
         """
         Clip a simulation by a bounding box (time, layer, y, x).
@@ -1233,6 +1234,11 @@ class Modflow6Simulation(collections.UserDict, ISimulation):
             :class:`imod.mf6.ConstantHead`,
             :class:`imod.mf6.GroundwaterTransportModel` will get a
             :class:`imod.mf6.ConstantConcentration` package.
+        ignore_time_purge_empty: bool, default None
+            If True, only the first timestep is validated. This increases
+            performance for packages with a time dimensions over which changes
+            of cell activity are not expected. If None, the value of the
+            validation context is of the simulation is used.
 
         Returns
         -------
@@ -1276,6 +1282,8 @@ class Modflow6Simulation(collections.UserDict, ISimulation):
             raise ValueError(
                 "Unable to clip simulation. Clipping can only be done on simulations that have a single flow model ."
             )
+        if ignore_time_purge_empty is None:
+            ignore_time_purge_empty = self._validation_context.ignore_time
         for model_name, model in self.get_models().items():
             supported, error_with_object = model._is_clipping_supported()
             if not supported:
@@ -1301,6 +1309,7 @@ class Modflow6Simulation(collections.UserDict, ISimulation):
                     y_min=y_min,
                     y_max=y_max,
                     state_for_boundary=state_for_boundary,
+                    ignore_time_purge_empty=ignore_time_purge_empty,
                 )
             elif isinstance(value, Package):
                 clipped[key] = value.clip_box(
@@ -1688,6 +1697,7 @@ class Modflow6Simulation(collections.UserDict, ISimulation):
     def mask_all_models(
         self,
         mask: GridDataArray,
+        ignore_time_purge_empty: Optional[bool] = None,
     ) -> None:
         """
         This function applies a mask to all models in a simulation, provided they use
@@ -1713,7 +1723,9 @@ class Modflow6Simulation(collections.UserDict, ISimulation):
         mask should be an idomain-like array, i.e. it should have the same shape
         as the model and contain integer values.
         """
-        _mask_all_models(self, mask)
+        if ignore_time_purge_empty is None:
+            ignore_time_purge_empty = self._validation_context.ignore_time
+        _mask_all_models(self, mask, ignore_time_purge_empty)
 
     @classmethod
     @standard_log_decorator()

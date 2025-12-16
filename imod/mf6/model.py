@@ -697,6 +697,7 @@ class Modflow6Model(collections.UserDict, IModel, abc.ABC):
         y_min: Optional[float] = None,
         y_max: Optional[float] = None,
         state_for_boundary: Optional[GridDataArray] = None,
+        ignore_time_purge_empty: bool = False,
     ):
         """
         Clip a model by a bounding box (time, layer, y, x).
@@ -724,6 +725,9 @@ class Modflow6Model(collections.UserDict, IModel, abc.ABC):
         state_for_boundary : optional, Union[xr.DataArray, xu.UgridDataArray]
             A grids with states that are used to put as boundary values. This
             model will get a :class:`imod.mf6.ConstantHead`.
+        ignore_time_purge_empty : bool, default False
+            Whether to ignore time dimension when purging empty packages. Can
+            improve performance when clipping models with many time steps.
 
         Returns
         -------
@@ -786,7 +790,7 @@ class Modflow6Model(collections.UserDict, IModel, abc.ABC):
         if clipped_boundary_condition is not None:
             clipped[pkg_name] = clipped_boundary_condition
 
-        clipped.purge_empty_packages()
+        clipped.purge_empty_packages(ignore_time=ignore_time_purge_empty)
 
         return clipped
 
@@ -882,6 +886,7 @@ class Modflow6Model(collections.UserDict, IModel, abc.ABC):
     def mask_all_packages(
         self,
         mask: GridDataArray,
+        ignore_time_purge_empty: bool = False,
     ):
         """
         This function applies a mask to all packages in a model. The mask must
@@ -898,9 +903,12 @@ class Modflow6Model(collections.UserDict, IModel, abc.ABC):
         mask: xr.DataArray, xu.UgridDataArray of ints
             idomain-like integer array. >0 sets cells to active, 0 sets cells to inactive,
             <0 sets cells to vertical passthrough
+        ignore_time_purge_empty: bool, default False
+            Whether to ignore time dimension when purging empty packages. Can
+            improve performance when masking models with many time steps.
         """
 
-        _mask_all_packages(self, mask)
+        _mask_all_packages(self, mask, ignore_time_purge_empty)
 
     def purge_empty_packages(
         self, model_name: Optional[str] = "", ignore_time: bool = False
