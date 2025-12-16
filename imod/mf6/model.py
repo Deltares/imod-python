@@ -22,7 +22,7 @@ from imod.common.interfaces.imodel import IModel
 from imod.common.serializer import EngineType
 from imod.common.statusinfo import NestedStatusInfo, StatusInfo, StatusInfoBase
 from imod.common.utilities.clip import clip_box_dataset
-from imod.common.utilities.mask import _mask_all_packages
+from imod.common.utilities.mask import mask_all_packages
 from imod.common.utilities.regrid import _regrid_like
 from imod.common.utilities.schemata import (
     concatenate_schemata_dicts,
@@ -908,7 +908,7 @@ class Modflow6Model(collections.UserDict, IModel, abc.ABC):
             improve performance when masking models with many time steps.
         """
 
-        _mask_all_packages(self, mask, ignore_time_purge_empty)
+        mask_all_packages(self, mask, ignore_time_purge_empty)
 
     def purge_empty_packages(
         self, model_name: Optional[str] = "", ignore_time: bool = False

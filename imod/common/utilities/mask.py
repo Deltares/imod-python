@@ -37,7 +37,7 @@ def _validate_coords_mask(mask: GridDataArray) -> None:
         )
 
 
-def _mask_all_models(
+def mask_all_models(
     simulation: ISimulation,
     mask: GridDataArray,
     ignore_time_purge_empty: bool = False,
@@ -62,7 +62,7 @@ def _mask_all_models(
             )
 
 
-def _mask_all_packages(
+def mask_all_packages(
     model: IModel,
     mask: GridDataArray,
     ignore_time_purge_empty: bool = False,
