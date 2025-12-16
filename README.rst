@@ -1,4 +1,5 @@
-[![Build status](https://dpcbuild.deltares.nl/guestAuth/app/rest/builds/buildType:(id:iMOD6_IMODPython_Windows_Tests)/statusIcon](https://github.com/Deltares/imod-python/commits/master/)
+.. image:: https://dpcbuild.deltares.nl/guestAuth/app/rest/builds/buildType:(id:iMOD6_IMODPython_Windows_Tests)/statusIcon.svg
+   :target: https://github.com/Deltares/imod-python/commits/master/
 .. image:: https://img.shields.io/pypi/l/imod
    :target: https://choosealicense.com/licenses/mit/
 .. image:: https://img.shields.io/conda/vn/conda-forge/imod.svg
