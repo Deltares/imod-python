@@ -9,6 +9,15 @@ The format is based on `Keep a Changelog`_, and this project adheres to
 [Unreleased]
 ------------
 
+Added
+~~~~~
+
+- Added ``ignore_time_purge_empty`` argument to
+  :meth:`imod.mf6.Modflow6Simulation.mask_all_models` and
+  :meth:`imod.mf6.Modflow6Simulation.clip_box` to consider a package empty if
+  its first times step is all nodata. This can save a lot of clipping or masking
+  transient models with many timesteps.
+
 Fixed
 ~~~~~
 
