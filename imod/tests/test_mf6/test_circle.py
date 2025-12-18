@@ -246,6 +246,49 @@ def test_simulation_clip_and_state_at_boundary(circle_model_transport, tmp_path)
     assert concentration_half.shape == (52, 2, 108)
 
 
+def test_simulation_clip_and_state_at_boundary__transient_chd(circle_model_transport, tmp_path):
+    # Arrange
+    simulation = circle_model_transport
+    idomain = simulation["GWF_1"]["disv"]["idomain"].compute()
+    time = simulation["time_discretization"].dataset.coords["time"]
+
+    simulation["GWF_1"]["chd"].dataset["head"] = simulation["GWF_1"]["chd"].dataset["head"].expand_dims(time=time.values)
+
+    simulation.write(tmp_path / "full")
+    simulation.run()
+    head = simulation.open_head().compute().reindex_like(idomain)
+    concentration = simulation.open_concentration().compute().reindex_like(idomain)
+
+    states_for_boundary = {
+        "GWF_1": head.isel(time=-1, drop=True),
+        "transport": concentration.isel(time=-1, drop=True),
+    }
+    # Act
+    half_simulation = simulation.clip_box(
+        x_max=0.1, states_for_boundary=states_for_boundary
+    )
+    # Assert
+    # Test if model dims halved
+    idomain_half = half_simulation["GWF_1"]["disv"]["idomain"]
+    dim = idomain_half.grid.face_dimension
+    np.testing.assert_array_equal(idomain_half.sizes[dim] / idomain.sizes[dim], 0.5)
+    assert (
+        half_simulation["transport"]["cnc_clipped"]["concentration"].notnull().sum()
+        == 20
+    )
+    assert half_simulation["GWF_1"]["chd_clipped"]["head"].notnull().sum() == 20
+    # Test if model runs
+    half_simulation.write(tmp_path / "half")
+    half_simulation.run()
+    # Test if the clipped model output has the correct dimension
+    head_half = half_simulation.open_head().compute().reindex_like(idomain_half)
+    concentration_half = (
+        half_simulation.open_concentration().compute().reindex_like(idomain_half)
+    )
+    assert head_half.shape == (52, 2, 108)
+    assert concentration_half.shape == (52, 2, 108)
+
+
 def test_simulation_clip_and_state_at_boundary__from_file(
     circle_model_transport, tmp_path
 ):
@@ -258,8 +301,6 @@ def test_simulation_clip_and_state_at_boundary__from_file(
     simulation_split = simulation.split(partition_labels)
     simulation_split.write(tmp_path / "full")
     simulation_split.run()
-    head = simulation_split.open_head().reindex_like(idomain)
-    concentration = simulation_split.open_concentration().reindex_like(idomain)
 
     simulation.dump(tmp_path / "dumped")
     simulated_from_dump = imod.mf6.Modflow6Simulation.from_file(
@@ -294,7 +335,7 @@ def test_simulation_clip_and_state_at_boundary__from_file(
 
     states_for_boundary = {
         "GWF_1": head["head"].isel(time=-1, drop=True),
-        "transport": concentration["concentration"].isel(time=-1, drop=True),
+        "transport": conc["concentration"].isel(time=-1, drop=True),
     }
     # Act
     half_simulation = simulated_from_dump.clip_box(
