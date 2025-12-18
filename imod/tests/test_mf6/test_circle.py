@@ -245,19 +245,19 @@ def test_simulation_clip_and_state_at_boundary(circle_model_transport, tmp_path)
     assert head_half.shape == (52, 2, 108)
     assert concentration_half.shape == (52, 2, 108)
 
-
-def test_simulation_clip_and_state_at_boundary__transient_chd(circle_model_transport, tmp_path):
+def test_simulation_clip_and_constant_state_at_boundary__transient_chd(circle_model_transport, tmp_path):
     # Arrange
     simulation = circle_model_transport
     idomain = simulation["GWF_1"]["disv"]["idomain"].compute()
-    time = simulation["time_discretization"].dataset.coords["time"]
+    time = simulation["time_discretization"].dataset.coords["time"].values
 
-    simulation["GWF_1"]["chd"].dataset["head"] = simulation["GWF_1"]["chd"].dataset["head"].expand_dims(time=time.values)
+    simulation["GWF_1"]["chd"].dataset["head"] = simulation["GWF_1"]["chd"].dataset["head"].expand_dims(time=time)
 
     simulation.write(tmp_path / "full")
     simulation.run()
-    head = simulation.open_head().compute().reindex_like(idomain)
-    concentration = simulation.open_concentration().compute().reindex_like(idomain)
+    # 
+    head = simulation.open_head(simulation_start_time=time[0]).compute().reindex_like(idomain)
+    concentration = simulation.open_concentration(simulation_start_time=time[0]).compute().reindex_like(idomain)
 
     states_for_boundary = {
         "GWF_1": head.isel(time=-1, drop=True),
@@ -276,7 +276,7 @@ def test_simulation_clip_and_state_at_boundary__transient_chd(circle_model_trans
         half_simulation["transport"]["cnc_clipped"]["concentration"].notnull().sum()
         == 20
     )
-    assert half_simulation["GWF_1"]["chd_clipped"]["head"].notnull().sum() == 20
+    assert half_simulation["GWF_1"]["chd_clipped"]["head"].notnull().sum() == 20 * 52
     # Test if model runs
     half_simulation.write(tmp_path / "half")
     half_simulation.run()
@@ -289,56 +289,26 @@ def test_simulation_clip_and_state_at_boundary__transient_chd(circle_model_trans
     assert concentration_half.shape == (52, 2, 108)
 
 
-def test_simulation_clip_and_state_at_boundary__from_file(
-    circle_model_transport, tmp_path
-):
+def test_simulation_clip_and_transient_state_at_boundary__transient_chd(circle_model_transport, tmp_path):
     # Arrange
     simulation = circle_model_transport
-    idomain = simulation["GWF_1"]["disv"]["idomain"]
+    idomain = simulation["GWF_1"]["disv"]["idomain"].compute()
+    time = simulation["time_discretization"].dataset.coords["time"].values
 
-    partition_labels = create_partition_labels(idomain, npartitions=2)
+    simulation["GWF_1"]["chd"].dataset["head"] = simulation["GWF_1"]["chd"].dataset["head"].expand_dims(time=time)
 
-    simulation_split = simulation.split(partition_labels)
-    simulation_split.write(tmp_path / "full")
-    simulation_split.run()
-
-    simulation.dump(tmp_path / "dumped")
-    simulated_from_dump = imod.mf6.Modflow6Simulation.from_file(
-        tmp_path / "dumped" / "circle.toml"
-    )
-
-    paths_head = (tmp_path / "full").glob("**/*.hds")
-    paths_conc = (tmp_path / "full").glob("**/*.ucn")
-    paths_grb = (tmp_path / "full").glob("**/disv.disv.grb")
-
-    heads = []
-    concs = []
-    tstart = simulation["time_discretization"]["time"].isel(time=0).values
-    for path_head, path_conc, path_grb in zip(paths_head, paths_conc, paths_grb):
-        head_part = imod.mf6.open_hds(
-            path_head,
-            path_grb,
-            simulation_start_time=tstart,
-        )
-        heads.append(head_part)
-        conc_part = imod.mf6.open_conc(
-            path_conc,
-            path_grb,
-            simulation_start_time=tstart,
-        )
-        concs.append(conc_part)
-
-    head = xu.merge_partitions(heads)
-    conc = xu.merge_partitions(concs)
-    head = head.reindex_like(idomain)
-    conc = conc.reindex_like(idomain)
+    simulation.write(tmp_path / "full")
+    simulation.run()
+    # 
+    head = simulation.open_head(simulation_start_time=time[0]).compute().reindex_like(idomain)
+    concentration = simulation.open_concentration(simulation_start_time=time[0]).compute().reindex_like(idomain)
 
     states_for_boundary = {
-        "GWF_1": head["head"].isel(time=-1, drop=True),
-        "transport": conc["concentration"].isel(time=-1, drop=True),
+        "GWF_1": head.isel(time=slice(12, None)),
+        "transport": concentration.isel(time=slice(12, None)),
     }
     # Act
-    half_simulation = simulated_from_dump.clip_box(
+    half_simulation = simulation.clip_box(
         x_max=0.1, states_for_boundary=states_for_boundary
     )
     # Assert
@@ -346,15 +316,14 @@ def test_simulation_clip_and_state_at_boundary__from_file(
     idomain_half = half_simulation["GWF_1"]["disv"]["idomain"]
     dim = idomain_half.grid.face_dimension
     np.testing.assert_array_equal(idomain_half.sizes[dim] / idomain.sizes[dim], 0.5)
-    n_conc = (
-        half_simulation["transport"]["cnc_clipped"]["concentration"]
-        .notnull()
-        .sum()
-        .compute()
+    # Conc data for 40 time steps (from 12 to 52)
+    assert (
+        half_simulation["transport"]["cnc_clipped"]["concentration"].notnull().sum()
+        == 20 * 40
     )
-    n_head = half_simulation["GWF_1"]["chd_clipped"]["head"].notnull().sum().compute()
-    assert n_conc == 24
-    assert n_head == 20
+    # Head data for 39 time steps (from 12 to 51) as the last time step of
+    # results is not present in the chd package already present in the model.
+    assert half_simulation["GWF_1"]["chd_clipped"]["head"].notnull().sum() == 20 * 39
     # Test if model runs
     half_simulation.write(tmp_path / "half")
     half_simulation.run()
@@ -365,3 +334,4 @@ def test_simulation_clip_and_state_at_boundary__from_file(
     )
     assert head_half.shape == (52, 2, 108)
     assert concentration_half.shape == (52, 2, 108)
+
