@@ -3,6 +3,7 @@ from typing import TypeAlias
 from imod.mf6 import ConstantConcentration, ConstantHead
 from imod.select.grid import active_grid_boundary_xy
 from imod.typing import GridDataArray
+from imod.util.dims import enforced_dim_order
 
 StateType: TypeAlias = ConstantHead | ConstantConcentration
 StateClassType: TypeAlias = type[ConstantHead] | type[ConstantConcentration]
@@ -23,6 +24,19 @@ def _find_unassigned_grid_boundaries(
 
     return unassigned_grid_boundaries
 
+
+@enforced_dim_order
+def _create_clipped_boundary_state(
+    idomain: GridDataArray,
+    state_for_clipped_boundary: GridDataArray,
+    original_constant_head_boundaries: list[StateType],
+):
+    """"Helper function to make sure dimension order is enforced"""
+    active_grid_boundary = active_grid_boundary_xy(idomain > 0)
+    unassigned_grid_boundaries = _find_unassigned_grid_boundaries(
+        active_grid_boundary, original_constant_head_boundaries
+    )
+    return state_for_clipped_boundary.where(unassigned_grid_boundaries)
 
 def create_clipped_boundary(
     idomain: GridDataArray,
@@ -52,10 +66,10 @@ def create_clipped_boundary(
         packages
 
     """
-    active_grid_boundary = active_grid_boundary_xy(idomain > 0)
-    unassigned_grid_boundaries = _find_unassigned_grid_boundaries(
-        active_grid_boundary, original_constant_head_boundaries
+    constant_state = _create_clipped_boundary_state(
+        idomain,
+        state_for_clipped_boundary,
+        original_constant_head_boundaries,
     )
-    constant_state = state_for_clipped_boundary.where(unassigned_grid_boundaries)
 
     return pkg_type(constant_state, print_input=True, print_flows=True, save_flows=True)
