@@ -310,7 +310,7 @@ def test_simulation_clip_and_transient_state_at_boundary__transient_chd(
     time = simulation["time_discretization"].dataset.coords["time"].values
 
     simulation["GWF_1"]["chd"].dataset["head"] = (
-        simulation["GWF_1"]["chd"].dataset["head"].expand_dims(time=time)
+        simulation["GWF_1"]["chd"].dataset["head"].expand_dims(time=time[:5])
     )
 
     simulation.write(tmp_path / "full")
@@ -328,8 +328,8 @@ def test_simulation_clip_and_transient_state_at_boundary__transient_chd(
     )
 
     states_for_boundary = {
-        "GWF_1": head.isel(time=slice(12, None)),
-        "transport": concentration.isel(time=slice(12, None)),
+        "GWF_1": head.isel(time=slice(11, -11)),
+        "transport": concentration.isel(time=slice(11, -11)),
     }
     # Act
     half_simulation = simulation.clip_box(
@@ -340,14 +340,14 @@ def test_simulation_clip_and_transient_state_at_boundary__transient_chd(
     idomain_half = half_simulation["GWF_1"]["disv"]["idomain"]
     dim = idomain_half.grid.face_dimension
     np.testing.assert_array_equal(idomain_half.sizes[dim] / idomain.sizes[dim], 0.5)
-    # Conc data for 40 time steps (from 12 to 52)
-    assert (
-        half_simulation["transport"]["cnc_clipped"]["concentration"].notnull().sum()
-        == 20 * 40
-    )
-    # Head data for 39 time steps (from 12 to 51) as the last time step of
-    # results is not present in the chd package already present in the model.
-    assert half_simulation["GWF_1"]["chd_clipped"]["head"].notnull().sum() == 20 * 39
+    # Transport data for just 30 time steps (from 12 up to 41)
+    conc_clipped = half_simulation["transport"]["cnc_clipped"]["concentration"]
+    assert conc_clipped.sizes["time"] == 30
+    assert conc_clipped.notnull().sum() == 20 * 30
+    # Head data for chd for just 30 time steps (from 12 up to 41)
+    head_clipped = half_simulation["GWF_1"]["chd_clipped"]["head"]
+    assert head_clipped.sizes["time"] == 30
+    assert head_clipped.notnull().sum() == 20 * 30
     # Test if model runs
     half_simulation.write(tmp_path / "half")
     half_simulation.run()
