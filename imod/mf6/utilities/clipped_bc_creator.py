@@ -30,7 +30,7 @@ def _find_unassigned_grid_boundaries(
 def _align_time_indexes_boundaries(
     state_for_clipped_boundary: GridDataArray,
     unassigned_grid_boundaries: GridDataArray,
-) -> Tuple[GridDataArray, GridDataArray]:
+) -> Optional[GridDataArray]:
     """
     Create an outer time index for aligning boundaries. Furthermore deal with
     cases where one or both boundaries don't have a time dimension. In a graphic
