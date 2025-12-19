@@ -31,12 +31,13 @@ def _create_clipped_boundary_state(
     state_for_clipped_boundary: GridDataArray,
     original_constant_head_boundaries: list[StateType],
 ):
-    """"Helper function to make sure dimension order is enforced"""
+    """ "Helper function to make sure dimension order is enforced"""
     active_grid_boundary = active_grid_boundary_xy(idomain > 0)
     unassigned_grid_boundaries = _find_unassigned_grid_boundaries(
         active_grid_boundary, original_constant_head_boundaries
     )
     return state_for_clipped_boundary.where(unassigned_grid_boundaries)
+
 
 def create_clipped_boundary(
     idomain: GridDataArray,

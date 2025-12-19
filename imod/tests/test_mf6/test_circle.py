@@ -10,7 +10,6 @@ import imod
 from imod.logging import LoggerType, LogLevel
 from imod.mf6.validation_settings import ValidationSettings
 from imod.mf6.write_context import WriteContext
-from imod.prepare.partition import create_partition_labels
 
 
 def test_simulation_write_and_run(circle_model, tmp_path):
@@ -245,19 +244,32 @@ def test_simulation_clip_and_state_at_boundary(circle_model_transport, tmp_path)
     assert head_half.shape == (52, 2, 108)
     assert concentration_half.shape == (52, 2, 108)
 
-def test_simulation_clip_and_constant_state_at_boundary__transient_chd(circle_model_transport, tmp_path):
+
+def test_simulation_clip_and_constant_state_at_boundary__transient_chd(
+    circle_model_transport, tmp_path
+):
     # Arrange
     simulation = circle_model_transport
     idomain = simulation["GWF_1"]["disv"]["idomain"].compute()
     time = simulation["time_discretization"].dataset.coords["time"].values
 
-    simulation["GWF_1"]["chd"].dataset["head"] = simulation["GWF_1"]["chd"].dataset["head"].expand_dims(time=time)
+    simulation["GWF_1"]["chd"].dataset["head"] = (
+        simulation["GWF_1"]["chd"].dataset["head"].expand_dims(time=time)
+    )
 
     simulation.write(tmp_path / "full")
     simulation.run()
-    # 
-    head = simulation.open_head(simulation_start_time=time[0]).compute().reindex_like(idomain)
-    concentration = simulation.open_concentration(simulation_start_time=time[0]).compute().reindex_like(idomain)
+    #
+    head = (
+        simulation.open_head(simulation_start_time=time[0])
+        .compute()
+        .reindex_like(idomain)
+    )
+    concentration = (
+        simulation.open_concentration(simulation_start_time=time[0])
+        .compute()
+        .reindex_like(idomain)
+    )
 
     states_for_boundary = {
         "GWF_1": head.isel(time=-1, drop=True),
@@ -289,19 +301,31 @@ def test_simulation_clip_and_constant_state_at_boundary__transient_chd(circle_mo
     assert concentration_half.shape == (52, 2, 108)
 
 
-def test_simulation_clip_and_transient_state_at_boundary__transient_chd(circle_model_transport, tmp_path):
+def test_simulation_clip_and_transient_state_at_boundary__transient_chd(
+    circle_model_transport, tmp_path
+):
     # Arrange
     simulation = circle_model_transport
     idomain = simulation["GWF_1"]["disv"]["idomain"].compute()
     time = simulation["time_discretization"].dataset.coords["time"].values
 
-    simulation["GWF_1"]["chd"].dataset["head"] = simulation["GWF_1"]["chd"].dataset["head"].expand_dims(time=time)
+    simulation["GWF_1"]["chd"].dataset["head"] = (
+        simulation["GWF_1"]["chd"].dataset["head"].expand_dims(time=time)
+    )
 
     simulation.write(tmp_path / "full")
     simulation.run()
-    # 
-    head = simulation.open_head(simulation_start_time=time[0]).compute().reindex_like(idomain)
-    concentration = simulation.open_concentration(simulation_start_time=time[0]).compute().reindex_like(idomain)
+    #
+    head = (
+        simulation.open_head(simulation_start_time=time[0])
+        .compute()
+        .reindex_like(idomain)
+    )
+    concentration = (
+        simulation.open_concentration(simulation_start_time=time[0])
+        .compute()
+        .reindex_like(idomain)
+    )
 
     states_for_boundary = {
         "GWF_1": head.isel(time=slice(12, None)),
@@ -334,4 +358,3 @@ def test_simulation_clip_and_transient_state_at_boundary__transient_chd(circle_m
     )
     assert head_half.shape == (52, 2, 108)
     assert concentration_half.shape == (52, 2, 108)
-
