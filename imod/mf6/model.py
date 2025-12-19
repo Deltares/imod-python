@@ -130,9 +130,9 @@ def _create_boundary_condition_clipped_boundary(
     # indices, which can lead to them to be removed when purging empty packages
     # with ignore_time=True. Unfortunately, this is needs to be handled here and
     # not in _create_boundary_condition_for_unassigned_boundary, as otherwise
-    # this function is called and twice and it could result in broadcasting
-    # errors in the second call otherwise if the time domain of
-    # state_for_boundary and assigned packages have no overlap.
+    # this function is called twice which could result in broadcasting errors in
+    # the second call if the time domain of state_for_boundary and assigned
+    # packages have no overlap.
     if (
         (state_for_boundary is not None)
         and (state_for_boundary.indexes.get("time") is not None)
