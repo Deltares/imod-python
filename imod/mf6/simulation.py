@@ -1726,7 +1726,7 @@ class Modflow6Simulation(collections.UserDict, ISimulation):
             timesteps for each package is a costly operation. Therefore, this
             option can be set to True to only check the first timestep. Defaults
             to False.
-            
+
         Examples
         --------
         To mask all models in a simulation, you can use the following code:
