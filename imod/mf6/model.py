@@ -726,8 +726,13 @@ class Modflow6Model(collections.UserDict, IModel, abc.ABC):
             A grids with states that are used to put as boundary values. This
             model will get a :class:`imod.mf6.ConstantHead`.
         ignore_time_purge_empty : bool, default False
-            Whether to ignore time dimension when purging empty packages. Can
-            improve performance when clipping models with many time steps.
+            Whether to ignore the time dimension when purging empty packages.
+            Can improve performance when clipping models with many time steps.
+            Clipping models can cause package data with all nans. These packages
+            are considered empty and need to be removed. However, checking all
+            timesteps for each package is a costly operation. Therefore, this
+            option can be set to True to only check the first timestep. Defaults
+            to False.
 
         Returns
         -------

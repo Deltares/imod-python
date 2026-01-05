@@ -1234,11 +1234,14 @@ class Modflow6Simulation(collections.UserDict, ISimulation):
             :class:`imod.mf6.ConstantHead`,
             :class:`imod.mf6.GroundwaterTransportModel` will get a
             :class:`imod.mf6.ConstantConcentration` package.
-        ignore_time_purge_empty: bool, default None
-            If True, only the first timestep is validated. This increases
-            performance for packages with a time dimensions over which changes
-            of cell activity are not expected. If None, the value of the
-            validation context is of the simulation is used.
+        ignore_time_purge_empty: optional, bool, default None
+            Whether to ignore the time dimension when purging empty packages.
+            Can improve performance when clipping models with many time steps.
+            Clipping models can cause package data with all nans. These packages
+            are considered empty and need to be removed. However, checking all
+            timesteps for each package is a costly operation. Therefore, this
+            option can be set to True to only check the first timestep. If None,
+            the value of the validation settings of the simulation are used.
 
         Returns
         -------
@@ -1407,11 +1410,14 @@ class Modflow6Simulation(collections.UserDict, ISimulation):
             similar shape as a layer in the domain. The values in the array
             indicate to which partition a cell belongs. The values should be
             zero or greater.
-        ignore_time_purge_empty: bool, default None
-            If True, only the first timestep is validated. This increases
-            performance for packages with a time dimensions over which changes
-            of cell activity are not expected. If None, the value of the
-            validation context is of the simulation is used.
+        ignore_time_purge_empty: optional, bool, default None
+            Whether to ignore the time dimension when purging empty packages.
+            Can improve performance when splitting models with many time steps.
+            Splitting models can cause package data with all nans. These packages
+            are considered empty and need to be removed. However, checking all
+            timesteps for each package is a costly operation. Therefore, this
+            option can be set to True to only check the first timestep. If None,
+            the value of the validation settings of the simulation are used.
 
         Returns
         -------
@@ -1712,7 +1718,15 @@ class Modflow6Simulation(collections.UserDict, ISimulation):
         mask: xr.DataArray, xu.UgridDataArray of ints
             idomain-like integer array. >0 sets cells to active, 0 sets cells to inactive,
             <0 sets cells to vertical passthrough
-
+        ignore_time_purge_empty : bool, default False
+            Whether to ignore the time dimension when purging empty packages.
+            Can improve performance when masking models with many time steps.
+            Masking models can cause package data with all nans. These packages
+            are considered empty and need to be removed. However, checking all
+            timesteps for each package is a costly operation. Therefore, this
+            option can be set to True to only check the first timestep. Defaults
+            to False.
+            
         Examples
         --------
         To mask all models in a simulation, you can use the following code:
