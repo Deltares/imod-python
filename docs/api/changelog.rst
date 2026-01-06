@@ -24,17 +24,17 @@ Fixed
 - Fixed bug where :class:`imod.mf6.Evapotranspiration` package would write files
   to binary, which could not be parsed by MODFLOW 6 when ``proportion_depth``
   and ``proportion_rate`` were provided without segments.
-- Bug where :class:`imod.mf6.ConstantConcentration` package could not be written
+- Fixed bug where :class:`imod.mf6.ConstantConcentration` package could not be written
   for multiple timesteps.
-- Bug where :meth:`imod.mf6.Modflow6Simulation.clip_box` where a ValidationError
+- Fixed bug where :meth:`imod.mf6.Modflow6Simulation.clip_box` where a ValidationError
   was thrown when clipping a model with a :class:`imod.mf6.ConstantHead` or
   :class:`imod.mf6.ConstantConcentration` package with a ``time`` dimension and
   providing ``states_for_boundary``.
-- Bug where :meth:`imod.mf6.Modflow6Simulation.clip_box` would drop layers if
+- Fixed bug where :meth:`imod.mf6.Modflow6Simulation.clip_box` would drop layers if
   ``states_for_boundary`` were provided and the model already contained a
   :class:`imod.mf6.ConstantHead` or :class:`imod.mf6.ConstantConcentration` with
   less layers.
-- Bug where :meth:`imod.mf6.Modflow6Simulation.clip_box` would not properly
+- Fixed bug where :meth:`imod.mf6.Modflow6Simulation.clip_box` would not properly
   align timesteps and forward fill data if ``states_for_boundary`` were provided
   and the model already contained a :class:`imod.mf6.ConstantHead` or
   :class:`imod.mf6.ConstantConcentration`, both with timesteps, which were
