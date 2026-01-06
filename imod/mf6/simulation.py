@@ -24,7 +24,7 @@ from imod.common.interfaces.isimulation import ISimulation
 from imod.common.serializer import EngineType
 from imod.common.statusinfo import NestedStatusInfo
 from imod.common.utilities.dataclass_type import DataclassType
-from imod.common.utilities.mask import _mask_all_models
+from imod.common.utilities.mask import mask_all_models
 from imod.common.utilities.regrid import _regrid_like
 from imod.common.utilities.version import (
     get_version,
@@ -1202,6 +1202,7 @@ class Modflow6Simulation(collections.UserDict, ISimulation):
         y_min: Optional[float] = None,
         y_max: Optional[float] = None,
         states_for_boundary: Optional[dict[str, GridDataArray]] = None,
+        ignore_time_purge_empty: Optional[bool] = None,
     ) -> Modflow6Simulation:
         """
         Clip a simulation by a bounding box (time, layer, y, x).
@@ -1233,6 +1234,14 @@ class Modflow6Simulation(collections.UserDict, ISimulation):
             :class:`imod.mf6.ConstantHead`,
             :class:`imod.mf6.GroundwaterTransportModel` will get a
             :class:`imod.mf6.ConstantConcentration` package.
+        ignore_time_purge_empty: optional, bool, default None
+            Whether to ignore the time dimension when purging empty packages.
+            Can improve performance when clipping models with many time steps.
+            Clipping models can cause package data with all nans. These packages
+            are considered empty and need to be removed. However, checking all
+            timesteps for each package is a costly operation. Therefore, this
+            option can be set to True to only check the first timestep. If None,
+            the value of the validation settings of the simulation are used.
 
         Returns
         -------
@@ -1276,6 +1285,8 @@ class Modflow6Simulation(collections.UserDict, ISimulation):
             raise ValueError(
                 "Unable to clip simulation. Clipping can only be done on simulations that have a single flow model ."
             )
+        if ignore_time_purge_empty is None:
+            ignore_time_purge_empty = self._validation_context.ignore_time
         for model_name, model in self.get_models().items():
             supported, error_with_object = model._is_clipping_supported()
             if not supported:
@@ -1301,6 +1312,7 @@ class Modflow6Simulation(collections.UserDict, ISimulation):
                     y_min=y_min,
                     y_max=y_max,
                     state_for_boundary=state_for_boundary,
+                    ignore_time_purge_empty=ignore_time_purge_empty,
                 )
             elif isinstance(value, Package):
                 clipped[key] = value.clip_box(
@@ -1398,11 +1410,14 @@ class Modflow6Simulation(collections.UserDict, ISimulation):
             similar shape as a layer in the domain. The values in the array
             indicate to which partition a cell belongs. The values should be
             zero or greater.
-        ignore_time_purge_empty: bool, default None
-            If True, only the first timestep is validated. This increases
-            performance for packages with a time dimensions over which changes
-            of cell activity are not expected. If None, the value of the
-            validation context is of the simulation is used.
+        ignore_time_purge_empty: optional, bool, default None
+            Whether to ignore the time dimension when purging empty packages.
+            Can improve performance when splitting models with many time steps.
+            Splitting models can cause package data with all nans. These packages
+            are considered empty and need to be removed. However, checking all
+            timesteps for each package is a costly operation. Therefore, this
+            option can be set to True to only check the first timestep. If None,
+            the value of the validation settings of the simulation are used.
 
         Returns
         -------
@@ -1688,6 +1703,7 @@ class Modflow6Simulation(collections.UserDict, ISimulation):
     def mask_all_models(
         self,
         mask: GridDataArray,
+        ignore_time_purge_empty: Optional[bool] = None,
     ) -> None:
         """
         This function applies a mask to all models in a simulation, provided they use
@@ -1702,6 +1718,14 @@ class Modflow6Simulation(collections.UserDict, ISimulation):
         mask: xr.DataArray, xu.UgridDataArray of ints
             idomain-like integer array. >0 sets cells to active, 0 sets cells to inactive,
             <0 sets cells to vertical passthrough
+        ignore_time_purge_empty : bool, default False
+            Whether to ignore the time dimension when purging empty packages.
+            Can improve performance when masking models with many time steps.
+            Masking models can cause package data with all nans. These packages
+            are considered empty and need to be removed. However, checking all
+            timesteps for each package is a costly operation. Therefore, this
+            option can be set to True to only check the first timestep. Defaults
+            to False.
 
         Examples
         --------
@@ -1713,7 +1737,9 @@ class Modflow6Simulation(collections.UserDict, ISimulation):
         mask should be an idomain-like array, i.e. it should have the same shape
         as the model and contain integer values.
         """
-        _mask_all_models(self, mask)
+        if ignore_time_purge_empty is None:
+            ignore_time_purge_empty = self._validation_context.ignore_time
+        mask_all_models(self, mask, ignore_time_purge_empty)
 
     @classmethod
     @standard_log_decorator()

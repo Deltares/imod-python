@@ -78,7 +78,7 @@ def cleanup_mf6_sim(simulation: Modflow6Simulation) -> None:
         pkg.dataset.load()
 
     mask = model.domain
-    simulation.mask_all_models(mask)
+    simulation.mask_all_models(mask, ignore_time_purge_empty=True)
     dis = model["dis"]
 
     pkgs_to_cleanup = [

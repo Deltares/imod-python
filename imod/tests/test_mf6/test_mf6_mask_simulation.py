@@ -9,13 +9,15 @@ import imod
 from imod.tests.fixtures.mf6_modelrun_fixture import assert_simulation_can_run
 
 
+@pytest.mark.parametrize("ignore_time", [True, False])
 def test_mask_simulation(
     tmp_path: Path,
     flow_transport_simulation: imod.mf6.Modflow6Simulation,
+    ignore_time: bool,
 ):
     mask = deepcopy(flow_transport_simulation["flow"].domain)
     mask.loc[1, 0.5, 15] = 0
-    flow_transport_simulation.mask_all_models(mask)
+    flow_transport_simulation.mask_all_models(mask, ignore_time_purge_empty=ignore_time)
     assert (
         flow_transport_simulation["flow"].domain.sel({"layer": 1, "y": 0.5, "x": 15})
         == 0
