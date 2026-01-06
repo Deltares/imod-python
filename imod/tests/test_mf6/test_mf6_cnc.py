@@ -74,16 +74,29 @@ def concentration_transient():
     idomain = xr.DataArray(np.ones(shape), coords=coords, dims=dims)
 
     # Constant cocnentration
-    concentration = xr.full_like(idomain, np.nan)
+    concentration = xr.full_like(idomain, np.nan).sel(layer=[1, 2])
     concentration[...] = np.nan
     concentration[..., 0] = 0.0
 
-    return concentration
+    time_da = xr.DataArray(
+        [1.0, 2.0],
+        coords={"time": globaltimes[:-1]},
+        dims=("time",),
+    )
+
+    return time_da * concentration
 
 
-def test_render(concentration_steadystate):
+def test_render_steady_state(concentration_steadystate):
     directory = pathlib.Path("mymodel")
-    globaltimes = np.array(["2000-01-01"], dtype="datetime64[ns]")
+    globaltimes = np.array(
+        [
+            "2000-01-01",
+            "2000-01-02",
+            "2000-01-03",
+        ],
+        dtype="datetime64[ns]",
+    )
 
     cnc = imod.mf6.ConstantConcentration(
         concentration_steadystate, print_input=True, print_flows=True, save_flows=True
@@ -104,7 +117,47 @@ def test_render(concentration_steadystate):
 
         begin period 1
           open/close mymodel/cnc/cnc.bin (binary)
-        end period"""
+        end period
+        """
+    )
+    assert actual == expected
+
+
+def test_render_transient(concentration_transient):
+    directory = pathlib.Path("mymodel")
+    globaltimes = np.array(
+        [
+            "2000-01-01",
+            "2000-01-02",
+            "2000-01-03",
+        ],
+        dtype="datetime64[ns]",
+    )
+
+    cnc = imod.mf6.ConstantConcentration(
+        concentration_transient, print_input=True, print_flows=True, save_flows=True
+    )
+    actual = cnc._render(directory, "cnc", globaltimes, True)
+
+    expected = textwrap.dedent(
+        """\
+        begin options
+          print_input
+          print_flows
+          save_flows
+        end options
+
+        begin dimensions
+          maxbound 30
+        end dimensions
+
+        begin period 1
+          open/close mymodel/cnc/cnc-0.bin (binary)
+        end period
+        begin period 2
+          open/close mymodel/cnc/cnc-1.bin (binary)
+        end period
+        """
     )
     assert actual == expected
 
@@ -118,7 +171,7 @@ def test_write_period_data(concentration_transient):
         ],
         dtype="datetime64[ns]",
     )
-    concentration_transient[:] = 2
+    concentration_transient += 999  # to avoid having zeros in the data
     cnc = imod.mf6.ConstantConcentration(
         concentration_transient,
         print_input=True,
@@ -131,5 +184,5 @@ def test_write_period_data(concentration_transient):
         with open(output_dir + "/cnc/cnc-0.dat", "r") as f:
             data = f.read()
             assert (
-                data.count("2") == 1080
-            )  # the number 2 is in the concentration data, and in the cell indices.
+                data.count("999") == 30
+            )  # the number 999 is in the concentration data, and in the cell indices.

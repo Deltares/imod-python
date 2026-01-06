@@ -40,6 +40,7 @@ from imod.mf6.package import Package
 from imod.mf6.riv import River
 from imod.mf6.utilities.clipped_bc_creator import (
     StateClassType,
+    StateType,
     create_clipped_boundary,
 )
 from imod.mf6.utilities.mf6hfb import merge_hfb_packages
@@ -64,8 +65,8 @@ def pkg_has_cleanup(pkg: Package):
 def _create_boundary_condition_for_unassigned_boundary(
     model: Modflow6Model,
     state_for_boundary: Optional[GridDataArray],
-    additional_boundaries: Optional[list[StateClassType]] = None,
-):
+    additional_boundaries: list[Optional[StateType]] = [None],
+) -> Optional[StateType]:
     if state_for_boundary is None:
         return None
 
@@ -90,7 +91,7 @@ def _create_boundary_condition_clipped_boundary(
     clipped_model: Modflow6Model,
     state_for_boundary: Optional[GridDataArray],
     clip_box_args: tuple,
-):
+) -> Optional[StateType]:
     # Create temporary boundary condition for the original model boundary. This
     # is used later to see which boundaries can be ignored as they were already
     # present in the original model. We want to just end up with the boundary
@@ -120,9 +121,29 @@ def _create_boundary_condition_clipped_boundary(
     else:
         state_for_boundary_clipped = None
 
-    return _create_boundary_condition_for_unassigned_boundary(
+    bc_constant_pkg = _create_boundary_condition_for_unassigned_boundary(
         clipped_model, state_for_boundary_clipped, [unassigned_boundary_clipped]
     )
+
+    # Remove all indices before first timestep of state_for_clipped_boundary.
+    # This to prevent empty dataarrays unnecessarily being made for these
+    # indices, which can lead to them to be removed when purging empty packages
+    # with ignore_time=True. Unfortunately, this is needs to be handled here and
+    # not in _create_boundary_condition_for_unassigned_boundary, as otherwise
+    # this function is called twice which could result in broadcasting errors in
+    # the second call if the time domain of state_for_boundary and assigned
+    # packages have no overlap.
+    if (
+        (state_for_boundary is not None)
+        and (state_for_boundary.indexes.get("time") is not None)
+        and (bc_constant_pkg is not None)
+    ):
+        start_time = state_for_boundary.indexes["time"][0]
+        bc_constant_pkg.dataset = bc_constant_pkg.dataset.sel(
+            time=slice(start_time, None)
+        )
+
+    return bc_constant_pkg
 
 
 class Modflow6Model(collections.UserDict, IModel, abc.ABC):

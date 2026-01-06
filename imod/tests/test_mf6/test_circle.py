@@ -205,15 +205,30 @@ def test_simulation_write_and_run_transport_vsc(circle_model_transport_vsc, tmp_
     assert concentration.shape == (52, 2, 216)
 
 
+def run_simulation(simulation, modeldir):
+    idomain = simulation["GWF_1"]["disv"]["idomain"].compute()
+    time = simulation["time_discretization"].dataset.coords["time"].values
+    simulation.write(modeldir)
+    simulation.run()
+    head = (
+        simulation.open_head(simulation_start_time=time[0])
+        .compute()
+        .reindex_like(idomain)
+    )
+    concentration = (
+        simulation.open_concentration()
+        .compute(simulation_start_time=time[0])
+        .reindex_like(idomain)
+    )
+    return head, concentration
+
+
 def test_simulation_clip_and_state_at_boundary(circle_model_transport, tmp_path):
     # Arrange
     simulation = circle_model_transport
     idomain = simulation["GWF_1"]["disv"]["idomain"].compute()
 
-    simulation.write(tmp_path / "full")
-    simulation.run()
-    head = simulation.open_head().compute().reindex_like(idomain)
-    concentration = simulation.open_concentration().compute().reindex_like(idomain)
+    head, concentration = run_simulation(simulation, tmp_path / "full")
 
     states_for_boundary = {
         "GWF_1": head.isel(time=-1, drop=True),
@@ -233,13 +248,99 @@ def test_simulation_clip_and_state_at_boundary(circle_model_transport, tmp_path)
         == 20
     )
     assert half_simulation["GWF_1"]["chd_clipped"]["head"].notnull().sum() == 20
+
     # Test if model runs
-    half_simulation.write(tmp_path / "half")
-    half_simulation.run()
-    # Test if the clipped model output has the correct dimension
-    head_half = half_simulation.open_head().compute().reindex_like(idomain_half)
-    concentration_half = (
-        half_simulation.open_concentration().compute().reindex_like(idomain_half)
+    head_half, concentration_half = run_simulation(half_simulation, tmp_path / "half")
+    assert head_half.shape == (52, 2, 108)
+    assert concentration_half.shape == (52, 2, 108)
+
+
+def test_simulation_clip_and_constant_state_at_boundary__transient_chd(
+    circle_model_transport, tmp_path
+):
+    # Arrange
+    simulation = circle_model_transport
+    idomain = simulation["GWF_1"]["disv"]["idomain"].compute()
+    time = simulation["time_discretization"].dataset.coords["time"].values
+
+    simulation["GWF_1"]["chd"].dataset["head"] = (
+        simulation["GWF_1"]["chd"].dataset["head"].expand_dims(time=time)
     )
+
+    head, concentration = run_simulation(simulation, tmp_path / "full")
+
+    states_for_boundary = {
+        "GWF_1": head.isel(time=-1, drop=True),
+        "transport": concentration.isel(time=-1, drop=True),
+    }
+    # Act
+    half_simulation = simulation.clip_box(
+        x_max=0.1, states_for_boundary=states_for_boundary
+    )
+    # Assert
+    # Test if model dims halved
+    idomain_half = half_simulation["GWF_1"]["disv"]["idomain"]
+    dim = idomain_half.grid.face_dimension
+    np.testing.assert_array_equal(idomain_half.sizes[dim] / idomain.sizes[dim], 0.5)
+    # Test if the clipped boundary conditions have the correct dimension and values
+    conc_clipped = half_simulation["transport"]["cnc_clipped"]["concentration"]
+    assert conc_clipped.sizes["layer"] == 2
+    assert "time" not in conc_clipped.dims
+    assert conc_clipped.notnull().sum() == 20
+    head_clipped = half_simulation["GWF_1"]["chd_clipped"]["head"]
+    assert head_clipped.sizes["layer"] == 2
+    assert head_clipped.sizes["time"] == 52
+    assert head_clipped.notnull().sum() == 20 * 52
+    # Test if model runs
+    head_half, concentration_half = run_simulation(half_simulation, tmp_path / "half")
+    assert head_half.shape == (52, 2, 108)
+    assert concentration_half.shape == (52, 2, 108)
+
+
+def test_simulation_clip_and_transient_state_at_boundary__transient_chd(
+    circle_model_transport, tmp_path
+):
+    """
+    Test with a transient chd boundary condition and transient states for
+    boundary conditions. The time steps of the chd package are outside of the
+    time domain of the states_for_boundary.
+    """
+    # Arrange
+    simulation = circle_model_transport
+    idomain = simulation["GWF_1"]["disv"]["idomain"].compute()
+    time = simulation["time_discretization"].dataset.coords["time"].values
+
+    simulation["GWF_1"]["chd"].dataset["head"] = (
+        simulation["GWF_1"]["chd"].dataset["head"].expand_dims(time=time[:5])
+    )
+
+    head, concentration = run_simulation(simulation, tmp_path / "full")
+
+    states_for_boundary = {
+        "GWF_1": head.isel(time=slice(11, -11)),
+        "transport": concentration.isel(time=slice(11, -11)),
+    }
+    # Act
+    half_simulation = simulation.clip_box(
+        x_max=0.1, states_for_boundary=states_for_boundary
+    )
+    # Assert
+    # Test if model dims halved
+    idomain_half = half_simulation["GWF_1"]["disv"]["idomain"]
+    dim = idomain_half.grid.face_dimension
+    np.testing.assert_array_equal(idomain_half.sizes[dim] / idomain.sizes[dim], 0.5)
+    # Test if the clipped boundary conditions have the correct dimension and values
+    # Transport data for just 30 time steps (from 12 up to 41)
+    conc_clipped = half_simulation["transport"]["cnc_clipped"]["concentration"]
+    assert conc_clipped.sizes["layer"] == 2
+    assert conc_clipped.sizes["time"] == 30
+    assert conc_clipped.notnull().sum() == 20 * 30
+    # Head data for chd for just 30 time steps (from 12 up to 41)
+    head_clipped = half_simulation["GWF_1"]["chd_clipped"]["head"]
+    assert head_clipped.sizes["layer"] == 2
+    assert head_clipped.sizes["time"] == 30
+    assert head_clipped.notnull().sum() == 20 * 30
+    # Test if model runs
+    head_half, concentration_half = run_simulation(half_simulation, tmp_path / "half")
     assert head_half.shape == (52, 2, 108)
     assert concentration_half.shape == (52, 2, 108)
