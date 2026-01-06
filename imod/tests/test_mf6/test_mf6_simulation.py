@@ -278,6 +278,14 @@ def test_write_circle_model_twice(circle_model, tmp_path):
     assert len(diff.right_only) == 0
 
 
+@pytest.mark.parametrize("ignore_time_purge_empty", [True, False])
+def test_simulation_clip_box__ignore_time(circle_model, ignore_time_purge_empty):
+    simulation = circle_model
+    simulation.clip_box(
+        y_min=-50, y_max=0, ignore_time_purge_empty=ignore_time_purge_empty
+    )
+
+
 def test_simulation_clip_box__validation_settings_preserved(circle_model):
     simulation = circle_model
     simulation.set_validation_settings(

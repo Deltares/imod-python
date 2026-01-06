@@ -266,11 +266,13 @@ def test_mask_with_time_coordinate(
 @pytest.mark.parametrize(
     "inactivity_marker", [0, -1]
 )  # 0 = inactive, -1 = vertical passthrough
+@pytest.mark.parametrize("ignore_time_purge_empty", [True, False])
 def test_mask_structured(
     tmp_path: Path,
     structured_flow_model: GroundwaterFlowModel,
     mask_cells: list[tuple[int, int, int]],
     inactivity_marker: int,
+    ignore_time_purge_empty: bool,
 ):
     # Arrange
     # add a well to the model
@@ -291,7 +293,9 @@ def test_mask_structured(
         mask.values[*cell] = inactivity_marker
 
     # Act
-    structured_flow_model.mask_all_packages(mask)
+    structured_flow_model.mask_all_packages(
+        mask, ignore_time_purge_empty=ignore_time_purge_empty
+    )
 
     # Assert
     unique, counts = np.unique(

@@ -297,8 +297,16 @@ def test_validate_false():
 
 @pytest.mark.timeout(10, method="thread")
 def test_ignore_time_validation():
-    # Create a large recharge dataset with a time dimension. This is to test the
-    # performance of the validation when ignore_time_no_data is True.
+    """
+    Create a large recharge dataset with a time dimension. This is to test the
+    performance of the validation when ignore_time_no_data is True.
+    NOTE: There currently is no easy way to test the opposite (i.e.,
+    ignore_time_no_data is False, then catch timeout with an pytest xfail
+    marker), because the timeout will terminate the test run with an error when
+    using dask instead of a fail. Somewhat relevant issue:
+    https://github.com/pytest-dev/pytest-timeout/issues/181
+    """
+    # Arrange
     rng = dask.array.random.default_rng()
     layer = [1, 2, 3]
     template = imod.util.empty_3d(1.0, 0.0, 1000.0, 1.0, 0.0, 1000.0, layer)

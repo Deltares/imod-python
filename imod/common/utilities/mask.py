@@ -37,9 +37,10 @@ def _validate_coords_mask(mask: GridDataArray) -> None:
         )
 
 
-def _mask_all_models(
+def mask_all_models(
     simulation: ISimulation,
     mask: GridDataArray,
+    ignore_time_purge_empty: bool = False,
 ):
     _validate_coords_mask(mask)
     if simulation.is_split():
@@ -54,21 +55,22 @@ def _mask_all_models(
 
     for name in modelnames:
         if is_same_domain(simulation[name].domain, mask):
-            simulation[name].mask_all_packages(mask)
+            simulation[name].mask_all_packages(mask, ignore_time_purge_empty)
         else:
             raise ValueError(
                 "masking can only be applied to simulations when all the models in the simulation use the same grid."
             )
 
 
-def _mask_all_packages(
+def mask_all_packages(
     model: IModel,
     mask: GridDataArray,
+    ignore_time_purge_empty: bool = False,
 ):
     _validate_coords_mask(mask)
     for pkgname, pkg in model.items():
         model[pkgname] = pkg.mask(mask)
-    model.purge_empty_packages()
+    model.purge_empty_packages(ignore_time=ignore_time_purge_empty)
 
 
 def mask_package(package: IPackage, mask: GridDataArray) -> IPackage:
