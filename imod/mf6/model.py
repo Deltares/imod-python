@@ -7,6 +7,7 @@ import pathlib
 import warnings
 from pathlib import Path
 from typing import Any, List, Optional, Tuple, Union
+import uuid
 
 import cftime
 import jinja2
@@ -19,6 +20,7 @@ from jinja2 import Template
 
 import imod
 from imod.common.interfaces.imodel import IModel
+from imod.common.interfaces.ivisitee import IVisitee
 from imod.common.serializer import EngineType
 from imod.common.statusinfo import NestedStatusInfo, StatusInfo, StatusInfoBase
 from imod.common.utilities.clip import clip_box_dataset
@@ -32,6 +34,7 @@ from imod.common.utilities.schemata import (
 )
 from imod.common.utilities.version import prepend_content_with_version_info
 from imod.logging import LogLevel, logger, standard_log_decorator
+from imod.mf6.clipping.ClipBoxVisitor import ClipBoxVisitor
 from imod.mf6.drn import Drainage
 from imod.mf6.ghb import GeneralHeadBoundary
 from imod.mf6.hfb import HorizontalFlowBarrierBase
@@ -146,7 +149,7 @@ def _create_boundary_condition_clipped_boundary(
     return bc_constant_pkg
 
 
-class Modflow6Model(collections.UserDict, IModel, abc.ABC):
+class Modflow6Model(collections.UserDict, IModel, abc.ABC, IVisitee):
     _mandatory_packages: tuple[str, ...] = ()
     _init_schemata: SchemataDict = {}
     _model_id: Optional[str] = None
@@ -161,6 +164,7 @@ class Modflow6Model(collections.UserDict, IModel, abc.ABC):
 
     def __init__(self):
         collections.UserDict.__init__(self)
+        self.uuid = uuid.uuid4()
         self._options = {}
 
     @standard_log_decorator()
@@ -707,6 +711,9 @@ class Modflow6Model(collections.UserDict, IModel, abc.ABC):
             raise ValueError("Model id has not been set")
         return self._model_id
 
+    def accept(self, visitor) -> IModel:
+        return visitor.visit_model(self)
+        
     def clip_box(
         self,
         time_min: Optional[cftime.datetime | np.datetime64 | str] = None,
@@ -792,31 +799,26 @@ class Modflow6Model(collections.UserDict, IModel, abc.ABC):
             raise ValueError(
                 f"model cannot be clipped due to presence of package '{error_with_object}' in model"
             )
-
-        clip_box_args = (
-            time_min,
-            time_max,
-            layer_min,
-            layer_max,
-            x_min,
-            x_max,
-            y_min,
-            y_max,
+        
+        if state_for_boundary is not None:
+            states_for_boundary = {"dummy_name" : state_for_boundary}
+        else:
+            states_for_boundary = None
+            
+        visitor = ClipBoxVisitor(
+            time_min=time_min,
+            time_max=time_max,
+            layer_min=layer_min,
+            layer_max=layer_max,
+            x_min=x_min,
+            x_max=x_max,
+            y_min=y_min,
+            y_max=y_max,
+            states_for_boundary=states_for_boundary,
+            ignore_time_purge_empty=ignore_time_purge_empty,
         )
-
-        clipped = self._clip_box_packages(
-            *clip_box_args,
-        )
-
-        clipped_boundary_condition = _create_boundary_condition_clipped_boundary(
-            self, clipped, state_for_boundary, clip_box_args
-        )
-        state_pkg_id = self._boundary_state_pkg_type._pkg_id
-        pkg_name = f"{state_pkg_id}_clipped"
-        if clipped_boundary_condition is not None:
-            clipped[pkg_name] = clipped_boundary_condition
-
-        clipped.purge_empty_packages(ignore_time=ignore_time_purge_empty)
+        
+        clipped = self.accept(visitor)
 
         return clipped
 

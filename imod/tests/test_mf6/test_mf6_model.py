@@ -247,7 +247,7 @@ class TestModel:
         pkg_id = pkg_type._pkg_id
         assert f"{pkg_id}_clipped" not in clipped
 
-    @mock.patch("imod.mf6.model.create_clipped_boundary")
+    @mock.patch("imod.mf6.clipping.ClipBoxVisitor.create_clipped_boundary")
     @pytest.mark.parametrize(
         "model_type, pkg_type",
         [
@@ -289,7 +289,7 @@ class TestModel:
             pkg_type,
         )
 
-    @mock.patch("imod.mf6.model.create_clipped_boundary")
+    @mock.patch("imod.mf6.clipping.ClipBoxVisitor.create_clipped_boundary")
     @pytest.mark.parametrize(
         "model_type, pkg_type",
         [

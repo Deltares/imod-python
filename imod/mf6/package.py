@@ -16,6 +16,7 @@ from typing import (
     Union,
     cast,
 )
+import uuid
 
 import cftime
 import jinja2
@@ -84,6 +85,7 @@ class Package(PackageBase, IPackage, abc.ABC):
 
     def __init__(self, allargs: Mapping[str, GridDataArray | float | int | bool | str]):
         super().__init__(allargs)
+        self.uuid = uuid.uuid4()
 
     @staticmethod
     def _valid(value: Any) -> bool:
