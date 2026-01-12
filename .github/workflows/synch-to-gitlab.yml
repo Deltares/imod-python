@@ -11,7 +11,7 @@ jobs:
         with:
          fetch-depth: 0
       - name: Sync to GitLab
-        uses: yesolutions/mirror-action@master
+        uses: yesolutions/mirror-action@662fce0eced8996f64d7fa264d76cddd84827f33
         with:
           REMOTE: https://open-git.deltares.nl/deltares-github-backups/${{ github.event.repository.name }}.git
           GIT_USERNAME: ${{ secrets.GITLAB_USERNAME }}
