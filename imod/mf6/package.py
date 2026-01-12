@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import abc
 import pathlib
+import uuid
 from copy import deepcopy
 from pathlib import Path
 from typing import (
@@ -15,8 +16,8 @@ from typing import (
     Tuple,
     Union,
     cast,
+    final,
 )
-import uuid
 
 import cftime
 import jinja2
@@ -24,7 +25,9 @@ import numpy as np
 import xarray as xr
 import xugrid as xu
 
+from imod.common.interfaces.inode import INode
 from imod.common.interfaces.ipackage import IPackage
+from imod.common.interfaces.ivisitee import IVisitee, IVisitor
 from imod.common.utilities.clip import (
     clip_box_dataset,
 )
@@ -46,6 +49,7 @@ from imod.mf6.auxiliary_variables import (
     get_variable_names,
     remove_expanded_auxiliary_variables_from_dataset,
 )
+
 from imod.mf6.pkgbase import (
     EXCHANGE_PACKAGES,
     TRANSPORT_PACKAGES,
@@ -64,7 +68,7 @@ from imod.typing import GridDataArray
 from imod.util.regrid import RegridderWeightsCache
 
 
-class Package(PackageBase, IPackage, abc.ABC):
+class Package(PackageBase, IPackage, abc.ABC, IVisitee):
     """
     Package is used to share methods for specific packages with no time
     component.
@@ -86,7 +90,16 @@ class Package(PackageBase, IPackage, abc.ABC):
     def __init__(self, allargs: Mapping[str, GridDataArray | float | int | bool | str]):
         super().__init__(allargs)
         self.uuid = uuid.uuid4()
+        self._parent: Optional[INode] = None
 
+    @property
+    def parent(self) -> Optional[INode]:
+        return self._parent
+    
+    @parent.setter
+    def parent(self, value: Optional[INode]) -> None:
+        self._parent = value
+            
     @staticmethod
     def _valid(value: Any) -> bool:
         return is_valid(value)
@@ -378,7 +391,11 @@ class Package(PackageBase, IPackage, abc.ABC):
         # All state should be contained in the dataset.
         dataset_copy = cast(Mapping[str, Any], self.dataset.copy())
         return type(self)(**dataset_copy)
+    
+    def accept(self, visitor: IVisitor) -> IPackage:
+        return visitor.visit_package(self)
 
+    @final
     def clip_box(
         self,
         time_min: Optional[cftime.datetime | np.datetime64 | str] = None,
@@ -446,23 +463,27 @@ class Package(PackageBase, IPackage, abc.ABC):
         >>> pkg.clip_box(time_min=np.datetime64("2020-01-01"), time_max=np.datetime64("2020-12-31"))
 
         """
+        
+        from imod.mf6.clipping.ClipBoxVisitor import ClipBoxVisitor
+        
+        # Perform validation
         if not self._is_clipping_supported():
             raise ValueError("this package does not support clipping.")
-
-        selection = clip_box_dataset(
-            self.dataset,
-            time_min,
-            time_max,
-            layer_min,
-            layer_max,
-            x_min,
-            x_max,
-            y_min,
-            y_max,
+        
+        # Clip package
+        visitor = ClipBoxVisitor(
+            time_min=time_min,
+            time_max=time_max,
+            layer_min=layer_min,
+            layer_max=layer_max,
+            x_min=x_min,
+            x_max=x_max,
+            y_min=y_min,
+            y_max=y_max,
         )
-
-        cls = type(self)
-        return cls._from_dataset(selection)
+        
+        clipped = self.accept(visitor)
+        return clipped
 
     def mask(self, mask: GridDataArray) -> Any:
         """

@@ -5,9 +5,8 @@ import itertools
 import textwrap
 from collections.abc import Iterable
 from datetime import datetime
-from typing import Any, Callable, Optional, Self, Sequence, Tuple, Union, cast
+from typing import Any, Callable, Optional, Sequence, Tuple, Union, cast
 
-import cftime
 import numpy as np
 import numpy.typing as npt
 import pandas as pd
@@ -15,7 +14,7 @@ import xarray as xr
 import xugrid as xu
 
 import imod
-from imod.common.interfaces.ipointdatapackage import IPointDataPackage
+from imod.common.interfaces.ipointdatapackage import IPointDataPackage, ILayeredPointDataPackage, IZRangePointDataPackage
 from imod.common.utilities.grid import broadcast_to_full_domain
 from imod.common.utilities.layer import create_layered_top
 from imod.common.utilities.schemata import validation_pkg_error_message
@@ -43,9 +42,8 @@ from imod.schemata import (
 )
 from imod.select.points import points_indices, points_values
 from imod.typing import GridDataArray, Imod5DataDict, StressPeriodTimesType
-from imod.typing.grid import is_spatial_grid, ones_like
+from imod.typing.grid import ones_like
 from imod.util.expand_repetitions import average_timeseries, resample_timeseries
-from imod.util.structured import values_within_range
 
 ABSTRACT_METH_ERROR_MSG = "Method in abstract base class called"
 
@@ -759,7 +757,7 @@ class GridAgnosticWell(BoundaryCondition, IPointDataPackage, abc.ABC):
         self.dataset = dataset_cleaned
 
 
-class Well(GridAgnosticWell):
+class Well(GridAgnosticWell, IZRangePointDataPackage):
     """
     Agnostic WEL package, which accepts x, y and a top and bottom of the well screens.
 
@@ -931,141 +929,14 @@ class Well(GridAgnosticWell):
         index_coord = np.arange(self.dataset.sizes["index"])
         self.dataset = self.dataset.assign_coords(index=index_coord)
         self._validate_init_schemata(validate)
-
-    def clip_box(
-        self,
-        time_min: Optional[cftime.datetime | np.datetime64 | str] = None,
-        time_max: Optional[cftime.datetime | np.datetime64 | str] = None,
-        layer_min: Optional[int] = None,
-        layer_max: Optional[int] = None,
-        x_min: Optional[float] = None,
-        x_max: Optional[float] = None,
-        y_min: Optional[float] = None,
-        y_max: Optional[float] = None,
-        top: Optional[GridDataArray] = None,
-        bottom: Optional[GridDataArray] = None,
-    ) -> Self:
-        """
-        Clip a well package by a bounding box (time, layer, y, x).
-
-        Parameters
-        ----------
-        time_min: optional, np.datetime64
-            Start time to select. Data will be forward filled to this date. If
-            time_min is before the start time of the dataset, data is
-            backfilled.
-        time_max: optional
-            End time to select.
-        layer_min: optional, int
-            Ignored.
-        layer_max: optional, int
-            Ignored.
-        x_min: optional, float
-            Minimum x-coordinate to select.
-        x_max: optional, float
-            Maximum x-coordinate to select.
-        y_min: optional, float
-            Minimum y-coordinate to select.
-        y_max: optional, float
-            Maximum y-coordinate to select.
-        top: optional, GridDataArray
-            Grid of top used to clip well screen tops.
-        bottom: optional, GridDataArray
-            Grid of bottom used to clip well screen bottoms.
-
-        Returns
-        -------
-        clipped : Well
-            A new package that is clipped to the specified bounding box.
-
-        Examples
-        --------
-        Slicing intervals may be half-bounded, by providing None:
-
-        To select 500.0 <= x <= 1000.0:
-
-        >>> pkg.clip_box(x_min=500.0, x_max=1000.0)
-
-        To select x <= 1000.0:
-
-        >>> pkg.clip_box(x_max=1000.0)``
-
-        To select x >= 500.0:
-
-        >>> pkg.clip_box(x_min=500.0)
-
-        To select a time interval, you can use datetime64:
-
-        >>> pkg.clip_box(time_min=np.datetime64("2020-01-01"), time_max=np.datetime64("2020-12-31"))
-
-        To clip well screens:
-
-        >>> pkg.clip_box(top=top_grid, bottom=bottom_grid)
-
-        """
-        if (layer_max or layer_min) and (top is None or bottom is None):
-            raise ValueError(
-                "When clipping by layer both the top and bottom should be defined"
-            )
-
-        if top is not None:
-            # Bug in mypy when using unions in isInstance
-            if not isinstance(top, GridDataArray) or "layer" not in top.coords:  # type: ignore
-                top = create_layered_top(bottom, top)
-
-        # The super method will select in the time dimension without issues.
-        new = super().clip_box(time_min=time_min, time_max=time_max)
-
-        ds = new.dataset
-
-        z_max, in_bounds_z_max = self._find_well_value_at_layer(ds, top, layer_max)
-        z_min, in_bounds_z_min = self._find_well_value_at_layer(ds, bottom, layer_min)
-
-        # Prior to the actual clipping of z_max/z_min, replace the dataset in case a
-        # spatial selection needs to be done when a spatial grid is present (top/bottom).
-        ds = ds.loc[{"index": in_bounds_z_max & in_bounds_z_min}]
-
-        if z_max is not None:
-            ds["screen_top"] = ds["screen_top"].clip(None, z_max)
-        if z_min is not None:
-            ds["screen_bottom"] = ds["screen_bottom"].clip(z_min, None)
-
-        # Initiate array of True with right shape to deal with case no spatial
-        # selection needs to be done.
-        in_bounds = np.full(ds.sizes["index"], True)
-        # Select all variables along "index" dimension
-        in_bounds &= values_within_range(ds["x"], x_min, x_max)
-        in_bounds &= values_within_range(ds["y"], y_min, y_max)
-        in_bounds &= values_within_range(ds["screen_top"], z_min, z_max)
-        in_bounds &= values_within_range(ds["screen_bottom"], z_min, z_max)
-        # remove wells where the screen bottom and top are the same
-        in_bounds &= abs(ds["screen_bottom"] - ds["screen_top"]) > 1e-5
-        # Replace dataset with reduced dataset based on booleans
-        new.dataset = ds.loc[{"index": in_bounds}]
-
-        return new
-
-    @staticmethod
-    def _find_well_value_at_layer(
-        well_dataset: xr.Dataset, grid: GridDataArray, layer: Optional[int]
-    ):
-        value = None if layer is None else grid.isel(layer=layer)
-
-        # if value is a grid select the values at the well locations and drop the dimensions
-        if (value is not None) and is_spatial_grid(value):
-            value = imod.select.points_values(
-                value,
-                x=well_dataset["x"].values,
-                y=well_dataset["y"].values,
-                out_of_bounds="ignore",
-            )
-            in_bounds = np.full(well_dataset.sizes["index"], False)
-            in_bounds[value["index"]] = True
-            value = value.drop_vars(lambda x: x.coords)
-        else:
-            in_bounds = np.full(well_dataset.sizes["index"], True)
-
-        return value, in_bounds
+       
+    @property
+    def z_top(self) -> npt.NDArray[np.float64]:
+        return self.dataset["screen_top"].values
+    
+    @property
+    def z_bottom(self) -> npt.NDArray[np.float64]:
+        return self.dataset["screen_bottom"].values
 
     def _create_wells_df(self) -> pd.DataFrame:
         wells_df = self.dataset.to_dataframe()
@@ -1158,7 +1029,7 @@ class Well(GridAgnosticWell):
         self._cleanup(dis, cleanup_wel, minimum_thickness=minimum_thickness)
 
 
-class LayeredWell(GridAgnosticWell):
+class LayeredWell(GridAgnosticWell, ILayeredPointDataPackage):
     """
     Agnostic WEL package, which accepts x, y and layers.
 
@@ -1317,90 +1188,10 @@ class LayeredWell(GridAgnosticWell):
         self.dataset = self.dataset.assign_coords(index=index_coord)
         self._validate_init_schemata(validate)
 
-    def clip_box(
-        self,
-        time_min: Optional[cftime.datetime | np.datetime64 | str] = None,
-        time_max: Optional[cftime.datetime | np.datetime64 | str] = None,
-        layer_min: Optional[int] = None,
-        layer_max: Optional[int] = None,
-        x_min: Optional[float] = None,
-        x_max: Optional[float] = None,
-        y_min: Optional[float] = None,
-        y_max: Optional[float] = None,
-        top: Optional[GridDataArray] = None,
-        bottom: Optional[GridDataArray] = None,
-    ) -> Self:
-        """
-        Clip a well package by a bounding box (time, layer, y, x).
-
-        Parameters
-        ----------
-        time_min: optional, np.datetime64
-            Start time to select. Data will be forward filled to this date. If
-            time_min is before the start time of the dataset, data is
-            backfilled.
-        time_max: optional
-            End time to select.
-        layer_min: optional, int
-            Minimum layer to select.
-        layer_max: optional, int
-            Maximum layer to select.
-        x_min: optional, float
-            Minimum x-coordinate to select.
-        x_max: optional, float
-            Maximum x-coordinate to select.
-        y_min: optional, float
-            Minimum y-coordinate to select.
-        y_max: optional, float
-            Maximum y-coordinate to select.
-        top: optional, GridDataArray
-            Ignored.
-        bottom: optional, GridDataArray
-            Ignored.
-
-        Returns
-        -------
-        clipped : Well
-            A new package that is clipped to the specified bounding box.
-
-        Examples
-        --------
-        Slicing intervals may be half-bounded, by providing None:
-
-        To select 500.0 <= x <= 1000.0:
-
-        >>> pkg.clip_box(x_min=500.0, x_max=1000.0)
-
-        To select x <= 1000.0:
-
-        >>> pkg.clip_box(x_max=1000.0)``
-
-        To select x >= 500.0:
-
-        >>> pkg.clip_box(x_min=500.0)
-
-        To select a time interval, you can use datetime64:
-
-        >>> pkg.clip_box(time_min=np.datetime64("2020-01-01"), time_max=np.datetime64("2020-12-31"))
-
-        """
-        # The super method will select in the time dimension without issues.
-        new = super().clip_box(time_min=time_min, time_max=time_max)
-
-        ds = new.dataset
-
-        # Initiate array of True with right shape to deal with case no spatial
-        # selection needs to be done.
-        in_bounds = np.full(ds.sizes["index"], True)
-        # Select all variables along "index" dimension
-        in_bounds &= values_within_range(ds["x"], x_min, x_max)
-        in_bounds &= values_within_range(ds["y"], y_min, y_max)
-        in_bounds &= values_within_range(ds["layer"], layer_min, layer_max)
-        # Replace dataset with reduced dataset based on booleans
-        new.dataset = ds.loc[{"index": in_bounds}]
-
-        return new
-
+    @property
+    def layer(self) -> npt.NDArray[np.int32]:
+        return self.dataset["layer"].values.astype(np.int32)
+    
     def _create_wells_df(self) -> pd.DataFrame:
         return self.dataset.to_dataframe()
 

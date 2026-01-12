@@ -20,3 +20,28 @@ class IPointDataPackage(IAgnosticPackage):
     @abstractmethod
     def y(self) -> NDArray[np.float64]:
         raise NotImplementedError
+
+class ILayeredPointDataPackage(IPointDataPackage):
+    """
+    Interface for packages for which the data is defined by layer, x and y coordinates independent of the domain definition.
+    """
+
+    @property
+    @abstractmethod
+    def layer(self) -> NDArray[np.int32]:
+        raise NotImplementedError
+    
+class IZRangePointDataPackage(IPointDataPackage):
+    """
+    Interface for packages for which the data is defined by z-range, x and y coordinates independent of the domain definition.
+    """
+
+    @property
+    @abstractmethod
+    def z_top(self) -> NDArray[np.float64]:
+        raise NotImplementedError
+
+    @property
+    @abstractmethod
+    def z_bottom(self) -> NDArray[np.float64]:
+        raise NotImplementedError

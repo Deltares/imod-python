@@ -2,10 +2,11 @@ import abc
 from abc import abstractmethod
 from typing import Any
 
+from imod.common.interfaces.inode import INode
 from imod.common.interfaces.ipackagebase import IPackageBase
 
 
-class IPackage(IPackageBase, metaclass=abc.ABCMeta):
+class IPackage(IPackageBase, INode, metaclass=abc.ABCMeta):
     """
     Interface for imod.mf6.package.Package
     """

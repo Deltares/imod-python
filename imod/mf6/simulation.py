@@ -18,11 +18,10 @@ import xarray as xr
 import xugrid as xu
 
 import imod
-from imod.mf6.clipping.ClipBoxVisitor import ClipBoxVisitor
 import imod.mf6.exchangebase
 from imod.common.interfaces.imodel import IModel
 from imod.common.interfaces.isimulation import ISimulation
-from imod.common.interfaces.ivisitee import IVisitee
+from imod.common.interfaces.ivisitee import IVisitee, IVisitor
 from imod.common.serializer import EngineType
 from imod.common.statusinfo import NestedStatusInfo
 from imod.common.utilities.dataclass_type import DataclassType
@@ -34,6 +33,7 @@ from imod.common.utilities.version import (
     prepend_content_with_version_info,
 )
 from imod.logging import standard_log_decorator
+from imod.mf6.clipping.ClipBoxVisitor import ClipBoxVisitor
 from imod.mf6.gwfgwf import GWFGWF
 from imod.mf6.gwfgwt import GWFGWT
 from imod.mf6.gwtgwt import GWTGWT
@@ -66,7 +66,6 @@ from imod.typing.grid import (
     is_unstructured,
     merge_partitions,
 )
-
 
 OUTPUT_FUNC_MAPPING: dict[str, Callable] = {
     "head": open_hds,
@@ -1193,9 +1192,9 @@ class Modflow6Simulation(collections.UserDict, ISimulation, IVisitee):
         """
         return {k: v for k, v in self.items() if isinstance(v, Modflow6Model)}
 
-    def accept(self, visitor) -> ISimulation:
-        return visitor.visit_simulation(self, self.name)
-    
+    def accept(self, visitor: IVisitor) -> ISimulation:
+        return visitor.visit_simulation(self)
+
     @standard_log_decorator()
     def clip_box(
         self,
@@ -1282,6 +1281,7 @@ class Modflow6Simulation(collections.UserDict, ISimulation, IVisitee):
         ... )
         """
 
+        # Perform validation
         if self.is_split():
             raise RuntimeError(
                 "Unable to clip simulation. Clipping can only be done on simulations that haven't been split."
@@ -1299,7 +1299,15 @@ class Modflow6Simulation(collections.UserDict, ISimulation, IVisitee):
                 raise ValueError(
                     f"simulation cannot be clipped due to presence of package '{error_with_object}' in model '{model_name}'"
                 )
-                
+
+        # Create a mapping of model name to boundary state package
+        model_to_boundary_state = {}
+        if states_for_boundary is not None:
+            for model_name, model in self.get_models().items():
+                boundary_state = states_for_boundary.get(model_name)
+                model_to_boundary_state[model.uuid] = boundary_state
+
+        # Clip simulation
         visitor = ClipBoxVisitor(
             time_min=time_min,
             time_max=time_max,
@@ -1309,10 +1317,10 @@ class Modflow6Simulation(collections.UserDict, ISimulation, IVisitee):
             x_max=x_max,
             y_min=y_min,
             y_max=y_max,
-            states_for_boundary=states_for_boundary,
+            model_to_boundary_state=model_to_boundary_state,
             ignore_time_purge_empty=ignore_time_purge_empty,
         )
-        
+
         clipped = self.accept(visitor)
 
         return clipped

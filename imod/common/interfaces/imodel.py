@@ -2,12 +2,13 @@ from abc import abstractmethod
 from typing import Optional, Tuple
 
 from imod.common.interfaces.idict import IDict
+from imod.common.interfaces.inode import INode
 from imod.common.statusinfo import StatusInfoBase
 from imod.mf6.validation_settings import ValidationSettings
 from imod.typing import GridDataArray
 
 
-class IModel(IDict):
+class IModel(IDict, INode):
     """
     Interface for imod.mf6.model.Modflow6Model
     """

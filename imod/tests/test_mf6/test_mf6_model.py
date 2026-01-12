@@ -235,7 +235,7 @@ class TestModel:
 
         discretization_mock = MagicMock(spec_set=Package)
         discretization_mock._pkg_id = "dis"
-        discretization_mock.clip_box.return_value = discretization_mock
+        discretization_mock.accept.return_value = discretization_mock
 
         model = model_type()
         model["dis"] = discretization_mock
@@ -263,7 +263,7 @@ class TestModel:
 
         discretization_mock = MagicMock(spec_set=Package)
         discretization_mock._pkg_id = "dis"
-        discretization_mock.clip_box.return_value = discretization_mock
+        discretization_mock.accept.return_value = discretization_mock
 
         clipped_boundary_mock = MagicMock(spec_set=pkg_type)
         clipped_boundary_mock.is_empty.return_value = False
@@ -306,11 +306,11 @@ class TestModel:
         discretization_mock = MagicMock(spec_set=Package)
         discretization_mock._pkg_id = "dis"
         discretization_mock.is_empty.side_effect = [False, False]
-        discretization_mock.clip_box.return_value = discretization_mock
+        discretization_mock.accept.return_value = discretization_mock
 
         constant_boundary_mock = MagicMock(spec_set=pkg_type)
         constant_boundary_mock.is_empty.side_effect = [False, False]
-        constant_boundary_mock.clip_box.return_value = constant_boundary_mock
+        constant_boundary_mock.accept.return_value = constant_boundary_mock
 
         unassigned_original_constant_boundary = MagicMock(spec_set=pkg_type)
         unassigned_original_constant_boundary.is_empty.side_effect = [False]
