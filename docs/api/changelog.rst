@@ -39,6 +39,8 @@ Fixed
   and the model already contained a :class:`imod.mf6.ConstantHead` or
   :class:`imod.mf6.ConstantConcentration`, both with timesteps, which were
   unaligned.
+- Fixed bug where :class:`imod.mf6.Lake` package did not pass ``budgetfile``,
+  ``budgetcsvfile``, ``stagefile`` options to the written MODFLOW 6 package.
 
 Changed
 ~~~~~~~
