@@ -8,6 +8,7 @@ create a lake package.
 import pathlib
 import textwrap
 from collections import defaultdict
+from pathlib import Path
 from typing import Any, Dict
 
 import jinja2
@@ -670,6 +671,9 @@ class Lake(BoundaryCondition):
             DTypeSchema(np.floating),
             DimsSchema("index", "time") | DimsSchema(),
         ],
+        "budgetcsvfile": [DTypeSchema(str) | DTypeSchema(Path)],
+        "stagefile": [DTypeSchema(str) | DTypeSchema(Path)],
+        "budgetfile": [DTypeSchema(str) | DTypeSchema(Path)],
     }
 
     _write_schemata = {
