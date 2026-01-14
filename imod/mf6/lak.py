@@ -8,8 +8,8 @@ create a lake package.
 import pathlib
 import textwrap
 from collections import defaultdict
-from typing import Any, Dict
 from pathlib import Path
+from typing import Any, Dict
 
 import jinja2
 import numpy as np

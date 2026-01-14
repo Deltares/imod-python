@@ -53,7 +53,9 @@ def test_lake_render__options(lake_package):
     lake_package.dataset["stagefile"] = Path("path/to/stagefile.bin")
     lake_package.dataset["budgetfile"] = "path/to/budgetfile.bin"
     lake_package.dataset["budgetcsvfile"] = "path/to/budgetcsvfile.bin"
-    lake_package._validate_init_schemata(True) # Verify that added options pass validation.
+    lake_package._validate_init_schemata(
+        True
+    )  # Verify that added options pass validation.
     actual = lake_package._render(None, None, None, False)
     expected = textwrap.dedent(
         """\
