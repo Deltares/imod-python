@@ -482,6 +482,21 @@ class Modflow6Model(collections.UserDict, IModel, abc.ABC):
         )
 
     @standard_log_decorator()
+    def _prepare_sfr_for_mf6(
+        self, pkgname: str, validate_context: ValidationContext
+    ) -> Mf6Wel:
+        pkg = self[pkgname]
+        top, bottom, idomain = self._get_domain_geometry()
+        k = self._get_k()
+        return pkg._to_mf6_pkg(
+            idomain,
+            top,
+            bottom,
+            k,
+            validate_context,
+        )
+
+    @standard_log_decorator()
     def write(
         self,
         modelname: str,
@@ -564,6 +579,13 @@ class Modflow6Model(collections.UserDict, IModel, abc.ABC):
                 if issubclass(type(pkg), GridAgnosticWell):
                     mf6_well_pkg = self._prepare_wel_for_mf6(pkg_name, validate_context)
                     mf6_well_pkg._write(
+                        pkgname=pkg_name,
+                        globaltimes=globaltimes,
+                        write_context=pkg_write_context,
+                    )
+                elif isinstance(pkg, imod.mf6.StreamFlowRouting):
+                    mf6_sfr_pkg = self._prepare_sfr_for_mf6(pkg_name, validate_context)
+                    mf6_sfr_pkg._write(
                         pkgname=pkg_name,
                         globaltimes=globaltimes,
                         write_context=pkg_write_context,
