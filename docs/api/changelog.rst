@@ -41,6 +41,9 @@ Fixed
   unaligned.
 - Fixed bug where :class:`imod.mf6.Lake` package did not pass ``budgetfile``,
   ``budgetcsvfile``, ``stagefile`` options to the written MODFLOW 6 package.
+- Fixed bug where :func:`imod.evaluate.convert_pointwaterhead_freshwaterhead`
+  produced incorrect results when point water heads were below elevation levels
+  for unstructured grids.
 
 Changed
 ~~~~~~~
