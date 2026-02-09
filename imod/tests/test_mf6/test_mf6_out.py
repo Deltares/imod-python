@@ -434,7 +434,7 @@ def test_open_cbc__dis_datetime(transient_twri_result):
         )
 
     for array in cbc.values():
-        assert array.coords["time"].dtype == np.dtype("datetime64[ns]")
+        assert array.coords["time"].dtype == np.dtype("datetime64[us]")
 
 
 def test_open_cbc__dis_transient_unconfined(transient_unconfined_twri_result):
@@ -535,7 +535,7 @@ def test_open_cbc__disv_datetime(circle_result):
         )
 
     for array in cbc.values():
-        assert array.coords["time"].dtype == np.dtype("datetime64[ns]")
+        assert array.coords["time"].dtype == np.dtype("datetime64[us]")
 
 
 def test_open_cbc__disv_sto(circle_result_sto):
