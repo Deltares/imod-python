@@ -194,7 +194,7 @@ simulation["flow_solver"] = imod.mf6.Solution(
 # stress period is a year long. We can then use the "last" keyword in the output
 # control to save the output.
 
-simtimes = pd.date_range(start="2000-01-01", end="2030-01-01", freq="As")
+simtimes = pd.date_range(start="2000-01-01", end="2030-01-01", freq="YS")
 simulation.create_time_discretization(additional_times=simtimes)
 
 # %%
