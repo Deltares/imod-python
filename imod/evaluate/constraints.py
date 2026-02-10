@@ -254,8 +254,12 @@ def intra_cell_boundary_conditions(
                 if not drop_allnan or not dt.isnull().all():
                     results.append(dt)
                     resultids.append(comb)
+    # Set index to object dtype to work around xarray concat issue where
+    # StringDtype could not be interpreted as a data type with pandas 3.0 (as
+    # np.dtype is called.)
+    id_index = pd.Index(resultids, name="combination", dtype="object")
     dt_all = xr.concat(
-        results, pd.Index(resultids, name="combination"), coords="minimal"
+        results, id_index, coords="minimal"
     )
 
     # overall dt

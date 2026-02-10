@@ -94,10 +94,12 @@ def test_intra_cell_boundary_conditions(test_da1):
     riv1drn = test_da1 * (0.3 * 1.0) / min(100.0, 150) * (1.0 - 0.0)
     dt_min_ref = np.minimum(ghbdrn, riv1drn)
 
+    expected_index = pd.Index(["ghb-drn", "riv_0-drn"], name="combination", dtype="object")
+
     assert dt_min_ref.equals(dt_min)
     assert dt_all.equals(
         xr.concat(
-            (ghbdrn, riv1drn), pd.Index(["ghb-drn", "riv_0-drn"], name="combination")
+            (ghbdrn, riv1drn), expected_index
         )
     )
 
