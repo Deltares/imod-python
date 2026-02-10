@@ -267,7 +267,7 @@ def read_binary(path: Union[str, Path]) -> "geopandas.GeoDataFrame":  # type: ig
     else:
         df = pd.DataFrame()
     df["feature_type"] = feature_type
-    df["feature_type"] = df["feature_type"].replace(GENTYPE_TO_NAME)
+    df["feature_type"] = df["feature_type"].replace(GENTYPE_TO_NAME).astype(str)
 
     geometry = []
     for ftype, geom in zip(feature_type, xy):
