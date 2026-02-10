@@ -458,7 +458,8 @@ def write_assoc(path, df, itype=1, nodata=1.0e20, assoc_columns=None):
     # The reason is that datetime columns are converted to string as well
     # and then quoted. This causes trouble with some iMOD(batch) functions.
     for column in df.columns:
-        if df.loc[:, column].dtype == np.dtype("O"):
+        # Test for strings compatible with pandas 2 and 3
+        if pd.api.types.is_string_dtype(df[column].dtype):
             df.loc[:, column] = df.loc[:, column].astype(str)
             df.loc[:, column] = '"' + df.loc[:, column] + '"'
 
@@ -509,7 +510,8 @@ def write(path, df, indexcolumn=0, assoc_ext="txt", nodata=1.0e20):
     # The reason is that datetime columns are converted to string as well
     # and then quoted. This causes trouble with some iMOD(batch) functions.
     for column in df.columns:
-        if df.loc[:, column].dtype == np.dtype("O"):
+        # Test for strings compatible with pandas 2 and 3
+        if pd.api.types.is_string_dtype(df[column].dtype):
             df.loc[:, column] = df.loc[:, column].astype(str)
             df.loc[:, column] = '"' + df.loc[:, column] + '"'
 
