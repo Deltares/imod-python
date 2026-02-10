@@ -409,7 +409,8 @@ def test_planar_rch_from_imod5_constant(imod5_dataset, tmp_path):
     target_discretization = StructuredDiscretization.from_imod5_data(data)
 
     # create a planar grid with time-independent recharge
-    data["rch"]["rate"]["layer"].values[0] = -1
+    data["rch"]["rate"] = data["rch"]["rate"].assign_coords(layer=[-1])
+
     assert not is_transient_data_grid(data["rch"]["rate"])
     assert is_planar_grid(data["rch"]["rate"])
 
@@ -432,7 +433,7 @@ def test_planar_rch_from_imod5_constant(imod5_dataset, tmp_path):
     assert "maxbound 33856" in rendered_rch
     assert rendered_rch.count("begin period") == 1
     # teardown
-    data["rch"]["rate"]["layer"].values[0] = 1
+    data["rch"]["rate"] = data["rch"]["rate"].assign_coords(layer=[1])
 
 
 @pytest.mark.unittest_jit
