@@ -883,7 +883,9 @@ def test_import_and_convert_to_mf6(imod5_dataset, tmp_path, wel_class):
     wel = wel_class.from_imod5_data("wel-WELLS_L3", data, times, minimum_thickness=1.0)
     assert wel.dataset["x"].values[0] == 197910.0
     assert wel.dataset["y"].values[0] == 362860.0
-    np.testing.assert_almost_equal(np.mean(wel.dataset["rate"].values), -317.2059091946156)
+    np.testing.assert_almost_equal(
+        np.mean(wel.dataset["rate"].values), -317.2059091946156
+    )
     # convert to a gridded well
     top = target_dis.dataset["top"]
     bottom = target_dis.dataset["bottom"]
@@ -895,7 +897,9 @@ def test_import_and_convert_to_mf6(imod5_dataset, tmp_path, wel_class):
     assert len(mf6_well.dataset["x"].values) == 1
     assert mf6_well.dataset["x"].values[0] == 197910.0
     assert mf6_well.dataset["y"].values[0] == 362860.0
-    np.testing.assert_almost_equal(np.mean(mf6_well.dataset["rate"].values), -317.2059091946156)
+    np.testing.assert_almost_equal(
+        np.mean(mf6_well.dataset["rate"].values), -317.2059091946156
+    )
 
     # write the package for validation
     write_context = WriteContext(simulation_directory=tmp_path)
