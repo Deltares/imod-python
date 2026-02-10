@@ -126,7 +126,8 @@ def stability_constraint_advection(front, lower, right, top_bot, porosity=0.3, R
     dt = 1.0 / (1.0 / dt_x + 1.0 / dt_y + 1.0 / dt_z)
 
     dt_xyz = xr.concat(
-        (dt_x, dt_y, dt_z), dim=pd.Index(["x", "y", "z"], name="direction")
+        (dt_x, dt_y, dt_z),
+        dim=pd.Index(["x", "y", "z"], name="direction", dtype="object"),
     )
     return dt, dt_xyz
 
@@ -258,9 +259,7 @@ def intra_cell_boundary_conditions(
     # StringDtype could not be interpreted as a data type with pandas 3.0 (as
     # np.dtype is called.)
     id_index = pd.Index(resultids, name="combination", dtype="object")
-    dt_all = xr.concat(
-        results, id_index, coords="minimal"
-    )
+    dt_all = xr.concat(results, id_index, coords="minimal")
 
     # overall dt
     dt_min = dt_all.min(dim="combination")
