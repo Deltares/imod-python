@@ -16,7 +16,7 @@ def assert_frame_equal(left: pd.DataFrame, right: pd.DataFrame, **kwargs):
     def always_int64(df):
         df = df.copy()
         for column, dtype in df.dtypes.items():
-            if np.issubdtype(dtype, np.integer):
+            if pd.api.types.is_integer_dtype(dtype):
                 df[column] = df[column].astype(np.int64)
         return df
 

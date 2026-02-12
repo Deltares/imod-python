@@ -44,6 +44,8 @@ Fixed
 - Fixed bug where :func:`imod.evaluate.convert_pointwaterhead_freshwaterhead`
   produced incorrect results when point water heads were below elevation levels
   for unstructured grids.
+- Support pandas 3.0.
+
 
 Changed
 ~~~~~~~

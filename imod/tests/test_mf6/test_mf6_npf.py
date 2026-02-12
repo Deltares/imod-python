@@ -303,10 +303,8 @@ def test_npf_from_imod5_settings(imod5_dataset, tmp_path):
     # move the coordinates a bit so that it doesn't match the grid of k (and the regridding settings will matter)
     target_grid = data["khv"]["kh"]
     x = target_grid["x"].values
-    x += 50
     y = target_grid["y"].values
-    y += 50
-    target_grid = target_grid.assign_coords({"x": x, "y": y})
+    target_grid = target_grid.assign_coords({"x": x + 50, "y": y + 50})
 
     settings = imod.mf6.NodePropertyFlow.get_regrid_methods()
     settings_1 = deepcopy(settings)

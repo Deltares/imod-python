@@ -22,7 +22,7 @@ def test_render():
         """\
         begin options
           time_units days
-          start_date_time 2000-01-01T00:00:00.000000000
+          start_date_time 2000-01-01T00:00:00.000000
         end options
 
         begin dimensions

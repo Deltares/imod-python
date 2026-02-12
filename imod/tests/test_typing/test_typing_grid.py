@@ -95,11 +95,11 @@ def test_is_planar_grid(basic_dis, basic_unstructured_dis):
         assert not is_planar_grid(bottom_layer)
 
         # set layer coordinates as present and 0
-        bottom_layer.coords["layer"].values[0] = 0
+        bottom_layer = bottom_layer.assign_coords(layer=[0])
         assert is_planar_grid(bottom_layer)
 
         # set layer coordinates as present and -1
-        bottom_layer.coords["layer"].values[0] = -1
+        bottom_layer = bottom_layer.assign_coords(layer=[-1])
         assert is_planar_grid(bottom_layer)
 
 
@@ -120,7 +120,7 @@ def test_has_negative_layer(basic_dis, basic_unstructured_dis):
         assert not has_negative_layer(bottom_layer)
 
         # set layer coordinates as present and -1
-        bottom_layer.coords["layer"].values[0] = -1
+        bottom_layer = bottom_layer.assign_coords(layer=[-1])
         assert has_negative_layer(bottom_layer)
 
 

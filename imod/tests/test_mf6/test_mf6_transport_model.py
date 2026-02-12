@@ -153,7 +153,7 @@ def test_transport_concentration_loading(tmp_path, flow_transport_simulation):
         simulation_start_time="2000-01-31",
         time_unit="s",
     )
-    assert conc_time.coords["time"].dtype == np.dtype("datetime64[ns]")
+    assert conc_time.coords["time"].dtype == np.dtype("datetime64[us]")
 
 
 def test_transport_balance_loading(tmp_path, flow_transport_simulation):
@@ -170,7 +170,7 @@ def test_transport_balance_loading(tmp_path, flow_transport_simulation):
         simulation_start_time="2000-01-31",
         time_unit="s",
     )
-    assert balance_time.coords["time"].dtype == np.dtype("datetime64[ns]")
+    assert balance_time.coords["time"].dtype == np.dtype("datetime64[us]")
 
     np.testing.assert_allclose(
         balance_notime.sel(species="a")["source-sink mix_ssm"].values,
