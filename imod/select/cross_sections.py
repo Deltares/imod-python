@@ -274,16 +274,14 @@ def _cross_section(data, linecoords):
     else:
         ys[1:] += np.abs(dy_a).cumsum()
 
-    length = linecoords.size - 1
-
-    ixs = np.empty(length, dtype=np.int64)
-    iys = np.empty(length, dtype=np.int64)
-    sdxs = np.empty(length, dtype=np.float64)
-    sdys = np.empty(length, dtype=np.float64)
-    segments = np.empty(length, dtype=np.float64)
+    ixs_ls = []
+    iys_ls = []
+    sdxs_ls = []
+    sdys_ls = []
+    segments_ls = []
 
     bounding_box = _bounding_box(xmin, xmax, ymin, ymax)
-    for idx, (start, end) in enumerate(zip(linecoords[:-1], linecoords[1:])):
+    for start, end in zip(linecoords[:-1], linecoords[1:]):
         linestring = sg.LineString([start, end])
         if not linestring.length:
             continue
@@ -294,20 +292,27 @@ def _cross_section(data, linecoords):
                 xs, ys, x0, x1, y0, y1, xmin, xmax, ymin, ymax
             )
         else:  # append the linestring in full as nodata section
-            i = -1
-            j = -1
-            sdx = -1
-            sdy = -1
-            segment_length = linestring.length
+            i = np.array([-1])
+            j = np.array([-1])
+            sdx = np.array([-1])
+            sdy = np.array([-1])
+            segment_length = np.array([linestring.length])
 
-        ixs[idx] = i
-        iys[idx] = j
-        sdxs[idx] = sdx
-        sdys[idx] = sdy
-        segments[idx] = segment_length
+        ixs_ls.append(i)
+        iys_ls.append(j)
+        sdxs_ls.append(sdx)
+        sdys_ls.append(sdy)
+        segments_ls.append(segment_length)
 
-    if np.all(ixs == -1):
+    if len(ixs_ls) == 0:
         raise ValueError("Linestring does not intersect data")
+
+    # Concatenate into a single array
+    ixs = np.concatenate(ixs_ls)
+    iys = np.concatenate(iys_ls)
+    sdxs = np.concatenate(sdxs_ls)
+    sdys = np.concatenate(sdys_ls)
+    segments = np.concatenate(segments_ls)
 
     # Flip around indexes
     if x_decreasing:
