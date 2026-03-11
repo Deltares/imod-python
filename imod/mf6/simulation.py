@@ -25,6 +25,7 @@ from imod.common.serializer import EngineType
 from imod.common.statusinfo import NestedStatusInfo
 from imod.common.utilities.dataclass_type import DataclassType
 from imod.common.utilities.mask import mask_all_models
+from imod.common.utilities.partitioninfo import create_partition_info
 from imod.common.utilities.regrid import _regrid_like
 from imod.common.utilities.version import (
     get_version,
@@ -43,10 +44,7 @@ from imod.mf6.multimodel.exchange_creator_structured import ExchangeCreator_Stru
 from imod.mf6.multimodel.exchange_creator_unstructured import (
     ExchangeCreator_Unstructured,
 )
-from imod.mf6.multimodel.modelsplitter import (
-    ModelSplitter,
-    create_partition_info,
-)
+from imod.mf6.multimodel.modelsplitter import ModelSplitter
 from imod.mf6.out import open_cbc, open_conc, open_hds
 from imod.mf6.package import Package
 from imod.mf6.validation_settings import ValidationSettings

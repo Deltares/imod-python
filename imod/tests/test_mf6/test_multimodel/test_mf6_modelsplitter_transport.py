@@ -4,9 +4,10 @@ from pathlib import Path
 import numpy as np
 import pytest
 
+from imod.common.utilities.partitioninfo import create_partition_info
 from imod.mf6 import AdvectionCentral, AdvectionTVD, AdvectionUpstream
 from imod.mf6.dsp import Dispersion
-from imod.mf6.multimodel.modelsplitter import ModelSplitter, create_partition_info
+from imod.mf6.multimodel.modelsplitter import ModelSplitter
 from imod.mf6.package import Package
 from imod.mf6.simulation import Modflow6Simulation
 from imod.tests.fixtures.mf6_modelrun_fixture import assert_simulation_can_run

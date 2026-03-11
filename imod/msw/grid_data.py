@@ -83,7 +83,29 @@ class GridData(MetaSwapPackage, IRegridPackage):
 
         self._pkgcheck()
 
-    def generate_index_array(self) -> tuple[np.ndarray, xr.DataArray]:
+    def generate_index_array(self) -> np.ndarray:
+        """
+        Generate index array to be used on other packages.
+
+        Returns
+        -------
+        np.ndarray
+            Index array and svat grid.
+            The index array is a 1D array with the index of the active cells.
+        """
+        area = self.dataset["area"]
+        active = self.dataset["active"]
+
+        isactive = area.where(active).notnull()
+        # Load into memory to avoid dask issue
+        # https://github.com/dask/dask/issues/11753
+        isactive.load()
+
+        index = isactive.values.ravel()
+
+        return index
+
+    def generate_index_svat_array(self) -> tuple[np.ndarray, xr.DataArray]:
         """
         Generate index array and svat grid to be used on other packages.
 
@@ -94,17 +116,18 @@ class GridData(MetaSwapPackage, IRegridPackage):
             The index array is a 1D array with the index of the active cells.
             The svat grid is a 2D array with the SVAT numbers for each cell.
         """
+        index = self.generate_index_array()
+
         area = self.dataset["area"]
         active = self.dataset["active"]
-
         isactive = area.where(active).notnull()
+
         svat = xr.full_like(area, fill_value=0, dtype=np.int64).rename("svat")
         # Load into memory to avoid dask issue
         # https://github.com/dask/dask/issues/11753
         isactive.load()
         svat.load()
 
-        index = isactive.values.ravel()
         svat.data[isactive.data] = np.arange(1, index.sum() + 1)
 
         return index, svat

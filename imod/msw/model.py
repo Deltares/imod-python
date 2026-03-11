@@ -10,6 +10,8 @@ import jinja2
 import numpy as np
 import xarray as xr
 
+from imod.common.utilities.clip import clip_by_grid
+from imod.common.utilities.partitioninfo import create_partition_info
 from imod.common.utilities.value_filters import enforce_scalar
 from imod.common.utilities.version import prepend_content_with_version_info
 from imod.mf6.dis import StructuredDiscretization
@@ -43,23 +45,26 @@ from imod.msw.utilities.imod5_converter import has_active_scaling_factor
 from imod.msw.utilities.mask import MaskValues, mask_and_broadcast_cap_data
 from imod.msw.utilities.parse import read_para_sim
 from imod.msw.vegetation import AnnualCropFactors
-from imod.typing import Imod5DataDict
+from imod.typing import GridDataArray, Imod5DataDict
 from imod.util.dims import drop_layer_dim_cap_data
 from imod.util.regrid import RegridderWeightsCache
+from imod.util.time import to_datetime_internal
 
 REQUIRED_PACKAGES = (
     GridData,
     CouplerMapping,
     Infiltration,
     LanduseOptions,
-    MeteoGrid,
     EvapotranspirationMapping,
     PrecipitationMapping,
     IdfMapping,
     TimeOutputControl,
     AnnualCropFactors,
 )
-
+METEO_PACKAGES = (
+    MeteoGrid,
+    MeteoGridCopy,
+)
 INITIAL_CONDITIONS_PACKAGES = (
     InitialConditionsEquilibrium,
     InitialConditionsPercolation,
@@ -113,6 +118,7 @@ class MetaSwapModel(Model):
 
     _pkg_id = "model"
     _file_name = "para_sim.inp"
+    _model_name = "MSW"
 
     _template = jinja2.Template(
         "{%for setting, value in settings.items()%}{{setting}} = {{value}}\n{%endfor%}"
@@ -122,6 +128,7 @@ class MetaSwapModel(Model):
         self,
         unsaturated_database: Path | str,
         settings: Optional[dict[str, Any]] = None,
+        starttime: Optional[str] = None,
     ):
         super().__init__()
 
@@ -130,6 +137,7 @@ class MetaSwapModel(Model):
         else:
             self.simulation_settings = settings
 
+        self.starttime = starttime
         self.simulation_settings["unsa_svat_path"] = unsaturated_database
 
     def _render_unsaturated_database_path(self, unsaturated_database: Union[str, Path]):
@@ -151,6 +159,10 @@ class MetaSwapModel(Model):
             raise ValueError(
                 f"Missing the following required packages: {missing_packages}"
             )
+
+        meteo_set = pkg_types_included & set(METEO_PACKAGES)
+        if len(meteo_set) < 1:
+            raise ValueError(f"Missing meteo package, assign one of {METEO_PACKAGES}")
 
         initial_condition_set = pkg_types_included & set(INITIAL_CONDITIONS_PACKAGES)
         if len(initial_condition_set) < 1:
@@ -205,6 +217,19 @@ class MetaSwapModel(Model):
         return FileCopier in pkg_types_included
 
     def _get_starttime(self):
+        if self.starttime is not None:
+            starttime = to_datetime_internal(self.starttime, use_cftime=False)
+        else:
+            starttime = self._get_minimum_package_time()
+
+        year, time_since_start_year = to_metaswap_timeformat([starttime])
+
+        year = int(enforce_scalar(year.values))
+        time_since_start_year = float(enforce_scalar(time_since_start_year.values))
+
+        return year, time_since_start_year
+
+    def _get_minimum_package_time(self):
         """
         Loop over all packages to get the minimum time.
 
@@ -218,14 +243,13 @@ class MetaSwapModel(Model):
             if "time" in ds.coords:
                 starttimes.append(ds["time"].min().values)
 
+        if len(starttimes) == 0:
+            raise ValueError(
+                "No package with a coordinate 'time' found. Please add a MeteoGrid or TimeOutputControl package."
+            )
+
         starttime = min(starttimes)
-
-        year, time_since_start_year = to_metaswap_timeformat([starttime])
-
-        year = int(enforce_scalar(year.values))
-        time_since_start_year = float(enforce_scalar(time_since_start_year.values))
-
-        return year, time_since_start_year
+        return starttime
 
     def get_pkgkey(
         self, pkg_type: type[MetaSwapPackage], optional_package: bool = False
@@ -268,7 +292,7 @@ class MetaSwapModel(Model):
         )
         return self.get_pkgkey(pkg_type, optional_package)
 
-    def _model_checks(self, validate: bool):
+    def _model_checks(self, validate: Optional[bool] = True):
         if validate and not self._has_file_copier():
             self._check_required_packages()
             self._check_vegetation_indices_in_annual_crop_factors()
@@ -311,8 +335,8 @@ class MetaSwapModel(Model):
         self,
         directory: Union[str, Path],
         mf6_dis: StructuredDiscretization,
-        mf6_wel: Mf6Wel,
-        validate: bool = True,
+        mf6_wel: Optional[Mf6Wel] = None,
+        validate: Optional[bool] = True,
     ):
         """
         Write packages and simulation settings (para_sim.inp).
@@ -336,7 +360,7 @@ class MetaSwapModel(Model):
         # Get index and svat
         grid_key = self.get_pkgkey(GridData)
         grid_pkg = cast(GridData, self[grid_key])
-        index, svat = grid_pkg.generate_index_array()
+        index, svat = grid_pkg.generate_index_svat_array()
 
         # write package contents
         for pkgname in self:
@@ -476,6 +500,102 @@ class MetaSwapModel(Model):
                     y_max=y_max,
                 )
         return clipped
+
+    def split(
+        self,
+        submodel_labels: GridDataArray,
+    ) -> dict[str, "MetaSwapModel"]:
+        """
+        Split a MetaSWAP model in different partitions using a submodel_labels
+        array.
+
+        Parameters
+        ----------
+        submodel_labels: xr.DataArray or xu.UgridDataArray
+            A grid that defines how the simulation will be split. The array
+            should have the same topology as the domain being split, i.e.
+            similar shape as a layer in the domain. The values in the array
+            indicate to which partition a cell belongs. The values should be
+            zero or greater.
+
+        Returns
+        -------
+        dict[str, MetaSwapModel]
+            A mapping from generated submodel names to the corresponding clipped
+            MetaSWAP submodel.
+        Examples
+        --------
+        >>> submodel_labels = mf6_sim.create_partition_labels(n_partitions=4)
+        >>> msw_splitted = msw.split(submodel_labels)
+        """
+
+        has_meteogrid = MeteoGrid in [type(pkg) for pkg in self.values()]
+        if has_meteogrid:
+            raise ValueError(
+                "Splitting packages of type MeteoGrid is not supported, use MeteoGridCopy instead."
+            )
+
+        has_meteogrid_copy = MeteoGridCopy in [type(pkg) for pkg in self.values()]
+
+        settings = deepcopy(self.simulation_settings)
+        starttime = self.starttime
+        unsa_svat_path = settings.pop("unsa_svat_path")
+
+        partition_info_list = create_partition_info(submodel_labels)
+
+        # Initialize mapping from partition IDs to models
+        partition_id_to_models: dict[int, dict[str, MetaSwapModel]] = {}
+        for submodel_partition_info in partition_info_list:
+            partition_id_to_models[submodel_partition_info.id] = {}
+        partitioned_submodels = {}
+        submodel_to_partition = {}
+
+        # Create empty MetaSWAP model for each partition
+        for submodel_partition_info in partition_info_list:
+            submodel_name = f"{self._model_name}_{submodel_partition_info.id}"
+
+            submodel = MetaSwapModel(unsa_svat_path, settings, starttime)
+            partitioned_submodels[submodel_name] = submodel
+            submodel_to_partition[submodel_name] = submodel_partition_info
+            partition_id_to_models[submodel_partition_info.id][submodel_name] = submodel
+
+        # First, handle the grid data and determine the overlap.
+        grid_key = self.get_pkgkey(GridData)
+        grid_pkg = cast(GridData, self[grid_key])
+        has_overlap = {}
+
+        for submodel_name, submodel in partitioned_submodels.items():
+            partition_info = submodel_to_partition[submodel_name]
+            sliced_grid_pkg = clip_by_grid(grid_pkg, partition_info.active_domain)
+            sliced_index = sliced_grid_pkg.generate_index_array()
+
+            # Add package to model if it has data in the overlap.
+            if bool(sliced_index.any()):
+                has_overlap[submodel_name] = True
+                submodel[grid_key] = sliced_grid_pkg
+            else:
+                has_overlap[submodel_name] = False
+
+        # Second, add other packages to each partitioned submodel.
+        for submodel_name, submodel in partitioned_submodels.items():
+            partition_info = submodel_to_partition[submodel_name]
+
+            if not has_overlap[submodel_name]:
+                continue
+
+            # Add packages to models
+            for pkg_name, pkg in self.items():
+                if isinstance(pkg, GridData):
+                    continue
+
+                if has_meteogrid_copy and isinstance(pkg, MeteoMapping):
+                    submodel[pkg_name] = deepcopy(pkg)
+                else:
+                    # Slice and add the package to the partitioned model
+                    sliced_package = clip_by_grid(pkg, partition_info.active_domain)
+                    submodel[pkg_name] = sliced_package
+
+        return partitioned_submodels
 
     @classmethod
     def from_imod5_data(
