@@ -17,6 +17,7 @@ Added
   :meth:`imod.mf6.Modflow6Simulation.clip_box` to consider a package empty if
   its first times step is all nodata. This can save a lot of clipping or masking
   transient models with many timesteps.
+- Added :meth:`imod.msw.MetaSwapModel.split` to split MetaSWAP models.
 
 Fixed
 ~~~~~
@@ -53,7 +54,7 @@ Changed
 - ``proportion_depth`` and ``proportion_rate`` in
   :class:`imod.mf6.Evapotranspiration` are now optional variables. If provided,
   now require ``"segment"`` dimension when ``proportion_depth`` and
-  ``proportion_rate``. 
+  ``proportion_rate``.
 
 
 [1.0.0] - 2025-11-11
@@ -132,7 +133,7 @@ Fixed
 - Fixed bug where :meth:`imod.mf6.Modflow6Simulation.split`,
   :meth:`imod.mf6.Modflow6Simulation.regrid_like`, and
   :meth:`imod.mf6.Modflow6Simulation.clip_box` would not copy
-  :class:`imod.mf6.ValidationSettings`. 
+  :class:`imod.mf6.ValidationSettings`.
 - ``landuse``, ``soil_physical_unit``, ``active`` for :class:`imod.msw.GridData`
   are now properly regridded with the ``mode`` statistic when using
   :meth:`imod.msw.GridData.regrid_like`.
@@ -189,7 +190,7 @@ Fixed
   ``states_for_boundary`` argument would place these bc at the
   incorrect places with unstructured grids.
 - Fixed bug where :meth:`imod.mf6.SourceSinkMixing.from_flow_model` would return
-  an error upon adding a package which cannot have a ``concentration``, such as 
+  an error upon adding a package which cannot have a ``concentration``, such as
   :class:`imod.mf6.HorizontalFlowBarrierResistance`.
 - Broken names for ``outer_csvfile`` and ``inner_csvfile`` in the
   :class:`imod.mf6.Solution` MODFLOW 6 template file.
@@ -343,8 +344,8 @@ Changed
   :meth:`imod.mf6.Recharge.from_imod5_data` got extra arguments for
   ``period_data``, ``time_min`` and ``time_max``.
 - :func:`imod.visualize.read_imod_legend` now also returns the labels as an extra
-  argument. Update your code by changing 
-  ``colors, levels = read_imod_legend(...)`` to 
+  argument. Update your code by changing
+  ``colors, levels = read_imod_legend(...)`` to
   ``colors, levels, labels = read_imod_legend(...)``.
 
 
