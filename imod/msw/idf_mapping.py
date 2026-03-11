@@ -2,7 +2,6 @@ from dataclasses import asdict
 from typing import Optional
 
 import numpy as np
-import xarray as xr
 
 from imod.common.interfaces.iregridpackage import IRegridPackage
 from imod.common.utilities.dataclass_type import DataclassType
@@ -46,25 +45,6 @@ class IdfMapping(MetaSwapPackage, IRegridPackage):
 
         self.dataset["area"] = area
         self.dataset["nodata"] = nodata
-
-        nrow = self.dataset.coords["y"].size
-        ncol = self.dataset.coords["x"].size
-
-        y_index = xr.DataArray(
-            np.arange(1, nrow + 1), coords={"y": self.dataset.coords["y"]}, dims=("y",)
-        )
-        x_index = xr.DataArray(
-            np.arange(1, ncol + 1), coords={"x": self.dataset.coords["x"]}, dims=("x",)
-        )
-        rows, columns = xr.broadcast(y_index, x_index)
-
-        self.dataset["rows"] = rows
-        self.dataset["columns"] = columns
-
-        y_grid, x_grid = xr.broadcast(self.dataset["y"], self.dataset["x"])
-
-        self.dataset["x_grid"] = x_grid
-        self.dataset["y_grid"] = y_grid
 
     def _get_output_settings(self):
         grid = self.dataset["area"]

@@ -139,6 +139,30 @@ class MetaSwapPackage(abc.ABC):
         Collect to be written data in a DataFrame and call
         ``self.write_dataframe_fixed_width``
         """
+        if self.__class__.__name__ == "IdfMapping":
+            nrow = self.dataset.coords["y"].size
+            ncol = self.dataset.coords["x"].size
+
+            y_index = xr.DataArray(
+                np.arange(1, nrow + 1),
+                coords={"y": self.dataset.coords["y"]},
+                dims=("y",),
+            )
+            x_index = xr.DataArray(
+                np.arange(1, ncol + 1),
+                coords={"x": self.dataset.coords["x"]},
+                dims=("x",),
+            )
+            rows, columns = xr.broadcast(y_index, x_index)
+
+            self.dataset["rows"] = rows
+            self.dataset["columns"] = columns
+
+            y_grid, x_grid = xr.broadcast(self.dataset["y"], self.dataset["x"])
+
+            self.dataset["x_grid"] = x_grid
+            self.dataset["y_grid"] = y_grid
+
         data_dict: DataDictType = {"svat": svat.values.ravel()[index]}
 
         subunit = svat.coords["subunit"]
