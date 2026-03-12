@@ -507,7 +507,8 @@ class MetaSwapModel(Model):
     ) -> dict[str, "MetaSwapModel"]:
         """
         Split a MetaSWAP model in different partitions using a submodel_labels
-        array.
+        array. Note: for specifying meteorological grid data, splitting is only
+        supported when the MeteoGridCopy instance is being used.
 
         Parameters
         ----------
