@@ -1,5 +1,4 @@
 import csv
-from filecmp import cmp
 from pathlib import Path
 from shutil import copyfile
 from typing import Optional, Union
@@ -42,8 +41,6 @@ class MeteoGrid(MetaSwapPackage, IRegridPackage):
     _meteo_dirname = "meteo_grids"
 
     _regrid_method = MeteoGridRegridMethod()
-
-    _write_level_up = False
 
     def __init__(self, precipitation: xr.DataArray, evapotranspiration: xr.DataArray):
         super().__init__()
@@ -107,7 +104,7 @@ class MeteoGrid(MetaSwapPackage, IRegridPackage):
         else:
             return True
 
-    def _compose_dataframe(self, times: np.ndarray, level_up: Optional[bool] = False):
+    def _compose_dataframe(self, times: np.ndarray):
         dataframe = pd.DataFrame(index=times)
 
         year, time_since_start_year = to_metaswap_timeformat(times)
@@ -117,10 +114,7 @@ class MeteoGrid(MetaSwapPackage, IRegridPackage):
 
         # Data dir is always relative to model dir, so don't use model directory
         # here
-        if level_up:
-            data_dir = Path("..") / self._meteo_dirname
-        else:
-            data_dir = Path(".") / self._meteo_dirname
+        data_dir = Path(".") / self._meteo_dirname
 
         for varname in self.dataset.data_vars:
             # If grid, we have to add the filename of the .asc to be written
@@ -171,23 +165,18 @@ class MeteoGrid(MetaSwapPackage, IRegridPackage):
         """
 
         directory = Path(directory)
-        if self._write_level_up:
-            grid_directory = directory / ".."
-        else:
-            grid_directory = directory
 
         times = self.dataset["time"].values
 
-        dataframe = self._compose_dataframe(times, self._write_level_up)
-
+        dataframe = self._compose_dataframe(times)
         self._write_free_format_file(directory / self._file_name, dataframe)
 
         # Write grid data to ESRI ASCII files
         for varname in self.dataset.data_vars:
             if self._is_grid(str(varname)):
-                path = (
-                    grid_directory / self._meteo_dirname / str(varname)
-                ).with_suffix(".asc")
+                path = (directory / self._meteo_dirname / str(varname)).with_suffix(
+                    ".asc"
+                )
                 imod.rasterio.save(
                     path, self.dataset[str(varname)], nodata=MaskValues.default
                 )
@@ -237,17 +226,7 @@ class MeteoGridCopy(MetaSwapPackage, IRegridPackage):
         directory = Path(directory)
         path_metegrid = Path(str(self.dataset["path"].values[()]))
         new_path = directory / self._file_name
-
-        if not new_path.is_file():
-            write_metegrid = True
-        else:
-            if cmp(path_metegrid, new_path):
-                write_metegrid = False
-            else:
-                write_metegrid = True
-
-        if write_metegrid:
-            copyfile(path_metegrid, new_path)
+        copyfile(path_metegrid, new_path)
 
     @classmethod
     def from_imod5_data(cls, imod5_data: Imod5DataDict) -> "MeteoGridCopy":
