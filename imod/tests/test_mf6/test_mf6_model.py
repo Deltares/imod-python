@@ -21,6 +21,7 @@ from imod.mf6.validation_settings import ValidationSettings
 from imod.mf6.write_context import WriteContext
 from imod.schemata import ValidationError
 from imod.typing.grid import concat, nan_like
+from imod.common.utilities.dump_model import dump_modelpkgs
 
 
 # Duplicate from test_mf6_dis.py
@@ -91,7 +92,7 @@ def test_key_assign():
 
 
 def roundtrip(model, tmp_path):
-    model.dump(tmp_path, "test")
+    dump_modelpkgs(tmp_path, "test")
     back = type(model).from_file(tmp_path / "test/test.toml")
     assert isinstance(back, type(model))
 

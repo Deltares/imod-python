@@ -46,6 +46,7 @@ from imod.msw.vegetation import AnnualCropFactors
 from imod.typing import Imod5DataDict
 from imod.util.dims import drop_layer_dim_cap_data
 from imod.util.regrid import RegridderWeightsCache
+from imod.common.interfaces.imodel import IModel
 
 REQUIRED_PACKAGES = (
     GridData,
@@ -90,7 +91,7 @@ DEFAULT_SETTINGS: dict[str, Any] = {
 }
 
 
-class Model(collections.UserDict):
+class Model(collections.UserDict,IModel):
     def __setitem__(self, key, value):
         # TODO: Add packagecheck
         super().__setitem__(key, value)

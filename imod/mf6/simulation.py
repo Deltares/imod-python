@@ -25,6 +25,7 @@ from imod.common.serializer import EngineType
 from imod.common.statusinfo import NestedStatusInfo
 from imod.common.utilities.dataclass_type import DataclassType
 from imod.common.utilities.mask import mask_all_models
+from imod.common.utilities.dump_model import dump_modelpkgs
 from imod.common.utilities.regrid import _regrid_like
 from imod.common.utilities.version import (
     get_version,
@@ -1039,8 +1040,8 @@ class Modflow6Simulation(collections.UserDict, ISimulation):
         for key, value in self.items():
             cls_name = type(value).__name__
             if isinstance(value, Modflow6Model):
-                model_toml_path = value.dump(
-                    directory, key, validate, mdal_compliant, crs, engine=engine
+                model_toml_path = dump_modelpkgs(
+                    value, directory, key, validate, mdal_compliant, crs, engine=engine
                 )
                 toml_content[cls_name][key] = model_toml_path.relative_to(
                     directory
