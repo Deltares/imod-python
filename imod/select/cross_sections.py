@@ -274,11 +274,11 @@ def _cross_section(data, linecoords):
     else:
         ys[1:] += np.abs(dy_a).cumsum()
 
-    ixs = []
-    iys = []
-    sdxs = []
-    sdys = []
-    segments_list = []
+    ixs_ls = []
+    iys_ls = []
+    sdxs_ls = []
+    sdys_ls = []
+    segments_ls = []
 
     bounding_box = _bounding_box(xmin, xmax, ymin, ymax)
     for start, end in zip(linecoords[:-1], linecoords[1:]):
@@ -298,21 +298,21 @@ def _cross_section(data, linecoords):
             sdy = np.array([-1])
             segment_length = np.array([linestring.length])
 
-        ixs.append(i)
-        iys.append(j)
-        sdxs.append(sdx)
-        sdys.append(sdy)
-        segments_list.append(segment_length)
+        ixs_ls.append(i)
+        iys_ls.append(j)
+        sdxs_ls.append(sdx)
+        sdys_ls.append(sdy)
+        segments_ls.append(segment_length)
 
-    if len(ixs) == 0:
+    if len(ixs_ls) == 0:
         raise ValueError("Linestring does not intersect data")
 
     # Concatenate into a single array
-    ixs = np.concatenate(ixs)
-    iys = np.concatenate(iys)
-    sdxs = np.concatenate(sdxs)
-    sdys = np.concatenate(sdys)
-    segments = np.concatenate(segments_list)
+    ixs = np.concatenate(ixs_ls)
+    iys = np.concatenate(iys_ls)
+    sdxs = np.concatenate(sdxs_ls)
+    sdys = np.concatenate(sdys_ls)
+    segments = np.concatenate(segments_ls)
 
     # Flip around indexes
     if x_decreasing:
