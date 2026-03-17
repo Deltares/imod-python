@@ -536,8 +536,6 @@ class MetaSwapModel(Model):
                 "Splitting packages of type MeteoGrid is not supported, use MeteoGridCopy instead."
             )
 
-        has_meteogrid_copy = MeteoGridCopy in [type(pkg) for pkg in self.values()]
-
         settings = deepcopy(self.simulation_settings)
         starttime = self.starttime
         unsa_svat_path = settings.pop("unsa_svat_path")
@@ -563,25 +561,25 @@ class MetaSwapModel(Model):
         # First, handle the grid data and determine the overlap.
         grid_key = self.get_pkgkey(GridData)
         grid_pkg = cast(GridData, self[grid_key])
-        has_overlap = {}
+        is_in_active_domain = {}
 
         for submodel_name, submodel in partitioned_submodels.items():
             partition_info = submodel_to_partition[submodel_name]
             sliced_grid_pkg = clip_by_grid(grid_pkg, partition_info.active_domain)
             sliced_index = sliced_grid_pkg.generate_index_array()
 
-            # Add package to model if it has data in the overlap.
+            # Add package to model if it has data in the active domain.
             if bool(sliced_index.any()):
-                has_overlap[submodel_name] = True
+                is_in_active_domain[submodel_name] = True
                 submodel[grid_key] = sliced_grid_pkg
             else:
-                has_overlap[submodel_name] = False
+                is_in_active_domain[submodel_name] = False
 
         # Second, add other packages to each partitioned submodel.
         for submodel_name, submodel in partitioned_submodels.items():
             partition_info = submodel_to_partition[submodel_name]
 
-            if not has_overlap[submodel_name]:
+            if not is_in_active_domain[submodel_name]:
                 continue
 
             # Add packages to models
@@ -589,7 +587,7 @@ class MetaSwapModel(Model):
                 if isinstance(pkg, GridData):
                     continue
 
-                if has_meteogrid_copy and isinstance(pkg, MeteoMapping):
+                if isinstance(pkg, MeteoMapping):
                     submodel[pkg_name] = deepcopy(pkg)
                 else:
                     # Slice and add the package to the partitioned model
