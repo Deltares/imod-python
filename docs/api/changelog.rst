@@ -46,6 +46,8 @@ Fixed
   produced incorrect results when point water heads were below elevation levels
   for unstructured grids.
 - Support pandas 3.0.
+- :class:`imod.msw.IdfMapping` when model clipping is applied, the global
+  row/column indices are converted to local indices, as writen in idf_svat.inp.
 
 
 Changed
