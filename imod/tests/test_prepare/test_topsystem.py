@@ -359,8 +359,8 @@ def test_drn_allocation__elevation_above_surface_level(
     argnames="option,expected,_", prefix="allocation_", has_tag="drn"
 )
 def test_drn_allocation__elevation_equal_to_bottom(
-        active, top, bottom, drn_elevation, option, expected, _
-    ):
+    active, top, bottom, drn_elevation, option, expected, _
+):
     # Set bottom in layer 3 to drain elevation, take first value (drain
     # elevation is equal everywhere.)
     bottom.loc[bottom.coords["layer"] == 3] = drn_elevation.values.ravel()[0]
@@ -372,7 +372,6 @@ def test_drn_allocation__elevation_equal_to_bottom(
 
     np.testing.assert_equal(actual, expected)
     assert np.all(~empty)
-
 
 
 @parametrize_with_cases(
