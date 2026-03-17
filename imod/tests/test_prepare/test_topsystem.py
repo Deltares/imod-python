@@ -352,6 +352,30 @@ def test_drn_allocation__elevation_above_surface_level(
 
 
 @parametrize_with_cases(
+    argnames="active,top,bottom,drn_elevation",
+    prefix="drn_",
+)
+@parametrize_with_cases(
+    argnames="option,expected,_", prefix="allocation_", has_tag="drn"
+)
+def test_drn_allocation__elevation_equal_to_bottom(
+        active, top, bottom, drn_elevation, option, expected, _
+    ):
+    # Set bottom in layer 3 to drain elevation, take first value (drain
+    # elevation is equal everywhere.)
+    bottom.loc[bottom.coords["layer"] == 3] = drn_elevation.values.ravel()[0]
+
+    actual_da = allocate_drn_cells(option, active, top, bottom, drn_elevation)
+
+    actual = take_nth_layer_column(actual_da, 0)
+    empty = take_nth_layer_column(actual_da, 1)
+
+    np.testing.assert_equal(actual, expected)
+    assert np.all(~empty)
+
+
+
+@parametrize_with_cases(
     argnames="active,top,bottom,head",
     prefix="ghb_",
 )
