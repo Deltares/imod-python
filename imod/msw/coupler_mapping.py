@@ -4,6 +4,7 @@ import numpy as np
 import pandas as pd
 import xarray as xr
 
+from imod.common.interfaces.ipackagebase import IPackageBase
 from imod.mf6.dis import StructuredDiscretization
 from imod.mf6.mf6_wel_adapter import Mf6Wel
 from imod.msw.fixed_format import VariableMetaData
@@ -11,7 +12,7 @@ from imod.msw.pkgbase import DataDictType, MetaSwapPackage
 from imod.typing import IntArray
 
 
-class CouplerMapping(MetaSwapPackage):
+class CouplerMapping(MetaSwapPackage, IPackageBase):
     """
     This contains the data to connect MODFLOW 6 cells to MetaSWAP svats.
 

@@ -3,10 +3,10 @@ import pytest
 import xugrid as xu
 
 import imod
+from imod.common.utilities.partitioninfo import create_partition_info
 from imod.mf6.multimodel.exchange_creator_unstructured import (
     ExchangeCreator_Unstructured,
 )
-from imod.mf6.multimodel.modelsplitter import create_partition_info
 from imod.tests.fixtures.flow_basic_fixture import BasicDisSettings
 from imod.typing.grid import zeros_like
 
