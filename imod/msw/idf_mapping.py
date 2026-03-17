@@ -1,15 +1,18 @@
 from dataclasses import asdict
-from typing import Optional
+from typing import Optional, TextIO
 
 import numpy as np
+import xarray as xr
 
 from imod.common.interfaces.iregridpackage import IRegridPackage
 from imod.common.utilities.dataclass_type import DataclassType
 from imod.common.utilities.regrid import _regrid_array
+from imod.mf6.dis import StructuredDiscretization
+from imod.mf6.mf6_wel_adapter import Mf6Wel
 from imod.msw.fixed_format import VariableMetaData
 from imod.msw.pkgbase import MetaSwapPackage
 from imod.msw.regrid.regrid_schemes import IdfMappingRegridMethod
-from imod.typing import GridDataArray
+from imod.typing import GridDataArray, IntArray
 from imod.util.regrid import RegridderWeightsCache
 from imod.util.spatial import spatial_reference
 
@@ -132,3 +135,37 @@ class IdfMapping(MetaSwapPackage, IRegridPackage):
         )
 
         return type(self)(regridded_area, nodata)
+
+    def _render(
+        self,
+        file: TextIO,
+        index: IntArray,
+        svat: xr.DataArray,
+        mf6_dis: StructuredDiscretization,
+        mf6_well: Mf6Wel,
+    ) -> None:
+
+        nrow = self.dataset.coords["y"].size
+        ncol = self.dataset.coords["x"].size
+
+        y_index = xr.DataArray(
+            np.arange(1, nrow + 1),
+            coords={"y": self.dataset.coords["y"]},
+            dims=("y",),
+        )
+        x_index = xr.DataArray(
+            np.arange(1, ncol + 1),
+            coords={"x": self.dataset.coords["x"]},
+            dims=("x",),
+        )
+        rows, columns = xr.broadcast(y_index, x_index)
+
+        self.dataset["rows"] = rows
+        self.dataset["columns"] = columns
+
+        y_grid, x_grid = xr.broadcast(self.dataset["y"], self.dataset["x"])
+
+        self.dataset["x_grid"] = x_grid
+        self.dataset["y_grid"] = y_grid
+
+        super()._render(file, index, svat, mf6_dis, mf6_well)
