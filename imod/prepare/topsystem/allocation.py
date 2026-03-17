@@ -321,7 +321,7 @@ def get_above_lower_bound(bottom_elevation: GridDataArray, top_layered: GridData
     bottom_elevation grid or in the first layer.
     """
     top_layer_label = {"layer": min(top_layered.coords["layer"])}
-    is_above_lower_bound = bottom_elevation <= top_layered
+    is_above_lower_bound = bottom_elevation < top_layered
     # Bottom elevation above top surface is allowed, so these are set to True
     # regardless.
     is_above_lower_bound.loc[top_layer_label] = ~bottom_elevation.isnull()
@@ -366,7 +366,7 @@ def _allocate_cells__stage_to_riv_bot(
     top_layered = _enforce_layered_top(top, bottom)
 
     is_above_lower_bound = get_above_lower_bound(bottom_elevation, top_layered)
-    is_below_upper_bound = stage > bottom
+    is_below_upper_bound = stage >= bottom
     riv_cells = is_below_upper_bound & is_above_lower_bound
 
     return riv_cells, None
@@ -465,7 +465,7 @@ def _allocate_cells__stage_to_riv_bot_drn_above(
     layer = active.coords["layer"]
     is_below_upper_bound = upper_active_layer <= layer
     is_below_upper_bound_and_active = is_below_upper_bound & active
-    drn_cells = is_below_upper_bound_and_active & (bottom >= stage)
+    drn_cells = is_below_upper_bound_and_active & (bottom > stage)
     riv_cells = (is_below_upper_bound_and_active & is_above_lower_bound) != drn_cells
 
     return riv_cells, drn_cells
