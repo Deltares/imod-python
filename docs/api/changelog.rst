@@ -45,6 +45,12 @@ Fixed
   produced incorrect results when point water heads were below elevation levels
   for unstructured grids.
 - Support pandas 3.0.
+- Fixed edge case where allocation of :class:`imod.mf6.River` package with the
+  ``stage_to_riv_bot`` or ``stage_to_riv_bot_drn_above`` option of
+  :func:`imod.prepare.ALLOCATION_OPTION` would assign river cells to the wrong
+  layer when was exactly equal to a bottom of a layer in the model
+  discretization, which would these cells to be dropped when distributing
+  conductances later.
 
 
 Changed
