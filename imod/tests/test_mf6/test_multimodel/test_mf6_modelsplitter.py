@@ -1,6 +1,7 @@
 import numpy as np
 
-from imod.mf6.multimodel.modelsplitter import ModelSplitter, create_partition_info
+from imod.common.utilities.partitioninfo import create_partition_info
+from imod.mf6.multimodel.modelsplitter import ModelSplitter
 from imod.tests.fixtures.mf6_modelrun_fixture import assert_simulation_can_run
 from imod.typing.grid import zeros_like
 

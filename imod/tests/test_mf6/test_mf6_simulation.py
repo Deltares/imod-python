@@ -21,11 +21,11 @@ from pytest_cases import parametrize_with_cases
 
 import imod
 from imod.common.statusinfo import NestedStatusInfo, StatusInfo
+from imod.common.utilities.partitioninfo import PartitionInfo
 from imod.common.utilities.version import get_version
 from imod.logging import LoggerType, LogLevel
 from imod.mf6 import LayeredWell, Well
 from imod.mf6.model import Modflow6Model
-from imod.mf6.multimodel.modelsplitter import PartitionInfo
 from imod.mf6.oc import OutputControl
 from imod.mf6.regrid.regrid_schemes import (
     DiscretizationRegridMethod,

@@ -8,10 +8,12 @@ from pytest_cases import parametrize_with_cases
 
 from imod import mf6, msw
 from imod.msw.copy_files import FileCopier
+from imod.msw.meteo_grid import MeteoGridCopy
 from imod.msw.meteo_mapping import MeteoMapping
 from imod.msw.model import DEFAULT_SETTINGS
 from imod.msw.utilities.parse import read_para_sim
 from imod.typing import GridDataArray, Imod5DataDict
+from imod.typing.grid import zeros_like
 from imod.util.regrid import RegridderWeightsCache
 
 
@@ -141,6 +143,49 @@ def test_clip_box(msw_model):
     model_settings = msw_model.simulation_settings
     clipped_settings = clipped_model.simulation_settings
     assert clipped_settings == model_settings
+
+
+def test_msw_model_split_write(
+    msw_model_no_sprinkling, msw_model_get_starttime, coupled_mf6_model, tmp_path
+):
+    # Note that this test is without sprinkling wells.
+
+    # Set the MetaSWAP output directory.
+    output_dir = tmp_path / "metaswap"
+    output_dir.mkdir(exist_ok=True, parents=True)
+
+    # Set the starting time. This should be explicitly set since the MetaSWAP submodels
+    # will not have further time information during writing.
+    if msw_model_no_sprinkling.starttime is None:
+        msw_model_no_sprinkling.starttime = msw_model_get_starttime
+
+    # Create meteo output directory, write the meteo data, and copy metegrid.
+    meteo_output_dir = tmp_path / "meteo"
+    meteo_output_dir.mkdir(exist_ok=True, parents=True)
+    msw_model_no_sprinkling["meteo_grid"].write(meteo_output_dir)
+    del msw_model_no_sprinkling["meteo_grid"]
+    mete_grid = meteo_output_dir / Path("mete_grid.inp")
+    msw_model_no_sprinkling["meteo_grid"] = MeteoGridCopy(mete_grid)
+
+    # Set the partition mask.
+    active = coupled_mf6_model["GWF_1"].domain.sel(layer=1)
+    submodel_labels = zeros_like(active)
+    submodel_labels = submodel_labels.where((submodel_labels["y"] > 2.5), 1)
+    submodel_labels = submodel_labels.where((submodel_labels["y"] > 1.5), 2)
+
+    # Split the MODFLOW and MetaSWAP models.
+    mf6_splitted = coupled_mf6_model.split(submodel_labels)
+    msw_splitted = msw_model_no_sprinkling.split(submodel_labels)
+
+    # Write the MetaSWAP submodels.
+    for msw_submodelname, msw_submodel in msw_splitted.items():
+        mf6_submodelname = f"GWF_1{msw_submodelname.split('MSW')[1]}"
+        mf6_dis = mf6_splitted[mf6_submodelname]["dis"]
+        submodel_output_dir = output_dir / msw_submodelname
+        msw_submodel.write(directory=submodel_output_dir, mf6_dis=mf6_dis)
+
+        # Assert by checking the number of MetaSWAP inp file counts.
+        assert len(list(submodel_output_dir.rglob(r"*.inp"))) == 15
 
 
 def test_render_unsat_database_path(msw_model, tmp_path):
