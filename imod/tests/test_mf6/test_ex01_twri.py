@@ -378,7 +378,7 @@ def test_gwfmodel_render(twri_model, tmp_path):
 def test_simulation_render(twri_model):
     simulation = twri_model
     write_context = WriteContext(".")
-    actual = simulation._render(write_context)
+    actual = simulation._render(write_context, None)
 
     expected = textwrap.dedent(
         """\
@@ -394,7 +394,6 @@ def test_simulation_render(twri_model):
             end models
 
             begin exchanges
-
             end exchanges
 
             begin solutiongroup 1

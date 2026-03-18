@@ -4,6 +4,8 @@ begin options
 {%- if nocheck is defined %}  nocheck
 {% endif %}
 {%- if memory_print_option is defined %}  memory_print_option {{memory_print_option}}
+{% endif %}
+{%- if hpc_filein is defined %}  hpc6 filein {{hpc_filein}}
 {% endif -%}
 end options
 
@@ -20,7 +22,6 @@ begin exchanges
 {%- for exgtype, exgfile, exgmnamea, exgmnameb in exchanges %}
   {{exgtype}} {{exgfile}} {{exgmnamea}} {{exgmnameb}}
 {%- endfor %}
-
 end exchanges
 
 {% for solutiongroup in solutiongroups %}begin solutiongroup {{loop.index}}

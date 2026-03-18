@@ -300,3 +300,14 @@ class ModelSplitter:
             for model_name, model in models.items()
             if isinstance(model, GroundwaterTransportModel)
         ]
+
+    def _get_model_to_mpi_rank_mapping(self) -> dict[str, int]:
+        mpi_mapping = {}
+
+        for id, model_dict in self._partition_id_to_models.items():
+            mpi_rank = self.partition_info[id].mpi_rank
+            if mpi_rank > 0:
+                for model_name in model_dict.keys():
+                    mpi_mapping[model_name] = mpi_rank
+
+        return mpi_mapping

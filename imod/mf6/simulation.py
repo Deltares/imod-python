@@ -92,6 +92,12 @@ def get_packages(simulation: Modflow6Simulation) -> dict[str, Package]:
     }
 
 
+def initialize_template_hpc_filein():
+    loader = jinja2.PackageLoader("imod", "templates/mf6")
+    env = jinja2.Environment(loader=loader, keep_trailing_newline=True)
+    return env.get_template("utl-hpc.j2")
+
+
 class Modflow6Simulation(collections.UserDict, ISimulation):
     """
     Modflow6Simulation is a class that represents a Modflow 6 simulation. It
@@ -250,7 +256,7 @@ class Modflow6Simulation(collections.UserDict, ISimulation):
             timestep_duration=timestep_duration, validate=validate
         )
 
-    def _render(self, write_context: WriteContext):
+    def _render(self, write_context: WriteContext, hpc_filein: str | None):
         """Renders simulation namefile"""
         d: dict[str, Any] = {}
         models = []
@@ -284,6 +290,10 @@ class Modflow6Simulation(collections.UserDict, ISimulation):
             d["exchanges"] = self.get_exchange_relationships()
 
         d["solutiongroups"] = [solutiongroups]
+
+        if hpc_filein is not None:
+            d["hpc_filein"] = hpc_filein
+
         return self._template.render(d)
 
     def _write_tdis_package(self, globaltimes, write_context):
@@ -300,6 +310,24 @@ class Modflow6Simulation(collections.UserDict, ISimulation):
             write_context=write_context,
         )
 
+    def _write_hpc_package(self, hpc_filein_path):
+        """Write the HPC file"""
+
+        if "split_mpi_rank_mapping" not in self:
+            raise ValueError("MPI rank mappings are not set.")
+
+        template = initialize_template_hpc_filein()
+        partitions = []
+        for mname, mrank in self["split_mpi_rank_mapping"].items():
+            partitions.append((mname, mrank))
+        d: dict[str, Any] = {}
+        d["partitions"] = partitions
+
+        content = template.render(d)
+
+        with open(hpc_filein_path, "w") as f:
+            f.write(content)
+
     @standard_log_decorator()
     def write(
         self,
@@ -307,6 +335,7 @@ class Modflow6Simulation(collections.UserDict, ISimulation):
         binary=True,
         validate: bool = True,
         use_absolute_paths=False,
+        write_hpc_file=False,
     ):
         """
         Write Modflow6 simulation, including assigned groundwater flow and
@@ -325,6 +354,9 @@ class Modflow6Simulation(collections.UserDict, ISimulation):
             ``ValidationError``.
         use_absolute_paths: ({True, False}, optional)
             True if all paths written to the mf6 inputfiles should be absolute.
+        write_hpc_file: ({True, False}, optional)
+            When True, the HPC file is being written that is used for parallel
+            parallel simulation with the Message Passing Interface.
 
         Examples
         --------
@@ -356,8 +388,15 @@ class Modflow6Simulation(collections.UserDict, ISimulation):
         directory = pathlib.Path(directory)
         directory.mkdir(exist_ok=True, parents=True)
 
+        # Write the hpc file
+        if self.is_split() and write_hpc_file:
+            hpc_filein = "mfsim.hpc"
+            self._write_hpc_package(directory / hpc_filein)
+        else:
+            hpc_filein = None
+
         # Write simulation namefile
-        mfsim_content = self._render(write_context)
+        mfsim_content = self._render(write_context, hpc_filein)
         mfsim_content = prepend_content_with_version_info(mfsim_content)
         mfsim_path = directory / "mfsim.nam"
         with open(mfsim_path, "w") as f:
@@ -1058,6 +1097,8 @@ class Modflow6Simulation(collections.UserDict, ISimulation):
 
                     toml_content[key][exchange_class_short].append(path.name)
 
+            elif key == "split_mpi_rank_mapping":
+                raise ValueError("Dump is not yet supported for the HPC input file.")
             else:
                 path = value.to_file(
                     directory,
@@ -1395,6 +1436,7 @@ class Modflow6Simulation(collections.UserDict, ISimulation):
         self,
         submodel_labels: GridDataArray,
         ignore_time_purge_empty: Optional[bool] = None,
+        submodel_label_to_mpi_rank: Optional[dict[int, int]] = None,
     ) -> Modflow6Simulation:
         """
         Split a simulation in different partitions using a submodel_labels
@@ -1416,6 +1458,9 @@ class Modflow6Simulation(collections.UserDict, ISimulation):
             timesteps for each package is a costly operation. Therefore, this
             option can be set to True to only check the first timestep. If None,
             the value of the validation settings of the simulation are used.
+        submodel_label_to_mpi_rank: optional, dict, default None
+            A dictionary that specifies for each unique label, as in submodel_labels,
+            the Message Passing Interface (MPI) process rank number.
 
         Returns
         -------
@@ -1455,7 +1500,9 @@ class Modflow6Simulation(collections.UserDict, ISimulation):
                 )
 
         # Create partition info
-        partition_info = create_partition_info(submodel_labels)
+        partition_info = create_partition_info(
+            submodel_labels, submodel_label_to_mpi_rank
+        )
 
         # Create new simulation
         new_simulation = imod.mf6.Modflow6Simulation(
@@ -1511,6 +1558,8 @@ class Modflow6Simulation(collections.UserDict, ISimulation):
                 )
 
         new_simulation._add_modelsplit_exchanges(exchanges)
+        model_to_mpi_rank = modelsplitter._get_model_to_mpi_rank_mapping()
+        new_simulation._add_modelsplit_mpi_rank_mapping(model_to_mpi_rank)
         new_simulation._set_flow_exchange_options()
         new_simulation._set_transport_exchange_options()
         new_simulation._filter_inactive_cells_from_exchanges()
@@ -1556,6 +1605,12 @@ class Modflow6Simulation(collections.UserDict, ISimulation):
         if not self.is_split():
             self["split_exchanges"] = []
         self["split_exchanges"].extend(exchanges_list)
+
+    def _add_modelsplit_mpi_rank_mapping(
+        self, mpi_rank_mapping: dict[str, int]
+    ) -> None:
+        if self.is_split() and mpi_rank_mapping != {}:
+            self["split_mpi_rank_mapping"] = mpi_rank_mapping
 
     def _set_flow_exchange_options(self) -> None:
         # collect some options that we will auto-set

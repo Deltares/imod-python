@@ -1,3 +1,4 @@
+import textwrap
 from filecmp import dircmp
 from pathlib import Path
 
@@ -196,6 +197,50 @@ def test_split_flow_and_transport_model_evaluate_output_with_species(
         rtol=1e-4,
         atol=1e-6,
     )
+
+
+def test_split_flow_and_transport_model_evaluate_hpc_filein(
+    tmp_path: Path, flow_transport_simulation: Modflow6Simulation
+):
+    simulation = flow_transport_simulation
+
+    flow_model = simulation["flow"]
+    active = flow_model.domain
+
+    submodel_labels = zeros_like(active)
+    submodel_labels = submodel_labels.drop_vars("layer")
+    submodel_labels.values[:, :, 15:] = 1
+    submodel_labels = submodel_labels.sel(layer=0, drop=True)
+
+    submodel_label_to_mpi_rank = {0: 10, 1: 100}
+
+    new_simulation = simulation.split(
+        submodel_labels, submodel_label_to_mpi_rank=submodel_label_to_mpi_rank
+    )
+    new_simulation.write(tmp_path, binary=False, write_hpc_file=True)
+
+    expected_partitions_block = textwrap.dedent(
+        """\
+        begin partitions
+          flow_0 10
+          tpt_a_0 10
+          tpt_b_0 10
+          tpt_c_0 10
+          tpt_d_0 10
+          flow_1 100
+          tpt_a_1 100
+          tpt_b_1 100
+          tpt_c_1 100
+          tpt_d_1 100
+        end partitions
+        """
+    )
+
+    with open(tmp_path / "mfsim.hpc", mode="r") as hpc_filein:
+        hpcfile_content = hpc_filein.read()
+
+    # Assert
+    assert expected_partitions_block in hpcfile_content
 
 
 @pytest.mark.parametrize(

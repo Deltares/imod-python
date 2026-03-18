@@ -507,7 +507,6 @@ class TestModflow6Simulation:
             exchanges
               GWF6-GWF6 GWF_1_0_GWF_1_1.gwfgwf GWF_1_0 GWF_1_1
               GWF6-GWF6 GWF_1_1_GWF_1_2.gwfgwf GWF_1_1 GWF_1_2
-
             end exchanges
             """
         )

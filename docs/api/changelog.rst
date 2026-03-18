@@ -18,6 +18,13 @@ Added
   its first times step is all nodata. This can save a lot of clipping or masking
   transient models with many timesteps.
 - Added :meth:`imod.msw.MetaSwapModel.split` to split MetaSWAP models.
+- Added ``submodel_label_to_mpi_rank`` argument to
+  :meth:`imod.mf6.Modflow6Simulation.split`
+  for specifing the MPI rank for each label in case of parallel simulation.
+- Added ``write_hpc_file`` argument to
+  :meth:`imod.mf6.Modflow6Simulation.write
+  for writing the HPC file with the model to MPI rank mappings in case of 
+  parallel simulation.
 
 Fixed
 ~~~~~
