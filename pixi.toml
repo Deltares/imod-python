@@ -102,7 +102,7 @@ pytest-cases = ">=3.9.1"
 pytest-cov = "*"
 pytest-dotenv = "*"
 pytest-xdist = "*"
-python = "3.12.*"
+python = "3.13.*"
 python-build = "*"
 python-graphviz = "*"
 pyvista = "*"
@@ -141,16 +141,16 @@ jupyter = "*"
 pip = "*"
 pixi-diff-to-markdown = "*"
 
-[feature.py311.dependencies]
-python = "3.11.*"
-pip = "*"
-
 [feature.py312.dependencies]
 python = "3.12.*"
 pip = "*"
 
 [feature.py313.dependencies]
 python = "3.13.*"
+pip = "*"
+
+[feature.py314.dependencies]
+python = "3.14.*"
 pip = "*"
 
 [feature.pixi-update.tasks]
@@ -191,7 +191,7 @@ qgis_export ={ cmd = [
 default = { features = [], solve-group = "conda-deps" }
 interactive = { features = ["interactive"], solve-group = "conda-deps" }
 user-acceptance = { features = ["user-acceptance"], solve-group = "conda-deps" }
-py311 = { features = ["py311", "py_common"], no-default-feature = true }
 py312 = { features = ["py312", "py_common"], no-default-feature = true }
 py313 = { features = ["py313", "py_common"], no-default-feature = true }
+py314 = { features = ["py314", "py_common"], no-default-feature = true }
 pixi-update = { features = ["pixi-update"], no-default-feature = true }
