@@ -47,8 +47,14 @@ Fixed
   for unstructured grids.
 - Support pandas 3.0.
 - :class:`imod.msw.IdfMapping` when model clipping is applied, the global
-  row/column indices are converted to local indices, as writen in idf_svat.inp.
-
+  row/column indices are converted to local indices, as written in
+  ``idf_svat.inp``.
+- Fixed edge case where allocation of :class:`imod.mf6.River` package with the
+  ``stage_to_riv_bot`` or ``stage_to_riv_bot_drn_above`` option of
+  :func:`imod.prepare.ALLOCATION_OPTION` would assign river cells to the wrong
+  layer, when the stage and bottom_elevation were exactly equal to the bottom of
+  a layer in the model discretization, which would cause these cells to be
+  dropped when distributing conductances later.
 
 Changed
 ~~~~~~~

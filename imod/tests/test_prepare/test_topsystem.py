@@ -246,8 +246,50 @@ def test_riv_allocation__elevation_above_surface_level(
 def test_riv_allocation__stage_equals_bottom_elevation(
     active, top, bottom, stage, bottom_elevation, option, expected_riv, expected_drn
 ):
-    # Put elevations a lot above surface level. Need to be allocated to first
-    # layer.
+    # Bottom elevation equals stage here.
+    actual_riv_da, actual_drn_da = allocate_riv_cells(
+        option, active, top, bottom, stage, stage
+    )
+
+    # Override expected values
+    if option is ALLOCATION_OPTION.first_active_to_elevation:
+        expected_riv = [True, True, False, False]
+    elif option is not ALLOCATION_OPTION.at_first_active:
+        expected_riv = [False, True, False, False]
+    if expected_drn:
+        expected_drn = [True, False, False, False]
+
+    actual_riv = take_nth_layer_column(actual_riv_da, 0)
+    empty_riv = take_nth_layer_column(actual_riv_da, 1)
+
+    if actual_drn_da is None:
+        actual_drn = None
+        empty_drn = None
+    else:
+        actual_drn = take_nth_layer_column(actual_drn_da, 0)
+        empty_drn = take_nth_layer_column(actual_drn_da, 1)
+
+    np.testing.assert_equal(actual_riv, expected_riv)
+    np.testing.assert_equal(actual_drn, expected_drn)
+    assert np.all(~empty_riv)
+    if empty_drn is not None:
+        assert np.all(~empty_drn)
+
+
+@parametrize_with_cases(
+    argnames="active,top,bottom,stage,bottom_elevation",
+    prefix="riv_",
+)
+@parametrize_with_cases(
+    argnames="option,expected_riv,expected_drn", prefix="allocation_", has_tag="riv"
+)
+def test_riv_allocation__stage_equals_bottom_elevation_equals_bottom(
+    active, top, bottom, stage, bottom_elevation, option, expected_riv, expected_drn
+):
+    # Set bottom in layer 2 to stage, take first value (stage is equal everywhere.)
+    bottom.loc[bottom.coords["layer"] == 2] = stage.values.ravel()[0]
+
+    # Bottom elevation equals stage here.
     actual_riv_da, actual_drn_da = allocate_riv_cells(
         option, active, top, bottom, stage, stage
     )
@@ -307,6 +349,29 @@ def test_drn_allocation__elevation_above_surface_level(
     assert np.all(~empty)
     if empty is not None:
         assert np.all(~empty)
+
+
+@parametrize_with_cases(
+    argnames="active,top,bottom,drn_elevation",
+    prefix="drn_",
+)
+@parametrize_with_cases(
+    argnames="option,expected,_", prefix="allocation_", has_tag="drn"
+)
+def test_drn_allocation__elevation_equal_to_bottom(
+    active, top, bottom, drn_elevation, option, expected, _
+):
+    # Set bottom in layer 3 to drain elevation, take first value (drain
+    # elevation is equal everywhere.)
+    bottom.loc[bottom.coords["layer"] == 3] = drn_elevation.values.ravel()[0]
+
+    actual_da = allocate_drn_cells(option, active, top, bottom, drn_elevation)
+
+    actual = take_nth_layer_column(actual_da, 0)
+    empty = take_nth_layer_column(actual_da, 1)
+
+    np.testing.assert_equal(actual, expected)
+    assert np.all(~empty)
 
 
 @parametrize_with_cases(
@@ -475,6 +540,43 @@ def test_distribute_riv_conductance__equal_to_surface_level(
 def test_distribute_riv_conductance__stage_equal_to_bottom_elevation(
     active, top, bottom, stage, bottom_elevation, option, allocated_layer, _
 ):
+    allocated_layer.data = np.array([False, True, False, False])
+    expected = [np.nan, 1.0, np.nan, np.nan]
+    allocated = enforce_dim_order(active & allocated_layer)
+    k = xr.DataArray(
+        [2.0, 2.0, 1.0, 1.0], coords={"layer": [1, 2, 3, 4]}, dims=("layer",)
+    )
+
+    conductance = zeros_like(bottom_elevation) + 1.0
+
+    actual_da = distribute_riv_conductance(
+        option,
+        allocated,
+        conductance,
+        top,
+        bottom,
+        k,
+        stage,
+        stage,
+    )
+    actual = take_nth_layer_column(actual_da, 0)
+
+    np.testing.assert_equal(actual, expected)
+
+
+@parametrize_with_cases(
+    argnames="active,top,bottom,stage,bottom_elevation",
+    prefix="riv_",
+)
+@parametrize_with_cases(
+    argnames="option,allocated_layer,_", prefix="distribution_", has_tag="riv"
+)
+def test_distribute_riv_conductance__stage_equal_to_bottom_elevation_equal_to_bottom(
+    active, top, bottom, stage, bottom_elevation, option, allocated_layer, _
+):
+    # Set bottom in layer 2 to stage, take first value (stage is equal everywhere.)
+    bottom.loc[bottom.coords["layer"] == 2] = stage.values.ravel()[0]
+
     allocated_layer.data = np.array([False, True, False, False])
     expected = [np.nan, 1.0, np.nan, np.nan]
     allocated = enforce_dim_order(active & allocated_layer)
