@@ -126,6 +126,21 @@ def fits_exact_hole(parent: Polygon, child: Polygon, tol=0.0) -> bool:
 
 
 def test_polygonize_with_holes():
+    """
+    Polygonize should be able to handle polygons with holes. In this test, we
+    create a 5x5 grid of values as follows:
+
+    1 1 1 1 1
+    1 2 2 2 1
+    1 2 3 2 1
+    1 2 2 2 1
+    1 1 1 1 1
+    
+    The polygon for the value 1.0 should be a large square that contains the
+    entire grid, but has a hole in the middle that corresponds to the polygon
+    for the value 2.0. The polygon for the value 2.0 should have a hole that
+    corresponds exactly to the polygon for the value 3.0.
+    """
     nrow, ncol = 5, 5
     dx, dy = 1.0, -1.0
     xmin, xmax = 0.0, 5.0
