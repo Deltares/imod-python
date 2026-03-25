@@ -7,6 +7,7 @@ import pytest
 import shapely.geometry as sg
 import xarray as xr
 from pytest_cases import parametrize_with_cases
+from shapely.geometry import Polygon
 
 import imod
 from imod.testing import assert_frame_equal
@@ -116,6 +117,50 @@ def test_polygonize():
     gdf = imod.prepare.polygonize(da)
     assert len(gdf) == 3
     assert sorted(gdf["value"]) == [1.0, 2.0, 3.0]
+
+
+def fits_exact_hole(parent: Polygon, child: Polygon, tol=0.0) -> bool:
+    hole_polys = Polygon(parent.interiors[0])
+    exterior = Polygon(child.exterior)
+    return exterior.equals(hole_polys)
+
+
+def test_polygonize_with_holes():
+    """
+    Polygonize should be able to handle polygons with holes. In this test, we
+    create a 5x5 grid of values as follows:
+
+    1 1 1 1 1
+    1 2 2 2 1
+    1 2 3 2 1
+    1 2 2 2 1
+    1 1 1 1 1
+
+    The polygon for the value 1.0 should be a large square that contains the
+    entire grid, but has a hole in the middle that corresponds to the polygon
+    for the value 2.0. The polygon for the value 2.0 should have a hole that
+    corresponds exactly to the polygon for the value 3.0.
+    """
+    # Arrange
+    nrow, ncol = 5, 5
+    dx, dy = 1.0, -1.0
+    xmin, xmax = 0.0, 5.0
+    ymin, ymax = 0.0, 5.0
+    coords = imod.util.spatial._xycoords((xmin, xmax, ymin, ymax), (dx, dy))
+    kwargs = {"name": "test", "coords": coords, "dims": ("y", "x")}
+    data = np.ones((nrow, ncol), dtype=np.float32)
+    data[1:-1, 1:-1] = 2.0
+    data[2, 2] = 3.0
+    da = xr.DataArray(data, **kwargs)
+    # Act
+    gdf = imod.prepare.polygonize(da)
+    gdf = gdf.sort_values("value").reset_index(drop=True)
+    # Assert
+    assert len(gdf) == 3
+    assert sorted(gdf["value"]) == [1.0, 2.0, 3.0]
+    p1, p2, p3 = gdf.geometry
+    ok = fits_exact_hole(p1, p2) and fits_exact_hole(p2, p3)
+    assert ok
 
 
 def test_handle_dtype():

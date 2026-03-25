@@ -55,6 +55,7 @@ Fixed
   layer, when the stage and bottom_elevation were exactly equal to the bottom of
   a layer in the model discretization, which would cause these cells to be
   dropped when distributing conductances later.
+- Fixed :func:`imod.prepare.spatial.polygonize` for polygons with holes.
 
 Changed
 ~~~~~~~
