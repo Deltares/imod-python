@@ -135,7 +135,7 @@ def test_polygonize_with_holes():
     1 2 3 2 1
     1 2 2 2 1
     1 1 1 1 1
-    
+
     The polygon for the value 1.0 should be a large square that contains the
     entire grid, but has a hole in the middle that corresponds to the polygon
     for the value 2.0. The polygon for the value 2.0 should have a hole that
