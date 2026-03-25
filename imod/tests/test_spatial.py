@@ -141,6 +141,7 @@ def test_polygonize_with_holes():
     for the value 2.0. The polygon for the value 2.0 should have a hole that
     corresponds exactly to the polygon for the value 3.0.
     """
+    # Arrange
     nrow, ncol = 5, 5
     dx, dy = 1.0, -1.0
     xmin, xmax = 0.0, 5.0
@@ -151,8 +152,10 @@ def test_polygonize_with_holes():
     data[1:-1, 1:-1] = 2.0
     data[2, 2] = 3.0
     da = xr.DataArray(data, **kwargs)
+    # Act
     gdf = imod.prepare.polygonize(da)
     gdf = gdf.sort_values("value").reset_index(drop=True)
+    # Assert
     assert len(gdf) == 3
     assert sorted(gdf["value"]) == [1.0, 2.0, 3.0]
     p1, p2, p3 = gdf.geometry
