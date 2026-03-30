@@ -85,7 +85,7 @@ class GridData(MetaSwapPackage, IRegridPackage):
 
         self._pkgcheck()
 
-    def _generate_isactive_array(self) -> np.ndarray:
+    def _generate_isactive_array(self) -> xr.DataArray:
         """
         Generate a 1D array of active cells to be used on other packages.
 
@@ -128,7 +128,7 @@ class GridData(MetaSwapPackage, IRegridPackage):
         This method is kept for backward compatibility, but will be removed in
         future versions and will thus throw a deprecation warning. Use
         :meth:`imod.msw.GridData.generate_isactive_svat_arrays` instead.
-        
+
         Generate index array and svat grid to be used on other packages.
 
         Returns
