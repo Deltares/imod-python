@@ -64,7 +64,7 @@ def test_write(
         xr.full_like(like, True, dtype=bool),
     )
 
-    index, svat = grid_data.generate_index_svat_array()
+    index, svat = grid_data.generate_isactive_svat_arrays()
 
     with tempfile.TemporaryDirectory() as output_dir:
         output_dir = Path(output_dir)
@@ -293,12 +293,12 @@ def case_grid_data_two_subunits__dask(
 
 
 @parametrize_with_cases("grid_data_dict", cases=".", has_tag="two_subunit")
-def test_generate_index_svat_array(
+def test_generate_isactive_svat_arrays(
     grid_data_dict: dict[str, xr.DataArray], coords_two_subunit: dict
 ):
     grid_data = GridData(**grid_data_dict)
 
-    index, svat = grid_data.generate_index_svat_array()
+    index, svat = grid_data.generate_isactive_svat_arrays()
 
     index_expected = [
         False,
@@ -346,7 +346,7 @@ def test_generate_index_svat_array(
 def test_simple_model(fixed_format_parser, grid_data_dict: dict[str, xr.DataArray]):
     grid_data = GridData(**grid_data_dict)
 
-    index, svat = grid_data.generate_index_svat_array()
+    index, svat = grid_data.generate_isactive_svat_arrays()
 
     with tempfile.TemporaryDirectory() as output_dir:
         output_dir = Path(output_dir)
@@ -388,7 +388,7 @@ def test_simple_model_1_subunit(
 ):
     grid_data = GridData(**grid_data_dict)
 
-    index, svat = grid_data.generate_index_svat_array()
+    index, svat = grid_data.generate_isactive_svat_arrays()
 
     with tempfile.TemporaryDirectory() as output_dir:
         output_dir = Path(output_dir)
