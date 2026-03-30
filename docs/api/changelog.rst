@@ -64,6 +64,8 @@ Changed
   :class:`imod.mf6.Evapotranspiration` are now optional variables. If provided,
   now require ``"segment"`` dimension when ``proportion_depth`` and
   ``proportion_rate``.
+- :meth:`imod.msw.GridData.generate_index_array` is now deprecated, use
+  :meth:`imod.msw.GridData.generate_isactive_svat_arrays` instead.
 
 
 [1.0.0] - 2025-11-11
