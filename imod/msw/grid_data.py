@@ -1,3 +1,5 @@
+import warnings
+
 import numpy as np
 import xarray as xr
 
@@ -83,7 +85,7 @@ class GridData(MetaSwapPackage, IRegridPackage):
 
         self._pkgcheck()
 
-    def generate_index_array(self) -> np.ndarray:
+    def _generate_index_array(self) -> np.ndarray:
         """
         Generate index array to be used on other packages.
 
@@ -116,7 +118,7 @@ class GridData(MetaSwapPackage, IRegridPackage):
             The index array is a 1D array with the index of the active cells.
             The svat grid is a 2D array with the SVAT numbers for each cell.
         """
-        index = self.generate_index_array()
+        index = self._generate_index_array()
 
         area = self.dataset["area"]
         active = self.dataset["active"]
@@ -131,6 +133,27 @@ class GridData(MetaSwapPackage, IRegridPackage):
         svat.data[isactive.data] = np.arange(1, index.sum() + 1)
 
         return index, svat
+
+    def generate_index_array(self) -> tuple[np.ndarray, xr.DataArray]:
+        """
+        This method is kept for backward compatibility, but will be removed in
+        future versions and will thus throw a deprecation warning. Use
+        :meth:`imod.msw.GridData.generate_index_svat_array` instead.
+        
+        Generate index array and svat grid to be used on other packages.
+
+        Returns
+        -------
+        tuple[np.ndarray, xr.DataArray]
+            Index array and svat grid.
+            The index array is a 1D array with the index of the active cells.
+            The svat grid is a 2D array with the SVAT numbers for each cell.
+        """
+        warnings.warn(
+            "Method 'generate_index_array' is deprecated and will be removed in the future, use 'generate_index_svat_array' instead.",
+            DeprecationWarning,
+        )
+        return self.generate_index_svat_array()
 
     def _pkgcheck(self):
         super()._pkgcheck()

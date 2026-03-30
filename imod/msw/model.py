@@ -566,7 +566,7 @@ class MetaSwapModel(Model):
         for submodel_name, submodel in partitioned_submodels.items():
             partition_info = submodel_to_partition[submodel_name]
             sliced_grid_pkg = clip_by_grid(grid_pkg, partition_info.active_domain)
-            sliced_index = sliced_grid_pkg.generate_index_array()
+            sliced_index = sliced_grid_pkg._generate_index_array()
 
             # Add package to model if it has data in the active domain.
             if bool(sliced_index.any()):
