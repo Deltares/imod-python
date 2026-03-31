@@ -360,7 +360,7 @@ class MetaSwapModel(Model):
         # Get index and svat
         grid_key = self.get_pkgkey(GridData)
         grid_pkg = cast(GridData, self[grid_key])
-        index, svat = grid_pkg.generate_index_svat_array()
+        index, svat = grid_pkg.generate_isactive_svat_arrays()
 
         # write package contents
         for pkgname in self:
@@ -565,11 +565,13 @@ class MetaSwapModel(Model):
 
         for submodel_name, submodel in partitioned_submodels.items():
             partition_info = submodel_to_partition[submodel_name]
-            sliced_grid_pkg = clip_by_grid(grid_pkg, partition_info.active_domain)
-            sliced_index = sliced_grid_pkg.generate_index_array()
+            sliced_grid_pkg = cast(
+                GridData, clip_by_grid(grid_pkg, partition_info.active_domain)
+            )
+            sliced_isactive = sliced_grid_pkg._generate_isactive_array().values
 
             # Add package to model if it has data in the active domain.
-            if bool(sliced_index.any()):
+            if bool(sliced_isactive.any()):
                 is_in_active_domain[submodel_name] = True
                 submodel[grid_key] = sliced_grid_pkg
             else:
