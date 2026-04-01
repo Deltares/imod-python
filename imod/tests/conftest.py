@@ -29,6 +29,7 @@ from .fixtures.imod5_cap_data import (
 )
 from .fixtures.imod5_well_data import (
     well_duplication_import_prj,
+    well_empty_ipfs,
     well_mixed_ipfs,
     well_out_of_bounds_ipfs,
     well_regular_import_prj,
