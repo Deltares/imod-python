@@ -56,6 +56,8 @@ Fixed
   a layer in the model discretization, which would cause these cells to be
   dropped when distributing conductances later.
 - Fixed :func:`imod.prepare.spatial.polygonize` for polygons with holes.
+- :func:`imod.formats.prj.open_projectfile_data` now drops empty wells from the
+  dataset, and logs a warning about it.
 
 Changed
 ~~~~~~~
