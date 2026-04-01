@@ -188,6 +188,36 @@ def out_of_bounds_timeseries_string():
     )
 
 
+def ipf_simple_empty():
+    """
+    Empty ipf file with only the header and zero rows. iMOD5 can generate these
+    files after clipping an existing database.
+    """
+    ipf_simple_header_copy = "0" + ipf_simple_header[ipf_simple_header.find("\n") :]
+
+    return textwrap.dedent(
+        f"""\
+    {ipf_simple_header_copy}
+    """
+    )
+
+
+def ipf_associated_empty():
+    """
+    Empty associated ipf file with only the header and zero rows. iMOD5 can generate these
+    files after clipping an existing database.
+    """
+    ipf_associated_header_copy = (
+        "0" + ipf_associated_header[ipf_associated_header.find("\n") :]
+    )
+
+    return textwrap.dedent(
+        f"""\
+    {ipf_associated_header_copy}
+    """
+    )
+
+
 def write_ipf_and_maybe_assoc_files(
     tmp_path,
     projectfile_str,
@@ -337,3 +367,14 @@ def well_out_of_bounds_ipfs():
         other_timeseries_well_str,
         tmp_path,
     )
+
+
+@pytest.fixture(scope="session")
+def well_empty_ipfs():
+    tmp_path = imod.util.temporary_directory()
+    os.makedirs(tmp_path)
+
+    ipf1_str = ipf_simple_empty()
+    ipf_associated_str = ipf_associated_empty()
+
+    return write_ipf_mixed_files(ipf_associated_str, ipf1_str, "", "", tmp_path)

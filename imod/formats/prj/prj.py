@@ -915,6 +915,15 @@ def _read_package_ipf(
         # Ensure the columns are identifiable.
         path = Path(entry["path"])
         ipf_df, indexcol, ext = _try_read_with_func(imod.ipf._read_ipf, path)
+        nrow = ipf_df.shape[0]
+        if nrow == 0:
+            log_message = f"IPF file {path} contains no data. Skipping."
+            imod.logging.logger.log(
+                loglevel=LogLevel.WARNING,
+                message=log_message,
+                additional_depth=0,
+            )
+            continue
         if indexcol == 0:
             # No associated files
             has_associated = False

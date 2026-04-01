@@ -1,3 +1,4 @@
+import sys
 from datetime import datetime
 from shutil import copyfile
 from textwrap import dedent
@@ -13,7 +14,8 @@ from pytest_cases import (
     parametrize_with_cases,
 )
 
-from imod.formats.prj import open_projectfile_data
+from imod.formats.prj import open_projectfile_data, read_projectfile
+from imod.logging import LoggerType, LogLevel, configure
 from imod.mf6 import LayeredWell, Well
 
 
@@ -946,3 +948,47 @@ def test_from_imod5_data_wells__wells_out_of_bounds(
                 expected_last_rate = data[wellname]["dataframe"][0]["rate"].iloc[-2]
                 actual_last_rate = well.dataset["rate"].isel(index=1, time=-1).item()
                 assert actual_last_rate == expected_last_rate
+
+
+@pytest.mark.unittest_jit
+@parametrize("wel_case", argvalues=PRJ_ARGS)
+@parametrize("wel_cls", argvalues=[LayeredWell, Well])
+def test_from_imod5_data_wells__empty_wells(
+    wel_cls: Union[LayeredWell, Well],
+    wel_case,
+    well_empty_ipfs,
+    tmp_path,
+    request,
+):
+    # Arrange
+    # Replace layer number to zero if non-layered well.
+    if wel_cls == Well:
+        wel_case = wel_case.replace("1,2, 001", "1,2, 000")
+    # Write prj and copy ipfs to right folder.
+    case_name = get_case_name(request)
+    wel_file = tmp_path / f"{case_name}.prj"
+    setup_test_files(wel_case, wel_file, well_empty_ipfs, tmp_path)
+
+    projectfile_contents = read_projectfile(wel_file)
+
+    # Act
+    logfile_path = tmp_path / "logfile.txt"
+    with open(logfile_path, "w") as sys.stdout:
+        configure(
+            LoggerType.LOGURU,
+            log_level=LogLevel.WARNING,
+            add_default_file_handler=False,
+            add_default_stream_handler=True,
+        )
+        data, _ = open_projectfile_data(wel_file)
+
+    with open(logfile_path, "r") as f:
+        log = f.read()
+
+    # Assert
+    # Projectfile only contains empty wells, so expect empty data.
+    assert len(data) == 0
+    # Expect warning about empty wells.
+    for ipf_contents in projectfile_contents["(wel)"]["ipf"]:
+        ipf_path = ipf_contents["path"]
+        assert f"IPF file {ipf_path} contains no data. Skipping." in log
