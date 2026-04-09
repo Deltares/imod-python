@@ -27,7 +27,8 @@ object MyPyTemplate : Template({
             id = "MyPy_analysis"
             workingDir = "imod-python"
             scriptContent = """
-                    pixi install --environment default
+                    pixi config set --local detached-environments "C:\pixi_envs"
+                    pixi install --environment default --frozen
                     pixi run --environment default --frozen mypy_report
                     pixi run --environment default --frozen mypy_lint
                 """.trimIndent()
