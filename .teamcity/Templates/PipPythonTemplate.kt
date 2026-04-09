@@ -24,6 +24,8 @@ object PipPythonTemplate : Template({
             id = "pip_install"
             workingDir = "imod-python"
             scriptContent = """
+                    pixi config set --local detached-environments "C:\pixi_envs"
+                    pixi install --environment  %python_env% --frozen
                     pixi run --environment %python_env% --frozen test_import
                 """.trimIndent()
             formatStderrAsError = true
