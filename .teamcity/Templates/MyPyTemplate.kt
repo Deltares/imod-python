@@ -27,13 +27,14 @@ object MyPyTemplate : Template({
             id = "MyPy_analysis"
             workingDir = "imod-python"
             scriptContent = """
+                    pixi install --environment default
                     pixi run --environment default --frozen mypy_report
                     pixi run --environment default --frozen mypy_lint
                 """.trimIndent()
             formatStderrAsError = true
             dockerImage = "%DockerContainer%:%DockerVersion%"
             dockerImagePlatform = ScriptBuildStep.ImagePlatform.Windows
-            dockerRunParameters = """--cpus=4 --memory=16g"""
+            dockerRunParameters = """--cpus=8 --memory=16g"""
             dockerPull = false
         }
     }
