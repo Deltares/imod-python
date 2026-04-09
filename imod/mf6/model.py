@@ -75,11 +75,11 @@ def _create_boundary_condition_for_unassigned_boundary(
         pkg for _, pkg in model.items() if isinstance(pkg, pkg_type)
     ]
 
-    additional_boundaries = [
+    filtered_boundaries : list[StateType] = [
         item for item in additional_boundaries or [] if item is not None
     ]
 
-    constant_state_packages.extend(additional_boundaries)
+    constant_state_packages.extend(filtered_boundaries)
 
     return create_clipped_boundary(
         model.domain, state_for_boundary, constant_state_packages, pkg_type
