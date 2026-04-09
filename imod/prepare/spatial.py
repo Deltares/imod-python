@@ -165,7 +165,7 @@ def laplace_interpolate(
     if missing_dims:
         raise ValueError(f"Dimensions not in source: {missing_dims}")
     # Ensure order matches the order in source.
-    dims = tuple(cast(str, dim) for dim in source.dims if dim in dims)
+    dims = tuple(dim for dim in source.dims if dim in dims)
     shape = tuple(source.sizes[d] for d in dims)
     connectivity = laplace._build_connectivity(shape)
     arr = xr.apply_ufunc(
