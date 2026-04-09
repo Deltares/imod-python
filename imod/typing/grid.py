@@ -186,7 +186,7 @@ def merge(
     objects: Sequence[GridDataArray | GridDataset], *args, **kwargs
 ) -> GridDataset:
     return _type_dispatch_functions_on_grid_sequence(
-        objects, xu.merge, xr.merge, *args, **kwargs
+        objects, xu.merge, xr.merge, *args, compat="no_conflicts", **kwargs
     )
 
 
@@ -263,7 +263,12 @@ def merge_with_dictionary(
     **kwargs,
 ):
     return _type_dispatch_functions_on_dict(
-        variables_to_merge, merge_unstructured_dataset, xr.merge, *args, **kwargs
+        variables_to_merge,
+        merge_unstructured_dataset,
+        xr.merge,
+        *args,
+        compat="no_conflicts",
+        **kwargs,
     )
 
 

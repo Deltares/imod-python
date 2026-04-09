@@ -58,9 +58,9 @@ class GWTGWT(ExchangeBase):
 
         auxiliary_variables = [var for var in [angldegx, cdist] if var is not None]
         if auxiliary_variables:
-            self.dataset["auxiliary_data"] = xr.merge(auxiliary_variables).to_array(
-                name="auxiliary_data"
-            )
+            self.dataset["auxiliary_data"] = xr.merge(
+                auxiliary_variables, compat="no_conflicts"
+            ).to_array(name="auxiliary_data")
             expand_transient_auxiliary_variables(self)
 
     def set_options(

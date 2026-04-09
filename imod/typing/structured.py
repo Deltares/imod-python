@@ -245,7 +245,7 @@ def merge_partitions(
         merged_ls = []
         for key in unique_keys:
             merged_ls.append(_merge_partitions([da[key] for da in das]).rename(key))
-        return xr.merge(merged_ls)
+        return xr.merge(merged_ls, compat="no_conflicts")
     elif isinstance(first_item, xr.DataArray):
         # Store name to rename after concatenation
         name = first_item.name

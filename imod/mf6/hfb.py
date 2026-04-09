@@ -522,7 +522,10 @@ class HorizontalFlowBarrierBase(BoundaryCondition, ILineDataPackage):
     def line_data(self, value: GeoDataFrameType) -> None:
         variables_for_gdf = self._get_variable_names_for_gdf()
         self.dataset = self.dataset.merge(
-            value.to_xarray(), overwrite_vars=variables_for_gdf, join="right"
+            value.to_xarray(),
+            overwrite_vars=variables_for_gdf,
+            join="right",
+            compat="no_conflicts",
         )
 
     def _render(self, directory, pkgname, globaltimes, binary):

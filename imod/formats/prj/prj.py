@@ -621,7 +621,7 @@ def _create_dataarray(
         dav = _create_dataarray_from_values(values_valid, headers_values, dim=dim)
         dap.name = "tmp"
         dav.name = "tmp"
-        da = xr.merge((dap, dav), join="outer")["tmp"]
+        da = xr.merge((dap, dav), join="outer", compat="no_conflicts")["tmp"]
     elif paths_valid:
         # Only paths provided
         da = _create_dataarray_from_paths(paths_valid, headers_paths, dim=dim)
