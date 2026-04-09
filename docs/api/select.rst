@@ -14,7 +14,10 @@ Select points and cross sections
     points_set_values
     points_indices
     
-    upper_active_layer
+    get_lower_active_grid_cells
+    get_lower_active_layer_number
+    get_upper_active_grid_cells
+    get_upper_active_layer_number
 
     grid_boundary_xy
     active_grid_boundary_xy

@@ -34,40 +34,47 @@ def _custom_pattern_to_regex_pattern(pattern: str):
     return re.compile(simple_regex)
 
 
+def _groupdict_from_pattern(stem: str, pattern: Pattern) -> Dict:
+    """
+    Use a compiled regex pattern to extract the variables from the stem. Returns
+    empty dict if no match is found.
+    """
+    match = pattern.match(stem)
+    if match is None:
+        return {}
+    else:
+        return match.groupdict()
+
+
 def _groupdict(stem: str, pattern: Optional[str | Pattern]) -> Dict:
     if pattern is not None:
         if isinstance(pattern, Pattern):
-            match = pattern.match(stem)
-            if match is not None:
-                d = match.groupdict()
-            else:
-                d = {}
+            d = _groupdict_from_pattern(stem, pattern)
         else:
             re_pattern = _custom_pattern_to_regex_pattern(pattern)
             # Use it to get the required variables
-            d = re_pattern.match(stem).groupdict()
+            d = _groupdict_from_pattern(stem, re_pattern)
     else:  # Default to "iMOD conventions": {name}_c{species}_{time}_l{layer}
         has_layer = bool(re.search(r"_l\d+$", stem))
         has_species = bool(
             re.search(r"conc_c\d{1,3}_\d{8,14}", stem)
         )  # We are strict in recognizing species
-        try:  # try for time
+        base_pattern = r"(?P<name>[\w-]+)"
+        if has_species:
+            base_pattern += r"_c(?P<species>[0-9]+)"
+        base_pattern += r"_(?P<time>[0-9-]{6,})"
+        if has_layer:
+            base_pattern += r"_l(?P<layer>[0-9]+)"
+        re_pattern = re.compile(base_pattern)
+        d = _groupdict_from_pattern(stem, re_pattern)
+        if not d:  # If no match, try without time
             base_pattern = r"(?P<name>[\w-]+)"
             if has_species:
                 base_pattern += r"_c(?P<species>[0-9]+)"
-            base_pattern += r"_(?P<time>[0-9-]{6,})"
             if has_layer:
                 base_pattern += r"_l(?P<layer>[0-9]+)"
             re_pattern = re.compile(base_pattern)
-            d = re_pattern.match(stem).groupdict()
-        except AttributeError:  # probably no time
-            base_pattern = r"(?P<name>[\w-]+)"
-            if has_species:
-                base_pattern += r"_c(?P<species>[0-9]+)"
-            if has_layer:
-                base_pattern += r"_l(?P<layer>[0-9]+)"
-            re_pattern = re.compile(base_pattern)
-            d = re_pattern.match(stem).groupdict()
+            d = _groupdict_from_pattern(stem, re_pattern)
     return d
 
 

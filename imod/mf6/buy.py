@@ -1,24 +1,11 @@
 from typing import Optional, Sequence
 
 import numpy as np
-import xarray as xr
 
 from imod.logging import init_log_decorator
 from imod.mf6.package import Package
+from imod.mf6.utilities.dataset import assign_index
 from imod.schemata import DTypeSchema
-
-
-def assign_index(arg):
-    if isinstance(arg, xr.DataArray):
-        arg = arg.values
-    elif not isinstance(arg, (np.ndarray, list, tuple)):
-        raise TypeError("should be a tuple, list, or numpy array")
-
-    arr = np.array(arg)
-    if arr.ndim != 1:
-        raise ValueError("should be 1D")
-
-    return xr.DataArray(arr, dims=("index",))
 
 
 class Buoyancy(Package):
@@ -37,7 +24,8 @@ class Buoyancy(Package):
         fluid reference density used in the equation of state.
     density_concentration_slope: sequence of floats
         Slope of the (linear) density concentration line used in the density
-        equation of state.
+        equation of state. A value of 0.7143 is often used for TDS g/l. A value
+        of 1.316 is common for CL g/l.
     reference_concentration: sequence of floats
         Reference concentration used in the density equation of state.
     modelname: sequence of strings,
@@ -124,7 +112,7 @@ class Buoyancy(Package):
         super().__init__(dict_dataset)
         self._validate_init_schemata(validate)
 
-    def render(self, directory, pkgname, globaltimes, binary):
+    def _render(self, directory, pkgname, globaltimes, binary):
         ds = self.dataset
         packagedata = []
 
@@ -150,13 +138,13 @@ class Buoyancy(Package):
 
         return self._template.render(d)
 
-    def update_transport_models(self, new_modelnames: Sequence[str]):
+    def _update_transport_models(self, new_modelnames: Sequence[str]):
         """
         The names of the transport models can change in some cases, for example
         when partitioning. Use this function to update the names of the
         transport models.
         """
-        transport_model_names = self.get_transport_model_names()
+        transport_model_names = self._get_transport_model_names()
         if not len(transport_model_names) == len(new_modelnames):
             raise ValueError("the number of transport models cannot be changed.")
         for modelname, new_modelname in zip(transport_model_names, new_modelnames):
@@ -166,7 +154,7 @@ class Buoyancy(Package):
                 )
         self.dataset["modelname"] = assign_index(new_modelnames)
 
-    def get_transport_model_names(self) -> list[str]:
+    def _get_transport_model_names(self) -> list[str]:
         """
         Returns the names of the transport  models used by this buoyancy package.
         """

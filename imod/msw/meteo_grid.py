@@ -1,5 +1,6 @@
 import csv
 from pathlib import Path
+from shutil import copyfile
 from typing import Optional, Union
 
 import numpy as np
@@ -7,11 +8,17 @@ import pandas as pd
 import xarray as xr
 
 import imod
+from imod.common.interfaces.iregridpackage import IRegridPackage
+from imod.common.utilities.dataclass_type import DataclassType, EmptyRegridMethod
 from imod.msw.pkgbase import MetaSwapPackage
+from imod.msw.regrid.regrid_schemes import MeteoGridRegridMethod
 from imod.msw.timeutil import to_metaswap_timeformat
+from imod.msw.utilities.common import find_in_file_list
+from imod.msw.utilities.mask import MaskValues
+from imod.typing import Imod5DataDict
 
 
-class MeteoGrid(MetaSwapPackage):
+class MeteoGrid(MetaSwapPackage, IRegridPackage):
     """
     This contains the meteorological grid data. Grids are written to ESRI ASCII
     files. The meteorological data requires a time coordinate. Next to a
@@ -33,6 +40,8 @@ class MeteoGrid(MetaSwapPackage):
     _file_name = "mete_grid.inp"
     _meteo_dirname = "meteo_grids"
 
+    _regrid_method = MeteoGridRegridMethod()
+
     def __init__(self, precipitation: xr.DataArray, evapotranspiration: xr.DataArray):
         super().__init__()
 
@@ -41,7 +50,7 @@ class MeteoGrid(MetaSwapPackage):
 
         self._pkgcheck()
 
-    def write_free_format_file(self, path: Union[str, Path], dataframe: pd.DataFrame):
+    def _write_free_format_file(self, path: Union[str, Path], dataframe: pd.DataFrame):
         """
         Write free format file. The mete_grid.inp file is free format.
         """
@@ -59,7 +68,7 @@ class MeteoGrid(MetaSwapPackage):
         ]
         dataframe.loc[:, wofost_columns] = '"NoValue"'
 
-        self.check_string_lengths(dataframe)
+        self._check_string_lengths(dataframe)
 
         dataframe.to_csv(
             path, header=False, quoting=csv.QUOTE_NONE, float_format="%.4f", index=False
@@ -109,7 +118,7 @@ class MeteoGrid(MetaSwapPackage):
 
         for varname in self.dataset.data_vars:
             # If grid, we have to add the filename of the .asc to be written
-            if self._is_grid(varname):
+            if self._is_grid(str(varname)):
                 dataframe[varname] = [
                     self._compose_filename(
                         {"time": time, "name": varname, "extension": ".asc"},
@@ -122,7 +131,7 @@ class MeteoGrid(MetaSwapPackage):
 
         return dataframe
 
-    def check_string_lengths(self, dataframe: pd.DataFrame):
+    def _check_string_lengths(self, dataframe: pd.DataFrame):
         """
         Check if strings lengths do not exceed 256 characters.
         With absolute paths this might be an issue.
@@ -160,13 +169,17 @@ class MeteoGrid(MetaSwapPackage):
         times = self.dataset["time"].values
 
         dataframe = self._compose_dataframe(times)
-        self.write_free_format_file(directory / self._file_name, dataframe)
+        self._write_free_format_file(directory / self._file_name, dataframe)
 
         # Write grid data to ESRI ASCII files
         for varname in self.dataset.data_vars:
-            if self._is_grid(varname):
-                path = (directory / self._meteo_dirname / varname).with_suffix(".asc")
-                imod.rasterio.save(path, self.dataset[varname], nodata=-9999.0)
+            if self._is_grid(str(varname)):
+                path = (directory / self._meteo_dirname / str(varname)).with_suffix(
+                    ".asc"
+                )
+                imod.rasterio.save(
+                    path, self.dataset[str(varname)], nodata=MaskValues.default
+                )
 
     def _pkgcheck(self):
         for varname in self.dataset.data_vars:
@@ -182,3 +195,58 @@ class MeteoGrid(MetaSwapPackage):
                     f"Received excess dims {excess_dims} in {self.__class__} for "
                     f"{varname}, please provide data with {allowed_dims}"
                 )
+
+
+class MeteoGridCopy(MetaSwapPackage, IRegridPackage):
+    """
+    Class to copy existing ``mete_grid.inp``, which contains the meteorological
+    grid data. Next to a MeteoGridCopy instance, instances of
+    PrecipitationMapping and EvapotranspirationMapping are required as well to
+    specify meteorological information to MetaSWAP.
+
+    This is useful for large meteorological datasets, for which a
+    ``mete_grid.inp`` already has been generated, which is common in existing
+    iMOD5 model databases.
+
+    Parameters
+    ----------
+    path: Path to mete_grid.inp file
+    """
+
+    _file_name = "mete_grid.inp"
+    _meteo_dirname = "meteo_grids"
+
+    _regrid_method: DataclassType = EmptyRegridMethod()
+
+    def __init__(self, path: Path | str):
+        super().__init__()
+        self.dataset["path"] = path
+
+    def write(self, directory: Path | str, *args):
+        directory = Path(directory)
+        path_metegrid = Path(str(self.dataset["path"].values[()]))
+        new_path = directory / self._file_name
+        copyfile(path_metegrid, new_path)
+
+    @classmethod
+    def from_imod5_data(cls, imod5_data: Imod5DataDict) -> "MeteoGridCopy":
+        """
+        Construct a MetaSWAP MeteoGridCopy package from iMOD5 data in the CAP
+        package, loaded with the :func:`imod.formats.prj.open_projectfile_data`
+        function.
+
+        Parameters
+        ----------
+        imod5_data: Imod5DataDict
+            iMOD5 data as returned by
+            :func:`imod.formats.prj.open_projectfile_data`
+
+        Returns
+        -------
+        imod.msw.MeteoGridCopy
+        """
+
+        paths = imod5_data["extra"]["paths"]
+        filepath = find_in_file_list(cls._file_name, paths)
+
+        return cls(filepath)

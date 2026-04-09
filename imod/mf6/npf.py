@@ -1,14 +1,24 @@
-import warnings
-from typing import Optional, Tuple
+from typing import Optional, cast
 
 import numpy as np
+import xarray as xr
 
+from imod.common.interfaces.iregridpackage import IRegridPackage
+from imod.common.utilities.dataclass_type import (
+    DataclassType,
+)
+from imod.common.utilities.regrid import (
+    _regrid_package_data,
+)
 from imod.logging import init_log_decorator
-from imod.mf6.interfaces.iregridpackage import IRegridPackage
 from imod.mf6.package import Package
-from imod.mf6.utilities.regrid import RegridderType
+from imod.mf6.regrid.regrid_schemes import (
+    NodePropertyFlowRegridMethod,
+)
+from imod.mf6.utilities.imod5_converter import fill_missing_layers
 from imod.mf6.validation import PKG_DIMS_SCHEMA
 from imod.schemata import (
+    AllCoordsValueSchema,
     AllValueSchema,
     CompatibleSettingsSchema,
     DimsSchema,
@@ -17,6 +27,8 @@ from imod.schemata import (
     IndexesSchema,
 )
 from imod.typing import GridDataArray
+from imod.typing.grid import zeros_like
+from imod.util.regrid import RegridderWeightsCache
 
 
 def _dataarray_to_bool(griddataarray: GridDataArray) -> bool:
@@ -29,7 +41,8 @@ def _dataarray_to_bool(griddataarray: GridDataArray) -> bool:
     if griddataarray.values.dtype != bool:
         raise ValueError("DataArray is not a boolean")
 
-    return griddataarray.values.item()
+    bool_value = cast(bool, griddataarray.values.item())
+    return bool_value
 
 
 class NodePropertyFlow(Package, IRegridPackage):
@@ -238,41 +251,49 @@ class NodePropertyFlow(Package, IRegridPackage):
             DTypeSchema(np.integer),
             IndexesSchema(),
             PKG_DIMS_SCHEMA,
+            AllCoordsValueSchema("layer", ">", 0),
         ],
         "k": [
             DTypeSchema(np.floating),
             IndexesSchema(),
             PKG_DIMS_SCHEMA,
+            AllCoordsValueSchema("layer", ">", 0),
         ],
         "rewet_layer": [
             DTypeSchema(np.floating),
             IndexesSchema(),
             PKG_DIMS_SCHEMA,
+            AllCoordsValueSchema("layer", ">", 0),
         ],
         "k22": [
             DTypeSchema(np.floating),
             IndexesSchema(),
             PKG_DIMS_SCHEMA,
+            AllCoordsValueSchema("layer", ">", 0),
         ],
         "k33": [
             DTypeSchema(np.floating),
             IndexesSchema(),
             PKG_DIMS_SCHEMA,
+            AllCoordsValueSchema("layer", ">", 0),
         ],
         "angle1": [
             DTypeSchema(np.floating),
             IndexesSchema(),
             PKG_DIMS_SCHEMA,
+            AllCoordsValueSchema("layer", ">", 0),
         ],
         "angle2": [
             DTypeSchema(np.floating),
             IndexesSchema(),
             PKG_DIMS_SCHEMA,
+            AllCoordsValueSchema("layer", ">", 0),
         ],
         "angle3": [
             DTypeSchema(np.floating),
             IndexesSchema(),
             PKG_DIMS_SCHEMA,
+            AllCoordsValueSchema("layer", ">", 0),
         ],
         "alternative_cell_averaging": [
             DTypeSchema(str),
@@ -337,23 +358,7 @@ class NodePropertyFlow(Package, IRegridPackage):
         "rhs_option": "rhs",
     }
     _template = Package._initialize_template(_pkg_id)
-
-    _regrid_method = {
-        "icelltype": (RegridderType.OVERLAP, "mean"),
-        "k": (RegridderType.OVERLAP, "geometric_mean"),  # horizontal if angle2 = 0
-        "k22": (
-            RegridderType.OVERLAP,
-            "geometric_mean",
-        ),  # horizontal if angle2 = 0 & angle3 = 0
-        "k33": (
-            RegridderType.OVERLAP,
-            "harmonic_mean",
-        ),  # vertical if angle2 = 0 & angle3 = 0
-        "angle1": (RegridderType.OVERLAP, "mean"),
-        "angle2": (RegridderType.OVERLAP, "mean"),
-        "angle3": (RegridderType.OVERLAP, "mean"),
-        "rewet_layer": (RegridderType.OVERLAP, "mean"),
-    }
+    _regrid_method = NodePropertyFlowRegridMethod()
 
     @init_log_decorator()
     def __init__(
@@ -370,7 +375,6 @@ class NodePropertyFlow(Package, IRegridPackage):
         angle1=None,
         angle2=None,
         angle3=None,
-        cell_averaging=None,
         alternative_cell_averaging=None,
         save_flows=False,
         starting_head_as_confined_thickness=False,
@@ -391,12 +395,6 @@ class NodePropertyFlow(Package, IRegridPackage):
                 "rewet_layer, rewet_factor, rewet_iterations, and rewet_method should"
                 " all be left at a default value of None if rewet is False."
             )
-        if cell_averaging is not None:
-            warnings.warn(
-                "Use of `cell_averaging` is deprecated, please use `alternative_cell_averaging` instead",
-                DeprecationWarning,
-            )
-            alternative_cell_averaging = cell_averaging
 
         dict_dataset = {
             "icelltype": icelltype,
@@ -459,5 +457,76 @@ class NodePropertyFlow(Package, IRegridPackage):
 
         return errors
 
-    def get_regrid_methods(self) -> Optional[dict[str, Tuple[RegridderType, str]]]:
-        return self._regrid_method
+    @classmethod
+    def from_imod5_data(
+        cls,
+        imod5_data: dict[str, dict[str, GridDataArray]],
+        target_grid: GridDataArray,
+        regridder_types: Optional[DataclassType] = None,
+        regrid_cache: RegridderWeightsCache = RegridderWeightsCache(),
+    ) -> "NodePropertyFlow":
+        """
+        Construct an npf-package from iMOD5 data, loaded with the
+        :func:`imod.formats.prj.open_projectfile_data` function.
+
+        .. note::
+
+            The method expects the iMOD5 model to be fully 3D, not quasi-3D.
+
+        Parameters
+        ----------
+        imod5_data: dict
+            Dictionary with iMOD5 data. This can be constructed from the
+            :func:`imod.formats.prj.open_projectfile_data` method.
+        target_grid: GridDataArray
+            The grid that should be used for the new package. Does not
+            need to be identical to one of the input grids.
+        regridder_types: RegridMethodType, optional
+            Optional dataclass with regridder types for a specific variable.
+            Use this to override default regridding methods.
+        regrid_cache: RegridderWeightsCache, optional
+            stores regridder weights for different regridders. Can be used to speed up regridding,
+            if the same regridders are used several times for regridding different arrays.
+
+        Returns
+        -------
+        Modflow 6 npf package.
+
+        """
+
+        data = {
+            "k": imod5_data["khv"]["kh"],
+        }
+        has_vertical_anisotropy = (
+            "kva" in imod5_data.keys()
+            and "vertical_anisotropy" in imod5_data["kva"].keys()
+        )
+        has_horizontal_anisotropy = "ani" in imod5_data.keys()
+
+        if has_vertical_anisotropy:
+            data["k33"] = data["k"] * imod5_data["kva"]["vertical_anisotropy"]
+        if has_horizontal_anisotropy:
+            if not np.all(np.isnan(imod5_data["ani"]["factor"].values)):
+                factor = imod5_data["ani"]["factor"]
+                factor = fill_missing_layers(factor, target_grid, 1.0)
+                data["k22"] = data["k"] * factor
+            if not np.all(np.isnan(imod5_data["ani"]["angle"].values)):
+                angle1 = imod5_data["ani"]["angle"]
+                angle1 = 90.0 - angle1
+                angle1 = xr.where(angle1 < 0, 360.0 + angle1, angle1)
+                angle1 = fill_missing_layers(angle1, target_grid, 90.0)
+                data["angle1"] = angle1
+
+        icelltype = zeros_like(target_grid, dtype=int)
+
+        if regridder_types is None:
+            regridder_types = cls.get_regrid_methods()
+
+        new_package_data = _regrid_package_data(
+            data, target_grid, regridder_types, regrid_cache, {}
+        )
+        new_package_data["icelltype"] = icelltype
+
+        pkg = cls(**new_package_data, validate=True)
+        pkg.dataset.load()  # Force dask dataset into memory
+        return pkg

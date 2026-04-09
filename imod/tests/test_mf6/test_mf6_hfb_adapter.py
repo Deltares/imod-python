@@ -92,7 +92,7 @@ def test_hfb_render(barrier):
 
     # Act
     directory = pathlib.Path("mymodel")
-    actual = hfb.render(directory, "hfb", None, False)
+    actual = hfb._render(directory, "hfb", None, False)
 
     # Assert
     assert actual == expected
@@ -104,7 +104,7 @@ def test_hfb_writing_one_layer(barrier, tmp_path):
     hfb = Mf6HorizontalFlowBarrier(**barrier)
     write_context = WriteContext(tmp_path)
 
-    expected_hfb_data = np.row_stack(
+    expected_hfb_data = np.vstack(
         (
             barrier["layer"],
             barrier["cell_id1"],
@@ -115,7 +115,7 @@ def test_hfb_writing_one_layer(barrier, tmp_path):
     ).T
 
     # Act
-    hfb.write("hfb", None, write_context)
+    hfb._write("hfb", None, write_context)
 
     # Assert
     hfb_bin_path = tmp_path / "hfb" / "hfb.bin"

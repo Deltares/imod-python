@@ -63,10 +63,16 @@ _OPEN_HDS = {
     "disu": disu.open_hds,
 }
 
-_OPEN_CBC = {
+_OPEN_CBC: Dict[str, Callable] = {
     "dis": dis.open_cbc,
     "disv": disv.open_cbc,
     "disu": disu.open_cbc,
+}
+
+_OPEN_DVS = {
+    "dis": dis.open_dvs,
+    "disv": disv.open_dvs,
+    "disu": disu.open_dvs,
 }
 
 
@@ -90,6 +96,12 @@ def read_grb(path: FilePath) -> Dict[str, Any]:
     Returns
     -------
     grb_content: Dict[str, Any]
+
+    Examples
+    --------
+    Read the grb file:
+
+    >>> grb_content = imod.mf6.read_grb("my-model.grb")
     """
     with open(path, "rb") as f:
         h1 = _grb_text(f)
@@ -145,12 +157,103 @@ def open_hds(
     Returns
     -------
     head: Union[xr.DataArray, xu.UgridDataArray]
+
+    Examples
+    --------
+    When you completed MODFLOW6 simulation, you can open the head file:
+
+    >>> head = imod.mf6.open_hds("my-model.hds", "my-model.grb")
+
+    This will return a DataArray with the head values for each cell in the
+    model, with dimensions ("time", "layer", "y", "x"). The time coordinate will
+    only be the incremental time steps (1.0, 2.0, ...), unless you provide the
+    ``simulation_start_time`` and ``time_unit`` arguments. This will convert the
+    time coordinate to calendar time, starting from the provided simulation
+    start time:
+
+    >>> head = imod.mf6.open_hds(
+    ...     "my-model.hds",
+    ...     "my-model.grb",
+    ...     simulation_start_time=np.datetime64("2023-01-01T00:00:00"),
+    ...     time_unit="d",
+    ... )
+
     """
     grb_content = read_grb(grb_path)
     grb_content["name"] = "head"
     distype = grb_content["distype"]
     _open = _get_function(_OPEN_HDS, distype)
     return _open(hds_path, grb_content, dry_nan, simulation_start_time, time_unit)
+
+
+def open_dvs(
+    dvs_path: FilePath,
+    grb_path: FilePath,
+    indices: np.ndarray,
+    simulation_start_time: Optional[np.datetime64] = None,
+    time_unit: Optional[str] = "d",
+) -> GridDataArray:
+    """
+    Open modflow6 dependent variable output for complex packages (like the watercontent file for the UZF-package).
+
+    The data is lazily read per timestep and automatically converted into
+    (dense) xr.DataArrays or xu.UgridDataArrays, for DIS and DISV respectively.
+    The conversion is done via the information stored in the Binary Grid file
+    (GRB).
+
+
+    Parameters
+    ----------
+    dvs_path: Union[str, pathlib.Path]
+    grb_path: Union[str, pathlib.Path]
+    indices: np.ndarray
+        The indices to map dvs variable to model nodes
+    simulation_start_time : Optional datetime
+        The time and date correpsonding to the beginning of the simulation.
+        Use this to convert the time coordinates of the output array to
+        calendar time/dates. time_unit must also be present if this argument is present.
+    time_unit: Optional str
+        The time unit MF6 is working in, in string representation.
+        Only used if simulation_start_time was provided.
+        Admissible values are:
+        ns -> nanosecond
+        ms -> microsecond
+        s -> second
+        m -> minute
+        h -> hour
+        d -> day
+        w -> week
+        Units "month" or "year" are not supported, as they do not represent unambiguous timedelta values durations.
+
+    Returns
+    -------
+    dvs : Union[xr.DataArray, xu.UgridDataArray]
+
+    Examples
+    --------
+    When you completed MODFLOW6 simulation, you can open the dvs file:
+
+    >>> dvs = imod.mf6.open_dvs("my-model.dvs", "my-model.grb")
+
+    This will return a DataArray with the dvs values for each cell in the
+    model, with dimensions ("time", "layer", "y", "x"). The time coordinate will
+    only be the incremental time steps (1.0, 2.0, ...), unless you provide the
+    ``simulation_start_time`` and ``time_unit`` arguments. This will convert the
+    time coordinate to calendar time, starting from the provided simulation
+    start time:
+
+    >>> dvs = imod.mf6.open_dvs(
+    ...     "my-model.dvs",
+    ...     "my-model.grb",
+    ...     simulation_start_time=np.datetime64("2023-01-01T00:00:00"),
+    ...     time_unit="d",
+    ... )
+
+    """
+    grb_content = read_grb(grb_path)
+    distype = grb_content["distype"]
+    _open = _get_function(_OPEN_DVS, distype)
+    return _open(dvs_path, grb_content, indices, simulation_start_time, time_unit)
 
 
 def open_conc(
@@ -194,6 +297,27 @@ def open_conc(
     Returns
     -------
     concentration: Union[xr.DataArray, xu.UgridDataArray]
+
+    Examples
+    --------
+    When you completed MODFLOW6 simulation, you can open the ucn file:
+
+    >>> concentration = imod.mf6.open_conc("my-model.ucn", "my-model.grb")
+
+    This will return a DataArray with the concentration values for each cell in
+    the model, with dimensions ("time", "layer", "y", "x"). The time coordinate
+    will only be the incremental time steps (1.0, 2.0, ...), unless you provide
+    the ``simulation_start_time`` and ``time_unit`` arguments. This will convert
+    the time coordinate to calendar time, starting from the provided simulation
+    start time:
+
+    >>> concentration = imod.mf6.open_conc(
+    ...     "my-model.ucn",
+    ...     "my-model.grb",
+    ...     simulation_start_time=np.datetime64("2023-01-01T00:00:00"),
+    ...     time_unit="d",
+    ... )
+
     """
     grb_content = read_grb(grb_path)
     grb_content["name"] = "concentration"
@@ -321,6 +445,19 @@ def open_cbc(
     >>> drn_budget = cbc_content["drn]
     >>> mean = drn_budget.sel(layer=1).mean("time")
 
+    This will return a DataArray with the drain budget values for each cell in the
+    model, with dimensions ("time", "layer", "y", "x"). The time coordinate will
+    only be the incremental time steps (1.0, 2.0, ...), unless you provide the
+    ``simulation_start_time`` and ``time_unit`` arguments. This will convert the
+    time coordinate to calendar time, starting from the provided simulation
+    start time:
+
+    >>> cbc_content = imod.mf6.open_cbc(
+    ...     "my-model.cbc",
+    ...     "my-model.grb",
+    ...     simulation_start_time=np.datetime64("2023-01-01T00:00:00"),
+    ...     time_unit="d",
+    ... )
     """
     grb_content = read_grb(grb_path)
     distype = grb_content["distype"]

@@ -30,7 +30,7 @@ def test_render(src_rate):
     )
     directory = pathlib.Path("mymodel")
     globaltimes = np.array(["2000-01-01"], dtype="datetime64[ns]")
-    actual = src.render(directory, "src", globaltimes, True)
+    actual = src._render(directory, "src", globaltimes, True)
     expected = textwrap.dedent(
         """\
         begin options
@@ -80,7 +80,7 @@ def test_render_mass_source_transient(src_rate):
         ],
         dtype="datetime64[ns]",
     )
-    actual = src.render(directory, "src", globaltimes, True)
+    actual = src._render(directory, "src", globaltimes, True)
     expected = textwrap.dedent(
         """\
         begin options

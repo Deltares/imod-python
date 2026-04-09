@@ -9,16 +9,7 @@ import imod
 from imod.schemata import ValidationError
 
 
-@pytest.mark.usefixtures(
-    "rate_fc",
-    "elevation_fc",
-    "concentration_fc",
-    "proportion_rate_fc",
-    "proportion_depth_fc",
-)
-def test_render(
-    rate_fc, elevation_fc, concentration_fc, proportion_rate_fc, proportion_depth_fc
-):
+def test_render_simple(rate_fc, elevation_fc, concentration_fc):
     # Arrange
     directory = pathlib.Path("mymodel")
     globaltimes = np.array(
@@ -34,13 +25,11 @@ def test_render(
         surface=elevation_fc,
         rate=rate_fc,
         depth=elevation_fc,
-        proportion_rate=proportion_rate_fc,
-        proportion_depth=proportion_depth_fc,
         concentration=concentration_fc,
         concentration_boundary_type="AUX",
     )
     # Act
-    actual = evt.render(directory, "evt", globaltimes, False)
+    actual = evt._render(directory, "evt", globaltimes, False)
 
     # Assert
     expected = textwrap.dedent(
@@ -68,15 +57,7 @@ def test_render(
     assert actual == expected
 
 
-@pytest.mark.usefixtures(
-    "rate_fc",
-    "elevation_fc",
-    "proportion_rate_fc",
-    "proportion_depth_fc",
-)
-def test_get_options__no_segments(
-    rate_fc, elevation_fc, proportion_rate_fc, proportion_depth_fc
-):
+def test_get_options__no_segments(rate_fc, elevation_fc):
     """Test with no segments specified, this means there implicitly is 1 segment
     in the Modflow 6 input."""
 
@@ -85,23 +66,17 @@ def test_get_options__no_segments(
         surface=elevation_fc,
         rate=rate_fc,
         depth=elevation_fc,
-        proportion_rate=proportion_rate_fc,
-        proportion_depth=proportion_depth_fc,
+        proportion_rate=None,
+        proportion_depth=None,
     )
 
     # Act
-    options = evt._get_options({})
+    options = evt._get_pkg_options({})
 
     # Assert
     assert options["nseg"] == 1
 
 
-@pytest.mark.usefixtures(
-    "rate_fc",
-    "elevation_fc",
-    "proportion_rate_fc",
-    "proportion_depth_fc",
-)
 def test_get_options__with_segments(
     rate_fc, elevation_fc, proportion_rate_fc, proportion_depth_fc
 ):
@@ -127,54 +102,84 @@ def test_get_options__with_segments(
     )
 
     # Act
-    options = evt._get_options({})
+    options = evt._get_pkg_options({})
 
     # Assert
     assert options["nseg"] == 4
 
 
-@pytest.mark.usefixtures(
-    "rate_fc",
-    "elevation_fc",
-    "proportion_rate_fc",
-    "proportion_depth_fc",
-)
-def test_get_bin_ds__no_segments(
+def test_init__error_no_segment_dim(
     rate_fc, elevation_fc, proportion_rate_fc, proportion_depth_fc
 ):
+    """Test without segment dimension in proportion arrays, should raise ValidationError.
+    Proportion array fixtures miss a segmnent dimension"""
+
+    with pytest.raises(ValidationError, match="segment"):
+        imod.mf6.Evapotranspiration(
+            surface=elevation_fc,
+            rate=rate_fc,
+            depth=elevation_fc,
+            proportion_rate=proportion_rate_fc,
+            proportion_depth=proportion_depth_fc,
+        )
+
+
+def test_init__error_only_one_proportion_var(
+    rate_fc, elevation_fc, proportion_rate_fc, proportion_depth_fc
+):
+    """Test with only one proportion variable, should raise ValueError."""
+
+    with pytest.raises(
+        ValueError,
+        match="Both 'proportion_rate' and 'proportion_depth' must both be provided",
+    ):
+        imod.mf6.Evapotranspiration(
+            surface=elevation_fc,
+            rate=rate_fc,
+            depth=elevation_fc,
+            proportion_rate=proportion_rate_fc,
+            proportion_depth=None,
+        )
+
+    with pytest.raises(
+        ValueError,
+        match="Both 'proportion_rate' and 'proportion_depth' must both be provided",
+    ):
+        imod.mf6.Evapotranspiration(
+            surface=elevation_fc,
+            rate=rate_fc,
+            depth=elevation_fc,
+            proportion_rate=None,
+            proportion_depth=proportion_depth_fc,
+        )
+
+
+def test_get_bin_ds__no_proportion_vars(rate_fc, elevation_fc):
     # Arrange
     evt = imod.mf6.Evapotranspiration(
         surface=elevation_fc,
         rate=rate_fc,
         depth=elevation_fc,
-        proportion_rate=proportion_rate_fc,
-        proportion_depth=proportion_depth_fc,
+        proportion_rate=None,
+        proportion_depth=None,
     )
 
     # Act
     bin_ds = evt._get_bin_ds()
 
     # Assert
-    expected_dims = {"time": 3, "layer": 3, "y": 15, "x": 15}
+    expected_sizes = {"time": 3, "layer": 3, "y": 15, "x": 15}
     expected_variables = [
         "surface",
         "rate",
         "depth",
-        "proportion_depth",
-        "proportion_rate",
     ]
 
-    assert bin_ds.dims == expected_dims
+    assert bin_ds.sizes == expected_sizes
     assert list(bin_ds.keys()) == expected_variables
 
 
-@pytest.mark.usefixtures(
-    "rate_fc",
-    "elevation_fc",
-    "proportion_rate_fc",
-    "proportion_depth_fc",
-)
-def test_get_bin_ds__with_segments(
+def test_get_bin_ds__with_proportion_vars(
     rate_fc, elevation_fc, proportion_rate_fc, proportion_depth_fc
 ):
     # Arrange
@@ -199,7 +204,7 @@ def test_get_bin_ds__with_segments(
     bin_ds = evt._get_bin_ds()
 
     # Assert
-    expected_dims = {"time": 3, "layer": 3, "y": 15, "x": 15}
+    expected_sizes = {"time": 3, "layer": 3, "y": 15, "x": 15}
     expected_variables = [
         "surface",
         "rate",
@@ -212,16 +217,10 @@ def test_get_bin_ds__with_segments(
         "proportion_rate_segment_3",
     ]
 
-    assert bin_ds.dims == expected_dims
+    assert bin_ds.sizes == expected_sizes
     assert list(bin_ds.keys()) == expected_variables
 
 
-@pytest.mark.usefixtures(
-    "rate_fc",
-    "elevation_fc",
-    "proportion_rate_fc",
-    "proportion_depth_fc",
-)
 def test_wrong_dim_order(
     rate_fc, elevation_fc, proportion_rate_fc, proportion_depth_fc
 ):

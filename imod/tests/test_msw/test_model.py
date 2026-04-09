@@ -1,17 +1,63 @@
+from copy import copy
 from pathlib import Path
 
 import pytest
+import xarray as xr
 from numpy.testing import assert_almost_equal, assert_equal
+from pytest_cases import parametrize_with_cases
 
-from imod import msw
+from imod import mf6, msw
+from imod.msw.copy_files import FileCopier
+from imod.msw.meteo_grid import MeteoGridCopy
+from imod.msw.meteo_mapping import MeteoMapping
+from imod.msw.model import DEFAULT_SETTINGS
+from imod.msw.utilities.parse import read_para_sim
+from imod.typing import GridDataArray, Imod5DataDict
+from imod.typing.grid import zeros_like
+from imod.util.regrid import RegridderWeightsCache
 
 
-def test_msw_model_write(msw_model, tmp_path):
+def test_msw_model_write(msw_model, coupled_mf6_model, coupled_mf6wel, tmp_path):
+    mf6_dis = coupled_mf6_model["GWF_1"]["dis"]
+
     output_dir = tmp_path / "metaswap"
-    msw_model.write(output_dir)
+    msw_model.write(output_dir, mf6_dis, coupled_mf6wel)
 
     assert len(list(output_dir.rglob(r"*.inp"))) == 16
     assert len(list(output_dir.rglob(r"*.asc"))) == 4
+
+
+def test_msw_model_write_settings_roundtrip(msw_model, tmp_path):
+    # Arrange
+    output_dir = tmp_path / "metaswap"
+    output_dir.mkdir()
+    keys_to_drop = [
+        "iybg",
+        "tdbg",
+        "simgro_opt",
+        "idf_per",
+        "idf_dx",
+        "idf_dy",
+        "idf_ncol",
+        "idf_nrow",
+        "idf_xmin",
+        "idf_ymin",
+        "idf_nodata",
+    ]
+    # Act
+    msw_model._write_simulation_settings(output_dir)
+    # Assert
+    # Test first line of the file contains version information
+    filename = output_dir / "para_sim.inp"
+    with open(filename, "r") as f:
+        lines = f.readlines()
+    assert lines[0].startswith("* File written with iMOD Python version:")
+
+    parasim_settings = read_para_sim(filename)
+    for key in keys_to_drop:
+        parasim_settings.pop(key)
+
+    assert msw_model.simulation_settings == parasim_settings
 
 
 def test_get_starttime(msw_model):
@@ -22,7 +68,7 @@ def test_get_starttime(msw_model):
 
 
 def test_get_pkgkey(msw_model):
-    pkg_id = msw_model._get_pkg_key(msw.GridData)
+    pkg_id = msw_model.get_pkgkey(msw.GridData)
 
     assert pkg_id == "grid"
 
@@ -62,6 +108,86 @@ def test_check_landuse_indices_in_lookup_options(msw_model):
         msw_model._check_landuse_indices_in_lookup_options()
 
 
+def test_check_model(msw_model):
+    """
+    Test _model_checks method. Should raise error if validate = True and
+    FileCopier not present, else not.
+    """
+    msw_model.pop("grid")
+
+    msw_model._model_checks(validate=False)
+
+    with pytest.raises(ValueError):
+        msw_model._model_checks(validate=True)
+
+    msw_model["copy_files"] = FileCopier(["./test.txt"])
+    msw_model._model_checks(validate=True)
+
+
+def test_clip_box(msw_model):
+    clipped_model = msw_model.clip_box(x_min=1.0, x_max=2.5, y_min=1.0, y_max=2.5)
+
+    for pkg in clipped_model.values():
+        if isinstance(pkg, MeteoMapping):
+            coords = pkg.meteo.coords
+        else:
+            coords = pkg.dataset.coords
+        if "x" in coords:
+            assert coords["x"].min() >= 1.0
+            assert coords["x"].max() <= 2.5
+        if "y" in coords:
+            assert coords["y"].min() >= 1.0
+            assert coords["y"].max() <= 2.5
+
+    # Assert simulations settings are copied
+    model_settings = msw_model.simulation_settings
+    clipped_settings = clipped_model.simulation_settings
+    assert clipped_settings == model_settings
+
+
+def test_msw_model_split_write(
+    msw_model_no_sprinkling, msw_model_get_starttime, coupled_mf6_model, tmp_path
+):
+    # Note that this test is without sprinkling wells.
+
+    # Set the MetaSWAP output directory.
+    output_dir = tmp_path / "metaswap"
+    output_dir.mkdir(exist_ok=True, parents=True)
+
+    # Set the starting time. This should be explicitly set since the MetaSWAP submodels
+    # will not have further time information during writing.
+    if msw_model_no_sprinkling.starttime is None:
+        msw_model_no_sprinkling.starttime = msw_model_get_starttime
+
+    # Create meteo output directory, write the meteo data, and copy metegrid.
+    meteo_output_dir = tmp_path / "meteo"
+    meteo_output_dir.mkdir(exist_ok=True, parents=True)
+    msw_model_no_sprinkling["meteo_grid"].write(meteo_output_dir)
+    del msw_model_no_sprinkling["meteo_grid"]
+    mete_grid = meteo_output_dir / Path("mete_grid.inp")
+    msw_model_no_sprinkling["meteo_grid"] = MeteoGridCopy(mete_grid)
+
+    # Set the partition mask.
+    active = coupled_mf6_model["GWF_1"].domain.sel(layer=1)
+    submodel_labels = zeros_like(active)
+    submodel_labels = submodel_labels.where((submodel_labels["y"] > 2.5), 1)
+    submodel_labels = submodel_labels.where((submodel_labels["y"] > 1.5), 2)
+
+    # Split the MODFLOW and MetaSWAP models.
+    mf6_splitted = coupled_mf6_model.split(submodel_labels)
+    msw_splitted = msw_model_no_sprinkling.split(submodel_labels)
+
+    # Write the MetaSWAP submodels.
+    for msw_submodelname, msw_submodel in msw_splitted.items():
+        mf6_submodelname = f"GWF_1{msw_submodelname.split('MSW')[1]}"
+        mf6_dis = mf6_splitted[mf6_submodelname]["dis"]
+        submodel_output_dir = output_dir / msw_submodelname
+        msw_submodel.write(directory=submodel_output_dir, mf6_dis=mf6_dis)
+
+        # Assert by checking the number of MetaSWAP inp file counts.
+        assert len(list(submodel_output_dir.rglob(r"*.inp"))) == 15
+
+
 def test_render_unsat_database_path(msw_model, tmp_path):
     rel_path = msw_model._render_unsaturated_database_path("./unsat_database")
 
@@ -78,3 +204,252 @@ def test_render_unsat_database_path(msw_model, tmp_path):
     assert abs_path[-1] == '"'
 
     assert Path(abs_path.replace('"', "")).is_absolute()
+
+
+def get_target_mf6_discretization():
+    x = [1.0, 1.5, 2.0, 2.5, 3.0]
+    y = [3.0, 2.5, 2.0, 1.5, 1.0]
+    dx = 0.5
+    dy = -0.5
+    layer = [1, 2, 3]
+
+    idomain = xr.DataArray(
+        1,
+        dims=("layer", "y", "x"),
+        coords={"layer": layer, "y": y, "x": x, "dx": dx, "dy": dy},
+    )
+
+    top = 0.0
+    bottom = xr.DataArray([-1.0, -21.0, -321.0], coords={"layer": layer}, dims="layer")
+
+    dis = mf6.StructuredDiscretization(top=top, bottom=bottom, idomain=idomain)
+    return dis
+
+
+def test_model_regrid(msw_model, coupled_mf6wel, tmp_path):
+    """
+    Test where only msw model is regridded, modflow 6 wells placed in same
+    row/col number, thus change spatially.
+    """
+    mf6_discretization = get_target_mf6_discretization()
+
+    regrid_context = RegridderWeightsCache()
+    regridded_msw_model = msw_model.regrid_like(mf6_discretization, regrid_context)
+    regridded_msw_model.write(tmp_path, mf6_discretization, coupled_mf6wel)
+
+
+def test_coupled_model_regrid(msw_model, coupled_mf6_model, tmp_path):
+    """
+    Test where only msw model is regridded, modflow 6 wells placed in same
+    row/col number, thus change spatially.
+    """
+    mf6_discretization = get_target_mf6_discretization()
+
+    regrid_context = RegridderWeightsCache()
+    regridded_msw_model = msw_model.regrid_like(mf6_discretization, regrid_context)
+    regridded_mf6_model = coupled_mf6_model.regrid_like(
+        "regridded", mf6_discretization["idomain"]
+    )
+    regridded_npf = regridded_mf6_model["GWF_1"]["npf"]
+    grid_agnostic_well = coupled_mf6_model["GWF_1"]["well_msw"]
+    regridded_mf6_wel = grid_agnostic_well.to_mf6_pkg(
+        mf6_discretization["idomain"],
+        mf6_discretization["top"],
+        mf6_discretization["bottom"],
+        regridded_npf["k"],
+    )
+
+    regridded_msw_model.write(tmp_path, mf6_discretization, regridded_mf6_wel)
+
+
+def setup_written_meteo_grids(
+    meteo_grids: tuple[GridDataArray], tmp_path: Path
+) -> Path:
+    precipitation, _ = meteo_grids
+    meteo_grid = msw.MeteoGrid(precipitation, precipitation)
+    grid_dir = tmp_path / "grid"
+    grid_dir.mkdir(exist_ok=True, parents=True)
+    meteo_grid.write(grid_dir)
+    return grid_dir
+
+
+def setup_parasim_inp(directory: Path):
+    settings = copy(DEFAULT_SETTINGS)
+    settings["iybg"] = 2000
+    settings["tdbg"] = 200.45
+    settings["unsa_svat_path"] = str(directory)
+
+    filename = directory / "para_sim.inp"
+    with open(filename, "w") as f:
+        rendered = msw.MetaSwapModel._template.render(settings=settings)
+        f.write(rendered)
+    return filename
+
+
+def write_test_files(directory: Path, filenames: list[str]) -> list[Path]:
+    paths = [directory / filename for filename in filenames]
+    for p in paths:
+        with open(p, mode="w") as f:
+            f.write("test")
+    return paths
+
+
+def setup_extra_files(meteo_grids: tuple[GridDataArray], directory: Path):
+    grid_dir = setup_written_meteo_grids(meteo_grids, directory)
+    setup_parasim_inp(grid_dir)
+    write_test_files(grid_dir, ["a.inp", "b.inp"])
+    return {
+        "paths": [
+            [str(grid_dir / fn)]
+            for fn in ["a.inp", "mete_grid.inp", "para_sim.inp", "b.inp"]
+        ]
+    }
+
+
+class Imod5DataCases:
+    def case_grid(self, imod5_cap_data: Imod5DataDict) -> tuple[Imod5DataDict, bool]:
+        has_scaling_factor = True
+        return imod5_cap_data, has_scaling_factor
+
+    def case_no_scaling_factors(
+        self, imod5_cap_data: Imod5DataDict
+    ) -> tuple[Imod5DataDict, bool]:
+        has_scaling_factor = False
+        cap_data = imod5_cap_data["cap"]
+        # open_projectfile_data adds layer kwargs to constants
+        layer_kwargs = {"coords": {"layer": [1]}, "dims": ("layer",)}
+        cap_data["perched_water_table_level"] = xr.DataArray([-9999.0], **layer_kwargs)
+        cap_data["soil_moisture_fraction"] = xr.DataArray([1.0], **layer_kwargs)
+        cap_data["conductivitiy_factor"] = xr.DataArray([1.0], **layer_kwargs)
+        return imod5_cap_data, has_scaling_factor
+
+    def case_constants(
+        self, imod5_cap_data: Imod5DataDict
+    ) -> tuple[Imod5DataDict, bool]:
+        has_scaling_factor = False
+        cap_data = imod5_cap_data["cap"]
+        # open_projectfile_data adds layer kwargs to constants
+        layer_kwargs = {"coords": {"layer": [1]}, "dims": ("layer",)}
+        cap_data["perched_water_table_level"] = xr.DataArray([-9999.0], **layer_kwargs)
+        cap_data["soil_moisture_fraction"] = xr.DataArray([1.0], **layer_kwargs)
+        cap_data["conductivitiy_factor"] = xr.DataArray([1.0], **layer_kwargs)
+        cap_data["urban_ponding_depth"] = xr.DataArray([1.0], **layer_kwargs)
+        cap_data["rural_ponding_depth"] = xr.DataArray([1.0], **layer_kwargs)
+        cap_data["urban_runoff_resistance"] = xr.DataArray([1.0], **layer_kwargs)
+        cap_data["rural_runoff_resistance"] = xr.DataArray([1.0], **layer_kwargs)
+        cap_data["urban_runon_resistance"] = xr.DataArray([1.0], **layer_kwargs)
+        cap_data["rural_runon_resistance"] = xr.DataArray([1.0], **layer_kwargs)
+        cap_data["urban_infiltration_capacity"] = xr.DataArray([1.0], **layer_kwargs)
+        cap_data["rural_infiltration_capacity"] = xr.DataArray([1.0], **layer_kwargs)
+        return imod5_cap_data, has_scaling_factor
+
+
+@pytest.mark.unittest_jit
+@parametrize_with_cases("imod5_data, has_scaling_factor", cases=Imod5DataCases)
+def test_import_from_imod5(
+    imod5_data: Imod5DataDict,
+    has_scaling_factor: bool,
+    meteo_grids: tuple[GridDataArray],
+    coupled_mf6_model: mf6.Modflow6Simulation,
+    tmp_path: Path,
+):
+    # Arrange
+    imod5_data["extra"] = setup_extra_files(meteo_grids, tmp_path)
+    times = coupled_mf6_model["time_discretization"].dataset.coords["time"]
+    dis_pkg = coupled_mf6_model["GWF_1"]["dis"]
+    # Act
+    model = msw.MetaSwapModel.from_imod5_data(imod5_data, dis_pkg, times)
+    # Assert
+    grid_packages = {
+        "grid",
+        "infiltration",
+        "ponding",
+        "sprinkling",
+        "idf_mapping",
+    }
+    expected_keys = grid_packages | {
+        "meteo_grid",
+        "prec_mapping",
+        "evt_mapping",
+        "coupling",
+        "extra_files",
+        "time_oc",
+    }
+    missing_keys = expected_keys - set(model.keys())
+    assert not missing_keys
+    for pkgname in grid_packages:
+        # Test if all grid packages broadcasted to grid.
+        missing_dims = {"y", "x"} - set(model[pkgname].dataset.sizes.keys())
+        assert not missing_dims
+    assert "time" in model["time_oc"].dataset.sizes.keys()
+    assert len(model["meteo_grid"].dataset.dims) == 0
+    assert ("scaling_factor" in model.keys()) == has_scaling_factor
+
+
+@pytest.mark.unittest_jit
+@parametrize_with_cases("imod5_data, has_scaling_factor", cases=Imod5DataCases)
+def test_import_from_imod5_and_write(
+    imod5_data: Imod5DataDict,
+    has_scaling_factor: bool,
+    meteo_grids: tuple[GridDataArray],
+    coupled_mf6_model: mf6.Modflow6Simulation,
+    tmp_path: Path,
+):
+    # Arrange
+    imod5_data["extra"] = setup_extra_files(meteo_grids, tmp_path)
+    times = coupled_mf6_model["time_discretization"].dataset.coords["time"]
+    dis_pkg = coupled_mf6_model["GWF_1"]["dis"]
+    npf_pkg = coupled_mf6_model["GWF_1"]["npf"]
+    active = dis_pkg["idomain"] == 1
+    modeldir = tmp_path / "modeldir"
+    # Act
+    model = msw.MetaSwapModel.from_imod5_data(imod5_data, dis_pkg, times)
+    well_pkg = mf6.LayeredWell.from_imod5_cap_data(imod5_data)
+    mf6_wel_pkg = well_pkg.to_mf6_pkg(
+        active, dis_pkg["top"], dis_pkg["bottom"], npf_pkg["k"]
+    )
+    model.write(modeldir, dis_pkg, mf6_wel_pkg)
+
+    # Assert
+    expected_n_files = 13
+    if has_scaling_factor:
+        expected_n_files += 1
+    assert len(list(modeldir.rglob(r"*.inp"))) == expected_n_files
+
+
+@pytest.mark.unittest_jit
+@parametrize_with_cases("imod5_data, has_scaling_factor", cases=Imod5DataCases)
+def test_import_from_imod5_and_clip(
+    imod5_data: Imod5DataDict,
+    has_scaling_factor: bool,
+    meteo_grids: tuple[GridDataArray],
+    coupled_mf6_model: mf6.Modflow6Simulation,
+    tmp_path: Path,
+):
+    # Arrange
+    imod5_data["extra"] = setup_extra_files(meteo_grids, tmp_path)
+    times = coupled_mf6_model["time_discretization"].dataset.coords["time"]
+    dis_pkg = coupled_mf6_model["GWF_1"]["dis"]
+    # Act
+    model = msw.MetaSwapModel.from_imod5_data(imod5_data, dis_pkg, times)
+    clipped_model = model.clip_box(x_min=1.0, x_max=2.5, y_min=1.0, y_max=2.5)
+
+    # Assert all packages present
+    model_keys = set(model.keys())
+    clipped_keys = set(clipped_model.keys())
+    assert model_keys == clipped_keys
+
+    # Assert model clipped
+    for pkg in clipped_model.values():
+        coords = pkg.dataset.coords
+        if "x" in coords:
+            assert coords["x"].min() >= 1.0
+            assert coords["x"].max() <= 2.5
+        if "y" in coords:
+            assert coords["y"].min() >= 1.0
+            assert coords["y"].max() <= 2.5
+
+    # Assert simulations settings are copied
+    model_settings = model.simulation_settings
+    clipped_settings = clipped_model.simulation_settings
+    assert clipped_settings == model_settings

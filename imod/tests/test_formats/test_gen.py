@@ -160,16 +160,17 @@ def test_gen_single_feature(tmp_path, ftype):
     imod.gen.write(path, gdf, feature_type="feature_type")
     back = imod.gen.read(path)
     assert (back["feature_type"] == ftype).all()
+    geom_actual = back["geometry"]
+    geom_expected = gdf["geometry"]
+    expected = gdf.drop(columns="geometry").sort_index(axis=1)
+    actual = back.drop(columns="geometry").sort_index(axis=1)
+    # TODO: account for the fact that geopandas string type is ArrowStringArray, whereas iMOD GEN reader returns object dtype.
+    assert expected.equals(actual)
     if ftype in ("circle", "rectangle"):
         # Gotta do a different check, geometries won't be exactly the same
-        geom_actual = back["geometry"].iloc[0]
-        geom_expected = gdf["geometry"].iloc[0]
-        expected = gdf.drop(columns="geometry").sort_index(axis=1)
-        actual = back.drop(columns="geometry").sort_index(axis=1)
-        assert expected.equals(actual)
-        assert approximately_equal(geom_actual, geom_expected)
+        assert approximately_equal(geom_actual.iloc[0], geom_expected.iloc[0])
     else:
-        assert gdf.sort_index(axis=1).equals(back.sort_index(axis=1))
+        assert geom_actual.geom_equals(geom_expected).all()
 
 
 def test_gen_multi_feature(tmp_path):

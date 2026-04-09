@@ -16,7 +16,6 @@ comparison.
 import matplotlib.pyplot as plt
 
 import imod
-from imod.mf6.multimodel.partition_generator import get_label_array
 
 # %%
 # Obtain the simulation, write it, run it, and plot some heads.
@@ -45,17 +44,25 @@ hds_original.sel(layer=3).isel(time=6).plot(ax=ax)
 ax.set_title("hondsrug original ")
 # %%
 # Now we partition the Hondsrug model
-idomain = gwf_simulation["GWF"].domain
 number_partitions = 16
-submodel_labels = get_label_array(gwf_simulation, number_partitions)
+submodel_labels = gwf_simulation.create_partition_labels(number_partitions)
 
 # %%
-# plot the partitioning array. It shows how the model will be partitioned.
+# This label array determines how the model will be split. `METIS
+# <https://github.com/KarypisLab/METIS/blob/master/manual/manual.pdf>`_ is used
+# in the background to partition models, which is the cause of the imperfect
+# rectangular shapes. By default, partitions are weighted by the number of active cells
+# across the layer dimension.
+
 fig, ax = plt.subplots()
 submodel_labels.plot(ax=ax)
 ax.set_title("hondsrug partitioning geometry")
 
+# %%
+# Let's split the simulation into 16 submodels.
 split_simulation = gwf_simulation.split(submodel_labels)
+
+split_simulation
 
 # %%
 # Now we  write and run the partitioned model

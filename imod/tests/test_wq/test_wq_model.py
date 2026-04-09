@@ -772,3 +772,26 @@ def test_write_result_dir_is_workdir(basicmodel, tmp_path):
 
     assert line.split("=")[-1].strip() == "."
     # TODO: more rigorous testing
+
+
+def test_write__error_space_in_path(basicmodel, tmp_path):
+    """
+    Test if error is raised when there is a space in the path.
+    """
+    m = basicmodel
+    m.create_time_discretization("2000-01-06")
+
+    txt_to_match = r"Spaces in directory names are not allowed"
+    with pytest.raises(ValueError, match=txt_to_match):
+        m.write(
+            directory=tmp_path / "test model",
+            result_dir=tmp_path / "results",
+            resultdir_is_workdir=True,
+        )
+
+    with pytest.raises(ValueError, match=txt_to_match):
+        m.write(
+            directory=tmp_path / "test_model",
+            result_dir=tmp_path / "re sults",
+            resultdir_is_workdir=True,
+        )

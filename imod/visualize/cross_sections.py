@@ -197,6 +197,18 @@ def cross_section(
 
     >>> kwargs_aquitards = {"hatch": "/", "edgecolor": "k"}
     >>> imod.visualize.cross_section(da, colors, levels, aquitards=aquitards, kwargs_aquitards)
+
+    To turn off the colorbar:
+
+    >>> kwargs_colorbar = {"plot_colorbar": False}
+    >>> imod.visualize.cross_section(da, colors, levels, kwargs_colorbar=kwargs_colorbar)
+
+    To turn off the white triangles in the colorbar if values exceed the minimum
+    or maximum levels:
+
+    >>> kwargs_colorbar = {"whiten_triangles": False}
+    >>> imod.visualize.cross_section(da, colors, levels, kwargs_colorbar=kwargs_colorbar)
+
     """
     da = da.copy(deep=False)
     if aquitards is not None:

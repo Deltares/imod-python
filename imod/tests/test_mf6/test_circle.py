@@ -1,4 +1,3 @@
-import sys
 import textwrap
 from copy import deepcopy
 from datetime import datetime
@@ -9,11 +8,10 @@ import xugrid as xu
 
 import imod
 from imod.logging import LoggerType, LogLevel
+from imod.mf6.validation_settings import ValidationSettings
 from imod.mf6.write_context import WriteContext
 
 
-@pytest.mark.usefixtures("circle_model")
-@pytest.mark.skipif(sys.version_info < (3, 7), reason="capture_output added in 3.7")
 def test_simulation_write_and_run(circle_model, tmp_path):
     imod.logging.configure(
         LoggerType.PYTHON,
@@ -52,13 +50,12 @@ def test_simulation_write_and_run(circle_model, tmp_path):
     assert head.shape == (52, 2, 216)
 
 
-@pytest.mark.usefixtures("circle_model")
 def test_gwfmodel_render(circle_model, tmp_path):
     simulation = circle_model
     globaltimes = simulation["time_discretization"]["time"].values
     gwfmodel = simulation["GWF_1"]
-    write_context = WriteContext()
-    actual = gwfmodel.render("GWF_1", write_context)
+    write_context1 = WriteContext()
+    actual = gwfmodel._render("GWF_1", write_context1)
     path = "GWF_1"
     expected = textwrap.dedent(
         f"""\
@@ -77,14 +74,13 @@ def test_gwfmodel_render(circle_model, tmp_path):
             """
     )
     assert actual == expected
-    context = WriteContext(tmp_path)
-    gwfmodel.write("GWF_1", globaltimes, True, context)
+    validation_context = ValidationSettings(True)
+    write_context2 = WriteContext(tmp_path)
+    gwfmodel._write("GWF_1", globaltimes, write_context2, validation_context)
     assert (tmp_path / "GWF_1" / "GWF_1.nam").is_file()
     assert (tmp_path / "GWF_1").is_dir()
 
 
-@pytest.mark.usefixtures("circle_model_evt")
-@pytest.mark.skipif(sys.version_info < (3, 7), reason="capture_output added in 3.7")
 def test_simulation_write_and_run_evt(circle_model_evt, tmp_path):
     simulation = circle_model_evt
 
@@ -94,7 +90,7 @@ def test_simulation_write_and_run_evt(circle_model_evt, tmp_path):
         circle_model_evt.run()
 
     modeldir = tmp_path / "circle_evt"
-    simulation.write(modeldir, binary=False)
+    simulation.write(modeldir, binary=True)
     simulation.run()
 
     head = imod.mf6.open_hds(
@@ -105,13 +101,38 @@ def test_simulation_write_and_run_evt(circle_model_evt, tmp_path):
     assert head.shape == (52, 2, 216)
 
 
-@pytest.mark.usefixtures("circle_model_evt")
+def test_simulation_write_and_run_evt__no_segments(circle_model_evt, tmp_path):
+    simulation = circle_model_evt
+
+    evt = circle_model_evt["GWF_1"].pop("evt")
+    evt_ds = evt.dataset
+    evt_ds = evt_ds.drop_vars(["proportion_rate", "proportion_depth"])
+    evt_dict = {key: evt_ds[key] for key in evt_ds.keys()}
+    circle_model_evt["GWF_1"]["evt"] = imod.mf6.Evapotranspiration(**evt_dict)
+
+    with pytest.raises(
+        RuntimeError, match="Simulation circle has not been written yet."
+    ):
+        circle_model_evt.run()
+
+    modeldir = tmp_path / "circle_evt"
+    simulation.write(modeldir, binary=True)
+    simulation.run()
+
+    head = imod.mf6.open_hds(
+        modeldir / "GWF_1/GWF_1.hds", modeldir / "GWF_1/disv.disv.grb"
+    )
+    assert isinstance(head, xu.UgridDataArray)
+    assert head.dims == ("time", "layer", "mesh2d_nFaces")
+    assert head.shape == (52, 2, 216)
+
+
 def test_gwfmodel_render_evt(circle_model_evt, tmp_path):
     simulation = circle_model_evt
     globaltimes = simulation["time_discretization"]["time"].values
     gwfmodel = simulation["GWF_1"]
-    write_context = WriteContext()
-    actual = gwfmodel.render("GWF_1", write_context)
+    write_context1 = WriteContext()
+    actual = gwfmodel._render("GWF_1", write_context1)
     path = "GWF_1"
     expected = textwrap.dedent(
         f"""\
@@ -131,7 +152,195 @@ def test_gwfmodel_render_evt(circle_model_evt, tmp_path):
             """
     )
     assert actual == expected
-    context = WriteContext(tmp_path)
-    gwfmodel.write("GWF_1", globaltimes, True, context)
+    validation_context = ValidationSettings(True)
+    write_context2 = WriteContext(tmp_path)
+    gwfmodel._write("GWF_1", globaltimes, write_context2, validation_context)
     assert (tmp_path / "GWF_1" / "GWF_1.nam").is_file()
     assert (tmp_path / "GWF_1").is_dir()
+
+
+def test_simulation_write_and_run_transport(circle_model_transport, tmp_path):
+    simulation = circle_model_transport
+
+    with pytest.raises(
+        RuntimeError, match="Simulation circle has not been written yet."
+    ):
+        circle_model_transport.run()
+
+    modeldir = tmp_path / "circle_transport"
+    simulation.write(modeldir)
+    simulation.run()
+    head = simulation.open_head()
+    concentration = simulation.open_concentration()
+
+    assert isinstance(head, xu.UgridDataArray)
+    assert head.dims == ("time", "layer", "mesh2d_nFaces")
+    assert head.shape == (52, 2, 216)
+
+    assert isinstance(concentration, xu.UgridDataArray)
+    assert concentration.dims == ("time", "layer", "mesh2d_nFaces")
+    assert concentration.shape == (52, 2, 216)
+
+
+def test_simulation_write_and_run_transport_vsc(circle_model_transport_vsc, tmp_path):
+    simulation = circle_model_transport_vsc
+
+    with pytest.raises(
+        RuntimeError, match="Simulation circle has not been written yet."
+    ):
+        circle_model_transport_vsc.run()
+
+    modeldir = tmp_path / "circle_transport"
+    simulation.write(modeldir)
+    simulation.run()
+    head = simulation.open_head()
+    concentration = simulation.open_concentration()
+
+    assert isinstance(head, xu.UgridDataArray)
+    assert head.dims == ("time", "layer", "mesh2d_nFaces")
+    assert head.shape == (52, 2, 216)
+
+    assert isinstance(concentration, xu.UgridDataArray)
+    assert concentration.dims == ("time", "layer", "mesh2d_nFaces")
+    assert concentration.shape == (52, 2, 216)
+
+
+def run_simulation(simulation, modeldir):
+    idomain = simulation["GWF_1"]["disv"]["idomain"].compute()
+    time = simulation["time_discretization"].dataset.coords["time"].values
+    simulation.write(modeldir)
+    simulation.run()
+    head = (
+        simulation.open_head(simulation_start_time=time[0])
+        .compute()
+        .reindex_like(idomain)
+    )
+    concentration = (
+        simulation.open_concentration()
+        .compute(simulation_start_time=time[0])
+        .reindex_like(idomain)
+    )
+    return head, concentration
+
+
+def test_simulation_clip_and_state_at_boundary(circle_model_transport, tmp_path):
+    # Arrange
+    simulation = circle_model_transport
+    idomain = simulation["GWF_1"]["disv"]["idomain"].compute()
+
+    head, concentration = run_simulation(simulation, tmp_path / "full")
+
+    states_for_boundary = {
+        "GWF_1": head.isel(time=-1, drop=True),
+        "transport": concentration.isel(time=-1, drop=True),
+    }
+    # Act
+    half_simulation = simulation.clip_box(
+        x_max=0.1, states_for_boundary=states_for_boundary
+    )
+    # Assert
+    # Test if model dims halved
+    idomain_half = half_simulation["GWF_1"]["disv"]["idomain"]
+    dim = idomain_half.grid.face_dimension
+    np.testing.assert_array_equal(idomain_half.sizes[dim] / idomain.sizes[dim], 0.5)
+    assert (
+        half_simulation["transport"]["cnc_clipped"]["concentration"].notnull().sum()
+        == 20
+    )
+    assert half_simulation["GWF_1"]["chd_clipped"]["head"].notnull().sum() == 20
+
+    # Test if model runs
+    head_half, concentration_half = run_simulation(half_simulation, tmp_path / "half")
+    assert head_half.shape == (52, 2, 108)
+    assert concentration_half.shape == (52, 2, 108)
+
+
+def test_simulation_clip_and_constant_state_at_boundary__transient_chd(
+    circle_model_transport, tmp_path
+):
+    # Arrange
+    simulation = circle_model_transport
+    idomain = simulation["GWF_1"]["disv"]["idomain"].compute()
+    time = simulation["time_discretization"].dataset.coords["time"].values
+
+    simulation["GWF_1"]["chd"].dataset["head"] = (
+        simulation["GWF_1"]["chd"].dataset["head"].expand_dims(time=time)
+    )
+
+    head, concentration = run_simulation(simulation, tmp_path / "full")
+
+    states_for_boundary = {
+        "GWF_1": head.isel(time=-1, drop=True),
+        "transport": concentration.isel(time=-1, drop=True),
+    }
+    # Act
+    half_simulation = simulation.clip_box(
+        x_max=0.1, states_for_boundary=states_for_boundary
+    )
+    # Assert
+    # Test if model dims halved
+    idomain_half = half_simulation["GWF_1"]["disv"]["idomain"]
+    dim = idomain_half.grid.face_dimension
+    np.testing.assert_array_equal(idomain_half.sizes[dim] / idomain.sizes[dim], 0.5)
+    # Test if the clipped boundary conditions have the correct dimension and values
+    conc_clipped = half_simulation["transport"]["cnc_clipped"]["concentration"]
+    assert conc_clipped.sizes["layer"] == 2
+    assert "time" not in conc_clipped.dims
+    assert conc_clipped.notnull().sum() == 20
+    head_clipped = half_simulation["GWF_1"]["chd_clipped"]["head"]
+    assert head_clipped.sizes["layer"] == 2
+    assert head_clipped.sizes["time"] == 52
+    assert head_clipped.notnull().sum() == 20 * 52
+    # Test if model runs
+    head_half, concentration_half = run_simulation(half_simulation, tmp_path / "half")
+    assert head_half.shape == (52, 2, 108)
+    assert concentration_half.shape == (52, 2, 108)
+
+
+def test_simulation_clip_and_transient_state_at_boundary__transient_chd(
+    circle_model_transport, tmp_path
+):
+    """
+    Test with a transient chd boundary condition and transient states for
+    boundary conditions. The time steps of the chd package are outside of the
+    time domain of the states_for_boundary.
+    """
+    # Arrange
+    simulation = circle_model_transport
+    idomain = simulation["GWF_1"]["disv"]["idomain"].compute()
+    time = simulation["time_discretization"].dataset.coords["time"].values
+
+    simulation["GWF_1"]["chd"].dataset["head"] = (
+        simulation["GWF_1"]["chd"].dataset["head"].expand_dims(time=time[:5])
+    )
+
+    head, concentration = run_simulation(simulation, tmp_path / "full")
+
+    states_for_boundary = {
+        "GWF_1": head.isel(time=slice(11, -11)),
+        "transport": concentration.isel(time=slice(11, -11)),
+    }
+    # Act
+    half_simulation = simulation.clip_box(
+        x_max=0.1, states_for_boundary=states_for_boundary
+    )
+    # Assert
+    # Test if model dims halved
+    idomain_half = half_simulation["GWF_1"]["disv"]["idomain"]
+    dim = idomain_half.grid.face_dimension
+    np.testing.assert_array_equal(idomain_half.sizes[dim] / idomain.sizes[dim], 0.5)
+    # Test if the clipped boundary conditions have the correct dimension and values
+    # Transport data for just 30 time steps (from 12 up to 41)
+    conc_clipped = half_simulation["transport"]["cnc_clipped"]["concentration"]
+    assert conc_clipped.sizes["layer"] == 2
+    assert conc_clipped.sizes["time"] == 30
+    assert conc_clipped.notnull().sum() == 20 * 30
+    # Head data for chd for just 30 time steps (from 12 up to 41)
+    head_clipped = half_simulation["GWF_1"]["chd_clipped"]["head"]
+    assert head_clipped.sizes["layer"] == 2
+    assert head_clipped.sizes["time"] == 30
+    assert head_clipped.notnull().sum() == 20 * 30
+    # Test if model runs
+    head_half, concentration_half = run_simulation(half_simulation, tmp_path / "half")
+    assert head_half.shape == (52, 2, 108)
+    assert concentration_half.shape == (52, 2, 108)

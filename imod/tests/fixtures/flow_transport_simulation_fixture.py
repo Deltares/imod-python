@@ -164,8 +164,8 @@ def flow_transport_simulation():
         minimum_k=0.0001,
         concentration=injection_concentration,
     )
-
-    simulation = imod.mf6.Modflow6Simulation("1d_tpt_benchmark")
+    validation_settings = imod.mf6.ValidationSettings(strict_hfb_validation=False)
+    simulation = imod.mf6.Modflow6Simulation("1d_tpt_benchmark", validation_settings)
     simulation["flow"] = gwf_model
 
     # %%

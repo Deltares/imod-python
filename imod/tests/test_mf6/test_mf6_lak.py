@@ -1,8 +1,8 @@
 import textwrap
+from pathlib import Path
 
 import numpy as np
 import pandas as pd
-import pytest
 import xarray as xr
 import xugrid as xu
 
@@ -17,22 +17,52 @@ from imod.mf6.lak import (
 )
 
 
-@pytest.mark.usefixtures("naardermeer", "ijsselmeer")
 def test_alternative_constructor(naardermeer, ijsselmeer):
     outlet1 = OutletManning("Naardermeer", "IJsselmeer", 23.0, 24.0, 25.0, 26.0)
     outlet2 = OutletManning("IJsselmeer", "Naardermeer", 27.0, 28.0, 29.0, 30.0)
     actual = Lake.from_lakes_and_outlets(
         [naardermeer(), ijsselmeer()], [outlet1, outlet2]
     )
-    _ = actual.render(None, None, None, False)
+    _ = actual._render(None, None, None, False)
     assert isinstance(actual, Lake)
 
 
 def test_lake_render(lake_package):
-    actual = lake_package.render(None, None, None, False)
+    actual = lake_package._render(None, None, None, False)
     expected = textwrap.dedent(
         """\
         begin options
+        end options
+
+        begin dimensions
+          nlakes 2
+          noutlets 2
+          ntables 0
+        end dimensions
+
+        begin packagedata
+          1 11.0 3 Naardermeer
+          2 15.0 3 IJsselmeer
+        end packagedata
+        """
+    )
+    assert actual == expected
+
+
+def test_lake_render__options(lake_package):
+    lake_package.dataset["stagefile"] = Path("path/to/stagefile.bin")
+    lake_package.dataset["budgetfile"] = "path/to/budgetfile.bin"
+    lake_package.dataset["budgetcsvfile"] = "path/to/budgetcsvfile.bin"
+    lake_package._validate_init_schemata(
+        True
+    )  # Verify that added options pass validation.
+    actual = lake_package._render(None, None, None, False)
+    expected = textwrap.dedent(
+        """\
+        begin options
+          stage fileout path\\to\\stagefile.bin
+          budget fileout path/to/budgetfile.bin
+          budgetcsv fileout path/to/budgetcsvfile.bin
         end options
 
         begin dimensions

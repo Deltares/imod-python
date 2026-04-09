@@ -44,26 +44,26 @@ def test_lake_init_validation_dim_mismatch():
 
     expected = textwrap.dedent(
         """
-        * lake_number
-        \t- dim mismatch: expected ('lake_dim',), got ('dim_0',)
-        * lake_starting_stage
-        \t- dim mismatch: expected ('lake_dim',), got ('dim_0',)
-        * lake_boundname
-        \t- dim mismatch: expected ('lake_dim',), got ('dim_0',)
-        * connection_lake_number
-        \t- dim mismatch: expected ('connection_dim',), got ('dim_0',)
-        * connection_type
-        \t- dim mismatch: expected ('connection_dim',), got ('dim_0',)
-        * connection_bed_leak
-        \t- dim mismatch: expected ('connection_dim',), got ('dim_0',)
-        * connection_bottom_elevation
-        \t- dim mismatch: expected ('connection_dim',), got ('dim_0',)
-        * connection_top_elevation
-        \t- dim mismatch: expected ('connection_dim',), got ('dim_0',)
-        * connection_width
-        \t- dim mismatch: expected ('connection_dim',), got ('dim_0',)
-        * connection_length
-        \t- dim mismatch: expected ('connection_dim',), got ('dim_0',)"""
+        - lake_number
+            - dim mismatch: expected ('lake_dim',), got ('dim_0',)
+        - lake_starting_stage
+            - dim mismatch: expected ('lake_dim',), got ('dim_0',)
+        - lake_boundname
+            - dim mismatch: expected ('lake_dim',), got ('dim_0',)
+        - connection_lake_number
+            - dim mismatch: expected ('connection_dim',), got ('dim_0',)
+        - connection_type
+            - dim mismatch: expected ('connection_dim',), got ('dim_0',)
+        - connection_bed_leak
+            - dim mismatch: expected ('connection_dim',), got ('dim_0',)
+        - connection_bottom_elevation
+            - dim mismatch: expected ('connection_dim',), got ('dim_0',)
+        - connection_top_elevation
+            - dim mismatch: expected ('connection_dim',), got ('dim_0',)
+        - connection_width
+            - dim mismatch: expected ('connection_dim',), got ('dim_0',)
+        - connection_length
+            - dim mismatch: expected ('connection_dim',), got ('dim_0',)"""
     )
     assert str(error.value) == expected
 
@@ -108,26 +108,26 @@ def test_lake_init_validation_type_mismatch():
 
     expected = textwrap.dedent(
         """
-        * lake_number
-        \t- dtype float64 != <class 'numpy.integer'>
-        * lake_starting_stage
-        \t- dtype int32 != <class 'numpy.floating'>
-        * lake_boundname
-        \t- dtype int32 != <U0
-        * connection_lake_number
-        \t- dtype float64 != <class 'numpy.integer'>
-        * connection_type
-        \t- dtype int32 != <U0
-        * connection_bed_leak
-        \t- dtype int32 != <class 'numpy.floating'>
-        * connection_bottom_elevation
-        \t- dtype int32 != <class 'numpy.floating'>
-        * connection_top_elevation
-        \t- dtype int32 != <class 'numpy.floating'>
-        * connection_width
-        \t- dtype int32 != <class 'numpy.floating'>
-        * connection_length
-        \t- dtype int32 != <class 'numpy.floating'>"""
+        - lake_number
+            - dtype float64 != <class 'numpy.integer'>
+        - lake_starting_stage
+            - dtype int32 != <class 'numpy.floating'>
+        - lake_boundname
+            - dtype int32 != <U0
+        - connection_lake_number
+            - dtype float64 != <class 'numpy.integer'>
+        - connection_type
+            - dtype int32 != <U0
+        - connection_bed_leak
+            - dtype int32 != <class 'numpy.floating'>
+        - connection_bottom_elevation
+            - dtype int32 != <class 'numpy.floating'>
+        - connection_top_elevation
+            - dtype int32 != <class 'numpy.floating'>
+        - connection_width
+            - dtype int32 != <class 'numpy.floating'>
+        - connection_length
+            - dtype int32 != <class 'numpy.floating'>"""
     )
 
     # this replace action is needed because the default int type on teamcity
@@ -152,9 +152,6 @@ def test_lake_write_validation_sign_mismatch():
     connection_bed_leak = xr.DataArray([1.0], dims=CONNECTION_DIM)
     connection_bottom_elevation = xr.DataArray([1.0], dims=CONNECTION_DIM)
     connection_top_elevation = xr.DataArray([1.0], dims=CONNECTION_DIM)
-    connection_width = xr.DataArray([-1.0], dims=CONNECTION_DIM)
-    connection_length = xr.DataArray([-1.0], dims=CONNECTION_DIM)
-
     connection_width = xr.DataArray([-1.0], dims=CONNECTION_DIM)
     connection_length = xr.DataArray([-1.0], dims=CONNECTION_DIM)
 

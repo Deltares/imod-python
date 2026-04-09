@@ -2,14 +2,22 @@ import pathlib
 import re
 import tempfile
 import textwrap
+from copy import deepcopy
+from datetime import datetime
 
+import dask
 import numpy as np
 import pytest
 import xarray as xr
 
 import imod
+from imod.mf6.dis import StructuredDiscretization
+from imod.mf6.validation_settings import ValidationSettings
 from imod.mf6.write_context import WriteContext
+from imod.prepare.topsystem.allocation import ALLOCATION_OPTION
 from imod.schemata import ValidationError
+from imod.typing.grid import is_planar_grid, is_transient_data_grid, nan_like
+from imod.util.regrid import RegridderWeightsCache
 
 
 @pytest.fixture(scope="function")
@@ -55,7 +63,7 @@ def test_render(rch_dict):
     rch = imod.mf6.Recharge(**rch_dict)
     directory = pathlib.Path("mymodel")
     globaltimes = np.array(["2000-01-01"], dtype="datetime64[ns]")
-    actual = rch.render(directory, "recharge", globaltimes, True)
+    actual = rch._render(directory, "recharge", globaltimes, True)
     expected = textwrap.dedent(
         """\
         begin options
@@ -78,7 +86,7 @@ def test_render_fixed_cell(rch_dict):
     rch = imod.mf6.Recharge(**rch_dict)
     directory = pathlib.Path("mymodel")
     globaltimes = np.array(["2000-01-01"], dtype="datetime64[ns]")
-    actual = rch.render(directory, "recharge", globaltimes, True)
+    actual = rch._render(directory, "recharge", globaltimes, True)
     expected = textwrap.dedent(
         """\
         begin options
@@ -108,7 +116,7 @@ def test_render_transient(rch_dict_transient):
         ],
         dtype="datetime64[ns]",
     )
-    actual = rch.render(directory, "recharge", globaltimes, True)
+    actual = rch._render(directory, "recharge", globaltimes, True)
     expected = textwrap.dedent(
         """\
         begin options
@@ -140,7 +148,7 @@ def test_no_layer_dim(rch_dict):
     rch = imod.mf6.Recharge(**rch_dict)
     directory = pathlib.Path("mymodel")
     globaltimes = np.array(["2000-01-01"], dtype="datetime64[ns]")
-    actual = rch.render(directory, "recharge", globaltimes, True)
+    actual = rch._render(directory, "recharge", globaltimes, True)
     expected = textwrap.dedent(
         """\
         begin options
@@ -172,7 +180,7 @@ def test_transient_no_layer_dim(rch_dict_transient):
         dtype="datetime64[ns]",
     )
 
-    actual = rch.render(directory, "recharge", globaltimes, True)
+    actual = rch._render(directory, "recharge", globaltimes, True)
     expected = textwrap.dedent(
         """\
         begin options
@@ -194,7 +202,18 @@ def test_transient_no_layer_dim(rch_dict_transient):
     assert actual == expected
 
 
-@pytest.mark.usefixtures("concentration_fc", "rate_fc")
+def test_transient_aggregate(rch_dict_transient):
+    rch = imod.mf6.Recharge(**rch_dict_transient)
+    planar_dict = rch.aggregate_layers(rch.dataset)
+
+    assert isinstance(planar_dict, dict)
+    for value in planar_dict.values():
+        assert isinstance(value, xr.DataArray)
+        assert "layer" not in value.dims
+        assert "layer" not in value.coords
+        assert value.dims == ("time", "y", "x")
+
+
 def test_render_concentration(concentration_fc, rate_fc):
     rch = imod.mf6.Recharge(
         rate=rate_fc,
@@ -212,7 +231,7 @@ def test_render_concentration(concentration_fc, rate_fc):
         dtype="datetime64[ns]",
     )
 
-    actual = rch.render(directory, "rch", globaltimes, False)
+    actual = rch._render(directory, "rch", globaltimes, False)
 
     expected = textwrap.dedent(
         """\
@@ -241,8 +260,8 @@ def test_render_concentration(concentration_fc, rate_fc):
 def test_no_layer_coord(rch_dict):
     message = textwrap.dedent(
         """
-        * rate
-        \t- coords has missing keys: {'layer'}"""
+        - rate
+            - coords has missing keys: {'layer'}"""
     )
 
     rch_dict["rate"] = rch_dict["rate"].sel(layer=1, drop=True)
@@ -256,17 +275,17 @@ def test_no_layer_coord(rch_dict):
 def test_scalar():
     message = textwrap.dedent(
         """
-        * rate
-        \t- coords has missing keys: {'layer'}
-        \t- No option succeeded:
-        \tdim mismatch: expected ('time', 'layer', 'y', 'x'), got ()
-        \tdim mismatch: expected ('layer', 'y', 'x'), got ()
-        \tdim mismatch: expected ('time', 'layer', '{face_dim}'), got ()
-        \tdim mismatch: expected ('layer', '{face_dim}'), got ()
-        \tdim mismatch: expected ('time', 'y', 'x'), got ()
-        \tdim mismatch: expected ('y', 'x'), got ()
-        \tdim mismatch: expected ('time', '{face_dim}'), got ()
-        \tdim mismatch: expected ('{face_dim}',), got ()"""
+        - rate
+            - coords has missing keys: {'layer'}
+            - No option succeeded:
+            dim mismatch: expected ('time', 'layer', 'y', 'x'), got ()
+            dim mismatch: expected ('layer', 'y', 'x'), got ()
+            dim mismatch: expected ('time', 'layer', '{face_dim}'), got ()
+            dim mismatch: expected ('layer', '{face_dim}'), got ()
+            dim mismatch: expected ('time', 'y', 'x'), got ()
+            dim mismatch: expected ('y', 'x'), got ()
+            dim mismatch: expected ('time', '{face_dim}'), got ()
+            dim mismatch: expected ('{face_dim}',), got ()"""
     )
     with pytest.raises(ValidationError, match=re.escape(message)):
         imod.mf6.Recharge(rate=0.001)
@@ -276,7 +295,39 @@ def test_validate_false():
     imod.mf6.Recharge(rate=0.001, validate=False)
 
 
-@pytest.mark.usefixtures("rate_fc", "concentration_fc")
+@pytest.mark.timeout(10, method="thread")
+def test_ignore_time_validation():
+    """
+    Create a large recharge dataset with a time dimension. This is to test the
+    performance of the validation when ignore_time_no_data is True.
+    NOTE: There currently is no easy way to test the opposite (i.e.,
+    ignore_time_no_data is False, then catch timeout with an pytest xfail
+    marker), because the timeout will terminate the test run with an error when
+    using dask instead of a fail. Somewhat relevant issue:
+    https://github.com/pytest-dev/pytest-timeout/issues/181
+    """
+    # Arrange
+    rng = dask.array.random.default_rng()
+    layer = [1, 2, 3]
+    template = imod.util.empty_3d(1.0, 0.0, 1000.0, 1.0, 0.0, 1000.0, layer)
+    idomain = xr.ones_like(template, dtype=np.int32)
+    layer_bottom = xr.DataArray(
+        [0.0, -10.0, -20.0], coords={"layer": layer}, dims=["layer"]
+    )
+    bottom = layer_bottom * idomain
+    x = rng.random((10000, 3, 1000, 1000), chunks=(1, -1, -1, -1))
+    rate = xr.DataArray(x, coords=idomain.coords, dims=("time", "layer", "y", "x"))
+    rch = imod.mf6.Recharge(rate=rate, validate=False)
+    validation_context = ValidationSettings(ignore_time=True)
+    # Act
+    rch._validate(
+        schemata=rch._write_schemata,
+        idomain=idomain,
+        bottom=bottom,
+        validation_context=validation_context,
+    )
+
+
 def test_write_concentration_period_data(rate_fc, concentration_fc):
     globaltimes = np.array(
         [
@@ -298,7 +349,7 @@ def test_write_concentration_period_data(rate_fc, concentration_fc):
         write_context = WriteContext(
             simulation_directory=output_dir, write_directory=output_dir
         )
-        rch.write(pkgname="rch", globaltimes=globaltimes, write_context=write_context)
+        rch._write(pkgname="rch", globaltimes=globaltimes, write_context=write_context)
 
         with open(output_dir + "/rch/rch-0.dat", "r") as f:
             data = f.read()
@@ -324,3 +375,280 @@ def test_clip_box(rch_dict):
     selection = rch.clip_box(x_min=10.0, x_max=20.0, y_min=10.0, y_max=20.0)
     assert selection["rate"].dims == ("y", "x")
     assert selection["rate"].shape == (1, 1)
+
+
+@pytest.mark.parametrize(
+    "allocation_option",
+    [None, ALLOCATION_OPTION.at_first_active, ALLOCATION_OPTION.stage_to_riv_bot],
+)
+def test_reallocate(rch_dict, allocation_option):
+    # Arrange
+    rch = imod.mf6.Recharge(**rch_dict)
+    idomain = rch_dict["rate"].fillna(0.0).astype(np.int16)
+    top = 1.0
+    bottom = top - idomain.coords["layer"]
+    dis = imod.mf6.StructuredDiscretization(top=top, bottom=bottom, idomain=idomain)
+    if allocation_option is ALLOCATION_OPTION.stage_to_riv_bot:
+        # Act
+        with pytest.raises(
+            ValueError, match="Received incompatible setting for recharge"
+        ):
+            rch.reallocate(dis, allocation_option=allocation_option)
+    else:
+        # Act
+        rch_reallocated = rch.reallocate(dis, allocation_option=allocation_option)
+        # Assert
+        assert isinstance(rch_reallocated, imod.mf6.Recharge)
+        assert rch_reallocated.dataset.equals(rch.dataset)
+
+
+@pytest.mark.unittest_jit
+def test_planar_rch_from_imod5_constant(imod5_dataset, tmp_path):
+    data = deepcopy(imod5_dataset[0])
+    period_data = imod5_dataset[1]
+    target_discretization = StructuredDiscretization.from_imod5_data(data)
+
+    # create a planar grid with time-independent recharge
+    data["rch"]["rate"] = data["rch"]["rate"].assign_coords(layer=[-1])
+
+    assert not is_transient_data_grid(data["rch"]["rate"])
+    assert is_planar_grid(data["rch"]["rate"])
+
+    # Act
+    rch = imod.mf6.Recharge.from_imod5_data(
+        data,
+        period_data,
+        target_discretization,
+        time_min=datetime(2002, 2, 2),
+        time_max=datetime(2022, 2, 2),
+    )
+    rendered_rch = rch._render(tmp_path, "rch", None, None)
+
+    # Assert
+    np.testing.assert_allclose(
+        data["rch"]["rate"].mean().values / 1e3,
+        rch.dataset["rate"].mean().values,
+        atol=1e-5,
+    )
+    assert "maxbound 33856" in rendered_rch
+    assert rendered_rch.count("begin period") == 1
+    # teardown
+    data["rch"]["rate"] = data["rch"]["rate"].assign_coords(layer=[1])
+
+
+@pytest.mark.unittest_jit
+def test_planar_rch_from_imod5_transient(imod5_dataset, tmp_path):
+    data = deepcopy(imod5_dataset[0])
+    period_data = imod5_dataset[1]
+    target_discretization = StructuredDiscretization.from_imod5_data(data)
+
+    # create a grid with recharge for 3 timesteps
+    input_recharge = data["rch"]["rate"].copy(deep=True)
+    times = [
+        np.datetime64("2001-01-01"),
+        np.datetime64("2002-04-01"),
+        np.datetime64("2002-10-01"),
+    ]
+    input_recharge = input_recharge.expand_dims({"time": times})
+
+    # make it planar by setting the layer coordinate to -1
+    input_recharge = input_recharge.assign_coords({"layer": [-1]})
+
+    # update the data set
+    data["rch"]["rate"] = input_recharge
+    assert is_transient_data_grid(data["rch"]["rate"])
+    assert is_planar_grid(data["rch"]["rate"])
+
+    # act
+    rch = imod.mf6.Recharge.from_imod5_data(
+        data,
+        period_data,
+        target_discretization,
+        time_min=datetime(2002, 2, 2),
+        time_max=datetime(2022, 2, 2),
+    )
+    globaltimes = times + [np.datetime64("2022-02-02")]
+    globaltimes[0] = np.datetime64("2002-02-02")
+    rendered_rch = rch._render(tmp_path, "rch", globaltimes, None)
+
+    # assert
+    np.testing.assert_allclose(
+        data["rch"]["rate"].mean().values / 1e3,
+        rch.dataset["rate"].mean().values,
+        atol=1e-5,
+    )
+    assert rendered_rch.count("begin period") == 3
+    assert "maxbound 33856" in rendered_rch
+
+
+@pytest.mark.unittest_jit
+def test_non_planar_rch_from_imod5_constant(imod5_dataset, tmp_path):
+    data = deepcopy(imod5_dataset[0])
+    period_data = imod5_dataset[1]
+    target_discretization = StructuredDiscretization.from_imod5_data(data)
+
+    # make the first layer of the target grid inactive
+    target_grid = target_discretization.dataset["idomain"]
+    target_grid.loc[{"layer": 1}] = 0
+
+    # the input for recharge is on the second layer of the targetgrid
+    original_rch = data["rch"]["rate"].copy(deep=True)
+    data["rch"]["rate"] = data["rch"]["rate"].assign_coords({"layer": [-1]})
+    input_recharge = nan_like(data["khv"]["kh"])
+    input_recharge.loc[{"layer": 2}] = data["rch"]["rate"].isel(layer=0)
+
+    # update the data set
+
+    data["rch"]["rate"] = input_recharge
+    assert not is_planar_grid(data["rch"]["rate"])
+    assert not is_transient_data_grid(data["rch"]["rate"])
+
+    # act
+    rch = imod.mf6.Recharge.from_imod5_data(
+        data,
+        period_data,
+        target_discretization,
+        time_min=datetime(2002, 2, 2),
+        time_max=datetime(2022, 2, 2),
+    )
+    rendered_rch = rch._render(tmp_path, "rch", None, None)
+
+    # assert
+    np.testing.assert_allclose(
+        data["rch"]["rate"].mean().values / 1e3,
+        rch.dataset["rate"].mean().values,
+        atol=1e-5,
+    )
+    assert rendered_rch.count("begin period") == 1
+    assert "maxbound 33856" in rendered_rch
+
+    # teardown
+    data["rch"]["rate"] = original_rch
+
+
+@pytest.mark.unittest_jit
+def test_non_planar_rch_from_imod5_transient(imod5_dataset, tmp_path):
+    data = deepcopy(imod5_dataset[0])
+    period_data = imod5_dataset[1]
+    target_discretization = StructuredDiscretization.from_imod5_data(data)
+    # make the first layer of the target grid inactive
+    target_grid = target_discretization.dataset["idomain"]
+    target_grid.loc[{"layer": 1}] = 0
+
+    # the input for recharge is on the second layer of the targetgrid
+    input_recharge = nan_like(data["rch"]["rate"])
+    input_recharge = input_recharge.assign_coords({"layer": [2]})
+    input_recharge.loc[{"layer": 2}] = data["rch"]["rate"].sel(layer=1)
+    times = [
+        np.datetime64("2001-01-01"),
+        np.datetime64("2002-04-01"),
+        np.datetime64("2002-10-01"),
+    ]
+    input_recharge = input_recharge.expand_dims({"time": times})
+
+    # update the data set
+    data["rch"]["rate"] = input_recharge
+    assert not is_planar_grid(data["rch"]["rate"])
+    assert is_transient_data_grid(data["rch"]["rate"])
+
+    # act
+    rch = imod.mf6.Recharge.from_imod5_data(
+        data,
+        period_data,
+        target_discretization,
+        time_min=datetime(2002, 2, 2),
+        time_max=datetime(2022, 2, 2),
+    )
+    globaltimes = times + [np.datetime64("2022-02-02")]
+    globaltimes[0] = np.datetime64("2002-02-02")
+    rendered_rch = rch._render(tmp_path, "rch", globaltimes, None)
+
+    # assert
+    np.testing.assert_allclose(
+        data["rch"]["rate"].mean().values / 1e3,
+        rch.dataset["rate"].mean().values,
+        atol=1e-5,
+    )
+    assert rendered_rch.count("begin period") == 3
+    assert "maxbound 33856" in rendered_rch
+
+
+@pytest.mark.unittest_jit
+def test_from_imod5_cap_data(imod5_dataset):
+    # Arrange
+    data = deepcopy(imod5_dataset[0])
+    target_discretization = StructuredDiscretization.from_imod5_data(data)
+    data["cap"] = {}
+    msw_bound = data["bnd"]["ibound"].isel(layer=0, drop=False)
+    data["cap"]["boundary"] = msw_bound
+    data["cap"]["wetted_area"] = xr.ones_like(msw_bound) * 100
+    data["cap"]["urban_area"] = xr.ones_like(msw_bound) * 200
+    # Compute midpoint of grid and set areas such, that cells need to be
+    # deactivated.
+    midpoint = tuple((int(x / 2) for x in msw_bound.shape))
+    # Set to total cellsize, cell needs to be deactivated.
+    data["cap"]["wetted_area"][midpoint] = 625.0
+    # Set to zero, cell needs to be deactivated.
+    data["cap"]["urban_area"][midpoint] = 0.0
+    # Act
+    rch = imod.mf6.Recharge.from_imod5_cap_data(data, target_discretization)
+    rate = rch.dataset["rate"]
+    # Assert
+    # Shape
+    assert rate.dims == ("y", "x")
+    assert "layer" in rate.coords
+    assert rate.coords["layer"] == 1
+    # Values
+    np.testing.assert_array_equal(np.unique(rate), np.array([0.0, np.nan]))
+    # Boundaries inactive in MetaSWAP
+    assert np.isnan(rate[:, 0]).all()
+    assert np.isnan(rate[:, -1]).all()
+    assert np.isnan(rate[0, :]).all()
+    assert np.isnan(rate[-1, :]).all()
+    assert np.isnan(rate[midpoint]).all()
+
+
+@pytest.mark.unittest_jit
+def test_from_imod5_cap_data__regrid(imod5_dataset):
+    # Arrange
+    data = deepcopy(imod5_dataset[0])
+    target_discretization = StructuredDiscretization.from_imod5_data(data)
+    data["cap"] = {}
+    msw_bound = data["bnd"]["ibound"].isel(layer=0, drop=False)
+    data["cap"]["boundary"] = msw_bound
+    data["cap"]["wetted_area"] = xr.ones_like(msw_bound) * 100
+    data["cap"]["urban_area"] = xr.ones_like(msw_bound) * 200
+    # Setup template grid
+    dx_small, xmin, xmax, dy_small, ymin, ymax = imod.util.spatial_reference(msw_bound)
+    dx = dx_small * 2
+    dy = dy_small * 2
+    expected_spatial_ref = dx, xmin, xmax, dy, ymin, ymax
+    like = imod.util.empty_2d(*expected_spatial_ref)
+    # Act
+    rch = imod.mf6.Recharge.from_imod5_cap_data(data, target_discretization)
+    rch_coarse = rch.regrid_like(like, regrid_cache=RegridderWeightsCache())
+    # Assert
+    actual_spatial_ref = imod.util.spatial_reference(rch_coarse.dataset["rate"])
+    assert actual_spatial_ref == expected_spatial_ref
+
+
+@pytest.mark.unittest_jit
+def test_from_imod5_cap_data__clip_box(imod5_dataset):
+    # Arrange
+    data = deepcopy(imod5_dataset[0])
+    target_discretization = StructuredDiscretization.from_imod5_data(data)
+    data["cap"] = {}
+    msw_bound = data["bnd"]["ibound"].isel(layer=0, drop=False)
+    data["cap"]["boundary"] = msw_bound
+    data["cap"]["wetted_area"] = xr.ones_like(msw_bound) * 100
+    data["cap"]["urban_area"] = xr.ones_like(msw_bound) * 200
+    # Setup template grid
+    dx, xmin, xmax, dy, ymin, ymax = imod.util.spatial_reference(msw_bound)
+    xmin_to_clip = xmin + 10 * dx
+    expected_spatial_ref = dx, xmin_to_clip, xmax, dy, ymin, ymax
+    # Act
+    rch = imod.mf6.Recharge.from_imod5_cap_data(data, target_discretization)
+    rch_clipped = rch.clip_box(x_min=xmin_to_clip)
+    # Assert
+    actual_spatial_ref = imod.util.spatial_reference(rch_clipped.dataset["rate"])
+    assert actual_spatial_ref == expected_spatial_ref

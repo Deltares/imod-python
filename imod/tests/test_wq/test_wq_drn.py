@@ -88,10 +88,7 @@ def test_render_with_stress_repeats__elevation(drainage):
 
 def test_compress_discontinuous_layers(drainage):
     drn = drainage
-    layer = drn["layer"].values
-    layer[1] += 1
-    layer[2] += 2
-    drn["layer"] = drn["layer"].copy(data=layer)
+    drn.dataset = drn.dataset.assign_coords(layer=[1, 3, 5])
     directory = pathlib.Path(".")
 
     compare = """

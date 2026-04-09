@@ -21,7 +21,7 @@ from sphinx_gallery.sorting import FileNameSortKey
 
 project = "iMOD Python"
 copyright = "Deltares"
-author = "Martijn Visser, Huite Bootsma"
+author = "iMOD development team"
 
 # The full version, including alpha/beta/rc tags
 release = distribution("imod").version
@@ -45,9 +45,16 @@ extensions = [
     "sphinx.ext.todo",
     "sphinx.ext.napoleon",
     "sphinx_gallery.gen_gallery",
+    "sphinx_remove_toctrees",
 ]
 
 templates_path = ["_templates"]
+# Skip including the files for methods in the navbar on the side (note the *.*.rst)
+remove_from_toctrees = [
+    "api/generated/mf6/imod.mf6.*.*.rst",
+    "api/generated/msw/imod.msw.*.*.rst",
+    "api/generated/wq/imod.wq.*.*.rst",
+]
 
 sphinx_gallery_conf = {
     "examples_dirs": [
@@ -55,7 +62,6 @@ sphinx_gallery_conf = {
         # "../examples/data",
         "../examples/mf6",
         "../examples/imod-wq",
-        "../examples/imodflow",
         "../examples/metaswap",
         "../examples/prepare",
         "../examples/visualize",
@@ -65,7 +71,6 @@ sphinx_gallery_conf = {
         # "examples/data",
         "examples/mf6",
         "examples/imod-wq",
-        "examples/imodflow",
         "examples/metaswap",
         "examples/prepare",
         "examples/visualize",
@@ -117,7 +122,7 @@ html_theme = "pydata_sphinx_theme"
 # relative to this directory. They are copied after the builtin static files,
 # so a file named "default.css" will overwrite the builtin "default.css".
 html_static_path = ["_static"]
-html_css_files = ["theme-deltares.css"]
+html_js_files = ["deltares.js"]
 
 # Set
 html_context = {"default_mode": "light"}
@@ -132,8 +137,8 @@ html_theme_options = {
         {
             "name": "Deltares",
             "url": "https://www.deltares.nl/en/",
-            "icon": "_static/deltares-white.svg",
-            "type": "local",
+            "icon": "fa-custom fa-deltares",
+            "type": "fontawesome",
         },
         {
             "name": "GitHub",
@@ -143,8 +148,8 @@ html_theme_options = {
         },
     ],
     "logo": {
-        "image_light": "imod-python-logo.svg",
-        "image_dark": "imod-python-logo.svg",
+        "image_light": "imod-python-logo-light.svg",
+        "image_dark": "imod-python-logo-dark.svg",
     },
 }
 
@@ -157,10 +162,6 @@ html_theme_options = {
 # 'searchbox.html']``.
 #
 # html_sidebars = {}
-
-# The name of an image file (relative to this directory) to place at the top
-# of the sidebar.
-html_logo = "_static/imod-python-logo.svg"
 
 # -- Options for HTMLHelp output ---------------------------------------------
 

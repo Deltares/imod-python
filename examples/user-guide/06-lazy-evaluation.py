@@ -94,7 +94,7 @@ eager_result.data
 # ----------------------------------------
 #
 # The input and output functions in the imod package have been written to work
-# with xarray's delayed evaluation. This means that opening IDFs or MODFLOW6
+# with xarray's delayed evaluation. This means that opening IDFs or MODFLOW 6
 # will not load the data from the files into memory until they are needed.
 #
 # Let's grab some example results, store them in a temporarily directory, and

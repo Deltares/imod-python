@@ -77,9 +77,9 @@ def get_grid_da(is_unstructured, dtype, value=1):
 def create_lake_package(is_unstructured):
     is_lake1 = get_grid_da(is_unstructured, bool, False)
     times_of_numeric_timeseries = [
-        np.datetime64("2000-01-01"),
-        np.datetime64("2000-03-01"),
-        np.datetime64("2000-05-01"),
+        np.datetime64("2000-01-01", "ns"),
+        np.datetime64("2000-03-01", "ns"),
+        np.datetime64("2000-05-01", "ns"),
     ]
     numeric = xr.DataArray(
         np.full((len(times_of_numeric_timeseries)), 5.0),
@@ -151,6 +151,10 @@ def create_instance_boundary_condition_packages(is_unstructured):
     """
     creates instances of those modflow packages that are boundary conditions.
     """
+    segments = xr.DataArray(
+        data=[1, 1, 1], coords={"segment": [1, 2, 3]}, dims=("segment",)
+    )
+    segment_data = segments * get_grid_da(is_unstructured, np.float64, 0.2)
     return [
         imod.mf6.ConstantConcentration(
             get_grid_da(is_unstructured, np.float32, 2),
@@ -172,8 +176,8 @@ def create_instance_boundary_condition_packages(is_unstructured):
             surface=get_grid_da(is_unstructured, np.float64, 3),
             rate=get_grid_da(is_unstructured, np.float64, 2),
             depth=get_grid_da(is_unstructured, np.float64, 1),
-            proportion_rate=get_grid_da(is_unstructured, np.float64, 0.2),
-            proportion_depth=get_grid_da(is_unstructured, np.float64, 0.2),
+            proportion_rate=segment_data,
+            proportion_depth=segment_data,
             fixed_cell=True,
         ),
         imod.mf6.GeneralHeadBoundary(
@@ -201,12 +205,6 @@ STRUCTURED_GRID_PACKAGES = [
     imod.mf6.StructuredDiscretization(
         2.0, get_grid_da(False, np.float32), get_grid_da(False, np.int32)
     ),
-    imod.mf6.WellDisStructured(
-        layer=[3, 2, 1],
-        row=[1, 2, 3],
-        column=[2, 2, 2],
-        rate=[-5.0] * 3,
-    ),
     imod.mf6.MassSourceLoading(
         rate=get_grid_da(False, np.float64, 0.33),
         print_input=True,
@@ -219,26 +217,13 @@ STRUCTURED_GRID_PACKAGES = [
 ]
 
 
-UNSTRUCTURED_GRID_PACKAGES = (
-    [
-        imod.mf6.WellDisVertices(
-            layer=[1, 2, 1],
-            cell2d=[3, 12, 23],
-            rate=[-0.1, 0.2, 0.3],
-            print_input=False,
-            print_flows=False,
-            save_flows=False,
-        )
-    ]
-    + [create_vertices_discretization()]
-    + [
-        *create_instance_packages(is_unstructured=True),
-        *create_instance_boundary_condition_packages(True),
-    ]
-)
+UNSTRUCTURED_GRID_PACKAGES = [create_vertices_discretization()] + [
+    *create_instance_packages(is_unstructured=True),
+    *create_instance_boundary_condition_packages(True),
+]
 
 GRIDLESS_PACKAGES = [
-    imod.mf6.adv.Advection("upstream"),
+    imod.mf6.AdvectionUpstream(),
     imod.mf6.Buoyancy(
         reference_density=1000.0,
         reference_concentration=[4.0, 25.0],
@@ -309,9 +294,9 @@ GRIDLESS_PACKAGES = [
 def create_exchange_package() -> list[GWFGWF]:
     cell_id1 = xr.DataArray([[1, 1], [2, 1], [3, 1]])
     cell_id2 = xr.DataArray([[1, 2], [2, 2], [3, 2]])
-    layer = np.array([12, 13, 14])
-    cl1 = np.ones(len(cell_id1))
-    cl2 = np.ones(len(cell_id1))
+    layer = xr.DataArray(np.array([12, 13, 14]))
+    cl1 = xr.DataArray(np.ones(len(cell_id1)))
+    cl2 = xr.DataArray(np.ones(len(cell_id1)))
     hwva = cl1 + cl2
 
     return [

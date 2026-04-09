@@ -3,7 +3,6 @@ from imod import (
     couplers,
     data,
     evaluate,
-    flow,
     mf6,
     msw,
     prepare,
@@ -15,4 +14,4 @@ from imod import (
 )
 from imod.formats import gen, idf, ipf, prj, rasterio
 
-__version__ = "0.16.0"
+__version__ = "1.0.1dev1"

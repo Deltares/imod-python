@@ -1,13 +1,31 @@
-from typing import Optional, Tuple
+from datetime import datetime
+from typing import Optional
 
 import numpy as np
 
-from imod.logging import init_log_decorator
-from imod.mf6.boundary_condition import BoundaryCondition
-from imod.mf6.interfaces.iregridpackage import IRegridPackage
-from imod.mf6.utilities.regrid import RegridderType
+from imod.common.interfaces.iregridpackage import IRegridPackage
+from imod.common.utilities.dataclass_type import DataclassType
+from imod.common.utilities.mask import broadcast_and_mask_arrays
+from imod.logging import init_log_decorator, standard_log_decorator
+from imod.mf6.aggregate.aggregate_schemes import GeneralHeadBoundaryAggregationMethod
+from imod.mf6.dis import StructuredDiscretization
+from imod.mf6.disv import VerticesDiscretization
+from imod.mf6.npf import NodePropertyFlow
+from imod.mf6.regrid.regrid_schemes import (
+    GeneralHeadBoundaryRegridMethod,
+)
+from imod.mf6.topsystem import TopSystemBoundaryCondition
+from imod.mf6.utilities.imod5_converter import regrid_imod5_pkg_data
+from imod.mf6.utilities.package import set_repeat_stress_if_available
 from imod.mf6.validation import BOUNDARY_DIMS_SCHEMA, CONC_DIMS_SCHEMA
+from imod.prepare.cleanup import cleanup_ghb
+from imod.prepare.topsystem.allocation import ALLOCATION_OPTION, allocate_ghb_cells
+from imod.prepare.topsystem.conductance import (
+    DISTRIBUTING_OPTION,
+    distribute_ghb_conductance,
+)
 from imod.schemata import (
+    AllCoordsValueSchema,
     AllInsideNoDataSchema,
     AllNoDataSchema,
     AllValueSchema,
@@ -18,9 +36,12 @@ from imod.schemata import (
     IndexesSchema,
     OtherCoordsSchema,
 )
+from imod.typing import GridDataArray
+from imod.typing.grid import enforce_dim_order, has_negative_layer, is_planar_grid
+from imod.util.regrid import RegridderWeightsCache
 
 
-class GeneralHeadBoundary(BoundaryCondition, IRegridPackage):
+class GeneralHeadBoundary(TopSystemBoundaryCondition, IRegridPackage):
     """
     The General-Head Boundary package is used to simulate head-dependent flux
     boundaries.
@@ -60,14 +81,15 @@ class GeneralHeadBoundary(BoundaryCondition, IRegridPackage):
         Flag to indicate whether the package should be validated upon
         initialization. This raises a ValidationError if package input is
         provided in the wrong manner. Defaults to True.
-    repeat_stress: Optional[xr.DataArray] of datetimes
+    repeat_stress: dict or xr.DataArray of datetimes, optional
         Used to repeat data for e.g. repeating stress periods such as
-        seasonality without duplicating the values. The DataArray should have
-        dimensions ``("repeat", "repeat_items")``. The ``repeat_items``
-        dimension should have size 2: the first value is the "key", the second
-        value is the "value". For the "key" datetime, the data of the "value"
-        datetime will be used. Can also be set with a dictionary using the
-        ``set_repeat_stress`` method.
+        seasonality without duplicating the values. If provided as dict, it
+        should map new dates to old dates present in the dataset.
+        ``{"2001-04-01": "2000-04-01", "2001-10-01": "2000-10-01"}`` if provided
+        as DataArray, it should have dimensions ``("repeat", "repeat_items")``.
+        The ``repeat_items`` dimension should have size 2: the first value is
+        the "key", the second value is the "value". For the "key" datetime, the
+        data of the "value" datetime will be used.
     """
 
     _pkg_id = "ghb"
@@ -79,12 +101,14 @@ class GeneralHeadBoundary(BoundaryCondition, IRegridPackage):
             IndexesSchema(),
             CoordsSchema(("layer",)),
             BOUNDARY_DIMS_SCHEMA,
+            AllCoordsValueSchema("layer", ">", 0),
         ],
         "conductance": [
             DTypeSchema(np.floating),
             IndexesSchema(),
             CoordsSchema(("layer",)),
             BOUNDARY_DIMS_SCHEMA,
+            AllCoordsValueSchema("layer", ">", 0),
         ],
         "concentration": [
             DTypeSchema(np.floating),
@@ -96,6 +120,7 @@ class GeneralHeadBoundary(BoundaryCondition, IRegridPackage):
                 )
             ),
             CONC_DIMS_SCHEMA,
+            AllCoordsValueSchema("layer", ">", 0),
         ],
         "print_flows": [DTypeSchema(np.bool_), DimsSchema()],
         "save_flows": [DTypeSchema(np.bool_), DimsSchema()],
@@ -111,17 +136,10 @@ class GeneralHeadBoundary(BoundaryCondition, IRegridPackage):
     }
 
     _keyword_map = {}
-    _template = BoundaryCondition._initialize_template(_pkg_id)
+    _template = TopSystemBoundaryCondition._initialize_template(_pkg_id)
     _auxiliary_data = {"concentration": "species"}
-
-    _regrid_method = {
-        "head": (
-            RegridderType.OVERLAP,
-            "mean",
-        ),  # TODO set to barycentric once supported
-        "conductance": (RegridderType.RELATIVEOVERLAP, "conductance"),
-        "concentration": (RegridderType.OVERLAP, "mean"),
-    }
+    _regrid_method = GeneralHeadBoundaryRegridMethod()
+    _aggregate_method: DataclassType = GeneralHeadBoundaryAggregationMethod()
 
     @init_log_decorator()
     def __init__(
@@ -158,5 +176,173 @@ class GeneralHeadBoundary(BoundaryCondition, IRegridPackage):
 
         return errors
 
-    def get_regrid_methods(self) -> Optional[dict[str, Tuple[RegridderType, str]]]:
-        return self._regrid_method
+    @standard_log_decorator()
+    def cleanup(self, dis: StructuredDiscretization | VerticesDiscretization) -> None:
+        """
+        Clean up package inplace. This method calls
+        :func:`imod.prepare.cleanup_ghb`, see documentation of that
+        function for details on cleanup.
+
+        dis: imod.mf6.StructuredDiscretization | imod.mf6.VerticesDiscretization
+            Model discretization package.
+        """
+        dis_dict = {"idomain": dis.dataset["idomain"]}
+        cleaned_dict = self._call_func_on_grids(cleanup_ghb, dis_dict)
+        super().__init__(cleaned_dict)
+
+    @classmethod
+    def _allocate_and_distribute_planar_data(
+        cls,
+        planar_data: dict[str, GridDataArray],
+        dis: StructuredDiscretization | VerticesDiscretization,
+        npf: NodePropertyFlow,
+        allocation_option: ALLOCATION_OPTION,
+        distributing_option: DISTRIBUTING_OPTION,
+    ) -> dict[str, GridDataArray]:
+        """
+        Allocate and distribute planar data for given discretization and npf
+        package. If layer number of ``planar_data`` is negative,
+        ``allocation_option`` is overrided and set to
+        ALLOCATION_OPTION.at_first_active.
+
+        Parameters
+        ----------
+        planar_data: dict[str, GridDataArray]
+            Dictionary with planar grid data.
+        dis: imod.mf6.StructuredDiscretization
+            Model discretization package.
+        npf: imod.mf6.NodePropertyFlow
+            Node property flow package.
+        allocation_option: ALLOCATION_OPTION
+            allocation option. If planar data is assigned to a negative layer
+            number, this option is overridden and set to
+            ALLOCATION_OPTION.at_first_active.
+        distributing_option: DISTRIBUTING_OPTION
+            distributing option.
+
+        Returns
+        -------
+        dict[str, GridDataArray]
+            Dictionary with layered grid data.
+        """
+
+        top = dis.dataset["top"]
+        bottom = dis.dataset["bottom"]
+        idomain = dis.dataset["idomain"]
+
+        if has_negative_layer(planar_data["head"]):
+            allocation_option = ALLOCATION_OPTION.at_first_active
+
+        # Enforce planar data, remove all layer dimension information
+        planar_data = {
+            key: grid.isel({"layer": 0}, drop=True, missing_dims="ignore")
+            for key, grid in planar_data.items()
+        }
+
+        ghb_allocation = allocate_ghb_cells(
+            allocation_option,
+            idomain > 0,
+            top,
+            bottom,
+            planar_data["head"],
+        )
+
+        layered_data = {}
+        layered_data["head"] = planar_data["head"].where(ghb_allocation)
+        layered_data["head"] = enforce_dim_order(layered_data["head"])
+
+        layered_data["conductance"] = distribute_ghb_conductance(
+            distributing_option,
+            ghb_allocation,
+            planar_data["conductance"],
+            top,
+            bottom,
+            npf.dataset["k"],
+        )
+        return layered_data
+
+    @classmethod
+    def from_imod5_data(
+        cls,
+        key: str,
+        imod5_data: dict[str, dict[str, GridDataArray]],
+        period_data: dict[str, list[datetime]],
+        target_dis: StructuredDiscretization,
+        target_npf: NodePropertyFlow,
+        time_min: datetime,
+        time_max: datetime,
+        allocation_option: ALLOCATION_OPTION,
+        distributing_option: DISTRIBUTING_OPTION,
+        regridder_types: Optional[DataclassType] = None,
+        regrid_cache: RegridderWeightsCache = RegridderWeightsCache(),
+    ) -> "GeneralHeadBoundary":
+        """
+        Construct a GeneralHeadBoundary-package from iMOD5 data, loaded with the
+        :func:`imod.formats.prj.open_projectfile_data` function.
+
+        .. note::
+
+            The method expects the iMOD5 model to be fully 3D, not quasi-3D.
+
+        Parameters
+        ----------
+        imod5_data: dict
+            Dictionary with iMOD5 data. This can be constructed from the
+            :func:`imod.formats.prj.open_projectfile_data` method.
+        period_data: dict
+            Dictionary with iMOD5 period data. This can be constructed from the
+            :func:`imod.formats.prj.open_projectfile_data` method.
+        target_dis:  StructuredDiscretization package
+            The grid that should be used for the new package. Does not
+            need to be identical to one of the input grids.
+        target_npf: NodePropertyFlow package
+            The conductivity information, used to compute GHB flux
+        allocation_option: ALLOCATION_OPTION
+            allocation option. If package data is assigned to a negative layer
+            number, this option is overridden and set to
+            ALLOCATION_OPTION.at_first_active.
+        time_min: datetime
+            Begin-time of the simulation. Used for expanding period data.
+        time_max: datetime
+            End-time of the simulation. Used for expanding period data.
+        distributing_option: dict[str, DISTRIBUTING_OPTION]
+            distributing option.
+        regrid_cache: RegridderWeightsCache, optional
+            stores regridder weights for different regridders. Can be used to speed up regridding,
+            if the same regridders are used several times for regridding different arrays.
+        regridder_types: RegridMethodType, optional
+            Optional dataclass with regridder types for a specific variable.
+            Use this to override default regridding methods.
+
+        Returns
+        -------
+        A  Modflow 6 GeneralHeadBoundary packages.
+        """
+        data = {
+            "head": imod5_data[key]["head"],
+            "conductance": imod5_data[key]["conductance"],
+        }
+        mask = data["conductance"] > 0
+        data["conductance"] = data["conductance"].where(mask)
+        regridded_package_data = regrid_imod5_pkg_data(
+            cls, data, target_dis, regridder_types, regrid_cache
+        )
+        regridded_package_data = broadcast_and_mask_arrays(regridded_package_data)
+        is_planar = is_planar_grid(regridded_package_data["conductance"])
+        if is_planar:
+            layered_data = cls._allocate_and_distribute_planar_data(
+                regridded_package_data,
+                target_dis,
+                target_npf,
+                allocation_option,
+                distributing_option,
+            )
+            regridded_package_data.update(layered_data)
+
+        ghb = cls(**regridded_package_data, validate=True)
+        repeat = period_data.get(key)
+        set_repeat_stress_if_available(repeat, time_min, time_max, ghb)
+        # Clip the ghb package to the time range of the simulation and ensure
+        # time is forward filled.
+        ghb = ghb.clip_box(time_min=time_min, time_max=time_max)
+        return ghb

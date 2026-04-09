@@ -25,7 +25,7 @@ def grid_data_structured(
     dims = ("layer", "y", "x")
     layer = np.arange(1, nlayer + 1)
 
-    coords = {"layer": layer, "y": y, "x": x, "dx": cellsize, "dy": cellsize}
+    coords = {"layer": layer, "y": y, "x": x, "dx": cellsize, "dy": -cellsize}
 
     structured_grid_data = xr.DataArray(
         np.ones(shape, dtype=dtype) * value, coords=coords, dims=dims
@@ -56,7 +56,7 @@ def grid_data_unstructured(
     This function creates a dataarray with scalar values for a grid of configurable cell size.
     First a regular grid is constructed and then this is converted to an ugrid dataarray.
     """
-    return xu.UgridDataArray.from_structured(
+    return xu.UgridDataArray.from_structured2d(
         grid_data_structured(dtype, value, cellsize)
     )
 
@@ -68,7 +68,7 @@ def grid_data_unstructured_layered(
     This function creates a dataarray with scalar values for a grid of configurable cell size. The values are
     multiplied with the layer index. First a regular grid is constructed and then this is converted to an ugrid dataarray.
     """
-    return xu.UgridDataArray.from_structured(
+    return xu.UgridDataArray.from_structured2d(
         grid_data_structured_layered(dtype, value, cellsize)
     )
 
@@ -123,7 +123,7 @@ def structured_flow_model() -> imod.mf6.GroundwaterFlowModel:
     gwf_model = _make_model(grid_data_structured, cellsize)
 
     bottom = grid_data_structured_layered(np.float64, -1.0, cellsize)
-    idomain = grid_data_structured(np.int32, 1, cellsize)
+    idomain = grid_data_structured(np.int32, 2, cellsize)
 
     # Unassign the constant-head package from some cells to have a more meaningful simulation
     constant_head = gwf_model["chd"].dataset["head"]
@@ -152,7 +152,7 @@ def unstructured_flow_model() -> imod.mf6.GroundwaterFlowModel:
     constant_head.loc[{"mesh2d_nFaces": 13, "layer": 2}] = np.nan
 
     bottom = grid_data_unstructured_layered(np.float64, -1.0, cellsize)
-    idomain = grid_data_unstructured(np.int32, 1, cellsize)
+    idomain = grid_data_unstructured(np.int32, 2, cellsize)
     gwf_model["disv"] = imod.mf6.VerticesDiscretization(
         top=10.0, bottom=bottom, idomain=idomain
     )
@@ -182,7 +182,11 @@ def structured_flow_simulation(
     structured_flow_model: imod.mf6.GroundwaterFlowModel,
     solution_settings: imod.mf6.Solution,
 ) -> imod.mf6.Modflow6Simulation:
-    simulation = imod.mf6.Modflow6Simulation("original_simulation")
+    validation_settings = imod.mf6.ValidationSettings(
+        strict_well_validation=False,
+        strict_hfb_validation=False,
+    )
+    simulation = imod.mf6.Modflow6Simulation("original_simulation", validation_settings)
     simulation["flow"] = structured_flow_model
     simulation["solution"] = solution_settings
     simulation.create_time_discretization(
@@ -198,7 +202,7 @@ def structured_flow_simulation_2_flow_models(
     """Returns transient confined model."""
     other_flow_model = deepcopy(structured_flow_simulation["flow"])
     structured_flow_simulation["flow_copy"] = other_flow_model
-    structured_flow_simulation["solution"].add_model_to_solution("flow_copy")
+    structured_flow_simulation["solution"]._add_model_to_solution("flow_copy")
 
     return structured_flow_simulation
 
@@ -208,7 +212,11 @@ def unstructured_flow_simulation(
     unstructured_flow_model: imod.mf6.GroundwaterFlowModel,
     solution_settings: imod.mf6.Solution,
 ) -> imod.mf6.Modflow6Simulation:
-    simulation = imod.mf6.Modflow6Simulation("original_simulation")
+    validation_settings = imod.mf6.ValidationSettings(
+        strict_well_validation=False,
+        strict_hfb_validation=False,
+    )
+    simulation = imod.mf6.Modflow6Simulation("original_simulation", validation_settings)
     simulation["flow"] = unstructured_flow_model
     simulation["solution"] = solution_settings
     simulation.create_time_discretization(

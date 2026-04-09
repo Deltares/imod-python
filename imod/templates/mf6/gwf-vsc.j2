@@ -1,0 +1,25 @@
+begin options
+{%- if reference_viscosity is defined %}
+  viscref {{reference_viscosity}}{% endif %}
+{%- if temperature_species_name is defined %}
+  temperature_species_name {{temperature_species_name}}{% endif %}
+{%- if thermal_formulation is defined %}
+  thermal_formulation {{thermal_formulation}}{% endif %}
+{%- if thermal_a2 is defined %}
+  thermal_a2 {{thermal_a2}}{% endif %}
+{%- if thermal_a3 is defined %}
+  thermal_a3 {{thermal_a3}}{% endif %}
+{%- if thermal_a4 is defined %}
+  thermal_a4 {{thermal_a4}}{% endif %}
+{%- if viscosityfile is defined %}
+  viscosity fileout {{viscosityfile}}{% endif %}
+end options
+
+begin dimensions
+  nviscspecies {{nviscspecies}}
+end dimensions
+
+begin packagedata
+{%- for iviscspec, dviscdc, cviscref, modelname, auxspeciesname in packagedata %}
+  {{iviscspec}} {{dviscdc}} {{cviscref}} {{modelname}} {{auxspeciesname}}{% endfor %}
+end packagedata

@@ -1,19 +1,20 @@
+import textwrap
 from filecmp import dircmp
 from pathlib import Path
 
 import geopandas as gpd
 import numpy as np
 import pytest
-import shapely
+import xarray as xr
 import xugrid as xu
 from pytest_cases import parametrize_with_cases
 
 import imod
 from imod.mf6 import Modflow6Simulation
-from imod.typing.grid import zeros_like
+from imod.prepare.hfb import linestring_to_square_zpolygons
+from imod.typing.grid import ones_like, zeros_like
 
 
-@pytest.mark.usefixtures("circle_model")
 @pytest.fixture(scope="function")
 def idomain_top(circle_model):
     idomain = circle_model["GWF_1"].domain
@@ -72,13 +73,17 @@ class HorizontalFlowBarrierCases:
         # Vertical line at x = -100
         barrier_y = [-990.0, 990.0]
         barrier_x = [-100.0, -100.0]
+        barrier_ztop = [10.0]
+        barrier_zbottom = [0.0]
+
+        polygons = linestring_to_square_zpolygons(
+            barrier_x, barrier_y, barrier_ztop, barrier_zbottom
+        )
 
         return gpd.GeoDataFrame(
-            geometry=[shapely.linestrings(barrier_x, barrier_y)],
+            geometry=polygons,
             data={
                 "resistance": [10.0],
-                "ztop": [10.0],
-                "zbottom": [0.0],
             },
         )
 
@@ -86,13 +91,17 @@ class HorizontalFlowBarrierCases:
         # Horizontal line at y = -100.0
         barrier_x = [-990.0, 990.0]
         barrier_y = [-100.0, -100.0]
+        barrier_ztop = [10.0]
+        barrier_zbottom = [0.0]
+
+        polygons = linestring_to_square_zpolygons(
+            barrier_x, barrier_y, barrier_ztop, barrier_zbottom
+        )
 
         return gpd.GeoDataFrame(
-            geometry=[shapely.linestrings(barrier_x, barrier_y)],
+            geometry=polygons,
             data={
                 "resistance": [10.0],
-                "ztop": [10.0],
-                "zbottom": [0.0],
             },
         )
 
@@ -100,27 +109,17 @@ class HorizontalFlowBarrierCases:
         # Horizontal line at y = -100.0 running outside domain
         barrier_x = [-990.0, 10_000.0]
         barrier_y = [-100.0, -100.0]
+        barrier_ztop = [10.0]
+        barrier_zbottom = [0.0]
 
-        return gpd.GeoDataFrame(
-            geometry=[shapely.linestrings(barrier_x, barrier_y)],
-            data={
-                "resistance": [10.0],
-                "ztop": [10.0],
-                "zbottom": [0.0],
-            },
+        polygons = linestring_to_square_zpolygons(
+            barrier_x, barrier_y, barrier_ztop, barrier_zbottom
         )
 
-    def case_hfb_horizontal_origin(self):
-        # Horizontal line through origin
-        barrier_x = [-990.0, 990.0]
-        barrier_y = [0.0, 0.0]
-
         return gpd.GeoDataFrame(
-            geometry=[shapely.linestrings(barrier_x, barrier_y)],
+            geometry=polygons,
             data={
                 "resistance": [10.0],
-                "ztop": [10.0],
-                "zbottom": [0.0],
             },
         )
 
@@ -128,13 +127,17 @@ class HorizontalFlowBarrierCases:
         # Diagonal line
         barrier_y = [-480.0, 480.0]
         barrier_x = [-480.0, 480.0]
+        barrier_ztop = [10.0]
+        barrier_zbottom = [0.0]
+
+        polygons = linestring_to_square_zpolygons(
+            barrier_x, barrier_y, barrier_ztop, barrier_zbottom
+        )
 
         return gpd.GeoDataFrame(
-            geometry=[shapely.linestrings(barrier_x, barrier_y)],
+            geometry=polygons,
             data={
                 "resistance": [10.0],
-                "ztop": [10.0],
-                "zbottom": [0.0],
             },
         )
 
@@ -154,12 +157,10 @@ def is_expected_hfb_partition_combination_fail(current_cases):
     return False
 
 
-@pytest.mark.usefixtures("circle_model")
 @parametrize_with_cases("partition_array", cases=PartitionArrayCases)
 def test_partitioning_unstructured(
     tmp_path: Path, circle_model: Modflow6Simulation, partition_array: xu.UgridDataArray
 ):
-    # %%
     simulation = circle_model
     # Increase the recharge to make the head gradient more pronounced.
     simulation["GWF_1"]["rch"]["rate"] *= 100
@@ -195,7 +196,34 @@ def test_partitioning_unstructured(
         )
 
 
-@pytest.mark.usefixtures("circle_model")
+@parametrize_with_cases("partition_array", cases=PartitionArrayCases)
+def test_partitioning_disv_origins(
+    tmp_path: Path, circle_model: Modflow6Simulation, partition_array: xu.UgridDataArray
+):
+    """
+    Verify if the disv origin is set correctly in the partitioned simulation.
+    MODFLOW6 uses this when computing with XT3D on the exchanges between
+    submodels.
+    """
+    simulation = circle_model
+    split_simulation = simulation.split(partition_array)
+    split_simulation.write(tmp_path, binary=False)
+
+    modelnames = split_simulation.get_models_of_type("gwf6").keys()
+    for modelname in modelnames:
+        pkg = split_simulation[modelname]["disv"]
+        actual = pkg._render(tmp_path, "dis", None, True)
+        expected = textwrap.dedent(
+            """\
+            begin options
+              xorigin 0.0
+              yorigin 0.0
+            end options
+            """
+        )
+        assert expected in actual
+
+
 @pytest.mark.parametrize("inactivity_marker", [0, -1])
 @parametrize_with_cases("partition_array", cases=PartitionArrayCases)
 def test_partitioning_unstructured_with_inactive_cells(
@@ -248,7 +276,62 @@ def test_partitioning_unstructured_with_inactive_cells(
     )
 
 
-@pytest.mark.usefixtures("circle_model")
+def test_partitioning_unstructured_voronoi_conversion(
+    tmp_path: Path,
+    circle_model: Modflow6Simulation,
+):
+    # get original domain
+    grid_triangles = circle_model["GWF_1"].domain
+
+    # get voronoi grid
+    voronoi_grid = grid_triangles.ugrid.grid.tesselate_centroidal_voronoi()
+    nface = voronoi_grid.n_face
+    nlayer = len(grid_triangles["layer"])
+
+    layer = np.arange(nlayer, dtype=int) + 1
+
+    voronoi_idomain = xu.UgridDataArray(
+        xr.DataArray(
+            np.ones((nlayer, nface), dtype=np.int32),
+            coords={"layer": layer},
+            dims=["layer", voronoi_grid.face_dimension],
+            name="idomain",
+        ),
+        grid=voronoi_grid,
+    )
+
+    # get voronoi partition array
+    voronoi_partition_array = ones_like(voronoi_idomain.isel({"layer": 0}))
+    voronoi_partition_array.values[:50] = 0
+    voronoi_partition_array.name = "idomain"
+
+    # regrid original model to voronoi grid
+    voronoi_simulation = circle_model.regrid_like("regridded", voronoi_idomain)
+
+    # Run the original example, so without partitioning, and save the simulation
+    # results
+    original_dir = tmp_path / "original"
+    voronoi_simulation.write(original_dir, binary=False)
+
+    voronoi_simulation.run()
+
+    expected_head = voronoi_simulation.open_head()
+
+    # split the voronoi grid simulation into partitions.
+    split_simulation = voronoi_simulation.split(voronoi_partition_array)
+
+    split_simulation.write(tmp_path, binary=False)
+    split_simulation.run()
+
+    actual_head = split_simulation.open_head()
+    actual_head = actual_head.ugrid.reindex_like(expected_head)
+
+    # Compare the head result of the original simulation with the result of the partitioned simulation
+    np.testing.assert_allclose(
+        actual_head["head"].values, expected_head.values, rtol=1e-5, atol=1e-3
+    )
+
+
 @parametrize_with_cases("partition_array", cases=PartitionArrayCases)
 @parametrize_with_cases("hfb", cases=HorizontalFlowBarrierCases)
 def test_partitioning_unstructured_hfb(
@@ -304,7 +387,6 @@ def test_partitioning_unstructured_hfb(
         )
 
 
-@pytest.mark.usefixtures("circle_model")
 @parametrize_with_cases("partition_array", cases=PartitionArrayCases)
 @parametrize_with_cases("well", cases=WellCases)
 def test_partitioning_unstructured_with_well(
@@ -391,7 +473,6 @@ def get_exchange_masks(actual_flow_budget, expected_flow_budget):
     return is_exchange_cell, is_exchange_edge
 
 
-@pytest.mark.usefixtures("circle_model_transport")
 @parametrize_with_cases("partition_array", cases=PartitionArrayCases)
 def test_partition_transport(
     tmp_path: Path,
@@ -427,7 +508,7 @@ def test_partition_transport(
     )
 
     for budget_term in (
-        "ssm",
+        "source-sink mix_ssm",
         "flow-lower-face",
         "storage-aqueous",
         "flow-horizontal-face",
@@ -444,7 +525,6 @@ def test_partition_transport(
         )
 
 
-@pytest.mark.usefixtures("circle_model_transport_multispecies_variable_density")
 @parametrize_with_cases("partition_array", cases=PartitionArrayCases)
 def test_partition_transport_multispecies(
     tmp_path: Path,
@@ -489,7 +569,7 @@ def test_partition_transport_multispecies(
         actual_flow_budget, expected_flow_budget
     )
 
-    for key in ["flow-lower-face", "flow-horizontal-face", "sto-ss", "rch"]:
+    for key in ["flow-lower-face", "flow-horizontal-face", "sto-ss", "rch_rch"]:
         marker = is_exchange_cell
         if key == "flow-horizontal-face":
             marker = is_exchange_edge
@@ -502,7 +582,12 @@ def test_partition_transport_multispecies(
             rtol=rtol,
             atol=atol,
         )
-    for key in ["flow-lower-face", "flow-horizontal-face", "storage-aqueous", "ssm"]:
+    for key in [
+        "flow-lower-face",
+        "flow-horizontal-face",
+        "storage-aqueous",
+        "source-sink mix_ssm",
+    ]:
         marker = is_exchange_cell
         if key == "flow-horizontal-face":
             marker = is_exchange_edge
@@ -516,8 +601,7 @@ def test_partition_transport_multispecies(
         )
 
 
-@pytest.mark.usefixtures("circle_model")
-def test_slice_model_twice(tmp_path, circle_model):
+def test_slice_simulation_twice(tmp_path, circle_model):
     flow_model = circle_model["GWF_1"]
     active = flow_model.domain
 

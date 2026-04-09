@@ -1,4 +1,4 @@
-from typing import Dict, List
+from typing import Dict, List, Tuple
 
 import numpy as np
 import pandas as pd
@@ -39,8 +39,8 @@ class ExchangeCreator_Unstructured(ExchangeCreator):
         face1 = edge_face_connectivity[self._connected_cell_edge_indices, 0]
         face2 = edge_face_connectivity[self._connected_cell_edge_indices, 1]
 
-        label_of_face1 = self._submodel_labels.values[face1]
-        label_of_face2 = self._submodel_labels.values[face2]
+        label_of_face1 = self._submodel_labels.data[face1]
+        label_of_face2 = self._submodel_labels.data[face2]
 
         connected_cell_info = pd.DataFrame(
             {
@@ -73,7 +73,7 @@ class ExchangeCreator_Unstructured(ExchangeCreator):
         # get the normal to the cell edge from U
         dx = U[:, 0]
         dy = U[:, 1]
-        normal = np.array((dy[:], -dx[:]), dtype=np.float_).T
+        normal = np.array((dy[:], -dx[:]), dtype=np.float64).T
 
         # If the inner product of the normal with a vector on the edge to the face centroid is positive
         # then the normal vector points inwards
@@ -100,11 +100,13 @@ class ExchangeCreator_Unstructured(ExchangeCreator):
         cls, partition_info: List[PartitionInfo], global_cell_indices: GridDataArray
     ) -> Dict[int, pd.DataFrame]:
         global_to_local_idx = {}
+        global_cell_indices = global_cell_indices.rename("label")
         for submodel_partition_info in partition_info:
             local_cell_indices = cls._get_local_cell_indices(submodel_partition_info)
+            local_cell_indices = local_cell_indices.rename("label")
 
             global_cell_indices_partition = global_cell_indices.where(
-                submodel_partition_info.active_domain == 1
+                submodel_partition_info.active_domain > 0
             )
             global_cell_indices_partition = global_cell_indices_partition.dropna(
                 "mesh2d_nFaces", how="all"
@@ -118,7 +120,7 @@ class ExchangeCreator_Unstructured(ExchangeCreator):
                 join="inner",
                 fill_value=np.nan,
                 compat="override",
-            )["idomain"]
+            )["label"]
 
             model_id = submodel_partition_info.id
             global_to_local_idx[model_id] = pd.DataFrame(
@@ -137,8 +139,8 @@ class ExchangeCreator_Unstructured(ExchangeCreator):
         face1 = edge_face_connectivity[:, 0]
         face2 = edge_face_connectivity[:, 1]
 
-        label_of_face1 = submodel_labels.values[face1]
-        label_of_face2 = submodel_labels.values[face2]
+        label_of_face1 = submodel_labels.data[face1]
+        label_of_face2 = submodel_labels.data[face2]
 
         is_internal_edge = label_of_face1 - label_of_face2 == 0
         is_external_boundary_edge = np.any((face1 == -1, face2 == -1), axis=0)
@@ -149,7 +151,7 @@ class ExchangeCreator_Unstructured(ExchangeCreator):
     def _get_partition_numbers(self, face: np.ndarray) -> np.ndarray:
         return self._submodel_labels.data[face]
 
-    def _get_partition_sorted_connected_faces(self) -> (np.ndarray, np.ndarray):
+    def _get_partition_sorted_connected_faces(self) -> Tuple[np.ndarray, np.ndarray]:
         grid = self._submodel_labels.ugrid.grid
         edge_face_connectivity = grid.edge_face_connectivity
 
@@ -167,4 +169,4 @@ class ExchangeCreator_Unstructured(ExchangeCreator):
         face2 = np.where(
             face_partition_1 > face_partition_2, unordered_face1, unordered_face2
         )
-        return (face1, face2)
+        return face1, face2

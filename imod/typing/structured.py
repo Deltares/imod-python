@@ -135,7 +135,7 @@ def merge_arrays(
     return out
 
 
-def _unique_coords(das: List[xr.DataArray], dim: str) -> xr.DataArray:
+def _unique_coords(das: List[xr.DataArray], dim: str) -> np.ndarray:
     """Collect unique coords in list of dataarrays"""
     return np.unique(np.concatenate([da.coords[dim].values for da in das]))
 
@@ -244,8 +244,8 @@ def merge_partitions(
         unique_keys = {key for da in das for key in da.keys()}
         merged_ls = []
         for key in unique_keys:
-            merged_ls.append(_merge_partitions([da[key] for da in das]).rename(key))  # type: ignore
-        return xr.merge(merged_ls)
+            merged_ls.append(_merge_partitions([da[key] for da in das]).rename(key))
+        return xr.merge(merged_ls, compat="no_conflicts")
     elif isinstance(first_item, xr.DataArray):
         # Store name to rename after concatenation
         name = first_item.name

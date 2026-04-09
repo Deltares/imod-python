@@ -450,8 +450,8 @@ class Solution(Package):
         super().__init__(dict_dataset)
         self._validate_init_schemata(validate)
 
-    def remove_model_from_solution(self, modelname: str) -> None:
-        models_in_solution = self.get_models_in_solution()
+    def _remove_model_from_solution(self, modelname: str) -> None:
+        models_in_solution = self._get_models_in_solution()
         if modelname not in models_in_solution:
             raise ValueError(
                 f"attempted to remove model {modelname} from solution, but it was not found."
@@ -463,8 +463,8 @@ class Solution(Package):
         else:
             self.dataset.update({"modelnames": ("model", filtered_models)})
 
-    def add_model_to_solution(self, modelname: str) -> None:
-        models_in_solution = self.get_models_in_solution()
+    def _add_model_to_solution(self, modelname: str) -> None:
+        models_in_solution = self._get_models_in_solution()
         if modelname in models_in_solution:
             raise ValueError(
                 f"attempted to add model {modelname} to solution, but it was already in it."
@@ -472,7 +472,7 @@ class Solution(Package):
         models_in_solution.append(modelname)
         self.dataset.update({"modelnames": ("model", models_in_solution)})
 
-    def get_models_in_solution(self) -> list[str]:
+    def _get_models_in_solution(self) -> list[str]:
         models_in_solution = []
         if "modelnames" in self.dataset.keys():
             models_in_solution = list(self.dataset["modelnames"].values)
@@ -486,6 +486,14 @@ def SolutionPresetSimple(
     inner_csvfile=None,
     no_ptc=None,
 ):
+    """
+    Preset solution for simple models, where small mass balance errors are
+    wanted. This therefore is the strictest solution of all presets. We advice
+    users to always try these settings first, even for more complex models.
+
+    These settings are copied from MODFLOW 6, to make them accessible in iMOD
+    Python.
+    """
     solution = Solution(
         modelnames=modelnames,
         print_option=print_option,
@@ -523,6 +531,14 @@ def SolutionPresetModerate(
     inner_csvfile=None,
     no_ptc=None,
 ):
+    """
+    Preset solution for models of moderate complexity. We advice users to always
+    try :func:`imod.mf6.SolutionPresetSimple` first, even for more complex
+    models.
+
+    These settings are copied from MODFLOW 6, to make them accessible in iMOD
+    Python.
+    """
     solution = Solution(
         modelnames=modelnames,
         print_option=print_option,
@@ -560,6 +576,15 @@ def SolutionPresetComplex(
     inner_csvfile=None,
     no_ptc=None,
 ):
+    """
+    Preset solution for models of large complexity. We advice users to always
+    try :func:`imod.mf6.SolutionPresetSimple` first, even for more complex
+    models. Warning: this solution can lead to large mass balance errors (errors
+    in head of 0.1 m are accepted!), so use with care.
+
+    These settings are copied from MODFLOW 6, to make them accessible in iMOD
+    Python.
+    """
     solution = Solution(
         modelnames=modelnames,
         print_option=print_option,

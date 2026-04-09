@@ -7,7 +7,6 @@ Currently only :func:`imod.rasterio.write` is implemented.
 """
 
 import pathlib
-import warnings
 from typing import Dict
 
 import numpy as np
@@ -115,7 +114,7 @@ def _get_driver(path):
     except KeyError:
         raise ValueError(
             f'Unknown extension "{ext}", available extensions: '
-            f'{", ".join(EXTENSION_GDAL_DRIVER_CODE_MAP.keys())}'
+            f"{', '.join(EXTENSION_GDAL_DRIVER_CODE_MAP.keys())}"
         )
 
 
@@ -169,14 +168,6 @@ def _read(path, headersize, nrow, ncol, nodata, dtype):
         return array_io.reading._to_nan(a, nodata)
     else:
         return a
-
-
-def read(path, use_cftime=False, pattern=None):
-    warnings.warn(
-        "The imod.rasterio.read() function is deprecated. Instead use imod.rasterio.open().",
-        FutureWarning,
-    )
-    return open(path, use_cftime=False, pattern=None).load()
 
 
 def open(path, use_cftime=False, pattern=None):
@@ -309,8 +300,8 @@ def write_aaigrid(path: pathlib.Path, a: np.ndarray, profile: Dict) -> None:
     ymin = ymax + profile["height"] * dy
 
     header = (
-        f'ncols        {profile["width"]}\n'
-        f'nrows        {profile["height"]}\n'
+        f"ncols        {profile['width']}\n"
+        f"nrows        {profile['height']}\n"
         f"xllcorner    {xmin:.12f}\n"
         f"yllcorner    {ymin:.12f}\n"
         f"cellsize     {dx:.12f}\n"

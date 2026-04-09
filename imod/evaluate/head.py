@@ -4,10 +4,15 @@ import numpy as np
 import pandas as pd
 import xarray as xr
 
+from imod.typing import GridDataArray
+
 
 def convert_pointwaterhead_freshwaterhead(
-    pointwaterhead, density, elevation, density_fresh=1000.0
-):
+    pointwaterhead: GridDataArray,
+    density: GridDataArray,
+    elevation: GridDataArray,
+    density_fresh: float = 1000.0,
+) -> GridDataArray:
     r"""Function to convert point water head (as outputted by seawat)
     into freshwater head, using Eq.3 from Guo, W., & Langevin, C. D. (2002):
 
@@ -21,11 +26,11 @@ def convert_pointwaterhead_freshwaterhead(
 
     Parameters
     ----------
-    pointwaterhead : float or xr.DataArray of floats
+    pointwaterhead : float or xr.DataArray/xu.UgridDataArray of floats
         the point water head as outputted by SEAWAT, in m.
-    density : float or xr.DataArray of floats
+    density : float or xr.DataArray/xu.UgridDataArray of floats
         the water density at the same locations as `pointwaterhead`.
-    elevation : float or xr.DataArray of floats
+    elevation : float or xr.DataArray/xu.UgridDataArray of floats
         elevation at the same locations as `pointwaterhead`, in m.
     density_fresh : float, optional
         the density of freshwater (1000 kg/m3), or a different value if
@@ -33,7 +38,7 @@ def convert_pointwaterhead_freshwaterhead(
 
     Returns
     -------
-    freshwaterhead : float or xr.DataArray of floats
+    freshwaterhead : float or xr.xr.DataArray/xu.UgridDataArray of floats
     """
 
     freshwaterhead = (
@@ -43,8 +48,8 @@ def convert_pointwaterhead_freshwaterhead(
 
     # edge case: point water head below z
     # return freshwater head of top underlying cell where elevation < pointwaterhead
-    # only for xr.DataArrays
-    if isinstance(pointwaterhead, xr.DataArray) and "layer" in pointwaterhead.dims:
+    # only for grids with layers
+    if isinstance(pointwaterhead, GridDataArray) and "layer" in pointwaterhead.dims:
         freshwaterhead = freshwaterhead.where(pointwaterhead > elevation)
         freshwaterhead = freshwaterhead.bfill(dim="layer")
 
@@ -118,7 +123,7 @@ def _calculate_gxg(
     # First compute LG3 and HG3 per hydrological year, then compute the mean over the total.
     if gxg_data.chunks is not None:
         # If data is lazily loaded/chunked, process data of one year at a time.
-        gxg_data = gxg_data.chunk({"hydroyear": 1})
+        gxg_data = gxg_data.chunk({"hydroyear": 1, "bimonth": -1})
         lg3 = xr.map_blocks(lowest3_mean, gxg_data, template=gxg_data.isel(bimonth=0))
         hg3 = xr.map_blocks(highest3_mean, gxg_data, template=gxg_data.isel(bimonth=0))
     else:

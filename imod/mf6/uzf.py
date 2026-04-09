@@ -1,10 +1,12 @@
 import numpy as np
 import xarray as xr
+import xugrid as xu
 
 from imod.logging import init_log_decorator
 from imod.mf6.boundary_condition import AdvancedBoundaryCondition, BoundaryCondition
 from imod.mf6.validation import BOUNDARY_DIMS_SCHEMA
 from imod.schemata import (
+    AllCoordsValueSchema,
     AllInsideNoDataSchema,
     AllNoDataSchema,
     AllValueSchema,
@@ -15,13 +17,12 @@ from imod.schemata import (
     IndexesSchema,
     OtherCoordsSchema,
 )
+from imod.select.layers import get_upper_active_grid_cells
 
 
 class UnsaturatedZoneFlow(AdvancedBoundaryCondition):
     """
     Unsaturated Zone Flow (UZF) package.
-
-    TODO: Support timeseries file? Observations? Water Mover?
 
     Parameters
     ----------
@@ -92,6 +93,12 @@ class UnsaturatedZoneFlow(AdvancedBoundaryCondition):
         keyword to indicate that UZF flow terms will be written to the file specified with "BUDGET
         FILEOUT" in Output Control.
         Default is False.
+    budget_fileout: ({"str"}, optional)
+        path to output cbc-file for UZF budgets
+    budgetcsv_fileout: ({"str"}, optional)
+        path to output csv-file for summed budgets
+    water_content_file: ({"str"}, optional)
+        path to output file for unsaturated zone water content
     observations: [Not yet supported.]
         Default is None.
     water_mover: [Not yet supported.]
@@ -121,52 +128,64 @@ class UnsaturatedZoneFlow(AdvancedBoundaryCondition):
         "surface_depression_depth": [
             DTypeSchema(np.floating),
             BOUNDARY_DIMS_SCHEMA,
+            AllCoordsValueSchema("layer", ">", 0),
         ],
         "kv_sat": [
             DTypeSchema(np.floating),
             IndexesSchema(),
             CoordsSchema(("layer",)),
             BOUNDARY_DIMS_SCHEMA,
+            AllCoordsValueSchema("layer", ">", 0),
         ],
         "theta_res": [
             DTypeSchema(np.floating),
             BOUNDARY_DIMS_SCHEMA,
+            AllCoordsValueSchema("layer", ">", 0),
         ],
         "theta_sat": [
             DTypeSchema(np.floating),
             BOUNDARY_DIMS_SCHEMA,
+            AllCoordsValueSchema("layer", ">", 0),
         ],
         "theta_init": [
             DTypeSchema(np.floating),
             BOUNDARY_DIMS_SCHEMA,
+            AllCoordsValueSchema("layer", ">", 0),
         ],
         "epsilon": [
             DTypeSchema(np.floating),
             BOUNDARY_DIMS_SCHEMA,
+            AllCoordsValueSchema("layer", ">", 0),
         ],
         "infiltration_rate": [
             DTypeSchema(np.floating),
             BOUNDARY_DIMS_SCHEMA,
+            AllCoordsValueSchema("layer", ">", 0),
         ],
         "et_pot": [
             DTypeSchema(np.floating),
             BOUNDARY_DIMS_SCHEMA | DimsSchema(),  # optional var
+            AllCoordsValueSchema("layer", ">", 0),
         ],
         "extinction_depth": [
             DTypeSchema(np.floating),
             BOUNDARY_DIMS_SCHEMA | DimsSchema(),  # optional var
+            AllCoordsValueSchema("layer", ">", 0),
         ],
         "extinction_theta": [
             DTypeSchema(np.floating),
             BOUNDARY_DIMS_SCHEMA | DimsSchema(),  # optional var
+            AllCoordsValueSchema("layer", ">", 0),
         ],
         "root_potential": [
             DTypeSchema(np.floating),
             BOUNDARY_DIMS_SCHEMA | DimsSchema(),  # optional var
+            AllCoordsValueSchema("layer", ">", 0),
         ],
         "root_activity": [
             DTypeSchema(np.floating),
             BOUNDARY_DIMS_SCHEMA | DimsSchema(),  # optional var
+            AllCoordsValueSchema("layer", ">", 0),
         ],
         "print_flows": [DTypeSchema(np.bool_), DimsSchema()],
         "save_flows": [DTypeSchema(np.bool_), DimsSchema()],
@@ -183,12 +202,12 @@ class UnsaturatedZoneFlow(AdvancedBoundaryCondition):
         "theta_sat": [IdentityNoDataSchema("kv_sat"), AllValueSchema(">=", 0.0)],
         "theta_init": [IdentityNoDataSchema("kv_sat"), AllValueSchema(">=", 0.0)],
         "epsilon": [IdentityNoDataSchema("kv_sat")],
-        "infiltration_rate": [IdentityNoDataSchema("kv_sat")],
-        "et_pot": [IdentityNoDataSchema("kv_sat")],
-        "extinction_depth": [IdentityNoDataSchema("kv_sat")],
-        "extinction_theta": [IdentityNoDataSchema("kv_sat")],
-        "root_potential": [IdentityNoDataSchema("kv_sat")],
-        "root_activity": [IdentityNoDataSchema("kv_sat")],
+        "infiltration_rate": [IdentityNoDataSchema("stress_period_active")],
+        "et_pot": [IdentityNoDataSchema("stress_period_active")],
+        "extinction_depth": [IdentityNoDataSchema("stress_period_active")],
+        "extinction_theta": [IdentityNoDataSchema("stress_period_active")],
+        "root_potential": [IdentityNoDataSchema("stress_period_active")],
+        "root_activity": [IdentityNoDataSchema("stress_period_active")],
     }
 
     _package_data = (
@@ -226,6 +245,9 @@ class UnsaturatedZoneFlow(AdvancedBoundaryCondition):
         print_input=False,
         print_flows=False,
         save_flows=False,
+        budget_fileout=None,
+        budgetcsv_fileout=None,
+        water_content_file=None,
         observations=None,
         water_mover=None,
         timeseries=None,
@@ -234,6 +256,7 @@ class UnsaturatedZoneFlow(AdvancedBoundaryCondition):
         landflag = self._determine_landflag(kv_sat)
         iuzno = self._create_uzf_numbers(landflag)
         ivertcon = self._determine_vertical_connection(iuzno)
+        stress_period_active = landflag.where(landflag == 1)
 
         dict_dataset = {
             # Package data
@@ -244,6 +267,7 @@ class UnsaturatedZoneFlow(AdvancedBoundaryCondition):
             "theta_init": theta_init,
             "epsilon": epsilon,
             # Stress period data
+            "stress_period_active": stress_period_active,
             "infiltration_rate": infiltration_rate,
             "et_pot": et_pot,
             "extinction_depth": extinction_depth,
@@ -260,6 +284,9 @@ class UnsaturatedZoneFlow(AdvancedBoundaryCondition):
             "print_input": print_input,
             "print_flows": print_flows,
             "save_flows": save_flows,
+            "budget_fileout": budget_fileout,
+            "budgetcsv_fileout": budgetcsv_fileout,
+            "water_content_file": water_content_file,
             "observations": observations,
             "water_mover": water_mover,
             "timeseries": timeseries,
@@ -281,7 +308,7 @@ class UnsaturatedZoneFlow(AdvancedBoundaryCondition):
         )
         self._validate_init_schemata(validate)
 
-    def fill_stress_perioddata(self):
+    def _fill_stress_perioddata(self):
         """Modflow6 requires something to be filled in the stress perioddata,
         even though the data is not used in the current configuration.
         Only an infiltration rate is required,
@@ -290,7 +317,10 @@ class UnsaturatedZoneFlow(AdvancedBoundaryCondition):
         for var in self._period_data:
             if self.dataset[var].size == 1:  # Prevent loading large arrays in memory
                 if self.dataset[var].values[()] is None:
-                    self.dataset[var] = xr.full_like(self["infiltration_rate"], 0.0)
+                    if isinstance(self["infiltration_rate"], xu.UgridDataArray):
+                        self.dataset[var] = xu.full_like(self["infiltration_rate"], 0)
+                    else:
+                        self.dataset[var] = xr.full_like(self["infiltration_rate"], 0.0)
                 else:
                     raise ValueError("{} cannot be a scalar".format(var))
 
@@ -343,16 +373,19 @@ class UnsaturatedZoneFlow(AdvancedBoundaryCondition):
 
     def _create_uzf_numbers(self, landflag):
         """Create unique UZF ID's. Inactive cells equal 0"""
-        return np.cumsum(np.ravel(landflag)).reshape(landflag.shape) * landflag
+        active_nodes = landflag.notnull().astype(np.int8)
+        return np.nancumsum(active_nodes).reshape(landflag.shape) * active_nodes
 
     def _determine_landflag(self, kv_sat):
-        return (np.isfinite(kv_sat)).astype(np.int32)
+        """returns the landflag for uzf-model. Landflag == 1 for top active UZF-nodes"""
+        land_nodes = get_upper_active_grid_cells(kv_sat).astype(np.int32)
+        return land_nodes.where(kv_sat.notnull())
 
     def _determine_vertical_connection(self, uzf_number):
         return uzf_number.shift(layer=-1, fill_value=0)
 
     def _package_data_to_sparse(self):
-        notnull = self.dataset["landflag"].values == 1
+        notnull = self.dataset["landflag"].notnull().to_numpy()
         iuzno = self.dataset["iuzno"].values[notnull]
         landflag = self.dataset["landflag"].values[notnull]
         ivertcon = self.dataset["ivertcon"].values[notnull]
@@ -365,9 +398,12 @@ class UnsaturatedZoneFlow(AdvancedBoundaryCondition):
 
         field_spec = self._get_field_spec_from_dtype(recarr)
         field_names = [i[0] for i in field_spec]
-        index_spec = [("iuzno", np.int32)] + field_spec[:3]
+        n = 3
+        if isinstance(self.dataset, xu.UgridDataset):
+            n = 2
+        index_spec = [("iuzno", np.int32)] + field_spec[:n]
         field_spec = (
-            [("landflag", np.int32)] + [("ivertcon", np.int32)] + field_spec[3:]
+            [("landflag", np.int32)] + [("ivertcon", np.int32)] + field_spec[n:]
         )
         sparse_dtype = np.dtype(index_spec + field_spec)
 
@@ -379,7 +415,7 @@ class UnsaturatedZoneFlow(AdvancedBoundaryCondition):
 
         return recarr_new
 
-    def render(self, directory, pkgname, globaltimes, binary):
+    def _render(self, directory, pkgname, globaltimes, binary):
         """Render fills in the template only, doesn't write binary data"""
         d = {}
         bin_ds = self.dataset[list(self._period_data)]
@@ -389,10 +425,11 @@ class UnsaturatedZoneFlow(AdvancedBoundaryCondition):
         not_options = (
             list(self._period_data) + list(self._package_data) + ["iuzno" + "ivertcon"]
         )
-        d = self._get_options(d, not_options=not_options)
+        d = self._get_pkg_options(d, not_options=not_options)
         path = directory / pkgname / f"{self._pkg_id}-pkgdata.dat"
         d["packagedata"] = path.as_posix()
-        d["nuzfcells"] = self._max_active_n()
+        # max uzf-cells for which time period data will be supplied
+        d["nuzfcells"] = np.count_nonzero(np.isfinite(d["landflag"]))
         return self._template.render(d)
 
     def _to_struct_array(self, arrdict, layer):
@@ -422,6 +459,7 @@ class UnsaturatedZoneFlow(AdvancedBoundaryCondition):
     def _validate(self, schemata, **kwargs):
         # Insert additional kwargs
         kwargs["kv_sat"] = self["kv_sat"]
+        kwargs["stress_period_active"] = self["stress_period_active"]
         errors = super()._validate(schemata, **kwargs)
 
         return errors

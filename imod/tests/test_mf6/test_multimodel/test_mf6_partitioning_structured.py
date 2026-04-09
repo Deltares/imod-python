@@ -1,22 +1,24 @@
 from __future__ import annotations
 
+import textwrap
 from filecmp import dircmp
 from pathlib import Path
 
 import geopandas as gpd
 import numpy as np
 import pytest
-import shapely
 import xarray as xr
 from pytest_cases import case, parametrize_with_cases
 
 import imod
 from imod.mf6 import Modflow6Simulation
 from imod.mf6.wel import Well
+from imod.prepare.hfb import (
+    linestring_to_square_zpolygons,
+)
 from imod.typing.grid import zeros_like
 
 
-@pytest.mark.usefixtures("transient_twri_model")
 @pytest.fixture(scope="function")
 def idomain_top(transient_twri_model):
     idomain = transient_twri_model["GWF_1"].domain
@@ -132,13 +134,17 @@ class HorizontalFlowBarrierCases:
         # Vertical line at x = 52500.0
         barrier_y = [0.0, 52500.0]
         barrier_x = [52500.0, 52500.0]
+        barrier_ztop = [10.0]
+        barrier_zbottom = [0.0]
+
+        polygons = linestring_to_square_zpolygons(
+            barrier_x, barrier_y, barrier_ztop, barrier_zbottom
+        )
 
         return gpd.GeoDataFrame(
-            geometry=[shapely.linestrings(barrier_x, barrier_y)],
+            geometry=polygons,
             data={
                 "resistance": [10.0],
-                "ztop": [10.0],
-                "zbottom": [0.0],
             },
         )
 
@@ -146,13 +152,17 @@ class HorizontalFlowBarrierCases:
         # Horizontal line at y = 52500.0
         barrier_x = [0.0, 52500.0]
         barrier_y = [52500.0, 52500.0]
+        barrier_ztop = [10.0]
+        barrier_zbottom = [0.0]
+
+        polygons = linestring_to_square_zpolygons(
+            barrier_x, barrier_y, barrier_ztop, barrier_zbottom
+        )
 
         return gpd.GeoDataFrame(
-            geometry=[shapely.linestrings(barrier_x, barrier_y)],
+            geometry=polygons,
             data={
                 "resistance": [10.0],
-                "ztop": [10.0],
-                "zbottom": [0.0],
             },
         )
 
@@ -160,13 +170,17 @@ class HorizontalFlowBarrierCases:
         # Horizontal line at y = -100.0 running outside domain
         barrier_x = [0.0, 1_000_000.0]
         barrier_y = [52500.0, 52500.0]
+        barrier_ztop = [10.0]
+        barrier_zbottom = [0.0]
+
+        polygons = linestring_to_square_zpolygons(
+            barrier_x, barrier_y, barrier_ztop, barrier_zbottom
+        )
 
         return gpd.GeoDataFrame(
-            geometry=[shapely.linestrings(barrier_x, barrier_y)],
+            geometry=polygons,
             data={
                 "resistance": [10.0],
-                "ztop": [10.0],
-                "zbottom": [0.0],
             },
         )
 
@@ -174,18 +188,42 @@ class HorizontalFlowBarrierCases:
         # Diagonal line
         barrier_y = [0.0, 52500.0]
         barrier_x = [0.0, 52500.0]
+        barrier_ztop = [10.0]
+        barrier_zbottom = [0.0]
+
+        polygons = linestring_to_square_zpolygons(
+            barrier_x, barrier_y, barrier_ztop, barrier_zbottom
+        )
 
         return gpd.GeoDataFrame(
-            geometry=[shapely.linestrings(barrier_x, barrier_y)],
+            geometry=polygons,
             data={
                 "resistance": [10.0],
-                "ztop": [10.0],
-                "zbottom": [0.0],
             },
         )
 
 
-@pytest.mark.usefixtures("transient_twri_model")
+@parametrize_with_cases("partition_array", cases=PartitionArrayCases)
+def test_partitioning_structured__masking(
+    transient_twri_model: Modflow6Simulation,
+    partition_array: xr.DataArray,
+):
+    simulation = transient_twri_model
+    # Act
+    # Partition the simulation
+    split_simulation = simulation.split(partition_array)
+    # Assert
+    # Check if the partitioned simulation has the correct number of models
+    modelnames = split_simulation.get_models_of_type("gwf6").keys()
+    unique_partitions = np.unique(partition_array)
+    assert len(modelnames) == len(unique_partitions)
+
+    for partition_nr, modelname in zip(unique_partitions, modelnames):
+        is_partition = partition_array == partition_nr
+        model_active = split_simulation[modelname].domain == 1
+        assert np.all(is_partition == model_active)
+
+
 @parametrize_with_cases("partition_array", cases=PartitionArrayCases)
 def test_partitioning_structured(
     tmp_path: Path,
@@ -221,7 +259,40 @@ def test_partitioning_structured(
     )
 
 
-@pytest.mark.usefixtures("transient_twri_model")
+@parametrize_with_cases("partition_array", cases=PartitionArrayCases)
+def test_partitioning_dis_origins(
+    tmp_path: Path,
+    transient_twri_model: Modflow6Simulation,
+    partition_array: xr.DataArray,
+):
+    """
+    Verify if the dis origin is set correctly in the partitioned simulation.
+    MODFLOW6 uses this when computing with XT3D on the exchanges between
+    submodels.
+    """
+    simulation = transient_twri_model
+    # Partition the simulation, run it, and save the (merged) results
+    split_simulation = simulation.split(partition_array)
+    split_simulation.write(tmp_path, binary=False)
+    modelnames = split_simulation.get_models_of_type("gwf6").keys()
+    for modelname in modelnames:
+        pkg = split_simulation[modelname]["dis"]
+        x = pkg.dataset["idomain"].coords["x"]
+        y = pkg.dataset["idomain"].coords["y"]
+        _, xmin, _ = imod.util.spatial.coord_reference(x)
+        _, ymin, _ = imod.util.spatial.coord_reference(y)
+        actual = pkg._render(tmp_path, "dis", None, True)
+        expected = textwrap.dedent(
+            f"""\
+            begin options
+              xorigin {xmin}
+              yorigin {ymin}
+            end options
+            """
+        )
+        assert expected in actual
+
+
 @parametrize_with_cases(
     "partition_array", cases=PartitionArrayCases, glob="*four_squares"
 )
@@ -246,7 +317,6 @@ def test_split_dump(
     assert len(diff.right_only) == 0
 
 
-@pytest.mark.usefixtures("transient_twri_model")
 @parametrize_with_cases("partition_array", cases=PartitionArrayCases.case_four_squares)
 def test_partitioning_write_after_split(
     tmp_path: Path,
@@ -269,7 +339,6 @@ def test_partitioning_write_after_split(
     assert len(diff.right_only) == 0
 
 
-@pytest.mark.usefixtures("transient_twri_model")
 @parametrize_with_cases("partition_array", cases=PartitionArrayCases)
 def test_partitioning_structured_with_inactive_cells(
     tmp_path: Path,
@@ -319,7 +388,6 @@ def test_partitioning_structured_with_inactive_cells(
     )
 
 
-@pytest.mark.usefixtures("transient_twri_model")
 @parametrize_with_cases("partition_array", cases=PartitionArrayCases)
 def test_partitioning_structured_with_vpt_cells(
     tmp_path: Path,
@@ -371,7 +439,6 @@ def test_partitioning_structured_with_vpt_cells(
     )
 
 
-@pytest.mark.usefixtures("transient_twri_model")
 @parametrize_with_cases(
     "partition_array", cases=PartitionArrayCases, has_tag="intrusion"
 )
@@ -446,7 +513,6 @@ def test_partitioning_structured_geometry_auxiliary_variables(
     )
 
 
-@pytest.mark.usefixtures("transient_twri_model")
 @parametrize_with_cases("partition_array", cases=PartitionArrayCases)
 @parametrize_with_cases("well", cases=WellCases)
 def test_partitioning_structured_one_high_level_well(
@@ -508,7 +574,6 @@ def is_expected_hfb_partition_combination_fail(current_cases):
     return False
 
 
-@pytest.mark.usefixtures("transient_twri_model")
 @parametrize_with_cases("partition_array", cases=PartitionArrayCases)
 @parametrize_with_cases("hfb", cases=HorizontalFlowBarrierCases)
 def test_partitioning_structured_hfb(
@@ -556,3 +621,59 @@ def test_partitioning_structured_hfb(
     # Compare the head result of the original simulation with the result of the
     # partitioned simulation.
     np.testing.assert_allclose(head["head"].values, original_head.values, rtol=1e-3)
+
+
+@parametrize_with_cases(
+    "partition_array", cases=PartitionArrayCases, prefix="case_four_"
+)
+def test_partitioning_structured__disconnected_models(
+    tmp_path: Path,
+    transient_twri_model: Modflow6Simulation,
+    partition_array: xr.DataArray,
+):
+    simulation = transient_twri_model
+
+    # Isolate models from each other. There shouldn't be exchanges between these
+    # models.
+    new_idomain = simulation["GWF_1"]["dis"].dataset["idomain"].copy()
+    new_idomain[:, 7, :7] = 0
+    simulation.mask_all_models(new_idomain)
+
+    # Run the original example, so without partitioning, and save the simulation
+    # results.
+    original_dir = tmp_path / "original"
+    simulation.write(original_dir, binary=False)
+    simulation.run()
+
+    original_head = imod.mf6.open_hds(
+        original_dir / "GWF_1/GWF_1.hds",
+        original_dir / "GWF_1/dis.dis.grb",
+    )
+
+    # Partition the simulation, run it, and save the (merged) results
+    split_simulation = simulation.split(partition_array)
+
+    split_simulation.write(tmp_path, binary=False)
+    split_simulation.run()
+
+    head = split_simulation.open_head()
+    _ = split_simulation.open_flow_budget()
+
+    # Check that one exchange has been removed, as the models are disconnected.
+    assert len(split_simulation["split_exchanges"]) == 3
+    varnames = ["model_name_1", "model_name_2"]
+    modelnames = [
+        [exch[key].item() for key in varnames]
+        for exch in split_simulation["split_exchanges"]
+    ]
+    assert sorted(modelnames) == [
+        ["GWF_1_0", "GWF_1_1"],
+        ["GWF_1_1", "GWF_1_3"],
+        ["GWF_1_2", "GWF_1_3"],
+    ]
+
+    # Compare the head result of the original simulation with the result of the
+    # partitioned simulation.
+    np.testing.assert_allclose(
+        head["head"].values, original_head.values, rtol=1e-4, atol=1e-4
+    )

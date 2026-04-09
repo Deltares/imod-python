@@ -32,10 +32,7 @@ class AdvectionFiniteDifference(Package):
     _keywords = {"weighting": {"upstream": 0, "central": 1}}
 
     _template = (
-        "[adv]\n"
-        "    mixelm = 0\n"
-        "    percel = {courant}\n"
-        "    nadvfd = {weighting}\n"
+        "[adv]\n    mixelm = 0\n    percel = {courant}\n    nadvfd = {weighting}\n"
     )
 
     def __init__(self, courant=0.75, weighting="upstream"):
@@ -421,7 +418,7 @@ class AdvectionTVD(Package):
 
     _pkg_id = "adv"
 
-    _template = "[adv]\n" "    mixelm = -1\n" "    percel = {courant}\n"
+    _template = "[adv]\n    mixelm = -1\n    percel = {courant}\n"
 
     def __init__(self, courant=0.75):
         super().__init__()

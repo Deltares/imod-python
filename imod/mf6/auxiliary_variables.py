@@ -1,4 +1,4 @@
-from imod.mf6.interfaces.ipackage import IPackage
+from imod.common.interfaces.ipackage import IPackage
 
 
 def get_variable_names(package: IPackage):

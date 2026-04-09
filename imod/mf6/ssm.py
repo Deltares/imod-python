@@ -1,21 +1,43 @@
-from typing import Optional, Tuple
+from pathlib import Path
+from typing import Self
 
 import numpy as np
 
+from imod.common.interfaces.iregridpackage import IRegridPackage
 from imod.logging import init_log_decorator, logger
 from imod.mf6 import GroundwaterFlowModel
 from imod.mf6.boundary_condition import BoundaryCondition
-from imod.mf6.interfaces.iregridpackage import IRegridPackage
-from imod.mf6.utilities.regrid import RegridderType
+from imod.mf6.package import Package
 from imod.schemata import DTypeSchema
 
 
-def with_index_dim(array_like):
+def with_index_dim(array_like) -> tuple[str, list]:
     # At least1d will also extract the values if array_like is a DataArray.
     arr1d = np.atleast_1d(array_like)
     if arr1d.ndim > 1:
         raise ValueError("array must be 1d")
-    return ("index", arr1d)
+    return ("index", arr1d.tolist())
+
+
+def is_concentration_package(package: Package) -> bool:
+    """
+    Check if the package has auxiliary data with a concentration variable.
+    This is used to determine if a package can be used in SourceSinkMixing.
+
+    Parameters
+    ----------
+    package: Package
+        The package to check.
+
+    Returns
+    -------
+    bool
+        True if the package has a concentration variable in its auxiliary data.
+    """
+    return (
+        hasattr(package, "_auxiliary_data")
+        and "concentration" in package._auxiliary_data.keys()
+    )
 
 
 class SourceSinkMixing(BoundaryCondition, IRegridPackage):
@@ -43,8 +65,6 @@ class SourceSinkMixing(BoundaryCondition, IRegridPackage):
 
     _write_schemata = {}
 
-    _regrid_method: dict[str, Tuple[RegridderType, str]] = {}
-
     @init_log_decorator()
     def __init__(
         self,
@@ -67,7 +87,24 @@ class SourceSinkMixing(BoundaryCondition, IRegridPackage):
         super().__init__(dict_dataset)
         self._validate_init_schemata(validate)
 
-    def render(self, directory, pkgname, globaltimes, binary):
+    @classmethod
+    def from_file(cls, path: str | Path, **kwargs) -> Self:
+        instance = super().from_file(path, **kwargs)
+
+        # to_netcdf converts strings into  NetCDF "variable‑length UTF‑8 strings"
+        # which are loaded as dtype=object arrays.
+        # This will convert them back to str.
+        vars = [
+            "package_names",
+            "concentration_boundary_type",
+            "auxiliary_variable_name",
+        ]
+        for var in vars:
+            instance.dataset[var] = instance.dataset[var].astype(str)
+
+        return instance
+
+    def _render(self, directory, pkgname, globaltimes, binary):
         d = {
             "sources": list(
                 zip(
@@ -133,7 +170,7 @@ class SourceSinkMixing(BoundaryCondition, IRegridPackage):
         boundary_types = []
         aux_var_names = []
         for name, package in model.items():
-            if isinstance(package, BoundaryCondition):
+            if is_concentration_package(package):
                 ds = package.dataset
                 # The package should contain a concentration variable, with a
                 # species coordinate.
@@ -170,6 +207,3 @@ class SourceSinkMixing(BoundaryCondition, IRegridPackage):
             save_flows=save_flows,
             validate=validate,
         )
-
-    def get_regrid_methods(self) -> Optional[dict[str, Tuple[RegridderType, str]]]:
-        return self._regrid_method

@@ -21,7 +21,6 @@ convenient groundwater modeling.
    :hidden:
    
    mf6/index.rst
-   imodflow/index.rst
    imod-wq/index.rst
    metaswap/index.rst
    prepare/index.rst

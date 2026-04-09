@@ -7,7 +7,6 @@ import pytest
 import xarray as xr
 
 import imod
-from imod.mf6.write_context import WriteContext
 from imod.schemata import ValidationError
 
 
@@ -15,7 +14,7 @@ def test_render_string():
     oc = imod.mf6.OutputControl(save_head="first", save_budget="last")
     directory = pathlib.Path("mymodel")
     globaltimes = [np.datetime64("2000-01-01")]
-    actual = oc.render(directory, "outputcontrol", globaltimes, True)
+    actual = oc._render(directory, "outputcontrol", globaltimes, True)
     expected = textwrap.dedent(
         """\
         begin options
@@ -40,7 +39,7 @@ def test_render_string_two_timesteps():
 
     oc = imod.mf6.OutputControl(save_head=save_head, save_budget="last")
     directory = pathlib.Path("mymodel")
-    actual = oc.render(directory, "outputcontrol", globaltimes, True)
+    actual = oc._render(directory, "outputcontrol", globaltimes, True)
     expected = textwrap.dedent(
         """\
         begin options
@@ -64,7 +63,7 @@ def test_render_int():
     oc = imod.mf6.OutputControl(save_head=4, save_budget=3)
     directory = pathlib.Path("mymodel")
     globaltimes = np.array(["2000-01-01"], dtype="datetime64[ns]")
-    actual = oc.render(directory, "outputcontrol", globaltimes, True)
+    actual = oc._render(directory, "outputcontrol", globaltimes, True)
     expected = textwrap.dedent(
         """\
         begin options
@@ -84,16 +83,16 @@ def test_render_int():
 def test_render_bool_fail():
     message = textwrap.dedent(
         """
-        * save_head
-        \t- No option succeeded:
-        \tdtype bool != <class 'numpy.integer'>
-        \tdtype bool != <U0
-        \tdtype bool != object
-        * save_budget
-        \t- No option succeeded:
-        \tdtype bool != <class 'numpy.integer'>
-        \tdtype bool != <U0
-        \tdtype bool != object"""
+        - save_head
+            - No option succeeded:
+            dtype bool != <class 'numpy.integer'>
+            dtype bool != <U0
+            dtype bool != object
+        - save_budget
+            - No option succeeded:
+            dtype bool != <class 'numpy.integer'>
+            dtype bool != <U0
+            dtype bool != object"""
     )
 
     with pytest.raises(ValidationError, match=re.escape(message)):
@@ -107,7 +106,7 @@ def test_render_string_fail():
 
     expected_message = "Output Control received wrong string. String should be one of ['first', 'last', 'all'], instead got foo"
     with pytest.raises(ValueError, match=re.escape(expected_message)):
-        _ = oc.render(directory, "outputcontrol", globaltimes, True)
+        _ = oc._render(directory, "outputcontrol", globaltimes, True)
 
 
 def test_render_mixed_two_timesteps():
@@ -120,7 +119,7 @@ def test_render_mixed_two_timesteps():
 
     oc = imod.mf6.OutputControl(save_head=save_head, save_budget=None)
     directory = pathlib.Path("mymodel")
-    actual = oc.render(directory, "outputcontrol", globaltimes, True)
+    actual = oc._render(directory, "outputcontrol", globaltimes, True)
     expected = textwrap.dedent(
         """\
         begin options
@@ -142,7 +141,7 @@ def test_render_string_concentration():
     oc = imod.mf6.OutputControl(save_concentration="first", save_budget="last")
     directory = pathlib.Path("mymodel")
     globaltimes = np.array(["2000-01-01"], dtype="datetime64[ns]")
-    actual = oc.render(directory, "outputcontrol", globaltimes, True)
+    actual = oc._render(directory, "outputcontrol", globaltimes, True)
     expected = textwrap.dedent(
         """\
         begin options
@@ -169,7 +168,7 @@ def test_render_string_two_timesteps_concentration():
         save_concentration=save_concentration, save_budget="last"
     )
     directory = pathlib.Path("mymodel")
-    actual = oc.render(directory, "outputcontrol", globaltimes, True)
+    actual = oc._render(directory, "outputcontrol", globaltimes, True)
     expected = textwrap.dedent(
         """\
         begin options
@@ -208,7 +207,7 @@ def test_fileout_none():
     oc = imod.mf6.OutputControl(save_concentration="first", save_budget="last")
     directory = pathlib.Path("mymodel")
     globaltimes = np.array(["2000-01-01"], dtype="datetime64[ns]")
-    actual = oc.render(directory, "outputcontrol", globaltimes, True)
+    actual = oc._render(directory, "outputcontrol", globaltimes, True)
     expected = textwrap.dedent(
         """\
         begin options
@@ -232,7 +231,7 @@ def test_fileout_abs(tmp_path):
     globaltimes = np.array(["2000-01-01"], dtype="datetime64[ns]")
     outpath = tmp_path / "output" / "mymodel.cbc"
     oc["budget_file"] = outpath
-    actual = oc.render(directory, "outputcontrol", globaltimes, True)
+    actual = oc._render(directory, "outputcontrol", globaltimes, True)
     expected = textwrap.dedent(
         f"""\
         begin options
@@ -255,7 +254,7 @@ def test_fileout_relative(tmp_path):
     directory = pathlib.Path("input/gwf")
     # Relative path, resolve to simulation name file.
     oc["budget_file"] = "output/gwf.cbc"
-    actual = oc.render(directory, "outputcontrol", globaltimes, True)
+    actual = oc._render(directory, "outputcontrol", globaltimes, True)
     expected = textwrap.dedent(
         """\
         begin options
@@ -281,8 +280,7 @@ def test_oc_write(tmp_path):
     with imod.util.cd(tmp_path):
         directory = tmp_path / "input/gwf"
         directory.mkdir(exist_ok=True, parents=True)
-        write_context = WriteContext(simulation_directory=directory)
-        oc.write("outputcontrol", globaltimes, write_context)
+        oc.write("outputcontrol", globaltimes, directory)
 
         assert (directory / "outputcontrol.oc").is_file()
         assert (tmp_path / "output").exists()

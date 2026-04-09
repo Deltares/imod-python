@@ -41,8 +41,8 @@ class VariableDensityFlow(Package):
         Value of 1000 is often used.
     density_concentration_slope: float
         is the slope d(rho)/d(C) of the linear equation of state that relates
-        fluid density to solute concentration (denseslp). Value of 0.7143 is
-        often used.
+        fluid density to solute concentration (denseslp). A value of 0.7143 is
+        often used for TDS g/l. A value of 1.316 is common for CL g/l.
     density_criterion: float
         is the convergence parameter for the coupling between flow and transport
         and has units of fluid density (DNSCRIT). If the maximum density

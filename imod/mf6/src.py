@@ -5,6 +5,7 @@ from imod.mf6.boundary_condition import BoundaryCondition
 from imod.mf6.package import Package
 from imod.mf6.validation import BOUNDARY_DIMS_SCHEMA
 from imod.schemata import (
+    AllCoordsValueSchema,
     AllInsideNoDataSchema,
     AllNoDataSchema,
     DTypeSchema,
@@ -57,6 +58,7 @@ class MassSourceLoading(BoundaryCondition):
             DTypeSchema(np.floating),
             IndexesSchema(),
             BOUNDARY_DIMS_SCHEMA,
+            AllCoordsValueSchema("layer", ">", 0),
         )
     }
 

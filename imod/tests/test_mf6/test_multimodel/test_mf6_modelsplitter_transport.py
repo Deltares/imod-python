@@ -4,9 +4,11 @@ from pathlib import Path
 import numpy as np
 import pytest
 
-from imod.mf6.adv import Advection
+from imod.common.utilities.partitioninfo import create_partition_info
+from imod.mf6 import AdvectionCentral, AdvectionTVD, AdvectionUpstream
 from imod.mf6.dsp import Dispersion
-from imod.mf6.multimodel.modelsplitter import create_partition_info, slice_model
+from imod.mf6.multimodel.modelsplitter import ModelSplitter
+from imod.mf6.package import Package
 from imod.mf6.simulation import Modflow6Simulation
 from imod.tests.fixtures.mf6_modelrun_fixture import assert_simulation_can_run
 from imod.typing.grid import zeros_like
@@ -19,22 +21,21 @@ def test_slice_model_structured(flow_transport_simulation: Modflow6Simulation):
     submodel_labels[:, :, 30:] = 1
 
     partition_info = create_partition_info(submodel_labels)
-
-    submodel_list = []
+    modelsplitter = ModelSplitter(partition_info)
 
     # Act
-    for submodel_partition_info in partition_info:
-        submodel_list.append(slice_model(submodel_partition_info, transport_model))
+    partition_models_dict = modelsplitter.split("tpt_a", transport_model)
 
     # Assert
-    assert len(submodel_list) == 2
-    for submodel in submodel_list:
+    assert len(partition_models_dict) == 2
+    for new_model_name, new_model in partition_models_dict.items():
         for package_name in list(transport_model.keys()):
-            assert package_name in list(submodel.keys())
+            assert package_name in list(new_model.keys())
 
 
-@pytest.mark.usefixtures("flow_transport_simulation")
+@pytest.mark.parametrize("engine", ["netcdf4", "zarr", "zarr.zip"])
 def test_split_dump(
+    engine: str,
     tmp_path: Path,
     flow_transport_simulation: Modflow6Simulation,
 ):
@@ -50,7 +51,7 @@ def test_split_dump(
     split_simulation.write(
         tmp_path / "split/original"
     )  # a write is necessary before the dump to generate the gwtgwf packages
-    split_simulation.dump(tmp_path / "split")
+    split_simulation.dump(tmp_path / "split", engine=engine)
     reloaded_split = Modflow6Simulation.from_file(
         tmp_path / "split/1d_tpt_benchmark_partioned.toml"
     )
@@ -62,7 +63,6 @@ def test_split_dump(
     assert len(diff.right_only) == 0
 
 
-@pytest.mark.usefixtures("flow_transport_simulation")
 def test_split_flow_and_transport_model(
     tmp_path: Path, flow_transport_simulation: Modflow6Simulation
 ):
@@ -115,10 +115,9 @@ def test_split_flow_and_transport_model(
             .values
         ) == ["chd", "rch", "well"]
 
-    assert_simulation_can_run(new_simulation, "dis", tmp_path)
+    assert_simulation_can_run(new_simulation, tmp_path)
 
 
-@pytest.mark.usefixtures("flow_transport_simulation")
 def test_split_flow_and_transport_model_evaluate_output(
     tmp_path: Path, flow_transport_simulation: Modflow6Simulation
 ):
@@ -161,7 +160,6 @@ def test_split_flow_and_transport_model_evaluate_output(
     )
 
 
-@pytest.mark.usefixtures("flow_transport_simulation")
 def test_split_flow_and_transport_model_evaluate_output_with_species(
     tmp_path: Path, flow_transport_simulation: Modflow6Simulation
 ):
@@ -200,13 +198,14 @@ def test_split_flow_and_transport_model_evaluate_output_with_species(
     )
 
 
-@pytest.mark.usefixtures("flow_transport_simulation")
-@pytest.mark.parametrize("advection_scheme", ["TVD", "upstream", "central"])
+@pytest.mark.parametrize(
+    "advection_pkg", [AdvectionCentral, AdvectionTVD, AdvectionUpstream]
+)
 @pytest.mark.parametrize("dsp_xt3d_off", [True, False])
 def test_split_flow_and_transport_settings(
     tmp_path: Path,
     flow_transport_simulation: Modflow6Simulation,
-    advection_scheme: str,
+    advection_pkg: Package,
     dsp_xt3d_off: bool,
 ):
     simulation = flow_transport_simulation
@@ -221,7 +220,7 @@ def test_split_flow_and_transport_settings(
         xt3d_off=dsp_xt3d_off,
         xt3d_rhs=not dsp_xt3d_off,
     )
-    simulation["tpt_b"]["adv"] = Advection(scheme=advection_scheme)
+    simulation["tpt_b"]["adv"] = advection_pkg()
     # create label array
     submodel_labels = zeros_like(active)
     submodel_labels = submodel_labels.drop_vars("layer")
@@ -231,7 +230,7 @@ def test_split_flow_and_transport_settings(
     new_simulation = simulation.split(submodel_labels)
     assert (
         new_simulation["split_exchanges"][2].dataset["adv_scheme"].values[()]
-        == advection_scheme
+        == advection_pkg._scheme
     )
     assert (
         new_simulation["split_exchanges"][2].dataset["dsp_xt3d_off"].values[()]

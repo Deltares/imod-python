@@ -98,7 +98,7 @@ heads_grid.plot.imshow(ax=ax)
 # and the closing criteria.
 
 interpolated_heads = imod.prepare.laplace_interpolate(
-    heads_grid, close=0.001, mxiter=150, iter1=100
+    heads_grid, atol=0.001, maxiter=150
 )
 
 # Plotting the interpolation results
@@ -110,10 +110,7 @@ interpolated_heads.plot.imshow(ax=ax)
 # the interpolation, so that we can better judge the quality of the
 # interpolation.
 #
-# One way to show this is to derive a grid with whether a cell contains an
-# observation. Consequently we can plot this as an overlay, setting cells
-# without an observation as transparent. ``imshow`` accepts a matrix with alpha
-# values as well, which allows us to set transparency per cell.
+# We can use the `plt.scatter` function to plot the borehole locations on top.
 
 # Derive grid with which cell has an observation
 is_observation = (~np.isnan(heads_grid)).astype(np.float64)
@@ -122,10 +119,8 @@ fig, ax = plt.subplots()
 # Plot the interpolation results
 interpolated_heads.plot.imshow(ax=ax)
 
-# We'll plot on the same axis with transparency to use ``is_observation``
-# as overlay.
-is_observation.plot.imshow(
-    ax=ax, add_colorbar=False, cmap="gray_r", alpha=is_observation.values
-)
+# Plot the borehole locations on top
+plt.scatter(x=mean_heads_in_grid["x"], y=mean_heads_in_grid["y"], color="black", s=5)
+
 
 # %%

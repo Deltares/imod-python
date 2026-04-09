@@ -160,7 +160,7 @@ class Mf6HorizontalFlowBarrier(BoundaryCondition):
 
         return recarr
 
-    def write(
+    def _write(
         self,
         pkgname: str,
         globaltimes: Union[list[np.datetime64], np.ndarray],
@@ -169,4 +169,4 @@ class Mf6HorizontalFlowBarrier(BoundaryCondition):
         # MODFLOW6 does not support binary HFB input.
         hfb_write_context = deepcopy(write_context)
         hfb_write_context.use_binary = False
-        super().write(pkgname, globaltimes, hfb_write_context)
+        super()._write(pkgname, globaltimes, hfb_write_context)

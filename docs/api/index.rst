@@ -1,11 +1,13 @@
-API Reference
-=============
+API
+===
 
 This page provides an auto-generated summary of imod's API.
 
 .. toctree::
   :maxdepth: 2
   
+  changelog
+
   io
   prepare
   select
@@ -16,8 +18,5 @@ This page provides an auto-generated summary of imod's API.
 
   mf6
   wq
-  flow
   msw
   metamod
-
-  changelog

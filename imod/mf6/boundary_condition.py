@@ -1,6 +1,5 @@
 import abc
 import pathlib
-import warnings
 from copy import copy, deepcopy
 from typing import Mapping, Optional, Union
 
@@ -15,7 +14,7 @@ from imod.mf6.auxiliary_variables import (
 from imod.mf6.package import Package
 from imod.mf6.utilities.package import get_repeat_stress
 from imod.mf6.write_context import WriteContext
-from imod.typing.grid import GridDataArray
+from imod.typing import GridDataArray
 
 
 def _dis_recarr(arrdict, layer, notnull):
@@ -71,6 +70,13 @@ class BoundaryCondition(Package, abc.ABC):
     """
 
     def __init__(self, allargs: Mapping[str, GridDataArray | float | int | bool | str]):
+        # Convert repeat_stress in dict to a xr.DataArray in the right shape if
+        # necessary, which is required to merge it into the dataset.
+        if "repeat_stress" in allargs.keys() and isinstance(
+            allargs["repeat_stress"], dict
+        ):
+            allargs["repeat_stress"] = get_repeat_stress(allargs["repeat_stress"])  # type: ignore
+        # Call the Package constructor, this merges the arguments into a dataset.
         super().__init__(allargs)
         if "concentration" in allargs.keys() and allargs["concentration"] is None:
             # Remove vars inplace
@@ -79,40 +85,12 @@ class BoundaryCondition(Package, abc.ABC):
         else:
             expand_transient_auxiliary_variables(self)
 
-    def set_repeat_stress(self, times: dict[np.datetime64, np.datetime64]) -> None:
-        """
-        Set repeat stresses: re-use data of earlier periods.
-
-        Parameters
-        ----------
-        times: Dict of datetime-like to datetime-like.
-            The data of the value datetime is used for the key datetime.
-        """
-        warnings.warn(
-            f"""{self.__class__.__name__}.set_repeat_stress(...) is deprecated.
-            In the future, add repeat stresses as constructor parameters. An
-            object containing them can be created using 'get_repeat_stress', as
-            follows:
-
-            from imod.mf6.utilities.package_utils import get_repeat_stress
-
-            repeat_stress = get_repeat_stress(repeat_periods) # args before provided to River.set_repeat_stress
-            riv = imod.mf6.River(..., repeat_stress=repeat_stress)
-
-            Note that the location of get_repeat_stress (imod.mf6.utilities.package_utils)
-            may change in the future
-            """,
-            DeprecationWarning,
-        )
-
-        self.dataset["repeat_stress"] = get_repeat_stress(times)
-
     def _max_active_n(self):
         """
         Determine the maximum active number of cells that are active
         during a stress period.
         """
-        da = self.dataset[self.get_period_varnames()[0]]
+        da = self.dataset[self._get_period_varnames()[0]]
         if "time" in da.coords:
             nmax = int(da.groupby("time").count(xr.ALL_DIMS).max())
         else:
@@ -127,8 +105,7 @@ class BoundaryCondition(Package, abc.ABC):
         fields = struct_array.dtype.fields
         fmt = [self._number_format(field[0]) for field in fields.values()]
         header = " ".join(list(fields.keys()))
-        with open(outpath, "w") as f:
-            np.savetxt(fname=f, X=struct_array, fmt=fmt, header=header)
+        np.savetxt(fname=outpath, X=struct_array, fmt=fmt, header=header)
 
     def _write_datafile(self, outpath, ds, binary):
         """
@@ -183,7 +160,9 @@ class BoundaryCondition(Package, abc.ABC):
 
         return recarr
 
-    def _period_paths(self, directory, pkgname, globaltimes, bin_ds, binary):
+    def _period_paths(
+        self, directory: pathlib.Path | str, pkgname: str, globaltimes, bin_ds, binary
+    ):
         directory = pathlib.Path(directory) / pkgname
 
         if binary:
@@ -191,10 +170,12 @@ class BoundaryCondition(Package, abc.ABC):
         else:
             ext = "dat"
 
-        periods = {}
+        periods: dict[np.int64, str] = {}
+        # Force to np.int64 for mypy and numpy >= 2.2.4
+        one = np.int64(1)
         if "time" in bin_ds:  # one of bin_ds has time
             package_times = bin_ds.coords["time"].values
-            starts = np.searchsorted(globaltimes, package_times) + 1
+            starts = np.searchsorted(globaltimes, package_times) + one
             for i, start in enumerate(starts):
                 path = directory / f"{self._pkg_id}-{i}.{ext}"
                 periods[start] = path.as_posix()
@@ -203,32 +184,45 @@ class BoundaryCondition(Package, abc.ABC):
             if repeat_stress is not None and repeat_stress.values[()] is not None:
                 keys = repeat_stress.isel(repeat_items=0).values
                 values = repeat_stress.isel(repeat_items=1).values
-                repeat_starts = np.searchsorted(globaltimes, keys) + 1
-                values_index = np.searchsorted(globaltimes, values) + 1
-                for i, start in zip(values_index, repeat_starts):
-                    periods[start] = periods[i]
+                repeat_starts = np.searchsorted(globaltimes, keys) + one
+                values_index = np.searchsorted(globaltimes, values) + one
+                for j, start_repeat in zip(values_index, repeat_starts):
+                    periods[start_repeat] = periods[j]
                 # Now make sure the periods are sorted by key.
                 periods = dict(sorted(periods.items()))
         else:
             path = directory / f"{self._pkg_id}.{ext}"
-            periods[1] = path.as_posix()
+            periods[one] = path.as_posix()
 
         return periods
 
-    def _get_options(
+    def _get_unfiltered_pkg_options(
         self, predefined_options: dict, not_options: Optional[list] = None
     ):
         options = copy(predefined_options)
 
         if not_options is None:
-            not_options = self.get_period_varnames()
+            not_options = self._get_period_varnames()
 
         for varname in self.dataset.data_vars.keys():  # pylint:disable=no-member
             if varname in not_options:
                 continue
             v = self.dataset[varname].values[()]
-            if self._valid(v):  # skip None and False
-                options[varname] = v
+            options[varname] = v
+        return options
+
+    def _get_pkg_options(
+        self, predefined_options: dict, not_options: Optional[list] = None
+    ):
+        unfiltered_options = self._get_unfiltered_pkg_options(
+            predefined_options, not_options=not_options
+        )
+        # Filter out options which are None or False
+        options = {
+            key: value
+            for key, value in unfiltered_options.items()
+            if self._valid(value)
+        }
         return options
 
     def _get_bin_ds(self):
@@ -237,9 +231,9 @@ class BoundaryCondition(Package, abc.ABC):
         datafiles. This method can be overriden to do some extra operations on
         this dataset before writing.
         """
-        return self[self.get_period_varnames()]
+        return self[self._get_period_varnames()]
 
-    def render(self, directory, pkgname, globaltimes, binary):
+    def _render(self, directory, pkgname, globaltimes, binary):
         """Render fills in the template only, doesn't write binary data"""
         d = {"binary": binary}
         bin_ds = self._get_bin_ds()
@@ -247,7 +241,7 @@ class BoundaryCondition(Package, abc.ABC):
             directory, pkgname, globaltimes, bin_ds, binary
         )
         # construct the rest (dict for render)
-        d = self._get_options(d)
+        d = self._get_pkg_options(d)
         d["maxbound"] = self._max_active_n()
 
         if (hasattr(self, "_auxiliary_data")) and (names := get_variable_names(self)):
@@ -256,7 +250,7 @@ class BoundaryCondition(Package, abc.ABC):
         return self._template.render(d)
 
     def _write_perioddata(self, directory, pkgname, binary):
-        if len(self.get_period_varnames()) == 0:
+        if len(self._get_period_varnames()) == 0:
             return
         bin_ds = self._get_bin_ds()
 
@@ -275,7 +269,7 @@ class BoundaryCondition(Package, abc.ABC):
             path = directory / pkgname / f"{self._pkg_id}.{ext}"
             self._write_datafile(path, bin_ds, binary=binary)
 
-    def write(
+    def _write(
         self,
         pkgname: str,
         globaltimes: Union[list[np.datetime64], np.ndarray],
@@ -287,7 +281,7 @@ class BoundaryCondition(Package, abc.ABC):
         directory is modelname
         """
 
-        super().write(pkgname, globaltimes, write_context)
+        super()._write(pkgname, globaltimes, write_context)
         directory = write_context.write_directory
 
         self._write_perioddata(
@@ -296,10 +290,32 @@ class BoundaryCondition(Package, abc.ABC):
             binary=write_context.use_binary,
         )
 
-    def get_period_varnames(self):
+    def _get_period_varnames(self) -> list[str]:
+        """
+        Get variable names for transient data of this package.
+
+        Returns
+        -------
+        list[str]
+            List of variable names that are used for transient data in this
+            package.
+
+        Examples
+        --------
+        To get the variable names for transient data in a package, e.g. a River
+        package:
+
+        >>> river = imod.mf6.River.from_file("river_with_concentration.nc")
+        >>> river._get_period_varnames()
+        >>> # prints: ['stage', 'conductance', 'bottom_elevation', 'concentration']
+        """
         result = []
         if hasattr(self, "_period_data"):
             result.extend(self._period_data)
+        if hasattr(self, "_optional_data"):
+            for varname in self._optional_data:
+                if varname in self.dataset.data_vars:
+                    result.append(varname)
         if hasattr(self, "_auxiliary_data"):
             result.extend(get_variable_names(self))
 
@@ -341,13 +357,13 @@ class AdvancedBoundaryCondition(BoundaryCondition, abc.ABC):
         """
         return
 
-    def write_packagedata(self, directory, pkgname, binary):
+    def _write_packagedata(self, directory, pkgname, binary):
         outpath = directory / pkgname / f"{self._pkg_id}-pkgdata.dat"
         outpath.parent.mkdir(exist_ok=True, parents=True)
         package_data = self._package_data_to_sparse()
         self._write_file(outpath, package_data)
 
-    def write(
+    def _write(
         self,
         pkgname: str,
         globaltimes: Union[list[np.datetime64], np.ndarray],
@@ -356,46 +372,12 @@ class AdvancedBoundaryCondition(BoundaryCondition, abc.ABC):
         boundary_condition_write_context = deepcopy(write_context)
         boundary_condition_write_context.use_binary = False
 
-        self.fill_stress_perioddata()
-        super().write(pkgname, globaltimes, boundary_condition_write_context)
+        self._fill_stress_perioddata()
+        super()._write(pkgname, globaltimes, boundary_condition_write_context)
 
         directory = boundary_condition_write_context.write_directory
-        self.write_packagedata(directory, pkgname, binary=False)
+        self._write_packagedata(directory, pkgname, binary=False)
 
     @abc.abstractmethod
-    def fill_stress_perioddata(self):
+    def _fill_stress_perioddata(self):
         raise NotImplementedError
-
-
-class DisStructuredBoundaryCondition(BoundaryCondition):
-    def _to_struct_array(self, arrdict, layer):
-        spec = []
-        for key in arrdict:
-            if key in ["layer", "row", "column"]:
-                spec.append((key, np.int32))
-            else:
-                spec.append((key, np.float64))
-
-        sparse_dtype = np.dtype(spec)
-        nrow = next(iter(arrdict.values())).size
-        recarr = np.empty(nrow, dtype=sparse_dtype)
-        for key, arr in arrdict.items():
-            recarr[key] = arr
-        return recarr
-
-
-class DisVerticesBoundaryCondition(BoundaryCondition):
-    def _to_struct_array(self, arrdict, layer):
-        spec = []
-        for key in arrdict:
-            if key in ["layer", "cell2d"]:
-                spec.append((key, np.int32))
-            else:
-                spec.append((key, np.float64))
-
-        sparse_dtype = np.dtype(spec)
-        nrow = next(iter(arrdict.values())).size
-        recarr = np.empty(nrow, dtype=sparse_dtype)
-        for key, arr in arrdict.items():
-            recarr[key] = arr
-        return recarr

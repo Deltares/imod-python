@@ -1,32 +1,36 @@
 import abc
-from typing import Optional, Tuple
+from typing import Any, Dict, Optional
 
 import numpy as np
 
+from imod.common.interfaces.iregridpackage import IRegridPackage
+from imod.common.utilities.dataclass_type import (
+    DataclassType,
+)
+from imod.common.utilities.regrid import _regrid_package_data
 from imod.logging import init_log_decorator
-from imod.mf6.interfaces.iregridpackage import IRegridPackage
 from imod.mf6.package import Package
-from imod.mf6.utilities.regrid import RegridderType
+from imod.mf6.regrid.regrid_schemes import (
+    SpecificStorageRegridMethod,
+    StorageCoefficientRegridMethod,
+)
 from imod.mf6.validation import PKG_DIMS_SCHEMA
 from imod.schemata import (
+    AllCoordsValueSchema,
     AllValueSchema,
     DimsSchema,
     DTypeSchema,
     IdentityNoDataSchema,
     IndexesSchema,
 )
-
-
-class Storage(Package):
-    _pkg_id = "sto_deprecated"
-
-    def __init__(*args, **kwargs):
-        raise NotImplementedError(
-            r"Storage package has been removed. Use SpecificStorage or StorageCoefficient instead."
-        )
+from imod.typing import GridDataArray
+from imod.typing.grid import zeros_like
+from imod.util.regrid import RegridderWeightsCache
 
 
 class StorageBase(Package, IRegridPackage, abc.ABC):
+    _grid_data: Dict[str, type] = {}
+
     def get_options(self, d):
         # Skip both variables in grid_data and "transient".
         not_options = list(self._grid_data.keys())
@@ -40,8 +44,8 @@ class StorageBase(Package, IRegridPackage, abc.ABC):
                 d[varname] = v
         return d
 
-    def _render_dict(self, directory, pkgname, globaltimes, binary):
-        d = {}
+    def _render_dict(self, directory, pkgname, globaltimes, binary) -> Dict[str, Any]:
+        d: Dict[str, Any] = {}
         stodirectory = directory / pkgname
         for varname in self._grid_data:
             key = self._keyword_map.get(varname, varname)
@@ -49,7 +53,8 @@ class StorageBase(Package, IRegridPackage, abc.ABC):
                 self[varname], stodirectory, key, binary=binary
             )
             if self._valid(value):  # skip False or None
-                d[f"{key}_layered"], d[key] = layered, value
+                d[f"{key}_layered"] = layered
+                d[key] = value
 
         periods = {}
         if "time" in self.dataset["transient"].coords:
@@ -124,11 +129,13 @@ class SpecificStorage(StorageBase):
             DTypeSchema(np.floating),
             IndexesSchema(),
             PKG_DIMS_SCHEMA,
+            AllCoordsValueSchema("layer", ">", 0),
         ),
         "specific_yield": (
             DTypeSchema(np.floating),
             IndexesSchema(),
             PKG_DIMS_SCHEMA,
+            AllCoordsValueSchema("layer", ">", 0),
         ),
         "transient": (
             DTypeSchema(np.bool_),
@@ -139,6 +146,7 @@ class SpecificStorage(StorageBase):
             DTypeSchema(np.integer),
             IndexesSchema(),
             PKG_DIMS_SCHEMA,
+            AllCoordsValueSchema("layer", ">", 0),
         ),
         "save_flows": (DTypeSchema(np.bool_), DimsSchema()),
     }
@@ -153,18 +161,10 @@ class SpecificStorage(StorageBase):
             AllValueSchema(">=", 0.0),
             IdentityNoDataSchema(other="idomain", is_other_notnull=(">", 0)),
         ),
-        "convertible": (
-            IdentityNoDataSchema(other="idomain", is_other_notnull=(">", 0)),
-        ),
-    }
-
-    _regrid_method = {
-        "convertible": (RegridderType.OVERLAP, "mode"),
-        "specific_storage": (RegridderType.OVERLAP, "mean"),
-        "specific_yield": (RegridderType.OVERLAP, "mean"),
     }
 
     _template = Package._initialize_template(_pkg_id)
+    _regrid_method = SpecificStorageRegridMethod()
 
     @init_log_decorator()
     def __init__(
@@ -186,12 +186,9 @@ class SpecificStorage(StorageBase):
         super().__init__(dict_dataset)
         self._validate_init_schemata(validate)
 
-    def render(self, directory, pkgname, globaltimes, binary):
+    def _render(self, directory, pkgname, globaltimes, binary):
         d = self._render_dict(directory, pkgname, globaltimes, binary)
         return self._template.render(d)
-
-    def get_regrid_methods(self) -> Optional[dict[str, Tuple[RegridderType, str]]]:
-        return self._regrid_method
 
 
 class StorageCoefficient(StorageBase):
@@ -262,11 +259,13 @@ class StorageCoefficient(StorageBase):
             DTypeSchema(np.floating),
             IndexesSchema(),
             PKG_DIMS_SCHEMA,
+            AllCoordsValueSchema("layer", ">", 0),
         ),
         "specific_yield": (
             DTypeSchema(np.floating),
             IndexesSchema(),
             PKG_DIMS_SCHEMA,
+            AllCoordsValueSchema("layer", ">", 0),
         ),
         "transient": (
             DTypeSchema(np.bool_),
@@ -277,6 +276,7 @@ class StorageCoefficient(StorageBase):
             DTypeSchema(np.integer),
             IndexesSchema(),
             PKG_DIMS_SCHEMA,
+            AllCoordsValueSchema("layer", ">", 0),
         ),
         "save_flows": (DTypeSchema(np.bool_), DimsSchema()),
     }
@@ -290,19 +290,9 @@ class StorageCoefficient(StorageBase):
             AllValueSchema(">=", 0.0),
             IdentityNoDataSchema(other="idomain", is_other_notnull=(">", 0)),
         ),
-        "convertible": (
-            IdentityNoDataSchema(other="idomain", is_other_notnull=(">", 0)),
-            # No need to check coords: dataset ensures they align with idomain.
-        ),
     }
-
-    _regrid_method = {
-        "convertible": (RegridderType.OVERLAP, "mode"),
-        "storage_coefficient": (RegridderType.OVERLAP, "mean"),
-        "specific_yield": (RegridderType.OVERLAP, "mean"),
-    }
-
     _template = Package._initialize_template(_pkg_id)
+    _regrid_method = StorageCoefficientRegridMethod()
 
     @init_log_decorator()
     def __init__(
@@ -324,10 +314,63 @@ class StorageCoefficient(StorageBase):
         super().__init__(dict_dataset)
         self._validate_init_schemata(validate)
 
-    def render(self, directory, pkgname, globaltimes, binary):
+    def _render(self, directory, pkgname, globaltimes, binary):
         d = self._render_dict(directory, pkgname, globaltimes, binary)
         d["storagecoefficient"] = True
         return self._template.render(d)
 
-    def get_regrid_methods(self) -> Optional[dict[str, Tuple[RegridderType, str]]]:
-        return self._regrid_method
+    @classmethod
+    def from_imod5_data(
+        cls,
+        imod5_data: dict[str, dict[str, GridDataArray]],
+        target_grid: GridDataArray,
+        regridder_types: Optional[DataclassType] = None,
+        regrid_cache: RegridderWeightsCache = RegridderWeightsCache(),
+    ) -> "StorageCoefficient":
+        """
+        Construct a StorageCoefficient-package from iMOD5 data, loaded with the
+        :func:`imod.formats.prj.open_projectfile_data` function.
+
+        .. note::
+
+            The method expects the iMOD5 model to be fully 3D, not quasi-3D.
+
+        Parameters
+        ----------
+        imod5_data: dict
+            Dictionary with iMOD5 data. This can be constructed from the
+            :func:`imod.formats.prj.open_projectfile_data` method.
+        target_grid: GridDataArray
+            The grid that should be used for the new package. Does not
+            need to be identical to one of the input grids.
+        regridder_types: StorageCoefficientRegridMethod, optional
+            Optional dataclass with regridder types for a specific variable.
+            Use this to override default regridding methods.
+        regrid_cache: RegridderWeightsCache, optional
+            stores regridder weights for different regridders. Can be used to speed up regridding,
+            if the same regridders are used several times for regridding different arrays.
+
+        Returns
+        -------
+        Modflow 6 StorageCoefficient package. Its specific yield is 0 and it's transient if any storage_coefficient
+             is larger than 0. All cells are set to inconvertible (they stay confined throughout the simulation)
+        """
+
+        data = {
+            "storage_coefficient": imod5_data["sto"]["storage_coefficient"],
+        }
+
+        if regridder_types is None:
+            regridder_types = cls.get_regrid_methods()
+
+        new_package_data = _regrid_package_data(
+            data, target_grid, regridder_types, regrid_cache, {}
+        )
+
+        new_package_data["convertible"] = zeros_like(target_grid, dtype=int)
+        new_package_data["transient"] = np.any(
+            new_package_data["storage_coefficient"].values > 0
+        )
+        new_package_data["specific_yield"] = None
+
+        return cls(**new_package_data, validate=True, save_flows=False)

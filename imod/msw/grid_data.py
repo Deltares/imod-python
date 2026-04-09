@@ -1,12 +1,25 @@
+import warnings
+
 import numpy as np
 import xarray as xr
 
+from imod.common.interfaces.iregridpackage import IRegridPackage
+from imod.mf6 import StructuredDiscretization
 from imod.msw.fixed_format import VariableMetaData
 from imod.msw.pkgbase import MetaSwapPackage
-from imod.util.spatial import spatial_reference
+from imod.msw.regrid.regrid_schemes import GridDataRegridMethod
+from imod.msw.utilities.imod5_converter import (
+    get_cell_area_from_imod5_data,
+    get_landuse_from_imod5_data,
+    get_rootzone_depth_from_imod5_data,
+    is_msw_active_cell,
+)
+from imod.msw.utilities.mask import MetaSwapActive, mask_and_broadcast_pkg_data
+from imod.typing import Imod5DataDict
+from imod.util.spatial import get_cell_area, spatial_reference
 
 
-class GridData(MetaSwapPackage):
+class GridData(MetaSwapPackage, IRegridPackage):
     """
     This contains the grid data of MetaSWAP.
 
@@ -50,6 +63,8 @@ class GridData(MetaSwapPackage):
     _without_subunit = ("surface_elevation", "soil_physical_unit")
     _to_fill = ("soil_physical_unit_string", "temp")
 
+    _regrid_method = GridDataRegridMethod()
+
     def __init__(
         self,
         area: xr.DataArray,
@@ -60,6 +75,7 @@ class GridData(MetaSwapPackage):
         active: xr.DataArray,
     ):
         super().__init__()
+
         self.dataset["area"] = area
         self.dataset["landuse"] = landuse
         self.dataset["rootzone_depth"] = rootzone_depth
@@ -69,21 +85,64 @@ class GridData(MetaSwapPackage):
 
         self._pkgcheck()
 
-    def generate_index_array(self):
+    def _generate_isactive_array(self) -> xr.DataArray:
         """
-        Generate index arrays to be used on other packages
+        Generate a 1D array of active cells to be used on other packages.
+
+        Returns
+        -------
+        np.ndarray
+            A 1D array with which cells are active.
         """
         area = self.dataset["area"]
         active = self.dataset["active"]
 
         isactive = area.where(active).notnull()
+        # Load into memory to avoid dask issue
+        # https://github.com/dask/dask/issues/11753
+        isactive.load()
 
-        index = isactive.values.ravel()
+        return isactive
 
-        svat = xr.full_like(area, fill_value=0, dtype=np.int64).rename("svat")
-        svat.values[isactive.values] = np.arange(1, index.sum() + 1)
+    def generate_isactive_svat_arrays(self) -> tuple[np.ndarray, xr.DataArray]:
+        """
+        Generate index array and svat grid to be used on other packages.
 
-        return index, svat
+        Returns
+        -------
+        tuple[np.ndarray, xr.DataArray]
+            isactive array and svat grid.
+            The isactive array is a 1D array with which cells are active.
+            The svat grid is a 2D array with the SVAT numbers for each cell.
+        """
+        isactive = self._generate_isactive_array()
+        isactive_1d = isactive.values.ravel()
+
+        svat = xr.full_like(isactive, fill_value=0, dtype=np.int64).rename("svat")
+        svat.data[isactive.data] = np.arange(1, isactive_1d.sum() + 1)
+
+        return isactive_1d, svat
+
+    def generate_index_array(self) -> tuple[np.ndarray, xr.DataArray]:
+        """
+        This method is kept for backward compatibility, but will be removed in
+        future versions and will thus throw a deprecation warning. Use
+        :meth:`imod.msw.GridData.generate_isactive_svat_arrays` instead.
+
+        Generate index array and svat grid to be used on other packages.
+
+        Returns
+        -------
+        tuple[np.ndarray, xr.DataArray]
+            isactive array and svat grid.
+            The isactive array is a 1D array with which cells are active.
+            The svat grid is a 2D array with the SVAT numbers for each cell.
+        """
+        warnings.warn(
+            "Method 'generate_index_array' is deprecated and will be removed in the future, use 'generate_isactive_svat_arrays' instead.",
+            DeprecationWarning,
+        )
+        return self.generate_isactive_svat_arrays()
 
     def _pkgcheck(self):
         super()._pkgcheck()
@@ -95,7 +154,7 @@ class GridData(MetaSwapPackage):
 
         active = self.dataset["active"]
 
-        cell_area = active.astype(float) * dx * abs(dy)
+        cell_area = get_cell_area(active)
         total_area = self.dataset["area"].sum(dim="subunit")
 
         # Apparently all regional models intentionally provided area grids
@@ -106,3 +165,52 @@ class GridData(MetaSwapPackage):
             raise ValueError(
                 "Provided area grid with total areas larger than cell area"
             )
+
+    @classmethod
+    def from_imod5_data(
+        cls,
+        imod5_data: Imod5DataDict,
+        target_dis: StructuredDiscretization,
+    ) -> tuple["GridData", MetaSwapActive]:
+        """
+        Construct a MetaSWAP GridData package from iMOD5 data in the CAP
+        package, loaded with the :func:`imod.formats.prj.open_projectfile_data`
+        function.
+
+        Method does the following things:
+
+        - Computes rural area from the wetted area and urban area grids.
+        - Sets a second subunit for urban landuse (== 18).
+        - Rootzone depth is converted from cm's to m's.
+        - Determines where MetaSWAP should be active based on area grids,
+          boundary grid, and MODFLOW6 idomain.
+
+        Parameters
+        ----------
+        imod5_data: Imod5DataDict
+            iMOD5 data as returned by
+            :func:`imod.formats.prj.open_projectfile_data`
+        target_dis: imod.mf6.StructuredDiscretization
+            MODFLOW6 discretization to couple the MetaSWAP model to.
+
+        Returns
+        -------
+        imod.msw.GridData
+            GridData package
+        MetaSwapActive
+            Dataclass containing where MetaSwAP is active, per subunit, as well
+            as aggregated over subunits.
+        """
+        imod5_cap = imod5_data["cap"]
+
+        data = {}
+        data["area"] = get_cell_area_from_imod5_data(imod5_cap)
+        data["landuse"] = get_landuse_from_imod5_data(imod5_cap)
+        data["rootzone_depth"] = get_rootzone_depth_from_imod5_data(imod5_cap)
+        data["surface_elevation"] = imod5_cap["surface_elevation"]
+        data["soil_physical_unit"] = imod5_cap["soil_physical_unit"].astype(int)
+
+        msw_active = is_msw_active_cell(target_dis, imod5_cap, data["area"])
+        data_active = mask_and_broadcast_pkg_data(cls, data, msw_active)
+        data_active["active"] = msw_active.all
+        return cls(**data_active), msw_active

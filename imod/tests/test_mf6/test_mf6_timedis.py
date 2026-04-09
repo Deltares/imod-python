@@ -17,12 +17,12 @@ def test_render():
     timedis = imod.mf6.TimeDiscretization(
         timestep_duration, n_timesteps=2, timestep_multiplier=1.1
     )
-    actual = timedis.render()
+    actual = timedis._render(None, None, None, None)
     expected = textwrap.dedent(
         """\
         begin options
           time_units days
-          start_date_time 2000-01-01T00:00:00.000000000
+          start_date_time 2000-01-01T00:00:00.000000
         end options
 
         begin dimensions
@@ -77,3 +77,32 @@ def test_validate_false():
         timestep_multiplier=1.1,
         validate=False,
     )
+
+
+def test_set_ats_filename():
+    timestep_duration = xr.DataArray(
+        data=[0.001, 7.0, 365.0],
+        coords={"time": pd.date_range("2000-01-01", "2000-01-03")},
+        dims=["time"],
+    )
+    timedis = imod.mf6.TimeDiscretization(
+        timestep_duration, n_timesteps=2, timestep_multiplier=1.1
+    )
+    timedis._set_ats_filename("my_ats", imod.mf6.WriteContext("."))
+    assert "ats_filename" in timedis.dataset
+    assert timedis.dataset["ats_filename"].item().name == "my_ats.ats"
+
+
+def test_clear_ats_filename():
+    timestep_duration = xr.DataArray(
+        data=[0.001, 7.0, 365.0],
+        coords={"time": pd.date_range("2000-01-01", "2000-01-03")},
+        dims=["time"],
+    )
+    timedis = imod.mf6.TimeDiscretization(
+        timestep_duration, n_timesteps=2, timestep_multiplier=1.1
+    )
+    timedis.dataset["ats_filename"] = "some_file.ats"
+    assert "ats_filename" in timedis.dataset
+    timedis._clear_ats_filename()
+    assert "ats_filename" not in timedis.dataset

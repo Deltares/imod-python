@@ -4,9 +4,9 @@ import numpy as np
 import pandas as pd
 import xarray as xr
 
+from imod.common.utilities.grid import create_geometric_grid_info
 from imod.mf6.multimodel.exchange_creator import ExchangeCreator
 from imod.mf6.multimodel.modelsplitter import PartitionInfo
-from imod.mf6.utilities.grid import create_geometric_grid_info
 from imod.typing import GridDataArray
 
 NOT_CONNECTED_VALUE = -999
@@ -117,16 +117,18 @@ class ExchangeCreator_Structured(ExchangeCreator):
     def _create_global_to_local_idx(
         cls, partition_info: List[PartitionInfo], global_cell_indices: GridDataArray
     ) -> Dict[int, pd.DataFrame]:
+        global_cell_indices = global_cell_indices.rename("label")
         global_to_local_idx = {}
         for submodel_partition_info in partition_info:
             local_cell_indices = cls._get_local_cell_indices(submodel_partition_info)
+            local_cell_indices = local_cell_indices.rename("label")
 
             overlap = xr.merge(
                 (global_cell_indices, local_cell_indices),
                 join="inner",
                 fill_value=np.nan,
                 compat="override",
-            )["idomain"]
+            )["label"]
 
             model_id = submodel_partition_info.id
             global_to_local_idx[model_id] = pd.DataFrame(

@@ -9,12 +9,11 @@ from imod.mf6.ssm import SourceSinkMixing
 from imod.schemata import ValidationError
 
 
-@pytest.mark.usefixtures("flow_model_with_concentration")
 def test_transport_model_rendering(flow_model_with_concentration):
     directory = pathlib.Path("mymodel")
     globaltimes = np.array(["2000-01-01"], dtype="datetime64[ns]")
     m = SourceSinkMixing.from_flow_model(flow_model_with_concentration, "salinity")
-    actual = m.render(directory, "river", globaltimes, True)
+    actual = m._render(directory, "river", globaltimes, True)
     expected = textwrap.dedent(
         """\
         begin options
@@ -28,7 +27,6 @@ def test_transport_model_rendering(flow_model_with_concentration):
     assert actual == expected
 
 
-@pytest.mark.usefixtures("flow_model_with_concentration")
 def test_transport_model_multi_bcs_rendering(flow_model_with_concentration):
     directory = pathlib.Path("mymodel")
     globaltimes = np.array(["2000-01-01"], dtype="datetime64[ns]")
@@ -36,7 +34,7 @@ def test_transport_model_multi_bcs_rendering(flow_model_with_concentration):
     flow_model_with_concentration["riv-2"] = riv_new
 
     m = SourceSinkMixing.from_flow_model(flow_model_with_concentration, "salinity")
-    actual = m.render(directory, "river", globaltimes, True)
+    actual = m._render(directory, "river", globaltimes, True)
     expected = textwrap.dedent(
         """\
         begin options
@@ -51,14 +49,13 @@ def test_transport_model_multi_bcs_rendering(flow_model_with_concentration):
     assert actual == expected
 
 
-@pytest.mark.usefixtures("flow_model_with_concentration")
 def test_transport_model_rendering_settings(flow_model_with_concentration):
     directory = pathlib.Path("mymodel")
     globaltimes = np.array(["2000-01-01"], dtype="datetime64[ns]")
     m = SourceSinkMixing.from_flow_model(
         flow_model_with_concentration, "salinity", save_flows=True, print_flows=True
     )
-    actual = m.render(directory, "river", globaltimes, True)
+    actual = m._render(directory, "river", globaltimes, True)
     expected = textwrap.dedent(
         """\
         begin options

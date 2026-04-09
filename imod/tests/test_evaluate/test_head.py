@@ -1,8 +1,12 @@
 import numpy as np
 import pandas as pd
+import pytest
 import xarray as xr
+import xugrid as xu
+from pytest_cases import parametrize_with_cases
 
 import imod
+from imod.typing.grid import full_like
 
 
 def test_convert_pointwaterhead_freshwaterhead_scalar():
@@ -19,21 +23,55 @@ def test_convert_pointwaterhead_freshwaterhead_scalar():
     )
 
 
-def test_convert_pointwaterhead_freshwaterhead_da():
-    data = np.ones((3, 2, 1))
-    coords = {"layer": [1, 2, 3], "y": [0.5, 1.5], "x": [0.5]}
+def structured_grid():
+    data = np.ones((3, 2, 2))
+    coords = {"layer": [1, 2, 3], "y": [0.5, 1.5], "x": [0.5, 1.5]}
     dims = ("layer", "y", "x")
 
-    da = xr.DataArray(data, coords, dims)
-    pwh = xr.full_like(da, 4.0)
-    dens = xr.full_like(da, 1025.0)
-    z = xr.full_like(da, 1.0)
-    fwh = xr.full_like(da, 4.075)
-    fwh2 = imod.evaluate.convert_pointwaterhead_freshwaterhead(pwh, dens, z)
-    assert fwh.equals(fwh2.round(5))
+    return xr.DataArray(data, coords, dims)
 
 
-def test_calculate_gxg():
+class GridCases:
+    def case_structured(self):
+        return structured_grid()
+
+    def case_unstructured(self):
+        structured = structured_grid()
+        return xu.UgridDataArray.from_structured(structured)
+
+
+@parametrize_with_cases("da", cases=GridCases)
+def test_convert_pointwaterhead_freshwaterhead_da(da):
+    pwh = full_like(da, 4.0)
+    dens = full_like(da, 1025.0)
+    z = full_like(da, 1.0)
+    fwh_expected = full_like(da, 4.075)
+    fwh_actual = imod.evaluate.convert_pointwaterhead_freshwaterhead(pwh, dens, z)
+    assert type(fwh_actual) is type(da)
+    assert fwh_expected.equals(fwh_actual.round(5))
+
+
+@parametrize_with_cases("da", cases=GridCases)
+def test_convert_pointwaterhead_freshwaterhead_backfill(da):
+    # edge case: point water head below z
+    # return freshwater head of top underlying cell where elevation < pointwaterhead
+    # only for grids with layers
+    #
+    # Test this by setting point water head in top layer to 0.0. This should
+    # trigger a backfill with the value from layer 2, which is 4.075. So in the
+    # end, test results should be 4.075 everywhere.
+    pwh = full_like(da, 4.0)
+    pwh[0, ...] = 0.0
+    dens = full_like(da, 1025.0)
+    z = full_like(da, 1.0)
+    fwh_expected = full_like(da, 4.075)
+    fwh_actual = imod.evaluate.convert_pointwaterhead_freshwaterhead(pwh, dens, z)
+    assert type(fwh_actual) is type(da)
+    assert fwh_expected.equals(fwh_actual.round(5))
+
+
+@pytest.mark.parametrize("chunk", [False, True])
+def test_calculate_gxg(chunk: bool):
     data = (np.ones((1, 2, 49)) * np.arange(49)).T
     coords = {
         "time": pd.date_range("2000-04-01", periods=49, freq="SMS"),
@@ -42,6 +80,8 @@ def test_calculate_gxg():
     }
     dims = ("time", "y", "x")
     da = xr.DataArray(data, coords, dims)
+    if chunk:
+        da = da.chunk({"time": 1})
 
     coords_ref = {"y": [0.5, 1.5], "x": [0.5]}
     dims_ref = ("y", "x")
@@ -59,7 +99,8 @@ def test_calculate_gxg():
     assert gxg["ghg"].round(5).equals(0 - ghg_ref)
 
 
-def test_calculate_gxg_nan():
+@pytest.mark.parametrize("chunk", [False, True])
+def test_calculate_gxg_nan(chunk: bool):
     data = (np.ones((1, 2, 49)) * np.arange(49)).T
     # This invalidates the second year: it no longer forms a complete
     # "hydrological year" with 24 entries.
@@ -72,6 +113,8 @@ def test_calculate_gxg_nan():
     }
     dims = ("time", "y", "x")
     da = xr.DataArray(data, coords, dims)
+    if chunk:
+        da = da.chunk({"time": 1})
 
     coords_ref = {"y": [0.5, 1.5], "x": [0.5]}
     dims_ref = ("y", "x")

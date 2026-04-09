@@ -1,5 +1,5 @@
 from pathlib import Path
-from typing import Optional, Union
+from typing import Optional, Self, Union
 
 import cftime
 import numpy as np
@@ -38,13 +38,14 @@ class GWFGWF(ExchangeBase):
         angldegx: Optional[xr.DataArray] = None,
         cdist: Optional[xr.DataArray] = None,
     ):
+        ihc = ones_like(cl1, dtype=int)
         dict_dataset = {
             "cell_id1": cell_id1,
             "cell_id2": cell_id2,
             "layer": layer,
             "model_name_1": model_id1,
             "model_name_2": model_id2,
-            "ihc": ones_like(cl1, dtype=int),
+            "ihc": ihc,
             "cl1": cl1,
             "cl2": cl2,
             "hwva": hwva,
@@ -53,9 +54,9 @@ class GWFGWF(ExchangeBase):
 
         auxiliary_variables = [var for var in [angldegx, cdist] if var is not None]
         if auxiliary_variables:
-            self.dataset["auxiliary_data"] = xr.merge(auxiliary_variables).to_array(
-                name="auxiliary_data"
-            )
+            self.dataset["auxiliary_data"] = xr.merge(
+                auxiliary_variables, compat="no_conflicts"
+            ).to_array(name="auxiliary_data")
             expand_transient_auxiliary_variables(self)
 
     def set_options(
@@ -90,10 +91,11 @@ class GWFGWF(ExchangeBase):
         y_max: Optional[float] = None,
         top: Optional[GridDataArray] = None,
         bottom: Optional[GridDataArray] = None,
-    ) -> Package:
+    ) -> Self:
+        """This package cannot be clipped by a bounding box."""
         raise NotImplementedError("this package cannot be clipped")
 
-    def render(
+    def _render(
         self,
         directory: Path,
         pkgname: str,

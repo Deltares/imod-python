@@ -16,7 +16,9 @@ except ImportError:
     ctx = MissingOptionalModule("contextily")
 
 
-def read_imod_legend(path):
+def read_imod_legend(
+    path: str | pathlib.Path,
+) -> tuple[list[str], list[float], list[str]]:
     """
     Parameters
     ----------
@@ -28,24 +30,26 @@ def read_imod_legend(path):
     colors : List of hex colors of length N.
     levels : List of floats of length N-1. These are the boundaries between
         the legend colors/classes.
+    labels : List of strings of length N. These are the labels for the
+        legend colors/classes.
     """
 
     # Read file. Do not rely the headers in the leg file.
-    def _read(delim_whitespace):
+    def _read(sep):
         return pd.read_csv(
             path,
             header=1,
-            delim_whitespace=delim_whitespace,
+            sep=sep,
             index_col=False,
-            usecols=[0, 1, 2, 3, 4],
-            names=["upper", "lower", "red", "green", "blue"],
+            usecols=[0, 1, 2, 3, 4, 5],
+            names=["upper", "lower", "red", "green", "blue", "labels"],
         )
 
     # Try both comma and whitespace separated
     try:
-        legend = _read(delim_whitespace=False)
+        legend = _read(sep=",")
     except ValueError:
-        legend = _read(delim_whitespace=True)
+        legend = _read(sep=r"\s+")
 
     # The colors in iMOD are formatted in RGB. Format to hexadecimal.
     red = legend["red"]
@@ -53,8 +57,9 @@ def read_imod_legend(path):
     green = legend["green"]
     colors = [f"#{r:02x}{g:02x}{b:02x}" for r, g, b in zip(red, green, blue)][::-1]
     levels = list(legend["lower"])[::-1][1:]
+    labels = list(legend["labels"])[::-1]
 
-    return colors, levels
+    return colors, levels, labels
 
 
 def _crs2string(crs):
@@ -206,8 +211,7 @@ def plot_map(
     # Catch case first where no figure provided, but ax was provided
     if fig is None and ax is not None:
         raise ValueError(
-            "Axes provided, yet no figure is provided. "
-            "Please provide a figure as well."
+            "Axes provided, yet no figure is provided. Please provide a figure as well."
         )
     if fig is None:
         fig = plt.figure(figsize=figsize)

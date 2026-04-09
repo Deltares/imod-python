@@ -11,7 +11,7 @@ def test_render_simple():
     directory = pathlib.Path("mymodel")
     globaltimes = np.array(["2000-01-01"], dtype="datetime64[ns]")
     m = MobileStorageTransfer(0.3)
-    actual = m.render(directory, "mst", globaltimes, True)
+    actual = m._render(directory, "mst", globaltimes, True)
     expected = textwrap.dedent(
         """\
         begin options
@@ -25,14 +25,6 @@ def test_render_simple():
     assert actual == expected
 
 
-@pytest.mark.usefixtures(
-    "porosity_fc",
-    "decay_fc",
-    "decay_sorbed_fc",
-    "bulk_density_fc",
-    "distcoef_fc",
-    "sp2_fc",
-)
 def test_render_first_order_decay(
     porosity_fc, decay_fc, decay_sorbed_fc, bulk_density_fc, distcoef_fc, sp2_fc
 ):
@@ -48,7 +40,7 @@ def test_render_first_order_decay(
         first_order_decay=True,
         sorption="langmuir",
     )
-    actual = m.render(directory, "mst", globaltimes, True)
+    actual = m._render(directory, "mst", globaltimes, True)
     expected = textwrap.dedent(
         """\
         begin options
@@ -90,7 +82,7 @@ def test_render_zero_order_decay(
         sorption="langmuir",
         zero_order_decay=True,
     )
-    actual = m.render(directory, "mst", globaltimes, True)
+    actual = m._render(directory, "mst", globaltimes, True)
     expected = textwrap.dedent(
         """\
         begin options

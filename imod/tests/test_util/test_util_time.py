@@ -4,6 +4,7 @@ import cftime
 import numpy as np
 import pandas as pd
 import pytest
+from pytest_cases import parametrize_with_cases
 
 import imod
 from imod.util.time import _check_year, forcing_starts_ends, to_datetime_internal
@@ -138,3 +139,35 @@ def test_forcing__irregular_day():
         package_times=package_times, globaltimes=globaltimes
     )
     assert starts_ends == ["1", "2:4", "5", "6"]
+
+
+class DateTimeCases:
+    def case_Y(self):
+        return ["2000", "2001", "9999"]
+
+    def case_Ymd(self):
+        return ["20000101", "20000102", "99990101"]
+
+    def case_YmdH(self):
+        return ["2000010100", "2000010200", "9999010100"]
+
+    def case_YmdHM(self):
+        return ["200001010000", "200001020000", "999901010000"]
+
+    def case_YmdHMS(self):
+        return ["20000101000000", "20000102000000", "99990101000000"]
+
+
+@parametrize_with_cases("datestr", cases=DateTimeCases)
+def test_to_pandas_datetime_series(datestr):
+    """
+    Test whether behavior of pandas stays similar to the past, since pandas 2
+    and 3 have different base time units (ns vs us). The function should be able to handle
+    both cases, but the test is to check if the behavior of pandas has changed
+    in a way that affects the function.
+    """
+    series = pd.Series(datestr)
+    datetime_series = imod.util.time.to_pandas_datetime_series(series)
+    assert datetime_series.dtype == np.dtype("datetime64[us]")
+    assert datetime_series.iloc[0] == np.datetime64("2000-01-01", "us")
+    assert datetime_series.iloc[-1] == np.datetime64("9999-01-01", "us")

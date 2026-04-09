@@ -1,4 +1,5 @@
 import copy
+from pathlib import Path
 
 import numpy as np
 import pandas as pd
@@ -167,7 +168,6 @@ def circle_model():
     return make_circle_model()
 
 
-@pytest.mark.usefixtures("circle_model")
 @pytest.fixture(scope="session")
 def circle_result(tmpdir_factory):
     # Using a tmpdir_factory is the canonical way of sharing a tempory pytest
@@ -175,6 +175,31 @@ def circle_result(tmpdir_factory):
     modeldir = tmpdir_factory.mktemp("circle")
     simulation = make_circle_model()
     simulation.write(modeldir)
+    simulation.run()
+    return modeldir
+
+
+@pytest.fixture(scope="session")
+def circle_result__offset_origins(tmpdir_factory):
+    # Using a tmpdir_factory is the canonical way of sharing a tempory pytest
+    # directory between different testing modules.
+    modeldir = tmpdir_factory.mktemp("circle")
+    simulation = make_circle_model()
+    simulation.write(modeldir)
+    gwf_dir = Path(modeldir) / "GWF_1"
+    # Custom rendering of the disv package to offset the origin
+    disv_pkg = simulation["GWF_1"]["disv"]
+    render_dict = disv_pkg._get_render_dictionary(gwf_dir, "disv", None, True)
+    # Original grid ranges from -1000.0 to 1000.0, shift to 9000.0 to 11000.0
+    render_dict["xorigin"] = 10000.0
+    render_dict["yorigin"] = 10000.0
+    rendered = disv_pkg._template.render(render_dict)
+    filename = gwf_dir / "disv.disv"
+    with open(filename, "w") as f:
+        f.write(rendered)
+    # Append vertices and cell2d data to the block file
+    disv_pkg._append_vertices_and_cell2d(filename)
+    # Run
     simulation.run()
     return modeldir
 
@@ -213,12 +238,11 @@ def make_circle_model_evt():
     return simulation
 
 
-@pytest.fixture(scope="session")
+@pytest.fixture(scope="function")
 def circle_model_evt():
     return make_circle_model_evt()
 
 
-@pytest.mark.usefixtures("circle_model_evt")
 @pytest.fixture(scope="session")
 def circle_result_evt(tmpdir_factory):
     # Using a tmpdir_factory is the canonical way of sharing a tempory pytest
@@ -252,7 +276,6 @@ def circle_result_sto(tmpdir_factory):
     return modeldir
 
 
-@pytest.mark.usefixtures("circle_model_evt")
 @pytest.fixture(scope="function")
 def circle_partitioned():
     simulation = make_circle_model_evt()
@@ -314,8 +337,86 @@ def circle_model_transport():
     # Define the maximum concentration as the initial conditions, also output
     # options for the transport model, and assign the transport model to the
     # simulation as well.
+    transport_model["ic"] = imod.mf6.InitialConditions(start=max_concentration)
+    transport_model["oc"] = imod.mf6.OutputControl(
+        save_concentration="last", save_budget="last"
+    )
+
+    simulation["transport"] = transport_model
+    simulation["transport_solver"] = imod.mf6.Solution(
+        modelnames=["transport"],
+        print_option="summary",
+        outer_dvclose=1.0e-4,
+        outer_maximum=500,
+        under_relaxation=None,
+        inner_dvclose=1.0e-4,
+        inner_rclose=0.001,
+        inner_maximum=100,
+        linear_acceleration="bicgstab",
+        scaling_method=None,
+        reordering_method=None,
+        relaxation_factor=0.97,
+    )
+    simtimes = pd.date_range(start="2000-01-01", end="2001-01-01", freq="W")
+    simulation.create_time_discretization(additional_times=simtimes)
+    return simulation
+
+
+@pytest.fixture(scope="function")
+def circle_model_transport_vsc():
+    al = 0.001
+    porosity = 0.3
     max_concentration = 35.0
     min_concentration = 0.0
+    max_density = 1025.0
+    min_density = 1000.0
+
+    simulation = make_circle_model_flow_with_transport_data(["salinity"])
+    gwf_model = simulation["GWF_1"]
+
+    slope = (max_density - min_density) / (max_concentration - min_concentration)
+    gwf_model["buoyancy"] = imod.mf6.Buoyancy(
+        reference_density=min_density,
+        modelname=["transport"],
+        reference_concentration=[min_concentration],
+        density_concentration_slope=[slope],
+        species=["salinity"],
+    )
+    gwf_model["vsc"] = imod.mf6.Viscosity(
+        reference_viscosity=8.904e-04,
+        viscosity_concentration_slope=[3.3e-5],
+        reference_concentration=[min_concentration],
+        modelname=["transport"],
+        species=["salinity"],
+        viscosityfile="viscosity.bin",
+    )
+    transport_model = imod.mf6.GroundwaterTransportModel(save_flows=True)
+    transport_model["ssm"] = imod.mf6.SourceSinkMixing.from_flow_model(
+        gwf_model, "salinity", save_flows=True
+    )
+    transport_model["disv"] = gwf_model["disv"]
+
+    # %%
+    # Now we define some transport packages for simulating the physical processes
+    # of advection, mechanical dispersion, and molecular diffusion dispersion. This
+    # example is transient, and the volume available for storage is the porosity,
+    # in this case 0.10.
+
+    transport_model["dsp"] = imod.mf6.Dispersion(
+        diffusion_coefficient=1e-4,
+        longitudinal_horizontal=al,
+        transversal_horizontal1=al * 0.1,
+        transversal_vertical=al * 0.01,
+        xt3d_off=False,
+        xt3d_rhs=False,
+    )
+    transport_model["adv"] = imod.mf6.AdvectionUpstream()
+    transport_model["mst"] = imod.mf6.MobileStorageTransfer(porosity, save_flows=True)
+
+    # %%
+    # Define the maximum concentration as the initial conditions, also output
+    # options for the transport model, and assign the transport model to the
+    # simulation as well.
     transport_model["ic"] = imod.mf6.InitialConditions(start=max_concentration)
     transport_model["oc"] = imod.mf6.OutputControl(
         save_concentration="last", save_budget="last"

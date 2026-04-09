@@ -2,6 +2,8 @@
 from .sample_data import (
     ahn,
     circle,
+    colleagues_river_data,
+    fetch_imod5_model,
     fluxes,
     head_observations,
     hondsrug_crosssection,
@@ -15,5 +17,7 @@ from .sample_data import (
     hondsrug_simulation,
     imod5_projectfile_data,
     lakes_shp,
+    lhm_clip_triangular_grid,
+    tutorial_03,
     twri_output,
 )

@@ -5,9 +5,9 @@ build-backend = "hatchling.build"
 [project]
 name = "imod"
 dynamic = ["version"]
-requires-python = ">=3.10"
-authors = [{ name = "Deltares", email = "huite.bootsma@deltares.nl" }, ]
-maintainers = [{ name = "Deltares", email = "huite.bootsma@deltares.nl" }]
+requires-python = ">=3.11"
+authors = [{ name = "Deltares", email = "imod.info@deltares.nl" }, ]
+maintainers = [{ name = "Deltares", email = "imod.info@deltares.nl" }]
 description = "Make massive MODFLOW models!"
 readme = "README.rst"
 license = { file = "LICENSE" }
@@ -20,8 +20,9 @@ classifiers = [
     "Operating System :: OS Independent",
     "Programming Language :: Python",
     "Programming Language :: Python :: 3",
-    "Programming Language :: Python :: 3.10",
     "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
     "Programming Language :: Python :: Implementation :: CPython",
     "Topic :: Scientific/Engineering"
 ]
@@ -29,7 +30,8 @@ dependencies = [
     "affine",
     "cftime >=1",
     "dask",
-    "fastcore",
+    "plum-dispatch",
+    "filelock",
     "Jinja2",
     "loguru",
     "matplotlib",
@@ -37,13 +39,14 @@ dependencies = [
     "numpy",
     "pandas",
     "pooch",
+    "pydantic",
     "scipy",
     "tomli >= 1.1.0",
     "tomli_w",
     "toolz",
     "tqdm",
     "xarray >=2023.08.0",
-    "xugrid >=0.9.0",
+    "xugrid >=0.14.0",
 ]
 
 [project.urls]
@@ -72,17 +75,15 @@ exclude_lines = [
 ]
 
 [tool.ruff.lint]
-select = ["C4", "E", "F", "I", "PD"]
+select = ["C4", "E", "F", "I", "NPY201", "PD"]
 ignore = [
     "E501", # line-too-long. This rule can't be fullfilled by the ruff formatter. The same behavior as black.
     "PD003",
     "PD004",
-    "PD901",
     "PD011",
     "PD013",
     "PD015",
 ]
-ignore-init-module-imports = true
 
 [tool.ruff.lint.pydocstyle]
 convention = "numpy"
@@ -95,52 +96,64 @@ convention = "numpy"
 "examples/*" = ["E402"]
 
 [tool.mypy]
-files = [
-    "imod/mf6/**.py",
-    "imod/msw/**.py",    
-    "imod/logging/**.py",
-    "imod/prepare/**.py",  
-    "imod/select/**.py",
-    "imod/typing/**.py",    
-    "imod/util/**.py",          
+packages = ["imod"]
+exclude = [
+    "imod/common",
+    "imod/data",
+    "imod/evaluate",
+    "imod/formats",
+    "imod/schemata.py",
+    "imod/templates",
+    "imod/tests",
+    "imod/visualize",
+    "imod/wq",
 ]
-follow_imports = "silent"
-warn_unused_configs = true
+follow_imports = "normal"
+strict = true
+
+# These shouldn't be too much additional work, but may be tricky to
+# get passing if you use a lot of untyped libraries
+disallow_any_generics = false
+
+# These next few are various gradations of forcing use of type annotations
+disallow_untyped_calls = false
+disallow_incomplete_defs = false
+disallow_untyped_defs = false
+
+# This one isn't too hard to get passing, but return on investment is lower
+no_implicit_reexport = false
+
+# This one can be tricky to get passing if you use a lot of untyped libraries
+warn_return_any = false
 
 [[tool.mypy.overrides]]
-module = ['mf6', 'logging']
-follow_imports = "normal"
+module = ["imod.msw.*"]
+check_untyped_defs = false
 
 [[tool.mypy.overrides]]
 module = [
+    # No stubs available
     "affine.*",
-    "bottleneck.*",
     "cftime.*",
-    "contextily.*",
-    "dateutil.*",
-    "flopy.*",
-    "fastcore.*",
-    "geopandas.*",
-    "matplotlib.*",
-    "mpl_toolkits.*",
     "numba.*",
     "osgeo.*",
-    "pandas.*",
-    "pooch.*",
-    "pyproj.*",
     "rasterio.*",
+    "xugrid.*",
+    # Stubs available, but too much work to fix right now
+    "dateutil.*",
+    "geopandas.*",
+    "pandas.*",
     "scipy.*",
     "shapely.*",
-    "tomllib.*",
-    "tqdm.*",
-    "vtk.*",
-    "xugrid.*",
 ]
 ignore_missing_imports = true
 
 [tool.pytest.ini_options]
 markers = [
     "example: marks test as example (deselect with '-m \"not example\"')",
+    "user_acceptance: marks user acceptance tests (deselect with '-m \"not user_acceptance\"')",
+    "unittest_jit: marks unit tests that should be jitted (deselect with '-m \"not unittest_jit\"')",
+    "qgis_export: marks tests that export to QGIS (deselect with '-m \"not qgis_export\"')",
 ]
 
 [tool.hatch.version]

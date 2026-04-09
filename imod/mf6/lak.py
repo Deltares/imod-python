@@ -8,6 +8,8 @@ create a lake package.
 import pathlib
 import textwrap
 from collections import defaultdict
+from pathlib import Path
+from typing import Any, Dict
 
 import jinja2
 import numpy as np
@@ -272,13 +274,13 @@ def create_connection_data(lakes):
         )
         cell_ids.append(cell_id)
 
-    connection_data = {
+    connection_data_dict = {
         k: xr.DataArray(data=np.concatenate(v), dims=[CONNECTION_DIM])
         for k, v in connection_data.items()
     }
 
-    connection_data["connection_cell_id"] = xr.concat(cell_ids, dim=CONNECTION_DIM)
-    return connection_data
+    connection_data_dict["connection_cell_id"] = xr.concat(cell_ids, dim=CONNECTION_DIM)
+    return connection_data_dict
 
 
 def create_outlet_data(outlets, name_to_number):
@@ -322,10 +324,10 @@ def create_outlet_data(outlets, name_to_number):
                 value = np.nan
             outlet_data[f"outlet_{var}"].append(value)
 
-    outlet_data = {
+    outlet_data_dict = {
         k: xr.DataArray(data=v, dims=[OUTLET_DIM]) for k, v in outlet_data.items()
     }
-    return outlet_data
+    return outlet_data_dict
 
 
 def concatenate_timeseries(list_of_lakes_or_outlets, timeseries_name):
@@ -347,14 +349,17 @@ def concatenate_timeseries(list_of_lakes_or_outlets, timeseries_name):
                 list_of_indices.append(index + 1)
 
         index = index + 1
+
     if len(list_of_dataarrays) == 0:
         return None
-    fill_value = np.nan
-    if not pd.api.types.is_numeric_dtype(list_of_dataarrays[0].dtype):
-        fill_value = ""
+
+    fill_value = (
+        "" if not pd.api.types.is_numeric_dtype(list_of_dataarrays[0].dtype) else np.nan
+    )
     out = xr.concat(
         list_of_dataarrays, join="outer", dim="index", fill_value=fill_value
     )
+
     out = out.assign_coords(index=list_of_indices)
     return out
 
@@ -666,6 +671,9 @@ class Lake(BoundaryCondition):
             DTypeSchema(np.floating),
             DimsSchema("index", "time") | DimsSchema(),
         ],
+        "budgetcsvfile": [DTypeSchema(str) | DTypeSchema(Path)],
+        "stagefile": [DTypeSchema(str) | DTypeSchema(Path)],
+        "budgetfile": [DTypeSchema(str) | DTypeSchema(Path)],
     }
 
     _write_schemata = {
@@ -901,7 +909,7 @@ class Lake(BoundaryCondition):
         x[idx[0][:]] = ""
         return x.astype(str)
 
-    def render(self, directory, pkgname, globaltimes, binary):
+    def _render(self, directory, pkgname, globaltimes, binary):
         d = {}
         for var in (
             "print_input",
@@ -987,9 +995,9 @@ class Lake(BoundaryCondition):
         df = self.dataset[outlet_vars].to_dataframe()
         return df
 
-    def write_blockfile(self, pkgname, globaltimes, write_context: WriteContext):
+    def _write_blockfile(self, pkgname, globaltimes, write_context: WriteContext):
         renderdir = pathlib.Path(write_context.write_directory.stem)
-        content = self.render(
+        content = self._render(
             directory=renderdir,
             pkgname=pkgname,
             globaltimes=globaltimes,
@@ -1047,7 +1055,7 @@ class Lake(BoundaryCondition):
             for tssname in self._period_data:
                 if len(period_data[tssname].dims) > 0:
                     for index in period_data.coords["index"].values:
-                        value = period_data[tssname].sel(index=index).values[()]
+                        value = period_data[tssname].sel(index=index).item()
                         isvalid = False
                         if isinstance(value, str):
                             isvalid = value != ""
@@ -1075,7 +1083,7 @@ class Lake(BoundaryCondition):
             )
         )
 
-        d = {}
+        d: Dict[str, Any] = {}
         d["nperiod"] = len(period_data_list)
         d["periods"] = period_data_list
 
@@ -1161,10 +1169,7 @@ class Lake(BoundaryCondition):
             has_barea_column = "barea" in table.coords["column"]
             if has_barea_column:
                 barea_column = table.sel({"column": "barea"})
-                has_barea_column = (
-                    barea_column.where(pd.api.types.is_numeric_dtype).count().values[()]
-                    > 0
-                )
+                has_barea_column = barea_column.notnull().any().item()
 
             columns = ["stage", "sarea", "volume"]
             if has_barea_column:
@@ -1207,11 +1212,35 @@ class Lake(BoundaryCondition):
         f.write(f"end {title}\n")
         return
 
-    def is_splitting_supported(self) -> bool:
+    def _is_splitting_supported(self) -> bool:
+        """
+        Return True if this package supports splitting.
+
+        Returns
+        -------
+        bool
+            True if this package supports splitting, False otherwise.
+        """
         return False
 
-    def is_regridding_supported(self) -> bool:
+    def _is_regridding_supported(self) -> bool:
+        """
+        Return True if this package supports regridding.
+
+        Returns
+        -------
+        bool
+            True if this package supports regridding, False otherwise.
+        """
         return False
 
-    def is_clipping_supported(self) -> bool:
+    def _is_clipping_supported(self) -> bool:
+        """
+        Return True if this package supports clipping.
+
+        Returns
+        -------
+        bool
+            True if this package supports clipping, False otherwise.
+        """
         return False

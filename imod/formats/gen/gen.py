@@ -53,6 +53,7 @@ def parse_ascii_segments(lines: List[str]):
 
     first_coord = features[0][1:][0]
     has_whitespace = _infer_delimwhitespace(first_coord, 2)
+    sep = r"\s+" if has_whitespace else ","
 
     vertex_coords = []
     for i, feature in enumerate(features):
@@ -60,9 +61,7 @@ def parse_ascii_segments(lines: List[str]):
         # Use pd.read_csv instead of np.loadtxt, since it supports files
         # delimited with multiple whitespace characters.
         feature_buffer = io.StringIO(initial_value="\n".join(feature[1:]))
-        coords_df = pd.read_csv(
-            feature_buffer, delim_whitespace=has_whitespace, header=None
-        )
+        coords_df = pd.read_csv(feature_buffer, sep=sep, header=None)
         coords = coords_df.values
         is_polygon[i] = (coords[0] == coords[-1]).all()
         vertex_coords.append(coords)
@@ -268,7 +267,7 @@ def read_binary(path: Union[str, Path]) -> "geopandas.GeoDataFrame":  # type: ig
     else:
         df = pd.DataFrame()
     df["feature_type"] = feature_type
-    df["feature_type"] = df["feature_type"].replace(GENTYPE_TO_NAME)
+    df["feature_type"] = df["feature_type"].replace(GENTYPE_TO_NAME).astype(str)
 
     geometry = []
     for ftype, geom in zip(feature_type, xy):

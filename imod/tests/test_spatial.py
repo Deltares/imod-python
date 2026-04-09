@@ -7,6 +7,7 @@ import pytest
 import shapely.geometry as sg
 import xarray as xr
 from pytest_cases import parametrize_with_cases
+from shapely.geometry import Polygon
 
 import imod
 from imod.testing import assert_frame_equal
@@ -42,13 +43,11 @@ def test_round_extent():
     cellsize = 5.0
     expected = (0.0, 0.0, 55.0, 55.0)
     assert imod.prepare.spatial.round_extent(extent, cellsize) == expected
-    # Test if previous namespace available.
-    assert imod.util.round_extent(extent, cellsize) == expected
 
 
 def test_fill():
-    da = xr.DataArray([np.nan, 1.0, 2.0], {"x": [1, 2, 3]}, ("x",))
-    expected = xr.DataArray([1.0, 1.0, 2.0], {"x": [1, 2, 3]}, ("x",))
+    da = xr.DataArray([[np.nan, 1.0, 2.0]], {"x": [1, 2, 3], "y": [1]}, ("y", "x"))
+    expected = xr.DataArray([[1.0, 1.0, 2.0]], {"x": [1, 2, 3], "y": [1]}, ("y", "x"))
     actual = imod.prepare.spatial.fill(da)
     assert actual.identical(expected)
 
@@ -64,8 +63,8 @@ def test_fill():
     expected_x = xr.DataArray(
         [[2.0, 2.0, 1.0], [2.0, 2.0, 2.0]], {"x": [1, 2, 3], "y": [1, 2]}, ("y", "x")
     )
-    actual_x = imod.prepare.spatial.fill(da, by="x")
-    actual_y = imod.prepare.spatial.fill(da, by="y")
+    actual_x = imod.prepare.spatial.fill(da, dims=("y",))
+    actual_y = imod.prepare.spatial.fill(da, dims=("x",))
     assert actual_x.identical(expected_x)
     assert actual_y.identical(expected_y)
 
@@ -81,21 +80,7 @@ def test_laplace_interpolate():
     da = xr.DataArray(data, **kwargs)
     # remove some values
     da.values[:, 1] = np.nan
-    actual = imod.prepare.laplace_interpolate(da, mxiter=5, iter1=30)
-    assert np.allclose(actual.values, 1.0)
-
-    ibound = xr.full_like(da, True)
-    ibound.values[1, 1] = False
-    actual = imod.prepare.laplace_interpolate(da, ibound=ibound, mxiter=5, iter1=30)
-    assert np.isnan(actual.values[1, 1])
-    actual.values[1, 1] = 1.0
-    assert np.allclose(actual.values, 1.0)
-
-    da.values[:] = 1.0
-    da.values[1, :] = np.nan
-    actual = imod.prepare.laplace_interpolate(da, ibound=ibound, mxiter=5, iter1=30)
-    assert np.isnan(actual.values[1, 1])
-    actual.values[1, 1] = 1.0
+    actual = imod.prepare.laplace_interpolate(da, maxiter=50)
     assert np.allclose(actual.values, 1.0)
 
 
@@ -134,6 +119,50 @@ def test_polygonize():
     assert sorted(gdf["value"]) == [1.0, 2.0, 3.0]
 
 
+def fits_exact_hole(parent: Polygon, child: Polygon, tol=0.0) -> bool:
+    hole_polys = Polygon(parent.interiors[0])
+    exterior = Polygon(child.exterior)
+    return exterior.equals(hole_polys)
+
+
+def test_polygonize_with_holes():
+    """
+    Polygonize should be able to handle polygons with holes. In this test, we
+    create a 5x5 grid of values as follows:
+
+    1 1 1 1 1
+    1 2 2 2 1
+    1 2 3 2 1
+    1 2 2 2 1
+    1 1 1 1 1
+
+    The polygon for the value 1.0 should be a large square that contains the
+    entire grid, but has a hole in the middle that corresponds to the polygon
+    for the value 2.0. The polygon for the value 2.0 should have a hole that
+    corresponds exactly to the polygon for the value 3.0.
+    """
+    # Arrange
+    nrow, ncol = 5, 5
+    dx, dy = 1.0, -1.0
+    xmin, xmax = 0.0, 5.0
+    ymin, ymax = 0.0, 5.0
+    coords = imod.util.spatial._xycoords((xmin, xmax, ymin, ymax), (dx, dy))
+    kwargs = {"name": "test", "coords": coords, "dims": ("y", "x")}
+    data = np.ones((nrow, ncol), dtype=np.float32)
+    data[1:-1, 1:-1] = 2.0
+    data[2, 2] = 3.0
+    da = xr.DataArray(data, **kwargs)
+    # Act
+    gdf = imod.prepare.polygonize(da)
+    gdf = gdf.sort_values("value").reset_index(drop=True)
+    # Assert
+    assert len(gdf) == 3
+    assert sorted(gdf["value"]) == [1.0, 2.0, 3.0]
+    p1, p2, p3 = gdf.geometry
+    ok = fits_exact_hole(p1, p2) and fits_exact_hole(p2, p3)
+    assert ok
+
+
 def test_handle_dtype():
     assert imod.prepare.spatial._handle_dtype(np.uint8, None) == (1, 0)
     assert imod.prepare.spatial._handle_dtype(np.uint16, None) == (2, 0)
@@ -142,11 +171,16 @@ def test_handle_dtype():
     assert imod.prepare.spatial._handle_dtype(np.int32, None) == (5, -2147483648)
     assert imod.prepare.spatial._handle_dtype(np.float32, None) == (6, np.nan)
     assert imod.prepare.spatial._handle_dtype(np.float64, None) == (7, np.nan)
+    assert imod.prepare.spatial._handle_dtype(np.uint64, None) == (12, 0)
+    assert imod.prepare.spatial._handle_dtype(np.int64, None) == (
+        13,
+        -9223372036854775808,
+    )
 
     with pytest.raises(ValueError):  # out of bounds
         imod.prepare.spatial._handle_dtype(np.uint32, -1)
-    with pytest.raises(ValueError):  # invalid dtype
-        imod.prepare.spatial._handle_dtype(np.int64, -1)
+    with pytest.raises(ValueError):  # out of bounds
+        imod.prepare.spatial._handle_dtype(np.uint64, -1)
 
 
 @parametrize_with_cases("shapefile, expected_value", cases=ShapefileCases)

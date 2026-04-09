@@ -1,6 +1,8 @@
 package Deploy
 
 import jetbrains.buildServer.configs.kotlin.*
+import jetbrains.buildServer.configs.kotlin.buildFeatures.dockerSupport
+import jetbrains.buildServer.configs.kotlin.buildSteps.ScriptBuildStep
 import jetbrains.buildServer.configs.kotlin.buildSteps.powerShell
 import jetbrains.buildServer.configs.kotlin.buildSteps.script
 import jetbrains.buildServer.configs.kotlin.triggers.vcs
@@ -38,15 +40,27 @@ object BuildPackage : BuildType({
             id = "Create_package"
             workingDir = "imod-python"
             scriptContent = """
+                SET TEMP=%system.teamcity.build.checkoutDir%\tmpdir
+                SET TMPDIR=%system.teamcity.build.checkoutDir%\tmpdir
+                SET TMP=%system.teamcity.build.checkoutDir%\tmpdir
+
                 pixi run --environment default --frozen rm --recursive --force dist
                 pixi run --environment default --frozen python -m build
             """.trimIndent()
             formatStderrAsError = true
+            dockerImage = "%DockerContainer%:%DockerVersion%"
+            dockerImagePlatform = ScriptBuildStep.ImagePlatform.Windows
+            dockerRunParameters = """--cpus=4 --memory=16g"""
+            dockerPull = false
         }
     }
 
-    requirements {
-        equals("env.OS", "Windows_NT")
+    features {
+        dockerSupport {
+            loginToRegistry = on {
+                dockerRegistryId = "PROJECT_EXT_134"
+            }
+        }
     }
 })
 
@@ -72,11 +86,15 @@ object BuildPages : BuildType({
             name = "Build documentation"
             workingDir = "imod-python"
             scriptContent = """
-                set Path=%system.teamcity.build.checkoutDir%\modflow6;%env.Path% 
+                SET PATH=%%PATH%%;%system.teamcity.build.checkoutDir%\modflow6
                 
                 pixi run --environment default --frozen docs
             """.trimIndent()
             formatStderrAsError = true
+            dockerImage = "%DockerContainer%:%DockerVersion%"
+            dockerImagePlatform = ScriptBuildStep.ImagePlatform.Windows
+            dockerRunParameters = """--cpus=8 --memory=32g"""
+            dockerPull = false
         }
     }
 
@@ -85,9 +103,12 @@ object BuildPages : BuildType({
             enabled = false
         }
     }
-
+    params {
+        param("reverse.dep.Modflow_Modflow6Release.MODFLOW6_Version", "6.6.3")
+        param("reverse.dep.Modflow_Modflow6Release.MODFLOW6_Platform", "win64")
+    }
     dependencies {
-        dependency(AbsoluteId("MetaSWAP_Modflow_Modflow6Release642")) {
+        dependency(AbsoluteId("Modflow_Modflow6Release")) {
             snapshot {
                 onDependencyFailure = FailureAction.FAIL_TO_START
             }
@@ -105,8 +126,12 @@ object BuildPages : BuildType({
         }
     }
 
-    requirements {
-        equals("env.OS", "Windows_NT")
+    features {
+        dockerSupport {
+            loginToRegistry = on {
+                dockerRegistryId = "PROJECT_EXT_134"
+            }
+        }
     }
 })
 
@@ -147,6 +172,10 @@ object CreateGitHubRelease : BuildType({
                     pixi run --environment default --frozen gh release create ${'$'}tag --verify-tag --notes "See https://deltares.github.io/imod-python/api/changelog.html"
                 """.trimIndent()
             }
+            param("plugin.docker.imagePlatform", "windows")
+            param("plugin.docker.pull.enabled", "false")
+            param("plugin.docker.imageId", "%DockerContainer%:%DockerVersion%")
+            param("plugin.docker.run.parameters", "--cpus=4 --memory=16g")
         }
     }
 
@@ -154,8 +183,12 @@ object CreateGitHubRelease : BuildType({
         errorMessage = true
     }
 
-    requirements {
-        equals("env.OS", "Windows_NT")
+    features {
+        dockerSupport {
+            loginToRegistry = on {
+                dockerRegistryId = "PROJECT_EXT_134"
+            }
+        }
     }
 })
 
@@ -166,7 +199,7 @@ object DeployPackage : BuildType({
         param("env.TWINE_USERNAME", "__token__")
         param("env.TWINE_NON_INTERACTIVE", "true")
         param("env.PIXI_BETA_WARNING_OFF", "true")
-        password("env.TWINE_PASSWORD", "credentialsJSON:2881ed77-6bd2-439f-99d6-c19b776099b0")
+        password("env.TWINE_PASSWORD", "credentialsJSON:2cea585c-e4f8-4a45-9941-9189daf09ecc")
     }
 
     vcs {
@@ -185,9 +218,13 @@ object DeployPackage : BuildType({
             id = "Deploy_to_PyPi"
             workingDir = "imod-python"
             scriptContent = """
-                pixi run --environment default --frozen twine check ../dist
-                pixi run --environment default --frozen twine upload ../dist/*
+                pixi run --frozen twine check ../dist/*
+                pixi run --frozen twine upload ../dist/*
             """.trimIndent()
+            dockerImage = "%DockerContainer%:%DockerVersion%"
+            dockerImagePlatform = ScriptBuildStep.ImagePlatform.Windows
+            dockerRunParameters = """--cpus=4 --memory=16g"""
+            dockerPull = false
         }
     }
 
@@ -203,8 +240,12 @@ object DeployPackage : BuildType({
         }
     }
 
-    requirements {
-        equals("env.OS", "Windows_NT")
+    features {
+        dockerSupport {
+            loginToRegistry = on {
+                dockerRegistryId = "PROJECT_EXT_134"
+            }
+        }
     }
 })
 
@@ -239,6 +280,10 @@ object DeployPages : BuildType({
             workingDir = "imod-python"
             scriptContent = """
                 echo on
+                echo "Setup git"
+                git config --global user.email "svc-teamcity-ansible@DIRECTORY.INTRA"
+                git config --global user.name "SVC TeamCity Ansible"
+
                 echo "Checkout imod-python-pages"
                 git remote set-url origin https://%GH_USER%:%env.GH_TOKEN%@github.com/Deltares/imod-python.git
                 git fetch origin gh-pages
@@ -260,6 +305,10 @@ object DeployPages : BuildType({
                 git push origin gh-pages
             """.trimIndent()
             formatStderrAsError = true
+            dockerImage = "%DockerContainer%:%DockerVersion%"
+            dockerImagePlatform = ScriptBuildStep.ImagePlatform.Windows
+            dockerRunParameters = """--cpus=4 --memory=16g"""
+            dockerPull = false
         }
     }
 
@@ -276,8 +325,12 @@ object DeployPages : BuildType({
         }
     }
 
-    requirements {
-        equals("env.OS", "Windows_NT")
+    features {
+        dockerSupport {
+            loginToRegistry = on {
+                dockerRegistryId = "PROJECT_EXT_134"
+            }
+        }
     }
 })
 

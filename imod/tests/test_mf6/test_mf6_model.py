@@ -1,5 +1,4 @@
 from copy import deepcopy
-from pathlib import Path
 from unittest import mock
 from unittest.mock import MagicMock
 
@@ -12,12 +11,16 @@ from jinja2 import Template
 from xugrid.core.wrap import UgridDataArray
 
 import imod
-from imod.mf6 import ConstantHead
+from imod.mf6 import ConstantConcentration, ConstantHead
+from imod.mf6.mf6_wel_adapter import Mf6Wel
 from imod.mf6.model import Modflow6Model
 from imod.mf6.model_gwf import GroundwaterFlowModel
+from imod.mf6.model_gwt import GroundwaterTransportModel
 from imod.mf6.package import Package
+from imod.mf6.validation_settings import ValidationSettings
 from imod.mf6.write_context import WriteContext
 from imod.schemata import ValidationError
+from imod.typing.grid import concat, nan_like
 
 
 # Duplicate from test_mf6_dis.py
@@ -93,7 +96,6 @@ def roundtrip(model, tmp_path):
     assert isinstance(back, type(model))
 
 
-@pytest.mark.usefixtures("circle_model")
 def test_circle_roundtrip(circle_model, tmp_path):
     roundtrip(circle_model["GWF_1"], tmp_path)
 
@@ -105,6 +107,7 @@ class TestModel:
         model_name = "Test model"
         model = Modflow6Model()
         # create write context
+        validation_context = ValidationSettings()
         write_context = WriteContext(tmp_path)
 
         discretization_mock = MagicMock(spec_set=Package)
@@ -119,7 +122,9 @@ class TestModel:
         global_times_mock = MagicMock(spec_set=imod.mf6.TimeDiscretization)
 
         # Act.
-        status = model.write(model_name, global_times_mock, True, write_context)
+        status = model._write(
+            model_name, global_times_mock, write_context, validation_context
+        )
 
         # Assert.
         assert not status.has_errors()
@@ -130,6 +135,7 @@ class TestModel:
         model_name = "Test model"
         model = Modflow6Model()
         # create write context
+        validation_context = ValidationSettings()
         write_context = WriteContext(tmp_path)
 
         template_mock = MagicMock(spec_set=Template)
@@ -139,7 +145,9 @@ class TestModel:
         global_times_mock = MagicMock(spec_set=imod.mf6.TimeDiscretization)
 
         # Act.
-        status = model.write(model_name, global_times_mock, True, write_context)
+        status = model._write(
+            model_name, global_times_mock, write_context, validation_context
+        )
 
         # Assert.
         assert status.has_errors()
@@ -150,6 +158,7 @@ class TestModel:
         model_name = "Test model"
         model = Modflow6Model()
         # create write context
+        validation_context = ValidationSettings()
         write_context = WriteContext(tmp_path)
 
         discretization_mock = MagicMock(spec_set=Package)
@@ -167,8 +176,8 @@ class TestModel:
         global_times_mock = MagicMock(spec_set=imod.mf6.TimeDiscretization)
 
         # Act.
-        status = model.write(
-            model_name, global_times_mock, True, write_context=write_context
+        status = model._write(
+            model_name, global_times_mock, write_context, validation_context
         )
 
         # Assert.
@@ -178,6 +187,7 @@ class TestModel:
         # Arrange.
         tmp_path = tmpdir_factory.mktemp("TestSimulation")
         model_name = "Test model"
+        validation_context = ValidationSettings()
         write_context = WriteContext(simulation_directory=tmp_path)
 
         model = Modflow6Model()
@@ -205,11 +215,131 @@ class TestModel:
 
         # Act.
         write_context = WriteContext(tmp_path)
-        status = model.write(model_name, global_times_mock, True, write_context)
+        status = model._write(
+            model_name, global_times_mock, write_context, validation_context
+        )
 
         # Assert.
         assert len(status.errors) == 2
 
+    @pytest.mark.parametrize(
+        "model_type, pkg_type",
+        [
+            (GroundwaterFlowModel, ConstantHead),
+            (GroundwaterTransportModel, ConstantConcentration),
+        ],
+    )
+    def test_clip_box_without_state_for_boundary(self, model_type, pkg_type):
+        # Arrange.
+        state_for_boundary = None
+
+        discretization_mock = MagicMock(spec_set=Package)
+        discretization_mock._pkg_id = "dis"
+        discretization_mock.clip_box.return_value = discretization_mock
+
+        model = model_type()
+        model["dis"] = discretization_mock
+
+        # Act.
+        clipped = model.clip_box(state_for_boundary=state_for_boundary)
+
+        # Assert.
+        pkg_id = pkg_type._pkg_id
+        assert f"{pkg_id}_clipped" not in clipped
+
+    @mock.patch("imod.mf6.model.create_clipped_boundary")
+    @pytest.mark.parametrize(
+        "model_type, pkg_type",
+        [
+            (GroundwaterFlowModel, ConstantHead),
+            (GroundwaterTransportModel, ConstantConcentration),
+        ],
+    )
+    def test_clip_box_with_state_for_boundary(
+        self, create_clipped_boundary_mock, model_type, pkg_type
+    ):
+        # Arrange.
+        state_for_boundary = MagicMock(spec_set=UgridDataArray)
+
+        discretization_mock = MagicMock(spec_set=Package)
+        discretization_mock._pkg_id = "dis"
+        discretization_mock.clip_box.return_value = discretization_mock
+
+        clipped_boundary_mock = MagicMock(spec_set=pkg_type)
+        clipped_boundary_mock.is_empty.return_value = False
+
+        create_clipped_boundary_mock.side_effect = [
+            None,
+            clipped_boundary_mock,
+        ]
+
+        model = model_type()
+        model["dis"] = discretization_mock
+
+        # Act.
+        clipped = model.clip_box(state_for_boundary=state_for_boundary)
+
+        # Assert.
+        pkg_id = pkg_type._pkg_id
+        assert f"{pkg_id}_clipped" in clipped
+        create_clipped_boundary_mock.assert_called_with(
+            discretization_mock["idomain"],
+            state_for_boundary.to_dataset().copy().__getitem__(),
+            [],
+            pkg_type,
+        )
+
+    @mock.patch("imod.mf6.model.create_clipped_boundary")
+    @pytest.mark.parametrize(
+        "model_type, pkg_type",
+        [
+            (GroundwaterFlowModel, ConstantHead),
+            (GroundwaterTransportModel, ConstantConcentration),
+        ],
+    )
+    def test_clip_box_with_unassigned_boundaries_in_original_model(
+        self, create_clipped_boundary_mock, model_type, pkg_type
+    ):
+        # Arrange.
+        state_for_boundary = MagicMock(spec_set=UgridDataArray)
+
+        discretization_mock = MagicMock(spec_set=Package)
+        discretization_mock._pkg_id = "dis"
+        discretization_mock.is_empty.side_effect = [False, False]
+        discretization_mock.clip_box.return_value = discretization_mock
+
+        constant_boundary_mock = MagicMock(spec_set=pkg_type)
+        constant_boundary_mock.is_empty.side_effect = [False, False]
+        constant_boundary_mock.clip_box.return_value = constant_boundary_mock
+
+        unassigned_original_constant_boundary = MagicMock(spec_set=pkg_type)
+        unassigned_original_constant_boundary.is_empty.side_effect = [False]
+        assigned_constant_boundary_clipped_mock = unassigned_original_constant_boundary
+
+        create_clipped_boundary_mock.side_effect = [
+            unassigned_original_constant_boundary,
+            assigned_constant_boundary_clipped_mock,
+        ]
+
+        pkg_id = pkg_type._pkg_id
+        model = model_type()
+        model["dis"] = discretization_mock
+        model[pkg_id] = constant_boundary_mock
+
+        # Act.
+        clipped = model.clip_box(state_for_boundary=state_for_boundary)
+
+        # Assert.
+        assert f"{pkg_id}_clipped" in clipped
+        create_clipped_boundary_mock.assert_called_with(
+            discretization_mock["idomain"],
+            state_for_boundary.to_dataset().copy().__getitem__(),
+            [constant_boundary_mock, unassigned_original_constant_boundary.clip_box()],
+            pkg_type,
+        )
+
+
+class TestGroundwaterFlowModel:
     @pytest.mark.parametrize("use_newton", [False, True])
     @pytest.mark.parametrize("use_under_relaxation", [False, True])
     def test_render_newton(self, use_newton, use_under_relaxation):
@@ -220,7 +350,7 @@ class TestModel:
         write_context_mock = MagicMock(spec_set=WriteContext)
 
         # Act.
-        output = model.render("TestModel", write_context_mock)
+        output = model._render("TestModel", write_context_mock)
 
         # Assert.
         assert ("newton" in output) == use_newton and (
@@ -228,102 +358,7 @@ class TestModel:
         ) == (use_newton and use_under_relaxation)
 
 
-class TestGroundwaterFlowModel:
-    def test_clip_box_without_state_for_boundary(self):
-        # Arrange.
-        state_for_boundary = None
-
-        discretization_mock = MagicMock(spec_set=Package)
-        discretization_mock._pkg_id = "dis"
-        discretization_mock.clip_box.return_value = discretization_mock
-
-        model = GroundwaterFlowModel()
-        model["dis"] = discretization_mock
-
-        # Act.
-        clipped = model.clip_box(state_for_boundary=state_for_boundary)
-
-        # Assert.
-        assert "chd_clipped" not in clipped
-
-    @mock.patch("imod.mf6.model_gwf.create_clipped_boundary")
-    def test_clip_box_with_state_for_boundary(self, create_clipped_boundary_mock):
-        # Arrange.
-        state_for_boundary = MagicMock(spec_set=UgridDataArray)
-
-        discretization_mock = MagicMock(spec_set=Package)
-        discretization_mock._pkg_id = "dis"
-        discretization_mock.clip_box.return_value = discretization_mock
-
-        clipped_boundary_mock = MagicMock(spec_set=ConstantHead)
-        clipped_boundary_mock.is_empty.return_value = False
-
-        create_clipped_boundary_mock.side_effect = [
-            None,
-            clipped_boundary_mock,
-        ]
-
-        model = GroundwaterFlowModel()
-        model["dis"] = discretization_mock
-
-        # Act.
-        clipped = model.clip_box(state_for_boundary=state_for_boundary)
-
-        # Assert.
-        assert "chd_clipped" in clipped
-        create_clipped_boundary_mock.assert_called_with(
-            discretization_mock["idomain"],
-            state_for_boundary,
-            [],
-        )
-
-    @mock.patch("imod.mf6.model_gwf.create_clipped_boundary")
-    def test_clip_box_with_unassigned_boundaries_in_original_model(
-        self, create_clipped_boundary_mock
-    ):
-        # Arrange.
-        state_for_boundary = MagicMock(spec_set=UgridDataArray)
-
-        discretization_mock = MagicMock(spec_set=Package)
-        discretization_mock._pkg_id = "dis"
-        discretization_mock.is_empty.side_effect = [False, False]
-        discretization_mock.clip_box.return_value = discretization_mock
-
-        constant_head_mock = MagicMock(spec_set=ConstantHead)
-        constant_head_mock.is_empty.side_effect = [False, False]
-        constant_head_mock.clip_box.return_value = constant_head_mock
-
-        unassigned_boundary_original_constant_head_mock = MagicMock(
-            spec_set=ConstantHead
-        )
-        unassigned_boundary_original_constant_head_mock.is_empty.side_effect = [False]
-        assigned_boundary_clipped_constant_head_mock = (
-            unassigned_boundary_original_constant_head_mock
-        )
-
-        create_clipped_boundary_mock.side_effect = [
-            unassigned_boundary_original_constant_head_mock,
-            assigned_boundary_clipped_constant_head_mock,
-        ]
-
-        model = GroundwaterFlowModel()
-        model["dis"] = discretization_mock
-        model["chd"] = constant_head_mock
-
-        # Act.
-        clipped = model.clip_box(state_for_boundary=state_for_boundary)
-
-        # Assert.
-        assert "chd_clipped" in clipped
-        create_clipped_boundary_mock.assert_called_with(
-            discretization_mock["idomain"],
-            state_for_boundary,
-            [constant_head_mock, unassigned_boundary_original_constant_head_mock],
-        )
-
-
 def test_purge_empty_package(
-    tmp_path: Path,
     unstructured_flow_model: GroundwaterFlowModel,
 ):
     # test that purging leaves the non-empty packages in place
@@ -354,8 +389,125 @@ def test_purge_empty_package(
     assert original_nr_packages == len(unstructured_flow_model.items())
 
 
+def test_purge_empty_package__ignore_time(
+    unstructured_flow_model: GroundwaterFlowModel,
+):
+    # Arrange
+    rch = unstructured_flow_model["rch"]
+    empty = nan_like(rch.dataset["rate"])
+    transient_rate = concat([empty, rch.dataset["rate"]], dim="time")
+    time_coords = [np.datetime64("2000-01-01"), np.datetime64("2001-01-01")]
+    transient_rate = transient_rate.assign_coords(time=time_coords)
+    rch.dataset["rate"] = transient_rate
+
+    # Act
+    original_nr_packages = len(unstructured_flow_model.items())
+    unstructured_flow_model.purge_empty_packages(ignore_time=False)
+    assert original_nr_packages == len(unstructured_flow_model.items())
+
+    unstructured_flow_model.purge_empty_packages(ignore_time=True)
+    assert (original_nr_packages - 1) == len(unstructured_flow_model.items())
+
+
 def test_deepcopy(
     unstructured_flow_model: GroundwaterFlowModel,
 ):
     # test  making a deepcopy will not crash
     _ = deepcopy(unstructured_flow_model)
+
+
+def test_prepare_wel_to_mf6(
+    structured_flow_model: GroundwaterFlowModel,
+):
+    # Arrange
+    # add a well to the model
+    well = imod.mf6.Well(
+        x=[3.0],
+        y=[3.0],
+        screen_top=[0.0],
+        screen_bottom=[-3.0],
+        rate=[1.0],
+        print_flows=True,
+        validate=True,
+    )
+    structured_flow_model["well"] = well
+    # Act
+    mf6_well = structured_flow_model.prepare_wel_for_mf6("well", True, True)
+    # Assert
+    assert isinstance(mf6_well, Mf6Wel)
+
+
+def test_prepare_wel_to_mf6__error(
+    structured_flow_model: GroundwaterFlowModel,
+):
+    # Act
+    with pytest.raises(TypeError):
+        structured_flow_model.prepare_wel_for_mf6("dis", True, True)
+
+
+def test_get_k(structured_flow_model: GroundwaterFlowModel):
+    # Act
+    k = structured_flow_model._get_k()
+    # Assert
+    assert isinstance(k, xr.DataArray)
+    np.testing.assert_allclose(k.values, 1.23)
+    # Arrange
+    npf = structured_flow_model.pop("npf")
+    structured_flow_model["npf_other_name"] = npf
+    # Act
+    k = structured_flow_model._get_k()
+    # Assert
+    assert isinstance(k, xr.DataArray)
+    np.testing.assert_allclose(k.values, 1.23)
+
+
+def test_get_domain_geometry(structured_flow_model: GroundwaterFlowModel):
+    # Act
+    top, bottom, idomain = structured_flow_model._get_domain_geometry()
+    # Assert
+    assert isinstance(top, xr.DataArray)
+    assert isinstance(bottom, xr.DataArray)
+    assert isinstance(idomain, xr.DataArray)
+
+    assert top.dtype == np.float64
+    assert bottom.dtype == np.float64
+    assert idomain.dtype == np.int32
+
+    assert np.all(np.isin(top.values, [10.0]))
+    assert np.all(np.isin(bottom.values, [-1.0, -2.0, -3.0]))
+    assert np.all(np.isin(idomain.values, [2]))
+
+
+def test_model_options_validation(
+    structured_flow_model: GroundwaterFlowModel,
+):
+    # Act
+    status = structured_flow_model.validate("modelname")
+    # Assert
+    assert not status.has_errors()
+
+    # Arrange
+    structured_flow_model._options["newton"] = 1
+    # Act
+    status = structured_flow_model.validate("modelname")
+    # Assert
+    assert status.has_errors()
+
+
+def test_model_init_validation(
+    structured_flow_model: GroundwaterFlowModel,
+):
+    # Act
+    structured_flow_model._validate_init_schemata_options(
+        validate=True,
+    )
+    # Arrange
+    structured_flow_model._options["newton"] = 1
+    # Act
+    structured_flow_model._validate_init_schemata_options(
+        validate=False,
+    )
+    with pytest.raises(ValidationError):
+        structured_flow_model._validate_init_schemata_options(
+            validate=True,
+        )

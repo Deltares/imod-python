@@ -42,6 +42,7 @@ HIGH_LEVEL_PACKAGES = [
     imod.mf6.HorizontalFlowBarrierHydraulicCharacteristic,
     imod.mf6.HorizontalFlowBarrierMultiplier,
     imod.mf6.HorizontalFlowBarrierResistance,
+    imod.mf6.LayeredWell,
 ]
 
 
@@ -76,30 +77,30 @@ def test_render_twice(instance, tmp_path):
     globaltimes = [np.datetime64("2000-01-01")]
     modeldir = tmp_path / "testdir"
 
-    sig = inspect.signature(instance.render)
+    sig = inspect.signature(instance._render)
     if any(isinstance(instance, pack) for pack in HIGH_LEVEL_PACKAGES):
         with pytest.raises(NotImplementedError):
-            instance.render(modeldir, "test", globaltimes, False)
+            instance._render(modeldir, "test", globaltimes, False)
         return
     elif len(sig.parameters) == 0:
-        text1 = instance.render()
-        text2 = instance.render()
+        text1 = instance._render()
+        text2 = instance._render()
     elif len(sig.parameters) == 3:
-        text1 = instance.render(modeldir, "test", False)
-        text2 = instance.render(modeldir, "test", False)
+        text1 = instance._render(modeldir, "test", False)
+        text2 = instance._render(modeldir, "test", False)
     elif len(sig.parameters) == 4:
-        text1 = instance.render(modeldir, "test", globaltimes, False)
-        text2 = instance.render(modeldir, "test", globaltimes, False)
+        text1 = instance._render(modeldir, "test", globaltimes, False)
+        text2 = instance._render(modeldir, "test", globaltimes, False)
     else:
         assert False  # unexpected nr of arguments
     assert text1 == text2
 
 
 @pytest.mark.parametrize("instance", ALL_PACKAGE_INSTANCES)
-def test_save_and_load(instance, tmp_path):
+@pytest.mark.parametrize("engine", ["netcdf4", "zarr", "zarr.zip"])
+def test_save_and_load(instance, engine, tmp_path):
     pkg_class = type(instance)
-    path = tmp_path / f"{instance._pkg_id}.nc"
-    instance.to_netcdf(path)
+    path = instance.to_file(tmp_path, instance._pkg_id, engine=engine)
     back = pkg_class.from_file(path)
     assert instance.dataset.equals(back.dataset)
 
@@ -108,3 +109,12 @@ def test_save_and_load(instance, tmp_path):
 def test_repr(instance):
     assert isinstance(instance.__repr__(), str)
     assert isinstance(instance._repr_html_(), str)
+
+
+@pytest.mark.parametrize("instance", ALL_PACKAGE_INSTANCES)
+def test_from_dataset(instance):
+    pkg_class = type(instance)
+    ds = instance.dataset
+    new_instance = pkg_class._from_dataset(ds)
+    assert isinstance(new_instance, pkg_class)
+    assert instance.dataset.equals(new_instance.dataset)

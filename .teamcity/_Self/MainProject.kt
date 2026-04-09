@@ -1,26 +1,32 @@
 package _Self
 
 import Deploy.DeployProject
+import Docker.DockerProject
 import Nightly.NightlyProject
 import Pixi.PixiProject
 import Templates.*
+import Weekly.WeeklyProject
 import jetbrains.buildServer.configs.kotlin.*
 import jetbrains.buildServer.configs.kotlin.buildFeatures.PullRequests
 import jetbrains.buildServer.configs.kotlin.buildFeatures.pullRequests
 import jetbrains.buildServer.configs.kotlin.failureConditions.BuildFailureOnMetric
 import jetbrains.buildServer.configs.kotlin.failureConditions.failOnMetricChange
 import jetbrains.buildServer.configs.kotlin.projectFeatures.ProjectReportTab
+import jetbrains.buildServer.configs.kotlin.projectFeatures.dockerRegistry
 import jetbrains.buildServer.configs.kotlin.projectFeatures.projectReportTab
 import jetbrains.buildServer.configs.kotlin.triggers.vcs
 
 object MainProject : Project({
+    params {
+        param("DockerContainer", "containers.deltares.nl/hydrology_product_line_imod/windows-pixi")
+        param("DockerVersion", "v0.59.0")
+    }
+
     buildType(Lint)
     buildType(MyPy)
     buildType(UnitTests)
     buildType(Examples)
-    buildType(PipPython310)
-    buildType(PipPython311)
-    buildType(PipPython312)
+    buildType(PipPython)
     buildType(Tests)
 
     template(GitHubIntegrationTemplate)
@@ -28,11 +34,17 @@ object MainProject : Project({
     template(MyPyTemplate)
     template(UnitTestsTemplate)
     template(ExamplesTemplate)
-    template(PipPython310Template)
-    template(PipPython311Template)
-    template(PipPython312Template)
+    template(PipPythonTemplate)
+    template(AcceptanceTestsTemplate)
 
     features {
+        dockerRegistry {
+            id = "PROJECT_EXT_134"
+            name = "Hydrology"
+            url = "https://containers.deltares.nl/"
+            userName = "robot${'$'}hydrology_product_line_imod+teamcity"
+            password = "credentialsJSON:7cfeee0c-bc26-4c80-b488-a5d8e00233c3"
+        }
         buildTypeCustomChart {
             id = "PROJECT_EXT_41"
             title = "Build Duration (all stages)"
@@ -54,7 +66,9 @@ object MainProject : Project({
 
     subProject(DeployProject)
     subProject(NightlyProject)
+    subProject(WeeklyProject)
     subProject(PixiProject)
+    subProject(DockerProject)
 })
 
 object Lint : BuildType({
@@ -84,12 +98,17 @@ object MyPy : BuildType({
 object UnitTests : BuildType({
     name = "UnitTests"
 
+    params {
+        param("reverse.dep.Modflow_Modflow6Release.MODFLOW6_Version", "6.6.3")
+        param("reverse.dep.Modflow_Modflow6Release.MODFLOW6_Platform", "win64")
+    }
     templates(UnitTestsTemplate, GitHubIntegrationTemplate)
 
     dependencies {
-        dependency(AbsoluteId("MetaSWAP_Modflow_Modflow6Release642")) {
+        dependency(AbsoluteId("Modflow_Modflow6Release")) {
             snapshot {
                 onDependencyFailure = FailureAction.FAIL_TO_START
+
             }
 
             artifacts {
@@ -108,10 +127,15 @@ object UnitTests : BuildType({
 object Examples : BuildType({
     name = "Examples"
 
+    params {
+        param("reverse.dep.Modflow_Modflow6Release.MODFLOW6_Version", "6.6.3")
+        param("reverse.dep.Modflow_Modflow6Release.MODFLOW6_Platform", "win64")
+    }
+
     templates(ExamplesTemplate, GitHubIntegrationTemplate)
 
     dependencies {
-        dependency(AbsoluteId("MetaSWAP_Modflow_Modflow6Release642")) {
+        dependency(AbsoluteId("Modflow_Modflow6Release")) {
             snapshot {
                 onDependencyFailure = FailureAction.FAIL_TO_START
             }
@@ -129,22 +153,10 @@ object Examples : BuildType({
     }
 })
 
-object PipPython310 : BuildType({
-    name = "PipPython310"
+object PipPython : BuildType({
+    name = "PipPython"
 
-    templates(PipPython310Template, GitHubIntegrationTemplate)
-})
-
-object PipPython311 : BuildType({
-    name = "PipPython311"
-
-    templates(PipPython311Template, GitHubIntegrationTemplate)
-})
-
-object PipPython312 : BuildType({
-    name = "PipPython312"
-
-    templates(PipPython312Template, GitHubIntegrationTemplate)
+    templates(PipPythonTemplate, GitHubIntegrationTemplate)
 })
 
 object Tests : BuildType({
@@ -181,13 +193,7 @@ object Tests : BuildType({
     }
 
     dependencies {
-        snapshot(PipPython310) {
-            onDependencyFailure = FailureAction.FAIL_TO_START
-        }
-        snapshot(PipPython311) {
-            onDependencyFailure = FailureAction.FAIL_TO_START
-        }
-        snapshot(PipPython312) {
+        snapshot(PipPython) {
             onDependencyFailure = FailureAction.FAIL_TO_START
         }
         snapshot(Examples) {

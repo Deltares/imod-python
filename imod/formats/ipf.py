@@ -17,6 +17,7 @@ import numpy as np
 import pandas as pd
 
 import imod
+from imod.util.time import to_pandas_datetime_series
 
 
 def _infer_delimwhitespace(line, ncol):
@@ -53,9 +54,10 @@ def _read_ipf(path, kwargs=None) -> Tuple[pd.DataFrame, int, str]:
         line = f.readline()
         delim_whitespace = _infer_delimwhitespace(line, ncol)
         f.seek(position)
+        sep = r"\s+" if delim_whitespace else ","
 
         ipf_kwargs = {
-            "delim_whitespace": delim_whitespace,
+            "sep": sep,
             "header": None,
             "names": colnames,
             "nrows": nrow,
@@ -68,7 +70,7 @@ def _read_ipf(path, kwargs=None) -> Tuple[pd.DataFrame, int, str]:
 
 
 def _read(path, kwargs=None, assoc_kwargs=None):
-    """
+    r"""
     Read one IPF file to a single pandas.DataFrame, including associated (TXT) files.
 
     Parameters
@@ -77,10 +79,10 @@ def _read(path, kwargs=None, assoc_kwargs=None):
         globpath for IPF files to read.
     kwargs : dict
         Dictionary containing the ``pandas.read_csv()`` keyword arguments for the
-        IPF files (e.g. `{"delim_whitespace": True}`)
+        IPF files (e.g. `{"sep": "\s+"}`)
     assoc_kwargs: dict
         Dictionary containing the ``pandas.read_csv()`` keyword arguments for the
-        associated (TXT) files (e.g. `{"delim_whitespace": True}`)
+        associated (TXT) files (e.g. `{"sep": "\s+"}`)
 
     Returns
     -------
@@ -121,7 +123,7 @@ def _read(path, kwargs=None, assoc_kwargs=None):
 
 
 def read_associated(path, kwargs={}):
-    """
+    r"""
     Read an IPF associated file (TXT).
 
     Parameters
@@ -130,7 +132,7 @@ def read_associated(path, kwargs={}):
         Path to associated file.
     kwargs : dict
         Dictionary containing the ``pandas.read_csv()`` keyword arguments for the
-        associated (TXT) file (e.g. `{"delim_whitespace": True}`).
+        associated (TXT) file (e.g. `{"sep": "\s+"}`).
 
     Returns
     -------
@@ -162,6 +164,7 @@ def read_associated(path, kwargs={}):
         # https://github.com/pandas-dev/pandas/issues/19827#issuecomment-398649163
         lines = [f.readline() for _ in range(ncol)]
         delim_whitespace = _infer_delimwhitespace(lines[0], 2)
+        sep = r"\s+" if delim_whitespace else ","
         # Normally, this ought to work:
         # metadata = pd.read_csv(f, header=None, nrows=ncol).values
         # TODO: replace when bugfix is released
@@ -173,7 +176,7 @@ def read_associated(path, kwargs={}):
         # the challenge lies in replacing the pd.notnull for nodata values.
         # is otherwise quite a bit faster for such a header block.
         metadata_kwargs = {
-            "delim_whitespace": delim_whitespace,
+            "sep": sep,
             "header": None,
             "nrows": ncol,
             "skipinitialspace": True,
@@ -199,15 +202,16 @@ def read_associated(path, kwargs={}):
         line = f.readline()
         f.seek(position)
         delim_whitespace = _infer_delimwhitespace(line, ncol)
+        sep = r"\s+" if delim_whitespace else ","
 
         itype_kwargs = {
-            "delim_whitespace": delim_whitespace,
             "header": None,
             "names": colnames,
             "usecols": usecols,
             "nrows": nrow,
             "na_values": na_values,
             "skipinitialspace": True,
+            "sep": sep,
         }
         if itype == 1:  # Timevariant information: timeseries
             # check if first column is time in [yyyymmdd] or [yyyymmddhhmmss]
@@ -217,7 +221,7 @@ def read_associated(path, kwargs={}):
             itype_kwargs["dtype"] = {colnames[0]: np.float64}
         elif itype == 3:  # cpt
             # all columns must be numeric
-            itype_kwargs["dtype"] = {colname: np.float64 for colname in colnames}
+            itype_kwargs["dtype"] = dict.fromkeys(colnames, np.float64)
         elif itype == 4:  # 3D borehole
             # enforce first 3 columns are float
             itype_kwargs["dtype"] = {
@@ -230,20 +234,12 @@ def read_associated(path, kwargs={}):
 
     if nrow > 0 and itype == 1:
         time_column = colnames[0]
-        len_date = len(df[time_column].iloc[0])
-        if len_date == 14:
-            df[time_column] = pd.to_datetime(df[time_column], format="%Y%m%d%H%M%S")
-        elif len_date == 8:
-            df[time_column] = pd.to_datetime(df[time_column], format="%Y%m%d")
-        else:
-            raise ValueError(
-                f"{path.name}: datetime format must be yyyymmddhhmmss or yyyymmdd"
-            )
+        df[time_column] = to_pandas_datetime_series(df[time_column])
     return df
 
 
 def read(path, kwargs={}, assoc_kwargs={}):
-    """
+    r"""
     Read one or more IPF files to a single pandas.DataFrame, including associated
     (TXT) files.
 
@@ -269,10 +265,10 @@ def read(path, kwargs={}, assoc_kwargs={}):
         be combined in a single pd.DataFrame.
     kwargs : dict
         Dictionary containing the ``pandas.read_csv()`` keyword arguments for the
-        IPF files (e.g. `{"delim_whitespace": True}`)
+        IPF files (e.g. `{"sep": "\s+"}`)
     assoc_kwargs: dict
         Dictionary containing the ``pandas.read_csv()`` keyword arguments for the
-        associated (TXT) files (e.g. `{"delim_whitespace": True}`)
+        associated (TXT) files (e.g. `{"sep": "\s+"}`)
 
     Returns
     -------
@@ -401,10 +397,11 @@ def write_assoc(path, df, itype=1, nodata=1.0e20, assoc_columns=None):
         IPF type.
         Possible values, either integer or string:
 
-        1 : "timeseries"
-        2 : "borehole1d"
-        3 : "cpt"
-        4 : "borehole3d"
+        * ``1`` : ``"timeseries"``, a column named ``"time"`` is required.
+        * ``2`` : ``"borehole1d"``, a column named ``"top"`` is required.
+        * ``3`` : ``"cpt"``, a column named ``"top"`` is required.
+        * ``4`` : ``"borehole3d"``, columns named ``"x_offset"``,
+          ``"y_offset"``, and ``"top"`` are required.
     nodata : float
         The value given to nodata values. These are generally NaN (Not-a-Number)
         in pandas, but this leads to errors in iMOD(FLOW) for IDFs.
@@ -461,7 +458,8 @@ def write_assoc(path, df, itype=1, nodata=1.0e20, assoc_columns=None):
     # The reason is that datetime columns are converted to string as well
     # and then quoted. This causes trouble with some iMOD(batch) functions.
     for column in df.columns:
-        if df.loc[:, column].dtype == np.dtype("O"):
+        # Test for strings compatible with pandas 2 and 3
+        if pd.api.types.is_string_dtype(df[column].dtype):
             df.loc[:, column] = df.loc[:, column].astype(str)
             df.loc[:, column] = '"' + df.loc[:, column] + '"'
 
@@ -512,7 +510,8 @@ def write(path, df, indexcolumn=0, assoc_ext="txt", nodata=1.0e20):
     # The reason is that datetime columns are converted to string as well
     # and then quoted. This causes trouble with some iMOD(batch) functions.
     for column in df.columns:
-        if df.loc[:, column].dtype == np.dtype("O"):
+        # Test for strings compatible with pandas 2 and 3
+        if pd.api.types.is_string_dtype(df[column].dtype):
             df.loc[:, column] = df.loc[:, column].astype(str)
             df.loc[:, column] = '"' + df.loc[:, column] + '"'
 
@@ -629,10 +628,11 @@ def save(path, df, itype=None, assoc_ext="txt", nodata=1.0e20, assoc_columns=Non
         IPF type. Defaults to ``None``, in which case no associated files are
         created. Possible other values, either integer or string:
 
-        * ``1`` or ``"timeseries"``
-        * ``2`` or ``"borehole1d"``
-        * ``3`` or ``"cpt"``
-        * ``4`` or ``"borehole3d"``
+        * ``1`` or ``"timeseries"``, a column named ``"time"`` is required.
+        * ``2`` or ``"borehole1d"``, a column named ``"top"`` is required.
+        * ``3`` or ``"cpt"``, a column named ``"top"`` is required.
+        * ``4`` or ``"borehole3d"``, columns named ``"x_offset"``,
+          ``"y_offset"``, and ``"top"`` are required.
     assoc_ext : str
         Extension of the associated files. Defaults to "txt".
     nodata : float

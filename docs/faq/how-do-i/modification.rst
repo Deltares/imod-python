@@ -99,19 +99,25 @@ Make sure the grids have the same spatial coordinates.
 Change cellsize (and extent)
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
+`xugrid's regridding functionality
+<https://deltares.github.io/xugrid/examples/regridder_overview.html>`_ allows
+regridding structured grids (next to regridding unstructured grids).
+
 Nearest neighbor:
 
 .. code-block:: python
 
-    regridder = imod.prepare.Regridder(source, destination, method="nearest")
-    out = regridder.regrid(source)
+    import xugrid as xu
+    regridder = xu.CentroidLocatorRegridder(source=source, target=like)
+    result = regridder.regrid(source)
     
 Area weighted mean:
 
 .. code-block:: python
 
-    regridder = imod.prepare.Regridder(source, destination, method="mean")
-    out = regridder.regrid(source)
+    import xugrid as xu
+    regridder = xu.OverlapRegridder(source=source, target=like, method="mean")
+    result = regridder.regrid(source)
     
 Change time resolution
 ~~~~~~~~~~~~~~~~~~~~~~
@@ -159,7 +165,18 @@ integer or float), use ``.item()``:
 .. code-block:: python
    
     single_value = da.mean().item()
- 
+
+Flip the y-coordinates
+~~~~~~~~~~~~~~~~~~~~~~
+
+Xarray sorts coordinates in ascending order in some methods (see ``align``
+example below), which you need to correct afterwards. We want y to be
+descending. The most efficient way to do this:
+
+.. code-block:: python
+
+    da = da.reindex(y=da.y[::-1])
+
 Increase the extent of a raster
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -168,6 +185,11 @@ Use another raster with appropriate extent, and use ``align``:
 .. code-block:: python
 
     small_aligned, big_aligned = xr.align(small, big, join="outer")
+    # Flip y-coordinates. Xarray sorts coordinates in ascending order.
+    # We want y to be descending.
+    y_descending = big_aligned.y[::-1]
+    small_aligned = small_aligned.reindex(y=y_descending)
+    big_aligned = big_aligned.reindex(y=y_descending)
     
 Make sure the cell size is the same, or the result will be non-equidistant.
 
@@ -341,4 +363,4 @@ Sum properties over layers
 .. _xarray documentation on resampling: https://xarray.pydata.org/en/stable/user-guide/time-series.html#resampling-and-grouped-operations.
 .. _xarray documentation on interpolation of NaN values: https://xarray.pydata.org/en/stable/generated/xarray.DataArray.interpolate_na.html
 .. _convolution: https://en.wikipedia.org/wiki/Convolution
-.. _xarray-spatial's zonal stats: https://xarray-spatial.org/reference/_autosummary/xrspatial.zonal.stats.html
+.. _xarray-spatial's zonal stats: https://xarray-spatial.readthedocs.io/en/stable/reference/_autosummary/xrspatial.zonal.stats.html

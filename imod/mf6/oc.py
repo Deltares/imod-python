@@ -1,15 +1,14 @@
-import collections
 import os
+from collections import defaultdict
 from pathlib import Path
-from typing import Optional, Tuple, Union
+from typing import Any, Dict, Union
 
 import numpy as np
 
+from imod.common.interfaces.iregridpackage import IRegridPackage
+from imod.common.utilities.value_filters import is_empty_dataarray
 from imod.logging import init_log_decorator
-from imod.mf6.interfaces.iregridpackage import IRegridPackage
 from imod.mf6.package import Package
-from imod.mf6.utilities.dataset import is_dataarray_none
-from imod.mf6.utilities.regrid import RegridderType
 from imod.mf6.write_context import WriteContext
 from imod.schemata import DTypeSchema
 
@@ -82,7 +81,6 @@ class OutputControl(Package, IRegridPackage):
     }
 
     _write_schemata = {}
-    _regrid_method: dict[str, Tuple[RegridderType, str]] = {}
 
     @init_log_decorator()
     def __init__(
@@ -96,10 +94,10 @@ class OutputControl(Package, IRegridPackage):
         validate: bool = True,
     ):
         save_concentration = (
-            None if is_dataarray_none(save_concentration) else save_concentration
+            None if is_empty_dataarray(save_concentration) else save_concentration
         )
-        save_head = None if is_dataarray_none(save_head) else save_head
-        save_budget = None if is_dataarray_none(save_budget) else save_budget
+        save_head = None if is_empty_dataarray(save_head) else save_head
+        save_budget = None if is_empty_dataarray(save_budget) else save_budget
 
         if save_head is not None and save_concentration is not None:
             raise ValueError("save_head and save_concentration cannot both be defined.")
@@ -155,8 +153,8 @@ class OutputControl(Package, IRegridPackage):
 
         return path
 
-    def render(self, directory, pkgname, globaltimes, binary):
-        d = {}
+    def _render(self, directory, pkgname, globaltimes, binary):
+        d: dict[str, Any] = {}
 
         for output_variable in OUTPUT_EXT_MAPPING.keys():
             save = self.dataset[f"save_{output_variable}"].values[()]
@@ -165,7 +163,7 @@ class OutputControl(Package, IRegridPackage):
                 output_path = self._get_output_filepath(directory, output_variable)
                 d[varname] = output_path.as_posix()
 
-        periods = collections.defaultdict(dict)
+        periods: defaultdict[int, Dict[str, str]] = defaultdict(dict)
         for datavar in ("save_head", "save_concentration", "save_budget"):
             if self.dataset[datavar].values[()] is None:
                 continue
@@ -174,7 +172,7 @@ class OutputControl(Package, IRegridPackage):
                 package_times = self.dataset[datavar].coords["time"].values
                 starts = np.searchsorted(globaltimes, package_times) + 1
                 for i, s in enumerate(starts):
-                    setting = self.dataset[datavar].isel(time=i).item()
+                    setting = self.dataset[datavar].isel(time=i).values[()]
                     periods[s][key] = self._get_ocsetting(setting)
 
             else:
@@ -185,7 +183,7 @@ class OutputControl(Package, IRegridPackage):
 
         return self._template.render(d)
 
-    def write(
+    def _write(
         self,
         pkgname: str,
         globaltimes: Union[list[np.datetime64], np.ndarray],
@@ -193,7 +191,7 @@ class OutputControl(Package, IRegridPackage):
     ):
         # We need to overload the write here to ensure the output directory is
         # created in advance for MODFLOW6.
-        super().write(pkgname, globaltimes, write_context)
+        super()._write(pkgname, globaltimes, write_context)
 
         for datavar in ("head_file", "concentration_file", "budget_file"):
             path = self.dataset[datavar].values[()]
@@ -209,6 +207,3 @@ class OutputControl(Package, IRegridPackage):
     @property
     def is_budget_output(self) -> bool:
         return self.dataset["save_budget"].values[()] is not None
-
-    def get_regrid_methods(self) -> Optional[dict[str, Tuple[RegridderType, str]]]:
-        return self._regrid_method

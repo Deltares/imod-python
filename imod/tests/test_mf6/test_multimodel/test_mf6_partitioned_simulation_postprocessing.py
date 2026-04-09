@@ -1,12 +1,10 @@
 from pathlib import Path
 
 import numpy as np
-import pytest
 
 from imod.mf6.simulation import Modflow6Simulation
 
 
-@pytest.mark.usefixtures("split_transient_twri_model")
 def test_import_heads_structured(
     tmp_path: Path, split_transient_twri_model: Modflow6Simulation
 ):
@@ -66,7 +64,6 @@ def test_import_heads_structured(
     )
 
 
-@pytest.mark.usefixtures("circle_partitioned")
 def test_import_heads_unstructured(tmp_path, circle_partitioned):
     # Arrange
 
@@ -82,7 +79,6 @@ def test_import_heads_unstructured(tmp_path, circle_partitioned):
     assert np.allclose(merged_heads.coords["mesh2d_nFaces"].values, list(range(216)))
 
 
-@pytest.mark.usefixtures("split_transient_twri_model")
 def test_import_balances_structured(
     tmp_path: Path, split_transient_twri_model: Modflow6Simulation
 ):
@@ -97,11 +93,11 @@ def test_import_balances_structured(
     # Assert
     expected_keys = [
         "gwf-gwf",
-        "chd",
+        "chd_chd",
         "flow-right-face",
         "sto-ss",
         "flow-lower-face",
-        "drn",
+        "drn_drn",
         "flow-front-face",
     ]
     expected_coords = ["x", "y", "layer", "time", "dx", "dy"]
@@ -117,7 +113,6 @@ def test_import_balances_structured(
             assert dim in merged_balances[key].dims
 
 
-@pytest.mark.usefixtures("circle_partitioned")
 def test_import_balances_unstructured(
     tmp_path: Path, circle_partitioned: Modflow6Simulation
 ):
@@ -131,7 +126,7 @@ def test_import_balances_unstructured(
 
     # Assert
     expected_keys = [
-        "chd",
+        "chd_chd",
         "flow-horizontal-face",
         "gwf-gwf",
         "flow-horizontal-face-y",

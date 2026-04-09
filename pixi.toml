@@ -1,9 +1,9 @@
-[project]
+[workspace]
 name = "imod-python"
-version = "0.16.0"
+version = "1.0.0.post1"
 description = "Make massive MODFLOW models"
-authors = ["Deltares <huite.bootsma@deltares.nl>", ]
-channels = ["conda-forge", ]
+authors = ["Deltares <imod.info@deltares.nl>"]
+channels = ["conda-forge"]
 platforms = ["win-64", "linux-64", "osx-arm64", "osx-64"]
 license = "MIT"
 license-file = "LICENSE"
@@ -13,16 +13,25 @@ documentation = "https://deltares.github.io/imod-python/"
 repository = "https://github.com/Deltares/imod-python.git"
 
 [tasks]
-docs =  { cmd = "make html", depends_on = ["install"], cwd = "docs" }
+# General tasks
+docs = { cmd = "./make.bat html", depends-on = ["install"], cwd = "docs" }
 install = "python -m pip install --no-deps --editable ."
-install_with_deps = "python -m pip install --editable ."
+pypi-publish = { cmd = "rm --recursive --force dist && python -m build && twine check dist/* && twine upload dist/*" }
+
+# Lint and format tasks
 format = "ruff check --fix .; ruff format ."
 lint = "ruff check . ; ruff format --check ."
-tests = { depends_on = ["unittests", "examples"] }
-unittests = { cmd = [
+mypy_lint = { cmd ="mypy", depends-on = ["install"]}
+mypy_report = { cmd ="mypy | mypy2junit > mypy-report.xml", depends-on = ["install"]}
+
+# Tests tasks
+tests = { depends-on = ["unittests", "examples"] }
+unittests = { depends-on = ["unittests_njit", "unittests_jit"] }
+unittests_njit = { cmd = [
     "NUMBA_DISABLE_JIT=1",
     "pytest",
-    "-m", "not example",
+    "-n", "auto",
+    "-m", "not example and not user_acceptance and not unittest_jit and not qgis_export",
     "--cache-clear",
     "--verbose",
     "--junitxml=unittest_report.xml",
@@ -30,47 +39,48 @@ unittests = { cmd = [
     "--cov-report=term",
     "--cov-report=html:coverage",
     "--cov-config=.coveragerc"
-], depends_on = ["install"], cwd = "imod/tests" }
-examples = { cmd = [
-    "NUMBA_DISABLE_JIT=1",
+], depends-on = ["install"], cwd = "imod/tests" }
+unittests_jit = { cmd = [
     "pytest",
+    "-n", "auto",
+    "-m", "unittest_jit",
+    "--cache-clear",
+    "--verbose",
+    "--junitxml=unittest_jit_report.xml",
+], depends-on = ["install"], cwd = "imod/tests" }
+examples = { cmd = [
+    "pytest",
+    "-n", "auto",
     "-m", "example",
     "--cache-clear",
     "--verbose",
     "--junitxml=examples_report.xml",
-], depends_on = ["install"], cwd = "imod/tests" }
-test_import = { cmd = [
-    "python",
-    "-c",
-    "import imod"
-], depends_on = ["install_with_deps"]}
-pypi-publish = { cmd = "rm --recursive --force dist && python -m build && twine check dist/* && twine upload dist/*" }
-
-mypy_lint = { cmd ="mypy", depends_on = ["install"]}
-mypy_report = { cmd ="mypy | mypy2junit > mypy-report.xml", depends_on = ["install"]}
-
-
-
+], depends-on = ["install"], cwd = "imod/tests", env = { IMOD_DATA_DIR = ".imod_data" } }
+generate-sbom = { cmd = [
+    "sbom4python", 
+    "-m", "imod", 
+    "--system", "--sbom", "spdx", 
+    "--format", "json", "--output", "imod-python.spdx.json"
+], env = { "PATH" = "$PATH;$CONDA_PREFIX/Lib/site-packages/magic/libmagic" }, inputs = ["pyproject.toml"], outputs = ["imod-python.spdx.json"], depends-on = ["install"] }
 
 [dependencies]
-# Keep empty or undefined to create an empty default environment.
-
-[feature.base.dependencies]
 affine = "*"
 black = "*"
 bottleneck = "*"
 cftime = ">=1"
 contextily = ">=1"
 cytoolz = "*"
-dask = "<2024.1.0" # Newer version incompatible with rasterio
-fastcore = "*"
+dask = "*"
+filelock = "*"
 flopy = "*"
+gdal = ">=3.9.2"
 geopandas = "*"
 gh = "*"
 graphviz = "*"
 hatchling = "*"
 hypothesis = "*"
 jinja2 = "*"
+libgdal-hdf5 = "*"
 loguru = "*"
 matplotlib = "*"
 mypy = "*"
@@ -78,61 +88,110 @@ netcdf4 = "*"
 numba = ">=0.50"
 numpy = "*"
 pandamesh = "*"
-pandas = "*"
+pandas = ">=3"
+pip = "*"
+plum-dispatch = "*"
 pooch = "*"
+pydantic = "*"
 pydata-sphinx-theme = "*"
 pymetis = "*"
 pyproj = "*"
-pytest = "<8"   # Newer version incompatible with pytest-cases
+pytest = "*"
 pytest-benchmark = "*"
-pytest-cases = "*"
+pytest-cases = ">=3.9.1"
 pytest-cov = "*"
-python = "3.11"
+pytest-dotenv = "*"
+pytest-xdist = "*"
+python = "3.13.*"
+python-build = "*"
 python-graphviz = "*"
 pyvista = "*"
-rasterio = ">=1.0"
+rasterio = "*"
 rioxarray = "*"
 ruff = "*"
 scipy = "*"
 scooby = "*"
 setuptools_scm = "*"
 shapely = ">=2.0"
-sphinx = "5"
+sphinx = "*"
 sphinx-gallery = "*"
+sphinx-remove-toctrees = "*"
 tomli = ">=1.1.0"
 tomli-w = "*"
 toolz = "*"
 tqdm = "*"
 twine = "*"
-vtk = { version = ">=9.0", build = "*qt*", channel = "conda-forge" }
-xarray = ">=2023.08.0"
-xugrid = ">=0.10.0"
+vtk = { version = ">=9.0", build = "*qt*" }
+xarray = "!=2025.04.0" # Issue with xarray 2025.04.0 and rendering HFBs
+xugrid = ">=0.14.2"
 zarr = "*"
-build = "*"
+pytest-timeout = ">=2.3.1,<3"
 
-[feature.base.pypi-dependencies]
+[pypi-dependencies]
 mypy2junit = "*"
+sbom4python = ">=0.12.3"
+python-magic = ">=0.4.27"
 
 [feature.interactive.dependencies]
 ipykernel = "*"
 ipython = "*"
 jupyter = "*"
 
-[feature.py310.dependencies]
-python = "3.10.12"
+[feature.pixi-update.dependencies]
 pip = "*"
-
-[feature.py311.dependencies]
-python = "3.11"
-pip = "*"
+pixi-diff-to-markdown = "*"
 
 [feature.py312.dependencies]
-python = "3.12"
+python = "3.12.*"
 pip = "*"
 
+[feature.py313.dependencies]
+python = "3.13.*"
+pip = "*"
+
+[feature.py314.dependencies]
+python = "3.14.*"
+pip = "*"
+
+[feature.pixi-update.tasks]
+update = "pixi update --json | pixi-diff-to-markdown > diff.md"
+
+[feature.py_common.tasks]
+test_import = { cmd = [
+    "python",
+    "-c",
+    "import imod"
+], depends-on = ["install_with_deps"]}
+install_with_deps = "python -m pip install --editable ."
+
+[feature.user-acceptance.dependencies]
+dvc = "*"
+dvc-s3 = "*"
+
+[feature.user-acceptance.tasks]
+pull_data = "dvc pull --remote minio"
+fetch_lhm = {cmd = "tar -xf LHM_transient.zip", depends-on = ["pull_data"], cwd = "imod/tests/user_acceptance_data"}
+user_acceptance = { cmd = [
+    "pytest",
+    "-m", "user_acceptance",
+    "--cache-clear",
+    "--verbose",
+    "--junitxml=user_acceptance_report.xml",
+], depends-on = ["install", "fetch_lhm"], cwd = "imod/tests", env = { USER_ACCEPTANCE_DIR = "user_acceptance_data"} }
+run_imod5 = {cmd = ["prepare_mf6_transient_imod5.bat"], cwd = "imod/tests/user_acceptance_data/LHM_transient/scripts_imod-5"}
+qgis_export ={ cmd = [
+    "pytest", "-s",
+    "-m", "qgis_export",
+    "--cache-clear",
+    "--verbose",
+    "--junitxml=qgis_export_report.xml",
+], depends-on = ["install"], cwd = "imod/tests", env = { IMOD_DATA_DIR = ".imod_data" } }
+
 [environments]
-default = {features = ["base"], solve-group = "conda-deps"}
-interactive = {features = ["interactive", "base"], solve-group = "conda-deps"}
-py310 = {features = ["py310"], solve-group = "py310"}
-py311 = {features = ["py311"], solve-group = "py311"}
-py312 = {features = ["py312"], solve-group = "py312"}
+default = { features = [], solve-group = "conda-deps" }
+interactive = { features = ["interactive"], solve-group = "conda-deps" }
+user-acceptance = { features = ["user-acceptance"], solve-group = "conda-deps" }
+py312 = { features = ["py312", "py_common"], no-default-feature = true }
+py313 = { features = ["py313", "py_common"], no-default-feature = true }
+py314 = { features = ["py314", "py_common"], no-default-feature = true }
+pixi-update = { features = ["pixi-update"], no-default-feature = true }

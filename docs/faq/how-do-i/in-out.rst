@@ -56,3 +56,28 @@ With :func:`imod.util.to_ugrid2d`:
     ugrid_ds = imod.util.to_ugrid2d(da)
     ugrid_ds.to_netcdf("ds_ugrid.nc")
  
+
+Make data readable by QGIS
+~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+This requires the data to be compliant with `GDAL
+<https://gdal.org/index.html>`_ for structured data, or `MDAL <https://www.mdal.xyz/>`_ for
+unstructured data respectively.
+
+For structured data:
+
+.. code-block:: python
+
+    da_gdal = imod.util.spatial.gdal_compliant_grid(da)
+    da_gdal.to_netcdf("path/to/file.nc")
+
+You can open this data as **raster** data in QGIS.
+
+For unstructured data:
+
+.. code-block:: python
+
+    uda_mdal = imod.util.spatial.mdal_compliant_ugrid2d(uda)
+    uda_mdal.ugrid.to_netcdf("path/to/file.nc")
+
+You you can open this data as **mesh** data in QGIS.

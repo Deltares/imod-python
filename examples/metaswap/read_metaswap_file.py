@@ -75,7 +75,7 @@ landuse_options = imod.msw.LanduseOptions(
 directory = imod.util.temporary_directory()
 os.makedirs(directory)
 
-landuse_options.write(directory, None, None)
+landuse_options.write(directory, None, None, None, None)
 
 # %%
 # Reading the .inp file

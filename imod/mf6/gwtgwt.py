@@ -1,5 +1,5 @@
 from pathlib import Path
-from typing import Optional, Union
+from typing import Optional, Self, Union
 
 import cftime
 import numpy as np
@@ -58,9 +58,9 @@ class GWTGWT(ExchangeBase):
 
         auxiliary_variables = [var for var in [angldegx, cdist] if var is not None]
         if auxiliary_variables:
-            self.dataset["auxiliary_data"] = xr.merge(auxiliary_variables).to_array(
-                name="auxiliary_data"
-            )
+            self.dataset["auxiliary_data"] = xr.merge(
+                auxiliary_variables, compat="no_conflicts"
+            ).to_array(name="auxiliary_data")
             expand_transient_auxiliary_variables(self)
 
     def set_options(
@@ -87,10 +87,11 @@ class GWTGWT(ExchangeBase):
         y_max: Optional[float] = None,
         top: Optional[GridDataArray] = None,
         bottom: Optional[GridDataArray] = None,
-    ) -> Package:
+    ) -> Self:
+        """This package cannot be clipped by a bounding box."""
         raise NotImplementedError("this package cannot be clipped")
 
-    def render(
+    def _render(
         self,
         directory: Path,
         pkgname: str,

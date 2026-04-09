@@ -1,7 +1,12 @@
+import os
+import textwrap
+
+import geopandas as gpd
 import numpy as np
 import pandas as pd
 import pytest
 import xarray as xr
+from shapely import linestrings
 
 import imod
 from imod.typing.grid import zeros_like
@@ -233,6 +238,28 @@ def transient_twri_model():
 
 
 @pytest.fixture(scope="function")
+def twri_model_hfb():
+    """Returns steady-state confined model."""
+    simulation = make_twri_model()
+    gwf_model = simulation["GWF_1"]
+
+    barrier_y = [150_000.0, 50_000.0, 0.0]
+    barrier_x = [50_000.0, 50_000.0, 50_000.0]
+
+    geometry = gpd.GeoDataFrame(
+        geometry=[linestrings(barrier_x, barrier_y)],
+        data={
+            "resistance": [1200.0],
+            "layer": [1],
+        },
+    )
+
+    gwf_model["hfb"] = imod.mf6.SingleLayerHorizontalFlowBarrierResistance(geometry)
+
+    return simulation
+
+
+@pytest.fixture(scope="function")
 def transient_unconfined_twri_model():
     """Returns transient unconfined model, also saves specific discharges."""
     simulation = make_twri_model()
@@ -260,7 +287,6 @@ def transient_unconfined_twri_model():
     return simulation
 
 
-@pytest.mark.usefixtures("twri_model")
 @pytest.fixture(scope="function")
 def twri_result(tmpdir_factory):
     # Using a tmpdir_factory is the canonical way of sharing a tempory pytest
@@ -272,7 +298,52 @@ def twri_result(tmpdir_factory):
     return modeldir
 
 
-@pytest.mark.usefixtures("transient_twri_model")
+DRN_TEXT = textwrap.dedent(
+    """
+    begin options
+        print_input
+        print_flows
+        save_flows
+    end options
+
+    begin dimensions
+        maxbound 9
+    end dimensions
+
+    begin period 1
+        1 7 10 0.0 1.0
+        1 7 10 0.0 1.0
+        1 7 10 10.0 1.0
+        1 7 10 20.0 1.0
+        1 7 10 30.0 1.0
+        1 7 10 50.0 1.0
+        1 7 10 70.0 1.0
+        1 7 10 90.0 1.0
+        1 7 10 100.0 1.0
+    end period
+    """
+)
+
+
+@pytest.fixture(scope="function")
+def twri_result_9_drn_in_1_cell(tmpdir_factory):
+    """TWRI model with drains in the same cell, so to test open_cbc."""
+    # Using a tmpdir_factory is the canonical way of sharing a tempory pytest
+    # directory between different testing modules.
+    modeldir = tmpdir_factory.mktemp("ex01-twri-duplicate-cellvalue")
+    simulation = make_twri_model()
+    simulation.write(modeldir)
+
+    # Duplicate the cell value
+    drn_path = modeldir / "GWF_1" / "drn.drn"
+    os.remove(drn_path)
+    with open(drn_path, "w") as f:
+        f.write(DRN_TEXT)
+
+    simulation.run()
+    return modeldir
+
+
 @pytest.fixture(scope="function")
 def transient_twri_result(tmpdir_factory, transient_twri_model):
     # Using a tmpdir_factory is the canonical way of sharing a tempory pytest
@@ -284,7 +355,6 @@ def transient_twri_result(tmpdir_factory, transient_twri_model):
     return modeldir
 
 
-@pytest.mark.usefixtures("transient_unconfined_twri_model")
 @pytest.fixture(scope="function")
 def transient_unconfined_twri_result(tmpdir_factory, transient_unconfined_twri_model):
     # Using a tmpdir_factory is the canonical way of sharing a tempory pytest
@@ -296,12 +366,13 @@ def transient_unconfined_twri_result(tmpdir_factory, transient_unconfined_twri_m
     return modeldir
 
 
-@pytest.mark.usefixtures("transient_twri_model")
 @pytest.fixture(scope="function")
 def split_transient_twri_model(transient_twri_model):
     active = transient_twri_model["GWF_1"].domain.sel(layer=1)
     number_partitions = 3
-    split_location = np.linspace(active.y.min(), active.y.max(), number_partitions + 1)
+    split_location = np.linspace(
+        active.y.min().item(), active.y.max().item(), number_partitions + 1
+    )
 
     coords = active.coords
     submodel_labels = zeros_like(active)

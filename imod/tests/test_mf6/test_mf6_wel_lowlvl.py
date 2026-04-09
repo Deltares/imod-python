@@ -20,12 +20,16 @@ def struct_array_expected():
         [
             (1, 1, 9, 1.0),
             (1, 2, 9, 1.0),
+            (1, 3, 9, 1.0),
             (1, 1, 8, 1.0),
             (1, 2, 8, 1.0),
-            (2, 3, 7, 1.0),
+            (1, 3, 8, 1.0),
             (2, 4, 7, 1.0),
-            (2, 3, 6, 1.0),
+            (2, 5, 7, 1.0),
+            (2, 6, 7, 1.0),
             (2, 4, 6, 1.0),
+            (2, 5, 6, 1.0),
+            (2, 6, 6, 1.0),
         ],
         dtype=[("layer", "<i4"), ("row", "<i4"), ("column", "<i4"), ("rate", "<f8")],
     )
@@ -94,7 +98,7 @@ def test_mf6wel_write__stationary(
     write_context = WriteContext(directory, use_binary=True)
 
     # Act
-    mf6wel.write(pkgname, globaltimes, write_context)
+    mf6wel._write(pkgname, globaltimes, write_context)
 
     # Assert
     assert len(list(directory.glob("**/*"))) == 3
@@ -116,7 +120,7 @@ def test_mf6wel_write__transient(
     directory.mkdir(exist_ok=True)
     write_context = WriteContext(directory, use_binary=True)
     # Act
-    mf6wel.write(pkgname, globaltimes, write_context)
+    mf6wel._write(pkgname, globaltimes, write_context)
 
     # Assert
     assert len(list(directory.glob("**/*"))) == 7
@@ -138,14 +142,14 @@ def test_mf6wel_render__transient(
     directory.mkdir(exist_ok=True)
 
     # Act
-    actual = mf6wel.render(directory.stem, pkgname, globaltimes, False)
+    actual = mf6wel._render(directory.stem, pkgname, globaltimes, False)
     expected = textwrap.dedent(
         """\
     begin options
     end options
 
     begin dimensions
-      maxbound 24
+      maxbound 36
     end dimensions
 
     begin period 1
@@ -185,7 +189,7 @@ def test_remove_inactive__stationary(basic_dis, mf6wel_test_data_stationary):
     ds_removed = imod.mf6.utilities.dataset.remove_inactive(ds, active)
 
     # Assert
-    assert dict(ds_removed.dims) == {"ncellid": 6, "nmax_cellid": 3}
+    assert dict(ds_removed.sizes) == {"ncellid": 10, "dim_cellid": 3}
 
 
 def test_remove_inactive__transient(basic_dis, mf6wel_test_data_transient):
@@ -203,4 +207,4 @@ def test_remove_inactive__transient(basic_dis, mf6wel_test_data_transient):
     ds_removed = imod.mf6.utilities.dataset.remove_inactive(ds, active)
 
     # Assert
-    assert dict(ds_removed.dims) == {"ncellid": 6, "time": 5, "nmax_cellid": 3}
+    assert dict(ds_removed.sizes) == {"ncellid": 10, "time": 5, "dim_cellid": 3}

@@ -7,6 +7,7 @@ Evaluate model output
     :toctree: generated/evaluate
 
     calculate_gxg
+    calculate_gxg_points
 
     convert_pointwaterhead_freshwaterhead
 

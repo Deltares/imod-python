@@ -1,15 +1,18 @@
-from typing import Optional, Tuple
+from pathlib import Path
+from typing import Any, List
 
 import numpy as np
 import pandas as pd
 
+from imod.common.interfaces.imaskingsettings import IMaskingSettings
+from imod.common.interfaces.iregridpackage import IRegridPackage
 from imod.logging import init_log_decorator
-from imod.mf6.interfaces.iregridpackage import IRegridPackage
 from imod.mf6.package import Package
-from imod.mf6.utilities.regrid import RegridderType
+from imod.mf6.regrid.regrid_schemes import DiscretizationRegridMethod
 from imod.mf6.validation import DisBottomSchema
 from imod.mf6.write_context import WriteContext
 from imod.schemata import (
+    AllCoordsValueSchema,
     AllValueSchema,
     AnyValueSchema,
     DimsSchema,
@@ -19,15 +22,31 @@ from imod.schemata import (
 )
 
 
-class VerticesDiscretization(Package, IRegridPackage):
+class VerticesDiscretization(Package, IRegridPackage, IMaskingSettings):
     """
     Discretization by Vertices (DISV).
 
     Parameters
     ----------
     top: array of floats (xu.UgridDataArray)
+        is the top elevation for each cell in the top model layer.
     bottom: array of floats (xu.UgridDataArray)
+        is the bottom elevation for each cell.
     idomain: array of integers (xu.UgridDataArray)
+        Indicates the existence status of a cell.
+
+        * If 0, the cell does not exist in the simulation. Input and output
+          values will be read and written for the cell, but internal to the
+          program, the cell is excluded from the solution.
+        * If >0, the cell exists in the simulation.
+        * If <0, the cell does not exist in the simulation. Furthermore, the
+          first existing cell above will be connected to the first existing cell
+          below. This type of cell is referred to as a "vertical pass through"
+          cell.
+
+        This UgridDataArray needs to contain a ``"layer"`` coordinate and a face
+        dimension. Horizontal discretization information will be derived from
+        its face dimension.
     validate: {True, False}
         Flag to indicate whether the package should be validated upon
         initialization. This raises a ValidationError if package input is
@@ -46,17 +65,19 @@ class VerticesDiscretization(Package, IRegridPackage):
             DTypeSchema(np.floating),
             DimsSchema("layer", "{face_dim}") | DimsSchema("layer"),
             IndexesSchema(),
+            AllCoordsValueSchema("layer", ">", 0),
         ],
         "idomain": [
             DTypeSchema(np.integer),
             DimsSchema("layer", "{face_dim}"),
             IndexesSchema(),
+            AllCoordsValueSchema("layer", ">", 0),
         ],
     }
     _write_schemata = {
         "idomain": (AnyValueSchema(">", 0),),
         "top": (
-            AllValueSchema(">", "bottom", ignore=("idomain", "==", -1)),
+            AllValueSchema(">", "bottom", ignore=("idomain", "<=", 0)),
             IdentityNoDataSchema(other="idomain", is_other_notnull=(">", 0)),
             # No need to check coords: dataset ensures they align with idomain.
         ),
@@ -66,14 +87,11 @@ class VerticesDiscretization(Package, IRegridPackage):
     _grid_data = {"top": np.float64, "bottom": np.float64, "idomain": np.int32}
     _keyword_map = {"bottom": "botm"}
     _template = Package._initialize_template(_pkg_id)
+    _regrid_method = DiscretizationRegridMethod()
 
-    _regrid_method = {
-        "top": (RegridderType.OVERLAP, "mean"),
-        "bottom": (RegridderType.OVERLAP, "mean"),
-        "idomain": (RegridderType.OVERLAP, "mode"),
-    }
-
-    _skip_mask_arrays = ["bottom"]
+    @property
+    def skip_variables(self) -> List[str]:
+        return ["bottom"]
 
     @init_log_decorator()
     def __init__(self, top, bottom, idomain, validate: bool = True):
@@ -85,12 +103,12 @@ class VerticesDiscretization(Package, IRegridPackage):
         super().__init__(dict_dataset)
         self._validate_init_schemata(validate)
 
-    def render(self, directory, pkgname, binary):
+    def _get_render_dictionary(self, directory, pkgname, globaltimes, binary):
         disdirectory = directory / pkgname
-        d = {}
+        d: dict[str, Any] = {}
         grid = self.dataset.ugrid.grid
-        d["xorigin"] = grid.node_x.min()
-        d["yorigin"] = grid.node_y.min()
+        d["xorigin"] = 0.0
+        d["yorigin"] = 0.0
         d["nlay"] = self.dataset["idomain"].coords["layer"].size
         facedim = grid.face_dimension
         d["ncpl"] = self.dataset["idomain"].coords[facedim].size
@@ -105,7 +123,7 @@ class VerticesDiscretization(Package, IRegridPackage):
         d["idomain_layered"], d["idomain"] = self._compose_values(
             self["idomain"], disdirectory, "idomain", binary=binary
         )
-        return self._template.render(d)
+        return d
 
     def _verts_dataframe(self) -> pd.DataFrame:
         grid = self.dataset.ugrid.grid
@@ -129,12 +147,8 @@ class VerticesDiscretization(Package, IRegridPackage):
             )
         return df
 
-    def write_blockfile(self, pkgname, globaltimes, write_context: WriteContext):
-        dir_for_render = write_context.get_formatted_write_directory()
-        content = self.render(dir_for_render, pkgname, write_context.use_binary)
-        filename = write_context.write_directory / f"{pkgname}.{self._pkg_id}"
-        with open(filename, "w") as f:
-            f.write(content)
+    def _append_vertices_and_cell2d(self, filename: Path | str) -> None:
+        with open(filename, "a") as f:
             f.write("\n\n")
 
             f.write("begin vertices\n")
@@ -148,6 +162,14 @@ class VerticesDiscretization(Package, IRegridPackage):
                 f, header=False, sep=" ", lineterminator="\n"
             )
             f.write("end cell2d\n")
+
+        return
+
+    def _write_blockfile(self, pkgname, globaltimes, write_context: WriteContext):
+        super()._write_blockfile(pkgname, globaltimes, write_context)
+        filename = write_context.write_directory / f"{pkgname}.{self._pkg_id}"
+        self._append_vertices_and_cell2d(filename)
+
         return
 
     def _validate(self, schemata, **kwargs):
@@ -156,6 +178,3 @@ class VerticesDiscretization(Package, IRegridPackage):
         errors = super()._validate(schemata, **kwargs)
 
         return errors
-
-    def get_regrid_methods(self) -> Optional[dict[str, Tuple[RegridderType, str]]]:
-        return self._regrid_method

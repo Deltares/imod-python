@@ -16,16 +16,15 @@ FloPy nearly fully supports a list of models and software:
 * MODFLOW2005
 * MODFLOW-LGR
 * MODFLOW-USG
-* MODFLOW6
+* MODFLOW 6
 * SEAWAT
 * MODPATH
 * MT3D
   
 imod supports (partially):
 
-* iMODFLOW
 * iMOD-WQ
-* MODFLOW6
+* MODFLOW 6
 
 Data structures
 ~~~~~~~~~~~~~~~
@@ -40,7 +39,7 @@ computing in Python; imod is built on xarray. To quote "`Why xarray?`_":
 imod-python started out as a package to read iMODFLOW files (IDF, IPF) into
 Python as xarray and pandas data structures. The `Why xarray?`_ page provides
 more background, but we can demonstrate with an example of two tasks for a
-(structured) MODFLOW6 model:
+(structured) MODFLOW 6 model:
 
     1. selecting the heads at a specified (x, y) point;
     2. computing a mean of the heads over time.
@@ -117,7 +116,7 @@ imod has significantly more:
 Many of these packages have binary dependencies, but both FloPy and imod can be
 installed via ``pip``. However, full functionality -- such as exporting to
 netCDF, reading and writing GIS formats, or 3D visualization -- involves more
-complex dependencies, which require the ``mamba`` or ``conda`` package managers
+complex dependencies, which require the ``pixi`` or ``conda`` package managers
 to install correctly (especially on Windows).
  
 Large data

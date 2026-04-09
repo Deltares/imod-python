@@ -34,7 +34,18 @@ validation xarray library becomes.
 import abc
 import operator
 from functools import partial
-from typing import Any, Callable, Dict, Optional, Sequence, Tuple, TypeAlias, Union
+from typing import (
+    TYPE_CHECKING,
+    Any,
+    Callable,
+    Dict,
+    Optional,
+    Sequence,
+    Tuple,
+    Type,
+    TypeAlias,
+    Union,
+)
 
 import numpy as np
 import scipy
@@ -43,6 +54,16 @@ import xugrid as xu
 from numpy.typing import DTypeLike  # noqa: F401
 
 from imod.typing import GridDataArray, ScalarAsDataArray
+from imod.typing.grid import notnull
+from imod.util.imports import MissingOptionalModule
+
+if TYPE_CHECKING:
+    import geopandas as gpd
+else:
+    try:
+        import geopandas as gpd
+    except ImportError:
+        gpd = MissingOptionalModule("geopandas")
 
 DimsT = Union[str, None]
 ShapeT = Tuple[Union[int, None]]
@@ -74,7 +95,7 @@ def scalar_None(obj):
     if not isinstance(obj, (xr.DataArray, xu.UgridDataArray)):
         return False
     else:
-        return (len(obj.shape) == 0) & (~obj.notnull()).all()
+        return (len(obj.shape) == 0) and (obj.isnull()).all()
 
 
 def align_other_obj_with_coords(
@@ -115,8 +136,8 @@ class BaseSchema(abc.ABC):
         return SchemaUnion(self, other)
 
 
-# SchemaType = TypeVar("SchemaType", bound=BaseSchema)
 SchemaType: TypeAlias = BaseSchema
+SchemataDict: TypeAlias = dict[str, list[SchemaType] | Tuple[SchemaType, ...]]
 
 
 class SchemaUnion:
@@ -140,8 +161,9 @@ class SchemaUnion:
             except ValidationError as e:
                 errors.append(e)
 
+        ws = "\n    "
         if len(errors) == len(self.schemata):  # All schemata failed
-            message = "\n\t" + "\n\t".join(str(error) for error in errors)
+            message = f"{ws}" + f"{ws}".join(str(error) for error in errors)
             raise ValidationError(f"No option succeeded:{message}")
 
     def __or__(self, other):
@@ -174,6 +196,14 @@ class OptionSchema(BaseSchema):
 
 class DTypeSchema(BaseSchema):
     def __init__(self, dtype: DTypeLike) -> None:
+        """
+        Validate dtype
+
+        Parameters
+        ----------
+        dtype : Any
+            Dtype of the DataArray.
+        """
         if dtype in [
             np.floating,
             np.integer,
@@ -186,19 +216,55 @@ class DTypeSchema(BaseSchema):
             self.dtype = np.dtype(dtype)
 
     def validate(self, obj: GridDataArray, **kwargs) -> None:
+        if scalar_None(obj):
+            return
+
+        if not np.issubdtype(obj.dtype, self.dtype):
+            raise ValidationError(f"dtype {obj.dtype} != {self.dtype}")
+
+
+class TypeSchema(BaseSchema):
+    def __init__(self, dtype: Type) -> None:
         """
-        Validate dtype
+        Validate type, used for model options instead of GridDataArrays.
+
+        Parameters
+        ----------
+        dtype : type
+            Type of the DataArray.
+        """
+        self.dtype = dtype
+
+    def validate(self, obj: Any, **kwargs) -> None:
+        if obj is None:
+            return
+
+        if not isinstance(obj, self.dtype):
+            raise ValidationError(f"type {type(obj)} != {self.dtype}")
+
+
+class GeometryTypeSchema(BaseSchema):
+    def __init__(self, dtype: DTypeLike) -> None:
+        """
+        Validate geometry types
 
         Parameters
         ----------
         dtype : Any
             Dtype of the DataArray.
         """
-        if scalar_None(obj):
-            return
+        self.dtype = dtype
 
-        if not np.issubdtype(obj.dtype, self.dtype):
-            raise ValidationError(f"dtype {obj.dtype} != {self.dtype}")
+    def validate(self, obj: GridDataArray, **kwargs) -> None:
+        is_geometry_type = [isinstance(i, self.dtype) for i in obj.data.ravel()]
+        if not all(is_geometry_type):
+            is_wrong_type = ~np.array(is_geometry_type)
+            wrong_type_index = np.argwhere(is_wrong_type).ravel()
+            wrong_types = [o.geom_type for o in obj.data.ravel()[is_wrong_type]]
+            raise ValidationError(
+                f"Geometry not of expected type '{self.dtype}'. "
+                f"Got wrong types for geometry number {wrong_type_index}, namely {wrong_types}"
+            )
 
 
 class DimsSchema(BaseSchema):
@@ -256,7 +322,7 @@ class EmptyIndexesSchema(BaseSchema):
         # Remove face dim from list to validate, as it has no ``indexes``
         # attribute.
         if isinstance(obj, xu.UgridDataArray):
-            ugrid_dims = obj.ugrid.grid.dimensions
+            ugrid_dims = obj.ugrid.grid.sizes.keys()
             dims_to_validate = [
                 dim for dim in dims_to_validate if dim not in ugrid_dims
             ]
@@ -407,6 +473,42 @@ class OtherCoordsSchema(BaseSchema):
         ).validate(obj)
 
 
+class AllCoordsValueSchema(BaseSchema):
+    """
+    Validate presence of coords.
+
+    Parameters
+    ----------
+    coord : str
+        name of coordinate
+    """
+
+    def __init__(
+        self,
+        coordname: str,
+        operator: str,
+        other: Any,
+    ) -> None:
+        self.coordname = coordname
+        self.operator = OPERATORS[operator]
+        self.operator_str = operator
+        self.other = other
+
+    def validate(self, obj: GridDataArray, **kwargs) -> None:
+        obj_coords = list(obj.coords.keys())
+        # Shortcut if coord is not in obj, use Coordinate schema to throw error if
+        # coord is missing.
+        if scalar_None(obj) or (self.coordname not in obj_coords):
+            return
+
+        obj_coord = obj.coords[self.coordname]
+        condition = self.operator(obj_coord, self.other)
+        if not condition.all():
+            raise ValidationError(
+                f"Not all values of coordinate {self.coordname} comply with criterion: {self.operator_str} {self.other}"
+            )
+
+
 class ValueSchema(BaseSchema, abc.ABC):
     """
     Base class for AllValueSchema or AnyValueSchema.
@@ -503,20 +605,40 @@ class AnyValueSchema(ValueSchema):
             )
 
 
-def _notnull(obj):
+class MaxNUniqueValuesSchema(BaseSchema):
     """
-    Helper function; does the same as xr.DataArray.notnull. This function is to
-    avoid an issue where xr.DataArray.notnull() returns ordinary numpy arrays
-    for instances of xu.UgridDataArray.
+    Fails if amount of unique values exceeds a limit.
     """
 
-    return ~np.isnan(obj)
+    def __init__(self, max_unique_values: int):
+        self.max_unique_values = max_unique_values
+
+    def validate(self, obj: GridDataArray, **kwargs) -> None:
+        if len(np.unique(obj)) > self.max_unique_values:
+            raise ValidationError(
+                f"Amount of unique values exceeds limit of {self.max_unique_values}"
+            )
+
+
+class UniqueValuesSchema(BaseSchema):
+    def __init__(self, other_value: list) -> None:
+        """
+        Validate if unique values in other values list
+        """
+        self.other_value = other_value
+
+    def validate(self, obj: GridDataArray, **kwargs) -> None:
+        unique_values = np.unique(obj)
+        if not np.all(np.isin(unique_values, self.other_value)):
+            raise ValidationError(
+                f"Unique values not matching: {self.other_value}, got unique values: {unique_values}"
+            )
 
 
 class NoDataSchema(BaseSchema):
     def __init__(
         self,
-        is_notnull: Union[Callable, Tuple[str, Any]] = _notnull,
+        is_notnull: Union[Callable, Tuple[str, Any]] = notnull,
     ):
         if isinstance(is_notnull, tuple):
             op, value = is_notnull
@@ -555,8 +677,8 @@ class NoDataComparisonSchema(BaseSchema):
     def __init__(
         self,
         other: str,
-        is_notnull: Union[Callable, Tuple[str, Any]] = _notnull,
-        is_other_notnull: Union[Callable, Tuple[str, Any]] = _notnull,
+        is_notnull: Union[Callable, Tuple[str, Any]] = notnull,
+        is_other_notnull: Union[Callable, Tuple[str, Any]] = notnull,
     ):
         self.other = other
         if isinstance(is_notnull, tuple):
@@ -602,10 +724,11 @@ class AllInsideNoDataSchema(NoDataComparisonSchema):
 
     def validate(self, obj: GridDataArray, **kwargs) -> None:
         other_obj = kwargs[self.other]
+
         valid = self.is_notnull(obj)
         other_valid = self.is_other_notnull(other_obj)
 
-        valid, other_valid = align_other_obj_with_coords(valid, other_obj)
+        valid, other_valid = align_other_obj_with_coords(valid, other_valid)
 
         if (valid & ~other_valid).any():
             raise ValidationError(f"data values found at nodata values of {self.other}")
@@ -624,7 +747,7 @@ class ActiveCellsConnectedSchema(BaseSchema):
 
     def __init__(
         self,
-        is_notnull: Union[Callable, Tuple[str, Any]] = _notnull,
+        is_notnull: Union[Callable, Tuple[str, Any]] = notnull,
     ):
         if isinstance(is_notnull, tuple):
             op, value = is_notnull

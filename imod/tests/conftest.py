@@ -1,5 +1,10 @@
 import pytest
 
+from .fixtures.backward_compatibility_fixture import (
+    imod5_dataset,
+    imod5_dataset_periods,
+    imod5_dataset_transient,
+)
 from .fixtures.flow_basic_fixture import (
     basic_dis,
     basic_dis__topsystem,
@@ -16,15 +21,30 @@ from .fixtures.flow_basic_unstructured_fixture import (
     basic_unstructured_dis,
     circle_dis,
 )
-from .fixtures.flow_example_fixture import imodflow_model
 from .fixtures.flow_transport_simulation_fixture import flow_transport_simulation
+from .fixtures.imod5_cap_data import (
+    cap_data_sprinkling_grid,
+    cap_data_sprinkling_grid__big,
+    cap_data_sprinkling_points,
+)
+from .fixtures.imod5_well_data import (
+    well_duplication_import_prj,
+    well_empty_ipfs,
+    well_mixed_ipfs,
+    well_out_of_bounds_ipfs,
+    well_regular_import_prj,
+    well_simple_import_prj__steady_state,
+    well_simple_import_prj__transient,
+)
 from .fixtures.mf6_circle_fixture import (
     circle_model,
     circle_model_evt,
     circle_model_transport,
     circle_model_transport_multispecies_variable_density,
+    circle_model_transport_vsc,
     circle_partitioned,
     circle_result,
+    circle_result__offset_origins,
     circle_result_evt,
     circle_result_sto,
 )
@@ -67,7 +87,9 @@ from .fixtures.mf6_twri_fixture import (
     transient_unconfined_twri_model,
     transient_unconfined_twri_result,
     twri_model,
+    twri_model_hfb,
     twri_result,
+    twri_result_9_drn_in_1_cell,
 )
 from .fixtures.mf6_welltest_fixture import (
     mf6wel_test_data_stationary,
@@ -77,5 +99,13 @@ from .fixtures.mf6_welltest_fixture import (
     well_test_data_stationary,
     well_test_data_transient,
 )
-from .fixtures.msw_fixture import fixed_format_parser
-from .fixtures.msw_model_fixture import coupled_mf6_model, msw_model
+from .fixtures.msw_fixture import fixed_format_parser, simple_2d_grid_with_subunits
+from .fixtures.msw_imod5_cap_fixture import imod5_cap_data
+from .fixtures.msw_meteo_fixture import meteo_grids
+from .fixtures.msw_model_fixture import (
+    coupled_mf6_model,
+    coupled_mf6wel,
+    msw_model,
+    msw_model_get_starttime,
+    msw_model_no_sprinkling,
+)

@@ -1,19 +1,17 @@
+import sys
 from textwrap import dedent
-from zipfile import ZipFile
 
 import numpy as np
 from numpy.testing import assert_allclose
 
-from imod.data.sample_data import create_pooch_registry, load_pooch_registry
+import imod
 from imod.formats.prj import open_projectfile_data
-
-registry = create_pooch_registry()
-registry = load_pooch_registry(registry)
-fname_model = registry.fetch("iMOD5_model.zip")
+from imod.logging.config import LoggerType
+from imod.logging.loglevel import LogLevel
 
 
 def snippet_constant_kh(factor: float, addition: float, init: float):
-    return dedent(f"""\
+    return dedent(rf"""\
         0001,(KHV),1, Horizontal Permeability
         001,2
         1,1,1,{factor},{addition},{init}   >>> (KHV) Horizontal Permeability (IDF) <<<
@@ -22,8 +20,7 @@ def snippet_constant_kh(factor: float, addition: float, init: float):
 
 
 def test_import_constants(tmp_path):
-    with ZipFile(fname_model) as archive:
-        archive.extractall(tmp_path)
+    _ = imod.data.imod5_projectfile_data(tmp_path)
 
     projects_file = tmp_path / "iMOD5_model_pooch" / "iMOD5_model.prj"
 
@@ -51,7 +48,7 @@ def test_import_constants(tmp_path):
 
 
 def snippet_idf_import_kh(factor: float, addition: float):
-    return dedent(f"""\
+    return dedent(rf"""\
         0001,(KHV),1, Horizontal Permeability
         001,2
         1,1,1,{factor},{addition},-999.99, '.\Database\KHV\VERSION_1\IPEST_KHV_L1.IDF' >>> (KHV) Horizontal Permeability (IDF) <<<
@@ -60,8 +57,7 @@ def snippet_idf_import_kh(factor: float, addition: float):
 
 
 def test_import_idf(tmp_path):
-    with ZipFile(fname_model) as archive:
-        archive.extractall(tmp_path)
+    _ = imod.data.imod5_projectfile_data(tmp_path)
 
     projects_file = tmp_path / "iMOD5_model_pooch" / "iMOD5_model.prj"
 
@@ -91,7 +87,7 @@ def test_import_idf(tmp_path):
 def snippet_idf_import_transient(
     factor1: float, addition1: float, factor2: float, addition2: float
 ):
-    return dedent(f"""\
+    return dedent(rf"""\
         0002, (chd), 1, ConstantHead, ['head']
         2018-01-01 00:00:00                  
         001, 001
@@ -103,8 +99,7 @@ def snippet_idf_import_transient(
 
 
 def test_import_idf_transient(tmp_path):
-    with ZipFile(fname_model) as archive:
-        archive.extractall(tmp_path)
+    _ = imod.data.imod5_projectfile_data(tmp_path)
 
     projects_file = tmp_path / "iMOD5_model_pooch" / "iMOD5_model.prj"
 
@@ -124,7 +119,7 @@ def test_import_idf_transient(tmp_path):
 
 
 def snippet_gen_import_hfb(factor: float, addition: float):
-    return dedent(f"""\
+    return dedent(rf"""\
         0001,(HFB),1, Horizontal Flow Barrier
         001,2
         1,2, 003,{factor},{addition},  -999.9900    ,'.\Database\HFB\VERSION_1\IBV2_HOOFDBREUKEN_BX.GEN' >>> (HFB) Horizontal Barrier Flow (GEN) <<<
@@ -133,8 +128,7 @@ def snippet_gen_import_hfb(factor: float, addition: float):
 
 
 def test_import_gen(tmp_path):
-    with ZipFile(fname_model) as archive:
-        archive.extractall(tmp_path)
+    _ = imod.data.imod5_projectfile_data(tmp_path)
 
     projects_file = tmp_path / "iMOD5_model_pooch" / "iMOD5_model.prj"
 
@@ -150,7 +144,7 @@ def test_import_gen(tmp_path):
 def snippet_gen_import_ipf(
     factor1: float, addition1: float, factor2: float, addition2: float
 ):
-    return dedent(f"""\
+    return dedent(rf"""\
         0001,(WEL),1, Wells
         STEADY-STATE
         001,003
@@ -161,8 +155,7 @@ def snippet_gen_import_ipf(
 
 
 def test_import_ipf(tmp_path):
-    with ZipFile(fname_model) as archive:
-        archive.extractall(tmp_path)
+    _ = imod.data.imod5_projectfile_data(tmp_path)
 
     projects_file = tmp_path / "iMOD5_model_pooch" / "iMOD5_model.prj"
 
@@ -181,21 +174,93 @@ def test_import_ipf(tmp_path):
     result_snippet_1 = open_projectfile_data(projects_file)
 
     assert np.all(
-        result_snippet_1[0]["wel-1"]["dataframe"]["rate"]
-        == 2 * result_snippet_0[0]["wel-1"]["dataframe"]["rate"] + 1.3
+        result_snippet_1[0]["wel-WELLS_L3"]["dataframe"][0]["rate"]
+        == 2 * result_snippet_0[0]["wel-WELLS_L3"]["dataframe"][0]["rate"] + 1.3
     )
     assert np.all(
-        result_snippet_1[0]["wel-2"]["dataframe"]["rate"]
-        == -1 * result_snippet_0[0]["wel-2"]["dataframe"]["rate"] + 0
+        result_snippet_1[0]["wel-WELLS_L4"]["dataframe"][0]["rate"]
+        == -1 * result_snippet_0[0]["wel-WELLS_L4"]["dataframe"][0]["rate"] + 0
     )
     assert np.all(
-        result_snippet_1[0]["wel-3"]["dataframe"]["rate"]
-        == 2 * result_snippet_0[0]["wel-2"]["dataframe"]["rate"] + 1.3
+        result_snippet_1[0]["wel-WELLS_L5"]["dataframe"][0]["rate"]
+        == 2 * result_snippet_0[0]["wel-WELLS_L4"]["dataframe"][0]["rate"] + 1.3
     )
+    assert np.all(
+        result_snippet_1[0]["wel-WELLS_L3"]["dataframe"][0]["filt_top"] == 11.0
+    )
+    assert np.all(
+        result_snippet_1[0]["wel-WELLS_L3"]["dataframe"][0]["filt_bot"] == 6.0
+    )
+    assert np.all(
+        result_snippet_1[0]["wel-WELLS_L4"]["dataframe"][0]["filt_top"] == 11.0
+    )
+    assert np.all(
+        result_snippet_1[0]["wel-WELLS_L4"]["dataframe"][0]["filt_bot"] == 6.0
+    )
+    assert np.all(
+        result_snippet_1[0]["wel-WELLS_L5"]["dataframe"][0]["filt_top"] == 11.0
+    )
+    assert np.all(
+        result_snippet_1[0]["wel-WELLS_L5"]["dataframe"][0]["filt_bot"] == 6.0
+    )
+
+
+def test_import_ipf_unique_id_and_logging(tmp_path):
+    _ = imod.data.imod5_projectfile_data(tmp_path)
+
+    logfile_path = tmp_path / "logfile.txt"
+
+    try:
+        with open(logfile_path, "w") as sys.stdout:
+            # start logging
+            imod.logging.configure(
+                LoggerType.PYTHON,
+                log_level=LogLevel.WARNING,
+                add_default_file_handler=False,
+                add_default_stream_handler=True,
+            )
+            projects_file = tmp_path / "iMOD5_model_pooch" / "iMOD5_model.prj"
+
+            file1 = open(projects_file, "w")
+            file1.write(
+                snippet_gen_import_ipf(
+                    factor1=2.0, addition1=1.3, factor2=-1.0, addition2=0.0
+                )
+            )
+            file1.close()
+
+            # Act
+            result_snippet_1 = open_projectfile_data(projects_file)
+    finally:
+        # turn the logger off again
+        imod.logging.configure(
+            LoggerType.NULL,
+            log_level=LogLevel.WARNING,
+            add_default_file_handler=False,
+            add_default_stream_handler=False,
+        )
+
+    # test that id's were made unique
+    # Assert
+    assert np.all(
+        result_snippet_1[0]["wel-WELLS_L3"]["dataframe"][0]["id"] == "extractions"
+    )
+    assert np.all(
+        result_snippet_1[0]["wel-WELLS_L4"]["dataframe"][0]["id"] == "extractions_1"
+    )
+    assert np.all(
+        result_snippet_1[0]["wel-WELLS_L5"]["dataframe"][0]["id"] == "extractions_2"
+    )
+
+    with open(logfile_path, "r") as log_file:
+        log = log_file.read()
+        assert "This happened at x =\n197910, y = 362860, id = extractions" in log
+        assert "appended with the suffix _1" in log
+        assert "appended with the suffix _2" in log
 
 
 def snippet_boundary_condition(factor: float, addition: float):
-    return dedent(f"""\
+    return dedent(rf"""\
         0001,(CHD),1, Constant Head
         STEADY-STATE
         001,2
@@ -205,8 +270,7 @@ def snippet_boundary_condition(factor: float, addition: float):
 
 
 def test_import_idf_boundary_condition(tmp_path):
-    with ZipFile(fname_model) as archive:
-        archive.extractall(tmp_path)
+    _ = imod.data.imod5_projectfile_data(tmp_path)
 
     projects_file = tmp_path / "iMOD5_model_pooch" / "iMOD5_model.prj"
 
@@ -231,7 +295,7 @@ def test_import_idf_boundary_condition(tmp_path):
 
 
 def snippet_idf_without_layer_dim(factor: float, addition: float):
-    return dedent(f"""\
+    return dedent(rf"""\
         0001,(RIV),1, Rivers
         STEADY-STATE
         004,001
@@ -243,8 +307,7 @@ def snippet_idf_without_layer_dim(factor: float, addition: float):
 
 
 def test_import_no_layer(tmp_path):
-    with ZipFile(fname_model) as archive:
-        archive.extractall(tmp_path)
+    _ = imod.data.imod5_projectfile_data(tmp_path)
 
     projects_file = tmp_path / "iMOD5_model_pooch" / "iMOD5_model.prj"
 

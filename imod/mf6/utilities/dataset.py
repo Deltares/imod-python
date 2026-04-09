@@ -1,9 +1,8 @@
-from typing import Any
+from typing import Optional
 
 import numpy as np
 import pandas as pd
 import xarray as xr
-from xarray.core.utils import is_scalar
 
 from imod.typing import GridDataArray
 
@@ -40,17 +39,10 @@ def remove_inactive(ds: xr.Dataset, active: xr.DataArray) -> xr.Dataset:
     return ds.loc[{"ncellid": valid}]
 
 
-def is_dataarray_none(datarray: Any) -> bool:
-    return isinstance(datarray, xr.DataArray) and datarray.isnull().values.all()
-
-
-def get_scalar_variables(ds: GridDataArray) -> list[str]:
-    """Returns scalar variables in a dataset."""
-    return [var for var, arr in ds.variables.items() if is_scalar(arr)]
-
-
 def assign_datetime_coords(
-    da: GridDataArray, simulation_start_time: np.datetime64, time_unit: str = "d"
+    da: GridDataArray,
+    simulation_start_time: np.datetime64,
+    time_unit: Optional[str] = "d",
 ) -> GridDataArray:
     if "time" not in da.coords:
         raise ValueError(
@@ -61,3 +53,16 @@ def assign_datetime_coords(
         da["time"], unit=time_unit
     )
     return da.assign_coords(time=time)
+
+
+def assign_index(arg):
+    if isinstance(arg, xr.DataArray):
+        arg = arg.values
+    elif not isinstance(arg, (np.ndarray, list, tuple)):
+        raise TypeError("should be a tuple, list, or numpy array")
+
+    arr = np.array(arg)
+    if arr.ndim != 1:
+        raise ValueError("should be 1D")
+
+    return xr.DataArray(arr, dims=("index",))

@@ -5,10 +5,10 @@ import numpy as np
 import pandas as pd
 import xarray as xr
 
+from imod.common.utilities.grid import get_active_domain_slice, to_cell_idx
 from imod.mf6.gwfgwf import GWFGWF
 from imod.mf6.gwtgwt import GWTGWT
 from imod.mf6.multimodel.modelsplitter import PartitionInfo
-from imod.mf6.utilities.grid import get_active_domain_slice, to_cell_idx
 from imod.typing import GridDataArray
 
 
@@ -155,7 +155,7 @@ class ExchangeCreator(abc.ABC):
                     GWFGWF(
                         f"{model_name}_{model_id1}",
                         f"{model_name}_{model_id2}",
-                        **connected_cells_dataset,
+                        **connected_cells_dataset,  # type: ignore[misc]
                     )
                 )
 
@@ -232,7 +232,7 @@ class ExchangeCreator(abc.ABC):
                         f"{transport_model_name}_{model_id2}",
                         f"{flow_model_name}_{model_id1}",
                         f"{flow_model_name}_{model_id2}",
-                        **connected_cells_dataset,
+                        **connected_cells_dataset,  # type: ignore[misc]
                     )
                 )
 
@@ -290,11 +290,12 @@ class ExchangeCreator(abc.ABC):
 
         label_decreasing = df["cell_label1"] > df["cell_label2"]
 
-        colnames = ["cell_idx1", "cell_idx2", "cell_label1", "cell_label2"]
-        colnames_reversed = ["cell_idx2", "cell_idx1", "cell_label2", "cell_label1"]
+        if label_decreasing.any():
+            colnames = ["cell_idx1", "cell_idx2", "cell_label1", "cell_label2"]
+            colnames_reversed = ["cell_idx2", "cell_idx1", "cell_label2", "cell_label1"]
 
-        decreasing_connections = df.loc[label_decreasing, colnames].values.astype(int)
-
-        df.loc[label_decreasing, colnames_reversed] = decreasing_connections
+            df_decreasing = df.loc[label_decreasing, colnames]
+            df_decreasing.columns = colnames_reversed
+            df.loc[label_decreasing, colnames_reversed] = df_decreasing
 
         self._connected_cells = df

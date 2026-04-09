@@ -67,7 +67,7 @@ def test_render_specific_storage_with_specific_yield(sy_layered, convertible):
 
     directory = pathlib.Path("mymodel")
     globaltimes = np.array(["2000-01-01"], dtype="datetime64[ns]")
-    actual = sto.render(directory, "sto", globaltimes, True)
+    actual = sto._render(directory, "sto", globaltimes, True)
     expected = textwrap.dedent(
         """\
         begin options
@@ -102,7 +102,7 @@ def test_render_specific_storage_without_specific_yield(convertible):
 
     directory = pathlib.Path("mymodel")
     globaltimes = np.array(["2000-01-01"], dtype="datetime64[ns]")
-    actual = sto.render(directory, "sto", globaltimes, True)
+    actual = sto._render(directory, "sto", globaltimes, True)
     expected = textwrap.dedent(
         """\
         begin options
@@ -135,7 +135,7 @@ def test_render_specific_storage_save_flows(sy_layered, convertible):
 
     directory = pathlib.Path("mymodel")
     globaltimes = np.array(["2000-01-01"], dtype="datetime64[ns]")
-    actual = sto.render(directory, "sto", globaltimes, True)
+    actual = sto._render(directory, "sto", globaltimes, True)
     expected = textwrap.dedent(
         """\
         begin options
@@ -182,7 +182,7 @@ def test_render_specific_storage_three_periods(sy_layered, convertible):
         ],
         dtype="datetime64[ns]",
     )
-    actual = sto.render(directory, "sto", globaltimes, True)
+    actual = sto._render(directory, "sto", globaltimes, True)
     expected = textwrap.dedent(
         """\
         begin options
@@ -221,7 +221,7 @@ def test_render_storage_coefficient(sy_layered, convertible):
 
     directory = pathlib.Path("mymodel")
     globaltimes = np.array(["2000-01-01"], dtype="datetime64[ns]")
-    actual = sto.render(directory, "sto", globaltimes, True)
+    actual = sto._render(directory, "sto", globaltimes, True)
     expected = textwrap.dedent(
         """\
         begin options
@@ -259,7 +259,7 @@ def test_render_storage_coefficient_save_flows(sy_layered, convertible):
 
     directory = pathlib.Path("mymodel")
     globaltimes = np.array(["2000-01-01"], dtype="datetime64[ns]")
-    actual = sto.render(directory, "sto", globaltimes, True)
+    actual = sto._render(directory, "sto", globaltimes, True)
     expected = textwrap.dedent(
         """\
         begin options
@@ -284,16 +284,6 @@ def test_render_storage_coefficient_save_flows(sy_layered, convertible):
         """
     )
     assert actual == expected
-
-
-def test_storage_deprecation_warning(sy_layered, convertible):
-    with pytest.raises(NotImplementedError):
-        imod.mf6.Storage(
-            specific_storage=0.0003,
-            specific_yield=sy_layered,
-            transient=True,
-            convertible=convertible,
-        )
 
 
 def test_wrong_dtype_sc(sy_layered, convertible):
@@ -428,3 +418,33 @@ def test_check_nan_in_active_cell(sy_layered, convertible, dis):
 
     for var, error in errors.items():
         assert var == "storage_coefficient"
+
+
+@pytest.mark.unittest_jit
+def test_from_imod5(imod5_dataset, tmp_path):
+    data = imod5_dataset[0]
+
+    target_grid = data["khv"]["kh"]
+
+    sto = imod.mf6.StorageCoefficient.from_imod5_data(data, target_grid)
+
+    assert not sto.dataset["save_flows"]
+    assert sto.dataset["transient"]
+    assert sto.dataset["storage_coefficient"].values[0] == 0.15
+    assert np.all(sto.dataset["storage_coefficient"].values[1:] == 1e-5)
+    assert sto.dataset["specific_yield"].values[()] is None
+
+    rendered_sto = sto._render(tmp_path, "sto", None, False)
+    assert "ss" in rendered_sto
+
+
+@pytest.mark.unittest_jit
+def test_from_imod5_steady_state(imod5_dataset):
+    data = imod5_dataset[0]
+
+    data["sto"]["storage_coefficient"].values[:] = 0
+    target_grid = data["khv"]["kh"]
+
+    sto = imod.mf6.StorageCoefficient.from_imod5_data(data, target_grid)
+
+    assert not sto.dataset["transient"]

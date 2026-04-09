@@ -10,5 +10,10 @@ from imod.prepare.topsystem.conductance import (
     distribute_drn_conductance,
     distribute_ghb_conductance,
     distribute_riv_conductance,
+    split_conductance_with_infiltration_factor,
+)
+from imod.prepare.topsystem.default_allocation_methods import (
+    SimulationAllocationOptions,
+    SimulationDistributingOptions,
 )
 from imod.prepare.topsystem.resistance import c_leakage, c_radial

@@ -1,8 +1,12 @@
+from typing import Any, TextIO
+
+from imod.common.interfaces.iregridpackage import IRegridPackage
+from imod.common.utilities.dataclass_type import DataclassType, EmptyRegridMethod
 from imod.msw.fixed_format import VariableMetaData
 from imod.msw.pkgbase import MetaSwapPackage
 
 
-class LanduseOptions(MetaSwapPackage):
+class LanduseOptions(MetaSwapPackage, IRegridPackage):
     """
     Land use options. This object is responsible for luse_svat.inp
 
@@ -53,6 +57,12 @@ class LanduseOptions(MetaSwapPackage):
         Hoyningen.
     interception_intercept: array of floats (xr.DataArray)
         Intercept of the interception evaporation curve. Pun unintended.
+    interception_capacity_per_LAI_Rutter: this initializer argument is for
+        internal use only. Users can ignore it and should only provide
+        interception_capacity_per_LAI
+    interception_capacity_per_LAI_VonHoyningen: this initializer argument is for
+        internal use only. Users can ignore it and should only provide
+        interception_capacity_per_LAI
 
     Notes
     -----
@@ -116,6 +126,8 @@ class LanduseOptions(MetaSwapPackage):
 
     _file_name = "luse_svat.inp"
 
+    _regrid_method: DataclassType = EmptyRegridMethod()
+
     def __init__(
         self,
         landuse_name,
@@ -137,8 +149,10 @@ class LanduseOptions(MetaSwapPackage):
         start_sprinkling_season,
         end_sprinkling_season,
         interception_option,
-        interception_capacity_per_LAI,
-        interception_intercept,
+        interception_capacity_per_LAI=None,
+        interception_capacity_per_LAI_Rutter=None,
+        interception_capacity_per_LAI_VonHoyningen=None,
+        interception_intercept=None,
     ):
         super().__init__()
         self.dataset["landuse_name"] = landuse_name
@@ -160,17 +174,27 @@ class LanduseOptions(MetaSwapPackage):
         self.dataset["start_sprinkling_season"] = start_sprinkling_season
         self.dataset["end_sprinkling_season"] = end_sprinkling_season
         self.dataset["interception_option"] = interception_option
-        self.dataset["interception_capacity_per_LAI_Rutter"] = (
-            interception_capacity_per_LAI
-        )
-        self.dataset["interception_capacity_per_LAI_VonHoyningen"] = (
-            interception_capacity_per_LAI
-        )
+        if interception_capacity_per_LAI is not None:
+            self.dataset["interception_capacity_per_LAI_Rutter"] = (
+                interception_capacity_per_LAI
+            )
+        else:
+            self.dataset["interception_capacity_per_LAI_Rutter"] = (
+                interception_capacity_per_LAI_Rutter
+            )
+        if interception_capacity_per_LAI is not None:
+            self.dataset["interception_capacity_per_LAI_VonHoyningen"] = (
+                interception_capacity_per_LAI
+            )
+        else:
+            self.dataset["interception_capacity_per_LAI_VonHoyningen"] = (
+                interception_capacity_per_LAI_VonHoyningen
+            )
         self.dataset["interception_intercept"] = interception_intercept
 
         self._pkgcheck()
 
-    def _render(self, file, *args):
+    def _render(self, file: TextIO, *args: Any):
         dataframe = self.dataset.to_dataframe(
             dim_order=("landuse_index",)
         ).reset_index()
@@ -187,7 +211,7 @@ class LanduseOptions(MetaSwapPackage):
         # Reorder columns to _metadata_dict order
         dataframe = dataframe[list(self._metadata_dict.keys())]
 
-        return self.write_dataframe_fixed_width(file, dataframe)
+        return self._write_dataframe_fixed_width(file, dataframe)
 
     def _pkgcheck(self):
         dims = self.dataset.dims

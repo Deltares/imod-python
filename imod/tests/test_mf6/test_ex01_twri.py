@@ -8,16 +8,17 @@ import pytest
 import xarray as xr
 
 import imod
+from imod.common.utilities.version import get_version
+from imod.mf6.validation_settings import ValidationSettings
 from imod.mf6.write_context import WriteContext
 from imod.schemata import ValidationError
 from imod.typing.grid import ones_like
 
 
-@pytest.mark.usefixtures("twri_model")
 def test_dis_render(twri_model, tmp_path):
     simulation = twri_model
     dis = simulation["GWF_1"]["dis"]
-    actual = dis.render(
+    actual = dis._render(
         directory=tmp_path,
         pkgname="dis",
         globaltimes=None,
@@ -56,18 +57,17 @@ def test_dis_render(twri_model, tmp_path):
     assert actual == expected
     write_context = WriteContext(simulation_directory=tmp_path, use_binary=True)
 
-    dis.write(pkgname="dis", globaltimes=None, write_context=write_context)
+    dis._write(pkgname="dis", globaltimes=None, write_context=write_context)
     assert (tmp_path / "dis.dis").is_file()
     assert (tmp_path / "dis").is_dir()
     assert (tmp_path / "dis" / "idomain.bin").is_file()
 
 
-@pytest.mark.usefixtures("twri_model")
 def test_chd_render(twri_model, tmp_path):
     simulation = twri_model
     globaltimes = simulation["time_discretization"]["time"].values
     chd = simulation["GWF_1"]["chd"]
-    actual = chd.render(
+    actual = chd._render(
         directory=tmp_path,
         pkgname="chd",
         globaltimes=globaltimes,
@@ -93,18 +93,17 @@ def test_chd_render(twri_model, tmp_path):
     )
     assert actual == expected
     write_context = WriteContext(simulation_directory=tmp_path, use_binary=True)
-    chd.write(pkgname="chd", globaltimes=None, write_context=write_context)
+    chd._write(pkgname="chd", globaltimes=None, write_context=write_context)
     assert (tmp_path / "chd.chd").is_file()
     assert (tmp_path / "chd").is_dir()
     assert (tmp_path / "chd" / "chd.bin").is_file()
 
 
-@pytest.mark.usefixtures("twri_model")
 def test_drn_render(twri_model, tmp_path):
     simulation = twri_model
     globaltimes = simulation["time_discretization"]["time"].values
     drn = simulation["GWF_1"]["drn"]
-    actual = drn.render(
+    actual = drn._render(
         directory=tmp_path,
         pkgname="drn",
         globaltimes=globaltimes,
@@ -130,17 +129,16 @@ def test_drn_render(twri_model, tmp_path):
     )
     assert actual == expected
     write_context = WriteContext(simulation_directory=tmp_path, use_binary=True)
-    drn.write(pkgname="drn", globaltimes=None, write_context=write_context)
+    drn._write(pkgname="drn", globaltimes=None, write_context=write_context)
     assert (tmp_path / "drn.drn").is_file()
     assert (tmp_path / "drn").is_dir()
     assert (tmp_path / "drn" / "drn.bin").is_file()
 
 
-@pytest.mark.usefixtures("twri_model")
 def test_ic_render(twri_model, tmp_path):
     simulation = twri_model
     ic = simulation["GWF_1"]["ic"]
-    actual = ic.render(
+    actual = ic._render(
         directory=tmp_path,
         pkgname="ic",
         globaltimes=None,
@@ -159,15 +157,14 @@ def test_ic_render(twri_model, tmp_path):
     )
     assert actual == expected
     write_context = WriteContext(simulation_directory=tmp_path, use_binary=True)
-    ic.write(pkgname="ic", globaltimes=None, write_context=write_context)
+    ic._write(pkgname="ic", globaltimes=None, write_context=write_context)
     assert (tmp_path / "ic.ic").is_file()
 
 
-@pytest.mark.usefixtures("twri_model")
 def test_npf_render(twri_model, tmp_path):
     simulation = twri_model
     npf = simulation["GWF_1"]["npf"]
-    actual = npf.render(
+    actual = npf._render(
         directory=tmp_path, pkgname="npf", globaltimes=None, binary=True
     )
     expected = textwrap.dedent(
@@ -196,11 +193,10 @@ def test_npf_render(twri_model, tmp_path):
     )
     assert actual == expected
     write_context = WriteContext(simulation_directory=tmp_path, use_binary=True)
-    npf.write(pkgname="npf", globaltimes=None, write_context=write_context)
+    npf._write(pkgname="npf", globaltimes=None, write_context=write_context)
     assert (tmp_path / "npf.npf").is_file()
 
 
-@pytest.mark.usefixtures("twri_model")
 def test_oc_render(twri_model, tmp_path):
     simulation = twri_model
     globaltimes = simulation["time_discretization"]["time"].values
@@ -208,7 +204,7 @@ def test_oc_render(twri_model, tmp_path):
 
     # An absolute path should be maintained in the fileout entries!
     path = tmp_path.as_posix()
-    actual = oc.render(
+    actual = oc._render(
         directory=tmp_path, pkgname="oc", globaltimes=globaltimes, binary=True
     )
     expected = textwrap.dedent(
@@ -227,7 +223,7 @@ def test_oc_render(twri_model, tmp_path):
     assert actual == expected
 
     path = Path(tmp_path.stem)
-    actual = oc.render(
+    actual = oc._render(
         directory=path, pkgname="oc", globaltimes=globaltimes, binary=True
     )
     expected = textwrap.dedent(
@@ -246,12 +242,11 @@ def test_oc_render(twri_model, tmp_path):
     assert actual == expected
 
 
-@pytest.mark.usefixtures("twri_model")
 def test_rch_render(twri_model, tmp_path):
     simulation = twri_model
     globaltimes = simulation["time_discretization"]["time"].values
     rch = simulation["GWF_1"]["rch"]
-    actual = rch.render(
+    actual = rch._render(
         directory=tmp_path,
         pkgname="rch",
         globaltimes=globaltimes,
@@ -274,7 +269,7 @@ def test_rch_render(twri_model, tmp_path):
     )
     assert actual == expected
     write_context = WriteContext(simulation_directory=tmp_path, use_binary=True)
-    rch.write(pkgname="rch", globaltimes=None, write_context=write_context)
+    rch._write(pkgname="rch", globaltimes=None, write_context=write_context)
     assert (tmp_path / "rch.rch").is_file()
     assert (tmp_path / "rch").is_dir()
     assert (tmp_path / "rch" / "rch.bin").is_file()
@@ -289,8 +284,11 @@ def test_wel_render(twri_model, tmp_path):
     with open(wel_path, "r") as wel_file:
         actual = wel_file.read()
 
+    version = get_version()
     expected = textwrap.dedent(
-        """\
+        f"""\
+            # File written with iMOD Python version: {version}
+
             begin options
               save_flows
             end options
@@ -309,11 +307,10 @@ def test_wel_render(twri_model, tmp_path):
     assert (tmp_path / "GWF_1/wel" / "wel.bin").is_file()
 
 
-@pytest.mark.usefixtures("twri_model")
 def test_solver_render(twri_model, tmp_path):
     simulation = twri_model
     solver = simulation["solver"]
-    actual = solver.render(
+    actual = solver._render(
         directory=tmp_path,
         pkgname="solver",
         globaltimes=None,
@@ -341,18 +338,18 @@ def test_solver_render(twri_model, tmp_path):
     )
     assert actual == expected
     write_context = WriteContext(simulation_directory=tmp_path, use_binary=True)
-    solver.write(pkgname="solver", globaltimes=None, write_context=write_context)
+    solver._write(pkgname="solver", globaltimes=None, write_context=write_context)
     assert (tmp_path / "solver.ims").is_file()
 
 
-@pytest.mark.usefixtures("twri_model")
 def test_gwfmodel_render(twri_model, tmp_path):
     simulation = twri_model
     globaltimes = simulation["time_discretization"]["time"].values
     gwfmodel = simulation["GWF_1"]
     path = Path(tmp_path.stem).as_posix()
+    validation_context = ValidationSettings(tmp_path)
     write_context = WriteContext(tmp_path)
-    actual = gwfmodel.render(path, write_context)
+    actual = gwfmodel._render(path, write_context)
     expected = textwrap.dedent(
         f"""\
             begin options
@@ -373,16 +370,15 @@ def test_gwfmodel_render(twri_model, tmp_path):
             """
     )
     assert actual == expected
-    gwfmodel.write("GWF_1", globaltimes, True, write_context)
+    gwfmodel._write("GWF_1", globaltimes, write_context, validation_context)
     assert (tmp_path / "GWF_1" / "GWF_1.nam").is_file()
     assert (tmp_path / "GWF_1").is_dir()
 
 
-@pytest.mark.usefixtures("twri_model")
 def test_simulation_render(twri_model):
     simulation = twri_model
     write_context = WriteContext(".")
-    actual = simulation.render(write_context)
+    actual = simulation._render(write_context)
 
     expected = textwrap.dedent(
         """\
@@ -409,7 +405,6 @@ def test_simulation_render(twri_model):
     assert actual == expected
 
 
-@pytest.mark.usefixtures("twri_model")
 @pytest.mark.skipif(sys.version_info < (3, 7), reason="capture_output added in 3.7")
 def test_simulation_write_and_run(twri_model, tmp_path):
     simulation = twri_model
@@ -437,14 +432,13 @@ def test_simulation_write_and_run(twri_model, tmp_path):
     assert head.shape == (1, 3, 15, 15)
     assert np.all(
         head["time"].values
-        == np.array("1999-01-02T00:00:00.000000000", dtype="datetime64[ns]")
+        == np.array("1999-01-02T00:00:00.000000", dtype="datetime64[ns]")
     )
     meanhead_layer = head.groupby("layer").mean(dim=xr.ALL_DIMS)
     mean_answer = np.array([59.79181509, 30.44132373, 24.88576811])
     assert np.allclose(meanhead_layer, mean_answer)
 
 
-@pytest.mark.usefixtures("transient_twri_model")
 @pytest.mark.skipif(sys.version_info < (3, 7), reason="capture_output added in 3.7")
 def test_simulation_write_storage(transient_twri_model, tmp_path):
     simulation = transient_twri_model
@@ -469,7 +463,6 @@ def test_simulation_write_storage(transient_twri_model, tmp_path):
     np.testing.assert_allclose(meanflux_layer.values, mean_answer, rtol=2e-7)
 
 
-@pytest.mark.usefixtures("transient_twri_model")
 @pytest.mark.skipif(sys.version_info < (3, 7), reason="capture_output added in 3.7")
 def test_simulation_wrong_dtype(transient_twri_model, tmp_path):
     simulation = transient_twri_model
@@ -485,7 +478,6 @@ def test_simulation_wrong_dtype(transient_twri_model, tmp_path):
         simulation.write(modeldir, binary=True)
 
 
-@pytest.mark.usefixtures("transient_twri_model")
 @pytest.mark.skipif(sys.version_info < (3, 7), reason="capture_output added in 3.7")
 def test_simulation_validate_false(transient_twri_model, tmp_path):
     simulation = transient_twri_model
@@ -499,7 +491,6 @@ def test_simulation_validate_false(transient_twri_model, tmp_path):
     simulation.write(modeldir, binary=True, validate=False)
 
 
-@pytest.mark.usefixtures("twri_model")
 @pytest.mark.skipif(sys.version_info < (3, 7), reason="capture_output added in 3.7")
 def test_simulation_write_errors(twri_model, tmp_path):
     simulation = twri_model
@@ -512,7 +503,6 @@ def test_simulation_write_errors(twri_model, tmp_path):
         simulation.write(modeldir, binary=True)
 
 
-@pytest.mark.usefixtures("transient_twri_model")
 @pytest.mark.skipif(sys.version_info < (3, 7), reason="capture_output added in 3.7")
 def test_slice_and_run(transient_twri_model, tmp_path):
     # TODO: bring back well once slicing is implemented...
@@ -532,14 +522,13 @@ def test_slice_and_run(transient_twri_model, tmp_path):
     simulation.run()
 
 
-@pytest.mark.usefixtures("transient_twri_model")
 @pytest.mark.skipif(sys.version_info < (3, 7), reason="capture_output added in 3.7")
 def test_slice_and_run_with_state(transient_twri_model, tmp_path):
     # TODO: bring back well once slicing is implemented...
     transient_twri_model["GWF_1"].pop("wel")
     transient_twri_model.write(tmp_path, False, True, False)
     transient_twri_model.run()
-    head = transient_twri_model.open_head()
+    head = transient_twri_model.open_head(simulation_start_time="2000-01-01")
 
     # set the boundary to  recognizable value, in this case 1.23
     state_for_boundary = {"GWF_1": 1.23 * ones_like(head)}
@@ -556,14 +545,13 @@ def test_slice_and_run_with_state(transient_twri_model, tmp_path):
     )
 
     # check that the value 1.23 occurrs in the chd_clipped package of the clipped simulation
-    clipped_boundary = clipped_simulation["GWF_1"]["chd_clipped"].dataset.sel(
-        time=2, layer=1
+    clipped_boundary = (
+        clipped_simulation["GWF_1"]["chd_clipped"].dataset.sel(layer=1).isel(time=2)
     )
     np_array = clipped_boundary["head"].values
     assert (np_array == 1.23).sum() == 33
 
 
-@pytest.mark.usefixtures("transient_twri_model")
 @pytest.mark.skipif(sys.version_info < (3, 7), reason="capture_output added in 3.7")
 def test_slice_and_run_purge_empty_package(transient_twri_model, tmp_path):
     # TODO: bring back well once slicing is implemented...

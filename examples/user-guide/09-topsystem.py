@@ -1,15 +1,19 @@
 """
-Defining the topsystem
-======================
+Topsystem: from 2D map to 3D model
+==================================
 
 iMOD Python has multiple features to help you define the topsystem of the
 groundwater system. With "topsystem" we mean all forcings which act on the top
 of the groundwater system. These are usually either meteorological
 (precipitation & evapotranspiration) or hydrological (rivers, ditches, lakes,
-sea) in nature. This data is usually provided as planar grids (x, y) without any
-vertical dimension. This user guide will show you how to allocate these forcings
-across model layers to grid cells and how to distribute conductances for
-Robin-like boundary conditions over model layers.
+sea) in nature. In MODFLOW 6 these are usually simulated with the DRN, RIV, GHB,
+and RCH package. This data is usually provided as planar grids (x, y) without
+any vertical dimension. This user guide will show you how to allocate these
+forcings across model layers to grid cells and how to distribute conductances
+for Robin-like boundary conditions (RIV, DRN, GHB) over model layers. We will
+demonstrate this with the RIV package, as this package supports all options for
+allocating cells and distributing conductances. A subset of options are
+available for the DRN, GHB, and RCH packages.
 
 """
 
@@ -78,7 +82,7 @@ riv_allocated, _ = allocate_riv_cells(
 import geopandas as gpd
 from shapely.geometry import LineString
 
-geometry = LineString([[238000, 562200], [242000, 559800]])
+geometry = LineString([[238725, 561800], [241050, 560350]])
 
 # Define overlay
 overlays = [
@@ -131,7 +135,8 @@ layer_grid.coords["bottom"] = layer_model["bottom"]
 xsection_layer_nr = imod.select.cross_section_linestring(layer_grid, geometry)
 
 imod.visualize.cross_section(xsection_layer_nr, "tab20", np.arange(21))
-
+ax.scatter(x_line, stage_line.values, marker=7, c="k")
+ax.scatter(x_line, stage_bottom.values, marker=6, c="k")
 
 # %%
 # Overview allocation options
@@ -163,8 +168,8 @@ imod.visualize.cross_section(
     fig=fig,
     ax=ax,
 )
-ax.scatter(x_line, stage_line.values, s=32.0, marker=7, c="k", linewidths=0)
-ax.scatter(x_line, stage_bottom.values, s=32.0, marker=6, c="k", linewidths=0)
+ax.scatter(x_line, stage_line.values, marker=7, c="k")
+ax.scatter(x_line, stage_bottom.values, marker=6, c="k")
 ax.set_title("stage and bottom elevation")
 
 # Loop over allocation options, and plot the allocated cells as a polygon,
@@ -314,7 +319,7 @@ imod.visualize.cross_section(
 # other plots show the effects of different settings. Again, distributing
 # options are described in more detail in :func:`imod.prepare.DISTRIBUTING_OPTION`
 
-fig, axes = plt.subplots(4, 2, figsize=[11, 15], sharex=True, sharey=True)
+fig, axes = plt.subplots(3, 3, figsize=[13, 11], sharex=True, sharey=True)
 axes = np.ravel(axes)
 
 k = distributing_data["k"].copy()
@@ -332,8 +337,8 @@ imod.visualize.cross_section(
     fig=fig,
     ax=ax,
 )
-ax.scatter(x_line, stage_line.values, s=32.0, marker=7, c="k", linewidths=0)
-ax.scatter(x_line, stage_bottom.values, s=32.0, marker=6, c="k", linewidths=0)
+ax.scatter(x_line, stage_line.values, marker=7, c="k")
+ax.scatter(x_line, stage_bottom.values, marker=6, c="k")
 ax.set_title("hydraulic conductivity")
 
 for i, option in enumerate(DISTRIBUTING_OPTION, start=1):
@@ -348,10 +353,10 @@ for i, option in enumerate(DISTRIBUTING_OPTION, start=1):
         riv_conductance, geometry
     )
 
-    if (i % 2) == 0:
-        kwargs_colorbar = {"plot_colorbar": False}
-    else:
+    if (i % 3) == 2:
         kwargs_colorbar = {"plot_colorbar": True}
+    else:
+        kwargs_colorbar = {"plot_colorbar": False}
 
     # Plot grey background of active cells
     is_active = ~np.isnan(xsection_distributed.coords["top"])
@@ -392,9 +397,88 @@ plt.tight_layout()
 # ``by_crosscut_transmissivity`` uses the crosscut thickness instead of the
 # layer thickness and therefore shows a lower conductance in the deeper layer
 # compared to ``by_layer_transmissivity``. Finally
-# ``by_corrected_transmissivity`` also corrects for the displacement of the
-# midpoint over the length where crosscut transmissivity is computed over
-# (``[layer top - river bottom]/2``) compared to the model cell centre. This
-# further reduces the conductance in the deeper layer.
+# ``by_corrected_transmissivity`` and ``by_corrected_thickness`` also correct
+# for the displacement of the midpoint over the length where crosscut
+# transmissivity is computed over (``[layer top - river bottom]/2``) compared to
+# the model cell centre. This further reduces the conductance in the deeper
+# layer.
 
 # %%
+# MODFLOW 6 package
+# -----------------
+#
+# The data created can now be used to create a MODFLOW 6 package. To construct 3D
+# grids from planar grids for the stages, we can utilize xarrays broadcasting:
+from imod.typing.grid import enforce_dim_order
+
+riv_stage = planar_river["stage"].where(riv_allocated)
+# Use this function to enforce the right dimension order for iMOD Python.
+riv_stage = enforce_dim_order(riv_stage)
+
+riv_stage
+
+# %%
+#
+# We can do the same for the river bottom and construct a river package. Note
+# that we use the previously distributed conductance which we assigned to the
+# variable ``riv_conductance``.
+
+riv_bottom = planar_river["bottom"].where(riv_allocated)
+riv_bottom = enforce_dim_order(riv_bottom)
+
+# Remove coordinates that were added for cross-section plots previously
+riv_conductance = riv_conductance.drop_vars(["bottom", "top"])
+
+riv = imod.mf6.River(
+    stage=riv_stage, conductance=riv_conductance, bottom_elevation=riv_bottom
+)
+
+riv
+
+# %%
+#
+# Reallocate package
+# ------------------
+#
+# The river package has a :meth:`imod.mf6.River.reallocate` method which can be
+# used to reallocate the river package to a new model layer schematization. This
+# is convenient when you already have an existing model, but want to apply a
+# different allocation or distribution option to its river package. This saves
+# you from unpacking the right variables from the the DIS/DISV and NPF package,
+# aggregating the package data over layers and allocating and distributing the
+# conductance again. There are equivalent methods for the
+# :meth:`imod.mf6.Drainage.reallocate`,
+# :meth:`imod.mf6.GeneralHeadBoundary.reallocate`, and
+# :meth:`imod.mf6.Recharge.reallocate`.
+
+dis = imod.mf6.StructuredDiscretization(
+    top=layer_model["top"].sel(layer=1),
+    bottom=layer_model["bottom"],
+    idomain=layer_model["idomain"].astype(int),
+)
+npf = imod.mf6.NodePropertyFlow(icelltype=0, k=layer_model["k"])
+
+riv_reallocated = riv.reallocate(
+    dis, npf, allocation_option=ALLOCATION_OPTION.stage_to_riv_bot
+)
+
+riv_reallocated
+
+# %%
+#
+# The default allocation option and distribution option for the are set in the
+# :class:`imod.prepare.SimulationAllocationOptions` and
+# :class:`imod.prepare.SimulationDistributingOptions`. Let's print the default
+# options to see what they are. First let's start with the allocation options:
+
+from dataclasses import asdict
+
+from imod.prepare import SimulationAllocationOptions, SimulationDistributingOptions
+
+print(asdict(SimulationAllocationOptions()))
+
+# %%
+#
+# Now let's print the distribution options:
+
+print(asdict(SimulationDistributingOptions()))
