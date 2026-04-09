@@ -28,7 +28,7 @@ object MyPyTemplate : Template({
             workingDir = "imod-python"
             scriptContent = """
                     pixi run --environment default --frozen mypy_report
-                    pixi run --environment default --frozen mypy
+                    pixi run --environment default --frozen mypy_lint
                 """.trimIndent()
             formatStderrAsError = true
             dockerImage = "%DockerContainer%:%DockerVersion%"
