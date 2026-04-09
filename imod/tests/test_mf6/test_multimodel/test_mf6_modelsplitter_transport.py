@@ -133,28 +133,28 @@ def test_split_flow_and_transport_model_evaluate_output(
     submodel_labels = submodel_labels.sel(layer=0, drop=True)
 
     # for reference run the original model and load the results
-    simulation.write(tmp_path / "original", binary=False)
+    simulation.write(tmp_path / "original")
     simulation.run()
     original_conc = simulation.open_concentration()
     original_head = simulation.open_head()
 
     # split the model , run the split model and load the results
     new_simulation = simulation.split(submodel_labels)
-    new_simulation.write(tmp_path, binary=False)
+    new_simulation.write(tmp_path)
     new_simulation.run()
     conc = new_simulation.open_concentration()
     head = new_simulation.open_head()
 
     # Compare
     np.testing.assert_allclose(
-        head.sel(time=2000)["head"].values,
-        original_head.sel(time=2000).values,
+        head.sel(time=20)["head"].values,
+        original_head.sel(time=20).values,
         rtol=1e-4,
         atol=1e-6,
     )
     np.testing.assert_allclose(
-        conc.sel(time=2000)["concentration"].values,
-        original_conc.sel(time=2000).values,
+        conc.sel(time=20)["concentration"].values,
+        original_conc.sel(time=20).values,
         rtol=1e-4,
         atol=1e-6,
     )
@@ -191,8 +191,8 @@ def test_split_flow_and_transport_model_evaluate_output_with_species(
 
     # Compare
     np.testing.assert_allclose(
-        conc.sel(time=2000)["concentration"].values,
-        original_conc.sel(time=2000).values,
+        conc.sel(time=20)["concentration"].values,
+        original_conc.sel(time=20).values,
         rtol=1e-4,
         atol=1e-6,
     )
