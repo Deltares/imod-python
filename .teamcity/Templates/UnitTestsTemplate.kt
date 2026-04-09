@@ -47,6 +47,8 @@ object UnitTestsTemplate : Template({
             workingDir = "imod-python/imod/tests"
             scriptMode = script {
                 content = """
+                    pixi config set --local detached-environments "C:\pixi_envs"
+                    
                     ${'$'}REPORT = echo "coverage report" | pixi shell --environment default --frozen
                     
                     ${'$'}TOTALS = ${'$'}REPORT | Select-String -Pattern 'TOTAL' -CaseSensitive -SimpleMatch
