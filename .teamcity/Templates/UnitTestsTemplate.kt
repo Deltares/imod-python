@@ -45,7 +45,7 @@ object UnitTestsTemplate : Template({
             workingDir = "imod-python/imod/tests"
             scriptMode = script {
                 content = """
-                    ${'$'}REPORT = echo "coverage report" | pixi shell --environment default
+                    ${'$'}REPORT = echo "coverage report" | pixi shell --environment default --frozen
                     
                     ${'$'}TOTALS = ${'$'}REPORT | Select-String -Pattern 'TOTAL' -CaseSensitive -SimpleMatch
                     ${'$'}STATISTICS = ${'$'}TOTALS -split "\s+"
