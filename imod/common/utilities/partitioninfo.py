@@ -1,4 +1,4 @@
-from typing import List, NamedTuple
+from typing import List, NamedTuple, Optional
 
 import numpy as np
 
@@ -9,9 +9,13 @@ from imod.typing.grid import ones_like
 class PartitionInfo(NamedTuple):
     active_domain: GridDataArray
     id: int
+    mpi_rank: int
 
 
-def create_partition_info(submodel_labels: GridDataArray) -> List[PartitionInfo]:
+def create_partition_info(
+    submodel_labels: GridDataArray,
+    submodel_label_to_mpi_rank: Optional[dict[int, int]] = None,
+) -> List[PartitionInfo]:
     """
     A PartitionInfo is used to partition a model or package. The partition
     info's of a domain are created using a submodel_labels array. The
@@ -31,8 +35,19 @@ def create_partition_info(submodel_labels: GridDataArray) -> List[PartitionInfo]
         active_domain = ones_like(active_domain).where(active_domain.notnull(), 0)
         active_domain = active_domain.astype(submodel_labels.dtype)
 
+        if submodel_label_to_mpi_rank is not None:
+            if label_id not in submodel_label_to_mpi_rank:
+                raise ValueError(
+                    f"Label {label_id} not found in the MPI process mapping."
+                )
+            mpi_rank = submodel_label_to_mpi_rank[label_id]
+            if mpi_rank < 0:
+                raise ValueError(f"Negative MPI rank of {mpi_rank} is not allowed.")
+        else:
+            mpi_rank = -1
+
         submodel_partition_info = PartitionInfo(
-            id=label_id, active_domain=active_domain
+            id=label_id, mpi_rank=mpi_rank, active_domain=active_domain
         )
         partition_infos.append(submodel_partition_info)
 

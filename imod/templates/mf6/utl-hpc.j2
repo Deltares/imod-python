@@ -1,0 +1,9 @@
+begin options
+{% if print_tabe is defined %}  print_table
+{% endif -%}
+end options
+
+begin partitions
+{% for mname, mrank in partitions %}  {{mname}} {{mrank}}
+{% endfor -%}
+end partitions
