@@ -199,19 +199,21 @@ def test_simulation_open_head(circle_model, tmp_path):
     modeldir = tmp_path / "circle"
     simulation.write(modeldir)
     simulation.run()
-    head = simulation.open_head()
 
-    assert isinstance(head, xu.UgridDataArray)
-    assert head.dims == ("time", "layer", "mesh2d_nFaces")
-    assert head.shape == (52, 2, 216)
+    # open heads without time conversion
+    head_notime = simulation.open_head()
+
+    assert isinstance(head_notime, xu.UgridDataArray)
+    assert head_notime.dims == ("time", "layer", "mesh2d_nFaces")
+    assert head_notime.shape == (2, 2, 216)
 
     # open heads with time conversion.
     head = simulation.open_head(
         simulation_start_time=datetime(2013, 3, 11, 22, 0, 0), time_unit="w"
     )
     assert head.dims == ("time", "layer", "mesh2d_nFaces")
-    assert head.shape == (52, 2, 216)
-    assert str(head.coords["time"].values[()][0]) == "2013-04-29T22:00:00.000000"
+    assert head.shape == (2, 2, 216)
+    assert str(head.coords["time"].values[()][0]) == "2013-03-18T22:00:00.000000"
 
 
 class PathCases:
@@ -235,9 +237,10 @@ def test_simulation_write_run_open__different_paths(circle_model, tmp_path, path
         simulation.write(path)
         simulation.run()
         head = simulation.open_head()
-        # Assert not an empty array is returned
+
         assert isinstance(head, xu.UgridDataArray)
-        assert head.shape == (52, 2, 216)
+        assert head.dims == ("time", "layer", "mesh2d_nFaces")
+        assert head.shape == (2, 2, 216)
 
 
 def test_simulation_open_flow_budget(circle_model, tmp_path):
