@@ -14,15 +14,14 @@ repository = "https://github.com/Deltares/imod-python.git"
 
 [tasks]
 # General tasks
-docs = { cmd = "./make.bat html", depends-on = ["install"], cwd = "docs" }
-install = "python -m pip install --no-deps --editable ."
+docs = { cmd = "./make.bat html", cwd = "docs" }
 pypi-publish = { cmd = "rm --recursive --force dist && python -m build && twine check dist/* && twine upload dist/*" }
 
 # Lint and format tasks
 format = "ruff check --fix .; ruff format ."
 lint = "ruff check . ; ruff format --check ."
-mypy_lint = { cmd ="mypy", depends-on = ["install"]}
-mypy_report = { cmd ="mypy | mypy2junit > mypy-report.xml", depends-on = ["install"]}
+mypy_lint = "mypy"
+mypy_report = "mypy | mypy2junit > mypy-report.xml"
 
 # Tests tasks
 tests = { depends-on = ["unittests", "examples"] }
@@ -39,7 +38,7 @@ unittests_njit = { cmd = [
     "--cov-report=term",
     "--cov-report=html:coverage",
     "--cov-config=.coveragerc"
-], depends-on = ["install"], cwd = "imod/tests" }
+], cwd = "imod/tests" }
 unittests_jit = { cmd = [
     "pytest",
     "-n", "auto",
@@ -47,7 +46,7 @@ unittests_jit = { cmd = [
     "--cache-clear",
     "--verbose",
     "--junitxml=unittest_jit_report.xml",
-], depends-on = ["install"], cwd = "imod/tests" }
+], cwd = "imod/tests" }
 examples = { cmd = [
     "pytest",
     "-n", "auto",
@@ -55,13 +54,13 @@ examples = { cmd = [
     "--cache-clear",
     "--verbose",
     "--junitxml=examples_report.xml",
-], depends-on = ["install"], cwd = "imod/tests", env = { IMOD_DATA_DIR = ".imod_data" } }
+], cwd = "imod/tests", env = { IMOD_DATA_DIR = ".imod_data" } }
 generate-sbom = { cmd = [
     "sbom4python", 
     "-m", "imod", 
     "--system", "--sbom", "spdx", 
     "--format", "json", "--output", "imod-python.spdx.json"
-], env = { "PATH" = "$PATH;$CONDA_PREFIX/Lib/site-packages/magic/libmagic" }, inputs = ["pyproject.toml"], outputs = ["imod-python.spdx.json"], depends-on = ["install"] }
+], env = { "PATH" = "$PATH;$CONDA_PREFIX/Lib/site-packages/magic/libmagic" }, inputs = ["pyproject.toml"], outputs = ["imod-python.spdx.json"] }
 
 [dependencies]
 affine = "*"
@@ -128,6 +127,7 @@ zarr = "*"
 pytest-timeout = ">=2.3.1,<3"
 
 [pypi-dependencies]
+imod = { path = ".", editable = true }
 mypy2junit = "*"
 sbom4python = ">=0.12.3"
 python-magic = ">=0.4.27"
@@ -156,13 +156,15 @@ pip = "*"
 [feature.pixi-update.tasks]
 update = "pixi update --json | pixi-diff-to-markdown > diff.md"
 
+[feature.py_common.pypi-dependencies]
+imod = { path = ".", editable = true }
+
 [feature.py_common.tasks]
 test_import = { cmd = [
     "python",
     "-c",
     "import imod"
-], depends-on = ["install_with_deps"]}
-install_with_deps = "python -m pip install --editable ."
+]}
 
 [feature.user-acceptance.dependencies]
 dvc = "*"
@@ -177,7 +179,7 @@ user_acceptance = { cmd = [
     "--cache-clear",
     "--verbose",
     "--junitxml=user_acceptance_report.xml",
-], depends-on = ["install", "fetch_lhm"], cwd = "imod/tests", env = { USER_ACCEPTANCE_DIR = "user_acceptance_data"} }
+], depends-on = ["fetch_lhm"], cwd = "imod/tests", env = { USER_ACCEPTANCE_DIR = "user_acceptance_data"} }
 run_imod5 = {cmd = ["prepare_mf6_transient_imod5.bat"], cwd = "imod/tests/user_acceptance_data/LHM_transient/scripts_imod-5"}
 qgis_export ={ cmd = [
     "pytest", "-s",
@@ -185,7 +187,7 @@ qgis_export ={ cmd = [
     "--cache-clear",
     "--verbose",
     "--junitxml=qgis_export_report.xml",
-], depends-on = ["install"], cwd = "imod/tests", env = { IMOD_DATA_DIR = ".imod_data" } }
+], cwd = "imod/tests", env = { IMOD_DATA_DIR = ".imod_data" } }
 
 [environments]
 default = { features = [], solve-group = "conda-deps" }

@@ -28,6 +28,8 @@ object ExamplesTemplate : Template({
             workingDir = "imod-python"
             scriptContent = """
                 SET PATH=%%PATH%%;%system.teamcity.build.checkoutDir%\modflow6
+                pixi config set --local detached-environments "C:\pixi_envs"
+                pixi install --environment default --frozen
                 pixi run --environment default --frozen examples
             """.trimIndent()
             formatStderrAsError = true

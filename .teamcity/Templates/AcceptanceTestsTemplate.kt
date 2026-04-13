@@ -30,6 +30,9 @@ object AcceptanceTestsTemplate : Template({
             workingDir = "imod-python"
             scriptContent = """
                 SET PATH=%%PATH%%;%system.teamcity.build.checkoutDir%\modflow6
+
+                pixi config set --local detached-environments "C:\pixi_envs"
+                pixi install --environment user-acceptance --frozen
                 
                 pixi run --environment user-acceptance --frozen dvc remote modify --local minio access_key_id %env.access_key%
                 pixi run --environment user-acceptance --frozen dvc remote modify --local minio secret_access_key %env.secret_access_key%
