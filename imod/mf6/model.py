@@ -6,7 +6,7 @@ import inspect
 import pathlib
 import warnings
 from pathlib import Path
-from typing import Any, List, Optional, Tuple, Union, cast
+from typing import Any, List, Optional, Tuple, Union
 
 import cftime
 import jinja2
@@ -568,8 +568,8 @@ class Modflow6Model(collections.UserDict[str, Package], IModel, abc.ABC):
                         globaltimes=globaltimes,
                         write_context=pkg_write_context,
                     )
-                elif issubclass(type(pkg), imod.mf6.HorizontalFlowBarrierBase):
-                    mf6_hfb_ls.append(cast(HorizontalFlowBarrierBase, pkg))
+                elif isinstance(pkg, imod.mf6.HorizontalFlowBarrierBase):
+                    mf6_hfb_ls.append(pkg)
                 else:
                     pkg._write(
                         pkgname=pkg_name,

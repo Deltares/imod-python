@@ -317,9 +317,7 @@ class MetaSwapModel(Model):
 
         # Add IdfMapping settings
         idf_key = self.get_pkgkey(IdfMapping)
-        if idf_key is None:
-            raise ValueError("No IdfMapping package found in model")
-        idf_pkg = cast(IdfMapping, self[idf_key])
+        idf_pkg = cast(IdfMapping, self[idf_key])  # type: ignore[index]
         simulation_settings.update(idf_pkg._get_output_settings())
 
         simulation_settings["unsa_svat_path"] = self._render_unsaturated_database_path(
@@ -361,9 +359,7 @@ class MetaSwapModel(Model):
 
         # Get index and svat
         grid_key = self.get_pkgkey(GridData)
-        if grid_key is None:
-            raise ValueError("No GridData package found in model")
-        grid_pkg = cast(GridData, self[grid_key])
+        grid_pkg = cast(GridData, self[grid_key])  # type: ignore[index]
         index, svat = grid_pkg.generate_isactive_svat_arrays()
 
         # write package contents
@@ -564,9 +560,7 @@ class MetaSwapModel(Model):
 
         # First, handle the grid data and determine the overlap.
         grid_key = self.get_pkgkey(GridData)
-        if grid_key is None:
-            raise ValueError("No GridData package found in model")
-        grid_pkg = cast(GridData, self[grid_key])
+        grid_pkg = cast(GridData, self[grid_key])  # type: ignore[index]
         is_in_active_domain = {}
 
         for submodel_name, submodel in partitioned_submodels.items():
