@@ -1,9 +1,9 @@
 import collections
 import functools
-from typing import Any, Dict, List
+from typing import Any
 
 
-def initialize_nested_dict(depth: int) -> collections.defaultdict:
+def initialize_nested_dict(depth: int) -> collections.defaultdict[Any, Any]:
     """
     Initialize a nested dict with a fixed depth
 
@@ -27,7 +27,7 @@ def initialize_nested_dict(depth: int) -> collections.defaultdict:
     if depth == 0 or depth == 1:
         return collections.defaultdict(dict)
     else:
-        d: functools.partial[collections.defaultdict] = functools.partial(
+        d: functools.partial[collections.defaultdict[Any, Any]] = functools.partial(
             collections.defaultdict, dict
         )
         for _ in range(depth - 2):
@@ -35,7 +35,9 @@ def initialize_nested_dict(depth: int) -> collections.defaultdict:
         return collections.defaultdict(d)
 
 
-def set_nested(d: collections.defaultdict, keys: List[str], value: Any) -> None:
+def set_nested(
+    d: collections.defaultdict[Any, Any], keys: list[str], value: Any
+) -> None:
     """
     Set in the deepest dict of a set of nested dictionaries, as created by the
     initialize_nested_dict function above.
@@ -59,7 +61,7 @@ def set_nested(d: collections.defaultdict, keys: List[str], value: Any) -> None:
         set_nested(d[keys[0]], keys[1:], value)
 
 
-def append_nested_dict(dict1: Dict, dict2: Dict) -> None:
+def append_nested_dict(dict1: dict[Any, Any], dict2: dict[Any, Any]) -> None:
     """
     Recursively walk through two dicts to append dict2 to dict1.
 
@@ -89,7 +91,7 @@ def append_nested_dict(dict1: Dict, dict2: Dict) -> None:
             dict1[key] = val
 
 
-def sorted_nested_dict(d: Dict) -> list:
+def sorted_nested_dict(d: dict[Any, Any]) -> list[Any]:
     """
     Sorts a variably nested dict (of dicts) by keys.
 

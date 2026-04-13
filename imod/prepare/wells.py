@@ -170,7 +170,7 @@ def locate_wells(
 
 
 def validate_well_columnnames(
-    wells: pd.DataFrame, names: set = {"x", "y", "id"}
+    wells: pd.DataFrame, names: set[str] = {"x", "y", "id"}
 ) -> None:
     missing = names.difference(wells.columns)
     if missing:

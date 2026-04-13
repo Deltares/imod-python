@@ -53,7 +53,7 @@ class VariableOutputControl(MetaSwapPackage, IRegridPackage):
     """
 
     _file_name = "sel_key_svat_per.inp"
-    _settings: dict = {}
+    _settings: dict[str, Any] = {}
     _metadata_dict = {
         "variable": VariableMetaData(10, None, None, str),
         "option": VariableMetaData(10, 0, 3, int),
@@ -113,7 +113,7 @@ class TimeOutputControl(MetaSwapPackage, IRegridPackage):
     """
 
     _file_name = "tiop_sim.inp"
-    _settings: dict = {}
+    _settings: dict[str, Any] = {}
     _metadata_dict = {
         "time_since_start_year": VariableMetaData(15, 0.0, 366.0, float),
         "year": VariableMetaData(6, 1, 9999, int),

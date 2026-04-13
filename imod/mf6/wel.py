@@ -5,7 +5,7 @@ import itertools
 import textwrap
 from collections.abc import Iterable
 from datetime import datetime
-from typing import Any, Callable, Optional, Self, Sequence, Tuple, Union, cast
+from typing import Any, Callable, Optional, Self, Sequence, Union, cast
 
 import cftime
 import numpy as np
@@ -50,7 +50,7 @@ from imod.util.structured import values_within_range
 ABSTRACT_METH_ERROR_MSG = "Method in abstract base class called"
 
 
-def _assign_dims(arg: Any) -> Tuple | xr.DataArray:
+def _assign_dims(arg: Any) -> tuple[Any, ...] | xr.DataArray:
     is_da = isinstance(arg, xr.DataArray)
     if is_da and "time" in arg.coords:
         if arg.ndim != 2:
@@ -113,7 +113,7 @@ def _df_groups_to_da_rates(
 
 
 def _prepare_well_rates_from_groups(
-    pkg_data: dict,
+    pkg_data: dict[str, Any],
     unique_well_groups: Sequence[pd.api.typing.DataFrameGroupBy],
     start_times: StressPeriodTimesType,
 ) -> xr.DataArray:
@@ -141,7 +141,7 @@ def _process_timeseries(
 
 
 def _prepare_df_ipf_associated(
-    pkg_data: dict, all_well_times: list[datetime]
+    pkg_data: dict[str, Any], all_well_times: list[datetime]
 ) -> pd.DataFrame:
     """Prepare dataframe for an ipf with associated timeseries in a textfile."""
     # Validate if associated wells are assigned multiple layers, factors,
@@ -170,7 +170,7 @@ def _prepare_df_ipf_associated(
 
 
 def _prepare_df_ipf_unassociated(
-    pkg_data: dict, start_times: StressPeriodTimesType
+    pkg_data: dict[str, Any], start_times: StressPeriodTimesType
 ) -> pd.DataFrame:
     """Prepare dataframe for an ipf with no associated timeseries."""
     is_steady_state = any(t is None for t in pkg_data["time"])
@@ -216,7 +216,9 @@ def _prepare_df_ipf_unassociated(
 
 
 def _unpack_package_data(
-    pkg_data: dict, start_times: StressPeriodTimesType, all_well_times: list[datetime]
+    pkg_data: dict[str, Any],
+    start_times: StressPeriodTimesType,
+    all_well_times: list[datetime],
 ) -> pd.DataFrame:
     """Unpack package data to dataframe"""
     has_associated = pkg_data["has_associated"]
@@ -226,7 +228,7 @@ def _unpack_package_data(
         return _prepare_df_ipf_unassociated(pkg_data, start_times)
 
 
-def get_all_imod5_prj_well_times(imod5_data: dict) -> list[datetime]:
+def get_all_imod5_prj_well_times(imod5_data: dict[str, Any]) -> list[datetime]:
     """Get all times a well data is defined on in a prj file"""
     wel_keys = [key for key in imod5_data.keys() if key.startswith("wel")]
     wel_times_per_pkg = [imod5_data[wel_key]["time"] for wel_key in wel_keys]
@@ -239,9 +241,9 @@ def get_all_imod5_prj_well_times(imod5_data: dict) -> list[datetime]:
 
 def derive_cellid_from_points(
     dst_grid: GridDataArray,
-    x: list,
-    y: list,
-    layer: list,
+    x: list[Any],
+    y: list[Any],
+    layer: list[Any],
 ) -> GridDataArray:
     """
     Create DataArray with Modflow6 cell identifiers based on x, y coordinates
@@ -583,7 +585,7 @@ class GridAgnosticWell(BoundaryCondition, IPointDataPackage, abc.ABC):
 
     @classmethod
     def _validate_imod5_depth_information(
-        cls, key: str, pkg_data: dict, df: pd.DataFrame
+        cls, key: str, pkg_data: dict[str, Any], df: pd.DataFrame
     ) -> None:
         raise NotImplementedError(ABSTRACT_METH_ERROR_MSG)
 
@@ -724,7 +726,7 @@ class GridAgnosticWell(BoundaryCondition, IPointDataPackage, abc.ABC):
     def _cleanup(
         self,
         dis: StructuredDiscretization | VerticesDiscretization,
-        cleanup_func: Callable,
+        cleanup_func: Callable[..., Any],
         **cleanup_kwargs,
     ) -> None:
         # Work around mypy error, .data_vars cannot be used with xu.UgridDataset
@@ -1079,7 +1081,9 @@ class Well(GridAgnosticWell):
         return wells_df
 
     @standard_log_decorator()
-    def _validate(self, schemata: dict, **kwargs) -> dict[str, list[ValidationError]]:
+    def _validate(
+        self, schemata: dict[str, Any], **kwargs
+    ) -> dict[str, list[ValidationError]]:
         kwargs["screen_top"] = self.dataset["screen_top"]
         return Package._validate(self, schemata, **kwargs)
 
@@ -1119,7 +1123,7 @@ class Well(GridAgnosticWell):
 
     @classmethod
     def _validate_imod5_depth_information(
-        cls, key: str, pkg_data: dict, df: pd.DataFrame
+        cls, key: str, pkg_data: dict[str, Any], df: pd.DataFrame
     ) -> None:
         if "layer" in pkg_data.keys() and (np.any(np.array(pkg_data["layer"]) != 0)):
             log_msg = textwrap.dedent(
@@ -1416,7 +1420,7 @@ class LayeredWell(GridAgnosticWell):
 
     @classmethod
     def _validate_imod5_depth_information(
-        cls, key: str, pkg_data: dict, df: pd.DataFrame
+        cls, key: str, pkg_data: dict[str, Any], df: pd.DataFrame
     ) -> None:
         if np.any(np.array(pkg_data["layer"]) == 0):
             log_msg = textwrap.dedent(

@@ -88,13 +88,13 @@ def open_dvs(
 
 
 def open_imeth1_budgets(
-    cbc_path: FilePath, grb_content: dict, header_list: List[cbc.Imeth1Header]
+    cbc_path: FilePath, grb_content: Dict[str, Any], header_list: List[cbc.Imeth1Header]
 ) -> xr.DataArray:
     raise NotImplementedError
 
 
 def open_imeth6_budgets(
-    cbc_path: FilePath, grb_content: dict, header_list: List[cbc.Imeth6Header]
+    cbc_path: FilePath, grb_content: Dict[str, Any], header_list: List[cbc.Imeth6Header]
 ) -> xr.DataArray:
     raise NotImplementedError
 

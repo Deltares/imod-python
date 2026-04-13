@@ -95,7 +95,7 @@ DEFAULT_SETTINGS: dict[str, Any] = {
 }
 
 
-class Model(collections.UserDict):
+class Model(collections.UserDict[str, Any]):
     def __setitem__(self, key, value):
         # TODO: Add packagecheck
         super().__setitem__(key, value)
@@ -317,6 +317,8 @@ class MetaSwapModel(Model):
 
         # Add IdfMapping settings
         idf_key = self.get_pkgkey(IdfMapping)
+        if idf_key is None:
+            raise ValueError("No IdfMapping package found in model")
         idf_pkg = cast(IdfMapping, self[idf_key])
         simulation_settings.update(idf_pkg._get_output_settings())
 
@@ -359,6 +361,8 @@ class MetaSwapModel(Model):
 
         # Get index and svat
         grid_key = self.get_pkgkey(GridData)
+        if grid_key is None:
+            raise ValueError("No GridData package found in model")
         grid_pkg = cast(GridData, self[grid_key])
         index, svat = grid_pkg.generate_isactive_svat_arrays()
 
@@ -560,6 +564,8 @@ class MetaSwapModel(Model):
 
         # First, handle the grid data and determine the overlap.
         grid_key = self.get_pkgkey(GridData)
+        if grid_key is None:
+            raise ValueError("No GridData package found in model")
         grid_pkg = cast(GridData, self[grid_key])
         is_in_active_domain = {}
 

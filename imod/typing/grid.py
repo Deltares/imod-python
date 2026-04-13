@@ -107,7 +107,7 @@ def _force_decreasing_y(structured_grid: xr.DataArray | xr.Dataset):
     return structured_grid
 
 
-def _get_first_item(objects: Sequence):
+def _get_first_item(objects: Sequence[Any]) -> Any:
     return next(iter(objects))
 
 
@@ -115,8 +115,8 @@ def _get_first_item(objects: Sequence):
 # isinstance testing
 def _type_dispatch_functions_on_grid_sequence(
     objects: Sequence[GridDataArray | GridDataset],
-    unstructured_func: Callable,
-    structured_func: Callable,
+    unstructured_func: Callable[..., Any],
+    structured_func: Callable[..., Any],
     *args,
     **kwargs,
 ) -> GridDataArray | GridDataset:
@@ -144,8 +144,8 @@ def _type_dispatch_functions_on_grid_sequence(
 # to manual type testing
 def _type_dispatch_functions_on_dict(
     dict_of_objects: Mapping[str, GridDataArray | float | bool | int],
-    unstructured_func: Callable,
-    structured_func: Callable,
+    unstructured_func: Callable[..., Any],
+    structured_func: Callable[..., Any],
     *args,
     **kwargs,
 ):
@@ -206,7 +206,9 @@ def concat(
     )
 
 
-def merge_unstructured_dataset(variables_to_merge: list[dict], *args, **kwargs):
+def merge_unstructured_dataset(
+    variables_to_merge: list[dict[str, Any]], *args, **kwargs
+):
     """
     Work around xugrid issue https://github.com/Deltares/xugrid/issues/179
 
@@ -524,7 +526,7 @@ class GridCache:
     unique geometry hash.
     """
 
-    def __init__(self, func: Callable, max_cache_size=5):
+    def __init__(self, func: Callable[..., Any], max_cache_size: int = 5):
         self.max_cache_size = max_cache_size
         self.grid_cache: dict[int, GridDataArray] = {}
         self.func = func

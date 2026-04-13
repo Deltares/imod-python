@@ -6,7 +6,7 @@ import inspect
 import pathlib
 import warnings
 from pathlib import Path
-from typing import Any, List, Optional, Tuple, Union
+from typing import Any, List, Optional, Tuple, Union, cast
 
 import cftime
 import jinja2
@@ -90,7 +90,7 @@ def _create_boundary_condition_clipped_boundary(
     original_model: Modflow6Model,
     clipped_model: Modflow6Model,
     state_for_boundary: Optional[GridDataArray],
-    clip_box_args: tuple,
+    clip_box_args: tuple[Any, ...],
 ) -> Optional[StateType]:
     # Create temporary boundary condition for the original model boundary. This
     # is used later to see which boundaries can be ignored as they were already
@@ -146,7 +146,7 @@ def _create_boundary_condition_clipped_boundary(
     return bc_constant_pkg
 
 
-class Modflow6Model(collections.UserDict, IModel, abc.ABC):
+class Modflow6Model(collections.UserDict[str, Package], IModel, abc.ABC):
     _mandatory_packages: tuple[str, ...] = ()
     _init_schemata: SchemataDict = {}
     _model_id: Optional[str] = None
@@ -165,7 +165,7 @@ class Modflow6Model(collections.UserDict, IModel, abc.ABC):
 
     @standard_log_decorator()
     def _validate_options(
-        self, schemata: dict, **kwargs
+        self, schemata: dict[str, Any], **kwargs
     ) -> dict[str, list[ValidationError]]:
         return validate_schemata_dict(schemata, self._options, **kwargs)
 
@@ -569,7 +569,7 @@ class Modflow6Model(collections.UserDict, IModel, abc.ABC):
                         write_context=pkg_write_context,
                     )
                 elif issubclass(type(pkg), imod.mf6.HorizontalFlowBarrierBase):
-                    mf6_hfb_ls.append(pkg)
+                    mf6_hfb_ls.append(cast(HorizontalFlowBarrierBase, pkg))
                 else:
                     pkg._write(
                         pkgname=pkg_name,
@@ -656,7 +656,7 @@ class Modflow6Model(collections.UserDict, IModel, abc.ABC):
             if statusinfo.has_errors():
                 raise ValidationError(statusinfo.to_string())
 
-        toml_content: dict = collections.defaultdict(dict)
+        toml_content: dict[str, Any] = collections.defaultdict(dict)
 
         for pkgname, pkg in self.items():
             pkg_path = pkg.to_file(
@@ -696,7 +696,7 @@ class Modflow6Model(collections.UserDict, IModel, abc.ABC):
         return instance
 
     @property
-    def options(self) -> dict:
+    def options(self) -> dict[str, Any]:
         if self._options is None:
             raise ValueError("Model id has not been set")
         return self._options

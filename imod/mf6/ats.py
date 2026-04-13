@@ -8,7 +8,7 @@ from imod.mf6.write_context import WriteContext
 from imod.schemata import AllValueSchema, DimsSchema, DTypeSchema
 from imod.typing import GridDataset
 
-_PeriodDataType: TypeAlias = dict[np.int64, list]
+_PeriodDataType: TypeAlias = dict[np.int64, list[Any]]
 _PeriodDataVarNames: TypeAlias = tuple[str, str, str, str, str]
 
 
@@ -208,7 +208,7 @@ class AdaptiveTimeStepping(Package):
         d["perioddata"] = perioddata
         return d
 
-    def _validate(self, schemata: dict, **kwargs):
+    def _validate(self, schemata: dict[str, Any], **kwargs):
         # Insert additional kwargs
         kwargs["dt_max"] = self["dt_max"]
         errors = super()._validate(schemata, **kwargs)

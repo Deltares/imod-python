@@ -10,7 +10,9 @@ import imod
 from imod.typing import GridDataArray
 
 
-def get_unstructured_cell2d_from_xy(uda: xu.UgridDataArray, **points) -> npt.NDArray:
+def get_unstructured_cell2d_from_xy(
+    uda: xu.UgridDataArray, **points
+) -> npt.NDArray[np.intp]:
     # Unstructured grids always require to be tested both on x and y coordinates
     # to see if points are within bounds.
     for coord in ["x", "y"]:
@@ -24,7 +26,7 @@ def get_unstructured_cell2d_from_xy(uda: xu.UgridDataArray, **points) -> npt.NDA
     return uda.ugrid.grid.locate_points(xy)
 
 
-def _check_and_get_points_shape(points: dict) -> dict:
+def _check_and_get_points_shape(points: dict[str, Any]) -> dict[str, Any]:
     """Check whether points have the right shape"""
     shapes = {}
     for coord, value in points.items():
@@ -39,13 +41,13 @@ def _check_and_get_points_shape(points: dict) -> dict:
     return shapes
 
 
-def _check_point_shapes_consistency(shapes: dict):
+def _check_point_shapes_consistency(shapes: dict[str, Any]) -> None:
     if not len(set(shapes.values())) == 1:
         msg = "\n".join([f"{coord}: {shape}" for coord, shape in shapes.items()])
         raise ValueError(f"Shapes of coordinates do match each other:\n{msg}")
 
 
-def _check_points(points: dict):
+def _check_points(points: dict[str, Any]) -> None:
     """
     Check whether the array with points has the right and consistent shape.
     """
@@ -54,7 +56,7 @@ def _check_points(points: dict):
     _check_point_shapes_consistency(shapes)
 
 
-def _arr_like_points(points: dict, fill_value: Any) -> npt.NDArray:
+def _arr_like_points(points: dict[str, Any], fill_value: Any) -> npt.NDArray[Any]:
     """
     Return array with the same shape as the first array provided in points.
     """
@@ -120,7 +122,9 @@ def points_in_bounds(da: GridDataArray, **points) -> npt.NDArray[np.bool_]:
     return in_bounds
 
 
-def check_points_in_bounds(da: GridDataArray, points: dict, out_of_bounds: str):
+def check_points_in_bounds(
+    da: GridDataArray, points: dict[str, Any], out_of_bounds: str
+):
     inside = points_in_bounds(da, **points)
     # Error handling
     msg = "Not all points are located within the bounds of the DataArray"
