@@ -213,7 +213,7 @@ def test_simulation_open_head(circle_model, tmp_path):
     )
     assert head.dims == ("time", "layer", "mesh2d_nFaces")
     assert head.shape == (2, 2, 216)
-    assert str(head.coords["time"].values[()][0]) == "2013-03-18T22:00:00.000000000"
+    assert str(head.coords["time"].values[()][0]) == "2013-03-18T22:00:00.000000"
 
 
 class PathCases:

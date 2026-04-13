@@ -3,6 +3,7 @@ from copy import deepcopy
 from datetime import datetime
 
 import numpy as np
+import pandas as pd
 import pytest
 import xugrid as xu
 
@@ -24,17 +25,18 @@ def test_simulation_write_and_run(circle_model, tmp_path):
     with pytest.raises(
         RuntimeError, match="Simulation circle has not been written yet."
     ):
-        circle_model.run()
+        simulation.run()
 
     modeldir = tmp_path / "circle"
 
-    mask = deepcopy(circle_model["GWF_1"].domain)
+    mask = deepcopy(simulation["GWF_1"].domain)
     mask.values[:, 133] = -1
     simulation.mask_all_models(mask)
 
     simulation.write(modeldir, binary=False, use_absolute_paths=True)
     simulation.run()
-
+    # Test opening with different time unit, see if time unit is correctly
+    # converted to seconds
     head = imod.mf6.open_hds(
         modeldir / "GWF_1/GWF_1.hds",
         modeldir / "GWF_1/disv.disv.grb",
@@ -44,10 +46,10 @@ def test_simulation_write_and_run(circle_model, tmp_path):
     assert isinstance(head, xu.UgridDataArray)
     assert np.all(
         head["time"].values[0]
-        == np.array(datetime(1999, 1, 1, 0, 0, 7), dtype="datetime64[ns]")
+        == np.array(datetime(1999, 1, 1, 0, 0, 1), dtype="datetime64[ns]")
     )
     assert head.dims == ("time", "layer", "mesh2d_nFaces")
-    assert head.shape == (52, 2, 216)
+    assert head.shape == (2, 2, 216)
 
 
 def test_gwfmodel_render(circle_model, tmp_path):
@@ -87,7 +89,7 @@ def test_simulation_write_and_run_evt(circle_model_evt, tmp_path):
     with pytest.raises(
         RuntimeError, match="Simulation circle has not been written yet."
     ):
-        circle_model_evt.run()
+        simulation.run()
 
     modeldir = tmp_path / "circle_evt"
     simulation.write(modeldir, binary=True)
@@ -98,22 +100,22 @@ def test_simulation_write_and_run_evt(circle_model_evt, tmp_path):
     )
     assert isinstance(head, xu.UgridDataArray)
     assert head.dims == ("time", "layer", "mesh2d_nFaces")
-    assert head.shape == (52, 2, 216)
+    assert head.shape == (2, 2, 216)
 
 
 def test_simulation_write_and_run_evt__no_segments(circle_model_evt, tmp_path):
     simulation = circle_model_evt
 
-    evt = circle_model_evt["GWF_1"].pop("evt")
+    evt = simulation["GWF_1"].pop("evt")
     evt_ds = evt.dataset
     evt_ds = evt_ds.drop_vars(["proportion_rate", "proportion_depth"])
     evt_dict = {key: evt_ds[key] for key in evt_ds.keys()}
-    circle_model_evt["GWF_1"]["evt"] = imod.mf6.Evapotranspiration(**evt_dict)
+    simulation["GWF_1"]["evt"] = imod.mf6.Evapotranspiration(**evt_dict)
 
     with pytest.raises(
         RuntimeError, match="Simulation circle has not been written yet."
     ):
-        circle_model_evt.run()
+        simulation.run()
 
     modeldir = tmp_path / "circle_evt"
     simulation.write(modeldir, binary=True)
@@ -124,7 +126,7 @@ def test_simulation_write_and_run_evt__no_segments(circle_model_evt, tmp_path):
     )
     assert isinstance(head, xu.UgridDataArray)
     assert head.dims == ("time", "layer", "mesh2d_nFaces")
-    assert head.shape == (52, 2, 216)
+    assert head.shape == (2, 2, 216)
 
 
 def test_gwfmodel_render_evt(circle_model_evt, tmp_path):
@@ -161,11 +163,10 @@ def test_gwfmodel_render_evt(circle_model_evt, tmp_path):
 
 def test_simulation_write_and_run_transport(circle_model_transport, tmp_path):
     simulation = circle_model_transport
-
     with pytest.raises(
         RuntimeError, match="Simulation circle has not been written yet."
     ):
-        circle_model_transport.run()
+        simulation.run()
 
     modeldir = tmp_path / "circle_transport"
     simulation.write(modeldir)
@@ -175,11 +176,11 @@ def test_simulation_write_and_run_transport(circle_model_transport, tmp_path):
 
     assert isinstance(head, xu.UgridDataArray)
     assert head.dims == ("time", "layer", "mesh2d_nFaces")
-    assert head.shape == (52, 2, 216)
+    assert head.shape == (2, 2, 216)
 
     assert isinstance(concentration, xu.UgridDataArray)
     assert concentration.dims == ("time", "layer", "mesh2d_nFaces")
-    assert concentration.shape == (52, 2, 216)
+    assert concentration.shape == (2, 2, 216)
 
 
 def test_simulation_write_and_run_transport_vsc(circle_model_transport_vsc, tmp_path):
@@ -198,11 +199,11 @@ def test_simulation_write_and_run_transport_vsc(circle_model_transport_vsc, tmp_
 
     assert isinstance(head, xu.UgridDataArray)
     assert head.dims == ("time", "layer", "mesh2d_nFaces")
-    assert head.shape == (52, 2, 216)
+    assert head.shape == (2, 2, 216)
 
     assert isinstance(concentration, xu.UgridDataArray)
     assert concentration.dims == ("time", "layer", "mesh2d_nFaces")
-    assert concentration.shape == (52, 2, 216)
+    assert concentration.shape == (2, 2, 216)
 
 
 def run_simulation(simulation, modeldir):
@@ -251,8 +252,8 @@ def test_simulation_clip_and_state_at_boundary(circle_model_transport, tmp_path)
 
     # Test if model runs
     head_half, concentration_half = run_simulation(half_simulation, tmp_path / "half")
-    assert head_half.shape == (52, 2, 108)
-    assert concentration_half.shape == (52, 2, 108)
+    assert head_half.shape == (2, 2, 108)
+    assert concentration_half.shape == (2, 2, 108)
 
 
 def test_simulation_clip_and_constant_state_at_boundary__transient_chd(
@@ -289,12 +290,12 @@ def test_simulation_clip_and_constant_state_at_boundary__transient_chd(
     assert conc_clipped.notnull().sum() == 20
     head_clipped = half_simulation["GWF_1"]["chd_clipped"]["head"]
     assert head_clipped.sizes["layer"] == 2
-    assert head_clipped.sizes["time"] == 52
-    assert head_clipped.notnull().sum() == 20 * 52
+    assert head_clipped.sizes["time"] == 2
+    assert head_clipped.notnull().sum() == 20 * 2
     # Test if model runs
     head_half, concentration_half = run_simulation(half_simulation, tmp_path / "half")
-    assert head_half.shape == (52, 2, 108)
-    assert concentration_half.shape == (52, 2, 108)
+    assert head_half.shape == (2, 2, 108)
+    assert concentration_half.shape == (2, 2, 108)
 
 
 def test_simulation_clip_and_transient_state_at_boundary__transient_chd(
@@ -304,9 +305,17 @@ def test_simulation_clip_and_transient_state_at_boundary__transient_chd(
     Test with a transient chd boundary condition and transient states for
     boundary conditions. The time steps of the chd package are outside of the
     time domain of the states_for_boundary.
+
+    Extend the time discretization as it was before
+    https://github.com/Deltares/imod-python/pull/1029, to allow clipping longer
+    timeseries.
     """
     # Arrange
     simulation = circle_model_transport
+    simulation.create_time_discretization(
+        additional_times=pd.date_range(start="2000-01-01", end="2001-01-01", freq="W")
+    )
+
     idomain = simulation["GWF_1"]["disv"]["idomain"].compute()
     time = simulation["time_discretization"].dataset.coords["time"].values
 
