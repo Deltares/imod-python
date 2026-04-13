@@ -63,7 +63,7 @@ from imod.typing.grid import (
     merge_partitions,
 )
 
-OUTPUT_FUNC_MAPPING: dict[str, Callable] = {
+OUTPUT_FUNC_MAPPING: dict[str, Callable[..., Any]] = {
     "head": open_hds,
     "concentration": open_conc,
     "budget-flow": open_cbc,
@@ -92,7 +92,7 @@ def get_packages(simulation: Modflow6Simulation) -> dict[str, Package]:
     }
 
 
-class Modflow6Simulation(collections.UserDict, ISimulation):
+class Modflow6Simulation(collections.UserDict[str, Any], ISimulation):
     """
     Modflow6Simulation is a class that represents a Modflow 6 simulation. It
     contains data on simulation timing, models that are present in the
@@ -1028,7 +1028,7 @@ class Modflow6Simulation(collections.UserDict, ISimulation):
         directory = pathlib.Path(directory)
         directory.mkdir(parents=True, exist_ok=True)
 
-        toml_content: DefaultDict[str, dict] = collections.defaultdict(dict)
+        toml_content: DefaultDict[str, dict[str, Any]] = collections.defaultdict(dict)
         # Dump version number
         version = get_version()
         toml_content["version"] = {"imod-python": version}
@@ -1135,7 +1135,7 @@ class Modflow6Simulation(collections.UserDict, ISimulation):
 
         return simulation
 
-    def get_exchange_relationships(self) -> list:
+    def get_exchange_relationships(self) -> list[Any]:
         """
         Get exchange relationships in the simulation.
 
@@ -1471,6 +1471,8 @@ class Modflow6Simulation(collections.UserDict, ISimulation):
         original_model_name_to_solution: dict[str, Solution] = {}
         for model_name, model in original_models.items():
             solution_name = self.get_solution_name(model_name)
+            if solution_name is None:
+                raise ValueError(f"Could not find a solution for model '{model_name}'")
             solution = cast(Solution, new_simulation[solution_name])
             original_model_name_to_solution[model_name] = solution
 
@@ -1561,7 +1563,7 @@ class Modflow6Simulation(collections.UserDict, ISimulation):
         # collect some options that we will auto-set
         for exchange in self["split_exchanges"]:
             if isinstance(exchange, GWFGWF):
-                model_name_1 = exchange.dataset["model_name_1"].values[()]
+                model_name_1 = str(exchange.dataset["model_name_1"].values[()])
                 model_1 = self[model_name_1]
                 exchange.set_options(
                     save_flows=model_1["oc"].is_budget_output,
@@ -1574,7 +1576,7 @@ class Modflow6Simulation(collections.UserDict, ISimulation):
     def _set_transport_exchange_options(self) -> None:
         for exchange in self["split_exchanges"]:
             if isinstance(exchange, GWTGWT):
-                model_name_1 = exchange.dataset["model_name_1"].values[()]
+                model_name_1 = str(exchange.dataset["model_name_1"].values[()])
                 model_1 = self[model_name_1]
                 advection_key = model_1._get_pkgkey("adv")
                 dispersion_key = model_1._get_pkgkey("dsp")

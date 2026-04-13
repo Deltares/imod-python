@@ -1,5 +1,5 @@
 from copy import deepcopy
-from typing import Union
+from typing import Any, Union
 
 import numpy as np
 import xarray as xr
@@ -115,7 +115,7 @@ class Mf6HorizontalFlowBarrier(BoundaryCondition):
         print_input: Union[bool, xr.DataArray] = False,
         validate: Union[bool, xr.DataArray] = True,
     ):
-        dict_dataset = {
+        dict_dataset: dict[str, Any] = {
             "cell_id1": cell_id1,
             "cell_id2": cell_id2,
             "layer": layer,

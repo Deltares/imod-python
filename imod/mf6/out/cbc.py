@@ -266,7 +266,7 @@ def read_imeth6_budgets_dense(
     dtype: np.dtype,
     pos: int,
     size: int,
-    shape: tuple,
+    shape: Tuple[int, ...],
     return_variable: str,
     indices: np.ndarray | None,
 ) -> FloatArray:

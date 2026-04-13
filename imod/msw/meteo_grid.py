@@ -1,7 +1,7 @@
 import csv
 from pathlib import Path
 from shutil import copyfile
-from typing import Optional, Union
+from typing import Any, Optional, Union
 
 import numpy as np
 import pandas as pd
@@ -75,7 +75,7 @@ class MeteoGrid(MetaSwapPackage, IRegridPackage):
         )
 
     def _compose_filename(
-        self, d: dict, directory: Path, pattern: Optional[str] = None
+        self, d: dict[str, Any], directory: Path, pattern: Optional[str] = None
     ):
         """
         Construct a filename, following the iMOD conventions.

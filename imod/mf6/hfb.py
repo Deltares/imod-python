@@ -5,7 +5,7 @@ import typing
 from copy import deepcopy
 from enum import Enum
 from pathlib import Path
-from typing import TYPE_CHECKING, Dict, List, Optional, Self, Tuple
+from typing import TYPE_CHECKING, Any, Dict, List, Optional, Self, Tuple
 
 import cftime
 import numpy as np
@@ -186,7 +186,7 @@ def to_connected_cells_dataset(
     idomain: GridDataArray,
     grid: xu.Ugrid2d,
     edge_index: np.ndarray,
-    edge_values: dict,
+    edge_values: dict[str, Any],
 ) -> xr.Dataset:
     """
     Converts a cell edge grid with values defined on the edges to a dataset with the cell ids of the connected cells,
@@ -416,7 +416,7 @@ def _prepare_barrier_dataset_for_mf6_adapter(dataset: xr.Dataset) -> xr.Dataset:
 
 def _snap_to_grid_and_aggregate(
     barrier_dataframe: GeoDataFrameType, grid2d: xu.Ugrid2d, vardict_agg: dict[str, str]
-) -> tuple[xu.UgridDataset, npt.NDArray]:
+) -> tuple[xu.UgridDataset, npt.NDArray[Any]]:
     """
     Snap barrier dataframe to grid and aggregate multiple lines with a list of
     methods per variable.
@@ -481,7 +481,7 @@ class HorizontalFlowBarrierBase(BoundaryCondition, ILineDataPackage):
         geometry: "gpd.GeoDataFrame",
         print_input: bool = False,
     ) -> None:
-        dict_dataset = {"print_input": print_input}
+        dict_dataset: dict[str, Any] = {"print_input": print_input}
         super().__init__(dict_dataset)
         self.line_data = geometry
 
@@ -859,7 +859,7 @@ class HorizontalFlowBarrierBase(BoundaryCondition, ILineDataPackage):
         raise NotImplementedError
 
     @abc.abstractmethod
-    def _get_vertical_variables(self) -> list:
+    def _get_vertical_variables(self) -> list[str]:
         raise NotImplementedError
 
     def clip_box(
@@ -1143,7 +1143,7 @@ class HorizontalFlowBarrierHydraulicCharacteristic(HorizontalFlowBarrierBase):
     def _get_variable_name(self) -> str:
         return "hydraulic_characteristic"
 
-    def _get_vertical_variables(self) -> list:
+    def _get_vertical_variables(self) -> list[str]:
         return []
 
     def _compute_barrier_values(
@@ -1220,7 +1220,7 @@ class SingleLayerHorizontalFlowBarrierHydraulicCharacteristic(
     def _get_variable_name(self) -> str:
         return "hydraulic_characteristic"
 
-    def _get_vertical_variables(self) -> list:
+    def _get_vertical_variables(self) -> list[str]:
         return ["layer"]
 
     def _compute_barrier_values(
@@ -1294,7 +1294,7 @@ class HorizontalFlowBarrierMultiplier(HorizontalFlowBarrierBase):
     def _get_variable_name(self) -> str:
         return "multiplier"
 
-    def _get_vertical_variables(self) -> list:
+    def _get_vertical_variables(self) -> list[str]:
         return []
 
     def _compute_barrier_values(
@@ -1373,7 +1373,7 @@ class SingleLayerHorizontalFlowBarrierMultiplier(HorizontalFlowBarrierBase):
     def _get_variable_name(self) -> str:
         return "multiplier"
 
-    def _get_vertical_variables(self) -> list:
+    def _get_vertical_variables(self) -> list[str]:
         return ["layer"]
 
     def _compute_barrier_values(
@@ -1467,7 +1467,7 @@ class HorizontalFlowBarrierResistance(HorizontalFlowBarrierBase):
     def _get_variable_name(self) -> str:
         return "resistance"
 
-    def _get_vertical_variables(self) -> list:
+    def _get_vertical_variables(self) -> list[str]:
         return []
 
     def _compute_barrier_values(
@@ -1539,7 +1539,7 @@ class SingleLayerHorizontalFlowBarrierResistance(HorizontalFlowBarrierBase):
     def _get_variable_name(self) -> str:
         return "resistance"
 
-    def _get_vertical_variables(self) -> list:
+    def _get_vertical_variables(self) -> list[str]:
         return ["layer"]
 
     def _compute_barrier_values(

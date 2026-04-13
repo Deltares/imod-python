@@ -322,7 +322,9 @@ class Package(PackageBase, IPackage, abc.ABC):
                             self._write_text_griddata(path, da, dtype)
 
     @standard_log_decorator()
-    def _validate(self, schemata: dict, **kwargs) -> dict[str, list[ValidationError]]:
+    def _validate(
+        self, schemata: dict[str, Any], **kwargs
+    ) -> dict[str, list[ValidationError]]:
         ds = trim_time_dimension(self.dataset, **kwargs)
         return validate_schemata_dict(schemata, ds, **kwargs)
 
@@ -612,7 +614,7 @@ class Package(PackageBase, IPackage, abc.ABC):
         return result
 
     def _call_func_on_grids(
-        self, func: Callable, dis: dict
+        self, func: Callable[..., Any], dis: dict[str, Any]
     ) -> dict[str, GridDataArray]:
         """
         Call function on dictionary of grids and merge settings back into

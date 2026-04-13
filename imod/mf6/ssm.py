@@ -1,5 +1,5 @@
 from pathlib import Path
-from typing import Self
+from typing import Any, Self
 
 import numpy as np
 
@@ -11,7 +11,7 @@ from imod.mf6.package import Package
 from imod.schemata import DTypeSchema
 
 
-def with_index_dim(array_like) -> tuple[str, list]:
+def with_index_dim(array_like) -> tuple[str, list[Any]]:
     # At least1d will also extract the values if array_like is a DataArray.
     arr1d = np.atleast_1d(array_like)
     if arr1d.ndim > 1:

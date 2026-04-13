@@ -95,7 +95,7 @@ DEFAULT_SETTINGS: dict[str, Any] = {
 }
 
 
-class Model(collections.UserDict):
+class Model(collections.UserDict[str, Any]):
     def __setitem__(self, key, value):
         # TODO: Add packagecheck
         super().__setitem__(key, value)
@@ -317,7 +317,7 @@ class MetaSwapModel(Model):
 
         # Add IdfMapping settings
         idf_key = self.get_pkgkey(IdfMapping)
-        idf_pkg = cast(IdfMapping, self[idf_key])
+        idf_pkg = cast(IdfMapping, self[idf_key])  # type: ignore[index]
         simulation_settings.update(idf_pkg._get_output_settings())
 
         simulation_settings["unsa_svat_path"] = self._render_unsaturated_database_path(
@@ -359,7 +359,7 @@ class MetaSwapModel(Model):
 
         # Get index and svat
         grid_key = self.get_pkgkey(GridData)
-        grid_pkg = cast(GridData, self[grid_key])
+        grid_pkg = cast(GridData, self[grid_key])  # type: ignore[index]
         index, svat = grid_pkg.generate_isactive_svat_arrays()
 
         # write package contents
@@ -560,7 +560,7 @@ class MetaSwapModel(Model):
 
         # First, handle the grid data and determine the overlap.
         grid_key = self.get_pkgkey(GridData)
-        grid_pkg = cast(GridData, self[grid_key])
+        grid_pkg = cast(GridData, self[grid_key])  # type: ignore[index]
         is_in_active_domain = {}
 
         for submodel_name, submodel in partitioned_submodels.items():

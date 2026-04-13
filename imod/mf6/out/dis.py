@@ -208,7 +208,7 @@ def open_dvs(
 
 
 def open_imeth1_budgets(
-    cbc_path: FilePath, grb_content: dict, header_list: List[cbc.Imeth1Header]
+    cbc_path: FilePath, grb_content: Dict[str, Any], header_list: List[cbc.Imeth1Header]
 ) -> xr.DataArray:
     """
     Open the data for an imeth==1 budget section. Data is read lazily per
@@ -252,7 +252,7 @@ def open_imeth1_budgets(
 
 def open_imeth6_budgets(
     cbc_path: FilePath,
-    grb_content: dict,
+    grb_content: Dict[str, Any],
     header_list: List[cbc.Imeth6Header],
     return_variable: str = "budget",
     indices: np.ndarray | None = None,
@@ -374,7 +374,7 @@ def dis_indices(
 
 
 def dis_to_right_front_lower_indices(
-    grb_content: dict,
+    grb_content: Dict[str, Any],
 ) -> Tuple[xr.DataArray, xr.DataArray, xr.DataArray]:
     """
     Infer the indices to extract right, front, and lower face flows from the
@@ -442,7 +442,7 @@ def dis_extract_face_budgets(
 
 
 def dis_open_face_budgets(
-    cbc_path: FilePath, grb_content: dict, header_list: List[cbc.Imeth1Header]
+    cbc_path: FilePath, grb_content: Dict[str, Any], header_list: List[cbc.Imeth1Header]
 ) -> Tuple[xr.DataArray, xr.DataArray, xr.DataArray]:
     """
     Open the flow-ja-face, and extract right, front, and lower face flows.

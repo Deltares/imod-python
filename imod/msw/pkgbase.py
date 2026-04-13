@@ -34,10 +34,10 @@ class MetaSwapPackage(abc.ABC):
     __slots__ = "_pkg_id"
     _file_name = "filename_not_set"
     _regrid_method: DataclassType = EmptyRegridMethod()
-    _with_subunit: tuple = ()
-    _without_subunit: tuple = ()
-    _to_fill: tuple = ()
-    _metadata_dict: dict = {}
+    _with_subunit: tuple[Any, ...] = ()
+    _without_subunit: tuple[Any, ...] = ()
+    _to_fill: tuple[Any, ...] = ()
+    _metadata_dict: dict[str, Any] = {}
 
     def __init__(self):
         self.dataset = xr.Dataset()
