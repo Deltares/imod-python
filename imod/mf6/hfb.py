@@ -43,7 +43,7 @@ from imod.schemata import (
     MaxNUniqueValuesSchema,
     ValidationError,
 )
-from imod.typing import GeoDataFrameType, GridDataArray, LineStringType
+from imod.typing import GeoDataFrameType, GridDataArray, LineStringType, GridDataDict
 from imod.typing.grid import as_ugrid_dataarray, ones_like
 from imod.util.imports import MissingOptionalModule
 
@@ -1479,6 +1479,24 @@ class HorizontalFlowBarrierResistance(HorizontalFlowBarrierBase):
 
         return barrier_values
 
+    @classmethod
+    def from_imod5_data(cls, key: str, imod5_data: Dict[str, GridDataDict]):
+        imod5_keys = list(imod5_data.keys())
+        if key not in imod5_keys:
+            raise ValueError("hfb key not present.")
+
+        hfb_dict = imod5_data[key]
+        layer = hfb_dict.get("layer", None)
+        if layer != 0:
+            raise ValueError(
+                "assigning to a layer is not supported for "
+                "HorizontalFlowBarrierResistance. "
+                "Try SingleLayerHorizontalFlowBarrierResistance class."
+            )
+        geometry_layer = hfb_dict["geodataframe"]
+
+        return cls(geometry_layer)
+
 
 class SingleLayerHorizontalFlowBarrierResistance(HorizontalFlowBarrierBase):
     """
@@ -1553,7 +1571,7 @@ class SingleLayerHorizontalFlowBarrierResistance(HorizontalFlowBarrierBase):
         return barrier_values
 
     @classmethod
-    def from_imod5_data(cls, key: str, imod5_data: Dict[str, Dict[str, GridDataArray]]):
+    def from_imod5_data(cls, key: str, imod5_data: Dict[str, GridDataDict]):
         imod5_keys = list(imod5_data.keys())
         if key not in imod5_keys:
             raise ValueError("hfb key not present.")
