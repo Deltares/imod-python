@@ -43,7 +43,7 @@ from imod.schemata import (
     MaxNUniqueValuesSchema,
     ValidationError,
 )
-from imod.typing import GeoDataFrameType, GridDataArray, LineStringType, GridDataDict
+from imod.typing import GeoDataFrameType, GridDataArray, GridDataDict, LineStringType
 from imod.typing.grid import as_ugrid_dataarray, ones_like
 from imod.util.imports import MissingOptionalModule
 
