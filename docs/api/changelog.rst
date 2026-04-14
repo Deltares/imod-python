@@ -18,6 +18,9 @@ Added
   its first times step is all nodata. This can save a lot of clipping or masking
   transient models with many timesteps.
 - Added :meth:`imod.msw.MetaSwapModel.split` to split MetaSWAP models.
+- Added :meth:`imod.mf6.HorizontalFlowBarrierResistance.from_imod5_data` to load
+  barriers from 3D GEN files. 
+
 
 Fixed
 ~~~~~
