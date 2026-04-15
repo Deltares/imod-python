@@ -1485,6 +1485,34 @@ class HorizontalFlowBarrierResistance(HorizontalFlowBarrierBase):
 
     @classmethod
     def from_imod5_data(cls, key: str, imod5_data: Dict[str, GridDataDict]):
+        """
+        Import HFB data from imod5 data dictionary. Data from "3D GEN" files, so
+        with a polygon geometry, can be loaded with this method.
+
+        Parameters
+        ----------
+        key: str
+            Key in the imod5_data dictionary where the HFB data is stored.
+        imod5_data: Dict[str, GridDataDict]
+            Dictionary with data from imod5, where the HFB data is stored under
+            the provided key.
+        
+        Returns
+        -------
+        HorizontalFlowBarrierResistance
+             HFB package with data from the imod5 data dictionary.
+
+        Examples
+        --------
+
+        Load HFB data from an imod5 data dictionary. The imod5 data dictionary
+        can be obtained by reading a .prj file with the
+        :func:`imod.formats.prj.open_prj_data` function. The projectfile should
+        point to 3D GEN files.
+
+        >>> imod5_data, _ = imod.formats.prj.open_prj_data("path/to/prj/file.prj")
+        >>> hfb = HorizontalFlowBarrierResistance.from_imod5_data("hfb_1", imod5_data)
+        """
         imod5_keys = list(imod5_data.keys())
         if key not in imod5_keys:
             raise ValueError("hfb key not present.")
@@ -1576,6 +1604,34 @@ class SingleLayerHorizontalFlowBarrierResistance(HorizontalFlowBarrierBase):
 
     @classmethod
     def from_imod5_data(cls, key: str, imod5_data: Dict[str, GridDataDict]):
+        """
+        Import HFB data from imod5 data dictionary. Data from "2D GEN" files, so
+        with a line shape, can be loaded with this method.
+
+        Parameters
+        ----------
+        key: str
+            Key in the imod5_data dictionary where the HFB data is stored.
+        imod5_data: Dict[str, GridDataDict]
+            Dictionary with data from imod5, where the HFB data is stored under
+            the provided key.
+        
+        Returns
+        -------
+        SingleLayerHorizontalFlowBarrierResistance
+             HFB package with data from the imod5 data dictionary.
+
+        Examples
+        --------
+
+        Load HFB data from an imod5 data dictionary. The imod5 data dictionary
+        can be obtained by reading a .prj file with the
+        :func:`imod.formats.prj.open_prj_data` function. The projectfile should
+        point to 2D GEN files.
+        
+        >>> imod5_data, _ = imod.formats.prj.open_prj_data("path/to/prj/file.prj")
+        >>> hfb = SingleLayerHorizontalFlowBarrierResistance.from_imod5_data("hfb_1", imod5_data)
+        """
         imod5_keys = list(imod5_data.keys())
         if key not in imod5_keys:
             raise ValueError("hfb key not present.")
