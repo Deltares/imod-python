@@ -1496,7 +1496,7 @@ class HorizontalFlowBarrierResistance(HorizontalFlowBarrierBase):
         imod5_data: Dict[str, GridDataDict]
             Dictionary with data from imod5, where the HFB data is stored under
             the provided key.
-        
+
         Returns
         -------
         HorizontalFlowBarrierResistance
@@ -1615,7 +1615,7 @@ class SingleLayerHorizontalFlowBarrierResistance(HorizontalFlowBarrierBase):
         imod5_data: Dict[str, GridDataDict]
             Dictionary with data from imod5, where the HFB data is stored under
             the provided key.
-        
+
         Returns
         -------
         SingleLayerHorizontalFlowBarrierResistance
