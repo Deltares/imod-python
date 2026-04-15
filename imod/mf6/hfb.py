@@ -572,6 +572,10 @@ class HorizontalFlowBarrierBase(BoundaryCondition, ILineDataPackage):
 
         return instance
 
+    @classmethod
+    def from_imod5_data(cls, key: str, imod5_data: dict[str, Any]) -> Self:
+        raise NotImplementedError(f"Method not implemented for {cls.__name__}")
+
     def _compute_barrier_values(
         self, snapped_dataset, edge_index, idomain, top, bottom, k
     ):

@@ -16,6 +16,7 @@ from imod.mf6.dis import StructuredDiscretization
 from imod.mf6.drn import Drainage
 from imod.mf6.ghb import GeneralHeadBoundary
 from imod.mf6.hfb import (
+    HorizontalFlowBarrierBase,
     HorizontalFlowBarrierResistance,
     SingleLayerHorizontalFlowBarrierResistance,
 )
@@ -417,6 +418,7 @@ class GroundwaterFlowModel(Modflow6Model):
         if len(hfb_keys) != 0:
             for hfb_key in hfb_keys:
                 layer = imod5_data[hfb_key]["layer"]
+                hfb_pkgtype: type[HorizontalFlowBarrierBase]
                 if layer == 0:
                     hfb_pkgtype = HorizontalFlowBarrierResistance
                 else:
