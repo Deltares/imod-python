@@ -1511,7 +1511,7 @@ class HorizontalFlowBarrierResistance(HorizontalFlowBarrierBase):
         point to 3D GEN files.
 
         >>> imod5_data, _ = imod.formats.prj.open_prj_data("path/to/prj/file.prj")
-        >>> hfb = HorizontalFlowBarrierResistance.from_imod5_data("hfb_1", imod5_data)
+        >>> hfb = HorizontalFlowBarrierResistance.from_imod5_data("hfb-1", imod5_data)
         """
         imod5_keys = list(imod5_data.keys())
         if key not in imod5_keys:
@@ -1628,9 +1628,9 @@ class SingleLayerHorizontalFlowBarrierResistance(HorizontalFlowBarrierBase):
         can be obtained by reading a .prj file with the
         :func:`imod.formats.prj.open_prj_data` function. The projectfile should
         point to 2D GEN files.
-        
+
         >>> imod5_data, _ = imod.formats.prj.open_prj_data("path/to/prj/file.prj")
-        >>> hfb = SingleLayerHorizontalFlowBarrierResistance.from_imod5_data("hfb_1", imod5_data)
+        >>> hfb = SingleLayerHorizontalFlowBarrierResistance.from_imod5_data("hfb-1", imod5_data)
         """
         imod5_keys = list(imod5_data.keys())
         if key not in imod5_keys:
