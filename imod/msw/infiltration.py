@@ -8,7 +8,7 @@ from imod.msw.fixed_format import VariableMetaData
 from imod.msw.pkgbase import MetaSwapPackage
 from imod.msw.regrid.regrid_schemes import InfiltrationRegridMethod
 from imod.msw.utilities.common import concat_imod5
-from imod.msw.utilities.mask import MaskValues
+from imod.common.utilities.mask import MaskValues
 from imod.typing import GridDataDict, Imod5DataDict
 from imod.typing.grid import ones_like
 

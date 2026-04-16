@@ -14,7 +14,7 @@ from imod.msw.pkgbase import MetaSwapPackage
 from imod.msw.regrid.regrid_schemes import MeteoGridRegridMethod
 from imod.msw.timeutil import to_metaswap_timeformat
 from imod.msw.utilities.common import find_in_file_list
-from imod.msw.utilities.mask import MaskValues
+from imod.common.utilities.mask import MaskValues
 from imod.typing import Imod5DataDict
 
 

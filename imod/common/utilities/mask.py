@@ -1,5 +1,7 @@
+from dataclasses import dataclass
 import numbers
 
+import numpy as np
 import xarray as xr
 from plum import Dispatcher
 from xarray.core.utils import is_scalar
@@ -19,6 +21,15 @@ from imod.typing.grid import (
 
 # create dispatcher instance to limit scope of typedispatching
 dispatch = Dispatcher()
+
+
+@dataclass
+class MaskValues:
+    """Stores sentinel values for nodata. Most cases use -9999.0, but exceptions
+    can be added here."""
+
+    default = -9999.0
+    integer = 0
 
 
 def _validate_coords_mask(mask: GridDataArray) -> None:
@@ -80,7 +91,7 @@ def mask_package(package: IPackage, mask: GridDataArray) -> IPackage:
         if _skip_dataarray(package.dataset[var]) or _skip_variable(package, var):
             masked[var] = package.dataset[var]
         else:
-            masked[var] = _mask_spatial_var(package, var, mask)
+            masked[var] = _mask_spatial_var_pkg(package, var, mask)
 
     return type(package)(**masked)
 
@@ -108,23 +119,33 @@ def _skip_variable(package: IMaskingSettings, var: str) -> bool:
     return var in package.skip_variables
 
 
-def _mask_spatial_var(self, var: str, mask: GridDataArray) -> GridDataArray:
-    da = self.dataset[var]
-    array_mask = _adjust_mask_for_unlayered_data(da, mask)
-    active = array_mask > 0
+def _mask(da: GridDataArray, mask: GridDataArray) -> GridDataArray:
+    """
+    Mask a DataArray with a boolean mask. Function attempts to preserve the
+    dtype of the original DataArray. It will set the
+    value to 0 for integers and np.nan for floats.
+    """
+
+    nodata_float = np.nan
 
     if issubclass(da.dtype.type, numbers.Integral):
-        if var == "idomain":
-            return da.where(active, other=array_mask)
-        else:
-            return da.where(active, other=0)
+        return da.where(mask, other=0)
     elif issubclass(da.dtype.type, numbers.Real):
-        return da.where(active)
+        return da.where(mask)
     else:
         raise TypeError(
             f"Expected dtype float or integer. Received instead: {da.dtype}"
         )
 
+
+def _mask_spatial_var_pkg(package: IPackage, var: str, mask: GridDataArray) -> GridDataArray:
+    da = package.dataset[var]
+    array_mask = _adjust_mask_for_unlayered_data(da, mask)
+    active = array_mask > 0
+
+    if var == "idomain":
+        return da.where(active, other=array_mask)
+    return _mask(da, active)
 
 def _adjust_mask_for_unlayered_data(
     da: GridDataArray, mask: GridDataArray
@@ -151,6 +172,7 @@ def mask_arrays(arrays: dict[str, GridDataArray]) -> dict[str, GridDataArray]:
     coordinates. When a np.nan value is found in any array, the other arrays are also
     set to np.nan at the same coordinates.
     """
+
     masks = [notnull(array) for array in arrays.values()]
     # Get total mask across all arrays
     total_mask = concat(masks, dim="arrays").all("arrays")

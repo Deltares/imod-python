@@ -1,6 +1,7 @@
 import numbers
 from dataclasses import dataclass
 
+from imod.common.utilities.mask import MaskValues
 from imod.msw.pkgbase import MetaSwapPackage
 from imod.typing import GridDataArray, GridDataDict
 
@@ -9,15 +10,6 @@ from imod.typing import GridDataArray, GridDataDict
 class MetaSwapActive:
     all: GridDataArray
     per_subunit: GridDataArray
-
-
-@dataclass
-class MaskValues:
-    """Stores sentinel values for nodata. Most cases use -9999.0, but exceptions
-    can be added here."""
-
-    default = -9999.0
-    integer = 0
 
 
 def mask_and_broadcast_cap_data(

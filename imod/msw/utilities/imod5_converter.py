@@ -1,9 +1,10 @@
 from xarray.core.utils import is_scalar
 
+from imod.common.utilities.mask import MaskValues
 from imod.logging import LogLevel, logger
 from imod.mf6 import StructuredDiscretization
 from imod.msw.utilities.common import concat_imod5
-from imod.msw.utilities.mask import MaskValues, MetaSwapActive
+from imod.msw.utilities.mask import MetaSwapActive
 from imod.typing import GridDataArray, GridDataDict
 from imod.typing.grid import ones_like
 from imod.util.spatial import get_cell_area
