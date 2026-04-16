@@ -265,6 +265,7 @@ Flow Packages
     HorizontalFlowBarrierResistance.get_regrid_methods
     HorizontalFlowBarrierResistance.mask
     HorizontalFlowBarrierResistance.regrid_like
+    HorizontalFlowBarrierResistance.from_imod5_data
     LayeredWell
     LayeredWell.from_imod5_data
     LayeredWell.from_imod5_cap_data
@@ -369,6 +370,7 @@ Flow Packages
     SingleLayerHorizontalFlowBarrierResistance.get_regrid_methods
     SingleLayerHorizontalFlowBarrierResistance.mask
     SingleLayerHorizontalFlowBarrierResistance.regrid_like
+    SingleLayerHorizontalFlowBarrierResistance.from_imod5_data
     SpecificStorage
     SpecificStorage.mask
     SpecificStorage.regrid_like
