@@ -289,7 +289,7 @@ class NodePropertyFlowRegridMethod(DataclassType):
     icelltype: tuple, defaults (RegridderType.OVERLAP, "mean")
     k: tuple, defaults ( RegridderType.OVERLAP,"geometric_mean")
     k22: tuple, defaults (RegridderType.OVERLAP,"geometric_mean")
-    k33: tuple, defaults (RegridderType.OVERLAP,"harmonic_mean")
+    k33: tuple, defaults (RegridderType.OVERLAP,"mean")
     angle1: tuple, defaults (RegridderType.OVERLAP, "mean")
     angle2: tuple, defaults (RegridderType.OVERLAP, "mean")
     angle3: tuple, defaults (RegridderType.OVERLAP, "mean")
@@ -319,7 +319,7 @@ class NodePropertyFlowRegridMethod(DataclassType):
     )  # horizontal if angle2 = 0 & angle3 = 0
     k33: RegridVarType = (
         RegridderType.OVERLAP,
-        "harmonic_mean",
+        "mean",
     )  # vertical if angle2 = 0 & angle3 = 0
     angle1: RegridVarType = (RegridderType.OVERLAP, "mean")
     angle2: RegridVarType = (RegridderType.OVERLAP, "mean")

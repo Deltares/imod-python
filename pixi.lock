@@ -14752,7 +14752,7 @@ packages:
 - pypi: ./
   name: imod
   version: 1.0.1.dev1
-  sha256: b242a1acd646ffa5410ebc6470e9fa558e81e42073304819f54be9e77949a462
+  sha256: d27105972c53a243e6793668ecb915b0b24268a493441e035e214e01a8a8e389
   requires_dist:
   - affine
   - cftime>=1

@@ -58,6 +58,9 @@ Fixed
 - Fixed :func:`imod.prepare.spatial.polygonize` for polygons with holes.
 - :func:`imod.formats.prj.open_projectfile_data` now drops empty wells from the
   dataset, and logs a warning about it.
+- :meth:`imod.mf6.NodePropertyFlow.regrid_like` now regrids ``k33`` using the
+  correct method, namely ``mean`` instead of ``harmonic_mean``. As this is the
+  appropriate method for horizontal regridding of ``k33``.
 
 Changed
 ~~~~~~~
