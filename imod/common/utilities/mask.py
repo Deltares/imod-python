@@ -138,13 +138,17 @@ def mask_da(da: GridDataArray, mask: GridDataArray) -> GridDataArray:
     """
 
     if is_integer(da):
-        return da.where(mask, other=MaskValues.integer)
+        other = MaskValues.integer
     elif is_float(da):
-        return da.where(mask, other=MaskValues.float)
+        other = MaskValues.float
     else:
         raise TypeError(
             f"Expected dtype float or integer. Received instead: {da.dtype}"
         )
+    # Align the mask, as calling where with "other" specified does not
+    # automatically align the mask to the DataArray.
+    _, mask = xr.align(da, mask, join="left", copy=False)
+    return da.where(mask, other=other)
 
 
 def _mask_spatial_var_pkg(
@@ -207,7 +211,7 @@ def mask_arrays(arrays: dict[str, GridDataArray]) -> dict[str, GridDataArray]:
     """
 
     masks = [make_mask(array) for array in arrays.values()]
-    # Get total mask across all arrays
+    # Get total mask across all arrays.
     total_mask = concat(masks, dim="arrays").all("arrays")
     # Mask arrays with total mask
     arrays_masked = {key: mask_da(array, total_mask) for key, array in arrays.items()}
