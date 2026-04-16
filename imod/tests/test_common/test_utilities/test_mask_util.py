@@ -79,8 +79,8 @@ def test_array_masking(arrays):
     assert isinstance(masked_arrays["array1"], type(array1))
     assert isinstance(masked_arrays["array2"], type(array2))
 
-    assert masked_arrays["array1"].dtype == np.int64
-    assert masked_arrays["array2"].dtype == np.float64
+    assert masked_arrays["array1"].dtype == array1.dtype
+    assert masked_arrays["array2"].dtype == array2.dtype
 
     # element first element should be nan in both arrays
     array1_1d = masked_arrays["array1"].values.ravel()
