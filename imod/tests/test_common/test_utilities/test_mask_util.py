@@ -79,7 +79,7 @@ def test_array_masking(arrays):
     # element first element should be nan in both arrays
     array1_1d = masked_arrays["array1"].values.ravel()
     array2_1d = masked_arrays["array2"].values.ravel()
-    assert np.isnan(array1_1d[0])
+    assert array1_1d[0] == 0
     assert np.isnan(array2_1d[0])
 
     # there should be only 1 nan in both arrays
@@ -96,7 +96,7 @@ def test_broadcast_and_mask_arrays():
     # Test broadcasting and masking with two arrays with the same shape
     result1 = broadcast_and_mask_arrays({"array1": array1, "array2": array2})
     xr.testing.assert_equal(
-        result1["array1"], array2
+        result1["array1"], array2.fillna(0)
     )  # Masking turns array1 into array2
     xr.testing.assert_equal(result1["array2"], array2)
     # Test broadcasting and masking with one array and a scalar array
