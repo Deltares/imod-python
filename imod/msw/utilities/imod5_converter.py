@@ -104,7 +104,7 @@ def has_active_scaling_factor(imod5_cap: GridDataDict):
     function shortcuts if data is provided as constant.
     """
     variable_inactive_mapping = {
-        "perched_water_table_level": MaskValues.default,
+        "perched_water_table_level": MaskValues.msw_default,
         "soil_moisture_fraction": 1.0,
         "conductivitiy_factor": 1.0,
     }

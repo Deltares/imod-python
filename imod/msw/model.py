@@ -653,7 +653,7 @@ class MetaSwapModel(Model):
         if has_active_scaling_factor(imod5_cap_no_layer["cap"]):
             model["scaling_factor"] = ScalingFactors.from_imod5_data(imod5_masked)
         area = model["grid"]["area"].isel(subunit=0, drop=True)
-        model["idf_mapping"] = IdfMapping(area, MaskValues.default)
+        model["idf_mapping"] = IdfMapping(area, MaskValues.msw_default)
         model["coupling"] = CouplerMapping()
         model["extra_files"] = FileCopier.from_imod5_data(imod5_masked)
 

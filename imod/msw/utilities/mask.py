@@ -1,7 +1,6 @@
-import numbers
 from dataclasses import dataclass
 
-from imod.common.utilities.mask import MaskValues
+from imod.common.utilities.mask import mask_da
 from imod.msw.pkgbase import MetaSwapPackage
 from imod.typing import GridDataArray, GridDataDict
 
@@ -18,9 +17,7 @@ def mask_and_broadcast_cap_data(
     """
     Mask and broadcast cap data, always mask with "all" of MetaSwapActive.
     """
-    return {
-        key: _mask_spatial_var(grid, msw_active.all) for key, grid in cap_data.items()
-    }
+    return {key: mask_da(grid, msw_active.all) for key, grid in cap_data.items()}
 
 
 def mask_and_broadcast_pkg_data(
@@ -33,20 +30,9 @@ def mask_and_broadcast_pkg_data(
 
     return {
         key: (
-            _mask_spatial_var(grid, msw_active.per_subunit)
+            mask_da(grid, msw_active.per_subunit)
             if key in package._with_subunit
-            else _mask_spatial_var(grid, msw_active.all)
+            else mask_da(grid, msw_active.all)
         )
         for key, grid in grid_data.items()
     }
-
-
-def _mask_spatial_var(da: GridDataArray, active: GridDataArray) -> GridDataArray:
-    if issubclass(da.dtype.type, numbers.Integral):
-        return da.where(active, other=MaskValues.integer)
-    elif issubclass(da.dtype.type, numbers.Real):
-        return da.where(active)
-    else:
-        raise TypeError(
-            f"Expected dtype float or integer. Received instead: {da.dtype}"
-        )
