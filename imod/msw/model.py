@@ -10,6 +10,7 @@ import jinja2
 import numpy as np
 import xarray as xr
 
+from imod.common.constants import MaskValues
 from imod.common.utilities.clip import clip_by_grid
 from imod.common.utilities.partitioninfo import create_partition_info
 from imod.common.utilities.value_filters import enforce_scalar
@@ -42,7 +43,7 @@ from imod.msw.sprinkling import Sprinkling
 from imod.msw.timeutil import to_metaswap_timeformat
 from imod.msw.utilities.common import find_in_file_list
 from imod.msw.utilities.imod5_converter import has_active_scaling_factor
-from imod.msw.utilities.mask import MaskValues, mask_and_broadcast_cap_data
+from imod.msw.utilities.mask import mask_and_broadcast_cap_data
 from imod.msw.utilities.parse import read_para_sim
 from imod.msw.vegetation import AnnualCropFactors
 from imod.typing import GridDataArray, Imod5DataDict
@@ -652,7 +653,7 @@ class MetaSwapModel(Model):
         if has_active_scaling_factor(imod5_cap_no_layer["cap"]):
             model["scaling_factor"] = ScalingFactors.from_imod5_data(imod5_masked)
         area = model["grid"]["area"].isel(subunit=0, drop=True)
-        model["idf_mapping"] = IdfMapping(area, MaskValues.default)
+        model["idf_mapping"] = IdfMapping(area, MaskValues.msw_default)
         model["coupling"] = CouplerMapping()
         model["extra_files"] = FileCopier.from_imod5_data(imod5_masked)
 

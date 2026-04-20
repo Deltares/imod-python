@@ -19,6 +19,7 @@ from imod.common.utilities.line_data import (
     clipped_zbound_linestrings_to_vertical_polygons,
     vertical_polygons_to_zbound_linestrings,
 )
+from imod.common.utilities.mask import mask_da
 from imod.common.utilities.value_filters import is_valid
 from imod.typing import GeoDataFrameType, GridDataArray, GridDataset
 from imod.typing.grid import bounding_polygon, is_spatial_grid
@@ -128,18 +129,18 @@ def _filter_inactive_cells(package: IPackage, active: GridDataArray):
         return
 
     package_vars = package.dataset.data_vars
-    for var in package_vars:
-        if package_vars[var].shape != ():
-            if is_spatial_grid(package.dataset[var]):
-                other = (
-                    0
-                    if np.issubdtype(package.dataset[var].dtype, np.integer)
-                    else np.nan
-                )
+    to_mask = [
+        var
+        for var in package_vars
+        if (package_vars[var].shape != () and is_spatial_grid(package.dataset[var]))
+    ]
+    # Shortcut if nothing to mask to avoid computing mask unnecessarily.
+    if not to_mask:
+        return
 
-                package.dataset[var] = package.dataset[var].where(
-                    active > 0, other=other
-                )
+    mask = active > 0
+    for var in to_mask:
+        package.dataset[var] = mask_da(package.dataset[var], mask)
 
 
 def _clip_linestring(

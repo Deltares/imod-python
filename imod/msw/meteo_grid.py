@@ -8,13 +8,13 @@ import pandas as pd
 import xarray as xr
 
 import imod
+from imod.common.constants import MaskValues
 from imod.common.interfaces.iregridpackage import IRegridPackage
 from imod.common.utilities.dataclass_type import DataclassType, EmptyRegridMethod
 from imod.msw.pkgbase import MetaSwapPackage
 from imod.msw.regrid.regrid_schemes import MeteoGridRegridMethod
 from imod.msw.timeutil import to_metaswap_timeformat
 from imod.msw.utilities.common import find_in_file_list
-from imod.msw.utilities.mask import MaskValues
 from imod.typing import Imod5DataDict
 
 
@@ -178,7 +178,7 @@ class MeteoGrid(MetaSwapPackage, IRegridPackage):
                     ".asc"
                 )
                 imod.rasterio.save(
-                    path, self.dataset[str(varname)], nodata=MaskValues.default
+                    path, self.dataset[str(varname)], nodata=MaskValues.msw_default
                 )
 
     def _pkgcheck(self):

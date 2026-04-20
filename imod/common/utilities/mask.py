@@ -1,13 +1,13 @@
-import numbers
-
 import xarray as xr
 from plum import Dispatcher
 from xarray.core.utils import is_scalar
 
+from imod.common.constants import MaskValues
 from imod.common.interfaces.imaskingsettings import IMaskingSettings
 from imod.common.interfaces.imodel import IModel
 from imod.common.interfaces.ipackage import IPackage
 from imod.common.interfaces.isimulation import ISimulation
+from imod.common.utilities.dtype import is_bool, is_float, is_integer
 from imod.typing.grid import (
     GridDataArray,
     concat,
@@ -80,7 +80,7 @@ def mask_package(package: IPackage, mask: GridDataArray) -> IPackage:
         if _skip_dataarray(package.dataset[var]) or _skip_variable(package, var):
             masked[var] = package.dataset[var]
         else:
-            masked[var] = _mask_spatial_var(package, var, mask)
+            masked[var] = _mask_spatial_var_pkg(package, var, mask)
 
     return type(package)(**masked)
 
@@ -108,22 +108,43 @@ def _skip_variable(package: IMaskingSettings, var: str) -> bool:
     return var in package.skip_variables
 
 
-def _mask_spatial_var(self, var: str, mask: GridDataArray) -> GridDataArray:
-    da = self.dataset[var]
+def mask_da(da: GridDataArray, mask: GridDataArray) -> GridDataArray:
+    """
+    Mask a DataArray with a boolean mask. Function attempts to preserve the
+    dtype of the original DataArray. It will set the
+    value to 0 for integers, np.nan for floats, and False for booleans.
+    """
+
+    if is_integer(da.dtype):
+        other = MaskValues.integer
+    elif is_float(da.dtype):
+        other = MaskValues.float
+    elif is_bool(da.dtype):
+        other = MaskValues.bool
+    else:
+        raise TypeError(
+            f"Expected dtype float, integer, or bool. Received instead: {da.dtype}"
+        )
+    # Align the mask, as calling where with "other" specified does not
+    # automatically align the mask to the DataArray.
+    _, mask = xr.align(da, mask, join="left", copy=False)
+    return da.where(mask, other=other)
+
+
+def _mask_spatial_var_pkg(
+    package: IPackage, var: str, mask: GridDataArray
+) -> GridDataArray:
+    """
+    Mask a spatial variable in a package. There is some additional logic for the
+    MF6 DIS/DISV packages to work with unlayered grids for the "top" value.
+    """
+    da = package.dataset[var]
     array_mask = _adjust_mask_for_unlayered_data(da, mask)
     active = array_mask > 0
 
-    if issubclass(da.dtype.type, numbers.Integral):
-        if var == "idomain":
-            return da.where(active, other=array_mask)
-        else:
-            return da.where(active, other=0)
-    elif issubclass(da.dtype.type, numbers.Real):
-        return da.where(active)
-    else:
-        raise TypeError(
-            f"Expected dtype float or integer. Received instead: {da.dtype}"
-        )
+    if var == "idomain":
+        return da.where(active, other=array_mask)
+    return mask_da(da, active)
 
 
 def _adjust_mask_for_unlayered_data(
@@ -145,17 +166,37 @@ def _adjust_mask_for_unlayered_data(
     return array_mask
 
 
+def make_mask(da: GridDataArray):
+    """
+    Make a boolean mask from a DataArray. The mask is True where the values are
+    not equal to the nodata value. The nodata value is determined by the dtype
+    of the DataArray. For integers, the nodata value is 0. For floats, the
+    nodata value is np.nan. For booleans, the nodata value is False.
+    """
+    if is_integer(da.dtype):
+        return da != MaskValues.integer
+    elif is_float(da.dtype):
+        return notnull(da)
+    elif is_bool(da.dtype):
+        return da != MaskValues.bool
+    else:
+        raise TypeError(
+            f"Expected dtype float, integer, or bool. Received instead: {da.dtype}"
+        )
+
+
 def mask_arrays(arrays: dict[str, GridDataArray]) -> dict[str, GridDataArray]:
     """
     This function takes a dictionary of xr.DataArrays. The arrays are assumed to have the same
     coordinates. When a np.nan value is found in any array, the other arrays are also
     set to np.nan at the same coordinates.
     """
-    masks = [notnull(array) for array in arrays.values()]
-    # Get total mask across all arrays
+
+    masks = [make_mask(array) for array in arrays.values()]
+    # Get total mask across all arrays.
     total_mask = concat(masks, dim="arrays").all("arrays")
     # Mask arrays with total mask
-    arrays_masked = {key: array.where(total_mask) for key, array in arrays.items()}
+    arrays_masked = {key: mask_da(array, total_mask) for key, array in arrays.items()}
     return arrays_masked
 
 
