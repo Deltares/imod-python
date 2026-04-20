@@ -1,13 +1,12 @@
-
 import xarray as xr
 from plum import Dispatcher
 from xarray.core.utils import is_scalar
 
+from imod.common.constants import MaskValues
 from imod.common.interfaces.imaskingsettings import IMaskingSettings
 from imod.common.interfaces.imodel import IModel
 from imod.common.interfaces.ipackage import IPackage
 from imod.common.interfaces.isimulation import ISimulation
-from imod.common.constants import MaskValues
 from imod.common.utilities.dtype import is_float, is_integer
 from imod.typing.grid import (
     GridDataArray,

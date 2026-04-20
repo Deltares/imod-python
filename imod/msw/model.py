@@ -10,8 +10,8 @@ import jinja2
 import numpy as np
 import xarray as xr
 
-from imod.common.utilities.clip import clip_by_grid
 from imod.common.constants import MaskValues
+from imod.common.utilities.clip import clip_by_grid
 from imod.common.utilities.partitioninfo import create_partition_info
 from imod.common.utilities.value_filters import enforce_scalar
 from imod.common.utilities.version import prepend_content_with_version_info

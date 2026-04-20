@@ -129,7 +129,11 @@ def _filter_inactive_cells(package: IPackage, active: GridDataArray):
         return
 
     package_vars = package.dataset.data_vars
-    to_mask = [var for var in package_vars if (package_vars[var].shape != () and is_spatial_grid(package.dataset[var]))]
+    to_mask = [
+        var
+        for var in package_vars
+        if (package_vars[var].shape != () and is_spatial_grid(package.dataset[var]))
+    ]
     # Shortcut if nothing to mask to avoid computing mask unnecessarily.
     if not to_mask:
         return

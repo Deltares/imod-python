@@ -9,6 +9,7 @@ from plum import Dispatcher
 from xarray.core.utils import is_scalar
 from xugrid.regrid.regridder import BaseRegridder
 
+from imod.common.constants import MaskValues
 from imod.common.interfaces.ilinedatapackage import ILineDataPackage
 from imod.common.interfaces.imodel import IModel
 from imod.common.interfaces.ipackage import IPackage
@@ -17,9 +18,8 @@ from imod.common.interfaces.iregridpackage import IRegridPackage
 from imod.common.interfaces.isimulation import ISimulation
 from imod.common.utilities.clip import clip_by_grid
 from imod.common.utilities.dataclass_type import DataclassType, EmptyRegridMethod
-from imod.common.utilities.value_filters import is_valid
-from imod.common.constants import MaskValues
 from imod.common.utilities.dtype import is_integer
+from imod.common.utilities.value_filters import is_valid
 from imod.typing.grid import (
     GridDataArray,
     GridDataset,
@@ -454,6 +454,8 @@ def _get_regridding_domain(
         idomain_regridder_type = regridder.regrid(is_active)
         included_in_all = included_in_all.where(idomain_regridder_type.notnull())
 
-    new_idomain = regridded_domain.where(included_in_all.notnull(), other=MaskValues.integer).astype(int)
+    new_idomain = regridded_domain.where(
+        included_in_all.notnull(), other=MaskValues.integer
+    ).astype(int)
 
     return new_idomain
