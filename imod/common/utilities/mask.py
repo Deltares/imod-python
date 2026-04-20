@@ -1,4 +1,3 @@
-import numbers
 
 import xarray as xr
 from plum import Dispatcher
@@ -9,6 +8,7 @@ from imod.common.interfaces.imodel import IModel
 from imod.common.interfaces.ipackage import IPackage
 from imod.common.interfaces.isimulation import ISimulation
 from imod.common.constants import MaskValues
+from imod.common.utilities.dtype import is_float, is_integer
 from imod.typing.grid import (
     GridDataArray,
     concat,
@@ -109,14 +109,6 @@ def _skip_variable(package: IMaskingSettings, var: str) -> bool:
     return var in package.skip_variables
 
 
-def is_float(da: GridDataArray) -> bool:
-    return issubclass(da.dtype.type, numbers.Real)
-
-
-def is_integer(da: GridDataArray) -> bool:
-    return issubclass(da.dtype.type, numbers.Integral)
-
-
 def mask_da(da: GridDataArray, mask: GridDataArray) -> GridDataArray:
     """
     Mask a DataArray with a boolean mask. Function attempts to preserve the
@@ -124,9 +116,9 @@ def mask_da(da: GridDataArray, mask: GridDataArray) -> GridDataArray:
     value to 0 for integers and np.nan for floats.
     """
 
-    if is_integer(da):
+    if is_integer(da.dtype):
         other = MaskValues.integer
-    elif is_float(da):
+    elif is_float(da.dtype):
         other = MaskValues.float
     else:
         raise TypeError(
@@ -180,9 +172,9 @@ def make_mask(da: GridDataArray):
     of the DataArray. For integers, the nodata value is 0. For floats, the
     nodata value is np.nan.
     """
-    if is_integer(da):
+    if is_integer(da.dtype):
         return da != MaskValues.integer
-    elif is_float(da):
+    elif is_float(da.dtype):
         return notnull(da)
     else:
         raise TypeError(

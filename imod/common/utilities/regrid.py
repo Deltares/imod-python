@@ -19,6 +19,7 @@ from imod.common.utilities.clip import clip_by_grid
 from imod.common.utilities.dataclass_type import DataclassType, EmptyRegridMethod
 from imod.common.utilities.value_filters import is_valid
 from imod.common.constants import MaskValues
+from imod.common.utilities.dtype import is_integer
 from imod.typing.grid import (
     GridDataArray,
     GridDataset,
@@ -108,7 +109,7 @@ def _regrid_array(
     # Nans can be introduced when the source data has a nan value, or when the
     # target grid has a larger domain. Fill nans with 0 for integer, as this is
     # mainly important for the idomain array where 0 indicates an inactive cell.
-    if np.issubdtype(original_dtype, np.integer):
+    if is_integer(original_dtype):
         regridded_array = regridded_array.fillna(MaskValues.integer)
     return regridded_array.astype(original_dtype)
 
