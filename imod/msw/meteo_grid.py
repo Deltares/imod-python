@@ -10,7 +10,7 @@ import xarray as xr
 import imod
 from imod.common.interfaces.iregridpackage import IRegridPackage
 from imod.common.utilities.dataclass_type import DataclassType, EmptyRegridMethod
-from imod.common.utilities.mask import MaskValues
+from imod.common.utilities.constants import MaskValues
 from imod.msw.pkgbase import MetaSwapPackage
 from imod.msw.regrid.regrid_schemes import MeteoGridRegridMethod
 from imod.msw.timeutil import to_metaswap_timeformat

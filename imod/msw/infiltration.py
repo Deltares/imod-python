@@ -3,7 +3,7 @@ from textwrap import dedent
 import xarray as xr
 
 from imod.common.interfaces.iregridpackage import IRegridPackage
-from imod.common.utilities.mask import MaskValues
+from imod.common.utilities.constants import MaskValues
 from imod.logging import LogLevel, logger
 from imod.msw.fixed_format import VariableMetaData
 from imod.msw.pkgbase import MetaSwapPackage

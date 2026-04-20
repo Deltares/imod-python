@@ -1,7 +1,5 @@
 import numbers
-from dataclasses import dataclass
 
-import numpy as np
 import xarray as xr
 from plum import Dispatcher
 from xarray.core.utils import is_scalar
@@ -10,6 +8,7 @@ from imod.common.interfaces.imaskingsettings import IMaskingSettings
 from imod.common.interfaces.imodel import IModel
 from imod.common.interfaces.ipackage import IPackage
 from imod.common.interfaces.isimulation import ISimulation
+from imod.common.utilities.constants import MaskValues
 from imod.typing.grid import (
     GridDataArray,
     concat,
@@ -21,18 +20,6 @@ from imod.typing.grid import (
 
 # create dispatcher instance to limit scope of typedispatching
 dispatch = Dispatcher()
-
-
-@dataclass
-class MaskValues:
-    """
-    Stores mask values for nodata. Special sentinel values can be stored in
-    here, such as the -9999.0 for MetaSWAP.
-    """
-
-    float = np.nan
-    integer = 0
-    msw_default = -9999.0
 
 
 def _validate_coords_mask(mask: GridDataArray) -> None:
