@@ -8,7 +8,7 @@ from imod.common.interfaces.imaskingsettings import IMaskingSettings
 from imod.common.interfaces.imodel import IModel
 from imod.common.interfaces.ipackage import IPackage
 from imod.common.interfaces.isimulation import ISimulation
-from imod.common.utilities.constants import MaskValues
+from imod.common.constants import MaskValues
 from imod.typing.grid import (
     GridDataArray,
     concat,

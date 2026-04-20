@@ -1,6 +1,6 @@
 from xarray.core.utils import is_scalar
 
-from imod.common.utilities.constants import MaskValues
+from imod.common.constants import MaskValues
 from imod.logging import LogLevel, logger
 from imod.mf6 import StructuredDiscretization
 from imod.msw.utilities.common import concat_imod5
