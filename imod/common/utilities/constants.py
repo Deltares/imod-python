@@ -1,3 +1,8 @@
+"""
+Store constants here that are used across the package. This is to avoid circular
+imports and to have a single source of truth for these values.
+"""
+
 import numpy as np
 
 
