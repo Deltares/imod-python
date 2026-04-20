@@ -15,6 +15,7 @@ class MaskValues:
     here, such as the -9999.0 for MetaSWAP.
     """
 
+    bool = False
     float = np.nan
     integer = 0
     msw_default = -9999.0
