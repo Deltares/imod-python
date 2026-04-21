@@ -248,7 +248,7 @@ class GroundwaterFlowModel(Modflow6Model):
         target_grid: GridDataArray, optional
             the target grid to which the data should be regridded. If not
             provided, the first grid of the BND package is used as target grid.
-            
+
         Returns
         -------
         A GWF model containing the packages that could be imported form IMOD5. Users must still

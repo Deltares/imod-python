@@ -218,7 +218,9 @@ class StructuredDiscretization(Package, IRegridPackage, IMaskingSettings):
         }
 
         if target_grid is None:
-            target_grid = data["idomain"].isel(layer=0, drop=True, missing_dims="ignore")
+            target_grid = data["idomain"].isel(
+                layer=0, drop=True, missing_dims="ignore"
+            )
 
         if regridder_types is None:
             regridder_types = StructuredDiscretization.get_regrid_methods()
