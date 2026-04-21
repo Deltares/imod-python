@@ -207,6 +207,7 @@ class GroundwaterFlowModel(Modflow6Model):
         allocation_options: Optional[SimulationAllocationOptions] = None,
         distributing_options: Optional[SimulationDistributingOptions] = None,
         regridder_types: Optional[dict[str, DataclassType]] = None,
+        target_grid: Optional[GridDataArray] = None,
     ) -> "GroundwaterFlowModel":
         """
         Imports a GroundwaterFlowModel (GWF) from the data in an iMOD5 project
@@ -244,7 +245,10 @@ class GroundwaterFlowModel(Modflow6Model):
             then it should be imported separately
         regridder_types:  dict[str, RegridMethodType]
             the key is the package name. The value is a subclass of RegridMethodType.
-
+        target_grid: GridDataArray, optional
+            the target grid to which the data should be regridded. If not
+            provided, the first grid of the BND package is used as target grid.
+            
         Returns
         -------
         A GWF model containing the packages that could be imported form IMOD5. Users must still
@@ -268,6 +272,7 @@ class GroundwaterFlowModel(Modflow6Model):
             cast(DiscretizationRegridMethod, regridder_types.get("dis")),
             regrid_cache,
             False,
+            target_grid=target_grid,
         )
         grid = dis_pkg.dataset["idomain"]
         result["dis"] = dis_pkg

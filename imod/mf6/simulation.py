@@ -1751,6 +1751,7 @@ class Modflow6Simulation(collections.UserDict[str, Any], ISimulation):
         allocation_options: Optional[SimulationAllocationOptions] = None,
         distributing_options: Optional[SimulationDistributingOptions] = None,
         regridder_types: Optional[dict[str, DataclassType]] = None,
+        target_grid: Optional[GridDataArray] = None,
     ) -> "Modflow6Simulation":
         """
         Imports a GroundwaterFlowModel (GWF) from the data in an iMOD5 project
@@ -1795,6 +1796,9 @@ class Modflow6Simulation(collections.UserDict[str, Any], ISimulation):
             the key is the package name. The value is the RegridMethodType
             object containing the settings for regridding the package with the
             specified key.
+        target_grid: GridDataArray, optional
+            the target grid to which the data should be regridded. If not
+            provided, the first grid of the BND package is used as target grid.
 
         Returns
         -------
@@ -1848,6 +1852,7 @@ class Modflow6Simulation(collections.UserDict[str, Any], ISimulation):
             allocation_options,
             distributing_options,
             regridder_types,
+            target_grid,
         )
         simulation["imported_model"] = gwf_model
 
