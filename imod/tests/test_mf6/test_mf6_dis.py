@@ -336,12 +336,13 @@ def test_from_imod5_data__idomain_values(imod5_dataset):
     assert (dis["idomain"] == 2).sum() == 688329
 
 
-def test_from_imod5_data__grid_extent(imod5_dataset):
+def test_from_imod5_data_regridding__default(imod5_dataset):
     imod5_data = imod5_dataset[0]
 
     dis = imod.mf6.StructuredDiscretization.from_imod5_data(imod5_data)
 
-    # Test if regridded to smallest grid resolution
+    # Test if regridded to BND resolution, which is 25 by 25 m. TOP and BOT were
+    # 100 by 100 m.
     assert dis["top"].dx == 25.0
     assert dis["top"].dy == -25.0
     assert (dis.dataset.coords["x"][1] - dis.dataset.coords["x"][0]) == 25.0
@@ -352,6 +353,37 @@ def test_from_imod5_data__grid_extent(imod5_dataset):
     assert dis.dataset.coords["y"].max() == 365287.5
     assert dis.dataset.coords["x"].min() == 194712.5
     assert dis.dataset.coords["x"].max() == 199287.5
+
+
+def test_from_imod5_data_regridding__target_grid(imod5_dataset):
+    imod5_data = imod5_dataset[0]
+
+    xmin = 195000.0
+    xmax = 199000.0
+    ymin = 361000.0
+    ymax = 365000.0
+    dx = 100.0
+    dy = 100.0
+
+    target_grid = imod.util.empty_2d(
+        dx=dx, xmin=xmin, xmax=xmax, dy=dy, ymin=ymin, ymax=ymax
+    )
+    dis = imod.mf6.StructuredDiscretization.from_imod5_data(
+        imod5_data, target_grid=target_grid, validate=False
+    )
+
+    # Test if regridded to BND resolution, which is 25 by 25 m. TOP and BOT were
+    # 100 by 100 m.
+    assert dis["top"].dx == dx
+    assert dis["top"].dy == -dy
+    assert (dis.dataset.coords["x"][1] - dis.dataset.coords["x"][0]) == dx
+    assert (dis.dataset.coords["y"][1] - dis.dataset.coords["y"][0]) == -dy
+
+    # Test extent
+    assert dis.dataset.coords["y"].min() == ymin + dy / 2
+    assert dis.dataset.coords["y"].max() == ymax - dy / 2
+    assert dis.dataset.coords["x"].min() == xmin + dx / 2
+    assert dis.dataset.coords["x"].max() == xmax - dx / 2
 
 
 def test_from_imod5_data__write(imod5_dataset, tmp_path):
