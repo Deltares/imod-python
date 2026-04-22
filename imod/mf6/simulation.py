@@ -1817,16 +1817,39 @@ class Modflow6Simulation(collections.UserDict[str, Any], ISimulation):
         >>> times = [np.datetime("2001-01-01"), np.datetime("2002-01-01"), np.datetime("2003-01-01")]
         >>> mf6_sim = imod.mf6.Modflow6Simulation.from_imod5_data(imod5_data, period_data, times)
 
-        Allocate rivers differently:
+        You can override solver settings if needed after importing:
+
+        >>> mf6_sim["imported_model"]["ims"] = SolutionPresetSimple()
+
+        To allocate rivers differently:
 
         >>> from imod.prepare.topsystem import SimulationAllocationOptions, ALLOCATION_OPTION
         >>> allocation_options = SimulationAllocationOptions()
         >>> allocation_options.riv = ALLOCATION_OPTION.at_elevation
-        >>> mf6_sim = imod.mf6.Modflow6Simulation.from_imod5_data(imod5_data, period_data, times, allocation_options)
+        >>> mf6_sim = imod.mf6.Modflow6Simulation.from_imod5_data(
+        >>>     imod5_data, period_data, times, allocation_options=allocation_options
+        >>> )
 
-        You can override solver settings if needed after importing:
+        To regrid the model to a specific grid upon import:
 
-        >>> mf6_sim["imported_model"]["ims"] = SolutionPresetComplex()
+        >>> target_grid = imod.util.empty_2d(
+        >>>     dx=100.0, xmin=195000.0, xmax=199000.0, dy=100.0, ymin=361000.0, ymax=365000.0
+        >>> )
+        >>> mf6_sim = imod.mf6.Modflow6Simulation.from_imod5_data(
+        >>>     imod5_data, period_data, times, target_grid=target_grid
+        >>> )
+
+        To set regridding methods for specific packages upon import:
+
+        >>> from imod.util.regrid import RegridderType
+        >>> from imod.mf6.regrid import NodePropertyFlowRegridMethod
+        >>> regridder_types = {
+        >>>     "npf": NodePropertyFlowRegridMethod(k=(RegridderType.OVERLAP, "mean")),
+        >>> }
+        >>> mf6_sim = imod.mf6.Modflow6Simulation.from_imod5_data(
+        >>>     imod5_data, period_data, times, regridder_types=regridder_types, target_grid=target_grid
+        >>> )
+
 
         """
         if allocation_options is None:
