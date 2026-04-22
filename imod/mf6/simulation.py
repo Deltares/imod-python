@@ -1821,7 +1821,10 @@ class Modflow6Simulation(collections.UserDict[str, Any], ISimulation):
 
         >>> mf6_sim["imported_model"]["ims"] = SolutionPresetSimple()
 
-        To allocate rivers differently:
+        To allocate rivers to model layers differently than the default, you can
+        set the allocation options for the river package before importing.
+        :doc:`For more information on topsystem allocation see the user guide.
+        </user-guide/09-topsystem>`
 
         >>> from imod.prepare.topsystem import SimulationAllocationOptions, ALLOCATION_OPTION
         >>> allocation_options = SimulationAllocationOptions()
