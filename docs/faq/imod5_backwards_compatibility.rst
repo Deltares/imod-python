@@ -51,12 +51,6 @@ Notes
   preset from MODFLOW 6 ("Moderate") is set. This is because the solvers between
   iMODLFOW and MODFLOW 6 are different. You are advised to test settings
   yourself.
-- The imported iMOD5 discretization for the model is created by taking the
-  smallest grid and finest resolution amongst the TOP, BOT, and BND grids. This
-  differs from iMOD5, where the first BND grid is used as target grid. All input
-  grids are regridded towards this target grid. Therefore, be careful when you
-  have a very fine resolution in one of these packages.
-
 
 Files
 -----

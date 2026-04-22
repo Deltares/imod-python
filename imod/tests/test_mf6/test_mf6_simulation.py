@@ -721,6 +721,7 @@ def test_import_from_imod5__well_steady_state(imod5_dataset):
 
 @pytest.mark.unittest_jit
 def test_import_from_imod5__nonstandard_regridding(imod5_dataset, tmp_path):
+    # Arrange
     imod5_data = imod5_dataset[0]
     period_data = imod5_dataset[1]
 
@@ -730,13 +731,24 @@ def test_import_from_imod5__nonstandard_regridding(imod5_dataset, tmp_path):
     regridding_option["sto"] = StorageCoefficientRegridMethod()
     times = pd.date_range(start="1/1/2018", end="12/1/2018", freq="ME")
 
+    xmin = 195000.0
+    xmax = 199000.0
+    ymin = 361000.0
+    ymax = 365000.0
+    dx = 200.0
+    dy = 200.0
+
+    target_grid = imod.util.empty_2d(
+        dx=dx, xmin=xmin, xmax=xmax, dy=dy, ymin=ymin, ymax=ymax
+    )
+
+    # Act
     simulation = Modflow6Simulation.from_imod5_data(
         imod5_data,
         period_data,
         times,
-        SimulationAllocationOptions,
-        SimulationDistributingOptions,
-        regridding_option,
+        regridder_types=regridding_option,
+        target_grid=target_grid,
     )
     simulation["imported_model"]["oc"] = OutputControl(
         save_head="last", save_budget="last"
@@ -750,8 +762,18 @@ def test_import_from_imod5__nonstandard_regridding(imod5_dataset, tmp_path):
     # Align NoData to domain
     idomain = simulation["imported_model"].domain
     simulation.mask_all_models(idomain)
+
+    # Assert
     # write and validate the simulation.
     simulation.write(tmp_path, binary=False, validate=True)
+    # Check that storage package regridded to target_grid
+    coords = simulation["imported_model"]["sto"].dataset.coords
+    assert coords["x"][1] - coords["x"][0] == dx
+    assert coords["y"][1] - coords["y"][0] == -dy
+    assert coords["x"].min() == xmin + dx / 2
+    assert coords["x"].max() == xmax - dx / 2
+    assert coords["y"].min() == ymin + dy / 2
+    assert coords["y"].max() == ymax - dy / 2
 
 
 @pytest.mark.unittest_jit
