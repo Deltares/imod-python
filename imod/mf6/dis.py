@@ -183,9 +183,8 @@ class StructuredDiscretization(Package, IRegridPackage, IMaskingSettings):
         Construct package from iMOD5 data, loaded with the
         :func:`imod.formats.prj.open_projectfile_data` function.
 
-        Method regrids all variables to a target grid with the smallest extent
-        and smallest cellsize available in all the grids. Consequently it
-        converts iMODFLOW data to MODFLOW 6 data.
+        Method regrids all variables to a target grid. If not provided, the
+        first grid of the BND package is used as target grid.
 
         .. note::
 
