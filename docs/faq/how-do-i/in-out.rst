@@ -46,6 +46,20 @@ Import a single netCDF variable as DataArray
     da = xr.open_dataarray("variable.nc")
     
 
+Read the contents of a projectfile
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. code-block:: python
+
+    prj_contents = imod.formats.prj.read_projectfile_data("my-model.prj")
+
+Load the contents of the project file
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. code-block:: python
+
+    imod5_data, repeat_stress = imod.formats.prj.open_projectfile_data("my-model.prj")
+
 Convert structured data to UGRID netCDF
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
