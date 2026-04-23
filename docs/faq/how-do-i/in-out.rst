@@ -51,7 +51,7 @@ Read the contents of a projectfile
 
 .. code-block:: python
 
-    prj_contents = imod.formats.prj.read_projectfile_data("my-model.prj")
+    prj_contents = imod.formats.prj.read_projectfile("my-model.prj")
 
 Load the contents of the project file
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
