@@ -98,7 +98,7 @@ METASWAP_VARS = (
     "rural_infiltration_capacity",
     "perched_water_table_level",
     "soil_moisture_fraction",
-    "conductivitiy_factor",
+    "conductivity_factor",
     "plot_number",
     "steering_location",
     "plot_drainage_level",

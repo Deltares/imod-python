@@ -320,7 +320,7 @@ class Imod5DataCases:
         layer_kwargs = {"coords": {"layer": [1]}, "dims": ("layer",)}
         cap_data["perched_water_table_level"] = xr.DataArray([-9999.0], **layer_kwargs)
         cap_data["soil_moisture_fraction"] = xr.DataArray([1.0], **layer_kwargs)
-        cap_data["conductivitiy_factor"] = xr.DataArray([1.0], **layer_kwargs)
+        cap_data["conductivity_factor"] = xr.DataArray([1.0], **layer_kwargs)
         return imod5_cap_data, has_scaling_factor
 
     def case_constants(
@@ -332,7 +332,7 @@ class Imod5DataCases:
         layer_kwargs = {"coords": {"layer": [1]}, "dims": ("layer",)}
         cap_data["perched_water_table_level"] = xr.DataArray([-9999.0], **layer_kwargs)
         cap_data["soil_moisture_fraction"] = xr.DataArray([1.0], **layer_kwargs)
-        cap_data["conductivitiy_factor"] = xr.DataArray([1.0], **layer_kwargs)
+        cap_data["conductivity_factor"] = xr.DataArray([1.0], **layer_kwargs)
         cap_data["urban_ponding_depth"] = xr.DataArray([1.0], **layer_kwargs)
         cap_data["rural_ponding_depth"] = xr.DataArray([1.0], **layer_kwargs)
         cap_data["urban_runoff_resistance"] = xr.DataArray([1.0], **layer_kwargs)
