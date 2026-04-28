@@ -140,11 +140,11 @@ def regrid_imod5_data(
     imod5_cap_no_layer = drop_layer_dim_cap_data(imod5_data)
     target_grid = target_dis.dataset["idomain"].isel(layer=0, drop=True)
     # Regrid the input data
-    if regridder_types is not None:
+    if regridder_types is None:
         regridder_types = CapDataRegridMethod()
     regrid_cache = RegridderWeightsCache()
     cap_data_regridded = _regrid_package_data(
-        imod5_cap_no_layer, target_grid, regridder_types, regrid_cache
+        imod5_cap_no_layer["cap"], target_grid, regridder_types, regrid_cache
     )
     extra_paths = imod5_data["extra"]["paths"]
     imod5_regridded: Imod5DataDict = {
