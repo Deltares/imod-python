@@ -123,9 +123,12 @@ def has_active_scaling_factor(imod5_cap: GridDataDict):
 
     return not scaling_factor_inactive
 
+
 def regrid_imod5_data(
-        imod5_data: Imod5DataDict, target_dis: StructuredDiscretization, regridder_types: Optional[CapDataRegridMethod] = None
-    ) -> Imod5DataDict:
+    imod5_data: Imod5DataDict,
+    target_dis: StructuredDiscretization,
+    regridder_types: Optional[CapDataRegridMethod] = None,
+) -> Imod5DataDict:
     """
     Regrid iMOD5 CAP data to consistent grid. This is necessary to be able to
     use iMOD5 data in MetaSWAP, as the grid of the iMOD5 CAP data is not
