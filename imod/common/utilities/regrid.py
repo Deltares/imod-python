@@ -77,7 +77,7 @@ def _regrid_array(
 
     # the dataarray might be a scalar. If it is, then it does not need regridding.
     if scalar_da:
-        return da.values[()]
+        return da.squeeze(drop=True)
 
     if isinstance(da, xr.DataArray):
         coords = da.coords
