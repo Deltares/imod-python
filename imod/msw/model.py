@@ -641,6 +641,10 @@ class MetaSwapModel(Model):
         unsa_svat_path = cast(str, parasim_settings["unsa_svat_path"])
         # Regrid iMOD5 CAP data to target discretization.
         imod5_regridded = regrid_imod5_data(imod5_data, target_dis, regridder_types)
+        # Test with regridded data instead of masked, as masking broadcasts
+        # scalars to grids, which causes the is_scalar check in
+        # has_active_scaling_factor to always return False.
+        active_scaling_factor = has_active_scaling_factor(imod5_regridded["cap"])
         # Setup model
         model = cls(unsa_svat_path, parasim_settings)
         model["grid"], msw_active = GridData.from_imod5_data(
@@ -659,7 +663,7 @@ class MetaSwapModel(Model):
         model["meteo_grid"] = MeteoGridCopy.from_imod5_data(imod5_masked)
         model["prec_mapping"] = PrecipitationMapping.from_imod5_data(imod5_masked)
         model["evt_mapping"] = EvapotranspirationMapping.from_imod5_data(imod5_masked)
-        if has_active_scaling_factor(imod5_masked["cap"]):
+        if active_scaling_factor:
             model["scaling_factor"] = ScalingFactors.from_imod5_data(imod5_masked)
         area = model["grid"]["area"].isel(subunit=0, drop=True)
         model["idf_mapping"] = IdfMapping(area, MaskValues.msw_default)
