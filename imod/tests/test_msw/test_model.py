@@ -1,5 +1,6 @@
 from copy import copy
 from pathlib import Path
+from typing import cast
 
 import pytest
 import xarray as xr
@@ -12,9 +13,11 @@ from imod.msw.meteo_grid import MeteoGridCopy
 from imod.msw.meteo_mapping import MeteoMapping
 from imod.msw.model import DEFAULT_SETTINGS
 from imod.msw.utilities.parse import read_para_sim
+from imod.tests.fixtures.msw_model_fixture import coupled_mf6_model
 from imod.typing import GridDataArray, Imod5DataDict
 from imod.typing.grid import zeros_like
 from imod.util.regrid import RegridderWeightsCache
+from imod.util.spatial import empty_2d
 
 
 def test_msw_model_write(msw_model, coupled_mf6_model, coupled_mf6wel, tmp_path):
@@ -344,19 +347,46 @@ class Imod5DataCases:
         return imod5_cap_data, has_scaling_factor
 
 
+class TargetDisCases:
+    def case_dis_same_grid(
+        self, coupled_mf6_model: mf6.Modflow6Simulation
+    ) -> tuple[mf6.StructuredDiscretization :, xr.DataArray]:
+        """
+        Modflow6 discretization on the same grid as the CAP data, thus no regridding needed.
+        """
+        dis_pkg = cast(mf6.StructuredDiscretization, coupled_mf6_model["GWF_1"]["dis"])
+        times = coupled_mf6_model["time_discretization"].dataset.coords["time"]
+        return dis_pkg, times
+
+    def case_dis_different_grid(
+        self, coupled_mf6_model: mf6.Modflow6Simulation
+    ) -> tuple[mf6.StructuredDiscretization :, xr.DataArray]:
+        """
+        Modflow6 discretization on different grid as the CAP data, thus regridding needed.
+        """
+        dis_pkg = cast(mf6.StructuredDiscretization, coupled_mf6_model["GWF_1"]["dis"])
+        target_grid = empty_2d(
+            dx=0.5, xmin=0.75, xmax=3.25, dy=-0.5, ymin=0.75, ymax=3.25
+        )
+        times = coupled_mf6_model["time_discretization"].dataset.coords["time"]
+        regridder_types = RegridderWeightsCache()
+        dis_pkg_regridded = dis_pkg.regrid_like(target_grid, regridder_types)
+        return dis_pkg_regridded, times
+
+
 @pytest.mark.unittest_jit
 @parametrize_with_cases("imod5_data, has_scaling_factor", cases=Imod5DataCases)
+@parametrize_with_cases("dis_pkg, times", cases=TargetDisCases)
 def test_import_from_imod5(
     imod5_data: Imod5DataDict,
     has_scaling_factor: bool,
     meteo_grids: tuple[GridDataArray],
-    coupled_mf6_model: mf6.Modflow6Simulation,
+    dis_pkg: mf6.StructuredDiscretization,
+    times: xr.DataArray,
     tmp_path: Path,
 ):
     # Arrange
     imod5_data["extra"] = setup_extra_files(meteo_grids, tmp_path)
-    times = coupled_mf6_model["time_discretization"].dataset.coords["time"]
-    dis_pkg = coupled_mf6_model["GWF_1"]["dis"]
     # Act
     model = msw.MetaSwapModel.from_imod5_data(imod5_data, dis_pkg, times)
     # Assert
@@ -384,6 +414,8 @@ def test_import_from_imod5(
     assert "time" in model["time_oc"].dataset.sizes.keys()
     assert len(model["meteo_grid"].dataset.dims) == 0
     assert ("scaling_factor" in model.keys()) == has_scaling_factor
+    assert dis_pkg.dataset["x"].equals(model["grid"].dataset["x"])
+    assert dis_pkg.dataset["y"].equals(model["grid"].dataset["y"])
 
 
 @pytest.mark.unittest_jit
