@@ -13,7 +13,6 @@ from imod.msw.meteo_grid import MeteoGridCopy
 from imod.msw.meteo_mapping import MeteoMapping
 from imod.msw.model import DEFAULT_SETTINGS
 from imod.msw.utilities.parse import read_para_sim
-from imod.tests.fixtures.msw_model_fixture import coupled_mf6_model
 from imod.typing import GridDataArray, Imod5DataDict
 from imod.typing.grid import zeros_like
 from imod.util.regrid import RegridderWeightsCache
