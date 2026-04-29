@@ -450,3 +450,16 @@ class StorageCoefficientRegridMethod(DataclassType):
     convertible: RegridVarType = (RegridderType.OVERLAP, "mode")
     storage_coefficient: RegridVarType = (RegridderType.OVERLAP, "mean")
     specific_yield: RegridVarType = (RegridderType.OVERLAP, "mean")
+
+
+@dataclass(config=_CONFIG)
+class CapDataRechargeRegridMethod(DataclassType):
+    """
+    Object containing regridder methods for CAP data for the
+    :class:`imod.mf6.Recharge.from_imod5_data` method. This contains regridder
+    methods for only the relevant CAP variables for the recharge package.
+    """
+
+    boundary: RegridVarType = (RegridderType.OVERLAP, "mode")
+    wetted_area: RegridVarType = (RegridderType.RELATIVEOVERLAP, "conductance")
+    urban_area: RegridVarType = (RegridderType.RELATIVEOVERLAP, "conductance")

@@ -13,6 +13,7 @@ import xarray as xr
 from imod.common.constants import MaskValues
 from imod.common.utilities.clip import clip_by_grid
 from imod.common.utilities.partitioninfo import create_partition_info
+from imod.common.utilities.regrid import regrid_imod5_cap_data
 from imod.common.utilities.value_filters import enforce_scalar
 from imod.common.utilities.version import prepend_content_with_version_info
 from imod.mf6.dis import StructuredDiscretization
@@ -45,7 +46,6 @@ from imod.msw.timeutil import to_metaswap_timeformat
 from imod.msw.utilities.common import find_in_file_list
 from imod.msw.utilities.imod5_converter import (
     has_active_scaling_factor,
-    regrid_imod5_data,
 )
 from imod.msw.utilities.mask import mask_and_broadcast_cap_data
 from imod.msw.utilities.parse import read_para_sim
@@ -644,7 +644,7 @@ class MetaSwapModel(Model):
         parasim_settings = read_para_sim(path_to_parasim)
         unsa_svat_path = cast(str, parasim_settings["unsa_svat_path"])
         # Regrid iMOD5 CAP data to target discretization.
-        imod5_regridded = regrid_imod5_data(
+        imod5_regridded = regrid_imod5_cap_data(
             imod5_data, target_dis, regridder_types, regrid_cache
         )
         # Test with regridded data instead of masked, as masking broadcasts

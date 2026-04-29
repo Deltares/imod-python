@@ -6,10 +6,14 @@ import xarray as xr
 
 from imod.common.interfaces.iregridpackage import IRegridPackage
 from imod.common.utilities.dataclass_type import DataclassType
+from imod.common.utilities.regrid import regrid_imod5_cap_data
 from imod.logging import init_log_decorator
 from imod.mf6.aggregate.aggregate_schemes import RechargeAggregationMethod
 from imod.mf6.dis import StructuredDiscretization, VerticesDiscretization
-from imod.mf6.regrid.regrid_schemes import RechargeRegridMethod
+from imod.mf6.regrid.regrid_schemes import (
+    CapDataRechargeRegridMethod,
+    RechargeRegridMethod,
+)
 from imod.mf6.topsystem import TopSystemBoundaryCondition
 from imod.mf6.utilities.imod5_converter import (
     convert_unit_rch_rate,
@@ -39,7 +43,6 @@ from imod.typing.grid import (
     enforce_dim_order,
     is_planar_grid,
 )
-from imod.util.dims import drop_layer_dim_cap_data
 from imod.util.regrid import RegridderWeightsCache
 
 
@@ -286,6 +289,8 @@ class Recharge(TopSystemBoundaryCondition, IRegridPackage):
         cls,
         imod5_data: Imod5DataDict,
         target_dis: StructuredDiscretization,
+        regridder_types: CapDataRechargeRegridMethod = CapDataRechargeRegridMethod(),
+        regrid_cache: RegridderWeightsCache = RegridderWeightsCache(),
     ) -> "Recharge":
         """
         Construct an rch-package from iMOD5 data in the CAP package, loaded with
@@ -293,7 +298,9 @@ class Recharge(TopSystemBoundaryCondition, IRegridPackage):
         used to couple MODFLOW6 to MetaSWAP models. Active cells will have a
         recharge rate of 0.0.
         """
-        cap_data = drop_layer_dim_cap_data(imod5_data)["cap"]
+        cap_data = regrid_imod5_cap_data(
+            imod5_data, target_dis, regridder_types, regrid_cache
+        )["cap"]
 
         msw_area = get_cell_area_from_imod5_data(cap_data)
         msw_active = is_msw_active_cell(target_dis, cap_data, msw_area)

@@ -1,16 +1,12 @@
 from xarray.core.utils import is_scalar
 
 from imod.common.constants import MaskValues
-from imod.common.utilities.dataclass_type import DataclassType
-from imod.common.utilities.regrid import _regrid_package_data
 from imod.logging import LogLevel, logger
 from imod.mf6 import StructuredDiscretization
 from imod.msw.utilities.common import concat_imod5
 from imod.msw.utilities.mask import MetaSwapActive
-from imod.typing import GridDataArray, GridDataDict, Imod5DataDict
+from imod.typing import GridDataArray, GridDataDict
 from imod.typing.grid import ones_like
-from imod.util.dims import drop_layer_dim_cap_data
-from imod.util.regrid import RegridderWeightsCache
 from imod.util.spatial import get_cell_area
 
 
@@ -120,31 +116,3 @@ def has_active_scaling_factor(imod5_cap: GridDataDict):
         )
 
     return not scaling_factor_inactive
-
-
-def regrid_imod5_data(
-    imod5_data: Imod5DataDict,
-    target_dis: StructuredDiscretization,
-    regridder_types: DataclassType,
-    regrid_cache: RegridderWeightsCache,
-) -> Imod5DataDict:
-    """
-    Regrid iMOD5 CAP data to consistent grid. This is necessary to be able to
-    use iMOD5 data in MetaSWAP, as the grid of the iMOD5 CAP data is not
-    necessarily the same as the grid of the target MODFLOW6 discretization. The
-    regridding process ensures consistency between the iMOD5 CAP data and the
-    target MODFLOW6 grid.
-    """
-    # Drop layer coords
-    imod5_cap_no_layer = drop_layer_dim_cap_data(imod5_data)
-    target_grid = target_dis.dataset["idomain"].isel(layer=0, drop=True)
-    # Regrid the input data
-    cap_data_regridded = _regrid_package_data(
-        imod5_cap_no_layer["cap"], target_grid, regridder_types, regrid_cache
-    )
-    extra_paths = imod5_data["extra"]["paths"]
-    imod5_regridded: Imod5DataDict = {
-        "cap": cap_data_regridded,
-        "extra": {"paths": extra_paths},
-    }
-    return imod5_regridded
