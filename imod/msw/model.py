@@ -608,7 +608,7 @@ class MetaSwapModel(Model):
         imod5_data: Imod5DataDict,
         target_dis: StructuredDiscretization,
         times: list[datetime],
-        regridder_types: Optional[CapDataRegridMethod] = None,
+        regridder_types: CapDataRegridMethod = CapDataRegridMethod(),
     ) -> "MetaSwapModel":
         """
         Construct a MetaSWAP model from iMOD5 data in the CAP package, loaded
@@ -626,7 +626,7 @@ class MetaSwapModel(Model):
         times: list[datetime]
             List of datetimes, will be used to set the output control times.
             Is also used to infer the starttime of the simulation.
-        regridder_types: Optional[CapDataRegridMethod], default None
+        regridder_types: CapDataRegridMethod, default CapDataRegridMethod()
             Custom regrid method for CAP data.
 
         Returns

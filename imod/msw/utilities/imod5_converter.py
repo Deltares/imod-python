@@ -1,5 +1,3 @@
-from typing import Optional
-
 from xarray.core.utils import is_scalar
 
 from imod.common.constants import MaskValues
@@ -127,7 +125,7 @@ def has_active_scaling_factor(imod5_cap: GridDataDict):
 def regrid_imod5_data(
     imod5_data: Imod5DataDict,
     target_dis: StructuredDiscretization,
-    regridder_types: Optional[CapDataRegridMethod] = None,
+    regridder_types: CapDataRegridMethod,
 ) -> Imod5DataDict:
     """
     Regrid iMOD5 CAP data to consistent grid. This is necessary to be able to
@@ -140,8 +138,6 @@ def regrid_imod5_data(
     imod5_cap_no_layer = drop_layer_dim_cap_data(imod5_data)
     target_grid = target_dis.dataset["idomain"].isel(layer=0, drop=True)
     # Regrid the input data
-    if regridder_types is None:
-        regridder_types = CapDataRegridMethod()
     regrid_cache = RegridderWeightsCache()
     cap_data_regridded = _regrid_package_data(
         imod5_cap_no_layer["cap"], target_grid, regridder_types, regrid_cache
