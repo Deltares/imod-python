@@ -1,10 +1,10 @@
 from xarray.core.utils import is_scalar
 
 from imod.common.constants import MaskValues
+from imod.common.utilities.dataclass_type import DataclassType
 from imod.common.utilities.regrid import _regrid_package_data
 from imod.logging import LogLevel, logger
 from imod.mf6 import StructuredDiscretization
-from imod.msw.regrid.regrid_schemes import CapDataRegridMethod
 from imod.msw.utilities.common import concat_imod5
 from imod.msw.utilities.mask import MetaSwapActive
 from imod.typing import GridDataArray, GridDataDict, Imod5DataDict
@@ -125,7 +125,8 @@ def has_active_scaling_factor(imod5_cap: GridDataDict):
 def regrid_imod5_data(
     imod5_data: Imod5DataDict,
     target_dis: StructuredDiscretization,
-    regridder_types: CapDataRegridMethod,
+    regridder_types: DataclassType,
+    regrid_cache: RegridderWeightsCache,
 ) -> Imod5DataDict:
     """
     Regrid iMOD5 CAP data to consistent grid. This is necessary to be able to
@@ -138,7 +139,6 @@ def regrid_imod5_data(
     imod5_cap_no_layer = drop_layer_dim_cap_data(imod5_data)
     target_grid = target_dis.dataset["idomain"].isel(layer=0, drop=True)
     # Regrid the input data
-    regrid_cache = RegridderWeightsCache()
     cap_data_regridded = _regrid_package_data(
         imod5_cap_no_layer["cap"], target_grid, regridder_types, regrid_cache
     )

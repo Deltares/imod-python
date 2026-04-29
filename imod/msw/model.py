@@ -609,6 +609,7 @@ class MetaSwapModel(Model):
         target_dis: StructuredDiscretization,
         times: list[datetime],
         regridder_types: CapDataRegridMethod = CapDataRegridMethod(),
+        regrid_cache: RegridderWeightsCache = RegridderWeightsCache(),
     ) -> "MetaSwapModel":
         """
         Construct a MetaSWAP model from iMOD5 data in the CAP package, loaded
@@ -628,6 +629,9 @@ class MetaSwapModel(Model):
             Is also used to infer the starttime of the simulation.
         regridder_types: CapDataRegridMethod, default CapDataRegridMethod()
             Custom regrid method for CAP data.
+        regrid_cache: RegridderWeightsCache, default RegridderWeightsCache()
+            Cache for regridder weights, can be used to speed up regridding if the
+            same regridders are used multiple times.
 
         Returns
         -------
@@ -640,7 +644,9 @@ class MetaSwapModel(Model):
         parasim_settings = read_para_sim(path_to_parasim)
         unsa_svat_path = cast(str, parasim_settings["unsa_svat_path"])
         # Regrid iMOD5 CAP data to target discretization.
-        imod5_regridded = regrid_imod5_data(imod5_data, target_dis, regridder_types)
+        imod5_regridded = regrid_imod5_data(
+            imod5_data, target_dis, regridder_types, regrid_cache
+        )
         # Test with regridded data instead of masked, as masking broadcasts
         # scalars to grids, which causes the is_scalar check in
         # has_active_scaling_factor to always return False.
