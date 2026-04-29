@@ -4,9 +4,9 @@ import numpy as np
 import pandas as pd
 import xarray as xr
 
+from imod.common.interfaces.iregridpackage import IRegridPackage
 from imod.common.utilities.dataclass_type import DataclassType
 from imod.common.utilities.regrid import _regrid_package_data, regrid_imod5_cap_data
-from imod.mf6.dis import StructuredDiscretization
 from imod.mf6.package import Package
 from imod.typing import GridDataArray, GridDataDict, Imod5DataDict
 from imod.typing.grid import full_like
@@ -85,7 +85,7 @@ def _well_from_imod5_cap_grid_data(cap_data: GridDataDict) -> dict[str, np.ndarr
 
 def well_from_imod5_cap_data(
     imod5_data: Imod5DataDict,
-    target_dis: StructuredDiscretization,
+    target_dis: IRegridPackage,
     regridder_types: DataclassType,
     regrid_cache: RegridderWeightsCache,
 ) -> dict[str, np.ndarray]:

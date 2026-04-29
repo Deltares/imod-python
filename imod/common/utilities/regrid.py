@@ -20,7 +20,6 @@ from imod.common.utilities.clip import clip_by_grid
 from imod.common.utilities.dataclass_type import DataclassType, EmptyRegridMethod
 from imod.common.utilities.dtype import is_integer
 from imod.common.utilities.value_filters import is_valid
-from imod.mf6 import StructuredDiscretization
 from imod.typing import Imod5DataDict
 from imod.typing.grid import (
     GridDataArray,
@@ -465,7 +464,7 @@ def _get_regridding_domain(
 
 def regrid_imod5_cap_data(
     imod5_data: Imod5DataDict,
-    target_dis: StructuredDiscretization,
+    target_dis: IRegridPackage,
     regridder_types: DataclassType,
     regrid_cache: RegridderWeightsCache,
 ) -> Imod5DataDict:
