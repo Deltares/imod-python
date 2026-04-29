@@ -456,10 +456,22 @@ class StorageCoefficientRegridMethod(DataclassType):
 class CapDataRechargeRegridMethod(DataclassType):
     """
     Object containing regridder methods for CAP data for the
-    :class:`imod.mf6.Recharge.from_imod5_data` method. This contains regridder
+    :class:`imod.mf6.Recharge.from_imod5_cap_data` method. This contains regridder
     methods for only the relevant CAP variables for the recharge package.
     """
 
     boundary: RegridVarType = (RegridderType.OVERLAP, "mode")
     wetted_area: RegridVarType = (RegridderType.RELATIVEOVERLAP, "conductance")
     urban_area: RegridVarType = (RegridderType.RELATIVEOVERLAP, "conductance")
+
+
+@dataclass(config=_CONFIG)
+class CapDataWellRegridMethod(DataclassType):
+    """
+    Object containing regridder methods for CAP data for the
+    :class:`imod.mf6.LayeredWell.from_imod5_cap_data` method. This contains
+    regridder methods for only the relevant CAP variables for the well package.
+    """
+
+    artificial_recharge: RegridVarType = (RegridderType.OVERLAP, "mean")
+    artificial_recharge_layer: RegridVarType = (RegridderType.OVERLAP, "mode")
