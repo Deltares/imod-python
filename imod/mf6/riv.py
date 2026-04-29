@@ -141,7 +141,7 @@ def _create_drain_from_leftover_riv_imod5_data(
     else:
         drain_leftover_data = infiltration_drn_data
 
-    return Drainage(**drain_leftover_data)  # type: ignore[arg-type]
+    return Drainage(**drain_leftover_data)
 
 
 class River(TopSystemBoundaryCondition, IRegridPackage):
