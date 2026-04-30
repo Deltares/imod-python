@@ -435,7 +435,7 @@ def test_import_from_imod5_and_write(
     modeldir = tmp_path / "modeldir"
     # Act
     model = msw.MetaSwapModel.from_imod5_data(imod5_data, dis_pkg, times)
-    well_pkg = mf6.LayeredWell.from_imod5_cap_data(imod5_data)
+    well_pkg = mf6.LayeredWell.from_imod5_cap_data(imod5_data, dis_pkg)
     mf6_wel_pkg = well_pkg.to_mf6_pkg(
         active, dis_pkg["top"], dis_pkg["bottom"], npf_pkg["k"]
     )

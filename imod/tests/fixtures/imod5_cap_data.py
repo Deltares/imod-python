@@ -3,6 +3,7 @@ import pandas as pd
 import pytest
 import xarray as xr
 
+from imod.mf6 import StructuredDiscretization
 from imod.typing import Imod5DataDict
 
 
@@ -22,6 +23,42 @@ def zeros_grid(n):
 def zeros_dask_grid(n):
     da = zeros_grid(n)
     return da.chunk({"x": n, "y": n})
+
+
+@pytest.fixture(scope="function")
+def cap_coupled_dis_grid() -> StructuredDiscretization:
+    n = 3
+    layer_coord = np.arange(n) + 1
+    layer_template = xr.DataArray(
+        layer_coord, dims="layer", coords={"layer": layer_coord}
+    )
+    template_grid = layer_template * zeros_grid(n)
+
+    idomain = template_grid.astype(int) + 1
+    top = 10.0
+    bottom = xr.DataArray(
+        [0.0, -10.0, -20.0], dims="layer", coords={"layer": layer_coord}
+    )
+
+    return StructuredDiscretization(idomain=idomain, top=top, bottom=bottom)
+
+
+@pytest.fixture(scope="function")
+def cap_coupled_dis_grid__big() -> StructuredDiscretization:
+    n = 1000
+    layer_coord = np.arange(3) + 1
+    layer_template = xr.DataArray(
+        layer_coord, dims="layer", coords={"layer": layer_coord}
+    )
+    template_grid = layer_template * zeros_dask_grid(n)
+
+    idomain = template_grid.astype(int) + 1
+    top = 10.0
+    bottom = xr.DataArray(
+        [0.0, -10.0, -20.0], dims="layer", coords={"layer": layer_coord}
+    )
+
+    return StructuredDiscretization(idomain=idomain, top=top, bottom=bottom)
 
 
 @pytest.fixture(scope="function")
@@ -46,7 +83,7 @@ def cap_data_sprinkling_grid() -> Imod5DataDict:
         "artificial_recharge_capacity": xr.DataArray(25.0),
     }
 
-    return {"cap": cap_data}
+    return {"cap": cap_data, "extra": {"paths": ["path1", "path2"]}}
 
 
 @pytest.fixture(scope="function")
@@ -69,7 +106,7 @@ def cap_data_sprinkling_grid__big() -> Imod5DataDict:
         "artificial_recharge_capacity": xr.DataArray(25.0),
     }
 
-    return {"cap": cap_data}
+    return {"cap": cap_data, "extra": {"paths": ["path1", "path2"]}}
 
 
 @pytest.fixture(scope="function")
@@ -94,7 +131,7 @@ def cap_data_sprinkling_grid_with_layer() -> Imod5DataDict:
         "artificial_recharge_capacity": xr.DataArray(25.0),
     }
 
-    return {"cap": cap_data}
+    return {"cap": cap_data, "extra": {"paths": ["path1", "path2"]}}
 
 
 @pytest.fixture(scope="function")
@@ -126,4 +163,4 @@ def cap_data_sprinkling_points() -> Imod5DataDict:
         "artificial_recharge_capacity": xr.DataArray(25.0),
     }
 
-    return {"cap": cap_data}
+    return {"cap": cap_data, "extra": {"paths": ["path1", "path2"]}}

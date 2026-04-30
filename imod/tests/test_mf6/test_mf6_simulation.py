@@ -615,6 +615,7 @@ def test_from_imod5__has_cap_data(imod5_dataset):
     imod5_data = deepcopy(imod5_dataset[0])
     period_data = imod5_dataset[1]
 
+    imod5_data["extra"] = {"paths": ["path1", "path2"]}
     imod5_data["cap"] = {}
     msw_bound = imod5_data["bnd"]["ibound"].isel(layer=0, drop=True)
     imod5_data["cap"]["boundary"] = msw_bound
