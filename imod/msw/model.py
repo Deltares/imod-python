@@ -13,6 +13,7 @@ import xarray as xr
 from imod.common.constants import MaskValues
 from imod.common.utilities.clip import clip_by_grid
 from imod.common.utilities.partitioninfo import create_partition_info
+from imod.common.utilities.regrid import regrid_imod5_cap_data
 from imod.common.utilities.value_filters import enforce_scalar
 from imod.common.utilities.version import prepend_content_with_version_info
 from imod.mf6.dis import StructuredDiscretization
@@ -38,16 +39,18 @@ from imod.msw.meteo_mapping import (
 from imod.msw.output_control import TimeOutputControl
 from imod.msw.pkgbase import MetaSwapPackage
 from imod.msw.ponding import Ponding
+from imod.msw.regrid.regrid_schemes import CapDataRegridMethod
 from imod.msw.scaling_factors import ScalingFactors
 from imod.msw.sprinkling import Sprinkling
 from imod.msw.timeutil import to_metaswap_timeformat
 from imod.msw.utilities.common import find_in_file_list
-from imod.msw.utilities.imod5_converter import has_active_scaling_factor
+from imod.msw.utilities.imod5_converter import (
+    has_active_scaling_factor,
+)
 from imod.msw.utilities.mask import mask_and_broadcast_cap_data
 from imod.msw.utilities.parse import read_para_sim
 from imod.msw.vegetation import AnnualCropFactors
 from imod.typing import GridDataArray, Imod5DataDict
-from imod.util.dims import drop_layer_dim_cap_data
 from imod.util.regrid import RegridderWeightsCache
 from imod.util.time import to_datetime_internal
 
@@ -605,7 +608,9 @@ class MetaSwapModel(Model):
         imod5_data: Imod5DataDict,
         target_dis: StructuredDiscretization,
         times: list[datetime],
-    ):
+        regridder_types: CapDataRegridMethod = CapDataRegridMethod(),
+        regrid_cache: RegridderWeightsCache = RegridderWeightsCache(),
+    ) -> "MetaSwapModel":
         """
         Construct a MetaSWAP model from iMOD5 data in the CAP package, loaded
         with the :func:`imod.formats.prj.open_projectfile_data` function.
@@ -616,29 +621,43 @@ class MetaSwapModel(Model):
             Dictionary with iMOD5 data. This can be constructed from the
             :func:`imod.formats.prj.open_projectfile_data` method.
         target_dis: imod.mf6.StructuredDiscretization
-            Target discretization, cells where MODLOW6 is inactive will be
-            inactive in MetaSWAP as well.
+            Target discretization, iMOD5 CAP data will be regridded to this
+            discretization. Cells where MODLOW6 is inactive will be inactive in
+            MetaSWAP as well.
         times: list[datetime]
             List of datetimes, will be used to set the output control times.
             Is also used to infer the starttime of the simulation.
+        regridder_types: CapDataRegridMethod, default CapDataRegridMethod()
+            Custom regrid method for CAP data.
+        regrid_cache: RegridderWeightsCache, default RegridderWeightsCache()
+            Cache for regridder weights, can be used to speed up regridding if the
+            same regridders are used multiple times.
 
         Returns
         -------
         MetaSwapModel
             MetaSWAP model imported from imod5 data.
         """
+        # Path and settings management
         extra_paths = imod5_data["extra"]["paths"]
         path_to_parasim = find_in_file_list("para_sim.inp", extra_paths)
         parasim_settings = read_para_sim(path_to_parasim)
         unsa_svat_path = cast(str, parasim_settings["unsa_svat_path"])
-        # Drop layer coord
-        imod5_cap_no_layer = drop_layer_dim_cap_data(imod5_data)
+        # Regrid iMOD5 CAP data to target discretization.
+        imod5_regridded = regrid_imod5_cap_data(
+            imod5_data, target_dis, regridder_types, regrid_cache
+        )
+        # Test with regridded data instead of masked, as masking broadcasts
+        # scalars to grids, which causes the is_scalar check in
+        # has_active_scaling_factor to always return False.
+        active_scaling_factor = has_active_scaling_factor(imod5_regridded["cap"])
+        # Setup model
         model = cls(unsa_svat_path, parasim_settings)
         model["grid"], msw_active = GridData.from_imod5_data(
-            imod5_cap_no_layer, target_dis
+            imod5_regridded, target_dis
         )
         cap_data_masked = mask_and_broadcast_cap_data(
-            imod5_cap_no_layer["cap"], msw_active
+            imod5_regridded["cap"], msw_active
         )
         imod5_masked: Imod5DataDict = {
             "cap": cap_data_masked,
@@ -650,7 +669,7 @@ class MetaSwapModel(Model):
         model["meteo_grid"] = MeteoGridCopy.from_imod5_data(imod5_masked)
         model["prec_mapping"] = PrecipitationMapping.from_imod5_data(imod5_masked)
         model["evt_mapping"] = EvapotranspirationMapping.from_imod5_data(imod5_masked)
-        if has_active_scaling_factor(imod5_cap_no_layer["cap"]):
+        if active_scaling_factor:
             model["scaling_factor"] = ScalingFactors.from_imod5_data(imod5_masked)
         area = model["grid"]["area"].isel(subunit=0, drop=True)
         model["idf_mapping"] = IdfMapping(area, MaskValues.msw_default)

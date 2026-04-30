@@ -28,6 +28,7 @@ from imod.mf6.boundary_condition import (
 )
 from imod.mf6.mf6_wel_adapter import Mf6Wel, concat_indices_to_cellid
 from imod.mf6.package import Package
+from imod.mf6.regrid.regrid_schemes import CapDataWellRegridMethod
 from imod.mf6.utilities.dataset import remove_inactive
 from imod.mf6.utilities.imod5_converter import well_from_imod5_cap_data
 from imod.mf6.validation_settings import ValidationSettings
@@ -45,6 +46,7 @@ from imod.select.points import points_indices, points_values
 from imod.typing import GridDataArray, Imod5DataDict, StressPeriodTimesType
 from imod.typing.grid import is_spatial_grid, ones_like
 from imod.util.expand_repetitions import average_timeseries, resample_timeseries
+from imod.util.regrid import RegridderWeightsCache
 from imod.util.structured import values_within_range
 
 ABSTRACT_METH_ERROR_MSG = "Method in abstract base class called"
@@ -1443,7 +1445,13 @@ class LayeredWell(GridAgnosticWell):
             raise ValueError(log_msg)
 
     @classmethod
-    def from_imod5_cap_data(cls, imod5_data: Imod5DataDict):
+    def from_imod5_cap_data(
+        cls,
+        imod5_data: Imod5DataDict,
+        target_dis: StructuredDiscretization,
+        regridder_types: CapDataWellRegridMethod = CapDataWellRegridMethod(),
+        regrid_cache: RegridderWeightsCache = RegridderWeightsCache(),
+    ):
         """
         Create LayeredWell from imod5_data in "cap" package. Abstraction data
         for sprinkling is defined in iMOD5 either with grids (IDF) or points
@@ -1481,7 +1489,9 @@ class LayeredWell(GridAgnosticWell):
             belongs, as returned by
             :func:`imod.formats.prj.open_projectfile_data`.
         """
-        data = well_from_imod5_cap_data(imod5_data)
+        data = well_from_imod5_cap_data(
+            imod5_data, target_dis, regridder_types, regrid_cache
+        )
         return cls(**data)  # type: ignore
 
     @standard_log_decorator()

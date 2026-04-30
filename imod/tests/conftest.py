@@ -23,6 +23,8 @@ from .fixtures.flow_basic_unstructured_fixture import (
 )
 from .fixtures.flow_transport_simulation_fixture import flow_transport_simulation
 from .fixtures.imod5_cap_data import (
+    cap_coupled_dis_grid,
+    cap_coupled_dis_grid__big,
     cap_data_sprinkling_grid,
     cap_data_sprinkling_grid__big,
     cap_data_sprinkling_points,

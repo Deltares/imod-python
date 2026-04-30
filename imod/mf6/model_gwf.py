@@ -45,7 +45,7 @@ from imod.prepare.topsystem.default_allocation_methods import (
     SimulationDistributingOptions,
 )
 from imod.schemata import TypeSchema
-from imod.typing import GridDataArray, StressPeriodTimesType
+from imod.typing import GridDataArray, Imod5DataDict, StressPeriodTimesType
 from imod.typing.grid import zeros_like
 from imod.util.regrid import RegridderWeightsCache
 
@@ -354,8 +354,13 @@ class GroundwaterFlowModel(Modflow6Model):
             )
 
         if "cap" in imod5_keys:
-            result["msw-sprinkling"] = LayeredWell.from_imod5_cap_data(imod5_data)  # type: ignore
-            result["msw-rch"] = Recharge.from_imod5_cap_data(imod5_data, dis_pkg)  # type: ignore
+            imod5_cap_data_dict = cast(Imod5DataDict, imod5_data)
+            result["msw-sprinkling"] = LayeredWell.from_imod5_cap_data(
+                imod5_cap_data_dict, dis_pkg, regrid_cache=regrid_cache
+            )
+            result["msw-rch"] = Recharge.from_imod5_cap_data(
+                imod5_cap_data_dict, dis_pkg, regrid_cache=regrid_cache
+            )
 
         # import ghb's
         ghb_keys = [key for key in imod5_keys if key[0:3] == "ghb"]

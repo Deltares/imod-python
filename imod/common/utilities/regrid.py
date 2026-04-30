@@ -20,13 +20,14 @@ from imod.common.utilities.clip import clip_by_grid
 from imod.common.utilities.dataclass_type import DataclassType, EmptyRegridMethod
 from imod.common.utilities.dtype import is_integer
 from imod.common.utilities.value_filters import is_valid
+from imod.typing import Imod5DataDict
 from imod.typing.grid import (
     GridDataArray,
     GridDataset,
     is_unstructured,
     ones_like,
 )
-from imod.util.dims import enforced_dim_order
+from imod.util.dims import drop_layer_dim_cap_data, enforced_dim_order
 from imod.util.regrid import (
     RegridderType,
     RegridderWeightsCache,
@@ -77,7 +78,7 @@ def _regrid_array(
 
     # the dataarray might be a scalar. If it is, then it does not need regridding.
     if scalar_da:
-        return da.values[()]
+        return da.squeeze(drop=True)
 
     if isinstance(da, xr.DataArray):
         coords = da.coords
@@ -459,3 +460,32 @@ def _get_regridding_domain(
     ).astype(int)
 
     return new_idomain
+
+
+def regrid_imod5_cap_data(
+    imod5_data: Imod5DataDict,
+    target_dis: IRegridPackage,
+    regridder_types: DataclassType,
+    regrid_cache: RegridderWeightsCache,
+) -> Imod5DataDict:
+    """
+    Regrid iMOD5 CAP data to consistent grid. This is necessary to be able to
+    use iMOD5 data in MetaSWAP, as the grid of the iMOD5 CAP data is not
+    necessarily the same as the grid of the target MODFLOW6 discretization. The
+    regridding process ensures consistency between the iMOD5 CAP data and the
+    target MODFLOW6 grid. Used in both ``imod.msw.MetaSwapModel.from_imod5_data``
+    and ``imod.mf6.Recharge.from_imod5_cap_data``.
+    """
+    # Drop layer coords
+    imod5_cap_no_layer = drop_layer_dim_cap_data(imod5_data)
+    target_grid = target_dis.dataset["idomain"].isel(layer=0, drop=True)
+    # Regrid the input data
+    cap_data_regridded = _regrid_package_data(
+        imod5_cap_no_layer["cap"], target_grid, regridder_types, regrid_cache
+    )
+    extra_paths = imod5_data["extra"]["paths"]
+    imod5_regridded: Imod5DataDict = {
+        "cap": cap_data_regridded,
+        "extra": {"paths": extra_paths},
+    }
+    return imod5_regridded

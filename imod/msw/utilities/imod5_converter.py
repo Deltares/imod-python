@@ -106,7 +106,7 @@ def has_active_scaling_factor(imod5_cap: GridDataDict):
     variable_inactive_mapping = {
         "perched_water_table_level": MaskValues.msw_default,
         "soil_moisture_fraction": 1.0,
-        "conductivitiy_factor": 1.0,
+        "conductivity_factor": 1.0,
     }
     scaling_factor_inactive = True
     for var, inactive_value in variable_inactive_mapping.items():

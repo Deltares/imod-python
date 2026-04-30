@@ -4,12 +4,12 @@ import numpy as np
 import pandas as pd
 import xarray as xr
 
+from imod.common.interfaces.iregridpackage import IRegridPackage
 from imod.common.utilities.dataclass_type import DataclassType
-from imod.common.utilities.regrid import _regrid_package_data
+from imod.common.utilities.regrid import _regrid_package_data, regrid_imod5_cap_data
 from imod.mf6.package import Package
 from imod.typing import GridDataArray, GridDataDict, Imod5DataDict
 from imod.typing.grid import full_like
-from imod.util.dims import drop_layer_dim_cap_data
 from imod.util.regrid import RegridderWeightsCache
 
 
@@ -83,7 +83,12 @@ def _well_from_imod5_cap_grid_data(cap_data: GridDataDict) -> dict[str, np.ndarr
     return data
 
 
-def well_from_imod5_cap_data(imod5_data: Imod5DataDict) -> dict[str, np.ndarray]:
+def well_from_imod5_cap_data(
+    imod5_data: Imod5DataDict,
+    target_dis: IRegridPackage,
+    regridder_types: DataclassType,
+    regrid_cache: RegridderWeightsCache,
+) -> dict[str, np.ndarray]:
     """
     Abstraction data for sprinkling is defined in iMOD5 either with grids (IDF)
     or points (IPF) combined with a grid. Depending on the type, the function does
@@ -110,12 +115,16 @@ def well_from_imod5_cap_data(imod5_data: Imod5DataDict) -> dict[str, np.ndarray]
         capacity is already defined in the point data. This is an ``n:1``
         mapping: multiple grid cells can map to one well.
     """
-    cap_data = drop_layer_dim_cap_data(imod5_data)["cap"]
+    cap_data = imod5_data["cap"]
+    has_ipf_well = isinstance(cap_data["artificial_recharge_layer"], pd.DataFrame)
 
-    if isinstance(cap_data["artificial_recharge_layer"], pd.DataFrame):
+    if has_ipf_well:
         return _well_from_imod5_cap_point_data(cap_data)
     else:
-        return _well_from_imod5_cap_grid_data(cap_data)
+        cap_data_regridded = regrid_imod5_cap_data(
+            imod5_data, target_dis, regridder_types, regrid_cache
+        )["cap"]
+        return _well_from_imod5_cap_grid_data(cap_data_regridded)
 
 
 def regrid_imod5_pkg_data(

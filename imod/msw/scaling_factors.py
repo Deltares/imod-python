@@ -109,7 +109,7 @@ class ScalingFactors(MetaSwapPackage, IRegridPackage):
             cap_data["soil_moisture_fraction"], grid_ones
         )
         data["scale_hydraulic_conductivity"] = concat_imod5(
-            cap_data["conductivitiy_factor"], grid_ones
+            cap_data["conductivity_factor"], grid_ones
         )
         data["scale_pressure_head"] = concat_imod5(grid_ones, grid_ones)
         data["depth_perched_water_table"] = cap_data["perched_water_table_level"]

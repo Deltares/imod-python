@@ -64,6 +64,10 @@ Fixed
 - :meth:`imod.mf6.NodePropertyFlow.regrid_like` now regrids ``k33`` using the
   correct method, namely ``mean`` instead of ``harmonic_mean``. As this is the
   appropriate method for horizontal regridding of ``k33``.
+- :meth:`imod.msw.MetaSwapModel.from_imod5_data`,
+  :meth:`imod.mf6.Recharge.from_imod5_cap_data`,
+  :meth:`imod.mf6.LayeredWell.from_imod5_cap_data` now regrids the iMOD5 CAP
+  data to the MODFLOW6 target discretization.
 
 Changed
 ~~~~~~~

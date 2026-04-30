@@ -139,7 +139,7 @@ def test_from_imod5_data(fixed_format_parser):
     scale_rural = scale.sel(subunit=0, drop=True)
     imod5_data["cap"]["boundary"] = ones_like(scale_rural)
     imod5_data["cap"]["soil_moisture_fraction"] = scale_rural
-    imod5_data["cap"]["conductivitiy_factor"] = scale_rural
+    imod5_data["cap"]["conductivity_factor"] = scale_rural
     imod5_data["cap"]["perched_water_table_level"] = depth_perched_water_table
 
     scaling_factors = ScalingFactors.from_imod5_data(imod5_data)
