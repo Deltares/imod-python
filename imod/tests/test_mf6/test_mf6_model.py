@@ -11,6 +11,7 @@ from jinja2 import Template
 from xugrid.core.wrap import UgridDataArray
 
 import imod
+from imod.common.utilities.dump_model import dump_modelpkgs
 from imod.mf6 import ConstantConcentration, ConstantHead
 from imod.mf6.mf6_wel_adapter import Mf6Wel
 from imod.mf6.model import Modflow6Model
@@ -21,7 +22,6 @@ from imod.mf6.validation_settings import ValidationSettings
 from imod.mf6.write_context import WriteContext
 from imod.schemata import ValidationError
 from imod.typing.grid import concat, nan_like
-from imod.common.utilities.dump_model import dump_modelpkgs
 
 
 # Duplicate from test_mf6_dis.py

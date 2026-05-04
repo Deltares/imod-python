@@ -12,6 +12,7 @@ import xarray as xr
 
 from imod.common.utilities.value_filters import enforce_scalar
 from imod.common.utilities.version import prepend_content_with_version_info
+from imod.logging import standard_log_decorator
 from imod.mf6.dis import StructuredDiscretization
 from imod.mf6.mf6_wel_adapter import Mf6Wel
 from imod.msw.copy_files import FileCopier
@@ -91,7 +92,7 @@ DEFAULT_SETTINGS: dict[str, Any] = {
 }
 
 
-class Model(collections.UserDict,IModel):
+class Model(collections.UserDict):
     def __setitem__(self, key, value):
         # TODO: Add packagecheck
         super().__setitem__(key, value)
@@ -101,7 +102,7 @@ class Model(collections.UserDict,IModel):
             self[k] = v
 
 
-class MetaSwapModel(Model):
+class MetaSwapModel(Model, IModel):
     """
     Contains data and writes consistent model input files
 

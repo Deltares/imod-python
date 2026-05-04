@@ -7,13 +7,27 @@ from numpy.testing import assert_almost_equal, assert_equal
 from pytest_cases import parametrize_with_cases
 
 from imod import mf6, msw
+from imod.common.utilities.dump_model import dump_modelpkgs
 from imod.msw.copy_files import FileCopier
 from imod.msw.meteo_mapping import MeteoMapping
 from imod.msw.model import DEFAULT_SETTINGS
+from imod.msw.model import MetaSwapModel
 from imod.msw.utilities.parse import read_para_sim
 from imod.typing import GridDataArray, Imod5DataDict
 from imod.util.regrid import RegridderWeightsCache
 
+
+def roundtrip(msw_model, tmpdir_factory, name, engine):
+    # TODO: look at the values?
+    tmp_path = tmpdir_factory.mktemp(name)
+    dump_modelpkgs(msw_model, tmp_path, name, engine=engine)
+    back = MetaSwapModel.from_file(tmp_path / f"{simulation.name}.toml")
+    assert isinstance(back, MetaSwapModel)
+
+def test_msw_pkgdump(msw_model, tmp_path):
+    dump_modelpkgs(msw_model, tmp_path, "testmodel", engine="netcdf4")
+#   back = MetaSwapModel.from_file(tmp_path / "testmodel.toml")
+#   assert isinstance(back, MetaSwapModel)
 
 def test_msw_model_write(msw_model, coupled_mf6_model, coupled_mf6wel, tmp_path):
     mf6_dis = coupled_mf6_model["GWF_1"]["dis"]

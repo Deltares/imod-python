@@ -24,8 +24,8 @@ from imod.common.interfaces.isimulation import ISimulation
 from imod.common.serializer import EngineType
 from imod.common.statusinfo import NestedStatusInfo
 from imod.common.utilities.dataclass_type import DataclassType
-from imod.common.utilities.mask import mask_all_models
 from imod.common.utilities.dump_model import dump_modelpkgs
+from imod.common.utilities.mask import mask_all_models
 from imod.common.utilities.regrid import _regrid_like
 from imod.common.utilities.version import (
     get_version,
