@@ -3,22 +3,23 @@ import csv
 
 def infer_delimwhitespace(line: str, ncol: int):
     """
-    Infer whether the line is delimited by whitespace or commas, based on the number of columns.
-    Also returns whether the line has the amount of expected columns.
+    Infer whether the line is delimited by whitespace or commas, based on the
+    number of columns. Also returns whether the line has the amount of expected
+    columns if delimited by commas.
 
     Parameters
     ----------
     line : str
         The line to analyze.
     ncol : int
-        The expected number of columns.
+        The expected number of columns if line delimited by commas.
 
     Returns
     -------
     has_whitespace : bool
         Whether the line is delimited by whitespace.
     has_expected_cols : bool
-        Whether the line has the expected number of columns.
+        Whether the line has the expected number of columns if delimited by commas.
     """
     n_elem = len(next(csv.reader([line])))
     if n_elem == 1:
