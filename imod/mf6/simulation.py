@@ -1857,7 +1857,13 @@ class Modflow6Simulation(collections.UserDict[str, Any], ISimulation):
         >>>     imod5_data, period_data, times, regridder_types=regridder_types, target_grid=target_grid
         >>> )
 
+        Provide custom name to the simulation and model:
 
+        >>> mf6_sim = imod.mf6.Modflow6Simulation.from_imod5_data(
+        >>>     imod5_data, period_data, times, name="custom"
+        >>> )
+        >>> print(mf6_sim.name)  # prints "custom_simulation"
+        >>> gwf_model = mf6_sim["custom_model"]
         """
         if allocation_options is None:
             allocation_options = SimulationAllocationOptions()
