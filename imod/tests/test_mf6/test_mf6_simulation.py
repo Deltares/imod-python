@@ -611,6 +611,22 @@ def test_import_from_imod5(imod5_dataset, tmp_path):
 
 
 @pytest.mark.unittest_jit
+def test_import_from_imod5__custom_name(imod5_dataset):
+    imod5_data = imod5_dataset[0]
+    period_data = imod5_dataset[1]
+
+    datelist = pd.date_range(start="1/1/1989", end="1/3/1989", freq="D")
+    simulation = Modflow6Simulation.from_imod5_data(
+        imod5_data,
+        period_data,
+        datelist,
+        name="custom",
+    )
+    assert "custom_simulation" in simulation.name
+    assert "custom_model" in simulation.keys()
+
+
+@pytest.mark.unittest_jit
 def test_from_imod5__has_cap_data(imod5_dataset):
     imod5_data = deepcopy(imod5_dataset[0])
     period_data = imod5_dataset[1]
@@ -669,8 +685,6 @@ def test_import_from_imod5__correct_well_type(imod5_dataset):
     original_wel_layer = imod5_data["wel-WELLS_L3"]["layer"]
     imod5_data["wel-WELLS_L3"]["layer"] = [0] * len(original_wel_layer)
     # Other arrangement
-    default_simulation_allocation_options = SimulationAllocationOptions
-    default_simulation_distributing_options = SimulationDistributingOptions
     datelist = pd.date_range(start="1/1/1989", end="1/1/2013", freq="W")
 
     # Act
@@ -678,8 +692,6 @@ def test_import_from_imod5__correct_well_type(imod5_dataset):
         imod5_data,
         period_data,
         datelist,
-        default_simulation_allocation_options,
-        default_simulation_distributing_options,
     )
     # Set layer back to right value (before AssertionError might be thrown)
     imod5_data["wel-WELLS_L3"]["layer"] = original_wel_layer
