@@ -1752,6 +1752,7 @@ class Modflow6Simulation(collections.UserDict[str, Any], ISimulation):
         distributing_options: Optional[SimulationDistributingOptions] = None,
         regridder_types: Optional[dict[str, DataclassType]] = None,
         target_grid: Optional[GridDataArray] = None,
+        name: str = "imported",
     ) -> "Modflow6Simulation":
         """
         Imports a GroundwaterFlowModel (GWF) from the data in an iMOD5 project
@@ -1799,6 +1800,9 @@ class Modflow6Simulation(collections.UserDict[str, Any], ISimulation):
         target_grid: GridDataArray, optional
             the target grid to which the data should be regridded. If not
             provided, the first grid of the BND package is used as target grid.
+        name: str, optional
+            name that will be used as a prefix for the simulation and model
+            names. Default is "imported".
 
         Returns
         -------
@@ -1853,7 +1857,13 @@ class Modflow6Simulation(collections.UserDict[str, Any], ISimulation):
         >>>     imod5_data, period_data, times, regridder_types=regridder_types, target_grid=target_grid
         >>> )
 
+        Provide custom name to the simulation and model:
 
+        >>> mf6_sim = imod.mf6.Modflow6Simulation.from_imod5_data(
+        >>>     imod5_data, period_data, times, name="custom"
+        >>> )
+        >>> print(mf6_sim.name)  # prints "custom_simulation"
+        >>> gwf_model = mf6_sim["custom_model"]
         """
         if allocation_options is None:
             allocation_options = SimulationAllocationOptions()
@@ -1866,8 +1876,9 @@ class Modflow6Simulation(collections.UserDict[str, Any], ISimulation):
             strict_well_validation=False,
             strict_hfb_validation=False,
         )
+        simulation_name = f"{name}_simulation"
         simulation = Modflow6Simulation(
-            "imported_simulation", validation_settings=validation_settings
+            simulation_name, validation_settings=validation_settings
         )
 
         # import GWF model,
@@ -1880,11 +1891,12 @@ class Modflow6Simulation(collections.UserDict[str, Any], ISimulation):
             regridder_types,
             target_grid,
         )
-        simulation["imported_model"] = gwf_model
+        gwf_modelname = f"{name}_model"
+        simulation[gwf_modelname] = gwf_model
 
         # generate ims package
         solution = SolutionPresetModerate(
-            ["imported_model"],
+            [gwf_modelname],
             print_option="all",
         )
         simulation["ims"] = solution
