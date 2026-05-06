@@ -69,6 +69,7 @@ Fixed
   :meth:`imod.mf6.Recharge.from_imod5_cap_data`,
   :meth:`imod.mf6.LayeredWell.from_imod5_cap_data` now regrids the iMOD5 CAP
   data to the MODFLOW6 target discretization.
+- Fixed confusing warning about inconsistent IPF columns when loading GEN files.
 
 Changed
 ~~~~~~~
