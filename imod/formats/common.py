@@ -1,7 +1,13 @@
 import csv
+from typing import NamedTuple
 
 
-def infer_delimwhitespace(line: str, ncol: int):
+class LineDelimiterInfo(NamedTuple):
+    has_whitespace: bool
+    has_expected_cols: bool
+
+
+def infer_line_delimiter_info(line: str, ncol: int) -> LineDelimiterInfo:
     """
     Infer whether the line is delimited by whitespace or commas, based on the
     number of columns. Also returns whether the line has the amount of expected
@@ -16,15 +22,16 @@ def infer_delimwhitespace(line: str, ncol: int):
 
     Returns
     -------
-    has_whitespace : bool
-        Whether the line is delimited by whitespace.
-    has_expected_cols : bool
-        Whether the line has the expected number of columns if delimited by commas.
+    LineDelimiterInfo
+        has_whitespace : bool
+            Whether the line is delimited by whitespace.
+        has_expected_cols : bool
+            Whether the line has the expected number of columns if delimited by commas.
     """
     n_elem = len(next(csv.reader([line])))
     if n_elem == 1:
-        return True, True
+        return LineDelimiterInfo(has_whitespace=True, has_expected_cols=True)
     elif n_elem == ncol:
-        return False, True
+        return LineDelimiterInfo(has_whitespace=False, has_expected_cols=True)
     else:
-        return False, False
+        return LineDelimiterInfo(has_whitespace=False, has_expected_cols=False)

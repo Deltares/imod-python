@@ -7,7 +7,7 @@ import numpy as np
 import pandas as pd
 from scipy.io import FortranFile, FortranFormattingError
 
-from imod.formats.common import infer_delimwhitespace
+from imod.formats.common import infer_line_delimiter_info
 from imod.util.imports import MissingOptionalModule
 
 try:
@@ -52,7 +52,7 @@ def parse_ascii_segments(lines: List[str]):
     indices = np.repeat(np.arange(n_feature), n_vertex)
 
     first_coord = features[0][1:][0]
-    has_whitespace, _ = infer_delimwhitespace(first_coord, 3)
+    has_whitespace, _ = infer_line_delimiter_info(first_coord, 3)
     sep = r"\s+" if has_whitespace else ","
 
     vertex_coords = []

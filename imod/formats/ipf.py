@@ -17,15 +17,15 @@ import numpy as np
 import pandas as pd
 
 import imod
-from imod.formats.common import infer_delimwhitespace
+from imod.formats.common import infer_line_delimiter_info
 from imod.logging import LogLevel
 from imod.util.time import to_pandas_datetime_series
 
 
 def _infer_delimwhitespace(line, ncol):
-    infer_whitespace, has_expected_cols = infer_delimwhitespace(line, ncol)
+    delimiter_info = infer_line_delimiter_info(line, ncol)
 
-    if not has_expected_cols:
+    if not delimiter_info.has_expected_cols:
         log_message = f"Inconsistent IPF: header states {ncol} columns, first line contains {len(line.split())} whitespace-delimited columns and {len(next(csv.reader([line])))} comma-delimited columns."
         imod.logging.logger.log(
             loglevel=LogLevel.WARNING,
@@ -33,7 +33,7 @@ def _infer_delimwhitespace(line, ncol):
             additional_depth=2,
         )
         warnings.warn(log_message)
-    return infer_whitespace
+    return delimiter_info.has_whitespace
 
 
 def _read_ipf(path, kwargs=None) -> Tuple[pd.DataFrame, int, str]:
