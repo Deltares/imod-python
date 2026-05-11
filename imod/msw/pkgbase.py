@@ -1,13 +1,17 @@
 import abc
+import numbers
 from copy import deepcopy
 from pathlib import Path
-from typing import Any, Optional, TextIO, TypeAlias, Union
+from typing import Any, Optional, Self, TextIO, TypeAlias, Union
 
 import cftime
 import numpy as np
 import pandas as pd
 import xarray as xr
+import zarr  # nb: in modflow6, this is a try...except
+from xarray.core.utils import is_scalar
 
+from imod.common.serializer import EngineType, create_package_serializer
 from imod.common.utilities.clip import clip_spatial_box, clip_time_slice
 from imod.common.utilities.dataclass_type import DataclassType, EmptyRegridMethod
 from imod.common.utilities.regrid import (
@@ -21,6 +25,17 @@ from imod.typing.grid import GridDataArray, GridDataset
 from imod.util.regrid import RegridderWeightsCache
 
 DataDictType: TypeAlias = dict[str, IntArray | int | str]
+
+
+def _is_scalar_nan(da: GridDataArray):
+    """
+    Test if is_scalar_nan, carefully avoid loading grids in memory
+    """
+    scalar_data: bool = is_scalar(da)
+    if scalar_data:
+        stripped_value = da.to_numpy()[()]
+        return isinstance(stripped_value, numbers.Real) and np.isnan(stripped_value)  # type: ignore[call-overload]
+    return False
 
 
 class MetaSwapPackage(abc.ABC):
@@ -385,3 +400,105 @@ class MetaSwapPackage(abc.ABC):
 
     def _is_clipping_supported(self) -> bool:
         return True
+
+    @classmethod
+    def from_file(cls, path: str | Path, **kwargs) -> Self:
+        """
+        Loads an imod msw package from a file (netcdf or zarr).
+        Note that the checks upon package initialization are not done again!
+
+        Parameters
+        ----------
+        path : str, pathlib.Path
+            Path to the file.
+        **kwargs : keyword arguments
+            Arbitrary keyword arguments forwarded to ``xarray.open_dataset()``, or
+            ``xarray.open_zarr()``.
+        Refer to the examples.
+
+        Returns
+        -------
+        package : imod.msw.MetaSwapPackage
+            Returns a package with data loaded from file.
+
+        Examples
+        --------
+
+        To load a package from a file, e.g. a River package:
+
+        >>> river = imod.mf6.River.from_file("river.nc")
+
+        For large datasets, you likely want to process it in chunks. You can
+        forward keyword arguments to ``xarray.open_dataset()`` or
+        ``xarray.open_zarr()``:
+
+        >>> river = imod.mf6.River.from_file("river.nc", chunks={"time": 1})
+
+        Refer to the xarray documentation for the possible keyword arguments.
+        """
+        path = Path(path)
+        if path.suffix in (".zip", ".zarr"):
+            if path.suffix == ".zip":
+                with zarr.storage.ZipStore(path, mode="r") as store:
+                    dataset = xr.open_zarr(store, **kwargs)
+            else:
+                dataset = xr.open_zarr(str(path), **kwargs)
+        else:
+            dataset = xr.open_dataset(path, chunks="auto", **kwargs)
+
+        # Replace NaNs by None
+        for key, value in dataset.items():
+            if _is_scalar_nan(value):
+                dataset[key] = None
+
+        return cls._from_dataset(dataset)
+
+    def to_file(
+        self,
+        modeldirectory: Path,
+        pkgname: str,
+        mdal_compliant: bool = False,
+        crs: Optional[Any] = None,
+        engine: EngineType = "netcdf4",
+        **kwargs,
+    ) -> Path:
+        """
+        Write package to file.
+
+        Parameters
+        ----------
+        modeldirectory : pathlib.Path
+            Directory where to write the package file.
+        pkgname : str
+            Name of the package, used to create the file name.
+        mdal_compliant : bool, optional
+            Whether to write the package in MDAL-compliant format. Only used if
+            ``engine="netcdf4"``. Default is False.
+        crs : optional
+            Coordinate reference system to use when writing the package. Only
+            used if ``engine="netcdf4"`` Default is None.
+        engine : str, optional
+            File engine used to write packages. Options are ``'netcdf4'``,
+            ``'zarr'``, and ``'zarr.zip'``. NetCDF4 is readable by many other
+            softwares, for example QGIS. Zarr is optimized for big data, cloud
+            storage and parallel access. The ``'zarr.zip'`` option is an
+            experimental option which creates a zipped zarr store in a single
+            file, which is easier to copy and automatically compresses data as
+            well. Default is ``'netcdf4'``.
+        **kwargs : keyword arguments
+            Additional keyword arguments forwarded to the package serializer's
+            `to_file` method.
+
+        Returns
+        -------
+        pathlib.Path
+            Path to the written package file.
+        """
+
+        # All serialization logic is in the package serializers do not override
+        # this method (hence final decorator).
+        filewriter = create_package_serializer(
+            engine, mdal_compliant=mdal_compliant, crs=crs
+        )
+        path = filewriter.to_file(self, modeldirectory, pkgname, **kwargs)
+        return path

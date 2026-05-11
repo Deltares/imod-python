@@ -92,7 +92,7 @@ def test_key_assign():
 
 
 def roundtrip(model, tmp_path):
-    dump_modelpkgs(tmp_path, "test")
+    dump_modelpkgs(model, tmp_path, "test")
     back = type(model).from_file(tmp_path / "test/test.toml")
     assert isinstance(back, type(model))
 

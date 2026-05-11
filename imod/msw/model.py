@@ -1,18 +1,22 @@
 import collections
+import inspect
 import warnings
 from copy import copy, deepcopy
 from datetime import datetime
 from pathlib import Path
-from typing import Any, Optional, Union, cast
+from typing import Any, Optional, Tuple, Union, cast
 
 import cftime
 import jinja2
 import numpy as np
+import tomli
 import xarray as xr
 
+import imod.msw
+from imod.common.interfaces.imodel import IModel
+from imod.common.utilities.mask import mask_all_packages
 from imod.common.utilities.value_filters import enforce_scalar
 from imod.common.utilities.version import prepend_content_with_version_info
-from imod.logging import standard_log_decorator
 from imod.mf6.dis import StructuredDiscretization
 from imod.mf6.mf6_wel_adapter import Mf6Wel
 from imod.msw.copy_files import FileCopier
@@ -44,10 +48,9 @@ from imod.msw.utilities.imod5_converter import has_active_scaling_factor
 from imod.msw.utilities.mask import MaskValues, mask_and_broadcast_cap_data
 from imod.msw.utilities.parse import read_para_sim
 from imod.msw.vegetation import AnnualCropFactors
-from imod.typing import Imod5DataDict
+from imod.typing import GridDataArray, Imod5DataDict
 from imod.util.dims import drop_layer_dim_cap_data
 from imod.util.regrid import RegridderWeightsCache
-from imod.common.interfaces.imodel import IModel
 
 REQUIRED_PACKAGES = (
     GridData,
@@ -344,6 +347,34 @@ class MetaSwapModel(Model, IModel):
         for pkgname in self:
             self[pkgname].write(directory, index, svat, mf6_dis, mf6_wel)
 
+    @classmethod
+    def from_file(cls, directory, modelname):
+        pkg_classes = {
+            name: pkg_cls
+            for name, pkg_cls in inspect.getmembers(imod.msw, inspect.isclass)
+            if issubclass(pkg_cls, MetaSwapPackage)
+        }
+        modeldirectory = Path(directory) / modelname
+        toml_path = modeldirectory / f"{modelname}.toml"
+        with open(toml_path, "rb") as f:
+            toml_content = tomli.load(f)
+
+        parentdir = toml_path.parent
+        if issubclass(cls, MetaSwapModel):
+            simulation_settings = toml_content.get("simulation_settings", {})
+            unsa_svat_path = simulation_settings.get("unsa_svat_path", "")
+            instance = cls(unsa_svat_path, simulation_settings)
+        else:
+            instance = cls()
+
+        for key, entry in toml_content.items():
+            if key != "simulation_settings":
+                for pkgname, path in entry.items():
+                    pkg_cls = pkg_classes[key]
+                    instance[pkgname] = pkg_cls.from_file(parentdir / path)
+
+        return instance
+
     def regrid_like(
         self,
         mf6_regridded_dis: StructuredDiscretization,
@@ -541,3 +572,148 @@ class MetaSwapModel(Model, IModel):
         model["time_oc"] = TimeOutputControl(times_da)
 
         return model
+
+    def _is_splitting_supported(self) -> Tuple[bool, str]:
+        """
+        Returns True if all the packages in the model supports splitting. If one
+        of the packages in the model does not support splitting, it returns the
+        name of the first one.
+
+        Returns
+        -------
+        Tuple[bool, str]
+            A tuple where the first element is a boolean indicating if splitting
+            is supported, and the second element is the name of the first package
+            that does not support splitting, or an empty string if all packages
+            support splitting.
+        """
+        for package_name, package in self.items():
+            if not package._is_splitting_supported():
+                return False, package_name
+        return True, ""
+
+    def _is_regridding_supported(self) -> Tuple[bool, str]:
+        """
+        Returns True if all the packages in the model supports regridding. If one
+        of the packages in the model does not support regridding, it returns the
+        name of the first one.
+
+        Returns
+        -------
+        Tuple[bool, str]
+            A tuple where the first element is a boolean indicating if regridding
+            is supported, and the second element is the name of the first package
+            that does not support regridding, or an empty string if all packages
+            support regridding.
+        """
+        for package_name, package in self.items():
+            if not package._is_regridding_supported():
+                return False, package_name
+        return True, ""
+
+    def _is_clipping_supported(self) -> Tuple[bool, str]:
+        """
+        Returns True if all the packages in the model supports clipping. If one
+        of the packages in the model does not support clipping, it returns the
+        name of the first one.
+
+        Returns
+        -------
+        Tuple[bool, str]
+            A tuple where the first element is a boolean indicating if clipping
+            is supported, and the second element is the name of the first package
+            that does not support clipping, or an empty string if all packages
+            support clipping.
+        """
+        for package_name, package in self.items():
+            if not package._is_clipping_supported():
+                return False, package_name
+        return True, ""
+
+    def purge_empty_packages(
+        self, model_name: Optional[str] = "", ignore_time: bool = False
+    ) -> None:
+        """
+        This method removes empty packages from the model in place.
+
+        Parameters
+        ----------
+        model_name: str, optional
+            Name of the model, used for logging.
+        ignore_time: bool, optional
+            If False, packages are considered empty if they have no data at all
+            timesteps. If True, packages are considered empty if they have no
+            data at the first time step. The latter can increase performance
+            considerably.
+        """
+        empty_packages = [
+            package_name
+            for package_name, package in self.items()
+            if package.is_empty(ignore_time=ignore_time)
+        ]
+        for package_name in empty_packages:
+            self.pop(package_name)
+
+    def mask_all_packages(
+        self,
+        mask: GridDataArray,
+        ignore_time_purge_empty: bool = False,
+    ):
+        """
+        This function applies a mask to all packages in a model. The mask must
+        be presented as an idomain-like integer array that has 0 (inactive) or
+        <0 (vertical passthrough) values in filtered cells and >0 in active
+        cells.
+        Masking will overwrite idomain with the mask where the mask is <=0.
+        Where the mask is >0, the original value of idomain will be kept. Masking
+        will update the packages accordingly, blanking their input where needed,
+        and is therefore not a reversible operation.
+
+        Parameters
+        ----------
+        mask: xr.DataArray, xu.UgridDataArray of ints
+            idomain-like integer array. >0 sets cells to active, 0 sets cells to inactive,
+            <0 sets cells to vertical passthrough
+        ignore_time_purge_empty: bool, default False
+            Whether to ignore time dimension when purging empty packages. Can
+            improve performance when masking models with many time steps.
+        """
+
+        mask_all_packages(self, mask, ignore_time_purge_empty)
+
+    @property
+    def model_id(self) -> str:
+        if self._model_id is None:
+            return "MetaSwapModel"
+        return self._model_id
+
+    @property
+    def options(self) -> dict:
+        return self._options
+
+    @property
+    def domain(self) -> GridDataArray:
+        """
+        Get the active domain array as an integer array compatible with idomain.
+
+        Returns
+        -------
+        GridDataArray
+        Integer array where:
+        - 1 indicates active cells
+        - 0 indicates inactive cells
+        """
+        grid_key = self.get_pkgkey(GridData)
+        active = self[grid_key]["active"]
+        return active.astype(int)
+
+    def validate(
+        self,
+        model_name: str = "",
+        validation_context: Optional[Any] = None,
+        **kwargs,
+    ) -> None:
+        return
+
+
+# make a read function for packages from netcdf

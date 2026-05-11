@@ -83,6 +83,9 @@ def dump_modelpkgs(
         )
         toml_content[type(pkg).__name__][pkgname] = pkg_path.name
 
+    if hasattr(model, "simulation_settings"):
+        toml_content["simulation_settings"] = model.simulation_settings
+
     toml_path = modeldirectory / f"{modelname}.toml"
     with open(toml_path, "wb") as f:
         tomli_w.dump(toml_content, f)
