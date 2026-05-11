@@ -31,7 +31,7 @@ def convert_imod5_to_msw_model(
     dis_pkg.dataset.load()  # Load dataset to speed up import
     npf_pkg = imod.mf6.NodePropertyFlow.from_imod5_data(imod5_data, dis_pkg["idomain"])
     npf_pkg.dataset.load()  # Load dataset to speed up import
-    wel_pkg = imod.mf6.LayeredWell.from_imod5_cap_data(imod5_data)
+    wel_pkg = imod.mf6.LayeredWell.from_imod5_cap_data(imod5_data, dis_pkg)
     active = dis_pkg["idomain"] == 1
     mf6_wel_pkg = wel_pkg.to_mf6_pkg(
         active, dis_pkg["top"], dis_pkg["bottom"], npf_pkg["k"]
