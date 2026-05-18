@@ -17,6 +17,11 @@ Added
   :meth:`imod.mf6.Modflow6Simulation.clip_box` to consider a package empty if
   its first times step is all nodata. This can save a lot of clipping or masking
   transient models with many timesteps.
+- Added :meth:`imod.msw.MetaSwapModel.split` to split MetaSWAP models.
+- Added :meth:`imod.mf6.HorizontalFlowBarrierResistance.from_imod5_data` to load
+  barriers from 3D GEN files. 
+- Added ``name`` argument to:meth:`imod.mf6.Modflow6Simulation.from_imod5_data`
+  to provide custom name to imported simulation and model.
 
 Fixed
 ~~~~~
@@ -45,7 +50,26 @@ Fixed
   produced incorrect results when point water heads were below elevation levels
   for unstructured grids.
 - Support pandas 3.0.
-
+- :class:`imod.msw.IdfMapping` when model clipping is applied, the global
+  row/column indices are converted to local indices, as written in
+  ``idf_svat.inp``.
+- Fixed edge case where allocation of :class:`imod.mf6.River` package with the
+  ``stage_to_riv_bot`` or ``stage_to_riv_bot_drn_above`` option of
+  :func:`imod.prepare.ALLOCATION_OPTION` would assign river cells to the wrong
+  layer, when the stage and bottom_elevation were exactly equal to the bottom of
+  a layer in the model discretization, which would cause these cells to be
+  dropped when distributing conductances later.
+- Fixed :func:`imod.prepare.spatial.polygonize` for polygons with holes.
+- :func:`imod.formats.prj.open_projectfile_data` now drops empty wells from the
+  dataset, and logs a warning about it.
+- :meth:`imod.mf6.NodePropertyFlow.regrid_like` now regrids ``k33`` using the
+  correct method, namely ``mean`` instead of ``harmonic_mean``. As this is the
+  appropriate method for horizontal regridding of ``k33``.
+- :meth:`imod.msw.MetaSwapModel.from_imod5_data`,
+  :meth:`imod.mf6.Recharge.from_imod5_cap_data`,
+  :meth:`imod.mf6.LayeredWell.from_imod5_cap_data` now regrids the iMOD5 CAP
+  data to the MODFLOW6 target discretization.
+- Fixed confusing warning about inconsistent IPF columns when loading GEN files.
 
 Changed
 ~~~~~~~
@@ -53,7 +77,9 @@ Changed
 - ``proportion_depth`` and ``proportion_rate`` in
   :class:`imod.mf6.Evapotranspiration` are now optional variables. If provided,
   now require ``"segment"`` dimension when ``proportion_depth`` and
-  ``proportion_rate``. 
+  ``proportion_rate``.
+- :meth:`imod.msw.GridData.generate_index_array` is now deprecated, use
+  :meth:`imod.msw.GridData.generate_isactive_svat_arrays` instead.
 
 
 [1.0.0] - 2025-11-11
@@ -132,7 +158,7 @@ Fixed
 - Fixed bug where :meth:`imod.mf6.Modflow6Simulation.split`,
   :meth:`imod.mf6.Modflow6Simulation.regrid_like`, and
   :meth:`imod.mf6.Modflow6Simulation.clip_box` would not copy
-  :class:`imod.mf6.ValidationSettings`. 
+  :class:`imod.mf6.ValidationSettings`.
 - ``landuse``, ``soil_physical_unit``, ``active`` for :class:`imod.msw.GridData`
   are now properly regridded with the ``mode`` statistic when using
   :meth:`imod.msw.GridData.regrid_like`.
@@ -189,7 +215,7 @@ Fixed
   ``states_for_boundary`` argument would place these bc at the
   incorrect places with unstructured grids.
 - Fixed bug where :meth:`imod.mf6.SourceSinkMixing.from_flow_model` would return
-  an error upon adding a package which cannot have a ``concentration``, such as 
+  an error upon adding a package which cannot have a ``concentration``, such as
   :class:`imod.mf6.HorizontalFlowBarrierResistance`.
 - Broken names for ``outer_csvfile`` and ``inner_csvfile`` in the
   :class:`imod.mf6.Solution` MODFLOW 6 template file.
@@ -343,8 +369,8 @@ Changed
   :meth:`imod.mf6.Recharge.from_imod5_data` got extra arguments for
   ``period_data``, ``time_min`` and ``time_max``.
 - :func:`imod.visualize.read_imod_legend` now also returns the labels as an extra
-  argument. Update your code by changing 
-  ``colors, levels = read_imod_legend(...)`` to 
+  argument. Update your code by changing
+  ``colors, levels = read_imod_legend(...)`` to
   ``colors, levels, labels = read_imod_legend(...)``.
 
 

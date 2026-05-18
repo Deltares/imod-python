@@ -98,7 +98,7 @@ METASWAP_VARS = (
     "rural_infiltration_capacity",
     "perched_water_table_level",
     "soil_moisture_fraction",
-    "conductivitiy_factor",
+    "conductivity_factor",
     "plot_number",
     "steering_location",
     "plot_drainage_level",
@@ -621,7 +621,7 @@ def _create_dataarray(
         dav = _create_dataarray_from_values(values_valid, headers_values, dim=dim)
         dap.name = "tmp"
         dav.name = "tmp"
-        da = xr.merge((dap, dav), join="outer")["tmp"]
+        da = xr.merge((dap, dav), join="outer", compat="no_conflicts")["tmp"]
     elif paths_valid:
         # Only paths provided
         da = _create_dataarray_from_paths(paths_valid, headers_paths, dim=dim)
@@ -915,6 +915,15 @@ def _read_package_ipf(
         # Ensure the columns are identifiable.
         path = Path(entry["path"])
         ipf_df, indexcol, ext = _try_read_with_func(imod.ipf._read_ipf, path)
+        nrow = ipf_df.shape[0]
+        if nrow == 0:
+            log_message = f"IPF file {path} contains no data. Skipping."
+            imod.logging.logger.log(
+                loglevel=LogLevel.WARNING,
+                message=log_message,
+                additional_depth=0,
+            )
+            continue
         if indexcol == 0:
             # No associated files
             has_associated = False

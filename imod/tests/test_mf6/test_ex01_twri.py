@@ -4,6 +4,7 @@ import textwrap
 from pathlib import Path
 
 import numpy as np
+import pandas as pd
 import pytest
 import xarray as xr
 
@@ -15,8 +16,32 @@ from imod.schemata import ValidationError
 from imod.typing.grid import ones_like
 
 
-def test_dis_render(twri_model, tmp_path):
+@pytest.fixture(scope="function")
+def twri_model_extended(twri_model):
+    """Extend the time discretization as it was before
+    https://github.com/Deltares/imod-python/pull/1029, to make sure that
+    integration tests succeed here."""
     simulation = twri_model
+    simulation.create_time_discretization(
+        additional_times=pd.date_range("2000-01-01", " 2000-01-31")
+    )
+    return simulation
+
+
+@pytest.fixture(scope="function")
+def transient_twri_model_extended(transient_twri_model):
+    """Extend the time discretization as it was before
+    https://github.com/Deltares/imod-python/pull/1029, to make sure that
+    integration tests succeed here."""
+    simulation = transient_twri_model
+    simulation.create_time_discretization(
+        additional_times=pd.date_range("2000-01-01", " 2000-01-31")
+    )
+    return simulation
+
+
+def test_dis_render(twri_model_extended, tmp_path):
+    simulation = twri_model_extended
     dis = simulation["GWF_1"]["dis"]
     actual = dis._render(
         directory=tmp_path,
@@ -63,8 +88,8 @@ def test_dis_render(twri_model, tmp_path):
     assert (tmp_path / "dis" / "idomain.bin").is_file()
 
 
-def test_chd_render(twri_model, tmp_path):
-    simulation = twri_model
+def test_chd_render(twri_model_extended, tmp_path):
+    simulation = twri_model_extended
     globaltimes = simulation["time_discretization"]["time"].values
     chd = simulation["GWF_1"]["chd"]
     actual = chd._render(
@@ -99,8 +124,8 @@ def test_chd_render(twri_model, tmp_path):
     assert (tmp_path / "chd" / "chd.bin").is_file()
 
 
-def test_drn_render(twri_model, tmp_path):
-    simulation = twri_model
+def test_drn_render(twri_model_extended, tmp_path):
+    simulation = twri_model_extended
     globaltimes = simulation["time_discretization"]["time"].values
     drn = simulation["GWF_1"]["drn"]
     actual = drn._render(
@@ -135,8 +160,8 @@ def test_drn_render(twri_model, tmp_path):
     assert (tmp_path / "drn" / "drn.bin").is_file()
 
 
-def test_ic_render(twri_model, tmp_path):
-    simulation = twri_model
+def test_ic_render(twri_model_extended, tmp_path):
+    simulation = twri_model_extended
     ic = simulation["GWF_1"]["ic"]
     actual = ic._render(
         directory=tmp_path,
@@ -161,8 +186,8 @@ def test_ic_render(twri_model, tmp_path):
     assert (tmp_path / "ic.ic").is_file()
 
 
-def test_npf_render(twri_model, tmp_path):
-    simulation = twri_model
+def test_npf_render(twri_model_extended, tmp_path):
+    simulation = twri_model_extended
     npf = simulation["GWF_1"]["npf"]
     actual = npf._render(
         directory=tmp_path, pkgname="npf", globaltimes=None, binary=True
@@ -197,8 +222,8 @@ def test_npf_render(twri_model, tmp_path):
     assert (tmp_path / "npf.npf").is_file()
 
 
-def test_oc_render(twri_model, tmp_path):
-    simulation = twri_model
+def test_oc_render(twri_model_extended, tmp_path):
+    simulation = twri_model_extended
     globaltimes = simulation["time_discretization"]["time"].values
     oc = simulation["GWF_1"]["oc"]
 
@@ -242,8 +267,8 @@ def test_oc_render(twri_model, tmp_path):
     assert actual == expected
 
 
-def test_rch_render(twri_model, tmp_path):
-    simulation = twri_model
+def test_rch_render(twri_model_extended, tmp_path):
+    simulation = twri_model_extended
     globaltimes = simulation["time_discretization"]["time"].values
     rch = simulation["GWF_1"]["rch"]
     actual = rch._render(
@@ -275,8 +300,8 @@ def test_rch_render(twri_model, tmp_path):
     assert (tmp_path / "rch" / "rch.bin").is_file()
 
 
-def test_wel_render(twri_model, tmp_path):
-    simulation = twri_model
+def test_wel_render(twri_model_extended, tmp_path):
+    simulation = twri_model_extended
     simulation.write(
         tmp_path,
     )
@@ -307,8 +332,8 @@ def test_wel_render(twri_model, tmp_path):
     assert (tmp_path / "GWF_1/wel" / "wel.bin").is_file()
 
 
-def test_solver_render(twri_model, tmp_path):
-    simulation = twri_model
+def test_solver_render(twri_model_extended, tmp_path):
+    simulation = twri_model_extended
     solver = simulation["solver"]
     actual = solver._render(
         directory=tmp_path,
@@ -342,8 +367,8 @@ def test_solver_render(twri_model, tmp_path):
     assert (tmp_path / "solver.ims").is_file()
 
 
-def test_gwfmodel_render(twri_model, tmp_path):
-    simulation = twri_model
+def test_gwfmodel_render(twri_model_extended, tmp_path):
+    simulation = twri_model_extended
     globaltimes = simulation["time_discretization"]["time"].values
     gwfmodel = simulation["GWF_1"]
     path = Path(tmp_path.stem).as_posix()
@@ -375,8 +400,8 @@ def test_gwfmodel_render(twri_model, tmp_path):
     assert (tmp_path / "GWF_1").is_dir()
 
 
-def test_simulation_render(twri_model):
-    simulation = twri_model
+def test_simulation_render(twri_model_extended):
+    simulation = twri_model_extended
     write_context = WriteContext(".")
     actual = simulation._render(write_context)
 
@@ -406,13 +431,13 @@ def test_simulation_render(twri_model):
 
 
 @pytest.mark.skipif(sys.version_info < (3, 7), reason="capture_output added in 3.7")
-def test_simulation_write_and_run(twri_model, tmp_path):
-    simulation = twri_model
+def test_simulation_write_and_run(twri_model_extended, tmp_path):
+    simulation = twri_model_extended
 
     with pytest.raises(
         RuntimeError, match="Simulation ex01-twri has not been written yet."
     ):
-        twri_model.run()
+        simulation.run()
 
     modeldir = tmp_path / "ex01-twri"
     simulation.write(
@@ -429,10 +454,10 @@ def test_simulation_write_and_run(twri_model, tmp_path):
     )
     assert isinstance(head, xr.DataArray)
     assert head.dims == ("time", "layer", "y", "x")
-    assert head.shape == (1, 3, 15, 15)
+    assert head.shape == (30, 3, 15, 15)
     assert np.all(
-        head["time"].values
-        == np.array("1999-01-02T00:00:00.000000", dtype="datetime64[ns]")
+        head["time"].values[-1]
+        == np.array("1999-01-31T00:00:00.000000000", dtype="datetime64[ns]")
     )
     meanhead_layer = head.groupby("layer").mean(dim=xr.ALL_DIMS)
     mean_answer = np.array([59.79181509, 30.44132373, 24.88576811])
@@ -440,8 +465,8 @@ def test_simulation_write_and_run(twri_model, tmp_path):
 
 
 @pytest.mark.skipif(sys.version_info < (3, 7), reason="capture_output added in 3.7")
-def test_simulation_write_storage(transient_twri_model, tmp_path):
-    simulation = transient_twri_model
+def test_simulation_write_storage(transient_twri_model_extended, tmp_path):
+    simulation = transient_twri_model_extended
     modeldir = tmp_path / "ex01-twri-transient"
     simulation.write(modeldir, binary=True)
     simulation.run()
@@ -492,8 +517,8 @@ def test_simulation_validate_false(transient_twri_model, tmp_path):
 
 
 @pytest.mark.skipif(sys.version_info < (3, 7), reason="capture_output added in 3.7")
-def test_simulation_write_errors(twri_model, tmp_path):
-    simulation = twri_model
+def test_simulation_write_errors(twri_model_extended, tmp_path):
+    simulation = twri_model_extended
     model = simulation["GWF_1"]
     model.pop("sto")
     modeldir = tmp_path / "ex01-twri"
@@ -523,16 +548,17 @@ def test_slice_and_run(transient_twri_model, tmp_path):
 
 
 @pytest.mark.skipif(sys.version_info < (3, 7), reason="capture_output added in 3.7")
-def test_slice_and_run_with_state(transient_twri_model, tmp_path):
+def test_slice_and_run_with_state(transient_twri_model_extended, tmp_path):
+    simulation = transient_twri_model_extended
     # TODO: bring back well once slicing is implemented...
-    transient_twri_model["GWF_1"].pop("wel")
-    transient_twri_model.write(tmp_path, False, True, False)
-    transient_twri_model.run()
-    head = transient_twri_model.open_head(simulation_start_time="2000-01-01")
+    simulation["GWF_1"].pop("wel")
+    simulation.write(tmp_path, False, True, False)
+    simulation.run()
+    head = simulation.open_head(simulation_start_time="2000-01-01")
 
     # set the boundary to  recognizable value, in this case 1.23
     state_for_boundary = {"GWF_1": 1.23 * ones_like(head)}
-    clipped_simulation = transient_twri_model.clip_box(
+    clipped_simulation = simulation.clip_box(
         time_min="2000-01-10",
         time_max="2000-01-20",
         layer_min=1,

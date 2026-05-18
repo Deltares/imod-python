@@ -26,6 +26,7 @@ from imod.common.statusinfo import NestedStatusInfo
 from imod.common.utilities.dataclass_type import DataclassType
 from imod.common.utilities.dump_model import dump_modelpkgs
 from imod.common.utilities.mask import mask_all_models
+from imod.common.utilities.partitioninfo import create_partition_info
 from imod.common.utilities.regrid import _regrid_like
 from imod.common.utilities.version import (
     get_version,
@@ -44,10 +45,7 @@ from imod.mf6.multimodel.exchange_creator_structured import ExchangeCreator_Stru
 from imod.mf6.multimodel.exchange_creator_unstructured import (
     ExchangeCreator_Unstructured,
 )
-from imod.mf6.multimodel.modelsplitter import (
-    ModelSplitter,
-    create_partition_info,
-)
+from imod.mf6.multimodel.modelsplitter import ModelSplitter
 from imod.mf6.out import open_cbc, open_conc, open_hds
 from imod.mf6.package import Package
 from imod.mf6.validation_settings import ValidationSettings
@@ -66,7 +64,7 @@ from imod.typing.grid import (
     merge_partitions,
 )
 
-OUTPUT_FUNC_MAPPING: dict[str, Callable] = {
+OUTPUT_FUNC_MAPPING: dict[str, Callable[..., Any]] = {
     "head": open_hds,
     "concentration": open_conc,
     "budget-flow": open_cbc,
@@ -95,7 +93,7 @@ def get_packages(simulation: Modflow6Simulation) -> dict[str, Package]:
     }
 
 
-class Modflow6Simulation(collections.UserDict, ISimulation):
+class Modflow6Simulation(collections.UserDict[str, Any], ISimulation):
     """
     Modflow6Simulation is a class that represents a Modflow 6 simulation. It
     contains data on simulation timing, models that are present in the
@@ -1031,7 +1029,7 @@ class Modflow6Simulation(collections.UserDict, ISimulation):
         directory = pathlib.Path(directory)
         directory.mkdir(parents=True, exist_ok=True)
 
-        toml_content: DefaultDict[str, dict] = collections.defaultdict(dict)
+        toml_content: DefaultDict[str, dict[str, Any]] = collections.defaultdict(dict)
         # Dump version number
         version = get_version()
         toml_content["version"] = {"imod-python": version}
@@ -1138,7 +1136,7 @@ class Modflow6Simulation(collections.UserDict, ISimulation):
 
         return simulation
 
-    def get_exchange_relationships(self) -> list:
+    def get_exchange_relationships(self) -> list[Any]:
         """
         Get exchange relationships in the simulation.
 
@@ -1474,6 +1472,8 @@ class Modflow6Simulation(collections.UserDict, ISimulation):
         original_model_name_to_solution: dict[str, Solution] = {}
         for model_name, model in original_models.items():
             solution_name = self.get_solution_name(model_name)
+            if solution_name is None:
+                raise ValueError(f"Could not find a solution for model '{model_name}'")
             solution = cast(Solution, new_simulation[solution_name])
             original_model_name_to_solution[model_name] = solution
 
@@ -1564,7 +1564,7 @@ class Modflow6Simulation(collections.UserDict, ISimulation):
         # collect some options that we will auto-set
         for exchange in self["split_exchanges"]:
             if isinstance(exchange, GWFGWF):
-                model_name_1 = exchange.dataset["model_name_1"].values[()]
+                model_name_1 = str(exchange.dataset["model_name_1"].values[()])
                 model_1 = self[model_name_1]
                 exchange.set_options(
                     save_flows=model_1["oc"].is_budget_output,
@@ -1577,7 +1577,7 @@ class Modflow6Simulation(collections.UserDict, ISimulation):
     def _set_transport_exchange_options(self) -> None:
         for exchange in self["split_exchanges"]:
             if isinstance(exchange, GWTGWT):
-                model_name_1 = exchange.dataset["model_name_1"].values[()]
+                model_name_1 = str(exchange.dataset["model_name_1"].values[()])
                 model_1 = self[model_name_1]
                 advection_key = model_1._get_pkgkey("adv")
                 dispersion_key = model_1._get_pkgkey("dsp")
@@ -1752,6 +1752,8 @@ class Modflow6Simulation(collections.UserDict, ISimulation):
         allocation_options: Optional[SimulationAllocationOptions] = None,
         distributing_options: Optional[SimulationDistributingOptions] = None,
         regridder_types: Optional[dict[str, DataclassType]] = None,
+        target_grid: Optional[GridDataArray] = None,
+        name: str = "imported",
     ) -> "Modflow6Simulation":
         """
         Imports a GroundwaterFlowModel (GWF) from the data in an iMOD5 project
@@ -1796,6 +1798,12 @@ class Modflow6Simulation(collections.UserDict, ISimulation):
             the key is the package name. The value is the RegridMethodType
             object containing the settings for regridding the package with the
             specified key.
+        target_grid: GridDataArray, optional
+            the target grid to which the data should be regridded. If not
+            provided, the first grid of the BND package is used as target grid.
+        name: str, optional
+            name that will be used as a prefix for the simulation and model
+            names. Default is "imported".
 
         Returns
         -------
@@ -1814,17 +1822,49 @@ class Modflow6Simulation(collections.UserDict, ISimulation):
         >>> times = [np.datetime("2001-01-01"), np.datetime("2002-01-01"), np.datetime("2003-01-01")]
         >>> mf6_sim = imod.mf6.Modflow6Simulation.from_imod5_data(imod5_data, period_data, times)
 
-        Allocate rivers differently:
+        You can override solver settings if needed after importing:
+
+        >>> mf6_sim["imported_model"]["ims"] = SolutionPresetSimple()
+
+        To allocate rivers to model layers differently than the default, you can
+        set the allocation options for the river package before importing.
+        :doc:`For more information on topsystem allocation see the user guide.
+        </user-guide/09-topsystem>`
 
         >>> from imod.prepare.topsystem import SimulationAllocationOptions, ALLOCATION_OPTION
         >>> allocation_options = SimulationAllocationOptions()
         >>> allocation_options.riv = ALLOCATION_OPTION.at_elevation
-        >>> mf6_sim = imod.mf6.Modflow6Simulation.from_imod5_data(imod5_data, period_data, times, allocation_options)
+        >>> mf6_sim = imod.mf6.Modflow6Simulation.from_imod5_data(
+        >>>     imod5_data, period_data, times, allocation_options=allocation_options
+        >>> )
 
-        You can override solver settings if needed after importing:
+        To regrid the model to a specific grid upon import:
 
-        >>> mf6_sim["imported_model"]["ims"] = SolutionPresetComplex()
+        >>> target_grid = imod.util.empty_2d(
+        >>>     dx=100.0, xmin=195000.0, xmax=199000.0, dy=100.0, ymin=361000.0, ymax=365000.0
+        >>> )
+        >>> mf6_sim = imod.mf6.Modflow6Simulation.from_imod5_data(
+        >>>     imod5_data, period_data, times, target_grid=target_grid
+        >>> )
 
+        To set regridding methods for specific packages upon import:
+
+        >>> from imod.util.regrid import RegridderType
+        >>> from imod.mf6.regrid import NodePropertyFlowRegridMethod
+        >>> regridder_types = {
+        >>>     "npf": NodePropertyFlowRegridMethod(k=(RegridderType.OVERLAP, "mean")),
+        >>> }
+        >>> mf6_sim = imod.mf6.Modflow6Simulation.from_imod5_data(
+        >>>     imod5_data, period_data, times, regridder_types=regridder_types, target_grid=target_grid
+        >>> )
+
+        Provide custom name to the simulation and model:
+
+        >>> mf6_sim = imod.mf6.Modflow6Simulation.from_imod5_data(
+        >>>     imod5_data, period_data, times, name="custom"
+        >>> )
+        >>> print(mf6_sim.name)  # prints "custom_simulation"
+        >>> gwf_model = mf6_sim["custom_model"]
         """
         if allocation_options is None:
             allocation_options = SimulationAllocationOptions()
@@ -1837,8 +1877,9 @@ class Modflow6Simulation(collections.UserDict, ISimulation):
             strict_well_validation=False,
             strict_hfb_validation=False,
         )
+        simulation_name = f"{name}_simulation"
         simulation = Modflow6Simulation(
-            "imported_simulation", validation_settings=validation_settings
+            simulation_name, validation_settings=validation_settings
         )
 
         # import GWF model,
@@ -1849,12 +1890,14 @@ class Modflow6Simulation(collections.UserDict, ISimulation):
             allocation_options,
             distributing_options,
             regridder_types,
+            target_grid,
         )
-        simulation["imported_model"] = gwf_model
+        gwf_modelname = f"{name}_model"
+        simulation[gwf_modelname] = gwf_model
 
         # generate ims package
         solution = SolutionPresetModerate(
-            ["imported_model"],
+            [gwf_modelname],
             print_option="all",
         )
         simulation["ims"] = solution

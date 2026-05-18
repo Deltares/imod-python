@@ -170,7 +170,7 @@ With pixi you can install the latest development version of imod::
 
   git clone https://github.com/Deltares/imod-python.git
   cd imod-python
-  pixi run install
+  pixi install
 
 This will install the same python installation the iMOD Python developers work
 with, so it should work (otherwise we couldn't do our work!). This contains an

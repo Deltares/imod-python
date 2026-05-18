@@ -24,6 +24,8 @@ object PipPythonTemplate : Template({
             id = "pip_install"
             workingDir = "imod-python"
             scriptContent = """
+                    pixi config set --local detached-environments "C:\pixi_envs"
+                    pixi install --environment  %python_env% --frozen
                     pixi run --environment %python_env% --frozen test_import
                 """.trimIndent()
             formatStderrAsError = true
@@ -43,9 +45,9 @@ object PipPythonTemplate : Template({
         matrix {
             param(
                 "python_env", listOf(
-                    value("py311", label = "python 3.11"),
                     value("py312", label = "python 3.12"),
-                    value("py313", label = "python 3.13")
+                    value("py313", label = "python 3.13"),
+                    value("py314", label = "python 3.14")
                 )
             )
         }

@@ -114,6 +114,34 @@ def test_idf_oc_write_simple_model(fixed_format_parser):
     assert_almost_equal(results["x_grid"], np.array([2.0, 2.0, 2.0, 2.0, 4.0]))
 
 
+def test_idf_oc_write_simple_model_clip(fixed_format_parser):
+    area, index, svat = grid()
+    nodata = -9999.0
+    x_min, x_max, y_min, y_max = 1.5, 4.5, 1.5, 3.5
+
+    idf_output_control = IdfMapping(area, nodata)
+    idf_output_control_clip = idf_output_control.clip_box(
+        x_min=x_min, x_max=x_max, y_min=y_min, y_max=y_max
+    )
+
+    svat_clip = svat.sel(x=slice(x_min, x_max), y=slice(y_min, y_max))
+    index_clip = (svat_clip != 0).values.ravel()
+
+    with tempfile.TemporaryDirectory() as output_dir:
+        output_dir = Path(output_dir)
+        idf_output_control_clip.write(output_dir, index_clip, svat_clip, None, None)
+
+        results = fixed_format_parser(
+            output_dir / IdfMapping._file_name, IdfMapping._metadata_dict
+        )
+
+    assert_equal(results["svat"], np.array([2, 4, 5]))
+    assert_equal(results["rows"], np.array([2, 1, 1]))
+    assert_equal(results["columns"], np.array([1, 1, 3]))
+    assert_almost_equal(results["y_grid"], np.array([3.0, 2.0, 2.0]))
+    assert_almost_equal(results["x_grid"], np.array([2.0, 2.0, 4.0]))
+
+
 def test_idf_oc_mapping_order(fixed_format_parser):
     area, index, svat = grid()
     nodata = -9999.0

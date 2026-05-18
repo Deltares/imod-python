@@ -21,11 +21,11 @@ from pytest_cases import parametrize_with_cases
 
 import imod
 from imod.common.statusinfo import NestedStatusInfo, StatusInfo
+from imod.common.utilities.partitioninfo import PartitionInfo
 from imod.common.utilities.version import get_version
 from imod.logging import LoggerType, LogLevel
 from imod.mf6 import LayeredWell, Well
 from imod.mf6.model import Modflow6Model
-from imod.mf6.multimodel.modelsplitter import PartitionInfo
 from imod.mf6.oc import OutputControl
 from imod.mf6.regrid.regrid_schemes import (
     DiscretizationRegridMethod,
@@ -199,19 +199,21 @@ def test_simulation_open_head(circle_model, tmp_path):
     modeldir = tmp_path / "circle"
     simulation.write(modeldir)
     simulation.run()
-    head = simulation.open_head()
 
-    assert isinstance(head, xu.UgridDataArray)
-    assert head.dims == ("time", "layer", "mesh2d_nFaces")
-    assert head.shape == (52, 2, 216)
+    # open heads without time conversion
+    head_notime = simulation.open_head()
+
+    assert isinstance(head_notime, xu.UgridDataArray)
+    assert head_notime.dims == ("time", "layer", "mesh2d_nFaces")
+    assert head_notime.shape == (2, 2, 216)
 
     # open heads with time conversion.
     head = simulation.open_head(
         simulation_start_time=datetime(2013, 3, 11, 22, 0, 0), time_unit="w"
     )
     assert head.dims == ("time", "layer", "mesh2d_nFaces")
-    assert head.shape == (52, 2, 216)
-    assert str(head.coords["time"].values[()][0]) == "2013-04-29T22:00:00.000000"
+    assert head.shape == (2, 2, 216)
+    assert str(head.coords["time"].values[()][0]) == "2013-03-18T22:00:00.000000"
 
 
 class PathCases:
@@ -235,9 +237,10 @@ def test_simulation_write_run_open__different_paths(circle_model, tmp_path, path
         simulation.write(path)
         simulation.run()
         head = simulation.open_head()
-        # Assert not an empty array is returned
+
         assert isinstance(head, xu.UgridDataArray)
-        assert head.shape == (52, 2, 216)
+        assert head.dims == ("time", "layer", "mesh2d_nFaces")
+        assert head.shape == (2, 2, 216)
 
 
 def test_simulation_open_flow_budget(circle_model, tmp_path):
@@ -608,10 +611,27 @@ def test_import_from_imod5(imod5_dataset, tmp_path):
 
 
 @pytest.mark.unittest_jit
+def test_import_from_imod5__custom_name(imod5_dataset):
+    imod5_data = imod5_dataset[0]
+    period_data = imod5_dataset[1]
+
+    datelist = pd.date_range(start="1/1/1989", end="1/3/1989", freq="D")
+    simulation = Modflow6Simulation.from_imod5_data(
+        imod5_data,
+        period_data,
+        datelist,
+        name="custom",
+    )
+    assert "custom_simulation" in simulation.name
+    assert "custom_model" in simulation.keys()
+
+
+@pytest.mark.unittest_jit
 def test_from_imod5__has_cap_data(imod5_dataset):
     imod5_data = deepcopy(imod5_dataset[0])
     period_data = imod5_dataset[1]
 
+    imod5_data["extra"] = {"paths": ["path1", "path2"]}
     imod5_data["cap"] = {}
     msw_bound = imod5_data["bnd"]["ibound"].isel(layer=0, drop=True)
     imod5_data["cap"]["boundary"] = msw_bound
@@ -665,8 +685,6 @@ def test_import_from_imod5__correct_well_type(imod5_dataset):
     original_wel_layer = imod5_data["wel-WELLS_L3"]["layer"]
     imod5_data["wel-WELLS_L3"]["layer"] = [0] * len(original_wel_layer)
     # Other arrangement
-    default_simulation_allocation_options = SimulationAllocationOptions
-    default_simulation_distributing_options = SimulationDistributingOptions
     datelist = pd.date_range(start="1/1/1989", end="1/1/2013", freq="W")
 
     # Act
@@ -674,8 +692,6 @@ def test_import_from_imod5__correct_well_type(imod5_dataset):
         imod5_data,
         period_data,
         datelist,
-        default_simulation_allocation_options,
-        default_simulation_distributing_options,
     )
     # Set layer back to right value (before AssertionError might be thrown)
     imod5_data["wel-WELLS_L3"]["layer"] = original_wel_layer
@@ -718,6 +734,7 @@ def test_import_from_imod5__well_steady_state(imod5_dataset):
 
 @pytest.mark.unittest_jit
 def test_import_from_imod5__nonstandard_regridding(imod5_dataset, tmp_path):
+    # Arrange
     imod5_data = imod5_dataset[0]
     period_data = imod5_dataset[1]
 
@@ -727,13 +744,24 @@ def test_import_from_imod5__nonstandard_regridding(imod5_dataset, tmp_path):
     regridding_option["sto"] = StorageCoefficientRegridMethod()
     times = pd.date_range(start="1/1/2018", end="12/1/2018", freq="ME")
 
+    xmin = 195000.0
+    xmax = 199000.0
+    ymin = 361000.0
+    ymax = 365000.0
+    dx = 200.0
+    dy = 200.0
+
+    target_grid = imod.util.empty_2d(
+        dx=dx, xmin=xmin, xmax=xmax, dy=dy, ymin=ymin, ymax=ymax
+    )
+
+    # Act
     simulation = Modflow6Simulation.from_imod5_data(
         imod5_data,
         period_data,
         times,
-        SimulationAllocationOptions,
-        SimulationDistributingOptions,
-        regridding_option,
+        regridder_types=regridding_option,
+        target_grid=target_grid,
     )
     simulation["imported_model"]["oc"] = OutputControl(
         save_head="last", save_budget="last"
@@ -747,8 +775,18 @@ def test_import_from_imod5__nonstandard_regridding(imod5_dataset, tmp_path):
     # Align NoData to domain
     idomain = simulation["imported_model"].domain
     simulation.mask_all_models(idomain)
+
+    # Assert
     # write and validate the simulation.
     simulation.write(tmp_path, binary=False, validate=True)
+    # Check that storage package regridded to target_grid
+    coords = simulation["imported_model"]["sto"].dataset.coords
+    assert coords["x"][1] - coords["x"][0] == dx
+    assert coords["y"][1] - coords["y"][0] == -dy
+    assert coords["x"].min() == xmin + dx / 2
+    assert coords["x"].max() == xmax - dx / 2
+    assert coords["y"].min() == ymin + dy / 2
+    assert coords["y"].max() == ymax - dy / 2
 
 
 @pytest.mark.unittest_jit

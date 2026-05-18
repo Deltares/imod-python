@@ -1,3 +1,5 @@
+import warnings
+
 import numpy as np
 import xarray as xr
 
@@ -83,31 +85,64 @@ class GridData(MetaSwapPackage, IRegridPackage):
 
         self._pkgcheck()
 
-    def generate_index_array(self) -> tuple[np.ndarray, xr.DataArray]:
+    def _generate_isactive_array(self) -> xr.DataArray:
+        """
+        Generate a 1D array of active cells to be used on other packages.
+
+        Returns
+        -------
+        np.ndarray
+            A 1D array with which cells are active.
+        """
+        area = self.dataset["area"]
+        active = self.dataset["active"]
+
+        isactive = area.where(active).notnull()
+        # Load into memory to avoid dask issue
+        # https://github.com/dask/dask/issues/11753
+        isactive.load()
+
+        return isactive
+
+    def generate_isactive_svat_arrays(self) -> tuple[np.ndarray, xr.DataArray]:
         """
         Generate index array and svat grid to be used on other packages.
 
         Returns
         -------
         tuple[np.ndarray, xr.DataArray]
-            Index array and svat grid.
-            The index array is a 1D array with the index of the active cells.
+            isactive array and svat grid.
+            The isactive array is a 1D array with which cells are active.
             The svat grid is a 2D array with the SVAT numbers for each cell.
         """
-        area = self.dataset["area"]
-        active = self.dataset["active"]
+        isactive = self._generate_isactive_array()
+        isactive_1d = isactive.values.ravel()
 
-        isactive = area.where(active).notnull()
-        svat = xr.full_like(area, fill_value=0, dtype=np.int64).rename("svat")
-        # Load into memory to avoid dask issue
-        # https://github.com/dask/dask/issues/11753
-        isactive.load()
-        svat.load()
+        svat = xr.full_like(isactive, fill_value=0, dtype=np.int64).rename("svat")
+        svat.data[isactive.data] = np.arange(1, isactive_1d.sum() + 1)
 
-        index = isactive.values.ravel()
-        svat.data[isactive.data] = np.arange(1, index.sum() + 1)
+        return isactive_1d, svat
 
-        return index, svat
+    def generate_index_array(self) -> tuple[np.ndarray, xr.DataArray]:
+        """
+        This method is kept for backward compatibility, but will be removed in
+        future versions and will thus throw a deprecation warning. Use
+        :meth:`imod.msw.GridData.generate_isactive_svat_arrays` instead.
+
+        Generate index array and svat grid to be used on other packages.
+
+        Returns
+        -------
+        tuple[np.ndarray, xr.DataArray]
+            isactive array and svat grid.
+            The isactive array is a 1D array with which cells are active.
+            The svat grid is a 2D array with the SVAT numbers for each cell.
+        """
+        warnings.warn(
+            "Method 'generate_index_array' is deprecated and will be removed in the future, use 'generate_isactive_svat_arrays' instead.",
+            DeprecationWarning,
+        )
+        return self.generate_isactive_svat_arrays()
 
     def _pkgcheck(self):
         super()._pkgcheck()

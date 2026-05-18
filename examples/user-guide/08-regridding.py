@@ -372,22 +372,25 @@ axes[1].set_ylabel("regridded")
 # A note on regridding conductivity
 # ---------------------------------
 #
-# In the npf package, it is possible to use for definining the conductivity
-# tensor:
+# By default, K and K22 are regrid with a different method than K33. Namely K
+# and K22 are regridded by default with a geometric mean (Bierkens, 1998),
+# whereas K33 is regrid with an arithmetic mean. Note that default regridding
+# methods were chosen assuming that K and K22 are roughly horizontal and K33
+# roughly vertical. But this may not be the case if the input arrays angle2
+# and/or angle3 have large values.
 #
-# - 1 array (K)
-# - 2 arrays (K and K22)
-# - 3 arrays (K, K22, K33)
+# Furthermore it is possible to only provide one array for the hydraulic
+# conductivity, K. In that case, the same k values are used in all directions
+# (K, K22, and K33), and the model is called isotropic. It is recommended to
+# introduce K33 as a separate array in the source model even if it is isotropic
+# when regridding simulations, as K33 is regridded with a different method.
 #
-# If 1 array is given the tensor is called isotropic. Defining only K gives the
-# same behavior as specifying K, K22 and K33 with the same value. When
-# regridding, K33 has a default method different from that of K and K22, but it
-# can only be applied if K33 exists in the source model in the first place. So
-# it is recommended to introduce K33 as a separate array in the source model
-# even if it is isotropic. Also note that default regridding methods were chosen
-# assuming that K and K22 are roughly horizontal and K33 roughly vertical. But
-# this may not be the case if the input arrays angle2 and/or angle3 have large
-# values.
+# Reference:
+#
+# Bierkens, M., van der Gaast, J. Upscaling hydraulic conductivity: theory and
+# examples from geohydrological studies. *Nutrient Cycling in Agroecosystems* **50**,
+# 193–207 (1998). https://doi.org/10.1023/A:1009740328153
+#
 #
 # Regridding boundary conditions
 # ------------------------------

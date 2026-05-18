@@ -63,7 +63,7 @@ _OPEN_HDS = {
     "disu": disu.open_hds,
 }
 
-_OPEN_CBC: Dict[str, Callable] = {
+_OPEN_CBC: Dict[str, Callable[..., Any]] = {
     "dis": dis.open_cbc,
     "disv": disv.open_cbc,
     "disu": disu.open_cbc,
@@ -76,7 +76,7 @@ _OPEN_DVS = {
 }
 
 
-def _get_function(d: Dict[str, Callable], key: str) -> Callable:
+def _get_function(d: Dict[str, Callable[..., Any]], key: str) -> Callable[..., Any]:
     try:
         func = d[key]
     except KeyError:

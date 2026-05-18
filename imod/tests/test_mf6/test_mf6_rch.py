@@ -578,6 +578,7 @@ def test_from_imod5_cap_data(imod5_dataset):
     # Arrange
     data = deepcopy(imod5_dataset[0])
     target_discretization = StructuredDiscretization.from_imod5_data(data)
+    data["extra"] = {"paths": ["path1", "path2"]}
     data["cap"] = {}
     msw_bound = data["bnd"]["ibound"].isel(layer=0, drop=False)
     data["cap"]["boundary"] = msw_bound
@@ -613,6 +614,7 @@ def test_from_imod5_cap_data__regrid(imod5_dataset):
     # Arrange
     data = deepcopy(imod5_dataset[0])
     target_discretization = StructuredDiscretization.from_imod5_data(data)
+    data["extra"] = {"paths": ["path1", "path2"]}
     data["cap"] = {}
     msw_bound = data["bnd"]["ibound"].isel(layer=0, drop=False)
     data["cap"]["boundary"] = msw_bound
@@ -637,6 +639,7 @@ def test_from_imod5_cap_data__clip_box(imod5_dataset):
     # Arrange
     data = deepcopy(imod5_dataset[0])
     target_discretization = StructuredDiscretization.from_imod5_data(data)
+    data["extra"] = {"paths": ["path1", "path2"]}
     data["cap"] = {}
     msw_bound = data["bnd"]["ibound"].isel(layer=0, drop=False)
     data["cap"]["boundary"] = msw_bound

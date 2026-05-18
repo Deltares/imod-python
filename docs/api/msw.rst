@@ -28,6 +28,7 @@ Grid packages
     GridData.from_imod5_data
     GridData.get_regrid_methods
     GridData.generate_index_array
+    GridData.generate_isactive_svat_arrays
     GridData.write
     Infiltration
     Infiltration.regrid_like

@@ -1124,14 +1124,16 @@ def test_logmessage_for_missing_filter_settings(
 
 
 @pytest.mark.unittest_jit
-def test_from_imod5_cap_data__grid(cap_data_sprinkling_grid):
+def test_from_imod5_cap_data__grid(cap_data_sprinkling_grid, cap_coupled_dis_grid):
     # Arrange
     expected_layer = np.array([2, 1, 2, 1, 2, 1])
     expected_y = np.array([3.0, 3.0, 2.0, 2.0, 1.0, 1.0])
     expected_x = np.array([2.0, 3.0, 2.0, 3.0, 2.0, 3.0])
 
     # Act
-    well = LayeredWell.from_imod5_cap_data(cap_data_sprinkling_grid)
+    well = LayeredWell.from_imod5_cap_data(
+        cap_data_sprinkling_grid, cap_coupled_dis_grid
+    )
 
     # Assert
     ds = well.dataset
@@ -1143,20 +1145,26 @@ def test_from_imod5_cap_data__grid(cap_data_sprinkling_grid):
 
 @pytest.mark.unittest_jit
 @pytest.mark.timeout(300)
-def test_from_imod5_cap_data__big_grid(cap_data_sprinkling_grid__big):
+def test_from_imod5_cap_data__big_grid(
+    cap_data_sprinkling_grid__big, cap_coupled_dis_grid__big
+):
     """Test if performance is acceptable for large grids."""
     # Arrange
     bnd_2d = cap_data_sprinkling_grid__big["cap"]["boundary"]
     layer = xr.DataArray([1, 1], coords={"layer": [1, 2]}, dims=["layer"])
     bnd = layer * bnd_2d
     # Act
-    well = LayeredWell.from_imod5_cap_data(cap_data_sprinkling_grid__big)
+    well = LayeredWell.from_imod5_cap_data(
+        cap_data_sprinkling_grid__big, cap_coupled_dis_grid__big
+    )
     mf6_wel = well.to_mf6_pkg(bnd.astype(bool), bnd, bnd, bnd)
     # Assert
     assert mf6_wel.dataset.sizes["ncellid"] == bnd_2d.size
 
 
 @pytest.mark.unittest_jit
-def test_from_imod5_cap_data__points(cap_data_sprinkling_points):
+def test_from_imod5_cap_data__points(cap_data_sprinkling_points, cap_coupled_dis_grid):
     with pytest.raises(NotImplementedError):
-        LayeredWell.from_imod5_cap_data(cap_data_sprinkling_points)
+        LayeredWell.from_imod5_cap_data(
+            cap_data_sprinkling_points, cap_coupled_dis_grid
+        )

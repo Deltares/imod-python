@@ -73,11 +73,11 @@ def _create_boundary_condition_for_unassigned_boundary(
         pkg for _, pkg in model.items() if isinstance(pkg, pkg_type)
     ]
 
-    additional_boundaries = [
+    filtered_boundaries: list[StateType] = [
         item for item in additional_boundaries or [] if item is not None
     ]
 
-    constant_state_packages.extend(additional_boundaries)
+    constant_state_packages.extend(filtered_boundaries)
 
     return create_clipped_boundary(
         model.domain, state_for_boundary, constant_state_packages, pkg_type
@@ -88,7 +88,7 @@ def _create_boundary_condition_clipped_boundary(
     original_model: Modflow6Model,
     clipped_model: Modflow6Model,
     state_for_boundary: Optional[GridDataArray],
-    clip_box_args: tuple,
+    clip_box_args: tuple[Any, ...],
 ) -> Optional[StateType]:
     # Create temporary boundary condition for the original model boundary. This
     # is used later to see which boundaries can be ignored as they were already
@@ -144,7 +144,7 @@ def _create_boundary_condition_clipped_boundary(
     return bc_constant_pkg
 
 
-class Modflow6Model(collections.UserDict, IModel, abc.ABC):
+class Modflow6Model(collections.UserDict[str, Package], IModel, abc.ABC):
     _mandatory_packages: tuple[str, ...] = ()
     _init_schemata: SchemataDict = {}
     _model_id: Optional[str] = None
@@ -163,7 +163,7 @@ class Modflow6Model(collections.UserDict, IModel, abc.ABC):
 
     @standard_log_decorator()
     def _validate_options(
-        self, schemata: dict, **kwargs
+        self, schemata: dict[str, Any], **kwargs
     ) -> dict[str, list[ValidationError]]:
         return validate_schemata_dict(schemata, self._options, **kwargs)
 
@@ -566,7 +566,7 @@ class Modflow6Model(collections.UserDict, IModel, abc.ABC):
                         globaltimes=globaltimes,
                         write_context=pkg_write_context,
                     )
-                elif issubclass(type(pkg), imod.mf6.HorizontalFlowBarrierBase):
+                elif isinstance(pkg, imod.mf6.HorizontalFlowBarrierBase):
                     mf6_hfb_ls.append(pkg)
                 else:
                     pkg._write(
@@ -604,6 +604,74 @@ class Modflow6Model(collections.UserDict, IModel, abc.ABC):
 
         return NestedStatusInfo(modelname)
 
+    @standard_log_decorator()
+    def dump(
+        self,
+        directory,
+        modelname,
+        validate: bool = True,
+        mdal_compliant: bool = False,
+        crs: Optional[Any] = None,
+        engine: EngineType = "netcdf4",
+    ) -> Path:
+        """
+        Dump simulation to files. Writes a model definition as .TOML file, which
+        points to data for each package. Each package is stored as a separate
+        NetCDF. Structured grids are saved as regular NetCDFs, unstructured
+        grids are saved as UGRID NetCDF. Structured grids are always made GDAL
+        compliant, unstructured grids can be made MDAL compliant optionally.
+
+        Parameters
+        ----------
+        directory: str or Path
+            directory to dump simulation into.
+        modelname: str
+            modelname, will be used to create a subdirectory.
+        validate: bool, optional
+            Whether to validate simulation data. Defaults to True.
+        mdal_compliant: bool, optional
+            Convert data with
+            :func:`imod.prepare.spatial.mdal_compliant_ugrid2d` to MDAL
+            compliant unstructured grids. Defaults to False.
+        crs: Any, optional
+            Anything accepted by rasterio.crs.CRS.from_user_input
+            Requires ``rioxarray`` installed.
+        engine : str, optional
+            File engine used to write packages. Options are ``'netcdf4'``,
+            ``'zarr'``, and ``'zarr.zip'``. NetCDF4 is readable by many other
+            softwares, for example QGIS. Zarr is optimized for big data, cloud
+            storage and parallel access. The ``'zarr.zip'`` option is an
+            experimental option which creates a zipped zarr store in a single
+            file, which is easier to copy and automatically compresses data as
+            well. Default is ``'netcdf4'``.
+
+        """
+        modeldirectory = pathlib.Path(directory) / modelname
+        modeldirectory.mkdir(exist_ok=True, parents=True)
+        validation_context = ValidationSettings(validate=validate)
+        if validation_context.validate:
+            statusinfo = self.validate(modelname, validation_context)
+            if statusinfo.has_errors():
+                raise ValidationError(statusinfo.to_string())
+
+        toml_content: dict[str, Any] = collections.defaultdict(dict)
+
+        for pkgname, pkg in self.items():
+            pkg_path = pkg.to_file(
+                modeldirectory,
+                pkgname,
+                mdal_compliant=mdal_compliant,
+                crs=crs,
+                engine=engine,
+            )
+            toml_content[type(pkg).__name__][pkgname] = pkg_path.name
+
+        toml_path = modeldirectory / f"{modelname}.toml"
+        with open(toml_path, "wb") as f:
+            tomli_w.dump(toml_content, f)
+
+        return toml_path
+
     @classmethod
     def from_file(cls, toml_path):
         pkg_classes = {
@@ -626,7 +694,7 @@ class Modflow6Model(collections.UserDict, IModel, abc.ABC):
         return instance
 
     @property
-    def options(self) -> dict:
+    def options(self) -> dict[str, Any]:
         if self._options is None:
             raise ValueError("Model id has not been set")
         return self._options

@@ -1,4 +1,4 @@
-from typing import Callable
+from typing import Any, Callable
 
 import numpy as np
 from pydantic.dataclasses import dataclass
@@ -37,10 +37,10 @@ class RiverAggregationMethod(DataclassType):
 
     """
 
-    stage: Callable = np.nanmean
-    conductance: Callable = np.nansum
-    bottom_elevation: Callable = np.nanmean
-    concentration: Callable = np.nanmean
+    stage: Callable[..., Any] = np.nanmean
+    conductance: Callable[..., Any] = np.nansum
+    bottom_elevation: Callable[..., Any] = np.nanmean
+    concentration: Callable[..., Any] = np.nanmean
 
 
 @dataclass(config=_CONFIG)
@@ -65,9 +65,9 @@ class DrainageAggregationMethod(DataclassType):
 
     """
 
-    elevation: Callable = np.nanmean
-    conductance: Callable = np.nansum
-    concentration: Callable = np.nanmean
+    elevation: Callable[..., Any] = np.nanmean
+    conductance: Callable[..., Any] = np.nansum
+    concentration: Callable[..., Any] = np.nanmean
 
 
 @dataclass(config=_CONFIG)
@@ -92,9 +92,9 @@ class GeneralHeadBoundaryAggregationMethod(DataclassType):
 
     """
 
-    head: Callable = np.nanmean
-    conductance: Callable = np.nansum
-    concentration: Callable = np.nanmean
+    head: Callable[..., Any] = np.nanmean
+    conductance: Callable[..., Any] = np.nansum
+    concentration: Callable[..., Any] = np.nanmean
 
 
 @dataclass(config=_CONFIG)
@@ -118,5 +118,5 @@ class RechargeAggregationMethod(DataclassType):
 
     """
 
-    rate: Callable = np.nansum
-    concentration: Callable = np.nanmean
+    rate: Callable[..., Any] = np.nansum
+    concentration: Callable[..., Any] = np.nanmean

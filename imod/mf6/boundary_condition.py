@@ -1,7 +1,7 @@
 import abc
 import pathlib
 from copy import copy, deepcopy
-from typing import Mapping, Optional, Union
+from typing import Any, MutableMapping, Optional, Union
 
 import numpy as np
 import xarray as xr
@@ -69,13 +69,15 @@ class BoundaryCondition(Package, abc.ABC):
     not the array input which is used in :class:`Package`.
     """
 
-    def __init__(self, allargs: Mapping[str, GridDataArray | float | int | bool | str]):
+    def __init__(
+        self, allargs: MutableMapping[str, GridDataArray | float | int | bool | str]
+    ):
         # Convert repeat_stress in dict to a xr.DataArray in the right shape if
         # necessary, which is required to merge it into the dataset.
         if "repeat_stress" in allargs.keys() and isinstance(
             allargs["repeat_stress"], dict
         ):
-            allargs["repeat_stress"] = get_repeat_stress(allargs["repeat_stress"])  # type: ignore
+            allargs["repeat_stress"] = get_repeat_stress(allargs["repeat_stress"])
         # Call the Package constructor, this merges the arguments into a dataset.
         super().__init__(allargs)
         if "concentration" in allargs.keys() and allargs["concentration"] is None:
@@ -197,7 +199,9 @@ class BoundaryCondition(Package, abc.ABC):
         return periods
 
     def _get_unfiltered_pkg_options(
-        self, predefined_options: dict, not_options: Optional[list] = None
+        self,
+        predefined_options: dict[str, Any],
+        not_options: Optional[list[str]] = None,
     ):
         options = copy(predefined_options)
 
@@ -208,11 +212,13 @@ class BoundaryCondition(Package, abc.ABC):
             if varname in not_options:
                 continue
             v = self.dataset[varname].values[()]
-            options[varname] = v
+            options[str(varname)] = v
         return options
 
     def _get_pkg_options(
-        self, predefined_options: dict, not_options: Optional[list] = None
+        self,
+        predefined_options: dict[str, Any],
+        not_options: Optional[list[str]] = None,
     ):
         unfiltered_options = self._get_unfiltered_pkg_options(
             predefined_options, not_options=not_options

@@ -15,7 +15,11 @@ from imod.mf6.chd import ConstantHead
 from imod.mf6.dis import StructuredDiscretization
 from imod.mf6.drn import Drainage
 from imod.mf6.ghb import GeneralHeadBoundary
-from imod.mf6.hfb import SingleLayerHorizontalFlowBarrierResistance
+from imod.mf6.hfb import (
+    HorizontalFlowBarrierBase,
+    HorizontalFlowBarrierResistance,
+    SingleLayerHorizontalFlowBarrierResistance,
+)
 from imod.mf6.ic import InitialConditions
 from imod.mf6.model import Modflow6Model
 from imod.mf6.npf import NodePropertyFlow
@@ -41,7 +45,7 @@ from imod.prepare.topsystem.default_allocation_methods import (
     SimulationDistributingOptions,
 )
 from imod.schemata import TypeSchema
-from imod.typing import GridDataArray, StressPeriodTimesType
+from imod.typing import GridDataArray, Imod5DataDict, StressPeriodTimesType
 from imod.typing.grid import zeros_like
 from imod.util.regrid import RegridderWeightsCache
 
@@ -203,6 +207,7 @@ class GroundwaterFlowModel(Modflow6Model):
         allocation_options: Optional[SimulationAllocationOptions] = None,
         distributing_options: Optional[SimulationDistributingOptions] = None,
         regridder_types: Optional[dict[str, DataclassType]] = None,
+        target_grid: Optional[GridDataArray] = None,
     ) -> "GroundwaterFlowModel":
         """
         Imports a GroundwaterFlowModel (GWF) from the data in an iMOD5 project
@@ -240,6 +245,9 @@ class GroundwaterFlowModel(Modflow6Model):
             then it should be imported separately
         regridder_types:  dict[str, RegridMethodType]
             the key is the package name. The value is a subclass of RegridMethodType.
+        target_grid: GridDataArray, optional
+            the target grid to which the data should be regridded. If not
+            provided, the first grid of the BND package is used as target grid.
 
         Returns
         -------
@@ -264,6 +272,7 @@ class GroundwaterFlowModel(Modflow6Model):
             cast(DiscretizationRegridMethod, regridder_types.get("dis")),
             regrid_cache,
             False,
+            target_grid=target_grid,
         )
         grid = dis_pkg.dataset["idomain"]
         result["dis"] = dis_pkg
@@ -345,8 +354,13 @@ class GroundwaterFlowModel(Modflow6Model):
             )
 
         if "cap" in imod5_keys:
-            result["msw-sprinkling"] = LayeredWell.from_imod5_cap_data(imod5_data)  # type: ignore
-            result["msw-rch"] = Recharge.from_imod5_cap_data(imod5_data, dis_pkg)  # type: ignore
+            imod5_cap_data_dict = cast(Imod5DataDict, imod5_data)
+            result["msw-sprinkling"] = LayeredWell.from_imod5_cap_data(
+                imod5_cap_data_dict, dis_pkg, regrid_cache=regrid_cache
+            )
+            result["msw-rch"] = Recharge.from_imod5_cap_data(
+                imod5_cap_data_dict, dis_pkg, regrid_cache=regrid_cache
+            )
 
         # import ghb's
         ghb_keys = [key for key in imod5_keys if key[0:3] == "ghb"]
@@ -413,11 +427,13 @@ class GroundwaterFlowModel(Modflow6Model):
         hfb_keys = [key for key in imod5_keys if key[0:3] == "hfb"]
         if len(hfb_keys) != 0:
             for hfb_key in hfb_keys:
-                result[hfb_key] = (
-                    SingleLayerHorizontalFlowBarrierResistance.from_imod5_data(
-                        hfb_key, imod5_data
-                    )
-                )
+                layer = imod5_data[hfb_key]["layer"]
+                hfb_pkgtype: type[HorizontalFlowBarrierBase]
+                if layer == 0:
+                    hfb_pkgtype = HorizontalFlowBarrierResistance
+                else:
+                    hfb_pkgtype = SingleLayerHorizontalFlowBarrierResistance
+                result[hfb_key] = hfb_pkgtype.from_imod5_data(hfb_key, imod5_data)
 
         # import chd
         chd_keys = [key for key in imod5_keys if key[0:3] == "chd"]

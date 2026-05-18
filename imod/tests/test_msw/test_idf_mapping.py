@@ -16,8 +16,8 @@ def test_idf_mapping_regrid():
 
     idf_mapping_regridded = idf_mapping.regrid_like(new_grid, regrid_context)
 
-    assert len(idf_mapping_regridded.dataset["rows"]) == 5
-    assert len(idf_mapping_regridded.dataset["columns"]) == 5
+    assert len(idf_mapping_regridded.dataset["y"]) == 5
+    assert len(idf_mapping_regridded.dataset["x"]) == 5
     assert np.isnan(idf_mapping_regridded.dataset["nodata"].values[()])
 
 
@@ -27,8 +27,8 @@ def test_idf_mapping_clip():
     idf_mapping = IdfMapping(area, np.nan)
 
     idf_mapping_selected = idf_mapping.clip_box(
-        x_min=1.0, x_max=2.5, y_min=1.0, y_max=2.5
+        x_min=2.0, x_max=3.5, y_min=1.0, y_max=2.5
     )
 
-    expected_area = area.sel(x=slice(1.0, 2.5), y=slice(2.5, 1.0))
+    expected_area = area.sel(x=slice(2.0, 3.5), y=slice(2.5, 1.0))
     xr.testing.assert_allclose(idf_mapping_selected.dataset["area"], expected_area)

@@ -1,7 +1,7 @@
 import warnings
 from dataclasses import dataclass
 from pathlib import Path
-from typing import Optional, Union
+from typing import Any, Optional, Union
 
 import numpy as np
 
@@ -44,7 +44,7 @@ def fixed_format_parser(
         Dictionary with the VariableMetaData. Access this dictionary in a
         package by calling <pkg>._metadata_dict
     """
-    results: dict[str, list] = {}
+    results: dict[str, list[Any]] = {}
     for key in metadata_dict:
         results[key] = []
 

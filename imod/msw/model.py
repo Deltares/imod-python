@@ -15,6 +15,10 @@ import xarray as xr
 import imod.msw
 from imod.common.interfaces.imodel import IModel
 from imod.common.utilities.mask import mask_all_packages
+from imod.common.constants import MaskValues
+from imod.common.utilities.clip import clip_by_grid
+from imod.common.utilities.partitioninfo import create_partition_info
+from imod.common.utilities.regrid import regrid_imod5_cap_data
 from imod.common.utilities.value_filters import enforce_scalar
 from imod.common.utilities.version import prepend_content_with_version_info
 from imod.mf6.dis import StructuredDiscretization
@@ -40,31 +44,36 @@ from imod.msw.meteo_mapping import (
 from imod.msw.output_control import TimeOutputControl
 from imod.msw.pkgbase import MetaSwapPackage
 from imod.msw.ponding import Ponding
+from imod.msw.regrid.regrid_schemes import CapDataRegridMethod
 from imod.msw.scaling_factors import ScalingFactors
 from imod.msw.sprinkling import Sprinkling
 from imod.msw.timeutil import to_metaswap_timeformat
 from imod.msw.utilities.common import find_in_file_list
-from imod.msw.utilities.imod5_converter import has_active_scaling_factor
-from imod.msw.utilities.mask import MaskValues, mask_and_broadcast_cap_data
+from imod.msw.utilities.imod5_converter import (
+    has_active_scaling_factor,
+)
+from imod.msw.utilities.mask import mask_and_broadcast_cap_data
 from imod.msw.utilities.parse import read_para_sim
 from imod.msw.vegetation import AnnualCropFactors
 from imod.typing import GridDataArray, Imod5DataDict
-from imod.util.dims import drop_layer_dim_cap_data
 from imod.util.regrid import RegridderWeightsCache
+from imod.util.time import to_datetime_internal
 
 REQUIRED_PACKAGES = (
     GridData,
     CouplerMapping,
     Infiltration,
     LanduseOptions,
-    MeteoGrid,
     EvapotranspirationMapping,
     PrecipitationMapping,
     IdfMapping,
     TimeOutputControl,
     AnnualCropFactors,
 )
-
+METEO_PACKAGES = (
+    MeteoGrid,
+    MeteoGridCopy,
+)
 INITIAL_CONDITIONS_PACKAGES = (
     InitialConditionsEquilibrium,
     InitialConditionsPercolation,
@@ -95,7 +104,7 @@ DEFAULT_SETTINGS: dict[str, Any] = {
 }
 
 
-class Model(collections.UserDict):
+class Model(collections.UserDict[str, Any]):
     def __setitem__(self, key, value):
         # TODO: Add packagecheck
         super().__setitem__(key, value)
@@ -118,6 +127,7 @@ class MetaSwapModel(Model, IModel):
 
     _pkg_id = "model"
     _file_name = "para_sim.inp"
+    _model_name = "MSW"
 
     _template = jinja2.Template(
         "{%for setting, value in settings.items()%}{{setting}} = {{value}}\n{%endfor%}"
@@ -127,6 +137,7 @@ class MetaSwapModel(Model, IModel):
         self,
         unsaturated_database: Path | str,
         settings: Optional[dict[str, Any]] = None,
+        starttime: Optional[str] = None,
     ):
         super().__init__()
 
@@ -135,6 +146,7 @@ class MetaSwapModel(Model, IModel):
         else:
             self.simulation_settings = settings
 
+        self.starttime = starttime
         self.simulation_settings["unsa_svat_path"] = unsaturated_database
 
     def _render_unsaturated_database_path(self, unsaturated_database: Union[str, Path]):
@@ -156,6 +168,10 @@ class MetaSwapModel(Model, IModel):
             raise ValueError(
                 f"Missing the following required packages: {missing_packages}"
             )
+
+        meteo_set = pkg_types_included & set(METEO_PACKAGES)
+        if len(meteo_set) < 1:
+            raise ValueError(f"Missing meteo package, assign one of {METEO_PACKAGES}")
 
         initial_condition_set = pkg_types_included & set(INITIAL_CONDITIONS_PACKAGES)
         if len(initial_condition_set) < 1:
@@ -210,6 +226,19 @@ class MetaSwapModel(Model, IModel):
         return FileCopier in pkg_types_included
 
     def _get_starttime(self):
+        if self.starttime is not None:
+            starttime = to_datetime_internal(self.starttime, use_cftime=False)
+        else:
+            starttime = self._get_minimum_package_time()
+
+        year, time_since_start_year = to_metaswap_timeformat([starttime])
+
+        year = int(enforce_scalar(year.values))
+        time_since_start_year = float(enforce_scalar(time_since_start_year.values))
+
+        return year, time_since_start_year
+
+    def _get_minimum_package_time(self):
         """
         Loop over all packages to get the minimum time.
 
@@ -223,14 +252,13 @@ class MetaSwapModel(Model, IModel):
             if "time" in ds.coords:
                 starttimes.append(ds["time"].min().values)
 
+        if len(starttimes) == 0:
+            raise ValueError(
+                "No package with a coordinate 'time' found. Please add a MeteoGrid or TimeOutputControl package."
+            )
+
         starttime = min(starttimes)
-
-        year, time_since_start_year = to_metaswap_timeformat([starttime])
-
-        year = int(enforce_scalar(year.values))
-        time_since_start_year = float(enforce_scalar(time_since_start_year.values))
-
-        return year, time_since_start_year
+        return starttime
 
     def get_pkgkey(
         self, pkg_type: type[MetaSwapPackage], optional_package: bool = False
@@ -273,7 +301,7 @@ class MetaSwapModel(Model, IModel):
         )
         return self.get_pkgkey(pkg_type, optional_package)
 
-    def _model_checks(self, validate: bool):
+    def _model_checks(self, validate: Optional[bool] = True):
         if validate and not self._has_file_copier():
             self._check_required_packages()
             self._check_vegetation_indices_in_annual_crop_factors()
@@ -298,7 +326,7 @@ class MetaSwapModel(Model, IModel):
 
         # Add IdfMapping settings
         idf_key = self.get_pkgkey(IdfMapping)
-        idf_pkg = cast(IdfMapping, self[idf_key])
+        idf_pkg = cast(IdfMapping, self[idf_key])  # type: ignore[index]
         simulation_settings.update(idf_pkg._get_output_settings())
 
         simulation_settings["unsa_svat_path"] = self._render_unsaturated_database_path(
@@ -316,8 +344,8 @@ class MetaSwapModel(Model, IModel):
         self,
         directory: Union[str, Path],
         mf6_dis: StructuredDiscretization,
-        mf6_wel: Mf6Wel,
-        validate: bool = True,
+        mf6_wel: Optional[Mf6Wel] = None,
+        validate: Optional[bool] = True,
     ):
         """
         Write packages and simulation settings (para_sim.inp).
@@ -340,8 +368,8 @@ class MetaSwapModel(Model, IModel):
 
         # Get index and svat
         grid_key = self.get_pkgkey(GridData)
-        grid_pkg = cast(GridData, self[grid_key])
-        index, svat = grid_pkg.generate_index_array()
+        grid_pkg = cast(GridData, self[grid_key])  # type: ignore[index]
+        index, svat = grid_pkg.generate_isactive_svat_arrays()
 
         # write package contents
         for pkgname in self:
@@ -510,13 +538,112 @@ class MetaSwapModel(Model, IModel):
                 )
         return clipped
 
+    def split(
+        self,
+        submodel_labels: GridDataArray,
+    ) -> dict[str, "MetaSwapModel"]:
+        """
+        Split a MetaSWAP model in different partitions using a submodel_labels
+        array. Note: for specifying meteorological grid data, splitting is only
+        supported when the MeteoGridCopy instance is being used.
+
+        Parameters
+        ----------
+        submodel_labels: xr.DataArray or xu.UgridDataArray
+            A grid that defines how the simulation will be split. The array
+            should have the same topology as the domain being split, i.e.
+            similar shape as a layer in the domain. The values in the array
+            indicate to which partition a cell belongs. The values should be
+            zero or greater.
+
+        Returns
+        -------
+        dict[str, MetaSwapModel]
+            A mapping from generated submodel names to the corresponding clipped
+            MetaSWAP submodel.
+        Examples
+        --------
+        >>> submodel_labels = mf6_sim.create_partition_labels(n_partitions=4)
+        >>> msw_splitted = msw.split(submodel_labels)
+        """
+
+        has_meteogrid = MeteoGrid in [type(pkg) for pkg in self.values()]
+        if has_meteogrid:
+            raise ValueError(
+                "Splitting packages of type MeteoGrid is not supported, use MeteoGridCopy instead."
+            )
+
+        settings = deepcopy(self.simulation_settings)
+        starttime = self.starttime
+        unsa_svat_path = settings.pop("unsa_svat_path")
+
+        partition_info_list = create_partition_info(submodel_labels)
+
+        # Initialize mapping from partition IDs to models
+        partition_id_to_models: dict[int, dict[str, MetaSwapModel]] = {}
+        for submodel_partition_info in partition_info_list:
+            partition_id_to_models[submodel_partition_info.id] = {}
+        partitioned_submodels = {}
+        submodel_to_partition = {}
+
+        # Create empty MetaSWAP model for each partition
+        for submodel_partition_info in partition_info_list:
+            submodel_name = f"{self._model_name}_{submodel_partition_info.id}"
+
+            submodel = MetaSwapModel(unsa_svat_path, settings, starttime)
+            partitioned_submodels[submodel_name] = submodel
+            submodel_to_partition[submodel_name] = submodel_partition_info
+            partition_id_to_models[submodel_partition_info.id][submodel_name] = submodel
+
+        # First, handle the grid data and determine the overlap.
+        grid_key = self.get_pkgkey(GridData)
+        grid_pkg = cast(GridData, self[grid_key])  # type: ignore[index]
+        is_in_active_domain = {}
+
+        for submodel_name, submodel in partitioned_submodels.items():
+            partition_info = submodel_to_partition[submodel_name]
+            sliced_grid_pkg = cast(
+                GridData, clip_by_grid(grid_pkg, partition_info.active_domain)
+            )
+            sliced_isactive = sliced_grid_pkg._generate_isactive_array().values
+
+            # Add package to model if it has data in the active domain.
+            if bool(sliced_isactive.any()):
+                is_in_active_domain[submodel_name] = True
+                submodel[grid_key] = sliced_grid_pkg
+            else:
+                is_in_active_domain[submodel_name] = False
+
+        # Second, add other packages to each partitioned submodel.
+        for submodel_name, submodel in partitioned_submodels.items():
+            partition_info = submodel_to_partition[submodel_name]
+
+            if not is_in_active_domain[submodel_name]:
+                continue
+
+            # Add packages to models
+            for pkg_name, pkg in self.items():
+                if isinstance(pkg, GridData):
+                    continue
+
+                if isinstance(pkg, MeteoMapping):
+                    submodel[pkg_name] = deepcopy(pkg)
+                else:
+                    # Slice and add the package to the partitioned model
+                    sliced_package = clip_by_grid(pkg, partition_info.active_domain)
+                    submodel[pkg_name] = sliced_package
+
+        return partitioned_submodels
+
     @classmethod
     def from_imod5_data(
         cls,
         imod5_data: Imod5DataDict,
         target_dis: StructuredDiscretization,
         times: list[datetime],
-    ):
+        regridder_types: CapDataRegridMethod = CapDataRegridMethod(),
+        regrid_cache: RegridderWeightsCache = RegridderWeightsCache(),
+    ) -> "MetaSwapModel":
         """
         Construct a MetaSWAP model from iMOD5 data in the CAP package, loaded
         with the :func:`imod.formats.prj.open_projectfile_data` function.
@@ -527,29 +654,43 @@ class MetaSwapModel(Model, IModel):
             Dictionary with iMOD5 data. This can be constructed from the
             :func:`imod.formats.prj.open_projectfile_data` method.
         target_dis: imod.mf6.StructuredDiscretization
-            Target discretization, cells where MODLOW6 is inactive will be
-            inactive in MetaSWAP as well.
+            Target discretization, iMOD5 CAP data will be regridded to this
+            discretization. Cells where MODLOW6 is inactive will be inactive in
+            MetaSWAP as well.
         times: list[datetime]
             List of datetimes, will be used to set the output control times.
             Is also used to infer the starttime of the simulation.
+        regridder_types: CapDataRegridMethod, default CapDataRegridMethod()
+            Custom regrid method for CAP data.
+        regrid_cache: RegridderWeightsCache, default RegridderWeightsCache()
+            Cache for regridder weights, can be used to speed up regridding if the
+            same regridders are used multiple times.
 
         Returns
         -------
         MetaSwapModel
             MetaSWAP model imported from imod5 data.
         """
+        # Path and settings management
         extra_paths = imod5_data["extra"]["paths"]
         path_to_parasim = find_in_file_list("para_sim.inp", extra_paths)
         parasim_settings = read_para_sim(path_to_parasim)
         unsa_svat_path = cast(str, parasim_settings["unsa_svat_path"])
-        # Drop layer coord
-        imod5_cap_no_layer = drop_layer_dim_cap_data(imod5_data)
+        # Regrid iMOD5 CAP data to target discretization.
+        imod5_regridded = regrid_imod5_cap_data(
+            imod5_data, target_dis, regridder_types, regrid_cache
+        )
+        # Test with regridded data instead of masked, as masking broadcasts
+        # scalars to grids, which causes the is_scalar check in
+        # has_active_scaling_factor to always return False.
+        active_scaling_factor = has_active_scaling_factor(imod5_regridded["cap"])
+        # Setup model
         model = cls(unsa_svat_path, parasim_settings)
         model["grid"], msw_active = GridData.from_imod5_data(
-            imod5_cap_no_layer, target_dis
+            imod5_regridded, target_dis
         )
         cap_data_masked = mask_and_broadcast_cap_data(
-            imod5_cap_no_layer["cap"], msw_active
+            imod5_regridded["cap"], msw_active
         )
         imod5_masked: Imod5DataDict = {
             "cap": cap_data_masked,
@@ -561,10 +702,10 @@ class MetaSwapModel(Model, IModel):
         model["meteo_grid"] = MeteoGridCopy.from_imod5_data(imod5_masked)
         model["prec_mapping"] = PrecipitationMapping.from_imod5_data(imod5_masked)
         model["evt_mapping"] = EvapotranspirationMapping.from_imod5_data(imod5_masked)
-        if has_active_scaling_factor(imod5_cap_no_layer["cap"]):
+        if active_scaling_factor:
             model["scaling_factor"] = ScalingFactors.from_imod5_data(imod5_masked)
         area = model["grid"]["area"].isel(subunit=0, drop=True)
-        model["idf_mapping"] = IdfMapping(area, MaskValues.default)
+        model["idf_mapping"] = IdfMapping(area, MaskValues.msw_default)
         model["coupling"] = CouplerMapping()
         model["extra_files"] = FileCopier.from_imod5_data(imod5_masked)
 

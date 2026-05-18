@@ -97,23 +97,8 @@ convention = "numpy"
 
 [tool.mypy]
 packages = ["imod"]
-exclude = [
-    "imod/common",
-    "imod/data",
-    "imod/evaluate",
-    "imod/formats",
-    "imod/schemata.py",
-    "imod/templates",
-    "imod/tests",
-    "imod/visualize",
-    "imod/wq",
-]
 follow_imports = "normal"
 strict = true
-
-# These shouldn't be too much additional work, but may be tricky to
-# get passing if you use a lot of untyped libraries
-disallow_any_generics = false
 
 # These next few are various gradations of forcing use of type annotations
 disallow_untyped_calls = false
@@ -126,9 +111,31 @@ no_implicit_reexport = false
 # This one can be tricky to get passing if you use a lot of untyped libraries
 warn_return_any = false
 
+# Define folders that we want to ignore from analyses.
+# By defining it at explicit overrides instead of a list of excludes it also 
+# works with the vscode mypy extension
+[[tool.mypy.overrides]]
+module = [
+    "imod.common.*",
+    "imod.data.*",
+    "imod.evaluate.*",
+    "imod.formats.*",
+    "imod.schemata.*",
+    "imod.templates.*",
+    "imod.tests.*",
+    "imod.visualize.*",
+    "imod.wq.*",
+]
+ignore_errors = true
+
 [[tool.mypy.overrides]]
 module = ["imod.msw.*"]
 check_untyped_defs = false
+
+# pyvista triggers a mypy daemon crash (mypy bug with partial types)
+[[tool.mypy.overrides]]
+module = ["pyvista.*"]
+follow_imports = "skip"
 
 [[tool.mypy.overrides]]
 module = [

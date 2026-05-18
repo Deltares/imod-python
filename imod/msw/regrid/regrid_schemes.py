@@ -11,6 +11,71 @@ from imod.util.regrid import (
 
 
 @dataclass(config=_CONFIG)
+class CapDataRegridMethod(DataclassType):
+    """
+    Object containing regridder methods for the iMOD5 CAP data. This can be
+    provided to the ``regrid_like`` method to regrid with custom settings. This
+    is used when constructing a MetaSWAP model from iMOD5 data.
+
+    Parameters
+    ----------
+    boundary: tuple, default (RegridderType.OVERLAP, "mode")
+    landuse: tuple, default (RegridderType.OVERLAP, "mode")
+    rootzone_thickness: tuple, default (RegridderType.OVERLAP, "mean")
+    soil_physical_unit: tuple, default (RegridderType.OVERLAP, "mode")
+    meteo_station_number: tuple, default (RegridderType.OVERLAP, "mode")
+    surface_elevation: tuple, default (RegridderType.OVERLAP, "mean")
+    artificial_recharge: tuple, default (RegridderType.OVERLAP, "mean")
+    artificial_recharge_layer: tuple, default (RegridderType.OVERLAP, "mode")
+    artificial_recharge_capacity: tuple, default (RegridderType.OVERLAP, "mean")
+    wetted_area: tuple, default (RegridderType.RELATIVEOVERLAP, "conductance")
+    urban_area: tuple, default (RegridderType.RELATIVEOVERLAP, "conductance")
+    urban_ponding_depth: tuple, default (RegridderType.OVERLAP, "mean")
+    rural_ponding_depth: tuple, default (RegridderType.OVERLAP, "mean")
+    urban_runoff_resistance: tuple, default (RegridderType.OVERLAP, "mean")
+    rural_runoff_resistance: tuple, default (RegridderType.OVERLAP, "mean")
+    urban_runon_resistance: tuple, default (RegridderType.OVERLAP, "mean")
+    rural_runon_resistance: tuple, default (RegridderType.OVERLAP, "mean")
+    urban_infiltration_capacity: tuple, default (RegridderType.OVERLAP, "mean")
+    rural_infiltration_capacity: tuple, default (RegridderType.OVERLAP, "mean")
+    perched_water_table_level: tuple, default (RegridderType.OVERLAP, "mean")
+    soil_moisture_fraction: tuple, default (RegridderType.OVERLAP, "mean")
+    conductivity_factor: tuple, default (RegridderType.OVERLAP, "mean")
+    plot_number: tuple, default (RegridderType.OVERLAP, "mode")
+    steering_location: tuple, default (RegridderType.OVERLAP, "mode")
+    plot_drainage_level: tuple, default (RegridderType.OVERLAP, "mean")
+    plot_drainage_resistance: tuple, default (RegridderType.OVERLAP, "mean")
+    """
+
+    boundary: RegridVarType = (RegridderType.OVERLAP, "mode")
+    landuse: RegridVarType = (RegridderType.OVERLAP, "mode")
+    rootzone_thickness: RegridVarType = (RegridderType.OVERLAP, "mean")
+    soil_physical_unit: RegridVarType = (RegridderType.OVERLAP, "mode")
+    meteo_station_number: RegridVarType = (RegridderType.OVERLAP, "mode")
+    surface_elevation: RegridVarType = (RegridderType.OVERLAP, "mean")
+    artificial_recharge: RegridVarType = (RegridderType.OVERLAP, "mean")
+    artificial_recharge_layer: RegridVarType = (RegridderType.OVERLAP, "mode")
+    artificial_recharge_capacity: RegridVarType = (RegridderType.OVERLAP, "mean")
+    wetted_area: RegridVarType = (RegridderType.RELATIVEOVERLAP, "conductance")
+    urban_area: RegridVarType = (RegridderType.RELATIVEOVERLAP, "conductance")
+    urban_ponding_depth: RegridVarType = (RegridderType.OVERLAP, "mean")
+    rural_ponding_depth: RegridVarType = (RegridderType.OVERLAP, "mean")
+    urban_runoff_resistance: RegridVarType = (RegridderType.OVERLAP, "mean")
+    rural_runoff_resistance: RegridVarType = (RegridderType.OVERLAP, "mean")
+    urban_runon_resistance: RegridVarType = (RegridderType.OVERLAP, "mean")
+    rural_runon_resistance: RegridVarType = (RegridderType.OVERLAP, "mean")
+    urban_infiltration_capacity: RegridVarType = (RegridderType.OVERLAP, "mean")
+    rural_infiltration_capacity: RegridVarType = (RegridderType.OVERLAP, "mean")
+    perched_water_table_level: RegridVarType = (RegridderType.OVERLAP, "mean")
+    soil_moisture_fraction: RegridVarType = (RegridderType.OVERLAP, "mean")
+    conductivity_factor: RegridVarType = (RegridderType.OVERLAP, "mean")
+    plot_number: RegridVarType = (RegridderType.OVERLAP, "mode")
+    steering_location: RegridVarType = (RegridderType.OVERLAP, "mode")
+    plot_drainage_level: RegridVarType = (RegridderType.OVERLAP, "mean")
+    plot_drainage_resistance: RegridVarType = (RegridderType.OVERLAP, "mean")
+
+
+@dataclass(config=_CONFIG)
 class SprinklingRegridMethod(DataclassType):
     """
     Object containing regridder methods for the

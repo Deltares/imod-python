@@ -9,6 +9,7 @@ import pandas as pd
 import xarray as xr
 
 import imod
+from imod.common.interfaces.ipackagebase import IPackageBase
 from imod.common.utilities.clip import clip_spatial_box, clip_time_slice
 from imod.common.utilities.dataclass_type import DataclassType
 from imod.msw.fixed_format import VariableMetaData
@@ -65,7 +66,7 @@ def open_first_meteo_grid_from_imod5_data(imod5_data: Imod5DataDict, column_nr: 
     return open_first_meteo_grid(metegrid_path, column_nr=column_nr)
 
 
-class MeteoMapping(MetaSwapPackage):
+class MeteoMapping(MetaSwapPackage, IPackageBase):
     """
     This class provides common methods for creating mappings between
     meteorological data and MetaSWAP grids. It should not be instantiated

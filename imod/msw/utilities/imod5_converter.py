@@ -1,9 +1,10 @@
 from xarray.core.utils import is_scalar
 
+from imod.common.constants import MaskValues
 from imod.logging import LogLevel, logger
 from imod.mf6 import StructuredDiscretization
 from imod.msw.utilities.common import concat_imod5
-from imod.msw.utilities.mask import MaskValues, MetaSwapActive
+from imod.msw.utilities.mask import MetaSwapActive
 from imod.typing import GridDataArray, GridDataDict
 from imod.typing.grid import ones_like
 from imod.util.spatial import get_cell_area
@@ -103,9 +104,9 @@ def has_active_scaling_factor(imod5_cap: GridDataDict):
     function shortcuts if data is provided as constant.
     """
     variable_inactive_mapping = {
-        "perched_water_table_level": MaskValues.default,
+        "perched_water_table_level": MaskValues.msw_default,
         "soil_moisture_fraction": 1.0,
-        "conductivitiy_factor": 1.0,
+        "conductivity_factor": 1.0,
     }
     scaling_factor_inactive = True
     for var, inactive_value in variable_inactive_mapping.items():

@@ -1,5 +1,5 @@
 import pathlib
-from typing import TYPE_CHECKING, Callable, Iterable, Optional, Union, cast
+from typing import TYPE_CHECKING, Any, Callable, Iterable, Optional, Union, cast
 
 import dask
 import numba
@@ -165,7 +165,7 @@ def laplace_interpolate(
     if missing_dims:
         raise ValueError(f"Dimensions not in source: {missing_dims}")
     # Ensure order matches the order in source.
-    dims = tuple(cast(str, dim) for dim in source.dims if dim in dims)
+    dims = tuple(dim for dim in source.dims if dim in dims)
     shape = tuple(source.sizes[d] for d in dims)
     connectivity = laplace._build_connectivity(shape)
     arr = xr.apply_ufunc(
@@ -233,9 +233,9 @@ def rasterize(
     # shapes must be an iterable
     try:
         iter(shapes)
-        iterable_shapes: Iterable = shapes
+        iterable_shapes: Iterable[Any] = shapes
     except TypeError:
-        iterable_shapes: Iterable = (shapes,)  # type: ignore[no-redef]
+        iterable_shapes: Iterable[Any] = (shapes,)  # type: ignore[no-redef]
 
     if dtype is None:
         dtype = like.dtype
@@ -856,7 +856,7 @@ def _zonal_aggregate_raster(
     column: str,
     resolution: float,
     raster: xr.DataArray,
-    method: Union[str, Callable],
+    method: Union[str, Callable[..., Any]],
 ) -> pd.DataFrame:
     """
     * Rasterize the polygon at given `resolution`
@@ -916,7 +916,7 @@ def _zonal_aggregate_polygons(
     column_b: str,
     resolution: float,
     like: xr.DataArray,
-    method: Union[str, Callable],
+    method: Union[str, Callable[..., Any]],
 ) -> pd.DataFrame:
     """
     * Rasterize a, rasterize b for the same domain
@@ -965,7 +965,7 @@ def zonal_aggregate_raster(
     column: str,
     raster: xr.DataArray,
     resolution: float,
-    method: Union[str, Callable],
+    method: Union[str, Callable[..., Any]],
     chunksize: int = 10_000,
 ) -> pd.DataFrame:
     """
@@ -1048,7 +1048,7 @@ def zonal_aggregate_polygons(
     column_b: str,
     like: xr.DataArray,
     resolution: float,
-    method: Union[str, Callable],
+    method: Union[str, Callable[..., Any]],
     chunksize: int = 10_000,
 ) -> pd.DataFrame:
     """

@@ -23,6 +23,8 @@ object LintTemplate : Template({
             id = "Static_code_analysis"
             workingDir = "imod-python"
             scriptContent = """
+                    pixi config set --local detached-environments "C:\pixi_envs"
+                    pixi install --environment default --frozen
                     pixi run --environment default --frozen lint 
                 """.trimIndent()
             formatStderrAsError = true

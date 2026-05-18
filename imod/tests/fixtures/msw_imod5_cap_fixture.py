@@ -222,7 +222,7 @@ def imod5_cap_data() -> GridDataDict:
         ),
         **da_kwargs
     )
-    d["conductivitiy_factor"]= xr.DataArray(
+    d["conductivity_factor"]= xr.DataArray(
         np.array([
             [
                 [2.5, 2.5, 2.5],

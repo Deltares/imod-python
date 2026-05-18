@@ -289,7 +289,7 @@ class NodePropertyFlowRegridMethod(DataclassType):
     icelltype: tuple, defaults (RegridderType.OVERLAP, "mean")
     k: tuple, defaults ( RegridderType.OVERLAP,"geometric_mean")
     k22: tuple, defaults (RegridderType.OVERLAP,"geometric_mean")
-    k33: tuple, defaults (RegridderType.OVERLAP,"harmonic_mean")
+    k33: tuple, defaults (RegridderType.OVERLAP,"mean")
     angle1: tuple, defaults (RegridderType.OVERLAP, "mean")
     angle2: tuple, defaults (RegridderType.OVERLAP, "mean")
     angle3: tuple, defaults (RegridderType.OVERLAP, "mean")
@@ -319,7 +319,7 @@ class NodePropertyFlowRegridMethod(DataclassType):
     )  # horizontal if angle2 = 0 & angle3 = 0
     k33: RegridVarType = (
         RegridderType.OVERLAP,
-        "harmonic_mean",
+        "mean",
     )  # vertical if angle2 = 0 & angle3 = 0
     angle1: RegridVarType = (RegridderType.OVERLAP, "mean")
     angle2: RegridVarType = (RegridderType.OVERLAP, "mean")
@@ -450,3 +450,28 @@ class StorageCoefficientRegridMethod(DataclassType):
     convertible: RegridVarType = (RegridderType.OVERLAP, "mode")
     storage_coefficient: RegridVarType = (RegridderType.OVERLAP, "mean")
     specific_yield: RegridVarType = (RegridderType.OVERLAP, "mean")
+
+
+@dataclass(config=_CONFIG)
+class CapDataRechargeRegridMethod(DataclassType):
+    """
+    Object containing regridder methods for CAP data for the
+    :class:`imod.mf6.Recharge.from_imod5_cap_data` method. This contains regridder
+    methods for only the relevant CAP variables for the recharge package.
+    """
+
+    boundary: RegridVarType = (RegridderType.OVERLAP, "mode")
+    wetted_area: RegridVarType = (RegridderType.RELATIVEOVERLAP, "conductance")
+    urban_area: RegridVarType = (RegridderType.RELATIVEOVERLAP, "conductance")
+
+
+@dataclass(config=_CONFIG)
+class CapDataWellRegridMethod(DataclassType):
+    """
+    Object containing regridder methods for CAP data for the
+    :class:`imod.mf6.LayeredWell.from_imod5_cap_data` method. This contains
+    regridder methods for only the relevant CAP variables for the well package.
+    """
+
+    artificial_recharge: RegridVarType = (RegridderType.OVERLAP, "mean")
+    artificial_recharge_layer: RegridVarType = (RegridderType.OVERLAP, "mode")

@@ -5,7 +5,7 @@ import typing
 from copy import deepcopy
 from enum import Enum
 from pathlib import Path
-from typing import TYPE_CHECKING, Dict, List, Optional, Self, Tuple
+from typing import TYPE_CHECKING, Any, Dict, List, Optional, Self, Tuple
 
 import cftime
 import numpy as np
@@ -43,7 +43,7 @@ from imod.schemata import (
     MaxNUniqueValuesSchema,
     ValidationError,
 )
-from imod.typing import GeoDataFrameType, GridDataArray, LineStringType
+from imod.typing import GeoDataFrameType, GridDataArray, GridDataDict, LineStringType
 from imod.typing.grid import as_ugrid_dataarray, ones_like
 from imod.util.imports import MissingOptionalModule
 
@@ -186,7 +186,7 @@ def to_connected_cells_dataset(
     idomain: GridDataArray,
     grid: xu.Ugrid2d,
     edge_index: np.ndarray,
-    edge_values: dict,
+    edge_values: dict[str, Any],
 ) -> xr.Dataset:
     """
     Converts a cell edge grid with values defined on the edges to a dataset with the cell ids of the connected cells,
@@ -416,7 +416,7 @@ def _prepare_barrier_dataset_for_mf6_adapter(dataset: xr.Dataset) -> xr.Dataset:
 
 def _snap_to_grid_and_aggregate(
     barrier_dataframe: GeoDataFrameType, grid2d: xu.Ugrid2d, vardict_agg: dict[str, str]
-) -> tuple[xu.UgridDataset, npt.NDArray]:
+) -> tuple[xu.UgridDataset, npt.NDArray[Any]]:
     """
     Snap barrier dataframe to grid and aggregate multiple lines with a list of
     methods per variable.
@@ -481,7 +481,7 @@ class HorizontalFlowBarrierBase(BoundaryCondition, ILineDataPackage):
         geometry: "gpd.GeoDataFrame",
         print_input: bool = False,
     ) -> None:
-        dict_dataset = {"print_input": print_input}
+        dict_dataset: dict[str, Any] = {"print_input": print_input}
         super().__init__(dict_dataset)
         self.line_data = geometry
 
@@ -522,7 +522,10 @@ class HorizontalFlowBarrierBase(BoundaryCondition, ILineDataPackage):
     def line_data(self, value: GeoDataFrameType) -> None:
         variables_for_gdf = self._get_variable_names_for_gdf()
         self.dataset = self.dataset.merge(
-            value.to_xarray(), overwrite_vars=variables_for_gdf, join="right"
+            value.to_xarray(),
+            overwrite_vars=variables_for_gdf,
+            join="right",
+            compat="no_conflicts",
         )
 
     def _render(self, directory, pkgname, globaltimes, binary):
@@ -568,6 +571,10 @@ class HorizontalFlowBarrierBase(BoundaryCondition, ILineDataPackage):
         instance.line_data = gpd.GeoDataFrame.from_features(geometry)
 
         return instance
+
+    @classmethod
+    def from_imod5_data(cls, key: str, imod5_data: dict[str, Any]) -> Self:
+        raise NotImplementedError(f"Method not implemented for {cls.__name__}")
 
     def _compute_barrier_values(
         self, snapped_dataset, edge_index, idomain, top, bottom, k
@@ -856,7 +863,7 @@ class HorizontalFlowBarrierBase(BoundaryCondition, ILineDataPackage):
         raise NotImplementedError
 
     @abc.abstractmethod
-    def _get_vertical_variables(self) -> list:
+    def _get_vertical_variables(self) -> list[str]:
         raise NotImplementedError
 
     def clip_box(
@@ -1140,7 +1147,7 @@ class HorizontalFlowBarrierHydraulicCharacteristic(HorizontalFlowBarrierBase):
     def _get_variable_name(self) -> str:
         return "hydraulic_characteristic"
 
-    def _get_vertical_variables(self) -> list:
+    def _get_vertical_variables(self) -> list[str]:
         return []
 
     def _compute_barrier_values(
@@ -1217,7 +1224,7 @@ class SingleLayerHorizontalFlowBarrierHydraulicCharacteristic(
     def _get_variable_name(self) -> str:
         return "hydraulic_characteristic"
 
-    def _get_vertical_variables(self) -> list:
+    def _get_vertical_variables(self) -> list[str]:
         return ["layer"]
 
     def _compute_barrier_values(
@@ -1291,7 +1298,7 @@ class HorizontalFlowBarrierMultiplier(HorizontalFlowBarrierBase):
     def _get_variable_name(self) -> str:
         return "multiplier"
 
-    def _get_vertical_variables(self) -> list:
+    def _get_vertical_variables(self) -> list[str]:
         return []
 
     def _compute_barrier_values(
@@ -1370,7 +1377,7 @@ class SingleLayerHorizontalFlowBarrierMultiplier(HorizontalFlowBarrierBase):
     def _get_variable_name(self) -> str:
         return "multiplier"
 
-    def _get_vertical_variables(self) -> list:
+    def _get_vertical_variables(self) -> list[str]:
         return ["layer"]
 
     def _compute_barrier_values(
@@ -1464,7 +1471,7 @@ class HorizontalFlowBarrierResistance(HorizontalFlowBarrierBase):
     def _get_variable_name(self) -> str:
         return "resistance"
 
-    def _get_vertical_variables(self) -> list:
+    def _get_vertical_variables(self) -> list[str]:
         return []
 
     def _compute_barrier_values(
@@ -1475,6 +1482,52 @@ class HorizontalFlowBarrierResistance(HorizontalFlowBarrierBase):
         )
 
         return barrier_values
+
+    @classmethod
+    def from_imod5_data(cls, key: str, imod5_data: Dict[str, GridDataDict]):
+        """
+        Import HFB data from imod5 data dictionary. Data from "3D GEN" files, so
+        with a polygon geometry, can be loaded with this method.
+
+        Parameters
+        ----------
+        key: str
+            Key in the imod5_data dictionary where the HFB data is stored.
+        imod5_data: Dict[str, GridDataDict]
+            Dictionary with data from imod5, where the HFB data is stored under
+            the provided key.
+
+        Returns
+        -------
+        HorizontalFlowBarrierResistance
+             HFB package with data from the imod5 data dictionary.
+
+        Examples
+        --------
+
+        Load HFB data from an imod5 data dictionary. The imod5 data dictionary
+        can be obtained by reading a .prj file with the
+        :func:`imod.prj.open_projectfile_data` function. The projectfile
+        should point to 3D GEN files.
+
+        >>> imod5_data, _ = imod.prj.open_projectfile_data("path/to/prj/file.prj")
+        >>> hfb = HorizontalFlowBarrierResistance.from_imod5_data("hfb-1", imod5_data)
+        """
+        imod5_keys = list(imod5_data.keys())
+        if key not in imod5_keys:
+            raise ValueError("hfb key not present.")
+
+        hfb_dict = imod5_data[key]
+        layer = hfb_dict.get("layer", None)
+        if layer != 0:
+            raise ValueError(
+                "assigning to a layer is not supported for "
+                "HorizontalFlowBarrierResistance. "
+                "Try SingleLayerHorizontalFlowBarrierResistance class."
+            )
+        geometry_layer = hfb_dict["geodataframe"]
+
+        return cls(geometry_layer)
 
 
 class SingleLayerHorizontalFlowBarrierResistance(HorizontalFlowBarrierBase):
@@ -1536,7 +1589,7 @@ class SingleLayerHorizontalFlowBarrierResistance(HorizontalFlowBarrierBase):
     def _get_variable_name(self) -> str:
         return "resistance"
 
-    def _get_vertical_variables(self) -> list:
+    def _get_vertical_variables(self) -> list[str]:
         return ["layer"]
 
     def _compute_barrier_values(
@@ -1550,7 +1603,35 @@ class SingleLayerHorizontalFlowBarrierResistance(HorizontalFlowBarrierBase):
         return barrier_values
 
     @classmethod
-    def from_imod5_data(cls, key: str, imod5_data: Dict[str, Dict[str, GridDataArray]]):
+    def from_imod5_data(cls, key: str, imod5_data: Dict[str, GridDataDict]):
+        """
+        Import HFB data from imod5 data dictionary. Data from "2D GEN" files, so
+        with a line shape, can be loaded with this method.
+
+        Parameters
+        ----------
+        key: str
+            Key in the imod5_data dictionary where the HFB data is stored.
+        imod5_data: Dict[str, GridDataDict]
+            Dictionary with data from imod5, where the HFB data is stored under
+            the provided key.
+
+        Returns
+        -------
+        SingleLayerHorizontalFlowBarrierResistance
+             HFB package with data from the imod5 data dictionary.
+
+        Examples
+        --------
+
+        Load HFB data from an imod5 data dictionary. The imod5 data dictionary
+        can be obtained by reading a .prj file with the
+        :func:`imod.prj.open_projectfile_data` function. The projectfile
+        should point to 2D GEN files.
+
+        >>> imod5_data, _ = imod.prj.open_projectfile_data("path/to/prj/file.prj")
+        >>> hfb = SingleLayerHorizontalFlowBarrierResistance.from_imod5_data("hfb-1", imod5_data)
+        """
         imod5_keys = list(imod5_data.keys())
         if key not in imod5_keys:
             raise ValueError("hfb key not present.")

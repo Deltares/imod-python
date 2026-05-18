@@ -8,14 +8,12 @@ import datetime
 import pathlib
 import re
 import tempfile
-from typing import Any, Dict, Optional
+from typing import Any, Optional
 
 import cftime
 import numpy as np
 
 from imod.util.time import _compose_timestring, to_datetime
-
-Pattern = re.Pattern
 
 
 def _custom_pattern_to_regex_pattern(pattern: str):
@@ -34,7 +32,7 @@ def _custom_pattern_to_regex_pattern(pattern: str):
     return re.compile(simple_regex)
 
 
-def _groupdict_from_pattern(stem: str, pattern: Pattern) -> Dict:
+def _groupdict_from_pattern(stem: str, pattern: re.Pattern[str]) -> dict[str, Any]:
     """
     Use a compiled regex pattern to extract the variables from the stem. Returns
     empty dict if no match is found.
@@ -46,9 +44,9 @@ def _groupdict_from_pattern(stem: str, pattern: Pattern) -> Dict:
         return match.groupdict()
 
 
-def _groupdict(stem: str, pattern: Optional[str | Pattern]) -> Dict:
+def _groupdict(stem: str, pattern: Optional[str | re.Pattern[str]]) -> dict[str, Any]:
     if pattern is not None:
-        if isinstance(pattern, Pattern):
+        if isinstance(pattern, re.Pattern):
             d = _groupdict_from_pattern(stem, pattern)
         else:
             re_pattern = _custom_pattern_to_regex_pattern(pattern)
@@ -78,7 +76,7 @@ def _groupdict(stem: str, pattern: Optional[str | Pattern]) -> Dict:
     return d
 
 
-def decompose(path, pattern: Optional[str] = None) -> Dict[str, Any]:
+def decompose(path, pattern: Optional[str] = None) -> dict[str, Any]:
     r"""
     Parse a path, returning a dict of the parts, following the iMOD conventions.
 

@@ -730,7 +730,13 @@ def _polygonize(da: xr.DataArray) -> "gpd.GeoDataFrame":
     geometries = []
     colvalues = []
     for geom, colval in shapes:
-        geometries.append(shapely.geometry.Polygon(geom["coordinates"][0]))
+        coordinates = geom["coordinates"]
+        exterior = coordinates[0]
+        if len(coordinates) > 1:
+            interiors = coordinates[1:]
+        else:
+            interiors = None
+        geometries.append(shapely.geometry.Polygon(exterior, interiors))
         colvalues.append(colval)
 
     gdf = gpd.GeoDataFrame({"value": colvalues, "geometry": geometries})

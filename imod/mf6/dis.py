@@ -7,7 +7,6 @@ import imod
 from imod.common.interfaces.imaskingsettings import IMaskingSettings
 from imod.common.interfaces.iregridpackage import IRegridPackage
 from imod.common.utilities.dataclass_type import DataclassType
-from imod.common.utilities.grid import create_smallest_target_grid
 from imod.common.utilities.regrid import (
     _regrid_like,
     _regrid_package_data,
@@ -178,14 +177,14 @@ class StructuredDiscretization(Package, IRegridPackage, IMaskingSettings):
         regridder_types: Optional[DataclassType] = None,
         regrid_cache: RegridderWeightsCache = RegridderWeightsCache(),
         validate: bool = True,
+        target_grid: Optional[GridDataArray] = None,
     ) -> "StructuredDiscretization":
         """
         Construct package from iMOD5 data, loaded with the
         :func:`imod.formats.prj.open_projectfile_data` function.
 
-        Method regrids all variables to a target grid with the smallest extent
-        and smallest cellsize available in all the grids. Consequently it
-        converts iMODFLOW data to MODFLOW 6 data.
+        Method regrids all variables to a target grid. If not provided, the
+        first grid of the BND package is used as target grid.
 
         .. note::
 
@@ -202,6 +201,9 @@ class StructuredDiscretization(Package, IRegridPackage, IMaskingSettings):
         regrid_cache: RegridderWeightsCache, optional
             stores regridder weights for different regridders. Can be used to speed up regridding,
             if the same regridders are used several times for regridding different arrays.
+        target_grid: GridDataArray, optional
+            the target grid to which the data should be regridded. If not
+            provided, the first grid of the BND package is used as target grid.
 
         Returns
         -------
@@ -214,7 +216,10 @@ class StructuredDiscretization(Package, IRegridPackage, IMaskingSettings):
             "bottom": imod5_data["bot"]["bottom"],
         }
 
-        target_grid = create_smallest_target_grid(*data.values())
+        if target_grid is None:
+            target_grid = data["idomain"].isel(
+                layer=0, drop=True, missing_dims="ignore"
+            )
 
         if regridder_types is None:
             regridder_types = StructuredDiscretization.get_regrid_methods()

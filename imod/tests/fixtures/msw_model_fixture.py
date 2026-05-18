@@ -201,13 +201,6 @@ def make_msw_model():
     msw_model["meteo_grid"] = msw.MeteoGrid(precipitation, evapotranspiration)
     msw_model["mapping_prec"] = msw.PrecipitationMapping(precipitation)
     msw_model["mapping_evt"] = msw.EvapotranspirationMapping(precipitation * 1.5)
-
-    # %% Sprinkling
-    msw_model["sprinkling"] = msw.Sprinkling(
-        max_abstraction_groundwater=xr.full_like(area, 100.0),
-        max_abstraction_surfacewater=xr.full_like(area, 100.0),
-    )
-
     # %% Ponding
     msw_model["ponding"] = msw.Ponding(
         ponding_depth=xr.full_like(area, 0.0),
@@ -279,6 +272,17 @@ def make_msw_model():
     return msw_model
 
 
+def msw_add_sprinkling(msw_model):
+    # %% Sprinkling
+    area = msw_model["grid"].dataset["area"]
+
+    msw_model["sprinkling"] = msw.Sprinkling(
+        max_abstraction_groundwater=xr.full_like(area, 100.0),
+        max_abstraction_surfacewater=xr.full_like(area, 100.0),
+    )
+    return msw_model
+
+
 @pytest.fixture(scope="function")
 def coupled_mf6wel():
     x = [1.0, 2.0, 3.0]
@@ -316,4 +320,15 @@ def coupled_mf6_model():
 
 @pytest.fixture(scope="function")
 def msw_model():
+    msw_model = make_msw_model()
+    return msw_add_sprinkling(msw_model)
+
+
+@pytest.fixture(scope="function")
+def msw_model_no_sprinkling():
     return make_msw_model()
+
+
+@pytest.fixture(scope="function")
+def msw_model_get_starttime():
+    return "1/1/1971"

@@ -4,6 +4,7 @@ import numpy as np
 import pandas as pd
 import xarray as xr
 
+from imod.common.interfaces.ipackagebase import IPackageBase
 from imod.mf6.dis import StructuredDiscretization
 from imod.mf6.mf6_wel_adapter import Mf6Wel
 from imod.msw.fixed_format import VariableMetaData
@@ -11,7 +12,7 @@ from imod.msw.pkgbase import DataDictType, MetaSwapPackage
 from imod.typing import IntArray
 
 
-class CouplerMapping(MetaSwapPackage):
+class CouplerMapping(MetaSwapPackage, IPackageBase):
     """
     This contains the data to connect MODFLOW 6 cells to MetaSWAP svats.
 
@@ -46,8 +47,9 @@ class CouplerMapping(MetaSwapPackage):
         """
         mod_id = xr.full_like(svat, fill_value=0, dtype=np.int64)
         n_subunit = svat["subunit"].size
-
-        n_mod_top = idomain_top_active.sum()
+        # Sum active cells and convert to int for MyPy. This is the number of
+        # modflow cells in the top layer.
+        n_mod_top = int(idomain_top_active.sum().item())
 
         # idomain does not have a subunit dimension, so tile for n_subunits
         mod_id_1d: IntArray = np.tile(np.arange(1, n_mod_top + 1), (n_subunit, 1))
@@ -124,8 +126,9 @@ class CouplerMapping(MetaSwapPackage):
         well_layer = well_cellid.sel(dim_cellid="layer").data
         well_row = well_cellid.sel(dim_cellid="row").data - 1
         well_column = well_cellid.sel(dim_cellid="column").data - 1
-
-        n_mod = idomain_active.sum()
+        # Sum active cells and convert to int for MyPy. This is the number of
+        # modflow cells in the top layer.
+        n_mod = int(idomain_active.sum().item())
         mod_id = xr.full_like(idomain_active, 0, dtype=np.int64)
         mod_id.data[idomain_active.data] = np.arange(1, n_mod + 1)
 

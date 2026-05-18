@@ -87,11 +87,8 @@ def test_regrid_transport(
     # Compute and compare the total mass of the original model and the regridded mode.
     # Constants like porosity are not included.
     for species in ["species_a", "species_b", "species_c", "species_d"]:
-        original_mass = np.sum(
-            conc.sel(time=2000, species=species).values * cell_volume
-        )
+        original_mass = np.sum(conc.sel(time=20, species=species).values * cell_volume)
         regridded_mass = np.sum(
-            regridded_conc.sel(time=2000, species=species).values
-            * regridded_cell_volume
+            regridded_conc.sel(time=20, species=species).values * regridded_cell_volume
         )
         assert abs((original_mass - regridded_mass)) / original_mass < 3e-2
