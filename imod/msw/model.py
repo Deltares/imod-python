@@ -13,10 +13,10 @@ import tomli
 import xarray as xr
 
 import imod.msw
-from imod.common.interfaces.imodel import IModel
-from imod.common.utilities.mask import mask_all_packages
 from imod.common.constants import MaskValues
+from imod.common.interfaces.imodel import IModel
 from imod.common.utilities.clip import clip_by_grid
+from imod.common.utilities.mask import mask_all_packages
 from imod.common.utilities.partitioninfo import create_partition_info
 from imod.common.utilities.regrid import regrid_imod5_cap_data
 from imod.common.utilities.value_filters import enforce_scalar
