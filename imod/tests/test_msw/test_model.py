@@ -26,6 +26,14 @@ def roundtrip(msw_model, tmpdir_factory, name, engine):
     dump_modelpkgs(msw_model, tmp_path, name, engine=engine, validate=False)
     back = MetaSwapModel.from_file(tmp_path, name)
     assert isinstance(back, MetaSwapModel)
+    pkgkeycheck = set(msw_model.keys()) == set(back.keys())
+    assert pkgkeycheck
+    pkgcheck = all(
+        msw_model[pkgname].dataset.equals(back[pkgname].dataset)
+        for pkgname in msw_model.keys()
+    )
+    assert pkgcheck
+    assert msw_model.simulation_settings == back.simulation_settings
 
 
 def test_msw_pkgdump(msw_model, tmpdir_factory):
