@@ -228,8 +228,8 @@ class MetaSwapModel(Model):
 
         year, time_since_start_year = to_metaswap_timeformat([starttime])
 
-        year = int(enforce_scalar(year.values))
-        time_since_start_year = float(enforce_scalar(time_since_start_year.values))
+        year = int(enforce_scalar(year))
+        time_since_start_year = float(enforce_scalar(time_since_start_year))
 
         return year, time_since_start_year
 
