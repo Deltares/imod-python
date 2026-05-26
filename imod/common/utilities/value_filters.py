@@ -29,7 +29,7 @@ def is_valid(value: Any) -> bool:
 
 
 def is_empty_dataarray(da: Any) -> bool:
-    return isinstance(da, xr.DataArray) and da.isnull().all().item()
+    return isinstance(da, xr.DataArray) and da.isnull().all().compute().item()
 
 
 def get_scalar_variables(ds: GridDataset) -> list[str]:
