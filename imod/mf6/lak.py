@@ -1171,7 +1171,7 @@ class Lake(BoundaryCondition):
             has_barea_column = "barea" in table.coords["column"]
             if has_barea_column:
                 barea_column = table.sel({"column": "barea"})
-                has_barea_column = barea_column.notnull().any().item()
+                has_barea_column = enforce_scalar(barea_column.notnull().any())
 
             columns = ["stage", "sarea", "volume"]
             if has_barea_column:
