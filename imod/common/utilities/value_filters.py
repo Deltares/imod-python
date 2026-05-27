@@ -4,7 +4,7 @@ import numpy as np
 import xarray as xr
 from xarray.core.utils import is_scalar
 
-from imod.typing import GridDataset, GridDataArray
+from imod.typing import GridDataArray, GridDataset
 
 
 def is_valid(value: Any) -> bool:
@@ -37,7 +37,7 @@ def get_scalar_variables(ds: GridDataset) -> list[str]:
     return [var for var, arr in ds.variables.items() if is_scalar(arr)]
 
 
-def enforce_scalar(a: GridDataArray | np.ndarray) -> GridDataArray:
+def enforce_scalar(a: GridDataArray | np.ndarray) -> Any:
     """Enforce scalar value from array."""
     if a.size == 1:
         return a.compute().item()

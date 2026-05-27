@@ -10,6 +10,7 @@ from imod.common.utilities.dataclass_type import (
 from imod.common.utilities.regrid import (
     _regrid_package_data,
 )
+from imod.common.utilities.value_filters import enforce_scalar
 from imod.logging import init_log_decorator
 from imod.mf6.package import Package
 from imod.mf6.regrid.regrid_schemes import (
@@ -35,13 +36,11 @@ def _dataarray_to_bool(griddataarray: GridDataArray) -> bool:
     if griddataarray is None or griddataarray.values is None:
         return False
 
-    if griddataarray.values.size != 1:
-        raise ValueError("DataArray is not a single value")
-
     if griddataarray.values.dtype != bool:
         raise ValueError("DataArray is not a boolean")
 
-    bool_value = cast(bool, griddataarray.values.item())
+    bool_value = cast(bool, enforce_scalar(griddataarray))
+
     return bool_value
 
 
