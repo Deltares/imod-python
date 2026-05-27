@@ -9,7 +9,7 @@ import pathlib
 import textwrap
 from collections import defaultdict
 from pathlib import Path
-from typing import Any, Dict
+from typing import Any, Dict, Optional
 
 import jinja2
 import numpy as np
@@ -17,6 +17,7 @@ import pandas as pd
 import xarray as xr
 
 from imod import mf6
+from imod.common.utilities.value_filters import enforce_scalar
 from imod.logging import init_log_decorator
 from imod.mf6.boundary_condition import BoundaryCondition
 from imod.mf6.package import Package
@@ -296,7 +297,7 @@ def create_outlet_data(outlets, name_to_number):
 
         # Convert names to numbers
         for var in ("lakein", "lakeout"):
-            name = outlet.dataset[var].item()
+            name = enforce_scalar(outlet.dataset[var])
             if (
                 var == "lakeout" and name == ""
             ):  # the outlet lakeout can be outside of the model
@@ -317,7 +318,7 @@ def create_outlet_data(outlets, name_to_number):
                 if "time" in outlet.dataset[var].dims:
                     value = 0.0
                 else:
-                    value = outlet.dataset[var].item()
+                    value = enforce_scalar(outlet.dataset[var])
                 if value is None:
                     value = np.nan
             else:
@@ -797,29 +798,31 @@ class Lake(BoundaryCondition):
 
     @staticmethod
     def from_lakes_and_outlets(
-        lakes,
-        outlets=None,
-        print_input=False,
-        print_stage=False,
-        print_flows=False,
-        save_flows=False,
-        stagefile=None,
-        budgetfile=None,
-        budgetcsvfile=None,
-        package_convergence_filename=None,
-        time_conversion=None,
-        length_conversion=None,
+        lakes: list[LakeData],
+        outlets: Optional[list[OutletBase]] = None,
+        print_input: bool = False,
+        print_stage: bool = False,
+        print_flows: bool = False,
+        save_flows: bool = False,
+        stagefile: Optional[str] = None,
+        budgetfile: Optional[str] = None,
+        budgetcsvfile: Optional[str] = None,
+        package_convergence_filename: Optional[str] = None,
+        time_conversion: Optional[float] = None,
+        length_conversion: Optional[float] = None,
     ):
-        package_content = {}
+        package_content: dict[str, Any] = {}
         name_to_number = {
-            lake["boundname"].item(): i + 1 for i, lake in enumerate(lakes)
+            enforce_scalar(lake["boundname"]): i + 1 for i, lake in enumerate(lakes)
         }
 
         # Package data
         lake_numbers = list(name_to_number.values())
-        n_connection = [lake["connection_type"].count().values[()] for lake in lakes]
+        n_connection = [
+            enforce_scalar(lake["connection_type"].count()) for lake in lakes
+        ]
         package_content["lake_starting_stage"] = xr.DataArray(
-            data=[lake["starting_stage"].item() for lake in lakes],
+            data=[enforce_scalar(lake["starting_stage"]) for lake in lakes],
             dims=[LAKE_DIM],
         )
         package_content["lake_number"] = xr.DataArray(
@@ -924,7 +927,7 @@ class Lake(BoundaryCondition):
             "time_conversion",
             "length_conversion",
         ):
-            value = self[var].item()
+            value = enforce_scalar(self[var])
             if self._valid(value):
                 d[var] = value
 
@@ -944,7 +947,7 @@ class Lake(BoundaryCondition):
             self.dataset["lake_starting_stage"],
         ):
             nconn = (self.dataset["connection_lake_number"] == number).sum()
-            row = tuple(a.item() for a in (number, stage, nconn, name))
+            row = tuple(enforce_scalar(a) for a in (number, stage, nconn, name))
             packagedata.append(row)
         d["packagedata"] = packagedata
 
@@ -1055,7 +1058,7 @@ class Lake(BoundaryCondition):
             for tssname in self._period_data:
                 if len(period_data[tssname].dims) > 0:
                     for index in period_data.coords["index"].values:
-                        value = period_data[tssname].sel(index=index).item()
+                        value = enforce_scalar(period_data[tssname].sel(index=index))
                         isvalid = False
                         if isinstance(value, str):
                             isvalid = value != ""
@@ -1161,9 +1164,8 @@ class Lake(BoundaryCondition):
 
             # count number of rows
             stage_col = table.sel({"column": "stage"})
-            d["nrow"] = (
-                stage_col.where(pd.api.types.is_numeric_dtype).count().values[()]
-            )
+            stage_counts = stage_col.where(pd.api.types.is_numeric_dtype).count()
+            d["nrow"] = enforce_scalar(stage_counts)
 
             # check if the barea column is present for this table (and not filled with nan's)
             has_barea_column = "barea" in table.coords["column"]
