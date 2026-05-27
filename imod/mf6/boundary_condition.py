@@ -7,6 +7,7 @@ import numpy as np
 import xarray as xr
 import xugrid as xu
 
+from imod.common.utilities.value_filters import enforce_scalar
 from imod.mf6.auxiliary_variables import (
     expand_transient_auxiliary_variables,
     get_variable_names,
@@ -211,7 +212,7 @@ class BoundaryCondition(Package, abc.ABC):
         for varname in self.dataset.data_vars.keys():  # pylint:disable=no-member
             if varname in not_options:
                 continue
-            v = self.dataset[varname].values[()]
+            v = enforce_scalar(self.dataset[varname])
             options[str(varname)] = v
         return options
 
