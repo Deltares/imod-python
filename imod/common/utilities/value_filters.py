@@ -37,7 +37,7 @@ def get_scalar_variables(ds: GridDataset) -> list[str]:
     return [var for var, arr in ds.variables.items() if is_scalar(arr)]
 
 
-def enforce_scalar(a: GridDataArray | np.ndarray) -> Any:
+def enforce_scalar(a: GridDataArray) -> Any:
     """Enforce scalar value from array."""
     if a.size == 1:
         return a.compute().item()
