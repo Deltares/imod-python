@@ -93,7 +93,7 @@ class BoundaryCondition(Package, abc.ABC):
         Determine the maximum active number of cells that are active
         during a stress period.
         """
-        da = self.dataset[self._get_period_varnames()[0]]
+        da = self.dataset[self._get_period_varnames()[-1]]
         if "time" in da.coords:
             nmax = int(da.groupby("time").count(xr.ALL_DIMS).max())
         else:
