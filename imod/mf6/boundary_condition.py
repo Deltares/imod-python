@@ -95,6 +95,9 @@ class BoundaryCondition(Package, abc.ABC):
         """
         if not hasattr(self, "_period_data") or len(self._period_data) == 0:
             raise ValueError("No period data variables defined for this package.")
+        # Get the last period data element to work around the first variable
+        # (cellid) of the Mf6HorizontalFlowBarrier having an additional
+        # dimension.
         da = self.dataset[self._period_data[-1]]
         if "time" in da.coords:
             nmax = int(da.groupby("time").count(xr.ALL_DIMS).max())
