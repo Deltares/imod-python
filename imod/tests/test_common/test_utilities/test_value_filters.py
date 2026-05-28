@@ -1,33 +1,50 @@
-import xarray as xr
 import dask
 import numpy as np
 import pytest
+import pytest_cases
+import xarray as xr
 
 from imod.common.utilities.value_filters import enforce_scalar, is_empty_dataarray
 
-def test_enforce_scalar():
-    da = xr.DataArray([42])
-    assert enforce_scalar(da) == 42
 
-    da = xr.DataArray([42.0])
-    assert enforce_scalar(da) == 42.0
+class ScalarCases:
+    def case_int(self):
+        return 42
 
-    da = xr.DataArray([False])
-    assert enforce_scalar(da) is False
+    def case_float(self):
+        return 42.0
 
-    da = xr.DataArray([None])
-    assert enforce_scalar(da) is None
+    def case_bool(self):
+        return False
 
-    da = xr.DataArray(["test"])
-    assert enforce_scalar(da) == "test"
+    def case_none(self):
+        return None
 
-    data = dask.array.from_array([False], chunks=1)
-    da = xr.DataArray(data)
-    assert enforce_scalar(da) == False
+    def case_string(self):
+        return "test"
 
+
+@pytest_cases.parametrize_with_cases("input_value", cases=ScalarCases)
+def test_enforce_scalar(input_value):
+    da = xr.DataArray([input_value])
+    assert enforce_scalar(da) == input_value
+
+    da = xr.DataArray([input_value, input_value])
     with pytest.raises(ValueError):
-        da = xr.DataArray([1, 2])
         enforce_scalar(da)
+
+
+@pytest_cases.parametrize_with_cases("input_value", cases=ScalarCases)
+def test_enforce_scalar_from_dask(input_value):
+    data = dask.array.from_array([input_value], chunks=1)
+    da = xr.DataArray(data)
+    assert enforce_scalar(da) == input_value
+
+    data = dask.array.from_array([input_value, input_value], chunks=2)
+    da = xr.DataArray(data)
+    with pytest.raises(ValueError):
+        enforce_scalar(da)
+
 
 def test_is_empty_dataarray():
     da = xr.DataArray([1, 2, 3])
@@ -52,7 +69,7 @@ def test_is_empty_dataarray():
     da = xr.DataArray(data)
     assert is_empty_dataarray(da)
 
-    #TODO: Figure out if this edge case needs to be handled or not.
+    # TODO: Figure out if this edge case needs to be handled or not.
     data = dask.array.from_array([None, None], chunks=2)
     da = xr.DataArray(data)
     assert is_empty_dataarray(da)
