@@ -305,7 +305,9 @@ class BoundaryCondition(Package, abc.ABC):
 
     def _get_period_varnames(self) -> list[str]:
         """
-        Get variable names for transient data of this package.
+        Get variable names for transient data of this package. These will be the
+        variables that are written to binary files and referenced in the block
+        file.
 
         Returns
         -------
