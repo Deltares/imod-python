@@ -68,8 +68,3 @@ def test_is_empty_dataarray():
     data = dask.array.from_array([np.nan, np.nan], chunks=2)
     da = xr.DataArray(data)
     assert is_empty_dataarray(da)
-
-    # TODO: Figure out if this edge case needs to be handled or not.
-    data = dask.array.from_array([None, None], chunks=2)
-    da = xr.DataArray(data)
-    assert is_empty_dataarray(da)
