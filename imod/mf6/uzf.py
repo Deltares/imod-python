@@ -432,7 +432,7 @@ class UnsaturatedZoneFlow(AdvancedBoundaryCondition):
         path = directory / pkgname / f"{self._pkg_id}-pkgdata.dat"
         d["packagedata"] = path.as_posix()
         # max uzf-cells for which time period data will be supplied
-        d["nuzfcells"] = np.count_nonzero(np.isfinite(d["landflag"]))
+        d["nuzfcells"] = np.count_nonzero(np.isfinite(self.dataset["landflag"]))
         return self._template.render(d)
 
     def _to_struct_array(self, arrdict, layer):
