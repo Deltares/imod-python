@@ -78,6 +78,8 @@ Fixed
   memory. Affected :class:`imod.mf6.River`, :class:`imod.mf6.Drain`,
   :class:`imod.mf6.ConstantHeadBoundary`, :class:`imod.mf6.Recharge`,
   :class:`imod.mf6.Well` and :class:`imod.mf6.GeneralHeadBoundary`.
+- Fix bug where ``maxbound`` of the ``.wel`` file computed by
+  :class:`imod.mf6.Mf6Wel` was twice or thrice too large.
 
 Changed
 ~~~~~~~
