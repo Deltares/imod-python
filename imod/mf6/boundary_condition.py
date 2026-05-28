@@ -212,7 +212,7 @@ class BoundaryCondition(Package, abc.ABC):
         for varname in self.dataset.data_vars.keys():  # pylint:disable=no-member
             if varname in not_options:
                 continue
-            v = enforce_scalar(self.dataset[varname])
+            v = self.dataset[varname].values[()]
             options[str(varname)] = v
         return options
 
