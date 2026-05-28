@@ -422,8 +422,11 @@ class UnsaturatedZoneFlow(AdvancedBoundaryCondition):
         d["periods"] = self._period_paths(
             directory, pkgname, globaltimes, bin_ds, binary=False
         )
+        # List variables that are not in the period data or package data, but
+        # are needed for rendering the template and are not options.
+        vars_from_init = ["iuzno", "ivertcon", "landflag", "stress_period_active"]
         not_options = (
-            list(self._period_data) + list(self._package_data) + ["iuzno" + "ivertcon"]
+            list(self._period_data) + list(self._package_data) + vars_from_init
         )
         d = self._get_pkg_options(d, not_options=not_options)
         path = directory / pkgname / f"{self._pkg_id}-pkgdata.dat"
