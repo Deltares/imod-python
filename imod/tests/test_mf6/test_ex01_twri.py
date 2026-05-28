@@ -319,7 +319,7 @@ def test_wel_render(twri_model_extended, tmp_path):
             end options
 
             begin dimensions
-              maxbound 45
+              maxbound 15
             end dimensions
 
             begin period 1
