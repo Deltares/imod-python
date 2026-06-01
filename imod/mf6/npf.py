@@ -1,4 +1,4 @@
-from typing import Optional, cast
+from typing import Optional
 
 import numpy as np
 import xarray as xr
@@ -33,15 +33,15 @@ from imod.util.regrid import RegridderWeightsCache
 
 
 def _dataarray_to_bool(griddataarray: GridDataArray) -> bool:
-    if griddataarray is None or griddataarray.values is None:
+    scalar_value: Optional[bool] = enforce_scalar(griddataarray)
+
+    if scalar_value is None:
         return False
 
-    if griddataarray.values.dtype != bool:
-        raise ValueError("DataArray is not a boolean")
+    if not isinstance(scalar_value, bool):
+        raise ValueError("DataArray does not contain a boolean value")
 
-    bool_value = cast(bool, enforce_scalar(griddataarray))
-
-    return bool_value
+    return scalar_value
 
 
 class NodePropertyFlow(Package, IRegridPackage):

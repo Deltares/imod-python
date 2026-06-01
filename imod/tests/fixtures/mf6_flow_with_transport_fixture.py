@@ -83,6 +83,7 @@ def conductance_fc():
 
     # Constant head
     conductance = xr.full_like(idomain, np.nan)
+    conductance[:, 0, 7, 7:9] = 1.0
     return conductance
 
 
