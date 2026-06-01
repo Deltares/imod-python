@@ -24,7 +24,7 @@ from imod.common.interfaces.isimulation import ISimulation
 from imod.common.serializer import EngineType
 from imod.common.statusinfo import NestedStatusInfo
 from imod.common.utilities.dataclass_type import DataclassType
-from imod.common.utilities.dump_model import dump_modelpkgs
+from imod.common.utilities.dump_model import _dump_model
 from imod.common.utilities.mask import mask_all_models
 from imod.common.utilities.partitioninfo import create_partition_info
 from imod.common.utilities.regrid import _regrid_like
@@ -1038,7 +1038,7 @@ class Modflow6Simulation(collections.UserDict[str, Any], ISimulation):
         for key, value in self.items():
             cls_name = type(value).__name__
             if isinstance(value, Modflow6Model):
-                model_toml_path = dump_modelpkgs(
+                model_toml_path = _dump_model(
                     value, directory, key, validate, mdal_compliant, crs, engine=engine
                 )
                 toml_content[cls_name][key] = model_toml_path.relative_to(

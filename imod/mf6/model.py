@@ -22,6 +22,7 @@ from imod.common.interfaces.imodel import IModel
 from imod.common.serializer import EngineType
 from imod.common.statusinfo import NestedStatusInfo, StatusInfo, StatusInfoBase
 from imod.common.utilities.clip import clip_box_dataset
+from imod.common.utilities.dump_model import _dump_model
 from imod.common.utilities.mask import mask_all_packages
 from imod.common.utilities.regrid import _regrid_like
 from imod.common.utilities.schemata import (
@@ -657,6 +658,16 @@ class Modflow6Model(collections.UserDict[str, Package], IModel, abc.ABC):
                 raise ValidationError(statusinfo.to_string())
 
         toml_content: dict[str, Any] = collections.defaultdict(dict)
+
+        _dump_model(
+            self,
+            modeldirectory,
+            modelname,
+            validate=validate,
+            mdal_compliant=mdal_compliant,
+            crs=crs,
+            engine=engine,
+        )
 
         for pkgname, pkg in self.items():
             pkg_path = pkg.to_file(

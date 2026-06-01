@@ -8,7 +8,6 @@ from numpy.testing import assert_almost_equal, assert_equal
 from pytest_cases import parametrize_with_cases
 
 from imod import mf6, msw
-from imod.common.utilities.dump_model import dump_modelpkgs
 from imod.msw.copy_files import FileCopier
 from imod.msw.meteo_grid import MeteoGridCopy
 from imod.msw.meteo_mapping import MeteoMapping
@@ -23,7 +22,7 @@ from imod.util.spatial import empty_2d
 def roundtrip(msw_model, tmpdir_factory, name, engine):
     # TODO: look at the values?
     tmp_path = tmpdir_factory.mktemp(name)
-    dump_modelpkgs(msw_model, tmp_path, name, engine=engine, validate=False)
+    msw_model.dump(tmp_path, name, engine=engine, validate=False)
     back = MetaSwapModel.from_file(tmp_path, name)
     assert isinstance(back, MetaSwapModel)
     pkgkeycheck = set(msw_model.keys()) == set(back.keys())

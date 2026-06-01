@@ -1,26 +1,18 @@
 import collections
-import inspect
-import pathlib
 from pathlib import Path
 from typing import Any, Optional
 
-import tomli
 import tomli_w
 
-import imod.mf6
-import imod.msw
 from imod.common.interfaces.imodel import IModel
-from imod.common.interfaces.ipackage import IPackage
 from imod.common.serializer import EngineType
 from imod.logging.logging_decorators import standard_log_decorator
-from imod.mf6.model import Modflow6Model
 from imod.mf6.validation_settings import ValidationSettings
-from imod.msw.model import MetaSwapModel
 from imod.schemata import ValidationError
 
 
 @standard_log_decorator()
-def dump_modelpkgs(
+def _dump_model(
     model: IModel,
     directory,
     modelname,
@@ -91,27 +83,3 @@ def dump_modelpkgs(
         tomli_w.dump(toml_content, f)
 
     return toml_path
-
-
-def from_file(instance, toml_path):
-    if isinstance(instance, Modflow6Model):
-        modref = imod.mf6
-    if isinstance(instance, MetaSwapModel):
-        modref = imod.msw
-    pkg_classes = {
-        name: pkg_cls
-        for name, pkg_cls in inspect.getmembers(modref, inspect.isclass)
-        if issubclass(pkg_cls, IPackage)
-    }
-
-    toml_path = pathlib.Path(toml_path)
-    with open(toml_path, "rb") as f:
-        toml_content = tomli.load(f)
-
-    parentdir = toml_path.parent
-    for key, entry in toml_content.items():
-        for pkgname, path in entry.items():
-            pkg_cls = pkg_classes[key]
-            instance[pkgname] = pkg_cls.from_file(parentdir / path)
-
-    return instance

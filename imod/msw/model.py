@@ -15,7 +15,9 @@ import xarray as xr
 import imod.msw
 from imod.common.constants import MaskValues
 from imod.common.interfaces.imodel import IModel
+from imod.common.serializer import EngineType
 from imod.common.utilities.clip import clip_by_grid
+from imod.common.utilities.dump_model import _dump_model
 from imod.common.utilities.mask import mask_all_packages
 from imod.common.utilities.partitioninfo import create_partition_info
 from imod.common.utilities.regrid import regrid_imod5_cap_data
@@ -402,6 +404,44 @@ class MetaSwapModel(Model, IModel):
                     instance[pkgname] = pkg_cls.from_file(parentdir / path)
 
         return instance
+
+    def dump(
+        self,
+        directory: Union[str, Path],
+        modelname: Optional[str] = None,
+        validate: Optional[bool] = True,
+        mdal_compliant: bool = False,
+        crs: Optional[str] = None,
+        engine: EngineType = "netcdf4",
+    ):
+        """
+        Dump model packages to netCDF files and create a toml file with paths to these files.
+        The MetaSWAP model can be reloaded from the dumped files using the :func:`from_file` method.
+
+        Parameters
+        ----------
+        directory: Path or str
+            Directory to dump model in. A subdirectory with the name of the model will be created in this directory, and the files will be dumped there.
+        modelname: str, optional
+            Name of the model. This will be used as the name of the subdirectory where the files are dumped, and in the name of the toml file. If not provided, it defaults to the value of ``self._model_name``.
+        validate: bool, optional
+            Whether to perform validation before dumping the model. If True, the model will be validated using the validation functionality in iMOD. If validation errors are found, a ValidationError is raised and the model is not dumped. Default is True.
+        mdal_compliant: bool, optional
+            Whether to write the files in a format compliant with the MDAL specification. This can be used to make the files compatible with software that supports MDAL, such as QGIS. Default is False.
+        crs: str, optional
+            Coordinate reference system to use in the dumped files. This should be a string in a format recognized by the pyproj library, for example "EPSG:28992". If not provided, no CRS information is included in the files.
+        engine: EngineType, optional
+            File engine used to write packages.
+        """
+        _dump_model(
+            self,
+            directory=directory,
+            modelname=modelname,
+            validate=validate,
+            mdal_compliant=mdal_compliant,
+            crs=crs,
+            engine=engine,
+        )
 
     def regrid_like(
         self,
