@@ -53,6 +53,7 @@ import xarray as xr
 import xugrid as xu
 from numpy.typing import DTypeLike  # noqa: F401
 
+from imod.common.utilities.value_filters import enforce_scalar
 from imod.typing import GridDataArray, ScalarAsDataArray
 from imod.typing.grid import notnull
 from imod.util.imports import MissingOptionalModule
@@ -183,7 +184,7 @@ class OptionSchema(BaseSchema):
             return
 
         # MODFLOW 6 is not case sensitive for string options.
-        value = obj.item()
+        value = enforce_scalar(obj)
         if isinstance(value, str):
             value = value.lower()
 

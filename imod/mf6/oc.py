@@ -6,7 +6,7 @@ from typing import Any, Dict, Union
 import numpy as np
 
 from imod.common.interfaces.iregridpackage import IRegridPackage
-from imod.common.utilities.value_filters import is_empty_dataarray
+from imod.common.utilities.value_filters import enforce_scalar, is_empty_dataarray
 from imod.logging import init_log_decorator
 from imod.mf6.package import Package
 from imod.mf6.write_context import WriteContext
@@ -172,11 +172,11 @@ class OutputControl(Package, IRegridPackage):
                 package_times = self.dataset[datavar].coords["time"].values
                 starts = np.searchsorted(globaltimes, package_times) + 1
                 for i, s in enumerate(starts):
-                    setting = self.dataset[datavar].isel(time=i).values[()]
+                    setting = enforce_scalar(self.dataset[datavar].isel(time=i))
                     periods[s][key] = self._get_ocsetting(setting)
 
             else:
-                setting = self.dataset[datavar].item()
+                setting = enforce_scalar(self.dataset[datavar])
                 periods[1][key] = self._get_ocsetting(setting)
 
         d["periods"] = periods

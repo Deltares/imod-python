@@ -27,6 +27,7 @@ from imod.common.utilities.line_data import (
     _extract_zbounds_from_vertical_polygons,
     _prepare_index_names,
 )
+from imod.common.utilities.value_filters import enforce_scalar
 from imod.logging import LogLevel, init_log_decorator, logger
 from imod.mf6.boundary_condition import BoundaryCondition
 from imod.mf6.dis import StructuredDiscretization
@@ -567,7 +568,7 @@ class HorizontalFlowBarrierBase(BoundaryCondition, ILineDataPackage):
         Refer to the xarray documentation for the possible keyword arguments.
         """
         instance = super().from_file(path, **kwargs)
-        geometry = json.loads(instance.dataset["geometry"].values.item())
+        geometry = json.loads(enforce_scalar(instance.dataset["geometry"]))
         instance.line_data = gpd.GeoDataFrame.from_features(geometry)
 
         return instance

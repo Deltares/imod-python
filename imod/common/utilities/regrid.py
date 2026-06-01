@@ -19,7 +19,7 @@ from imod.common.interfaces.isimulation import ISimulation
 from imod.common.utilities.clip import clip_by_grid
 from imod.common.utilities.dataclass_type import DataclassType, EmptyRegridMethod
 from imod.common.utilities.dtype import is_integer
-from imod.common.utilities.value_filters import is_valid
+from imod.common.utilities.value_filters import enforce_scalar, is_valid
 from imod.typing import Imod5DataDict
 from imod.typing.grid import (
     GridDataArray,
@@ -48,7 +48,7 @@ def handle_extra_coords(coordname: str, target_grid: GridDataArray, variable_dat
     if hasattr(variable_data, "coords"):
         if coordname in target_grid.coords:
             return variable_data.assign_coords(
-                {coordname: target_grid.coords[coordname].values[()]}
+                {coordname: enforce_scalar(target_grid.coords[coordname])}
             )
         elif coordname in variable_data.coords:
             return variable_data.drop_vars(coordname)
@@ -73,7 +73,7 @@ def _regrid_array(
 
     # skip regridding for scalar arrays with no valid values (such as "None")
     scalar_da: bool = is_scalar(da)
-    if scalar_da and not is_valid(da.values[()]):
+    if scalar_da and not is_valid(enforce_scalar(da)):
         return None
 
     # the dataarray might be a scalar. If it is, then it does not need regridding.

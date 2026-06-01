@@ -17,6 +17,7 @@ import numpy as np
 
 from imod.common.interfaces.iregridpackage import IRegridPackage
 from imod.common.utilities.dataclass_type import DataclassType
+from imod.common.utilities.value_filters import enforce_scalar
 from imod.mf6.package import Package
 from imod.schemata import AllValueSchema, DimsSchema, DTypeSchema
 from imod.typing import GridDataArray
@@ -43,11 +44,11 @@ class AdvectionBase(Package, IRegridPackage, ABC):
 
     def _render(self, directory, pkgname, globaltimes, binary):
         render_dict = {}
-        render_dict["scheme"] = self.dataset["scheme"].item()
-        if "ats_percel" in self.dataset and self._valid(
-            self.dataset["ats_percel"].item()
-        ):
-            render_dict["ats_percel"] = self.dataset["ats_percel"].item()
+        render_dict["scheme"] = enforce_scalar(self.dataset["scheme"])
+        if "ats_percel" in self.dataset:
+            ats_percel = enforce_scalar(self.dataset["ats_percel"])
+            if self._valid(ats_percel):
+                render_dict["ats_percel"] = ats_percel
         return self._template.render(render_dict)
 
     def mask(self, _) -> Package:

@@ -1,6 +1,7 @@
 import cftime
 import numpy as np
 
+from imod.common.utilities.value_filters import enforce_scalar
 from imod.logging import init_log_decorator
 from imod.mf6.package import Package
 from imod.mf6.write_context import WriteContext
@@ -79,7 +80,7 @@ class TimeDiscretization(Package):
             "start_date_time": start_date_time,
         }
         if "ats_filename" in self.dataset:
-            d["ats_filename"] = self.dataset["ats_filename"].item()
+            d["ats_filename"] = enforce_scalar(self.dataset["ats_filename"])
         timestep_duration = self.dataset["timestep_duration"]
         n_timesteps = self.dataset["n_timesteps"]
         timestep_multiplier = self.dataset["timestep_multiplier"]

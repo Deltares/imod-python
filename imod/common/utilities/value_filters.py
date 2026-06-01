@@ -4,7 +4,7 @@ import numpy as np
 import xarray as xr
 from xarray.core.utils import is_scalar
 
-from imod.typing import GridDataset
+from imod.typing import GridDataArray, GridDataset
 
 
 def is_valid(value: Any) -> bool:
@@ -29,7 +29,7 @@ def is_valid(value: Any) -> bool:
 
 
 def is_empty_dataarray(da: Any) -> bool:
-    return isinstance(da, xr.DataArray) and da.isnull().all().item()
+    return isinstance(da, xr.DataArray) and enforce_scalar(da.isnull().all())
 
 
 def get_scalar_variables(ds: GridDataset) -> list[str]:
@@ -37,8 +37,8 @@ def get_scalar_variables(ds: GridDataset) -> list[str]:
     return [var for var, arr in ds.variables.items() if is_scalar(arr)]
 
 
-def enforce_scalar(a: np.ndarray) -> np.ndarray:
+def enforce_scalar(a: GridDataArray) -> Any:
     """Enforce scalar value from array."""
     if a.size == 1:
-        return a.item()
-    return ValueError(f"Array has size {a.size}, expected size 1.")
+        return a.compute().item()
+    raise ValueError(f"Array has size {a.size}, expected size 1.")
