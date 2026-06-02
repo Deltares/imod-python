@@ -79,20 +79,33 @@ def test_compute_overlap():
     assert np.allclose(correction_actual, expected_correction)
 
 
-def test_compute_penetration_mismatch_factor_zero_thickness():
+def test_compute_penetration_mismatch_factor__zero_layer_thickness():
     # Zero-thickness layers (top == bottom) used to trigger a divide-by-zero in
     # the penetration mismatch factor, emitting a RuntimeWarning (which raises
     # under -W error) and producing NaN factors.
     layer_bounds = np.array([[0.0, 10.0], [10.0, 10.0], [10.0, 20.0]])
-    well_bounds = np.array([[2.0, 8.0], [10.0, 10.0], [12.0, 18.0]])
+    well_bounds = np.array([[2.0, 10.0], [2.0, 10.0], [12.0, 18.0]])
 
     with np.errstate(divide="raise", invalid="raise"):
         factor = prepwel.compute_penetration_mismatch_factor(well_bounds, layer_bounds)
 
     assert np.all(np.isfinite(factor))
     # the values for the non-degenerate layers are unchanged
-    assert np.allclose(factor[[0, 2]], [1.0, 1.0])
+    assert np.allclose(factor, [0.8, 1.0, 1.0])
 
+def test_compute_penetration_mismatch_factor__zero_mismatch_thickness():
+    # Zero-thickness layers (top == bottom) plus a zero mismatch factor used to
+    # trigger a invalid value in the penetration mismatch factor, emitting a
+    # RuntimeWarning (which raises under -W error) and producing NaN factors.
+    layer_bounds = np.array([[0.0, 10.0], [10.0, 10.0], [10.0, 20.0]])
+    well_bounds = np.array([[2.0, 10.0], [10.0, 10.0], [12.0, 18.0]])
+
+    with np.errstate(divide="raise", invalid="raise"):
+        factor = prepwel.compute_penetration_mismatch_factor(well_bounds, layer_bounds)
+
+    assert np.all(np.isfinite(factor))
+    # the values for the non-degenerate layers are unchanged
+    assert np.allclose(factor, [0.8, 1.0, 1.0])
 
 class AssignWellCases:
     def case_mix_wells(self):
