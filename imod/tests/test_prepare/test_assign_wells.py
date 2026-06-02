@@ -93,6 +93,7 @@ def test_compute_penetration_mismatch_factor__zero_layer_thickness():
     # the values for the non-degenerate layers are unchanged
     assert np.allclose(factor, [0.8, 1.0, 1.0])
 
+
 def test_compute_penetration_mismatch_factor__zero_mismatch_thickness():
     # Zero-thickness layers (top == bottom) plus a zero mismatch factor used to
     # trigger a invalid value in the penetration mismatch factor, emitting a
@@ -106,6 +107,7 @@ def test_compute_penetration_mismatch_factor__zero_mismatch_thickness():
     assert np.all(np.isfinite(factor))
     # the values for the non-degenerate layers are unchanged
     assert np.allclose(factor, [0.8, 1.0, 1.0])
+
 
 class AssignWellCases:
     def case_mix_wells(self):
