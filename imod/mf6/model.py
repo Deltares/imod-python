@@ -12,7 +12,6 @@ import cftime
 import jinja2
 import numpy as np
 import tomli
-import tomli_w
 import xarray as xr
 import xugrid as xu
 from jinja2 import Template
@@ -22,7 +21,7 @@ from imod.common.interfaces.imodel import IModel
 from imod.common.serializer import EngineType
 from imod.common.statusinfo import NestedStatusInfo, StatusInfo, StatusInfoBase
 from imod.common.utilities.clip import clip_box_dataset
-from imod.common.utilities.dump_model import _dump_model
+from imod.common.utilities.dump_model import dump_model
 from imod.common.utilities.mask import mask_all_packages
 from imod.common.utilities.regrid import _regrid_like
 from imod.common.utilities.schemata import (
@@ -618,70 +617,57 @@ class Modflow6Model(collections.UserDict[str, Package], IModel, abc.ABC):
         engine: EngineType = "netcdf4",
     ) -> Path:
         """
-        Dump simulation to files. Writes a model definition as .TOML file, which
-        points to data for each package. Each package is stored as a separate
-        NetCDF. Structured grids are saved as regular NetCDFs, unstructured
-        grids are saved as UGRID NetCDF. Structured grids are always made GDAL
-        compliant, unstructured grids can be made MDAL compliant optionally.
+         Dump simulation to files. Writes a model definition as .TOML file, which
+         points to data for each package. Each package is stored as a separate
+         NetCDF. Structured grids are saved as regular NetCDFs, unstructured
+         grids are saved as UGRID NetCDF. Structured grids are always made GDAL
+         compliant, unstructured grids can be made MDAL compliant optionally.
 
-        Parameters
-        ----------
-        directory: str or Path
-            directory to dump simulation into.
-        modelname: str
-            modelname, will be used to create a subdirectory.
-        validate: bool, optional
-            Whether to validate simulation data. Defaults to True.
-        mdal_compliant: bool, optional
-            Convert data with
-            :func:`imod.prepare.spatial.mdal_compliant_ugrid2d` to MDAL
-            compliant unstructured grids. Defaults to False.
-        crs: Any, optional
-            Anything accepted by rasterio.crs.CRS.from_user_input
-            Requires ``rioxarray`` installed.
-        engine : str, optional
-            File engine used to write packages. Options are ``'netcdf4'``,
-            ``'zarr'``, and ``'zarr.zip'``. NetCDF4 is readable by many other
-            softwares, for example QGIS. Zarr is optimized for big data, cloud
-            storage and parallel access. The ``'zarr.zip'`` option is an
-            experimental option which creates a zipped zarr store in a single
-            file, which is easier to copy and automatically compresses data as
-            well. Default is ``'netcdf4'``.
+         Parameters
+         ----------
+         directory: str or Path
+             directory to dump simulation into.
+         modelname: str
+             modelname, will be used to create a subdirectory.
+         validate: bool, optional
+             Whether to validate simulation data. Defaults to True.
+         mdal_compliant: bool, optional
+             Convert data with
+             :func:`imod.prepare.spatial.mdal_compliant_ugrid2d` to MDAL
+             compliant unstructured grids. Defaults to False.
+         crs: Any, optional
+             Anything accepted by rasterio.crs.CRS.from_user_input
+             Requires ``rioxarray`` installed.
+         engine : str, optional
+             File engine used to write packages. Options are ``'netcdf4'``,
+             ``'zarr'``, and ``'zarr.zip'``. NetCDF4 is readable by many other
+             softwares, for example QGIS. Zarr is optimized for big data, cloud
+             storage and parallel access. The ``'zarr.zip'`` option is an
+             experimental option which creates a zipped zarr store in a single
+             file, which is easier to copy and automatically compresses data as
+             well. Default is ``'netcdf4'``.
 
+        Returns
+         -------
+         Path
+             Path to the created toml file which contains the paths to the dumped package files. The package files are dumped in the same directory as the toml file.
+
+         Example
+         -------
+         >>> tmp_path = tmpdir_factory.mktemp(name)
+         >>> toml_path = mf6_model.dump(tmp_path, name, engine=engine, validate=False)
+         >>> back = ModflowModel.from_file(tmp_path, name)
         """
-        modeldirectory = pathlib.Path(directory) / modelname
-        modeldirectory.mkdir(exist_ok=True, parents=True)
-        validation_context = ValidationSettings(validate=validate)
-        if validation_context.validate:
-            statusinfo = self.validate(modelname, validation_context)
-            if statusinfo.has_errors():
-                raise ValidationError(statusinfo.to_string())
 
-        toml_content: dict[str, Any] = collections.defaultdict(dict)
-
-        _dump_model(
+        toml_path = dump_model(
             self,
-            modeldirectory,
+            directory,
             modelname,
             validate=validate,
             mdal_compliant=mdal_compliant,
             crs=crs,
             engine=engine,
         )
-
-        for pkgname, pkg in self.items():
-            pkg_path = pkg.to_file(
-                modeldirectory,
-                pkgname,
-                mdal_compliant=mdal_compliant,
-                crs=crs,
-                engine=engine,
-            )
-            toml_content[type(pkg).__name__][pkgname] = pkg_path.name
-
-        toml_path = modeldirectory / f"{modelname}.toml"
-        with open(toml_path, "wb") as f:
-            tomli_w.dump(toml_content, f)
 
         return toml_path
 

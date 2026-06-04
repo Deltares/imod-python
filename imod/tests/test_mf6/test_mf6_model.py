@@ -11,7 +11,6 @@ from jinja2 import Template
 from xugrid.core.wrap import UgridDataArray
 
 import imod
-from imod.common.utilities.dump_model import _dump_model
 from imod.mf6 import ConstantConcentration, ConstantHead
 from imod.mf6.mf6_wel_adapter import Mf6Wel
 from imod.mf6.model import Modflow6Model
@@ -92,7 +91,7 @@ def test_key_assign():
 
 
 def roundtrip(model, tmp_path):
-    _dump_model(model, tmp_path, "test")
+    model.dump(tmp_path, "test")
     back = type(model).from_file(tmp_path / "test/test.toml")
     assert isinstance(back, type(model))
 

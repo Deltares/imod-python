@@ -12,7 +12,7 @@ from imod.schemata import ValidationError
 
 
 @standard_log_decorator()
-def _dump_model(
+def dump_model(
     model: IModel,
     directory,
     modelname,
@@ -75,6 +75,7 @@ def _dump_model(
         )
         toml_content[type(pkg).__name__][pkgname] = pkg_path.name
 
+    # simulation settings are only relevant/present for MetaSwap models (msw)
     if hasattr(model, "simulation_settings"):
         toml_content["simulation_settings"] = model.simulation_settings
 

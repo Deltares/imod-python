@@ -17,8 +17,7 @@ from imod.common.constants import MaskValues
 from imod.common.interfaces.imodel import IModel
 from imod.common.serializer import EngineType
 from imod.common.utilities.clip import clip_by_grid
-from imod.common.utilities.dump_model import _dump_model
-from imod.common.utilities.mask import mask_all_packages
+from imod.common.utilities.dump_model import dump_model
 from imod.common.utilities.partitioninfo import create_partition_info
 from imod.common.utilities.regrid import regrid_imod5_cap_data
 from imod.common.utilities.value_filters import enforce_scalar
@@ -390,12 +389,9 @@ class MetaSwapModel(Model, IModel):
             toml_content = tomli.load(f)
 
         parentdir = toml_path.parent
-        if issubclass(cls, MetaSwapModel):
-            simulation_settings = toml_content.get("simulation_settings", {})
-            unsa_svat_path = simulation_settings.get("unsa_svat_path", "")
-            instance = cls(unsa_svat_path, simulation_settings)
-        else:
-            instance = cls()
+        simulation_settings = toml_content.get("simulation_settings", {})
+        unsa_svat_path = simulation_settings.get("unsa_svat_path", "")
+        instance = cls(unsa_svat_path, simulation_settings)
 
         for key, entry in toml_content.items():
             if key != "simulation_settings":
@@ -449,10 +445,11 @@ class MetaSwapModel(Model, IModel):
         Example
         -------
         >>> tmp_path = tmpdir_factory.mktemp(name)
-        >>> msw_model.dump(tmp_path, name, engine=engine, validate=False)
+        >>> toml_path = msw_model.dump(tmp_path, name, engine=engine, validate=False)
+        >>> back = MetaSwapModel.from_file(tmp_path, name)
         """
 
-        _dump_model(
+        toml_path = dump_model(
             self,
             directory=directory,
             modelname=modelname,
@@ -461,6 +458,7 @@ class MetaSwapModel(Model, IModel):
             crs=crs,
             engine=engine,
         )
+        return toml_path
 
     def regrid_like(
         self,
@@ -774,138 +772,37 @@ class MetaSwapModel(Model, IModel):
         return model
 
     def _is_splitting_supported(self) -> Tuple[bool, str]:
-        """
-        Returns True if all the packages in the model supports splitting. If one
-        of the packages in the model does not support splitting, it returns the
-        name of the first one.
-
-        Returns
-        -------
-        Tuple[bool, str]
-            A tuple where the first element is a boolean indicating if splitting
-            is supported, and the second element is the name of the first package
-            that does not support splitting, or an empty string if all packages
-            support splitting.
-        """
-        for package_name, package in self.items():
-            if not package._is_splitting_supported():
-                return False, package_name
-        return True, ""
+        raise NotImplementedError
 
     def _is_regridding_supported(self) -> Tuple[bool, str]:
-        """
-        Returns True if all the packages in the model supports regridding. If one
-        of the packages in the model does not support regridding, it returns the
-        name of the first one.
-
-        Returns
-        -------
-        Tuple[bool, str]
-            A tuple where the first element is a boolean indicating if regridding
-            is supported, and the second element is the name of the first package
-            that does not support regridding, or an empty string if all packages
-            support regridding.
-        """
-        for package_name, package in self.items():
-            if not package._is_regridding_supported():
-                return False, package_name
-        return True, ""
+        raise NotImplementedError
 
     def _is_clipping_supported(self) -> Tuple[bool, str]:
-        """
-        Returns True if all the packages in the model supports clipping. If one
-        of the packages in the model does not support clipping, it returns the
-        name of the first one.
-
-        Returns
-        -------
-        Tuple[bool, str]
-            A tuple where the first element is a boolean indicating if clipping
-            is supported, and the second element is the name of the first package
-            that does not support clipping, or an empty string if all packages
-            support clipping.
-        """
-        for package_name, package in self.items():
-            if not package._is_clipping_supported():
-                return False, package_name
-        return True, ""
+        raise NotImplementedError
 
     def purge_empty_packages(
         self, model_name: Optional[str] = "", ignore_time: bool = False
     ) -> None:
-        """
-        This method removes empty packages from the model in place.
-
-        Parameters
-        ----------
-        model_name: str, optional
-            Name of the model, used for logging.
-        ignore_time: bool, optional
-            If False, packages are considered empty if they have no data at all
-            timesteps. If True, packages are considered empty if they have no
-            data at the first time step. The latter can increase performance
-            considerably.
-        """
-        empty_packages = [
-            package_name
-            for package_name, package in self.items()
-            if package.is_empty(ignore_time=ignore_time)
-        ]
-        for package_name in empty_packages:
-            self.pop(package_name)
+        raise NotImplementedError
 
     def mask_all_packages(
         self,
         mask: GridDataArray,
         ignore_time_purge_empty: bool = False,
     ):
-        """
-        This function applies a mask to all packages in a model. The mask must
-        be presented as an idomain-like integer array that has 0 (inactive) or
-        <0 (vertical passthrough) values in filtered cells and >0 in active
-        cells.
-        Masking will overwrite idomain with the mask where the mask is <=0.
-        Where the mask is >0, the original value of idomain will be kept. Masking
-        will update the packages accordingly, blanking their input where needed,
-        and is therefore not a reversible operation.
-
-        Parameters
-        ----------
-        mask: xr.DataArray, xu.UgridDataArray of ints
-            idomain-like integer array. >0 sets cells to active, 0 sets cells to inactive,
-            <0 sets cells to vertical passthrough
-        ignore_time_purge_empty: bool, default False
-            Whether to ignore time dimension when purging empty packages. Can
-            improve performance when masking models with many time steps.
-        """
-
-        mask_all_packages(self, mask, ignore_time_purge_empty)
+        raise NotImplementedError
 
     @property
     def model_id(self) -> str:
-        if self._model_id is None:
-            return "MetaSwapModel"
-        return self._model_id
+        raise NotImplementedError
 
     @property
     def options(self) -> dict:
-        return self._options
+        raise NotImplementedError
 
     @property
     def domain(self) -> GridDataArray:
-        """
-        Get the active domain array as an integer array compatible with idomain.
-
-        Returns
-        -------
-        GridDataArray
-        Integer array where:
-        - 1 indicates active cells
-        - 0 indicates inactive cells
-        """
-        grid_key = self.get_pkgkey(GridData)
-        active = self[grid_key]["active"]
-        return active.astype(int)
+        raise NotImplementedError
 
     def validate(
         self,

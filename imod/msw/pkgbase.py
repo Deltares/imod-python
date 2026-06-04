@@ -1,5 +1,4 @@
 import abc
-import numbers
 from copy import deepcopy
 from pathlib import Path
 from typing import Any, Optional, Self, TextIO, TypeAlias, Union
@@ -9,7 +8,6 @@ import numpy as np
 import pandas as pd
 import xarray as xr
 import zarr  # nb: in modflow6, this is a try...except
-from xarray.core.utils import is_scalar
 
 from imod.common.serializer import EngineType, create_package_serializer
 from imod.common.utilities.clip import clip_spatial_box, clip_time_slice
@@ -17,6 +15,7 @@ from imod.common.utilities.dataclass_type import DataclassType, EmptyRegridMetho
 from imod.common.utilities.regrid import (
     _regrid_like,
 )
+from imod.common.utilities.value_filters import is_scalar_nan
 from imod.mf6.dis import StructuredDiscretization
 from imod.mf6.mf6_wel_adapter import Mf6Wel
 from imod.msw.fixed_format import format_fixed_width
@@ -25,17 +24,6 @@ from imod.typing.grid import GridDataArray, GridDataset
 from imod.util.regrid import RegridderWeightsCache
 
 DataDictType: TypeAlias = dict[str, IntArray | int | str]
-
-
-def _is_scalar_nan(da: GridDataArray):
-    """
-    Test if is_scalar_nan, carefully avoid loading grids in memory
-    """
-    scalar_data: bool = is_scalar(da)
-    if scalar_data:
-        stripped_value = da.to_numpy()[()]
-        return isinstance(stripped_value, numbers.Real) and np.isnan(stripped_value)  # type: ignore[call-overload]
-    return False
 
 
 class MetaSwapPackage(abc.ABC):
@@ -448,7 +436,7 @@ class MetaSwapPackage(abc.ABC):
 
         # Replace NaNs by None
         for key, value in dataset.items():
-            if _is_scalar_nan(value):
+            if is_scalar_nan(value):
                 dataset[key] = None
 
         return cls._from_dataset(dataset)
