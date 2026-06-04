@@ -432,7 +432,26 @@ class MetaSwapModel(Model, IModel):
             Coordinate reference system to use in the dumped files. This should be a string in a format recognized by the pyproj library, for example "EPSG:28992". If not provided, no CRS information is included in the files.
         engine: EngineType, optional
             File engine used to write packages.
+                    engine : str, optional
+            File engine used to write packages. Options are ``'netcdf4'``,
+            ``'zarr'``, and ``'zarr.zip'``. NetCDF4 is readable by many other
+            softwares, for example QGIS. Zarr is optimized for big data, cloud
+            storage and parallel access. The ``'zarr.zip'`` option is an
+            experimental option which creates a zipped zarr store in a single
+            file, which is easier to copy and automatically compresses data as
+            well. Default is ``'netcdf4'``.
+
+        Returns
+        -------
+        Path
+            Path to the created toml file which contains the paths to the dumped package files. The package files are dumped in the same directory as the toml file.
+
+        Example
+        -------
+        >>> tmp_path = tmpdir_factory.mktemp(name)
+        >>> msw_model.dump(tmp_path, name, engine=engine, validate=False)
         """
+
         _dump_model(
             self,
             directory=directory,

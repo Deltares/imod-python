@@ -35,8 +35,16 @@ def roundtrip(msw_model, tmpdir_factory, name, engine):
     assert msw_model.simulation_settings == back.simulation_settings
 
 
-def test_msw_pkgdump(msw_model, tmpdir_factory):
+def test_msw_pkgdump_nc(msw_model, tmpdir_factory):
     roundtrip(msw_model, tmpdir_factory, name="testmodel", engine="netcdf4")
+
+
+def test_msw_pkgdump_zarr(msw_model, tmpdir_factory):
+    roundtrip(msw_model, tmpdir_factory, name="testmodel", engine="zarr")
+
+
+def test_msw_pkgdump_zarrzip(msw_model, tmpdir_factory):
+    roundtrip(msw_model, tmpdir_factory, name="testmodel", engine="zarr.zip")
 
 
 def test_msw_model_write(msw_model, coupled_mf6_model, coupled_mf6wel, tmp_path):
