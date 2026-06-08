@@ -4,7 +4,7 @@ import warnings
 from copy import copy, deepcopy
 from datetime import datetime
 from pathlib import Path
-from typing import Any, Optional, Tuple, Union, cast
+from typing import Any, Optional, Union, cast
 
 import cftime
 import jinja2
@@ -14,7 +14,7 @@ import xarray as xr
 
 import imod.msw
 from imod.common.constants import MaskValues
-from imod.common.interfaces.imodel import IModel
+from imod.common.interfaces.idict import IDict
 from imod.common.serializer import EngineType
 from imod.common.utilities.clip import clip_by_grid
 from imod.common.utilities.dump_model import dump_model
@@ -115,7 +115,7 @@ class Model(collections.UserDict[str, Any]):
             self[k] = v
 
 
-class MetaSwapModel(Model, IModel):
+class MetaSwapModel(Model, IDict):
     """
     Contains data and writes consistent model input files
 
@@ -770,47 +770,6 @@ class MetaSwapModel(Model, IModel):
         model["time_oc"] = TimeOutputControl(times_da)
 
         return model
-
-    def _is_splitting_supported(self) -> Tuple[bool, str]:
-        raise NotImplementedError
-
-    def _is_regridding_supported(self) -> Tuple[bool, str]:
-        raise NotImplementedError
-
-    def _is_clipping_supported(self) -> Tuple[bool, str]:
-        raise NotImplementedError
-
-    def purge_empty_packages(
-        self, model_name: Optional[str] = "", ignore_time: bool = False
-    ) -> None:
-        raise NotImplementedError
-
-    def mask_all_packages(
-        self,
-        mask: GridDataArray,
-        ignore_time_purge_empty: bool = False,
-    ):
-        raise NotImplementedError
-
-    @property
-    def model_id(self) -> str:
-        raise NotImplementedError
-
-    @property
-    def options(self) -> dict:
-        raise NotImplementedError
-
-    @property
-    def domain(self) -> GridDataArray:
-        raise NotImplementedError
-
-    def validate(
-        self,
-        model_name: str = "",
-        validation_context: Optional[Any] = None,
-        **kwargs,
-    ) -> None:
-        return
 
 
 # make a read function for packages from netcdf

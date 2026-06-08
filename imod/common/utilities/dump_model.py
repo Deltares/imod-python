@@ -4,7 +4,7 @@ from typing import Any, Optional
 
 import tomli_w
 
-from imod.common.interfaces.imodel import IModel
+from imod.common.interfaces.idict import IDict
 from imod.common.serializer import EngineType
 from imod.logging.logging_decorators import standard_log_decorator
 from imod.mf6.validation_settings import ValidationSettings
@@ -13,10 +13,10 @@ from imod.schemata import ValidationError
 
 @standard_log_decorator()
 def dump_model(
-    model: IModel,
+    model: IDict,
     directory,
     modelname,
-    validate: bool = True,
+    validate: Optional[bool] = True,
     mdal_compliant: bool = False,
     crs: Optional[Any] = None,
     engine: EngineType = "netcdf4",
@@ -57,11 +57,16 @@ def dump_model(
     modeldirectory.mkdir(exist_ok=True, parents=True)
 
     # validation currently only supports MF6, but we want to keep the option to turn it on for other
-    validation_context = ValidationSettings(validate=validate)
-    if validation_context.validate:
-        statusinfo = model.validate(modelname, validation_context)
-        if statusinfo.has_errors():
-            raise ValidationError(statusinfo.to_string())
+    if hasattr(model, "validate") and callable(getattr(model, "validate")):
+        validation_context = ValidationSettings(validate=validate)
+        if validation_context.validate:
+            statusinfo = model.validate(modelname, validation_context)
+            if statusinfo.has_errors():
+                raise ValidationError(statusinfo.to_string())
+    else:
+        raise NotImplementedError(
+            "Model does not have a validate method, cannot validate model."
+        )
 
     toml_content: dict = collections.defaultdict(dict)
 

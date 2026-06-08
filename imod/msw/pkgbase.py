@@ -9,6 +9,7 @@ import pandas as pd
 import xarray as xr
 import zarr  # nb: in modflow6, this is a try...except
 
+from imod.common.interfaces.ipackagebase import IPackageBase
 from imod.common.serializer import EngineType, create_package_serializer
 from imod.common.utilities.clip import clip_spatial_box, clip_time_slice
 from imod.common.utilities.dataclass_type import DataclassType, EmptyRegridMethod
@@ -26,7 +27,7 @@ from imod.util.regrid import RegridderWeightsCache
 DataDictType: TypeAlias = dict[str, IntArray | int | str]
 
 
-class MetaSwapPackage(abc.ABC):
+class MetaSwapPackage(IPackageBase, abc.ABC):
     """
     MetaSwapPackage is used to share methods for Metaswap packages.
 
