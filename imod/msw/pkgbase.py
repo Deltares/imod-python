@@ -7,7 +7,6 @@ import cftime
 import numpy as np
 import pandas as pd
 import xarray as xr
-import zarr  # nb: in modflow6, this is a try...except
 
 from imod.common.interfaces.ipackagebase import IPackageBase
 from imod.common.serializer import EngineType, create_package_serializer
@@ -22,7 +21,13 @@ from imod.mf6.mf6_wel_adapter import Mf6Wel
 from imod.msw.fixed_format import format_fixed_width
 from imod.typing import IntArray
 from imod.typing.grid import GridDataArray, GridDataset
+from imod.util.imports import MissingOptionalModule
 from imod.util.regrid import RegridderWeightsCache
+
+try:
+    import zarr
+except ImportError:
+    zarr = MissingOptionalModule("zarr")
 
 DataDictType: TypeAlias = dict[str, IntArray | int | str]
 
