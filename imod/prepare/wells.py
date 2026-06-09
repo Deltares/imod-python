@@ -87,7 +87,14 @@ def compute_penetration_mismatch_factor(
         np.minimum(well_bounds[:, 1], layer_bounds[:, 1])
         + np.maximum(well_bounds[:, 0], layer_bounds[:, 0])
     ) / 2
-    return 1.0 - np.abs(Z_c - F_c) / (0.5 * D)
+    # Zero-thickness layers (D == 0) have no overlap with any filter and are
+    # discarded downstream. Guard the division so those cells do not trigger a
+    # spurious "divide by zero" / "invalid value" RuntimeWarning (which raises
+    # under -W error) and do not produce NaN factors.
+    ratio = np.divide(
+        np.abs(Z_c - F_c), 0.5 * D, out=np.zeros_like(D, dtype=np.float64), where=D != 0
+    )
+    return 1.0 - ratio
 
 
 def compute_overlap_and_correction_factor(

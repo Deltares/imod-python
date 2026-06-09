@@ -19,6 +19,7 @@ from imod.common.interfaces.ipointdatapackage import IPointDataPackage
 from imod.common.utilities.grid import broadcast_to_full_domain
 from imod.common.utilities.layer import create_layered_top
 from imod.common.utilities.schemata import validation_pkg_error_message
+from imod.common.utilities.value_filters import enforce_scalar
 from imod.logging import init_log_decorator, logger
 from imod.logging.logging_decorators import standard_log_decorator
 from imod.logging.loglevel import LogLevel
@@ -1107,8 +1108,8 @@ class Well(GridAgnosticWell):
 
         index_names = wells_df.index.names
 
-        minimum_k = self.dataset["minimum_k"].item()
-        minimum_thickness = self.dataset["minimum_thickness"].item()
+        minimum_k = enforce_scalar(self.dataset["minimum_k"])
+        minimum_thickness = enforce_scalar(self.dataset["minimum_thickness"])
 
         # Unset multi-index, because assign_wells cannot deal with
         # multi-indices which is returned by self.dataset.to_dataframe() in

@@ -20,7 +20,6 @@ from imod.common.utilities.clip import clip_by_grid
 from imod.common.utilities.dump_model import dump_model
 from imod.common.utilities.partitioninfo import create_partition_info
 from imod.common.utilities.regrid import regrid_imod5_cap_data
-from imod.common.utilities.value_filters import enforce_scalar
 from imod.common.utilities.version import prepend_content_with_version_info
 from imod.mf6.dis import StructuredDiscretization
 from imod.mf6.mf6_wel_adapter import Mf6Wel
@@ -234,8 +233,8 @@ class MetaSwapModel(Model, IDict):
 
         year, time_since_start_year = to_metaswap_timeformat([starttime])
 
-        year = int(enforce_scalar(year.values))
-        time_since_start_year = float(enforce_scalar(time_since_start_year.values))
+        year = int(year.item())
+        time_since_start_year = float(time_since_start_year.item())
 
         return year, time_since_start_year
 

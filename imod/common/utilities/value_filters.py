@@ -8,17 +8,6 @@ from xarray.core.utils import is_scalar
 from imod.typing import GridDataArray, GridDataset
 
 
-def is_scalar_nan(da: GridDataArray):
-    """
-    Test if is_scalar_nan, carefully avoid loading grids in memory
-    """
-    scalar_data: bool = is_scalar(da)
-    if scalar_data:
-        stripped_value = da.to_numpy()[()]
-        return isinstance(stripped_value, numbers.Real) and np.isnan(stripped_value)  # type: ignore[call-overload]
-    return False
-
-
 def is_valid(value: Any) -> bool:
     """
     Filters values that are None, False, or a numpy.bool_ False.
@@ -41,7 +30,7 @@ def is_valid(value: Any) -> bool:
 
 
 def is_empty_dataarray(da: Any) -> bool:
-    return isinstance(da, xr.DataArray) and da.isnull().all().item()
+    return isinstance(da, xr.DataArray) and enforce_scalar(da.isnull().all())
 
 
 def get_scalar_variables(ds: GridDataset) -> list[str]:
@@ -49,8 +38,8 @@ def get_scalar_variables(ds: GridDataset) -> list[str]:
     return [var for var, arr in ds.variables.items() if is_scalar(arr)]
 
 
-def enforce_scalar(a: np.ndarray) -> np.ndarray:
+def enforce_scalar(a: GridDataArray) -> Any:
     """Enforce scalar value from array."""
     if a.size == 1:
-        return a.item()
-    return ValueError(f"Array has size {a.size}, expected size 1.")
+        return a.compute().item()
+    raise ValueError(f"Array has size {a.size}, expected size 1.")

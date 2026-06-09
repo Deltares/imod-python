@@ -5,6 +5,7 @@ import pandas as pd
 import xarray as xr
 
 from imod.common.interfaces.ipackagebase import IPackageBase
+from imod.common.utilities.value_filters import enforce_scalar
 from imod.mf6.dis import StructuredDiscretization
 from imod.mf6.mf6_wel_adapter import Mf6Wel
 from imod.msw.fixed_format import VariableMetaData
@@ -49,7 +50,7 @@ class CouplerMapping(MetaSwapPackage, IPackageBase):
         n_subunit = svat["subunit"].size
         # Sum active cells and convert to int for MyPy. This is the number of
         # modflow cells in the top layer.
-        n_mod_top = int(idomain_top_active.sum().item())
+        n_mod_top = int(enforce_scalar(idomain_top_active.sum()))
 
         # idomain does not have a subunit dimension, so tile for n_subunits
         mod_id_1d: IntArray = np.tile(np.arange(1, n_mod_top + 1), (n_subunit, 1))
@@ -128,7 +129,7 @@ class CouplerMapping(MetaSwapPackage, IPackageBase):
         well_column = well_cellid.sel(dim_cellid="column").data - 1
         # Sum active cells and convert to int for MyPy. This is the number of
         # modflow cells in the top layer.
-        n_mod = int(idomain_active.sum().item())
+        n_mod = int(enforce_scalar(idomain_active.sum()))
         mod_id = xr.full_like(idomain_active, 0, dtype=np.int64)
         mod_id.data[idomain_active.data] = np.arange(1, n_mod + 1)
 

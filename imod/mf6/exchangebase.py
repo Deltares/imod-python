@@ -4,6 +4,7 @@ from typing import Union
 import numpy as np
 import xarray as xr
 
+from imod.common.utilities.value_filters import enforce_scalar
 from imod.mf6.package import Package
 
 _pkg_id_to_type = {"gwfgwf": "GWF6-GWF6", "gwfgwt": "GWF6-GWT6", "gwtgwt": "GWT6-GWT6"}
@@ -21,13 +22,13 @@ class ExchangeBase(Package):
     def model_name1(self) -> str:
         if "model_name_1" not in self.dataset:
             raise ValueError("model_name_1 not present in dataset")
-        return self.dataset["model_name_1"].item()
+        return enforce_scalar(self.dataset["model_name_1"])
 
     @property
     def model_name2(self) -> str:
         if "model_name_2" not in self.dataset:
             raise ValueError("model_name_2 not present in dataset")
-        return self.dataset["model_name_2"].item()
+        return enforce_scalar(self.dataset["model_name_2"])
 
     def package_name(self) -> str:
         return f"{self.model_name1}_{self.model_name2}"

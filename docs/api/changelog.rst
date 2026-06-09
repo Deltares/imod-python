@@ -70,6 +70,10 @@ Fixed
   :meth:`imod.mf6.LayeredWell.from_imod5_cap_data` now regrids the iMOD5 CAP
   data to the MODFLOW6 target discretization.
 - Fixed confusing warning about inconsistent IPF columns when loading GEN files.
+- Fix bug where iMOD Python would error on writing a model where package
+  settings were specified as dask array, which could happen when loading a model
+  lazily with :meth:`imod.mf6.Modflow6Simulation.from_file` and not
+  computing the data before writing.
 
 Changed
 ~~~~~~~
