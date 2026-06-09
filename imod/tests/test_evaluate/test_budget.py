@@ -216,3 +216,62 @@ def test_flowlower_up_big_budgetzonenr():
     assert rf.sum() == 0.0
     assert rl.sum() == 2.0
     assert rr.sum() == 0.0
+
+
+def test_omit_front():
+    # facebudget only requires one of front/lower/right; omitting `front`
+    # previously raised AttributeError because the time loop and the
+    # no-zones branch dereferenced `front` unconditionally.
+    data = np.zeros((3, 2, 1))
+    coords = {"layer": [1, 2, 3], "y": [0.5, 1.5], "x": [0.5]}
+    dims = ("layer", "y", "x")
+
+    da = xr.DataArray(data, coords, dims)
+    lower = xr.full_like(da, 0.0)
+    budgetzone = xr.full_like(da, np.nan)
+
+    lower[:2] = 1.0
+    budgetzone[:2] = 1
+    # front and right omitted (default None)
+    assert imod.evaluate.facebudget(budgetzone, lower=lower).sum() == 2.0
+    rf, rl, rr = imod.evaluate.facebudget(budgetzone, lower=lower, netflow=False)
+    assert rf.sum() == 0.0
+    assert rl.sum() == 2.0
+    assert rr.sum() == 0.0
+
+
+def test_omit_front_transient():
+    # Same as above, but with a time dimension (exercises the time loop, which
+    # took its length from front.coords["time"]) and the no-zones branch.
+    data = np.zeros((4, 3, 2, 1))
+    coords = {
+        "time": pd.date_range("2000-01-01", "2000-01-04"),
+        "layer": [1, 2, 3],
+        "y": [0.5, 1.5],
+        "x": [0.5],
+    }
+    dims = ("time", "layer", "y", "x")
+
+    lower = xr.DataArray(data, coords, dims)
+    # A partial zone creates a control surface, so indices.size > 0 and the
+    # time loop runs -- this loop took its length from front.coords["time"].
+    budgetzone = xr.DataArray(
+        data=np.array([[[1]], [[1]], [[np.nan]]]),
+        coords={"layer": [1, 2, 3], "y": [0.5], "x": [0.5]},
+        dims=("layer", "y", "x"),
+    )
+    lower = lower.isel(y=[0])
+    netflow = imod.evaluate.facebudget(budgetzone, lower=lower)
+    assert netflow.shape == (4, 3, 1, 1)
+
+    # Without zones defined: the no-zones branch sized its output from
+    # front.shape, which is None when front is omitted.
+    lower = xr.DataArray(data, coords, dims)
+    budgetzone = xr.DataArray(
+        data=np.zeros((3, 2, 1)),
+        coords={"layer": [1, 2, 3], "y": [0.5, 1.5], "x": [0.5]},
+        dims=("layer", "y", "x"),
+    )
+    netflow = imod.evaluate.facebudget(budgetzone, lower=lower)
+    assert netflow.shape == (4, 3, 2, 1)
+    assert np.isnan(netflow.values).all()
