@@ -1,7 +1,15 @@
 import abc
 from copy import deepcopy
 from pathlib import Path
-from typing import Any, Optional, Self, TextIO, TypeAlias, Union
+from typing import (
+    TYPE_CHECKING,
+    Any,
+    Optional,
+    Self,
+    TextIO,
+    TypeAlias,
+    Union,
+)
 
 import cftime
 import numpy as np
@@ -24,10 +32,13 @@ from imod.typing.grid import GridDataArray, GridDataset
 from imod.util.imports import MissingOptionalModule
 from imod.util.regrid import RegridderWeightsCache
 
-try:
+if TYPE_CHECKING:
     import zarr
-except ImportError:
-    zarr = MissingOptionalModule("zarr")
+else:
+    try:
+        import zarr
+    except ImportError:
+        zarr = MissingOptionalModule("zarr")
 
 DataDictType: TypeAlias = dict[str, IntArray | int | str]
 
