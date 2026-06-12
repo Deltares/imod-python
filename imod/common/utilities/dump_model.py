@@ -63,10 +63,6 @@ def dump_model(
             statusinfo = model.validate(modelname, validation_context)
             if statusinfo.has_errors():
                 raise ValidationError(statusinfo.to_string())
-    else:
-        raise NotImplementedError(
-            "Model does not have a validate method, cannot validate model."
-        )
 
     toml_content: dict = collections.defaultdict(dict)
 
