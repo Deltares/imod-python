@@ -451,6 +451,8 @@ def _parse_block(lines: _LineIterator, content: Dict[str, Any]) -> None:
     while key is None and not lines.finished:
         n, key, active = _parse_blockheader(lines)
 
+    if key is None:
+        return
     try:
         if key in KEYS:
             if n != 1:

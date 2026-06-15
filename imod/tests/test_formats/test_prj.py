@@ -118,6 +118,7 @@ PRJ_TEMPLATE = textwrap.dedent(
     "benzene",1
     "chloride",2
 
+
     """
 )
 
