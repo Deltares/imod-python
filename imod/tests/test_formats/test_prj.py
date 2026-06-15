@@ -94,6 +94,8 @@ PRJ_TEMPLATE = textwrap.dedent(
         1,2, 000, 100000.0, 1.0, -999.9900 ,"{basepath}/first.gen"
         1,2, 000, 100000.0, 1.0, -999.9900 ,"{basepath}/second.gen"
 
+
+
     0001,(PCG),1, Precondition Conjugate-Gradient,[]
         MXITER=  500
         ITER1=   25
