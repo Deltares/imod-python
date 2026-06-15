@@ -12,7 +12,6 @@ import cftime
 import jinja2
 import numpy as np
 import tomli
-import tomli_w
 import xarray as xr
 import xugrid as xu
 from jinja2 import Template
@@ -22,6 +21,7 @@ from imod.common.interfaces.imodel import IModel
 from imod.common.serializer import EngineType
 from imod.common.statusinfo import NestedStatusInfo, StatusInfo, StatusInfoBase
 from imod.common.utilities.clip import clip_box_dataset
+from imod.common.utilities.dump_model import dump_model
 from imod.common.utilities.mask import mask_all_packages
 from imod.common.utilities.regrid import _regrid_like
 from imod.common.utilities.schemata import (
@@ -647,30 +647,27 @@ class Modflow6Model(collections.UserDict[str, Package], IModel, abc.ABC):
             file, which is easier to copy and automatically compresses data as
             well. Default is ``'netcdf4'``.
 
+        Returns
+        -------
+        Path
+            Path to the created toml file which contains the paths to the dumped package files. The package files are dumped in the same directory as the toml file.
+
+        Example
+        -------
+        >>> tmp_path = tmpdir_factory.mktemp(name)
+        >>> toml_path = mf6_model.dump(tmp_path, name, engine=engine, validate=False)
+        >>> back = ModflowModel.from_file(tmp_path, name)
         """
-        modeldirectory = pathlib.Path(directory) / modelname
-        modeldirectory.mkdir(exist_ok=True, parents=True)
-        validation_context = ValidationSettings(validate=validate)
-        if validation_context.validate:
-            statusinfo = self.validate(modelname, validation_context)
-            if statusinfo.has_errors():
-                raise ValidationError(statusinfo.to_string())
 
-        toml_content: dict[str, Any] = collections.defaultdict(dict)
-
-        for pkgname, pkg in self.items():
-            pkg_path = pkg.to_file(
-                modeldirectory,
-                pkgname,
-                mdal_compliant=mdal_compliant,
-                crs=crs,
-                engine=engine,
-            )
-            toml_content[type(pkg).__name__][pkgname] = pkg_path.name
-
-        toml_path = modeldirectory / f"{modelname}.toml"
-        with open(toml_path, "wb") as f:
-            tomli_w.dump(toml_content, f)
+        toml_path = dump_model(
+            self,
+            directory,
+            modelname,
+            validate=validate,
+            mdal_compliant=mdal_compliant,
+            crs=crs,
+            engine=engine,
+        )
 
         return toml_path
 

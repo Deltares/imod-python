@@ -11,12 +11,40 @@ from imod import mf6, msw
 from imod.msw.copy_files import FileCopier
 from imod.msw.meteo_grid import MeteoGridCopy
 from imod.msw.meteo_mapping import MeteoMapping
-from imod.msw.model import DEFAULT_SETTINGS
+from imod.msw.model import DEFAULT_SETTINGS, MetaSwapModel
 from imod.msw.utilities.parse import read_para_sim
 from imod.typing import GridDataArray, Imod5DataDict
 from imod.typing.grid import zeros_like
 from imod.util.regrid import RegridderWeightsCache
 from imod.util.spatial import empty_2d
+
+
+def roundtrip(msw_model, tmpdir_factory, name, engine):
+    # TODO: look at the values?
+    tmp_path = tmpdir_factory.mktemp(name)
+    msw_model.dump(tmp_path, name, engine=engine, validate=False)
+    back = MetaSwapModel.from_file(tmp_path, name)
+    assert isinstance(back, MetaSwapModel)
+    pkgkeycheck = set(msw_model.keys()) == set(back.keys())
+    assert pkgkeycheck
+    pkgcheck = all(
+        msw_model[pkgname].dataset.equals(back[pkgname].dataset)
+        for pkgname in msw_model.keys()
+    )
+    assert pkgcheck
+    assert msw_model.simulation_settings == back.simulation_settings
+
+
+def test_msw_pkgdump_nc(msw_model, tmpdir_factory):
+    roundtrip(msw_model, tmpdir_factory, name="testmodel", engine="netcdf4")
+
+
+def test_msw_pkgdump_zarr(msw_model, tmpdir_factory):
+    roundtrip(msw_model, tmpdir_factory, name="testmodel", engine="zarr")
+
+
+def test_msw_pkgdump_zarrzip(msw_model, tmpdir_factory):
+    roundtrip(msw_model, tmpdir_factory, name="testmodel", engine="zarr.zip")
 
 
 def test_msw_model_write(msw_model, coupled_mf6_model, coupled_mf6wel, tmp_path):

@@ -1,4 +1,5 @@
 import collections
+import inspect
 import warnings
 from copy import copy, deepcopy
 from datetime import datetime
@@ -8,10 +9,15 @@ from typing import Any, Optional, Union, cast
 import cftime
 import jinja2
 import numpy as np
+import tomli
 import xarray as xr
 
+import imod.msw
 from imod.common.constants import MaskValues
+from imod.common.interfaces.idict import IDict
+from imod.common.serializer import EngineType
 from imod.common.utilities.clip import clip_by_grid
+from imod.common.utilities.dump_model import dump_model
 from imod.common.utilities.partitioninfo import create_partition_info
 from imod.common.utilities.regrid import regrid_imod5_cap_data
 from imod.common.utilities.version import prepend_content_with_version_info
@@ -108,7 +114,7 @@ class Model(collections.UserDict[str, Any]):
             self[k] = v
 
 
-class MetaSwapModel(Model):
+class MetaSwapModel(Model, IDict):
     """
     Contains data and writes consistent model input files
 
@@ -368,6 +374,90 @@ class MetaSwapModel(Model):
         # write package contents
         for pkgname in self:
             self[pkgname].write(directory, index, svat, mf6_dis, mf6_wel)
+
+    @classmethod
+    def from_file(cls, directory, modelname):
+        pkg_classes = {
+            name: pkg_cls
+            for name, pkg_cls in inspect.getmembers(imod.msw, inspect.isclass)
+            if issubclass(pkg_cls, MetaSwapPackage)
+        }
+        modeldirectory = Path(directory) / modelname
+        toml_path = modeldirectory / f"{modelname}.toml"
+        with open(toml_path, "rb") as f:
+            toml_content = tomli.load(f)
+
+        parentdir = toml_path.parent
+        simulation_settings = toml_content.get("simulation_settings", {})
+        unsa_svat_path = simulation_settings.get("unsa_svat_path", "")
+        instance = cls(unsa_svat_path, simulation_settings)
+
+        for key, entry in toml_content.items():
+            if key != "simulation_settings":
+                for pkgname, path in entry.items():
+                    pkg_cls = pkg_classes[key]
+                    instance[pkgname] = pkg_cls.from_file(parentdir / path)
+
+        return instance
+
+    def dump(
+        self,
+        directory: Union[str, Path],
+        modelname: Optional[str] = None,
+        validate: Optional[bool] = True,
+        mdal_compliant: bool = False,
+        crs: Optional[str] = None,
+        engine: EngineType = "netcdf4",
+    ):
+        """
+        Dump model packages to netCDF files and create a toml file with paths to these files.
+        The MetaSWAP model can be reloaded from the dumped files using the :func:`from_file` method.
+
+        Parameters
+        ----------
+        directory: Path or str
+            Directory to dump model in. A subdirectory with the name of the model will be created in this directory, and the files will be dumped there.
+        modelname: str, optional
+            Name of the model. This will be used as the name of the subdirectory where the files are dumped, and in the name of the toml file. If not provided, it defaults to the value of ``self._model_name``.
+        validate: bool, optional
+            Whether to perform validation before dumping the model. If True, the model will be validated using the validation functionality in iMOD. If validation errors are found, a ValidationError is raised and the model is not dumped. Default is True.
+        mdal_compliant: bool, optional
+            Whether to write the files in a format compliant with the MDAL specification. This can be used to make the files compatible with software that supports MDAL, such as QGIS. Default is False.
+        crs: str, optional
+            Coordinate reference system to use in the dumped files. This should be a string in a format recognized by the pyproj library, for example "EPSG:28992". If not provided, no CRS information is included in the files.
+        engine: EngineType, optional
+            File engine used to write packages.
+                    engine : str, optional
+            File engine used to write packages. Options are ``'netcdf4'``,
+            ``'zarr'``, and ``'zarr.zip'``. NetCDF4 is readable by many other
+            softwares, for example QGIS. Zarr is optimized for big data, cloud
+            storage and parallel access. The ``'zarr.zip'`` option is an
+            experimental option which creates a zipped zarr store in a single
+            file, which is easier to copy and automatically compresses data as
+            well. Default is ``'netcdf4'``.
+
+        Returns
+        -------
+        Path
+            Path to the created toml file which contains the paths to the dumped package files. The package files are dumped in the same directory as the toml file.
+
+        Example
+        -------
+        >>> tmp_path = tmpdir_factory.mktemp(name)
+        >>> toml_path = msw_model.dump(tmp_path, name, engine=engine, validate=False)
+        >>> back = MetaSwapModel.from_file(tmp_path, name)
+        """
+
+        toml_path = dump_model(
+            self,
+            directory=directory,
+            modelname=modelname,
+            validate=validate,
+            mdal_compliant=mdal_compliant,
+            crs=crs,
+            engine=engine,
+        )
+        return toml_path
 
     def regrid_like(
         self,
@@ -679,3 +769,6 @@ class MetaSwapModel(Model):
         model["time_oc"] = TimeOutputControl(times_da)
 
         return model
+
+
+# make a read function for packages from netcdf

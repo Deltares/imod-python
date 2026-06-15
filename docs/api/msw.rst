@@ -11,6 +11,7 @@ Model objects & methods
 
     MetaSwapModel
     MetaSwapModel.write
+    MetaSwapModel.dump
     MetaSwapModel.from_imod5_data
     MetaSwapModel.regrid_like
     MetaSwapModel.clip_box
