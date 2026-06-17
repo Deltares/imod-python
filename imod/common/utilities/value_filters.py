@@ -1,4 +1,3 @@
-import numbers
 from typing import Any
 
 import numpy as np
@@ -8,7 +7,7 @@ from xarray.core.utils import is_scalar
 from imod.typing import GridDataArray, GridDataset
 
 
-def is_valid(value: Any) -> bool:
+def is_scalar_nan(value: Any) -> bool:
     """
     Filters values that are None, False, or a numpy.bool_ False.
     Needs to be this specific, since 0.0 and 0 are valid values, but are
