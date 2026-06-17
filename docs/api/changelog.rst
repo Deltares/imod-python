@@ -112,6 +112,9 @@ Added
 - Functionality to dump and load MODFLOW 6 simulations to/from zarr and zipstore
   formats. See :meth:`imod.mf6.Modflow6Simulation.dump` and
   :meth:`imod.mf6.Modflow6Simulation.from_file` for more information.
+- Functionality to dump and load MetaSwap models to/from netcdf
+  format. See :meth:`imod.msw.MetaSwapModel.dump` and
+  :meth:`imod.msw.MetaSwapModel.from_file` for more information.
 
 Changed
 ~~~~~~~

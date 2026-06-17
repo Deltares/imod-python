@@ -1,16 +1,14 @@
 import abc
-import numbers
 from pathlib import Path
 from typing import TYPE_CHECKING, Any, Mapping, Optional, Self, final
 
-import numpy as np
 import xarray as xr
 import xugrid as xu
-from xarray.core.utils import is_scalar
 
 import imod
 from imod.common.interfaces.ipackagebase import IPackageBase
 from imod.common.serializer import EngineType, create_package_serializer
+from imod.common.utilities.value_filters import is_scalar_nan
 from imod.typing.grid import (
     GridDataArray,
     GridDataset,
@@ -30,17 +28,6 @@ else:
 TRANSPORT_PACKAGES = ("adv", "dsp", "ssm", "mst", "ist", "src")
 EXCHANGE_PACKAGES = ("gwfgwf", "gwfgwt", "gwtgwt")
 UTIL_PACKAGES = ("ats", "hpc")
-
-
-def _is_scalar_nan(da: GridDataArray):
-    """
-    Test if is_scalar_nan, carefully avoid loading grids in memory
-    """
-    scalar_data: bool = is_scalar(da)
-    if scalar_data:
-        stripped_value = da.to_numpy()[()]
-        return isinstance(stripped_value, numbers.Real) and np.isnan(stripped_value)  # type: ignore[call-overload]
-    return False
 
 
 class PackageBase(IPackageBase, abc.ABC):
@@ -148,7 +135,7 @@ class PackageBase(IPackageBase, abc.ABC):
 
         # Replace NaNs by None
         for key, value in dataset.items():
-            if _is_scalar_nan(value):
+            if is_scalar_nan(value):
                 dataset[key] = None
 
         # to_netcdf converts strings into NetCDF "variable‑length UTF‑8 strings"
