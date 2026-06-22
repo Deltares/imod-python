@@ -95,7 +95,7 @@ pydantic = "*"
 pydata-sphinx-theme = "*"
 pymetis = "*"
 pyproj = "*"
-pytest = "*"
+pytest = "<9.1" # Upper bound pytest to <9.1 due to https://github.com/smarie/python-pytest-cases/issues/385
 pytest-benchmark = "*"
 pytest-cases = ">=3.9.1"
 pytest-cov = "*"
