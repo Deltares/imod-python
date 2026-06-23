@@ -23,9 +23,9 @@ from imod.common.utilities.regrid import regrid_imod5_cap_data
 from imod.common.utilities.version import prepend_content_with_version_info
 from imod.mf6.dis import StructuredDiscretization
 from imod.mf6.mf6_wel_adapter import Mf6Wel
+from imod.msw import GridData
 from imod.msw.copy_files import FileCopier
 from imod.msw.coupler_mapping import CouplerMapping
-from imod.msw.grid_data import GridData
 from imod.msw.idf_mapping import IdfMapping
 from imod.msw.infiltration import Infiltration
 from imod.msw.initial_conditions import (
@@ -52,7 +52,11 @@ from imod.msw.utilities.common import find_in_file_list
 from imod.msw.utilities.imod5_converter import (
     has_active_scaling_factor,
 )
-from imod.msw.utilities.mask import mask_and_broadcast_cap_data
+from imod.msw.utilities.mask import (
+    MetaSwapActive,
+    mask_and_broadcast_cap_data,
+    mask_and_broadcast_pkg_data,
+)
 from imod.msw.utilities.parse import read_para_sim
 from imod.msw.vegetation import AnnualCropFactors
 from imod.typing import GridDataArray, Imod5DataDict
@@ -510,6 +514,41 @@ class MetaSwapModel(Model, IDict):
             regridded_model[mod2svat_name] = CouplerMapping()
 
         return regridded_model
+
+    def mask_all_packages(
+        self,
+        msw_active: MetaSwapActive,
+        #       ignore_time_purge_empty: bool = False,
+    ):
+        """
+        This function applies a mask to all packages in a model. The mask must
+        be presented as an idomain-like integer array that has 0 (inactive) or
+        <0 (vertical passthrough) values in filtered cells and >0 in active
+        cells.
+        Masking will overwrite idomain with the mask where the mask is <=0.
+        Where the mask is >0, the original value of idomain will be kept. Masking
+        will update the packages accordingly, blanking their input where needed,
+        and is therefore not a reversible operation.
+
+        Parameters
+        ----------
+        mask: xr.DataArray, xu.UgridDataArray of ints
+            idomain-like integer array. >0 sets cells to active, 0 sets cells to inactive,
+            <0 sets cells to vertical passthrough
+        ignore_time_purge_empty: bool, default False
+            Whether to ignore time dimension when purging empty packages. Can
+            improve performance when masking models with many time steps.
+        """
+
+        for pkg in self.values():
+            if "x" in pkg.dataset.dims and "y" in pkg.dataset.dims:
+                data_dict = {
+                    key: pkg.dataset[key] for key in pkg.dataset.data_vars.keys()
+                }
+                masked_data = mask_and_broadcast_pkg_data(pkg, data_dict, msw_active)
+                for key, data in masked_data.items():
+                    pkg.dataset[key] = data
+        return
 
     def clip_box(
         self,

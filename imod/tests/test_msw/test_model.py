@@ -47,6 +47,25 @@ def test_msw_pkgdump_zarrzip(msw_model, tmpdir_factory):
     roundtrip(msw_model, tmpdir_factory, name="testmodel", engine="zarr.zip")
 
 
+def test_msw_mask_all(msw_model, tmpdir_factory, mask_fixture):
+    # Apply the mask to all packages in the model
+    msw_model.mask_all_packages(mask_fixture)
+
+    # Check that the mask has been applied correctly to each package
+    for pkgname, pkg in msw_model.items():
+        if isinstance(pkg, msw.meteo_mapping.PrecipitationMapping):
+            continue  # Skip PrecipitationMapping package for this test
+        if isinstance(pkg, msw.meteo_mapping.EvapotranspirationMapping):
+            continue  # Skip EvapotranspirationMapping package for this test
+        for var in pkg.dataset.data_vars:
+            da = pkg.dataset[var]
+            if "y" in da.dims and "x" in da.dims:
+                assert (
+                    da.where(mask_fixture).equals(da)
+                    or da.where(~mask_fixture).isnull().all()
+                )
+
+
 def test_msw_model_write(msw_model, coupled_mf6_model, coupled_mf6wel, tmp_path):
     mf6_dis = coupled_mf6_model["GWF_1"]["dis"]
 
