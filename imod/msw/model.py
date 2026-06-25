@@ -522,7 +522,7 @@ class MetaSwapModel(Model, IDict):
     ):
         """
          This function applies a mask to all packages in a model. The mask must
-         be presented as a MetaSwap Active object, which contains idomain-like integers. 
+         be presented as a MetaSwap Active object, which contains idomain-like integers.
          The mask is applied to all packages in the model, and the values in the mask determine which cells are active and which are inactive. The mask is applied to all packages, regardless of whether they have a subunit dimension or not.
 
          Parameters
