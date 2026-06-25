@@ -50,10 +50,11 @@ def open_first_meteo_grid(mete_grid_path: str | Path, column_nr: int) -> xr.Data
     potential_paths = []
     for line in lines:
         cols = line.strip().split(",")
-        if len(cols) > column_nr:
-            potential_paths.append(cols[column_nr].replace('"', ""))
-            if _is_parsable_and_existing_path(potential_paths[-1], mete_grid_path):
-                resolved_path = mete_grid_path / ".." / Path(potential_paths[-1])
+        if len(cols) > column_nr:                       # Check if column exists, if not: skip
+            potential_path = cols[column_nr].replace('"', "")
+            potential_paths.append(potential_path)
+            if _is_parsable_and_existing_path(potential_path, mete_grid_path):
+                resolved_path = mete_grid_path / ".." / Path(potential_path)
                 return imod.rasterio.open(resolved_path)
 
     error_message = dedent(f"""    
