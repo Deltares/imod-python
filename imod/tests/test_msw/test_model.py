@@ -2,6 +2,7 @@ from copy import copy
 from pathlib import Path
 from typing import cast
 
+import numpy as np
 import pytest
 import xarray as xr
 from numpy.testing import assert_almost_equal, assert_equal
@@ -12,11 +13,35 @@ from imod.msw.copy_files import FileCopier
 from imod.msw.meteo_grid import MeteoGridCopy
 from imod.msw.meteo_mapping import MeteoMapping
 from imod.msw.model import DEFAULT_SETTINGS, MetaSwapModel
+from imod.msw.utilities.mask import MetaSwapActive
 from imod.msw.utilities.parse import read_para_sim
 from imod.typing import GridDataArray, Imod5DataDict
 from imod.typing.grid import zeros_like
 from imod.util.regrid import RegridderWeightsCache
 from imod.util.spatial import empty_2d
+
+
+@pytest.fixture(scope="function")
+def mask_fixture() -> MetaSwapActive:
+    mask_per_subunit = xr.DataArray(
+        np.array(
+            [
+                [[0, 0, 0], [0, 1, 1], [0, 0, 0]],
+                [[1, 1, 1], [0, 1, 1], [0, 0, 0]],
+            ]
+        ).astype(bool),
+        dims=("subunit", "y", "x"),
+        coords={
+            "x": [1.0, 2.0, 3.0],
+            "y": [3.0, 2.0, 1.0],
+            "dx": 1.0,
+            "dy": 1.0,
+            "subunit": [0, 1],
+        },
+    )
+    mask_all = mask_per_subunit.any(dim="subunit")
+
+    return MetaSwapActive(mask_all, mask_per_subunit)
 
 
 def roundtrip(msw_model, tmpdir_factory, name, engine):

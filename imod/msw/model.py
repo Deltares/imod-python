@@ -521,18 +521,39 @@ class MetaSwapModel(Model, IDict):
         #       ignore_time_purge_empty: bool = False,
     ):
         """
-        This function applies a mask to all packages in a model. The mask must
-        be presented as an idomain-like integer array that has 0 (inactive) or
-        <0 (vertical passthrough) values in filtered cells and >0 in active
-        cells.
+         This function applies a mask to all packages in a model. The mask must
+         be presented as a MetaSwap Active object, which contains idomain-like integers. 
+         The mask is applied to all packages in the model, and the values in the mask determine which cells are active and which are inactive. The mask is applied to all packages, regardless of whether they have a subunit dimension or not.
 
-        Parameters
-        ----------
-        msw_active: MetaSwapActive, dictionary of xr.DataArray
-            idomain-like integers. >0 sets cells to active, 0 sets cells to inactive,
-            all: applies to all packages without a subunit dimension
-            subunit: applies to all packages with a subunit dimension on a per-subunit basis 
-                     (mask has a subunit dimension)
+         Parameters
+         ----------
+         msw_active: MetaSwapActive, dictionary of xr.DataArray
+             idomain-like integers. >0 sets cells to active, 0 sets cells to inactive,
+             all: applies to all packages without a subunit dimension
+             subunit: applies to all packages with a subunit dimension on a per-subunit basis
+                      (mask has a subunit dimension)
+
+        Example
+         -------
+         >>> mask_per_subunit = xr.DataArray(
+         >>>     np.array(
+         >>>         [
+         >>>             [[0, 0, 0], [0, 1, 1], [0, 0, 0]],
+         >>>             [[1, 1, 1], [0, 1, 1], [0, 0, 0]],
+         >>>         ]
+         >>>     ).astype(bool),
+         >>>     dims=("subunit", "y", "x"),
+         >>>     coords = {
+         >>>         "x" : [1.0, 2.0, 3.0],
+         >>>         "y" : [3.0, 2.0, 1.0],
+         >>>         "dx" : 1.0,
+         >>>         "dy" : 1.0,
+         >>>         "subunit" : [0, 1]
+         >>>     }
+         >>> )
+         >>> mask_all = mask_per_subunit.any(dim="subunit")
+         >>> msw_active = MetaSwapActive(mask_all, mask_per_subunit)
+         >>> msw_model.mask_all_packages(msw_active)
         """
 
         for pkg in self.values():
