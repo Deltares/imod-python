@@ -50,7 +50,7 @@ def open_first_meteo_grid(mete_grid_path: str | Path, column_nr: int) -> xr.Data
     potential_paths = []
     for line in lines:
         cols = line.strip().split(",")
-        if len(cols) > column_nr:                       # Check if column exists, if not: skip
+        if len(cols) > column_nr:  # Check if column exists, if not: skip
             potential_path = cols[column_nr].replace('"', "")
             potential_paths.append(potential_path)
             if _is_parsable_and_existing_path(potential_path, mete_grid_path):
