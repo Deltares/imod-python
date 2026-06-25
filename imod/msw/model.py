@@ -525,19 +525,14 @@ class MetaSwapModel(Model, IDict):
         be presented as an idomain-like integer array that has 0 (inactive) or
         <0 (vertical passthrough) values in filtered cells and >0 in active
         cells.
-        Masking will overwrite idomain with the mask where the mask is <=0.
-        Where the mask is >0, the original value of idomain will be kept. Masking
-        will update the packages accordingly, blanking their input where needed,
-        and is therefore not a reversible operation.
 
         Parameters
         ----------
-        mask: xr.DataArray, xu.UgridDataArray of ints
-            idomain-like integer array. >0 sets cells to active, 0 sets cells to inactive,
-            <0 sets cells to vertical passthrough
-        ignore_time_purge_empty: bool, default False
-            Whether to ignore time dimension when purging empty packages. Can
-            improve performance when masking models with many time steps.
+        msw_active: MetaSwapActive, dictionary of xr.DataArray
+            idomain-like integers. >0 sets cells to active, 0 sets cells to inactive,
+            all: applies to all packages without a subunit dimension
+            subunit: applies to all packages with a subunit dimension on a per-subunit basis 
+                     (mask has a subunit dimension)
         """
 
         for pkg in self.values():
