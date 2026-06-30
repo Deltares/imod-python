@@ -19,7 +19,7 @@ from imod.common.interfaces.isimulation import ISimulation
 from imod.common.utilities.clip import clip_by_grid
 from imod.common.utilities.dataclass_type import DataclassType, EmptyRegridMethod
 from imod.common.utilities.dtype import is_integer
-from imod.common.utilities.value_filters import enforce_scalar, is_scalar_nan
+from imod.common.utilities.value_filters import enforce_scalar, is_valid
 from imod.typing import Imod5DataDict
 from imod.typing.grid import (
     GridDataArray,
@@ -73,7 +73,7 @@ def _regrid_array(
 
     # skip regridding for scalar arrays with no valid values (such as "None")
     scalar_da: bool = is_scalar(da)
-    if scalar_da and not is_scalar_nan(enforce_scalar(da)):
+    if scalar_da and not is_valid(enforce_scalar(da)):
         return None
 
     # the dataarray might be a scalar. If it is, then it does not need regridding.

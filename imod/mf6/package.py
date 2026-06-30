@@ -37,7 +37,7 @@ from imod.common.utilities.schemata import (
     validate_schemata_dict,
     validate_with_error_message,
 )
-from imod.common.utilities.value_filters import is_scalar_nan
+from imod.common.utilities.value_filters import is_valid
 from imod.common.utilities.version import prepend_content_with_version_info
 from imod.logging import standard_log_decorator
 from imod.mf6.auxiliary_variables import (
@@ -87,7 +87,7 @@ class Package(PackageBase, IPackage, abc.ABC):
 
     @staticmethod
     def _valid(value: Any) -> bool:
-        return is_scalar_nan(value)
+        return is_valid(value)
 
     @staticmethod
     def _number_format(dtype: type):

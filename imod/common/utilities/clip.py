@@ -20,7 +20,7 @@ from imod.common.utilities.line_data import (
     vertical_polygons_to_zbound_linestrings,
 )
 from imod.common.utilities.mask import mask_da
-from imod.common.utilities.value_filters import is_scalar_nan
+from imod.common.utilities.value_filters import is_valid
 from imod.typing import GeoDataFrameType, GridDataArray, GridDataset
 from imod.typing.grid import bounding_polygon, is_spatial_grid
 from imod.util.imports import MissingOptionalModule
@@ -430,7 +430,7 @@ def clip_time_slice(
             time_end=time_end,
         )
 
-        if "repeat_stress" in selection.data_vars and is_scalar_nan(
+        if "repeat_stress" in selection.data_vars and is_valid(
             selection["repeat_stress"].values[()]
         ):
             repeat_indexer, repeat_stress = clip_repeat_stress(
