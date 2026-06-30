@@ -269,6 +269,11 @@ def facebudget(budgetzone, front=None, lower=None, right=None, netflow=True):
             if da_shape != shape:
                 raise ValueError(f"Shape of {daname} does not match budgetzone")
 
+    # At least one of front, lower, right is guaranteed to be provided (checked
+    # above), but any of them may be omitted. Use the first one that is present
+    # as the reference for the time axis and the array shape.
+    reference = next(da for da in (front, lower, right) if da is not None)
+
     # Determine control surface
     face = _outer_edge(budgetzone)
     # Convert indices array to dask array, otherwise garbage collection gets
@@ -289,7 +294,7 @@ def facebudget(budgetzone, front=None, lower=None, right=None, netflow=True):
         results_right = []
 
         if "time" in dims:
-            for itime in range(front.coords["time"].size):
+            for itime in range(reference.coords["time"].size):
                 if front is not None:
                     F = front.isel(time=itime)
                 if lower is not None:
@@ -317,9 +322,9 @@ def facebudget(budgetzone, front=None, lower=None, right=None, netflow=True):
             dask_front, dask_lower, dask_right = delayed_collect(indices, F, L, R)
     else:
         chunks = (1, *da_shape)
-        dask_front = dask.array.full(front.shape, np.nan, chunks=chunks)
-        dask_lower = dask.array.full(lower.shape, np.nan, chunks=chunks)
-        dask_right = dask.array.full(right.shape, np.nan, chunks=chunks)
+        dask_front = dask.array.full(reference.shape, np.nan, chunks=chunks)
+        dask_lower = dask.array.full(reference.shape, np.nan, chunks=chunks)
+        dask_right = dask.array.full(reference.shape, np.nan, chunks=chunks)
 
     if netflow:
         return xr.DataArray(dask_front + dask_lower + dask_right, coords, dims)

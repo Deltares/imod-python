@@ -11,6 +11,7 @@ import xarray as xr
 from numpy.testing import assert_equal
 
 from imod.msw import MeteoGrid, MeteoGridCopy
+from imod.msw.meteo_mapping import open_first_meteo_grid
 from imod.util.regrid import RegridderWeightsCache
 
 
@@ -21,7 +22,7 @@ def test_meteo_grid_init(meteo_grids):
     assert meteo_grids.dataset["evapotranspiration"].dims == ("time",)
 
 
-def test_meteo_grid_write(meteo_grids):
+def test_meteo_grid_write_read(meteo_grids):
     meteo_grid = MeteoGrid(*meteo_grids)
 
     with tempfile.TemporaryDirectory() as output_dir:
@@ -32,6 +33,19 @@ def test_meteo_grid_write(meteo_grids):
             output_dir / "mete_grid.inp", header=None, quoting=csv.QUOTE_NONE
         )
         gridnames = sorted([file.name for file in output_dir.glob("meteo_grids/*.asc")])
+
+        # test reading as well : roundtrip
+        with open(output_dir / "mete_grid.inp") as fin:
+            lines = fin.readlines()
+        lines.insert(
+            -1, " "
+        )  # add an empty line to test robustness of the parser to empty lines
+        lines.append(" ")
+        with open(output_dir / "mete_grid.inp", "w") as fout:
+            fout.writelines(lines)
+        open_first_meteo_grid(
+            output_dir / "mete_grid.inp", 2
+        )  # only test parsing of the mete_grid.inp file
 
     expected_paths = [
         '"meteo_grids' + os.path.sep + 'precipitation_20000101000000.asc"',
