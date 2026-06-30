@@ -47,11 +47,15 @@ def open_first_meteo_grid(mete_grid_path: str | Path, column_nr: int) -> xr.Data
     with open(mete_grid_path, "r") as f:
         lines = f.readlines()
 
-    potential_paths = [line.split(",")[column_nr].replace('"', "") for line in lines]
-    for potential_path in potential_paths:
-        if _is_parsable_and_existing_path(potential_path, mete_grid_path):
-            resolved_path = mete_grid_path / ".." / Path(potential_path)
-            return imod.rasterio.open(resolved_path)
+    potential_paths = []
+    for line in lines:
+        cols = line.strip().split(",")
+        if len(cols) > column_nr:  # Check if column exists, if not: skip
+            potential_path = cols[column_nr].replace('"', "")
+            potential_paths.append(potential_path)
+            if _is_parsable_and_existing_path(potential_path, mete_grid_path):
+                resolved_path = mete_grid_path / ".." / Path(potential_path)
+                return imod.rasterio.open(resolved_path)
 
     error_message = dedent(f"""    
     Did not find parsable path to existing .ASC file in column {column_nr}. Got
