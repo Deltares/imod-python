@@ -74,6 +74,10 @@ Fixed
   settings were specified as dask array, which could happen when loading a model
   lazily with :meth:`imod.mf6.Modflow6Simulation.from_file` and not
   computing the data before writing.
+- Fixed bug where :func:`imod.evaluate.facebudget` raised an error when the
+  ``front`` budget was left out, even though you only need to provide one of
+  ``front``, ``lower`` or ``right``. Leaving out ``front`` now works as
+  described in the documentation.
 
 Changed
 ~~~~~~~
