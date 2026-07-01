@@ -2,7 +2,10 @@ import numpy as np
 import pandas as pd
 import pytest
 
+import imod.logging
 from imod import ipf
+from imod.logging.config import LoggerType
+from imod.logging.loglevel import LogLevel
 from imod.testing import assert_frame_equal
 
 
@@ -104,6 +107,35 @@ def test_read_associated__itype1implicit(tmp_path):
         f.write(assoc_string.format(delim=delim))
     df = ipf.read_associated(path, {"sep": r"\s+"})
     assert df.shape == (2, 2)
+
+
+def test_read__comma_wrong(write_basic_ipf, tmp_path, monkeypatch):
+    # change working directory to tmp_path to ensure that the log file is created there
+    monkeypatch.chdir(tmp_path)
+    imod.logging.configure(
+        LoggerType.PYTHON,
+        LogLevel.WARNING,
+        add_default_stream_handler=False,
+        add_default_file_handler=True,
+    )
+    path = "basic_comma.ipf"
+    write_basic_ipf(path, ",")
+
+    # modify the ipf file to deliberatie create an error by adding a column
+    with open(path, "r") as f:
+        content = f.readlines()
+    content[1] = "5\n"
+    content.insert(6, "Provincie\n")
+    with open(path, "w") as f:
+        f.writelines(content)
+
+    # read the ipf file, which should trigger a warning due to the mismatch in number of columns
+    ipf.read(path)
+
+    # check if the raised warning contains at least the file name of interest
+    with open("imod-python.log", "r") as ff:
+        #    assert "["+path+"]" in ff.read()
+        assert f"[{path}]" in ff.read()
 
 
 def test_read__comma(write_basic_ipf, tmp_path):

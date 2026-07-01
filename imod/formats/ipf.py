@@ -50,14 +50,15 @@ def _read_ipf(path, kwargs=None) -> Tuple[pd.DataFrame, int, str]:
         if not has_expected_cols:
             log_message = (
                 f"Inconsistent IPF: header states {ncol} columns,"
-                + " first line of file:\n{f.name} \ncontains {len(line.split())} whitespace-delimited"
-                + " columns and {len(next(csv.reader([line])))} comma-delimited columns."
+                + f" first line of file [{f.name}] contains {len(line.split())} whitespace-delimited"
+                + f" columns and {len(next(csv.reader([line])))} comma-delimited columns."
             )
             imod.logging.logger.log(
                 loglevel=LogLevel.WARNING,
                 message=log_message,
                 additional_depth=2,
             )
+            warnings.warn(log_message)
         f.seek(position)
         sep = r"\s+" if delim_whitespace else ","
 
@@ -180,7 +181,7 @@ def read_associated(path, kwargs={}):
                 message=log_message,
                 additional_depth=2,
             )
-        warnings.warn(log_message)
+            warnings.warn(log_message)
         sep = r"\s+" if delim_whitespace else ","
         # Normally, this ought to work:
         # metadata = pd.read_csv(f, header=None, nrows=ncol).values
@@ -230,7 +231,7 @@ def read_associated(path, kwargs={}):
                 message=log_message,
                 additional_depth=2,
             )
-
+            warnings.warn(log_message)
         sep = r"\s+" if delim_whitespace else ","
 
         itype_kwargs = {
