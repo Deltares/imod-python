@@ -102,7 +102,7 @@ class Mf6HorizontalFlowBarrier(BoundaryCondition):
     _write_schemata = {
         "idomain": (AnyValueSchema(">", 0),),
     }
-    _period_data = ("hydraulic_characteristic",)
+    _period_data = ("cell_id1", "cell_id2", "layer", "hydraulic_characteristic")
     _keyword_map = {}
     _template = BoundaryCondition._initialize_template(_pkg_id)
 
@@ -123,13 +123,6 @@ class Mf6HorizontalFlowBarrier(BoundaryCondition):
             "print_input": print_input,
         }
         super().__init__(dict_dataset)
-
-    def _get_bin_ds(self):
-        bin_ds = self.dataset[
-            ["cell_id1", "cell_id2", "layer", "hydraulic_characteristic"]
-        ]
-
-        return bin_ds
 
     def _ds_to_arrdict(self, ds):
         arrdict = super()._ds_to_arrdict(ds)

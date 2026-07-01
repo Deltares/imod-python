@@ -422,14 +422,17 @@ class UnsaturatedZoneFlow(AdvancedBoundaryCondition):
         d["periods"] = self._period_paths(
             directory, pkgname, globaltimes, bin_ds, binary=False
         )
+        # List variables that are not in the period data or package data, but
+        # are needed for rendering the template and are not options.
+        vars_from_init = ["iuzno", "ivertcon", "landflag", "stress_period_active"]
         not_options = (
-            list(self._period_data) + list(self._package_data) + ["iuzno" + "ivertcon"]
+            list(self._period_data) + list(self._package_data) + vars_from_init
         )
         d = self._get_pkg_options(d, not_options=not_options)
         path = directory / pkgname / f"{self._pkg_id}-pkgdata.dat"
         d["packagedata"] = path.as_posix()
         # max uzf-cells for which time period data will be supplied
-        d["nuzfcells"] = np.count_nonzero(np.isfinite(d["landflag"]))
+        d["nuzfcells"] = np.count_nonzero(np.isfinite(self.dataset["landflag"]))
         return self._template.render(d)
 
     def _to_struct_array(self, arrdict, layer):

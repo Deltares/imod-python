@@ -74,6 +74,12 @@ Fixed
   settings were specified as dask array, which could happen when loading a model
   lazily with :meth:`imod.mf6.Modflow6Simulation.from_file` and not
   computing the data before writing.
+- Fixed bug where ``concentration`` variables were needlessly loaded into
+  memory. Affected :class:`imod.mf6.River`, :class:`imod.mf6.Drain`,
+  :class:`imod.mf6.ConstantHeadBoundary`, :class:`imod.mf6.Recharge`,
+  :class:`imod.mf6.Well` and :class:`imod.mf6.GeneralHeadBoundary`.
+- Fix bug where ``maxbound`` of the ``.wel`` file computed by
+  :class:`imod.mf6.Mf6Wel` was twice or thrice too large.
 - Fixed bug where :func:`imod.evaluate.facebudget` raised an error when the
   ``front`` budget was left out, even though you only need to provide one of
   ``front``, ``lower`` or ``right``. Leaving out ``front`` now works as

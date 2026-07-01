@@ -7,6 +7,7 @@ import numpy as np
 import xarray as xr
 import xugrid as xu
 
+from imod.common.utilities.value_filters import enforce_scalar
 from imod.mf6.auxiliary_variables import (
     expand_transient_auxiliary_variables,
     get_variable_names,
@@ -92,7 +93,12 @@ class BoundaryCondition(Package, abc.ABC):
         Determine the maximum active number of cells that are active
         during a stress period.
         """
-        da = self.dataset[self._get_period_varnames()[0]]
+        if not hasattr(self, "_period_data") or len(self._period_data) == 0:
+            raise ValueError("No period data variables defined for this package.")
+        # Get the last period data element to work around the first variable
+        # (cellid) of the Mf6HorizontalFlowBarrier having an additional
+        # dimension.
+        da = self.dataset[self._period_data[-1]]
         if "time" in da.coords:
             nmax = int(da.groupby("time").count(xr.ALL_DIMS).max())
         else:
@@ -206,12 +212,13 @@ class BoundaryCondition(Package, abc.ABC):
         options = copy(predefined_options)
 
         if not_options is None:
-            not_options = self._get_period_varnames()
+            other_exceptions = ["concentration", "repeat_stress"]
+            not_options = self._get_period_varnames() + other_exceptions
 
         for varname in self.dataset.data_vars.keys():  # pylint:disable=no-member
             if varname in not_options:
                 continue
-            v = self.dataset[varname].values[()]
+            v = enforce_scalar(self.dataset[varname])
             options[str(varname)] = v
         return options
 
@@ -243,12 +250,12 @@ class BoundaryCondition(Package, abc.ABC):
         """Render fills in the template only, doesn't write binary data"""
         d = {"binary": binary}
         bin_ds = self._get_bin_ds()
-        d["periods"] = self._period_paths(
-            directory, pkgname, globaltimes, bin_ds, binary
-        )
         # construct the rest (dict for render)
         d = self._get_pkg_options(d)
         d["maxbound"] = self._max_active_n()
+        d["periods"] = self._period_paths(
+            directory, pkgname, globaltimes, bin_ds, binary
+        )
 
         if (hasattr(self, "_auxiliary_data")) and (names := get_variable_names(self)):
             d["auxiliary"] = names
@@ -298,7 +305,9 @@ class BoundaryCondition(Package, abc.ABC):
 
     def _get_period_varnames(self) -> list[str]:
         """
-        Get variable names for transient data of this package.
+        Get variable names for transient data of this package. These will be the
+        variables that are written to binary files and referenced in the block
+        file.
 
         Returns
         -------
@@ -313,7 +322,7 @@ class BoundaryCondition(Package, abc.ABC):
 
         >>> river = imod.mf6.River.from_file("river_with_concentration.nc")
         >>> river._get_period_varnames()
-        >>> # prints: ['stage', 'conductance', 'bottom_elevation', 'concentration']
+        >>> # prints: ['stage', 'conductance', 'bottom_elevation', 'species1', 'species2']
         """
         result = []
         if hasattr(self, "_period_data"):
