@@ -521,20 +521,19 @@ class MetaSwapModel(Model, IDict):
     ):
         """
          This function applies a mask to all packages in a model. The mask must
-         be presented as a MetaSwap Active object, which contains idomain-like integers.
+         be presented as a GridDataArray, which contains idomain-like integers.
          The mask is applied to all packages in the model, and the values in the mask determine which cells are active and which are inactive. The mask is applied to all packages, regardless of whether they have a subunit dimension or not.
 
          Parameters
          ----------
-         msw_active: MetaSwapActive, dictionary of xr.DataArray
+         mask: GridDataArray
              idomain-like integers. >0 sets cells to active, 0 sets cells to inactive,
-             all: applies to all packages without a subunit dimension
-             subunit: applies to all packages with a subunit dimension on a per-subunit basis
-                      (mask has a subunit dimension)
+             mask is applied on a per-subunit basis if the package has a subunit dimension.
+             If the package does not have a subunit dimension, the mask is applied to all subunits of the package.
 
         Example
          -------
-         >>> mask_per_subunit = xr.DataArray(
+         >>> mask = xr.DataArray(
          >>>     np.array(
          >>>         [
          >>>             [[0, 0, 0], [0, 1, 1], [0, 0, 0]],
@@ -550,9 +549,6 @@ class MetaSwapModel(Model, IDict):
          >>>         "subunit" : [0, 1]
          >>>     }
          >>> )
-         >>> mask_all = mask_per_subunit.any(dim="subunit")
-         >>> msw_active = MetaSwapActive(mask_all, mask_per_subunit)
-         >>> msw_model.mask_all_packages(msw_active)
         """
 
         if "subunit" in mask.dims:
