@@ -173,8 +173,8 @@ def read_associated(path, kwargs={}):
         if not has_expected_cols:
             log_message = (
                 f"Inconsistent IPF: header states {ncol} columns,"
-                + " first line of file:\n{f.name} \ncontains {len(line.split())} whitespace-delimited"
-                + " columns and {len(next(csv.reader([line])))} comma-delimited columns."
+                + f" first line of file:\n{f.name} \ncontains {len(line.split())} whitespace-delimited"
+                + f" columns and {len(next(csv.reader([line])))} comma-delimited columns."
             )
             imod.logging.logger.log(
                 loglevel=LogLevel.WARNING,
@@ -223,8 +223,8 @@ def read_associated(path, kwargs={}):
         if not has_expected_cols:
             log_message = (
                 f"Inconsistent IPF: header states {ncol} columns,"
-                + " first datablock of file:\n{f.name} \ncontains {len(line.split())} whitespace-delimited"
-                + " columns and {len(next(csv.reader([line])))} comma-delimited columns."
+                + f" first datablock of file:\n{f.name} \ncontains {len(line.split())} whitespace-delimited"
+                + f" columns and {len(next(csv.reader([line])))} comma-delimited columns."
             )
             imod.logging.logger.log(
                 loglevel=LogLevel.WARNING,

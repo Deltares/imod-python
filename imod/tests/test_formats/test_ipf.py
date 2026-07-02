@@ -121,7 +121,7 @@ def test_read__comma_wrong(write_basic_ipf, tmp_path, monkeypatch):
     path = "basic_comma.ipf"
     write_basic_ipf(path, ",")
 
-    # modify the ipf file to deliberatie create an error by adding a column
+    # modify the ipf file to deliberately create an error by adding a column
     with open(path, "r") as f:
         content = f.readlines()
     content[1] = "5\n"
