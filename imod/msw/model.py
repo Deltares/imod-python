@@ -23,9 +23,9 @@ from imod.common.utilities.regrid import regrid_imod5_cap_data
 from imod.common.utilities.version import prepend_content_with_version_info
 from imod.mf6.dis import StructuredDiscretization
 from imod.mf6.mf6_wel_adapter import Mf6Wel
+from imod.msw import GridData
 from imod.msw.copy_files import FileCopier
 from imod.msw.coupler_mapping import CouplerMapping
-from imod.msw.grid_data import GridData
 from imod.msw.idf_mapping import IdfMapping
 from imod.msw.infiltration import Infiltration
 from imod.msw.initial_conditions import (
@@ -52,7 +52,11 @@ from imod.msw.utilities.common import find_in_file_list
 from imod.msw.utilities.imod5_converter import (
     has_active_scaling_factor,
 )
-from imod.msw.utilities.mask import mask_and_broadcast_cap_data
+from imod.msw.utilities.mask import (
+    MetaSwapActive,
+    mask_and_broadcast_cap_data,
+    mask_and_broadcast_pkg_data,
+)
 from imod.msw.utilities.parse import read_para_sim
 from imod.msw.vegetation import AnnualCropFactors
 from imod.typing import GridDataArray, Imod5DataDict
@@ -510,6 +514,64 @@ class MetaSwapModel(Model, IDict):
             regridded_model[mod2svat_name] = CouplerMapping()
 
         return regridded_model
+
+    def mask_all_packages(
+        self,
+        mask: GridDataArray,
+    ):
+        """
+         This function applies a mask to all packages in a model. The mask must
+         be presented as a GridDataArray, which contains idomain-like integers.
+         The mask is applied to all packages in the model, and the values in the mask determine which cells are active and which are inactive. The mask is applied to all packages, regardless of whether they have a subunit dimension or not.
+
+         Parameters
+         ----------
+         mask: GridDataArray
+             idomain-like integers. >0 sets cells to active, 0 sets cells to inactive,
+             mask is applied on a per-subunit basis if the package has a subunit dimension.
+             If the package does not have a subunit dimension, the mask is applied to all subunits of the package.
+
+        Example
+         -------
+         >>> mask = xr.DataArray(
+         >>>     np.array(
+         >>>         [
+         >>>             [[0, 0, 0], [0, 1, 1], [0, 0, 0]],
+         >>>             [[1, 1, 1], [0, 1, 1], [0, 0, 0]],
+         >>>         ]
+         >>>     ).astype(bool),
+         >>>     dims=("subunit", "y", "x"),
+         >>>     coords = {
+         >>>         "x" : [1.0, 2.0, 3.0],
+         >>>         "y" : [3.0, 2.0, 1.0],
+         >>>         "dx" : 1.0,
+         >>>         "dy" : 1.0,
+         >>>         "subunit" : [0, 1]
+         >>>     }
+         >>> )
+        """
+
+        if "subunit" in mask.dims:
+            mask_all = mask.any(dim="subunit")
+            msw_active = MetaSwapActive(all=mask_all, per_subunit=mask)
+        else:
+            nsub = 1
+            for pkg in self.values():
+                if "subunit" in pkg.dataset.dims:
+                    nsub = pkg.dataset.dims["subunit"]
+                    break
+            mask_per_subunit = mask.expand_dims(dim={"subunit": nsub})
+            msw_active = MetaSwapActive(all=mask, per_subunit=mask_per_subunit)
+
+        for pkg in self.values():
+            if "x" in pkg.dataset.dims and "y" in pkg.dataset.dims:
+                data_dict = {
+                    key: pkg.dataset[key] for key in pkg.dataset.data_vars.keys()
+                }
+                masked_data = mask_and_broadcast_pkg_data(pkg, data_dict, msw_active)
+                for key, data in masked_data.items():
+                    pkg.dataset[key] = data
+        return
 
     def clip_box(
         self,
