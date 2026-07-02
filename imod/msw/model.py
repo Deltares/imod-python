@@ -517,8 +517,7 @@ class MetaSwapModel(Model, IDict):
 
     def mask_all_packages(
         self,
-        msw_active: MetaSwapActive,
-        #       ignore_time_purge_empty: bool = False,
+        mask: GridDataArray,
     ):
         """
          This function applies a mask to all packages in a model. The mask must
@@ -555,6 +554,18 @@ class MetaSwapModel(Model, IDict):
          >>> msw_active = MetaSwapActive(mask_all, mask_per_subunit)
          >>> msw_model.mask_all_packages(msw_active)
         """
+
+        if "subunit" in mask.dims:
+            mask_all = mask.any(dim="subunit")
+            msw_active = MetaSwapActive(all=mask_all, per_subunit=mask)
+        else:
+            nsub = 1
+            for pkg in self.values():
+                if "subunit" in pkg.dataset.dims:
+                    nsub = pkg.dataset.dims["subunit"]
+                    break
+            mask_per_subunit = mask.expand_dims(dim={"subunit": nsub})
+            msw_active = MetaSwapActive(all=mask, per_subunit=mask_per_subunit)
 
         for pkg in self.values():
             if "x" in pkg.dataset.dims and "y" in pkg.dataset.dims:

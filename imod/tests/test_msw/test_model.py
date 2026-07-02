@@ -22,7 +22,7 @@ from imod.util.spatial import empty_2d
 
 
 @pytest.fixture(scope="function")
-def mask_fixture() -> MetaSwapActive:
+def mask_fixture() -> xr.DataArray:
     mask_per_subunit = xr.DataArray(
         np.array(
             [
@@ -39,9 +39,7 @@ def mask_fixture() -> MetaSwapActive:
             "subunit": [0, 1],
         },
     )
-    mask_all = mask_per_subunit.any(dim="subunit")
-
-    return MetaSwapActive(mask_all, mask_per_subunit)
+    return mask_per_subunit
 
 
 def roundtrip(msw_model, tmpdir_factory, name, engine):
@@ -77,17 +75,15 @@ def test_msw_mask_all(msw_model, tmpdir_factory, mask_fixture):
     msw_model.mask_all_packages(mask_fixture)
 
     # Check that the mask has been applied correctly to each package
+    mask_all = mask_fixture.any(dim="subunit")
+    msw_active = MetaSwapActive(all=mask_all, per_subunit=mask_fixture)
     for pkgname, pkg in msw_model.items():
-        if isinstance(pkg, msw.meteo_mapping.PrecipitationMapping):
-            continue  # Skip PrecipitationMapping package for this test
-        if isinstance(pkg, msw.meteo_mapping.EvapotranspirationMapping):
-            continue  # Skip EvapotranspirationMapping package for this test
         for var in pkg.dataset.data_vars:
             da = pkg.dataset[var]
             if "y" in da.dims and "x" in da.dims:
                 assert (
-                    da.where(mask_fixture).equals(da)
-                    or da.where(~mask_fixture).isnull().all()
+                    da.where(msw_active).equals(da)
+                    or da.where(~msw_active).isnull().all()
                 )
 
 
