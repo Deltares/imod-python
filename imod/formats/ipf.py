@@ -24,16 +24,7 @@ from imod.util.time import to_pandas_datetime_series
 
 def _infer_delimwhitespace(line, ncol):
     delimiter_info = infer_line_delimiter_info(line, ncol)
-
-    if not delimiter_info.has_expected_cols:
-        log_message = f"Inconsistent IPF: header states {ncol} columns, first line contains {len(line.split())} whitespace-delimited columns and {len(next(csv.reader([line])))} comma-delimited columns."
-        imod.logging.logger.log(
-            loglevel=LogLevel.WARNING,
-            message=log_message,
-            additional_depth=2,
-        )
-        warnings.warn(log_message)
-    return delimiter_info.has_whitespace
+    return delimiter_info.has_whitespace, delimiter_info.has_expected_cols
 
 
 def _read_ipf(path, kwargs=None) -> Tuple[pd.DataFrame, int, str]:
@@ -55,7 +46,19 @@ def _read_ipf(path, kwargs=None) -> Tuple[pd.DataFrame, int, str]:
 
         position = f.tell()
         line = f.readline()
-        delim_whitespace = _infer_delimwhitespace(line, ncol)
+        delim_whitespace, has_expected_cols = _infer_delimwhitespace(line, ncol)
+        if not has_expected_cols:
+            log_message = (
+                f"Inconsistent IPF: header states {ncol} columns,"
+                + f" first line of file [{f.name}] contains {len(line.split())} whitespace-delimited"
+                + f" columns and {len(next(csv.reader([line])))} comma-delimited columns."
+            )
+            imod.logging.logger.log(
+                loglevel=LogLevel.WARNING,
+                message=log_message,
+                additional_depth=2,
+            )
+            warnings.warn(log_message)
         f.seek(position)
         sep = r"\s+" if delim_whitespace else ","
 
@@ -166,7 +169,19 @@ def read_associated(path, kwargs={}):
         # this is a workaround for a pandas bug, probable related issue:
         # https://github.com/pandas-dev/pandas/issues/19827#issuecomment-398649163
         lines = [f.readline() for _ in range(ncol)]
-        delim_whitespace = _infer_delimwhitespace(lines[0], 2)
+        delim_whitespace, has_expected_cols = _infer_delimwhitespace(lines[0], 2)
+        if not has_expected_cols:
+            log_message = (
+                f"Inconsistent IPF: header states {ncol} columns,"
+                + f" first line of file:\n{f.name} \ncontains {len(line.split())} whitespace-delimited"
+                + f" columns and {len(next(csv.reader([line])))} comma-delimited columns."
+            )
+            imod.logging.logger.log(
+                loglevel=LogLevel.WARNING,
+                message=log_message,
+                additional_depth=2,
+            )
+            warnings.warn(log_message)
         sep = r"\s+" if delim_whitespace else ","
         # Normally, this ought to work:
         # metadata = pd.read_csv(f, header=None, nrows=ncol).values
@@ -204,7 +219,19 @@ def read_associated(path, kwargs={}):
         position = f.tell()
         line = f.readline()
         f.seek(position)
-        delim_whitespace = _infer_delimwhitespace(line, ncol)
+        delim_whitespace, has_expected_cols = _infer_delimwhitespace(line, ncol)
+        if not has_expected_cols:
+            log_message = (
+                f"Inconsistent IPF: header states {ncol} columns,"
+                + f" first datablock of file:\n{f.name} \ncontains {len(line.split())} whitespace-delimited"
+                + f" columns and {len(next(csv.reader([line])))} comma-delimited columns."
+            )
+            imod.logging.logger.log(
+                loglevel=LogLevel.WARNING,
+                message=log_message,
+                additional_depth=2,
+            )
+            warnings.warn(log_message)
         sep = r"\s+" if delim_whitespace else ","
 
         itype_kwargs = {
