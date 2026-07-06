@@ -546,8 +546,9 @@ class MetaSwapModel(Model, IDict):
          ----------
          mask: GridDataArray
              idomain-like integers. >0 sets cells to active, 0 sets cells to inactive,
-             mask is applied on a per-subunit basis if the package has a subunit dimension.
-             If the package does not have a subunit dimension, the mask is applied to all subunits of the package.
+             mask is applied on a per-subunit basis if the mask grid has a subunit dimension.
+             If the package does not have a subunit dimension, the combined mask grid over all of its subunits is applied,
+             i.e. a cell is set to active if it is active in any of the subunits.
 
         Example
          -------
