@@ -264,6 +264,24 @@ class MetaSwapModel(Model, IDict):
         starttime = min(starttimes)
         return starttime
 
+    @property
+    def nsubunits(self) -> int:
+        """
+        Get the number of subunits in the model from the first dataset having a subunit dimension.
+        Defaults to 1 if no package has a subunit dimension.
+
+        Returns
+        -------
+        int
+            The number of subunits in the model.
+        """
+        nsub = 1
+        for pkg in self.values():
+            if "subunit" in pkg.dataset.dims:
+                nsub = pkg.dataset.dims["subunit"]
+                break
+        return nsub
+
     def get_pkgkey(
         self, pkg_type: type[MetaSwapPackage], optional_package: bool = False
     ) -> str | None:
@@ -555,12 +573,7 @@ class MetaSwapModel(Model, IDict):
             mask_all = mask.any(dim="subunit")
             msw_active = MetaSwapActive(all=mask_all, per_subunit=mask)
         else:
-            nsub = 1
-            for pkg in self.values():
-                if "subunit" in pkg.dataset.dims:
-                    nsub = pkg.dataset.dims["subunit"]
-                    break
-            mask_per_subunit = mask.expand_dims(dim={"subunit": nsub})
+            mask_per_subunit = mask.expand_dims(dim={"subunit": self.nsubunits})
             msw_active = MetaSwapActive(all=mask, per_subunit=mask_per_subunit)
 
         for pkg in self.values():
