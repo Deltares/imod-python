@@ -22,6 +22,8 @@ Added
   barriers from 3D GEN files. 
 - Added ``name`` argument to:meth:`imod.mf6.Modflow6Simulation.from_imod5_data`
   to provide custom name to imported simulation and model.
+- Added :meth:`imod.msw.MetaSwapModel.mask_all_packages` to mask all packages of
+  a MetaSWAP model.
 
 Fixed
 ~~~~~
