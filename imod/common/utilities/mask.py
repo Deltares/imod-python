@@ -129,7 +129,9 @@ def mask_da(da: GridDataArray, mask: GridDataArray) -> GridDataArray:
         )
     # Align the mask, as calling where with "other" specified does not
     # automatically align the mask to the DataArray.
-    aligned: tuple[GridDataArray, GridDataArray] = xr.align(da, mask, join="left", copy=False)
+    aligned: tuple[GridDataArray, GridDataArray] = xr.align(
+        da, mask, join="left", copy=False
+    )
     _, mask_aligned = aligned
     return da.where(mask_aligned, other=other)
 
