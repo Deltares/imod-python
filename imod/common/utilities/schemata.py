@@ -62,7 +62,7 @@ def concatenate_schemata_dicts(
 
 
 def validate_schemata_dict(
-    schemata: SchemataDict, data: GridDataset, **kwargs: Any
+    schemata: SchemataDict, data: GridDataset | dict[str, Any], **kwargs: Any
 ) -> dict[str, list[ValidationError]]:
     """
     Validate a data mapping against a schemata dictionary. Returns a dictionary
