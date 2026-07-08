@@ -97,7 +97,7 @@ def clip_by_grid(  # noqa: F811
     return cls._from_dataset(selection)
 
 
-@dispatch  # type: ignore[no-redef, misc]
+@dispatch  # type: ignore[no-redef]
 def clip_by_grid(package: ILineDataPackage, active: xr.DataArray) -> ILineDataPackage:  # noqa: F811
     """Clip LineDataPackage outside structured grid."""
     return _clip_by_grid_line_data(package, active)
@@ -105,7 +105,7 @@ def clip_by_grid(package: ILineDataPackage, active: xr.DataArray) -> ILineDataPa
 
 # For some reason the plum dispatching finds "active: GridDataArray" ambiguous
 # and raises an error if this is not duplicated.
-@dispatch  # type: ignore[no-redef, misc]
+@dispatch  # type: ignore[no-redef]
 def clip_by_grid(  # noqa: F811
     package: ILineDataPackage, active: xu.UgridDataArray
 ) -> ILineDataPackage:

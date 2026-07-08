@@ -116,7 +116,6 @@ warn_return_any = false
 # works with the vscode mypy extension
 [[tool.mypy.overrides]]
 module = [
-    "imod.common.*",
     "imod.data.*",
     "imod.evaluate.*",
     "imod.formats.*",

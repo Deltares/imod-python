@@ -1,7 +1,7 @@
 import copy
 from collections import defaultdict
 from dataclasses import asdict
-from typing import Any, Optional, Tuple, TypeAlias, Union
+from typing import Any, DefaultDict, Optional, Tuple, TypeAlias, Union
 
 import numpy as np
 import xarray as xr
@@ -163,14 +163,23 @@ def _regrid_package_data(
     return new_package_data
 
 
-def _get_unique_regridder_types(model: IModel) -> defaultdict[RegridderType, list[str]]:
+def __get_regrid_methods_as_dict(package: IRegridPackage) -> dict[str, RegridVarType]:
+    """
+    Returns the regrid methods of a package as a dictionary. Separated function
+    to set an ignore for mypy.
+    """
+    regrid_methods = package.get_regrid_methods()
+    return asdict(regrid_methods)  # type: ignore[arg-type]
+
+
+def _get_unique_regridder_types(model: IModel) -> DefaultDict[RegridderType, list[Any]]:
     """
     This function loops over the packages and  collects all regridder-types that are in use.
     """
-    methods: defaultdict = defaultdict(list)
+    methods: DefaultDict[RegridderType, list[Any]] = defaultdict(list)
     regrid_packages = [pkg for pkg in model.values() if isinstance(pkg, IRegridPackage)]
     regrid_packages_with_methods = {
-        pkg: asdict(pkg.get_regrid_methods()).items()  # type: ignore[union-attr]
+        pkg: __get_regrid_methods_as_dict(pkg).items()
         for pkg in regrid_packages
         if not isinstance(pkg.get_regrid_methods(), EmptyRegridMethod)
     }

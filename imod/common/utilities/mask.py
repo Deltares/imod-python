@@ -77,6 +77,7 @@ def mask_package(package: IPackage, mask: GridDataArray) -> IPackage:
     masked = {}
 
     for var in package.dataset.data_vars.keys():
+        var = str(var)
         if _skip_dataarray(package.dataset[var]) or _skip_variable(package, var):
             masked[var] = package.dataset[var]
         else:
@@ -114,6 +115,7 @@ def mask_da(da: GridDataArray, mask: GridDataArray) -> GridDataArray:
     dtype of the original DataArray. It will set the
     value to 0 for integers, np.nan for floats, and False for booleans.
     """
+    other: int | float | bool
 
     if is_integer(da.dtype):
         other = MaskValues.integer
@@ -127,8 +129,11 @@ def mask_da(da: GridDataArray, mask: GridDataArray) -> GridDataArray:
         )
     # Align the mask, as calling where with "other" specified does not
     # automatically align the mask to the DataArray.
-    _, mask = xr.align(da, mask, join="left", copy=False)
-    return da.where(mask, other=other)
+    aligned: tuple[GridDataArray, GridDataArray] = xr.align(
+        da, mask, join="left", copy=False
+    )
+    _, mask_aligned = aligned
+    return da.where(mask_aligned, other=other)
 
 
 def _mask_spatial_var_pkg(
@@ -213,7 +218,7 @@ def broadcast_and_mask_arrays(
     # will result in no spatial grid.
     if not is_spatial_grid(broadcasted_arrays[0]):
         raise ValueError("One or more arrays need to be a spatial grid.")
-    broadcasted_arrays = dict(zip(arrays.keys(), broadcasted_arrays))
+    broadcasted_arrays_dict = dict(zip(arrays.keys(), broadcasted_arrays))
 
     # Mask arrays with np.nan values
-    return mask_arrays(broadcasted_arrays)
+    return mask_arrays(broadcasted_arrays_dict)

@@ -59,7 +59,7 @@ class NetCDFSerializer(IPackageSerializer):
 
         return pkg.dataset
 
-    def _netcdf_encoding(self, pkg: IPackageBase) -> dict:
+    def _netcdf_encoding(self, pkg: IPackageBase) -> dict[str, dict[str, str]]:
         """
 
         The encoding used in the to_netcdf method

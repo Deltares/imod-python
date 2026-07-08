@@ -1,4 +1,4 @@
-from typing import ClassVar, Protocol, runtime_checkable
+from typing import Any, ClassVar, Protocol, runtime_checkable
 
 from pydantic import ConfigDict
 from pydantic.dataclasses import dataclass
@@ -14,9 +14,9 @@ class DataclassType(Protocol):
     # See also:
     # https://github.com/python/mypy/issues/6568#issuecomment-1324196557
 
-    __dataclass_fields__: ClassVar[dict]
+    __dataclass_fields__: ClassVar[dict[str, Any]]
 
-    def asdict(self) -> dict:
+    def asdict(self) -> dict[str, Any]:
         return vars(self)
 
 

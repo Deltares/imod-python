@@ -1,6 +1,6 @@
 import collections
 from pathlib import Path
-from typing import Any, Optional
+from typing import Any, DefaultDict, Optional
 
 import tomli_w
 
@@ -16,7 +16,7 @@ def dump_model(
     model: IDict,
     directory,
     modelname,
-    validate: Optional[bool] = True,
+    validate: bool = True,
     mdal_compliant: bool = False,
     crs: Optional[Any] = None,
     engine: EngineType = "netcdf4",
@@ -64,7 +64,7 @@ def dump_model(
             if statusinfo.has_errors():
                 raise ValidationError(statusinfo.to_string())
 
-    toml_content: dict = collections.defaultdict(dict)
+    toml_content: DefaultDict[str, dict[str, Any]] = collections.defaultdict(dict)
 
     for pkgname, pkg in model.items():
         pkg_path = pkg.to_file(

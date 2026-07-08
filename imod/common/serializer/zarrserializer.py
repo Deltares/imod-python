@@ -2,7 +2,7 @@ import shutil
 from contextlib import nullcontext
 from copy import deepcopy
 from pathlib import Path
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, Any
 
 import xugrid as xu
 
@@ -28,6 +28,9 @@ class ZarrSerializer(IPackageSerializer):
     def to_file(
         self, pkg: IPackageBase, directory: Path, file_name: str, **kwargs
     ) -> Path:
+        store: zarr.storage.ZipStore | Path
+        write_context: zarr.storage.ZipStore | nullcontext[Any]
+
         if self.use_zip:
             path = directory / f"{file_name}.zarr.zip"
             store = zarr.storage.ZipStore(path, mode="w")

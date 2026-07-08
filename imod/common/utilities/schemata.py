@@ -1,10 +1,10 @@
 from collections import defaultdict
-from collections.abc import Mapping
 from copy import deepcopy
 from typing import Any, Optional, Protocol
 
 from imod.common.statusinfo import NestedStatusInfo, StatusInfo, StatusInfoBase
 from imod.schemata import BaseSchema, SchemataDict, ValidationError
+from imod.typing import GridDataset
 
 
 def filter_schemata_dict(
@@ -33,7 +33,7 @@ def filter_schemata_dict(
     Prints ``{'stage': [<imod.schemata.AllNoDataSchema at 0x1b152b12aa0>]}``
     """
 
-    d = {}
+    d: SchemataDict = {}
     for key, schema_ls in schemata_dict.items():
         schema_match = [
             schema for schema in schema_ls if isinstance(schema, schema_types)
@@ -62,7 +62,7 @@ def concatenate_schemata_dicts(
 
 
 def validate_schemata_dict(
-    schemata: SchemataDict, data: Mapping, **kwargs: Any
+    schemata: SchemataDict, data: GridDataset | dict[str, Any], **kwargs: Any
 ) -> dict[str, list[ValidationError]]:
     """
     Validate a data mapping against a schemata dictionary. Returns a dictionary
