@@ -426,7 +426,7 @@ class MetaSwapModel(Model, IDict):
         self,
         directory: Union[str, Path],
         modelname: Optional[str] = None,
-        validate: Optional[bool] = True,
+        validate: bool = True,
         mdal_compliant: bool = False,
         crs: Optional[str] = None,
         engine: EngineType = "netcdf4",
