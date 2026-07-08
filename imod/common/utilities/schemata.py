@@ -1,5 +1,4 @@
 from collections import defaultdict
-from collections.abc import Mapping
 from copy import deepcopy
 from typing import Any, Optional, Protocol
 
