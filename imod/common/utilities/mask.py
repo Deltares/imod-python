@@ -218,7 +218,7 @@ def broadcast_and_mask_arrays(
     # will result in no spatial grid.
     if not is_spatial_grid(broadcasted_arrays[0]):
         raise ValueError("One or more arrays need to be a spatial grid.")
-    broadcasted_arrays = dict(zip(arrays.keys(), broadcasted_arrays))
+    broadcasted_arrays_dict = dict(zip(arrays.keys(), broadcasted_arrays))
 
     # Mask arrays with np.nan values
-    return mask_arrays(broadcasted_arrays)
+    return mask_arrays(broadcasted_arrays_dict)
