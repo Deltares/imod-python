@@ -5,6 +5,7 @@ from typing import Any, Optional, Protocol
 
 from imod.common.statusinfo import NestedStatusInfo, StatusInfo, StatusInfoBase
 from imod.schemata import BaseSchema, SchemataDict, ValidationError
+from imod.typing import GridDataset
 
 
 def filter_schemata_dict(
@@ -62,7 +63,7 @@ def concatenate_schemata_dicts(
 
 
 def validate_schemata_dict(
-    schemata: SchemataDict, data: Mapping[str, Any], **kwargs: Any
+    schemata: SchemataDict, data: GridDataset, **kwargs: Any
 ) -> dict[str, list[ValidationError]]:
     """
     Validate a data mapping against a schemata dictionary. Returns a dictionary
