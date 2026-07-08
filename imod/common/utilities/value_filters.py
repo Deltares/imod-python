@@ -46,7 +46,7 @@ def is_empty_dataarray(da: Any) -> bool:
 
 def get_scalar_variables(ds: GridDataset) -> list[str]:
     """Returns scalar variables in a dataset."""
-    return [var for var, arr in ds.variables.items() if is_scalar(arr)]
+    return [str(var) for var, arr in ds.variables.items() if is_scalar(arr)]
 
 
 def enforce_scalar(a: GridDataArray) -> Any:
