@@ -1,5 +1,5 @@
 from abc import abstractmethod
-from typing import Optional, Tuple
+from typing import Any, Optional, Tuple
 
 from imod.common.interfaces.idict import IDict
 from imod.common.statusinfo import StatusInfoBase
@@ -37,7 +37,7 @@ class IModel(IDict):
 
     @property
     @abstractmethod
-    def options(self) -> dict:
+    def options(self) -> dict[str, Any]:
         raise NotImplementedError
 
     @property
