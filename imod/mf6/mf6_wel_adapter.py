@@ -143,6 +143,7 @@ class Mf6Wel(BoundaryCondition, IPackage):
         self,
         cellid,
         rate,
+        id,
         concentration=None,
         concentration_boundary_type="aux",
         save_flows: Optional[bool] = None,
@@ -153,6 +154,7 @@ class Mf6Wel(BoundaryCondition, IPackage):
         dict_dataset = {
             "cellid": cellid,
             "rate": rate,
+            "id": id,
             "concentration": concentration,
             "concentration_boundary_type": concentration_boundary_type,
             "save_flows": save_flows,
@@ -169,7 +171,7 @@ class Mf6Wel(BoundaryCondition, IPackage):
         arrdict: Dict[str, Any] = {}
 
         arrdict["data_vars"] = [
-            var_name for var_name in ds.data_vars if var_name != "cellid"
+            var_name for var_name in ds.data_vars if var_name not in ("cellid", "id")
         ]
 
         dsvar = {}

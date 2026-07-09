@@ -539,8 +539,6 @@ class GridAgnosticWell(BoundaryCondition, IPointDataPackage, abc.ABC):
             )
             logger.log(loglevel=LogLevel.WARNING, message=message_end)
 
-        ds = ds.drop_vars("id")
-
         data_vars_dict = {str(k): v for k, v in ds.data_vars.items()}
         return Mf6Wel(**data_vars_dict)  # type: ignore[arg-type]
 
