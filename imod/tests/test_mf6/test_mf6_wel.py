@@ -880,7 +880,9 @@ def test_import_and_convert_to_mf6(imod5_dataset, tmp_path, wel_class):
     times = list(pd.date_range(datetime(1989, 1, 1), datetime(2013, 1, 1), 8400))
 
     # import grid-agnostic well from imod5 data (it contains 1 well)
-    wel = wel_class.from_imod5_data("wel-1-WELLS_L3", data, times, minimum_thickness=1.0)
+    wel = wel_class.from_imod5_data(
+        "wel-1-WELLS_L3", data, times, minimum_thickness=1.0
+    )
     assert wel.dataset["x"].values[0] == 197910.0
     assert wel.dataset["y"].values[0] == 362860.0
     np.testing.assert_almost_equal(
@@ -1044,7 +1046,9 @@ def test_logmessage_for_layer_assignment_import_imod5(
     imod5dict = open_projectfile_data(well_regular_import_prj)
 
     logfile_path = tmp_path / "logfile.txt"
-    imod5dict[0]["wel-1-ipf1"]["layer"] = [layer] * len(imod5dict[0]["wel-1-ipf1"]["layer"])
+    imod5dict[0]["wel-1-ipf1"]["layer"] = [layer] * len(
+        imod5dict[0]["wel-1-ipf1"]["layer"]
+    )
 
     try:
         with open(logfile_path, "w") as sys.stdout:

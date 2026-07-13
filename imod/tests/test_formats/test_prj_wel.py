@@ -597,7 +597,6 @@ class WellReadCases:
                 "factor": [1.0],
                 "addition": [0.0],
             },
-
         }
 
 
@@ -630,12 +629,20 @@ class WellPackageCases:
 
     def case_simple__first(self):
         return {
-            "wel-1-simple1": (False, True, [datetime(1982, 2, 1), datetime(1982, 3, 1)]),
+            "wel-1-simple1": (
+                False,
+                True,
+                [datetime(1982, 2, 1), datetime(1982, 3, 1)],
+            ),
         }
 
     def case_simple__first_multi_layer1(self):
         return {
-            "wel-1-simple1": (False, True, [datetime(1982, 2, 1), datetime(1982, 3, 1)]),
+            "wel-1-simple1": (
+                False,
+                True,
+                [datetime(1982, 2, 1), datetime(1982, 3, 1)],
+            ),
         }
 
     def case_simple__first_multi_layer2(self):
@@ -660,7 +667,11 @@ class WellPackageCases:
 
     def case_simple__all_different1(self):
         return {
-            "wel-1-simple1": (False, True, [datetime(1982, 2, 1), datetime(1982, 3, 1)]),
+            "wel-1-simple1": (
+                False,
+                True,
+                [datetime(1982, 2, 1), datetime(1982, 3, 1)],
+            ),
             "wel-2-simple2": (False, True, [datetime(1982, 3, 1)]),
             "wel-3-simple3": (False, True, []),
         }
@@ -693,7 +704,11 @@ class WellPackageCases:
 
     def case_mixed__first(self):
         return {
-            "wel-1-simple1": (False, True, [datetime(1982, 2, 1), datetime(1982, 3, 1)]),
+            "wel-1-simple1": (
+                False,
+                True,
+                [datetime(1982, 2, 1), datetime(1982, 3, 1)],
+            ),
             "wel-2-associated": (False, True, []),
         }
 
@@ -705,7 +720,11 @@ class WellPackageCases:
 
     def case_mixed__associated_second(self):
         return {
-            "wel-1-simple1": (False, True, [datetime(1982, 2, 1), datetime(1982, 3, 1)]),
+            "wel-1-simple1": (
+                False,
+                True,
+                [datetime(1982, 2, 1), datetime(1982, 3, 1)],
+            ),
             "wel-2-associated": (True, False, []),
         }
 
