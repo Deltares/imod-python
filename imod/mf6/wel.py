@@ -1449,7 +1449,7 @@ class LayeredWell(GridAgnosticWell):
     def from_imod5_cap_data(
         cls,
         imod5_data: Imod5DataDict,
-        target_dis: StructuredDiscretization,
+        target_dis: Optional[StructuredDiscretization] = None,
         regridder_types: CapDataWellRegridMethod = CapDataWellRegridMethod(),
         regrid_cache: RegridderWeightsCache = RegridderWeightsCache(),
     ):
@@ -1489,6 +1489,17 @@ class LayeredWell(GridAgnosticWell):
             xarray datasets, under the key of the package type to which it
             belongs, as returned by
             :func:`imod.formats.prj.open_projectfile_data`.
+        target_dis: Optional[StructuredDiscretization]
+            The target discretization to which the data should be regridded.
+            Only necessary when "artificial_recharge_layer" is an IDF grid,
+            otherwise ignored.
+        regridder_types: CapDataWellRegridMethod
+            The regridder type to use for the regridding of the "artificial_recharge_layer"
+            and "artificial_recharge_capacity" grids. Only necessary when
+            "artificial_recharge_layer" is an IDF grid, otherwise ignored.
+        regrid_cache: RegridderWeightsCache
+            Cache for storing intermediate regridding results. Only necessary when
+            "artificial_recharge_layer" is an IDF grid, otherwise ignored.
         """
         data = well_from_imod5_cap_data(
             imod5_data, target_dis, regridder_types, regrid_cache
