@@ -331,7 +331,7 @@ class GroundwaterFlowModel(Modflow6Model):
         wel_times: StressPeriodTimesType = times if is_transient else "steady-state"
         wel_keys = [key for key in imod5_keys if key[0:3] == "wel"]
         for wel_key in wel_keys:
-            wel_key_truncated = wel_key[:16]
+            wel_key_truncated = wel_key[:40]
             if wel_key_truncated in result.keys():
                 # Remove this when https://github.com/Deltares/imod-python/issues/1167
                 # is resolved
