@@ -682,8 +682,8 @@ def test_import_from_imod5__correct_well_type(imod5_dataset):
     period_data = imod5_dataset[1]
     # Temporarily change layer number to 0, to force Well object instead of
     # LayeredWell
-    original_wel_layer = imod5_data["wel-WELLS_L3"]["layer"]
-    imod5_data["wel-WELLS_L3"]["layer"] = [0] * len(original_wel_layer)
+    original_wel_layer = imod5_data["wel-1-WELLS_L3"]["layer"]
+    imod5_data["wel-1-WELLS_L3"]["layer"] = [0] * len(original_wel_layer)
     # Other arrangement
     datelist = pd.date_range(start="1/1/1989", end="1/1/2013", freq="W")
 
@@ -694,11 +694,11 @@ def test_import_from_imod5__correct_well_type(imod5_dataset):
         datelist,
     )
     # Set layer back to right value (before AssertionError might be thrown)
-    imod5_data["wel-WELLS_L3"]["layer"] = original_wel_layer
+    imod5_data["wel-1-WELLS_L3"]["layer"] = original_wel_layer
     # Assert
-    assert isinstance(simulation["imported_model"]["wel-WELLS_L3"], Well)
-    assert isinstance(simulation["imported_model"]["wel-WELLS_L4"], LayeredWell)
-    assert isinstance(simulation["imported_model"]["wel-WELLS_L5"], LayeredWell)
+    assert isinstance(simulation["imported_model"]["wel-1-WELLS_L3"], Well)
+    assert isinstance(simulation["imported_model"]["wel-2-WELLS_L4"], LayeredWell)
+    assert isinstance(simulation["imported_model"]["wel-3-WELLS_L5"], LayeredWell)
 
 
 @pytest.mark.unittest_jit
@@ -724,9 +724,9 @@ def test_import_from_imod5__well_steady_state(imod5_dataset):
     )
     # Assert
     gwf = simulation["imported_model"]
-    assert "time" not in gwf["wel-WELLS_L3"].dataset.coords
-    assert "time" not in gwf["wel-WELLS_L4"].dataset.coords
-    assert "time" not in gwf["wel-WELLS_L5"].dataset.coords
+    assert "time" not in gwf["wel-1-WELLS_L3"].dataset.coords
+    assert "time" not in gwf["wel-2-WELLS_L4"].dataset.coords
+    assert "time" not in gwf["wel-3-WELLS_L5"].dataset.coords
     # Teardown
     # Reassign storage package again
     imod5_data["sto"] = sto
