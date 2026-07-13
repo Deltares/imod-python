@@ -445,10 +445,12 @@ class GridAgnosticWell(BoundaryCondition, IPointDataPackage, abc.ABC):
         """
         Write package to Modflow 6 package.
 
-        Based on the model grid and top and bottoms, cellids are determined.
-        When well screens hit multiple layers, groundwater extractions are
-        distributed based on layer transmissivities. Wells located in inactive
-        cells are removed.
+        Based on the model grid, cellids are determined. For :class:`Well`, a
+        screen that intersects multiple layers is split into cells and its rate
+        is distributed based on layer transmissivities. For
+        :class:`LayeredWell`, the supplied layer and rate are retained without
+        screen-depth allocation or transmissivity-based redistribution. Wells
+        located in inactive cells are removed.
 
         Note
         ----
@@ -767,6 +769,15 @@ class GridAgnosticWell(BoundaryCondition, IPointDataPackage, abc.ABC):
 class Well(GridAgnosticWell):
     """
     Agnostic WEL package, which accepts x, y and a top and bottom of the well screens.
+
+    Use ``Well`` when well data contains physical screen elevations instead of
+    model layer numbers. During conversion to a MODFLOW 6 package, the screen is
+    intersected with the active model layers. The specified rate is distributed
+    over the eligible cells in proportion to their transmissivity, calculated
+    from horizontal hydraulic conductivity and screen overlap thickness.
+
+    Use :class:`LayeredWell` instead when the target model layer is already
+    known and each rate should remain assigned to that layer.
 
     This package can be written to any provided model grid.
     Any number of WEL Packages can be specified for a single groundwater flow model.
@@ -1168,6 +1179,14 @@ class Well(GridAgnosticWell):
 class LayeredWell(GridAgnosticWell):
     """
     Agnostic WEL package, which accepts x, y and layers.
+
+    Use ``LayeredWell`` when the model layer for every well record is already
+    known. Conversion to a MODFLOW 6 package retains the supplied layer and
+    rate; it does not infer layers from screen elevations or distribute a rate
+    based on transmissivity.
+
+    Use :class:`Well` instead for a physical well screen that can intersect one
+    or more model layers.
 
     This package can be written to any provided model grid, given that it has
     enough layers. Any number of WEL Packages can be specified for a single
