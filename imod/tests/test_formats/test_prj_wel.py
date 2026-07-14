@@ -819,11 +819,8 @@ def test_open_projectfile_data_out_of_bounds_wells(
             assert field in actual
             assert actual[field] == wel_expected[field]
         if actual["has_associated"]:
-            timeseries = next(
-                data[name]["dataframe"][0]["time"]
-                for name in data
-                if "-associated" in name
-            )
+            pkg_name = next(name for name in data if "-associated" in name)
+            timeseries = data[pkg_name]["dataframe"][0]["time"]
             # Test if last element not NaT (since pandas 3, before it was NaT)
             assert timeseries.iloc[-1] == pd.Timestamp("2999-11-12 00:00:00")
 
