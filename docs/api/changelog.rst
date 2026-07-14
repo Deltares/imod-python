@@ -28,6 +28,9 @@ Added
 Fixed
 ~~~~~
 
+- Fixed bug in :class:`imod.mf6.GroundwaterFlowModel` and :class:`imod.formats.prf.IpfResult` 
+  where names of wels were duplicated by increasing the character limit to 40
+  and enumerating wel names.
 - Fixed bug where :class:`imod.mf6.Evapotranspiration` package would write files
   to binary, which could not be parsed by MODFLOW 6 when ``proportion_depth``
   and ``proportion_rate`` were provided without segments.

@@ -1119,8 +1119,8 @@ def open_projectfile_data(path: FilePath) -> tuple[dict[str, Any], dict[str, Any
 
         strippedkey = key.strip("(").strip(")")
         if strippedkey == "wel":
-            for key, d in data.items():
-                named_key = f"{strippedkey}-{key}"
+            for i, (key, d) in enumerate(data.items()):
+                named_key = f"{strippedkey}-{i + 1}-{key}"
                 prj_data[named_key] = d
                 repeat_stress[named_key] = repeats
         elif len(data) > 1:

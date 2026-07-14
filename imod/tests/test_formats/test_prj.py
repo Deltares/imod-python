@@ -586,8 +586,8 @@ class TestProjectFile:
         assert isinstance(
             content["cap"]["artificial_recharge_layer"], expected_sprinkling_type
         )
-        assert isinstance(content["wel-wells_l1"]["dataframe"][0], pd.DataFrame)
-        assert isinstance(content["wel-wells_l2"]["dataframe"][0], pd.DataFrame)
+        assert isinstance(content["wel-1-wells_l1"]["dataframe"][0], pd.DataFrame)
+        assert isinstance(content["wel-2-wells_l2"]["dataframe"][0], pd.DataFrame)
         assert isinstance(content["hfb-1"]["geodataframe"], gpd.GeoDataFrame)
         assert isinstance(content["hfb-2"]["geodataframe"], gpd.GeoDataFrame)
         assert isinstance(content["pcg"], dict)

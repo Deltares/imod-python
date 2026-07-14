@@ -289,7 +289,7 @@ class WellReadCases:
 
     def case_simple__steady_state(self):
         return {
-            "wel-simple1": {
+            "wel-1-simple1": {
                 "has_associated": False,
                 "time": [None],
                 "layer": [1],
@@ -300,7 +300,7 @@ class WellReadCases:
 
     def case_associated__steady_state(self):
         return {
-            "wel-associated": {
+            "wel-1-associated": {
                 "has_associated": True,
                 "time": [None],
                 "layer": [1],
@@ -311,15 +311,15 @@ class WellReadCases:
 
     def case_mixed__steady_state(self):
         return {
-            "wel-simple1": {
-                "has_associated": False,
+            "wel-1-associated": {
+                "has_associated": True,
                 "time": [None],
                 "layer": [1],
                 "factor": [1.0],
                 "addition": [0.0],
             },
-            "wel-associated": {
-                "has_associated": True,
+            "wel-2-simple1": {
+                "has_associated": False,
                 "time": [None],
                 "layer": [1],
                 "factor": [1.0],
@@ -329,7 +329,7 @@ class WellReadCases:
 
     def case_simple__first(self):
         return {
-            "wel-simple1": {
+            "wel-1-simple1": {
                 "has_associated": False,
                 "time": [datetime(1982, 1, 1)],
                 "layer": [1],
@@ -340,7 +340,7 @@ class WellReadCases:
 
     def case_simple__first_multi_layer1(self):
         return {
-            "wel-simple1": {
+            "wel-1-simple1": {
                 "has_associated": False,
                 "time": [datetime(1982, 1, 1), datetime(1982, 1, 1)],
                 "layer": [1, 2],
@@ -351,7 +351,7 @@ class WellReadCases:
 
     def case_simple__first_multi_layer2(self):
         return {
-            "wel-simple1": {
+            "wel-1-simple1": {
                 "has_associated": False,
                 "time": [datetime(1982, 1, 1), datetime(1982, 1, 1)],
                 "layer": [0, 1],
@@ -362,7 +362,7 @@ class WellReadCases:
 
     def case_simple__all_same(self):
         return {
-            "wel-simple1": {
+            "wel-1-simple1": {
                 "has_associated": False,
                 "time": [
                     datetime(1982, 1, 1),
@@ -377,7 +377,7 @@ class WellReadCases:
 
     def case_simple__all_same_multi_layer1(self):
         return {
-            "wel-simple1": {
+            "wel-1-simple1": {
                 "has_associated": False,
                 "time": [
                     datetime(1982, 1, 1),
@@ -395,7 +395,7 @@ class WellReadCases:
 
     def case_simple__all_same_multi_layer2(self):
         return {
-            "wel-simple1": {
+            "wel-1-simple1": {
                 "has_associated": False,
                 "time": [
                     datetime(1982, 1, 1),
@@ -413,21 +413,21 @@ class WellReadCases:
 
     def case_simple__all_different1(self):
         return {
-            "wel-simple1": {
+            "wel-1-simple1": {
                 "has_associated": False,
                 "time": [datetime(1982, 1, 1)],
                 "layer": [1],
                 "factor": [1.0],
                 "addition": [0.0],
             },
-            "wel-simple2": {
+            "wel-2-simple2": {
                 "has_associated": False,
                 "time": [datetime(1982, 2, 1)],
                 "layer": [1],
                 "factor": [1.0],
                 "addition": [0.0],
             },
-            "wel-simple3": {
+            "wel-3-simple3": {
                 "has_associated": False,
                 "time": [datetime(1982, 3, 1)],
                 "layer": [1],
@@ -438,21 +438,21 @@ class WellReadCases:
 
     def case_simple__all_different2(self):
         return {
-            "wel-simple1": {
+            "wel-1-simple1": {
                 "has_associated": False,
                 "time": [datetime(1982, 1, 1), datetime(1982, 2, 1)],
                 "layer": [1, 1],
                 "factor": [1.0, 1.0],
                 "addition": [0.0, 0.0],
             },
-            "wel-simple2": {
+            "wel-2-simple2": {
                 "has_associated": False,
                 "time": [datetime(1982, 2, 1)],
                 "layer": [1],
                 "factor": [1.0],
                 "addition": [0.0],
             },
-            "wel-simple3": {
+            "wel-3-simple3": {
                 "has_associated": False,
                 "time": [datetime(1982, 3, 1)],
                 "layer": [1],
@@ -463,21 +463,21 @@ class WellReadCases:
 
     def case_simple__all_different3(self):
         return {
-            "wel-simple1": {
+            "wel-1-simple1": {
                 "has_associated": False,
                 "time": [datetime(1982, 1, 1), datetime(1982, 3, 1)],
                 "layer": [1, 1],
                 "factor": [1.0, 1.0],
                 "addition": [0.0, 0.0],
             },
-            "wel-simple2": {
+            "wel-2-simple2": {
                 "has_associated": False,
                 "time": [datetime(1982, 2, 1)],
                 "layer": [1],
                 "factor": [1.0],
                 "addition": [0.0],
             },
-            "wel-simple3": {
+            "wel-3-simple3": {
                 "has_associated": False,
                 "time": [datetime(1982, 3, 1)],
                 "layer": [1],
@@ -488,7 +488,7 @@ class WellReadCases:
 
     def case_associated__first(self):
         return {
-            "wel-associated": {
+            "wel-1-associated": {
                 "has_associated": True,
                 "time": [datetime(1982, 1, 1)],
                 "layer": [1],
@@ -499,7 +499,7 @@ class WellReadCases:
 
     def case_associated__all(self):
         return {
-            "wel-associated": {
+            "wel-1-associated": {
                 "has_associated": True,
                 "time": [
                     datetime(1982, 1, 1),
@@ -514,7 +514,7 @@ class WellReadCases:
 
     def case_associated__all_varying_factors(self):
         return {
-            "wel-associated": {
+            "wel-1-associated": {
                 "has_associated": True,
                 "time": [
                     datetime(1982, 1, 1),
@@ -529,7 +529,7 @@ class WellReadCases:
 
     def case_associated__multiple_layers_different_factors(self):
         return {
-            "wel-associated": {
+            "wel-1-associated": {
                 "has_associated": True,
                 "time": [
                     datetime(1982, 1, 1),
@@ -543,14 +543,14 @@ class WellReadCases:
 
     def case_mixed__first(self):
         return {
-            "wel-simple1": {
+            "wel-1-simple1": {
                 "has_associated": False,
                 "time": [datetime(1982, 1, 1)],
                 "layer": [1],
                 "factor": [1.0],
                 "addition": [0.0],
             },
-            "wel-associated": {
+            "wel-2-associated": {
                 "has_associated": True,
                 "time": [datetime(1982, 1, 1)],
                 "layer": [1],
@@ -561,7 +561,7 @@ class WellReadCases:
 
     def case_mixed__all(self):
         return {
-            "wel-associated": {
+            "wel-1-associated": {
                 "has_associated": True,
                 "time": [
                     datetime(1982, 1, 1),
@@ -572,7 +572,7 @@ class WellReadCases:
                 "factor": [1.0, 1.0, 1.0],
                 "addition": [0.0, 0.0, 0.0],
             },
-            "wel-simple1": {
+            "wel-2-simple1": {
                 "has_associated": False,
                 "time": [datetime(1982, 2, 1)],
                 "layer": [1],
@@ -583,16 +583,16 @@ class WellReadCases:
 
     def case_mixed__associated_second(self):
         return {
-            "wel-associated": {
-                "has_associated": True,
-                "time": [datetime(1982, 2, 1)],
+            "wel-1-simple1": {
+                "has_associated": False,
+                "time": [datetime(1982, 1, 1)],
                 "layer": [1],
                 "factor": [1.0],
                 "addition": [0.0],
             },
-            "wel-simple1": {
-                "has_associated": False,
-                "time": [datetime(1982, 1, 1)],
+            "wel-2-associated": {
+                "has_associated": True,
+                "time": [datetime(1982, 2, 1)],
                 "layer": [1],
                 "factor": [1.0],
                 "addition": [0.0],
@@ -613,99 +613,119 @@ class WellPackageCases:
 
     def case_simple__steady_state(self):
         return {
-            "wel-simple1": (False, False, []),
+            "wel-1-simple1": (False, False, []),
         }
 
     def case_associated__steady_state(self):
         return {
-            "wel-associated": (False, True, []),
+            "wel-1-associated": (False, True, []),
         }
 
     def case_mixed__steady_state(self):
         return {
-            "wel-associated": (False, True, []),
-            "wel-simple1": (False, False, []),
+            "wel-1-associated": (False, True, []),
+            "wel-2-simple1": (False, False, []),
         }
 
     def case_simple__first(self):
         return {
-            "wel-simple1": (False, True, [datetime(1982, 2, 1), datetime(1982, 3, 1)]),
+            "wel-1-simple1": (
+                False,
+                True,
+                [datetime(1982, 2, 1), datetime(1982, 3, 1)],
+            ),
         }
 
     def case_simple__first_multi_layer1(self):
         return {
-            "wel-simple1": (False, True, [datetime(1982, 2, 1), datetime(1982, 3, 1)]),
+            "wel-1-simple1": (
+                False,
+                True,
+                [datetime(1982, 2, 1), datetime(1982, 3, 1)],
+            ),
         }
 
     def case_simple__first_multi_layer2(self):
         return {
-            "wel-simple1": (True, False, []),
+            "wel-1-simple1": (True, False, []),
         }
 
     def case_simple__all_same(self):
         return {
-            "wel-simple1": (False, True, []),
+            "wel-1-simple1": (False, True, []),
         }
 
     def case_simple__all_same_multi_layer1(self):
         return {
-            "wel-simple1": (False, True, []),
+            "wel-1-simple1": (False, True, []),
         }
 
     def case_simple__all_same_multi_layer2(self):
         return {
-            "wel-simple1": (True, False, []),
+            "wel-1-simple1": (True, False, []),
         }
 
     def case_simple__all_different1(self):
         return {
-            "wel-simple1": (False, True, [datetime(1982, 2, 1), datetime(1982, 3, 1)]),
-            "wel-simple2": (False, True, [datetime(1982, 3, 1)]),
-            "wel-simple3": (False, True, []),
+            "wel-1-simple1": (
+                False,
+                True,
+                [datetime(1982, 2, 1), datetime(1982, 3, 1)],
+            ),
+            "wel-2-simple2": (False, True, [datetime(1982, 3, 1)]),
+            "wel-3-simple3": (False, True, []),
         }
 
     def case_simple__all_different2(self):
         return {
-            "wel-simple1": (False, True, [datetime(1982, 3, 1)]),
-            "wel-simple2": (False, True, [datetime(1982, 3, 1)]),
-            "wel-simple3": (False, True, []),
+            "wel-1-simple1": (False, True, [datetime(1982, 3, 1)]),
+            "wel-2-simple2": (False, True, [datetime(1982, 3, 1)]),
+            "wel-3-simple3": (False, True, []),
         }
 
     def case_simple__all_different3(self):
         return {
-            "wel-simple1": (False, True, [datetime(1982, 2, 1)]),
-            "wel-simple2": (False, True, [datetime(1982, 3, 1)]),
-            "wel-simple3": (False, True, []),
+            "wel-1-simple1": (False, True, [datetime(1982, 2, 1)]),
+            "wel-2-simple2": (False, True, [datetime(1982, 3, 1)]),
+            "wel-3-simple3": (False, True, []),
         }
 
     def case_associated__first(self):
-        return {"wel-associated": (False, True, [])}
+        return {"wel-1-associated": (False, True, [])}
 
     def case_associated__all(self):
-        return {"wel-associated": (False, True, [])}
+        return {"wel-1-associated": (False, True, [])}
 
     def case_associated__all_varying_factors(self):
-        return {"wel-associated": (True, False, [])}
+        return {"wel-1-associated": (True, False, [])}
 
     def case_associated__multiple_layers_different_factors(self):
-        return {"wel-associated": (True, False, [])}
+        return {"wel-1-associated": (True, False, [])}
 
     def case_mixed__first(self):
         return {
-            "wel-simple1": (False, True, [datetime(1982, 2, 1), datetime(1982, 3, 1)]),
-            "wel-associated": (False, True, []),
+            "wel-1-simple1": (
+                False,
+                True,
+                [datetime(1982, 2, 1), datetime(1982, 3, 1)],
+            ),
+            "wel-2-associated": (False, True, []),
         }
 
     def case_mixed__all(self):
         return {
-            "wel-simple1": (False, True, [datetime(1982, 3, 1)]),
-            "wel-associated": (False, True, []),
+            "wel-1-associated": (False, True, []),
+            "wel-2-simple1": (False, True, [datetime(1982, 3, 1)]),
         }
 
     def case_mixed__associated_second(self):
         return {
-            "wel-simple1": (False, True, [datetime(1982, 2, 1), datetime(1982, 3, 1)]),
-            "wel-associated": (True, False, []),
+            "wel-1-simple1": (
+                False,
+                True,
+                [datetime(1982, 2, 1), datetime(1982, 3, 1)],
+            ),
+            "wel-2-associated": (True, False, []),
         }
 
 
@@ -799,7 +819,8 @@ def test_open_projectfile_data_out_of_bounds_wells(
             assert field in actual
             assert actual[field] == wel_expected[field]
         if actual["has_associated"]:
-            timeseries = data["wel-associated"]["dataframe"][0]["time"]
+            pkg_name = next(name for name in data if "-associated" in name)
+            timeseries = data[pkg_name]["dataframe"][0]["time"]
             # Test if last element not NaT (since pandas 3, before it was NaT)
             assert timeseries.iloc[-1] == pd.Timestamp("2999-11-12 00:00:00")
 

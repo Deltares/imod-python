@@ -1,6 +1,5 @@
 from __future__ import annotations
 
-import textwrap
 from datetime import datetime
 from typing import Optional, cast
 
@@ -331,19 +330,7 @@ class GroundwaterFlowModel(Modflow6Model):
         wel_times: StressPeriodTimesType = times if is_transient else "steady-state"
         wel_keys = [key for key in imod5_keys if key[0:3] == "wel"]
         for wel_key in wel_keys:
-            wel_key_truncated = wel_key[:16]
-            if wel_key_truncated in result.keys():
-                # Remove this when https://github.com/Deltares/imod-python/issues/1167
-                # is resolved
-                msg = textwrap.dedent(
-                    f"""Truncated key: '{wel_key_truncated}' already assigned to
-                    imported model, please rename wells so that unique names are
-                    formed after they are truncated to 16 characters for MODFLOW
-                    6.
-                    """
-                )
-                raise KeyError(msg)
-
+            wel_key_truncated = wel_key[:40]
             wel_layer = np.array(imod5_data[wel_key]["layer"])
             is_allocated = np.any(wel_layer == 0)
             wel_args = (wel_key, imod5_data, wel_times)
