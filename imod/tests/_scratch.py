@@ -4,9 +4,50 @@ import xarray as xr
 from imod.util.dims import drop_layer_dim_cap_data
 import pandas as pd
 
-# %%
-SUBUNIT = 0
+def get_indexer(df: pd.DataFrame, columns: list[str]):
+    """
+    Get the indexer for a dataframe of wells to select the SVAT subunit for each
+    well based on its row/col location in the model grid.
 
+    Parameters
+    ----------
+    df : pd.DataFrame
+        DataFrame containing the wells with columns "subunit", "row",
+        and "column" (1-based).
+
+    Returns
+    -------
+    np.ndarray
+        Indexer array for selecting SVAT subunits from svat_da.
+    """
+    if not set(["row", "column"]).issubset(columns):
+        raise ValueError("columns must contain 'row' and 'column'")
+    df.loc[:, ["row", "column"]] -= 1  # Convert to 0-based indexing for xarray
+
+    indexer = df.loc[:, columns].to_numpy()
+    return indexer.T
+
+
+def double_length_df_subunit(df: pd.DataFrame, subunit_col: str = "subunit") -> pd.DataFrame:
+    """
+    Duplicate the rows of a DataFrame for each subunit (0 and 1).
+
+    Parameters
+    ----------
+    df : pd.DataFrame
+        Input DataFrame to duplicate.
+    subunit_col : str, optional
+        Name of the column to assign subunit values, by default "subunit".
+
+    Returns
+    -------
+    pd.DataFrame
+        DataFrame with duplicated rows for each subunit.
+    """
+    return pd.concat([df.assign(**{subunit_col: 0}), df.assign(**{subunit_col: 1})], ignore_index=True)
+
+
+# %%
 df_points = imod.ipf.read(r"c:\Users\engelen\projects_wdir\imod-python\imod5_converter\NHI_sprint\Peelvenen\BASIS7\METASWAP\grid\Sprinkling\BEREGEN_LOC.IPF")
 art_grid = imod.idf.open(r"c:\Users\engelen\projects_wdir\imod-python\imod5_converter\NHI_sprint\Peelvenen\BASIS7\METASWAP\grid\Sprinkling\BEREGENINGS_LOCATIES.IDF").compute().astype(int)
 
@@ -61,10 +102,7 @@ points_mf6_merged_df = arl_points.reset_index().merge(
 )
 # %%
 # Flatten id_msw grid → (y, x, id_msw) table, drop cells with no well
-# TODO: Verify with Peter that only the first subunit (landuse: agriculture) is
-#   relevant for the SVAT mapping.
-grids = xr.merge([art_grid, svat.sel(subunit=SUBUNIT, drop=True)])
-
+grids = xr.merge([art_grid, svat])
 art_df = (
     grids
     .to_dataframe()
@@ -84,15 +122,15 @@ msw_mf6_merged_df = art_df.merge(
     validate="many_to_one"
 )
 
-# %% 
+# %%
 # Derive the SVAT subunit for each well from the SVAT grid based on the
 # well's row/col location. 
-indexer = msw_mf6_merged_df.loc[:, dim_cellid].to_numpy() - 1
+indexer = get_indexer(msw_mf6_merged_df, columns=["subunit", "row", "column"])
 # We need to align the SVAT grid with the dis_pkg grid as the SVAT grid might be
 # smaller.
 idomain_flat = dis_pkg.dataset["idomain"].isel(layer=0, drop=True)
 _, svat_aligned = xr.align(idomain_flat, svat, join="left")
-svat_groundwater = svat_aligned.data[SUBUNIT, indexer[:, 1], indexer[:, 2]]
+svat_groundwater = svat_aligned.data[*indexer]
 
 msw_mf6_merged_df["svat_groundwater"] = svat_groundwater.astype(int)
 
@@ -114,15 +152,20 @@ dataframe["max_abstraction_surfacewater"] = capacity.where(~is_gw_extraction, 0.
 # checking which wells in mf6_cellid_df are not in msw_mf6_merged_df.
 is_outside_art = ~mf6_cellid_df["id"].isin(msw_mf6_merged_df["id"].unique())
 outside_df = points_mf6_merged_df.loc[is_outside_art, ["layer", "capacity"]]
+outside_df = double_length_df_subunit(outside_df)
 # Select the SVAT subunit for these wells based on their row/col location.
-indexer_outside = mf6_cellid_df.loc[is_outside_art, dim_cellid].to_numpy() - 1
-svat_outside = svat_aligned.data[SUBUNIT, indexer_outside[:, 1], indexer_outside[:, 2]]
+df_cellid_outside = mf6_cellid_df.loc[is_outside_art]
+df_cellid_outside = double_length_df_subunit(df_cellid_outside)
+indexer_outside = get_indexer(df_cellid_outside, columns=["subunit", "row", "column"])
+svat_outside = svat_aligned.data[indexer_outside[0], indexer_outside[1], indexer_outside[2]]
 outside_df["svat_groundwater"] = svat_outside.astype(int)
 outside_df["svat"] = svat_outside.astype(int)
 # Set capacity to surfacewater abstraction, and set groundwater abstraction to 0.
 outside_df = outside_df.rename(columns={"capacity": "max_abstraction_surfacewater"})
 outside_df["max_abstraction_groundwater"] = 0.0
-
+# drop subunit column as it is no longer needed
+outside_df = outside_df.drop(columns=["subunit"])
+# drop wells that are outside the active metaswap model domain (svat = 0)
 outside_df = outside_df.query("svat > 0").reset_index(drop=True)
 
 # %%
@@ -131,3 +174,5 @@ outside_df = outside_df.query("svat > 0").reset_index(drop=True)
 dataframe_out = pd.concat([dataframe, outside_df], axis=0, ignore_index=True)
 dataframe_out = dataframe_out.sort_values(by=["svat"]).reset_index(drop=True)
 # %%
+#
+# TODO: Verify if iMOD5 SVAT grid the same as the one derived in this script.
