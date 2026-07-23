@@ -12,7 +12,7 @@ from collections import defaultdict
 from collections.abc import Iterable
 from pathlib import Path
 from re import Pattern
-from typing import Any
+from typing import Any, DefaultDict
 
 import dask
 import dask.array
@@ -222,7 +222,11 @@ def _more_than_one_unique_value(values: Iterable[Any]):
     return len(set(values)) != 1
 
 
-def _merge_subdomains(paths_per_subdomain, use_cftime, pattern):
+def _merge_subdomains(
+    paths_per_subdomain: DefaultDict[Any, list[str]],
+    use_cftime: bool,
+    pattern: str | Pattern,
+):
     """
     Open and spatially merge all subdomain IDF files for one timestep.
     Returns an ``xr.DataArray`` with all coordinates computed by
@@ -240,9 +244,33 @@ def _merge_subdomains(paths_per_subdomain, use_cftime, pattern):
     return merge_partitions(das)[name]
 
 
-def _merge_subdomains_values(paths_per_subdomain, use_cftime, pattern):
+def _merge_subdomains_values(
+    paths_per_subdomain: DefaultDict[Any, list[str]],
+    use_cftime: bool,
+    pattern: str | Pattern,
+):
     """Wraps ``_merge_subdomains`` to return a numpy array for ``dask.array.from_delayed``."""
     return _merge_subdomains(paths_per_subdomain, use_cftime, pattern).values
+
+
+def check_subdomain_consistency(
+    parsed: list[dict[str, Any]], paths: list[str], pattern: str | Pattern
+):
+    grouped = defaultdict(list)
+    for match, p in zip(parsed, paths):
+        try:
+            key = match["subdomain"]
+        except KeyError as e:
+            raise KeyError(f"{e} in path: {p} with pattern: {pattern}")
+        grouped[key].append(p)
+
+    n_idf_per_subdomain = {
+        subdomain_id: len(path_ls) for subdomain_id, path_ls in grouped.items()
+    }
+    if _more_than_one_unique_value(n_idf_per_subdomain.values()):
+        raise ValueError(
+            f"Each subdomain must have the same number of IDF files, found: {n_idf_per_subdomain}"
+        )
 
 
 def open_subdomains(
@@ -279,25 +307,13 @@ def open_subdomains(
             pattern = "{name}_{time}_l{layer}_p{subdomain}"
 
     parsed = [imod.util.path.decompose(path, pattern) for path in paths]
-    grouped = defaultdict(list)
-    for match, p in zip(parsed, paths):
-        try:
-            key = match["subdomain"]
-        except KeyError as e:
-            raise KeyError(f"{e} in path: {p} with pattern: {pattern}")
-        grouped[key].append(p)
-
-    n_idf_per_subdomain = {
-        subdomain_id: len(path_ls) for subdomain_id, path_ls in grouped.items()
-    }
-    if _more_than_one_unique_value(n_idf_per_subdomain.values()):
-        raise ValueError(
-            f"Each subdomain must have the same number of IDF files, found: {n_idf_per_subdomain}"
-        )
+    check_subdomain_consistency(parsed, paths, pattern)
 
     # Group by time (datetime.datetime from decompose), then by subdomain.
     # Each delayed task processes one timestep, keeping the outer graph at O(n_time).
-    grouped_by_time: defaultdict = defaultdict(lambda: defaultdict(list))
+    grouped_by_time: DefaultDict[Any, DefaultDict[Any, list]] = defaultdict(
+        lambda: defaultdict(list)
+    )
     for match, p in zip(parsed, paths):
         grouped_by_time[match["time"]][match["subdomain"]].append(p)
 
@@ -323,7 +339,9 @@ def open_subdomains(
     merged = []
     for time_key in raw_times_sorted:
         group = grouped_by_time[time_key]
-        timestep_data = dask.delayed(_merge_subdomains_values)(group, use_cftime, pattern)
+        timestep_data = dask.delayed(_merge_subdomains_values)(
+            group, use_cftime, pattern
+        )
         merged.append(dask.array.from_delayed(timestep_data, shape=shape, dtype=dtype))
     data = dask.array.concatenate(merged, axis=time_axis)
 
