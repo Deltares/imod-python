@@ -6,7 +6,6 @@ The primary functions to use are :func:`imod.idf.open` and
 """
 
 import glob
-import itertools
 import pathlib
 import struct
 from collections import defaultdict
@@ -225,10 +224,11 @@ def _more_than_one_unique_value(values: Iterable[Any]):
 
 def _merge_subdomains(paths_per_subdomain, use_cftime, pattern):
     """
-    Open and spatially merge all subdomain IDF files for a single timestep.
-    Intended to be called inside ``dask.delayed``. The inner dask graphs
-    created by ``open()`` are computed synchronously within the task, so the
-    outer graph has only O(n_time) nodes — matching the original performance.
+    Open and spatially merge all subdomain IDF files for one timestep.
+    Returns an ``xr.DataArray`` with all coordinates computed by
+    ``merge_partitions``.  Called directly (eagerly) once to obtain a
+    coordinate template, and indirectly via ``_merge_subdomains_values``
+    inside ``dask.delayed`` for actual computation.
     """
     das = []
     for pathlist in paths_per_subdomain.values():
@@ -237,7 +237,12 @@ def _merge_subdomains(paths_per_subdomain, use_cftime, pattern):
             da = da.isel(subdomain=0, drop=True)
         das.append(da)
     name = das[0].name
-    return merge_partitions(das)[name].values
+    return merge_partitions(das)[name]
+
+
+def _merge_subdomains_values(paths_per_subdomain, use_cftime, pattern):
+    """Wraps ``_merge_subdomains`` to return a numpy array for ``dask.array.from_delayed``."""
+    return _merge_subdomains(paths_per_subdomain, use_cftime, pattern).values
 
 
 def open_subdomains(
@@ -275,12 +280,12 @@ def open_subdomains(
 
     parsed = [imod.util.path.decompose(path, pattern) for path in paths]
     grouped = defaultdict(list)
-    for match, path in zip(parsed, paths):
+    for match, p in zip(parsed, paths):
         try:
             key = match["subdomain"]
         except KeyError as e:
-            raise KeyError(f"{e} in path: {path} with pattern: {pattern}")
-        grouped[key].append(path)
+            raise KeyError(f"{e} in path: {p} with pattern: {pattern}")
+        grouped[key].append(p)
 
     n_idf_per_subdomain = {
         subdomain_id: len(path_ls) for subdomain_id, path_ls in grouped.items()
@@ -293,97 +298,45 @@ def open_subdomains(
     # Group by time (datetime.datetime from decompose), then by subdomain.
     # Each delayed task processes one timestep, keeping the outer graph at O(n_time).
     grouped_by_time: defaultdict = defaultdict(lambda: defaultdict(list))
-    all_layers = []
-    all_species = []
     for match, p in zip(parsed, paths):
         grouped_by_time[match["time"]][match["subdomain"]].append(p)
-        all_layers.append(match["layer"])
-        if "species" in match:
-            all_species.append(match["species"])
 
-    # Read headers from the first timestep to determine the output shape and
-    # coordinates without loading any data.
-    first_time_key = next(iter(grouped_by_time))
-    first_group = grouped_by_time[first_time_key]
-    unique_subdomains = sorted(first_group.keys())
-
-    all_x_coords = []
-    all_y_coords = []
-    for subdomain in unique_subdomains:
-        hdr = header(first_group[subdomain][0], pattern)
-        bounds = (hdr["xmin"], hdr["xmax"], hdr["ymin"], hdr["ymax"])
-        sub_coords = imod.util.spatial._xycoords(bounds, (hdr["dx"], hdr["dy"]))
-        all_x_coords.append(sub_coords["x"])
-        all_y_coords.append(sub_coords["y"])
-
-    global_x = np.unique(np.concatenate(all_x_coords))
-    global_y = np.unique(np.concatenate(all_y_coords))[::-1]  # descending
-    nrow = global_y.size
-    ncol = global_x.size
-    global_layers = np.array(sorted(set(all_layers)))
-    nlayer = global_layers.size
-    global_species = np.array(sorted(set(all_species))) if all_species else None
-
-    first_hdr = header(first_group[unique_subdomains[0]][0], pattern)
-    dtype = first_hdr["dtype"]
-
-    if global_species is not None:
-        nspecies = global_species.size
-        shape = (nspecies, 1, nlayer, nrow, ncol)
-        dims = ("species", "time", "layer", "y", "x")
-        time_axis = 1
-    else:
-        shape = (1, nlayer, nrow, ncol)
-        dims = ("time", "layer", "y", "x")
-        time_axis = 0
-
-    # Sort times; datetime.datetime objects are always comparable
+    # Sort and convert times before calling _merge_subdomains so that
+    # use_cftime is already correct when the template is built.
     raw_times_sorted = sorted(grouped_by_time.keys())
     converted_times, use_cftime = imod.util.time._convert_datetimes(
         raw_times_sorted, use_cftime
     )
 
+    # Call _merge_subdomains eagerly for the first timestep to obtain a
+    # coordinate template. No data is computed — only the coordinate arrays
+    # (which are numpy) are used; the dask data array is discarded.
+    first_time_key = raw_times_sorted[0]
+    template = _merge_subdomains(grouped_by_time[first_time_key], use_cftime, pattern)
+
+    shape = template.shape  # e.g. (1, nlayer, nrow, ncol)
+    dims = template.dims  # e.g. ("time", "layer", "y", "x")
+    dtype = template.dtype
+    time_axis = list(dims).index("time")
+
     # One delayed task per timestep → outer graph depth 3, O(n_time) tasks
     merged = []
     for time_key in raw_times_sorted:
         group = grouped_by_time[time_key]
-        timestep_data = dask.delayed(_merge_subdomains)(group, use_cftime, pattern)
+        timestep_data = dask.delayed(_merge_subdomains_values)(group, use_cftime, pattern)
         merged.append(dask.array.from_delayed(timestep_data, shape=shape, dtype=dtype))
     data = dask.array.concatenate(merged, axis=time_axis)
 
+    # Build the full time coordinate and replace the single-timestep one from the template.
     if use_cftime:
         time_coord = xr.CFTimeIndex(converted_times)
     else:
         time_coord = np.array(converted_times, dtype="datetime64[ns]")
 
-    coords = {
-        "y": global_y,
-        "x": global_x,
-        "layer": global_layers,
-        "time": time_coord,
-    }
-    if global_species is not None:
-        coords["species"] = global_species
+    coords = dict(template.coords)
+    coords["time"] = time_coord
 
-    # Add z/dz coordinates if top/bottom data is present in the IDF headers
-    sample_paths = first_group[unique_subdomains[0]]
-    hdrs = [header(p, pattern) for p in sample_paths]
-    tops = [h.get("top") for h in hdrs]
-    bots = [h.get("bot") for h in hdrs]
-    layer_nums = [h.get("layer") for h in hdrs]
-    _, unique_indices = np.unique(layer_nums, return_index=True)
-    all_have_z = all(v is not None for v in itertools.chain(tops, bots))
-    if all_have_z:
-        if nlayer > 1:
-            coords = array_io.reading._array_z_coord(coords, tops, bots, unique_indices)
-        else:
-            coords = array_io.reading._scalar_z_coord(coords, tops, bots)
-
-    name = parsed[0]["name"]
-    attrs = {}
-    if "nodata" in first_hdr:
-        attrs["nodata"] = first_hdr["nodata"]
-    return xr.DataArray(data, coords, dims, name=name, attrs=attrs)
+    return xr.DataArray(data, coords, dims, name=template.name, attrs=template.attrs)
 
 
 def open_dataset(globpath, use_cftime=False, pattern=None):
