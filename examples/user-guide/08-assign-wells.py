@@ -3,7 +3,7 @@ Assigning Wells to Model Layers
 ==========
 
 iMOD Python provides two grid-agnostic well classes:
-:class:`imod.mf6.Well` and :class:`imod.mf6.LayeredWell` 
+:class:`imod.mf6.Well` and :class:`imod.mf6.LayeredWell`
 to build MODFLOW 6 well package input.
 
 Use :class:`imod.mf6.Well` when the physical top and bottom of a well screen
@@ -15,7 +15,7 @@ Use :class:`imod.mf6.LayeredWell` when the target model layer is already known
 for every well record. In that case, the supplied layer and rate are kept as
 provided.
 
-In both cases, wells in inactive cells are removed during conversion to a 
+In both cases, wells in inactive cells are removed during conversion to a
 MODFLOW 6 well package.
 
 """
@@ -49,14 +49,15 @@ k = layer_model["k"]
 # %%
 
 # %%
-# 
+#
 # Let's define a cross-section line through the model, and some well locations along that line.
 from shapely.geometry import LineString
+
 geometry = LineString([[238725, 560000], [242000, 563500]])
 
-x=[239380.0, 240362.5, 241345.0]
-y=[560700.0, 561750.0, 562800.0]
-rate=[-10.0, -25.0, -15.0]
+x = [239380.0, 240362.5, 241345.0]
+y = [560700.0, 561750.0, 562800.0]
+rate = [-10.0, -25.0, -15.0]
 
 # %%
 
@@ -68,11 +69,11 @@ rate=[-10.0, -25.0, -15.0]
 # and convert it to a MODFLOW 6 well package input.
 
 screen_based = imod.mf6.Well(
-       x=x,
-       y=y,
-       screen_top=[6.0, 7.0, 6.0],
-       screen_bottom=[5.0, 6.5, 4.5],
-       rate=rate,
+    x=x,
+    y=y,
+    screen_top=[6.0, 7.0, 6.0],
+    screen_bottom=[5.0, 6.5, 4.5],
+    rate=rate,
 )
 screen_based_mf6 = screen_based.to_mf6_pkg(idomain, top, bottom, k)
 
@@ -81,12 +82,12 @@ screen_based_mf6["cellid"]
 # %%
 
 # %%
-# 
-# Let's plot the top elevation of the model on a map, with the well locations and cross-section overlaid. 
+#
+# Let's plot the top elevation of the model on a map, with the well locations and cross-section overlaid.
 # You can see we have a ridge roughly the centre of the model, sided by two low-lying areas.
 
-import numpy as np
 import geopandas as gpd
+import numpy as np
 
 overlays = [
     {"gdf": gpd.GeoDataFrame(geometry=[geometry]), "edgecolor": "black", "linewidth": 3}
@@ -101,7 +102,7 @@ ax.scatter(screen_based.x, screen_based.y, c="red", s=60, marker="o")
 # %%
 
 # %%
-# 
+#
 # We can also visualise the well location per model layer, with respect to the hydraulic conductivity.
 
 from matplotlib import pyplot as plt
@@ -136,7 +137,7 @@ for ax, layer in zip(axes, unique_layers):
     ax.scatter(well_x[layer_mask], well_y[layer_mask], c="red", s=60, marker="o")
     ax.set_title(f"Model layer {int(layer)}")
 
-for ax in axes[len(unique_layers):]:
+for ax in axes[len(unique_layers) :]:
     ax.set_visible(False)
 
 # %%
@@ -146,7 +147,7 @@ for ax in axes[len(unique_layers):]:
 # ------------
 #
 # Now we can follow a similar process to create a :class:`imod.mf6.LayeredWell` object
-# and convert it to a MODFLOW 6 well package input. The process is the similar, except we 
+# and convert it to a MODFLOW 6 well package input. The process is the similar, except we
 # specify the target model layer for each well.
 layer_based = imod.mf6.LayeredWell(
     x=x,
@@ -161,11 +162,11 @@ layer_based_mf6["cellid"]
 # %%
 
 # %%
-# To visualise the difference between the two well types, 
-# we can plot the wells on a cross-section of the model. 
+# To visualise the difference between the two well types,
+# we can plot the wells on a cross-section of the model.
 import xarray as xr
-from shapely.geometry import Point
 from matplotlib import pyplot as plt
+from shapely.geometry import Point
 
 layer_grid = layer_model.layer * xr.ones_like(layer_model["top"])
 layer_grid.coords["top"] = layer_model["top"]
@@ -175,10 +176,18 @@ xsection_layer_nr = imod.select.cross_section_linestring(layer_grid, geometry)
 fig, axes = plt.subplots(1, 2, figsize=(14, 6), constrained_layout=True)
 
 # Well
-well_df = screen_based.dataset[["x", "y", "screen_top", "screen_bottom"]].to_dataframe().reset_index(drop=True)
-well_df["s"] = [geometry.project(Point(x, y)) for x, y in zip(well_df["x"], well_df["y"])]
+well_df = (
+    screen_based.dataset[["x", "y", "screen_top", "screen_bottom"]]
+    .to_dataframe()
+    .reset_index(drop=True)
+)
+well_df["s"] = [
+    geometry.project(Point(x, y)) for x, y in zip(well_df["x"], well_df["y"])
+]
 
-imod.visualize.cross_section(xsection_layer_nr, "tab20", np.arange(21), fig=fig, ax=axes[0])
+imod.visualize.cross_section(
+    xsection_layer_nr, "tab20", np.arange(21), fig=fig, ax=axes[0]
+)
 for _, row in well_df.iterrows():
     axes[0].vlines(
         row["s"],
@@ -187,15 +196,28 @@ for _, row in well_df.iterrows():
         color="black",
         linewidth=3,
     )
-    axes[0].scatter(row["s"], row["screen_top"], color="black", marker="1", s=100, linewidths=1.6)
-    axes[0].scatter(row["s"], row["screen_bottom"], color="black", marker="2", s=100, linewidths=1.6)
+    axes[0].scatter(
+        row["s"], row["screen_top"], color="black", marker="1", s=100, linewidths=1.6
+    )
+    axes[0].scatter(
+        row["s"], row["screen_bottom"], color="black", marker="2", s=100, linewidths=1.6
+    )
 axes[0].set_title("Well on layer cross section", fontsize=16)
 
 # LayeredWell
-layered_well_df = layer_based.dataset[["x", "y", "layer"]].to_dataframe().reset_index(drop=True)
-layered_well_df["s"] = [geometry.project(Point(x, y)) for x, y in zip(layered_well_df["x"], layered_well_df["y"])]
+layered_well_df = (
+    layer_based.dataset[["x", "y", "layer"]].to_dataframe().reset_index(drop=True)
+)
+layered_well_df["s"] = [
+    geometry.project(Point(x, y))
+    for x, y in zip(layered_well_df["x"], layered_well_df["y"])
+]
 
-imod.visualize.cross_section(xsection_layer_nr, "tab20", np.arange(21), fig=fig, ax=axes[1])
+imod.visualize.cross_section(
+    xsection_layer_nr, "tab20", np.arange(21), fig=fig, ax=axes[1]
+)
 for _, row in layered_well_df.iterrows():
-    axes[1].scatter(row["s"], row["layer"], color="black", marker="x", s=120, linewidths=1.8)
+    axes[1].scatter(
+        row["s"], row["layer"], color="black", marker="x", s=120, linewidths=1.8
+    )
 axes[1].set_title("LayeredWell on layer cross section", fontsize=16)

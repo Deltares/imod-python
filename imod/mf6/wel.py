@@ -456,7 +456,7 @@ class GridAgnosticWell(BoundaryCondition, IPointDataPackage, abc.ABC):
         used directly, without screen splitting, screen-depth allocation, or
         transmissivity-based rate distribution. If the provided layer is
         inactive, the well is removed.
-        
+
 
         Note
         ----
