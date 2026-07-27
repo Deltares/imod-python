@@ -21,7 +21,7 @@ import xarray as xr
 
 import imod
 from imod.formats import array_io
-from imod.typing.structured import merge_partitions
+from imod.typing.structured import merge_partitions_as_da_components
 
 # Make sure we can still use the built-in function...
 f_open = open
@@ -240,8 +240,7 @@ def _merge_subdomains(
         if "subdomain" in da.dims:
             da = da.isel(subdomain=0, drop=True)
         das.append(da)
-    name = das[0].name
-    return merge_partitions(das)[name]
+    return merge_partitions_as_da_components(das)
 
 
 def _merge_subdomains_values(
@@ -250,7 +249,21 @@ def _merge_subdomains_values(
     pattern: str | Pattern,
 ):
     """Wraps ``_merge_subdomains`` to return a numpy array for ``dask.array.from_delayed``."""
-    return _merge_subdomains(paths_per_subdomain, use_cftime, pattern).values
+    data, _, _ = _merge_subdomains(paths_per_subdomain, use_cftime, pattern)
+    return data
+
+
+def merge_subdomains_to_dataarray(
+    paths_per_subdomain: DefaultDict[Any, list[str]],
+    use_cftime: bool,
+    pattern: str | Pattern,
+) -> xr.DataArray:
+    data, coords, dims = _merge_subdomains(paths_per_subdomain, use_cftime, pattern)
+    return xr.DataArray(
+        data=data,
+        coords=coords,
+        dims=dims,
+    )
 
 
 def check_subdomain_consistency(
@@ -328,7 +341,9 @@ def open_subdomains(
     # coordinate template. No data is computed — only the coordinate arrays
     # (which are numpy) are used; the dask data array is discarded.
     first_time_key = raw_times_sorted[0]
-    template = _merge_subdomains(grouped_by_time[first_time_key], use_cftime, pattern)
+    template = merge_subdomains_to_dataarray(
+        grouped_by_time[first_time_key], use_cftime, pattern
+    )
 
     shape = template.shape  # e.g. (1, nlayer, nrow, ncol)
     dims = template.dims  # e.g. ("time", "layer", "y", "x")
