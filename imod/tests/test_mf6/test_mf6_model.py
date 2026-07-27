@@ -87,7 +87,9 @@ def test_key_assign():
     gwf_model["ic"] = imod.mf6.InitialConditions(start=0.0)
 
     with pytest.raises(KeyError):
-        gwf_model["it-is-an-even-longer-way-too-long-key-name"] = imod.mf6.InitialConditions(start=0.0)
+        gwf_model["it-is-an-even-longer-way-too-long-key-name"] = (
+            imod.mf6.InitialConditions(start=0.0)
+        )
 
 
 def roundtrip(model, tmp_path):
