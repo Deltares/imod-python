@@ -322,13 +322,19 @@ def open_subdomains(
     parsed = [imod.util.path.decompose(path, pattern) for path in paths]
     check_subdomain_consistency(parsed, paths, pattern)
 
+    has_time = "time" in parsed[0]
+
     # Group by time (datetime.datetime from decompose), then by subdomain.
     # Each delayed task processes one timestep, keeping the outer graph at O(n_time).
     grouped_by_time: DefaultDict[Any, DefaultDict[Any, list]] = defaultdict(
         lambda: defaultdict(list)
     )
-    for match, p in zip(parsed, paths):
-        grouped_by_time[match["time"]][match["subdomain"]].append(p)
+    if has_time:
+        for match, p in zip(parsed, paths):
+            grouped_by_time[match["time"]][match["subdomain"]].append(p)
+    else:
+        for match, p in zip(parsed, paths):
+            grouped_by_time["steady-state"][match["subdomain"]].append(p)
 
     # Sort and convert times before calling _merge_subdomains so that
     # use_cftime is already correct when the template is built.
@@ -336,6 +342,7 @@ def open_subdomains(
     converted_times, use_cftime = imod.util.time._convert_datetimes(
         raw_times_sorted, use_cftime
     )
+    is_steady_state = all(time == "steady-state" for time in converted_times)
 
     # Call _merge_subdomains eagerly for the first timestep to obtain a
     # coordinate template. No data is computed — only the coordinate arrays
@@ -363,6 +370,8 @@ def open_subdomains(
     # Build the full time coordinate and replace the single-timestep one from the template.
     if use_cftime:
         time_coord = xr.CFTimeIndex(converted_times)
+    elif is_steady_state:
+        time_coord = np.array(converted_times, dtype=str)
     else:
         time_coord = np.array(converted_times, dtype="datetime64[ns]")
 
