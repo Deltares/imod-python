@@ -248,16 +248,17 @@ def _merge_subdomains_values(
     use_cftime: bool,
     pattern: str | Pattern,
 ):
-    """Wraps ``_merge_subdomains`` to return a numpy array for ``dask.array.from_delayed``."""
+    """Wraps ``_merge_subdomains`` to return just a numpy array for ``dask.array.from_delayed``."""
     data, _, _, _ = _merge_subdomains(paths_per_subdomain, use_cftime, pattern)
     return data
 
 
-def merge_subdomains_to_dataarray(
+def _merge_subdomains_to_dataarray(
     paths_per_subdomain: DefaultDict[Any, list[str]],
     use_cftime: bool,
     pattern: str | Pattern,
 ) -> xr.DataArray:
+    """Wraps ``_merge_subdomains`` to return a DataArray for coordinate template."""
     data, coords, dims, name = _merge_subdomains(
         paths_per_subdomain, use_cftime, pattern
     )
@@ -272,6 +273,7 @@ def merge_subdomains_to_dataarray(
 def check_subdomain_consistency(
     parsed: list[dict[str, Any]], paths: list[str], pattern: str | Pattern
 ):
+    """Check that each subdomain has the same number of IDF files."""
     grouped = defaultdict(list)
     for match, p in zip(parsed, paths):
         try:
@@ -312,6 +314,11 @@ def open_subdomains(
     xarray.DataArray
 
     """
+    # This function is a wrapper around open() that groups by subdomain and
+    # merges the subdomains into one DataArray, in a delayed manner, chunked per
+    # timestep. A lot of logic in this function is about grouping the files by
+    # subdomain and time, and setting the right time coordinate again.
+
     paths = sorted(glob.glob(str(path)))
 
     if pattern is None:
@@ -353,7 +360,7 @@ def open_subdomains(
     # coordinate template. No data is computed — only the coordinate arrays
     # (which are numpy) are used; the dask data array is discarded.
     first_time_key = raw_times_sorted[0]
-    template = merge_subdomains_to_dataarray(
+    template = _merge_subdomains_to_dataarray(
         grouped_by_time[first_time_key], use_cftime, pattern
     )
 
@@ -365,7 +372,9 @@ def open_subdomains(
     else:
         time_axis = -1  # steady-state, no time dimension
 
-    # One delayed task per timestep → outer graph depth 3, O(n_time) tasks
+    # Delayed tasks for each timestep, which will be concatenated into a single
+    # dask array. One delayed task per timestep → outer graph depth 3, O(n_time)
+    # tasks
     merged = []
     for time_key in raw_times_sorted:
         group = grouped_by_time[time_key]
@@ -375,7 +384,7 @@ def open_subdomains(
         merged.append(dask.array.from_delayed(timestep_data, shape=shape, dtype=dtype))
     data = dask.array.concatenate(merged, axis=time_axis)
 
-    # Build the full time coordinate and replace the single-timestep one from the template.
+    # Build the full time coordinate
     coords = dict(template.coords)
     if has_time:
         if use_cftime:
