@@ -40,18 +40,43 @@ imod.logging.configure(LoggerType.LOGURU)
 
 imod.logging.configure(LoggerType.LOGURU, log_level=LogLevel.INFO)
 
-original_simulation = imod.data.hondsrug_simulation(tmpdir / "hondsrug_saved")
+simulation = imod.data.hondsrug_simulation(tmpdir / "hondsrug_saved")
 # %%
+# If we run the command again with the log level set to DEBUG,
+# we can see more detailed logging output:
+
+imod.logging.configure(LoggerType.LOGURU, log_level=LogLevel.DEBUG)
+
+simulation = imod.data.hondsrug_simulation(tmpdir / "hondsrug_saved")
 
 # %%
-# We can then run this again but this time using the Python
-# logging framework, as well as logging output to a file
-# called `imod-python.log`, by adding
-# `add_default_file_handler=True` to the command.
-
-# Setup imod python logging using the python logging framework and write the log output to a file
+# It is also possible to log the output to a default log file, `imod-python.log`,
+# by adding `add_default_file_handler=True` to the command.
+# Here we setup logging using the python logging framework. Notice how the output
+# is slightly different than the Loguru output, but the information is similar.
 
 imod.logging.configure(
     LoggerType.PYTHON, log_level=LogLevel.INFO, add_default_file_handler=True
 )
-original_simulation = imod.data.hondsrug_simulation(tmpdir / "hondsrug_saved")
+simulation = imod.data.hondsrug_simulation(tmpdir / "hondsrug_saved")
+
+# %%
+# Sometimes, it might be useful to redirect logging to a specific file,
+# such as when processing large datasets or running automated
+# simulations, to keep logging output organised for debugging and verification.
+# Here, we also set `add_default_stream_handler=False` to avoid logging to the console.
+# By default, this is usually True, meaning logging is also sent to the console.
+
+from contextlib import redirect_stdout
+
+logfile_path = "open_simulation.log"
+
+with open(logfile_path, "w") as f:
+    with redirect_stdout(f):
+        imod.logging.configure(
+            LoggerType.PYTHON,
+            log_level=LogLevel.INFO,
+            add_default_file_handler=False,
+            add_default_stream_handler=False,
+        )
+        simulation = imod.data.hondsrug_simulation(tmpdir / "hondsrug_saved")
