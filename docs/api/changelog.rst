@@ -89,6 +89,10 @@ Fixed
   ``front`` budget was left out, even though you only need to provide one of
   ``front``, ``lower`` or ``right``. Leaving out ``front`` now works as
   described in the documentation.
+- Fixed big performance degradation with :func:`imod.idf.open_subdomains` where
+  it would take a long time to open lots of idf files. Performance is now
+  significantly improved up to the same speed as before the change that caused
+  the performance degradation.
 
 Changed
 ~~~~~~~
