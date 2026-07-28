@@ -206,6 +206,7 @@ def merge_partitions_as_da_components(
         coords["dy"] = ("y", _merge_nonequidistant_coords(das, "dy", iys, nrow))
 
     dims = cast(tuple[str, ...], first.dims)
+    name = cast(str, first.name)
     arrays = [da.data for da in das]
     data: np.ndarray
     if first.chunks is None:
@@ -252,18 +253,19 @@ def merge_partitions_as_da_components(
         # After merging, the xy chunks are always (1, 1)
         reshaped = merged_blocks.reshape(block_shape + (1, 1))
         data = dask.array.block(reshaped.tolist())
-    return data, coords, dims
+    return data, coords, dims, name
 
 
 def _merge_partitions_da(das: List[xr.DataArray]) -> xr.DataArray:
     """
     Merge a list of xarray DataArrays into a single DataArray.
     """
-    data, coords, dims = merge_partitions_as_da_components(das)
+    data, coords, dims, name = merge_partitions_as_da_components(das)
     return xr.DataArray(
         data=data,
         coords=coords,
         dims=dims,
+        name=name,
     )
 
 

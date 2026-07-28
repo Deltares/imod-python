@@ -249,7 +249,7 @@ def _merge_subdomains_values(
     pattern: str | Pattern,
 ):
     """Wraps ``_merge_subdomains`` to return a numpy array for ``dask.array.from_delayed``."""
-    data, _, _ = _merge_subdomains(paths_per_subdomain, use_cftime, pattern)
+    data, _, _, _ = _merge_subdomains(paths_per_subdomain, use_cftime, pattern)
     return data
 
 
@@ -258,11 +258,12 @@ def merge_subdomains_to_dataarray(
     use_cftime: bool,
     pattern: str | Pattern,
 ) -> xr.DataArray:
-    data, coords, dims = _merge_subdomains(paths_per_subdomain, use_cftime, pattern)
+    data, coords, dims, name = _merge_subdomains(paths_per_subdomain, use_cftime, pattern)
     return xr.DataArray(
         data=data,
         coords=coords,
         dims=dims,
+        name=name,
     )
 
 
