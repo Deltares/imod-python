@@ -228,11 +228,12 @@ def test_open_subdomains_pattern_no_time(subdomains, expected, equidistant, tmp_
     pattern = r"{name}_l{layer}_p{subdomain}"
     da = idf.open_subdomains(tmp_path / "subdomains_*.idf", pattern=pattern).load()
 
-    assert da.dims == ("time", "layer", "y", "x")
+    assert da.dims == ("layer", "y", "x")
     assert da.name == "subdomains_20000101"
 
-    assert da.coords["time"] == "steady-state"
-    assert np.all(da.isel(time=0) == expected)
+    assert "time" not in da.coords.keys()
+    assert np.all(da == expected)
+
 
 @parametrize_with_cases(
     "subdomains,expected,equidistant", cases=SubdomainCases, has_tag="species"

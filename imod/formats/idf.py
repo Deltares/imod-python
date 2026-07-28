@@ -258,7 +258,9 @@ def merge_subdomains_to_dataarray(
     use_cftime: bool,
     pattern: str | Pattern,
 ) -> xr.DataArray:
-    data, coords, dims, name = _merge_subdomains(paths_per_subdomain, use_cftime, pattern)
+    data, coords, dims, name = _merge_subdomains(
+        paths_per_subdomain, use_cftime, pattern
+    )
     return xr.DataArray(
         data=data,
         coords=coords,
@@ -330,12 +332,15 @@ def open_subdomains(
     grouped_by_time: DefaultDict[Any, DefaultDict[Any, list]] = defaultdict(
         lambda: defaultdict(list)
     )
-    if has_time:
-        for match, p in zip(parsed, paths):
-            grouped_by_time[match["time"]][match["subdomain"]].append(p)
-    else:
-        for match, p in zip(parsed, paths):
-            grouped_by_time["steady-state"][match["subdomain"]].append(p)
+
+    for match, p in zip(parsed, paths):
+        if has_time:
+            time_key = match["time"]
+        else:
+            # Work around for files without time dimension
+            # (imod.util.time._convert_datetimes special-cases this string)
+            time_key = "steady-state"
+        grouped_by_time[time_key][match["subdomain"]].append(p)
 
     # Sort and convert times before calling _merge_subdomains so that
     # use_cftime is already correct when the template is built.
@@ -343,7 +348,6 @@ def open_subdomains(
     converted_times, use_cftime = imod.util.time._convert_datetimes(
         raw_times_sorted, use_cftime
     )
-    is_steady_state = all(time == "steady-state" for time in converted_times)
 
     # Call _merge_subdomains eagerly for the first timestep to obtain a
     # coordinate template. No data is computed — only the coordinate arrays
@@ -356,7 +360,10 @@ def open_subdomains(
     shape = template.shape  # e.g. (1, nlayer, nrow, ncol)
     dims = template.dims  # e.g. ("time", "layer", "y", "x")
     dtype = template.dtype
-    time_axis = list(dims).index("time")
+    if has_time:
+        time_axis = list(dims).index("time")
+    else:
+        time_axis = -1  # steady-state, no time dimension
 
     # One delayed task per timestep → outer graph depth 3, O(n_time) tasks
     merged = []
@@ -369,15 +376,13 @@ def open_subdomains(
     data = dask.array.concatenate(merged, axis=time_axis)
 
     # Build the full time coordinate and replace the single-timestep one from the template.
-    if use_cftime:
-        time_coord = xr.CFTimeIndex(converted_times)
-    elif is_steady_state:
-        time_coord = np.array(converted_times, dtype=str)
-    else:
-        time_coord = np.array(converted_times, dtype="datetime64[ns]")
-
     coords = dict(template.coords)
-    coords["time"] = time_coord
+    if has_time:
+        if use_cftime:
+            time_coord = xr.CFTimeIndex(converted_times)
+        else:
+            time_coord = np.array(converted_times, dtype="datetime64[ns]")
+        coords["time"] = time_coord
 
     return xr.DataArray(data, coords, dims, name=template.name, attrs=template.attrs)
 
