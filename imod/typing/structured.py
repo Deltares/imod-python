@@ -157,7 +157,7 @@ def _merge_nonequidistant_coords(
 
 def merge_partitions_as_da_components(
     das: List[xr.DataArray],
-) -> tuple[np.ndarray, dict[str, Any], tuple[str, ...]]:
+) -> tuple[np.ndarray, dict[str, Any], tuple[str, ...], str]:
     """
     Merge a list of xarray DataArrays into components for a single DataArray.
 
