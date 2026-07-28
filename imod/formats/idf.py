@@ -324,34 +324,34 @@ def open_dataset(globpath, use_cftime=False, pattern=None):
 
     paths = [pathlib.Path(p) for p in glob.glob(globpath, recursive=True)]
 
-    n = len(paths)
-    if n == 0:
+    if len(paths) == 0:
         raise FileNotFoundError("Could not find any files matching {}".format(globpath))
     # group the DataArrays together using their name
     # note that directory names are ignored, and in case of duplicates, the last one wins
     names = [imod.util.path.decompose(path, pattern)["name"] for path in paths]
-    unique_names = list(np.unique(names))
-    d = {}
-    for n in unique_names:
-        d[n] = []  # prepare empty lists to append to
-    for p, n in zip(paths, names):
-        d[n].append(p)
-
+    paths_by_name = {name: [] for name in np.unique(names)}
+    for path, name in zip(paths, names, strict=True):
+        paths_by_name[name].append(path)
     # load each group into a DataArray
-    das = [
-        array_io.reading._load(v, use_cftime, pattern, _read, header)
-        for v in d.values()
+    dataarrays = [
+        array_io.reading._load(
+            grouped_paths,
+            use_cftime,
+            _read,
+            [header(p, pattern) for p in grouped_paths],
+        )
+        for grouped_paths in paths_by_name.values()
     ]
 
-    # store each DataArray under it's own name in a dictionary
-    dd = {da.name: da for da in das}
+    # store each DataArray under its own name in a dictionary
+    dataset_dict = {da.name: da for da in dataarrays}
     # Initially I wanted to return a xarray Dataset here,
     # but then realised that it is not always aligned, and therefore not possible, see
     # https://github.com/pydata/xarray/issues/1471#issuecomment-313719395
     # It is not aligned when some parameters only have a non empty subset of a dimension,
     # such as L2 + L3. This dict provides a similar interface anyway. If a Dataset is constructed
     # from unaligned DataArrays it will make copies of the data, which we don't want.
-    return dd
+    return dataset_dict
 
 
 def write(path, a, nodata=1.0e20, dtype=np.float32):
