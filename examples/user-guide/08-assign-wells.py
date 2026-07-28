@@ -11,9 +11,8 @@ are known. During conversion, iMOD Python intersects each screen with model
 layers and distributes the specified rate over eligible cells in proportion to
 transmissivity.
 
-Use :class:`imod.mf6.LayeredWell` when the target model layer is already known
-for every well record. In that case, the supplied layer and rate are kept as
-provided.
+Use :class:`imod.mf6.LayeredWell` for direct control over well assignment to model layers.
+In that case, the supplied layer and rate are kept as provided.
 
 In both cases, wells in inactive cells are removed during conversion to a
 MODFLOW 6 well package.
@@ -50,14 +49,14 @@ k = layer_model["k"]
 
 # %%
 #
-# Let's define a cross-section line through the model, and some well locations along that line.
+# Let's define some well locations, and then draw a cross-section line through them.
 from shapely.geometry import LineString
-
-geometry = LineString([[238725, 560000], [242000, 563500]])
 
 x = [239380.0, 240362.5, 241345.0]
 y = [560700.0, 561750.0, 562800.0]
 rate = [-10.0, -25.0, -15.0]
+
+geometry = LineString([[238725, 560000], [242000, 563500]])
 
 # %%
 
@@ -68,11 +67,15 @@ rate = [-10.0, -25.0, -15.0]
 # Now that we have the model data and well data, we can create a :class:`imod.mf6.Well` object
 # and convert it to a MODFLOW 6 well package input.
 
+# Define the top and bottom elevations of the well screen for each well.
+screen_top = [6.0, 7.0, 6.0]
+screen_bottom = [5.0, 6.5, 4.5]
+
 screen_based = imod.mf6.Well(
     x=x,
     y=y,
-    screen_top=[6.0, 7.0, 6.0],
-    screen_bottom=[5.0, 6.5, 4.5],
+    screen_top=screen_top,
+    screen_bottom=screen_bottom,
     rate=rate,
 )
 screen_based_mf6 = screen_based.to_mf6_pkg(idomain, top, bottom, k)
@@ -149,10 +152,14 @@ for ax in axes[len(unique_layers) :]:
 # Now we can follow a similar process to create a :class:`imod.mf6.LayeredWell` object
 # and convert it to a MODFLOW 6 well package input. The process is the similar, except we
 # specify the target model layer for each well.
+
+# Assign the wells to model layers directly, instead of using screen top and bottom elevations.
+layer = [6, 7, 6]
+
 layer_based = imod.mf6.LayeredWell(
     x=x,
     y=y,
-    layer=[6, 7, 6],
+    layer=layer,
     rate=rate,
 )
 layer_based_mf6 = layer_based.to_mf6_pkg(idomain, top, bottom, k)
@@ -168,56 +175,78 @@ import xarray as xr
 from matplotlib import pyplot as plt
 from shapely.geometry import Point
 
+# Create a grid containing layer numbers and add top/bottom elevations as coordinates
 layer_grid = layer_model.layer * xr.ones_like(layer_model["top"])
 layer_grid.coords["top"] = layer_model["top"]
 layer_grid.coords["bottom"] = layer_model["bottom"]
+
+# Extract a cross-section along the specified geometry line
 xsection_layer_nr = imod.select.cross_section_linestring(layer_grid, geometry)
 
-fig, axes = plt.subplots(1, 2, figsize=(14, 6), constrained_layout=True)
-
-# Well
+# Prepare the screen-based well data for visualization
 well_df = (
     screen_based.dataset[["x", "y", "screen_top", "screen_bottom"]]
     .to_dataframe()
     .reset_index(drop=True)
 )
-well_df["s"] = [
+# Project well locations onto the cross-section line to get their position along the line
+well_df["position_along_line"] = [
     geometry.project(Point(x, y)) for x, y in zip(well_df["x"], well_df["y"])
 ]
 
+# Create subplots
+fig, axes = plt.subplots(1, 2, figsize=(14, 6), constrained_layout=True)
+
+# Plot the screen-based well data on the first subplot
 imod.visualize.cross_section(
     xsection_layer_nr, "tab20", np.arange(21), fig=fig, ax=axes[0]
 )
 for _, row in well_df.iterrows():
     axes[0].vlines(
-        row["s"],
+        row["position_along_line"],
         row["screen_bottom"],
         row["screen_top"],
         color="black",
         linewidth=3,
     )
     axes[0].scatter(
-        row["s"], row["screen_top"], color="black", marker="1", s=100, linewidths=1.6
+        row["position_along_line"],
+        row["screen_top"],
+        color="black",
+        marker="1",
+        s=100,
+        linewidths=1.6,
     )
     axes[0].scatter(
-        row["s"], row["screen_bottom"], color="black", marker="2", s=100, linewidths=1.6
+        row["position_along_line"],
+        row["screen_bottom"],
+        color="black",
+        marker="2",
+        s=100,
+        linewidths=1.6,
     )
 axes[0].set_title("Well on layer cross section", fontsize=16)
 
-# LayeredWell
+# Prepare LayeredWell data for visualization
 layered_well_df = (
     layer_based.dataset[["x", "y", "layer"]].to_dataframe().reset_index(drop=True)
 )
-layered_well_df["s"] = [
+layered_well_df["position_along_line"] = [
     geometry.project(Point(x, y))
     for x, y in zip(layered_well_df["x"], layered_well_df["y"])
 ]
 
+# Plot the LayeredWell data on the second subplot
 imod.visualize.cross_section(
     xsection_layer_nr, "tab20", np.arange(21), fig=fig, ax=axes[1]
 )
 for _, row in layered_well_df.iterrows():
     axes[1].scatter(
-        row["s"], row["layer"], color="black", marker="x", s=120, linewidths=1.8
+        row["position_along_line"],
+        row["layer"],
+        color="black",
+        marker="x",
+        s=120,
+        linewidths=1.8,
     )
 axes[1].set_title("LayeredWell on layer cross section", fontsize=16)

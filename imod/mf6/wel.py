@@ -450,7 +450,8 @@ class GridAgnosticWell(BoundaryCondition, IPointDataPackage, abc.ABC):
         For :class:`Well`, the screen interval is split over
         intersected cells, and the rate is distributed by layer
         transmissivity when multiple layers are intersected. Wells located in
-        inactive cells are removed.
+        inactive cells, or in a layer less than the ``minimum_k`` or
+        ``minimum_thickness`` are removed.
 
         For :class:`LayeredWell`, the provided layer and rate are
         used directly, without screen splitting, screen-depth allocation, or
@@ -781,6 +782,8 @@ class Well(GridAgnosticWell):
     interval is intersected with model layers and the specified rate is
     distributed over eligible cells in proportion to transmissivity (based on
     horizontal hydraulic conductivity and screen-overlap thickness).
+    Wells assigned to layers that fall below the minimum_thickness or minimum_k
+    threshold are dropped.
 
     Use :class:`LayeredWell` when the target layer is already known and each
     rate must remain assigned to that layer.
