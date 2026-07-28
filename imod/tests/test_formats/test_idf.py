@@ -156,6 +156,7 @@ def test_open_subdomains(subdomains, expected, equidistant, tmp_path):
     expected_coords = util.spatial._xycoords((0.0, 8.0, 0.0, 6.0), (dx, dy))
 
     assert da.dims == ("time", "layer", "y", "x")
+    assert da.name == "subdomains"
 
     assert np.all(da.isel(time=0) == expected)
     assert len(da.x) == 8
@@ -186,6 +187,7 @@ def test_open_subdomains__start_nr_not_zero(
     expected_coords = util.spatial._xycoords((0.0, 8.0, 0.0, 6.0), (dx, dy))
 
     assert da.dims == ("time", "layer", "y", "x")
+    assert da.name == "subdomains"
 
     assert np.all(da.isel(time=0) == expected)
     assert len(da.x) == 8
@@ -211,9 +213,26 @@ def test_open_subdomains_pattern_None(subdomains, expected, equidistant, tmp_pat
     da = idf.open_subdomains(tmp_path / "subdomains_*.idf").load()
 
     assert da.dims == ("time", "layer", "y", "x")
+    assert da.name == "subdomains"
 
     assert np.all(da.isel(time=0) == expected)
 
+
+@parametrize_with_cases(
+    "subdomains,expected,equidistant", cases=SubdomainCases, has_tag="no_species"
+)
+def test_open_subdomains_pattern_no_time(subdomains, expected, equidistant, tmp_path):
+    """Read with pattern without {time}"""
+    _save_subdomains_no_species(subdomains, tmp_path)
+    # Test with pattern
+    pattern = r"{name}_l{layer}_p{subdomain}"
+    da = idf.open_subdomains(tmp_path / "subdomains_*.idf", pattern=pattern).load()
+
+    assert da.dims == ("time", "layer", "y", "x")
+    assert da.name == "subdomains_20000101"
+
+    assert da.coords["time"] == "steady-state"
+    assert np.all(da.isel(time=0) == expected)
 
 @parametrize_with_cases(
     "subdomains,expected,equidistant", cases=SubdomainCases, has_tag="species"
@@ -230,6 +249,7 @@ def test_open_subdomains_species(subdomains, expected, equidistant, tmp_path):
     expected_coords = util.spatial._xycoords((0.0, 8.0, 0.0, 6.0), (dx, dy))
 
     assert da.dims == ("species", "time", "layer", "y", "x")
+    assert da.name == "subdomains"
 
     assert np.all(da.isel(time=0) == expected)
     assert len(da.x) == 8
