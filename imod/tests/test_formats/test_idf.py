@@ -222,7 +222,10 @@ def test_open_subdomains_pattern_None(subdomains, expected, equidistant, tmp_pat
     "subdomains,expected,equidistant", cases=SubdomainCases, has_tag="no_species"
 )
 def test_open_subdomains_pattern_no_time(subdomains, expected, equidistant, tmp_path):
-    """Read with pattern without {time}"""
+    """
+    Read with pattern without {time}, the time in the idf filename should then
+    be included in the name of the DataArray
+    """
     _save_subdomains_no_species(subdomains, tmp_path)
     # Test with pattern
     pattern = r"{name}_l{layer}_p{subdomain}"
