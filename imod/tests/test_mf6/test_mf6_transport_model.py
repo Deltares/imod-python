@@ -17,9 +17,9 @@ def test_long_package_name():
     m = imod.mf6.GroundwaterTransportModel()
     with pytest.raises(
         KeyError,
-        match="Received key with more than 16 characters: 'my_very_long_package_name'Modflow 6 has a character limit of 16.",
+        match="Received key with more than 40 characters: 'my_extremely_long_and_verbose_package_name'Modflow 6 has a character limit of 40.",
     ):
-        m["my_very_long_package_name"] = imod.mf6.AdvectionCentral()
+        m["my_extremely_long_and_verbose_package_name"] = imod.mf6.AdvectionCentral()
 
 
 def test_transport_model_rendering():

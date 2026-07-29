@@ -97,6 +97,8 @@ Fixed
 Changed
 ~~~~~~~
 
+- Increased the character limit to 40 in :class:`imod.mf6.Modflow6Model` for all 
+  keys assigned to a Modflow6 model.
 - ``proportion_depth`` and ``proportion_rate`` in
   :class:`imod.mf6.Evapotranspiration` are now optional variables. If provided,
   now require ``"segment"`` dimension when ``proportion_depth`` and

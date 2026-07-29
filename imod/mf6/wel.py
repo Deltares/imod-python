@@ -446,9 +446,18 @@ class GridAgnosticWell(BoundaryCondition, IPointDataPackage, abc.ABC):
         Write package to Modflow 6 package.
 
         Based on the model grid and top and bottoms, cellids are determined.
-        When well screens hit multiple layers, groundwater extractions are
-        distributed based on layer transmissivities. Wells located in inactive
-        cells are removed.
+
+        For :class:`Well`, the screen interval is split over
+        intersected cells, and the rate is distributed by layer
+        transmissivity when multiple layers are intersected. Wells located in
+        inactive cells, or in a layer less than the ``minimum_k`` or
+        ``minimum_thickness`` are removed.
+
+        For :class:`LayeredWell`, the provided layer and rate are
+        used directly, without screen splitting, screen-depth allocation, or
+        transmissivity-based rate distribution. If the provided layer is
+        inactive, the well is removed.
+
 
         Note
         ----
@@ -767,6 +776,17 @@ class GridAgnosticWell(BoundaryCondition, IPointDataPackage, abc.ABC):
 class Well(GridAgnosticWell):
     """
     Agnostic WEL package, which accepts x, y and a top and bottom of the well screens.
+
+    Use :class:`Well` when input is defined by screen elevations rather than
+    by model layer. During conversion to a MODFLOW 6 package, the screen
+    interval is intersected with model layers and the specified rate is
+    distributed over eligible cells in proportion to transmissivity (based on
+    horizontal hydraulic conductivity and screen-overlap thickness).
+    Wells assigned to layers that fall below the minimum_thickness or minimum_k
+    threshold are dropped.
+
+    Use :class:`LayeredWell` when the target layer is already known and each
+    rate must remain assigned to that layer.
 
     This package can be written to any provided model grid.
     Any number of WEL Packages can be specified for a single groundwater flow model.
@@ -1168,6 +1188,14 @@ class Well(GridAgnosticWell):
 class LayeredWell(GridAgnosticWell):
     """
     Agnostic WEL package, which accepts x, y and layers.
+
+    Use :class:`LayeredWell` when input is defined by model layer. During
+    conversion to a MODFLOW 6 package, the supplied layer and rate are
+    retained; no layer inference from screen elevations or
+    transmissivity-based rate redistribution is applied.
+
+    Use :class:`Well` instead when input is defined by a physical well screen
+    that can intersect one or more model layers.
 
     This package can be written to any provided model grid, given that it has
     enough layers. Any number of WEL Packages can be specified for a single
