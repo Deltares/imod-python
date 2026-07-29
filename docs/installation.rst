@@ -51,17 +51,7 @@ know what ``conda`` and ``pip`` are, and are able to install tedious packages
 GIS packages yourself without issue, you are *experienced*. If you have no idea
 what the previous sentence was about, you are *new*.
 
-New
-^^^
-
-We recommend new users to install iMOD Python using the `Deltaforge`_ Python
-distribution. See :ref:`install_deltaforge`.
-
-Experienced
-^^^^^^^^^^^
-
-For experienced users, who want to be in control of packages installed, we
-recommend installing using `pixi`_. Pixi supports creating reproducible
+We recommend installing using `pixi`_. Pixi supports creating reproducible
 projects, where all dependencies' versions in an environment are stored in a
 textfile, the "lockfile". On top of that, it is faster than other package
 managers.
@@ -83,18 +73,6 @@ installations in your system.
 
 Ways to install iMOD Python
 ---------------------------
-
-.. _install_deltaforge:
-
-Installing with Deltaforge
-^^^^^^^^^^^^^^^^^^^^^^^^^^
-
-Deltaforge is an installer of Deltares python packages, including iMOD Python,
-and their dependencies. This makes it possible to install iMOD Python without
-much knowledge about the Python package management system. The download links
-are listed `here. <https://deltares.github.io/deltaforge/index.html#where>`__
-Users new to the python package ecosystem are recommended to install iMOD Python
-using Deltaforge.
 
 Installing with pixi
 ^^^^^^^^^^^^^^^^^^^^
