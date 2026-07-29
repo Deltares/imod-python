@@ -1,8 +1,8 @@
 """
-Logging in iMOD-Python
+Logging in iMOD Python
 ======================================
 
-iMOD-Python supports logging through both the standard
+iMOD Python supports logging through both the standard
 Python logging framework and Loguru, so that you can choose
 whichever best fits your needs and project. By default,
 logging is silent, so messages are only output once a logger
