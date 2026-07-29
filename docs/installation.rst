@@ -43,7 +43,7 @@ Or with pip::
 Which Python?
 -------------
 
-You'll need **3.11, 3.12, or 3.13**. 
+You'll need **3.12, 3.13, or 3.14**. 
 
 The recommended way to install Python depends on your experience: Are you new to
 the Python packaging ecosystem or already got experience with it? If you already
