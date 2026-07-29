@@ -441,3 +441,19 @@ def test_save_open_arbitrary_4D(tmp_path):
     assert isinstance(back, xr.DataArray)
     # Might get shuffled dimensions for the same reason.
     assert set(da.dims) == set(back.dims)
+
+
+def test_open_dataset(test_layerda, tmp_path):
+    da = test_layerda
+    idf.save(tmp_path / "head", da)
+    # Save a second parameter so the dataset has multiple entries
+    idf.save(tmp_path / "kh", da.rename("kh"))
+
+    result = idf.open_dataset(str(tmp_path / "*.idf"))
+
+    assert isinstance(result, dict)
+    assert "head" in result
+    assert "kh" in result
+    for name, da_result in result.items():
+        assert isinstance(da_result, xr.DataArray)
+        assert da_result.dims == ("layer", "y", "x")
