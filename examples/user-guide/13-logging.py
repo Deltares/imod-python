@@ -2,7 +2,7 @@
 Logging in iMOD-Python
 ======================================
 
-iMod-python supports logging through both the standard
+iMOD-Python supports logging through both the standard
 Python logging framework and Loguru, so that you can choose
 whichever best fits your needs and project. By default,
 logging is silent, so messages are only output once a logger
@@ -64,19 +64,23 @@ simulation = imod.data.hondsrug_simulation(tmpdir / "hondsrug_saved")
 # Sometimes, it might be useful to redirect logging to a specific file,
 # such as when processing large datasets or running automated
 # simulations, to keep logging output organised for debugging and verification.
-# Here, we also set `add_default_stream_handler=False` to avoid logging to the console.
-# By default, this is usually True, meaning logging is also sent to the console.
+# Here, we also set `add_default_stream_handler=True`, which controls if logging
+# output is also sent to the console.
 
+# Context manager to handle redirection of log output
 from contextlib import redirect_stdout
 
 logfile_path = "open_simulation.log"
 
 with open(logfile_path, "w") as f:
+    # Redirect stdout to the log file
     with redirect_stdout(f):
+        # Configure logging
         imod.logging.configure(
             LoggerType.PYTHON,
             log_level=LogLevel.INFO,
             add_default_file_handler=False,
-            add_default_stream_handler=False,
+            add_default_stream_handler=True,
         )
+        # Load the simulation
         simulation = imod.data.hondsrug_simulation(tmpdir / "hondsrug_saved")
