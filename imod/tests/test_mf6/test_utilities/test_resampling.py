@@ -80,6 +80,27 @@ def test_timeseries_resampling_2():
     )
 
 
+def test_timeseries_resampling_before_start_with_arrow_dtypes():
+    """
+    Regression test for assigning the first well location to multiple rows when
+    the location columns use Arrow-backed dtypes.
+    """
+    timeseries = initialize_timeseries(
+        [datetime(1989, 4, 3)],
+        [100.0],
+    ).convert_dtypes(dtype_backend="pyarrow")
+    # Keep time as NumPy datetime64, as produced by the iMOD5 import workflow.
+    timeseries["time"] = timeseries["time"].astype("datetime64[ns]")
+    new_dates = pd.date_range(datetime(1989, 1, 1), datetime(1989, 4, 3))
+
+    new_timeseries = resample_timeseries(timeseries, new_dates)
+
+    assert len(new_timeseries) == 93
+    assert (new_timeseries.loc[:91, "rate"] == 0.0).all()
+    assert (new_timeseries.loc[:91, "id"] == "ID").all()
+    assert new_timeseries.loc[92, "rate"] == 100.0
+
+
 def test_timeseries_resampling_3():
     # In this test, we resample a timeseries for a coarser output discretization.
     # The output times are a subset of the input times.

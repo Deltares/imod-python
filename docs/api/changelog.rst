@@ -28,6 +28,8 @@ Added
 Fixed
 ~~~~~
 
+- Fixed resampling of Arrow-backed iMOD5 well timeseries when simulation
+  timesteps precede the first well timestep.
 - Fixed bug in :class:`imod.mf6.GroundwaterFlowModel` and :class:`imod.formats.prf.IpfResult` 
   where names of wels were duplicated by increasing the character limit to 40
   and enumerating wel names.
