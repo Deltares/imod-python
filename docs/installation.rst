@@ -8,10 +8,7 @@ This section is for if you are in a hurry and just want to get started. We
 advice you to read the full documentation below if you are new to Python or the
 Python packaging ecosystem.
 
-Regular install
-^^^^^^^^^^^^^^^
-
-Install with pixi::
+Install with `pixi`_ (recommended)::
 
   pixi add imod
 
@@ -22,23 +19,6 @@ Install with conda::
 Install with pip::
 
   pip install imod
-
-Install beta release
-^^^^^^^^^^^^^^^^^^^^
-
-To install a beta release with pixi::
-
-  pixi config prepend default-channels "conda-forge/label/imod_rc"
-  pixi add imod=1.0.0rc5
-
-Or with conda::
-
-  conda install -c conda-forge/label/imod_rc -c conda-forge imod=1.0.0rc5
-
-Or with pip::
-
-  pip install --pre imod=1.0.0rc5
-
 
 Which Python?
 -------------
