@@ -44,6 +44,7 @@ object BuildPackage : BuildType({
                 SET TMPDIR=%system.teamcity.build.checkoutDir%\tmpdir
                 SET TMP=%system.teamcity.build.checkoutDir%\tmpdir
 
+                pixi config set --local detached-environments "C:\pixi_envs"
                 pixi run --environment default --frozen rm --recursive --force dist
                 pixi run --environment default --frozen python -m build
             """.trimIndent()
@@ -87,7 +88,8 @@ object BuildPages : BuildType({
             workingDir = "imod-python"
             scriptContent = """
                 SET PATH=%%PATH%%;%system.teamcity.build.checkoutDir%\modflow6
-                
+
+                pixi config set --local detached-environments "C:\pixi_envs"
                 pixi run --environment default --frozen docs
             """.trimIndent()
             formatStderrAsError = true
@@ -169,6 +171,7 @@ object CreateGitHubRelease : BuildType({
                     ${'$'}tag = git describe --tags --abbrev=0 --exact-match
                     
                     echo "Creating GitHub release for: ${'$'}tag"
+                    pixi config set --local detached-environments "C:\pixi_envs"
                     pixi run --environment default --frozen gh release create ${'$'}tag --verify-tag --notes "See https://deltares.github.io/imod-python/api/changelog.html"
                 """.trimIndent()
             }
@@ -218,6 +221,7 @@ object DeployPackage : BuildType({
             id = "Deploy_to_PyPi"
             workingDir = "imod-python"
             scriptContent = """
+                pixi config set --local detached-environments "C:\pixi_envs"
                 pixi run --frozen twine check ../dist/*
                 pixi run --frozen twine upload ../dist/*
             """.trimIndent()
