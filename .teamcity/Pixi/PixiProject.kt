@@ -38,6 +38,9 @@ object UpdateDependencies : BuildType({
                     git remote set-url origin https://%GH_USER%:%env.GH_TOKEN%@github.com/Deltares/imod-python.git
                     git checkout -b pixi_update_%build.counter%
                     
+                    echo "Set environment location for detached environments" 
+                    pixi config set --local detached-environments "C:\pixi_envs"
+
                     echo "Update dependencies" 
                     pixi run -e pixi-update update
                     
