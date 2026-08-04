@@ -138,7 +138,7 @@ Set up ibound, which sets where active cells are `(ibound = 1.0)`
  .. code-block:: none
 
 
-    <matplotlib.collections.QuadMesh object at 0x000001CE832547D0>
+    <matplotlib.collections.QuadMesh object at 0x0000014674636490>
 
 
 
@@ -204,7 +204,7 @@ Define the starting concentration
  .. code-block:: none
 
 
-    <matplotlib.collections.QuadMesh object at 0x000001CEF7D0CB90>
+    <matplotlib.collections.QuadMesh object at 0x000001466D223750>
 
 
 
@@ -317,7 +317,7 @@ plot results as follows:
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** (0 minutes 1.094 seconds)
+   **Total running time of the script:** (0 minutes 0.923 seconds)
 
 
 .. _sphx_glr_download_examples_imod-wq_SaltwaterPocket.py:

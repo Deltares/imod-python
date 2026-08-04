@@ -6,7 +6,7 @@
 
 Computation times
 =================
-**09:06.809** total execution time for 14 files **from user-guide**:
+**06:13.928** total execution time for 14 files **from user-guide**:
 
 .. container::
 
@@ -33,44 +33,44 @@ Computation times
      - Time
      - Mem (MB)
    * - :ref:`sphx_glr_user-guide_12-imod5-model-to-modflow6.py` (``12-imod5-model-to-modflow6.py``)
-     - 05:23.104
+     - 03:14.772
      - 0.0
    * - :ref:`sphx_glr_user-guide_07-regridding.py` (``07-regridding.py``)
-     - 01:32.017
+     - 01:10.381
      - 0.0
    * - :ref:`sphx_glr_user-guide_00-index-examples.py` (``00-index-examples.py``)
-     - 01:03.603
+     - 00:57.494
      - 0.0
    * - :ref:`sphx_glr_user-guide_11-imod5-files.py` (``11-imod5-files.py``)
-     - 00:20.376
+     - 00:14.651
      - 0.0
    * - :ref:`sphx_glr_user-guide_09-topsystem.py` (``09-topsystem.py``)
-     - 00:11.483
-     - 0.0
-   * - :ref:`sphx_glr_user-guide_10-cleanup.py` (``10-cleanup.py``)
-     - 00:08.006
+     - 00:08.854
      - 0.0
    * - :ref:`sphx_glr_user-guide_08-assign-wells.py` (``08-assign-wells.py``)
-     - 00:07.648
+     - 00:06.181
+     - 0.0
+   * - :ref:`sphx_glr_user-guide_10-cleanup.py` (``10-cleanup.py``)
+     - 00:05.919
      - 0.0
    * - :ref:`sphx_glr_user-guide_04-unstructured-grids.py` (``04-unstructured-grids.py``)
-     - 00:06.724
+     - 00:04.590
      - 0.0
    * - :ref:`sphx_glr_user-guide_01-raster-data.py` (``01-raster-data.py``)
-     - 00:04.676
+     - 00:03.617
      - 0.0
    * - :ref:`sphx_glr_user-guide_05-lazy-evaluation.py` (``05-lazy-evaluation.py``)
-     - 00:03.794
+     - 00:03.576
      - 0.0
    * - :ref:`sphx_glr_user-guide_13-logging.py` (``13-logging.py``)
-     - 00:02.144
+     - 00:01.359
      - 0.0
    * - :ref:`sphx_glr_user-guide_02-vector-data.py` (``02-vector-data.py``)
-     - 00:01.670
+     - 00:01.291
      - 0.0
    * - :ref:`sphx_glr_user-guide_03-timeseries-data.py` (``03-timeseries-data.py``)
-     - 00:01.446
+     - 00:01.159
      - 0.0
    * - :ref:`sphx_glr_user-guide_06-time-discretization.py` (``06-time-discretization.py``)
-     - 00:00.118
+     - 00:00.083
      - 0.0

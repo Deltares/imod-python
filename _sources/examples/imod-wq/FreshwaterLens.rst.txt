@@ -171,7 +171,7 @@ that is: ``bnd[index] = -1```
  .. code-block:: none
 
 
-    <matplotlib.collections.QuadMesh object at 0x000001CE85CA0550>
+    <matplotlib.collections.QuadMesh object at 0x00000146415DE5D0>
 
 
 
@@ -208,7 +208,7 @@ Define the recharge rates
  .. code-block:: none
 
 
-    [<matplotlib.lines.Line2D object at 0x000001CE849FFB10>]
+    [<matplotlib.lines.Line2D object at 0x0000014670154050>]
 
 
 
@@ -274,7 +274,7 @@ Defining the starting concentrations
  .. code-block:: none
 
 
-    <matplotlib.collections.QuadMesh object at 0x000001CEF7D7EC10>
+    <matplotlib.collections.QuadMesh object at 0x00000146698B2AD0>
 
 
 
@@ -385,7 +385,7 @@ plot results as follows:
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** (0 minutes 0.845 seconds)
+   **Total running time of the script:** (0 minutes 0.683 seconds)
 
 
 .. _sphx_glr_download_examples_imod-wq_FreshwaterLens.py:

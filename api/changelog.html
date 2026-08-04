@@ -757,10 +757,16 @@ transient models with many timesteps.</p></li>
 <li><p>Added <code class="xref py py-meth docutils literal notranslate"><span class="pre">imod.msw.MetaSwapModel.split()</span></code> to split MetaSWAP models.</p></li>
 <li><p>Added <a class="reference internal" href="generated/mf6/imod.mf6.HorizontalFlowBarrierResistance.from_imod5_data.html#imod.mf6.HorizontalFlowBarrierResistance.from_imod5_data" title="imod.mf6.HorizontalFlowBarrierResistance.from_imod5_data"><code class="xref py py-meth docutils literal notranslate"><span class="pre">imod.mf6.HorizontalFlowBarrierResistance.from_imod5_data()</span></code></a> to load
 barriers from 3D GEN files.</p></li>
-<li><p>Added <code class="docutils literal notranslate"><span class="pre">name</span></code> argument to:meth:<cite>imod.mf6.Modflow6Simulation.from_imod5_data</cite>
+<li><p>Added <code class="docutils literal notranslate"><span class="pre">name</span></code> argument to <a class="reference internal" href="generated/mf6/imod.mf6.Modflow6Simulation.from_imod5_data.html#imod.mf6.Modflow6Simulation.from_imod5_data" title="imod.mf6.Modflow6Simulation.from_imod5_data"><code class="xref py py-meth docutils literal notranslate"><span class="pre">imod.mf6.Modflow6Simulation.from_imod5_data()</span></code></a>
 to provide custom name to imported simulation and model.</p></li>
 <li><p>Added <a class="reference internal" href="generated/msw/imod.msw.MetaSwapModel.mask_all_packages.html#imod.msw.MetaSwapModel.mask_all_packages" title="imod.msw.MetaSwapModel.mask_all_packages"><code class="xref py py-meth docutils literal notranslate"><span class="pre">imod.msw.MetaSwapModel.mask_all_packages()</span></code></a> to mask all packages of
 a MetaSWAP model.</p></li>
+<li><p>Added optional <code class="docutils literal notranslate"><span class="pre">target_grid</span></code> argument to
+<a class="reference internal" href="generated/mf6/imod.mf6.Modflow6Simulation.from_imod5_data.html#imod.mf6.Modflow6Simulation.from_imod5_data" title="imod.mf6.Modflow6Simulation.from_imod5_data"><code class="xref py py-meth docutils literal notranslate"><span class="pre">imod.mf6.Modflow6Simulation.from_imod5_data()</span></code></a>,
+<a class="reference internal" href="generated/mf6/imod.mf6.GroundwaterFlowModel.from_imod5_data.html#imod.mf6.GroundwaterFlowModel.from_imod5_data" title="imod.mf6.GroundwaterFlowModel.from_imod5_data"><code class="xref py py-meth docutils literal notranslate"><span class="pre">imod.mf6.GroundwaterFlowModel.from_imod5_data()</span></code></a>,
+<a class="reference internal" href="generated/mf6/imod.mf6.StructuredDiscretization.from_imod5_data.html#imod.mf6.StructuredDiscretization.from_imod5_data" title="imod.mf6.StructuredDiscretization.from_imod5_data"><code class="xref py py-meth docutils literal notranslate"><span class="pre">imod.mf6.StructuredDiscretization.from_imod5_data()</span></code></a> to specify a target
+grid for regridding the iMOD5 data to. If not provided, the first IBOUND layer
+is used as target grid, like in iMOD5.</p></li>
 </ul>
 </section>
 <section id="fixed">
@@ -844,6 +850,11 @@ now require <code class="docutils literal notranslate"><span class="pre">&quot;s
 <code class="docutils literal notranslate"><span class="pre">proportion_rate</span></code>.</p></li>
 <li><p><a class="reference internal" href="generated/msw/imod.msw.GridData.generate_index_array.html#imod.msw.GridData.generate_index_array" title="imod.msw.GridData.generate_index_array"><code class="xref py py-meth docutils literal notranslate"><span class="pre">imod.msw.GridData.generate_index_array()</span></code></a> is now deprecated, use
 <a class="reference internal" href="generated/msw/imod.msw.GridData.generate_isactive_svat_arrays.html#imod.msw.GridData.generate_isactive_svat_arrays" title="imod.msw.GridData.generate_isactive_svat_arrays"><code class="xref py py-meth docutils literal notranslate"><span class="pre">imod.msw.GridData.generate_isactive_svat_arrays()</span></code></a> instead.</p></li>
+<li><p>If no <code class="docutils literal notranslate"><span class="pre">target_grid</span></code> is provided,
+<a class="reference internal" href="generated/mf6/imod.mf6.StructuredDiscretization.from_imod5_data.html#imod.mf6.StructuredDiscretization.from_imod5_data" title="imod.mf6.StructuredDiscretization.from_imod5_data"><code class="xref py py-meth docutils literal notranslate"><span class="pre">imod.mf6.StructuredDiscretization.from_imod5_data()</span></code></a> chooses a grid the
+same as iMOD5 did: the first IBOUND layer. This is different from previous
+versions of iMOD Python, which defaulted to the smallest possible extent
+and finest resolution, based on the iMOD5 IBOUND, TOP and BOTTOM data.</p></li>
 </ul>
 </section>
 </section>
