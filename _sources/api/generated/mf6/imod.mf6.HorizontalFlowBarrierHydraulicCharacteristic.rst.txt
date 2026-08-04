@@ -18,6 +18,7 @@
       ~HorizontalFlowBarrierHydraulicCharacteristic.clip_box
       ~HorizontalFlowBarrierHydraulicCharacteristic.copy
       ~HorizontalFlowBarrierHydraulicCharacteristic.from_file
+      ~HorizontalFlowBarrierHydraulicCharacteristic.from_imod5_data
       ~HorizontalFlowBarrierHydraulicCharacteristic.get_regrid_methods
       ~HorizontalFlowBarrierHydraulicCharacteristic.is_empty
       ~HorizontalFlowBarrierHydraulicCharacteristic.mask

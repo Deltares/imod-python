@@ -15,9 +15,11 @@
    
       ~InitialConditionsEquilibrium.__init__
       ~InitialConditionsEquilibrium.clip_box
+      ~InitialConditionsEquilibrium.from_file
       ~InitialConditionsEquilibrium.from_imod5_data
       ~InitialConditionsEquilibrium.get_regrid_methods
       ~InitialConditionsEquilibrium.regrid_like
+      ~InitialConditionsEquilibrium.to_file
       ~InitialConditionsEquilibrium.write
    
    

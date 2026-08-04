@@ -1,0 +1,6 @@
+﻿imod.mf6.HorizontalFlowBarrierResistance.from\_imod5\_data
+==========================================================
+
+.. currentmodule:: imod.mf6
+
+.. automethod:: HorizontalFlowBarrierResistance.from_imod5_data

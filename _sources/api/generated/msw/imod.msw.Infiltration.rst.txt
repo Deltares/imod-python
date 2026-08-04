@@ -15,9 +15,11 @@
    
       ~Infiltration.__init__
       ~Infiltration.clip_box
+      ~Infiltration.from_file
       ~Infiltration.from_imod5_data
       ~Infiltration.get_regrid_methods
       ~Infiltration.regrid_like
+      ~Infiltration.to_file
       ~Infiltration.write
    
    

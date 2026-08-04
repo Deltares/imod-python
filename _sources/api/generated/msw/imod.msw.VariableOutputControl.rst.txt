@@ -15,9 +15,11 @@
    
       ~VariableOutputControl.__init__
       ~VariableOutputControl.clip_box
+      ~VariableOutputControl.from_file
       ~VariableOutputControl.from_imod5_data
       ~VariableOutputControl.get_regrid_methods
       ~VariableOutputControl.regrid_like
+      ~VariableOutputControl.to_file
       ~VariableOutputControl.write
    
    

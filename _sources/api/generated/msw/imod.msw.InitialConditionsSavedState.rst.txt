@@ -15,9 +15,11 @@
    
       ~InitialConditionsSavedState.__init__
       ~InitialConditionsSavedState.clip_box
+      ~InitialConditionsSavedState.from_file
       ~InitialConditionsSavedState.from_imod5_data
       ~InitialConditionsSavedState.get_regrid_methods
       ~InitialConditionsSavedState.regrid_like
+      ~InitialConditionsSavedState.to_file
       ~InitialConditionsSavedState.write
    
    

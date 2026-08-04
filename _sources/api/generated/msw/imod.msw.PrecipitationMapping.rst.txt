@@ -15,9 +15,11 @@
    
       ~PrecipitationMapping.__init__
       ~PrecipitationMapping.clip_box
+      ~PrecipitationMapping.from_file
       ~PrecipitationMapping.from_imod5_data
       ~PrecipitationMapping.get_regrid_methods
       ~PrecipitationMapping.regrid_like
+      ~PrecipitationMapping.to_file
       ~PrecipitationMapping.write
    
    

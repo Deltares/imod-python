@@ -18,10 +18,12 @@ The dockerfile can be found at `.teamcity\\Dockerfile\\Dockerfile` and is displa
 
 How to build
 ------------
-A prerequisite of building the image is that you have `Docker Desktop`_ installed on your machine.
-Once installed open a console and navigate to the folder where the dockerfile resides.
 
-To build the image:
+A prerequisite of building the image is that you have `Docker Desktop`_
+installed on your machine. Make sure you are using a Windows builder, click the
+Docker tray icon (bottom right) and select "Switch to Windows containers". This
+will allow you to build the image on your local machine. Once installed open a
+console and navigate to the folder where the dockerfile resides.
 
 .. code-block:: console
 

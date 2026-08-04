@@ -162,6 +162,13 @@ Criteria for user acceptance tests of the 1.0 release are:
   - Some small differences in how rivers and drains are allocated and their
     conductances are distributed. This leads to local head differences in the
     output of the simulations in the south of Limburg.
+* There additionally is a user acceptance test to test performance of the
+  :func:`imod.formats.idf.open_subdomains` function. This function is used to
+  open a large number of IDF files and load them into memory. The test will
+  write 32,000 IDF files to disk, and then open them and load them into memory.
+  The time it takes to do this should be less than 10 minutes, otherwise it will
+  fail. (For reference: It takes about 3 minutes on a machine with 32 GB of RAM
+  and an Intel i7-12800HX CPU.)
 
 Manual checks
 *************

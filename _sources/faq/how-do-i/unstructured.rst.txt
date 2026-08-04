@@ -28,12 +28,6 @@ GeoDataFrames.
 It can be installed with::
 
     pip install pandamesh
-
-.. note::
-
-    One of the dependencies of pandamesh, the Python bindings to triangle, `does
-    not have the (binary) wheels for Python 3.9 and higher
-    yet <https://github.com/drufat/triangle/issues/57>`_.
     
 Plot a timeseries for a single cell
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~

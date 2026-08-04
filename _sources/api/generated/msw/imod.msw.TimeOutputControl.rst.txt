@@ -15,9 +15,11 @@
    
       ~TimeOutputControl.__init__
       ~TimeOutputControl.clip_box
+      ~TimeOutputControl.from_file
       ~TimeOutputControl.from_imod5_data
       ~TimeOutputControl.get_regrid_methods
       ~TimeOutputControl.regrid_like
+      ~TimeOutputControl.to_file
       ~TimeOutputControl.write
    
    

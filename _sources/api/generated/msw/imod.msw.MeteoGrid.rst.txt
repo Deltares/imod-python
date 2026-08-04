@@ -15,9 +15,11 @@
    
       ~MeteoGrid.__init__
       ~MeteoGrid.clip_box
+      ~MeteoGrid.from_file
       ~MeteoGrid.from_imod5_data
       ~MeteoGrid.get_regrid_methods
       ~MeteoGrid.regrid_like
+      ~MeteoGrid.to_file
       ~MeteoGrid.write
    
    

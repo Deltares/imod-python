@@ -15,9 +15,11 @@
    
       ~AnnualCropFactors.__init__
       ~AnnualCropFactors.clip_box
+      ~AnnualCropFactors.from_file
       ~AnnualCropFactors.from_imod5_data
       ~AnnualCropFactors.get_regrid_methods
       ~AnnualCropFactors.regrid_like
+      ~AnnualCropFactors.to_file
       ~AnnualCropFactors.write
    
    

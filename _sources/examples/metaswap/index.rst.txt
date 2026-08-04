@@ -6,6 +6,10 @@ MetaSWAP
 These examples demonstrate how to use iMOD Python to build MetaSWAP and coupled
 MODFLOW 6 models.
 
+.. raw:: html
+
+  <div id='sg-tag-list' class='sphx-glr-tag-list'></div>
+
 
 .. raw:: html
 
@@ -22,7 +26,7 @@ MODFLOW 6 models.
   .. image:: /examples/metaswap/images/thumb/sphx_glr_metaswap_example_thumb.png
     :alt:
 
-  :ref:`sphx_glr_examples_metaswap_metaswap_example.py`
+  :doc:`/examples/metaswap/metaswap_example`
 
 .. raw:: html
 
@@ -39,7 +43,7 @@ MODFLOW 6 models.
   .. image:: /examples/metaswap/images/thumb/sphx_glr_read_metaswap_file_thumb.png
     :alt:
 
-  :ref:`sphx_glr_examples_metaswap_read_metaswap_file.py`
+  :doc:`/examples/metaswap/read_metaswap_file`
 
 .. raw:: html
 

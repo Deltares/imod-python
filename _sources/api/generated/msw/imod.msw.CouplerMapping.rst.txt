@@ -15,9 +15,11 @@
    
       ~CouplerMapping.__init__
       ~CouplerMapping.clip_box
+      ~CouplerMapping.from_file
       ~CouplerMapping.from_imod5_data
       ~CouplerMapping.get_regrid_methods
       ~CouplerMapping.regrid_like
+      ~CouplerMapping.to_file
       ~CouplerMapping.write
    
    

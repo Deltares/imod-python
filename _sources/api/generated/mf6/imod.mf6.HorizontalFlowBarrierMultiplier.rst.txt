@@ -18,6 +18,7 @@
       ~HorizontalFlowBarrierMultiplier.clip_box
       ~HorizontalFlowBarrierMultiplier.copy
       ~HorizontalFlowBarrierMultiplier.from_file
+      ~HorizontalFlowBarrierMultiplier.from_imod5_data
       ~HorizontalFlowBarrierMultiplier.get_regrid_methods
       ~HorizontalFlowBarrierMultiplier.is_empty
       ~HorizontalFlowBarrierMultiplier.mask

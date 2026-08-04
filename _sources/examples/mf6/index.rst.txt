@@ -30,6 +30,10 @@ These examples demonstrate how to use imod to build MODFLOW 6 models.
     `For more detailed instructions, see this writeup. <https://windowsloop.com/how-to-add-to-windows-path/>`_
 
 
+.. raw:: html
+
+  <div id='sg-tag-list' class='sphx-glr-tag-list'></div>
+
 
 .. raw:: html
 
@@ -46,7 +50,7 @@ These examples demonstrate how to use imod to build MODFLOW 6 models.
   .. image:: /examples/mf6/images/thumb/sphx_glr_Henry_thumb.png
     :alt:
 
-  :ref:`sphx_glr_examples_mf6_Henry.py`
+  :doc:`/examples/mf6/Henry`
 
 .. raw:: html
 
@@ -63,7 +67,7 @@ These examples demonstrate how to use imod to build MODFLOW 6 models.
   .. image:: /examples/mf6/images/thumb/sphx_glr_circle_thumb.png
     :alt:
 
-  :ref:`sphx_glr_examples_mf6_circle.py`
+  :doc:`/examples/mf6/circle`
 
 .. raw:: html
 
@@ -80,7 +84,7 @@ These examples demonstrate how to use imod to build MODFLOW 6 models.
   .. image:: /examples/mf6/images/thumb/sphx_glr_circle_partitioned_thumb.png
     :alt:
 
-  :ref:`sphx_glr_examples_mf6_circle_partitioned.py`
+  :doc:`/examples/mf6/circle_partitioned`
 
 .. raw:: html
 
@@ -97,7 +101,7 @@ These examples demonstrate how to use imod to build MODFLOW 6 models.
   .. image:: /examples/mf6/images/thumb/sphx_glr_circle_transport_thumb.png
     :alt:
 
-  :ref:`sphx_glr_examples_mf6_circle_transport.py`
+  :doc:`/examples/mf6/circle_transport`
 
 .. raw:: html
 
@@ -114,7 +118,7 @@ These examples demonstrate how to use imod to build MODFLOW 6 models.
   .. image:: /examples/mf6/images/thumb/sphx_glr_different_ways_to_regrid_models_thumb.png
     :alt:
 
-  :ref:`sphx_glr_examples_mf6_different_ways_to_regrid_models.py`
+  :doc:`/examples/mf6/different_ways_to_regrid_models`
 
 .. raw:: html
 
@@ -131,7 +135,7 @@ These examples demonstrate how to use imod to build MODFLOW 6 models.
   .. image:: /examples/mf6/images/thumb/sphx_glr_ex01_twri_thumb.png
     :alt:
 
-  :ref:`sphx_glr_examples_mf6_ex01_twri.py`
+  :doc:`/examples/mf6/ex01_twri`
 
 .. raw:: html
 
@@ -148,7 +152,7 @@ These examples demonstrate how to use imod to build MODFLOW 6 models.
   .. image:: /examples/mf6/images/thumb/sphx_glr_example_1d_transport_thumb.png
     :alt:
 
-  :ref:`sphx_glr_examples_mf6_example_1d_transport.py`
+  :doc:`/examples/mf6/example_1d_transport`
 
 .. raw:: html
 
@@ -165,7 +169,7 @@ These examples demonstrate how to use imod to build MODFLOW 6 models.
   .. image:: /examples/mf6/images/thumb/sphx_glr_example_models_thumb.png
     :alt:
 
-  :ref:`sphx_glr_examples_mf6_example_models.py`
+  :doc:`/examples/mf6/example_models`
 
 .. raw:: html
 
@@ -182,7 +186,7 @@ These examples demonstrate how to use imod to build MODFLOW 6 models.
   .. image:: /examples/mf6/images/thumb/sphx_glr_hondsrug_thumb.png
     :alt:
 
-  :ref:`sphx_glr_examples_mf6_hondsrug.py`
+  :doc:`/examples/mf6/hondsrug`
 
 .. raw:: html
 
@@ -199,7 +203,7 @@ These examples demonstrate how to use imod to build MODFLOW 6 models.
   .. image:: /examples/mf6/images/thumb/sphx_glr_hondsrug_partitioning_thumb.png
     :alt:
 
-  :ref:`sphx_glr_examples_mf6_hondsrug_partitioning.py`
+  :doc:`/examples/mf6/hondsrug_partitioning`
 
 .. raw:: html
 
@@ -216,7 +220,7 @@ These examples demonstrate how to use imod to build MODFLOW 6 models.
   .. image:: /examples/mf6/images/thumb/sphx_glr_lake_thumb.png
     :alt:
 
-  :ref:`sphx_glr_examples_mf6_lake.py`
+  :doc:`/examples/mf6/lake`
 
 .. raw:: html
 
@@ -233,7 +237,7 @@ These examples demonstrate how to use imod to build MODFLOW 6 models.
   .. image:: /examples/mf6/images/thumb/sphx_glr_transport_2d_thumb.png
     :alt:
 
-  :ref:`sphx_glr_examples_mf6_transport_2d.py`
+  :doc:`/examples/mf6/transport_2d`
 
 .. raw:: html
 

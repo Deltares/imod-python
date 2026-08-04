@@ -15,9 +15,11 @@
    
       ~IdfMapping.__init__
       ~IdfMapping.clip_box
+      ~IdfMapping.from_file
       ~IdfMapping.from_imod5_data
       ~IdfMapping.get_regrid_methods
       ~IdfMapping.regrid_like
+      ~IdfMapping.to_file
       ~IdfMapping.write
    
    

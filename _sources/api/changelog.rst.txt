@@ -6,6 +6,107 @@ All notable changes to this project will be documented in this file.
 The format is based on `Keep a Changelog`_, and this project adheres to
 `Semantic Versioning`_.
 
+[1.1.0] - 2026-08-03
+--------------------
+
+Added
+~~~~~
+
+- Added ``ignore_time_purge_empty`` argument to
+  :meth:`imod.mf6.Modflow6Simulation.mask_all_models` and
+  :meth:`imod.mf6.Modflow6Simulation.clip_box` to consider a package empty if
+  its first times step is all nodata. This can save a lot of clipping or masking
+  transient models with many timesteps.
+- Added :meth:`imod.msw.MetaSwapModel.split` to split MetaSWAP models.
+- Added :meth:`imod.mf6.HorizontalFlowBarrierResistance.from_imod5_data` to load
+  barriers from 3D GEN files. 
+- Added ``name`` argument to:meth:`imod.mf6.Modflow6Simulation.from_imod5_data`
+  to provide custom name to imported simulation and model.
+- Added :meth:`imod.msw.MetaSwapModel.mask_all_packages` to mask all packages of
+  a MetaSWAP model.
+
+Fixed
+~~~~~
+
+- Fixed bug in :class:`imod.mf6.GroundwaterFlowModel` and :class:`imod.formats.prf.IpfResult` 
+  where names of wels were duplicated by increasing the character limit to 40
+  and enumerating wel names.
+- Fixed bug where :class:`imod.mf6.Evapotranspiration` package would write files
+  to binary, which could not be parsed by MODFLOW 6 when ``proportion_depth``
+  and ``proportion_rate`` were provided without segments.
+- Fixed bug where :class:`imod.mf6.ConstantConcentration` package could not be written
+  for multiple timesteps.
+- Fixed bug where :meth:`imod.mf6.Modflow6Simulation.clip_box` where a ValidationError
+  was thrown when clipping a model with a :class:`imod.mf6.ConstantHead` or
+  :class:`imod.mf6.ConstantConcentration` package with a ``time`` dimension and
+  providing ``states_for_boundary``.
+- Fixed bug where :meth:`imod.mf6.Modflow6Simulation.clip_box` would drop layers if
+  ``states_for_boundary`` were provided and the model already contained a
+  :class:`imod.mf6.ConstantHead` or :class:`imod.mf6.ConstantConcentration` with
+  less layers.
+- Fixed bug where :meth:`imod.mf6.Modflow6Simulation.clip_box` would not properly
+  align timesteps and forward fill data if ``states_for_boundary`` were provided
+  and the model already contained a :class:`imod.mf6.ConstantHead` or
+  :class:`imod.mf6.ConstantConcentration`, both with timesteps, which were
+  unaligned.
+- Fixed bug where :class:`imod.mf6.Lake` package did not pass ``budgetfile``,
+  ``budgetcsvfile``, ``stagefile`` options to the written MODFLOW 6 package.
+- Fixed bug where :func:`imod.evaluate.convert_pointwaterhead_freshwaterhead`
+  produced incorrect results when point water heads were below elevation levels
+  for unstructured grids.
+- Support pandas 3.0.
+- :class:`imod.msw.IdfMapping` when model clipping is applied, the global
+  row/column indices are converted to local indices, as written in
+  ``idf_svat.inp``.
+- Fixed edge case where allocation of :class:`imod.mf6.River` package with the
+  ``stage_to_riv_bot`` or ``stage_to_riv_bot_drn_above`` option of
+  :func:`imod.prepare.ALLOCATION_OPTION` would assign river cells to the wrong
+  layer, when the stage and bottom_elevation were exactly equal to the bottom of
+  a layer in the model discretization, which would cause these cells to be
+  dropped when distributing conductances later.
+- Fixed :func:`imod.prepare.spatial.polygonize` for polygons with holes.
+- :func:`imod.formats.prj.open_projectfile_data` now drops empty wells from the
+  dataset, and logs a warning about it.
+- :meth:`imod.mf6.NodePropertyFlow.regrid_like` now regrids ``k33`` using the
+  correct method, namely ``mean`` instead of ``harmonic_mean``. As this is the
+  appropriate method for horizontal regridding of ``k33``.
+- :meth:`imod.msw.MetaSwapModel.from_imod5_data`,
+  :meth:`imod.mf6.Recharge.from_imod5_cap_data`,
+  :meth:`imod.mf6.LayeredWell.from_imod5_cap_data` now regrids the iMOD5 CAP
+  data to the MODFLOW6 target discretization.
+- Fixed confusing warning about inconsistent IPF columns when loading GEN files.
+- Fix bug where iMOD Python would error on writing a model where package
+  settings were specified as dask array, which could happen when loading a model
+  lazily with :meth:`imod.mf6.Modflow6Simulation.from_file` and not
+  computing the data before writing.
+- Fixed bug where ``concentration`` variables were needlessly loaded into
+  memory. Affected :class:`imod.mf6.River`, :class:`imod.mf6.Drain`,
+  :class:`imod.mf6.ConstantHeadBoundary`, :class:`imod.mf6.Recharge`,
+  :class:`imod.mf6.Well` and :class:`imod.mf6.GeneralHeadBoundary`.
+- Fix bug where ``maxbound`` of the ``.wel`` file computed by
+  :class:`imod.mf6.Mf6Wel` was twice or thrice too large.
+- Fixed bug where :func:`imod.evaluate.facebudget` raised an error when the
+  ``front`` budget was left out, even though you only need to provide one of
+  ``front``, ``lower`` or ``right``. Leaving out ``front`` now works as
+  described in the documentation.
+- Fixed big performance degradation with :func:`imod.idf.open_subdomains` where
+  it would take a long time to open lots of idf files. Performance is now
+  significantly improved up to the same speed as before the change that caused
+  the performance degradation.
+
+Changed
+~~~~~~~
+
+- Increased the character limit to 40 in :class:`imod.mf6.Modflow6Model` for all 
+  keys assigned to a Modflow6 model.
+- ``proportion_depth`` and ``proportion_rate`` in
+  :class:`imod.mf6.Evapotranspiration` are now optional variables. If provided,
+  now require ``"segment"`` dimension when ``proportion_depth`` and
+  ``proportion_rate``.
+- :meth:`imod.msw.GridData.generate_index_array` is now deprecated, use
+  :meth:`imod.msw.GridData.generate_isactive_svat_arrays` instead.
+
+
 [1.0.0] - 2025-11-11
 --------------------
 
@@ -26,6 +127,9 @@ Added
 - Functionality to dump and load MODFLOW 6 simulations to/from zarr and zipstore
   formats. See :meth:`imod.mf6.Modflow6Simulation.dump` and
   :meth:`imod.mf6.Modflow6Simulation.from_file` for more information.
+- Functionality to dump and load MetaSwap models to/from netcdf
+  format. See :meth:`imod.msw.MetaSwapModel.dump` and
+  :meth:`imod.msw.MetaSwapModel.from_file` for more information.
 
 Changed
 ~~~~~~~
@@ -82,7 +186,7 @@ Fixed
 - Fixed bug where :meth:`imod.mf6.Modflow6Simulation.split`,
   :meth:`imod.mf6.Modflow6Simulation.regrid_like`, and
   :meth:`imod.mf6.Modflow6Simulation.clip_box` would not copy
-  :class:`imod.mf6.ValidationSettings`. 
+  :class:`imod.mf6.ValidationSettings`.
 - ``landuse``, ``soil_physical_unit``, ``active`` for :class:`imod.msw.GridData`
   are now properly regridded with the ``mode`` statistic when using
   :meth:`imod.msw.GridData.regrid_like`.
@@ -139,7 +243,7 @@ Fixed
   ``states_for_boundary`` argument would place these bc at the
   incorrect places with unstructured grids.
 - Fixed bug where :meth:`imod.mf6.SourceSinkMixing.from_flow_model` would return
-  an error upon adding a package which cannot have a ``concentration``, such as 
+  an error upon adding a package which cannot have a ``concentration``, such as
   :class:`imod.mf6.HorizontalFlowBarrierResistance`.
 - Broken names for ``outer_csvfile`` and ``inner_csvfile`` in the
   :class:`imod.mf6.Solution` MODFLOW 6 template file.
@@ -293,8 +397,8 @@ Changed
   :meth:`imod.mf6.Recharge.from_imod5_data` got extra arguments for
   ``period_data``, ``time_min`` and ``time_max``.
 - :func:`imod.visualize.read_imod_legend` now also returns the labels as an extra
-  argument. Update your code by changing 
-  ``colors, levels = read_imod_legend(...)`` to 
+  argument. Update your code by changing
+  ``colors, levels = read_imod_legend(...)`` to
   ``colors, levels, labels = read_imod_legend(...)``.
 
 

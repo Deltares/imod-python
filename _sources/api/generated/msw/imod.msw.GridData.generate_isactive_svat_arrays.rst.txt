@@ -1,0 +1,6 @@
+﻿imod.msw.GridData.generate\_isactive\_svat\_arrays
+==================================================
+
+.. currentmodule:: imod.msw
+
+.. automethod:: GridData.generate_isactive_svat_arrays

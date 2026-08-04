@@ -1,0 +1,6 @@
+﻿imod.msw.MetaSwapModel.dump
+===========================
+
+.. currentmodule:: imod.msw
+
+.. automethod:: MetaSwapModel.dump

@@ -17,16 +17,21 @@
       ~MetaSwapModel.clear
       ~MetaSwapModel.clip_box
       ~MetaSwapModel.copy
+      ~MetaSwapModel.dump
+      ~MetaSwapModel.from_file
       ~MetaSwapModel.from_imod5_data
       ~MetaSwapModel.fromkeys
       ~MetaSwapModel.get
       ~MetaSwapModel.get_pkgkey
+      ~MetaSwapModel.has_key
       ~MetaSwapModel.items
       ~MetaSwapModel.keys
+      ~MetaSwapModel.mask_all_packages
       ~MetaSwapModel.pop
       ~MetaSwapModel.popitem
       ~MetaSwapModel.regrid_like
       ~MetaSwapModel.setdefault
+      ~MetaSwapModel.split
       ~MetaSwapModel.update
       ~MetaSwapModel.values
       ~MetaSwapModel.write
@@ -34,5 +39,11 @@
    
 
    
+   
+   .. rubric:: Attributes
+
+   .. autosummary::
+   
+      ~MetaSwapModel.nsubunits
    
    

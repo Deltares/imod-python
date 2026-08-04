@@ -15,9 +15,11 @@
    
       ~InitialConditionsPercolation.__init__
       ~InitialConditionsPercolation.clip_box
+      ~InitialConditionsPercolation.from_file
       ~InitialConditionsPercolation.from_imod5_data
       ~InitialConditionsPercolation.get_regrid_methods
       ~InitialConditionsPercolation.regrid_like
+      ~InitialConditionsPercolation.to_file
       ~InitialConditionsPercolation.write
    
    

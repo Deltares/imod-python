@@ -336,7 +336,7 @@ rch_trans = rch_trans.where(rch_trans > 0, 0)  # check negative values
 # resampled to a yearly step by using the xarray function
 # `Dataset.resample <http://xarray.pydata.org/en/stable/generated/xarray.Dataset.resample.html#xarray.Dataset.resample>`_.
 
-rch_trans_yr = rch_trans.resample(time="A", label="left").mean()
+rch_trans_yr = rch_trans.resample(time="YS", label="left").mean()
 rch_trans_yr
 
 # %%

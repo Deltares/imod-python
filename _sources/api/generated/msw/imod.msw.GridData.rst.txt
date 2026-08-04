@@ -15,10 +15,13 @@
    
       ~GridData.__init__
       ~GridData.clip_box
+      ~GridData.from_file
       ~GridData.from_imod5_data
       ~GridData.generate_index_array
+      ~GridData.generate_isactive_svat_arrays
       ~GridData.get_regrid_methods
       ~GridData.regrid_like
+      ~GridData.to_file
       ~GridData.write
    
    

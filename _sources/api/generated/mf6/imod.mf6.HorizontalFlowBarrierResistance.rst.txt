@@ -18,6 +18,7 @@
       ~HorizontalFlowBarrierResistance.clip_box
       ~HorizontalFlowBarrierResistance.copy
       ~HorizontalFlowBarrierResistance.from_file
+      ~HorizontalFlowBarrierResistance.from_imod5_data
       ~HorizontalFlowBarrierResistance.get_regrid_methods
       ~HorizontalFlowBarrierResistance.is_empty
       ~HorizontalFlowBarrierResistance.mask

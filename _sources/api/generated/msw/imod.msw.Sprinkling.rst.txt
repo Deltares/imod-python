@@ -15,9 +15,11 @@
    
       ~Sprinkling.__init__
       ~Sprinkling.clip_box
+      ~Sprinkling.from_file
       ~Sprinkling.from_imod5_data
       ~Sprinkling.get_regrid_methods
       ~Sprinkling.regrid_like
+      ~Sprinkling.to_file
       ~Sprinkling.write
    
    

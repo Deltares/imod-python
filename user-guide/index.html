@@ -8,7 +8,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>User Guide &#8212; iMOD Python 1.0.0.post1 documentation</title>
+    <title>User Guide &#8212; iMOD Python 1.1.0 documentation</title>
   
   
   
@@ -27,25 +27,27 @@
   </noscript>
   
   <!-- Loaded before other Sphinx assets -->
-  <link href="../_static/styles/theme.css?digest=8878045cc6db502f8baf" rel="stylesheet" />
-<link href="../_static/styles/pydata-sphinx-theme.css?digest=8878045cc6db502f8baf" rel="stylesheet" />
+  <link href="../_static/styles/theme.css?digest=90905a2f556bf617f1a9" rel="stylesheet" />
+<link href="../_static/styles/pydata-sphinx-theme.css?digest=90905a2f556bf617f1a9" rel="stylesheet" />
 
     <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=03e43079" />
-    <link rel="stylesheet" type="text/css" href="../_static/sg_gallery.css?v=d2d258e8" />
+    <link rel="stylesheet" type="text/css" href="../_static/sg_gallery.css?v=fd6457a4" />
     <link rel="stylesheet" type="text/css" href="../_static/sg_gallery-binder.css?v=f4aeca0c" />
     <link rel="stylesheet" type="text/css" href="../_static/sg_gallery-dataframe.css?v=2082cf3c" />
     <link rel="stylesheet" type="text/css" href="../_static/sg_gallery-rendered-html.css?v=1277b6f3" />
   
   <!-- So that users can add custom icons -->
-  <script src="../_static/scripts/fontawesome.js?digest=8878045cc6db502f8baf"></script>
+  <script defer src="../_static/scripts/fontawesome.js?digest=90905a2f556bf617f1a9"></script>
   <!-- Pre-loaded scripts that we'll load fully later -->
-  <link rel="preload" as="script" href="../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
-<link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
+  <link rel="preload" as="script" href="../_static/scripts/bootstrap.js?digest=90905a2f556bf617f1a9" />
+<link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=90905a2f556bf617f1a9" />
 
-    <script src="../_static/documentation_options.js?v=f5399c8a"></script>
-    <script src="../_static/doctools.js?v=9bcbadda"></script>
-    <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../_static/documentation_options.js?v=fc837d61"></script>
+    <script src="../_static/doctools.js?v=fd6eb6e6"></script>
+    <script src="../_static/sphinx_highlight.js?v=6ffebe34"></script>
+    <script src="../_static/sg-tags.js?v=d80f6fa4"></script>
     <script>DOCUMENTATION_OPTIONS.pagename = 'user-guide/index';</script>
+    <script>DOCUMENTATION_OPTIONS.search_as_you_type = false;</script>
     <script src="../_static/deltares.js?v=a1037e22"></script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
@@ -53,21 +55,27 @@
     <link rel="prev" title="Installing" href="../installation.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
-  <meta name="docsearch:version" content="1.0.0.dev" />
+  <meta name="docsearch:version" content="1.1.0.dev" />
+  
+    
+    <script src="../_static/searchtools.js"></script>
+    <script src="../_static/language_data.js"></script>
+    <script src="../searchindex.js"></script>
+  
   </head>
-  
-  
-  <body data-bs-spy="scroll" data-bs-target=".bd-toc-nav" data-offset="180" data-bs-root-margin="0px 0px -60%" data-default-mode="light">
-
+  <body data-default-mode="light">
   
   
   <div id="pst-skip-link" class="skip-link d-print-none"><a href="#main-content">Skip to main content</a></div>
+
   
   <div id="pst-scroll-pixel-helper"></div>
   
   <button type="button" class="btn rounded-pill" id="pst-back-to-top">
     <i class="fa-solid fa-arrow-up"></i>Back to top</button>
-
+  
+  
+  
   
   <dialog id="pst-search-dialog">
     
@@ -93,7 +101,7 @@
 </div>
 
   
-    <header class="bd-header navbar navbar-expand-lg bd-navbar d-print-none">
+    <header id="pst-header" class="bd-header navbar navbar-expand-lg bd-navbar d-print-none">
 <div class="bd-header__inner bd-page-width">
   <button class="pst-navbar-icon sidebar-toggle primary-toggle" aria-label="Site navigation">
     <span class="fa-solid fa-bars"></span>
@@ -117,8 +125,8 @@
     
     
     
-    <img src="../_static/imod-python-logo-light.svg" class="logo__image only-light" alt="iMOD Python 1.0.0.post1 documentation - Home"/>
-    <img src="../_static/imod-python-logo-dark.svg" class="logo__image only-dark pst-js-only" alt="iMOD Python 1.0.0.post1 documentation - Home"/>
+    <img src="../_static/imod-python-logo-light.svg" class="logo__image only-light" alt="iMOD Python 1.1.0 documentation - Home"/>
+    <img src="../_static/imod-python-logo-dark.svg" class="logo__image only-dark pst-js-only" alt="iMOD Python 1.1.0 documentation - Home"/>
   
   
 </a></div>
@@ -167,23 +175,13 @@
   </a>
 </li>
 
-            <li class="nav-item dropdown">
-                <button class="btn dropdown-toggle nav-item" type="button"
-                data-bs-toggle="dropdown" aria-expanded="false"
-                aria-controls="pst-nav-more-links">
-                    More
-                </button>
-                <ul id="pst-nav-more-links" class="dropdown-menu">
-                    
-<li class=" ">
-  <a class="nav-link dropdown-item nav-internal" href="../developing/index.html">
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../developing/index.html">
     Developing
   </a>
 </li>
 
-                </ul>
-            </li>
-            
   </ul>
 </nav></div>
       
@@ -205,11 +203,18 @@
       
         <div class="navbar-item">
 
-<button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button pst-js-only" aria-label="Color mode" data-bs-title="Color mode"  data-bs-placement="bottom" data-bs-toggle="tooltip">
-  <i class="theme-switch fa-solid fa-sun                fa-lg" data-mode="light" title="Light"></i>
-  <i class="theme-switch fa-solid fa-moon               fa-lg" data-mode="dark"  title="Dark"></i>
-  <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg" data-mode="auto"  title="System Settings"></i>
-</button></div>
+<div class="theme-switch-container dropdown pst-js-only" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Color mode">
+  <button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button dropdown-toggle" aria-label="Color mode" data-bs-toggle="dropdown">
+    <i class="theme-switch fa-solid fa-sun fa-lg fa-fw" data-mode="light" title="Light"></i>
+    <i class="theme-switch fa-solid fa-moon fa-lg fa-fw" data-mode="dark" title="Dark"></i>
+    <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg fa-fw" data-mode="auto" title="System Settings"></i>
+  </button>
+  <ul class="dropdown-menu dropdown-menu-end">
+    <li><button class="dropdown-item d-flex align-items-center theme-change-button" data-mode="auto"><i class="fa-solid fa-circle-half-stroke fa-lg fa-fw me-1"></i>System Settings</button></li>
+    <li><button class="dropdown-item d-flex align-items-center theme-change-button" data-mode="light"><i class="fa-solid fa-sun fa-lg fa-fw me-1"></i>Light</button></li>
+    <li><button class="dropdown-item d-flex align-items-center theme-change-button" data-mode="dark"><i class="fa-solid fa-moon fa-lg fa-fw me-1"></i>Dark</button></li>
+  </ul>
+</div></div>
       
         <div class="navbar-item"><ul class="navbar-icon-links"
     aria-label="Icon Links">
@@ -222,8 +227,7 @@
           
           
           
-          <a href="https://www.deltares.nl/en/" title="Deltares" class="nav-link pst-navbar-icon" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><i class="fa-custom fa-deltares fa-lg" aria-hidden="true"></i>
-            <span class="sr-only">Deltares</span></a>
+          <a href="https://www.deltares.nl/en/" title="Deltares" class="nav-link pst-navbar-icon" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><i class="fa-custom fa-lg" data-prefix="fa-custom" data-icon="deltares" aria-hidden="true"></i><span class="visually-hidden">Deltares</span></a>
         </li>
         <li class="nav-item">
           
@@ -234,8 +238,7 @@
           
           
           
-          <a href="https://github.com/Deltares/imod-python" title="GitHub" class="nav-link pst-navbar-icon" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><i class="fab fa-github fa-lg" aria-hidden="true"></i>
-            <span class="sr-only">GitHub</span></a>
+          <a href="https://github.com/Deltares/imod-python" title="GitHub" class="nav-link pst-navbar-icon" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><i class="fab fa-github fa-lg" aria-hidden="true"></i><span class="visually-hidden">GitHub</span></a>
         </li>
 </ul></div>
       
@@ -338,11 +341,18 @@
         
           <div class="navbar-item">
 
-<button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button pst-js-only" aria-label="Color mode" data-bs-title="Color mode"  data-bs-placement="bottom" data-bs-toggle="tooltip">
-  <i class="theme-switch fa-solid fa-sun                fa-lg" data-mode="light" title="Light"></i>
-  <i class="theme-switch fa-solid fa-moon               fa-lg" data-mode="dark"  title="Dark"></i>
-  <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg" data-mode="auto"  title="System Settings"></i>
-</button></div>
+<div class="theme-switch-container dropdown pst-js-only" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Color mode">
+  <button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button dropdown-toggle" aria-label="Color mode" data-bs-toggle="dropdown">
+    <i class="theme-switch fa-solid fa-sun fa-lg fa-fw" data-mode="light" title="Light"></i>
+    <i class="theme-switch fa-solid fa-moon fa-lg fa-fw" data-mode="dark" title="Dark"></i>
+    <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg fa-fw" data-mode="auto" title="System Settings"></i>
+  </button>
+  <ul class="dropdown-menu dropdown-menu-end">
+    <li><button class="dropdown-item d-flex align-items-center theme-change-button" data-mode="auto"><i class="fa-solid fa-circle-half-stroke fa-lg fa-fw me-1"></i>System Settings</button></li>
+    <li><button class="dropdown-item d-flex align-items-center theme-change-button" data-mode="light"><i class="fa-solid fa-sun fa-lg fa-fw me-1"></i>Light</button></li>
+    <li><button class="dropdown-item d-flex align-items-center theme-change-button" data-mode="dark"><i class="fa-solid fa-moon fa-lg fa-fw me-1"></i>Dark</button></li>
+  </ul>
+</div></div>
         
           <div class="navbar-item"><ul class="navbar-icon-links"
     aria-label="Icon Links">
@@ -355,8 +365,7 @@
           
           
           
-          <a href="https://www.deltares.nl/en/" title="Deltares" class="nav-link pst-navbar-icon" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><i class="fa-custom fa-deltares fa-lg" aria-hidden="true"></i>
-            <span class="sr-only">Deltares</span></a>
+          <a href="https://www.deltares.nl/en/" title="Deltares" class="nav-link pst-navbar-icon" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><i class="fa-custom fa-lg" data-prefix="fa-custom" data-icon="deltares" aria-hidden="true"></i><span class="visually-hidden">Deltares</span></a>
         </li>
         <li class="nav-item">
           
@@ -367,8 +376,7 @@
           
           
           
-          <a href="https://github.com/Deltares/imod-python" title="GitHub" class="nav-link pst-navbar-icon" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><i class="fab fa-github fa-lg" aria-hidden="true"></i>
-            <span class="sr-only">GitHub</span></a>
+          <a href="https://github.com/Deltares/imod-python" title="GitHub" class="nav-link pst-navbar-icon" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><i class="fab fa-github fa-lg" aria-hidden="true"></i><span class="visually-hidden">GitHub</span></a>
         </li>
 </ul></div>
         
@@ -377,7 +385,15 @@
   </div>
   
     <div class="sidebar-primary-items__start sidebar-primary__section">
+        <div class="sidebar-primary-item pst-sidebar-collapse"><button id="pst-collapse-sidebar-button" aria-expanded="true" aria-controls="pst-primary-sidebar">
+  <svg class="pst-icon" role="img" aria-hidden="true" focusable="false" viewBox="0 0 16 16" xmlns="http://www.w3.org/2000/svg">
+    <path fill="currentColor" d="M3 15.5C2.36232 15.5 1.74874 15.2564 1.28478 14.8189C0.820828 14.3815 0.541576 13.7832 0.504167 13.1467L0.5 13L0.5 3C0.499965 2.36232 0.743605 1.74874 1.18107 1.28478C1.61854 0.820828 2.21676 0.541576 2.85333 0.504167L3 0.5L13 0.5C13.6377 0.499965 14.2513 0.743605 14.7152 1.18107C15.1792 1.61854 15.4584 2.21676 15.4958 2.85333L15.5 3L15.5 13C15.5 13.6377 15.2564 14.2513 14.8189 14.7152C14.3815 15.1792 13.7832 15.4584 13.1467 15.4958L13 15.5L3 15.5ZM3 13.8333L10.5 13.8333L10.5 2.16667L3 2.16667C2.79589 2.16669 2.59889 2.24163 2.44636 2.37726C2.29383 2.5129 2.19638 2.69979 2.1725 2.9025L2.16667 3L2.16667 13C2.16669 13.2041 2.24163 13.4011 2.37726 13.5536C2.5129 13.7062 2.69979 13.8036 2.9025 13.8275L3 13.8333ZM6.65583 10.325L6.5775 10.2558L4.91083 8.58917C4.76735 8.44567 4.68116 8.25476 4.66843 8.05223C4.65569 7.84971 4.71729 7.6495 4.84167 7.48917L4.91083 7.41083L6.5775 5.74417C6.72747 5.59471 6.9287 5.50794 7.14032 5.50148C7.35194 5.49502 7.55809 5.56935 7.7169 5.70937C7.8757 5.8494 7.97525 6.04463 7.99533 6.25539C8.01541 6.46616 7.95451 6.67667 7.825 6.84417L7.75583 6.9225L6.67917 8L7.75583 9.0775C7.89931 9.22099 7.98551 9.41191 7.99824 9.61443C8.01097 9.81695 7.94938 10.0172 7.825 10.1775L7.75583 10.2558C7.61234 10.3993 7.42142 10.4855 7.2189 10.4982C7.01638 10.511 6.81617 10.4494 6.65583 10.325Z"/>
+  </svg>
+  <span class="pst-collapse-sidebar-label">Collapse Sidebar</span>
+  <span class="pst-expand-sidebar-label">Expand Sidebar</span>
+</button></div>
         <div class="sidebar-primary-item">
+
 <nav class="bd-docs-nav bd-links"
      aria-label="Section Navigation">
   <p class="bd-links__title" role="heading" aria-level="1">Section Navigation</p>
@@ -386,14 +402,16 @@
 <li class="toctree-l1"><a class="reference internal" href="01-raster-data.html">Raster data and xarray</a></li>
 <li class="toctree-l1"><a class="reference internal" href="02-vector-data.html">Vector data and Geopandas</a></li>
 <li class="toctree-l1"><a class="reference internal" href="03-timeseries-data.html">Time series data and Pandas</a></li>
-<li class="toctree-l1"><a class="reference internal" href="05-unstructured-grids.html">Unstructured Grids</a></li>
-<li class="toctree-l1"><a class="reference internal" href="06-lazy-evaluation.html">Lazy evaluation</a></li>
-<li class="toctree-l1"><a class="reference internal" href="07-time-discretization.html">Model time discretization</a></li>
-<li class="toctree-l1"><a class="reference internal" href="08-regridding.html">Regridding</a></li>
+<li class="toctree-l1"><a class="reference internal" href="04-unstructured-grids.html">Unstructured Grids</a></li>
+<li class="toctree-l1"><a class="reference internal" href="05-lazy-evaluation.html">Lazy evaluation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="06-time-discretization.html">Model time discretization</a></li>
+<li class="toctree-l1"><a class="reference internal" href="07-regridding.html">Regridding</a></li>
+<li class="toctree-l1"><a class="reference internal" href="08-assign-wells.html">Assigning Wells to Model Layers</a></li>
 <li class="toctree-l1"><a class="reference internal" href="09-topsystem.html">Topsystem: from 2D map to 3D model</a></li>
 <li class="toctree-l1"><a class="reference internal" href="10-cleanup.html">Data cleanup</a></li>
 <li class="toctree-l1"><a class="reference internal" href="11-imod5-files.html">Reading and writing iMOD5 files in Python</a></li>
 <li class="toctree-l1"><a class="reference internal" href="12-imod5-model-to-modflow6.html">Working with iMOD5 models in MODFLOW 6</a></li>
+<li class="toctree-l1"><a class="reference internal" href="13-logging.html">Logging in iMOD Python</a></li>
 </ul>
 </div>
 </nav></div>
@@ -480,42 +498,48 @@ geopandas data structures. Therefore, this guide first introduces these data
 structures. Secondly, it will demonstrate how a modeling workflow is set up.</p>
 <div class="toctree-wrapper compound">
 </div>
-<div class="sphx-glr-thumbnails"><div class="sphx-glr-thumbcontainer" tooltip="These are the examples in the index page of the iMOD Python user guide. The examples are used to demonstrate the features of iMOD Python and how to use them. This file is meant to test if the index page is working correctly and to provide a quick overview of the examples available in the user guide."><img alt="" src="../_images/sphx_glr_00-index-examples_thumb.png" />
-<p><a class="reference internal" href="00-index-examples.html#sphx-glr-user-guide-00-index-examples-py"><span class="std std-ref">Quick start</span></a></p>
+<div id='sg-tag-list' class='sphx-glr-tag-list'></div><div class="sphx-glr-thumbnails"><div class="sphx-glr-thumbcontainer" tooltip="These are the examples in the index page of the iMOD Python user guide. The examples are used to demonstrate the features of iMOD Python and how to use them. This file is meant to test if the index page is working correctly and to provide a quick overview of the examples available in the user guide."><img alt="" src="../_images/sphx_glr_00-index-examples_thumb.png" />
+<p><a class="reference internal" href="00-index-examples.html"><span class="doc">Quick start</span></a></p>
   <div class="sphx-glr-thumbnail-title">Quick start</div>
 </div><div class="sphx-glr-thumbcontainer" tooltip="Geospatial data primarily comes in two forms: raster data and vector data. This guide focuses on the first."><img alt="" src="../_images/sphx_glr_01-raster-data_thumb.png" />
-<p><a class="reference internal" href="01-raster-data.html#sphx-glr-user-guide-01-raster-data-py"><span class="std std-ref">Raster data and xarray</span></a></p>
+<p><a class="reference internal" href="01-raster-data.html"><span class="doc">Raster data and xarray</span></a></p>
   <div class="sphx-glr-thumbnail-title">Raster data and xarray</div>
 </div><div class="sphx-glr-thumbcontainer" tooltip="Geospatial data primarily comes in two forms: raster data and vector data. This guide focuses on the latter."><img alt="" src="../_images/sphx_glr_02-vector-data_thumb.png" />
-<p><a class="reference internal" href="02-vector-data.html#sphx-glr-user-guide-02-vector-data-py"><span class="std std-ref">Vector data and Geopandas</span></a></p>
+<p><a class="reference internal" href="02-vector-data.html"><span class="doc">Vector data and Geopandas</span></a></p>
   <div class="sphx-glr-thumbnail-title">Vector data and Geopandas</div>
 </div><div class="sphx-glr-thumbcontainer" tooltip="Handling time series is major part of geohydrology and groundwater modeling. Time series data come in more than one form:"><img alt="" src="../_images/sphx_glr_03-timeseries-data_thumb.png" />
-<p><a class="reference internal" href="03-timeseries-data.html#sphx-glr-user-guide-03-timeseries-data-py"><span class="std std-ref">Time series data and Pandas</span></a></p>
+<p><a class="reference internal" href="03-timeseries-data.html"><span class="doc">Time series data and Pandas</span></a></p>
   <div class="sphx-glr-thumbnail-title">Time series data and Pandas</div>
-</div><div class="sphx-glr-thumbcontainer" tooltip="MODFLOW 6 supports unstructured grids. Unlike raster data, the connectivity of unstructured grids is irregular. This means that the number of neighboring cells is not constant; for structured grids, every cell has 4 neighbors (in 2D), or 6 neighbors (in 3D)."><img alt="" src="../_images/sphx_glr_05-unstructured-grids_thumb.png" />
-<p><a class="reference internal" href="05-unstructured-grids.html#sphx-glr-user-guide-05-unstructured-grids-py"><span class="std std-ref">Unstructured Grids</span></a></p>
+</div><div class="sphx-glr-thumbcontainer" tooltip="MODFLOW 6 supports unstructured grids. Unlike raster data, the connectivity of unstructured grids is irregular. This means that the number of neighboring cells is not constant; for structured grids, every cell has 4 neighbors (in 2D), or 6 neighbors (in 3D)."><img alt="" src="../_images/sphx_glr_04-unstructured-grids_thumb.png" />
+<p><a class="reference internal" href="04-unstructured-grids.html"><span class="doc">Unstructured Grids</span></a></p>
   <div class="sphx-glr-thumbnail-title">Unstructured Grids</div>
-</div><div class="sphx-glr-thumbcontainer" tooltip="A powerful feature of xarray is `lazy evaluation`_. Lazy evaluation means that expressions are delayed until the results are needed. In a nutshell, lazy evaluation has the following advantages for us:"><img alt="" src="../_images/sphx_glr_06-lazy-evaluation_thumb.png" />
-<p><a class="reference internal" href="06-lazy-evaluation.html#sphx-glr-user-guide-06-lazy-evaluation-py"><span class="std std-ref">Lazy evaluation</span></a></p>
+</div><div class="sphx-glr-thumbcontainer" tooltip="A powerful feature of xarray is `lazy evaluation`_. Lazy evaluation means that expressions are delayed until the results are needed. In a nutshell, lazy evaluation has the following advantages for us:"><img alt="" src="../_images/sphx_glr_05-lazy-evaluation_thumb.png" />
+<p><a class="reference internal" href="05-lazy-evaluation.html"><span class="doc">Lazy evaluation</span></a></p>
   <div class="sphx-glr-thumbnail-title">Lazy evaluation</div>
-</div><div class="sphx-glr-thumbcontainer" tooltip="iMOD Python provides nice functionality to discretize your models into stress periods, depending on the timesteps you assigned your boundary conditions. This functionality is activated with the create_time_discretization() method."><img alt="" src="../_images/sphx_glr_07-time-discretization_thumb.png" />
-<p><a class="reference internal" href="07-time-discretization.html#sphx-glr-user-guide-07-time-discretization-py"><span class="std std-ref">Model time discretization</span></a></p>
+</div><div class="sphx-glr-thumbcontainer" tooltip="iMOD Python provides nice functionality to discretize your models into stress periods, depending on the timesteps you assigned your boundary conditions. This functionality is activated with the create_time_discretization() method."><img alt="" src="../_images/sphx_glr_06-time-discretization_thumb.png" />
+<p><a class="reference internal" href="06-time-discretization.html"><span class="doc">Model time discretization</span></a></p>
   <div class="sphx-glr-thumbnail-title">Model time discretization</div>
-</div><div class="sphx-glr-thumbcontainer" tooltip="Introduction ------------"><img alt="" src="../_images/sphx_glr_08-regridding_thumb.png" />
-<p><a class="reference internal" href="08-regridding.html#sphx-glr-user-guide-08-regridding-py"><span class="std std-ref">Regridding</span></a></p>
+</div><div class="sphx-glr-thumbcontainer" tooltip="Introduction ------------"><img alt="" src="../_images/sphx_glr_07-regridding_thumb.png" />
+<p><a class="reference internal" href="07-regridding.html"><span class="doc">Regridding</span></a></p>
   <div class="sphx-glr-thumbnail-title">Regridding</div>
+</div><div class="sphx-glr-thumbcontainer" tooltip="iMOD Python provides two grid-agnostic well classes: imod.mf6.Well and imod.mf6.LayeredWell to build MODFLOW 6 well package input."><img alt="" src="../_images/sphx_glr_08-assign-wells_thumb.png" />
+<p><a class="reference internal" href="08-assign-wells.html"><span class="doc">Assigning Wells to Model Layers</span></a></p>
+  <div class="sphx-glr-thumbnail-title">Assigning Wells to Model Layers</div>
 </div><div class="sphx-glr-thumbcontainer" tooltip="iMOD Python has multiple features to help you define the topsystem of the groundwater system. With &quot;topsystem&quot; we mean all forcings which act on the top of the groundwater system. These are usually either meteorological (precipitation &amp; evapotranspiration) or hydrological (rivers, ditches, lakes, sea) in nature. In MODFLOW 6 these are usually simulated with the DRN, RIV, GHB, and RCH package. This data is usually provided as planar grids (x, y) without any vertical dimension. This user guide will show you how to allocate these forcings across model layers to grid cells and how to distribute conductances for Robin-like boundary conditions (RIV, DRN, GHB) over model layers. We will demonstrate this with the RIV package, as this package supports all options for allocating cells and distributing conductances. A subset of options are available for the DRN, GHB, and RCH packages."><img alt="" src="../_images/sphx_glr_09-topsystem_thumb.png" />
-<p><a class="reference internal" href="09-topsystem.html#sphx-glr-user-guide-09-topsystem-py"><span class="std std-ref">Topsystem: from 2D map to 3D model</span></a></p>
+<p><a class="reference internal" href="09-topsystem.html"><span class="doc">Topsystem: from 2D map to 3D model</span></a></p>
   <div class="sphx-glr-thumbnail-title">Topsystem: from 2D map to 3D model</div>
 </div><div class="sphx-glr-thumbcontainer" tooltip="More often than not, data contained in databases is not entirely consistent, causing errors. It therefore is useful to have some utilities at hand to clean up data. We included some convenience methods to help clean up inconsistent datasets."><img alt="" src="../_images/sphx_glr_10-cleanup_thumb.png" />
-<p><a class="reference internal" href="10-cleanup.html#sphx-glr-user-guide-10-cleanup-py"><span class="std std-ref">Data cleanup</span></a></p>
+<p><a class="reference internal" href="10-cleanup.html"><span class="doc">Data cleanup</span></a></p>
   <div class="sphx-glr-thumbnail-title">Data cleanup</div>
 </div><div class="sphx-glr-thumbcontainer" tooltip="This example demonstrates how to work with iMOD5 files in Python using the imod package. It shows how to save, read, and manipulate iMOD5 files, including handling temporary directories and glob patterns for file selection."><img alt="" src="../_images/sphx_glr_11-imod5-files_thumb.png" />
-<p><a class="reference internal" href="11-imod5-files.html#sphx-glr-user-guide-11-imod5-files-py"><span class="std std-ref">Reading and writing iMOD5 files in Python</span></a></p>
+<p><a class="reference internal" href="11-imod5-files.html"><span class="doc">Reading and writing iMOD5 files in Python</span></a></p>
   <div class="sphx-glr-thumbnail-title">Reading and writing iMOD5 files in Python</div>
 </div><div class="sphx-glr-thumbcontainer" tooltip="This example shows how to work with iMOD5 models in MODFLOW 6. It demonstrates how to convert an iMOD5 model to a MODFLOW 6 model using the imod package. The example fetches an iMOD5 model, converts it to a MODFLOW 6 model, regrids it to an unstructured grid, and compares differences in output between the structured and unstructured grids."><img alt="" src="../_images/sphx_glr_12-imod5-model-to-modflow6_thumb.png" />
-<p><a class="reference internal" href="12-imod5-model-to-modflow6.html#sphx-glr-user-guide-12-imod5-model-to-modflow6-py"><span class="std std-ref">Working with iMOD5 models in MODFLOW 6</span></a></p>
+<p><a class="reference internal" href="12-imod5-model-to-modflow6.html"><span class="doc">Working with iMOD5 models in MODFLOW 6</span></a></p>
   <div class="sphx-glr-thumbnail-title">Working with iMOD5 models in MODFLOW 6</div>
+</div><div class="sphx-glr-thumbcontainer" tooltip="iMOD Python supports logging through both the standard Python logging framework and Loguru, so that you can choose whichever best fits your needs and project. By default, logging is silent, so messages are only output once a logger is configured."><img alt="" src="../_images/sphx_glr_13-logging_thumb.png" />
+<p><a class="reference internal" href="13-logging.html"><span class="doc">Logging in iMOD Python</span></a></p>
+  <div class="sphx-glr-thumbnail-title">Logging in iMOD Python</div>
 </div></div><div class="toctree-wrapper compound">
 </div>
 <div class="sphx-glr-footer sphx-glr-footer-gallery docutils container">
@@ -569,13 +593,13 @@ structures. Secondly, it will demonstrate how a modeling workflow is set up.</p>
 
 
   <div class="sidebar-secondary-item">
-  <div role="note" aria-label="source link">
-    <h3>This Page</h3>
-    <ul class="this-page-menu">
-      <li><a href="../_sources/user-guide/index.rst.txt"
-            rel="nofollow">Show Source</a></li>
-    </ul>
-   </div></div>
+
+  <div class="tocsection sourcelink">
+    <a href="../_sources/user-guide/index.rst.txt">
+      <i class="fa-solid fa-file-lines"></i> Show Source
+    </a>
+  </div>
+</div>
 
 </div></div>
               
@@ -590,8 +614,8 @@ structures. Secondly, it will demonstrate how a modeling workflow is set up.</p>
   </div>
   
   <!-- Scripts loaded after <body> so the DOM is not blocked -->
-  <script defer src="../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf"></script>
-<script defer src="../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf"></script>
+  <script defer src="../_static/scripts/bootstrap.js?digest=90905a2f556bf617f1a9"></script>
+<script defer src="../_static/scripts/pydata-sphinx-theme.js?digest=90905a2f556bf617f1a9"></script>
 
   <footer class="bd-footer">
 <div class="bd-footer__inner bd-page-width">
@@ -611,7 +635,7 @@ structures. Secondly, it will demonstrate how a modeling workflow is set up.</p>
         <div class="footer-item">
 
   <p class="sphinx-version">
-    Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 8.2.3.
+    Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 9.1.0.
     <br/>
   </p>
 </div>
@@ -625,7 +649,7 @@ structures. Secondly, it will demonstrate how a modeling workflow is set up.</p>
         <div class="footer-item">
 <p class="theme-version">
   <!-- # L10n: Setting the PST URL as an argument as this does not need to be localized -->
-  Built with the <a href="https://pydata-sphinx-theme.readthedocs.io/en/stable/index.html">PyData Sphinx Theme</a> 0.16.1.
+  Built with the <a href="https://pydata-sphinx-theme.readthedocs.io/en/stable/index.html">PyData Sphinx Theme</a> 0.20.0.
 </p></div>
       
     </div>

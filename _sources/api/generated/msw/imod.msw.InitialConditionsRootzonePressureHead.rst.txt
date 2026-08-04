@@ -15,9 +15,11 @@
    
       ~InitialConditionsRootzonePressureHead.__init__
       ~InitialConditionsRootzonePressureHead.clip_box
+      ~InitialConditionsRootzonePressureHead.from_file
       ~InitialConditionsRootzonePressureHead.from_imod5_data
       ~InitialConditionsRootzonePressureHead.get_regrid_methods
       ~InitialConditionsRootzonePressureHead.regrid_like
+      ~InitialConditionsRootzonePressureHead.to_file
       ~InitialConditionsRootzonePressureHead.write
    
    

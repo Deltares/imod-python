@@ -9,6 +9,10 @@ with `matplotlib`_, and 3D plots with `pyvista`_.
 .. _matplotlib: https://matplotlib.org/
 .. _pyvista: https://docs.pyvista.org/
 
+.. raw:: html
+
+  <div id='sg-tag-list' class='sphx-glr-tag-list'></div>
+
 
 .. raw:: html
 
@@ -25,7 +29,7 @@ with `matplotlib`_, and 3D plots with `pyvista`_.
   .. image:: /examples/visualize/images/thumb/sphx_glr_flowvel_streamlines_thumb.png
     :alt:
 
-  :ref:`sphx_glr_examples_visualize_flowvel_streamlines.py`
+  :doc:`/examples/visualize/flowvel_streamlines`
 
 .. raw:: html
 
@@ -42,7 +46,7 @@ with `matplotlib`_, and 3D plots with `pyvista`_.
   .. image:: /examples/visualize/images/thumb/sphx_glr_plot_map_thumb.png
     :alt:
 
-  :ref:`sphx_glr_examples_visualize_plot_map.py`
+  :doc:`/examples/visualize/plot_map`
 
 .. raw:: html
 

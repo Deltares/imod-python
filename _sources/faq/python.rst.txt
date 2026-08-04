@@ -128,7 +128,7 @@ practical sense.)
 To create a Pixi environment open a command prompt and ``cd`` to the imod folder.
 In the imod folder use the following command::
 
-    pixi run install
+    pixi install
 
 This will create a conda environment inside the imod folder. To activate the environment run::
 

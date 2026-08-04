@@ -82,6 +82,8 @@ Reproject points
 
  .. code-block:: none
 
+    C:\buildagent\work\4b9080cbb3354582\imod-python\examples\prepare\reproject.py:26: FutureWarning: This function is deprecated. See: https://pyproj4.github.io/pyproj/stable/gotchas.html#upgrading-to-pyproj-2-from-pyproj-1
+      x, y = pyproj.transform(wgs84, amersfoort, lat, lon)
     [132152.59039576206, 92645.5317909315, 177892.3125604112] [468151.410998257, 447126.74989173946, 467201.53865388624]
 
 
@@ -162,7 +164,7 @@ Importing the original file, which has a cellsize of 100.0 m and its EPSG is 289
  .. code-block:: none
 
 
-    <matplotlib.image.AxesImage object at 0x0000019B2F20B9B0>
+    <matplotlib.image.AxesImage object at 0x000001CE85606FD0>
 
 
 
@@ -273,7 +275,7 @@ reprojection.
  .. code-block:: none
 
 
-    <matplotlib.image.AxesImage object at 0x0000019B180BF440>
+    <matplotlib.image.AxesImage object at 0x000001CEFA948910>
 
 
 
@@ -313,7 +315,7 @@ it's coordinate system will be EPSG:32631:
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** (0 minutes 0.844 seconds)
+   **Total running time of the script:** (0 minutes 0.933 seconds)
 
 
 .. _sphx_glr_download_examples_prepare_reproject.py:

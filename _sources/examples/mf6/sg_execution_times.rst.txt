@@ -6,7 +6,7 @@
 
 Computation times
 =================
-**10:06.114** total execution time for 12 files **from examples\mf6**:
+**14:03.302** total execution time for 12 files **from examples\mf6**:
 
 .. container::
 
@@ -33,38 +33,38 @@ Computation times
      - Time
      - Mem (MB)
    * - :ref:`sphx_glr_examples_mf6_hondsrug_partitioning.py` (``hondsrug_partitioning.py``)
-     - 04:36.711
+     - 06:14.185
      - 0.0
    * - :ref:`sphx_glr_examples_mf6_hondsrug.py` (``hondsrug.py``)
-     - 02:25.441
+     - 03:24.417
      - 0.0
    * - :ref:`sphx_glr_examples_mf6_circle_transport.py` (``circle_transport.py``)
-     - 01:16.796
+     - 01:39.615
      - 0.0
    * - :ref:`sphx_glr_examples_mf6_transport_2d.py` (``transport_2d.py``)
-     - 00:57.121
+     - 01:15.539
      - 0.0
    * - :ref:`sphx_glr_examples_mf6_Henry.py` (``Henry.py``)
-     - 00:39.794
-     - 0.0
-   * - :ref:`sphx_glr_examples_mf6_circle_partitioned.py` (``circle_partitioned.py``)
-     - 00:03.165
-     - 0.0
-   * - :ref:`sphx_glr_examples_mf6_circle.py` (``circle.py``)
-     - 00:02.714
-     - 0.0
-   * - :ref:`sphx_glr_examples_mf6_example_1d_transport.py` (``example_1d_transport.py``)
-     - 00:01.983
+     - 00:51.955
      - 0.0
    * - :ref:`sphx_glr_examples_mf6_different_ways_to_regrid_models.py` (``different_ways_to_regrid_models.py``)
-     - 00:01.125
+     - 00:12.459
      - 0.0
-   * - :ref:`sphx_glr_examples_mf6_lake.py` (``lake.py``)
-     - 00:00.677
+   * - :ref:`sphx_glr_examples_mf6_circle_partitioned.py` (``circle_partitioned.py``)
+     - 00:09.900
+     - 0.0
+   * - :ref:`sphx_glr_examples_mf6_circle.py` (``circle.py``)
+     - 00:06.134
+     - 0.0
+   * - :ref:`sphx_glr_examples_mf6_example_1d_transport.py` (``example_1d_transport.py``)
+     - 00:05.450
      - 0.0
    * - :ref:`sphx_glr_examples_mf6_ex01_twri.py` (``ex01_twri.py``)
-     - 00:00.586
+     - 00:02.195
+     - 0.0
+   * - :ref:`sphx_glr_examples_mf6_lake.py` (``lake.py``)
+     - 00:01.446
      - 0.0
    * - :ref:`sphx_glr_examples_mf6_example_models.py` (``example_models.py``)
-     - 00:00.000
+     - 00:00.006
      - 0.0

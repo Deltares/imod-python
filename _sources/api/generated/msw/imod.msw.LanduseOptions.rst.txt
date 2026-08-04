@@ -15,9 +15,11 @@
    
       ~LanduseOptions.__init__
       ~LanduseOptions.clip_box
+      ~LanduseOptions.from_file
       ~LanduseOptions.from_imod5_data
       ~LanduseOptions.get_regrid_methods
       ~LanduseOptions.regrid_like
+      ~LanduseOptions.to_file
       ~LanduseOptions.write
    
    

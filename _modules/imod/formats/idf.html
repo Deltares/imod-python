@@ -7,7 +7,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>imod.formats.idf &#8212; iMOD Python 1.0.0.post1 documentation</title>
+    <title>imod.formats.idf &#8212; iMOD Python 1.1.0 documentation</title>
   
   
   
@@ -26,45 +26,53 @@
   </noscript>
   
   <!-- Loaded before other Sphinx assets -->
-  <link href="../../../_static/styles/theme.css?digest=8878045cc6db502f8baf" rel="stylesheet" />
-<link href="../../../_static/styles/pydata-sphinx-theme.css?digest=8878045cc6db502f8baf" rel="stylesheet" />
+  <link href="../../../_static/styles/theme.css?digest=90905a2f556bf617f1a9" rel="stylesheet" />
+<link href="../../../_static/styles/pydata-sphinx-theme.css?digest=90905a2f556bf617f1a9" rel="stylesheet" />
 
     <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=03e43079" />
-    <link rel="stylesheet" type="text/css" href="../../../_static/sg_gallery.css?v=d2d258e8" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/sg_gallery.css?v=fd6457a4" />
     <link rel="stylesheet" type="text/css" href="../../../_static/sg_gallery-binder.css?v=f4aeca0c" />
     <link rel="stylesheet" type="text/css" href="../../../_static/sg_gallery-dataframe.css?v=2082cf3c" />
     <link rel="stylesheet" type="text/css" href="../../../_static/sg_gallery-rendered-html.css?v=1277b6f3" />
   
   <!-- So that users can add custom icons -->
-  <script src="../../../_static/scripts/fontawesome.js?digest=8878045cc6db502f8baf"></script>
+  <script defer src="../../../_static/scripts/fontawesome.js?digest=90905a2f556bf617f1a9"></script>
   <!-- Pre-loaded scripts that we'll load fully later -->
-  <link rel="preload" as="script" href="../../../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
-<link rel="preload" as="script" href="../../../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
+  <link rel="preload" as="script" href="../../../_static/scripts/bootstrap.js?digest=90905a2f556bf617f1a9" />
+<link rel="preload" as="script" href="../../../_static/scripts/pydata-sphinx-theme.js?digest=90905a2f556bf617f1a9" />
 
-    <script src="../../../_static/documentation_options.js?v=f5399c8a"></script>
-    <script src="../../../_static/doctools.js?v=9bcbadda"></script>
-    <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../../_static/documentation_options.js?v=fc837d61"></script>
+    <script src="../../../_static/doctools.js?v=fd6eb6e6"></script>
+    <script src="../../../_static/sphinx_highlight.js?v=6ffebe34"></script>
+    <script src="../../../_static/sg-tags.js?v=d80f6fa4"></script>
     <script>DOCUMENTATION_OPTIONS.pagename = '_modules/imod/formats/idf';</script>
+    <script>DOCUMENTATION_OPTIONS.search_as_you_type = false;</script>
     <script src="../../../_static/deltares.js?v=a1037e22"></script>
     <link rel="index" title="Index" href="../../../genindex.html" />
     <link rel="search" title="Search" href="../../../search.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
-  <meta name="docsearch:version" content="1.0.0.dev" />
+  <meta name="docsearch:version" content="1.1.0.dev" />
+  
+    
+    <script src="../../../_static/searchtools.js"></script>
+    <script src="../../../_static/language_data.js"></script>
+    <script src="../../../searchindex.js"></script>
+  
   </head>
-  
-  
-  <body data-bs-spy="scroll" data-bs-target=".bd-toc-nav" data-offset="180" data-bs-root-margin="0px 0px -60%" data-default-mode="light">
-
+  <body data-default-mode="light">
   
   
   <div id="pst-skip-link" class="skip-link d-print-none"><a href="#main-content">Skip to main content</a></div>
+
   
   <div id="pst-scroll-pixel-helper"></div>
   
   <button type="button" class="btn rounded-pill" id="pst-back-to-top">
     <i class="fa-solid fa-arrow-up"></i>Back to top</button>
-
+  
+  
+  
   
   <dialog id="pst-search-dialog">
     
@@ -90,7 +98,7 @@
 </div>
 
   
-    <header class="bd-header navbar navbar-expand-lg bd-navbar d-print-none">
+    <header id="pst-header" class="bd-header navbar navbar-expand-lg bd-navbar d-print-none">
 <div class="bd-header__inner bd-page-width">
   <button class="pst-navbar-icon sidebar-toggle primary-toggle" aria-label="Site navigation">
     <span class="fa-solid fa-bars"></span>
@@ -114,8 +122,8 @@
     
     
     
-    <img src="../../../_static/imod-python-logo-light.svg" class="logo__image only-light" alt="iMOD Python 1.0.0.post1 documentation - Home"/>
-    <img src="../../../_static/imod-python-logo-dark.svg" class="logo__image only-dark pst-js-only" alt="iMOD Python 1.0.0.post1 documentation - Home"/>
+    <img src="../../../_static/imod-python-logo-light.svg" class="logo__image only-light" alt="iMOD Python 1.1.0 documentation - Home"/>
+    <img src="../../../_static/imod-python-logo-dark.svg" class="logo__image only-dark pst-js-only" alt="iMOD Python 1.1.0 documentation - Home"/>
   
   
 </a></div>
@@ -164,23 +172,13 @@
   </a>
 </li>
 
-            <li class="nav-item dropdown">
-                <button class="btn dropdown-toggle nav-item" type="button"
-                data-bs-toggle="dropdown" aria-expanded="false"
-                aria-controls="pst-nav-more-links">
-                    More
-                </button>
-                <ul id="pst-nav-more-links" class="dropdown-menu">
-                    
-<li class=" ">
-  <a class="nav-link dropdown-item nav-internal" href="../../../developing/index.html">
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../../developing/index.html">
     Developing
   </a>
 </li>
 
-                </ul>
-            </li>
-            
   </ul>
 </nav></div>
       
@@ -202,11 +200,18 @@
       
         <div class="navbar-item">
 
-<button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button pst-js-only" aria-label="Color mode" data-bs-title="Color mode"  data-bs-placement="bottom" data-bs-toggle="tooltip">
-  <i class="theme-switch fa-solid fa-sun                fa-lg" data-mode="light" title="Light"></i>
-  <i class="theme-switch fa-solid fa-moon               fa-lg" data-mode="dark"  title="Dark"></i>
-  <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg" data-mode="auto"  title="System Settings"></i>
-</button></div>
+<div class="theme-switch-container dropdown pst-js-only" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Color mode">
+  <button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button dropdown-toggle" aria-label="Color mode" data-bs-toggle="dropdown">
+    <i class="theme-switch fa-solid fa-sun fa-lg fa-fw" data-mode="light" title="Light"></i>
+    <i class="theme-switch fa-solid fa-moon fa-lg fa-fw" data-mode="dark" title="Dark"></i>
+    <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg fa-fw" data-mode="auto" title="System Settings"></i>
+  </button>
+  <ul class="dropdown-menu dropdown-menu-end">
+    <li><button class="dropdown-item d-flex align-items-center theme-change-button" data-mode="auto"><i class="fa-solid fa-circle-half-stroke fa-lg fa-fw me-1"></i>System Settings</button></li>
+    <li><button class="dropdown-item d-flex align-items-center theme-change-button" data-mode="light"><i class="fa-solid fa-sun fa-lg fa-fw me-1"></i>Light</button></li>
+    <li><button class="dropdown-item d-flex align-items-center theme-change-button" data-mode="dark"><i class="fa-solid fa-moon fa-lg fa-fw me-1"></i>Dark</button></li>
+  </ul>
+</div></div>
       
         <div class="navbar-item"><ul class="navbar-icon-links"
     aria-label="Icon Links">
@@ -219,8 +224,7 @@
           
           
           
-          <a href="https://www.deltares.nl/en/" title="Deltares" class="nav-link pst-navbar-icon" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><i class="fa-custom fa-deltares fa-lg" aria-hidden="true"></i>
-            <span class="sr-only">Deltares</span></a>
+          <a href="https://www.deltares.nl/en/" title="Deltares" class="nav-link pst-navbar-icon" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><i class="fa-custom fa-lg" data-prefix="fa-custom" data-icon="deltares" aria-hidden="true"></i><span class="visually-hidden">Deltares</span></a>
         </li>
         <li class="nav-item">
           
@@ -231,8 +235,7 @@
           
           
           
-          <a href="https://github.com/Deltares/imod-python" title="GitHub" class="nav-link pst-navbar-icon" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><i class="fab fa-github fa-lg" aria-hidden="true"></i>
-            <span class="sr-only">GitHub</span></a>
+          <a href="https://github.com/Deltares/imod-python" title="GitHub" class="nav-link pst-navbar-icon" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><i class="fab fa-github fa-lg" aria-hidden="true"></i><span class="visually-hidden">GitHub</span></a>
         </li>
 </ul></div>
       
@@ -333,11 +336,18 @@
         
           <div class="navbar-item">
 
-<button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button pst-js-only" aria-label="Color mode" data-bs-title="Color mode"  data-bs-placement="bottom" data-bs-toggle="tooltip">
-  <i class="theme-switch fa-solid fa-sun                fa-lg" data-mode="light" title="Light"></i>
-  <i class="theme-switch fa-solid fa-moon               fa-lg" data-mode="dark"  title="Dark"></i>
-  <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg" data-mode="auto"  title="System Settings"></i>
-</button></div>
+<div class="theme-switch-container dropdown pst-js-only" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Color mode">
+  <button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button dropdown-toggle" aria-label="Color mode" data-bs-toggle="dropdown">
+    <i class="theme-switch fa-solid fa-sun fa-lg fa-fw" data-mode="light" title="Light"></i>
+    <i class="theme-switch fa-solid fa-moon fa-lg fa-fw" data-mode="dark" title="Dark"></i>
+    <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg fa-fw" data-mode="auto" title="System Settings"></i>
+  </button>
+  <ul class="dropdown-menu dropdown-menu-end">
+    <li><button class="dropdown-item d-flex align-items-center theme-change-button" data-mode="auto"><i class="fa-solid fa-circle-half-stroke fa-lg fa-fw me-1"></i>System Settings</button></li>
+    <li><button class="dropdown-item d-flex align-items-center theme-change-button" data-mode="light"><i class="fa-solid fa-sun fa-lg fa-fw me-1"></i>Light</button></li>
+    <li><button class="dropdown-item d-flex align-items-center theme-change-button" data-mode="dark"><i class="fa-solid fa-moon fa-lg fa-fw me-1"></i>Dark</button></li>
+  </ul>
+</div></div>
         
           <div class="navbar-item"><ul class="navbar-icon-links"
     aria-label="Icon Links">
@@ -350,8 +360,7 @@
           
           
           
-          <a href="https://www.deltares.nl/en/" title="Deltares" class="nav-link pst-navbar-icon" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><i class="fa-custom fa-deltares fa-lg" aria-hidden="true"></i>
-            <span class="sr-only">Deltares</span></a>
+          <a href="https://www.deltares.nl/en/" title="Deltares" class="nav-link pst-navbar-icon" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><i class="fa-custom fa-lg" data-prefix="fa-custom" data-icon="deltares" aria-hidden="true"></i><span class="visually-hidden">Deltares</span></a>
         </li>
         <li class="nav-item">
           
@@ -362,8 +371,7 @@
           
           
           
-          <a href="https://github.com/Deltares/imod-python" title="GitHub" class="nav-link pst-navbar-icon" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><i class="fab fa-github fa-lg" aria-hidden="true"></i>
-            <span class="sr-only">GitHub</span></a>
+          <a href="https://github.com/Deltares/imod-python" title="GitHub" class="nav-link pst-navbar-icon" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><i class="fab fa-github fa-lg" aria-hidden="true"></i><span class="visually-hidden">GitHub</span></a>
         </li>
 </ul></div>
         
@@ -441,14 +449,16 @@
 <span class="kn">from</span><span class="w"> </span><span class="nn">collections.abc</span><span class="w"> </span><span class="kn">import</span> <span class="n">Iterable</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">pathlib</span><span class="w"> </span><span class="kn">import</span> <span class="n">Path</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">re</span><span class="w"> </span><span class="kn">import</span> <span class="n">Pattern</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Any</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Any</span><span class="p">,</span> <span class="n">DefaultDict</span>
 
+<span class="kn">import</span><span class="w"> </span><span class="nn">dask</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">dask.array</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">xarray</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">xr</span>
 
 <span class="kn">import</span><span class="w"> </span><span class="nn">imod</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">imod.formats</span><span class="w"> </span><span class="kn">import</span> <span class="n">array_io</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">imod.typing.structured</span><span class="w"> </span><span class="kn">import</span> <span class="n">merge_partitions</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">imod.typing.structured</span><span class="w"> </span><span class="kn">import</span> <span class="n">merge_partitions_as_da_components</span>
 
 <span class="c1"># Make sure we can still use the built-in function...</span>
 <span class="n">f_open</span> <span class="o">=</span> <span class="nb">open</span>
@@ -655,6 +665,75 @@
     <span class="k">return</span> <span class="nb">len</span><span class="p">(</span><span class="nb">set</span><span class="p">(</span><span class="n">values</span><span class="p">))</span> <span class="o">!=</span> <span class="mi">1</span>
 
 
+<span class="k">def</span><span class="w"> </span><span class="nf">_merge_subdomains</span><span class="p">(</span>
+    <span class="n">paths_per_subdomain</span><span class="p">:</span> <span class="n">DefaultDict</span><span class="p">[</span><span class="n">Any</span><span class="p">,</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]],</span>
+    <span class="n">use_cftime</span><span class="p">:</span> <span class="nb">bool</span><span class="p">,</span>
+    <span class="n">pattern</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="n">Pattern</span><span class="p">,</span>
+<span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Open and spatially merge all subdomain IDF files for one timestep.</span>
+<span class="sd">    Returns an ``xr.DataArray`` with all coordinates computed by</span>
+<span class="sd">    ``merge_partitions``.  Called directly (eagerly) once to obtain a</span>
+<span class="sd">    coordinate template, and indirectly via ``_merge_subdomains_values``</span>
+<span class="sd">    inside ``dask.delayed`` for actual computation.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">das</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">for</span> <span class="n">pathlist</span> <span class="ow">in</span> <span class="n">paths_per_subdomain</span><span class="o">.</span><span class="n">values</span><span class="p">():</span>
+        <span class="n">da</span> <span class="o">=</span> <span class="nb">open</span><span class="p">(</span><span class="n">pathlist</span><span class="p">,</span> <span class="n">use_cftime</span><span class="o">=</span><span class="n">use_cftime</span><span class="p">,</span> <span class="n">pattern</span><span class="o">=</span><span class="n">pattern</span><span class="p">)</span>
+        <span class="k">if</span> <span class="s2">&quot;subdomain&quot;</span> <span class="ow">in</span> <span class="n">da</span><span class="o">.</span><span class="n">dims</span><span class="p">:</span>
+            <span class="n">da</span> <span class="o">=</span> <span class="n">da</span><span class="o">.</span><span class="n">isel</span><span class="p">(</span><span class="n">subdomain</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">drop</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+        <span class="n">das</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">da</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">merge_partitions_as_da_components</span><span class="p">(</span><span class="n">das</span><span class="p">)</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">_merge_subdomains_values</span><span class="p">(</span>
+    <span class="n">paths_per_subdomain</span><span class="p">:</span> <span class="n">DefaultDict</span><span class="p">[</span><span class="n">Any</span><span class="p">,</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]],</span>
+    <span class="n">use_cftime</span><span class="p">:</span> <span class="nb">bool</span><span class="p">,</span>
+    <span class="n">pattern</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="n">Pattern</span><span class="p">,</span>
+<span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Wraps ``_merge_subdomains`` to return just a numpy array for ``dask.array.from_delayed``.&quot;&quot;&quot;</span>
+    <span class="n">data</span><span class="p">,</span> <span class="n">_</span><span class="p">,</span> <span class="n">_</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">_merge_subdomains</span><span class="p">(</span><span class="n">paths_per_subdomain</span><span class="p">,</span> <span class="n">use_cftime</span><span class="p">,</span> <span class="n">pattern</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">data</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">_merge_subdomains_to_dataarray</span><span class="p">(</span>
+    <span class="n">paths_per_subdomain</span><span class="p">:</span> <span class="n">DefaultDict</span><span class="p">[</span><span class="n">Any</span><span class="p">,</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]],</span>
+    <span class="n">use_cftime</span><span class="p">:</span> <span class="nb">bool</span><span class="p">,</span>
+    <span class="n">pattern</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="n">Pattern</span><span class="p">,</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">xr</span><span class="o">.</span><span class="n">DataArray</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Wraps ``_merge_subdomains`` to return a DataArray for coordinate template.&quot;&quot;&quot;</span>
+    <span class="n">data</span><span class="p">,</span> <span class="n">coords</span><span class="p">,</span> <span class="n">dims</span><span class="p">,</span> <span class="n">name</span> <span class="o">=</span> <span class="n">_merge_subdomains</span><span class="p">(</span>
+        <span class="n">paths_per_subdomain</span><span class="p">,</span> <span class="n">use_cftime</span><span class="p">,</span> <span class="n">pattern</span>
+    <span class="p">)</span>
+    <span class="k">return</span> <span class="n">xr</span><span class="o">.</span><span class="n">DataArray</span><span class="p">(</span>
+        <span class="n">data</span><span class="o">=</span><span class="n">data</span><span class="p">,</span>
+        <span class="n">coords</span><span class="o">=</span><span class="n">coords</span><span class="p">,</span>
+        <span class="n">dims</span><span class="o">=</span><span class="n">dims</span><span class="p">,</span>
+        <span class="n">name</span><span class="o">=</span><span class="n">name</span><span class="p">,</span>
+    <span class="p">)</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">check_subdomain_consistency</span><span class="p">(</span>
+    <span class="n">parsed</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]],</span> <span class="n">paths</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span> <span class="n">pattern</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="n">Pattern</span>
+<span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Check that each subdomain has the same number of IDF files.&quot;&quot;&quot;</span>
+    <span class="n">grouped</span> <span class="o">=</span> <span class="n">defaultdict</span><span class="p">(</span><span class="nb">list</span><span class="p">)</span>
+    <span class="k">for</span> <span class="n">match</span><span class="p">,</span> <span class="n">p</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">parsed</span><span class="p">,</span> <span class="n">paths</span><span class="p">):</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">key</span> <span class="o">=</span> <span class="n">match</span><span class="p">[</span><span class="s2">&quot;subdomain&quot;</span><span class="p">]</span>
+        <span class="k">except</span> <span class="ne">KeyError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">KeyError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2"> in path: </span><span class="si">{</span><span class="n">p</span><span class="si">}</span><span class="s2"> with pattern: </span><span class="si">{</span><span class="n">pattern</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="n">grouped</span><span class="p">[</span><span class="n">key</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">p</span><span class="p">)</span>
+
+    <span class="n">n_idf_per_subdomain</span> <span class="o">=</span> <span class="p">{</span>
+        <span class="n">subdomain_id</span><span class="p">:</span> <span class="nb">len</span><span class="p">(</span><span class="n">path_ls</span><span class="p">)</span> <span class="k">for</span> <span class="n">subdomain_id</span><span class="p">,</span> <span class="n">path_ls</span> <span class="ow">in</span> <span class="n">grouped</span><span class="o">.</span><span class="n">items</span><span class="p">()</span>
+    <span class="p">}</span>
+    <span class="k">if</span> <span class="n">_more_than_one_unique_value</span><span class="p">(</span><span class="n">n_idf_per_subdomain</span><span class="o">.</span><span class="n">values</span><span class="p">()):</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+            <span class="sa">f</span><span class="s2">&quot;Each subdomain must have the same number of IDF files, found: </span><span class="si">{</span><span class="n">n_idf_per_subdomain</span><span class="si">}</span><span class="s2">&quot;</span>
+        <span class="p">)</span>
+
+
 <div class="viewcode-block" id="open_subdomains">
 <a class="viewcode-back" href="../../../api/generated/io/imod.formats.idf.open_subdomains.html#imod.formats.idf.open_subdomains">[docs]</a>
 <span class="k">def</span><span class="w"> </span><span class="nf">open_subdomains</span><span class="p">(</span>
@@ -680,6 +759,11 @@
 <span class="sd">    xarray.DataArray</span>
 
 <span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c1"># This function is a wrapper around open() that groups by subdomain and</span>
+    <span class="c1"># merges the subdomains into one DataArray, in a delayed manner, chunked per</span>
+    <span class="c1"># timestep. A lot of logic in this function is about grouping the files by</span>
+    <span class="c1"># subdomain and time, and setting the right time coordinate again.</span>
+
     <span class="n">paths</span> <span class="o">=</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">glob</span><span class="o">.</span><span class="n">glob</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">path</span><span class="p">)))</span>
 
     <span class="k">if</span> <span class="n">pattern</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
@@ -691,30 +775,70 @@
             <span class="n">pattern</span> <span class="o">=</span> <span class="s2">&quot;</span><span class="si">{name}</span><span class="s2">_</span><span class="si">{time}</span><span class="s2">_l</span><span class="si">{layer}</span><span class="s2">_p</span><span class="si">{subdomain}</span><span class="s2">&quot;</span>
 
     <span class="n">parsed</span> <span class="o">=</span> <span class="p">[</span><span class="n">imod</span><span class="o">.</span><span class="n">util</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">decompose</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="n">pattern</span><span class="p">)</span> <span class="k">for</span> <span class="n">path</span> <span class="ow">in</span> <span class="n">paths</span><span class="p">]</span>
-    <span class="n">grouped</span> <span class="o">=</span> <span class="n">defaultdict</span><span class="p">(</span><span class="nb">list</span><span class="p">)</span>
-    <span class="k">for</span> <span class="n">match</span><span class="p">,</span> <span class="n">path</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">parsed</span><span class="p">,</span> <span class="n">paths</span><span class="p">):</span>
-        <span class="k">try</span><span class="p">:</span>
-            <span class="n">key</span> <span class="o">=</span> <span class="n">match</span><span class="p">[</span><span class="s2">&quot;subdomain&quot;</span><span class="p">]</span>
-        <span class="k">except</span> <span class="ne">KeyError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="ne">KeyError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2"> in path: </span><span class="si">{</span><span class="n">path</span><span class="si">}</span><span class="s2"> with pattern: </span><span class="si">{</span><span class="n">pattern</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
-        <span class="n">grouped</span><span class="p">[</span><span class="n">key</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">path</span><span class="p">)</span>
+    <span class="n">check_subdomain_consistency</span><span class="p">(</span><span class="n">parsed</span><span class="p">,</span> <span class="n">paths</span><span class="p">,</span> <span class="n">pattern</span><span class="p">)</span>
 
-    <span class="n">n_idf_per_subdomain</span> <span class="o">=</span> <span class="p">{</span>
-        <span class="n">subdomain_id</span><span class="p">:</span> <span class="nb">len</span><span class="p">(</span><span class="n">path_ls</span><span class="p">)</span> <span class="k">for</span> <span class="n">subdomain_id</span><span class="p">,</span> <span class="n">path_ls</span> <span class="ow">in</span> <span class="n">grouped</span><span class="o">.</span><span class="n">items</span><span class="p">()</span>
-    <span class="p">}</span>
-    <span class="k">if</span> <span class="n">_more_than_one_unique_value</span><span class="p">(</span><span class="n">n_idf_per_subdomain</span><span class="o">.</span><span class="n">values</span><span class="p">()):</span>
-        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
-            <span class="sa">f</span><span class="s2">&quot;Each subdomain must have the same number of IDF files, found: </span><span class="si">{</span><span class="n">n_idf_per_subdomain</span><span class="si">}</span><span class="s2">&quot;</span>
+    <span class="n">has_time</span> <span class="o">=</span> <span class="s2">&quot;time&quot;</span> <span class="ow">in</span> <span class="n">parsed</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+
+    <span class="c1"># Group by time (datetime.datetime from decompose), then by subdomain.</span>
+    <span class="c1"># Each delayed task processes one timestep, keeping the outer graph at O(n_time).</span>
+    <span class="n">grouped_by_time</span><span class="p">:</span> <span class="n">DefaultDict</span><span class="p">[</span><span class="n">Any</span><span class="p">,</span> <span class="n">DefaultDict</span><span class="p">[</span><span class="n">Any</span><span class="p">,</span> <span class="nb">list</span><span class="p">]]</span> <span class="o">=</span> <span class="n">defaultdict</span><span class="p">(</span>
+        <span class="k">lambda</span><span class="p">:</span> <span class="n">defaultdict</span><span class="p">(</span><span class="nb">list</span><span class="p">)</span>
+    <span class="p">)</span>
+
+    <span class="k">for</span> <span class="n">match</span><span class="p">,</span> <span class="n">p</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">parsed</span><span class="p">,</span> <span class="n">paths</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">has_time</span><span class="p">:</span>
+            <span class="n">time_key</span> <span class="o">=</span> <span class="n">match</span><span class="p">[</span><span class="s2">&quot;time&quot;</span><span class="p">]</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="c1"># Work around for files without time dimension</span>
+            <span class="c1"># (imod.util.time._convert_datetimes special-cases this string)</span>
+            <span class="n">time_key</span> <span class="o">=</span> <span class="s2">&quot;steady-state&quot;</span>
+        <span class="n">grouped_by_time</span><span class="p">[</span><span class="n">time_key</span><span class="p">][</span><span class="n">match</span><span class="p">[</span><span class="s2">&quot;subdomain&quot;</span><span class="p">]]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">p</span><span class="p">)</span>
+
+    <span class="c1"># Sort and convert times before calling _merge_subdomains so that</span>
+    <span class="c1"># use_cftime is already correct when the template is built.</span>
+    <span class="n">raw_times_sorted</span> <span class="o">=</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">grouped_by_time</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span>
+    <span class="n">converted_times</span><span class="p">,</span> <span class="n">use_cftime</span> <span class="o">=</span> <span class="n">imod</span><span class="o">.</span><span class="n">util</span><span class="o">.</span><span class="n">time</span><span class="o">.</span><span class="n">_convert_datetimes</span><span class="p">(</span>
+        <span class="n">raw_times_sorted</span><span class="p">,</span> <span class="n">use_cftime</span>
+    <span class="p">)</span>
+
+    <span class="c1"># Call _merge_subdomains eagerly for the first timestep to obtain a</span>
+    <span class="c1"># coordinate template. No data is computed — only the coordinate arrays</span>
+    <span class="c1"># (which are numpy) are used; the dask data array is discarded.</span>
+    <span class="n">first_time_key</span> <span class="o">=</span> <span class="n">raw_times_sorted</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+    <span class="n">template</span> <span class="o">=</span> <span class="n">_merge_subdomains_to_dataarray</span><span class="p">(</span>
+        <span class="n">grouped_by_time</span><span class="p">[</span><span class="n">first_time_key</span><span class="p">],</span> <span class="n">use_cftime</span><span class="p">,</span> <span class="n">pattern</span>
+    <span class="p">)</span>
+
+    <span class="n">shape</span> <span class="o">=</span> <span class="n">template</span><span class="o">.</span><span class="n">shape</span>  <span class="c1"># e.g. (1, nlayer, nrow, ncol)</span>
+    <span class="n">dims</span> <span class="o">=</span> <span class="n">template</span><span class="o">.</span><span class="n">dims</span>  <span class="c1"># e.g. (&quot;time&quot;, &quot;layer&quot;, &quot;y&quot;, &quot;x&quot;)</span>
+    <span class="n">dtype</span> <span class="o">=</span> <span class="n">template</span><span class="o">.</span><span class="n">dtype</span>
+    <span class="k">if</span> <span class="n">has_time</span><span class="p">:</span>
+        <span class="n">time_axis</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">dims</span><span class="p">)</span><span class="o">.</span><span class="n">index</span><span class="p">(</span><span class="s2">&quot;time&quot;</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">time_axis</span> <span class="o">=</span> <span class="o">-</span><span class="mi">1</span>  <span class="c1"># steady-state, no time dimension</span>
+
+    <span class="c1"># Delayed tasks for each timestep, which will be concatenated into a single</span>
+    <span class="c1"># dask array. One delayed task per timestep → outer graph depth 3, O(n_time)</span>
+    <span class="c1"># tasks</span>
+    <span class="n">merged</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">for</span> <span class="n">time_key</span> <span class="ow">in</span> <span class="n">raw_times_sorted</span><span class="p">:</span>
+        <span class="n">group</span> <span class="o">=</span> <span class="n">grouped_by_time</span><span class="p">[</span><span class="n">time_key</span><span class="p">]</span>
+        <span class="n">timestep_data</span> <span class="o">=</span> <span class="n">dask</span><span class="o">.</span><span class="n">delayed</span><span class="p">(</span><span class="n">_merge_subdomains_values</span><span class="p">)(</span>
+            <span class="n">group</span><span class="p">,</span> <span class="n">use_cftime</span><span class="p">,</span> <span class="n">pattern</span>
         <span class="p">)</span>
+        <span class="n">merged</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">dask</span><span class="o">.</span><span class="n">array</span><span class="o">.</span><span class="n">from_delayed</span><span class="p">(</span><span class="n">timestep_data</span><span class="p">,</span> <span class="n">shape</span><span class="o">=</span><span class="n">shape</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">dtype</span><span class="p">))</span>
+    <span class="n">data</span> <span class="o">=</span> <span class="n">dask</span><span class="o">.</span><span class="n">array</span><span class="o">.</span><span class="n">concatenate</span><span class="p">(</span><span class="n">merged</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="n">time_axis</span><span class="p">)</span>
 
-    <span class="n">das</span> <span class="o">=</span> <span class="p">[]</span>
-    <span class="k">for</span> <span class="n">pathlist</span> <span class="ow">in</span> <span class="n">grouped</span><span class="o">.</span><span class="n">values</span><span class="p">():</span>
-        <span class="n">da</span> <span class="o">=</span> <span class="nb">open</span><span class="p">(</span><span class="n">pathlist</span><span class="p">,</span> <span class="n">use_cftime</span><span class="o">=</span><span class="n">use_cftime</span><span class="p">,</span> <span class="n">pattern</span><span class="o">=</span><span class="n">pattern</span><span class="p">)</span>
-        <span class="n">da</span> <span class="o">=</span> <span class="n">da</span><span class="o">.</span><span class="n">isel</span><span class="p">(</span><span class="n">subdomain</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">drop</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-        <span class="n">das</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">da</span><span class="p">)</span>
+    <span class="c1"># Build the full time coordinate</span>
+    <span class="n">coords</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="n">template</span><span class="o">.</span><span class="n">coords</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">has_time</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">use_cftime</span><span class="p">:</span>
+            <span class="n">time_coord</span> <span class="o">=</span> <span class="n">xr</span><span class="o">.</span><span class="n">CFTimeIndex</span><span class="p">(</span><span class="n">converted_times</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">time_coord</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">converted_times</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="s2">&quot;datetime64[ns]&quot;</span><span class="p">)</span>
+        <span class="n">coords</span><span class="p">[</span><span class="s2">&quot;time&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">time_coord</span>
 
-    <span class="n">name</span> <span class="o">=</span> <span class="n">das</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">name</span>
-    <span class="k">return</span> <span class="n">merge_partitions</span><span class="p">(</span><span class="n">das</span><span class="p">)[</span><span class="n">name</span><span class="p">]</span>  <span class="c1"># as DataArray for backwards compatibility</span></div>
+    <span class="k">return</span> <span class="n">xr</span><span class="o">.</span><span class="n">DataArray</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">coords</span><span class="p">,</span> <span class="n">dims</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="n">template</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="n">attrs</span><span class="o">=</span><span class="n">template</span><span class="o">.</span><span class="n">attrs</span><span class="p">)</span></div>
 
 
 
@@ -764,34 +888,34 @@
 
     <span class="n">paths</span> <span class="o">=</span> <span class="p">[</span><span class="n">pathlib</span><span class="o">.</span><span class="n">Path</span><span class="p">(</span><span class="n">p</span><span class="p">)</span> <span class="k">for</span> <span class="n">p</span> <span class="ow">in</span> <span class="n">glob</span><span class="o">.</span><span class="n">glob</span><span class="p">(</span><span class="n">globpath</span><span class="p">,</span> <span class="n">recursive</span><span class="o">=</span><span class="kc">True</span><span class="p">)]</span>
 
-    <span class="n">n</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">paths</span><span class="p">)</span>
-    <span class="k">if</span> <span class="n">n</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">paths</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
         <span class="k">raise</span> <span class="ne">FileNotFoundError</span><span class="p">(</span><span class="s2">&quot;Could not find any files matching </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">globpath</span><span class="p">))</span>
     <span class="c1"># group the DataArrays together using their name</span>
     <span class="c1"># note that directory names are ignored, and in case of duplicates, the last one wins</span>
     <span class="n">names</span> <span class="o">=</span> <span class="p">[</span><span class="n">imod</span><span class="o">.</span><span class="n">util</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">decompose</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="n">pattern</span><span class="p">)[</span><span class="s2">&quot;name&quot;</span><span class="p">]</span> <span class="k">for</span> <span class="n">path</span> <span class="ow">in</span> <span class="n">paths</span><span class="p">]</span>
-    <span class="n">unique_names</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">unique</span><span class="p">(</span><span class="n">names</span><span class="p">))</span>
-    <span class="n">d</span> <span class="o">=</span> <span class="p">{}</span>
-    <span class="k">for</span> <span class="n">n</span> <span class="ow">in</span> <span class="n">unique_names</span><span class="p">:</span>
-        <span class="n">d</span><span class="p">[</span><span class="n">n</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>  <span class="c1"># prepare empty lists to append to</span>
-    <span class="k">for</span> <span class="n">p</span><span class="p">,</span> <span class="n">n</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">paths</span><span class="p">,</span> <span class="n">names</span><span class="p">):</span>
-        <span class="n">d</span><span class="p">[</span><span class="n">n</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">p</span><span class="p">)</span>
-
+    <span class="n">paths_by_name</span> <span class="o">=</span> <span class="p">{</span><span class="n">name</span><span class="p">:</span> <span class="p">[]</span> <span class="k">for</span> <span class="n">name</span> <span class="ow">in</span> <span class="n">np</span><span class="o">.</span><span class="n">unique</span><span class="p">(</span><span class="n">names</span><span class="p">)}</span>
+    <span class="k">for</span> <span class="n">path</span><span class="p">,</span> <span class="n">name</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">paths</span><span class="p">,</span> <span class="n">names</span><span class="p">,</span> <span class="n">strict</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+        <span class="n">paths_by_name</span><span class="p">[</span><span class="n">name</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">path</span><span class="p">)</span>
     <span class="c1"># load each group into a DataArray</span>
-    <span class="n">das</span> <span class="o">=</span> <span class="p">[</span>
-        <span class="n">array_io</span><span class="o">.</span><span class="n">reading</span><span class="o">.</span><span class="n">_load</span><span class="p">(</span><span class="n">v</span><span class="p">,</span> <span class="n">use_cftime</span><span class="p">,</span> <span class="n">pattern</span><span class="p">,</span> <span class="n">_read</span><span class="p">,</span> <span class="n">header</span><span class="p">)</span>
-        <span class="k">for</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">d</span><span class="o">.</span><span class="n">values</span><span class="p">()</span>
+    <span class="n">dataarrays</span> <span class="o">=</span> <span class="p">[</span>
+        <span class="n">array_io</span><span class="o">.</span><span class="n">reading</span><span class="o">.</span><span class="n">_load</span><span class="p">(</span>
+            <span class="n">grouped_paths</span><span class="p">,</span>
+            <span class="n">use_cftime</span><span class="p">,</span>
+            <span class="n">_read</span><span class="p">,</span>
+            <span class="p">[</span><span class="n">header</span><span class="p">(</span><span class="n">p</span><span class="p">,</span> <span class="n">pattern</span><span class="p">)</span> <span class="k">for</span> <span class="n">p</span> <span class="ow">in</span> <span class="n">grouped_paths</span><span class="p">],</span>
+        <span class="p">)</span>
+        <span class="k">for</span> <span class="n">grouped_paths</span> <span class="ow">in</span> <span class="n">paths_by_name</span><span class="o">.</span><span class="n">values</span><span class="p">()</span>
     <span class="p">]</span>
 
-    <span class="c1"># store each DataArray under it&#39;s own name in a dictionary</span>
-    <span class="n">dd</span> <span class="o">=</span> <span class="p">{</span><span class="n">da</span><span class="o">.</span><span class="n">name</span><span class="p">:</span> <span class="n">da</span> <span class="k">for</span> <span class="n">da</span> <span class="ow">in</span> <span class="n">das</span><span class="p">}</span>
+    <span class="c1"># store each DataArray under its own name in a dictionary</span>
+    <span class="n">dataset_dict</span> <span class="o">=</span> <span class="p">{</span><span class="n">da</span><span class="o">.</span><span class="n">name</span><span class="p">:</span> <span class="n">da</span> <span class="k">for</span> <span class="n">da</span> <span class="ow">in</span> <span class="n">dataarrays</span><span class="p">}</span>
     <span class="c1"># Initially I wanted to return a xarray Dataset here,</span>
     <span class="c1"># but then realised that it is not always aligned, and therefore not possible, see</span>
     <span class="c1"># https://github.com/pydata/xarray/issues/1471#issuecomment-313719395</span>
     <span class="c1"># It is not aligned when some parameters only have a non empty subset of a dimension,</span>
     <span class="c1"># such as L2 + L3. This dict provides a similar interface anyway. If a Dataset is constructed</span>
     <span class="c1"># from unaligned DataArrays it will make copies of the data, which we don&#39;t want.</span>
-    <span class="k">return</span> <span class="n">dd</span></div>
+    <span class="k">return</span> <span class="n">dataset_dict</span></div>
 
 
 
@@ -1061,8 +1185,8 @@
   </div>
   
   <!-- Scripts loaded after <body> so the DOM is not blocked -->
-  <script defer src="../../../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf"></script>
-<script defer src="../../../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf"></script>
+  <script defer src="../../../_static/scripts/bootstrap.js?digest=90905a2f556bf617f1a9"></script>
+<script defer src="../../../_static/scripts/pydata-sphinx-theme.js?digest=90905a2f556bf617f1a9"></script>
 
   <footer class="bd-footer">
 <div class="bd-footer__inner bd-page-width">
@@ -1082,7 +1206,7 @@
         <div class="footer-item">
 
   <p class="sphinx-version">
-    Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 8.2.3.
+    Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 9.1.0.
     <br/>
   </p>
 </div>
@@ -1096,7 +1220,7 @@
         <div class="footer-item">
 <p class="theme-version">
   <!-- # L10n: Setting the PST URL as an argument as this does not need to be localized -->
-  Built with the <a href="https://pydata-sphinx-theme.readthedocs.io/en/stable/index.html">PyData Sphinx Theme</a> 0.16.1.
+  Built with the <a href="https://pydata-sphinx-theme.readthedocs.io/en/stable/index.html">PyData Sphinx Theme</a> 0.20.0.
 </p></div>
       
     </div>

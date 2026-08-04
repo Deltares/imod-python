@@ -233,7 +233,7 @@ An important feature of every geometry is its geometry type:
     74    Polygon
     75    Polygon
     76    Polygon
-    Length: 77, dtype: object
+    Length: 77, dtype: str
 
 
 
@@ -287,7 +287,7 @@ As expected, the points are of the type ... Point:
     27    Point
     28    Point
     29    Point
-    dtype: object
+    dtype: str
 
 
 
@@ -347,7 +347,7 @@ They can be easily stored into more modern formats as well, such as
 
  .. code-block:: none
 
-    C:\buildagent\work\4b9080cbb3354582\imod-python\.pixi\envs\default\Lib\site-packages\pyogrio\geopandas.py:662: UserWarning: 'crs' was not provided.  The output dataset will not have projection information defined and may not be usable in other systems.
+    C:\pixi_envs\imod-python-1825887385235446013\envs\default\Lib\site-packages\pyogrio\geopandas.py:662: UserWarning: 'crs' was not provided.  The output dataset will not have projection information defined and may not be usable in other systems.
       write(
     lake
     points.gpkg
@@ -671,6 +671,7 @@ number and a resistance value.
       min-width: 300px;
       max-width: 700px;
       line-height: 1.6;
+      padding-bottom: 4px;
     }
 
     .xr-text-repr-fallback {
@@ -681,8 +682,11 @@ number and a resistance value.
     .xr-header {
       padding-top: 6px;
       padding-bottom: 6px;
-      margin-bottom: 4px;
+    }
+
+    .xr-header {
       border-bottom: solid 1px var(--xr-border-color);
+      margin-bottom: 4px;
     }
 
     .xr-header > div,
@@ -693,20 +697,15 @@ number and a resistance value.
     }
 
     .xr-obj-type,
-    .xr-obj-name,
-    .xr-group-name {
+    .xr-obj-name {
       margin-left: 2px;
       margin-right: 10px;
     }
 
-    .xr-group-name::before {
-      content: "📁";
-      padding-right: 0.3em;
-    }
-
-    .xr-group-name,
-    .xr-obj-type {
+    .xr-obj-type,
+    .xr-group-box-contents > label {
       color: var(--xr-font-color2);
+      display: block;
     }
 
     .xr-sections {
@@ -721,28 +720,39 @@ number and a resistance value.
       display: contents;
     }
 
-    .xr-section-item input {
-      display: inline-block;
+    .xr-section-item > input,
+    .xr-group-box-contents > input,
+    .xr-array-wrap > input {
+      display: block;
       opacity: 0;
       height: 0;
       margin: 0;
     }
 
-    .xr-section-item input + label {
+    .xr-section-item > input + label,
+    .xr-var-item > input + label {
       color: var(--xr-disabled-color);
-      border: 2px solid transparent !important;
     }
 
-    .xr-section-item input:enabled + label {
+    .xr-section-item > input:enabled + label,
+    .xr-var-item > input:enabled + label,
+    .xr-array-wrap > input:enabled + label,
+    .xr-group-box-contents > input:enabled + label {
       cursor: pointer;
       color: var(--xr-font-color2);
     }
 
-    .xr-section-item input:focus + label {
-      border: 2px solid var(--xr-font-color0) !important;
+    .xr-section-item > input:focus-visible + label,
+    .xr-var-item > input:focus-visible + label,
+    .xr-array-wrap > input:focus-visible + label,
+    .xr-group-box-contents > input:focus-visible + label {
+      outline: auto;
     }
 
-    .xr-section-item input:enabled + label:hover {
+    .xr-section-item > input:enabled + label:hover,
+    .xr-var-item > input:enabled + label:hover,
+    .xr-array-wrap > input:enabled + label:hover,
+    .xr-group-box-contents > input:enabled + label:hover {
       color: var(--xr-font-color0);
     }
 
@@ -750,11 +760,25 @@ number and a resistance value.
       grid-column: 1;
       color: var(--xr-font-color2);
       font-weight: 500;
+      white-space: nowrap;
+    }
+
+    .xr-section-summary > em {
+      font-weight: normal;
+    }
+
+    .xr-span-grid {
+      grid-column-end: -1;
     }
 
     .xr-section-summary > span {
       display: inline-block;
-      padding-left: 0.5em;
+      padding-left: 0.3em;
+    }
+
+    .xr-group-box-contents > input:checked + label > span {
+      display: inline-block;
+      padding-left: 0.6em;
     }
 
     .xr-section-summary-in:disabled + label {
@@ -782,7 +806,8 @@ number and a resistance value.
     }
 
     .xr-section-summary,
-    .xr-section-inline-details {
+    .xr-section-inline-details,
+    .xr-group-box-contents > label {
       padding-top: 4px;
     }
 
@@ -791,20 +816,29 @@ number and a resistance value.
     }
 
     .xr-section-details {
-      display: none;
       grid-column: 1 / -1;
       margin-top: 4px;
       margin-bottom: 5px;
+    }
+
+    .xr-section-summary-in ~ .xr-section-details {
+      display: none;
     }
 
     .xr-section-summary-in:checked ~ .xr-section-details {
       display: contents;
     }
 
+    .xr-children {
+      display: inline-grid;
+      grid-template-columns: 100%;
+      grid-column: 1 / -1;
+      padding-top: 4px;
+    }
+
     .xr-group-box {
       display: inline-grid;
-      grid-template-columns: 0px 20px auto;
-      width: 100%;
+      grid-template-columns: 0px 30px auto;
     }
 
     .xr-group-box-vline {
@@ -818,13 +852,43 @@ number and a resistance value.
       grid-column-start: 2;
       grid-row-start: 1;
       height: 1em;
-      width: 20px;
+      width: 26px;
       border-bottom: 0.2em solid;
       border-color: var(--xr-border-color);
     }
 
     .xr-group-box-contents {
       grid-column-start: 3;
+      padding-bottom: 4px;
+    }
+
+    .xr-group-box-contents > label::before {
+      content: "📂";
+      padding-right: 0.3em;
+    }
+
+    .xr-group-box-contents > input:checked + label::before {
+      content: "📁";
+    }
+
+    .xr-group-box-contents > input:checked + label {
+      padding-bottom: 0px;
+    }
+
+    .xr-group-box-contents > input:checked ~ .xr-sections {
+      display: none;
+    }
+
+    .xr-group-box-contents > input + label > span {
+      display: none;
+    }
+
+    .xr-group-box-ellipsis {
+      font-size: 1.4em;
+      font-weight: 900;
+      color: var(--xr-font-color2);
+      letter-spacing: 0.15em;
+      cursor: default;
     }
 
     .xr-array-wrap {
@@ -1062,7 +1126,7 @@ number and a resistance value.
         print_input  bool 1B False
         resistance   (index) float64 8B 100.0
         layer        (index) int64 8B 1
-        geometry     (index) geometry 8B LINESTRING (90000 450000, 91000 451000, ...</pre><div class='xr-wrap' style='display:none'><div class='xr-header'><div class='xr-obj-type'>xarray.Dataset</div></div><ul class='xr-sections'><li class='xr-section-item'><input id='section-fc1f79f0-f2e1-428f-86aa-4515f8da1611' class='xr-section-summary-in' type='checkbox' disabled ><label for='section-fc1f79f0-f2e1-428f-86aa-4515f8da1611' class='xr-section-summary'  title='Expand/collapse section'>Dimensions:</label><div class='xr-section-inline-details'><ul class='xr-dim-list'><li><span class='xr-has-index'>index</span>: 1</li></ul></div><div class='xr-section-details'></div></li><li class='xr-section-item'><input id='section-b9ef3f1f-9b13-45b8-acdb-2e696448133f' class='xr-section-summary-in' type='checkbox'  checked><label for='section-b9ef3f1f-9b13-45b8-acdb-2e696448133f' class='xr-section-summary' >Coordinates: <span>(1)</span></label><div class='xr-section-inline-details'></div><div class='xr-section-details'><ul class='xr-var-list'><li class='xr-var-item'><div class='xr-var-name'><span class='xr-has-index'>index</span></div><div class='xr-var-dims'>(index)</div><div class='xr-var-dtype'>int64</div><div class='xr-var-preview xr-preview'>0</div><input id='attrs-bf055b42-15e8-4516-8c41-9d37533bbfc1' class='xr-var-attrs-in' type='checkbox' disabled><label for='attrs-bf055b42-15e8-4516-8c41-9d37533bbfc1' title='Show/Hide attributes'><svg class='icon xr-icon-file-text2'><use xlink:href='#icon-file-text2'></use></svg></label><input id='data-00f67c16-4edc-4743-b433-fb6e5662ddd6' class='xr-var-data-in' type='checkbox'><label for='data-00f67c16-4edc-4743-b433-fb6e5662ddd6' title='Show/Hide data repr'><svg class='icon xr-icon-database'><use xlink:href='#icon-database'></use></svg></label><div class='xr-var-attrs'><dl class='xr-attrs'></dl></div><div class='xr-var-data'><pre>[1 values with dtype=int64]</pre></div></li></ul></div></li><li class='xr-section-item'><input id='section-114c1f53-0a2d-4d82-bed6-9304af98602c' class='xr-section-summary-in' type='checkbox'  checked><label for='section-114c1f53-0a2d-4d82-bed6-9304af98602c' class='xr-section-summary' >Data variables: <span>(4)</span></label><div class='xr-section-inline-details'></div><div class='xr-section-details'><ul class='xr-var-list'><li class='xr-var-item'><div class='xr-var-name'><span>print_input</span></div><div class='xr-var-dims'>()</div><div class='xr-var-dtype'>bool</div><div class='xr-var-preview xr-preview'>False</div><input id='attrs-80ef2eb0-06c1-45ba-80cb-d235dfe3bf9f' class='xr-var-attrs-in' type='checkbox' disabled><label for='attrs-80ef2eb0-06c1-45ba-80cb-d235dfe3bf9f' title='Show/Hide attributes'><svg class='icon xr-icon-file-text2'><use xlink:href='#icon-file-text2'></use></svg></label><input id='data-09249d7a-c5c3-4251-b8dd-5f5319e954aa' class='xr-var-data-in' type='checkbox'><label for='data-09249d7a-c5c3-4251-b8dd-5f5319e954aa' title='Show/Hide data repr'><svg class='icon xr-icon-database'><use xlink:href='#icon-database'></use></svg></label><div class='xr-var-attrs'><dl class='xr-attrs'></dl></div><div class='xr-var-data'><pre>array(False)</pre></div></li><li class='xr-var-item'><div class='xr-var-name'><span>resistance</span></div><div class='xr-var-dims'>(index)</div><div class='xr-var-dtype'>float64</div><div class='xr-var-preview xr-preview'>100.0</div><input id='attrs-b4c8835d-cab9-4d60-b929-6e67dbef6bf5' class='xr-var-attrs-in' type='checkbox' disabled><label for='attrs-b4c8835d-cab9-4d60-b929-6e67dbef6bf5' title='Show/Hide attributes'><svg class='icon xr-icon-file-text2'><use xlink:href='#icon-file-text2'></use></svg></label><input id='data-c5479f34-b648-43ed-9993-f0f789bfd3dd' class='xr-var-data-in' type='checkbox'><label for='data-c5479f34-b648-43ed-9993-f0f789bfd3dd' title='Show/Hide data repr'><svg class='icon xr-icon-database'><use xlink:href='#icon-database'></use></svg></label><div class='xr-var-attrs'><dl class='xr-attrs'></dl></div><div class='xr-var-data'><pre>array([100.])</pre></div></li><li class='xr-var-item'><div class='xr-var-name'><span>layer</span></div><div class='xr-var-dims'>(index)</div><div class='xr-var-dtype'>int64</div><div class='xr-var-preview xr-preview'>1</div><input id='attrs-8ef062c9-e5cd-4333-9c28-c619a896e14b' class='xr-var-attrs-in' type='checkbox' disabled><label for='attrs-8ef062c9-e5cd-4333-9c28-c619a896e14b' title='Show/Hide attributes'><svg class='icon xr-icon-file-text2'><use xlink:href='#icon-file-text2'></use></svg></label><input id='data-6245b5b8-76c4-44b5-a1bc-6ab92a392c80' class='xr-var-data-in' type='checkbox'><label for='data-6245b5b8-76c4-44b5-a1bc-6ab92a392c80' title='Show/Hide data repr'><svg class='icon xr-icon-database'><use xlink:href='#icon-database'></use></svg></label><div class='xr-var-attrs'><dl class='xr-attrs'></dl></div><div class='xr-var-data'><pre>array([1])</pre></div></li><li class='xr-var-item'><div class='xr-var-name'><span>geometry</span></div><div class='xr-var-dims'>(index)</div><div class='xr-var-dtype'>geometry</div><div class='xr-var-preview xr-preview'>LINESTRING (90000 450000, 91000 ...</div><input id='attrs-e1e6cc3e-2049-422c-8fa9-290f75f623e8' class='xr-var-attrs-in' type='checkbox' disabled><label for='attrs-e1e6cc3e-2049-422c-8fa9-290f75f623e8' title='Show/Hide attributes'><svg class='icon xr-icon-file-text2'><use xlink:href='#icon-file-text2'></use></svg></label><input id='data-cbc0290f-b627-4772-9dcc-51719fed0711' class='xr-var-data-in' type='checkbox'><label for='data-cbc0290f-b627-4772-9dcc-51719fed0711' title='Show/Hide data repr'><svg class='icon xr-icon-database'><use xlink:href='#icon-database'></use></svg></label><div class='xr-var-attrs'><dl class='xr-attrs'></dl></div><div class='xr-var-data'><pre>&lt;GeometryArray&gt;
+        geometry     (index) geometry 8B LINESTRING (90000 450000, 91000 451000, ...</pre><div class='xr-wrap' style='display:none'><div class='xr-header'><div class='xr-obj-type'>xarray.Dataset</div></div><ul class='xr-sections'><li class='xr-section-item'><input id='section-f3a4a316-a87b-4191-87ec-bf5b2bb9d3d3' class='xr-section-summary-in' type='checkbox' disabled /><label for='section-f3a4a316-a87b-4191-87ec-bf5b2bb9d3d3' class='xr-section-summary'>Dimensions:</label><div class='xr-section-inline-details'><ul class='xr-dim-list'><li><span class='xr-has-index'>index</span>: 1</li></ul></div></li><li class='xr-section-item'><input id='section-84cb0f97-0474-4b5a-ba6e-0e82fcf080c2' class='xr-section-summary-in' type='checkbox' checked /><label for='section-84cb0f97-0474-4b5a-ba6e-0e82fcf080c2' class='xr-section-summary' title='Expand/collapse section'>Coordinates: <span>(1)</span></label><div class='xr-section-inline-details'></div><div class='xr-section-details'><ul class='xr-var-list'><li class='xr-var-item'><div class='xr-var-name'><span class='xr-has-index'>index</span></div><div class='xr-var-dims'>(index)</div><div class='xr-var-dtype'>int64</div><div class='xr-var-preview xr-preview'>0</div><input id='attrs-844cdd06-7779-4b65-94e2-f4bf65b4da64' class='xr-var-attrs-in' type='checkbox' disabled><label for='attrs-844cdd06-7779-4b65-94e2-f4bf65b4da64' title='Show/Hide attributes'><svg class='icon xr-icon-file-text2'><use xlink:href='#icon-file-text2'></use></svg></label><input id='data-084d3bcb-85c4-4541-9978-82bc76c66c23' class='xr-var-data-in' type='checkbox'><label for='data-084d3bcb-85c4-4541-9978-82bc76c66c23' title='Show/Hide data repr'><svg class='icon xr-icon-database'><use xlink:href='#icon-database'></use></svg></label><div class='xr-var-attrs'><dl class='xr-attrs'></dl></div><div class='xr-var-data'><pre>[1 values with dtype=int64]</pre></div></li></ul></div></li><li class='xr-section-item'><input id='section-8720563b-0be9-430c-9a29-c02a6fad4553' class='xr-section-summary-in' type='checkbox' checked /><label for='section-8720563b-0be9-430c-9a29-c02a6fad4553' class='xr-section-summary' title='Expand/collapse section'>Data variables: <span>(4)</span></label><div class='xr-section-inline-details'></div><div class='xr-section-details'><ul class='xr-var-list'><li class='xr-var-item'><div class='xr-var-name'><span>print_input</span></div><div class='xr-var-dims'>()</div><div class='xr-var-dtype'>bool</div><div class='xr-var-preview xr-preview'>False</div><input id='attrs-549abc5f-d4c5-46fc-bb07-9368a89d8abd' class='xr-var-attrs-in' type='checkbox' disabled><label for='attrs-549abc5f-d4c5-46fc-bb07-9368a89d8abd' title='Show/Hide attributes'><svg class='icon xr-icon-file-text2'><use xlink:href='#icon-file-text2'></use></svg></label><input id='data-ee01c065-763f-4fbd-8d28-771d0c3c0db9' class='xr-var-data-in' type='checkbox'><label for='data-ee01c065-763f-4fbd-8d28-771d0c3c0db9' title='Show/Hide data repr'><svg class='icon xr-icon-database'><use xlink:href='#icon-database'></use></svg></label><div class='xr-var-attrs'><dl class='xr-attrs'></dl></div><div class='xr-var-data'><pre>array(False)</pre></div></li><li class='xr-var-item'><div class='xr-var-name'><span>resistance</span></div><div class='xr-var-dims'>(index)</div><div class='xr-var-dtype'>float64</div><div class='xr-var-preview xr-preview'>100.0</div><input id='attrs-b74413a6-4d26-4792-97dc-fc07107f4231' class='xr-var-attrs-in' type='checkbox' disabled><label for='attrs-b74413a6-4d26-4792-97dc-fc07107f4231' title='Show/Hide attributes'><svg class='icon xr-icon-file-text2'><use xlink:href='#icon-file-text2'></use></svg></label><input id='data-8736d17e-e14c-4c2b-930c-b492555c828c' class='xr-var-data-in' type='checkbox'><label for='data-8736d17e-e14c-4c2b-930c-b492555c828c' title='Show/Hide data repr'><svg class='icon xr-icon-database'><use xlink:href='#icon-database'></use></svg></label><div class='xr-var-attrs'><dl class='xr-attrs'></dl></div><div class='xr-var-data'><pre>array([100.])</pre></div></li><li class='xr-var-item'><div class='xr-var-name'><span>layer</span></div><div class='xr-var-dims'>(index)</div><div class='xr-var-dtype'>int64</div><div class='xr-var-preview xr-preview'>1</div><input id='attrs-91ab6757-28fd-46a5-8f74-e08d019fff9a' class='xr-var-attrs-in' type='checkbox' disabled><label for='attrs-91ab6757-28fd-46a5-8f74-e08d019fff9a' title='Show/Hide attributes'><svg class='icon xr-icon-file-text2'><use xlink:href='#icon-file-text2'></use></svg></label><input id='data-d3169ac3-eba9-4b6b-b8be-247eaa3c3aeb' class='xr-var-data-in' type='checkbox'><label for='data-d3169ac3-eba9-4b6b-b8be-247eaa3c3aeb' title='Show/Hide data repr'><svg class='icon xr-icon-database'><use xlink:href='#icon-database'></use></svg></label><div class='xr-var-attrs'><dl class='xr-attrs'></dl></div><div class='xr-var-data'><pre>array([1])</pre></div></li><li class='xr-var-item'><div class='xr-var-name'><span>geometry</span></div><div class='xr-var-dims'>(index)</div><div class='xr-var-dtype'>geometry</div><div class='xr-var-preview xr-preview'>LINESTRING (90000 450000, 91000 ...</div><input id='attrs-34ed89be-8760-4447-b828-07f6cf550519' class='xr-var-attrs-in' type='checkbox' disabled><label for='attrs-34ed89be-8760-4447-b828-07f6cf550519' title='Show/Hide attributes'><svg class='icon xr-icon-file-text2'><use xlink:href='#icon-file-text2'></use></svg></label><input id='data-100fa454-a3b3-48ca-8dfe-7f0bff02c2f3' class='xr-var-data-in' type='checkbox'><label for='data-100fa454-a3b3-48ca-8dfe-7f0bff02c2f3' title='Show/Hide data repr'><svg class='icon xr-icon-database'><use xlink:href='#icon-database'></use></svg></label><div class='xr-var-attrs'><dl class='xr-attrs'></dl></div><div class='xr-var-data'><pre>&lt;GeometryArray&gt;
     [&lt;LINESTRING (90000 450000, 91000 451000, 92000 452000, 93000 453000, 94000 4...&gt;]
     Length: 1, dtype: geometry</pre></div></li></ul></div></li></ul></div></div>
     </div>
@@ -1143,7 +1207,7 @@ the data as a geodataframe again use the line_data property:
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** (0 minutes 1.687 seconds)
+   **Total running time of the script:** (0 minutes 1.670 seconds)
 
 
 .. _sphx_glr_download_user-guide_02-vector-data.py:

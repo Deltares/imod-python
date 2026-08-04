@@ -1,0 +1,6 @@
+﻿imod.msw.MetaSwapModel.mask\_all\_packages
+==========================================
+
+.. currentmodule:: imod.msw
+
+.. automethod:: MetaSwapModel.mask_all_packages

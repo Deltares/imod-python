@@ -15,9 +15,11 @@
    
       ~EvapotranspirationMapping.__init__
       ~EvapotranspirationMapping.clip_box
+      ~EvapotranspirationMapping.from_file
       ~EvapotranspirationMapping.from_imod5_data
       ~EvapotranspirationMapping.get_regrid_methods
       ~EvapotranspirationMapping.regrid_like
+      ~EvapotranspirationMapping.to_file
       ~EvapotranspirationMapping.write
    
    

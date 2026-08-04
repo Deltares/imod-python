@@ -43,6 +43,10 @@ structures. Secondly, it will demonstrate how a modeling workflow is set up.
 .. _geopandas: http://geopandas.org
 
 
+.. raw:: html
+
+  <div id='sg-tag-list' class='sphx-glr-tag-list'></div>
+
 
 .. raw:: html
 
@@ -59,7 +63,7 @@ structures. Secondly, it will demonstrate how a modeling workflow is set up.
   .. image:: /user-guide/images/thumb/sphx_glr_00-index-examples_thumb.png
     :alt:
 
-  :ref:`sphx_glr_user-guide_00-index-examples.py`
+  :doc:`/user-guide/00-index-examples`
 
 .. raw:: html
 
@@ -76,7 +80,7 @@ structures. Secondly, it will demonstrate how a modeling workflow is set up.
   .. image:: /user-guide/images/thumb/sphx_glr_01-raster-data_thumb.png
     :alt:
 
-  :ref:`sphx_glr_user-guide_01-raster-data.py`
+  :doc:`/user-guide/01-raster-data`
 
 .. raw:: html
 
@@ -93,7 +97,7 @@ structures. Secondly, it will demonstrate how a modeling workflow is set up.
   .. image:: /user-guide/images/thumb/sphx_glr_02-vector-data_thumb.png
     :alt:
 
-  :ref:`sphx_glr_user-guide_02-vector-data.py`
+  :doc:`/user-guide/02-vector-data`
 
 .. raw:: html
 
@@ -110,7 +114,7 @@ structures. Secondly, it will demonstrate how a modeling workflow is set up.
   .. image:: /user-guide/images/thumb/sphx_glr_03-timeseries-data_thumb.png
     :alt:
 
-  :ref:`sphx_glr_user-guide_03-timeseries-data.py`
+  :doc:`/user-guide/03-timeseries-data`
 
 .. raw:: html
 
@@ -124,10 +128,10 @@ structures. Secondly, it will demonstrate how a modeling workflow is set up.
 
 .. only:: html
 
-  .. image:: /user-guide/images/thumb/sphx_glr_05-unstructured-grids_thumb.png
+  .. image:: /user-guide/images/thumb/sphx_glr_04-unstructured-grids_thumb.png
     :alt:
 
-  :ref:`sphx_glr_user-guide_05-unstructured-grids.py`
+  :doc:`/user-guide/04-unstructured-grids`
 
 .. raw:: html
 
@@ -141,10 +145,10 @@ structures. Secondly, it will demonstrate how a modeling workflow is set up.
 
 .. only:: html
 
-  .. image:: /user-guide/images/thumb/sphx_glr_06-lazy-evaluation_thumb.png
+  .. image:: /user-guide/images/thumb/sphx_glr_05-lazy-evaluation_thumb.png
     :alt:
 
-  :ref:`sphx_glr_user-guide_06-lazy-evaluation.py`
+  :doc:`/user-guide/05-lazy-evaluation`
 
 .. raw:: html
 
@@ -158,10 +162,10 @@ structures. Secondly, it will demonstrate how a modeling workflow is set up.
 
 .. only:: html
 
-  .. image:: /user-guide/images/thumb/sphx_glr_07-time-discretization_thumb.png
+  .. image:: /user-guide/images/thumb/sphx_glr_06-time-discretization_thumb.png
     :alt:
 
-  :ref:`sphx_glr_user-guide_07-time-discretization.py`
+  :doc:`/user-guide/06-time-discretization`
 
 .. raw:: html
 
@@ -175,14 +179,31 @@ structures. Secondly, it will demonstrate how a modeling workflow is set up.
 
 .. only:: html
 
-  .. image:: /user-guide/images/thumb/sphx_glr_08-regridding_thumb.png
+  .. image:: /user-guide/images/thumb/sphx_glr_07-regridding_thumb.png
     :alt:
 
-  :ref:`sphx_glr_user-guide_08-regridding.py`
+  :doc:`/user-guide/07-regridding`
 
 .. raw:: html
 
       <div class="sphx-glr-thumbnail-title">Regridding</div>
+    </div>
+
+
+.. raw:: html
+
+    <div class="sphx-glr-thumbcontainer" tooltip="iMOD Python provides two grid-agnostic well classes: imod.mf6.Well and imod.mf6.LayeredWell to build MODFLOW 6 well package input.">
+
+.. only:: html
+
+  .. image:: /user-guide/images/thumb/sphx_glr_08-assign-wells_thumb.png
+    :alt:
+
+  :doc:`/user-guide/08-assign-wells`
+
+.. raw:: html
+
+      <div class="sphx-glr-thumbnail-title">Assigning Wells to Model Layers</div>
     </div>
 
 
@@ -195,7 +216,7 @@ structures. Secondly, it will demonstrate how a modeling workflow is set up.
   .. image:: /user-guide/images/thumb/sphx_glr_09-topsystem_thumb.png
     :alt:
 
-  :ref:`sphx_glr_user-guide_09-topsystem.py`
+  :doc:`/user-guide/09-topsystem`
 
 .. raw:: html
 
@@ -212,7 +233,7 @@ structures. Secondly, it will demonstrate how a modeling workflow is set up.
   .. image:: /user-guide/images/thumb/sphx_glr_10-cleanup_thumb.png
     :alt:
 
-  :ref:`sphx_glr_user-guide_10-cleanup.py`
+  :doc:`/user-guide/10-cleanup`
 
 .. raw:: html
 
@@ -229,7 +250,7 @@ structures. Secondly, it will demonstrate how a modeling workflow is set up.
   .. image:: /user-guide/images/thumb/sphx_glr_11-imod5-files_thumb.png
     :alt:
 
-  :ref:`sphx_glr_user-guide_11-imod5-files.py`
+  :doc:`/user-guide/11-imod5-files`
 
 .. raw:: html
 
@@ -246,11 +267,28 @@ structures. Secondly, it will demonstrate how a modeling workflow is set up.
   .. image:: /user-guide/images/thumb/sphx_glr_12-imod5-model-to-modflow6_thumb.png
     :alt:
 
-  :ref:`sphx_glr_user-guide_12-imod5-model-to-modflow6.py`
+  :doc:`/user-guide/12-imod5-model-to-modflow6`
 
 .. raw:: html
 
       <div class="sphx-glr-thumbnail-title">Working with iMOD5 models in MODFLOW 6</div>
+    </div>
+
+
+.. raw:: html
+
+    <div class="sphx-glr-thumbcontainer" tooltip="iMOD Python supports logging through both the standard Python logging framework and Loguru, so that you can choose whichever best fits your needs and project. By default, logging is silent, so messages are only output once a logger is configured.">
+
+.. only:: html
+
+  .. image:: /user-guide/images/thumb/sphx_glr_13-logging_thumb.png
+    :alt:
+
+  :doc:`/user-guide/13-logging`
+
+.. raw:: html
+
+      <div class="sphx-glr-thumbnail-title">Logging in iMOD Python</div>
     </div>
 
 
@@ -268,14 +306,16 @@ structures. Secondly, it will demonstrate how a modeling workflow is set up.
    /user-guide/01-raster-data
    /user-guide/02-vector-data
    /user-guide/03-timeseries-data
-   /user-guide/05-unstructured-grids
-   /user-guide/06-lazy-evaluation
-   /user-guide/07-time-discretization
-   /user-guide/08-regridding
+   /user-guide/04-unstructured-grids
+   /user-guide/05-lazy-evaluation
+   /user-guide/06-time-discretization
+   /user-guide/07-regridding
+   /user-guide/08-assign-wells
    /user-guide/09-topsystem
    /user-guide/10-cleanup
    /user-guide/11-imod5-files
    /user-guide/12-imod5-model-to-modflow6
+   /user-guide/13-logging
 
 
 .. only:: html
