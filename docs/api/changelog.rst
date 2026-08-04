@@ -20,10 +20,16 @@ Added
 - Added :meth:`imod.msw.MetaSwapModel.split` to split MetaSWAP models.
 - Added :meth:`imod.mf6.HorizontalFlowBarrierResistance.from_imod5_data` to load
   barriers from 3D GEN files. 
-- Added ``name`` argument to:meth:`imod.mf6.Modflow6Simulation.from_imod5_data`
+- Added ``name`` argument to :meth:`imod.mf6.Modflow6Simulation.from_imod5_data`
   to provide custom name to imported simulation and model.
 - Added :meth:`imod.msw.MetaSwapModel.mask_all_packages` to mask all packages of
   a MetaSWAP model.
+- Added optional ``target_grid`` argument to
+  :meth:`imod.mf6.Modflow6Simulation.from_imod5_data`,
+  :meth:`imod.mf6.GroundwaterFlowModel.from_imod5_data`,
+  :meth:`imod.mf6.StructuredDiscretization.from_imod5_data` to specify a target
+  grid for regridding the iMOD5 data to. If not provided, the first IBOUND layer
+  is used as target grid, like in iMOD5.
 
 Fixed
 ~~~~~
@@ -105,6 +111,11 @@ Changed
   ``proportion_rate``.
 - :meth:`imod.msw.GridData.generate_index_array` is now deprecated, use
   :meth:`imod.msw.GridData.generate_isactive_svat_arrays` instead.
+- If no ``target_grid`` is provided,
+  :meth:`imod.mf6.StructuredDiscretization.from_imod5_data` chooses a grid the
+  same as iMOD5 did: the first IBOUND layer. This is different from previous
+  versions of iMOD Python, which defaulted to the smallest possible extent
+  and finest resolution, based on the iMOD5 IBOUND, TOP and BOTTOM data.
 
 
 [1.0.0] - 2025-11-11
