@@ -4,6 +4,7 @@ import jetbrains.buildServer.configs.kotlin.AbsoluteId
 import jetbrains.buildServer.configs.kotlin.BuildType
 import jetbrains.buildServer.configs.kotlin.Project
 import jetbrains.buildServer.configs.kotlin.buildFeatures.dockerSupport
+import jetbrains.buildServer.configs.kotlin.buildSteps.PowerShellStep
 import jetbrains.buildServer.configs.kotlin.buildSteps.powerShell
 import jetbrains.buildServer.configs.kotlin.triggers.schedule
 
@@ -31,9 +32,14 @@ object UpdateDependencies : BuildType({
         powerShell {
             name = "Update dependencies"
             id = "Update_dependencies"
+            edition = PowerShellStep.Edition.Core
             workingDir = "imod-python"
             scriptMode = script {
                 content = """
+                    # Fail the build when any command returns a non-zero exit code.
+                    ${'$'}ErrorActionPreference = "Stop"
+                    ${'$'}PSNativeCommandUseErrorActionPreference = ${'$'}true
+
                     echo "Create update branch"
                     git remote set-url origin https://%GH_USER%:%env.GH_TOKEN%@github.com/Deltares/imod-python.git
                     git checkout -b pixi_update_%build.counter%
