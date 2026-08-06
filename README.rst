@@ -1,3 +1,7 @@
+.. image:: https://img.shields.io/endpoint?url=https://raw.githubusercontent.com/Deltares/imod-python/master/docs/_static/badge.json
+   :target: https://github.com/Deltares/imod-python
+.. image:: https://img.shields.io/endpoint?url=https://raw.githubusercontent.com/Deltares/imod-python/master/docs/_static/badge_deltares.json
+   :target: https://www.deltares.nl/en
 .. image:: https://dpcbuild.deltares.nl/app/rest/builds/buildType:id:iMOD6_IMODPython_Windows_Tests/statusIcon.svg
    :target: https://github.com/Deltares/imod-python/commits/master/
 .. image:: https://img.shields.io/pypi/l/imod
@@ -16,7 +20,6 @@
    :target: http://mypy-lang.org/
 .. image:: https://img.shields.io/endpoint?url=https://raw.githubusercontent.com/astral-sh/ruff/main/assets/badge/v2.json
    :target: https://github.com/astral-sh/ruff
-
 
 The ``imod`` Python package is an open source project to make working with
 MODFLOW groundwater models in Python easier. It builds on top of popular

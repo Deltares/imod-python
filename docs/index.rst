@@ -1,6 +1,10 @@
 iMOD Python: make massive MODFLOW models
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+.. image:: https://img.shields.io/endpoint?url=https://raw.githubusercontent.com/Deltares/imod-python/master/docs/_static/badge.json
+   :target: https://github.com/Deltares/imod-python
+.. image:: https://img.shields.io/endpoint?url=https://raw.githubusercontent.com/Deltares/imod-python/master/docs/_static/badge_deltares.json
+   :target: https://www.deltares.nl/en
 .. image:: https://dpcbuild.deltares.nl/app/rest/builds/buildType:id:iMOD6_IMODPython_Windows_Tests/statusIcon.svg
    :target: https://github.com/Deltares/imod-python/commits/master/
 .. image:: https://img.shields.io/pypi/l/imod
