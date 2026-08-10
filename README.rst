@@ -7,7 +7,7 @@
 .. image:: https://img.shields.io/pypi/l/imod
    :target: https://choosealicense.com/licenses/mit/
 .. image:: https://img.shields.io/pypi/v/imod.svg
-   :target: https://pypi.python.org/pypi/imod/
+   :target: https://pypi.org/pypi/imod/
 .. image:: https://img.shields.io/conda/vn/conda-forge/imod.svg
    :target: https://github.com/conda-forge/imod-feedstock
 .. image:: https://img.shields.io/badge/Supported%20Python-3.12%20|%203.13%20|%203.14-blue
