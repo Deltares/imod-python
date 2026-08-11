@@ -2,6 +2,7 @@ from datetime import datetime
 
 import numpy as np
 import pandas as pd
+import pytest
 
 from imod.util.expand_repetitions import average_timeseries, resample_timeseries
 
@@ -163,6 +164,28 @@ def test_timeseries_resampling_6():
     pd.testing.assert_frame_equal(
         new_timeseries, expected_timeseries, check_dtype=False
     )
+
+
+@pytest.mark.parametrize("dtype_backend", ["numpy_nullable", "pyarrow"])
+def test_timeseries_resampling_before_start(dtype_backend):
+    """
+    Regression test for assigning the first well location to multiple rows. For
+    good measure, test with both dtype backends.
+    """
+    timeseries = initialize_timeseries(
+        [datetime(1989, 4, 3)],
+        [100.0],
+    ).convert_dtypes(dtype_backend=dtype_backend)
+    # Keep time as NumPy datetime64, as produced by the iMOD5 import workflow.
+    timeseries["time"] = timeseries["time"].astype("datetime64[ns]")
+    new_dates = pd.date_range(datetime(1989, 1, 1), datetime(1989, 4, 3))
+
+    new_timeseries = resample_timeseries(timeseries, new_dates)
+
+    assert len(new_timeseries) == 93
+    assert (new_timeseries.loc[:91, "rate"] == 0.0).all()
+    assert (new_timeseries.loc[:91, "id"] == "ID").all()
+    assert new_timeseries.loc[92, "rate"] == 100.0
 
 
 def test_timeseries_resampling_coarsen_and_refine():
