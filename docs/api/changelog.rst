@@ -6,6 +6,13 @@ All notable changes to this project will be documented in this file.
 The format is based on `Keep a Changelog`_, and this project adheres to
 `Semantic Versioning`_.
 
+[Unreleased]
+------------
+
+- Fixed resampling in :meth:`imod.mf6.Well.from_imod5_data` and
+  :meth:`imod.mf6.LayeredWell.from_imod5_data` when simulation timesteps precede
+  the first well timestep.
+
 [1.1.0] - 2026-08-03
 --------------------
 
@@ -34,8 +41,6 @@ Added
 Fixed
 ~~~~~
 
-- Fixed resampling of Arrow-backed iMOD5 well timeseries when simulation
-  timesteps precede the first well timestep.
 - Fixed bug in :class:`imod.mf6.GroundwaterFlowModel` and :class:`imod.formats.prf.IpfResult` 
   where names of wels were duplicated by increasing the character limit to 40
   and enumerating wel names.
