@@ -1,6 +1,6 @@
 """
 Assigning Wells to Model Layers
-==========
+===============================
 
 iMOD Python provides two grid-agnostic well classes:
 :class:`imod.mf6.Well` and :class:`imod.mf6.LayeredWell`
@@ -62,7 +62,7 @@ geometry = LineString([[238725, 560000], [242000, 563500]])
 
 # %%
 # Create a Well object
-# ------------
+# --------------------
 #
 # Now that we have the model data and well data, we can create a :class:`imod.mf6.Well` object
 # and convert it to a MODFLOW 6 well package input.
@@ -147,7 +147,7 @@ for ax in axes[len(unique_layers) :]:
 
 # %%
 # Create a Layered Well object
-# ------------
+# ----------------------------
 #
 # Now we can follow a similar process to create a :class:`imod.mf6.LayeredWell` object
 # and convert it to a MODFLOW 6 well package input. The process is the similar, except we
