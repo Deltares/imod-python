@@ -117,9 +117,10 @@ def resample_timeseries(
     )
     if time_before_start_input[0]:
         intermediate_df.loc[time_before_start_input, "rate"] = 0.0
-        intermediate_df.loc[time_before_start_input, location_columns] = well_rate.iloc[
-            0
-        ][location_columns].values
+        first_well_location_values = well_rate.iloc[0][location_columns].values
+        intermediate_df.loc[time_before_start_input, location_columns] = (
+            first_well_location_values
+        )
 
     # compute time difference from perious to current row
     time_diff_col = intermediate_df["time"].diff()
