@@ -400,3 +400,18 @@ def test_sprinkling_from_imod5_data__grid(cap_data_sprinkling_grid):
     np.testing.assert_array_equal(
         rural_ds["max_abstraction_surfacewater"].to_numpy(), expected_sw_abstraction
     )
+
+@pytest.mark.unittest_jit
+def test_sprinklingpoints_from_imod5_data__points(cap_data_sprinkling_points):
+    # Arrange
+    expected_vars = {'id2grid_p', 'capacity_p', 'layer_p', 'y_p', 'x_p', 'id_msw'}
+    rate = 25.0 * 0.25 * 1.0e-3
+
+    # Act
+    sprinkling = msw.SprinklingPoints.from_imod5_data(cap_data_sprinkling_points)
+
+    # Assert
+    assert sprinkling.dataset.sizes == {"id": 2, "x": 3, "y": 3}
+    assert set(sprinkling.dataset.keys()) == expected_vars
+
+
