@@ -146,11 +146,11 @@ def cap_data_sprinkling_points() -> Imod5DataDict:
     artificial_rch_type[:, 2] = 4000
 
     data = {
-        "id": [3000, 4000],
+        "x": [1.5, 2.5],
+        "y": [1.5, 2.5],
         "layer": [2, 3],
+        "id": [3000, 4000],
         "capacity": [15.0, 30.0],
-        "y": [1.0, 2.0],
-        "x": [1.0, 2.0],
     }
 
     layer = pd.DataFrame(data=data)
