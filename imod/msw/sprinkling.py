@@ -551,7 +551,7 @@ class SprinklingPoints(MetaSwapPackage, IRegridPackage):
         outside_df = _get_wells_outside_art_grid_dataframe(
             mf6_cellid_df, points_df, msw_mf6_sprinkling_df, svat_aligned
         )
-
+        # Prepare the final dataframe to be written to scap_svat.inp
         dataframe_out = pd.concat([inside_df, outside_df], axis=0, ignore_index=True)
         dataframe_out = dataframe_out.sort_values(by=["svat"]).reset_index(drop=True)
 
