@@ -532,18 +532,18 @@ class SprinklingPoints(MetaSwapPackage, IRegridPackage):
         )
 
         # Select columns that need to be written to scap_svat.inp
-        dataframe = msw_mf6_sprinkling_df[["svat", "layer", "svat_groundwater"]]
-        dataframe["svat"] = dataframe["svat"].astype(int)
+        inside_df = msw_mf6_sprinkling_df[["svat", "layer", "svat_groundwater"]]
+        inside_df["svat"] = inside_df["svat"].astype(int)
         capacity = msw_mf6_sprinkling_df["capacity"]
         # Set wells with layer > 0 to groundwater abstraction, and wells with layer = 0
         # to surfacewater abstraction.
         is_gw_extraction = msw_mf6_sprinkling_df["layer"] > 0
-        dataframe["max_abstraction_groundwater"] = capacity.where(is_gw_extraction, 0.0)
-        dataframe["max_abstraction_surfacewater"] = capacity.where(
+        inside_df["max_abstraction_groundwater"] = capacity.where(is_gw_extraction, 0.0)
+        inside_df["max_abstraction_surfacewater"] = capacity.where(
             ~is_gw_extraction, 0.0
         )
 
-        # TODO: Make sure wells in svats are all present in the dataframe. If
+        # TODO: Make sure wells in svats are all present in the inside_df. If
         #   these svats are 0 in the art_grid, they should get a 0.0 capacity.
 
         # Deal with edge case: wells that are outside art_grid, but in model domain.
@@ -552,7 +552,7 @@ class SprinklingPoints(MetaSwapPackage, IRegridPackage):
             mf6_cellid_df, points_df, msw_mf6_sprinkling_df, svat_aligned
         )
 
-        dataframe_out = pd.concat([dataframe, outside_df], axis=0, ignore_index=True)
+        dataframe_out = pd.concat([inside_df, outside_df], axis=0, ignore_index=True)
         dataframe_out = dataframe_out.sort_values(by=["svat"]).reset_index(drop=True)
 
         for var in self._to_fill:
