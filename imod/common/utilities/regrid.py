@@ -197,6 +197,11 @@ def _get_unique_regridder_types(model: IModel) -> DefaultDict[RegridderType, lis
 
 
 @dispatch
+def _regrid_like(package: object, target_grid: object, *_) -> None:
+    raise TypeError("this object cannot be regridded")
+
+
+@dispatch  # type: ignore[no-redef]
 def _regrid_like(
     package: IRegridPackage,
     target_grid: GridDataArray,
@@ -419,11 +424,6 @@ def _regrid_like(
     """
     target_grid_2d = target_grid.isel(layer=0, drop=True, missing_dims="ignore")
     return clip_by_grid(package, target_grid_2d)
-
-
-@dispatch  # type: ignore[no-redef]
-def _regrid_like(package: object, target_grid: GridDataArray, *_) -> None:
-    raise TypeError("this object cannot be regridded")
 
 
 @enforced_dim_order
