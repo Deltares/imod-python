@@ -86,7 +86,7 @@ def _extract_indexer_for_svat(df: pd.DataFrame, columns: list[str]):
     np.ndarray
         Indexer array for selecting SVAT subunits from svat_da.
     """
-    if not set(["row", "column"]).issubset(columns):
+    if not {"row", "column"}.issubset(columns):
         raise ValueError("columns must contain 'row' and 'column'")
     df.loc[:, ["row", "column"]] -= 1  # Convert to 0-based indexing for xarray
 
