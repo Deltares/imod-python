@@ -86,7 +86,7 @@ def _extract_indexer_for_svat(df: pd.DataFrame, columns: list[str]):
     np.ndarray
         Indexer array for selecting SVAT subunits from svat_da.
     """
-    if not set("row", "column").issubset(columns):
+    if not set(["row", "column"]).issubset(columns):
         raise ValueError("columns must contain 'row' and 'column'")
     df.loc[:, ["row", "column"]] -= 1  # Convert to 0-based indexing for xarray
 
@@ -186,7 +186,9 @@ def align_svat_with_dis(
     Align the SVAT grid with the dis_pkg grid as the SVAT grid might be smaller.
     """
     idomain_flat = dis_pkg.dataset["idomain"].isel(layer=0, drop=True)
-    _, svat_aligned = xr.align(idomain_flat, svat, join="left")
+    # Assign to _dummy instead of _ to avoid MyPy 2.3 crashing on the next line.
+    # See https://github.com/python/mypy/issues/21824
+    _dummy, svat_aligned = xr.align(idomain_flat, svat, join="left")
     return svat_aligned
 
 
