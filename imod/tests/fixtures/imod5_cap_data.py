@@ -153,13 +153,13 @@ def cap_data_sprinkling_points() -> Imod5DataDict:
         "capacity": [15.0, 30.0],
     }
 
-    layer = pd.DataFrame(data=data)
+    dataframe = pd.DataFrame(data=data)
     cap_data = {
         "boundary": boundary,
         "wetted_area": wetted_area,
         "urban_area": urban_area,
         "artificial_recharge": artificial_rch_type,
-        "artificial_recharge_layer": layer,
+        "artificial_recharge_layer": dataframe,
         "artificial_recharge_capacity": xr.DataArray(25.0),
     }
 
