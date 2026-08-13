@@ -200,53 +200,19 @@ def test_simple_model(
     assert_equal(results["svat_groundwater"], case_data.expected_svat_gw)
 
 
-def test_simple_model_1_subunit(fixed_format_parser):
-    x = [1.0, 2.0, 3.0]
-    y = [1.0, 2.0, 3.0]
-    subunit = [0]
-    dx = 1.0
-    dy = 1.0
-    # fmt: off
-    max_abstraction_groundwater = xr.DataArray(
-        np.array(
-            [
-                [[nan, 100.0, nan],
-                 [nan, 200.0, nan],
-                 [nan, 300.0, nan]]
-            ]
-        ),
-        dims=("subunit", "y", "x"),
-        coords={"subunit": subunit, "y": y, "x": x, "dx": dx, "dy": dy}
-    )
+@parametrize_with_cases("case_data", cases=AbstractionGrids)
+def test_simple_model_1_subunit(
+    fixed_format_parser: Callable,
+    sprinkling_svat_index: tuple[xr.DataArray, np.ndarray],
+    case_data: AbstractionCaseData,
+):
+    svat, index = sprinkling_svat_index
 
-    max_abstraction_surfacewater = xr.DataArray(
-        np.array(
-            [
-                [[nan, 100.0, nan],
-                 [nan, 200.0, nan],
-                 [nan, 300.0, nan]]
-            ]
-        ),
-        dims=("subunit", "y", "x"),
-        coords={"subunit": subunit, "y": y, "x": x, "dx": dx, "dy": dy}
-    )
-
-    svat = xr.DataArray(
-        np.array(
-            [
-                [[0, 1, 0],
-                 [0, 0, 0],
-                 [0, 2, 0]],
-            ]
-        ),
-        dims=("subunit", "y", "x"),
-        coords={"subunit": subunit, "y": y, "x": x, "dx": dx, "dy": dy}
-    )
-    # fmt: on
-    index = (svat != 0).values.ravel()
+    svat = svat.isel(subunit=[0])
+    index = index[:9]  # Only the first subunit
 
     # Well
-    well_layer = [3, 2]
+    well_layer = [3, 1]
     well_y = [1.0, 3.0]
     well_x = [2.0, 2.0]
     well_rate = [-5.0] * 2
@@ -255,8 +221,8 @@ def test_simple_model_1_subunit(fixed_format_parser):
     well = Mf6Wel(cellids, well_rate, well_id)
 
     sprinkling = msw.Sprinkling(
-        max_abstraction_groundwater,
-        max_abstraction_surfacewater,
+        case_data.max_abstraction_groundwater.isel(subunit=[0]),
+        case_data.max_abstraction_surfacewater.isel(subunit=[0]),
     )
 
     with tempfile.TemporaryDirectory() as output_dir:
@@ -268,17 +234,18 @@ def test_simple_model_1_subunit(fixed_format_parser):
             msw.Sprinkling._metadata_dict,
         )
 
-    assert_equal(results["svat"], np.array([1, 2]))
+    assert_equal(results["svat"], case_data.expected_svat_gw[:2])
     assert_almost_equal(
         results["max_abstraction_groundwater"],
-        np.array([100.0, 300.0]),
+        case_data.expected_abs_gw[:2],
     )
     assert_almost_equal(
         results["max_abstraction_surfacewater"],
-        np.array([100.0, 300.0]),
+        case_data.expected_abs_sw[:2],
     )
-    assert_equal(results["layer"], np.array([3, 2]))
-    assert_equal(results["svat_groundwater"], np.array([1, 2]))
+    assert_equal(results["layer"], case_data.expected_layer[:2])
+    assert_equal(results["svat_groundwater"], case_data.expected_svat_gw[:2])
+
 
 
 @pytest.mark.unittest_jit
