@@ -250,8 +250,13 @@ def test_simple_model_1_subunit(
 
 @pytest.mark.unittest_jit
 def test_sprinkling_from_imod5_data__points(cap_data_sprinkling_points):
-    with pytest.raises(NotImplementedError):
+    with pytest.raises(TypeError):
         msw.Sprinkling.from_imod5_data(cap_data_sprinkling_points)
+
+@pytest.mark.unittest_jit
+def test_sprinklingpoints_from_imod5_data__grid(cap_data_sprinkling_grid):
+    with pytest.raises(TypeError):
+        msw.SprinklingPoints.from_imod5_data(cap_data_sprinkling_grid)
 
 
 @pytest.mark.unittest_jit

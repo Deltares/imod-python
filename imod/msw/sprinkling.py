@@ -1,3 +1,4 @@
+import textwrap
 from typing import TextIO
 
 import numpy as np
@@ -29,8 +30,29 @@ def _ravel_per_subunit(da: xr.DataArray) -> np.ndarray:
 
 
 def _sprinkling_data_from_imod5_ipf(cap_data: GridDataDict) -> GridDataDict:
-    raise NotImplementedError(
-        "Assigning sprinkling wells with an IPF file is not supported, please specify them as IDF."
+    art_grid = cap_data["artificial_recharge"]
+    df_points = cap_data["artificial_recharge_layer"]
+
+    arl_points = df_points.iloc[:, :5]
+    arl_points.columns = ["x_p", "y_p", "layer_p", "id2grid_p", "capacity_p"]
+    # Enforce dtypes
+    arl_points = arl_points.astype(
+        {
+            "x_p": float,
+            "y_p": float,
+            "layer_p": int,
+            "id2grid_p": int,
+            "capacity_p": float,
+        }
+    )
+
+    return dict(
+        art_grid=art_grid,
+        x_p=arl_points["x_p"].to_numpy(),
+        y_p=arl_points["y_p"].to_numpy(),
+        layer_p=arl_points["layer_p"].to_numpy(),
+        id2grid_p=arl_points["id2grid_p"].to_numpy(),
+        capacity_p=arl_points["capacity_p"].to_numpy(),
     )
 
 
@@ -351,32 +373,28 @@ class Sprinkling(MetaSwapPackage, IRegridPackage):
     @classmethod
     def from_imod5_data(cls, imod5_data: Imod5DataDict) -> "Sprinkling":
         """
-        Import sprinkling data from imod5 data. Abstraction data for sprinkling
-        is defined in iMOD5 either with grids (IDF) or points (IPF) combined
-        with a grid. Depending on the type, the method does different conversions:
+        Import sprinkling data from imod5 data artificial recharge grids.
+        Abstraction data for sprinkling is defined in iMOD5 either with grids
+        (IDF) or points (IPF) combined with a grid. This class can handle only
+        the purely grid (IDF) variant. For point data (IPF), use
+        :class:`imod.msw.SprinklingPoints.from_imod5_data()` instead.
+        
+        The iMOD5 data is expected to contain three grids for sprinkling:
 
-        - grids (IDF)
-            The ``"artifical_recharge_layer"`` variable was defined as grid
-            (IDF), this grid defines in which layer a groundwater abstraction
-            well should be placed. The ``"artificial_recharge"`` grid contains
-            types which point to the type of abstraction:
+        1.  The ``"artificial_recharge"`` grid contains types which point to the
+            type of abstraction:
 
-                * 0: no abstraction
-                * 1: groundwater abstraction
-                * 2: surfacewater abstraction
-
-            The ``"artificial_recharge_capacity"`` grid/constant defines the
-            capacity of each groundwater or surfacewater abstraction. This is an
-            ``1:1`` mapping: Each grid cell maps to a separate well.
-
-        - points with grid (IPF & IDF)
-            The ``"artifical_recharge_layer"`` variable was defined as point
-            data (IPF), this table contains wellids with an abstraction capacity
-            and layer. The ``"artificial_recharge"`` grid contains a mapping of
-            grid cells to wellids in the point data. The
-            ``"artificial_recharge_capacity"`` is ignored as the abstraction
-            capacity is already defined in the point data. This is an ``n:1``
-            mapping: multiple grid cells can map to one well.
+            * **0**: no abstraction
+            * **1**: groundwater abstraction
+            * **2**: surfacewater abstraction
+        
+        2.  The ``"artificial_recharge_layer"`` defines in which layer a groundwater
+            abstraction well should be placed. 
+        3.  The ``"artificial_recharge_capacity"`` grid/constant defines the
+            capacity of each groundwater or surfacewater abstraction. This is
+            converted from mm/d to m3/d using the cell area of the SVAT grid.
+        
+        This is an ``1:1`` mapping: Each grid cell maps to a separate well.
 
         Parameters
         ----------
@@ -392,9 +410,16 @@ class Sprinkling(MetaSwapPackage, IRegridPackage):
         """
         cap_data = imod5_data["cap"]
         if isinstance(cap_data["artificial_recharge_layer"], pd.DataFrame):
-            data = _sprinkling_data_from_imod5_ipf(cap_data)
-        else:
-            data = _sprinkling_data_from_imod5_grid(cap_data)
+            msg = textwrap.dedent(
+                """
+                Unsupported format for artificial_recharge_layer: expected a
+                grid (IDF) got a DataFrame for point data (IPF). Call
+                imod.msw.SprinklingPoints.from_imod5_data() instead.
+                """
+            )
+            raise TypeError(msg)
+        
+        data = _sprinkling_data_from_imod5_grid(cap_data)
 
         return cls(**data)
 
@@ -480,31 +505,51 @@ class SprinklingPoints(MetaSwapPackage, IRegridPackage):
 
     @classmethod
     def from_imod5_data(cls, imod5_data: Imod5DataDict) -> "SprinklingPoints":
+        """
+        Import sprinkling data from imod5 data artificial recharge grids.
+        Abstraction data for sprinkling is defined in iMOD5 either with grids
+        (IDF) or points (IPF) combined with a grid. This class can handle only
+        the point (IPF) variant. For grid data (IDF), use
+        :class:`imod.msw.Sprinkling.from_imod5_data()` instead.
+
+        The iMOD5 data is expected to contain one grid (IDF) and one table with
+        points for sprinkling (IPF):
+        
+        1.  The ``"artificial_recharge"`` grid contains a mapping of
+            grid cells to wellids in the point data.
+        2.  The ``"artificial_recharge_layer"`` variable was defined as point
+            data (IPF), this table contains wellids with an abstraction capacity
+            and layer.
+        3.  The ``"artificial_recharge_capacity"`` is ignored as the abstraction
+            capacity is already defined in the point data. 
+        
+        This is an ``n:1`` mapping: multiple grid cells can map to one well.
+
+        Parameters
+        ----------
+        imod5_data: dict[str, dict[str, GridDataArray]]
+            dictionary containing the arrays mentioned in the project file as
+            xarray datasets, under the key of the package type to which it
+            belongs, as returned by
+            :func:`imod.formats.prj.open_projectfile_data`.
+
+        Returns
+        -------
+        SprinklingPoints package
+        """
         cap_data = imod5_data["cap"]
-        art_grid = cap_data["artificial_recharge"]
-        df_points = cap_data["artificial_recharge_layer"]
-
-        arl_points = df_points.iloc[:, :5]
-        arl_points.columns = ["x_p", "y_p", "layer_p", "id2grid_p", "capacity_p"]
-        # Enforce dtypes
-        arl_points = arl_points.astype(
-            {
-                "x_p": float,
-                "y_p": float,
-                "layer_p": int,
-                "id2grid_p": int,
-                "capacity_p": float,
-            }
-        )
-
-        return cls(
-            art_grid=art_grid,
-            x_p=arl_points["x_p"].to_numpy(),
-            y_p=arl_points["y_p"].to_numpy(),
-            layer_p=arl_points["layer_p"].to_numpy(),
-            id2grid_p=arl_points["id2grid_p"].to_numpy(),
-            capacity_p=arl_points["capacity_p"].to_numpy(),
-        )
+        if isinstance(cap_data["artificial_recharge_layer"], pd.DataFrame):
+            data = _sprinkling_data_from_imod5_ipf(cap_data)
+            return cls(**data)
+        else:
+            msg = textwrap.dedent(
+                """
+                Unsupported format for artificial_recharge_layer: expected a
+                DataFrame for point data (IPF), got a grid (IDF). Call
+                imod.msw.Sprinkling.from_imod5_data() instead.
+                """
+            )
+            raise TypeError(msg)
 
     def _render(self, file, index, svat, mf6_dis, mf6_well):
         """
