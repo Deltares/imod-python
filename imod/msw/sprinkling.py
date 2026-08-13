@@ -1,5 +1,5 @@
 import textwrap
-from typing import TextIO
+from typing import TextIO, TypedDict, cast
 
 import numpy as np
 import pandas as pd
@@ -18,8 +18,28 @@ from imod.msw.utilities.common import concat_imod5
 from imod.msw.utilities.imod5_converter import (
     get_cell_area_from_imod5_data,
 )
-from imod.typing import GridDataDict, Imod5DataDict, IntArray
+from imod.typing import GridDataArray, GridDataDict, Imod5DataDict, IntArray
 from imod.typing.grid import zeros_like
+
+
+# Some additional type aliases for sprinkling data, which is a bit more complex
+# than other packages.
+class CapSprinklingDataDict(TypedDict, total=False):
+    artificial_recharge: GridDataArray
+    artificial_recharge_layer: pd.DataFrame
+    artificial_recharge_capacity: GridDataArray
+
+
+class SprinklingPointsDataDict(TypedDict, total=False):
+    x_p: np.ndarray | list[float]
+    y_p: np.ndarray | list[float]
+    layer_p: np.ndarray | list[int]
+    id2grid_p: np.ndarray | list[int]
+    capacity_p: np.ndarray | list[float]
+
+
+class SprinklingPointsGridDataDict(SprinklingPointsDataDict, total=False):
+    art_grid: GridDataArray
 
 
 def _ravel_per_subunit(da: xr.DataArray) -> np.ndarray:
@@ -29,31 +49,36 @@ def _ravel_per_subunit(da: xr.DataArray) -> np.ndarray:
     return array_out[np.isfinite(array_out)]
 
 
-def _sprinkling_data_from_imod5_ipf(cap_data: GridDataDict) -> GridDataDict:
+def _sprinkling_data_from_imod5_ipf(
+    cap_data: CapSprinklingDataDict,
+) -> SprinklingPointsGridDataDict:
     art_grid = cap_data["artificial_recharge"]
     df_points = cap_data["artificial_recharge_layer"]
 
+    # Select first 5 columns and enforce column names, iMOD5 expects columns in
+    # this order. The additional columns are metadata for the user and can be
+    # ignored.
     arl_points = df_points.iloc[:, :5]
     arl_points.columns = ["x_p", "y_p", "layer_p", "id2grid_p", "capacity_p"]
     # Enforce dtypes
-    arl_points = arl_points.astype(
-        {
-            "x_p": float,
-            "y_p": float,
-            "layer_p": int,
-            "id2grid_p": int,
-            "capacity_p": float,
-        }
+    dtype_dict = {
+        "x_p": float,
+        "y_p": float,
+        "layer_p": int,
+        "id2grid_p": int,
+        "capacity_p": float,
+    }
+
+    arl_points = arl_points.astype(dtype_dict)
+    arl_point_dict = cast(
+        SprinklingPointsDataDict,
+        {key: arl_points[key].to_numpy() for key in dtype_dict.keys()},
     )
 
-    return dict(
-        art_grid=art_grid,
-        x_p=arl_points["x_p"].to_numpy(),
-        y_p=arl_points["y_p"].to_numpy(),
-        layer_p=arl_points["layer_p"].to_numpy(),
-        id2grid_p=arl_points["id2grid_p"].to_numpy(),
-        capacity_p=arl_points["capacity_p"].to_numpy(),
-    )
+    return {
+        "art_grid": art_grid,
+        **arl_point_dict,
+    }
 
 
 def _sprinkling_data_from_imod5_grid(cap_data: GridDataDict) -> GridDataDict:
@@ -378,7 +403,7 @@ class Sprinkling(MetaSwapPackage, IRegridPackage):
         (IDF) or points (IPF) combined with a grid. This class can handle only
         the purely grid (IDF) variant. For point data (IPF), use
         :class:`imod.msw.SprinklingPoints.from_imod5_data()` instead.
-        
+
         The iMOD5 data is expected to contain three grids for sprinkling:
 
         1.  The ``"artificial_recharge"`` grid contains types which point to the
@@ -387,13 +412,13 @@ class Sprinkling(MetaSwapPackage, IRegridPackage):
             * **0**: no abstraction
             * **1**: groundwater abstraction
             * **2**: surfacewater abstraction
-        
+
         2.  The ``"artificial_recharge_layer"`` defines in which layer a groundwater
-            abstraction well should be placed. 
+            abstraction well should be placed.
         3.  The ``"artificial_recharge_capacity"`` grid/constant defines the
             capacity of each groundwater or surfacewater abstraction. This is
             converted from mm/d to m3/d using the cell area of the SVAT grid.
-        
+
         This is an ``1:1`` mapping: Each grid cell maps to a separate well.
 
         Parameters
@@ -418,7 +443,7 @@ class Sprinkling(MetaSwapPackage, IRegridPackage):
                 """
             )
             raise TypeError(msg)
-        
+
         data = _sprinkling_data_from_imod5_grid(cap_data)
 
         return cls(**data)
@@ -514,15 +539,15 @@ class SprinklingPoints(MetaSwapPackage, IRegridPackage):
 
         The iMOD5 data is expected to contain one grid (IDF) and one table with
         points for sprinkling (IPF):
-        
+
         1.  The ``"artificial_recharge"`` grid contains a mapping of
             grid cells to wellids in the point data.
         2.  The ``"artificial_recharge_layer"`` variable was defined as point
             data (IPF), this table contains wellids with an abstraction capacity
             and layer.
         3.  The ``"artificial_recharge_capacity"`` is ignored as the abstraction
-            capacity is already defined in the point data. 
-        
+            capacity is already defined in the point data.
+
         This is an ``n:1`` mapping: multiple grid cells can map to one well.
 
         Parameters
@@ -537,7 +562,7 @@ class SprinklingPoints(MetaSwapPackage, IRegridPackage):
         -------
         SprinklingPoints package
         """
-        cap_data = imod5_data["cap"]
+        cap_data = cast(CapSprinklingDataDict, imod5_data["cap"])
         if isinstance(cap_data["artificial_recharge_layer"], pd.DataFrame):
             data = _sprinkling_data_from_imod5_ipf(cap_data)
             return cls(**data)

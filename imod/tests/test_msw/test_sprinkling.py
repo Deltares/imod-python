@@ -247,11 +247,11 @@ def test_simple_model_1_subunit(
     assert_equal(results["svat_groundwater"], case_data.expected_svat_gw[:2])
 
 
-
 @pytest.mark.unittest_jit
 def test_sprinkling_from_imod5_data__points(cap_data_sprinkling_points):
     with pytest.raises(TypeError):
         msw.Sprinkling.from_imod5_data(cap_data_sprinkling_points)
+
 
 @pytest.mark.unittest_jit
 def test_sprinklingpoints_from_imod5_data__grid(cap_data_sprinkling_grid):
