@@ -56,6 +56,12 @@ Grid packages
     Sprinkling.from_imod5_data
     Sprinkling.get_regrid_methods
     Sprinkling.write
+    SprinklingPoints
+    SprinklingPoints.regrid_like
+    SprinklingPoints.clip_box
+    SprinklingPoints.from_imod5_data
+    SprinklingPoints.get_regrid_methods
+    SprinklingPoints.write
 
 Initial conditions
 ==================
