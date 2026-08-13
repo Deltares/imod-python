@@ -21,7 +21,7 @@ def sprinkling_svat_index():
     y = [1.0, 2.0, 3.0]
     subunit = [0, 1]
     dx = 1.0
-    dy = 1.0
+    dy = -1.0
     # fmt: off
     svat = xr.DataArray(
         np.array(
@@ -36,7 +36,8 @@ def sprinkling_svat_index():
             ]
         ),
         dims=("subunit", "y", "x"),
-        coords={"subunit": subunit, "y": y, "x": x, "dx": dx, "dy": dy}
+        coords={"subunit": subunit, "y": y, "x": x, "dx": dx, "dy": dy},
+        name="svat",
     )
     # fmt: on
     index = (svat != 0).values.ravel()
@@ -306,21 +307,60 @@ def test_sprinklingpoints_from_imod5_data__points(cap_data_sprinkling_points):
     assert set(sprinkling.dataset.keys()) == expected_vars
     # No unit conversion is done in SprinklingPoints, as the capacity is already
     # in m3/d
-    np.testing.assert_almost_equal(sprinkling.dataset["capacity_p"].max(), 100.0)
+    np.testing.assert_almost_equal(sprinkling.dataset["capacity_p"], [15.0, 30.0])
 
 
-# @pytest.mark.unittest_jit
-# def test_sprinklingpoints_write__points(cap_data_sprinkling_points, tmp_path):
-#    well_x = cap_data_sprinkling_points["cap"]["x"].values
-#    well_y = cap_data_sprinkling_points["cap"]["y"].values
-#    well_layer = cap_data_sprinkling_points["cap"]["layer"].values
-#
-#    # Arrange
-#    # cellids = derive_cellid_from_points(svat, well_x, well_y, well_layer)
-#    # well = Mf6Wel(cellids, well_rate)
-#
-#    # Act
-#    sprinkling = msw.SprinklingPoints.from_imod5_data(cap_data_sprinkling_points)
-#
-#    # sprinkling.write()
-#
+# TODO: Create more test cases for SprinklingPoints.write() to test edge cases,
+#   such as wells in inactive SVATs, wells outside the model domain, etc.
+
+
+@pytest.mark.unittest_jit
+def test_sprinklingpoints_from_imod5_data_write__points(
+    sprinkling_svat_index,
+    fixed_format_parser,
+    cap_data_sprinkling_points,
+    cap_coupled_dis_grid,
+    tmp_path,
+):
+    """
+    Test with two wells: one inside the active SVAT area, and one outside the
+    active SVAT area but still in the model domain. Well nr 2. is not assigned
+    to anything. Well nr 1. is assigned and is located in the centre cell. In
+    subunit 1 this cell is inactive and the svats coupled to this well are
+    assigned to surface water, in subunit 2 this cell is active and this well is
+    coupled to the groundwater svat.
+    """
+    # Arrange
+    svat, index = sprinkling_svat_index
+    df = cap_data_sprinkling_points["cap"]["artificial_recharge_layer"]
+    well_x = df["x"].to_numpy()
+    well_y = df["y"].to_numpy()
+    well_layer = df["layer"].to_numpy()
+    well_rate = xr.DataArray([0.0, 0.0], dims=("ncellid",))
+    well_id = xr.DataArray(["0", "1"], dims=("ncellid",))
+    cellids = derive_cellid_from_points(svat, well_x, well_y, well_layer)
+    mf6_well = Mf6Wel(cellids, well_rate, well_id)
+    mf6_dis = cap_coupled_dis_grid
+    directory = tmp_path / "sprinkling_points"
+    directory.mkdir(parents=True, exist_ok=True)
+
+    # Act
+    sprinkling = msw.SprinklingPoints.from_imod5_data(cap_data_sprinkling_points)
+    sprinkling.write(directory, index, svat, mf6_dis, mf6_well)
+
+    results = fixed_format_parser(
+        directory / msw.Sprinkling._file_name,
+        msw.Sprinkling._metadata_dict,
+    )
+
+    # Assert
+    # TODO: Check with Hendrik whether this is the appropriate behaviour.
+    np.testing.assert_equal(results["svat"], [1, 2, 3, 4])
+    np.testing.assert_equal(results["svat_groundwater"], [1, 2, 4, 4])
+    np.testing.assert_equal(results["layer"], [2, 2, 2, 2])
+    np.testing.assert_equal(
+        results["max_abstraction_surfacewater"], [15.0, 15.0, 0.0, 0.0]
+    )
+    np.testing.assert_equal(
+        results["max_abstraction_groundwater"], [0.0, 0.0, 15.0, 15.0]
+    )
