@@ -265,7 +265,7 @@ def _get_wells_outside_art_grid_dataframe(
     checking which wells in mf6_cellid_df are not in msw_mf6_merged_df.
     """
     is_outside_art = ~mf6_cellid_df["id"].isin(msw_mf6_sprinkling_df["id"].unique())
-    outside_df = points_df.loc[is_outside_art, ["layer", "capacity"]]
+    outside_df = points_df.loc[is_outside_art, ["layer", "capacity_p"]]
     outside_df = _replicate_dataframe_by_subunit(outside_df)
     # Select the SVAT subunit for these wells based on their row/col location.
     cellid_outside_df = mf6_cellid_df.loc[is_outside_art]
@@ -277,7 +277,9 @@ def _get_wells_outside_art_grid_dataframe(
     outside_df["svat_groundwater"] = svat_outside.astype(int)
     outside_df["svat"] = svat_outside.astype(int)
     # Set capacity to surfacewater abstraction, and set groundwater abstraction to 0.
-    outside_df = outside_df.rename(columns={"capacity": "max_abstraction_surfacewater"})
+    outside_df = outside_df.rename(
+        columns={"capacity_p": "max_abstraction_surfacewater"}
+    )
     outside_df["max_abstraction_groundwater"] = 0.0
     # drop subunit column as it is no longer needed
     outside_df = outside_df.drop(columns=["subunit"])
@@ -604,7 +606,7 @@ class SprinklingPoints(MetaSwapPackage, IRegridPackage):
         # Select columns that need to be written to scap_svat.inp
         inside_df = msw_mf6_sprinkling_df[["svat", "layer", "svat_groundwater"]]
         inside_df["svat"] = inside_df["svat"].astype(int)
-        capacity = msw_mf6_sprinkling_df["capacity"]
+        capacity = msw_mf6_sprinkling_df["capacity_p"]
         # Set wells with layer > 0 to groundwater abstraction, and wells with layer = 0
         # to surfacewater abstraction.
         is_gw_extraction = msw_mf6_sprinkling_df["layer"] > 0
@@ -612,21 +614,40 @@ class SprinklingPoints(MetaSwapPackage, IRegridPackage):
         inside_df["max_abstraction_surfacewater"] = capacity.where(
             ~is_gw_extraction, 0.0
         )
+        ##############
+        # EDGE CASES #
+        ##############
+        # Set wells located in inactive SVAT groundwater units (svat = 0) to
+        # surface water extraction.
+        well_in_inactive_cell = inside_df["svat_groundwater"] == 0
+        inside_df.loc[well_in_inactive_cell, "max_abstraction_groundwater"] = 0.0
+        inside_df.loc[well_in_inactive_cell, "max_abstraction_surfacewater"] = (
+            capacity.where(well_in_inactive_cell, 0.0)
+        )
+        inside_df.loc[well_in_inactive_cell, "svat_groundwater"] = inside_df.loc[
+            well_in_inactive_cell, "svat"
+        ]
 
-        # TODO: Make sure wells in svats are all present in the inside_df. If
-        #   these svats are 0 in the art_grid, they should get a 0.0 capacity.
-
-        # Deal with edge case: wells that are outside art_grid, but in model domain.
+        # Wells that are outside art_grid, but in model domain.
         # These will be assigned to surfacewater abstraction.
         outside_df = _get_wells_outside_art_grid_dataframe(
             mf6_cellid_df, points_df, msw_mf6_sprinkling_df, svat_aligned
         )
+        ############
+        # FINALIZE #
+        ############
         # Prepare the final dataframe to be written to scap_svat.inp
         dataframe_out = pd.concat([inside_df, outside_df], axis=0, ignore_index=True)
+        # Order rows by SVAT number to ensure consistent output for testing and
+        # debugging.
         dataframe_out = dataframe_out.sort_values(by=["svat"]).reset_index(drop=True)
-
+        # Fill last columns with empty strings, as they are not used in the
+        # iMOD5 implementation but required by MetaSWAP.
         for var in self._to_fill:
             dataframe_out[var] = ""
+        # Order columns to match the metadata dict, which defines the order of
+        # columns in scap_svat.inp.
+        dataframe_out = dataframe_out[list(self._metadata_dict.keys())]
 
         self._check_range(dataframe_out)
 
