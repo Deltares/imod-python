@@ -13,15 +13,15 @@ from pytest_cases import parametrize_with_cases
 from imod import msw
 from imod.mf6.mf6_wel_adapter import Mf6Wel
 from imod.mf6.wel import derive_cellid_from_points
-
+from imod.mf6.dis import StructuredDiscretization
 
 @pytest.fixture(scope="function")
 def sprinkling_svat_index():
     x = [1.0, 2.0, 3.0]
-    y = [1.0, 2.0, 3.0]
+    y = [3.0, 2.0, 1.0]
     subunit = [0, 1]
     dx = 1.0
-    dy = -1.0
+    dy = 1.0
     # fmt: off
     svat = xr.DataArray(
         np.array(
@@ -45,6 +45,7 @@ def sprinkling_svat_index():
 
 @dataclass
 class ExpectedCaseData:
+    xfail: Optional[str] = None
     abs_gw: Optional[np.ndarray] = None
     abs_sw: Optional[np.ndarray] = None
     layer: Optional[np.ndarray] = None
@@ -60,11 +61,11 @@ class SprinklingGridCaseData:
 @dataclass
 class SprinklingPointsCaseData:
     art_grid: Optional[xr.DataArray] = None
-    x_p: Optional[xr.DataArray] = None
-    y_p: Optional[xr.DataArray] = None
-    layer_p: Optional[xr.DataArray] = None
-    id2grid_p: Optional[xr.DataArray] = None
-    capacity_p: Optional[xr.DataArray] = None
+    x_p: Optional[np.ndarray] = None
+    y_p: Optional[np.ndarray] = None
+    layer_p: Optional[np.ndarray] = None
+    id2grid_p: Optional[np.ndarray] = None
+    capacity_p: Optional[np.ndarray] = None
 
 
 class SprinklingGridCases:
@@ -178,14 +179,159 @@ class SprinklingGridCases:
 
 
 class SprinklingPointsCases:
-    def case_simple(self, sprinkling_svat_index):
+    def case_simple(self, sprinkling_svat_index) -> tuple[SprinklingPointsCaseData, ExpectedCaseData]:
+        """
+        Simple test case for sprinkling points. Each point is mapped to one svat.
+        """
         svat, _ = sprinkling_svat_index
         case_data = SprinklingPointsCaseData()
+        case_data.art_grid = xr.full_like(svat.isel(subunit=0, drop=True), 0, dtype=int)
+        # fmt: off
+        case_data.art_grid.data = np.array(
+            [[0, 1, 0],
+             [0, 2, 0],
+             [0, 3, 0]]
+        )
+        # fmt: on
+        case_data.x_p = [2.0, 2.0, 2.0]
+        case_data.y_p = [3.0, 2.0, 1.0]
+        case_data.layer_p = [1, 2, 3]
+        case_data.id2grid_p = [1, 2, 3]
+        case_data.capacity_p = [10.0, 20.0, 30.0]
+
+        expected_data = ExpectedCaseData()
+        expected_data.svat = np.array([1, 2, 3, 4])
+        expected_data.svat_gw = np.array([1, 2, 3, 4])
+        expected_data.layer = np.array([1, 3, 1, 2])
+        expected_data.abs_gw = np.array([10.0, 30.0, 10.0, 20.0])
+        expected_data.abs_sw = np.array([0.0, 0.0, 0.0, 0.0])
+
+        return case_data, expected_data
+
+
+    def case_multi_point_one_art_cell(self, sprinkling_svat_index) -> tuple[SprinklingPointsCaseData, ExpectedCaseData]:
+        """
+        Case where multiple points are assigned to the same SVAT. Not a common
+        usecase. Usually multiple cells coupled to one point.
+        """
+        svat, _ = sprinkling_svat_index
+        case_data = SprinklingPointsCaseData()
+        case_data.art_grid = xr.full_like(svat.isel(subunit=0, drop=True), 0, dtype=int)
+        # fmt: off
+        case_data.art_grid.data = np.array(
+            [[0, 0, 0],
+             [0, 1, 0],
+             [0, 0, 0]]
+        )
+        # fmt: on
+        case_data.x_p = [2.0, 2.0, 2.0]
+        case_data.y_p = [3.0, 2.0, 1.0]
+        case_data.layer_p = [1, 2, 3]
+        case_data.id2grid_p = [1, 1, 1]
+        case_data.capacity_p = [10.0, 20.0, 30.0]
+
+        expected_data = ExpectedCaseData()
+        expected_data.xfail = "Multiple points cannot be connected to one grid cell"
+        return case_data, expected_data
+
+    def case_one_point_multi_art_cell(self, sprinkling_svat_index) -> tuple[SprinklingPointsCaseData, ExpectedCaseData]:
+        """
+        Case where one point is assigned to multiple art_grid cells. Quite a
+        common usecase. The point is located in the centre of the grid, where
+        there is only an svat in subunit 1. In subunit 0 this cell is not
+        active, therefore sprinkling capacity is assigned to surface water.
+        """
+        svat, _ = sprinkling_svat_index
+        case_data = SprinklingPointsCaseData()
+        case_data.art_grid = xr.full_like(svat.isel(subunit=0, drop=True), 0, dtype=int)
+        # fmt: off
+        case_data.art_grid.data = np.array(
+            [[0, 1, 0],
+             [0, 1, 0],
+             [0, 1, 0]]
+        )
+        # fmt: on
+        case_data.x_p = [2.0]
+        case_data.y_p = [2.0]
+        case_data.layer_p = [2]
+        case_data.id2grid_p = [1]
+        case_data.capacity_p = [10.0]
+
+        expected_data = ExpectedCaseData()
+        expected_data.svat = np.array([1, 2, 3, 4])
+        expected_data.svat_gw = np.array([1, 2, 4, 4])
+        expected_data.layer = np.array([2, 2, 2, 2])
+        expected_data.abs_gw = np.array([0.0, 0.0, 10.0, 10.0])
+        expected_data.abs_sw = np.array([10.0, 10.0, 0.0, 0.0])
+
+        return case_data, expected_data
+
+
+    def case_art_grid_outside(self, sprinkling_svat_index) -> tuple[SprinklingPointsCaseData, ExpectedCaseData]:
+        """
+        Case where art grid is located outside the active SVAT area, but still in
+        the model domain. The well should not be assigned.
+        """
+        svat, _ = sprinkling_svat_index
+        case_data = SprinklingPointsCaseData()
+        case_data.art_grid = xr.full_like(svat.isel(subunit=0, drop=True), 0, dtype=int)
+        # fmt: off
+        case_data.art_grid.data = np.array(
+            [[0, 1, 4],
+             [0, 2, 0],
+             [0, 3, 0]]
+        )
+        # fmt: on
+        case_data.x_p = [2.0, 2.0, 2.0, 2.0]
+        case_data.y_p = [3.0, 2.0, 1.0, 3.0]
+        case_data.layer_p = [1, 2, 3, 3]
+        case_data.id2grid_p = [1, 2, 3, 4]
+        case_data.capacity_p = [10.0, 20.0, 30.0, 40.0]
+
+        expected_data = ExpectedCaseData()
+        expected_data.svat = np.array([1, 2, 3, 4])
+        expected_data.svat_gw = np.array([1, 2, 3, 4])
+        expected_data.layer = np.array([1, 3, 1, 2])
+        expected_data.abs_gw = np.array([10.0, 30.0, 10.0, 20.0])
+        expected_data.abs_sw = np.array([0.0, 0.0, 0.0, 0.0])
+
+
+        return case_data, expected_data
+
+
+    def case_point_outside(self, sprinkling_svat_index) -> tuple[SprinklingPointsCaseData, ExpectedCaseData]:
+        """
+        Case where one point is located outside the active SVAT area, but still in
+        the model domain. The well should be assigned as surface water extraction.
+        """
+        svat, _ = sprinkling_svat_index
+        case_data = SprinklingPointsCaseData()
+        case_data.art_grid = xr.full_like(svat.isel(subunit=0, drop=True), 0, dtype=int)
+        # fmt: off
+        case_data.art_grid.data = np.array(
+            [[0, 1, 0],
+             [0, 2, 0],
+             [0, 3, 0]]
+        )
+        # fmt: on
+        case_data.x_p = [2.0, 2.0, 3.0]
+        case_data.y_p = [1.0, 2.0, 1.0]
+        case_data.layer_p = [1, 2, 3]
+        case_data.id2grid_p = [1, 2, 1]
+        case_data.capacity_p = [10.0, 20.0, 30.0, 40.0]
+
+        expected_data = ExpectedCaseData()
+        expected_data.svat = np.array([1, 1, 2, 3, 3, 4])
+        expected_data.svat_gw = np.array([1, 1, 2, 3, 3, 4])
+        expected_data.layer = np.array([1, 1, 2, 1, 1, 3])
+        expected_data.abs_gw = np.array([10.0, 0.0, 20.0, 10.0, 0.0, 30.0])
+        expected_data.abs_sw = np.array([0.0, 40.0, 0.0, 0.0, 40.0, 0.0])
+        return case_data, expected_data
 
 
 
 @parametrize_with_cases("case_data, expected_data", cases=SprinklingGridCases)
-def test_simple_model(
+def test_grid_simple_model(
     fixed_format_parser: Callable,
     sprinkling_svat_index: tuple[xr.DataArray, np.ndarray],
     case_data: SprinklingGridCaseData,
@@ -197,8 +343,10 @@ def test_simple_model(
     well_layer = [3, 2, 1]
     well_y = [1.0, 2.0, 3.0]
     well_x = [2.0, 2.0, 2.0]
-    well_rate = [-5.0] * 3
-    well_id = ["a", "b", "c"]
+    well_rate_values = [-5.0] * 3
+    well_rate = xr.DataArray(well_rate_values, dims=("ncellid",))
+    well_id_values = ["0", "1", "2"]
+    well_id = xr.DataArray(well_id_values, dims=("ncellid",))
     cellids = derive_cellid_from_points(svat, well_x, well_y, well_layer)
     well = Mf6Wel(cellids, well_rate, well_id)
 
@@ -230,7 +378,7 @@ def test_simple_model(
 
 
 @parametrize_with_cases("case_data, expected_data", cases=SprinklingGridCases)
-def test_simple_model_1_subunit(
+def test_grid_simple_model_1_subunit(
     fixed_format_parser: Callable,
     sprinkling_svat_index: tuple[xr.DataArray, np.ndarray],
     case_data: SprinklingGridCaseData,
@@ -245,8 +393,10 @@ def test_simple_model_1_subunit(
     well_layer = [3, 1]
     well_y = [1.0, 3.0]
     well_x = [2.0, 2.0]
-    well_rate = [-5.0] * 2
-    well_id = ["a", "c"]
+    well_rate_values = [-5.0] * 2
+    well_rate = xr.DataArray(well_rate_values, dims=("ncellid",))
+    well_id_values = ["0", "2"]
+    well_id = xr.DataArray(well_id_values, dims=("ncellid",))
     cellids = derive_cellid_from_points(svat, well_x, well_y, well_layer)
     well = Mf6Wel(cellids, well_rate, well_id)
 
@@ -276,6 +426,63 @@ def test_simple_model_1_subunit(
     assert_equal(results["layer"], expected_data.layer[:2])
     assert_equal(results["svat_groundwater"], expected_data.svat_gw[:2])
 
+
+@parametrize_with_cases("case_data, expected_data", cases=SprinklingPointsCases)
+def test_points_simple_model(
+    fixed_format_parser: Callable,
+    sprinkling_svat_index: tuple[xr.DataArray, np.ndarray],
+    case_data: SprinklingPointsCaseData,
+    expected_data: ExpectedCaseData,
+):
+    if expected_data.xfail:
+        pytest.xfail(expected_data.xfail)
+    svat, index = sprinkling_svat_index
+
+    # Well
+    n_wells = len(case_data.x_p)
+    well_rate_values = [-5.0] * n_wells
+    well_rate = xr.DataArray(well_rate_values, dims=("ncellid",))
+    well_id_values = [str(i) for i in np.arange(n_wells)]
+    well_id = xr.DataArray(well_id_values, dims=("ncellid",))
+
+    cellids = derive_cellid_from_points(svat, case_data.x_p, case_data.y_p, case_data.layer_p)
+    well = Mf6Wel(cellids, well_rate, well_id)
+
+    layer_template = xr.DataArray([1.0, 2.0, 3.0], coords={"layer": [1, 2, 3]}, dims=("layer",))
+    grid_2d_template = xr.ones_like(svat.isel(subunit=0, drop=True), dtype=float)
+    mf6_dis_template = layer_template * grid_2d_template
+
+    dis = StructuredDiscretization(top=grid_2d_template, bottom=-mf6_dis_template, idomain=mf6_dis_template.astype(int))
+
+    sprinkling = msw.SprinklingPoints(
+        case_data.art_grid,
+        case_data.x_p,
+        case_data.y_p,
+        case_data.layer_p,
+        case_data.id2grid_p,
+        case_data.capacity_p
+    )
+
+    with tempfile.TemporaryDirectory() as output_dir:
+        output_dir = Path(output_dir)
+        sprinkling.write(output_dir, index, svat, dis, well)
+
+        results = fixed_format_parser(
+            output_dir / msw.SprinklingPoints._file_name,
+            msw.SprinklingPoints._metadata_dict,
+        )
+
+    assert_equal(results["svat"], expected_data.svat)
+    assert_almost_equal(
+        results["max_abstraction_groundwater"],
+        expected_data.abs_gw,
+    )
+    assert_almost_equal(
+        results["max_abstraction_surfacewater"],
+        expected_data.abs_sw,
+    )
+    assert_equal(results["layer"], expected_data.layer)
+    assert_equal(results["svat_groundwater"], expected_data.svat_gw)
 
 @pytest.mark.unittest_jit
 def test_sprinkling_from_imod5_data__points(cap_data_sprinkling_points):
@@ -321,11 +528,6 @@ def test_sprinkling_from_imod5_data__grid(cap_data_sprinkling_grid):
     np.testing.assert_array_equal(
         rural_ds["max_abstraction_surfacewater"].to_numpy(), expected_sw_abstraction
     )
-
-
-# TODO: Create more test cases for SprinklingPoints.write() to test edge cases,
-#   such as wells in inactive SVATs, wells outside the model domain, etc.
-
 
 
 @pytest.mark.unittest_jit
