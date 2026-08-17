@@ -43,21 +43,34 @@ def sprinkling_svat_index():
     index = (svat != 0).values.ravel()
     return svat, index
 
+@dataclass
+class ExpectedCaseData:
+    abs_gw: Optional[np.ndarray] = None
+    abs_sw: Optional[np.ndarray] = None
+    layer: Optional[np.ndarray] = None
+    svat: Optional[np.ndarray] = None
+    svat_gw: Optional[np.ndarray] = None
+
 
 @dataclass
-class AbstractionCaseData:
+class SprinklingGridCaseData:
     max_abstraction_groundwater: Optional[xr.DataArray] = None
     max_abstraction_surfacewater: Optional[xr.DataArray] = None
-    expected_abs_gw: Optional[np.ndarray] = None
-    expected_abs_sw: Optional[np.ndarray] = None
-    expected_layer: Optional[np.ndarray] = None
-    expected_svat_gw: Optional[np.ndarray] = None
+
+@dataclass
+class SprinklingPointsCaseData:
+    art_grid: Optional[xr.DataArray] = None
+    x_p: Optional[xr.DataArray] = None
+    y_p: Optional[xr.DataArray] = None
+    layer_p: Optional[xr.DataArray] = None
+    id2grid_p: Optional[xr.DataArray] = None
+    capacity_p: Optional[xr.DataArray] = None
 
 
-class AbstractionGrids:
-    def case_all_svats(self, sprinkling_svat_index) -> AbstractionCaseData:
+class SprinklingGridCases:
+    def case_all_svats(self, sprinkling_svat_index) -> tuple[SprinklingGridCaseData, ExpectedCaseData]:
         svat, _ = sprinkling_svat_index
-        case_data = AbstractionCaseData()
+        case_data = SprinklingGridCaseData()
         case_data.max_abstraction_groundwater = xr.full_like(svat, 0.0)
         case_data.max_abstraction_surfacewater = xr.full_like(svat, 0.0)
         # fmt: off
@@ -82,15 +95,18 @@ class AbstractionGrids:
             ]
         )
         # fmt: on
-        case_data.expected_abs_gw = np.array([100.0, 300.0, 100.0, 200.0])
-        case_data.expected_abs_sw = np.array([100.0, 300.0, 100.0, 200.0])
-        case_data.expected_layer = np.array([3, 1, 3, 2])
-        case_data.expected_svat_gw = np.array([1, 2, 3, 4])
-        return case_data
+        expected_data = ExpectedCaseData()
+        expected_data.abs_gw = np.array([100.0, 300.0, 100.0, 200.0])
+        expected_data.abs_sw = np.array([100.0, 300.0, 100.0, 200.0])
+        expected_data.layer = np.array([3, 1, 3, 2])
+        expected_data.svat = np.array([1, 2, 3, 4])
+        expected_data.svat_gw = np.array([1, 2, 3, 4])
+        case_data.expected_data = expected_data
+        return case_data, expected_data
 
-    def case_some_svats(self, sprinkling_svat_index):
+    def case_some_svats(self, sprinkling_svat_index) -> tuple[SprinklingGridCaseData, ExpectedCaseData]:
         svat, _ = sprinkling_svat_index
-        case_data = AbstractionCaseData()
+        case_data = SprinklingGridCaseData()
         case_data.max_abstraction_groundwater = xr.full_like(svat, 0.0)
         case_data.max_abstraction_surfacewater = xr.full_like(svat, 0.0)
         # fmt: off
@@ -115,16 +131,18 @@ class AbstractionGrids:
             ]
         )
         # fmt: on
-        case_data.expected_abs_gw = np.array([100.0, 300.0, 200.0])
-        case_data.expected_abs_sw = np.array([100.0, 300.0, 200.0])
-        case_data.expected_layer = np.array([3, 1, 2])
-        case_data.expected_svat_gw = np.array([1, 2, 4])
+        expected_data = ExpectedCaseData()
+        expected_data.abs_gw = np.array([100.0, 300.0, 200.0])
+        expected_data.abs_sw = np.array([100.0, 300.0, 200.0])
+        expected_data.layer = np.array([3, 1, 2])
+        expected_data.svat = np.array([1, 2, 4])
+        expected_data.svat_gw = np.array([1, 2, 4])
 
-        return case_data
+        return case_data, expected_data
 
-    def case_inconsistent_active_capacity(self, sprinkling_svat_index):
+    def case_inconsistent_active_capacity(self, sprinkling_svat_index) -> tuple[SprinklingGridCaseData, ExpectedCaseData]:
         svat, _ = sprinkling_svat_index
-        case_data = AbstractionCaseData()
+        case_data = SprinklingGridCaseData()
         case_data.max_abstraction_groundwater = xr.full_like(svat, 0.0)
         case_data.max_abstraction_surfacewater = xr.full_like(svat, 0.0)
         # fmt: off
@@ -149,19 +167,29 @@ class AbstractionGrids:
             ]
         )
         # fmt: on
-        case_data.expected_abs_gw = np.array([100.0, 0.0, 200.0])
-        case_data.expected_abs_sw = np.array([0.0, 300.0, 200.0])
-        case_data.expected_layer = np.array([3, 1, 2])
-        case_data.expected_svat_gw = np.array([1, 2, 4])
+        expected_data = ExpectedCaseData()
+        expected_data.abs_gw = np.array([100.0, 0.0, 200.0])
+        expected_data.abs_sw = np.array([0.0, 300.0, 200.0])
+        expected_data.layer = np.array([3, 1, 2])
+        expected_data.svat = np.array([1, 2, 4])
+        expected_data.svat_gw = np.array([1, 2, 4])
 
-        return case_data
+        return case_data, expected_data
 
 
-@parametrize_with_cases("case_data", cases=AbstractionGrids)
+class SprinklingPointsCases:
+    def case_simple(self, sprinkling_svat_index):
+        svat, _ = sprinkling_svat_index
+        case_data = SprinklingPointsCaseData()
+
+
+
+@parametrize_with_cases("case_data, expected_data", cases=SprinklingGridCases)
 def test_simple_model(
     fixed_format_parser: Callable,
     sprinkling_svat_index: tuple[xr.DataArray, np.ndarray],
-    case_data: AbstractionCaseData,
+    case_data: SprinklingGridCaseData,
+    expected_data: ExpectedCaseData,
 ):
     svat, index = sprinkling_svat_index
 
@@ -188,24 +216,25 @@ def test_simple_model(
             msw.Sprinkling._metadata_dict,
         )
 
-    assert_equal(results["svat"], case_data.expected_svat_gw)
+    assert_equal(results["svat"], expected_data.svat)
     assert_almost_equal(
         results["max_abstraction_groundwater"],
-        case_data.expected_abs_gw,
+        expected_data.abs_gw,
     )
     assert_almost_equal(
         results["max_abstraction_surfacewater"],
-        case_data.expected_abs_sw,
+        expected_data.abs_sw,
     )
-    assert_equal(results["layer"], case_data.expected_layer)
-    assert_equal(results["svat_groundwater"], case_data.expected_svat_gw)
+    assert_equal(results["layer"], expected_data.layer)
+    assert_equal(results["svat_groundwater"], expected_data.svat_gw)
 
 
-@parametrize_with_cases("case_data", cases=AbstractionGrids)
+@parametrize_with_cases("case_data, expected_data", cases=SprinklingGridCases)
 def test_simple_model_1_subunit(
     fixed_format_parser: Callable,
     sprinkling_svat_index: tuple[xr.DataArray, np.ndarray],
-    case_data: AbstractionCaseData,
+    case_data: SprinklingGridCaseData,
+    expected_data: ExpectedCaseData,
 ):
     svat, index = sprinkling_svat_index
 
@@ -235,17 +264,17 @@ def test_simple_model_1_subunit(
             msw.Sprinkling._metadata_dict,
         )
 
-    assert_equal(results["svat"], case_data.expected_svat_gw[:2])
+    assert_equal(results["svat"], expected_data.svat[:2])
     assert_almost_equal(
         results["max_abstraction_groundwater"],
-        case_data.expected_abs_gw[:2],
+        expected_data.abs_gw[:2],
     )
     assert_almost_equal(
         results["max_abstraction_surfacewater"],
-        case_data.expected_abs_sw[:2],
+        expected_data.abs_sw[:2],
     )
-    assert_equal(results["layer"], case_data.expected_layer[:2])
-    assert_equal(results["svat_groundwater"], case_data.expected_svat_gw[:2])
+    assert_equal(results["layer"], expected_data.layer[:2])
+    assert_equal(results["svat_groundwater"], expected_data.svat_gw[:2])
 
 
 @pytest.mark.unittest_jit
@@ -294,6 +323,11 @@ def test_sprinkling_from_imod5_data__grid(cap_data_sprinkling_grid):
     )
 
 
+# TODO: Create more test cases for SprinklingPoints.write() to test edge cases,
+#   such as wells in inactive SVATs, wells outside the model domain, etc.
+
+
+
 @pytest.mark.unittest_jit
 def test_sprinklingpoints_from_imod5_data__points(cap_data_sprinkling_points):
     # Arrange
@@ -308,10 +342,6 @@ def test_sprinklingpoints_from_imod5_data__points(cap_data_sprinkling_points):
     # No unit conversion is done in SprinklingPoints, as the capacity is already
     # in m3/d
     np.testing.assert_almost_equal(sprinkling.dataset["capacity_p"], [15.0, 30.0])
-
-
-# TODO: Create more test cases for SprinklingPoints.write() to test edge cases,
-#   such as wells in inactive SVATs, wells outside the model domain, etc.
 
 
 @pytest.mark.unittest_jit
