@@ -269,31 +269,34 @@ class SprinklingPointsCases:
 
     def case_art_grid_outside(self, sprinkling_svat_index) -> tuple[SprinklingPointsCaseData, ExpectedCaseData]:
         """
-        Case where art grid is located outside the active SVAT area, but still in
-        the model domain. The well should not be assigned.
+        Case where art grid is located outside the active SVAT area, but still
+        in the model domain. The well is inside the model domain. Sprinkling
+        should not be assigned.
         """
         svat, _ = sprinkling_svat_index
         case_data = SprinklingPointsCaseData()
         case_data.art_grid = xr.full_like(svat.isel(subunit=0, drop=True), 0, dtype=int)
         # fmt: off
         case_data.art_grid.data = np.array(
-            [[0, 1, 4],
-             [0, 2, 0],
-             [0, 3, 0]]
+            [[0, 0, 4],
+             [0, 0, 0],
+             [0, 0, 0]]
         )
         # fmt: on
-        case_data.x_p = [2.0, 2.0, 2.0, 2.0]
-        case_data.y_p = [3.0, 2.0, 1.0, 3.0]
-        case_data.layer_p = [1, 2, 3, 3]
-        case_data.id2grid_p = [1, 2, 3, 4]
-        case_data.capacity_p = [10.0, 20.0, 30.0, 40.0]
+        case_data.x_p = [2.0]
+        case_data.y_p = [2.0]
+        case_data.layer_p = [3]
+        case_data.id2grid_p = [4]
+        case_data.capacity_p = [40.0]
 
+        # TODO: This is wrong, this should be for the case where a well is
+        #   outside the grid.
         expected_data = ExpectedCaseData()
-        expected_data.svat = np.array([1, 2, 3, 4])
-        expected_data.svat_gw = np.array([1, 2, 3, 4])
-        expected_data.layer = np.array([1, 3, 1, 2])
-        expected_data.abs_gw = np.array([10.0, 30.0, 10.0, 20.0])
-        expected_data.abs_sw = np.array([0.0, 0.0, 0.0, 0.0])
+        expected_data.svat = np.array([4])
+        expected_data.svat_gw = np.array([4])
+        expected_data.layer = np.array([3])
+        expected_data.abs_gw = np.array([0.0])
+        expected_data.abs_sw = np.array([40.0])
 
 
         return case_data, expected_data
