@@ -253,40 +253,6 @@ def _get_svat_groundwater_for_wells(
     return svat_groundwater.astype(int)
 
 
-def _get_wells_outside_art_grid_dataframe(
-    mf6_cellid_df: pd.DataFrame,
-    points_df: pd.DataFrame,
-    msw_mf6_sprinkling_df: pd.DataFrame,
-    svat_aligned: xr.DataArray,
-) -> pd.DataFrame:
-    """
-    Deal with edge case: wells that are outside art_grid, but in model domain.
-    These will be assigned to surfacewater abstraction. We can identify these by
-    checking which wells in mf6_cellid_df are not in msw_mf6_merged_df.
-    """
-    is_outside_art = ~mf6_cellid_df["id"].isin(msw_mf6_sprinkling_df["id"].unique())
-    outside_df = points_df.loc[is_outside_art, ["layer", "capacity_p"]]
-    outside_df = _replicate_dataframe_by_subunit(outside_df)
-    # Select the SVAT subunit for these wells based on their row/col location.
-    cellid_outside_df = mf6_cellid_df.loc[is_outside_art]
-    cellid_outside_df = _replicate_dataframe_by_subunit(cellid_outside_df)
-    indexer_outside = _extract_indexer_for_svat(
-        cellid_outside_df, columns=["subunit", "row", "column"]
-    )
-    svat_outside = svat_aligned.data[*indexer_outside]
-    outside_df["svat_groundwater"] = svat_outside.astype(int)
-    outside_df["svat"] = svat_outside.astype(int)
-    # Set capacity to surfacewater abstraction, and set groundwater abstraction to 0.
-    outside_df = outside_df.rename(
-        columns={"capacity_p": "max_abstraction_surfacewater"}
-    )
-    outside_df["max_abstraction_groundwater"] = 0.0
-    # drop subunit column as it is no longer needed
-    outside_df = outside_df.drop(columns=["subunit"])
-    # drop wells that are outside the active metaswap model domain (svat = 0)
-    return outside_df.query("svat > 0").reset_index(drop=True)
-
-
 class Sprinkling(MetaSwapPackage, IRegridPackage):
     """
     This contains the sprinkling capacities of links between SVAT units and
@@ -602,14 +568,16 @@ class SprinklingPoints(MetaSwapPackage, IRegridPackage):
         msw_mf6_sprinkling_df["svat_groundwater"] = _get_svat_groundwater_for_wells(
             msw_mf6_sprinkling_df, svat_aligned
         )
-
+        is_point_inside = msw_mf6_sprinkling_df["svat_groundwater"] > 0
         # Select columns that need to be written to scap_svat.inp
-        inside_df = msw_mf6_sprinkling_df[["svat", "layer", "svat_groundwater"]]
+        inside_df = msw_mf6_sprinkling_df.loc[
+            is_point_inside, ["svat", "layer", "svat_groundwater"]
+        ]
         inside_df["svat"] = inside_df["svat"].astype(int)
-        capacity = msw_mf6_sprinkling_df["capacity_p"]
         # Set wells with layer > 0 to groundwater abstraction, and wells with layer = 0
         # to surfacewater abstraction.
-        is_gw_extraction = msw_mf6_sprinkling_df["layer"] > 0
+        capacity = msw_mf6_sprinkling_df.loc[is_point_inside, "capacity_p"]
+        is_gw_extraction = inside_df["layer"] > 0
         inside_df["max_abstraction_groundwater"] = capacity.where(is_gw_extraction, 0.0)
         inside_df["max_abstraction_surfacewater"] = capacity.where(
             ~is_gw_extraction, 0.0
@@ -617,22 +585,19 @@ class SprinklingPoints(MetaSwapPackage, IRegridPackage):
         ##############
         # EDGE CASES #
         ##############
-        # Set wells located in inactive SVAT groundwater units (svat = 0) to
-        # surface water extraction.
-        well_in_inactive_cell = inside_df["svat_groundwater"] == 0
-        inside_df.loc[well_in_inactive_cell, "max_abstraction_groundwater"] = 0.0
-        inside_df.loc[well_in_inactive_cell, "max_abstraction_surfacewater"] = (
-            capacity.where(well_in_inactive_cell, 0.0)
-        )
-        inside_df.loc[well_in_inactive_cell, "svat_groundwater"] = inside_df.loc[
-            well_in_inactive_cell, "svat"
-        ]
-
-        # Wells that are outside art_grid, but in model domain.
+        # 1. Wells that are outside art_grid, but in model domain.
         # These will be assigned to surfacewater abstraction.
-        outside_df = _get_wells_outside_art_grid_dataframe(
-            mf6_cellid_df, points_df, msw_mf6_sprinkling_df, svat_aligned
+        outside_df = msw_mf6_sprinkling_df.loc[
+            ~is_point_inside, ["svat", "layer", "svat_groundwater", "capacity_p"]
+        ]
+        # Set capacity to surfacewater abstraction, and set groundwater abstraction to 0.
+        outside_df = outside_df.rename(
+            columns={"capacity_p": "max_abstraction_surfacewater"}
         )
+        outside_df["max_abstraction_groundwater"] = 0.0
+        # Set svat_groundwater to svat, as these wells are outside art_grid and
+        # will be assigned to surfacewater abstraction.
+        outside_df["svat_groundwater"] = outside_df["svat"]
         ############
         # FINALIZE #
         ############
