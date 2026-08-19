@@ -8,10 +8,7 @@ This section is for if you are in a hurry and just want to get started. We
 advice you to read the full documentation below if you are new to Python or the
 Python packaging ecosystem.
 
-Regular install
-^^^^^^^^^^^^^^^
-
-Install with pixi::
+Install with `pixi`_ (recommended)::
 
   pixi add imod
 
@@ -23,27 +20,10 @@ Install with pip::
 
   pip install imod
 
-Install beta release
-^^^^^^^^^^^^^^^^^^^^
-
-To install a beta release with pixi::
-
-  pixi config prepend default-channels "conda-forge/label/imod_rc"
-  pixi add imod=1.0.0rc5
-
-Or with conda::
-
-  conda install -c conda-forge/label/imod_rc -c conda-forge imod=1.0.0rc5
-
-Or with pip::
-
-  pip install --pre imod=1.0.0rc5
-
-
 Which Python?
 -------------
 
-You'll need **3.11, 3.12, or 3.13**. 
+You'll need **3.12, 3.13, or 3.14**. 
 
 The recommended way to install Python depends on your experience: Are you new to
 the Python packaging ecosystem or already got experience with it? If you already
@@ -51,17 +31,7 @@ know what ``conda`` and ``pip`` are, and are able to install tedious packages
 GIS packages yourself without issue, you are *experienced*. If you have no idea
 what the previous sentence was about, you are *new*.
 
-New
-^^^
-
-We recommend new users to install iMOD Python using the `Deltaforge`_ Python
-distribution. See :ref:`install_deltaforge`.
-
-Experienced
-^^^^^^^^^^^
-
-For experienced users, who want to be in control of packages installed, we
-recommend installing using `pixi`_. Pixi supports creating reproducible
+We recommend installing using `pixi`_. Pixi supports creating reproducible
 projects, where all dependencies' versions in an environment are stored in a
 textfile, the "lockfile". On top of that, it is faster than other package
 managers.
@@ -83,18 +53,6 @@ installations in your system.
 
 Ways to install iMOD Python
 ---------------------------
-
-.. _install_deltaforge:
-
-Installing with Deltaforge
-^^^^^^^^^^^^^^^^^^^^^^^^^^
-
-Deltaforge is an installer of Deltares python packages, including iMOD Python,
-and their dependencies. This makes it possible to install iMOD Python without
-much knowledge about the Python package management system. The download links
-are listed `here. <https://deltares.github.io/deltaforge/index.html#where>`__
-Users new to the python package ecosystem are recommended to install iMOD Python
-using Deltaforge.
 
 Installing with pixi
 ^^^^^^^^^^^^^^^^^^^^

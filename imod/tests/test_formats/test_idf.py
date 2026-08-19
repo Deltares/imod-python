@@ -1,3 +1,5 @@
+import datetime
+
 import numpy as np
 import pytest
 import xarray as xr
@@ -156,6 +158,7 @@ def test_open_subdomains(subdomains, expected, equidistant, tmp_path):
     expected_coords = util.spatial._xycoords((0.0, 8.0, 0.0, 6.0), (dx, dy))
 
     assert da.dims == ("time", "layer", "y", "x")
+    assert da.name == "subdomains"
 
     assert np.all(da.isel(time=0) == expected)
     assert len(da.x) == 8
@@ -186,6 +189,7 @@ def test_open_subdomains__start_nr_not_zero(
     expected_coords = util.spatial._xycoords((0.0, 8.0, 0.0, 6.0), (dx, dy))
 
     assert da.dims == ("time", "layer", "y", "x")
+    assert da.name == "subdomains"
 
     assert np.all(da.isel(time=0) == expected)
     assert len(da.x) == 8
@@ -211,8 +215,29 @@ def test_open_subdomains_pattern_None(subdomains, expected, equidistant, tmp_pat
     da = idf.open_subdomains(tmp_path / "subdomains_*.idf").load()
 
     assert da.dims == ("time", "layer", "y", "x")
+    assert da.name == "subdomains"
 
     assert np.all(da.isel(time=0) == expected)
+
+
+@parametrize_with_cases(
+    "subdomains,expected,equidistant", cases=SubdomainCases, has_tag="no_species"
+)
+def test_open_subdomains_pattern_no_time(subdomains, expected, equidistant, tmp_path):
+    """
+    Read with pattern without {time}, the time in the idf filename should then
+    be included in the name of the DataArray
+    """
+    _save_subdomains_no_species(subdomains, tmp_path)
+    # Test with pattern
+    pattern = r"{name}_l{layer}_p{subdomain}"
+    da = idf.open_subdomains(tmp_path / "subdomains_*.idf", pattern=pattern).load()
+
+    assert da.dims == ("layer", "y", "x")
+    assert da.name == "subdomains_20000101"
+
+    assert "time" not in da.coords.keys()
+    assert np.all(da == expected)
 
 
 @parametrize_with_cases(
@@ -230,6 +255,7 @@ def test_open_subdomains_species(subdomains, expected, equidistant, tmp_path):
     expected_coords = util.spatial._xycoords((0.0, 8.0, 0.0, 6.0), (dx, dy))
 
     assert da.dims == ("species", "time", "layer", "y", "x")
+    assert da.name == "subdomains"
 
     assert np.all(da.isel(time=0) == expected)
     assert len(da.x) == 8
@@ -441,3 +467,90 @@ def test_save_open_arbitrary_4D(tmp_path):
     assert isinstance(back, xr.DataArray)
     # Might get shuffled dimensions for the same reason.
     assert set(da.dims) == set(back.dims)
+
+
+def test_open_dataset(test_layerda, tmp_path):
+    da = test_layerda
+    idf.save(tmp_path / "head", da)
+    # Save a second parameter so the dataset has multiple entries
+    idf.save(tmp_path / "kh", da.rename("kh"))
+
+    result = idf.open_dataset(str(tmp_path / "*.idf"))
+
+    assert isinstance(result, dict)
+    assert "head" in result
+    assert "kh" in result
+    for name, da_result in result.items():
+        assert isinstance(da_result, xr.DataArray)
+        assert da_result.dims == ("layer", "y", "x")
+
+
+@pytest.mark.timeout(600, method="thread")  # 10 minutes
+@pytest.mark.user_acceptance
+def test_open_subdomains_large_scale(tmp_path):
+    """
+    User acceptance test: write 32,000 IDF files for 16 subdomains, 40 layers,
+    and 50 timesteps, then open and load with imod.idf.open_subdomains.
+    Target: completes within 10 minutes (when setting up this test, it took 4
+    minutes on my laptop).
+    """
+    n_subdomains = 16  # 4 x 4 grid
+    n_layers = 40
+    n_times = 50
+    nrow, ncol = 5, 5  # cells per subdomain
+    dx, dy = 1.0, -1.0
+    grid_cols = 4
+    grid_rows = 4  # grid_cols * grid_rows == n_subdomains
+
+    assert n_subdomains * n_layers * n_times == 32_000
+
+    # Generate 50 daily timesteps starting 2000-01-01
+    start = datetime.date(2000, 1, 1)
+    date_strs = [
+        (start + datetime.timedelta(days=i)).strftime("%Y%m%d") for i in range(n_times)
+    ]
+
+    # Precompute one DataArray per subdomain (data is the same for all
+    # timesteps and layers; only the spatial extent differs per subdomain).
+    data = np.ones((nrow, ncol), dtype=np.float32)
+    subdomain_das = []
+    for s in range(n_subdomains):
+        col_idx = s % grid_cols
+        row_idx = s // grid_cols
+        xmin = col_idx * ncol * dx
+        xmax = xmin + ncol * dx
+        ymax = (grid_rows - row_idx) * nrow * abs(dy)
+        ymin = ymax - nrow * abs(dy)
+        coords = util.spatial._xycoords((xmin, xmax, ymin, ymax), (dx, dy))
+        da = xr.DataArray(data, dims=("y", "x"), coords=coords, name="head")
+        subdomain_das.append(da)
+
+    idf_dir = tmp_path / "idf_files"
+    idf_dir.mkdir(exist_ok=True)
+
+    # Write all 32,000 IDF files
+    for s, da in enumerate(subdomain_das):
+        for layer in range(1, n_layers + 1):
+            for date_str in date_strs:
+                idf.write(
+                    idf_dir / f"head_{date_str}_l{layer}_p{s:04d}.idf",
+                    da,
+                )
+
+    # Open subdomains and load into memory
+    t0 = datetime.datetime.now()
+    result = idf.open_subdomains(idf_dir / "head_*.idf").load()
+    elapsed = datetime.datetime.now() - t0
+    with open(tmp_path / "open_subdomains_large_scale.log", "w") as f:
+        f.write(
+            f"Elapsed time for open_subdomains + load: {elapsed.total_seconds():.2f}s\n"
+        )
+
+    assert isinstance(result, xr.DataArray)
+    assert result.dims == ("time", "layer", "y", "x")
+    assert result.sizes["time"] == n_times
+    assert result.sizes["layer"] == n_layers
+    assert result.sizes["y"] == grid_rows * nrow
+    assert result.sizes["x"] == grid_cols * ncol
+    assert result.values.dtype == np.float32
+    assert np.all(result.values == 1.0)

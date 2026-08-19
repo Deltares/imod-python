@@ -181,10 +181,10 @@ class Modflow6Model(collections.UserDict[str, Package], IModel, abc.ABC):
         )
 
     def __setitem__(self, key, value):
-        if len(key) > 16:
+        if len(key) > 40:
             raise KeyError(
-                f"Received key with more than 16 characters: '{key}'"
-                "Modflow 6 has a character limit of 16."
+                f"Received key with more than 40 characters: '{key}'"
+                "Modflow 6 has a character limit of 40 characters."
             )
 
         super().__setitem__(key, value)

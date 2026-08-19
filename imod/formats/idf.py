@@ -12,14 +12,16 @@ from collections import defaultdict
 from collections.abc import Iterable
 from pathlib import Path
 from re import Pattern
-from typing import Any
+from typing import Any, DefaultDict
 
+import dask
+import dask.array
 import numpy as np
 import xarray as xr
 
 import imod
 from imod.formats import array_io
-from imod.typing.structured import merge_partitions
+from imod.typing.structured import merge_partitions_as_da_components
 
 # Make sure we can still use the built-in function...
 f_open = open
@@ -220,6 +222,75 @@ def _more_than_one_unique_value(values: Iterable[Any]):
     return len(set(values)) != 1
 
 
+def _merge_subdomains(
+    paths_per_subdomain: DefaultDict[Any, list[str]],
+    use_cftime: bool,
+    pattern: str | Pattern,
+):
+    """
+    Open and spatially merge all subdomain IDF files for one timestep.
+    Returns an ``xr.DataArray`` with all coordinates computed by
+    ``merge_partitions``.  Called directly (eagerly) once to obtain a
+    coordinate template, and indirectly via ``_merge_subdomains_values``
+    inside ``dask.delayed`` for actual computation.
+    """
+    das = []
+    for pathlist in paths_per_subdomain.values():
+        da = open(pathlist, use_cftime=use_cftime, pattern=pattern)
+        if "subdomain" in da.dims:
+            da = da.isel(subdomain=0, drop=True)
+        das.append(da)
+    return merge_partitions_as_da_components(das)
+
+
+def _merge_subdomains_values(
+    paths_per_subdomain: DefaultDict[Any, list[str]],
+    use_cftime: bool,
+    pattern: str | Pattern,
+):
+    """Wraps ``_merge_subdomains`` to return just a numpy array for ``dask.array.from_delayed``."""
+    data, _, _, _ = _merge_subdomains(paths_per_subdomain, use_cftime, pattern)
+    return data
+
+
+def _merge_subdomains_to_dataarray(
+    paths_per_subdomain: DefaultDict[Any, list[str]],
+    use_cftime: bool,
+    pattern: str | Pattern,
+) -> xr.DataArray:
+    """Wraps ``_merge_subdomains`` to return a DataArray for coordinate template."""
+    data, coords, dims, name = _merge_subdomains(
+        paths_per_subdomain, use_cftime, pattern
+    )
+    return xr.DataArray(
+        data=data,
+        coords=coords,
+        dims=dims,
+        name=name,
+    )
+
+
+def check_subdomain_consistency(
+    parsed: list[dict[str, Any]], paths: list[str], pattern: str | Pattern
+):
+    """Check that each subdomain has the same number of IDF files."""
+    grouped = defaultdict(list)
+    for match, p in zip(parsed, paths):
+        try:
+            key = match["subdomain"]
+        except KeyError as e:
+            raise KeyError(f"{e} in path: {p} with pattern: {pattern}")
+        grouped[key].append(p)
+
+    n_idf_per_subdomain = {
+        subdomain_id: len(path_ls) for subdomain_id, path_ls in grouped.items()
+    }
+    if _more_than_one_unique_value(n_idf_per_subdomain.values()):
+        raise ValueError(
+            f"Each subdomain must have the same number of IDF files, found: {n_idf_per_subdomain}"
+        )
+
+
 def open_subdomains(
     path: str | Path, use_cftime: bool = False, pattern: str | Pattern = None
 ) -> xr.DataArray:
@@ -243,6 +314,11 @@ def open_subdomains(
     xarray.DataArray
 
     """
+    # This function is a wrapper around open() that groups by subdomain and
+    # merges the subdomains into one DataArray, in a delayed manner, chunked per
+    # timestep. A lot of logic in this function is about grouping the files by
+    # subdomain and time, and setting the right time coordinate again.
+
     paths = sorted(glob.glob(str(path)))
 
     if pattern is None:
@@ -254,30 +330,70 @@ def open_subdomains(
             pattern = "{name}_{time}_l{layer}_p{subdomain}"
 
     parsed = [imod.util.path.decompose(path, pattern) for path in paths]
-    grouped = defaultdict(list)
-    for match, path in zip(parsed, paths):
-        try:
-            key = match["subdomain"]
-        except KeyError as e:
-            raise KeyError(f"{e} in path: {path} with pattern: {pattern}")
-        grouped[key].append(path)
+    check_subdomain_consistency(parsed, paths, pattern)
 
-    n_idf_per_subdomain = {
-        subdomain_id: len(path_ls) for subdomain_id, path_ls in grouped.items()
-    }
-    if _more_than_one_unique_value(n_idf_per_subdomain.values()):
-        raise ValueError(
-            f"Each subdomain must have the same number of IDF files, found: {n_idf_per_subdomain}"
+    has_time = "time" in parsed[0]
+
+    # Group by time (datetime.datetime from decompose), then by subdomain.
+    # Each delayed task processes one timestep, keeping the outer graph at O(n_time).
+    grouped_by_time: DefaultDict[Any, DefaultDict[Any, list]] = defaultdict(
+        lambda: defaultdict(list)
+    )
+
+    for match, p in zip(parsed, paths):
+        if has_time:
+            time_key = match["time"]
+        else:
+            # Work around for files without time dimension
+            # (imod.util.time._convert_datetimes special-cases this string)
+            time_key = "steady-state"
+        grouped_by_time[time_key][match["subdomain"]].append(p)
+
+    # Sort and convert times before calling _merge_subdomains so that
+    # use_cftime is already correct when the template is built.
+    raw_times_sorted = sorted(grouped_by_time.keys())
+    converted_times, use_cftime = imod.util.time._convert_datetimes(
+        raw_times_sorted, use_cftime
+    )
+
+    # Call _merge_subdomains eagerly for the first timestep to obtain a
+    # coordinate template. No data is computed — only the coordinate arrays
+    # (which are numpy) are used; the dask data array is discarded.
+    first_time_key = raw_times_sorted[0]
+    template = _merge_subdomains_to_dataarray(
+        grouped_by_time[first_time_key], use_cftime, pattern
+    )
+
+    shape = template.shape  # e.g. (1, nlayer, nrow, ncol)
+    dims = template.dims  # e.g. ("time", "layer", "y", "x")
+    dtype = template.dtype
+    if has_time:
+        time_axis = list(dims).index("time")
+    else:
+        time_axis = -1  # steady-state, no time dimension
+
+    # Delayed tasks for each timestep, which will be concatenated into a single
+    # dask array. One delayed task per timestep → outer graph depth 3, O(n_time)
+    # tasks
+    merged = []
+    for time_key in raw_times_sorted:
+        group = grouped_by_time[time_key]
+        timestep_data = dask.delayed(_merge_subdomains_values)(
+            group, use_cftime, pattern
         )
+        merged.append(dask.array.from_delayed(timestep_data, shape=shape, dtype=dtype))
+    data = dask.array.concatenate(merged, axis=time_axis)
 
-    das = []
-    for pathlist in grouped.values():
-        da = open(pathlist, use_cftime=use_cftime, pattern=pattern)
-        da = da.isel(subdomain=0, drop=True)
-        das.append(da)
+    # Build the full time coordinate
+    coords = dict(template.coords)
+    if has_time:
+        if use_cftime:
+            time_coord = xr.CFTimeIndex(converted_times)
+        else:
+            time_coord = np.array(converted_times, dtype="datetime64[ns]")
+        coords["time"] = time_coord
 
-    name = das[0].name
-    return merge_partitions(das)[name]  # as DataArray for backwards compatibility
+    return xr.DataArray(data, coords, dims, name=template.name, attrs=template.attrs)
 
 
 def open_dataset(globpath, use_cftime=False, pattern=None):
@@ -324,34 +440,34 @@ def open_dataset(globpath, use_cftime=False, pattern=None):
 
     paths = [pathlib.Path(p) for p in glob.glob(globpath, recursive=True)]
 
-    n = len(paths)
-    if n == 0:
+    if len(paths) == 0:
         raise FileNotFoundError("Could not find any files matching {}".format(globpath))
     # group the DataArrays together using their name
     # note that directory names are ignored, and in case of duplicates, the last one wins
     names = [imod.util.path.decompose(path, pattern)["name"] for path in paths]
-    unique_names = list(np.unique(names))
-    d = {}
-    for n in unique_names:
-        d[n] = []  # prepare empty lists to append to
-    for p, n in zip(paths, names):
-        d[n].append(p)
-
+    paths_by_name = {name: [] for name in np.unique(names)}
+    for path, name in zip(paths, names, strict=True):
+        paths_by_name[name].append(path)
     # load each group into a DataArray
-    das = [
-        array_io.reading._load(v, use_cftime, pattern, _read, header)
-        for v in d.values()
+    dataarrays = [
+        array_io.reading._load(
+            grouped_paths,
+            use_cftime,
+            _read,
+            [header(p, pattern) for p in grouped_paths],
+        )
+        for grouped_paths in paths_by_name.values()
     ]
 
-    # store each DataArray under it's own name in a dictionary
-    dd = {da.name: da for da in das}
+    # store each DataArray under its own name in a dictionary
+    dataset_dict = {da.name: da for da in dataarrays}
     # Initially I wanted to return a xarray Dataset here,
     # but then realised that it is not always aligned, and therefore not possible, see
     # https://github.com/pydata/xarray/issues/1471#issuecomment-313719395
     # It is not aligned when some parameters only have a non empty subset of a dimension,
     # such as L2 + L3. This dict provides a similar interface anyway. If a Dataset is constructed
     # from unaligned DataArrays it will make copies of the data, which we don't want.
-    return dd
+    return dataset_dict
 
 
 def write(path, a, nodata=1.0e20, dtype=np.float32):

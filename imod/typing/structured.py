@@ -2,7 +2,7 @@
 
 import itertools
 from collections import defaultdict
-from typing import DefaultDict, List, Set, Tuple
+from typing import Any, DefaultDict, List, Set, Tuple, cast
 
 import dask
 import numpy as np
@@ -155,7 +155,29 @@ def _merge_nonequidistant_coords(
     return out
 
 
-def _merge_partitions(das: List[xr.DataArray]) -> xr.DataArray:
+def merge_partitions_as_da_components(
+    das: List[xr.DataArray],
+) -> tuple[np.ndarray, dict[str, Any], tuple[str, ...], str]:
+    """
+    Merge a list of xarray DataArrays into components for a single DataArray.
+
+    The returned components are not yet combined into a DataArray, to avoid
+    excessive overhead for imod.idf._merge_subdomains()
+
+    Parameters
+    ----------
+    das: list of xr.DataArray
+        The list of DataArrays to merge.
+
+    Returns
+    -------
+    data: np.ndarray
+        The merged data array.
+    coords: dict[str, Any]
+        The merged coordinates.
+    dims: tuple[str, ...]
+        The dimension names of the merged DataArray.
+    """
     # Do some input checking
     check_dtypes(das)
     check_dims(das)
@@ -175,7 +197,7 @@ def _merge_partitions(das: List[xr.DataArray]) -> xr.DataArray:
 
     # Collect coordinates
     first = das[0]
-    coords = dict(first.coords)
+    coords = cast(dict[str, Any], dict(first.coords))
     coords["x"] = x
     coords["y"] = y[::-1]
     if _is_nonequidistant_coord(first, "dx"):
@@ -183,7 +205,10 @@ def _merge_partitions(das: List[xr.DataArray]) -> xr.DataArray:
     if _is_nonequidistant_coord(first, "dy"):
         coords["dy"] = ("y", _merge_nonequidistant_coords(das, "dy", iys, nrow))
 
+    dims = cast(tuple[str, ...], first.dims)
+    name = cast(str, first.name)
     arrays = [da.data for da in das]
+    data: np.ndarray
     if first.chunks is None:
         # If the data is in memory, merge all at once.
         data = merge_arrays(arrays, ixs, iys, yx_shape)
@@ -228,11 +253,19 @@ def _merge_partitions(das: List[xr.DataArray]) -> xr.DataArray:
         # After merging, the xy chunks are always (1, 1)
         reshaped = merged_blocks.reshape(block_shape + (1, 1))
         data = dask.array.block(reshaped.tolist())
+    return data, coords, dims, name
 
+
+def _merge_partitions_da(das: List[xr.DataArray]) -> xr.DataArray:
+    """
+    Merge a list of xarray DataArrays into a single DataArray.
+    """
+    data, coords, dims, name = merge_partitions_as_da_components(das)
     return xr.DataArray(
         data=data,
         coords=coords,
-        dims=first.dims,
+        dims=dims,
+        name=name,
     )
 
 
@@ -244,12 +277,12 @@ def merge_partitions(
         unique_keys = {key for da in das for key in da.keys()}
         merged_ls = []
         for key in unique_keys:
-            merged_ls.append(_merge_partitions([da[key] for da in das]).rename(key))
+            merged_ls.append(_merge_partitions_da([da[key] for da in das]).rename(key))
         return xr.merge(merged_ls, compat="no_conflicts")
     elif isinstance(first_item, xr.DataArray):
         # Store name to rename after concatenation
         name = first_item.name
-        return _merge_partitions(das).to_dataset(name=name)  # type: ignore
+        return _merge_partitions_da(das).to_dataset(name=name)  # type: ignore
     else:
         raise TypeError(
             f"Expected type: xr.DataArray or xr.Dataset, got {type(first_item)}"

@@ -9,6 +9,16 @@ The format is based on `Keep a Changelog`_, and this project adheres to
 [Unreleased]
 ------------
 
+Fixed
+~~~~~
+
+- Fixed resampling in :meth:`imod.mf6.Well.from_imod5_data` and
+  :meth:`imod.mf6.LayeredWell.from_imod5_data` when simulation timesteps precede
+  the first well timestep.
+
+[1.1.0] - 2026-08-03
+--------------------
+
 Added
 ~~~~~
 
@@ -20,14 +30,23 @@ Added
 - Added :meth:`imod.msw.MetaSwapModel.split` to split MetaSWAP models.
 - Added :meth:`imod.mf6.HorizontalFlowBarrierResistance.from_imod5_data` to load
   barriers from 3D GEN files. 
-- Added ``name`` argument to:meth:`imod.mf6.Modflow6Simulation.from_imod5_data`
+- Added ``name`` argument to :meth:`imod.mf6.Modflow6Simulation.from_imod5_data`
   to provide custom name to imported simulation and model.
 - Added :meth:`imod.msw.MetaSwapModel.mask_all_packages` to mask all packages of
   a MetaSWAP model.
+- Added optional ``target_grid`` argument to
+  :meth:`imod.mf6.Modflow6Simulation.from_imod5_data`,
+  :meth:`imod.mf6.GroundwaterFlowModel.from_imod5_data`,
+  :meth:`imod.mf6.StructuredDiscretization.from_imod5_data` to specify a target
+  grid for regridding the iMOD5 data to. If not provided, the first IBOUND layer
+  is used as target grid, like in iMOD5.
 
 Fixed
 ~~~~~
 
+- Fixed bug in :class:`imod.mf6.GroundwaterFlowModel` and :class:`imod.formats.prf.IpfResult` 
+  where names of wels were duplicated by increasing the character limit to 40
+  and enumerating wel names.
 - Fixed bug where :class:`imod.mf6.Evapotranspiration` package would write files
   to binary, which could not be parsed by MODFLOW 6 when ``proportion_depth``
   and ``proportion_rate`` were provided without segments.
@@ -86,16 +105,27 @@ Fixed
   ``front`` budget was left out, even though you only need to provide one of
   ``front``, ``lower`` or ``right``. Leaving out ``front`` now works as
   described in the documentation.
+- Fixed big performance degradation with :func:`imod.idf.open_subdomains` where
+  it would take a long time to open lots of idf files. Performance is now
+  significantly improved up to the same speed as before the change that caused
+  the performance degradation.
 
 Changed
 ~~~~~~~
 
+- Increased the character limit to 40 in :class:`imod.mf6.Modflow6Model` for all 
+  keys assigned to a Modflow6 model.
 - ``proportion_depth`` and ``proportion_rate`` in
   :class:`imod.mf6.Evapotranspiration` are now optional variables. If provided,
   now require ``"segment"`` dimension when ``proportion_depth`` and
   ``proportion_rate``.
 - :meth:`imod.msw.GridData.generate_index_array` is now deprecated, use
   :meth:`imod.msw.GridData.generate_isactive_svat_arrays` instead.
+- If no ``target_grid`` is provided,
+  :meth:`imod.mf6.StructuredDiscretization.from_imod5_data` chooses a grid the
+  same as iMOD5 did: the first IBOUND layer. This is different from previous
+  versions of iMOD Python, which defaulted to the smallest possible extent
+  and finest resolution, based on the iMOD5 IBOUND, TOP and BOTTOM data.
 
 
 [1.0.0] - 2025-11-11
