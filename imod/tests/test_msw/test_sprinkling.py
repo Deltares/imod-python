@@ -22,7 +22,7 @@ def sprinkling_svat_index():
     y = [3.0, 2.0, 1.0]
     subunit = [0, 1]
     dx = 1.0
-    dy = 1.0
+    dy = -1.0
     # fmt: off
     svat = xr.DataArray(
         np.array(
@@ -356,7 +356,7 @@ def test_grid_simple_model(
 
     # Well
     well_layer = [3, 2, 1]
-    well_y = [1.0, 2.0, 3.0]
+    well_y = [3.0, 2.0, 1.0]
     well_x = [2.0, 2.0, 2.0]
     well_rate_values = [-5.0] * 3
     well_rate = xr.DataArray(well_rate_values, dims=("ncellid",))
@@ -406,7 +406,7 @@ def test_grid_simple_model_1_subunit(
 
     # Well
     well_layer = [3, 1]
-    well_y = [1.0, 3.0]
+    well_y = [3.0, 1.0]
     well_x = [2.0, 2.0]
     well_rate_values = [-5.0] * 2
     well_rate = xr.DataArray(well_rate_values, dims=("ncellid",))
@@ -610,7 +610,6 @@ def test_sprinklingpoints_from_imod5_data_write__points(
     )
 
     # Assert
-    # TODO: Check with Hendrik whether this is the appropriate behaviour.
     np.testing.assert_equal(results["svat"], [1, 2, 3, 4])
     np.testing.assert_equal(results["svat_groundwater"], [1, 2, 4, 4])
     np.testing.assert_equal(results["layer"], [2, 2, 2, 2])
