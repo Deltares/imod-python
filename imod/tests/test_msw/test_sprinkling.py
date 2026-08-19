@@ -67,7 +67,7 @@ class SprinklingPointsCaseData:
     x_p: Optional[np.ndarray] = None
     y_p: Optional[np.ndarray] = None
     layer_p: Optional[np.ndarray] = None
-    id2grid_p: Optional[np.ndarray] = None
+    id_sprinkling_p: Optional[np.ndarray] = None
     capacity_p: Optional[np.ndarray] = None
 
 
@@ -207,7 +207,7 @@ class SprinklingPointsCases:
         case_data.x_p = [2.0, 2.0, 2.0]
         case_data.y_p = [3.0, 2.0, 1.0]
         case_data.layer_p = [1, 2, 3]
-        case_data.id2grid_p = [1, 2, 3]
+        case_data.id_sprinkling_p = [1, 2, 3]
         case_data.capacity_p = [10.0, 20.0, 30.0]
 
         expected_data = ExpectedCaseData()
@@ -239,7 +239,7 @@ class SprinklingPointsCases:
         case_data.x_p = [2.0, 2.0, 2.0]
         case_data.y_p = [3.0, 2.0, 1.0]
         case_data.layer_p = [1, 2, 3]
-        case_data.id2grid_p = [1, 1, 1]
+        case_data.id_sprinkling_p = [1, 1, 1]
         case_data.capacity_p = [10.0, 20.0, 30.0]
 
         expected_data = ExpectedCaseData()
@@ -268,7 +268,7 @@ class SprinklingPointsCases:
         case_data.x_p = [2.0]
         case_data.y_p = [2.0]
         case_data.layer_p = [2]
-        case_data.id2grid_p = [1]
+        case_data.id_sprinkling_p = [1]
         case_data.capacity_p = [10.0]
 
         expected_data = ExpectedCaseData()
@@ -301,7 +301,7 @@ class SprinklingPointsCases:
         case_data.x_p = [2.0]
         case_data.y_p = [2.0]
         case_data.layer_p = [3]
-        case_data.id2grid_p = [4]
+        case_data.id_sprinkling_p = [4]
         case_data.capacity_p = [40.0]
 
         expected_data = ExpectedCaseData()
@@ -333,7 +333,7 @@ class SprinklingPointsCases:
         case_data.x_p = [3.0]
         case_data.y_p = [1.0]
         case_data.layer_p = [3]
-        case_data.id2grid_p = [5]
+        case_data.id_sprinkling_p = [5]
         case_data.capacity_p = [40.0]
 
         expected_data = ExpectedCaseData()
@@ -482,7 +482,7 @@ def test_points_simple_model(
         case_data.x_p,
         case_data.y_p,
         case_data.layer_p,
-        case_data.id2grid_p,
+        case_data.id_sprinkling_p,
         case_data.capacity_p,
     )
 
@@ -557,7 +557,7 @@ def test_sprinkling_from_imod5_data__grid(cap_data_sprinkling_grid):
 @pytest.mark.unittest_jit
 def test_sprinklingpoints_from_imod5_data__points(cap_data_sprinkling_points):
     # Arrange
-    expected_vars = {"id2grid_p", "capacity_p", "layer_p", "y_p", "x_p", "id_msw"}
+    expected_vars = {"id_sprinkling_p", "capacity_p", "layer_p", "y_p", "x_p", "id_sprinkling"}
 
     # Act
     sprinkling = msw.SprinklingPoints.from_imod5_data(cap_data_sprinkling_points)

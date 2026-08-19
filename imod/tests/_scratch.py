@@ -96,10 +96,10 @@ isactive_1d, svat = griddata.generate_isactive_svat_arrays()
 # %%
 # In from_imod5_cap_data
 arl_points = df_points.iloc[:, :5]
-arl_points.columns = ["x_p", "y_p", "layer_p", "id2grid_p", "capacity"]
+arl_points.columns = ["x_p", "y_p", "layer_p", "id_sprinkling_p", "capacity"]
 # Enforce dtypes
 arl_points = arl_points.astype(
-    {"x_p": float, "y_p": float, "layer_p": int, "id2grid_p": int, "capacity": float}
+    {"x_p": float, "y_p": float, "layer_p": int, "id_sprinkling_p": int, "capacity": float}
 )
 arl_points["id"] = arl_points.index.astype(str)
 arl_points = arl_points.set_index("id")
@@ -107,7 +107,7 @@ arl_points = arl_points.set_index("id")
 points_ds = arl_points.to_xarray()
 
 # in def __init__
-art_grid = art_grid.rename("id_msw")
+art_grid = art_grid.rename("id_sprinkling")
 dataset = xr.merge([art_grid, points_ds])
 
 # %%
@@ -126,9 +126,9 @@ points_mf6_merged_df = arl_points.reset_index().merge(
     mf6_cellid_df, on="id", how="right", validate="many_to_one"
 )
 # %%
-# Flatten id_msw grid → (y, x, id_msw) table, drop cells with no well
+# Flatten id_sprinkling grid → (y, x, id_sprinkling) table, drop cells with no well
 grids = xr.merge([art_grid, svat])
-art_df = grids.to_dataframe().reset_index().query("(id_msw > 0) & (svat > 0)")
+art_df = grids.to_dataframe().reset_index().query("(id_sprinkling > 0) & (svat > 0)")
 # Drop unnecessary columns. We preserve the x, y coords as they might prove
 # useful for debugging.
 art_df = art_df.drop(["dx", "dy"], axis=1)
@@ -136,8 +136,8 @@ art_df = art_df.drop(["dx", "dy"], axis=1)
 # Join: each SVAT cell gets the matching well row(s) from arl_points
 msw_mf6_merged_df = art_df.merge(
     points_mf6_merged_df,  # brings id back as a column
-    left_on="id_msw",
-    right_on="id2grid_p",
+    left_on="id_sprinkling",
+    right_on="id_sprinkling_p",
     how="inner",
     validate="many_to_one",
 )

@@ -34,7 +34,7 @@ class SprinklingPointsDataDict(TypedDict, total=False):
     x_p: np.ndarray | list[float]
     y_p: np.ndarray | list[float]
     layer_p: np.ndarray | list[int]
-    id2grid_p: np.ndarray | list[int]
+    id_sprinkling_p: np.ndarray | list[int]
     capacity_p: np.ndarray | list[float]
 
 
@@ -59,13 +59,13 @@ def _sprinkling_data_from_imod5_ipf(
     # this order. The additional columns are metadata for the user and can be
     # ignored.
     arl_points = df_points.iloc[:, :5]
-    arl_points.columns = ["x_p", "y_p", "layer_p", "id2grid_p", "capacity_p"]
+    arl_points.columns = ["x_p", "y_p", "layer_p", "id_sprinkling_p", "capacity_p"]
     # Enforce dtypes
     dtype_dict = {
         "x_p": float,
         "y_p": float,
         "layer_p": int,
-        "id2grid_p": int,
+        "id_sprinkling_p": int,
         "capacity_p": float,
     }
 
@@ -208,10 +208,9 @@ def _merge_sprinkling_points_with_grids(
     Merge sprinkling points with SVAT grids.
     """
 
-    # TODO: Rename "id_msw" and "id2grid_p" to something clearer like "id_sprinkling"
-    # Flatten id_msw grid → (y, x, id_msw) table, drop cells with no well
+    # Flatten id_sprinkling grid → (y, x, id_sprinkling) table, drop cells with no well
     grids = xr.merge([sprinkling_id_grid, svat])
-    art_df = grids.to_dataframe().reset_index().query("(id_msw > 0) & (svat > 0)")
+    art_df = grids.to_dataframe().reset_index().query("(id_sprinkling > 0) & (svat > 0)")
     # Drop unnecessary columns. We preserve the x, y coords as they might
     # prove useful for debugging.
     art_df = art_df.drop(["dx", "dy"], axis=1)
@@ -219,8 +218,8 @@ def _merge_sprinkling_points_with_grids(
     # Join: each SVAT cell gets the matching well row(s) from arl_points
     return art_df.merge(
         points_df,  # brings id back as a column
-        left_on="id_msw",
-        right_on="id2grid_p",
+        left_on="id_sprinkling",
+        right_on="id_sprinkling_p",
         how="inner",
         validate="many_to_one",
     )
@@ -437,7 +436,7 @@ class SprinklingPoints(MetaSwapPackage, IRegridPackage):
         y-coordinates of the artificial recharge locations.
     layer_p: np.ndarray | list[int]
         layer indices of the artificial recharge locations.
-    id2grid_p: np.ndarray | list[int]
+    id_sprinkling_p: np.ndarray | list[int]
         mapping of the artificial recharge locations to the grid cells.
     capacity_p: np.ndarray | list[float]
         abstraction capacities of the artificial recharge locations.
@@ -476,7 +475,7 @@ class SprinklingPoints(MetaSwapPackage, IRegridPackage):
         x_p: np.ndarray | list[float],
         y_p: np.ndarray | list[float],
         layer_p: np.ndarray | list[int],
-        id2grid_p: np.ndarray | list[int],
+        id_sprinkling_p: np.ndarray | list[int],
         capacity_p: np.ndarray | list[float],
     ):
         super().__init__()
@@ -488,12 +487,12 @@ class SprinklingPoints(MetaSwapPackage, IRegridPackage):
                 "x_p": (("id",), x_p),
                 "y_p": (("id",), y_p),
                 "layer_p": (("id",), layer_p),
-                "id2grid_p": (("id",), id2grid_p),
+                "id_sprinkling_p": (("id",), id_sprinkling_p),
                 "capacity_p": (("id",), capacity_p),
             },
             coords={"id": id_index},
         )
-        art_grid = art_grid.rename("id_msw")
+        art_grid = art_grid.rename("id_sprinkling")
         self.dataset = xr.merge([art_grid, points_ds])
 
     @classmethod
@@ -550,7 +549,7 @@ class SprinklingPoints(MetaSwapPackage, IRegridPackage):
 
         This method first merges the sprinkling points with the mf6_well cellids
         to get the row/col of each well, then merges the sprinkling points with
-        the svat and id_msw grid. It then selects the columns that need to be
+        the svat and id_sprinkling grid. It then selects the columns that need to be
         written to scap_svat.inp and sets wells with layer > 0 to groundwater
         abstraction, and wells with layer = 0 to surfacewater abstraction.
         Finally, it deals with edge cases for wells that are outside art_grid
@@ -560,9 +559,9 @@ class SprinklingPoints(MetaSwapPackage, IRegridPackage):
         # row/col of each well.
         mf6_cellid_df = _get_mf6_cellid_dataframe(mf6_well)
         points_df = _make_sprinkling_well_points_dataframe(self.dataset, mf6_cellid_df)
-        # Merge the sprinkling points with the svat and id_msw grid
+        # Merge the sprinkling points with the svat and id_sprinkling grid
         msw_mf6_sprinkling_df = _merge_sprinkling_points_with_grids(
-            points_df, svat, self.dataset["id_msw"]
+            points_df, svat, self.dataset["id_sprinkling"]
         )
         svat_aligned = align_svat_with_dis(svat, mf6_dis)
         msw_mf6_sprinkling_df["svat_groundwater"] = _get_svat_groundwater_for_wells(
