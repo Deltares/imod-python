@@ -222,6 +222,42 @@ class SprinklingPointsCases:
 
         return case_data, expected_data
 
+    def case_one_point_one_art_cell__one_subunit(
+        self, sprinkling_svat_index
+    ) -> tuple[SprinklingPointsCaseData, ExpectedCaseData]:
+        """
+        Simple test case for sprinkling points. Each point is mapped to one
+        svat. Only one subunit is used, similar to when imported from iMOD5
+        DBASE
+        """
+        svat, _ = sprinkling_svat_index
+        case_data = SprinklingPointsCaseData()
+        case_data.art_grid = xr.full_like(svat, 0, dtype=int)
+        # fmt: off
+        case_data.art_grid.data = np.array(
+            [[[0, 1, 0],
+              [0, 2, 0],
+              [0, 3, 0],],
+             [[0, 0, 0],
+              [0, 0, 0],
+              [0, 0, 0]]]
+        )
+        # fmt: on
+        case_data.x_p = [2.0, 2.0, 2.0]
+        case_data.y_p = [3.0, 2.0, 1.0]
+        case_data.layer_p = [1, 2, 3]
+        case_data.id_sprinkling_p = [1, 2, 3]
+        case_data.capacity_p = [10.0, 20.0, 30.0]
+
+        expected_data = ExpectedCaseData()
+        expected_data.svat = np.array([1, 2])
+        expected_data.svat_gw = np.array([1, 2])
+        expected_data.layer = np.array([1, 3])
+        expected_data.abs_gw = np.array([10.0, 30.0])
+        expected_data.abs_sw = np.array([0.0, 0.0])
+
+        return case_data, expected_data
+
     def case_multi_point_one_art_cell(
         self, sprinkling_svat_index
     ) -> tuple[SprinklingPointsCaseData, ExpectedCaseData]:
