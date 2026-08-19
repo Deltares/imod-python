@@ -1166,8 +1166,8 @@ def test_from_imod5_cap_data__big_grid(
 def test_from_imod5_cap_data__points(cap_data_sprinkling_points, cap_coupled_dis_grid):
     # Act
     well = LayeredWell.from_imod5_cap_data(
-            cap_data_sprinkling_points, cap_coupled_dis_grid
-        )
+        cap_data_sprinkling_points, cap_coupled_dis_grid
+    )
     # Assert
     ds = well.dataset
     np.testing.assert_allclose(ds["x"].to_numpy(), np.array([2.0, 2.0]))
