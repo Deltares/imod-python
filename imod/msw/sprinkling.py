@@ -210,7 +210,9 @@ def _merge_sprinkling_points_with_grids(
 
     # Flatten id_sprinkling grid → (y, x, id_sprinkling) table, drop cells with no well
     grids = xr.merge([sprinkling_id_grid, svat])
-    art_df = grids.to_dataframe().reset_index().query("(id_sprinkling > 0) & (svat > 0)")
+    art_df = (
+        grids.to_dataframe().reset_index().query("(id_sprinkling > 0) & (svat > 0)")
+    )
     # Drop unnecessary columns. We preserve the x, y coords as they might
     # prove useful for debugging.
     art_df = art_df.drop(["dx", "dy"], axis=1)

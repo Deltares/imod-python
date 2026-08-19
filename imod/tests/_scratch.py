@@ -99,7 +99,13 @@ arl_points = df_points.iloc[:, :5]
 arl_points.columns = ["x_p", "y_p", "layer_p", "id_sprinkling_p", "capacity"]
 # Enforce dtypes
 arl_points = arl_points.astype(
-    {"x_p": float, "y_p": float, "layer_p": int, "id_sprinkling_p": int, "capacity": float}
+    {
+        "x_p": float,
+        "y_p": float,
+        "layer_p": int,
+        "id_sprinkling_p": int,
+        "capacity": float,
+    }
 )
 arl_points["id"] = arl_points.index.astype(str)
 arl_points = arl_points.set_index("id")

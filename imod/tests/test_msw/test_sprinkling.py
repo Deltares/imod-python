@@ -557,7 +557,14 @@ def test_sprinkling_from_imod5_data__grid(cap_data_sprinkling_grid):
 @pytest.mark.unittest_jit
 def test_sprinklingpoints_from_imod5_data__points(cap_data_sprinkling_points):
     # Arrange
-    expected_vars = {"id_sprinkling_p", "capacity_p", "layer_p", "y_p", "x_p", "id_sprinkling"}
+    expected_vars = {
+        "id_sprinkling_p",
+        "capacity_p",
+        "layer_p",
+        "y_p",
+        "x_p",
+        "id_sprinkling",
+    }
 
     # Act
     sprinkling = msw.SprinklingPoints.from_imod5_data(cap_data_sprinkling_points)
