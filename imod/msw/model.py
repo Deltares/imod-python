@@ -46,11 +46,12 @@ from imod.msw.pkgbase import MetaSwapPackage
 from imod.msw.ponding import Ponding
 from imod.msw.regrid.regrid_schemes import CapDataRegridMethod
 from imod.msw.scaling_factors import ScalingFactors
-from imod.msw.sprinkling import Sprinkling
+from imod.msw.sprinkling import Sprinkling, SprinklingPoints
 from imod.msw.timeutil import to_metaswap_timeformat
 from imod.msw.utilities.common import find_in_file_list
 from imod.msw.utilities.imod5_converter import (
     has_active_scaling_factor,
+    is_sprinkling_from_points,
 )
 from imod.msw.utilities.mask import (
     MetaSwapActive,
@@ -830,7 +831,10 @@ class MetaSwapModel(Model, IDict):
         }
         model["infiltration"] = Infiltration.from_imod5_data(imod5_masked)
         model["ponding"] = Ponding.from_imod5_data(imod5_masked)
-        model["sprinkling"] = Sprinkling.from_imod5_data(imod5_masked)
+        if is_sprinkling_from_points(imod5_masked):
+            model["sprinkling"] = SprinklingPoints.from_imod5_data(imod5_masked)
+        else:
+            model["sprinkling"] = Sprinkling.from_imod5_data(imod5_masked)
         model["meteo_grid"] = MeteoGridCopy.from_imod5_data(imod5_masked)
         model["prec_mapping"] = PrecipitationMapping.from_imod5_data(imod5_masked)
         model["evt_mapping"] = EvapotranspirationMapping.from_imod5_data(imod5_masked)

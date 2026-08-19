@@ -1,5 +1,5 @@
 import textwrap
-from typing import TextIO, TypedDict, cast
+from typing import TextIO, cast
 
 import numpy as np
 import pandas as pd
@@ -14,32 +14,13 @@ from imod.msw.regrid.regrid_schemes import (
     SprinklingPointsRegridMethod,
     SprinklingRegridMethod,
 )
-from imod.msw.utilities.common import concat_imod5
 from imod.msw.utilities.imod5_converter import (
-    get_cell_area_from_imod5_data,
+    CapSprinklingDataDict,
+    is_sprinkling_from_points,
+    sprinkling_data_from_imod5_grid,
+    sprinkling_data_from_imod5_ipf,
 )
-from imod.typing import GridDataArray, GridDataDict, Imod5DataDict, IntArray
-from imod.typing.grid import zeros_like
-
-
-# Some additional type aliases for sprinkling data, which is a bit more complex
-# than other packages.
-class CapSprinklingDataDict(TypedDict, total=False):
-    artificial_recharge: GridDataArray
-    artificial_recharge_layer: pd.DataFrame
-    artificial_recharge_capacity: GridDataArray
-
-
-class SprinklingPointsDataDict(TypedDict, total=False):
-    x_p: np.ndarray | list[float]
-    y_p: np.ndarray | list[float]
-    layer_p: np.ndarray | list[int]
-    id_sprinkling_p: np.ndarray | list[int]
-    capacity_p: np.ndarray | list[float]
-
-
-class SprinklingPointsGridDataDict(SprinklingPointsDataDict, total=False):
-    art_grid: GridDataArray
+from imod.typing import Imod5DataDict, IntArray
 
 
 def _ravel_per_subunit(da: xr.DataArray) -> np.ndarray:
@@ -47,77 +28,6 @@ def _ravel_per_subunit(da: xr.DataArray) -> np.ndarray:
     array_out = da.to_numpy().ravel()
     # per defined well element, per defined subunits
     return array_out[np.isfinite(array_out)]
-
-
-def _sprinkling_data_from_imod5_ipf(
-    cap_data: CapSprinklingDataDict,
-) -> SprinklingPointsGridDataDict:
-    art_grid = cap_data["artificial_recharge"]
-    # Set urban landuse irrigation to 0, as sprinkling is not allowed for urban landuse.
-    subunit_template = xr.DataArray(
-        np.array([1, 0], dtype=int), dims="subunit", coords={"subunit": [0, 1]}
-    )
-    art_grid = subunit_template * art_grid
-
-    df_points = cap_data["artificial_recharge_layer"]
-    # Select first 5 columns and enforce column names, iMOD5 expects columns in
-    # this order. The additional columns are metadata for the user and can be
-    # ignored.
-    arl_points = df_points.iloc[:, :5]
-    arl_points.columns = ["x_p", "y_p", "layer_p", "id_sprinkling_p", "capacity_p"]
-    # Enforce dtypes
-    dtype_dict = {
-        "x_p": float,
-        "y_p": float,
-        "layer_p": int,
-        "id_sprinkling_p": int,
-        "capacity_p": float,
-    }
-
-    arl_points = arl_points.astype(dtype_dict)
-    arl_point_dict = cast(
-        SprinklingPointsDataDict,
-        {key: arl_points[key].to_numpy() for key in dtype_dict.keys()},
-    )
-
-    return {
-        "art_grid": art_grid,
-        **arl_point_dict,
-    }
-
-
-def _sprinkling_data_from_imod5_grid(cap_data: GridDataDict) -> GridDataDict:
-    # Convert units from mm/d to m3/d
-    msw_area = get_cell_area_from_imod5_data(cap_data)
-    capacity_mmd = cap_data["artificial_recharge_capacity"]
-    capacity_m3d = capacity_mmd * 1e-3 * msw_area.sel(subunit=0, drop=True)
-
-    artificial_rch_type = cap_data["artificial_recharge"]
-    from_groundwater = artificial_rch_type == 1
-    from_surfacewater = artificial_rch_type == 2
-    is_active = artificial_rch_type != 0
-
-    zero_where_active = zeros_like(artificial_rch_type).where(is_active)
-
-    # Add zero where active, to have active cells set to 0.0.
-    max_abstraction_groundwater_rural = zero_where_active.where(
-        ~from_groundwater, capacity_m3d
-    )
-    max_abstraction_surfacewater_rural = zero_where_active.where(
-        ~from_surfacewater, capacity_m3d
-    )
-
-    # No sprinkling for urban environments
-    max_abstraction_urban = zero_where_active
-
-    data = {}
-    data["max_abstraction_groundwater"] = concat_imod5(
-        max_abstraction_groundwater_rural, max_abstraction_urban
-    )
-    data["max_abstraction_surfacewater"] = concat_imod5(
-        max_abstraction_surfacewater_rural, max_abstraction_urban
-    )
-    return data
 
 
 def _extract_indexer_for_svat(df: pd.DataFrame, columns: list[str]):
@@ -384,8 +294,7 @@ class Sprinkling(MetaSwapPackage, IRegridPackage):
         -------
         Sprinkling package
         """
-        cap_data = imod5_data["cap"]
-        if isinstance(cap_data["artificial_recharge_layer"], pd.DataFrame):
+        if is_sprinkling_from_points(imod5_data):
             msg = textwrap.dedent(
                 """
                 Unsupported format for artificial_recharge_layer: expected a
@@ -394,8 +303,8 @@ class Sprinkling(MetaSwapPackage, IRegridPackage):
                 """
             )
             raise TypeError(msg)
-
-        data = _sprinkling_data_from_imod5_grid(cap_data)
+        cap_data = imod5_data["cap"]
+        data = sprinkling_data_from_imod5_grid(cap_data)
 
         return cls(**data)
 
@@ -512,9 +421,9 @@ class SprinklingPoints(MetaSwapPackage, IRegridPackage):
         -------
         SprinklingPoints package
         """
-        cap_data = cast(CapSprinklingDataDict, imod5_data["cap"])
-        if isinstance(cap_data["artificial_recharge_layer"], pd.DataFrame):
-            data = _sprinkling_data_from_imod5_ipf(cap_data)
+        if is_sprinkling_from_points(imod5_data):
+            cap_data = cast(CapSprinklingDataDict, imod5_data["cap"])
+            data = sprinkling_data_from_imod5_ipf(cap_data)
             return cls(**data)
         else:
             msg = textwrap.dedent(
