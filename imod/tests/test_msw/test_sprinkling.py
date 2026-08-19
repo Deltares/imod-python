@@ -196,12 +196,15 @@ class SprinklingPointsCases:
         """
         svat, _ = sprinkling_svat_index
         case_data = SprinklingPointsCaseData()
-        case_data.art_grid = xr.full_like(svat.isel(subunit=0, drop=True), 0, dtype=int)
+        case_data.art_grid = xr.full_like(svat, 0, dtype=int)
         # fmt: off
         case_data.art_grid.data = np.array(
-            [[0, 1, 0],
-             [0, 2, 0],
-             [0, 3, 0]]
+            [[[0, 1, 0],
+              [0, 2, 0],
+              [0, 3, 0],],
+             [[0, 1, 0],
+              [0, 2, 0],
+              [0, 3, 0]]]
         )
         # fmt: on
         case_data.x_p = [2.0, 2.0, 2.0]
@@ -228,12 +231,15 @@ class SprinklingPointsCases:
         """
         svat, _ = sprinkling_svat_index
         case_data = SprinklingPointsCaseData()
-        case_data.art_grid = xr.full_like(svat.isel(subunit=0, drop=True), 0, dtype=int)
+        case_data.art_grid = xr.full_like(svat, 0, dtype=int)
         # fmt: off
         case_data.art_grid.data = np.array(
-            [[0, 0, 0],
-             [0, 1, 0],
-             [0, 0, 0]]
+            [[[0, 0, 0],
+              [0, 1, 0],
+              [0, 0, 0]],
+             [[0, 0, 0],
+              [0, 1, 0],
+              [0, 0, 0]]]
         )
         # fmt: on
         case_data.x_p = [2.0, 2.0, 2.0]
@@ -257,12 +263,15 @@ class SprinklingPointsCases:
         """
         svat, _ = sprinkling_svat_index
         case_data = SprinklingPointsCaseData()
-        case_data.art_grid = xr.full_like(svat.isel(subunit=0, drop=True), 0, dtype=int)
+        case_data.art_grid = xr.full_like(svat, 0, dtype=int)
         # fmt: off
         case_data.art_grid.data = np.array(
-            [[0, 1, 0],
-             [0, 1, 0],
-             [0, 1, 0]]
+            [[[0, 1, 0],
+              [0, 1, 0],
+              [0, 1, 0]],
+             [[0, 1, 0],
+              [0, 1, 0],
+              [0, 1, 0]]]
         )
         # fmt: on
         case_data.x_p = [2.0]
@@ -290,13 +299,17 @@ class SprinklingPointsCases:
         """
         svat, _ = sprinkling_svat_index
         case_data = SprinklingPointsCaseData()
-        case_data.art_grid = xr.full_like(svat.isel(subunit=0, drop=True), 0, dtype=int)
+        case_data.art_grid = xr.full_like(svat, 0, dtype=int)
         # fmt: off
         case_data.art_grid.data = np.array(
-            [[0, 0, 4],
-             [0, 0, 0],
-             [0, 0, 0]]
+            [[[0, 0, 4],
+              [0, 0, 0],
+              [0, 0, 0]],
+             [[0, 0, 4],
+              [0, 0, 0],
+              [0, 0, 0]]]
         )
+
         # fmt: on
         case_data.x_p = [2.0]
         case_data.y_p = [2.0]
@@ -322,12 +335,15 @@ class SprinklingPointsCases:
         """
         svat, _ = sprinkling_svat_index
         case_data = SprinklingPointsCaseData()
-        case_data.art_grid = xr.full_like(svat.isel(subunit=0, drop=True), 0, dtype=int)
+        case_data.art_grid = xr.full_like(svat, 0, dtype=int)
         # fmt: off
         case_data.art_grid.data = np.array(
-            [[0, 0, 0],
-             [0, 0, 0],
-             [0, 5, 0]]
+            [[[0, 0, 0],
+              [0, 0, 0],
+              [0, 5, 0]],
+             [[0, 0, 0],
+              [0, 0, 0],
+              [0, 5, 0]]]
         )
         # fmt: on
         case_data.x_p = [3.0]
@@ -570,7 +586,7 @@ def test_sprinklingpoints_from_imod5_data__points(cap_data_sprinkling_points):
     sprinkling = msw.SprinklingPoints.from_imod5_data(cap_data_sprinkling_points)
 
     # Assert
-    assert sprinkling.dataset.sizes == {"id": 2, "x": 3, "y": 3}
+    assert sprinkling.dataset.sizes == {"subunit": 2, "id": 2, "x": 3, "y": 3}
     assert set(sprinkling.dataset.keys()) == expected_vars
     # No unit conversion is done in SprinklingPoints, as the capacity is already
     # in m3/d
@@ -617,12 +633,8 @@ def test_sprinklingpoints_from_imod5_data_write__points(
     )
 
     # Assert
-    np.testing.assert_equal(results["svat"], [1, 2, 3, 4])
-    np.testing.assert_equal(results["svat_groundwater"], [1, 2, 4, 4])
-    np.testing.assert_equal(results["layer"], [2, 2, 2, 2])
-    np.testing.assert_equal(
-        results["max_abstraction_surfacewater"], [15.0, 15.0, 0.0, 0.0]
-    )
-    np.testing.assert_equal(
-        results["max_abstraction_groundwater"], [0.0, 0.0, 15.0, 15.0]
-    )
+    np.testing.assert_equal(results["svat"], [1, 2])
+    np.testing.assert_equal(results["svat_groundwater"], [1, 2])
+    np.testing.assert_equal(results["layer"], [2, 3])
+    np.testing.assert_equal(results["max_abstraction_surfacewater"], [0.0, 30.0])
+    np.testing.assert_equal(results["max_abstraction_groundwater"], [15.0, 0.0])

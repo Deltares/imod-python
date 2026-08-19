@@ -143,11 +143,11 @@ def cap_data_sprinkling_points() -> Imod5DataDict:
 
     artificial_rch_type = zeros_grid(n)
     artificial_rch_type[:, 1] = 3000
-    artificial_rch_type[:, 2] = 4000
+    artificial_rch_type[2, 1] = 4000
 
     data = {
-        "x": [1.5, 2.5],
-        "y": [1.5, 2.5],
+        "x": [2.0, 2.0],
+        "y": [3.0, 2.0],
         "layer": [2, 3],
         "id": [3000, 4000],
         "capacity": [15.0, 30.0],

@@ -53,8 +53,13 @@ def _sprinkling_data_from_imod5_ipf(
     cap_data: CapSprinklingDataDict,
 ) -> SprinklingPointsGridDataDict:
     art_grid = cap_data["artificial_recharge"]
-    df_points = cap_data["artificial_recharge_layer"]
+    # Set urban landuse irrigation to 0, as sprinkling is not allowed for urban landuse.
+    subunit_template = xr.DataArray(
+        np.array([1, 0], dtype=int), dims="subunit", coords={"subunit": [0, 1]}
+    )
+    art_grid = subunit_template * art_grid
 
+    df_points = cap_data["artificial_recharge_layer"]
     # Select first 5 columns and enforce column names, iMOD5 expects columns in
     # this order. The additional columns are metadata for the user and can be
     # ignored.
@@ -139,29 +144,6 @@ def _extract_indexer_for_svat(df: pd.DataFrame, columns: list[str]):
 
     indexer = df.loc[:, columns].to_numpy()
     return indexer.T
-
-
-def _replicate_dataframe_by_subunit(
-    df: pd.DataFrame, subunit_col: str = "subunit"
-) -> pd.DataFrame:
-    """
-    Duplicate the rows of a DataFrame for each subunit (0 and 1).
-
-    Parameters
-    ----------
-    df : pd.DataFrame
-        Input DataFrame to duplicate.
-    subunit_col : str, optional
-        Name of the column to assign subunit values, by default "subunit".
-
-    Returns
-    -------
-    pd.DataFrame
-        DataFrame with duplicated rows for each subunit.
-    """
-    subunit_nrs = [0, 1]
-    df_ls = [df.assign(**{subunit_col: subunit_nr}) for subunit_nr in subunit_nrs]
-    return pd.concat(df_ls, ignore_index=True)
 
 
 def _get_mf6_cellid_dataframe(mf6_well: Mf6Wel) -> pd.DataFrame:
@@ -457,10 +439,7 @@ class SprinklingPoints(MetaSwapPackage, IRegridPackage):
         "trajectory": VariableMetaData(10, None, None, str),
     }
 
-    _with_subunit = (
-        "max_abstraction_groundwater",
-        "max_abstraction_surfacewater",
-    )
+    _with_subunit = ("id_sprinkling",)
     _without_subunit = ()
 
     _to_fill = (
@@ -496,6 +475,8 @@ class SprinklingPoints(MetaSwapPackage, IRegridPackage):
         )
         art_grid = art_grid.rename("id_sprinkling")
         self.dataset = xr.merge([art_grid, points_ds])
+
+        self._pkgcheck()
 
     @classmethod
     def from_imod5_data(cls, imod5_data: Imod5DataDict) -> "SprinklingPoints":
