@@ -341,14 +341,15 @@ class SprinklingGrid(SprinklingBase):
 
 class Sprinkling(SprinklingGrid):
     """
-    Deprecated class for sprinkling. Use :class:`imod.msw.SprinklingGrid` or
-    :class:`imod.msw.SprinklingPoints` instead.
+    Deprecated class for sprinkling. Use :class:`imod.msw.SprinklingGrid`
+    instead for the same behavior. This class is kept for backwards
+    compatibility and will be removed in a future version.
     """
 
     def __init__(self, *args, **kwargs):
         warnings.warn(
             "Sprinkling is deprecated and will be removed in a future version. "
-            "Use SprinklingGrid or SprinklingPoints instead.",
+            "Use SprinklingGrid for the same behavior instead.",
             DeprecationWarning,
         )
         super().__init__(*args, **kwargs)
