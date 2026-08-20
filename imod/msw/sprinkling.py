@@ -206,6 +206,20 @@ class SprinklingGrid(SprinklingBase):
     max_abstraction_surfacewater: array of floats (xr.DataArray)
         Describes the maximum abstraction of surfacewater to SVAT units in m3
         per day. This array must not have a subunit coordinate.
+    
+        
+    Examples
+    --------
+
+    >>> import xarray as xr
+    >>> import imod
+    >>> grid = imod.util.empty_2d(dx=25.0, dy=25.0, xmin=0.0, xmax=50.0, ymin=0.0, ymax=50.0)
+    >>> max_abstraction_groundwater = xr.concat([grid.fillna(25.0), grid.fillna(0.0)], dim="subunit").assign_coords(subunit=[0,1])
+    >>> max_abstraction_surfacewater = xr.concat([grid.fillna(0.0), grid.fillna(25.0)], dim="subunit").assign_coords(subunit=[0,1])
+    >>> sprinkling_grid = imod.msw.SprinklingGrid(
+    ...     max_abstraction_groundwater=max_abstraction_groundwater,
+    ...     max_abstraction_surfacewater=max_abstraction_surfacewater,
+    ... )
     """
 
     _with_subunit = (
@@ -368,7 +382,9 @@ class SprinklingPoints(SprinklingBase):
     Parameters
     ----------
     art_grid: xr.DataArray
-        Grid of the artificial recharge types, with subunit coordinate.
+        Grid of the artificial recharge ids, with subunit coordinate. These will
+        be used to map the sprinkling points with the id provided in
+        ``id_sprinkling_p``.
     x_p: np.ndarray | list[float]
         x-coordinates of the artificial recharge locations.
     y_p: np.ndarray | list[float]
@@ -376,10 +392,28 @@ class SprinklingPoints(SprinklingBase):
     layer_p: np.ndarray | list[int]
         layer indices of the artificial recharge locations.
     id_sprinkling_p: np.ndarray | list[int]
-        mapping of the artificial recharge locations to the grid cells.
+        ids mapping of the artificial recharge locations to the grid cells in
+        ``art_grid``.
     capacity_p: np.ndarray | list[float]
         abstraction capacities of the artificial recharge locations.
 
+    Examples
+    --------
+
+    >>> import xarray as xr
+    >>> import imod
+    >>> grid = imod.util.empty_2d(dx=25.0, dy=25.0, xmin=0.0, xmax=50.0, ymin=0.0, ymax=50.0)
+    >>> art_grid = xr.concat(
+    ...     [grid.fillna(1), grid.fillna(0)], dim="subunit"
+    ... ).assign_coords(subunit=[0,1]).astype(int)
+    >>> sprinkling_points = imod.msw.SprinklingPoints(
+    ...     art_grid=art_grid,
+    ...     x_p=[12.5],
+    ...     y_p=[12.5],
+    ...     layer_p=[2],
+    ...     id_sprinkling_p=[1],
+    ...     capacity_p=[25.0],
+    ... )
     """
 
     _with_subunit = ("id_sprinkling",)
