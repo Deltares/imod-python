@@ -202,10 +202,10 @@ class SprinklingGrid(SprinklingBase):
     ----------
     max_abstraction_groundwater: array of floats (xr.DataArray)
         Describes the maximum abstraction of groundwater to SVAT units in m3 per
-        day. This array must not have a subunit coordinate.
+        day. This array must have a subunit coordinate.
     max_abstraction_surfacewater: array of floats (xr.DataArray)
         Describes the maximum abstraction of surfacewater to SVAT units in m3
-        per day. This array must not have a subunit coordinate.
+        per day. This array must have a subunit coordinate.
     
         
     Examples
