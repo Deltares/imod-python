@@ -12,10 +12,10 @@ The format is based on `Keep a Changelog`_, and this project adheres to
 Added
 ~~~~~
 
-- :class:`imod.msw.SprinklingPoints` to specify sprinkling from points for
-  MetaSWAP models, instead of from grid. You can use this to specify sprinkling
-  wells from IPF files in an iMOD5 CAP dataset with
-  :meth:`imod.msw.SprinklingPoints.from_imod5_cap_data`.
+- Experimental class :class:`imod.msw.SprinklingPoints` to specify sprinkling
+  from points for MetaSWAP models, instead of from grid. You can use this to
+  specify sprinkling wells from IPF files in an iMOD5 CAP dataset with
+  :meth:`imod.msw.SprinklingPoints.from_imod5_data`.
 - :class:`imod.mf6.LayeredWell.from_imod5_cap_data` now also supports loading
   wells from IPF files in an iMOD5 CAP dataset.
 

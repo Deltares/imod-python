@@ -379,6 +379,10 @@ class SprinklingPoints(SprinklingBase):
 
     This class is responsible for the file `scap_svat.inp`
 
+    .. note::
+        This class is still in an experimental state, and might change in future
+        versions. It is not yet fully tested and validated.
+
     Parameters
     ----------
     art_grid: xr.DataArray
