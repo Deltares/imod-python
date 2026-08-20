@@ -16,7 +16,7 @@ Added
   MetaSWAP models, instead of from grid. You can use this to specify sprinkling
   wells from IPF files in an iMOD5 CAP dataset with
   :meth:`imod.msw.SprinklingPoints.from_imod5_cap_data`.
-- :class:`imod.msw.LayeredWell.from_imod5_cap_data` now also supports loading
+- :class:`imod.mf6.LayeredWell.from_imod5_cap_data` now also supports loading
   wells from IPF files in an iMOD5 CAP dataset.
 
 Fixed
