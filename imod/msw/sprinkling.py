@@ -400,18 +400,22 @@ class SprinklingPoints(SprinklingBase):
     Examples
     --------
 
+    Map a single sprinkling point to a grid with two subunits. The well will
+    sprinkle to all cells in the first subunit. We will use the arbitrary
+    number 43 as sprinkling point id.
+    
     >>> import xarray as xr
     >>> import imod
     >>> grid = imod.util.empty_2d(dx=25.0, dy=25.0, xmin=0.0, xmax=50.0, ymin=0.0, ymax=50.0)
     >>> art_grid = xr.concat(
-    ...     [grid.fillna(1), grid.fillna(0)], dim="subunit"
+    ...     [grid.fillna(43), grid.fillna(0)], dim="subunit"
     ... ).assign_coords(subunit=[0,1]).astype(int)
     >>> sprinkling_points = imod.msw.SprinklingPoints(
     ...     art_grid=art_grid,
     ...     x_p=[12.5],
     ...     y_p=[12.5],
     ...     layer_p=[2],
-    ...     id_sprinkling_p=[1],
+    ...     id_sprinkling_p=[43],
     ...     capacity_p=[25.0],
     ... )
     """
