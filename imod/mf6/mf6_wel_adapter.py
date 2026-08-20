@@ -128,6 +128,9 @@ class Mf6Wel(BoundaryCondition, IPackage):
     _pkg_id = "wel"
 
     _period_data = ("cellid", "rate")
+    # Workaround that this needs to be ignored in get_period_varnames. This can
+    # become an _auxiliary_data in the future with some extra work.
+    _optional_data = ("id",)
     _keyword_map = {}
     _template = BoundaryCondition._initialize_template(_pkg_id)
     _auxiliary_data = {"concentration": "species"}
