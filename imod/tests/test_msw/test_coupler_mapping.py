@@ -47,7 +47,8 @@ def get_mf6_wel(svat_data):
     well_x = [2.0, 2.0, 2.0]
     well_rate = [-5.0] * 3
     cellids = derive_cellid_from_points(svat_data, well_x, well_y, well_layer)
-    return Mf6Wel(cellids, well_rate)
+    well_id = [str(i) for i in range(len(well_rate))]
+    return Mf6Wel(cellids, well_rate, well_id)
 
 
 def get_mf6_dis(svat_data):
