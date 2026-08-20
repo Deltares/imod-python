@@ -470,7 +470,7 @@ class SprinklingPoints(SprinklingBase):
         Abstraction data for sprinkling is defined in iMOD5 either with grids
         (IDF) or points (IPF) combined with a grid. This class can handle only
         the point (IPF) variant. For grid data (IDF), use
-        :class:`imod.msw.Sprinkling.from_imod5_data()` instead.
+        :class:`imod.msw.SprinklingGrid.from_imod5_data()` instead.
 
         The iMOD5 data is expected to contain one grid (IDF) and one table with
         points for sprinkling (IPF):
