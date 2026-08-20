@@ -46,7 +46,7 @@ from imod.msw.pkgbase import MetaSwapPackage
 from imod.msw.ponding import Ponding
 from imod.msw.regrid.regrid_schemes import CapDataRegridMethod
 from imod.msw.scaling_factors import ScalingFactors
-from imod.msw.sprinkling import Sprinkling, SprinklingPoints
+from imod.msw.sprinkling import SprinklingGrid, SprinklingPoints
 from imod.msw.timeutil import to_metaswap_timeformat
 from imod.msw.utilities.common import find_in_file_list
 from imod.msw.utilities.imod5_converter import (
@@ -303,8 +303,21 @@ class MetaSwapModel(Model, IDict):
         str
             The key of the package of type ``pkg_type``.
         """
+        # Loop over all packages in the model and match based on filename
+        # attached to the package class. This is a temporary solution to make
+        # primod stable, where get_pkgkey(Sprinkling) was used and it should
+        # return a SprinklingGrid or SprinklingPoints package depending on the
+        # data in the model, while still making Sprinkling behave like
+        # SprinklingGrid. This can be reverted once primod is updated and had a
+        # few releases.
+        #
+        # The reason why this works for MetaSWAP as each package maps to one
+        # single unique file, so there can never be a model with both a
+        # SprinklingGrid and a SprinklingPoints package. The first occurrence of
+        # the filename is always the correct one.
+
         for pkg_key, pkg in self.items():
-            if isinstance(pkg, pkg_type):
+            if pkg._file_name == pkg_type._file_name:
                 return pkg_key
 
         if not optional_package:
@@ -834,7 +847,7 @@ class MetaSwapModel(Model, IDict):
         if is_sprinkling_from_points(imod5_masked):
             model["sprinkling"] = SprinklingPoints.from_imod5_data(imod5_masked)
         else:
-            model["sprinkling"] = Sprinkling.from_imod5_data(imod5_masked)
+            model["sprinkling"] = SprinklingGrid.from_imod5_data(imod5_masked)
         model["meteo_grid"] = MeteoGridCopy.from_imod5_data(imod5_masked)
         model["prec_mapping"] = PrecipitationMapping.from_imod5_data(imod5_masked)
         model["evt_mapping"] = EvapotranspirationMapping.from_imod5_data(imod5_masked)

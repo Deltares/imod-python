@@ -1,4 +1,6 @@
+import abc
 import textwrap
+import warnings
 from typing import TextIO, cast
 
 import numpy as np
@@ -146,7 +148,47 @@ def _get_svat_groundwater_for_wells(
     return svat_groundwater.astype(int)
 
 
-class Sprinkling(MetaSwapPackage, IRegridPackage):
+class SprinklingBase(MetaSwapPackage, IRegridPackage):
+    """
+    Base class for sprinkling packages. This class is not meant to be
+    instantiated directly, but rather through the subclasses
+    :class:`imod.msw.SprinklingGrid` and :class:`imod.msw.SprinklingPoints`.
+    """
+
+    _file_name = "scap_svat.inp"
+    _metadata_dict = {
+        "svat": VariableMetaData(10, 1, 99999999, int),
+        "max_abstraction_groundwater_mm_d": VariableMetaData(8, None, None, str),
+        "max_abstraction_surfacewater_mm_d": VariableMetaData(8, None, None, str),
+        "max_abstraction_groundwater": VariableMetaData(8, 0.0, 1e9, float),
+        "max_abstraction_surfacewater": VariableMetaData(8, 0.0, 1e9, float),
+        "svat_groundwater": VariableMetaData(10, 1, 99999999, int),
+        "layer": VariableMetaData(6, 1, 9999, int),
+        "trajectory": VariableMetaData(10, None, None, str),
+    }
+
+    @abc.abstractmethod
+    def _render(
+        self,
+        file: TextIO,
+        index: IntArray,
+        svat: xr.DataArray,
+        mf6_dis: StructuredDiscretization,
+        mf6_well: Mf6Wel,
+    ) -> None:
+        raise NotImplementedError(
+            "method _render() must be implemented in subclasses of SprinklingBase."
+        )
+
+    @classmethod
+    @abc.abstractmethod
+    def from_imod5_data(cls, imod5_data: Imod5DataDict):
+        raise NotImplementedError(
+            "method from_imod5_data() must be implemented in subclasses of SprinklingBase."
+        )
+
+
+class SprinklingGrid(SprinklingBase):
     """
     This contains the sprinkling capacities of links between SVAT units and
     groundwater/surface water locations. Input is provided as grids for the
@@ -165,18 +207,6 @@ class Sprinkling(MetaSwapPackage, IRegridPackage):
         Describes the maximum abstraction of surfacewater to SVAT units in m3
         per day. This array must not have a subunit coordinate.
     """
-
-    _file_name = "scap_svat.inp"
-    _metadata_dict = {
-        "svat": VariableMetaData(10, 1, 99999999, int),
-        "max_abstraction_groundwater_mm_d": VariableMetaData(8, None, None, str),
-        "max_abstraction_surfacewater_mm_d": VariableMetaData(8, None, None, str),
-        "max_abstraction_groundwater": VariableMetaData(8, 0.0, 1e9, float),
-        "max_abstraction_surfacewater": VariableMetaData(8, 0.0, 1e9, float),
-        "svat_groundwater": VariableMetaData(10, 1, 99999999, int),
-        "layer": VariableMetaData(6, 1, 9999, int),
-        "trajectory": VariableMetaData(10, None, None, str),
-    }
 
     _with_subunit = (
         "max_abstraction_groundwater",
@@ -210,7 +240,7 @@ class Sprinkling(MetaSwapPackage, IRegridPackage):
         svat: xr.DataArray,
         mf6_dis: StructuredDiscretization,
         mf6_well: Mf6Wel,
-    ):
+    ) -> None:
         if not isinstance(mf6_well, Mf6Wel):
             raise TypeError(rf"well not of type 'Mf6Wel', got '{type(mf6_well)}'")
 
@@ -257,7 +287,7 @@ class Sprinkling(MetaSwapPackage, IRegridPackage):
         return self._write_dataframe_fixed_width(file, dataframe)
 
     @classmethod
-    def from_imod5_data(cls, imod5_data: Imod5DataDict) -> "Sprinkling":
+    def from_imod5_data(cls, imod5_data: Imod5DataDict) -> "SprinklingGrid":
         """
         Import sprinkling data from imod5 data artificial recharge grids.
         Abstraction data for sprinkling is defined in iMOD5 either with grids
@@ -309,7 +339,22 @@ class Sprinkling(MetaSwapPackage, IRegridPackage):
         return cls(**data)
 
 
-class SprinklingPoints(MetaSwapPackage, IRegridPackage):
+class Sprinkling(SprinklingGrid):
+    """
+    Deprecated class for sprinkling. Use :class:`imod.msw.SprinklingGrid` or
+    :class:`imod.msw.SprinklingPoints` instead.
+    """
+
+    def __init__(self, *args, **kwargs):
+        warnings.warn(
+            "Sprinkling is deprecated and will be removed in a future version. "
+            "Use SprinklingGrid or SprinklingPoints instead.",
+            DeprecationWarning,
+        )
+        super().__init__(*args, **kwargs)
+
+
+class SprinklingPoints(SprinklingBase):
     """
     This contains the sprinkling capacities of links between SVAT units and
     groundwater/surface water locations. This class is capable of handling point
@@ -335,18 +380,6 @@ class SprinklingPoints(MetaSwapPackage, IRegridPackage):
         abstraction capacities of the artificial recharge locations.
 
     """
-
-    _file_name = "scap_svat.inp"
-    _metadata_dict = {
-        "svat": VariableMetaData(10, 1, 99999999, int),
-        "max_abstraction_groundwater_mm_d": VariableMetaData(8, None, None, str),
-        "max_abstraction_surfacewater_mm_d": VariableMetaData(8, None, None, str),
-        "max_abstraction_groundwater": VariableMetaData(8, 0.0, 1e9, float),
-        "max_abstraction_surfacewater": VariableMetaData(8, 0.0, 1e9, float),
-        "svat_groundwater": VariableMetaData(10, 1, 99999999, int),
-        "layer": VariableMetaData(6, 1, 9999, int),
-        "trajectory": VariableMetaData(10, None, None, str),
-    }
 
     _with_subunit = ("id_sprinkling",)
     _without_subunit = ()

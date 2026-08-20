@@ -417,7 +417,7 @@ def test_grid_simple_model(
     cellids = derive_cellid_from_points(svat, well_x, well_y, well_layer)
     well = Mf6Wel(cellids, well_rate, well_id)
 
-    sprinkling = msw.Sprinkling(
+    sprinkling = msw.SprinklingGrid(
         case_data.max_abstraction_groundwater,
         case_data.max_abstraction_surfacewater,
     )
@@ -427,8 +427,8 @@ def test_grid_simple_model(
         sprinkling.write(output_dir, index, svat, None, well)
 
         results = fixed_format_parser(
-            output_dir / msw.Sprinkling._file_name,
-            msw.Sprinkling._metadata_dict,
+            output_dir / msw.SprinklingGrid._file_name,
+            msw.SprinklingGrid._metadata_dict,
         )
 
     assert_equal(results["svat"], expected_data.svat)
@@ -467,7 +467,7 @@ def test_grid_simple_model_1_subunit(
     cellids = derive_cellid_from_points(svat, well_x, well_y, well_layer)
     well = Mf6Wel(cellids, well_rate, well_id)
 
-    sprinkling = msw.Sprinkling(
+    sprinkling = msw.SprinklingGrid(
         case_data.max_abstraction_groundwater.isel(subunit=[0]),
         case_data.max_abstraction_surfacewater.isel(subunit=[0]),
     )
@@ -477,8 +477,8 @@ def test_grid_simple_model_1_subunit(
         sprinkling.write(output_dir, index, svat, None, well)
 
         results = fixed_format_parser(
-            output_dir / msw.Sprinkling._file_name,
-            msw.Sprinkling._metadata_dict,
+            output_dir / msw.SprinklingGrid._file_name,
+            msw.SprinklingGrid._metadata_dict,
         )
 
     assert_equal(results["svat"], expected_data.svat[:2])
@@ -563,7 +563,7 @@ def test_points_simple_model(
 @pytest.mark.unittest_jit
 def test_sprinkling_from_imod5_data__points(cap_data_sprinkling_points):
     with pytest.raises(TypeError):
-        msw.Sprinkling.from_imod5_data(cap_data_sprinkling_points)
+        msw.SprinklingGrid.from_imod5_data(cap_data_sprinkling_points)
 
 
 @pytest.mark.unittest_jit
@@ -591,10 +591,10 @@ def test_sprinkling_from_imod5_data__grid(cap_data_sprinkling_grid):
     # fmt: on
 
     # Act
-    sprinkling = msw.Sprinkling.from_imod5_data(cap_data_sprinkling_grid)
+    sprinkling = msw.SprinklingGrid.from_imod5_data(cap_data_sprinkling_grid)
 
     # Assert
-    assert isinstance(sprinkling, msw.Sprinkling)
+    assert isinstance(sprinkling, msw.SprinklingGrid)
     ds = sprinkling.dataset
     assert (ds.sel(subunit=1) == 0).all()
     rural_ds = ds.sel(subunit=0)
@@ -664,8 +664,8 @@ def test_sprinklingpoints_from_imod5_data_write__points(
     sprinkling.write(directory, index, svat, mf6_dis, mf6_well)
 
     results = fixed_format_parser(
-        directory / msw.Sprinkling._file_name,
-        msw.Sprinkling._metadata_dict,
+        directory / msw.SprinklingGrid._file_name,
+        msw.SprinklingGrid._metadata_dict,
     )
 
     # Assert

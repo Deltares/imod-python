@@ -276,7 +276,7 @@ def msw_add_sprinkling(msw_model):
     # %% Sprinkling
     area = msw_model["grid"].dataset["area"]
 
-    msw_model["sprinkling"] = msw.Sprinkling(
+    msw_model["sprinkling"] = msw.SprinklingGrid(
         max_abstraction_groundwater=xr.full_like(area, 100.0),
         max_abstraction_surfacewater=xr.full_like(area, 100.0),
     )

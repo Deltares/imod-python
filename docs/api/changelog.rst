@@ -26,6 +26,13 @@ Fixed
   :meth:`imod.mf6.LayeredWell.from_imod5_data` when simulation timesteps precede
   the first well timestep.
 
+Changed
+~~~~~~~
+
+- Deprecated :class:`imod.msw.Sprinkling` in favor of
+  :class:`imod.msw.SprinklingGrid`. Call :class:`imod.msw.SprinklingGrid` to get
+  the same behavior as you were used to.
+
 [1.1.0] - 2026-08-03
 --------------------
 
