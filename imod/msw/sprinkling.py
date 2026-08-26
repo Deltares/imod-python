@@ -86,7 +86,9 @@ def _make_sprinkling_well_points_dataframe(
         key for key, da in sprinkling_dataset.data_vars.items() if "id" in da.dims
     ]
     sprinkling_points_df = (
-        sprinkling_dataset[points_keys].drop_vars(["dx", "dy"]).to_dataframe()
+        sprinkling_dataset[points_keys]
+        .drop_vars(["dx", "dy"], errors="ignore")
+        .to_dataframe()
     )
     # Merge again to confine to wells actually used in the modflow6 model.
     # This drops points that are outside model domain.
@@ -206,8 +208,8 @@ class SprinklingGrid(SprinklingBase):
     max_abstraction_surfacewater: array of floats (xr.DataArray)
         Describes the maximum abstraction of surfacewater to SVAT units in m3
         per day. This array must have a subunit coordinate.
-    
-        
+
+
     Examples
     --------
 
@@ -407,7 +409,7 @@ class SprinklingPoints(SprinklingBase):
     Map a single sprinkling point to a grid with two subunits. The well will
     sprinkle to all cells in the first subunit. We will use the arbitrary
     number 43 as sprinkling point id.
-    
+
     >>> import xarray as xr
     >>> import imod
     >>> grid = imod.util.empty_2d(dx=25.0, dy=25.0, xmin=0.0, xmax=50.0, ymin=0.0, ymax=50.0)
