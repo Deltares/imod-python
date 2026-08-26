@@ -137,10 +137,45 @@ def test_get_starttime(msw_model):
     assert_almost_equal(time_since_start_year, 0.0)
 
 
-def test_get_pkgkey(msw_model):
-    pkg_id = msw_model.get_pkgkey(msw.GridData)
+class PkgKeyCases:
+    def case_grid(self):
+        return msw.GridData, "grid"
 
-    assert pkg_id == "grid"
+    def case_crop_factors(self):
+        return msw.AnnualCropFactors, "crop_factors"
+
+    def case_landuse_options(self):
+        return msw.LanduseOptions, "landuse_options"
+
+    def case_meteo_grid(self):
+        return msw.MeteoGrid, "meteo_grid"
+
+    def case_sprinkling_grid(self):
+        return msw.SprinklingGrid, "sprinkling"
+
+    def case_sprinkling(self):
+        """Deprecated Sprinkling package, should return key of SprinklingGrid,
+        so that primod continues to work."""
+
+        return msw.Sprinkling, "sprinkling"
+
+    def case_sprinkling_point(self):
+        """Effect of the chosen solution to preserve primod"""
+
+        return msw.SprinklingPoints, "sprinkling"
+
+
+@parametrize_with_cases("pkgtype, expected_key", cases=PkgKeyCases)
+def test_get_pkgkey(msw_model, pkgtype, expected_key):
+    pkgkey = msw_model.get_pkgkey(pkgtype)
+    assert pkgkey == expected_key
+
+    msw_model.pop(expected_key)
+    with pytest.raises(KeyError):
+        msw_model.get_pkgkey(pkgtype)
+
+    pkgkey = msw_model.get_pkgkey(pkgtype, optional_package=True)
+    assert pkgkey is None
 
 
 def test_check_required_packages(msw_model):
