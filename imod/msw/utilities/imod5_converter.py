@@ -1,3 +1,7 @@
+"""
+iMOD5 to MetaSWAP converter utilities.
+"""
+
 from typing import TypedDict, cast
 
 import numpy as np
@@ -157,6 +161,23 @@ def is_sprinkling_from_points(imod5_data: Imod5DataDict) -> bool:
 def sprinkling_data_from_imod5_ipf(
     cap_data: CapSprinklingDataDict,
 ) -> SprinklingPointsGridDataDict:
+    """
+    Extract sprinkling data from the iMOD5 CAP dataset that has artificial
+    recharge specified in an IPF file and convert it into a format suitable for
+    SprinklingPoints
+
+    Parameters
+    ----------
+    cap_data: CapSprinklingDataDict
+        iMOD5 CAP dataset containing artificial recharge grid mapping and
+        sprinkling points data
+
+    Returns
+    -------
+    SprinklingPointsGridDataDict
+        Dictionary containing the artificial recharge grid and sprinkling points
+        data for SprinklingPoints.
+    """
     art_grid = cap_data["artificial_recharge"]
     # Set urban landuse irrigation to 0, as sprinkling is not allowed for urban landuse.
     subunit_template = xr.DataArray(
@@ -192,6 +213,23 @@ def sprinkling_data_from_imod5_ipf(
 
 
 def sprinkling_data_from_imod5_grid(cap_data: GridDataDict) -> GridDataDict:
+    """
+    Extract sprinkling data from the iMOD5 CAP dataset that has artificial
+    recharge specified on a grid and convert it into a format suitable for
+    SprinklingGrid.
+
+    Parameters
+    ----------
+    cap_data: GridDataDict
+        iMOD5 CAP dataset containing artificial recharge and sprinkling layer
+        data on a grid.
+
+    Returns
+    -------
+    GridDataDict
+        Dictionary containing the sprinkling capacities grids for
+        SprinklingGrid.
+    """
     # Convert units from mm/d to m3/d
     msw_area = get_cell_area_from_imod5_data(cap_data)
     capacity_mmd = cap_data["artificial_recharge_capacity"]
