@@ -537,62 +537,28 @@ class SprinklingPoints(SprinklingBase):
         msw_mf6_sprinkling_df["svat_groundwater"] = _get_svat_groundwater_for_wells(
             msw_mf6_sprinkling_df, svat_aligned
         )
-        ## TODO: The logic required for outside points and layer = 0 is
-        ##   essentially the same. Probably clearer (and slightly more efficient)
-        ##   to grab those together in one boolean and do the data modifications.
+
+        # Initiate dataframe_out with the merged sprinkling points dataframe.
+        dataframe_out = msw_mf6_sprinkling_df.loc[:, ["svat", "layer", "svat_groundwater"]]
+        # Set abstraction capacities for groundwater and surfacewater based on
+        # the location and layer of the well. Points outside the svat grid or in
+        # layer 0 should be set to surfacewater abstraction.
         is_point_inside = msw_mf6_sprinkling_df["svat_groundwater"] > 0
-        #is_layer_zero = msw_mf6_sprinkling_df["layer"] == 0
-        #is_outside_or_layer_zero = ~is_point_inside | is_layer_zero
-        #capacity = msw_mf6_sprinkling_df.loc[:, "capacity_p"]
-#
-#
-        #dataframe_out = msw_mf6_sprinkling_df.loc[:, ["svat", "layer", "svat_groundwater"]]
-        #dataframe_out.loc[is_outside_or_layer_zero, "layer"] = 1
-        #dataframe_out.loc[is_outside_or_layer_zero, "svat_groundwater"] = dataframe_out.loc[
-        #    is_outside_or_layer_zero, "svat"
-        #]
-        #dataframe_out["max_abstraction_groundwater"] = capacity.where(is_outside_or_layer_zero, 0.0)
-        #dataframe_out["max_abstraction_surfacewater"] = capacity.where(~is_outside_or_layer_zero, 0.0)
-#
-        # Select columns that need to be written to scap_svat.inp
-        inside_df = msw_mf6_sprinkling_df.loc[
-            is_point_inside, ["svat", "layer", "svat_groundwater"]
+        is_layer_zero = msw_mf6_sprinkling_df["layer"] == 0
+        is_surface_water = ~is_point_inside | is_layer_zero
+        capacity = msw_mf6_sprinkling_df.loc[:, "capacity_p"]
+        dataframe_out["max_abstraction_groundwater"] = capacity.where(~is_surface_water, 0.0)
+        dataframe_out["max_abstraction_surfacewater"] = capacity.where(is_surface_water, 0.0)
+        # Update the layer and svat_groundwater for wells outside the svat grid or in layer 0. 
+        dataframe_out.loc[is_surface_water, "layer"] = 1
+        dataframe_out.loc[is_surface_water, "svat_groundwater"] = dataframe_out.loc[
+            is_surface_water, "svat"
         ]
-        inside_df["svat"] = inside_df["svat"].astype(int)
-        # Set wells with layer > 0 to groundwater abstraction, and wells with layer = 0
-        # to surfacewater abstraction.
-        capacity = msw_mf6_sprinkling_df.loc[is_point_inside, "capacity_p"]
-        is_gw_extraction = inside_df["layer"] > 0
-        inside_df["max_abstraction_groundwater"] = capacity.where(is_gw_extraction, 0.0)
-        inside_df["max_abstraction_surfacewater"] = capacity.where(
-            ~is_gw_extraction, 0.0
-        )
-        inside_df.loc[~is_gw_extraction, "layer"] = 1
-        
-        ##############
-        # EDGE CASES #
-        ##############
-        # 1. Wells that are outside art_grid, but in model domain.
-        # These will be assigned to surfacewater abstraction.
-        outside_df = msw_mf6_sprinkling_df.loc[
-            ~is_point_inside, ["svat", "layer", "svat_groundwater", "capacity_p"]
-        ]
-        # Set capacity to surfacewater abstraction, and set groundwater abstraction to 0.
-        outside_df = outside_df.rename(
-            columns={"capacity_p": "max_abstraction_surfacewater"}
-        )
-        outside_df["max_abstraction_groundwater"] = 0.0
-        # Set svat_groundwater to svat, as these wells are outside art_grid and
-        # will be assigned to surfacewater abstraction.
-        outside_df["svat_groundwater"] = outside_df["svat"]
-        # Wells that are assigned to layer 0 need to be bumped to layer 1, as
-        # required by MetaSWAP.
-        outside_df["layer"] = outside_df["layer"].clip(lower=1)
+
         ############
         # FINALIZE #
         ############
         # Prepare the final dataframe to be written to scap_svat.inp
-        dataframe_out = pd.concat([inside_df, outside_df], axis=0, ignore_index=True)
         # Order rows by SVAT number to ensure consistent output for testing and
         # debugging.
         dataframe_out = dataframe_out.sort_values(by=["svat"]).reset_index(drop=True)
