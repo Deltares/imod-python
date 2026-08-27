@@ -75,6 +75,9 @@ class SprinklingGridCases:
     def case_all_svats(
         self, sprinkling_svat_index
     ) -> tuple[SprinklingGridCaseData, ExpectedCaseData]:
+        """
+        Case where all SVATs (1,2,3,4) have sprinkling cells.
+        """
         svat, _ = sprinkling_svat_index
         case_data = SprinklingGridCaseData()
         case_data.max_abstraction_groundwater = xr.full_like(svat, 0.0)
@@ -113,6 +116,9 @@ class SprinklingGridCases:
     def case_some_svats(
         self, sprinkling_svat_index
     ) -> tuple[SprinklingGridCaseData, ExpectedCaseData]:
+        """
+        Case where only some SVATs (1,2,4) have sprinkling cells.
+        """
         svat, _ = sprinkling_svat_index
         case_data = SprinklingGridCaseData()
         case_data.max_abstraction_groundwater = xr.full_like(svat, 0.0)
@@ -151,6 +157,10 @@ class SprinklingGridCases:
     def case_inconsistent_active_capacity(
         self, sprinkling_svat_index
     ) -> tuple[SprinklingGridCaseData, ExpectedCaseData]:
+        """
+        Case where the active capacity is inconsistent between groundwater and
+        surfacewater.
+        """
         svat, _ = sprinkling_svat_index
         case_data = SprinklingGridCaseData()
         case_data.max_abstraction_groundwater = xr.full_like(svat, 0.0)
