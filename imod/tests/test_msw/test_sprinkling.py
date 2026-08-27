@@ -270,8 +270,6 @@ class SprinklingPointsCases:
 
         return case_data, expected_data
 
-
-
     def case_one_point_one_art_cell__one_subunit(
         self, sprinkling_svat_index
     ) -> tuple[SprinklingPointsCaseData, ExpectedCaseData]:
@@ -375,7 +373,6 @@ class SprinklingPointsCases:
 
         return case_data, expected_data
 
-
     def case_one_point_multi_art_cell_layer0(
         self, sprinkling_svat_index
     ) -> tuple[SprinklingPointsCaseData, ExpectedCaseData]:
@@ -414,7 +411,6 @@ class SprinklingPointsCases:
         expected_data.abs_sw = np.array([10.0, 10.0, 10.0, 10.0])
 
         return case_data, expected_data
-
 
     def case_art_grid_outside(
         self, sprinkling_svat_index

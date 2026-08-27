@@ -539,7 +539,9 @@ class SprinklingPoints(SprinklingBase):
         )
 
         # Initiate dataframe_out with the merged sprinkling points dataframe.
-        dataframe_out = msw_mf6_sprinkling_df.loc[:, ["svat", "layer", "svat_groundwater"]]
+        dataframe_out = msw_mf6_sprinkling_df.loc[
+            :, ["svat", "layer", "svat_groundwater"]
+        ]
         # Set abstraction capacities for groundwater and surfacewater based on
         # the location and layer of the well. Points outside the svat grid or in
         # layer 0 should be set to surfacewater abstraction.
@@ -547,9 +549,13 @@ class SprinklingPoints(SprinklingBase):
         is_layer_zero = msw_mf6_sprinkling_df["layer"] == 0
         is_surface_water = ~is_point_inside | is_layer_zero
         capacity = msw_mf6_sprinkling_df.loc[:, "capacity_p"]
-        dataframe_out["max_abstraction_groundwater"] = capacity.where(~is_surface_water, 0.0)
-        dataframe_out["max_abstraction_surfacewater"] = capacity.where(is_surface_water, 0.0)
-        # Update the layer and svat_groundwater for wells outside the svat grid or in layer 0. 
+        dataframe_out["max_abstraction_groundwater"] = capacity.where(
+            ~is_surface_water, 0.0
+        )
+        dataframe_out["max_abstraction_surfacewater"] = capacity.where(
+            is_surface_water, 0.0
+        )
+        # Update the layer and svat_groundwater for wells outside the svat grid or in layer 0.
         dataframe_out.loc[is_surface_water, "layer"] = 1
         dataframe_out.loc[is_surface_water, "svat_groundwater"] = dataframe_out.loc[
             is_surface_water, "svat"
