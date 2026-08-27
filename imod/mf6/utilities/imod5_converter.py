@@ -58,9 +58,16 @@ def fill_missing_layers(
 
 
 def _well_from_imod5_cap_point_data(cap_data: GridDataDict) -> dict[str, np.ndarray]:
-    raise NotImplementedError(
-        "Assigning sprinkling wells with an IPF file is not supported, please specify them as IDF."
-    )
+    df_points = cap_data["artificial_recharge_layer"]
+    data = {}
+    # Order of columns is x, y, layer, the other columns are irrelevant here.
+    data["x"] = df_points.iloc[:, 0].to_numpy().astype(float)
+    data["y"] = df_points.iloc[:, 1].to_numpy().astype(float)
+    data["layer"] = df_points.iloc[:, 2].to_numpy().astype(int)
+    data["rate"] = np.zeros_like(data["x"], dtype=float)
+    data["id"] = df_points.index.to_numpy()
+
+    return data
 
 
 def _well_from_imod5_cap_grid_data(cap_data: GridDataDict) -> dict[str, np.ndarray]:
@@ -85,7 +92,7 @@ def _well_from_imod5_cap_grid_data(cap_data: GridDataDict) -> dict[str, np.ndarr
 
 def well_from_imod5_cap_data(
     imod5_data: Imod5DataDict,
-    target_dis: IRegridPackage,
+    target_dis: Optional[IRegridPackage],
     regridder_types: DataclassType,
     regrid_cache: RegridderWeightsCache,
 ) -> dict[str, np.ndarray]:
@@ -121,6 +128,11 @@ def well_from_imod5_cap_data(
     if has_ipf_well:
         return _well_from_imod5_cap_point_data(cap_data)
     else:
+        if target_dis is None:
+            raise ValueError(
+                "target_dis must be provided when converting iMOD5 cap data "
+                "from grids (IDF)"
+            )
         cap_data_regridded = regrid_imod5_cap_data(
             imod5_data, target_dis, regridder_types, regrid_cache
         )["cap"]

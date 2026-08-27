@@ -143,23 +143,23 @@ def cap_data_sprinkling_points() -> Imod5DataDict:
 
     artificial_rch_type = zeros_grid(n)
     artificial_rch_type[:, 1] = 3000
-    artificial_rch_type[:, 2] = 4000
+    artificial_rch_type[2, 1] = 4000
 
     data = {
-        "id": [3000, 4000],
+        "x": [2.0, 2.0],
+        "y": [3.0, 2.0],
         "layer": [2, 3],
+        "id": [3000, 4000],
         "capacity": [15.0, 30.0],
-        "y": [1.0, 2.0],
-        "x": [1.0, 2.0],
     }
 
-    layer = pd.DataFrame(data=data)
+    dataframe = pd.DataFrame(data=data)
     cap_data = {
         "boundary": boundary,
         "wetted_area": wetted_area,
         "urban_area": urban_area,
         "artificial_recharge": artificial_rch_type,
-        "artificial_recharge_layer": layer,
+        "artificial_recharge_layer": dataframe,
         "artificial_recharge_capacity": xr.DataArray(25.0),
     }
 

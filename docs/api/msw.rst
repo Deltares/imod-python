@@ -51,11 +51,18 @@ Grid packages
     ScalingFactors.get_regrid_methods
     ScalingFactors.write
     Sprinkling
-    Sprinkling.regrid_like
-    Sprinkling.clip_box
-    Sprinkling.from_imod5_data
-    Sprinkling.get_regrid_methods
-    Sprinkling.write
+    SprinklingGrid
+    SprinklingGrid.regrid_like
+    SprinklingGrid.clip_box
+    SprinklingGrid.from_imod5_data
+    SprinklingGrid.get_regrid_methods
+    SprinklingGrid.write
+    SprinklingPoints
+    SprinklingPoints.regrid_like
+    SprinklingPoints.clip_box
+    SprinklingPoints.from_imod5_data
+    SprinklingPoints.get_regrid_methods
+    SprinklingPoints.write
 
 Initial conditions
 ==================

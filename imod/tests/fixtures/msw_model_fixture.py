@@ -276,7 +276,7 @@ def msw_add_sprinkling(msw_model):
     # %% Sprinkling
     area = msw_model["grid"].dataset["area"]
 
-    msw_model["sprinkling"] = msw.Sprinkling(
+    msw_model["sprinkling"] = msw.SprinklingGrid(
         max_abstraction_groundwater=xr.full_like(area, 100.0),
         max_abstraction_surfacewater=xr.full_like(area, 100.0),
     )
@@ -307,9 +307,10 @@ def coupled_mf6wel():
     well_y = np.repeat(y, ncol)
     well_rate = np.zeros(well_x.shape)
     well_layer = np.full_like(well_x, layer, dtype=int)
+    well_id = [str(i) for i in range(len(well_rate))]
 
     cellids = derive_cellid_from_points(idomain, well_x, well_y, well_layer)
-    well_msw = Mf6Wel(cellids, well_rate)
+    well_msw = Mf6Wel(cellids, well_rate, well_id)
     return well_msw
 
 

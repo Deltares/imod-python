@@ -105,6 +105,28 @@ class SprinklingRegridMethod(DataclassType):
 
 
 @dataclass(config=_CONFIG)
+class SprinklingPointsRegridMethod(DataclassType):
+    """
+    Object containing regridder methods for the
+    :class:`imod.msw.SprinklingPoints` package. This can be provided to the
+    ``regrid_like`` method to regrid with custom settings.
+
+    Parameters
+    ----------
+    art_grid: tuple, default (RegridderType.OVERLAP, "mode")
+
+    Examples
+    --------
+    Regrid with custom settings:
+
+    >>> regrid_method = SprinklingPointsRegridMethod(art_grid=(RegridderType.OVERLAP,"min"))
+    >>> sprinkling.regrid_like(target_grid, RegridderWeightsCache(), regrid_method)
+    """
+
+    art_grid: RegridVarType = (RegridderType.OVERLAP, "mode")
+
+
+@dataclass(config=_CONFIG)
 class MeteoGridRegridMethod(DataclassType):
     """
     Object containing regridder methods for the

@@ -61,11 +61,11 @@ def _assign_dims(arg: Any) -> tuple[Any, ...] | xr.DataArray:
         if arg.dims[0] != "time":
             arg = arg.transpose()
         da = xr.DataArray(
-            data=arg.values, coords={"time": arg["time"]}, dims=["time", "index"]
+            data=arg.to_numpy(), coords={"time": arg["time"]}, dims=["time", "index"]
         )
         return da
     elif is_da:
-        return "index", arg.values
+        return "index", arg.to_numpy()
     else:
         return "index", arg
 
@@ -347,11 +347,11 @@ class GridAgnosticWell(BoundaryCondition, IPointDataPackage, abc.ABC):
 
     @property
     def x(self) -> npt.NDArray[np.float64]:
-        return self.dataset["x"].values
+        return self.dataset["x"].to_numpy()
 
     @property
     def y(self) -> npt.NDArray[np.float64]:
-        return self.dataset["y"].values
+        return self.dataset["y"].to_numpy()
 
     @classmethod
     def _is_grid_agnostic_package(cls) -> bool:
@@ -394,7 +394,9 @@ class GridAgnosticWell(BoundaryCondition, IPointDataPackage, abc.ABC):
         # Carefully rename the dimension and set coordinates
         d_rename = {"index": "ncellid"}
         ds_vars = ds_vars.rename_dims(**d_rename).rename_vars(**d_rename)
-        ds_vars = ds_vars.assign_coords(**{"ncellid": cellid.coords["ncellid"].values})
+        ds_vars = ds_vars.assign_coords(
+            **{"ncellid": cellid.coords["ncellid"].to_numpy()}
+        )
 
         return ds_vars
 
@@ -534,9 +536,9 @@ class GridAgnosticWell(BoundaryCondition, IPointDataPackage, abc.ABC):
         ds = ds.assign(**data_vars_dict)  # type: ignore[arg-type]
 
         ds = remove_inactive(ds, idomain)
-        ds["save_flows"] = self["save_flows"].values[()]
-        ds["print_flows"] = self["print_flows"].values[()]
-        ds["print_input"] = self["print_input"].values[()]
+        ds["save_flows"] = enforce_scalar(self["save_flows"])
+        ds["print_flows"] = enforce_scalar(self["print_flows"])
+        ds["print_input"] = enforce_scalar(self["print_input"])
 
         filtered_final_well_ids = self._gather_filtered_well_ids(ds, wells_df)
         if len(filtered_final_well_ids) > 0:
@@ -545,8 +547,6 @@ class GridAgnosticWell(BoundaryCondition, IPointDataPackage, abc.ABC):
                 filtered_final_well_ids, reason_text=reason_text
             )
             logger.log(loglevel=LogLevel.WARNING, message=message_end)
-
-        ds = ds.drop_vars("id")
 
         data_vars_dict = {str(k): v for k, v in ds.data_vars.items()}
         return Mf6Wel(**data_vars_dict)  # type: ignore[arg-type]
@@ -1080,8 +1080,8 @@ class Well(GridAgnosticWell):
         if (value is not None) and is_spatial_grid(value):
             value = imod.select.points_values(
                 value,
-                x=well_dataset["x"].values,
-                y=well_dataset["y"].values,
+                x=well_dataset["x"].to_numpy(),
+                y=well_dataset["y"].to_numpy(),
                 out_of_bounds="ignore",
             )
             in_bounds = np.full(well_dataset.sizes["index"], False)
@@ -1477,7 +1477,7 @@ class LayeredWell(GridAgnosticWell):
     def from_imod5_cap_data(
         cls,
         imod5_data: Imod5DataDict,
-        target_dis: StructuredDiscretization,
+        target_dis: Optional[StructuredDiscretization] = None,
         regridder_types: CapDataWellRegridMethod = CapDataWellRegridMethod(),
         regrid_cache: RegridderWeightsCache = RegridderWeightsCache(),
     ):
@@ -1517,6 +1517,17 @@ class LayeredWell(GridAgnosticWell):
             xarray datasets, under the key of the package type to which it
             belongs, as returned by
             :func:`imod.formats.prj.open_projectfile_data`.
+        target_dis: Optional[StructuredDiscretization]
+            The target discretization to which the data should be regridded.
+            Only necessary when "artificial_recharge_layer" is an IDF grid,
+            otherwise ignored.
+        regridder_types: CapDataWellRegridMethod
+            The regridder type to use for the regridding of the "artificial_recharge_layer"
+            and "artificial_recharge_capacity" grids. Only necessary when
+            "artificial_recharge_layer" is an IDF grid, otherwise ignored.
+        regrid_cache: RegridderWeightsCache
+            Cache for storing intermediate regridding results. Only necessary when
+            "artificial_recharge_layer" is an IDF grid, otherwise ignored.
         """
         data = well_from_imod5_cap_data(
             imod5_data, target_dis, regridder_types, regrid_cache

@@ -128,6 +128,10 @@ class Mf6Wel(BoundaryCondition, IPackage):
     _pkg_id = "wel"
 
     _period_data = ("cellid", "rate")
+    # Add "id" to optional_data classvar as a workaround that this needs to be
+    # ignored in get_period_varnames. This can become an _auxiliary_data in the
+    # future with some extra work.
+    _optional_data = ("id",)
     _keyword_map = {}
     _template = BoundaryCondition._initialize_template(_pkg_id)
     _auxiliary_data = {"concentration": "species"}
@@ -143,6 +147,7 @@ class Mf6Wel(BoundaryCondition, IPackage):
         self,
         cellid,
         rate,
+        id,
         concentration=None,
         concentration_boundary_type="aux",
         save_flows: Optional[bool] = None,
@@ -153,6 +158,7 @@ class Mf6Wel(BoundaryCondition, IPackage):
         dict_dataset = {
             "cellid": cellid,
             "rate": rate,
+            "id": id,
             "concentration": concentration,
             "concentration_boundary_type": concentration_boundary_type,
             "save_flows": save_flows,
@@ -169,7 +175,7 @@ class Mf6Wel(BoundaryCondition, IPackage):
         arrdict: Dict[str, Any] = {}
 
         arrdict["data_vars"] = [
-            var_name for var_name in ds.data_vars if var_name != "cellid"
+            var_name for var_name in ds.data_vars if var_name not in ("cellid", "id")
         ]
 
         dsvar = {}

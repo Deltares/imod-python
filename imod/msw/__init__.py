@@ -16,5 +16,7 @@ from imod.msw.model import MetaSwapModel
 from imod.msw.output_control import TimeOutputControl, VariableOutputControl
 from imod.msw.ponding import Ponding
 from imod.msw.scaling_factors import ScalingFactors
-from imod.msw.sprinkling import Sprinkling
+
+# Import deprecated class Sprinkling to keep public API stable
+from imod.msw.sprinkling import Sprinkling, SprinklingGrid, SprinklingPoints
 from imod.msw.vegetation import AnnualCropFactors

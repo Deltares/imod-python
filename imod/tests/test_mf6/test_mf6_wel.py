@@ -1168,7 +1168,14 @@ def test_from_imod5_cap_data__big_grid(
 
 @pytest.mark.unittest_jit
 def test_from_imod5_cap_data__points(cap_data_sprinkling_points, cap_coupled_dis_grid):
-    with pytest.raises(NotImplementedError):
-        LayeredWell.from_imod5_cap_data(
-            cap_data_sprinkling_points, cap_coupled_dis_grid
-        )
+    # Act
+    well = LayeredWell.from_imod5_cap_data(
+        cap_data_sprinkling_points, cap_coupled_dis_grid
+    )
+    # Assert
+    ds = well.dataset
+    np.testing.assert_allclose(ds["x"].to_numpy(), np.array([2.0, 2.0]))
+    np.testing.assert_allclose(ds["y"].to_numpy(), np.array([3.0, 2.0]))
+    np.testing.assert_equal(ds["layer"].to_numpy(), np.array([2, 3]))
+    np.testing.assert_allclose(ds["rate"].to_numpy(), np.array([0.0, 0.0]))
+    np.testing.assert_equal(ds["id"].to_numpy(), np.array(["0", "1"]))
