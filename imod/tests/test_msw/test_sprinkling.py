@@ -222,6 +222,46 @@ class SprinklingPointsCases:
 
         return case_data, expected_data
 
+    def case_one_point_one_art_cell_layer0(
+        self, sprinkling_svat_index
+    ) -> tuple[SprinklingPointsCaseData, ExpectedCaseData]:
+        """
+        Simple test case for sprinkling points but now with layer 0. All
+        extractions should be assigned to surface water extractions.
+
+        Note that even though the input layer is 0, the expected output layer is
+        set to 1 as this is required by MetaSWAP.
+        """
+        svat, _ = sprinkling_svat_index
+        case_data = SprinklingPointsCaseData()
+        case_data.art_grid = xr.full_like(svat, 0, dtype=int)
+        # fmt: off
+        case_data.art_grid.data = np.array(
+            [[[0, 1, 0],
+              [0, 2, 0],
+              [0, 3, 0],],
+             [[0, 1, 0],
+              [0, 2, 0],
+              [0, 3, 0]]]
+        )
+        # fmt: on
+        case_data.x_p = [2.0, 2.0, 2.0]
+        case_data.y_p = [3.0, 2.0, 1.0]
+        case_data.layer_p = [0, 0, 0]
+        case_data.id_sprinkling_p = [1, 2, 3]
+        case_data.capacity_p = [10.0, 20.0, 30.0]
+
+        expected_data = ExpectedCaseData()
+        expected_data.svat = np.array([1, 2, 3, 4])
+        expected_data.svat_gw = np.array([1, 2, 3, 4])
+        expected_data.layer = np.array([1, 1, 1, 1])
+        expected_data.abs_gw = np.array([0.0, 0.0, 0.0, 0.0])
+        expected_data.abs_sw = np.array([10.0, 30.0, 10.0, 20.0])
+
+        return case_data, expected_data
+
+
+
     def case_one_point_one_art_cell__one_subunit(
         self, sprinkling_svat_index
     ) -> tuple[SprinklingPointsCaseData, ExpectedCaseData]:
@@ -324,6 +364,47 @@ class SprinklingPointsCases:
         expected_data.abs_sw = np.array([10.0, 10.0, 0.0, 0.0])
 
         return case_data, expected_data
+
+
+    def case_one_point_multi_art_cell_layer0(
+        self, sprinkling_svat_index
+    ) -> tuple[SprinklingPointsCaseData, ExpectedCaseData]:
+        """
+        Case where one point is assigned to multiple art_grid cells but now with
+        layer 0. This should all be assigned as surface water and svat should be
+        equal to groundwater svats.
+
+        Note that even though the input layer is 0, the expected output layer is
+        set to 1 as this is required by MetaSWAP.
+        """
+        svat, _ = sprinkling_svat_index
+        case_data = SprinklingPointsCaseData()
+        case_data.art_grid = xr.full_like(svat, 0, dtype=int)
+        # fmt: off
+        case_data.art_grid.data = np.array(
+            [[[0, 1, 0],
+              [0, 1, 0],
+              [0, 1, 0]],
+             [[0, 1, 0],
+              [0, 1, 0],
+              [0, 1, 0]]]
+        )
+        # fmt: on
+        case_data.x_p = [2.0]
+        case_data.y_p = [2.0]
+        case_data.layer_p = [0]
+        case_data.id_sprinkling_p = [1]
+        case_data.capacity_p = [10.0]
+
+        expected_data = ExpectedCaseData()
+        expected_data.svat = np.array([1, 2, 3, 4])
+        expected_data.svat_gw = np.array([1, 2, 3, 4])
+        expected_data.layer = np.array([1, 1, 1, 1])
+        expected_data.abs_gw = np.array([0.0, 0.0, 0.0, 0.0])
+        expected_data.abs_sw = np.array([10.0, 10.0, 10.0, 10.0])
+
+        return case_data, expected_data
+
 
     def case_art_grid_outside(
         self, sprinkling_svat_index
