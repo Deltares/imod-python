@@ -758,6 +758,6 @@ def test_sprinklingpoints_from_imod5_data_write__points(
     # Assert
     np.testing.assert_equal(results["svat"], [1, 2])
     np.testing.assert_equal(results["svat_groundwater"], [1, 2])
-    np.testing.assert_equal(results["layer"], [2, 3])
+    np.testing.assert_equal(results["layer"], [2, 1])
     np.testing.assert_equal(results["max_abstraction_surfacewater"], [0.0, 30.0])
     np.testing.assert_equal(results["max_abstraction_groundwater"], [15.0, 0.0])
