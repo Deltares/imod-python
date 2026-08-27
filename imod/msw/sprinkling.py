@@ -385,23 +385,38 @@ class SprinklingPoints(SprinklingBase):
         This class is still in an experimental state, and might change in future
         versions. It is not yet fully tested and validated.
 
+    .. note::
+        Right now, whether a point is located on an svat cell or not is
+        evaluated on a per subunit basis, which can yield surprising results.
+        This is not an issue for packages created with
+        :meth:`imod.msw.SprinklingPoints.from_imod5_data`. As they only do
+        sprinkling for the rural areas (`subunit=0`) only, and sprinkling is
+        turned off in urban areas.
+
     Parameters
     ----------
     art_grid: xr.DataArray
         Grid of the artificial recharge ids, with subunit coordinate. These will
-        be used to map the sprinkling points with the id provided in
-        ``id_sprinkling_p``.
+        be used to map the artificial recharge abstraction well with the id
+        provided in ``id_sprinkling_p``.
     x_p: np.ndarray | list[float]
-        x-coordinates of the artificial recharge locations.
+        x-coordinates of the artificial recharge abstraction well. If the point is not
+        located on an svat cell, the coupled cells in the art_grid will be
+        treated as surface water.
     y_p: np.ndarray | list[float]
-        y-coordinates of the artificial recharge locations.
+        y-coordinates of the artificial recharge abstraction well. If the point is not
+        located on an svat cell, the coupled cells in the art_grid will be
+        treated as surface water.
     layer_p: np.ndarray | list[int]
-        layer indices of the artificial recharge locations.
+        layer indices of the artificial recharge abstraction well. If layer is 0, the
+        point will be treated as the surface water abstraction.
     id_sprinkling_p: np.ndarray | list[int]
-        ids mapping of the artificial recharge locations to the grid cells in
+        ids mapping of the artificial recharge abstraction well to the grid cells in
         ``art_grid``.
     capacity_p: np.ndarray | list[float]
-        abstraction capacities of the artificial recharge locations.
+        abstraction capacities of the artificial recharge abstraction well. Will be
+        distributed over groundwater and surface water based on whether layer is
+        0 or not.
 
     Examples
     --------
@@ -497,7 +512,10 @@ class SprinklingPoints(SprinklingBase):
 
         Returns
         -------
-        SprinklingPoints package
+
+        SprinklingPoints package. The `art_grid` will be only active for the
+        rural landuse (`subunit=0`). Urban areas (`subunit=1`) will not have
+        active `art_grid` cells.
         """
         if is_sprinkling_from_points(imod5_data):
             cap_data = cast(CapSprinklingDataDict, imod5_data["cap"])
@@ -519,11 +537,10 @@ class SprinklingPoints(SprinklingBase):
 
         This method first merges the sprinkling points with the mf6_well cellids
         to get the row/col of each well, then merges the sprinkling points with
-        the svat and id_sprinkling grid. It then selects the columns that need to be
-        written to scap_svat.inp and sets wells with layer > 0 to groundwater
-        abstraction, and wells with layer = 0 to surfacewater abstraction.
-        Finally, it deals with edge cases for wells that are outside art_grid
-        but in the model domain, and writes the dataframe to the file.
+        the svat and id_sprinkling grid. It then selects the columns that need
+        to be written to scap_svat.inp and sets wells with layer > 0 and are in
+        an active svat cell, and wells with layer = 0 or that are in an inactive
+        svat cell to surfacewater abstraction.
         """
         # Merge the sprinkling points with the mf6_well cellids to get the
         # row/col of each well.

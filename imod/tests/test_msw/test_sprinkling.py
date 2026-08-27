@@ -344,6 +344,11 @@ class SprinklingPointsCases:
         common usecase. The point is located in the centre of the grid, where
         there is only an svat in subunit 1. In subunit 0 this cell is not
         active, therefore sprinkling capacity is assigned to surface water.
+
+        NOTE: This is somewhat unwanted behavior, the subunit should not matter,
+          but this is not an issue for the iMOD5 user as they only do sprinkling
+          for the rural areas (subunit 0) only.
+
         """
         svat, _ = sprinkling_svat_index
         case_data = SprinklingPointsCaseData()
