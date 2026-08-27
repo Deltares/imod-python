@@ -359,7 +359,7 @@ class SprinklingPointsCases:
         expected_data = ExpectedCaseData()
         expected_data.svat = np.array([1, 2, 3, 4])
         expected_data.svat_gw = np.array([1, 2, 4, 4])
-        expected_data.layer = np.array([2, 2, 2, 2])
+        expected_data.layer = np.array([1, 1, 2, 2])
         expected_data.abs_gw = np.array([0.0, 0.0, 10.0, 10.0])
         expected_data.abs_sw = np.array([10.0, 10.0, 0.0, 0.0])
 
@@ -472,7 +472,7 @@ class SprinklingPointsCases:
         expected_data = ExpectedCaseData()
         expected_data.svat = np.array([2])
         expected_data.svat_gw = np.array([2])
-        expected_data.layer = np.array([3])
+        expected_data.layer = np.array([1])
         expected_data.abs_gw = np.array([0.0])
         expected_data.abs_sw = np.array([40.0])
         return case_data, expected_data
