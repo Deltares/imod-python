@@ -537,7 +537,23 @@ class SprinklingPoints(SprinklingBase):
         msw_mf6_sprinkling_df["svat_groundwater"] = _get_svat_groundwater_for_wells(
             msw_mf6_sprinkling_df, svat_aligned
         )
+        ## TODO: The logic required for outside points and layer = 0 is
+        ##   essentially the same. Probably clearer (and slightly more efficient)
+        ##   to grab those together in one boolean and do the data modifications.
         is_point_inside = msw_mf6_sprinkling_df["svat_groundwater"] > 0
+        #is_layer_zero = msw_mf6_sprinkling_df["layer"] == 0
+        #is_outside_or_layer_zero = ~is_point_inside | is_layer_zero
+        #capacity = msw_mf6_sprinkling_df.loc[:, "capacity_p"]
+#
+#
+        #dataframe_out = msw_mf6_sprinkling_df.loc[:, ["svat", "layer", "svat_groundwater"]]
+        #dataframe_out.loc[is_outside_or_layer_zero, "layer"] = 1
+        #dataframe_out.loc[is_outside_or_layer_zero, "svat_groundwater"] = dataframe_out.loc[
+        #    is_outside_or_layer_zero, "svat"
+        #]
+        #dataframe_out["max_abstraction_groundwater"] = capacity.where(is_outside_or_layer_zero, 0.0)
+        #dataframe_out["max_abstraction_surfacewater"] = capacity.where(~is_outside_or_layer_zero, 0.0)
+#
         # Select columns that need to be written to scap_svat.inp
         inside_df = msw_mf6_sprinkling_df.loc[
             is_point_inside, ["svat", "layer", "svat_groundwater"]
@@ -551,6 +567,8 @@ class SprinklingPoints(SprinklingBase):
         inside_df["max_abstraction_surfacewater"] = capacity.where(
             ~is_gw_extraction, 0.0
         )
+        inside_df.loc[~is_gw_extraction, "layer"] = 1
+        
         ##############
         # EDGE CASES #
         ##############
@@ -567,6 +585,9 @@ class SprinklingPoints(SprinklingBase):
         # Set svat_groundwater to svat, as these wells are outside art_grid and
         # will be assigned to surfacewater abstraction.
         outside_df["svat_groundwater"] = outside_df["svat"]
+        # Wells that are assigned to layer 0 need to be bumped to layer 1, as
+        # required by MetaSWAP.
+        outside_df["layer"] = outside_df["layer"].clip(lower=1)
         ############
         # FINALIZE #
         ############
