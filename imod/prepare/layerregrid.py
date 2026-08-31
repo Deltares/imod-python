@@ -12,14 +12,35 @@ METHODS.pop("multilinear")
 
 
 @numba.njit(cache=True)
+def _valid_layer_indices(top_col, bot_col, out):
+    """
+    Fill `out` (int64 array, same length as top_col) with the indices of
+    layers that have non-nan top AND bottom, at a single (row, col) column.
+    Returns the count of valid entries. Avoids allocating a new array per
+    column call.
+    """
+    count = 0
+    n = top_col.shape[0]
+    for k in range(n):
+        if not (np.isnan(top_col[k]) or np.isnan(bot_col[k])):
+            out[count] = k
+            count += 1
+    return count
+
+
+@numba.njit(cache=True)
 def _regrid_layers(src, dst, src_top, dst_top, src_bot, dst_bot, method):
     """
-    Maps one set of layers unto the other.
+    Maps one set of layers onto the other, skipping all-nan layers up front
+    per column instead of checking nan inside the nested layer loop.
     """
     nlayer_src, nrow, ncol = src.shape
     nlayer_dst = dst.shape[0]
+
     values = np.zeros(nlayer_src)
     weights = np.zeros(nlayer_src)
+    src_valid_idx = np.empty(nlayer_src, dtype=np.int64)
+    dst_valid_idx = np.empty(nlayer_dst, dtype=np.int64)
 
     for i in range(nrow):
         for j in range(ncol):
@@ -28,22 +49,26 @@ def _regrid_layers(src, dst, src_top, dst_top, src_bot, dst_bot, method):
             src_b = src_bot[:, i, j]
             dst_b = dst_bot[:, i, j]
 
-            # ii is index of dst
-            for ii in range(nlayer_dst):
+            # Precompute valid layer indices ONCE per column, instead of
+            # re-checking isnan for every (ii, jj) pair.
+            n_src_valid = _valid_layer_indices(src_t, src_b, src_valid_idx)
+            if n_src_valid == 0:
+                continue
+            n_dst_valid = _valid_layer_indices(dst_t, dst_b, dst_valid_idx)
+            if n_dst_valid == 0:
+                continue
+
+            for di in range(n_dst_valid):
+                ii = dst_valid_idx[di]
                 dt = dst_t[ii]
                 db = dst_b[ii]
-                if np.isnan(dt) or np.isnan(db):
-                    continue
 
                 count = 0
                 has_value = False
-                # jj is index of src
-                for jj in range(nlayer_src):
+                for sj in range(n_src_valid):
+                    jj = src_valid_idx[sj]
                     st = src_t[jj]
                     sb = src_b[jj]
-
-                    if np.isnan(st) or np.isnan(sb):
-                        continue
 
                     overlap = common._overlap((db, dt), (sb, st))
                     if overlap == 0:
@@ -53,12 +78,11 @@ def _regrid_layers(src, dst, src_top, dst_top, src_bot, dst_bot, method):
                     values[count] = src[jj, i, j]
                     weights[count] = overlap
                     count += 1
-                else:
-                    if has_value:
-                        dst[ii, i, j] = method(values, weights)
-                        # Reset
-                        values[:count] = 0
-                        weights[:count] = 0
+
+                if has_value:
+                    dst[ii, i, j] = method(values, weights)
+                    values[:count] = 0
+                    weights[:count] = 0
 
     return dst
 

@@ -71,6 +71,7 @@ def allocate_riv_cells(
     bottom: GridDataArray,
     stage: GridDataArray,
     bottom_elevation: GridDataArray,
+    drop_empty_layers: bool = False,
 ) -> tuple[GridDataArray, Optional[GridDataArray]]:
     """
     Allocate river cells from a planar grid across the vertical dimension.
@@ -96,6 +97,14 @@ def allocate_riv_cells(
     bottom_elevation: DataArray | UgridDatarray
         Planar grid containing river bottom elevations. Is not allowed to have a
         layer dimension.
+    drop_empty_layers: bool, default False
+        If True, drop layers from the result that contain no allocated
+        cells anywhere in the domain. This avoids carrying the package's
+        arrays at full model-layer size through downstream regridding,
+        clipping, masking, and splitting, which can otherwise become
+        expensive for models with many layers relative to how many
+        layers the topsystem package actually occupies. Set to False to
+        keep the previous full-layer-coordinate behaviour.
 
     Returns
     -------
@@ -111,21 +120,25 @@ def allocate_riv_cells(
     """
     match allocation_option:
         case ALLOCATION_OPTION.stage_to_riv_bot:
-            return _allocate_cells__stage_to_riv_bot(
+            riv_cells, drn_cells = _allocate_cells__stage_to_riv_bot(
                 top, bottom, stage, bottom_elevation
             )
         case ALLOCATION_OPTION.first_active_to_elevation:
-            return _allocate_cells__first_active_to_elevation(
+            riv_cells, drn_cells = _allocate_cells__first_active_to_elevation(
                 active, top, bottom, bottom_elevation
             )
         case ALLOCATION_OPTION.stage_to_riv_bot_drn_above:
-            return _allocate_cells__stage_to_riv_bot_drn_above(
+            riv_cells, drn_cells = _allocate_cells__stage_to_riv_bot_drn_above(
                 active, top, bottom, stage, bottom_elevation
             )
         case ALLOCATION_OPTION.at_elevation:
-            return _allocate_cells__at_elevation(top, bottom, bottom_elevation)
+            riv_cells, drn_cells = _allocate_cells__at_elevation(
+                top, bottom, bottom_elevation
+            )
         case ALLOCATION_OPTION.at_first_active:
-            return _allocate_cells__at_first_active(active, bottom_elevation)
+            riv_cells, drn_cells = _allocate_cells__at_first_active(
+                active, bottom_elevation
+            )
         case _:
             raise ValueError(
                 "Received incompatible setting for rivers, only"
@@ -137,6 +150,13 @@ def allocate_riv_cells(
                 f"got: '{allocation_option.name}'"
             )
 
+    if drop_empty_layers:
+        riv_cells = _drop_empty_layers(riv_cells)
+        if drn_cells is not None:
+            drn_cells = _drop_empty_layers(drn_cells)
+
+    return riv_cells, drn_cells
+
 
 def allocate_drn_cells(
     allocation_option: ALLOCATION_OPTION,
@@ -144,6 +164,7 @@ def allocate_drn_cells(
     top: GridDataArray,
     bottom: GridDataArray,
     elevation: GridDataArray,
+    drop_empty_layers: bool = False,
 ) -> GridDataArray:
     """
     Allocate drain cells from a planar grid across the vertical dimension.
@@ -166,6 +187,14 @@ def allocate_drn_cells(
     elevation: DataArray | UgridDatarray
         Planar grid containing drain elevation. Is not allowed to have a layer
         dimension.
+    drop_empty_layers: bool, default False
+        If True, drop layers from the result that contain no allocated
+        cells anywhere in the domain. This avoids carrying the package's
+        arrays at full model-layer size through downstream regridding,
+        clipping, masking, and splitting, which can otherwise become
+        expensive for models with many layers relative to how many
+        layers the topsystem package actually occupies. Set to False to
+        keep the previous full-layer-coordinate behaviour.
 
     Returns
     -------
@@ -181,13 +210,13 @@ def allocate_drn_cells(
     """
     match allocation_option:
         case ALLOCATION_OPTION.first_active_to_elevation:
-            return _allocate_cells__first_active_to_elevation(
+            result = _allocate_cells__first_active_to_elevation(
                 active, top, bottom, elevation
             )[0]
         case ALLOCATION_OPTION.at_elevation:
-            return _allocate_cells__at_elevation(top, bottom, elevation)[0]
+            result = _allocate_cells__at_elevation(top, bottom, elevation)[0]
         case ALLOCATION_OPTION.at_first_active:
-            return _allocate_cells__at_first_active(active, elevation)[0]
+            result = _allocate_cells__at_first_active(active, elevation)[0]
         case _:
             raise ValueError(
                 "Received incompatible setting for drains, only"
@@ -196,6 +225,8 @@ def allocate_drn_cells(
                 f"'{ALLOCATION_OPTION.at_first_active.name}' supported."
                 f"got: '{allocation_option.name}'"
             )
+
+    return _drop_empty_layers(result) if drop_empty_layers else result
 
 
 def allocate_ghb_cells(
@@ -263,6 +294,7 @@ def allocate_rch_cells(
     allocation_option: ALLOCATION_OPTION,
     active: GridDataArray,
     rate: GridDataArray,
+    drop_empty_layers: bool = False,
 ) -> GridDataArray:
     """
     Allocate recharge cells from a planar grid across the vertical dimension.
@@ -279,6 +311,14 @@ def allocate_rch_cells(
     rate: DataArray | UgridDataArray
         Array with recharge rates. This will only be used to infer where
         recharge cells are defined.
+    drop_empty_layers: bool, default False
+        If True, drop layers from the result that contain no allocated
+        cells anywhere in the domain. This avoids carrying the package's
+        arrays at full model-layer size through downstream regridding,
+        clipping, masking, and splitting, which can otherwise become
+        expensive for models with many layers relative to how many
+        layers the topsystem package actually occupies. Set to False to
+        keep the previous full-layer-coordinate behaviour.
 
     Returns
     -------
@@ -294,13 +334,15 @@ def allocate_rch_cells(
     """
     match allocation_option:
         case ALLOCATION_OPTION.at_first_active:
-            return _allocate_cells__at_first_active(active, rate)[0]
+            result = _allocate_cells__at_first_active(active, rate)[0]
         case _:
             raise ValueError(
                 "Received incompatible setting for recharge, only"
                 f"'{ALLOCATION_OPTION.at_first_active.name}' supported."
                 f"got: '{allocation_option.name}'"
             )
+
+    return _drop_empty_layers(result) if drop_empty_layers else result
 
 
 def _is_layered(grid: GridDataArray):
@@ -537,3 +579,54 @@ def _allocate_cells__at_first_active(
     topsystem_upper_active = upper_active & ~np.isnan(planar_topsystem_grid)
 
     return topsystem_upper_active, None
+
+
+def _drop_empty_layers(
+    grid: GridDataArray, spatial_dims: tuple[str, ...] = ("y", "x")
+) -> GridDataArray:
+    """
+    Drop layers that contain no True/non-nan values in any spatial cell
+    (and, if present, at any timestep). Keeps the `layer` coordinate but
+    only for layers that actually contain data - this is what lets
+    downstream regridding/clipping/masking/splitting operate over a much
+    smaller layer range when the topsystem package only spans a handful
+    of the model's total layers.
+
+    Parameters
+    ----------
+    grid: GridDataArray
+        Array with a "layer" dimension, typically the output of one of the
+        ``_allocate_cells__*`` functions.
+    spatial_dims: tuple[str, ...]
+        Dimensions to reduce over when checking "is this layer used
+        anywhere". Does not include "layer" or "time" by design - a layer
+        used at any timestep, anywhere in the domain, is kept.
+
+    Returns
+    -------
+    GridDataArray
+        Same array, subset to layers with data.
+    """
+    if "layer" not in grid.dims:
+        return grid
+
+    reduce_dims = [d for d in grid.dims if d != "layer"]
+
+    if grid.dtype == bool:
+        has_data_per_layer = grid.any(dim=reduce_dims)
+    else:
+        has_data_per_layer = (~grid.isnull()).any(dim=reduce_dims)
+
+    # Force to plain numpy/bool to avoid triggering a dask compute deep
+    # inside indexing logic more than once.
+    has_data_per_layer = (
+        has_data_per_layer.compute()
+        if hasattr(has_data_per_layer, "compute")
+        else has_data_per_layer
+    )
+
+    if bool(has_data_per_layer.all()):
+        return grid  # nothing to trim, skip the extra indexing op
+
+    used_layers = grid["layer"].where(has_data_per_layer, drop=True)
+    return grid.sel(layer=used_layers)
