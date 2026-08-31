@@ -30,10 +30,7 @@ def _valid_layer_indices(top_col, bot_col, out):
 
 @numba.njit(cache=True)
 def _regrid_layers(src, dst, src_top, dst_top, src_bot, dst_bot, method):
-    """
-    Maps one set of layers onto the other, skipping all-nan layers up front
-    per column instead of checking nan inside the nested layer loop.
-    """
+    """Maps one set of layers onto the other."""
     nlayer_src, nrow, ncol = src.shape
     nlayer_dst = dst.shape[0]
 

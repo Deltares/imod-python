@@ -1,5 +1,3 @@
-# tests/test_prepare/test_topsystem_layer_preservation.py
-
 import numpy as np
 import pytest
 import xarray as xr
@@ -46,11 +44,8 @@ def n_layers(request):
     return request.param
 
 
-def n_nonempty_layers(
-    da: GridDataArray, spatial_dims: tuple[str, ...] = ("y", "x")
-) -> int:
-    """
-    Number of layers that contain at least one meaningfully "present" value.
+def n_nonempty_layers(da: GridDataArray) -> int:
+    """Number of layers that contain at least one meaningfully "present" value.
 
     Handles the fact that boolean arrays get upcast to float by xarray's
     .where() (NaN has no bool representation) - after such a coercion,

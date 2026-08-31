@@ -581,9 +581,7 @@ def _allocate_cells__at_first_active(
     return topsystem_upper_active, None
 
 
-def _drop_empty_layers(
-    grid: GridDataArray, spatial_dims: tuple[str, ...] = ("y", "x")
-) -> GridDataArray:
+def _drop_empty_layers(grid: GridDataArray) -> GridDataArray:
     """
     Drop layers that contain no True/non-nan values in any spatial cell
     (and, if present, at any timestep). Keeps the `layer` coordinate but
@@ -597,10 +595,6 @@ def _drop_empty_layers(
     grid: GridDataArray
         Array with a "layer" dimension, typically the output of one of the
         ``_allocate_cells__*`` functions.
-    spatial_dims: tuple[str, ...]
-        Dimensions to reduce over when checking "is this layer used
-        anywhere". Does not include "layer" or "time" by design - a layer
-        used at any timestep, anywhere in the domain, is kept.
 
     Returns
     -------
