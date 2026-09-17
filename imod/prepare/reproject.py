@@ -125,27 +125,27 @@ def reproject(
     --------
     Resample a DataArray ``a`` to a new cellsize, using an existing DataArray ``b``:
 
-    >>> c = imod.rasterio.reproject(source=a, like=b)
+    >>> c = imod.prepare.reproject(source=a, like=b)
 
     Reproject a DataArray from one coordinate system (WGS84, EPSG:4326) to another (UTM30N, EPSG:32630):
 
-    >>> c = imod.rasterio.reproject(source=a, src_crs="EPSG:4326", dst_crs="EPSG:32630")
+    >>> c = imod.prepare.reproject(source=a, src_crs="EPSG:4326", dst_crs="EPSG:32630")
 
     Get the reprojected DataArray in the desired shape and coordinates by providing ``like``:
 
-    >>> c = imod.rasterio.reproject(source=a, like=b, src_crs="EPSG:4326", dst_crs="EPSG:32630")
+    >>> c = imod.prepare.reproject(source=a, like=b, src_crs="EPSG:4326", dst_crs="EPSG:32630")
 
     Open a single band raster, and reproject to RD new coordinate system (EPSG:28992), without explicitly specifying ``src_crs``.
     ``src_crs`` is taken from ``a.attrs``, so the raster file has to include coordinate system metadata for this to work.
 
     >>> a = rioxarray.open_rasterio("example.tif").squeeze("band")
-    >>> c = imod.rasterio.reproject(source=a, use_src_attrs=True, dst_crs="EPSG:28992")
+    >>> c = imod.prepare.reproject(source=a, use_src_attrs=True, dst_crs="EPSG:28992")
 
     In case of a rotated ``source``, provide ``src_transform`` directly or ``use_src_attrs=True`` to rely on generated attributes:
 
     >>> rotated = rioxarray.open_rasterio("rotated_example.tif").squeeze("band")
-    >>> c = imod.rasterio.reproject(source=rotated, dst_crs="EPSG:28992", reproject_kwargs={"src_transform":affine.Affine(...)})
-    >>> c = imod.rasterio.reproject(source=rotated, dst_crs="EPSG:28992", use_src_attrs=True)
+    >>> c = imod.prepare.reproject(source=rotated, dst_crs="EPSG:28992", reproject_kwargs={"src_transform":affine.Affine(...)})
+    >>> c = imod.prepare.reproject(source=rotated, dst_crs="EPSG:28992", use_src_attrs=True)
     """
 
     warnings.warn(
