@@ -123,10 +123,6 @@ def reproject(
 
     Examples
     --------
-    Resample a DataArray ``a`` to a new cellsize, using an existing DataArray ``b``:
-
-    >>> c = imod.prepare.reproject(source=a, like=b)
-
     Reproject a DataArray from one coordinate system (WGS84, EPSG:4326) to another (UTM30N, EPSG:32630):
 
     >>> c = imod.prepare.reproject(source=a, src_crs="EPSG:4326", dst_crs="EPSG:32630")
