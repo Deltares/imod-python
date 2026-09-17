@@ -58,8 +58,8 @@ def reproject(
 
     .. warning::
 
-        The `like` paramater does not seem to resample anymore due to changes in
-        rasterio. For regridding, consider using `xugrid to regrid instead.
+        The `like` paramater does not seem to resample anymore as expected. For
+        regridding, consider using `xugrid to regrid instead.
         <https://deltares.github.io/xugrid/examples/regridder_overview.html>`_
 
     Reprojects and/or resamples a 2D xarray DataArray to a
