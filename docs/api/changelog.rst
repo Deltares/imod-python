@@ -18,6 +18,13 @@ Added
   :meth:`imod.msw.SprinklingPoints.from_imod5_data`.
 - :class:`imod.mf6.LayeredWell.from_imod5_cap_data` now also supports loading
   wells from IPF files in an iMOD5 CAP dataset.
+- Added ``drop_empty_layers: bool = False`` to various cell allocation functions 
+  in :mod:`imod.prepare.topsystem.allocation` to remove fully empty layers from the grids.
+  Setting this to True, strips the empty layers before they are passed along to 
+  reprojection/regridding operations. Which can save considerable time for models with 
+  many empty layers. :meth:`imod.prepare.topsystem.allocation.allocate_riv_cells`, 
+  :meth:`imod.prepare.topsystem.allocation.allocate_drn_cells`,
+  :meth:`imod.prepare.topsystem.allocation.allocate_rch_cells`
 
 Fixed
 ~~~~~
