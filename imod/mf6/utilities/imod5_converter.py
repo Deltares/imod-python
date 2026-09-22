@@ -4,10 +4,12 @@ import numpy as np
 import pandas as pd
 import xarray as xr
 
+from imod.common.interfaces.imodel import IModel
 from imod.common.interfaces.iregridpackage import IRegridPackage
 from imod.common.utilities.dataclass_type import DataclassType
 from imod.common.utilities.regrid import _regrid_package_data, regrid_imod5_cap_data
 from imod.mf6.package import Package
+from imod.mf6.regrid.regrid_schemes import ConstantHeadRegridMethod
 from imod.typing import GridDataArray, GridDataDict, Imod5DataDict
 from imod.typing.grid import full_like
 from imod.util.regrid import RegridderWeightsCache
@@ -140,7 +142,7 @@ def well_from_imod5_cap_data(
 
 
 def regrid_imod5_pkg_data(
-    cls: type[Package],
+    cls: Optional[type[Package]],
     imod5_pkg_data: GridDataDict,
     target_dis: Package,
     regridder_types: Optional[DataclassType],
@@ -150,6 +152,11 @@ def regrid_imod5_pkg_data(
     Regrid iMOD5 package data to target idomain. Optionally get regrid methods
     from class if not provided.
     """
+    if cls is None and regridder_types is None:
+        raise ValueError(
+            "Either cls or regridder_types must be provided for regridding."
+        )
+
     target_idomain = target_dis.dataset["idomain"]
 
     # set up regridder methods
@@ -175,3 +182,31 @@ def chd_cells_from_imod5_data(
     head = head.where(target_idomain > 0)
 
     return {"head": head}
+
+
+def mask_topsystem_packages(
+    imod5_data: Imod5DataDict,
+    model: IModel,
+    regridder_types: ConstantHeadRegridMethod,
+    regrid_cache: RegridderWeightsCache,
+) -> None:
+    """
+    Mask all top system packages where IBOUND == -1.
+    """
+    from imod.mf6.topsystem import TopSystemBoundaryCondition
+
+    ibound = imod5_data["bnd"]["ibound"]
+    regridded_ibound = regrid_imod5_pkg_data(
+        cls=None,
+        imod5_pkg_data={"ibound": ibound},
+        target_dis=model["dis"],
+        regridder_types=regridder_types,
+        regrid_cache=regrid_cache,
+    )["ibound"]
+    mask = regridded_ibound == -1
+
+    topsystem_packages = [
+        key for key, pkg in model.items() if isinstance(pkg, TopSystemBoundaryCondition)
+    ]
+    for key in topsystem_packages:
+        model[key].mask(mask)

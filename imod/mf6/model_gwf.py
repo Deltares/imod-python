@@ -37,6 +37,7 @@ from imod.mf6.regrid.regrid_schemes import (
 from imod.mf6.riv import River
 from imod.mf6.sto import StorageCoefficient
 from imod.mf6.utilities.chd_concat import concat_layered_chd_packages
+from imod.mf6.utilities.imod5_converter import mask_topsystem_packages
 from imod.mf6.validation_settings import ValidationSettings
 from imod.mf6.wel import LayeredWell, Well
 from imod.prepare.topsystem.default_allocation_methods import (
@@ -453,4 +454,11 @@ class GroundwaterFlowModel(Modflow6Model):
             for key, chd_package in chd_packages.items():
                 result[key] = chd_package
 
+        # Mask all topsystem packages where IBOUND == -1
+        mask_topsystem_packages(
+            imod5_data,
+            result,
+            cast(ConstantHeadRegridMethod, regridder_types.get("topsystem_mask")),
+            regrid_cache,
+        )
         return result
