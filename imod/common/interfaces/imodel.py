@@ -17,8 +17,20 @@ class IModel(IDict):
         raise NotImplementedError
 
     @abstractmethod
+    def mask_packages(
+        self,
+        package_names: list[str],
+        mask: GridDataArray,
+        ignore_time_purge_empty: bool = False,
+    ):
+        raise NotImplementedError
+
+    @abstractmethod
     def purge_empty_packages(
-        self, model_name: Optional[str] = "", ignore_time: bool = False
+        self,
+        model_name: Optional[str] = "",
+        ignore_time: bool = False,
+        package_names: list[str] | None = None,
     ) -> None:
         raise NotImplementedError
 

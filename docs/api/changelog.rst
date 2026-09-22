@@ -18,6 +18,10 @@ Added
   :meth:`imod.msw.SprinklingPoints.from_imod5_data`.
 - :class:`imod.mf6.LayeredWell.from_imod5_cap_data` now also supports loading
   wells from IPF files in an iMOD5 CAP dataset.
+- Added :meth:`imod.mf6.GroundwaterFlowModel.mask_packages` and
+  :meth:`imod.mf6.GroundwaterTransportModel.mask_packages` to mask specific
+  packages of a groundwater flow model and a groundwater transport model
+  respectively.
 
 Fixed
 ~~~~~

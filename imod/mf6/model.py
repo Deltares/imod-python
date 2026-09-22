@@ -22,7 +22,7 @@ from imod.common.serializer import EngineType
 from imod.common.statusinfo import NestedStatusInfo, StatusInfo, StatusInfoBase
 from imod.common.utilities.clip import clip_box_dataset
 from imod.common.utilities.dump_model import dump_model
-from imod.common.utilities.mask import mask_all_packages
+from imod.common.utilities.mask import mask_packages
 from imod.common.utilities.regrid import _regrid_like
 from imod.common.utilities.schemata import (
     concatenate_schemata_dicts,
@@ -930,11 +930,41 @@ class Modflow6Model(collections.UserDict[str, Package], IModel, abc.ABC):
             Whether to ignore time dimension when purging empty packages. Can
             improve performance when masking models with many time steps.
         """
+        package_names = list(self.keys())
+        mask_packages(self, package_names, mask, ignore_time_purge_empty)
 
-        mask_all_packages(self, mask, ignore_time_purge_empty)
+    def mask_packages(
+        self,
+        package_names: list[str],
+        mask: GridDataArray,
+        ignore_time_purge_empty: bool = False,
+    ) -> None:
+        """
+        This function applies a mask to packages in a model. The mask must
+        be presented as an idomain-like integer array that has 0 (inactive) or
+        <0 (vertical passthrough) values in filtered cells and >0 in active
+        cells.
+        Masking will overwrite idomain with the mask where the mask is <=0.
+        Where the mask is >0, the original value of idomain will be kept. Masking
+        will update the packages accordingly, blanking their input where needed,
+        and is therefore not a reversible operation.
+
+        Parameters
+        ----------
+        mask: xr.DataArray, xu.UgridDataArray of ints
+            idomain-like integer array. >0 sets cells to active, 0 sets cells to inactive,
+            <0 sets cells to vertical passthrough
+        ignore_time_purge_empty: bool, default False
+            Whether to ignore time dimension when purging empty packages. Can
+            improve performance when masking models with many time steps.
+        """
+        mask_packages(self, package_names, mask, ignore_time_purge_empty)
 
     def purge_empty_packages(
-        self, model_name: Optional[str] = "", ignore_time: bool = False
+        self,
+        model_name: Optional[str] = "",
+        ignore_time: bool = False,
+        package_names: Optional[list[str]] = None,
     ) -> None:
         """
         This method removes empty packages from the model in place.
@@ -948,11 +978,17 @@ class Modflow6Model(collections.UserDict[str, Package], IModel, abc.ABC):
             timesteps. If True, packages are considered empty if they have no
             data at the first time step. The latter can increase performance
             considerably.
+        package_names: list[str], optional
+            List of package names to check for emptiness. If None, all packages
+            are checked.
         """
+        if package_names is None:
+            package_names = list(self.keys())
+
         empty_packages = [
             package_name
-            for package_name, package in self.items()
-            if package.is_empty(ignore_time=ignore_time)
+            for package_name in package_names
+            if self[package_name].is_empty(ignore_time=ignore_time)
         ]
         logger.info(
             f"packages: {empty_packages} removed in {model_name}, because all empty"
