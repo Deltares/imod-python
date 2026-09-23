@@ -3,7 +3,7 @@ from imod.common.interfaces.itopsystembc import ITopSystemBoundaryCondition
 from imod.typing import GridDataArray
 
 
-def mask_topsystem(model: IModel, is_active: GridDataArray):
+def mask_topsystem(model: IModel, is_active: GridDataArray) -> None:
     """
     Mask all top system packages in the model inplace with a boolean mask
     indicating active cells.
