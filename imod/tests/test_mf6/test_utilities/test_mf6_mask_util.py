@@ -1,6 +1,8 @@
-from imod.mf6.utilities.mask import mask_topsystem
-from imod.typing.grid import zeros_like, ones_like
 import numpy as np
+
+from imod.mf6.utilities.mask import mask_topsystem
+from imod.typing.grid import ones_like, zeros_like
+
 
 def test_mask_topsystem(twri_model):
     """
@@ -23,7 +25,6 @@ def test_mask_topsystem(twri_model):
         assert np.isnan(first_cell).item()
 
 
-
 def test_mask_topsystem__all_removed(twri_model):
     """
     Test the mask_topsystem utility function by deactivating all cells in the
@@ -37,4 +38,3 @@ def test_mask_topsystem__all_removed(twri_model):
     # Assert
     for key in ["rch", "drn"]:
         assert key not in gwf_model.keys()
-
