@@ -263,9 +263,20 @@ class TestModel:
         # Arrange.
         state_for_boundary = MagicMock(spec_set=UgridDataArray)
 
+        idomain = xr.DataArray(
+            np.ones((1, 2, 2), dtype=np.int32), dims=("layer", "y", "x")
+        )
+        top = xr.DataArray(np.ones((2, 2), dtype=np.float64), dims=("y", "x"))
+        bottom = xr.DataArray(np.array([-1.0], dtype=np.float64), dims=("layer",))
+
         discretization_mock = MagicMock(spec_set=Package)
         discretization_mock._pkg_id = "dis"
         discretization_mock.clip_box.return_value = discretization_mock
+        discretization_mock.__getitem__.side_effect = {
+            "idomain": idomain,
+            "top": top,
+            "bottom": bottom,
+        }.__getitem__
 
         clipped_boundary_mock = MagicMock(spec_set=pkg_type)
         clipped_boundary_mock.is_empty.return_value = False
@@ -305,10 +316,21 @@ class TestModel:
         # Arrange.
         state_for_boundary = MagicMock(spec_set=UgridDataArray)
 
+        idomain = xr.DataArray(
+            np.ones((1, 2, 2), dtype=np.int32), dims=("layer", "y", "x")
+        )
+        top = xr.DataArray(np.ones((2, 2), dtype=np.float64), dims=("y", "x"))
+        bottom = xr.DataArray(np.array([-1.0], dtype=np.float64), dims=("layer",))
+
         discretization_mock = MagicMock(spec_set=Package)
         discretization_mock._pkg_id = "dis"
         discretization_mock.is_empty.side_effect = [False, False]
         discretization_mock.clip_box.return_value = discretization_mock
+        discretization_mock.__getitem__.side_effect = {
+            "idomain": idomain,
+            "top": top,
+            "bottom": bottom,
+        }.__getitem__
 
         constant_boundary_mock = MagicMock(spec_set=pkg_type)
         constant_boundary_mock.is_empty.side_effect = [False, False]
