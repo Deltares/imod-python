@@ -29,6 +29,12 @@ Fixed
 - Fixed resampling in :meth:`imod.mf6.Well.from_imod5_data` and
   :meth:`imod.mf6.LayeredWell.from_imod5_data` when simulation timesteps precede
   the first well timestep.
+- :meth:`imod.mf6.GroundwaterFlowModel.from_imod5_data` now masks cells in
+  topsystem packages (:class:`imod.mf6.River`,
+  :class:`imod.mf6.GeneralHeadBoundary`, :class:`imod.mf6.Drainage`,
+  :class:`imod.mf6.Recharge`) where IBOUND is less than 0.
+- :meth:`imod.msw.MetaSwapModel.from_imod5_data` now masks cells where IBOUND is
+  less than 0.
 
 Changed
 ~~~~~~~
@@ -36,6 +42,11 @@ Changed
 - Deprecated :class:`imod.msw.Sprinkling` in favor of
   :class:`imod.msw.SprinklingGrid`. Call :class:`imod.msw.SprinklingGrid` to get
   the same behavior as you were used to.
+- If ``states_for_boundary`` is provided to
+  :meth:`imod.mf6.GroundwaterFlowModel.clip_box`, topsystem packages
+  (:class:`imod.mf6.River`, :class:`imod.mf6.GeneralHeadBoundary`,
+  :class:`imod.mf6.Drainage`, :class:`imod.mf6.Recharge`) will also be masked
+  where constant head cells are placed. 
 
 [1.1.0] - 2026-08-03
 --------------------
