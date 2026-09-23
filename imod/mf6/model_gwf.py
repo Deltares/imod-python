@@ -454,7 +454,7 @@ class GroundwaterFlowModel(Modflow6Model):
             for key, chd_package in chd_packages.items():
                 result[key] = chd_package
 
-        # Mask all topsystem packages where IBOUND == -1
+        # Mask all topsystem packages where IBOUND < 0
         mask_topsystem_packages(
             imod5_data,
             result,
