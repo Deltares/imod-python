@@ -10,6 +10,7 @@ from imod.common.utilities.dataclass_type import DataclassType
 from imod.common.utilities.regrid import _regrid_package_data, regrid_imod5_cap_data
 from imod.mf6.package import Package
 from imod.mf6.regrid.regrid_schemes import ConstantHeadRegridMethod
+from imod.mf6.utilities.mask import mask_topsystem
 from imod.typing import GridDataArray, GridDataDict, Imod5DataDict
 from imod.typing.grid import full_like
 from imod.util.regrid import RegridderWeightsCache
@@ -186,7 +187,7 @@ def chd_cells_from_imod5_data(
     return {"head": head}
 
 
-def mask_topsystem_packages(
+def mask_topsystem_packages_with_ibound(
     imod5_data: dict[str, dict[str, GridDataArray]],
     model: IModel,
     regridder_types: Optional[ConstantHeadRegridMethod],
@@ -196,8 +197,6 @@ def mask_topsystem_packages(
     Mask all top system packages where IBOUND < 0. These locations are assigned
     a constant head.
     """
-    # Import here to avoid circular import issues
-    from imod.mf6.topsystem import TopSystemBoundaryCondition
 
     if regridder_types is None:
         regridder_types = ConstantHeadRegridMethod()
@@ -212,8 +211,4 @@ def mask_topsystem_packages(
     )["ibound"]
     is_active = regridded_ibound >= 0
 
-    topsystem_packages = [
-        key for key, pkg in model.items() if isinstance(pkg, TopSystemBoundaryCondition)
-    ]
-    for key in topsystem_packages:
-        model[key] = model[key].mask(is_active)
+    mask_topsystem(model, is_active)
