@@ -43,11 +43,13 @@ from imod.mf6.utilities.clipped_bc_creator import (
     StateType,
     create_clipped_boundary,
 )
+from imod.mf6.utilities.mask import mask_topsystem
 from imod.mf6.utilities.mf6hfb import merge_hfb_packages
 from imod.mf6.validation_settings import ValidationSettings
 from imod.mf6.wel import GridAgnosticWell
 from imod.mf6.write_context import WriteContext
 from imod.schemata import SchemataDict, ValidationError
+from imod.select.grid import active_grid_boundary_xy
 from imod.typing import GridDataArray
 from imod.util.regrid import RegridderWeightsCache
 
@@ -812,6 +814,12 @@ class Modflow6Model(collections.UserDict[str, Package], IModel, abc.ABC):
         pkg_name = f"{state_pkg_id}_clipped"
         if clipped_boundary_condition is not None:
             clipped[pkg_name] = clipped_boundary_condition
+
+            # Clip topsystem packages where the active grid boundary has
+            # changed.
+            _, _, idomain_clipped = clipped._get_domain_geometry()
+            active_bounds_clipped = active_grid_boundary_xy(idomain_clipped > 0)
+            mask_topsystem(clipped, ~active_bounds_clipped)
 
         clipped.purge_empty_packages(ignore_time=ignore_time_purge_empty)
 
