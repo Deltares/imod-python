@@ -13,7 +13,3 @@ class ITopSystemBoundaryCondition(IPackage):
     @abstractmethod
     def aggregate_layers(cls, dataset: GridDataset) -> GridDataDict:
         raise NotImplementedError
-
-    @abstractmethod
-    def reallocate(self):
-        raise NotImplementedError
