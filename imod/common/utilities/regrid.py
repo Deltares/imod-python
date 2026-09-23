@@ -492,9 +492,13 @@ def regrid_imod5_cap_data(
     cap_data_regridded = _regrid_package_data(
         imod5_cap_no_layer["cap"], target_grid, regridder_types, regrid_cache
     )
+    bnd_data_regridded = _regrid_package_data(
+        imod5_data["bnd"], target_grid, regridder_types, regrid_cache
+    )
     extra_paths = imod5_data["extra"]["paths"]
     imod5_regridded: Imod5DataDict = {
         "cap": cap_data_regridded,
+        "bnd": bnd_data_regridded,
         "extra": {"paths": extra_paths},
     }
     return imod5_regridded
