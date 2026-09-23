@@ -21,5 +21,4 @@ def mask_topsystem(model: IModel, is_active: GridDataArray) -> None:
         for key, pkg in model.items()
         if isinstance(pkg, ITopSystemBoundaryCondition)
     ]
-    for key in topsystem_packages:
-        model[key] = model[key].mask(is_active)
+    model.mask_packages(topsystem_packages, is_active)
