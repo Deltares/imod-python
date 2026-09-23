@@ -114,6 +114,8 @@ def is_msw_active_cell(
         Cells active per subunit
     """
     mf6_top_active = target_dis["idomain"].isel(layer=0, drop=True)
+    # Where IBOUND = -1, there also shouldn't be any active cells in the CAP
+    # boundary array.
     imod5_active = (imod5_bnd["ibound"] > 0) & (imod5_cap["boundary"] > 0)
     subunit_active = imod5_active & (msw_area > 0) & (mf6_top_active > 0)
     active = subunit_active.any(dim="subunit")
