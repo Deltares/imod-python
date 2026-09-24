@@ -2,6 +2,7 @@ from abc import abstractmethod
 from typing import Any, Optional, Tuple
 
 from imod.common.interfaces.idict import IDict
+from imod.common.interfaces.ipackage import IPackage
 from imod.common.statusinfo import StatusInfoBase
 from imod.mf6.validation_settings import ValidationSettings
 from imod.typing import GridDataArray
@@ -67,4 +68,9 @@ class IModel(IDict):
 
     @abstractmethod
     def _is_clipping_supported(self) -> Tuple[bool, str]:
+        raise NotImplementedError
+
+    @property
+    @abstractmethod
+    def _boundary_state_pkg_type(self) -> type[IPackage]:
         raise NotImplementedError
