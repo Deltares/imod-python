@@ -96,6 +96,7 @@ def is_msw_active_cell(
     target_dis: StructuredDiscretization,
     imod5_cap: GridDataDict,
     msw_area: GridDataArray,
+    imod5_bnd: GridDataArray,
 ) -> MetaSwapActive:
     """
     Return grid of cells that are active in the coupled computation, based on
@@ -113,7 +114,10 @@ def is_msw_active_cell(
         Cells active per subunit
     """
     mf6_top_active = target_dis["idomain"].isel(layer=0, drop=True)
-    subunit_active = (imod5_cap["boundary"] > 0) & (msw_area > 0) & (mf6_top_active > 0)
+    # Where IBOUND = -1, there also shouldn't be any active cells in the CAP
+    # boundary array.
+    imod5_active = (imod5_bnd["ibound"] > 0) & (imod5_cap["boundary"] > 0)
+    subunit_active = imod5_active & (msw_area > 0) & (mf6_top_active > 0)
     active = subunit_active.any(dim="subunit")
     return MetaSwapActive(active, subunit_active)
 

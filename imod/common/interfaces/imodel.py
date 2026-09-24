@@ -2,6 +2,7 @@ from abc import abstractmethod
 from typing import Any, Optional, Tuple
 
 from imod.common.interfaces.idict import IDict
+from imod.common.interfaces.ipackage import IPackage
 from imod.common.statusinfo import StatusInfoBase
 from imod.mf6.validation_settings import ValidationSettings
 from imod.typing import GridDataArray
@@ -17,8 +18,20 @@ class IModel(IDict):
         raise NotImplementedError
 
     @abstractmethod
+    def mask_packages(
+        self,
+        package_names: list[str],
+        mask: GridDataArray,
+        ignore_time_purge_empty: bool = False,
+    ):
+        raise NotImplementedError
+
+    @abstractmethod
     def purge_empty_packages(
-        self, model_name: Optional[str] = "", ignore_time: bool = False
+        self,
+        model_name: Optional[str] = "",
+        ignore_time: bool = False,
+        package_names: list[str] | None = None,
     ) -> None:
         raise NotImplementedError
 
@@ -55,4 +68,9 @@ class IModel(IDict):
 
     @abstractmethod
     def _is_clipping_supported(self) -> Tuple[bool, str]:
+        raise NotImplementedError
+
+    @property
+    @abstractmethod
+    def _boundary_state_pkg_type(self) -> type[IPackage]:
         raise NotImplementedError

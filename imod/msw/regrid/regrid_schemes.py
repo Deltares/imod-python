@@ -73,6 +73,7 @@ class CapDataRegridMethod(DataclassType):
     steering_location: RegridVarType = (RegridderType.OVERLAP, "mode")
     plot_drainage_level: RegridVarType = (RegridderType.OVERLAP, "mean")
     plot_drainage_resistance: RegridVarType = (RegridderType.OVERLAP, "mean")
+    ibound: RegridVarType = (RegridderType.OVERLAP, "mode")
 
 
 @dataclass(config=_CONFIG)

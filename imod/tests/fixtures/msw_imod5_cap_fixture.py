@@ -232,6 +232,19 @@ def imod5_cap_data() -> GridDataDict:
         ),
         **da_kwargs
     )
+    d2 = {}
+    d2["ibound"] = xr.DataArray(
+        np.array([
+            [
+                [1, 1, 1],
+                [0, 0, 0],
+                [1, 1, 0],
+            ]],
+        dtype=int),
+        **da_kwargs
+    )
     # fmt: on
     imod5_data["cap"] = d
+    imod5_data["bnd"] = d2
+
     return imod5_data

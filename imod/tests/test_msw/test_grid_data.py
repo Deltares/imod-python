@@ -474,7 +474,12 @@ def test_from_imod5_data(grid_data_dict: dict[str, xr.DataArray]):
     cap_data["soil_physical_unit"] = xr.ones_like(like, dtype=int)
     cap_data["active"] = xr.ones_like(like, dtype=bool)
 
-    imod5_data = {"cap": cap_data}
+    ibound = xr.ones_like(like, dtype=int)
+    ibound[0, 0] = -1
+
+    bnd_data = {}
+    bnd_data["ibound"] = ibound
+    imod5_data = {"cap": cap_data, "bnd": bnd_data}
 
     layer = xr.DataArray([1, 1], coords={"layer": [1, 2]}, dims=("layer",))
     idomain = layer * xr.ones_like(like, dtype=int)
@@ -484,7 +489,15 @@ def test_from_imod5_data(grid_data_dict: dict[str, xr.DataArray]):
 
     griddata, _ = GridData.from_imod5_data(imod5_data, target_dis=dis)
     expected_rootzone_depth = cap_data["rootzone_thickness"] * 0.01
+    expected_rootzone_depth[0, 0] = np.nan
     xr.testing.assert_allclose(
         expected_rootzone_depth, griddata["rootzone_depth"].sel(subunit=0, drop=True)
     )
-    assert (griddata["landuse"].sel(subunit=1, drop=True) == 18).all()
+    # Test if all cells in subunit = 1 set to "urban" landuse code
+    np.testing.assert_array_equal(
+        np.unique(griddata["landuse"].sel(subunit=1, drop=True)), [0, 18]
+    )
+    # Test if cell where IBOUND == -1 is set to inactive (landuse = 0)
+    np.testing.assert_array_equal(griddata["landuse"][:, 0, 0], [0, 0])
+    np.testing.assert_array_equal(griddata["rootzone_depth"][:, 0, 0], [np.nan, np.nan])
+    np.testing.assert_array_equal(griddata["active"][0, 0], [False, False])

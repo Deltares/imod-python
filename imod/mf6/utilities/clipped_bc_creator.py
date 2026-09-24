@@ -1,7 +1,9 @@
-from typing import Optional, Tuple, TypeAlias
+from typing import Any, Optional, Tuple, TypeAlias, cast
 
 import xarray as xr
 
+from imod.common.interfaces.imodel import IModel
+from imod.common.utilities.clip import clip_box_dataset
 from imod.mf6 import ConstantConcentration, ConstantHead
 from imod.select.grid import active_grid_boundary_xy
 from imod.typing import GridDataArray
@@ -117,7 +119,7 @@ def _create_clipped_boundary_state(
     return state_for_clipped_boundary.where(unassigned_grid_boundaries)
 
 
-def create_clipped_boundary(
+def _create_clipped_boundary_pkg(
     idomain: GridDataArray,
     state_for_clipped_boundary: GridDataArray,
     original_constant_head_boundaries: list[StateType],
@@ -152,3 +154,110 @@ def create_clipped_boundary(
     )
 
     return pkg_type(constant_state, print_input=True, print_flows=True, save_flows=True)
+
+
+def _create_boundary_condition_for_unassigned_boundary(
+    model: IModel,
+    state_for_boundary: Optional[GridDataArray],
+    additional_boundaries: list[Optional[StateType]] = [None],
+) -> Optional[StateType]:
+    if state_for_boundary is None:
+        return None
+
+    pkg_type = cast(StateClassType, model._boundary_state_pkg_type)
+    constant_state_packages = [
+        pkg for _, pkg in model.items() if isinstance(pkg, pkg_type)
+    ]
+
+    filtered_boundaries: list[StateType] = [
+        item for item in additional_boundaries or [] if item is not None
+    ]
+
+    constant_state_packages.extend(filtered_boundaries)
+
+    return _create_clipped_boundary_pkg(
+        model.domain, state_for_boundary, constant_state_packages, pkg_type
+    )
+
+
+def create_boundary_condition_clipped_boundary(
+    original_model: IModel,
+    clipped_model: IModel,
+    state_for_boundary: Optional[GridDataArray],
+    clip_box_args: tuple[Any, ...],
+) -> Optional[StateType]:
+    """
+    Create a clipped boundary condition for a given state in the clipped model.
+    The function takes the original model as a reference to determine where
+    boundary conditions should NOT be placed, then applies this information to
+    create the boundary condition in the clipped model.
+
+    Parameters
+    ----------
+    original_model : IModel
+        The original model containing the unassigned boundary condition.
+    clipped_model : IModel
+        The clipped model where the boundary condition will be applied.
+    state_for_boundary : Optional[GridDataArray]
+        The state array for the boundary condition.
+    clip_box_args : tuple[Any, ...]
+        Arguments defining the clipping box.
+
+    Returns
+    -------
+    Optional[StateType]
+        The clipped boundary condition package, or None if no boundary condition is created.
+    """
+    # Create temporary boundary condition for the original model boundary. This
+    # is used later to see which boundaries can be ignored as they were already
+    # present in the original model. We want to just end up with the boundary
+    # created by the clip.
+    unassigned_boundary_original_domain = (
+        _create_boundary_condition_for_unassigned_boundary(
+            original_model, state_for_boundary
+        )
+    )
+    # Clip the unassigned boundary to the clipped model's domain, required to
+    # avoid topological errors later.
+    if unassigned_boundary_original_domain is not None:
+        unassigned_boundary_clipped = unassigned_boundary_original_domain.clip_box(
+            *clip_box_args
+        )
+    else:
+        unassigned_boundary_clipped = None
+
+    if state_for_boundary is not None:
+        # Clip box as dataset, temporarily add variable name to convert to
+        # dataset, then turn back into DataArray.
+        state_cls = cast(StateClassType, original_model._boundary_state_pkg_type)
+        varname = state_cls._period_data[0]
+        state_for_boundary = state_for_boundary.to_dataset(name=varname)
+        state_for_boundary_clipped = clip_box_dataset(
+            state_for_boundary, *clip_box_args
+        )[varname]
+    else:
+        state_for_boundary_clipped = None
+
+    bc_constant_pkg = _create_boundary_condition_for_unassigned_boundary(
+        clipped_model, state_for_boundary_clipped, [unassigned_boundary_clipped]
+    )
+
+    # Remove all indices before first timestep of state_for_clipped_boundary.
+    # This to prevent empty dataarrays unnecessarily being made for these
+    # indices, which can lead to them to be removed when purging empty packages
+    # with ignore_time=True. Unfortunately, this is needs to be handled here and
+    # not in _create_boundary_condition_for_unassigned_boundary, as otherwise
+    # this function is called twice which could result in broadcasting errors in
+    # the second call if the time domain of state_for_boundary and assigned
+    # packages have no overlap.
+    if (
+        (state_for_boundary is not None)
+        and (state_for_boundary.indexes.get("time") is not None)
+        and (bc_constant_pkg is not None)
+    ):
+        start_time = state_for_boundary.indexes["time"][0]
+        bc_constant_pkg.dataset = bc_constant_pkg.dataset.sel(
+            time=slice(start_time, None)
+        )
+
+    return bc_constant_pkg

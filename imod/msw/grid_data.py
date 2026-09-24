@@ -202,6 +202,7 @@ class GridData(MetaSwapPackage, IRegridPackage):
             as aggregated over subunits.
         """
         imod5_cap = imod5_data["cap"]
+        imod5_bnd = imod5_data["bnd"]
 
         data = {}
         data["area"] = get_cell_area_from_imod5_data(imod5_cap)
@@ -210,7 +211,7 @@ class GridData(MetaSwapPackage, IRegridPackage):
         data["surface_elevation"] = imod5_cap["surface_elevation"]
         data["soil_physical_unit"] = imod5_cap["soil_physical_unit"].astype(int)
 
-        msw_active = is_msw_active_cell(target_dis, imod5_cap, data["area"])
+        msw_active = is_msw_active_cell(target_dis, imod5_cap, data["area"], imod5_bnd)
         data_active = mask_and_broadcast_pkg_data(cls, data, msw_active)
         data_active["active"] = msw_active.all
         return cls(**data_active), msw_active

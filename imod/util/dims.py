@@ -57,4 +57,8 @@ def _drop_layer_if_dataarray(
 
 def drop_layer_dim_cap_data(imod5_data: Imod5DataDict) -> Imod5DataDict:
     cap_data = imod5_data["cap"]
-    return {"cap": {key: _drop_layer_if_dataarray(da) for key, da in cap_data.items()}}
+    bnd_data = imod5_data["bnd"]
+    return {
+        "cap": {key: _drop_layer_if_dataarray(da) for key, da in cap_data.items()},
+        "bnd": {key: _drop_layer_if_dataarray(da) for key, da in bnd_data.items()},
+    }

@@ -1,13 +1,16 @@
-from typing import Optional, Union
+from typing import Optional, Union, cast
 
 import numpy as np
 import pandas as pd
 import xarray as xr
 
+from imod.common.interfaces.imodel import IModel
 from imod.common.interfaces.iregridpackage import IRegridPackage
 from imod.common.utilities.dataclass_type import DataclassType
 from imod.common.utilities.regrid import _regrid_package_data, regrid_imod5_cap_data
 from imod.mf6.package import Package
+from imod.mf6.regrid.regrid_schemes import ConstantHeadRegridMethod
+from imod.mf6.utilities.mask import mask_topsystem
 from imod.typing import GridDataArray, GridDataDict, Imod5DataDict
 from imod.typing.grid import full_like
 from imod.util.regrid import RegridderWeightsCache
@@ -140,7 +143,7 @@ def well_from_imod5_cap_data(
 
 
 def regrid_imod5_pkg_data(
-    cls: type[Package],
+    cls: Optional[type[Package]],
     imod5_pkg_data: GridDataDict,
     target_dis: Package,
     regridder_types: Optional[DataclassType],
@@ -150,11 +153,18 @@ def regrid_imod5_pkg_data(
     Regrid iMOD5 package data to target idomain. Optionally get regrid methods
     from class if not provided.
     """
+    if (cls is None) and (regridder_types is None):
+        raise ValueError(
+            "Either cls or regridder_types must be provided for regridding."
+        )
+    # set up regridder methods
+    elif (cls is not None) and (regridder_types is None):  # check cls not None for mypy
+        regridder_types = cls.get_regrid_methods()
+    # For mypy to succeed
+    regridder_types = cast(DataclassType, regridder_types)
+
     target_idomain = target_dis.dataset["idomain"]
 
-    # set up regridder methods
-    if regridder_types is None:
-        regridder_types = cls.get_regrid_methods()
     # regrid the input data
     regridded_pkg_data = _regrid_package_data(
         imod5_pkg_data, target_idomain, regridder_types, regrid_cache, {}
@@ -175,3 +185,31 @@ def chd_cells_from_imod5_data(
     head = head.where(target_idomain > 0)
 
     return {"head": head}
+
+
+def mask_topsystem_packages_with_ibound(
+    imod5_data: dict[str, dict[str, GridDataArray]],
+    model: IModel,
+    regridder_types: Optional[ConstantHeadRegridMethod],
+    regrid_cache: RegridderWeightsCache,
+    ignore_time_purge_empty: bool,
+) -> None:
+    """
+    Mask all top system packages where IBOUND < 0. These locations are assigned
+    a constant head.
+    """
+
+    if regridder_types is None:
+        regridder_types = ConstantHeadRegridMethod()
+
+    ibound = imod5_data["bnd"]["ibound"]
+    regridded_ibound = regrid_imod5_pkg_data(
+        cls=None,
+        imod5_pkg_data={"ibound": ibound},
+        target_dis=model["dis"],
+        regridder_types=regridder_types,
+        regrid_cache=regrid_cache,
+    )["ibound"]
+    is_active = regridded_ibound >= 0
+
+    mask_topsystem(model, is_active, ignore_time_purge_empty)

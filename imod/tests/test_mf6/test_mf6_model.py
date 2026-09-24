@@ -102,12 +102,18 @@ def test_circle_roundtrip(circle_model, tmp_path):
     roundtrip(circle_model["GWF_1"], tmp_path)
 
 
+class ConcreteModflow6Model(Modflow6Model):
+    """Concrete implementation of the abstract Modflow6Model for testing purposes."""
+
+    _boundary_state_pkg_type = ConstantHead
+
+
 class TestModel:
     def test_write_valid_model_without_error(self, tmpdir_factory):
         # Arrange.
         tmp_path = tmpdir_factory.mktemp("TestSimulation")
         model_name = "Test model"
-        model = Modflow6Model()
+        model = ConcreteModflow6Model()
         # create write context
         validation_context = ValidationSettings()
         write_context = WriteContext(tmp_path)
@@ -135,7 +141,7 @@ class TestModel:
         # Arrange.
         tmp_path = tmpdir_factory.mktemp("TestSimulation")
         model_name = "Test model"
-        model = Modflow6Model()
+        model = ConcreteModflow6Model()
         # create write context
         validation_context = ValidationSettings()
         write_context = WriteContext(tmp_path)
@@ -158,7 +164,7 @@ class TestModel:
         # Arrange.
         tmp_path = tmpdir_factory.mktemp("TestSimulation")
         model_name = "Test model"
-        model = Modflow6Model()
+        model = ConcreteModflow6Model()
         # create write context
         validation_context = ValidationSettings()
         write_context = WriteContext(tmp_path)
@@ -192,7 +198,7 @@ class TestModel:
         validation_context = ValidationSettings()
         write_context = WriteContext(simulation_directory=tmp_path)
 
-        model = Modflow6Model()
+        model = ConcreteModflow6Model()
 
         discretization_mock = MagicMock(spec_set=Package)
         discretization_mock._pkg_id = "dis"
@@ -249,7 +255,8 @@ class TestModel:
         pkg_id = pkg_type._pkg_id
         assert f"{pkg_id}_clipped" not in clipped
 
-    @mock.patch("imod.mf6.model.create_clipped_boundary")
+    @mock.patch("imod.mf6.model.mask_topsystem")
+    @mock.patch("imod.mf6.utilities.clipped_bc_creator._create_clipped_boundary_pkg")
     @pytest.mark.parametrize(
         "model_type, pkg_type",
         [
@@ -258,14 +265,29 @@ class TestModel:
         ],
     )
     def test_clip_box_with_state_for_boundary(
-        self, create_clipped_boundary_mock, model_type, pkg_type
+        self,
+        create_clipped_boundary_mock,
+        mask_topsystem_mock,
+        model_type,
+        pkg_type,
     ):
         # Arrange.
         state_for_boundary = MagicMock(spec_set=UgridDataArray)
 
+        idomain = xr.DataArray(
+            np.ones((1, 2, 2), dtype=np.int32), dims=("layer", "y", "x")
+        )
+        top = xr.DataArray(np.ones((2, 2), dtype=np.float64), dims=("y", "x"))
+        bottom = xr.DataArray(np.array([-1.0], dtype=np.float64), dims=("layer",))
+
         discretization_mock = MagicMock(spec_set=Package)
         discretization_mock._pkg_id = "dis"
         discretization_mock.clip_box.return_value = discretization_mock
+        discretization_mock.__getitem__.side_effect = {
+            "idomain": idomain,
+            "top": top,
+            "bottom": bottom,
+        }.__getitem__
 
         clipped_boundary_mock = MagicMock(spec_set=pkg_type)
         clipped_boundary_mock.is_empty.return_value = False
@@ -290,8 +312,10 @@ class TestModel:
             [],
             pkg_type,
         )
+        mask_topsystem_mock.assert_called_once()
 
-    @mock.patch("imod.mf6.model.create_clipped_boundary")
+    @mock.patch("imod.mf6.model.mask_topsystem")
+    @mock.patch("imod.mf6.utilities.clipped_bc_creator._create_clipped_boundary_pkg")
     @pytest.mark.parametrize(
         "model_type, pkg_type",
         [
@@ -300,15 +324,30 @@ class TestModel:
         ],
     )
     def test_clip_box_with_unassigned_boundaries_in_original_model(
-        self, create_clipped_boundary_mock, model_type, pkg_type
+        self,
+        create_clipped_boundary_mock,
+        mask_topsystem_mock,
+        model_type,
+        pkg_type,
     ):
         # Arrange.
         state_for_boundary = MagicMock(spec_set=UgridDataArray)
+
+        idomain = xr.DataArray(
+            np.ones((1, 2, 2), dtype=np.int32), dims=("layer", "y", "x")
+        )
+        top = xr.DataArray(np.ones((2, 2), dtype=np.float64), dims=("y", "x"))
+        bottom = xr.DataArray(np.array([-1.0], dtype=np.float64), dims=("layer",))
 
         discretization_mock = MagicMock(spec_set=Package)
         discretization_mock._pkg_id = "dis"
         discretization_mock.is_empty.side_effect = [False, False]
         discretization_mock.clip_box.return_value = discretization_mock
+        discretization_mock.__getitem__.side_effect = {
+            "idomain": idomain,
+            "top": top,
+            "bottom": bottom,
+        }.__getitem__
 
         constant_boundary_mock = MagicMock(spec_set=pkg_type)
         constant_boundary_mock.is_empty.side_effect = [False, False]
@@ -339,6 +378,7 @@ class TestModel:
             [constant_boundary_mock, unassigned_original_constant_boundary.clip_box()],
             pkg_type,
         )
+        mask_topsystem_mock.assert_called_once()
 
 
 class TestGroundwaterFlowModel:
