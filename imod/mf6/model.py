@@ -733,8 +733,10 @@ class Modflow6Model(collections.UserDict[str, Package], IModel, abc.ABC):
             # Mask topsystem packages where the state boundary cells have been
             # added.
             state_varname = clipped_boundary_condition._period_data[0]
+            # Select the state variable for the first time step as mask.
+            # Its location will be constant through time.
             state_var = clipped_boundary_condition.dataset[state_varname].isel(
-                time=0, missing_dims="ignore"
+                time=0, missing_dims="ignore", drop=True
             )
             not_added_bc = np.isnan(state_var)
             # Purge empty packages called by the mask_topsystem function
