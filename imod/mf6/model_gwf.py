@@ -460,5 +460,6 @@ class GroundwaterFlowModel(Modflow6Model):
             result,
             cast(ConstantHeadRegridMethod, regridder_types.get("topsystem_mask")),
             regrid_cache,
+            ignore_time_purge_empty=True,
         )
         return result

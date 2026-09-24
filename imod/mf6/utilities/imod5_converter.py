@@ -192,6 +192,7 @@ def mask_topsystem_packages_with_ibound(
     model: IModel,
     regridder_types: Optional[ConstantHeadRegridMethod],
     regrid_cache: RegridderWeightsCache,
+    ignore_time_purge_empty: bool,
 ) -> None:
     """
     Mask all top system packages where IBOUND < 0. These locations are assigned
@@ -211,4 +212,4 @@ def mask_topsystem_packages_with_ibound(
     )["ibound"]
     is_active = regridded_ibound >= 0
 
-    mask_topsystem(model, is_active)
+    mask_topsystem(model, is_active, ignore_time_purge_empty)

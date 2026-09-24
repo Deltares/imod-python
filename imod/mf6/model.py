@@ -49,7 +49,6 @@ from imod.mf6.validation_settings import ValidationSettings
 from imod.mf6.wel import GridAgnosticWell
 from imod.mf6.write_context import WriteContext
 from imod.schemata import SchemataDict, ValidationError
-from imod.select.grid import active_grid_boundary_xy
 from imod.typing import GridDataArray
 from imod.util.regrid import RegridderWeightsCache
 
@@ -810,18 +809,24 @@ class Modflow6Model(collections.UserDict[str, Package], IModel, abc.ABC):
         clipped_boundary_condition = _create_boundary_condition_clipped_boundary(
             self, clipped, state_for_boundary, clip_box_args
         )
-        state_pkg_id = self._boundary_state_pkg_type._pkg_id
-        pkg_name = f"{state_pkg_id}_clipped"
         if clipped_boundary_condition is not None:
+            # Assign clipped boundary condition package
+            state_pkg_id = self._boundary_state_pkg_type._pkg_id
+            pkg_name = f"{state_pkg_id}_clipped"
+
             clipped[pkg_name] = clipped_boundary_condition
 
-            # Clip topsystem packages where the active grid boundary has
-            # changed.
-            _, _, idomain_clipped = clipped._get_domain_geometry()
-            active_bounds_clipped = active_grid_boundary_xy(idomain_clipped > 0)
-            mask_topsystem(clipped, ~active_bounds_clipped)
-
-        clipped.purge_empty_packages(ignore_time=ignore_time_purge_empty)
+            # Mask topsystem packages where the state boundary cells have been
+            # added.
+            state_varname = clipped_boundary_condition._period_data[0]
+            state_var = clipped_boundary_condition.dataset[state_varname].isel(
+                time=0, missing_dims="ignore"
+            )
+            not_added_bc = np.isnan(state_var)
+            # Purge empty packages called by the mask_topsystem function
+            mask_topsystem(clipped, not_added_bc, ignore_time_purge_empty)
+        else:
+            clipped.purge_empty_packages(ignore_time=ignore_time_purge_empty)
 
         return clipped
 
