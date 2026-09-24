@@ -16,7 +16,7 @@ def test_mask_topsystem(twri_model):
     is_active[0, 0, 0] = 0
 
     # Act
-    mask_topsystem(gwf_model, is_active)
+    mask_topsystem(gwf_model, is_active, True)
     # Assert
     for key in ["rch", "drn"]:
         pkg = gwf_model[key]
@@ -34,7 +34,7 @@ def test_mask_topsystem__all_removed(twri_model):
     gwf_model = twri_model["GWF_1"]
     is_active = zeros_like(gwf_model.domain)
     # Act
-    mask_topsystem(gwf_model, is_active)
+    mask_topsystem(gwf_model, is_active, True)
     # Assert
     for key in ["rch", "drn"]:
         assert key not in gwf_model.keys()
