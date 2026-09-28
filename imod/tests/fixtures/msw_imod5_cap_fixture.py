@@ -19,10 +19,10 @@ def imod5_cap_data() -> GridDataDict:
     da_kwargs["coords"] = {"layer": layer, "y": y, "x": x, "dx": dx, "dy": dy}
 
     imod5_data = {}
-    d = {}
+    d_cap = {}
 
     # fmt: off
-    d["boundary"] = xr.DataArray(
+    d_cap["boundary"] = xr.DataArray(
         np.array([
             [
                 [1, 1, 1],
@@ -32,7 +32,7 @@ def imod5_cap_data() -> GridDataDict:
         dtype=int),
         **da_kwargs
     )
-    d["landuse"] = xr.DataArray(
+    d_cap["landuse"] = xr.DataArray(
         np.array([
             [
                 [1, 2, 3],
@@ -42,7 +42,7 @@ def imod5_cap_data() -> GridDataDict:
         dtype=int),
         **da_kwargs
     )
-    d["rootzone_thickness"] = xr.DataArray(
+    d_cap["rootzone_thickness"] = xr.DataArray(
         np.array([
             [
                 [0.1, 0.1, 0.1],
@@ -52,7 +52,7 @@ def imod5_cap_data() -> GridDataDict:
         ),
         **da_kwargs
     )
-    d["soil_physical_unit"] = xr.DataArray(
+    d_cap["soil_physical_unit"] = xr.DataArray(
         np.array([
             [
                 [1, 1, 1],
@@ -62,7 +62,7 @@ def imod5_cap_data() -> GridDataDict:
         dtype=int),
         **da_kwargs
     )
-    d["surface_elevation"] = xr.DataArray(
+    d_cap["surface_elevation"] = xr.DataArray(
         np.array([
             [
                 [1.1, 1.2, 1.3],
@@ -72,7 +72,7 @@ def imod5_cap_data() -> GridDataDict:
         ),
         **da_kwargs
     )
-    d["artificial_recharge"] = xr.DataArray(
+    d_cap["artificial_recharge"] = xr.DataArray(
         np.array([
             [
                 [0.2, 0.2, 0.2],
@@ -82,7 +82,7 @@ def imod5_cap_data() -> GridDataDict:
         ),
         **da_kwargs
     )
-    d["artificial_recharge_layer"] = xr.DataArray(
+    d_cap["artificial_recharge_layer"] = xr.DataArray(
         np.array([
             [
                 [1, 2, 3],
@@ -92,7 +92,7 @@ def imod5_cap_data() -> GridDataDict:
         dtype=int),
         **da_kwargs
     )
-    d["artificial_recharge_capacity"] = xr.DataArray(
+    d_cap["artificial_recharge_capacity"] = xr.DataArray(
         np.array([
             [
                 [0.4, 0.4, 0.4],
@@ -102,7 +102,7 @@ def imod5_cap_data() -> GridDataDict:
         ),
         **da_kwargs
     )
-    d["wetted_area"] = xr.DataArray(
+    d_cap["wetted_area"] = xr.DataArray(
         np.array([
             [
                 [0.1, 0.1, 0.1],
@@ -112,7 +112,7 @@ def imod5_cap_data() -> GridDataDict:
         ),
         **da_kwargs
     )
-    d["urban_area"] = xr.DataArray(
+    d_cap["urban_area"] = xr.DataArray(
         np.array([
             [
                 [0.2, 0.2, 0.2],
@@ -122,7 +122,7 @@ def imod5_cap_data() -> GridDataDict:
         ),
         **da_kwargs
     )
-    d["urban_ponding_depth"] = xr.DataArray(
+    d_cap["urban_ponding_depth"] = xr.DataArray(
         np.array([
             [
                 [2.2, 2.2, 2.2],
@@ -132,7 +132,7 @@ def imod5_cap_data() -> GridDataDict:
         ),
         **da_kwargs
     )
-    d["rural_ponding_depth"] = xr.DataArray(
+    d_cap["rural_ponding_depth"] = xr.DataArray(
         np.array([
             [
                 [1.2, 1.2, 1.2],
@@ -142,7 +142,7 @@ def imod5_cap_data() -> GridDataDict:
         ),
         **da_kwargs
     )
-    d["urban_runoff_resistance"] = xr.DataArray(
+    d_cap["urban_runoff_resistance"] = xr.DataArray(
         np.array([
             [
                 [3.2, 3.2, 3.2],
@@ -152,7 +152,7 @@ def imod5_cap_data() -> GridDataDict:
         ),
         **da_kwargs
     )
-    d["rural_runoff_resistance"] = xr.DataArray(
+    d_cap["rural_runoff_resistance"] = xr.DataArray(
         np.array([
             [
                 [3.6, 3.6, 3.6],
@@ -162,7 +162,7 @@ def imod5_cap_data() -> GridDataDict:
         ),
         **da_kwargs
     )
-    d["urban_runon_resistance"] = xr.DataArray(
+    d_cap["urban_runon_resistance"] = xr.DataArray(
         np.array([
             [
                 [5.2, 5.2, 5.2],
@@ -172,7 +172,7 @@ def imod5_cap_data() -> GridDataDict:
         ),
         **da_kwargs
     )
-    d["rural_runon_resistance"] = xr.DataArray(
+    d_cap["rural_runon_resistance"] = xr.DataArray(
         np.array([
             [
                 [5.6, 5.6, 5.6],
@@ -182,7 +182,7 @@ def imod5_cap_data() -> GridDataDict:
         ),
         **da_kwargs
     )
-    d["urban_infiltration_capacity"] = xr.DataArray(
+    d_cap["urban_infiltration_capacity"] = xr.DataArray(
         np.array([
             [
                 [10.2, 10.2, 10.2],
@@ -192,7 +192,7 @@ def imod5_cap_data() -> GridDataDict:
         ),
         **da_kwargs
     )
-    d["rural_infiltration_capacity"] = xr.DataArray(
+    d_cap["rural_infiltration_capacity"] = xr.DataArray(
         np.array([
             [
                 [20.2, 20.2, 20.2],
@@ -202,7 +202,7 @@ def imod5_cap_data() -> GridDataDict:
         ),
         **da_kwargs
     )
-    d["perched_water_table_level"]= xr.DataArray(
+    d_cap["perched_water_table_level"]= xr.DataArray(
         np.array([
             [
                 [2.0, 2.0, 2.0],
@@ -212,7 +212,7 @@ def imod5_cap_data() -> GridDataDict:
         ),
         **da_kwargs
     )
-    d["soil_moisture_fraction"]= xr.DataArray(
+    d_cap["soil_moisture_fraction"]= xr.DataArray(
         np.array([
             [
                 [1.5, 1.5, 1.5],
@@ -222,7 +222,7 @@ def imod5_cap_data() -> GridDataDict:
         ),
         **da_kwargs
     )
-    d["conductivity_factor"]= xr.DataArray(
+    d_cap["conductivity_factor"]= xr.DataArray(
         np.array([
             [
                 [2.5, 2.5, 2.5],
@@ -232,8 +232,8 @@ def imod5_cap_data() -> GridDataDict:
         ),
         **da_kwargs
     )
-    d2 = {}
-    d2["ibound"] = xr.DataArray(
+    d_bnd = {}
+    d_bnd["ibound"] = xr.DataArray(
         np.array([
             [
                 [1, 1, 1],
@@ -244,7 +244,7 @@ def imod5_cap_data() -> GridDataDict:
         **da_kwargs
     )
     # fmt: on
-    imod5_data["cap"] = d
-    imod5_data["bnd"] = d2
+    imod5_data["cap"] = d_cap
+    imod5_data["bnd"] = d_bnd
 
     return imod5_data
