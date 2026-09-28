@@ -22,6 +22,22 @@ from imod.util.regrid import RegridderWeightsCache
 def convert_ibound_to_idomain(
     ibound: xr.DataArray, thickness: xr.DataArray
 ) -> xr.DataArray:
+    """
+    Convert IBOUND array to IDOMAIN array. IBOUND -1 will be set to 1 in
+    IDOMAIN. When the thickness is <= 0, IDOMAIN will be set to -1.
+
+    Parameters
+    ----------
+    ibound : xr.DataArray
+        The IBOUND array from iMOD5.
+    thickness : xr.DataArray
+        The thickness array of the model layers.
+
+    Returns
+    -------
+    xr.DataArray
+        The corresponding IDOMAIN array.
+    """
     # Convert IBOUND to IDOMAIN
     # -1 to 1, these will have to be filled with
     # CHD cells.
@@ -127,6 +143,26 @@ def well_from_imod5_cap_data(
         ``"artificial_recharge_capacity"`` is ignored as the abstraction
         capacity is already defined in the point data. This is an ``n:1``
         mapping: multiple grid cells can map to one well.
+
+    Parameters
+    ----------
+    imod5_data : Imod5DataDict
+        The iMOD5 data containing the "cap" package with abstraction
+        information.
+    target_dis : Optional[IRegridPackage]
+        The target discretization package for regridding the data. Required if
+        the data is in grid format (IDF).
+    regridder_types : DataclassType
+        The regrid methods to use for regridding the data.
+    regrid_cache : RegridderWeightsCache
+        Cache for storing regridder weights to speed up repeated regridding
+        operations.
+
+    Returns
+    -------
+    dict[str, np.ndarray]
+        A dictionary containing well information extracted from the iMOD5 cap
+        data.
     """
     cap_data = imod5_data["cap"]
     has_ipf_well = isinstance(cap_data["artificial_recharge_layer"], pd.DataFrame)
@@ -146,7 +182,7 @@ def well_from_imod5_cap_data(
 
 
 def regrid_imod5_pkg_data(
-    cls: Optional[type[Package]],
+    pkg_type: Optional[type[Package]],
     imod5_pkg_data: GridDataDict,
     target_dis: Package,
     regridder_types: Optional[DataclassType],
@@ -155,14 +191,37 @@ def regrid_imod5_pkg_data(
     """
     Regrid iMOD5 package data to target idomain. Optionally get regrid methods
     from class if not provided.
+
+    Parameters
+    ----------
+    pkg_type:
+        The type of the package being regridded. This is used to determine the
+        appropriate regrid methods if regridder_types is not provided.
+    imod5_pkg_data:
+        The iMOD5 package data to be regridded.
+    target_dis:
+        The target discretization package containing the idomain to regrid to.
+    regridder_types:
+        Optional regrid methods to use for regridding. If not provided, they
+        will be obtained from the pkg_type.
+    regrid_cache:
+        Cache for storing regridder weights to speed up repeated regridding
+        operations.
+
+    Returns
+    -------
+    GridDataDict
+        The regridded iMOD5 package data.
     """
-    if (cls is None) and (regridder_types is None):
+    if (pkg_type is None) and (regridder_types is None):
         raise ValueError(
-            "Either cls or regridder_types must be provided for regridding."
+            "Either pkg_type or regridder_types must be provided for regridding."
         )
     # set up regridder methods
-    elif (cls is not None) and (regridder_types is None):  # check cls not None for mypy
-        regridder_types = cls.get_regrid_methods()
+    elif (pkg_type is not None) and (
+        regridder_types is None
+    ):  # check pkg_type not None for mypy
+        regridder_types = pkg_type.get_regrid_methods()
     # For mypy to succeed
     regridder_types = cast(DataclassType, regridder_types)
 
@@ -178,6 +237,22 @@ def regrid_imod5_pkg_data(
 def chd_cells_from_imod5_data(
     imod5_pkg_data: GridDataDict, target_idomain: GridDataArray
 ) -> GridDataDict:
+    """
+    Get CHD cells from iMOD5 package data based on IBOUND and target idomain.
+
+    Parameters
+    ----------
+    imod5_pkg_data:
+        The iMOD5 package data containing "head" and "ibound".
+    target_idomain:
+        The target idomain to filter active cells.
+
+    Returns
+    -------
+    GridDataDict
+        The filtered CHD cells with "head" values where IBOUND < 0 and target
+        idomain > 0.
+    """
     head = imod5_pkg_data["head"]
     ibound = imod5_pkg_data["ibound"]
 
@@ -200,6 +275,26 @@ def mask_topsystem_packages_with_ibound(
     """
     Mask all top system packages where IBOUND < 0. These locations are assigned
     a constant head.
+
+    Parameters
+    ----------
+    imod5_data:
+        The iMOD5 data containing the "bnd" package with "ibound".
+    model:
+        The target MODFLOW 6 model.
+    regridder_types:
+        Optional regrid methods to use for regridding. If not provided, default
+        methods will be used.
+    regrid_cache:
+        Cache for storing regridder weights to speed up repeated regridding
+        operations.
+    ignore_time_purge_empty:
+        Flag indicating whether to ignore time when purging empty cells.
+
+    Returns
+    -------
+    None
+        The function modifies the top system packages in the model in place.
     """
 
     if regridder_types is None:
@@ -207,7 +302,7 @@ def mask_topsystem_packages_with_ibound(
 
     ibound = imod5_data["bnd"]["ibound"]
     regridded_ibound = regrid_imod5_pkg_data(
-        cls=None,
+        pkg_type=None,
         imod5_pkg_data={"ibound": ibound},
         target_dis=model["dis"],
         regridder_types=regridder_types,
