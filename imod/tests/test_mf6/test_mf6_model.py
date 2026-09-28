@@ -255,7 +255,7 @@ class TestModel:
         pkg_id = pkg_type._pkg_id
         assert f"{pkg_id}_clipped" not in clipped
 
-    @mock.patch("imod.mf6.model.mask_topsystem")
+    @mock.patch("imod.mf6.model.mask_topsystem_where_bc")
     @mock.patch("imod.mf6.utilities.clipped_bc_creator._create_clipped_boundary_pkg")
     @pytest.mark.parametrize(
         "model_type, pkg_type",
@@ -314,7 +314,7 @@ class TestModel:
         )
         mask_topsystem_mock.assert_called_once()
 
-    @mock.patch("imod.mf6.model.mask_topsystem")
+    @mock.patch("imod.mf6.model.mask_topsystem_where_bc")
     @mock.patch("imod.mf6.utilities.clipped_bc_creator._create_clipped_boundary_pkg")
     @pytest.mark.parametrize(
         "model_type, pkg_type",
