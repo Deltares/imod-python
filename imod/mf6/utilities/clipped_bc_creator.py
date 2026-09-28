@@ -256,7 +256,7 @@ def create_boundary_condition_clipped_boundary(
     # Remove all indices before first timestep of state_for_clipped_boundary.
     # This to prevent empty dataarrays unnecessarily being made for these
     # indices, which can lead to them to be removed when purging empty packages
-    # with ignore_time=True. Unfortunately, this is needs to be handled here and
+    # with ignore_time=True. Unfortunately, this needs to be handled here and
     # not in _create_boundary_condition_for_unassigned_boundary, as otherwise
     # this function is called twice which could result in broadcasting errors in
     # the second call if the time domain of state_for_boundary and assigned
