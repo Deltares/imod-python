@@ -55,7 +55,7 @@ def _drop_layer_if_dataarray(
     return _drop_layer_dim_and_coord(da)
 
 
-def drop_layer_dim_cap_data(imod5_data: Imod5DataDict) -> Imod5DataDict:
+def drop_layer_dim_cap_and_bnd_data(imod5_data: Imod5DataDict) -> Imod5DataDict:
     cap_data = imod5_data["cap"]
     bnd_data = imod5_data["bnd"]
     return {

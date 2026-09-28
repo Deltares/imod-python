@@ -27,7 +27,7 @@ from imod.typing.grid import (
     is_unstructured,
     ones_like,
 )
-from imod.util.dims import drop_layer_dim_cap_data, enforced_dim_order
+from imod.util.dims import drop_layer_dim_cap_and_bnd_data, enforced_dim_order
 from imod.util.regrid import (
     RegridderType,
     RegridderWeightsCache,
@@ -486,7 +486,7 @@ def regrid_imod5_cap_and_bnd_data(
     and ``imod.mf6.Recharge.from_imod5_cap_data``.
     """
     # Drop layer coords
-    imod5_no_layer = drop_layer_dim_cap_data(imod5_data)
+    imod5_no_layer = drop_layer_dim_cap_and_bnd_data(imod5_data)
     target_grid = target_dis.dataset["idomain"].isel(layer=0, drop=True)
     # Regrid the input data
     cap_data_regridded = _regrid_package_data(
