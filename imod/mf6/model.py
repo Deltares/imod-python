@@ -41,7 +41,7 @@ from imod.mf6.utilities.clipped_bc_creator import (
     StateClassType,
     create_boundary_condition_clipped_boundary,
 )
-from imod.mf6.utilities.mask import mask_topsystem
+from imod.mf6.utilities.mask import mask_topsystem_where_bc
 from imod.mf6.utilities.mf6hfb import merge_hfb_packages
 from imod.mf6.validation_settings import ValidationSettings
 from imod.mf6.wel import GridAgnosticWell
@@ -730,17 +730,9 @@ class Modflow6Model(collections.UserDict[str, Package], IModel, abc.ABC):
 
             clipped[pkg_name] = clipped_boundary_condition
 
-            # Mask topsystem packages where the state boundary cells have been
-            # added.
-            state_varname = clipped_boundary_condition._period_data[0]
-            # Select the state variable for the first time step as mask.
-            # Its location will be constant through time.
-            state_var = clipped_boundary_condition.dataset[state_varname].isel(
-                time=0, missing_dims="ignore", drop=True
+            mask_topsystem_where_bc(
+                clipped, clipped_boundary_condition, ignore_time_purge_empty
             )
-            not_added_bc = np.isnan(state_var)
-            # Purge empty packages called by the mask_topsystem function
-            mask_topsystem(clipped, not_added_bc, ignore_time_purge_empty)
         else:
             clipped.purge_empty_packages(ignore_time=ignore_time_purge_empty)
 
