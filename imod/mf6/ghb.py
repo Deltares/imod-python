@@ -224,11 +224,15 @@ class GeneralHeadBoundary(TopSystemBoundaryCondition, IRegridPackage):
             ALLOCATION_OPTION.at_first_active.
         distributing_option: DISTRIBUTING_OPTION
             distributing option.
-        drop_empty_layers: bool
-            If True, drop layers without any allocated cells from the
-            returned grids. Allocation and distribution are always computed
-            over the full layer range first, so this does not affect the
-            computed values.
+        drop_empty_layers: bool, default True
+            If True, drop layers that contain no allocated cells anywhere in the
+            domain (or at any time), so the returned grids only span the layers that
+            are actually used. Reduces memory use and speeds up later operations such
+            as regridding, clipping and splitting. If no cells are allocated in any
+            layer, nothing is dropped and the full layer range is returned, as a layer
+            dimension of size 0 is not valid. Note that allocation and conductance
+            distribution are always computed over the full layer range first, so
+            dropping layers does not change the computed values.
 
         Returns
         -------

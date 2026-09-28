@@ -81,13 +81,15 @@ class TopSystemBoundaryCondition(BoundaryCondition, abc.ABC):
             The distributing option to use for the reallocation. Required for
             packages with a conductance variable. If None, the default is taken
             from :class:`imod.prepare.SimulationDistributingOptions`.
-        drop_empty_layers : bool, default True
-            If True, drop layers from the resulting package that contain no
-            allocated cells anywhere in the domain. Allocation and
-            distribution are always computed over the full layer range
-            first; layers are only trimmed off the final result, so this
-            does not affect the computed values, only the package's layer
-            coordinate.
+        drop_empty_layers: bool, default True
+            If True, drop layers that contain no allocated cells anywhere in the
+            domain (or at any time), so the returned grids only span the layers that
+            are actually used. Reduces memory use and speeds up later operations such
+            as regridding, clipping and splitting. If no cells are allocated in any
+            layer, nothing is dropped and the full layer range is returned, as a layer
+            dimension of size 0 is not valid. Note that allocation and conductance
+            distribution are always computed over the full layer range first, so
+            dropping layers does not change the computed values.
 
         Returns
         -------

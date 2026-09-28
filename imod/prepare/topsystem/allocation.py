@@ -97,14 +97,15 @@ def allocate_riv_cells(
     bottom_elevation: DataArray | UgridDatarray
         Planar grid containing river bottom elevations. Is not allowed to have a
         layer dimension.
-    drop_empty_layers: bool, default False
-        If True, drop layers from the result that contain no allocated
-        cells anywhere in the domain. This avoids carrying the package's
-        arrays at full model-layer size through downstream regridding,
-        clipping, masking, and splitting, which can otherwise become
-        expensive for models with many layers relative to how many
-        layers the topsystem package actually occupies. Set to False to
-        keep the previous full-layer-coordinate behaviour.
+    drop_empty_layers: bool, default True
+        If True, drop layers that contain no allocated cells anywhere in the
+        domain (or at any time), so the returned grids only span the layers that
+        are actually used. Reduces memory use and speeds up later operations such
+        as regridding, clipping and splitting. If no cells are allocated in any
+        layer, nothing is dropped and the full layer range is returned, as a layer
+        dimension of size 0 is not valid. Note that allocation and conductance
+        distribution are always computed over the full layer range first, so
+        dropping layers does not change the computed values.
 
     Returns
     -------
@@ -188,13 +189,14 @@ def allocate_drn_cells(
         Planar grid containing drain elevation. Is not allowed to have a layer
         dimension.
     drop_empty_layers: bool, default True
-        If True, drop layers from the result that contain no allocated
-        cells anywhere in the domain. This avoids carrying the package's
-        arrays at full model-layer size through downstream regridding,
-        clipping, masking, and splitting, which can otherwise become
-        expensive for models with many layers relative to how many
-        layers the topsystem package actually occupies. Set to False to
-        keep the previous full-layer-coordinate behaviour.
+        If True, drop layers that contain no allocated cells anywhere in the
+        domain (or at any time), so the returned grids only span the layers that
+        are actually used. Reduces memory use and speeds up later operations such
+        as regridding, clipping and splitting. If no cells are allocated in any
+        layer, nothing is dropped and the full layer range is returned, as a layer
+        dimension of size 0 is not valid. Note that allocation and conductance
+        distribution are always computed over the full layer range first, so
+        dropping layers does not change the computed values.
 
     Returns
     -------
@@ -260,13 +262,14 @@ def allocate_ghb_cells(
         Planar grid containing general head boundary's head. Is not allowed to
         have a layer dimension.
     drop_empty_layers: bool, default True
-        If True, drop layers from the result that contain no allocated
-        cells anywhere in the domain. This avoids carrying the package's
-        arrays at full model-layer size through downstream regridding,
-        clipping, masking, and splitting, which can otherwise become
-        expensive for models with many layers relative to how many
-        layers the topsystem package actually occupies. Set to False to
-        keep the previous full-layer-coordinate behaviour.
+        If True, drop layers that contain no allocated cells anywhere in the
+        domain (or at any time), so the returned grids only span the layers that
+        are actually used. Reduces memory use and speeds up later operations such
+        as regridding, clipping and splitting. If no cells are allocated in any
+        layer, nothing is dropped and the full layer range is returned, as a layer
+        dimension of size 0 is not valid. Note that allocation and conductance
+        distribution are always computed over the full layer range first, so
+        dropping layers does not change the computed values.
 
     Returns
     -------
@@ -323,13 +326,14 @@ def allocate_rch_cells(
         Array with recharge rates. This will only be used to infer where
         recharge cells are defined.
     drop_empty_layers: bool, default True
-        If True, drop layers from the result that contain no allocated
-        cells anywhere in the domain. This avoids carrying the package's
-        arrays at full model-layer size through downstream regridding,
-        clipping, masking, and splitting, which can otherwise become
-        expensive for models with many layers relative to how many
-        layers the topsystem package actually occupies. Set to False to
-        keep the previous full-layer-coordinate behaviour.
+        If True, drop layers that contain no allocated cells anywhere in the
+        domain (or at any time), so the returned grids only span the layers that
+        are actually used. Reduces memory use and speeds up later operations such
+        as regridding, clipping and splitting. If no cells are allocated in any
+        layer, nothing is dropped and the full layer range is returned, as a layer
+        dimension of size 0 is not valid. Note that allocation and conductance
+        distribution are always computed over the full layer range first, so
+        dropping layers does not change the computed values.
 
     Returns
     -------
@@ -608,8 +612,13 @@ def _used_layers(mask: GridDataArray) -> Optional[GridDataArray]:
     Returns
     -------
     GridDataArray | None
-        Layer coordinate values with data, or None if nothing should be
-        trimmed or when the mask is entirely False.
+        Layer coordinate values with data, or None.
+        Returning None means either nothing to trim (all layers used)
+        or nothing to keep (no layer has any allocated cell). In the
+        latter case, do not return an empty layer coordinate: a layer
+        dimension of size 0 fails package validation and breaks downstream
+        operations. Keep the full layer range instead, so empty packages
+        can be removed by callers, e.g. ``mask_package__drop_if_empty``.
     """
     if "layer" not in mask.dims:
         return None
@@ -683,6 +692,8 @@ def drop_empty_layers_from_dict(
     -------
     GridDataDict
         Same dictionary, with every layered grid subset to layers with data.
+        If mask has no True values, data is returned unchanged.
+        To fully remove empty empty packages, additional logic outside this function is required.
     """
     used_layers = _used_layers(mask)
     if used_layers is None:
