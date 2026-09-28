@@ -609,7 +609,7 @@ def _used_layers(mask: GridDataArray) -> Optional[GridDataArray]:
     -------
     GridDataArray | None
         Layer coordinate values with data, or None if nothing should be
-        trimmed.
+        trimmed or when the mask is entirely False.
     """
     if "layer" not in mask.dims:
         return None
@@ -626,8 +626,11 @@ def _used_layers(mask: GridDataArray) -> Optional[GridDataArray]:
     # inside indexing logic more than once.
     has_data_per_layer = has_data_per_layer.compute()
 
-    if bool(has_data_per_layer.all()):
-        return None  # nothing to trim
+    if bool(has_data_per_layer.all()) or not bool(has_data_per_layer.any()):
+        # Nothing to trim, or nothing to keep.
+        # Never return an empty layer coordinate: keep the full range and
+        # let callers (e.g. # mask_package__drop_if_empty) remove empty packages.
+        return None
 
     return mask["layer"].where(has_data_per_layer, drop=True)
 
