@@ -13,7 +13,7 @@ from imod.select.layers import (
     get_upper_active_grid_cells,
     get_upper_active_layer_number,
 )
-from imod.typing import GridDataArray
+from imod.typing import GridDataArray, GridDataDict
 from imod.util.dims import enforced_dim_order
 
 
@@ -71,7 +71,7 @@ def allocate_riv_cells(
     bottom: GridDataArray,
     stage: GridDataArray,
     bottom_elevation: GridDataArray,
-    drop_empty_layers: bool = False,
+    drop_empty_layers: bool = True,
 ) -> tuple[GridDataArray, Optional[GridDataArray]]:
     """
     Allocate river cells from a planar grid across the vertical dimension.
@@ -164,7 +164,7 @@ def allocate_drn_cells(
     top: GridDataArray,
     bottom: GridDataArray,
     elevation: GridDataArray,
-    drop_empty_layers: bool = False,
+    drop_empty_layers: bool = True,
 ) -> GridDataArray:
     """
     Allocate drain cells from a planar grid across the vertical dimension.
@@ -187,7 +187,7 @@ def allocate_drn_cells(
     elevation: DataArray | UgridDatarray
         Planar grid containing drain elevation. Is not allowed to have a layer
         dimension.
-    drop_empty_layers: bool, default False
+    drop_empty_layers: bool, default True
         If True, drop layers from the result that contain no allocated
         cells anywhere in the domain. This avoids carrying the package's
         arrays at full model-layer size through downstream regridding,
@@ -235,6 +235,7 @@ def allocate_ghb_cells(
     top: GridDataArray,
     bottom: GridDataArray,
     head: GridDataArray,
+    drop_empty_layers: bool = True,
 ) -> GridDataArray:
     """
     Allocate general head boundary (GHB) cells from a planar grid across the
@@ -258,6 +259,14 @@ def allocate_ghb_cells(
     head: DataArray | UgridDatarray
         Planar grid containing general head boundary's head. Is not allowed to
         have a layer dimension.
+    drop_empty_layers: bool, default True
+        If True, drop layers from the result that contain no allocated
+        cells anywhere in the domain. This avoids carrying the package's
+        arrays at full model-layer size through downstream regridding,
+        clipping, masking, and splitting, which can otherwise become
+        expensive for models with many layers relative to how many
+        layers the topsystem package actually occupies. Set to False to
+        keep the previous full-layer-coordinate behaviour.
 
     Returns
     -------
@@ -273,13 +282,13 @@ def allocate_ghb_cells(
     """
     match allocation_option:
         case ALLOCATION_OPTION.first_active_to_elevation:
-            return _allocate_cells__first_active_to_elevation(
+            result = _allocate_cells__first_active_to_elevation(
                 active, top, bottom, head
             )[0]
         case ALLOCATION_OPTION.at_elevation:
-            return _allocate_cells__at_elevation(top, bottom, head)[0]
+            result = _allocate_cells__at_elevation(top, bottom, head)[0]
         case ALLOCATION_OPTION.at_first_active:
-            return _allocate_cells__at_first_active(active, head)[0]
+            result = _allocate_cells__at_first_active(active, head)[0]
         case _:
             raise ValueError(
                 "Received incompatible setting for general head boundary, only"
@@ -289,12 +298,14 @@ def allocate_ghb_cells(
                 f"got: '{allocation_option.name}'"
             )
 
+    return _drop_empty_layers(result) if drop_empty_layers else result
+
 
 def allocate_rch_cells(
     allocation_option: ALLOCATION_OPTION,
     active: GridDataArray,
     rate: GridDataArray,
-    drop_empty_layers: bool = False,
+    drop_empty_layers: bool = True,
 ) -> GridDataArray:
     """
     Allocate recharge cells from a planar grid across the vertical dimension.
@@ -311,7 +322,7 @@ def allocate_rch_cells(
     rate: DataArray | UgridDataArray
         Array with recharge rates. This will only be used to infer where
         recharge cells are defined.
-    drop_empty_layers: bool, default False
+    drop_empty_layers: bool, default True
         If True, drop layers from the result that contain no allocated
         cells anywhere in the domain. This avoids carrying the package's
         arrays at full model-layer size through downstream regridding,
@@ -581,46 +592,100 @@ def _allocate_cells__at_first_active(
     return topsystem_upper_active, None
 
 
+def _used_layers(mask: GridDataArray) -> Optional[GridDataArray]:
+    """
+    Return the layer coordinate values of ``mask`` that contain at least one
+    True value anywhere in the domain (and, if present, at any timestep), or
+    None if there is nothing to trim (no layer dimension, or every layer has
+    data).
+
+    Parameters
+    ----------
+    mask: GridDataArray
+        Boolean array with a "layer" dimension, typically one of the
+        ``allocated`` grids returned by an ``_allocate_cells__*`` function.
+
+    Returns
+    -------
+    GridDataArray | None
+        Layer coordinate values with data, or None if nothing should be
+        trimmed.
+    """
+    if "layer" not in mask.dims:
+        return None
+
+    if mask.dtype != bool:
+        raise ValueError(
+            f"Expected a boolean grid to drop empty layers from, got: {mask.dtype}"
+        )
+
+    reduce_dims = [d for d in mask.dims if d != "layer"]
+    has_data_per_layer = mask.any(dim=reduce_dims)
+
+    # Force to plain numpy/bool to avoid triggering a dask compute deep
+    # inside indexing logic more than once.
+    has_data_per_layer = has_data_per_layer.compute()
+
+    if bool(has_data_per_layer.all()):
+        return None  # nothing to trim
+
+    return mask["layer"].where(has_data_per_layer, drop=True)
+
+
 def _drop_empty_layers(grid: GridDataArray) -> GridDataArray:
     """
-    Drop layers that contain no True/non-nan values in any spatial cell
-    (and, if present, at any timestep). Keeps the `layer` coordinate but
-    only for layers that actually contain data - this is what lets
-    downstream regridding/clipping/masking/splitting operate over a much
-    smaller layer range when the topsystem package only spans a handful
-    of the model's total layers.
+    Drop layers that contain no True values in any spatial cell (and, if
+    present, at any timestep). Keeps the `layer` coordinate but only for
+    layers that actually contain data - this is what lets downstream
+    regridding/clipping/masking/splitting operate over a much smaller layer
+    range when the topsystem package only spans a handful of the model's
+    total layers.
 
     Parameters
     ----------
     grid: GridDataArray
-        Array with a "layer" dimension, typically the output of one of the
-        ``_allocate_cells__*`` functions.
+        Boolean array with a "layer" dimension, typically the output of one
+        of the ``_allocate_cells__*`` functions.
 
     Returns
     -------
     GridDataArray
         Same array, subset to layers with data.
     """
-    if "layer" not in grid.dims:
-        return grid
+    used_layers = _used_layers(grid)
+    return grid if used_layers is None else grid.sel(layer=used_layers)
 
-    reduce_dims = [d for d in grid.dims if d != "layer"]
 
-    if grid.dtype == bool:
-        has_data_per_layer = grid.any(dim=reduce_dims)
-    else:
-        has_data_per_layer = (~grid.isnull()).any(dim=reduce_dims)
+def drop_empty_layers_from_dict(
+    data: GridDataDict, mask: GridDataArray
+) -> GridDataDict:
+    """
+    Trim every layered grid in ``data`` down to the layers that contain data
+    in ``mask``. Unlike :func:`_drop_empty_layers`, this can be applied to
+    grids (such as distributed conductances) that are not themselves
+    boolean, as long as a boolean ``mask`` with the same (full) layer range
+    is available to decide which layers to keep.
 
-    # Force to plain numpy/bool to avoid triggering a dask compute deep
-    # inside indexing logic more than once.
-    has_data_per_layer = (
-        has_data_per_layer.compute()
-        if hasattr(has_data_per_layer, "compute")
-        else has_data_per_layer
-    )
+    Parameters
+    ----------
+    data: GridDataDict
+        Dictionary of grids, e.g. the layered package data returned by
+        ``_allocate_and_distribute_planar_data``. Grids without a "layer"
+        dimension are returned unchanged.
+    mask: GridDataArray
+        Boolean array with a "layer" dimension, e.g. the ``allocated`` grid
+        that was used to build the grids in ``data``.
 
-    if bool(has_data_per_layer.all()):
-        return grid  # nothing to trim, skip the extra indexing op
+    Returns
+    -------
+    GridDataDict
+        Same dictionary, with every layered grid subset to layers with data.
+    """
+    used_layers = _used_layers(mask)
+    if used_layers is None:
+        return data
 
-    used_layers = grid["layer"].where(has_data_per_layer, drop=True)
-    return grid.sel(layer=used_layers)
+    return {
+        key: grid.sel(layer=used_layers) if "layer" in grid.dims else grid
+        for key, grid in data.items()
+    }

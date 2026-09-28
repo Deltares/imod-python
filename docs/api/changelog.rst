@@ -18,13 +18,23 @@ Added
   :meth:`imod.msw.SprinklingPoints.from_imod5_data`.
 - :class:`imod.mf6.LayeredWell.from_imod5_cap_data` now also supports loading
   wells from IPF files in an iMOD5 CAP dataset.
-- Added ``drop_empty_layers: bool = False`` to various cell allocation functions 
+- Added ``drop_empty_layers: bool = True`` to various cell allocation functions 
   in :mod:`imod.prepare.topsystem.allocation` to remove fully empty layers from the grids.
-  Setting this to True, strips the empty layers before they are passed along to 
-  reprojection/regridding operations. Which can save considerable time for models with 
-  many empty layers. :meth:`imod.prepare.topsystem.allocation.allocate_riv_cells`, 
+  Strips the empty layers before they are passed along to 
+  reprojection/regridding operations, which can save considerable time for models with 
+  many empty layers. Set to False to keep the previous full-layer-coordinate
+  behaviour. :meth:`imod.prepare.topsystem.allocation.allocate_riv_cells`, 
   :meth:`imod.prepare.topsystem.allocation.allocate_drn_cells`,
+  :meth:`imod.prepare.topsystem.allocation.allocate_ghb_cells`,
   :meth:`imod.prepare.topsystem.allocation.allocate_rch_cells`
+- Added ``drop_empty_layers: bool = True`` to
+  :meth:`imod.mf6.River.reallocate`, :meth:`imod.mf6.Drainage.reallocate`,
+  :meth:`imod.mf6.GeneralHeadBoundary.reallocate`, and
+  :meth:`imod.mf6.Recharge.reallocate`. Allocation and conductance
+  distribution are always computed over the full layer range first; only
+  the final package has fully empty layers trimmed off afterwards, so this
+  does not affect computed values. Set to False to keep the previous
+  full-layer-coordinate behaviour.
 
 Fixed
 ~~~~~
@@ -32,6 +42,11 @@ Fixed
 - Fixed resampling in :meth:`imod.mf6.Well.from_imod5_data` and
   :meth:`imod.mf6.LayeredWell.from_imod5_data` when simulation timesteps precede
   the first well timestep.
+- Fixed :func:`imod.prepare.cleanup.align_interface_levels` (used by
+  ``cleanup_riv``, and therefore :meth:`imod.mf6.River.cleanup`) raising an
+  alignment error when a package's own layer coordinate is a subset of the
+  model's full layer range, e.g. after :meth:`imod.mf6.River.reallocate` with
+  ``drop_empty_layers=True``.
 
 Changed
 ~~~~~~~

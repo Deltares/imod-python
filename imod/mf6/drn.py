@@ -17,7 +17,11 @@ from imod.mf6.utilities.imod5_converter import regrid_imod5_pkg_data
 from imod.mf6.utilities.package import set_repeat_stress_if_available
 from imod.mf6.validation import BOUNDARY_DIMS_SCHEMA, CONC_DIMS_SCHEMA
 from imod.prepare.cleanup import cleanup_drn
-from imod.prepare.topsystem.allocation import ALLOCATION_OPTION, allocate_drn_cells
+from imod.prepare.topsystem.allocation import (
+    ALLOCATION_OPTION,
+    allocate_drn_cells,
+    drop_empty_layers_from_dict,
+)
 from imod.prepare.topsystem.conductance import (
     DISTRIBUTING_OPTION,
     distribute_drn_conductance,
@@ -193,6 +197,7 @@ class Drainage(TopSystemBoundaryCondition, IRegridPackage):
         npf: NodePropertyFlow,
         allocation_option: ALLOCATION_OPTION,
         distributing_option: DISTRIBUTING_OPTION,
+        drop_empty_layers: bool = True,
     ) -> dict[str, GridDataArray]:
         """
         Allocate and distribute planar data for given discretization and npf
@@ -214,6 +219,11 @@ class Drainage(TopSystemBoundaryCondition, IRegridPackage):
             ALLOCATION_OPTION.at_first_active.
         distributing_option: DISTRIBUTING_OPTION
             distributing option.
+        drop_empty_layers: bool
+            If True, drop layers without any allocated cells from the
+            returned grids. Allocation and distribution are always computed
+            over the full layer range first, so this does not affect the
+            computed values.
 
         Returns
         -------
@@ -240,6 +250,7 @@ class Drainage(TopSystemBoundaryCondition, IRegridPackage):
             top,
             bottom,
             planar_data["elevation"],
+            drop_empty_layers=False,  # Keep full layer range, drop empty layers below
         )
         layered_data = {}
         layered_data["conductance"] = distribute_drn_conductance(
@@ -253,6 +264,10 @@ class Drainage(TopSystemBoundaryCondition, IRegridPackage):
         )
         layered_data["elevation"] = planar_data["elevation"].where(drn_allocation)
         layered_data["elevation"] = enforce_dim_order(layered_data["elevation"])
+
+        if drop_empty_layers:
+            layered_data = drop_empty_layers_from_dict(layered_data, drn_allocation)
+
         return layered_data
 
     @classmethod

@@ -197,6 +197,38 @@ def test_cleanup_riv__stage_equals_bottom_elevation(riv_data: dict, dis_data: di
 
 
 @parametrize_with_cases("riv_data, dis_data", cases=RivDisCases)
+def test_cleanup_riv__trimmed_layers(riv_data: dict, dis_data: dict):
+    """
+    A river package's own grids may have fewer layers than the model's full
+    ``bottom`` (e.g. produced via ``drop_empty_layers=True``, see
+    ``imod.prepare.topsystem``). ``cleanup_riv`` should still work in that
+    case, keeping the package's own (trimmed) layer coordinate rather than
+    raising an alignment error.
+    """
+    dis_dict = _prepare_dis_dict(dis_data, cleanup_riv)
+    # Trim the river package down to a single layer, model bottom stays full range.
+    trimmed_layer = riv_data["stage"]["layer"].isel(layer=[0])
+    riv_data = {
+        key: (value.sel(layer=trimmed_layer) if "layer" in value.dims else value)
+        for key, value in riv_data.items()
+    }
+    # Force a bottom_elevation/bottom mismatch, to also exercise align_interface_levels.
+    riv_data["bottom_elevation"] -= 3.0
+
+    riv_data_cleaned = cleanup_riv(**dis_dict, **riv_data)
+
+    # Returned grids keep the package's own (trimmed) layers.
+    for value in riv_data_cleaned.values():
+        if value is not None and "layer" in value.dims:
+            np.testing.assert_equal(value["layer"].values, trimmed_layer.values)
+    riv_active = riv_data_cleaned["stage"].notnull()
+    expected = dis_dict["bottom"].sel(layer=trimmed_layer).where(riv_active)
+    np.testing.assert_equal(
+        riv_data_cleaned["bottom_elevation"].values, expected.values
+    )
+
+
+@parametrize_with_cases("riv_data, dis_data", cases=RivDisCases)
 def test_cleanup_riv__raise_error(riv_data: dict, dis_data: dict):
     """
     Test if error raised when stage below model layer bottom and see if user is

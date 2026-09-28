@@ -27,6 +27,16 @@ def align_interface_levels(
     bottom: GridDataArray,
     method: AlignLevelsMode = AlignLevelsMode.TOPDOWN,
 ) -> tuple[GridDataArray, GridDataArray]:
+    # `bottom` (e.g. a model's full layer range) may have more layers than
+    # `top` (e.g. a package trimmed to only its allocated layers, see
+    # ``drop_empty_layers`` in ``imod.prepare.topsystem``). Reindex `bottom`
+    # down to `top`'s own layers first, so the comparison below doesn't fail
+    # with an alignment error; `top`'s layers are always the ones we want to
+    # keep, matching the ``join="left"`` pattern used in
+    # ``imod.common.utilities.mask.mask_da``.
+    if "layer" in top.dims and "layer" in bottom.dims:
+        bottom = bottom.sel(layer=top["layer"])
+
     to_align = top < bottom
 
     match method:

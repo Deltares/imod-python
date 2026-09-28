@@ -9,7 +9,6 @@ import xarray as xr
 from pytest_cases import parametrize_with_cases
 
 import imod
-import imod.mf6.drn
 from imod.common.utilities.version import get_version
 from imod.logging import LoggerType, LogLevel
 from imod.mf6.dis import StructuredDiscretization
@@ -483,6 +482,40 @@ def test_reallocate(drainage):
         drn_reallocated["elevation"]
         .mean("layer")
         .equals(drn["elevation"].mean("layer"))
+    )
+
+
+def test_reallocate_drop_empty_layers(drainage):
+    """
+    drop_empty_layers=True should trim layers off the final package without
+    changing the values of the layers that remain (Option A: allocation and
+    conductance distribution always run over the full layer range first).
+    """
+    drn = imod.mf6.Drainage(**drainage)
+    idomain = drainage["elevation"].astype(np.int16)
+    top = 1.0
+    bottom = top - idomain.coords["layer"]
+
+    dis = imod.mf6.StructuredDiscretization(top=top, bottom=bottom, idomain=idomain)
+    npf = imod.mf6.NodePropertyFlow(icelltype=0, k=1.0)
+    allocation_option = ALLOCATION_OPTION.first_active_to_elevation
+    distributing_option = DISTRIBUTING_OPTION.by_corrected_transmissivity
+
+    full = drn.reallocate(
+        dis, npf, allocation_option, distributing_option, drop_empty_layers=False
+    )
+    trimmed = drn.reallocate(
+        dis, npf, allocation_option, distributing_option, drop_empty_layers=True
+    )
+
+    full_layers = full.dataset["layer"].values
+    trimmed_layers = trimmed.dataset["layer"].values
+    assert set(trimmed_layers) <= set(full_layers)
+    assert len(trimmed_layers) < len(full_layers)
+    np.testing.assert_allclose(
+        trimmed["conductance"].sel(layer=trimmed_layers).values,
+        full["conductance"].sel(layer=trimmed_layers).values,
+        equal_nan=True,
     )
 
 
