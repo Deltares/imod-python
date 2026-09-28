@@ -471,7 +471,7 @@ def _get_regridding_domain(
     return new_idomain
 
 
-def regrid_imod5_cap_data(
+def regrid_imod5_cap_and_bnd_data(
     imod5_data: Imod5DataDict,
     target_dis: IRegridPackage,
     regridder_types: DataclassType,

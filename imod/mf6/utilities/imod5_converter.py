@@ -7,7 +7,10 @@ import xarray as xr
 from imod.common.interfaces.imodel import IModel
 from imod.common.interfaces.iregridpackage import IRegridPackage
 from imod.common.utilities.dataclass_type import DataclassType
-from imod.common.utilities.regrid import _regrid_package_data, regrid_imod5_cap_data
+from imod.common.utilities.regrid import (
+    _regrid_package_data,
+    regrid_imod5_cap_and_bnd_data,
+)
 from imod.mf6.package import Package
 from imod.mf6.regrid.regrid_schemes import ConstantHeadRegridMethod
 from imod.mf6.utilities.mask import mask_topsystem
@@ -136,7 +139,7 @@ def well_from_imod5_cap_data(
                 "target_dis must be provided when converting iMOD5 cap data "
                 "from grids (IDF)"
             )
-        cap_data_regridded = regrid_imod5_cap_data(
+        cap_data_regridded = regrid_imod5_cap_and_bnd_data(
             imod5_data, target_dis, regridder_types, regrid_cache
         )["cap"]
         return _well_from_imod5_cap_grid_data(cap_data_regridded)

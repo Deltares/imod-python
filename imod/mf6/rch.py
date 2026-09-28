@@ -6,7 +6,7 @@ import xarray as xr
 
 from imod.common.interfaces.iregridpackage import IRegridPackage
 from imod.common.utilities.dataclass_type import DataclassType
-from imod.common.utilities.regrid import regrid_imod5_cap_data
+from imod.common.utilities.regrid import regrid_imod5_cap_and_bnd_data
 from imod.logging import init_log_decorator
 from imod.mf6.aggregate.aggregate_schemes import RechargeAggregationMethod
 from imod.mf6.dis import StructuredDiscretization, VerticesDiscretization
@@ -298,7 +298,7 @@ class Recharge(TopSystemBoundaryCondition, IRegridPackage):
         used to couple MODFLOW6 to MetaSWAP models. Active cells will have a
         recharge rate of 0.0.
         """
-        imod5_data_regridded = regrid_imod5_cap_data(
+        imod5_data_regridded = regrid_imod5_cap_and_bnd_data(
             imod5_data, target_dis, regridder_types, regrid_cache
         )
         cap_data = imod5_data_regridded["cap"]
