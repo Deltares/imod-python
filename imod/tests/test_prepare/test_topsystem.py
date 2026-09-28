@@ -288,14 +288,24 @@ def test_riv_allocation__elevation_above_surface_level(
         bottom_elevation + 100.0,
         drop_empty_layers=True,
     )
-    expected_riv_layers = np.nonzero(expected_riv)[0] + 1
+
+    def expected_layers_after_drop(expected: list[bool]) -> np.ndarray:
+        """
+        Layer numbers expected after ``drop_empty_layers=True``: the (1-based)
+        layers with at least one allocated cell. If nothing is allocated at all,
+        no layers are dropped, so the full layer range is expected. We never
+        return a layer dimension of size 0.
+        """
+        layers = np.nonzero(expected)[0] + 1
+        return layers if layers.size > 0 else np.arange(1, len(expected) + 1)
+
     np.testing.assert_array_equal(
-        actual_riv_da.coords["layer"].values, expected_riv_layers
+        actual_riv_da.coords["layer"].values, expected_layers_after_drop(expected_riv)
     )
     if actual_drn_da is not None:
-        expected_drn_layers = np.nonzero(expected_drn)[0] + 1
         np.testing.assert_array_equal(
-            actual_drn_da.coords["layer"].values, expected_drn_layers
+            actual_drn_da.coords["layer"].values,
+            expected_layers_after_drop(expected_drn),
         )
 
 
