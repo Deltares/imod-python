@@ -1,9 +1,7 @@
-from typing import cast
-
 import numpy as np
 
+from imod.common.interfaces.iboundarycondition import IBoundaryCondition
 from imod.common.interfaces.imodel import IModel
-from imod.common.interfaces.ipackage import IPackage
 from imod.common.interfaces.itopsystembc import ITopSystemBoundaryCondition
 from imod.typing import GridDataArray
 
@@ -34,7 +32,7 @@ def mask_topsystem(
 
 
 def mask_topsystem_where_bc(
-    model: IModel, boundary_condition: IPackage, ignore_time: bool
+    model: IModel, boundary_condition: IBoundaryCondition, ignore_time: bool
 ) -> None:
     """
     Mask all top system packages in the model inplace where the boundary
@@ -44,7 +42,7 @@ def mask_topsystem_where_bc(
     ----------
     model : IModel
         The MODFLOW 6 model containing top system packages.
-    boundary_condition : IPackage
+    boundary_condition : IBoundaryCondition
         The boundary condition package used to determine which cells are not
         added.
     ignore_time : bool
@@ -52,7 +50,7 @@ def mask_topsystem_where_bc(
         mask to where the first time step of the boundary condition contains
         active cells. Else, aggregate over all time steps to determine the mask.
     """
-    state_varname = cast(str, boundary_condition._period_data[0])
+    state_varname = boundary_condition._period_data[0]
     state_var = boundary_condition.dataset[state_varname]
     if "time" in state_var.dims:
         if ignore_time:
