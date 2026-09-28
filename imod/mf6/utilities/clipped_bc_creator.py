@@ -17,6 +17,9 @@ def _find_unassigned_grid_boundaries(
     active_grid_boundary: GridDataArray,
     boundary_conditions: list[StateType],
 ) -> GridDataArray:
+    """
+    Find the grid boundaries that have not been assigned any boundary conditions.
+    """
     unassigned_grid_boundaries = active_grid_boundary.copy()
     for boundary_condition in boundary_conditions:
         # Fetch variable name from the first boundary condition, can be "head" or
@@ -105,7 +108,7 @@ def _create_clipped_boundary_state(
     idomain: GridDataArray,
     state_for_clipped_boundary: GridDataArray,
     original_constant_head_boundaries: list[StateType],
-):
+) -> GridDataArray:
     """Helper function to make sure dimension order is enforced"""
     active_grid_boundary = active_grid_boundary_xy(idomain > 0)
     unassigned_grid_boundaries = _find_unassigned_grid_boundaries(
@@ -161,6 +164,14 @@ def _create_boundary_condition_for_unassigned_boundary(
     state_for_boundary: Optional[GridDataArray],
     additional_boundaries: list[Optional[StateType]] = [None],
 ) -> Optional[StateType]:
+    """
+    Create a boundary condition for the unnassigned boundary cells of a model.
+
+    Constant state packages are collected from the model and any additional
+    boundaries provided will be added to this list. Cells which are not covered
+    by any of these packages will have a new boundary condition created for
+    them.
+    """
     if state_for_boundary is None:
         return None
 
@@ -187,10 +198,10 @@ def create_boundary_condition_clipped_boundary(
     clip_box_args: tuple[Any, ...],
 ) -> Optional[StateType]:
     """
-    Create a clipped boundary condition for a given state in the clipped model.
+    Create a boundary condition for the clipped model.
+
     The function takes the original model as a reference to determine where
-    boundary conditions should NOT be placed, then applies this information to
-    create the boundary condition in the clipped model.
+    boundary conditions should NOT be placed.
 
     Parameters
     ----------
