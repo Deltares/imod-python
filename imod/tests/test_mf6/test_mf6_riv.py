@@ -497,7 +497,9 @@ def test_reallocate_drop_empty_layers():
     dx, dy = 10.0, -10.0
     layer = [1, 2, 3, 4]
 
-    top = xr.DataArray(0.0, coords={"y": y, "x": x, "dx": dx, "dy": dy}, dims=("y", "x"))
+    top = xr.DataArray(
+        0.0, coords={"y": y, "x": x, "dx": dx, "dy": dy}, dims=("y", "x")
+    )
     bottom = xr.DataArray(
         np.array([-1.0, -2.0, -3.0, -4.0])[:, None, None] * np.ones((4, 3, 3)),
         coords={"layer": layer, "y": y, "x": x, "dx": dx, "dy": dy},

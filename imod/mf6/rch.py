@@ -219,7 +219,7 @@ class Recharge(TopSystemBoundaryCondition, IRegridPackage):
             allocation_option,
             idomain > 0,
             planar_data["rate"],
-            drop_empty_layers=False, # Keep full here, drop empty layers below
+            drop_empty_layers=False,  # Keep full here, drop empty layers below
         )
         # remove rch from cells where it is not allocated and broadcast over layers.
         layered_data = {}

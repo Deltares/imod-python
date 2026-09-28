@@ -374,7 +374,7 @@ class River(TopSystemBoundaryCondition, IRegridPackage):
             bottom,
             planar_data["stage"],
             planar_data["bottom_elevation"],
-            drop_empty_layers=False, # Keep full layer range, drop empty layers below
+            drop_empty_layers=False,  # Keep full layer range, drop empty layers below
         )
         drn_is_allocated = drn_allocated is not None
         # Distribution of conductances
