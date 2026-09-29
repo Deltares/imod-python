@@ -82,8 +82,8 @@ def cap_data_sprinkling_grid() -> Imod5DataDict:
         "artificial_recharge_layer": layer,
         "artificial_recharge_capacity": xr.DataArray(25.0),
     }
-
-    return {"cap": cap_data, "extra": {"paths": ["path1", "path2"]}}
+    bnd_data = {"ibound": zeros_grid(n) + 1}
+    return {"cap": cap_data, "bnd": bnd_data, "extra": {"paths": ["path1", "path2"]}}
 
 
 @pytest.fixture(scope="function")
@@ -105,8 +105,9 @@ def cap_data_sprinkling_grid__big() -> Imod5DataDict:
         "artificial_recharge_layer": layer,
         "artificial_recharge_capacity": xr.DataArray(25.0),
     }
+    bnd_data = {"ibound": zeros_dask_grid(n) + 1}
 
-    return {"cap": cap_data, "extra": {"paths": ["path1", "path2"]}}
+    return {"cap": cap_data, "bnd": bnd_data, "extra": {"paths": ["path1", "path2"]}}
 
 
 @pytest.fixture(scope="function")

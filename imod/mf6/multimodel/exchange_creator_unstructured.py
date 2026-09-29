@@ -9,6 +9,11 @@ from imod.mf6.multimodel.modelsplitter import PartitionInfo
 from imod.typing import GridDataArray
 
 
+def _cross_2d(a: np.ndarray, b: np.ndarray) -> np.ndarray:
+    # Numpy 2.5.* no longer supports 2D inputs for np.cross, so we manually compute the z-component of the cross product.
+    return a[:, 0] * b[:, 1] - a[:, 1] * b[:, 0]
+
+
 class ExchangeCreator_Unstructured(ExchangeCreator):
     """
     Creates the GroundWaterFlow to GroundWaterFlow exchange package (gwfgwf) as a function of a submodel label array and a
@@ -86,8 +91,8 @@ class ExchangeCreator_Unstructured(ExchangeCreator):
             {
                 "cell_idx1": self._connected_cells["cell_idx1"].values,
                 "cell_idx2": self._connected_cells["cell_idx2"].values,
-                "cl1": np.abs(np.cross(U, Vi)) / length,
-                "cl2": np.abs(np.cross(U, Vj)) / length,
+                "cl1": np.abs(_cross_2d(U, Vi)) / length,
+                "cl2": np.abs(_cross_2d(U, Vj)) / length,
                 "hwva": length,
                 "angldegx": angle,
                 "cdist": cdist,
