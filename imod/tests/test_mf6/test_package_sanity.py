@@ -20,7 +20,7 @@ import pytest
 import imod
 from imod.mf6.boundary_condition import AdvancedBoundaryCondition, BoundaryCondition
 from imod.mf6.package import Package
-from imod.tests.fixtures.mf6_package_instance_creation import ALL_PACKAGE_INSTANCES
+from imod.tests.fixtures.mf6_package_instance_creation import ALL_MF6_PACKAGE_INSTANCES
 
 ALL_PACKAGES = [
     item
@@ -72,7 +72,7 @@ def test_adv_boundary_class_attributes(pkg_class):
     check_attributes(pkg_class)
 
 
-@pytest.mark.parametrize("instance", ALL_PACKAGE_INSTANCES)
+@pytest.mark.parametrize("instance", ALL_MF6_PACKAGE_INSTANCES)
 def test_render_twice(instance, tmp_path):
     globaltimes = [np.datetime64("2000-01-01")]
     modeldir = tmp_path / "testdir"
@@ -96,7 +96,7 @@ def test_render_twice(instance, tmp_path):
     assert text1 == text2
 
 
-@pytest.mark.parametrize("instance", ALL_PACKAGE_INSTANCES)
+@pytest.mark.parametrize("instance", ALL_MF6_PACKAGE_INSTANCES)
 @pytest.mark.parametrize("engine", ["netcdf4", "zarr", "zarr.zip"])
 def test_save_and_load(instance, engine, tmp_path):
     pkg_class = type(instance)
@@ -105,13 +105,13 @@ def test_save_and_load(instance, engine, tmp_path):
     assert instance.dataset.equals(back.dataset)
 
 
-@pytest.mark.parametrize("instance", ALL_PACKAGE_INSTANCES)
+@pytest.mark.parametrize("instance", ALL_MF6_PACKAGE_INSTANCES)
 def test_repr(instance):
     assert isinstance(instance.__repr__(), str)
     assert isinstance(instance._repr_html_(), str)
 
 
-@pytest.mark.parametrize("instance", ALL_PACKAGE_INSTANCES)
+@pytest.mark.parametrize("instance", ALL_MF6_PACKAGE_INSTANCES)
 def test_from_dataset(instance):
     pkg_class = type(instance)
     ds = instance.dataset
