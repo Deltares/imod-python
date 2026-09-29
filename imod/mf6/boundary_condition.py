@@ -7,6 +7,7 @@ import numpy as np
 import xarray as xr
 import xugrid as xu
 
+from imod.common.interfaces.iboundarycondition import IBoundaryCondition
 from imod.common.utilities.value_filters import enforce_scalar
 from imod.mf6.auxiliary_variables import (
     expand_transient_auxiliary_variables,
@@ -57,7 +58,7 @@ def _disv_recarr(arrdict, layer, notnull):
     return recarr
 
 
-class BoundaryCondition(Package, abc.ABC):
+class BoundaryCondition(Package, IBoundaryCondition, abc.ABC):
     """
     BoundaryCondition is used to share methods for specific stress packages
     with a time component.
@@ -324,7 +325,7 @@ class BoundaryCondition(Package, abc.ABC):
         >>> river._get_period_varnames()
         >>> # prints: ['stage', 'conductance', 'bottom_elevation', 'species1', 'species2']
         """
-        result = []
+        result: list[str] = []
         if hasattr(self, "_period_data"):
             result.extend(self._period_data)
         if hasattr(self, "_optional_data"):

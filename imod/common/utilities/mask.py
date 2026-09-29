@@ -62,15 +62,18 @@ def mask_all_models(
             )
 
 
-def mask_all_packages(
+def mask_packages(
     model: IModel,
+    package_names: list[str],
     mask: GridDataArray,
     ignore_time_purge_empty: bool = False,
-):
+) -> None:
     _validate_coords_mask(mask)
-    for pkgname, pkg in model.items():
-        model[pkgname] = pkg.mask(mask)
-    model.purge_empty_packages(ignore_time=ignore_time_purge_empty)
+    for pkgname in package_names:
+        model[pkgname] = model[pkgname].mask(mask)
+    model.purge_empty_packages(
+        ignore_time=ignore_time_purge_empty, package_names=package_names
+    )
 
 
 def mask_package(package: IPackage, mask: GridDataArray) -> IPackage:

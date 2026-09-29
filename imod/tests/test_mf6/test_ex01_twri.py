@@ -577,6 +577,17 @@ def test_slice_and_run_with_state(transient_twri_model_extended, tmp_path):
     np_array = clipped_boundary["head"].values
     assert (np_array == 1.23).sum() == 33
 
+    # Test that topsystem packages are masked.
+    topsystem_keys = ["rch", "drn"]
+    topsystem_mask = clipped_boundary["head"].notnull().compute()
+    for key in topsystem_keys:
+        topsystem_pkg = clipped_simulation["GWF_1"][key]
+        # Take first grid var
+        gridded_var = topsystem_pkg.dataset[topsystem_pkg._period_data[0]].compute()
+        # True wherever topsystem is masked but gridded_var still has a value
+        bad = gridded_var.notnull() & topsystem_mask
+        assert not bad.any().item()
+
 
 @pytest.mark.skipif(sys.version_info < (3, 7), reason="capture_output added in 3.7")
 def test_slice_and_run_purge_empty_package(transient_twri_model, tmp_path):

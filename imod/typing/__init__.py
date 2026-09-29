@@ -33,6 +33,7 @@ class DropVarsType(TypedDict, total=False):
 
 
 class Imod5DataDict(TypedDict, total=False):
+    bnd: GridDataDict
     cap: GridDataDict
     extra: dict[str, list[str]]
 
