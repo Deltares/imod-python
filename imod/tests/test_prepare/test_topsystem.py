@@ -290,13 +290,21 @@ def test_riv_allocation__elevation_above_surface_level(
     )
 
     expected_riv_layers = np.nonzero(expected_riv)[0] + 1
-    expected_riv_layers = expected_riv_layers if expected_riv_layers.size > 0 else np.arange(1, len(expected_riv) + 1)
+    expected_riv_layers = (
+        expected_riv_layers
+        if expected_riv_layers.size > 0
+        else np.arange(1, len(expected_riv) + 1)
+    )
     np.testing.assert_array_equal(
         actual_riv_da.coords["layer"].values, expected_riv_layers
     )
     if actual_drn_da is not None:
         expected_drn_layers = np.nonzero(expected_drn)[0] + 1
-        expected_drn_layers = expected_drn_layers if expected_drn_layers.size > 0 else np.arange(1, len(expected_drn) + 1)
+        expected_drn_layers = (
+            expected_drn_layers
+            if expected_drn_layers.size > 0
+            else np.arange(1, len(expected_drn) + 1)
+        )
         np.testing.assert_array_equal(
             actual_drn_da.coords["layer"].values,
             expected_drn_layers,
