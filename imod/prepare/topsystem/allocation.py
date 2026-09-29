@@ -8,6 +8,7 @@ from typing import Optional
 import numpy as np
 
 from imod.common.utilities.layer import create_layered_top
+from imod.logging import logger
 from imod.schemata import DimsSchema
 from imod.select.layers import (
     get_upper_active_grid_cells,
@@ -15,7 +16,6 @@ from imod.select.layers import (
 )
 from imod.typing import GridDataArray, GridDataDict
 from imod.util.dims import enforced_dim_order
-from imod.logging import logger
 
 
 class ALLOCATION_OPTION(Enum):
@@ -56,12 +56,14 @@ class ALLOCATION_OPTION(Enum):
     at_elevation = 2
     at_first_active = 9  # Not an iMOD 5.6 option
 
-class LAYER_USED(Enum):
+
+class LAYERS_USED(Enum):
     """
     What this result represents. It can be either:
     - ALL: nothing to trim (all layers used)
     - NONE: nothing to keep (no layer has any allocated cell)
     """
+
     ALL = 0
     NONE = 1
 
@@ -606,8 +608,7 @@ def _allocate_cells__at_first_active(
     return topsystem_upper_active, None
 
 
-
-def _used_layers(mask: GridDataArray) -> GridDataArray | LAYER_USED:
+def _used_layers(mask: GridDataArray) -> GridDataArray | LAYERS_USED:
     """
     Return the layer coordinate values of ``mask`` that contain at least one
     True value anywhere in the domain (and, if present, at any timestep), or
@@ -622,17 +623,17 @@ def _used_layers(mask: GridDataArray) -> GridDataArray | LAYER_USED:
 
     Returns
     -------
-    GridDataArray | LAYER_USED
-        Layer coordinate values with data, or LAYER_USED.
-        Returning LAYER_USED means either nothing to trim (all layers used)
-        or nothing to keep (no layer has any allocated cell). In the latter cases, 
-        do not return an empty layer coordinate: a layer dimension of 
+    GridDataArray | LAYERS_USED
+        Layer coordinate values with data, or LAYERS_USED.
+        Returning LAYERS_USED means either nothing to trim (all layers used)
+        or nothing to keep (no layer has any allocated cell). In the latter cases,
+        do not return an empty layer coordinate: a layer dimension of
         size 0 fails package validation and breaks downstream
         operations. Keep the full layer range instead, so empty packages
         can be removed by callers, e.g. ``mask_package__drop_if_empty``.
     """
     if "layer" not in mask.dims:
-        return LAYER_USED.ALL
+        return LAYERS_USED.ALL
 
     if mask.dtype != bool:
         raise ValueError(
@@ -649,9 +650,9 @@ def _used_layers(mask: GridDataArray) -> GridDataArray | LAYER_USED:
     # Never return an empty layer coordinate: keep the full range and
     # let callers (e.g. # mask_package__drop_if_empty) remove empty packages.
     if bool(has_data_per_layer.all()):
-        return LAYER_USED.ALL
+        return LAYERS_USED.ALL
     elif not bool(has_data_per_layer.any()):
-        return LAYER_USED.NONE
+        return LAYERS_USED.NONE
 
     return mask["layer"].where(has_data_per_layer, drop=True)
 
@@ -677,11 +678,13 @@ def _drop_empty_layers(grid: GridDataArray) -> GridDataArray:
         Same array, subset to layers with data.
     """
     used_layers = _used_layers(grid)
-    if used_layers == LAYER_USED.NONE:
+    if used_layers == LAYERS_USED.NONE:
         name = grid.name if hasattr(grid, "name") else "<unnamed grid>"
-        logger.warning(f"No layers have data in grid '{name}', the package should be removed by the caller.")
+        logger.warning(
+            f"No layers have data in grid '{name}', the package should be removed by the caller."
+        )
         return grid
-    elif used_layers == LAYER_USED.ALL:
+    elif used_layers == LAYERS_USED.ALL:
         return grid
     else:
         logger.debug("Dropping empty layers, keeping only used layers.")
@@ -716,8 +719,8 @@ def drop_empty_layers_from_dict(
         To fully remove empty empty packages, additional logic outside this function is required.
     """
     used_layers = _used_layers(mask)
-    if isinstance(used_layers, LAYER_USED):
-        return data # return as-is, let caller handle what to do with LAYER_USED.NONE or LAYER_USED.ALL
+    if isinstance(used_layers, LAYERS_USED):
+        return data  # return as-is, let caller handle what to do with LAYERS_USED.NONE or LAYERS_USED.ALL
 
     return {
         key: grid.sel(layer=used_layers) if "layer" in grid.dims else grid
