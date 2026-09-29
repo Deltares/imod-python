@@ -488,8 +488,7 @@ def test_reallocate(drainage):
 def test_reallocate_drop_empty_layers(drainage):
     """
     drop_empty_layers=True should trim layers off the final package without
-    changing the values of the layers that remain (Option A: allocation and
-    conductance distribution always run over the full layer range first).
+    changing the values of the layers that remain.
     """
     drn = imod.mf6.Drainage(**drainage)
     idomain = drainage["elevation"].astype(np.int16)

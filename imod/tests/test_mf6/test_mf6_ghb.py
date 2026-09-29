@@ -16,8 +16,7 @@ from imod.prepare.topsystem.conductance import DISTRIBUTING_OPTION
 def test_reallocate_drop_empty_layers():
     """
     drop_empty_layers=True should trim layers off the final package without
-    changing the values of the layers that remain (Option A: allocation and
-    conductance distribution always run over the full layer range first).
+    changing the values of the layers that remain.
     """
     layer = [1, 2, 3]
     y = [25.0, 15.0, 5.0]
