@@ -56,10 +56,10 @@ def reproject(
         <https://corteva.github.io/rioxarray/stable/rioxarray.html#rioxarray.raster_array.RasterArray.reproject>`_
         instead.
 
-    .. warning::
+    .. attention::
 
-        The `like` paramater does not seem to resample anymore as expected. For
-        regridding, consider using `xugrid to regrid instead.
+        Using The `like` parameter is not the best way to regrid data to another
+        grid. For proper regridding, consider using `xugrid` to regrid instead.
         <https://deltares.github.io/xugrid/examples/regridder_overview.html>`_
 
     Reprojects and/or resamples a 2D xarray DataArray to a
@@ -73,16 +73,10 @@ def reproject(
     source: xarray DataArray
         The DataArray to be resampled and/or reprojected. Must contain dimensions
         ``y`` and ``x``.
-    like: xarray DataArray
+    like: xarray DataArray, optional
         Example DataArray that shows what the resampled result should look like
         in terms of coordinates. Must contain dimensions ``y`` and ``x``.
-
-        .. warning::
-
-            The `like` parameter does not seem to resample anymore due to
-            changes in rasterio. For regridding, consider using `xugrid to regrid
-            instead.
-            <https://deltares.github.io/xugrid/examples/regridder_overview.html>`_
+        If not provided, only reprojection will be performed without resampling.
     src_crs: string, dict, rasterio.crs.CRS
         Coordinate system of ``source``. Options:
 
