@@ -625,14 +625,15 @@ def _used_layers(mask: GridDataArray) -> tuple[Optional[GridDataArray], LAYERS_U
 
     Returns
     -------
-    GridDataArray | LAYERS_USED
-        Layer coordinate values with data, or LAYERS_USED.
-        Returning LAYERS_USED means either nothing to trim (all layers used)
-        or nothing to keep (no layer has any allocated cell). In the latter cases,
-        do not return an empty layer coordinate: a layer dimension of
-        size 0 fails package validation and breaks downstream
-        operations. Keep the full layer range instead, so empty packages
-        can be removed by callers, e.g. ``mask_package__drop_if_empty``.
+    GridDataArray
+        Layer coordinate values with data. If all or none of the layers have
+        data, this will be None. In the latter case, do not return an empty
+        layer coordinate: a layer dimension of size 0 fails package validation
+        and breaks downstream operations. Keep the full layer range instead, so
+        empty packages can be removed by callers, e.g.
+        ``mask_package__drop_if_empty``.
+    LAYERS_USED
+        Enumerator indicating whether all, none, or some layers are used.
     """
     if "layer" not in mask.dims:
         return None, LAYERS_USED.ALL
