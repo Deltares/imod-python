@@ -691,7 +691,7 @@ def _drop_empty_layers(grid: GridDataArray) -> GridDataArray:
         return grid
     else:
         raise ValueError(f"Unexpected value for used_layers: {used_layers}")
-    
+
 
 def drop_empty_layers_from_dict(
     data: GridDataDict, mask: GridDataArray
