@@ -678,19 +678,16 @@ def _drop_empty_layers(grid: GridDataArray) -> GridDataArray:
         Same array, subset to layers with data.
     """
     used_layers = _used_layers(grid)
-    if isinstance(used_layers, GridDataArray):
-        logger.debug("Dropping empty layers, keeping only used layers.")
-        return grid.sel(layer=used_layers)
-    elif used_layers == LAYERS_USED.NONE:
-        name = grid.name if hasattr(grid, "name") else "<unnamed grid>"
+    name = grid.name if hasattr(grid, "name") else "<unnamed grid>"
+    if used_layers is LAYERS_USED.NONE:
         logger.warning(
             f"No layers have data in grid '{name}', the package should be removed by the caller."
         )
-        return grid
-    elif used_layers == LAYERS_USED.ALL:
-        return grid
-    else:
-        raise ValueError(f"Unexpected value for used_layers: {used_layers}")
+    if used_layers in (LAYERS_USED.NONE, LAYERS_USED.ALL):
+        return grid  # return as-is, let caller handle what to do with LAYERS_USED.NONE or LAYERS_USED.ALL
+
+    logger.debug(f"Dropping empty layers from grid '{name}', keeping only used layers.")
+    return grid.sel(layer=used_layers)
 
 
 def drop_empty_layers_from_dict(
@@ -721,9 +718,17 @@ def drop_empty_layers_from_dict(
         To fully remove empty empty packages, additional logic outside this function is required.
     """
     used_layers = _used_layers(mask)
-    if isinstance(used_layers, LAYERS_USED):
+    names = list(data.keys())
+    if used_layers is LAYERS_USED.NONE:
+        logger.warning(
+            f"No layers have data in grids '{names}', the package should be removed by the caller."
+        )
+    if used_layers in (LAYERS_USED.NONE, LAYERS_USED.ALL):
         return data  # return as-is, let caller handle what to do with LAYERS_USED.NONE or LAYERS_USED.ALL
 
+    logger.debug(
+        f"Dropping empty layers from grids '{names}', keeping only used layers."
+    )
     return {
         key: grid.sel(layer=used_layers) if "layer" in grid.dims else grid
         for key, grid in data.items()
