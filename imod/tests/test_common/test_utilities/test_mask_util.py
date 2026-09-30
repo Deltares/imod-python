@@ -10,7 +10,7 @@ from imod.common.utilities.mask import (
     broadcast_and_mask_arrays,
     mask_arrays,
 )
-from imod.tests.fixtures.package_instance_creation import get_grid_da
+from imod.tests.fixtures.mf6_package_instance_creation import get_grid_da
 
 
 class DataArrayCases:

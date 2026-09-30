@@ -210,7 +210,9 @@ class MeteoGridCopy(MetaSwapPackage, IRegridPackage):
 
     Parameters
     ----------
-    path: Path to mete_grid.inp file
+    path: str | Path
+        Path to mete_grid.inp file. This will be enforced to string upon storing
+        in the dataset.
     """
 
     _file_name = "mete_grid.inp"
@@ -220,11 +222,13 @@ class MeteoGridCopy(MetaSwapPackage, IRegridPackage):
 
     def __init__(self, path: Path | str):
         super().__init__()
-        self.dataset["path"] = path
+        # Store as string so that it can be easily serialized and retrieved from
+        # the dataset.
+        self.dataset["path"] = str(path)
 
     def write(self, directory: Path | str, *args):
         directory = Path(directory)
-        path_metegrid = Path(str(self.dataset["path"].values[()]))
+        path_metegrid = Path(self.dataset["path"].item())
         new_path = directory / self._file_name
         copyfile(path_metegrid, new_path)
 

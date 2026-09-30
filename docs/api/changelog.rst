@@ -57,6 +57,9 @@ Fixed
   alignment error when a package's own layer coordinate is a subset of the
   model's full layer range, e.g. after :meth:`imod.mf6.River.reallocate` with
   ``drop_empty_layers=True``.
+- :class:`imod.msw.FileCopier` and :class:`imod.msw.MeteoGridCopy` now force
+  paths to be stored as strings in the dataset. ``pathlib.Path`` objects could
+  cause errors when calling :meth:`imod.msw.MetaSwapModel.dump`.
 
 Changed
 ~~~~~~~
