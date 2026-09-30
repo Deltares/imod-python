@@ -27,7 +27,7 @@ from imod.typing.grid import (
     is_unstructured,
     ones_like,
 )
-from imod.util.dims import drop_layer_dim_cap_data, enforced_dim_order
+from imod.util.dims import drop_layer_dim_cap_and_bnd_data, enforced_dim_order
 from imod.util.regrid import (
     RegridderType,
     RegridderWeightsCache,
@@ -471,7 +471,7 @@ def _get_regridding_domain(
     return new_idomain
 
 
-def regrid_imod5_cap_data(
+def regrid_imod5_cap_and_bnd_data(
     imod5_data: Imod5DataDict,
     target_dis: IRegridPackage,
     regridder_types: DataclassType,
@@ -486,15 +486,19 @@ def regrid_imod5_cap_data(
     and ``imod.mf6.Recharge.from_imod5_cap_data``.
     """
     # Drop layer coords
-    imod5_cap_no_layer = drop_layer_dim_cap_data(imod5_data)
+    imod5_no_layer = drop_layer_dim_cap_and_bnd_data(imod5_data)
     target_grid = target_dis.dataset["idomain"].isel(layer=0, drop=True)
     # Regrid the input data
     cap_data_regridded = _regrid_package_data(
-        imod5_cap_no_layer["cap"], target_grid, regridder_types, regrid_cache
+        imod5_no_layer["cap"], target_grid, regridder_types, regrid_cache
+    )
+    bnd_data_regridded = _regrid_package_data(
+        imod5_no_layer["bnd"], target_grid, regridder_types, regrid_cache
     )
     extra_paths = imod5_data["extra"]["paths"]
     imod5_regridded: Imod5DataDict = {
         "cap": cap_data_regridded,
+        "bnd": bnd_data_regridded,
         "extra": {"paths": extra_paths},
     }
     return imod5_regridded

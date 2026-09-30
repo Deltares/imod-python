@@ -46,6 +46,7 @@ Model objects & methods
     Modflow6Simulation.set_validation_settings
     GroundwaterFlowModel
     GroundwaterFlowModel.mask_all_packages
+    GroundwaterFlowModel.mask_packages
     GroundwaterFlowModel.prepare_wel_for_mf6
     GroundwaterFlowModel.regrid_like
     GroundwaterFlowModel.dump
@@ -60,6 +61,7 @@ Model objects & methods
     GroundwaterFlowModel.get_diskey
     GroundwaterTransportModel
     GroundwaterTransportModel.mask_all_packages
+    GroundwaterTransportModel.mask_packages
     GroundwaterTransportModel.dump
     GroundwaterTransportModel.clip_box
     GroundwaterTransportModel.regrid_like

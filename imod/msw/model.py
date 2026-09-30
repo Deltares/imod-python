@@ -19,7 +19,7 @@ from imod.common.serializer import EngineType
 from imod.common.utilities.clip import clip_by_grid
 from imod.common.utilities.dump_model import dump_model
 from imod.common.utilities.partitioninfo import create_partition_info
-from imod.common.utilities.regrid import regrid_imod5_cap_data
+from imod.common.utilities.regrid import regrid_imod5_cap_and_bnd_data
 from imod.common.utilities.version import prepend_content_with_version_info
 from imod.mf6.dis import StructuredDiscretization
 from imod.mf6.mf6_wel_adapter import Mf6Wel
@@ -823,7 +823,7 @@ class MetaSwapModel(Model, IDict):
         parasim_settings = read_para_sim(path_to_parasim)
         unsa_svat_path = cast(str, parasim_settings["unsa_svat_path"])
         # Regrid iMOD5 CAP data to target discretization.
-        imod5_regridded = regrid_imod5_cap_data(
+        imod5_regridded = regrid_imod5_cap_and_bnd_data(
             imod5_data, target_dis, regridder_types, regrid_cache
         )
         # Test with regridded data instead of masked, as masking broadcasts

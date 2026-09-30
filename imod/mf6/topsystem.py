@@ -3,6 +3,7 @@ from copy import deepcopy
 from dataclasses import asdict
 from typing import Optional, Self, cast
 
+from imod.common.interfaces.itopsystembc import ITopSystemBoundaryCondition
 from imod.common.utilities.dataclass_type import DataclassType
 from imod.mf6.aggregate.aggregate_schemes import EmptyAggregationMethod
 from imod.mf6.boundary_condition import BoundaryCondition
@@ -41,7 +42,9 @@ def _handle_reallocate_arguments(
     return allocation_option, distributing_option
 
 
-class TopSystemBoundaryCondition(BoundaryCondition, abc.ABC):
+class TopSystemBoundaryCondition(
+    BoundaryCondition, ITopSystemBoundaryCondition, abc.ABC
+):
     """
     Base class to add some extra functionality for topsystem packages, such as
     RCH, DRN, RIV, and GHB.

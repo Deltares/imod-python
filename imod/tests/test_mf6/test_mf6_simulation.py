@@ -611,6 +611,43 @@ def test_import_from_imod5(imod5_dataset, tmp_path):
 
 
 @pytest.mark.unittest_jit
+def test_import_from_imod5_mask_topsystem(imod5_dataset):
+    """Test importing from imod5 masks the top system packages"""
+    # Arrange
+    imod5_data = imod5_dataset[0]
+    period_data = imod5_dataset[1]
+
+    datelist = pd.date_range(start="1/1/1989", end="1/1/2013", freq="W")
+    # Act
+    simulation = Modflow6Simulation.from_imod5_data(
+        imod5_data,
+        period_data,
+        datelist,
+        SimulationAllocationOptions,
+        SimulationDistributingOptions,
+    )
+    # Assert
+    ibound = imod5_data["bnd"]["ibound"].isel(layer=0, drop=True)
+    topsystem_mask = ibound < 0
+    topsystem_keys = [
+        "rch",
+        "drn-1",
+        "drn-2",
+        "riv-1riv",
+        "riv-1drn",
+        "riv-2riv",
+        "riv-2drn",
+    ]
+    for key in topsystem_keys:
+        topsystem_pkg = simulation["imported_model"][key]
+        # Take first grid var
+        gridded_var = topsystem_pkg.dataset[topsystem_pkg._period_data[0]]
+        # True wherever topsystem is masked but gridded_var still has a value
+        bad = gridded_var.notnull() & topsystem_mask
+        assert not bad.any().item()
+
+
+@pytest.mark.unittest_jit
 def test_import_from_imod5__custom_name(imod5_dataset):
     imod5_data = imod5_dataset[0]
     period_data = imod5_dataset[1]
