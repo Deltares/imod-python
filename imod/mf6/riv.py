@@ -349,9 +349,7 @@ class River(TopSystemBoundaryCondition, IRegridPackage):
             are actually used. Reduces memory use and speeds up later operations such
             as regridding, clipping and splitting. If no cells are allocated in any
             layer, nothing is dropped and the full layer range is returned, as a layer
-            dimension of size 0 is not valid. Note that allocation and conductance
-            distribution are always computed over the full layer range first, so
-            dropping layers does not change the computed values.
+            dimension of size 0 is not valid.
 
         Returns
         -------
