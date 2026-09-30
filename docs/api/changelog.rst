@@ -32,6 +32,7 @@ Changed
 - Deprecated :class:`imod.msw.Sprinkling` in favor of
   :class:`imod.msw.SprinklingGrid`. Call :class:`imod.msw.SprinklingGrid` to get
   the same behavior as you were used to.
+- :func:`imod.prepare.reproject` now throws a deprecation warning.
 
 [1.1.0] - 2026-08-03
 --------------------
