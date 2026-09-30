@@ -52,7 +52,7 @@ def test_riv_allocation(
     active, top, bottom, stage, bottom_elevation, option, expected_riv, expected_drn
 ):
     actual_riv_da, actual_drn_da = allocate_riv_cells(
-        option, active, top, bottom, stage, bottom_elevation
+        option, active, top, bottom, stage, bottom_elevation, drop_empty_layers=False
     )
 
     actual_riv = take_nth_layer_column(actual_riv_da, 0)
@@ -71,6 +71,20 @@ def test_riv_allocation(
     if empty_drn is not None:
         assert np.all(~empty_drn)
 
+    # drop_empty_layers=True should keep only the layers with allocated cells
+    actual_riv_da, actual_drn_da = allocate_riv_cells(
+        option, active, top, bottom, stage, bottom_elevation, drop_empty_layers=True
+    )
+    expected_riv_layers = np.nonzero(expected_riv)[0] + 1
+    np.testing.assert_array_equal(
+        actual_riv_da.coords["layer"].values, expected_riv_layers
+    )
+    if actual_drn_da is not None:
+        expected_drn_layers = np.nonzero(expected_drn)[0] + 1
+        np.testing.assert_array_equal(
+            actual_drn_da.coords["layer"].values, expected_drn_layers
+        )
+
 
 @parametrize_with_cases(
     argnames="active,top,bottom,drn_elevation",
@@ -80,13 +94,22 @@ def test_riv_allocation(
     argnames="option,expected,_", prefix="allocation_", has_tag="drn"
 )
 def test_drn_allocation(active, top, bottom, drn_elevation, option, expected, _):
-    actual_da = allocate_drn_cells(option, active, top, bottom, drn_elevation)
+    actual_da = allocate_drn_cells(
+        option, active, top, bottom, drn_elevation, drop_empty_layers=False
+    )
 
     actual = take_nth_layer_column(actual_da, 0)
     empty = take_nth_layer_column(actual_da, 1)
 
     np.testing.assert_equal(actual, expected)
     assert np.all(~empty)
+
+    # drop_empty_layers=True should keep only the layers with allocated cells
+    actual_da = allocate_drn_cells(
+        option, active, top, bottom, drn_elevation, drop_empty_layers=True
+    )
+    expected_layers = np.nonzero(expected)[0] + 1
+    np.testing.assert_array_equal(actual_da.coords["layer"].values, expected_layers)
 
 
 @parametrize_with_cases(
@@ -97,13 +120,22 @@ def test_drn_allocation(active, top, bottom, drn_elevation, option, expected, _)
     argnames="option,expected,_", prefix="allocation_", has_tag="ghb"
 )
 def test_ghb_allocation(active, top, bottom, head, option, expected, _):
-    actual_da = allocate_ghb_cells(option, active, top, bottom, head)
+    actual_da = allocate_ghb_cells(
+        option, active, top, bottom, head, drop_empty_layers=False
+    )
 
     actual = take_nth_layer_column(actual_da, 0)
     empty = take_nth_layer_column(actual_da, 1)
 
     np.testing.assert_equal(actual, expected)
     assert np.all(~empty)
+
+    # drop_empty_layers=True should keep only the layers with allocated cells
+    actual_da = allocate_ghb_cells(
+        option, active, top, bottom, head, drop_empty_layers=True
+    )
+    expected_layers = np.nonzero(expected)[0] + 1
+    np.testing.assert_array_equal(actual_da.coords["layer"].values, expected_layers)
 
 
 @parametrize_with_cases(
@@ -114,13 +146,18 @@ def test_ghb_allocation(active, top, bottom, head, option, expected, _):
     argnames="option,expected,_", prefix="allocation_", has_tag="rch"
 )
 def test_rch_allocation(active, rate, option, expected, _):
-    actual_da = allocate_rch_cells(option, active, rate)
+    actual_da = allocate_rch_cells(option, active, rate, drop_empty_layers=False)
 
     actual = take_nth_layer_column(actual_da, 0)
     empty = take_nth_layer_column(actual_da, 1)
 
     np.testing.assert_equal(actual, expected)
     assert np.all(~empty)
+
+    # drop_empty_layers=True should keep only the layers with allocated cells
+    actual_da = allocate_rch_cells(option, active, rate, drop_empty_layers=True)
+    expected_layers = np.nonzero(expected)[0] + 1
+    np.testing.assert_array_equal(actual_da.coords["layer"].values, expected_layers)
 
 
 @parametrize_with_cases(
@@ -211,7 +248,13 @@ def test_riv_allocation__elevation_above_surface_level(
     # Put elevations a lot above surface level. Need to be allocated to first
     # layer.
     actual_riv_da, actual_drn_da = allocate_riv_cells(
-        option, active, top, bottom, stage + 100.0, bottom_elevation + 100.0
+        option,
+        active,
+        top,
+        bottom,
+        stage + 100.0,
+        bottom_elevation + 100.0,
+        drop_empty_layers=False,
     )
 
     # Override expected values
@@ -235,6 +278,38 @@ def test_riv_allocation__elevation_above_surface_level(
     if empty_drn is not None:
         assert np.all(~empty_drn)
 
+    # drop_empty_layers=True should keep only the layers with allocated cells
+    actual_riv_da, actual_drn_da = allocate_riv_cells(
+        option,
+        active,
+        top,
+        bottom,
+        stage + 100.0,
+        bottom_elevation + 100.0,
+        drop_empty_layers=True,
+    )
+
+    expected_riv_layers = np.nonzero(expected_riv)[0] + 1
+    expected_riv_layers = (
+        expected_riv_layers
+        if expected_riv_layers.size > 0
+        else np.arange(1, len(expected_riv) + 1)
+    )
+    np.testing.assert_array_equal(
+        actual_riv_da.coords["layer"].values, expected_riv_layers
+    )
+    if actual_drn_da is not None:
+        expected_drn_layers = np.nonzero(expected_drn)[0] + 1
+        expected_drn_layers = (
+            expected_drn_layers
+            if expected_drn_layers.size > 0
+            else np.arange(1, len(expected_drn) + 1)
+        )
+        np.testing.assert_array_equal(
+            actual_drn_da.coords["layer"].values,
+            expected_drn_layers,
+        )
+
 
 @parametrize_with_cases(
     argnames="active,top,bottom,stage,bottom_elevation",
@@ -248,7 +323,7 @@ def test_riv_allocation__stage_equals_bottom_elevation(
 ):
     # Bottom elevation equals stage here.
     actual_riv_da, actual_drn_da = allocate_riv_cells(
-        option, active, top, bottom, stage, stage
+        option, active, top, bottom, stage, stage, drop_empty_layers=False
     )
 
     # Override expected values
@@ -274,6 +349,20 @@ def test_riv_allocation__stage_equals_bottom_elevation(
     assert np.all(~empty_riv)
     if empty_drn is not None:
         assert np.all(~empty_drn)
+
+    # drop_empty_layers=True should keep only the layers with allocated cells
+    actual_riv_da, actual_drn_da = allocate_riv_cells(
+        option, active, top, bottom, stage, stage, drop_empty_layers=True
+    )
+    expected_riv_layers = np.nonzero(expected_riv)[0] + 1
+    np.testing.assert_array_equal(
+        actual_riv_da.coords["layer"].values, expected_riv_layers
+    )
+    if actual_drn_da is not None:
+        expected_drn_layers = np.nonzero(expected_drn)[0] + 1
+        np.testing.assert_array_equal(
+            actual_drn_da.coords["layer"].values, expected_drn_layers
+        )
 
 
 @parametrize_with_cases(
@@ -291,7 +380,7 @@ def test_riv_allocation__stage_equals_bottom_elevation_equals_bottom(
 
     # Bottom elevation equals stage here.
     actual_riv_da, actual_drn_da = allocate_riv_cells(
-        option, active, top, bottom, stage, stage
+        option, active, top, bottom, stage, stage, drop_empty_layers=False
     )
 
     # Override expected values
@@ -317,6 +406,20 @@ def test_riv_allocation__stage_equals_bottom_elevation_equals_bottom(
     assert np.all(~empty_riv)
     if empty_drn is not None:
         assert np.all(~empty_drn)
+
+    # drop_empty_layers=True should keep only the layers with allocated cells
+    actual_riv_da, actual_drn_da = allocate_riv_cells(
+        option, active, top, bottom, stage, stage, drop_empty_layers=True
+    )
+    expected_riv_layers = np.nonzero(expected_riv)[0] + 1
+    np.testing.assert_array_equal(
+        actual_riv_da.coords["layer"].values, expected_riv_layers
+    )
+    if actual_drn_da is not None:
+        expected_drn_layers = np.nonzero(expected_drn)[0] + 1
+        np.testing.assert_array_equal(
+            actual_drn_da.coords["layer"].values, expected_drn_layers
+        )
 
 
 @parametrize_with_cases(
@@ -337,6 +440,7 @@ def test_drn_allocation__elevation_above_surface_level(
         top,
         bottom,
         elevation + 100.0,
+        drop_empty_layers=False,
     )
 
     # Override expected
@@ -349,6 +453,18 @@ def test_drn_allocation__elevation_above_surface_level(
     assert np.all(~empty)
     if empty is not None:
         assert np.all(~empty)
+
+    # drop_empty_layers=True should keep only the layers with allocated cells
+    actual_da = allocate_drn_cells(
+        option,
+        active,
+        top,
+        bottom,
+        elevation + 100.0,
+        drop_empty_layers=True,
+    )
+    expected_layers = np.nonzero(expected)[0] + 1
+    np.testing.assert_array_equal(actual_da.coords["layer"].values, expected_layers)
 
 
 @parametrize_with_cases(
@@ -365,13 +481,22 @@ def test_drn_allocation__elevation_equal_to_bottom(
     # elevation is equal everywhere.)
     bottom.loc[bottom.coords["layer"] == 3] = drn_elevation.values.ravel()[0]
 
-    actual_da = allocate_drn_cells(option, active, top, bottom, drn_elevation)
+    actual_da = allocate_drn_cells(
+        option, active, top, bottom, drn_elevation, drop_empty_layers=False
+    )
 
     actual = take_nth_layer_column(actual_da, 0)
     empty = take_nth_layer_column(actual_da, 1)
 
     np.testing.assert_equal(actual, expected)
     assert np.all(~empty)
+
+    # drop_empty_layers=True should keep only the layers with allocated cells
+    actual_da = allocate_drn_cells(
+        option, active, top, bottom, drn_elevation, drop_empty_layers=True
+    )
+    expected_layers = np.nonzero(expected)[0] + 1
+    np.testing.assert_array_equal(actual_da.coords["layer"].values, expected_layers)
 
 
 @parametrize_with_cases(
@@ -392,6 +517,7 @@ def test_ghb_allocation__elevation_above_surface_level(
         top,
         bottom,
         head + 100.0,
+        drop_empty_layers=False,
     )
 
     # Override expected
@@ -404,6 +530,18 @@ def test_ghb_allocation__elevation_above_surface_level(
     assert np.all(~empty)
     if empty is not None:
         assert np.all(~empty)
+
+    # drop_empty_layers=True should keep only the layers with allocated cells
+    actual_da = allocate_ghb_cells(
+        option,
+        active,
+        top,
+        bottom,
+        head + 100.0,
+        drop_empty_layers=True,
+    )
+    expected_layers = np.nonzero(expected)[0] + 1
+    np.testing.assert_array_equal(actual_da.coords["layer"].values, expected_layers)
 
 
 @parametrize_with_cases(

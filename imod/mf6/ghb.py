@@ -19,7 +19,11 @@ from imod.mf6.utilities.imod5_converter import regrid_imod5_pkg_data
 from imod.mf6.utilities.package import set_repeat_stress_if_available
 from imod.mf6.validation import BOUNDARY_DIMS_SCHEMA, CONC_DIMS_SCHEMA
 from imod.prepare.cleanup import cleanup_ghb
-from imod.prepare.topsystem.allocation import ALLOCATION_OPTION, allocate_ghb_cells
+from imod.prepare.topsystem.allocation import (
+    ALLOCATION_OPTION,
+    allocate_ghb_cells,
+    drop_empty_layers_from_dict,
+)
 from imod.prepare.topsystem.conductance import (
     DISTRIBUTING_OPTION,
     distribute_ghb_conductance,
@@ -198,6 +202,7 @@ class GeneralHeadBoundary(TopSystemBoundaryCondition, IRegridPackage):
         npf: NodePropertyFlow,
         allocation_option: ALLOCATION_OPTION,
         distributing_option: DISTRIBUTING_OPTION,
+        drop_empty_layers: bool = True,
     ) -> dict[str, GridDataArray]:
         """
         Allocate and distribute planar data for given discretization and npf
@@ -219,6 +224,13 @@ class GeneralHeadBoundary(TopSystemBoundaryCondition, IRegridPackage):
             ALLOCATION_OPTION.at_first_active.
         distributing_option: DISTRIBUTING_OPTION
             distributing option.
+        drop_empty_layers: bool, default True
+            If True, drop layers that contain no allocated cells anywhere in the
+            domain (or at any time), so the returned grids only span the layers that
+            are actually used. Reduces memory use and speeds up later operations such
+            as regridding, clipping and splitting. If no cells are allocated in any
+            layer, nothing is dropped and the full layer range is returned, as a layer
+            dimension of size 0 is not valid.
 
         Returns
         -------
@@ -245,6 +257,7 @@ class GeneralHeadBoundary(TopSystemBoundaryCondition, IRegridPackage):
             top,
             bottom,
             planar_data["head"],
+            drop_empty_layers=False,  # Keep full layer range, drop empty layers below
         )
 
         layered_data = {}
@@ -259,6 +272,8 @@ class GeneralHeadBoundary(TopSystemBoundaryCondition, IRegridPackage):
             bottom,
             npf.dataset["k"],
         )
+        if drop_empty_layers:
+            layered_data = drop_empty_layers_from_dict(layered_data, ghb_allocation)
         return layered_data
 
     @classmethod

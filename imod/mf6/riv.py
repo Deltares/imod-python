@@ -19,7 +19,11 @@ from imod.mf6.utilities.imod5_converter import regrid_imod5_pkg_data
 from imod.mf6.utilities.package import set_repeat_stress_if_available
 from imod.mf6.validation import BOUNDARY_DIMS_SCHEMA, CONC_DIMS_SCHEMA
 from imod.prepare.cleanup import AlignLevelsMode, align_interface_levels, cleanup_riv
-from imod.prepare.topsystem.allocation import ALLOCATION_OPTION, allocate_riv_cells
+from imod.prepare.topsystem.allocation import (
+    ALLOCATION_OPTION,
+    allocate_riv_cells,
+    drop_empty_layers_from_dict,
+)
 from imod.prepare.topsystem.conductance import (
     DISTRIBUTING_OPTION,
     distribute_drn_conductance,
@@ -317,6 +321,7 @@ class River(TopSystemBoundaryCondition, IRegridPackage):
         npf: NodePropertyFlow,
         allocation_option: ALLOCATION_OPTION,
         distributing_option: DISTRIBUTING_OPTION,
+        drop_empty_layers: bool = True,
     ) -> tuple[GridDataDict, GridDataDict]:
         """
         Allocate and distribute planar data for given discretization and npf
@@ -338,6 +343,13 @@ class River(TopSystemBoundaryCondition, IRegridPackage):
             ALLOCATION_OPTION.at_first_active.
         distributing_option: DISTRIBUTING_OPTION
             distributing option.
+        drop_empty_layers: bool, default True
+            If True, drop layers that contain no allocated cells anywhere in the
+            domain (or at any time), so the returned grids only span the layers that
+            are actually used. Reduces memory use and speeds up later operations such
+            as regridding, clipping and splitting. If no cells are allocated in any
+            layer, nothing is dropped and the full layer range is returned, as a layer
+            dimension of size 0 is not valid.
 
         Returns
         -------
@@ -364,6 +376,7 @@ class River(TopSystemBoundaryCondition, IRegridPackage):
             bottom,
             planar_data["stage"],
             planar_data["bottom_elevation"],
+            drop_empty_layers=False,  # Keep full layer range, drop empty layers below
         )
         drn_is_allocated = drn_allocated is not None
         # Distribution of conductances
@@ -408,6 +421,15 @@ class River(TopSystemBoundaryCondition, IRegridPackage):
         layered_data_riv["bottom_elevation"] = rise_bottom_elevation_if_needed(
             layered_data_riv["bottom_elevation"], bottom
         )
+
+        if drop_empty_layers:
+            layered_data_riv = drop_empty_layers_from_dict(
+                layered_data_riv, riv_allocated
+            )
+            if drn_allocated is not None:
+                layered_data_drn = drop_empty_layers_from_dict(
+                    layered_data_drn, drn_allocated
+                )
 
         return layered_data_riv, layered_data_drn
 

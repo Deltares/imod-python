@@ -25,7 +25,11 @@ from imod.msw.utilities.imod5_converter import (
     get_cell_area_from_imod5_data,
     is_msw_active_cell,
 )
-from imod.prepare.topsystem.allocation import ALLOCATION_OPTION, allocate_rch_cells
+from imod.prepare.topsystem.allocation import (
+    ALLOCATION_OPTION,
+    allocate_rch_cells,
+    drop_empty_layers_from_dict,
+)
 from imod.schemata import (
     AllCoordsValueSchema,
     AllInsideNoDataSchema,
@@ -182,6 +186,7 @@ class Recharge(TopSystemBoundaryCondition, IRegridPackage):
         planar_data: dict[str, GridDataArray],
         dis: StructuredDiscretization | VerticesDiscretization,
         allocation_option: ALLOCATION_OPTION,
+        drop_empty_layers: bool = True,
     ) -> dict[str, GridDataArray]:
         """
         Allocate and distribute planar data for given discretization and npf
@@ -196,6 +201,13 @@ class Recharge(TopSystemBoundaryCondition, IRegridPackage):
             Model discretization package.
         allocation_option: ALLOCATION_OPTION
             The allocation option to use for the reallocation.
+        drop_empty_layers: bool, default True
+            If True, drop layers that contain no allocated cells anywhere in the
+            domain (or at any time), so the returned grids only span the layers that
+            are actually used. Reduces memory use and speeds up later operations such
+            as regridding, clipping and splitting. If no cells are allocated in any
+            layer, nothing is dropped and the full layer range is returned, as a layer
+            dimension of size 0 is not valid.
 
         Returns
         -------
@@ -210,11 +222,14 @@ class Recharge(TopSystemBoundaryCondition, IRegridPackage):
             allocation_option,
             idomain > 0,
             planar_data["rate"],
+            drop_empty_layers=False,  # Keep full here, drop empty layers below
         )
         # remove rch from cells where it is not allocated and broadcast over layers.
         layered_data = {}
         layered_data["rate"] = planar_data["rate"].where(is_rch_cell)
         layered_data["rate"] = enforce_dim_order(layered_data["rate"])
+        if drop_empty_layers:
+            layered_data = drop_empty_layers_from_dict(layered_data, is_rch_cell)
         return layered_data
 
     @classmethod

@@ -402,6 +402,54 @@ def test_reallocate(rch_dict, allocation_option):
         assert rch_reallocated.dataset.equals(rch.dataset)
 
 
+def test_reallocate_drop_empty_layers():
+    """
+    drop_empty_layers=True should trim layers off the final package without
+    changing the values of the layers that remain.
+    """
+    x = [5.0, 15.0, 25.0]
+    y = [25.0, 15.0, 5.0]
+    layer = [1, 2, 3]
+    dx, dy = 10.0, -10.0
+
+    idomain = xr.DataArray(
+        np.ones((3, 3, 3), dtype=np.int16),
+        coords={"layer": layer, "y": y, "x": x, "dx": dx, "dy": dy},
+        dims=("layer", "y", "x"),
+    )
+    top = 1.0
+    bottom = top - idomain.coords["layer"]
+    dis = imod.mf6.StructuredDiscretization(top=top, bottom=bottom, idomain=idomain)
+
+    rate = xr.DataArray(
+        1.0,
+        coords={"y": y, "x": x, "dx": dx, "dy": dy},
+        dims=("y", "x"),
+    ).expand_dims(layer=[1])
+    rch = imod.mf6.Recharge(rate=rate)
+
+    full = rch.reallocate(
+        dis,
+        allocation_option=ALLOCATION_OPTION.at_first_active,
+        drop_empty_layers=False,
+    )
+    trimmed = rch.reallocate(
+        dis,
+        allocation_option=ALLOCATION_OPTION.at_first_active,
+        drop_empty_layers=True,
+    )
+
+    full_layers = full.dataset["layer"].values
+    trimmed_layers = trimmed.dataset["layer"].values
+    assert set(trimmed_layers) <= set(full_layers)
+    assert len(trimmed_layers) < len(full_layers)
+    np.testing.assert_allclose(
+        trimmed["rate"].sel(layer=trimmed_layers).values,
+        full["rate"].sel(layer=trimmed_layers).values,
+        equal_nan=True,
+    )
+
+
 @pytest.mark.unittest_jit
 def test_planar_rch_from_imod5_constant(imod5_dataset, tmp_path):
     data = deepcopy(imod5_dataset[0])

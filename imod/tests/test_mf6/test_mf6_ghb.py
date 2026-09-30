@@ -13,6 +13,49 @@ from imod.prepare.topsystem.allocation import ALLOCATION_OPTION
 from imod.prepare.topsystem.conductance import DISTRIBUTING_OPTION
 
 
+def test_reallocate_drop_empty_layers():
+    """
+    drop_empty_layers=True should trim layers off the final package without
+    changing the values of the layers that remain.
+    """
+    layer = [1, 2, 3]
+    y = [25.0, 15.0, 5.0]
+    x = [5.0, 15.0, 25.0]
+    dx, dy = 10.0, -10.0
+    head = xr.DataArray(
+        np.full((3, 3, 3), 1.0),
+        coords={"layer": layer, "y": y, "x": x, "dx": dx, "dy": dy},
+        dims=("layer", "y", "x"),
+    )
+    conductance = head.copy()
+    ghb = imod.mf6.GeneralHeadBoundary(head=head, conductance=conductance)
+
+    idomain = head.astype(np.int16)
+    top = 1.0
+    bottom = top - idomain.coords["layer"]
+    dis = imod.mf6.StructuredDiscretization(top=top, bottom=bottom, idomain=idomain)
+    npf = imod.mf6.NodePropertyFlow(icelltype=0, k=1.0)
+    allocation_option = ALLOCATION_OPTION.at_first_active
+    distributing_option = DISTRIBUTING_OPTION.by_layer_thickness
+
+    full = ghb.reallocate(
+        dis, npf, allocation_option, distributing_option, drop_empty_layers=False
+    )
+    trimmed = ghb.reallocate(
+        dis, npf, allocation_option, distributing_option, drop_empty_layers=True
+    )
+
+    full_layers = full.dataset["layer"].values
+    trimmed_layers = trimmed.dataset["layer"].values
+    assert set(trimmed_layers) <= set(full_layers)
+    assert len(trimmed_layers) < len(full_layers)
+    np.testing.assert_allclose(
+        trimmed["conductance"].sel(layer=trimmed_layers).values,
+        full["conductance"].sel(layer=trimmed_layers).values,
+        equal_nan=True,
+    )
+
+
 @pytest.mark.unittest_jit
 def test_from_imod5_non_planar(imod5_dataset_periods, tmp_path):
     period_data = imod5_dataset_periods[1]

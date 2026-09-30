@@ -58,6 +58,7 @@ class TopSystemBoundaryCondition(
         npf: Optional[NodePropertyFlow] = None,
         allocation_option: Optional[ALLOCATION_OPTION] = None,
         distributing_option: Optional[DISTRIBUTING_OPTION] = None,
+        drop_empty_layers: bool = True,
     ) -> Self:
         """
         Reallocates topsystem data across layers and create new package with it.
@@ -83,6 +84,13 @@ class TopSystemBoundaryCondition(
             The distributing option to use for the reallocation. Required for
             packages with a conductance variable. If None, the default is taken
             from :class:`imod.prepare.SimulationDistributingOptions`.
+        drop_empty_layers: bool, default True
+            If True, drop layers that contain no allocated cells anywhere in the
+            domain (or at any time), so the returned grids only span the layers that
+            are actually used. Reduces memory use and speeds up later operations such
+            as regridding, clipping and splitting. If no cells are allocated in any
+            layer, nothing is dropped and the full layer range is returned, as a layer
+            dimension of size 0 is not valid.
 
         Returns
         -------
@@ -102,10 +110,17 @@ class TopSystemBoundaryCondition(
             npf = cast(NodePropertyFlow, npf)
             distributing_option = cast(DISTRIBUTING_OPTION, distributing_option)
             grid_dict = self._allocate_and_distribute_planar_data(
-                planar_data, dis, npf, allocation_option, distributing_option
+                planar_data,
+                dis,
+                npf,
+                allocation_option,
+                distributing_option,
+                drop_empty_layers,
             )
         else:
-            grid_dict = self._allocate_planar_data(planar_data, dis, allocation_option)
+            grid_dict = self._allocate_planar_data(
+                planar_data, dis, allocation_option, drop_empty_layers
+            )
         # River package returns a tuple (second argument can also be Drainage
         # package)
         if isinstance(grid_dict, tuple):
@@ -122,6 +137,7 @@ class TopSystemBoundaryCondition(
         npf: NodePropertyFlow,
         allocation_option: ALLOCATION_OPTION,
         distributing_option: DISTRIBUTING_OPTION,
+        drop_empty_layers: bool = True,
     ) -> tuple[GridDataDict, GridDataDict] | GridDataDict:
         raise NotImplementedError(
             "This method should be implemented in the specific boundary condition "
@@ -134,6 +150,7 @@ class TopSystemBoundaryCondition(
         planar_data: GridDataDict,
         dis: StructuredDiscretization | VerticesDiscretization,
         allocation_option: ALLOCATION_OPTION,
+        drop_empty_layers: bool = True,
     ) -> tuple[GridDataDict, GridDataDict] | GridDataDict:
         raise NotImplementedError(
             "This method should be implemented in the specific boundary condition "

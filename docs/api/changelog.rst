@@ -22,6 +22,23 @@ Added
   :meth:`imod.mf6.GroundwaterTransportModel.mask_packages` to mask specific
   packages of a groundwater flow model and a groundwater transport model
   respectively.
+- Added ``drop_empty_layers: bool = True`` to various cell allocation functions 
+  in :mod:`imod.prepare.topsystem.allocation` to remove fully empty layers from the grids.
+  Strips the empty layers before they are passed along to 
+  reprojection/regridding operations, which can save considerable time for models with 
+  many empty layers. Set to False to keep the previous full-layer-coordinate
+  behaviour. :meth:`imod.prepare.topsystem.allocation.allocate_riv_cells`, 
+  :meth:`imod.prepare.topsystem.allocation.allocate_drn_cells`,
+  :meth:`imod.prepare.topsystem.allocation.allocate_ghb_cells`,
+  :meth:`imod.prepare.topsystem.allocation.allocate_rch_cells`
+- Added ``drop_empty_layers: bool = True`` to
+  :meth:`imod.mf6.River.reallocate`, :meth:`imod.mf6.Drainage.reallocate`,
+  :meth:`imod.mf6.GeneralHeadBoundary.reallocate`, and
+  :meth:`imod.mf6.Recharge.reallocate`. Allocation and conductance
+  distribution are always computed over the full layer range first; only
+  the final package has fully empty layers trimmed off afterwards, so this
+  does not affect computed values. Set to False to keep the previous
+  full-layer-coordinate behaviour.
 
 Fixed
 ~~~~~
@@ -35,6 +52,11 @@ Fixed
   :class:`imod.mf6.Recharge`) where IBOUND is less than 0.
 - :meth:`imod.msw.MetaSwapModel.from_imod5_data` now masks cells where IBOUND is
   less than 0.
+- Fixed :func:`imod.prepare.cleanup.align_interface_levels` (used by
+  ``cleanup_riv``, and therefore :meth:`imod.mf6.River.cleanup`) raising an
+  alignment error when a package's own layer coordinate is a subset of the
+  model's full layer range, e.g. after :meth:`imod.mf6.River.reallocate` with
+  ``drop_empty_layers=True``.
 - :class:`imod.msw.FileCopier` and :class:`imod.msw.MeteoGridCopy` now force
   paths to be stored as strings in the dataset. ``pathlib.Path`` objects could
   cause errors when calling :meth:`imod.msw.MetaSwapModel.dump`.

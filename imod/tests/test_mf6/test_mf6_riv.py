@@ -486,6 +486,72 @@ def test_reallocate__wrong_allocation_option(riv_data, dis_data):
         river.reallocate(dis, npf, allocation_option, distributing_option)
 
 
+def test_reallocate_drop_empty_layers():
+    """
+    drop_empty_layers=True should trim layers off the final package without
+    changing the values of the layers that remain.
+    """
+    x = [5.0, 15.0, 25.0]
+    y = [25.0, 15.0, 5.0]
+    dx, dy = 10.0, -10.0
+    layer = [1, 2, 3, 4]
+
+    top = xr.DataArray(
+        0.0, coords={"y": y, "x": x, "dx": dx, "dy": dy}, dims=("y", "x")
+    )
+    bottom = xr.DataArray(
+        np.array([-1.0, -2.0, -3.0, -4.0])[:, None, None] * np.ones((4, 3, 3)),
+        coords={"layer": layer, "y": y, "x": x, "dx": dx, "dy": dy},
+        dims=("layer", "y", "x"),
+    )
+    idomain = xr.DataArray(
+        np.ones((4, 3, 3), dtype=int),
+        coords={"layer": layer, "y": y, "x": x, "dx": dx, "dy": dy},
+        dims=("layer", "y", "x"),
+    )
+    dis = imod.mf6.StructuredDiscretization(top=top, bottom=bottom, idomain=idomain)
+    npf = imod.mf6.NodePropertyFlow(icelltype=0, k=1.0)
+
+    # Stage and bottom entirely confined to layer 2 (-1.0 to -2.0).
+    planar_coords = {"y": y, "x": x, "dx": dx, "dy": dy}
+    river = imod.mf6.River(
+        stage=xr.DataArray(-1.1, coords=planar_coords, dims=("y", "x")).expand_dims(
+            layer=[1]
+        ),
+        conductance=xr.DataArray(
+            10.0, coords=planar_coords, dims=("y", "x")
+        ).expand_dims(layer=[1]),
+        bottom_elevation=xr.DataArray(
+            -1.9, coords=planar_coords, dims=("y", "x")
+        ).expand_dims(layer=[1]),
+    )
+
+    allocation_option = ALLOCATION_OPTION.stage_to_riv_bot
+    distributing_option = DISTRIBUTING_OPTION.by_corrected_transmissivity
+
+    full = river.reallocate(
+        dis, npf, allocation_option, distributing_option, drop_empty_layers=False
+    )
+    trimmed = river.reallocate(
+        dis, npf, allocation_option, distributing_option, drop_empty_layers=True
+    )
+
+    full_layers = full.dataset["layer"].values
+    trimmed_layers = trimmed.dataset["layer"].values
+    assert set(trimmed_layers) <= set(full_layers)
+    assert len(trimmed_layers) < len(full_layers)
+    np.testing.assert_allclose(
+        trimmed["conductance"].sel(layer=trimmed_layers).values,
+        full["conductance"].sel(layer=trimmed_layers).values,
+        equal_nan=True,
+    )
+    np.testing.assert_allclose(
+        trimmed["stage"].sel(layer=trimmed_layers).values,
+        full["stage"].sel(layer=trimmed_layers).values,
+        equal_nan=True,
+    )
+
+
 def test_check_dim_monotonicity():
     """
     Test if dimensions are monotonically increasing or, in case of the y coord,
