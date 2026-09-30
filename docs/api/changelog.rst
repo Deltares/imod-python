@@ -35,6 +35,9 @@ Fixed
   :class:`imod.mf6.Recharge`) where IBOUND is less than 0.
 - :meth:`imod.msw.MetaSwapModel.from_imod5_data` now masks cells where IBOUND is
   less than 0.
+- :class:`imod.msw.FileCopier` and :class:`imod.msw.MeteoGridCopy` now force
+  paths to be stored as strings in the dataset. ``pathlib.Path`` objects could
+  cause errors when calling :meth:`imod.msw.MetaSwapModel.dump`.
 
 Changed
 ~~~~~~~
