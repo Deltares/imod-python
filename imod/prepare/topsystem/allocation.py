@@ -9,7 +9,6 @@ import numpy as np
 
 from imod.common.utilities.layer import create_layered_top
 from imod.logging import logger
-from imod.msw.utilities import mask
 from imod.schemata import DimsSchema
 from imod.select.layers import (
     get_upper_active_grid_cells,
