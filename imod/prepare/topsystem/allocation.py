@@ -678,7 +678,10 @@ def _drop_empty_layers(grid: GridDataArray) -> GridDataArray:
         Same array, subset to layers with data.
     """
     used_layers = _used_layers(grid)
-    if used_layers == LAYERS_USED.NONE:
+    if isinstance(used_layers, GridDataArray):
+        logger.debug("Dropping empty layers, keeping only used layers.")
+        return grid.sel(layer=used_layers)
+    elif used_layers == LAYERS_USED.NONE:
         name = grid.name if hasattr(grid, "name") else "<unnamed grid>"
         logger.warning(
             f"No layers have data in grid '{name}', the package should be removed by the caller."
@@ -687,9 +690,8 @@ def _drop_empty_layers(grid: GridDataArray) -> GridDataArray:
     elif used_layers == LAYERS_USED.ALL:
         return grid
     else:
-        logger.debug("Dropping empty layers, keeping only used layers.")
-        return grid.sel(layer=used_layers)
-
+        raise ValueError(f"Unexpected value for used_layers: {used_layers}")
+    
 
 def drop_empty_layers_from_dict(
     data: GridDataDict, mask: GridDataArray
