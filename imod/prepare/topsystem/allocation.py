@@ -9,6 +9,7 @@ import numpy as np
 
 from imod.common.utilities.layer import create_layered_top
 from imod.logging import logger
+from imod.msw.utilities import mask
 from imod.schemata import DimsSchema
 from imod.select.layers import (
     get_upper_active_grid_cells,
@@ -642,6 +643,9 @@ def _used_layers(mask: GridDataArray) -> tuple[Optional[GridDataArray], LAYERS_U
             f"Expected a boolean grid to drop empty layers from, got: {mask.dtype}"
         )
 
+    # Reduce the mask to the first time step if a time dimension exists for
+    # performance reasons
+    mask = mask.isel(time=0, drop=True, missing_dims="ignore")
     reduce_dims = [d for d in mask.dims if d != "layer"]
     has_data_per_layer = mask.any(dim=reduce_dims)
 
