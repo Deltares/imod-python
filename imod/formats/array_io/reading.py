@@ -280,8 +280,8 @@ def _dask(path, attrs=None, pattern=None, _read=None, header=None):
     return x, attrs
 
 
-def _load(paths, use_cftime, _read, headers):
-    """Combine a list of paths to IDFs to a single xarray.DataArray"""
+def load_as_components(paths, use_cftime, _read, headers):
+    """Combine a list of paths to IDFs to a single xarray.DataArray and return as components"""
     # this function also works for single IDFs
     names = [h["name"] for h in headers]
     _all_equal(names, "names")
@@ -320,8 +320,14 @@ def _load(paths, use_cftime, _read, headers):
             nested_dict.set_nested(groupby, groupbykeys, da)
         dask_arrays = nested_dict.sorted_nested_dict(groupby)
         dask_array = _ndconcat(dask_arrays, ndim)
+    return dask_array, coords, dims, names[0]
 
-    out = xr.DataArray(dask_array, coords, dims, name=names[0])
+
+def _load(paths, use_cftime, _read, headers):
+    dask_array, coords, dims, name = load_as_components(
+        paths, use_cftime, _read, headers
+    )
+    out = xr.DataArray(dask_array, coords, dims, name=name)
 
     first_attrs = headers[0]
 
