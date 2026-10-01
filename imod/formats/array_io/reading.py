@@ -280,7 +280,7 @@ def _dask(path, attrs=None, pattern=None, _read=None, header=None):
     return x, attrs
 
 
-def _load_as_components(paths, use_cftime, _read, headers):
+def load_as_components(paths, use_cftime, _read, headers):
     """Combine a list of paths to IDFs to a single xarray.DataArray and return as components"""
     # this function also works for single IDFs
     names = [h["name"] for h in headers]
@@ -324,7 +324,7 @@ def _load_as_components(paths, use_cftime, _read, headers):
 
 
 def _load(paths, use_cftime, _read, headers):
-    dask_array, coords, dims, name = _load_as_components(
+    dask_array, coords, dims, name = load_as_components(
         paths, use_cftime, _read, headers
     )
     out = xr.DataArray(dask_array, coords, dims, name=name)

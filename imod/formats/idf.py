@@ -20,7 +20,7 @@ import numpy as np
 import xarray as xr
 
 import imod
-from imod.formats import _load_as_components, array_io
+from imod.formats import array_io
 from imod.typing.structured import merge_partitions_as_da_components
 
 # Make sure we can still use the built-in function...
@@ -298,8 +298,8 @@ def _open_idf_data(
 ):
     """Open IDF files and return as a DataArray."""
     headers = [header(p, pattern) for p in paths]
-    data, _, _, _ = _load_as_components(
-        paths, use_cftime=use_cftime, _read=array_io.read, headers=headers
+    data, _, _, _ = array_io.reading.load_as_components(
+        paths, use_cftime=use_cftime, _read=_read, headers=headers
     )
     return data
 
@@ -377,7 +377,7 @@ def _open_idf_chunked_by_time(
     return xr.DataArray(data, coords, dims, name=template.name, attrs=template.attrs)
 
 
-def open_idf_by_time(path, use_cftime=False, pattern=None):
+def open_by_time(path, use_cftime=False, pattern=None):
     """
     Open IDF files grouped by time.
 

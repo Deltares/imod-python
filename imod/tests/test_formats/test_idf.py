@@ -299,6 +299,21 @@ def test_open_subdomains_error(subdomains, expected, equidistant, tmp_path):
         idf.open_subdomains(tmp_path / "subdomains_*.idf")
 
 
+@parametrize_with_cases(
+    "subdomains,expected,equidistant", cases=SubdomainCases, has_tag="no_species"
+)
+def test_open_by_time(subdomains, expected, equidistant, tmp_path):
+    _save_subdomains_no_species(subdomains, tmp_path)
+
+    # Test with pattern
+    pattern = r"{name}_{time}_l{layer}_p000"
+
+    da = idf.open_by_time(tmp_path / "subdomains_*_p000.idf", pattern=pattern).load()
+
+    assert da.dims == ("time", "layer", "y", "x")
+    assert da.name == "subdomains"
+
+
 def test_xycoords_equidistant():
     dx, dy = 1.0, -1.0
     xmin, xmax = 0.0, 4.0
