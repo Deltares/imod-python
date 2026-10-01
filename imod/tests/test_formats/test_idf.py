@@ -308,10 +308,11 @@ def test_open_by_time(subdomains, expected, equidistant, tmp_path):
     # Test with pattern
     pattern = r"{name}_{time}_l{layer}_p000"
 
-    da = idf.open_by_time(tmp_path / "subdomains_*_p000.idf", pattern=pattern).load()
+    da = idf.open_by_time(tmp_path / "subdomains_*_p000.idf", pattern=pattern)
 
     assert da.dims == ("time", "layer", "y", "x")
     assert da.name == "subdomains"
+    assert da.chunks == ((1,), (da.sizes["layer"],), (da.sizes["y"],), (da.sizes["x"],))
 
 
 def test_xycoords_equidistant():
