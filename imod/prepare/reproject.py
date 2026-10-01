@@ -1,3 +1,5 @@
+import warnings
+
 import affine
 import numpy as np
 import xarray as xr
@@ -46,25 +48,35 @@ def reproject(
     **reproject_kwargs,
 ):
     """
+
+    .. attention::
+
+        This function is deprecated and will be removed in a future version. Use
+        `rioxarray.reproject
+        <https://corteva.github.io/rioxarray/stable/rioxarray.html#rioxarray.raster_array.RasterArray.reproject>`_
+        instead.
+
+    .. attention::
+
+        Using The `like` parameter is not the best way to regrid data to another
+        grid. For proper regridding, consider using `xugrid` to regrid instead.
+        <https://deltares.github.io/xugrid/examples/regridder_overview.html>`_
+
     Reprojects and/or resamples a 2D xarray DataArray to a
     different cellsize or coordinate system.
 
-    * To resample to a new cellsize in the same projection: provide only ``like``.
-    * To only reproject: provide only ``src_crs`` and ``src_crs``.
+    * To reproject: provide only ``src_crs`` and ``dst_crs``.
     * To reproject and resample to a specific domain: provide ``src_crs``, ``src_crs``, and ``like``.
-
-    Note: when only ``like`` is provided, Cartesian (projected) coordinates are a
-    ssumed for resampling. In case of non-Cartesian coordinates, specify
-    ``src_crs`` and ``dst_crs`` for correct resampling.
 
     Parameters
     ----------
     source: xarray DataArray
         The DataArray to be resampled and/or reprojected. Must contain dimensions
         ``y`` and ``x``.
-    like: xarray DataArray
+    like: xarray DataArray, optional
         Example DataArray that shows what the resampled result should look like
         in terms of coordinates. Must contain dimensions ``y`` and ``x``.
+        If not provided, only reprojection will be performed without resampling.
     src_crs: string, dict, rasterio.crs.CRS
         Coordinate system of ``source``. Options:
 
@@ -105,38 +117,32 @@ def reproject(
 
     Examples
     --------
-    Resample a DataArray ``a`` to a new cellsize, using an existing DataArray ``b``:
-
-    >>> c = imod.rasterio.reproject(source=a, like=b)
-
-    Resample a DataArray to a new cellsize of 100.0, by creating a ``like`` DataArray first:
-    (Note that dy must be negative, as is usual for geospatial grids.)
-
-    >>> dims = ("y", "x")
-    >>> coords = {"y": np.arange(200_000.0, 100_000.0, -100.0), "x": np.arange(0.0, 100_000.0, 100.0)}
-    >>> b = xr.DataArray(data=np.empty((200, 100)), coords=coords, dims=dims)
-    >>> c = imod.rasterio.reproject(source=a, like=b)
-
     Reproject a DataArray from one coordinate system (WGS84, EPSG:4326) to another (UTM30N, EPSG:32630):
 
-    >>> c = imod.rasterio.reproject(source=a, src_crs="EPSG:4326", dst_crs="EPSG:32630")
+    >>> c = imod.prepare.reproject(source=a, src_crs="EPSG:4326", dst_crs="EPSG:32630")
 
     Get the reprojected DataArray in the desired shape and coordinates by providing ``like``:
 
-    >>> c = imod.rasterio.reproject(source=a, like=b, src_crs="EPSG:4326", dst_crs="EPSG:32630")
+    >>> c = imod.prepare.reproject(source=a, like=b, src_crs="EPSG:4326", dst_crs="EPSG:32630")
 
     Open a single band raster, and reproject to RD new coordinate system (EPSG:28992), without explicitly specifying ``src_crs``.
     ``src_crs`` is taken from ``a.attrs``, so the raster file has to include coordinate system metadata for this to work.
 
     >>> a = rioxarray.open_rasterio("example.tif").squeeze("band")
-    >>> c = imod.rasterio.reproject(source=a, use_src_attrs=True, dst_crs="EPSG:28992")
+    >>> c = imod.prepare.reproject(source=a, use_src_attrs=True, dst_crs="EPSG:28992")
 
     In case of a rotated ``source``, provide ``src_transform`` directly or ``use_src_attrs=True`` to rely on generated attributes:
 
     >>> rotated = rioxarray.open_rasterio("rotated_example.tif").squeeze("band")
-    >>> c = imod.rasterio.reproject(source=rotated, dst_crs="EPSG:28992", reproject_kwargs={"src_transform":affine.Affine(...)})
-    >>> c = imod.rasterio.reproject(source=rotated, dst_crs="EPSG:28992", use_src_attrs=True)
+    >>> c = imod.prepare.reproject(source=rotated, dst_crs="EPSG:28992", reproject_kwargs={"src_transform":affine.Affine(...)})
+    >>> c = imod.prepare.reproject(source=rotated, dst_crs="EPSG:28992", use_src_attrs=True)
     """
+
+    warnings.warn(
+        "imod.prepare.reproject is deprecated and will be removed in a future version.",
+        DeprecationWarning,
+    )
+
     # Make sure the rio accessor is avaible.
     import rioxarray  # noqa pylint: F401
 

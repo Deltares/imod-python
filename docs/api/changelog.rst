@@ -67,6 +67,7 @@ Changed
 - Deprecated :class:`imod.msw.Sprinkling` in favor of
   :class:`imod.msw.SprinklingGrid`. Call :class:`imod.msw.SprinklingGrid` to get
   the same behavior as you were used to.
+- :func:`imod.prepare.reproject` now throws a deprecation warning.
 - If ``states_for_boundary`` is provided to
   :meth:`imod.mf6.GroundwaterFlowModel.clip_box`, topsystem packages
   (:class:`imod.mf6.River`, :class:`imod.mf6.GeneralHeadBoundary`,
