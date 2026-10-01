@@ -139,7 +139,9 @@ def reproject(
     """
 
     warnings.warn(
-        "imod.prepare.reproject is deprecated and will be removed in a future version.",
+        "imod.prepare.reproject is deprecated and will be removed in a future "
+        "version. We advice to migrate code calling this function to use "
+        "rioxarray's 'reproject'",
         DeprecationWarning,
     )
 
