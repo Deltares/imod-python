@@ -1,6 +1,7 @@
 import datetime
 
 import numpy as np
+import pandas as pd
 import pytest
 import xarray as xr
 from pytest import approx
@@ -299,20 +300,81 @@ def test_open_subdomains_error(subdomains, expected, equidistant, tmp_path):
         idf.open_subdomains(tmp_path / "subdomains_*.idf")
 
 
+class TemporalCases:
+    def create_da(self, ntime):
+        nlayer, nrow, ncol = 3, 6, 8
+        dx = 1.0
+        dy = -1.0
+        xmin, xmax = 0.0, 8.0
+        ymin, ymax = 0.0, 6.0
+        layer = [1, 2, 3]
+
+        time = pd.date_range("2000-01-01", periods=ntime, freq="D")
+
+        kwargs = {"name": "temporal_data", "dims": ("time", "layer", "y", "x")}
+        kwargs["coords"] = util.spatial._xycoords((xmin, xmax, ymin, ymax), (dx, dy))
+        kwargs["coords"]["layer"] = layer
+        kwargs["coords"]["time"] = time
+        kwargs["data"] = np.ones((ntime, nlayer, nrow, ncol), dtype=np.float64)
+        return xr.DataArray(**kwargs).cumsum(dim="time")
+
+    def case_single_time(self):
+        ntime = 1
+        return self.create_da(ntime=ntime), ntime
+
+    def case_multiple_times(self):
+        ntime = 5
+        return self.create_da(ntime=ntime), ntime
+
+
 @parametrize_with_cases(
-    "subdomains,expected,equidistant", cases=SubdomainCases, has_tag="no_species"
+    "temporal_data,ntime", cases=TemporalCases
 )
-def test_open_by_time(subdomains, expected, equidistant, tmp_path):
-    _save_subdomains_no_species(subdomains, tmp_path)
+def test_open_by_time__with_pattern(temporal_data, ntime, tmp_path):
+    idf.save(tmp_path / "temporal_data", temporal_data)
 
     # Test with pattern
-    pattern = r"{name}_{time}_l{layer}_p000"
+    pattern = r"{name}_{time}_l{layer}"
 
-    da = idf.open_by_time(tmp_path / "subdomains_*_p000.idf", pattern=pattern)
+    da = idf.open_by_time(tmp_path / "temporal_data_*.idf", pattern=pattern)
 
     assert da.dims == ("time", "layer", "y", "x")
-    assert da.name == "subdomains"
-    assert da.chunks == ((1,), (da.sizes["layer"],), (da.sizes["y"],), (da.sizes["x"],))
+    assert da.name == "temporal_data"
+    assert da.sizes["layer"] == 3
+    assert da.sizes["y"] == 6
+    assert da.sizes["x"] == 8
+    assert da.sizes["time"] == ntime
+    time_chunk_shape = (1,) * ntime
+    assert da.chunks == (time_chunk_shape, (da.sizes["layer"],), (da.sizes["y"],), (da.sizes["x"],))
+
+    # Compute and see if no error is thrown
+    da = da.compute()
+
+    np.testing.assert_allclose(da, temporal_data)
+
+
+@parametrize_with_cases(
+    "temporal_data,ntime", cases=TemporalCases
+)
+def test_open_by_time__without_pattern(temporal_data, ntime, tmp_path):
+    idf.save(tmp_path / "temporal_data", temporal_data)
+
+    # Test without pattern
+    da = idf.open_by_time(tmp_path / "temporal_data_*.idf")
+
+    assert da.dims == ("time", "layer", "y", "x")
+    assert da.name == "temporal_data"
+    assert da.sizes["layer"] == 3
+    assert da.sizes["y"] == 6
+    assert da.sizes["x"] == 8
+    assert da.sizes["time"] == ntime
+    time_chunk_shape = (1,) * ntime
+    assert da.chunks == (time_chunk_shape, (da.sizes["layer"],), (da.sizes["y"],), (da.sizes["x"],))
+
+    # Compute and see if no error is thrown
+    da = da.compute()
+
+    np.testing.assert_allclose(da, temporal_data)
 
 
 def test_xycoords_equidistant():
