@@ -296,7 +296,7 @@ def _open_idf_data(
     use_cftime: bool,
     pattern: str | Pattern,
 ):
-    """Open IDF files and return as a DataArray."""
+    """Open IDF files and return as numpy array."""
     headers = [header(p, pattern) for p in paths]
     data, _, _, _ = array_io.reading.load_as_components(
         paths, use_cftime=use_cftime, _read=_read, headers=headers
@@ -388,11 +388,10 @@ def open_by_time(path, use_cftime=False, pattern=None):
     use_cftime : bool, optional
         Whether to use cftime for time coordinates.
     pattern : str, regex pattern, optional
-        If no pattern is provided, the function will first try:
-        "{name}_c{species}_{time}_l{layer}_p{subdomain}"
-        and if that fails:
-        "{name}_{time}_l{layer}_p{subdomain}"
-        Following the iMOD5/iMOD-WQ filename conventions.
+        If the filenames do match default naming conventions of
+        {name}_{time}_l{layer}, a custom pattern can be defined here either
+        as a string, or as a compiled regular expression pattern. See the
+        examples below.
 
     Returns
     -------
