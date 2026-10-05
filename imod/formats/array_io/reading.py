@@ -281,7 +281,32 @@ def _dask(path, attrs=None, pattern=None, _read=None, header=None):
 
 
 def load_as_components(paths, use_cftime, _read, headers):
-    """Combine a list of paths to IDFs to a single xarray.DataArray and return as components"""
+    """
+    Combine a list of paths to IDFs to components that can be used to construct
+    a single xarray.DataArray.
+
+    Parameters
+    ----------
+    paths : list[str]
+        List of file paths to IDF files.
+    use_cftime : bool
+        Whether to use cftime for time coordinates.
+    _read : Callable
+        Function to read individual IDF files.
+    headers : list[dict]
+        List of headers corresponding to each IDF file.
+
+    Returns
+    -------
+    dask.array
+        Dask array containing the combined data from all IDF files.
+    dict
+        Dictionary of coordinates for the DataArray.
+    list[str]
+        List of dimension names for the DataArray.
+    str
+        Name of the DataArray.
+    """
     # this function also works for single IDFs
     names = [h["name"] for h in headers]
     _all_equal(names, "names")
