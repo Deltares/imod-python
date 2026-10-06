@@ -568,10 +568,10 @@ def _create_dataarray_from_paths(
     factor = _get_array_transformation_parameters(headers, "factor", dim)
     addition = _get_array_transformation_parameters(headers, "addition", dim)
     da = _try_read_with_func(
-        imod.formats.array_io.reading._load,
+        imod.formats.idf.open_by_time,
         paths,
         use_cftime=False,
-        _read=imod.idf._read,
+        pattern=None,
         headers=headers,
     )
 
