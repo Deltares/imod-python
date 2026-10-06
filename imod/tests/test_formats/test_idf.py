@@ -327,9 +327,7 @@ class TemporalCases:
         return self.create_da(ntime=ntime), ntime
 
 
-@parametrize_with_cases(
-    "temporal_data,ntime", cases=TemporalCases
-)
+@parametrize_with_cases("temporal_data,ntime", cases=TemporalCases)
 def test_open_by_time__with_pattern(temporal_data, ntime, tmp_path):
     idf.save(tmp_path / "temporal_data", temporal_data)
 
@@ -345,7 +343,12 @@ def test_open_by_time__with_pattern(temporal_data, ntime, tmp_path):
     assert da.sizes["x"] == 8
     assert da.sizes["time"] == ntime
     time_chunk_shape = (1,) * ntime
-    assert da.chunks == (time_chunk_shape, (da.sizes["layer"],), (da.sizes["y"],), (da.sizes["x"],))
+    assert da.chunks == (
+        time_chunk_shape,
+        (da.sizes["layer"],),
+        (da.sizes["y"],),
+        (da.sizes["x"],),
+    )
 
     # Compute and see if no error is thrown
     da = da.compute()
@@ -353,9 +356,7 @@ def test_open_by_time__with_pattern(temporal_data, ntime, tmp_path):
     np.testing.assert_allclose(da, temporal_data)
 
 
-@parametrize_with_cases(
-    "temporal_data,ntime", cases=TemporalCases
-)
+@parametrize_with_cases("temporal_data,ntime", cases=TemporalCases)
 def test_open_by_time__without_pattern(temporal_data, ntime, tmp_path):
     idf.save(tmp_path / "temporal_data", temporal_data)
 
@@ -369,7 +370,12 @@ def test_open_by_time__without_pattern(temporal_data, ntime, tmp_path):
     assert da.sizes["x"] == 8
     assert da.sizes["time"] == ntime
     time_chunk_shape = (1,) * ntime
-    assert da.chunks == (time_chunk_shape, (da.sizes["layer"],), (da.sizes["y"],), (da.sizes["x"],))
+    assert da.chunks == (
+        time_chunk_shape,
+        (da.sizes["layer"],),
+        (da.sizes["y"],),
+        (da.sizes["x"],),
+    )
 
     # Compute and see if no error is thrown
     da = da.compute()
