@@ -364,7 +364,7 @@ def _load(paths, use_cftime, _read, headers):
     return out
 
 
-def _open(path, use_cftime, pattern, header, _read):
+def handle_path(path: pathlib.Path | str | list[pathlib.Path]) -> list[pathlib.Path]:
     if isinstance(path, pathlib.Path):
         path = str(path)
 
@@ -373,8 +373,16 @@ def _open(path, use_cftime, pattern, header, _read):
     else:
         paths = [pathlib.Path(p) for p in glob.glob(path)]
 
-    headers = [header(p, pattern) for p in paths]
     n = len(paths)
     if n == 0:
         raise FileNotFoundError(f"Could not find any files matching {path}")
+
+    return paths
+
+
+def _open(path, use_cftime, pattern, header, _read):
+    paths = handle_path(path)
+
+    headers = [header(p, pattern) for p in paths]
+
     return _load(paths, use_cftime, _read, headers)

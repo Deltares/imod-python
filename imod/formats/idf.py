@@ -399,7 +399,7 @@ def open_by_time(path, use_cftime=False, pattern=None):
 
     """
 
-    paths = sorted(glob.glob(str(path)))
+    paths = array_io.reading.handle_path(path)
     parsed = [imod.util.path.decompose(path, pattern) for path in paths]
 
     has_time = "time" in parsed[0]
@@ -442,8 +442,8 @@ def open_subdomains(
 
     Parameters
     ----------
-    path : str or Path
-        Global path.
+    path : str, Path or list
+        Global path or list of paths to open.
     use_cftime : bool, optional
     pattern : str, regex pattern, optional
         If no pattern is provided, the function will first try:
@@ -461,8 +461,7 @@ def open_subdomains(
     # merges the subdomains into one DataArray, in a delayed manner, chunked per
     # timestep. A lot of logic in this function is about grouping the files by
     # subdomain and time, and setting the right time coordinate again.
-
-    paths = sorted(glob.glob(str(path)))
+    paths = array_io.reading.handle_path(path)
 
     if pattern is None:
         # If no pattern provided test if
