@@ -334,7 +334,7 @@ def test_open_by_time__with_pattern(temporal_data, ntime, tmp_path):
     # Test with pattern
     pattern = r"{name}_{time}_l{layer}"
 
-    da = idf.open_by_time(tmp_path / "temporal_data_*.idf", pattern=pattern)
+    da = idf.open_chunked_by_time(tmp_path / "temporal_data_*.idf", pattern=pattern)
 
     assert da.dims == ("time", "layer", "y", "x")
     assert da.name == "temporal_data"
@@ -361,7 +361,7 @@ def test_open_by_time__without_pattern(temporal_data, ntime, tmp_path):
     idf.save(tmp_path / "temporal_data", temporal_data)
 
     # Test without pattern
-    da = idf.open_by_time(tmp_path / "temporal_data_*.idf")
+    da = idf.open_chunked_by_time(tmp_path / "temporal_data_*.idf")
 
     assert da.dims == ("time", "layer", "y", "x")
     assert da.name == "temporal_data"

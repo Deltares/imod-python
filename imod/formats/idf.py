@@ -393,7 +393,7 @@ def _open_idf_chunked_by_time(
     return xr.DataArray(data, coords, dims, name=template.name, attrs=template.attrs)
 
 
-def open_by_time(path, use_cftime=False, pattern=None, headers=None):
+def open_chunked_by_time(path, use_cftime=False, pattern=None, headers=None):
     """
     Open IDF files grouped by time.
 
