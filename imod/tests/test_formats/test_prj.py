@@ -593,6 +593,26 @@ class TestProjectFile:
         assert isinstance(content["pcg"], dict)
         assert set(repeats["rch"]) == {datetime(1899, 4, 1), datetime(1899, 10, 1)}
 
+        # Test if chunking of topsystem IDF data went correctly, should be
+        # chunked per timestep and have only 1 layer.
+        assert content["ghb"]["conductance"].shape == (3, 1, 2, 2)
+        assert content["ghb"]["conductance"].chunksizes["time"] == (1, 1, 1)
+        assert content["ghb"]["conductance"].chunksizes["layer"] == (1,)
+        assert content["ghb"]["conductance"].chunksizes["x"] == (2,)
+        assert content["ghb"]["conductance"].chunksizes["y"] == (2,)
+        # Load the data to ensure that dask arrays are correctly formed and
+        # can be evaluated.
+        content["ghb"]["conductance"].load()
+    
+        # Test if chunking BND data is expected, should be one chunk including
+        # the two layers.
+        assert content["bnd"]["ibound"].shape == (2, 2, 2)
+        assert content["bnd"]["ibound"].chunksizes["layer"] == (2,)
+        assert content["bnd"]["ibound"].chunksizes["x"] == (2,)
+        assert content["bnd"]["ibound"].chunksizes["y"] == (2,)
+        content["bnd"]["ibound"].load()
+
+
     def test_open_projectfile_data__faulty_well(self, projectfile):
         basepath = self.basepath
         # Setup faulty well
