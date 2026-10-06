@@ -364,7 +364,9 @@ def _load(paths, use_cftime, _read, headers):
     return out
 
 
-def handle_path(path: pathlib.Path | str | list[pathlib.Path]) -> list[pathlib.Path]:
+def handle_path(
+    path: pathlib.Path | str | list[pathlib.Path | str],
+) -> list[pathlib.Path]:
     """
     Handle a path input and return a list of pathlib.Path objects.
 

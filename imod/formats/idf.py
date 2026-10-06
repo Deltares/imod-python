@@ -12,12 +12,13 @@ from collections import defaultdict
 from collections.abc import Iterable
 from pathlib import Path
 from re import Pattern
-from typing import Any, Callable, DefaultDict
+from typing import Any, Callable, DefaultDict, Sequence, TypeAlias
 
 import dask
 import dask.array
 import numpy as np
 import xarray as xr
+from numpy.typing import DTypeLike
 
 import imod
 from imod.formats import array_io
@@ -26,8 +27,11 @@ from imod.typing.structured import merge_partitions_as_da_components
 # Make sure we can still use the built-in function...
 f_open = open
 
+PatternType: TypeAlias = Pattern[str] | str
+PathType: TypeAlias = str | Path
 
-def header(path: str | pathlib.Path, pattern: Pattern | str) -> dict[str, Any]:
+
+def header(path: PathType, pattern: PatternType | None) -> dict[str, Any]:
     """Read the IDF header information into a dictionary"""
     attrs = imod.util.path.decompose(path, pattern)
     with f_open(path, "rb") as f:
@@ -105,7 +109,14 @@ def header(path: str | pathlib.Path, pattern: Pattern | str) -> dict[str, Any]:
     return attrs
 
 
-def _read(path, headersize, nrow, ncol, nodata, dtype):
+def _read(
+    path: PathType,
+    headersize: int,
+    nrow: int,
+    ncol: int,
+    nodata: float,
+    dtype: DTypeLike,
+):
     """
     Read a single IDF file to a numpy.ndarray
 
@@ -133,7 +144,11 @@ def _read(path, headersize, nrow, ncol, nodata, dtype):
 
 
 # Open IDFs for multiple times and/or layers into one DataArray
-def open(path, use_cftime=False, pattern=None):
+def open(
+    path: PathType | list[PathType],
+    use_cftime=False,
+    pattern: PatternType | None = None,
+):
     r"""
     Open one or more IDF files as an xarray.DataArray.
 
@@ -223,9 +238,9 @@ def _more_than_one_unique_value(values: Iterable[Any]):
 
 
 def _merge_subdomains(
-    paths_per_subdomain: DefaultDict[Any, list[str]],
+    paths_per_subdomain: DefaultDict[Any, list[PathType]],
     use_cftime: bool,
-    pattern: str | Pattern,
+    pattern: PatternType | None,
 ):
     """
     Open and spatially merge all subdomain IDF files for one timestep.
@@ -244,9 +259,9 @@ def _merge_subdomains(
 
 
 def _merge_subdomains_values(
-    paths_per_subdomain: DefaultDict[Any, list[str]],
+    paths_per_subdomain: DefaultDict[Any, list[PathType]],
     use_cftime: bool,
-    pattern: str | Pattern,
+    pattern: PatternType,
 ):
     """Wraps ``_merge_subdomains`` to return just a numpy array for ``dask.array.from_delayed``."""
     data, _, _, _ = _merge_subdomains(paths_per_subdomain, use_cftime, pattern)
@@ -254,9 +269,9 @@ def _merge_subdomains_values(
 
 
 def _merge_subdomains_to_dataarray(
-    paths_per_subdomain: DefaultDict[Any, list[str]],
+    paths_per_subdomain: DefaultDict[Any, list[PathType]],
     use_cftime: bool,
-    pattern: str | Pattern,
+    pattern: PatternType,
 ) -> xr.DataArray:
     """Wraps ``_merge_subdomains`` to return a DataArray for coordinate template."""
     data, coords, dims, name = _merge_subdomains(
@@ -271,7 +286,7 @@ def _merge_subdomains_to_dataarray(
 
 
 def check_subdomain_consistency(
-    parsed: list[dict[str, Any]], paths: list[str], pattern: str | Pattern
+    parsed: list[dict[str, Any]], paths: Sequence[PathType], pattern: PatternType
 ):
     """Check that each subdomain has the same number of IDF files."""
     grouped = defaultdict(list)
@@ -307,7 +322,7 @@ def _open_idf_data_from_group(
 
 
 def _open_idf_from_group(
-    group: tuple[list[str], list[dict[str, Any]]],
+    group: tuple[list[PathType], list[dict[str, Any]]],
     use_cftime: bool,
 ) -> xr.DataArray:
     """Open IDF files and return a DataArray template with header-derived dims/coords."""
@@ -321,7 +336,7 @@ def _open_idf_from_group(
 
 
 def _open_idf_chunked_by_time(
-    open_func: Callable,
+    open_func: Callable[..., Any],
     grouped_by_time: dict[Any, Any],
     template: xr.DataArray,
     has_time: bool,
@@ -384,6 +399,7 @@ def _open_idf_chunked_by_time(
     # Build the full time coordinate
     coords = dict(template.coords)
     if has_time:
+        time_coord: xr.CFTimeIndex | np.ndarray
         if use_cftime:
             time_coord = xr.CFTimeIndex(converted_times)
         else:
@@ -393,14 +409,19 @@ def _open_idf_chunked_by_time(
     return xr.DataArray(data, coords, dims, name=template.name, attrs=template.attrs)
 
 
-def open_chunked_by_time(path, use_cftime=False, pattern=None, headers=None):
+def open_chunked_by_time(
+    path: PathType | list[PathType],
+    use_cftime: bool = False,
+    pattern: PatternType | None = None,
+    headers: list[dict[str, Any]] | None = None,
+):
     """
-    Open IDF files grouped by time.
+    Open IDF files chunked by time.
 
     Parameters
     ----------
-    path : str or Path
-        Global path.
+    path : str or Path or list of str or Path
+        Global path(s).
     use_cftime : bool, optional
         Whether to use cftime for time coordinates.
     pattern : str, regex pattern, optional
@@ -426,8 +447,8 @@ def open_chunked_by_time(path, use_cftime=False, pattern=None, headers=None):
     # Prefer header metadata for grouping and template construction.
     has_time = "time" in headers[0].get("dims", [])
 
-    grouped_paths_by_time: DefaultDict[Any, list] = defaultdict(list)
-    grouped_headers_by_time: DefaultDict[Any, list] = defaultdict(list)
+    grouped_paths_by_time: DefaultDict[Any, list[PathType]] = defaultdict(list)
+    grouped_headers_by_time: DefaultDict[Any, list[dict[str, Any]]] = defaultdict(list)
     for p, h in zip(paths, headers):
         if has_time:
             time_key = h["time"]
@@ -440,7 +461,10 @@ def open_chunked_by_time(path, use_cftime=False, pattern=None, headers=None):
 
     raw_times_sorted = sorted(grouped_paths_by_time.keys())
 
-    grouped_by_time: dict[Any, tuple[list[str], list[dict[str, Any]]]] = {
+    grouped_by_time: dict[
+        Any,
+        tuple[list[PathType], list[dict[str, Any]]],
+    ] = {
         key: (grouped_paths_by_time[key], grouped_headers_by_time[key])
         for key in raw_times_sorted
     }
@@ -461,14 +485,16 @@ def open_chunked_by_time(path, use_cftime=False, pattern=None, headers=None):
 
 
 def open_subdomains(
-    path: str | Path, use_cftime: bool = False, pattern: str | Pattern = None
+    path: PathType | list[PathType],
+    use_cftime: bool = False,
+    pattern: PatternType | None = None,
 ) -> xr.DataArray:
     """
     Combine IDF files of multiple subdomains.
 
     Parameters
     ----------
-    path : str, Path or list
+    path : PathType or list of PathType
         Global path or list of paths to open.
     use_cftime : bool, optional
     pattern : str, regex pattern, optional
@@ -504,7 +530,7 @@ def open_subdomains(
 
     # Group by time (datetime.datetime from decompose), then by subdomain.
     # Each delayed task processes one timestep, keeping the outer graph at O(n_time).
-    grouped_by_time: DefaultDict[Any, DefaultDict[Any, list]] = defaultdict(
+    grouped_by_time: DefaultDict[Any, DefaultDict[Any, list[PathType]]] = defaultdict(
         lambda: defaultdict(list)
     )
 
@@ -541,7 +567,11 @@ def open_subdomains(
     )
 
 
-def open_dataset(globpath, use_cftime=False, pattern=None):
+def open_dataset(
+    globpath: str | pathlib.Path,
+    use_cftime: bool = False,
+    pattern: PatternType | None = None,
+):
     """
     Open a set of IDFs to a dict of xarray.DataArrays.
 
@@ -590,7 +620,7 @@ def open_dataset(globpath, use_cftime=False, pattern=None):
     # group the DataArrays together using their name
     # note that directory names are ignored, and in case of duplicates, the last one wins
     names = [imod.util.path.decompose(path, pattern)["name"] for path in paths]
-    paths_by_name = {name: [] for name in np.unique(names)}
+    paths_by_name: dict[str, list[PathType]] = {name: [] for name in np.unique(names)}
     for path, name in zip(paths, names, strict=True):
         paths_by_name[name].append(path)
     # load each group into a DataArray
@@ -615,7 +645,12 @@ def open_dataset(globpath, use_cftime=False, pattern=None):
     return dataset_dict
 
 
-def write(path, a, nodata=1.0e20, dtype=np.float32):
+def write(
+    path: PathType,
+    a: xr.DataArray,
+    nodata: float = 1.0e20,
+    dtype: DTypeLike = np.float32,
+):
     """
     Write a 2D xarray.DataArray to a IDF file
 
@@ -725,7 +760,7 @@ def write(path, a, nodata=1.0e20, dtype=np.float32):
         a.values.tofile(f)
 
 
-def _as_voxeldata(a):
+def _as_voxeldata(a: xr.DataArray):
     """
     If "z" is present as a dimension, generate layer if necessary. Ensure that
     layer is the dimension (via swap_dims). Infer "dz" if necessary, and if
@@ -772,7 +807,13 @@ def _as_voxeldata(a):
     return a
 
 
-def save(path, a, nodata=1.0e20, pattern=None, dtype=np.float32):
+def save(
+    path: PathType,
+    a: xr.DataArray,
+    nodata: float = 1.0e20,
+    pattern: PatternType | None = None,
+    dtype: DTypeLike = np.float32,
+):
     """
     Write a xarray.DataArray to one or more IDF files
 
