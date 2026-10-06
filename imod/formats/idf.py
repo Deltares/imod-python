@@ -290,6 +290,7 @@ def check_subdomain_consistency(
             f"Each subdomain must have the same number of IDF files, found: {n_idf_per_subdomain}"
         )
 
+
 def _open_idf_data_from_group(
     group: tuple[list[str], list[dict[str, Any]]],
     use_cftime: bool,

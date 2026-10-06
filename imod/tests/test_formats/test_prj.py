@@ -603,7 +603,7 @@ class TestProjectFile:
         # Load the data to ensure that dask arrays are correctly formed and
         # can be evaluated.
         content["ghb"]["conductance"].load()
-    
+
         # Test if chunking BND data is expected, should be one chunk including
         # the two layers.
         assert content["bnd"]["ibound"].shape == (2, 2, 2)
@@ -611,7 +611,6 @@ class TestProjectFile:
         assert content["bnd"]["ibound"].chunksizes["x"] == (2,)
         assert content["bnd"]["ibound"].chunksizes["y"] == (2,)
         content["bnd"]["ibound"].load()
-
 
     def test_open_projectfile_data__faulty_well(self, projectfile):
         basepath = self.basepath
