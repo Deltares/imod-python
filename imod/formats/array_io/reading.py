@@ -365,6 +365,24 @@ def _load(paths, use_cftime, _read, headers):
 
 
 def handle_path(path: pathlib.Path | str | list[pathlib.Path]) -> list[pathlib.Path]:
+    """
+    Handle a path input and return a list of pathlib.Path objects.
+
+    Parameters
+    ----------
+    path : pathlib.Path, str, or list of pathlib.Path
+        The input path(s) to handle.
+
+    Returns
+    -------
+    list[pathlib.Path]
+        List of pathlib.Path objects corresponding to the input path(s).
+
+    Raises
+    ------
+    FileNotFoundError
+        If no files matching the input path(s) are found.
+    """
     if isinstance(path, pathlib.Path):
         path = str(path)
 
