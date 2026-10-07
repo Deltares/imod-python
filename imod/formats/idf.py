@@ -519,7 +519,7 @@ def open_subdomains(
         # If no pattern provided test if
         pattern = "{name}_c{species}_{time}_l{layer}_p{subdomain}"
         re_pattern_species = imod.util.path._custom_pattern_to_regex_pattern(pattern)
-        has_species = re_pattern_species.search(paths[0])
+        has_species = re_pattern_species.search(str(paths[0]))
         if not has_species:
             pattern = "{name}_{time}_l{layer}_p{subdomain}"
 
