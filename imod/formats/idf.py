@@ -12,12 +12,13 @@ from collections import defaultdict
 from collections.abc import Iterable
 from pathlib import Path
 from re import Pattern
-from typing import Any, DefaultDict
+from typing import Any, Callable, DefaultDict, Sequence, TypeAlias
 
 import dask
 import dask.array
 import numpy as np
 import xarray as xr
+from numpy.typing import DTypeLike
 
 import imod
 from imod.formats import array_io
@@ -26,8 +27,11 @@ from imod.typing.structured import merge_partitions_as_da_components
 # Make sure we can still use the built-in function...
 f_open = open
 
+PatternType: TypeAlias = Pattern[str] | str
+PathType: TypeAlias = str | Path
 
-def header(path, pattern):
+
+def header(path: PathType, pattern: PatternType | None) -> dict[str, Any]:
     """Read the IDF header information into a dictionary"""
     attrs = imod.util.path.decompose(path, pattern)
     with f_open(path, "rb") as f:
@@ -105,7 +109,14 @@ def header(path, pattern):
     return attrs
 
 
-def _read(path, headersize, nrow, ncol, nodata, dtype):
+def _read(
+    path: PathType,
+    headersize: int,
+    nrow: int,
+    ncol: int,
+    nodata: float,
+    dtype: DTypeLike,
+):
     """
     Read a single IDF file to a numpy.ndarray
 
@@ -133,7 +144,11 @@ def _read(path, headersize, nrow, ncol, nodata, dtype):
 
 
 # Open IDFs for multiple times and/or layers into one DataArray
-def open(path, use_cftime=False, pattern=None):
+def open(
+    path: PathType | list[PathType],
+    use_cftime=False,
+    pattern: PatternType | None = None,
+):
     r"""
     Open one or more IDF files as an xarray.DataArray.
 
@@ -223,9 +238,9 @@ def _more_than_one_unique_value(values: Iterable[Any]):
 
 
 def _merge_subdomains(
-    paths_per_subdomain: DefaultDict[Any, list[str]],
+    paths_per_subdomain: DefaultDict[Any, list[PathType]],
     use_cftime: bool,
-    pattern: str | Pattern,
+    pattern: PatternType | None,
 ):
     """
     Open and spatially merge all subdomain IDF files for one timestep.
@@ -244,19 +259,24 @@ def _merge_subdomains(
 
 
 def _merge_subdomains_values(
-    paths_per_subdomain: DefaultDict[Any, list[str]],
+    paths_per_subdomain: DefaultDict[Any, list[PathType]],
     use_cftime: bool,
-    pattern: str | Pattern,
-):
+    pattern: PatternType,
+) -> np.ndarray:
     """Wraps ``_merge_subdomains`` to return just a numpy array for ``dask.array.from_delayed``."""
     data, _, _, _ = _merge_subdomains(paths_per_subdomain, use_cftime, pattern)
+    # ``from_delayed`` expects each task to resolve to a concrete ndarray chunk.
+    # Returning a dask array here creates nested lazy arrays, which can leak
+    # ``dask.array.Array`` values into downstream numba-compiled code paths.
+    if isinstance(data, dask.array.Array):
+        data = data.compute()
     return data
 
 
 def _merge_subdomains_to_dataarray(
-    paths_per_subdomain: DefaultDict[Any, list[str]],
+    paths_per_subdomain: DefaultDict[Any, list[PathType]],
     use_cftime: bool,
-    pattern: str | Pattern,
+    pattern: PatternType,
 ) -> xr.DataArray:
     """Wraps ``_merge_subdomains`` to return a DataArray for coordinate template."""
     data, coords, dims, name = _merge_subdomains(
@@ -271,7 +291,7 @@ def _merge_subdomains_to_dataarray(
 
 
 def check_subdomain_consistency(
-    parsed: list[dict[str, Any]], paths: list[str], pattern: str | Pattern
+    parsed: list[dict[str, Any]], paths: Sequence[PathType], pattern: PatternType
 ):
     """Check that each subdomain has the same number of IDF files."""
     grouped = defaultdict(list)
@@ -291,16 +311,201 @@ def check_subdomain_consistency(
         )
 
 
+def _open_idf_data_from_group(
+    group: tuple[list[str], list[dict[str, Any]]],
+    use_cftime: bool,
+) -> np.ndarray:
+    """Open IDF files from a group and return as numpy array."""
+    group_paths, group_headers = group
+    # load_as_components mutates header dictionaries while preparing lazy reads.
+    # Copy to keep repeated/template reads safe.
+    headers = [h.copy() for h in group_headers]
+    data, _, _, _ = array_io.reading.load_as_components(
+        group_paths, use_cftime=use_cftime, _read=_read, headers=headers
+    )
+    # ``from_delayed`` expects each task to resolve to a concrete ndarray chunk.
+    # Returning a dask array here creates nested lazy arrays, which can leak
+    # ``dask.array.Array`` values into downstream numba-compiled code paths.
+    if isinstance(data, dask.array.Array):
+        data = data.compute()
+    return data
+
+
+def _open_idf_from_group(
+    group: tuple[list[PathType], list[dict[str, Any]]],
+    use_cftime: bool,
+) -> xr.DataArray:
+    """Open IDF files and return a DataArray template with header-derived dims/coords."""
+    # load_as_components mutates header dictionaries while preparing lazy reads.
+    group_paths, group_headers = group
+    group_headers = [h.copy() for h in group_headers]
+    data, coords, dims, name = array_io.reading.load_as_components(
+        group_paths, use_cftime=use_cftime, _read=_read, headers=group_headers
+    )
+    return xr.DataArray(data, coords, dims, name=name)
+
+
+def _open_idf_chunked_by_time(
+    open_func: Callable[..., Any],
+    grouped_by_time: dict[Any, Any],
+    template: xr.DataArray,
+    has_time: bool,
+    use_cftime: bool,
+    *args,
+):
+    """
+    Open IDF files chunked by time using a template DataArray.
+
+    Parameters
+    ----------
+    open_func : Callable
+        Function to open individual IDF files. Needs to have group, use_cftime,
+        pattern as arguments. Needs to return dask array as data.
+    grouped_by_time : dict[Any, Any]
+        Dictionary grouping file paths by time.
+    template : xr.DataArray
+        Template DataArray to define the shape, dims, and coords.
+    has_time : bool
+        Whether the data has a time dimension.
+    use_cftime : bool
+        Whether to use cftime for time coordinates.
+    *args : tuple
+        Additional arguments to pass to the open_func.
+
+    Returns
+    -------
+    xr.DataArray
+        Combined DataArray with data from all subdomains, chunked by time.
+
+
+    """
+    shape = template.shape  # e.g. (1, nlayer, nrow, ncol)
+    dims = template.dims  # e.g. ("time", "layer", "y", "x")
+    dtype = template.dtype
+    if has_time:
+        time_axis = list(dims).index("time")
+    else:
+        time_axis = -1  # steady-state, no time dimension
+
+    # Sort and convert times before calling _merge_subdomains so that
+    # use_cftime is already correct when the template is built.
+    raw_times_sorted = sorted(grouped_by_time.keys())
+    converted_times, use_cftime = imod.util.time._convert_datetimes(
+        raw_times_sorted, use_cftime
+    )
+
+    # Delayed tasks for each timestep, which will be concatenated into a single
+    # dask array. One delayed task per timestep → outer graph depth 3, O(n_time)
+    # tasks
+    dask_arrays = []
+    for time_key in raw_times_sorted:
+        group = grouped_by_time[time_key]
+        timestep_data = dask.delayed(open_func)(group, use_cftime, *args)
+        dask_arrays.append(
+            dask.array.from_delayed(timestep_data, shape=shape, dtype=dtype)
+        )
+    data = dask.array.concatenate(dask_arrays, axis=time_axis)
+
+    # Build the full time coordinate
+    coords = dict(template.coords)
+    if has_time:
+        time_coord: xr.CFTimeIndex | np.ndarray
+        if use_cftime:
+            time_coord = xr.CFTimeIndex(converted_times)
+        else:
+            time_coord = np.array(converted_times, dtype="datetime64[ns]")
+        coords["time"] = time_coord
+
+    return xr.DataArray(data, coords, dims, name=template.name, attrs=template.attrs)
+
+
+def open_chunked_by_time(
+    path: PathType | list[PathType],
+    use_cftime: bool = False,
+    pattern: PatternType | None = None,
+    headers: list[dict[str, Any]] | None = None,
+):
+    """
+    Open IDF files chunked by time.
+
+    Parameters
+    ----------
+    path : str or Path or list of str or Path
+        Global path(s).
+    use_cftime : bool, optional
+        Whether to use cftime for time coordinates.
+    pattern : str, regex pattern, optional
+        If the filenames do match default naming conventions of
+        {name}_{time}_l{layer}, a custom pattern can be defined here either
+        as a string, or as a compiled regular expression pattern. See the
+        examples below.
+    headers:  list, optional
+        List of headers. Can be provided to avoid re-reading headers from the
+        files.
+
+    Returns
+    -------
+    xarray.DataArray
+
+    """
+    paths = array_io.reading.handle_path(path)
+    if headers is None:
+        headers = [header(p, pattern) for p in paths]
+
+    # If headers were supplied by the caller, they may already contain
+    # dimensions like time/layer that are absent in the filename itself.
+    # Prefer header metadata for grouping and template construction.
+    has_time = "time" in headers[0].get("dims", [])
+
+    grouped_paths_by_time: DefaultDict[Any, list[PathType]] = defaultdict(list)
+    grouped_headers_by_time: DefaultDict[Any, list[dict[str, Any]]] = defaultdict(list)
+    for p, h in zip(paths, headers):
+        if has_time:
+            time_key = h["time"]
+        else:
+            # Work around for files without time dimension
+            # (imod.util.time._convert_datetimes special-cases this string)
+            time_key = "steady-state"
+        grouped_paths_by_time[time_key].append(p)
+        grouped_headers_by_time[time_key].append(h)
+
+    raw_times_sorted = sorted(grouped_paths_by_time.keys())
+
+    grouped_by_time: dict[
+        Any,
+        tuple[list[PathType], list[dict[str, Any]]],
+    ] = {
+        key: (grouped_paths_by_time[key], grouped_headers_by_time[key])
+        for key in raw_times_sorted
+    }
+
+    first_time_key = raw_times_sorted[0]
+    template = _open_idf_from_group(
+        grouped_by_time[first_time_key],
+        use_cftime=use_cftime,
+    )
+
+    return _open_idf_chunked_by_time(
+        _open_idf_data_from_group,
+        grouped_by_time,
+        template,
+        has_time,
+        use_cftime,
+    )
+
+
 def open_subdomains(
-    path: str | Path, use_cftime: bool = False, pattern: str | Pattern = None
+    path: PathType | list[PathType],
+    use_cftime: bool = False,
+    pattern: PatternType | None = None,
 ) -> xr.DataArray:
     """
     Combine IDF files of multiple subdomains.
 
     Parameters
     ----------
-    path : str or Path
-        Global path.
+    path : PathType or list of PathType
+        Global path or list of paths to open.
     use_cftime : bool, optional
     pattern : str, regex pattern, optional
         If no pattern is provided, the function will first try:
@@ -318,14 +523,13 @@ def open_subdomains(
     # merges the subdomains into one DataArray, in a delayed manner, chunked per
     # timestep. A lot of logic in this function is about grouping the files by
     # subdomain and time, and setting the right time coordinate again.
-
-    paths = sorted(glob.glob(str(path)))
+    paths = array_io.reading.handle_path(path)
 
     if pattern is None:
         # If no pattern provided test if
         pattern = "{name}_c{species}_{time}_l{layer}_p{subdomain}"
         re_pattern_species = imod.util.path._custom_pattern_to_regex_pattern(pattern)
-        has_species = re_pattern_species.search(paths[0])
+        has_species = re_pattern_species.search(str(paths[0]))
         if not has_species:
             pattern = "{name}_{time}_l{layer}_p{subdomain}"
 
@@ -336,7 +540,7 @@ def open_subdomains(
 
     # Group by time (datetime.datetime from decompose), then by subdomain.
     # Each delayed task processes one timestep, keeping the outer graph at O(n_time).
-    grouped_by_time: DefaultDict[Any, DefaultDict[Any, list]] = defaultdict(
+    grouped_by_time: DefaultDict[Any, DefaultDict[Any, list[PathType]]] = defaultdict(
         lambda: defaultdict(list)
     )
 
@@ -352,9 +556,6 @@ def open_subdomains(
     # Sort and convert times before calling _merge_subdomains so that
     # use_cftime is already correct when the template is built.
     raw_times_sorted = sorted(grouped_by_time.keys())
-    converted_times, use_cftime = imod.util.time._convert_datetimes(
-        raw_times_sorted, use_cftime
-    )
 
     # Call _merge_subdomains eagerly for the first timestep to obtain a
     # coordinate template. No data is computed — only the coordinate arrays
@@ -363,40 +564,24 @@ def open_subdomains(
     template = _merge_subdomains_to_dataarray(
         grouped_by_time[first_time_key], use_cftime, pattern
     )
+    # Collect additional arguments to pass to the open function.
+    args_for_func = (pattern,)
 
-    shape = template.shape  # e.g. (1, nlayer, nrow, ncol)
-    dims = template.dims  # e.g. ("time", "layer", "y", "x")
-    dtype = template.dtype
-    if has_time:
-        time_axis = list(dims).index("time")
-    else:
-        time_axis = -1  # steady-state, no time dimension
-
-    # Delayed tasks for each timestep, which will be concatenated into a single
-    # dask array. One delayed task per timestep → outer graph depth 3, O(n_time)
-    # tasks
-    merged = []
-    for time_key in raw_times_sorted:
-        group = grouped_by_time[time_key]
-        timestep_data = dask.delayed(_merge_subdomains_values)(
-            group, use_cftime, pattern
-        )
-        merged.append(dask.array.from_delayed(timestep_data, shape=shape, dtype=dtype))
-    data = dask.array.concatenate(merged, axis=time_axis)
-
-    # Build the full time coordinate
-    coords = dict(template.coords)
-    if has_time:
-        if use_cftime:
-            time_coord = xr.CFTimeIndex(converted_times)
-        else:
-            time_coord = np.array(converted_times, dtype="datetime64[ns]")
-        coords["time"] = time_coord
-
-    return xr.DataArray(data, coords, dims, name=template.name, attrs=template.attrs)
+    return _open_idf_chunked_by_time(
+        _merge_subdomains_values,
+        grouped_by_time,
+        template,
+        has_time,
+        use_cftime,
+        *args_for_func,
+    )
 
 
-def open_dataset(globpath, use_cftime=False, pattern=None):
+def open_dataset(
+    globpath: str | pathlib.Path,
+    use_cftime: bool = False,
+    pattern: PatternType | None = None,
+):
     """
     Open a set of IDFs to a dict of xarray.DataArrays.
 
@@ -445,7 +630,7 @@ def open_dataset(globpath, use_cftime=False, pattern=None):
     # group the DataArrays together using their name
     # note that directory names are ignored, and in case of duplicates, the last one wins
     names = [imod.util.path.decompose(path, pattern)["name"] for path in paths]
-    paths_by_name = {name: [] for name in np.unique(names)}
+    paths_by_name: dict[str, list[PathType]] = {name: [] for name in np.unique(names)}
     for path, name in zip(paths, names, strict=True):
         paths_by_name[name].append(path)
     # load each group into a DataArray
@@ -470,7 +655,12 @@ def open_dataset(globpath, use_cftime=False, pattern=None):
     return dataset_dict
 
 
-def write(path, a, nodata=1.0e20, dtype=np.float32):
+def write(
+    path: PathType,
+    a: xr.DataArray,
+    nodata: float = 1.0e20,
+    dtype: DTypeLike = np.float32,
+):
     """
     Write a 2D xarray.DataArray to a IDF file
 
@@ -580,7 +770,7 @@ def write(path, a, nodata=1.0e20, dtype=np.float32):
         a.values.tofile(f)
 
 
-def _as_voxeldata(a):
+def _as_voxeldata(a: xr.DataArray):
     """
     If "z" is present as a dimension, generate layer if necessary. Ensure that
     layer is the dimension (via swap_dims). Infer "dz" if necessary, and if
@@ -627,7 +817,13 @@ def _as_voxeldata(a):
     return a
 
 
-def save(path, a, nodata=1.0e20, pattern=None, dtype=np.float32):
+def save(
+    path: PathType,
+    a: xr.DataArray,
+    nodata: float = 1.0e20,
+    pattern: PatternType | None = None,
+    dtype: DTypeLike = np.float32,
+):
     """
     Write a xarray.DataArray to one or more IDF files
 

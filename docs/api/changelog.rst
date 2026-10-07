@@ -73,6 +73,9 @@ Changed
   (:class:`imod.mf6.River`, :class:`imod.mf6.GeneralHeadBoundary`,
   :class:`imod.mf6.Drainage`, :class:`imod.mf6.Recharge`) will also be masked
   where constant head cells are placed. 
+- :func:`imod.formats.prj.open_projectfile_data` now chunks the data by time
+  only instead of by both time and layer. This should enhance performance when
+  working with large datasets.
 
 [1.1.0] - 2026-08-03
 --------------------
