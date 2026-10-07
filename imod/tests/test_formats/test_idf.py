@@ -638,3 +638,59 @@ def test_open_subdomains_large_scale(tmp_path):
     assert result.sizes["x"] == grid_cols * ncol
     assert result.values.dtype == np.float32
     assert np.all(result.values == 1.0)
+
+
+@pytest.mark.timeout(600, method="thread")  # 10 minutes
+@pytest.mark.user_acceptance
+def test_open_chunked_by_time_large_scale(tmp_path):
+    """
+    Test the performance and correctness of opening large-scale IDF files
+    chunked by time.
+    """
+    n_layers = 40
+    n_times = 800
+    nrow, ncol = 20, 20  # cells per subdomain
+    dx, dy = 1.0, -1.0
+
+    assert n_layers * n_times == 32_000
+
+    # Generate 50 daily timesteps starting 2000-01-01
+    start = datetime.date(2000, 1, 1)
+    date_strs = [
+        (start + datetime.timedelta(days=i)).strftime("%Y%m%d") for i in range(n_times)
+    ]
+    # Create the DataArray for each timestep
+    data = np.ones((nrow, ncol), dtype=np.float32)
+    xmin, xmax = 0, ncol * dx
+    ymin, ymax = 0, nrow * abs(dy)
+    coords = util.spatial._xycoords((xmin, xmax, ymin, ymax), (dx, dy))
+    da = xr.DataArray(data, dims=("y", "x"), coords=coords, name="head")
+
+    idf_dir = tmp_path / "idf_files"
+    idf_dir.mkdir(exist_ok=True)
+
+    # Write all 32,000 IDF files
+    for layer in range(1, n_layers + 1):
+        for date_str in date_strs:
+            idf.write(
+                idf_dir / f"head_{date_str}_l{layer}.idf",
+                da,
+            )
+
+    # Open subdomains and load into memory
+    t0 = datetime.datetime.now()
+    result = idf.open_chunked_by_time(idf_dir / "head_*.idf").load()
+    elapsed = datetime.datetime.now() - t0
+    with open(tmp_path / "open_chunked_by_time_large_scale.log", "w") as f:
+        f.write(
+            f"Elapsed time for open_chunked_by_time + load: {elapsed.total_seconds():.2f}s\n"
+        )
+
+    assert isinstance(result, xr.DataArray)
+    assert result.dims == ("time", "layer", "y", "x")
+    assert result.sizes["time"] == n_times
+    assert result.sizes["layer"] == n_layers
+    assert result.sizes["y"] == nrow
+    assert result.sizes["x"] == ncol
+    assert result.values.dtype == np.float32
+    # assert np.all(result.isel(time=slice(None, 100)) == 1.0)
