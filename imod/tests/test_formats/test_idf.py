@@ -328,7 +328,7 @@ class TemporalCases:
 
 
 @parametrize_with_cases("temporal_data,ntime", cases=TemporalCases)
-def test_open_by_time__with_pattern(temporal_data, ntime, tmp_path):
+def test_open_chunked_by_time__with_pattern(temporal_data, ntime, tmp_path):
     idf.save(tmp_path / "temporal_data", temporal_data)
 
     # Test with pattern
@@ -357,7 +357,7 @@ def test_open_by_time__with_pattern(temporal_data, ntime, tmp_path):
 
 
 @parametrize_with_cases("temporal_data,ntime", cases=TemporalCases)
-def test_open_by_time__without_pattern(temporal_data, ntime, tmp_path):
+def test_open_chunked_by_time__without_pattern(temporal_data, ntime, tmp_path):
     idf.save(tmp_path / "temporal_data", temporal_data)
 
     # Test without pattern

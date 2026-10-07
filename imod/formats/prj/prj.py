@@ -568,7 +568,7 @@ def _create_dataarray_from_paths(
     factor = _get_array_transformation_parameters(headers, "factor", dim)
     addition = _get_array_transformation_parameters(headers, "addition", dim)
     da = _try_read_with_func(
-        imod.formats.idf.open_by_time,
+        imod.formats.idf.open_chunked_by_time,
         paths,
         use_cftime=False,
         pattern=None,
