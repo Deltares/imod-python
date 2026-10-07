@@ -262,9 +262,14 @@ def _merge_subdomains_values(
     paths_per_subdomain: DefaultDict[Any, list[PathType]],
     use_cftime: bool,
     pattern: PatternType,
-):
+) -> np.ndarray:
     """Wraps ``_merge_subdomains`` to return just a numpy array for ``dask.array.from_delayed``."""
     data, _, _, _ = _merge_subdomains(paths_per_subdomain, use_cftime, pattern)
+    # ``from_delayed`` expects each task to resolve to a concrete ndarray chunk.
+    # Returning a dask array here creates nested lazy arrays, which can leak
+    # ``dask.array.Array`` values into downstream numba-compiled code paths.
+    if isinstance(data, dask.array.Array):
+        data = data.compute()
     return data
 
 
@@ -309,7 +314,7 @@ def check_subdomain_consistency(
 def _open_idf_data_from_group(
     group: tuple[list[str], list[dict[str, Any]]],
     use_cftime: bool,
-):
+) -> np.ndarray:
     """Open IDF files from a group and return as numpy array."""
     group_paths, group_headers = group
     # load_as_components mutates header dictionaries while preparing lazy reads.
@@ -318,6 +323,11 @@ def _open_idf_data_from_group(
     data, _, _, _ = array_io.reading.load_as_components(
         group_paths, use_cftime=use_cftime, _read=_read, headers=headers
     )
+    # ``from_delayed`` expects each task to resolve to a concrete ndarray chunk.
+    # Returning a dask array here creates nested lazy arrays, which can leak
+    # ``dask.array.Array`` values into downstream numba-compiled code paths.
+    if isinstance(data, dask.array.Array):
+        data = data.compute()
     return data
 
 
