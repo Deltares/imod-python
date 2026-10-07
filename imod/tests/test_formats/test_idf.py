@@ -679,7 +679,7 @@ def test_open_chunked_by_time_large_scale(tmp_path):
 
     # Open subdomains and load into memory
     t0 = datetime.datetime.now()
-    result = idf.open_chunked_by_time(idf_dir / "head_*.idf").load()
+    result = idf.open_chunked_by_time(idf_dir / "head_*.idf").compute()
     elapsed = datetime.datetime.now() - t0
     with open(tmp_path / "open_chunked_by_time_large_scale.log", "w") as f:
         f.write(
@@ -693,4 +693,3 @@ def test_open_chunked_by_time_large_scale(tmp_path):
     assert result.sizes["y"] == nrow
     assert result.sizes["x"] == ncol
     assert result.values.dtype == np.float32
-    # assert np.all(result.isel(time=slice(None, 100)) == 1.0)
