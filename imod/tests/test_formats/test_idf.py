@@ -1,5 +1,7 @@
 import datetime
 
+import dask
+import dask.array
 import numpy as np
 import pandas as pd
 import pytest
@@ -381,6 +383,18 @@ def test_open_chunked_by_time__without_pattern(temporal_data, ntime, tmp_path):
     da = da.compute()
 
     np.testing.assert_allclose(da, temporal_data)
+
+
+def test_open_chunked_by_time__delayed_chunk_returns_numpy(tmp_path):
+    temporal_data = TemporalCases().create_da(ntime=2)
+    idf.save(tmp_path / "temporal_data", temporal_data)
+
+    da = idf.open_chunked_by_time(tmp_path / "temporal_data_*.idf")
+    first_chunk_delayed = da.data.to_delayed().ravel()[0]
+    first_chunk = dask.compute(first_chunk_delayed)[0]
+
+    assert isinstance(first_chunk, np.ndarray)
+    assert not isinstance(first_chunk, dask.array.Array)
 
 
 def test_xycoords_equidistant():
