@@ -39,6 +39,9 @@ Added
   the final package has fully empty layers trimmed off afterwards, so this
   does not affect computed values. Set to False to keep the previous
   full-layer-coordinate behaviour.
+- Added :class:`imod.mf6.AdvectionUTVD` to the transport packages. This is the
+  most accurate advection scheme in most cases, and is recommended for when
+  sharp fronts need to be preserved or when computing on an unstructured grid.
 
 Fixed
 ~~~~~

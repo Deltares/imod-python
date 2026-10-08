@@ -2,7 +2,12 @@
 Create a Modflow 6 model.
 """
 
-from imod.mf6.adv import AdvectionCentral, AdvectionTVD, AdvectionUpstream
+from imod.mf6.adv import (
+    AdvectionCentral,
+    AdvectionTVD,
+    AdvectionUpstream,
+    AdvectionUTVD,
+)
 from imod.mf6.api_package import ApiPackage
 from imod.mf6.ats import AdaptiveTimeStepping
 from imod.mf6.buy import Buoyancy
