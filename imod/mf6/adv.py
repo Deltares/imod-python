@@ -1,12 +1,13 @@
 """
 When simulating transport, MODFLOW6 needs to compute the concentration at a
-cellface between 2 adjacent cells. It supports 3 ways of doing this. Each of
+cellface between 2 adjacent cells. It supports 4 ways of doing this. Each of
 those has its own wrapper class. These numerical schemes differ in how much
 numerical dispersion they cause, how much oscillations, and how timestep and
-grid size affect stability. Central-in-space weighting is not often used
-because it can result in spurious oscillations in the simulated concentrations.
-Upstream weighting is a fast alternative, and TVD is a more expensive and more
-robust alternative.
+grid size affect stability. Central-in-space weighting is not often used because
+it can result in spurious oscillations in the simulated concentrations. Upstream
+weighting is a fast alternative, TVD is a more expensive and more robust
+alternative, and UTVD is the most accurate for sharp concentration fronts and
+unstructured grids.
 """
 
 from abc import ABC
