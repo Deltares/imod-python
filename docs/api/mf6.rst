@@ -449,6 +449,13 @@ Transport Packages
     AdvectionTVD.copy
     AdvectionTVD.is_empty
     AdvectionTVD.get_regrid_methods
+    AdvectionUTVD
+    AdvectionUTVD.write
+    AdvectionUTVD.from_file
+    AdvectionUTVD.to_file
+    AdvectionUTVD.copy
+    AdvectionUTVD.is_empty
+    AdvectionUTVD.get_regrid_methods
     AdvectionUpstream
     AdvectionUpstream.write
     AdvectionUpstream.from_file
