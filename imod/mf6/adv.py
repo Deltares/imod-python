@@ -135,8 +135,9 @@ class AdvectionCentral(AdvectionBase):
 
 class AdvectionTVD(AdvectionBase):
     """
-    An implicit second order TVD scheme. More expensive than upstream
-    weighting but more robust.
+    An implicit second order TVD scheme. More expensive than upstream weighting
+    but more robust. This scheme is not advised for unstructured grids, for that
+    see: :class:`AdvectionUTVD`
 
     Parameters
     ----------
@@ -159,3 +160,33 @@ class AdvectionTVD(AdvectionBase):
     """
 
     _scheme = "TVD"
+
+
+class AdvectionUTVD(AdvectionBase):
+    """
+    An implicit second order TVD scheme for unstructured grids. `This scheme
+    seems to perform best in preserving sharp fronts for both structured and
+    unstructured grids.
+    <https://modflow6-examples.readthedocs.io/en/latest/_examples/ex-gwt-adv-schemes.html>`_
+    Requires MODFLOW 6.7.0 or higher.
+
+    Parameters
+    ----------
+    ats_percel: float, optional
+        Fractional cell distance submitted by the ADV Package to the
+        :class:`imod.mf6.AdaptiveTimeStepping` (ATS) package. If ``ats_percel``
+        is specified and the ATS Package is active, a time step calculation will
+        be made for each cell based on flow through the cell and cell
+        properties. The largest time step will be calculated such that the
+        advective fractional cell distance (``ats_percel``) is not exceeded for
+        any active cell in the grid. This time-step constraint will be submitted
+        to the ATS Package, perhaps with constraints submitted by other
+        packages, in the calculation of the time step. ``ats_percel`` must be
+        greater than zero. If a value of zero is specified for ``ats_percel``
+        the program will automatically reset it to an internal no data value to
+        indicate that time steps should not be subject to this constraint.
+    validate: bool, optional
+        Validate the package upon initialization. Defaults to True.
+    """
+
+    _scheme = "UTVD"
