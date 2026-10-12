@@ -12,7 +12,7 @@ from collections import defaultdict
 from collections.abc import Iterable
 from pathlib import Path
 from re import Pattern
-from typing import Any, Callable, DefaultDict, Sequence, TypeAlias
+from typing import Any, Callable, DefaultDict, Literal, Sequence, TypeAlias
 
 import dask
 import dask.array
@@ -116,7 +116,7 @@ def _read(
     ncol: int,
     nodata: float,
     dtype: DTypeLike,
-):
+) -> np.ndarray:
     """
     Read a single IDF file to a numpy.ndarray
 
@@ -143,12 +143,12 @@ def _read(
     return array_io.reading._to_nan(a, nodata)
 
 
-# Open IDFs for multiple times and/or layers into one DataArray
 def open(
     path: PathType | list[PathType],
     use_cftime=False,
     pattern: PatternType | None = None,
-):
+    chunk_by: Literal["idf", "time"] = "idf",
+) -> xr.DataArray:
     r"""
     Open one or more IDF files as an xarray.DataArray.
 
@@ -178,6 +178,11 @@ def open(
         {name}_{time}_l{layer}, a custom pattern can be defined here either
         as a string, or as a compiled regular expression pattern. See the
         examples below.
+    chunk_by : {"idf", "time"}, optional
+        Determines how the data should be chunked when loaded into memory. "idf"
+        chunks by individual IDF files, while "time" chunks by the time
+        dimension. This can help optimize memory usage and computational
+        efficiency. The default is "idf".
 
     Returns
     -------
@@ -228,6 +233,50 @@ def open(
     generally a fiddly process. Regex notation is also impossible to
     remember. The website https://regex101.com is a nice help. Alternatively,
     the most pragmatic solution may be to just rename your files.
+
+    To increase performance when opening multiple IDF files, consider setting
+    the ``chunk_by`` parameter to "time" to control how the data is chunked in
+    memory. Data will be chunked along the time dimension, instead of per idf
+    file (so most often per time, per layer), which is the default.
+
+    >>> head = imod.idf.open("head_2001*_l*.idf", chunk_by="time")
+
+    """
+
+    if chunk_by == "idf":
+        return _open(path, use_cftime=use_cftime, pattern=pattern)
+    elif chunk_by == "time":
+        return open_chunked_by_time(
+            path, use_cftime=use_cftime, pattern=pattern, headers=None
+        )
+    else:
+        raise ValueError(
+            f"Unsupported chunk_by value: {chunk_by}, supported are 'idf' or 'time'"
+        )
+
+
+# Open IDFs for multiple times and/or layers into one DataArray
+def _open(
+    path: PathType | list[PathType],
+    use_cftime=False,
+    pattern: PatternType | None = None,
+) -> xr.DataArray:
+    """
+    Open an IDF file or list of IDF files and return as an xarray DataArray.
+
+    Parameters
+    ----------
+    path : PathType | list[PathType]
+        Path or list of paths to IDF files.
+    use_cftime : bool, optional
+        Whether to use cftime for datetime objects. Default is False.
+    pattern : PatternType | None, optional
+        Pattern to parse the filename into xarray coordinates. Default is None.
+
+    Returns
+    -------
+    xr.DataArray
+        The opened IDF data as an xarray DataArray.
     """
     return array_io.reading._open(path, use_cftime, pattern, header, _read)
 
@@ -251,7 +300,7 @@ def _merge_subdomains(
     """
     das = []
     for pathlist in paths_per_subdomain.values():
-        da = open(pathlist, use_cftime=use_cftime, pattern=pattern)
+        da = _open(pathlist, use_cftime=use_cftime, pattern=pattern)
         if "subdomain" in da.dims:
             da = da.isel(subdomain=0, drop=True)
         das.append(da)
