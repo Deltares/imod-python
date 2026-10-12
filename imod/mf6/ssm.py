@@ -4,6 +4,7 @@ from typing import Any, Self
 import numpy as np
 
 from imod.common.interfaces.iregridpackage import IRegridPackage
+from imod.common.utilities.dtype import normalize_string_dtype
 from imod.logging import init_log_decorator, logger
 from imod.mf6 import GroundwaterFlowModel
 from imod.mf6.boundary_condition import BoundaryCondition
@@ -100,7 +101,7 @@ class SourceSinkMixing(BoundaryCondition, IRegridPackage):
             "auxiliary_variable_name",
         ]
         for var in vars:
-            instance.dataset[var] = instance.dataset[var].astype(str)
+            instance.dataset[var] = normalize_string_dtype(instance.dataset[var])
 
         return instance
 
