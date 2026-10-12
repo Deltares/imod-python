@@ -335,7 +335,9 @@ def test_open_chunked_per_timestep(temporal_data, ntime, pattern, tmp_path):
     idf.save(tmp_path / "temporal_data", temporal_data)
 
     # Test with pattern
-    da = idf.open_chunked_per_timestep(tmp_path / "temporal_data_*.idf", pattern=pattern)
+    da = idf.open_chunked_per_timestep(
+        tmp_path / "temporal_data_*.idf", pattern=pattern
+    )
 
     assert da.dims == ("time", "layer", "y", "x")
     assert da.name == "temporal_data"
