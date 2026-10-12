@@ -10,6 +10,8 @@ from typing import Any, Protocol, cast
 import numpy as np
 from numpy.typing import DTypeLike
 
+from imod.typing import GridDataArray
+
 
 class SupportsDTypeType(Protocol):
     @property
@@ -43,3 +45,29 @@ def is_bool(dtype: DTypeLike) -> bool:
     except TypeError:
         dtype_with_type = cast(SupportsDTypeType, dtype)
         return issubclass(dtype_with_type.type, np.bool)
+
+
+def as_string(da: GridDataArray) -> GridDataArray:
+    """
+    Convert a GridDataArray to a string type if it is of a string-like dtype.
+
+    Parameters
+    ----------
+    da : GridDataArray
+        The input array to convert.
+
+    Returns
+    -------
+    GridDataArray
+        The converted array with string dtype.
+    """
+    if da.dtype.kind in ("S", "U", "O") or "StringDType" in str(da.dtype):
+        try:
+            da = da.astype(str)
+        except TypeError as e:
+            # numpy/xarray with StringDType cannot cast directly to plain `str`
+            # (unspecified fixed-width unicode). Convert via object first.
+            if "StringDType" not in str(e):
+                raise e
+            da = da.astype(object)
+    return da
