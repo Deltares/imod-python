@@ -50,6 +50,14 @@ def is_bool(dtype: DTypeLike) -> bool:
 def as_string(da: GridDataArray) -> GridDataArray:
     """
     Convert a GridDataArray to a string type if it is of a string-like dtype.
+    This function checks if the dtype of the input array is string-like (i.e.,
+    kind "S", "U", "O" or contains "StringDType"). If so, it attempts to convert
+    the array to a plain string dtype. If the conversion fails due to the
+    presence of a StringDType, it first converts the array to an object dtype
+    and then to a string dtype.
+
+    This is a TEMPORARY workaround, and will NOT be necessary in numpy version
+    2.6.0, when this fix is released: https://github.com/numpy/numpy/pull/32097
 
     Parameters
     ----------
@@ -69,5 +77,5 @@ def as_string(da: GridDataArray) -> GridDataArray:
             # (unspecified fixed-width unicode). Convert via object first.
             if "StringDType" not in str(e):
                 raise e
-            da = da.astype(object)
+            da = da.astype(object).astype(str)
     return da
