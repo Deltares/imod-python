@@ -39,6 +39,13 @@ Added
   the final package has fully empty layers trimmed off afterwards, so this
   does not affect computed values. Set to False to keep the previous
   full-layer-coordinate behaviour.
+- Added option ``chunk_layout`` to :func:`imod.idf.open` to control how the data is
+  loaded in chunks, which can improve performance and memory usage for large datasets.
+  The default option ``per_idf`` keeps the old behavior, by chunking per IDF file.
+  The alternative option ``per_timestep`` chunks per timestep.
+- Added :class:`imod.mf6.AdvectionUTVD` to the transport packages. This is the
+  most accurate advection scheme in most cases, and is recommended for when
+  sharp fronts need to be preserved or when computing on an unstructured grid.
 
 Fixed
 ~~~~~
@@ -75,6 +82,9 @@ Changed
   (:class:`imod.mf6.River`, :class:`imod.mf6.GeneralHeadBoundary`,
   :class:`imod.mf6.Drainage`, :class:`imod.mf6.Recharge`) will also be masked
   where constant head cells are placed. 
+- :func:`imod.formats.prj.open_projectfile_data` now chunks the data by time
+  only instead of by both time and layer. This should enhance performance when
+  working with large datasets.
 
 [1.1.0] - 2026-08-03
 --------------------

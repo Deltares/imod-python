@@ -280,8 +280,33 @@ def _dask(path, attrs=None, pattern=None, _read=None, header=None):
     return x, attrs
 
 
-def _load(paths, use_cftime, _read, headers):
-    """Combine a list of paths to IDFs to a single xarray.DataArray"""
+def load_as_components(paths, use_cftime, _read, headers):
+    """
+    Combine a list of paths to IDFs to components that can be used to construct
+    a single xarray.DataArray.
+
+    Parameters
+    ----------
+    paths : list[str]
+        List of file paths to IDF files.
+    use_cftime : bool
+        Whether to use cftime for time coordinates.
+    _read : Callable
+        Function to read individual IDF files.
+    headers : list[dict]
+        List of headers corresponding to each IDF file.
+
+    Returns
+    -------
+    dask.array
+        Dask array containing the combined data from all IDF files.
+    dict
+        Dictionary of coordinates for the DataArray.
+    list[str]
+        List of dimension names for the DataArray.
+    str
+        Name of the DataArray.
+    """
     # this function also works for single IDFs
     names = [h["name"] for h in headers]
     _all_equal(names, "names")
@@ -320,8 +345,14 @@ def _load(paths, use_cftime, _read, headers):
             nested_dict.set_nested(groupby, groupbykeys, da)
         dask_arrays = nested_dict.sorted_nested_dict(groupby)
         dask_array = _ndconcat(dask_arrays, ndim)
+    return dask_array, coords, dims, names[0]
 
-    out = xr.DataArray(dask_array, coords, dims, name=names[0])
+
+def _load(paths, use_cftime, _read, headers):
+    dask_array, coords, dims, name = load_as_components(
+        paths, use_cftime, _read, headers
+    )
+    out = xr.DataArray(dask_array, coords, dims, name=name)
 
     first_attrs = headers[0]
 
@@ -333,7 +364,27 @@ def _load(paths, use_cftime, _read, headers):
     return out
 
 
-def _open(path, use_cftime, pattern, header, _read):
+def handle_path(
+    path: pathlib.Path | str | list[pathlib.Path | str],
+) -> list[pathlib.Path]:
+    """
+    Handle a path input and return a list of pathlib.Path objects.
+
+    Parameters
+    ----------
+    path : pathlib.Path, str, or list of pathlib.Path
+        The input path(s) to handle.
+
+    Returns
+    -------
+    list[pathlib.Path]
+        List of pathlib.Path objects corresponding to the input path(s).
+
+    Raises
+    ------
+    FileNotFoundError
+        If no files matching the input path(s) are found.
+    """
     if isinstance(path, pathlib.Path):
         path = str(path)
 
@@ -342,8 +393,16 @@ def _open(path, use_cftime, pattern, header, _read):
     else:
         paths = [pathlib.Path(p) for p in glob.glob(path)]
 
-    headers = [header(p, pattern) for p in paths]
     n = len(paths)
     if n == 0:
         raise FileNotFoundError(f"Could not find any files matching {path}")
+
+    return paths
+
+
+def _open(path, use_cftime, pattern, header, _read):
+    paths = handle_path(path)
+
+    headers = [header(p, pattern) for p in paths]
+
     return _load(paths, use_cftime, _read, headers)
