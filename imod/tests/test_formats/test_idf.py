@@ -330,12 +330,11 @@ class TemporalCases:
 
 
 @parametrize_with_cases("temporal_data,ntime", cases=TemporalCases)
-def test_open_chunked_by_time__with_pattern(temporal_data, ntime, tmp_path):
+@parametrize("pattern", [None, r"{name}_{time}_l{layer}"])
+def test_open_chunked_by_time(temporal_data, ntime, pattern, tmp_path):
     idf.save(tmp_path / "temporal_data", temporal_data)
 
     # Test with pattern
-    pattern = r"{name}_{time}_l{layer}"
-
     da = idf.open_chunked_by_time(tmp_path / "temporal_data_*.idf", pattern=pattern)
 
     assert da.dims == ("time", "layer", "y", "x")
@@ -358,34 +357,12 @@ def test_open_chunked_by_time__with_pattern(temporal_data, ntime, tmp_path):
     np.testing.assert_allclose(da, temporal_data)
 
 
-@parametrize_with_cases("temporal_data,ntime", cases=TemporalCases)
-def test_open_chunked_by_time__without_pattern(temporal_data, ntime, tmp_path):
-    idf.save(tmp_path / "temporal_data", temporal_data)
-
-    # Test without pattern
-    da = idf.open_chunked_by_time(tmp_path / "temporal_data_*.idf")
-
-    assert da.dims == ("time", "layer", "y", "x")
-    assert da.name == "temporal_data"
-    assert da.sizes["layer"] == 3
-    assert da.sizes["y"] == 6
-    assert da.sizes["x"] == 8
-    assert da.sizes["time"] == ntime
-    time_chunk_shape = (1,) * ntime
-    assert da.chunks == (
-        time_chunk_shape,
-        (da.sizes["layer"],),
-        (da.sizes["y"],),
-        (da.sizes["x"],),
-    )
-
-    # Compute and see if no error is thrown
-    da = da.compute()
-
-    np.testing.assert_allclose(da, temporal_data)
-
-
 def test_open_chunked_by_time__delayed_chunk_returns_numpy(tmp_path):
+    """
+    Test that the dask chunks returned by open_chunked_by_time is a numpy array,
+    and not a dask array, as that would mean there are nested dask arrays, which
+    are problematic.
+    """
     temporal_data = TemporalCases().create_da(ntime=2)
     idf.save(tmp_path / "temporal_data", temporal_data)
 
@@ -453,6 +430,17 @@ def test_save_topbot__single_layer(test_da, tmp_path):
     da_read = idf.open(tmp_path / "test.idf")
     assert da_read["z"] == approx(0.5)
     assert da_read["dz"] == approx(1.0)
+
+
+@parametrize("chunk_by", ["idf", "time"])
+def test_saveopen_layer_chunking(test_layerda, chunk_by, tmp_path):
+    da = test_layerda
+    idf.save(tmp_path / "layer", da)
+    actual = idf.open(tmp_path / "layer_l*.idf", chunk_by=chunk_by)
+    if chunk_by == "idf":
+        assert actual.chunks[0] == (1,) * actual.sizes["layer"]
+    elif chunk_by == "time":
+        assert actual.chunks[0] == (actual.sizes["layer"],)
 
 
 def test_save_topbot__layers(test_layerda, tmp_path):
