@@ -331,11 +331,11 @@ class TemporalCases:
 
 @parametrize_with_cases("temporal_data,ntime", cases=TemporalCases)
 @parametrize("pattern", [None, r"{name}_{time}_l{layer}"])
-def test_open_chunked_by_time(temporal_data, ntime, pattern, tmp_path):
+def test_open_chunked_per_timestep(temporal_data, ntime, pattern, tmp_path):
     idf.save(tmp_path / "temporal_data", temporal_data)
 
     # Test with pattern
-    da = idf.open_chunked_by_time(tmp_path / "temporal_data_*.idf", pattern=pattern)
+    da = idf.open_chunked_per_timestep(tmp_path / "temporal_data_*.idf", pattern=pattern)
 
     assert da.dims == ("time", "layer", "y", "x")
     assert da.name == "temporal_data"
@@ -357,16 +357,16 @@ def test_open_chunked_by_time(temporal_data, ntime, pattern, tmp_path):
     np.testing.assert_allclose(da, temporal_data)
 
 
-def test_open_chunked_by_time__delayed_chunk_returns_numpy(tmp_path):
+def test_open_chunked_per_timestep__delayed_chunk_returns_numpy(tmp_path):
     """
-    Test that the dask chunks returned by open_chunked_by_time is a numpy array,
+    Test that the dask chunks returned by open_chunked_per_timestep is a numpy array,
     and not a dask array, as that would mean there are nested dask arrays, which
     are problematic.
     """
     temporal_data = TemporalCases().create_da(ntime=2)
     idf.save(tmp_path / "temporal_data", temporal_data)
 
-    da = idf.open_chunked_by_time(tmp_path / "temporal_data_*.idf")
+    da = idf.open_chunked_per_timestep(tmp_path / "temporal_data_*.idf")
     first_chunk_delayed = da.data.to_delayed().ravel()[0]
     first_chunk = dask.compute(first_chunk_delayed)[0]
 
@@ -644,7 +644,7 @@ def test_open_subdomains_large_scale(tmp_path):
 
 @pytest.mark.timeout(600, method="thread")  # 10 minutes
 @pytest.mark.user_acceptance
-def test_open_chunked_by_time_large_scale(tmp_path):
+def test_open_chunked_per_timestep_large_scale(tmp_path):
     """
     Test the performance and correctness of opening large-scale IDF files
     chunked by time.
@@ -681,11 +681,11 @@ def test_open_chunked_by_time_large_scale(tmp_path):
 
     # Open subdomains and load into memory
     t0 = datetime.datetime.now()
-    result = idf.open_chunked_by_time(idf_dir / "head_*.idf").compute()
+    result = idf.open_chunked_per_timestep(idf_dir / "head_*.idf").compute()
     elapsed = datetime.datetime.now() - t0
-    with open(tmp_path / "open_chunked_by_time_large_scale.log", "w") as f:
+    with open(tmp_path / "open_chunked_per_timestep_large_scale.log", "w") as f:
         f.write(
-            f"Elapsed time for open_chunked_by_time + load: {elapsed.total_seconds():.2f}s\n"
+            f"Elapsed time for open_chunked_per_timestep + load: {elapsed.total_seconds():.2f}s\n"
         )
 
     assert isinstance(result, xr.DataArray)

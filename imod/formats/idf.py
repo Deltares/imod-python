@@ -248,7 +248,7 @@ def open(
     if chunk_layout == "per_idf":
         return _open(path, use_cftime=use_cftime, pattern=pattern)
     elif chunk_layout == "per_timestep":
-        return open_chunked_by_time(
+        return open_chunked_per_timestep(
             path, use_cftime=use_cftime, pattern=pattern, headers=None
         )
     else:
@@ -471,14 +471,14 @@ def _open_idf_chunked_by_time(
     return xr.DataArray(data, coords, dims, name=template.name, attrs=template.attrs)
 
 
-def open_chunked_by_time(
+def open_chunked_per_timestep(
     path: PathType | list[PathType],
     use_cftime: bool = False,
     pattern: PatternType | None = None,
     headers: list[dict[str, Any]] | None = None,
 ):
     """
-    Open IDF files chunked by time.
+    Open IDF files chunked per timestep.
 
     Parameters
     ----------
