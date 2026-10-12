@@ -432,14 +432,14 @@ def test_save_topbot__single_layer(test_da, tmp_path):
     assert da_read["dz"] == approx(1.0)
 
 
-@parametrize("chunk_by", ["idf", "time"])
-def test_saveopen_layer_chunking(test_layerda, chunk_by, tmp_path):
+@parametrize("chunk_layout", ["per_idf", "per_timestep"])
+def test_saveopen_layer_chunking(test_layerda, chunk_layout, tmp_path):
     da = test_layerda
     idf.save(tmp_path / "layer", da)
-    actual = idf.open(tmp_path / "layer_l*.idf", chunk_by=chunk_by)
-    if chunk_by == "idf":
+    actual = idf.open(tmp_path / "layer_l*.idf", chunk_layout=chunk_layout)
+    if chunk_layout == "per_idf":
         assert actual.chunks[0] == (1,) * actual.sizes["layer"]
-    elif chunk_by == "time":
+    elif chunk_layout == "per_timestep":
         assert actual.chunks[0] == (actual.sizes["layer"],)
 
 

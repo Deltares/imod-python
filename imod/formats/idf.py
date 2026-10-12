@@ -147,7 +147,7 @@ def open(
     path: PathType | list[PathType],
     use_cftime=False,
     pattern: PatternType | None = None,
-    chunk_by: Literal["idf", "time"] = "idf",
+    chunk_layout: Literal["per_idf", "per_timestep"] = "per_idf",
 ) -> xr.DataArray:
     r"""
     Open one or more IDF files as an xarray.DataArray.
@@ -178,11 +178,12 @@ def open(
         {name}_{time}_l{layer}, a custom pattern can be defined here either
         as a string, or as a compiled regular expression pattern. See the
         examples below.
-    chunk_by : {"idf", "time"}, optional
-        Determines how the data should be chunked when loaded into memory. "idf"
-        chunks by individual IDF files, while "time" chunks by the time
-        dimension. This can help optimize memory usage and computational
-        efficiency. The default is "idf".
+    chunk_layout : {"per_idf", "per_timestep"}, optional
+        Determines how the data should be chunked when loaded into memory.
+        ``"per_idf"`` chunks by individual IDF files, while
+        ``"per_timestep"`` chunks by timestep, grouping all layers within a
+        timestep into one chunk. This can help optimize memory usage and
+        computational efficiency. The default is ``"per_idf"``.
 
     Returns
     -------
@@ -235,23 +236,25 @@ def open(
     the most pragmatic solution may be to just rename your files.
 
     To increase performance when opening multiple IDF files, consider setting
-    the ``chunk_by`` parameter to "time" to control how the data is chunked in
+    the ``chunk_layout`` parameter to ``"per_timestep"`` to control how the
+    data is chunked in
     memory. Data will be chunked along the time dimension, instead of per idf
     file (so most often per time, per layer), which is the default.
 
-    >>> head = imod.idf.open("head_2001*_l*.idf", chunk_by="time")
+    >>> head = imod.idf.open("head_2001*_l*.idf", chunk_layout="per_timestep")
 
     """
 
-    if chunk_by == "idf":
+    if chunk_layout == "per_idf":
         return _open(path, use_cftime=use_cftime, pattern=pattern)
-    elif chunk_by == "time":
+    elif chunk_layout == "per_timestep":
         return open_chunked_by_time(
             path, use_cftime=use_cftime, pattern=pattern, headers=None
         )
     else:
         raise ValueError(
-            f"Unsupported chunk_by value: {chunk_by}, supported are 'idf' or 'time'"
+            "Unsupported chunk_layout value: "
+            f"{chunk_layout}, supported are 'per_idf' or 'per_timestep'"
         )
 
 

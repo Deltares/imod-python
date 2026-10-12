@@ -39,6 +39,10 @@ Added
   the final package has fully empty layers trimmed off afterwards, so this
   does not affect computed values. Set to False to keep the previous
   full-layer-coordinate behaviour.
+- Added option ``chunk_layout`` to :func:`imod.idf.open` to control how the data is
+  loaded in chunks, which can improve performance and memory usage for large datasets.
+  The default option ``per_idf`` keeps the old behavior, by chunking per IDF file.
+  The alternative option ``per_timestep`` chunks per timestep.
 
 Fixed
 ~~~~~
