@@ -264,7 +264,7 @@ transport_model["dsp"] = imod.mf6.Dispersion(
     xt3d_off=False,
     xt3d_rhs=False,
 )
-transport_model["adv"] = imod.mf6.AdvectionTVD(ats_percel=0.95)
+transport_model["adv"] = imod.mf6.AdvectionUTVD(ats_percel=0.95)
 transport_model["mst"] = imod.mf6.MobileStorageTransfer(porosity)
 
 # %%

@@ -34,6 +34,15 @@ def test_advection_TVD():
     assert actual == expected
 
 
+def test_advection_UTVD():
+    directory = pathlib.Path("mymodel")
+    globaltimes = [np.datetime64("2000-01-01")]
+    adv = imod.mf6.AdvectionUTVD()
+    actual = adv._render(directory, "adv", globaltimes, True)
+    expected = "begin options\n  scheme UTVD\nend options"
+    assert actual == expected
+
+
 def test_advection_ats_percel():
     directory = pathlib.Path("mymodel")
     globaltimes = [np.datetime64("2000-01-01")]
