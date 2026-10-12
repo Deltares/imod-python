@@ -106,7 +106,7 @@ object BuildPages : BuildType({
         }
     }
     params {
-        param("reverse.dep.Modflow_Modflow6Release.MODFLOW6_Version", "6.6.3")
+        param("reverse.dep.Modflow_Modflow6Release.MODFLOW6_Version", "6.8.1")
         param("reverse.dep.Modflow_Modflow6Release.MODFLOW6_Platform", "win64")
     }
     dependencies {
