@@ -60,6 +60,8 @@ Fixed
 - :class:`imod.msw.FileCopier` and :class:`imod.msw.MeteoGridCopy` now force
   paths to be stored as strings in the dataset. ``pathlib.Path`` objects could
   cause errors when calling :meth:`imod.msw.MetaSwapModel.dump`.
+- Fixed issue where a TypeError was thrown for string data when calling
+  :meth:`imod.mf6.Modflow6Simulation.from_file` when reading from a zarr file.
 
 Changed
 ~~~~~~~
