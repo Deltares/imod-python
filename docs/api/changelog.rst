@@ -43,6 +43,9 @@ Added
   loaded in chunks, which can improve performance and memory usage for large datasets.
   The default option ``per_idf`` keeps the old behavior, by chunking per IDF file.
   The alternative option ``per_timestep`` chunks per timestep.
+- Added :class:`imod.mf6.AdvectionUTVD` to the transport packages. This is the
+  most accurate advection scheme in most cases, and is recommended for when
+  sharp fronts need to be preserved or when computing on an unstructured grid.
 
 Fixed
 ~~~~~
