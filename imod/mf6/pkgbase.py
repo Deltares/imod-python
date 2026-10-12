@@ -8,7 +8,7 @@ import xugrid as xu
 import imod
 from imod.common.interfaces.ipackagebase import IPackageBase
 from imod.common.serializer import EngineType, create_package_serializer
-from imod.common.utilities.dtype import as_string
+from imod.common.utilities.dtype import normalize_string_dtype
 from imod.common.utilities.value_filters import is_scalar_nan
 from imod.typing.grid import (
     GridDataArray,
@@ -145,7 +145,7 @@ class PackageBase(IPackageBase, abc.ABC):
         vars = ["species"]
         for var in vars:
             if var in dataset:
-                dataset[var] = as_string(dataset[var])
+                dataset[var] = normalize_string_dtype(dataset[var])
 
         return cls._from_dataset(dataset)
 

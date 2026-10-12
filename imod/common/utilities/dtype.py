@@ -47,7 +47,7 @@ def is_bool(dtype: DTypeLike) -> bool:
         return issubclass(dtype_with_type.type, np.bool)
 
 
-def as_string(da: GridDataArray) -> GridDataArray:
+def normalize_string_dtype(da: GridDataArray) -> GridDataArray:
     """
     Convert a GridDataArray to a string type if it is of a string-like dtype.
     This function checks if the dtype of the input array is string-like (i.e.,
