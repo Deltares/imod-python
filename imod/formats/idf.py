@@ -397,7 +397,7 @@ def _open_idf_from_group(
     return xr.DataArray(data, coords, dims, name=name)
 
 
-def _open_idf_chunked_by_time(
+def _open_idf_chunked_per_timestep(
     open_func: Callable[..., Any],
     grouped_by_time: dict[Any, Any],
     template: xr.DataArray,
@@ -406,7 +406,7 @@ def _open_idf_chunked_by_time(
     *args,
 ):
     """
-    Open IDF files chunked by time using a template DataArray.
+    Open IDF files chunked per timestep using a template DataArray.
 
     Parameters
     ----------
@@ -427,7 +427,7 @@ def _open_idf_chunked_by_time(
     Returns
     -------
     xr.DataArray
-        Combined DataArray with data from all subdomains, chunked by time.
+        Combined DataArray with data from all subdomains, chunked per timestep.
 
 
     """
@@ -537,7 +537,7 @@ def open_chunked_per_timestep(
         use_cftime=use_cftime,
     )
 
-    return _open_idf_chunked_by_time(
+    return _open_idf_chunked_per_timestep(
         _open_idf_data_from_group,
         grouped_by_time,
         template,
@@ -619,7 +619,7 @@ def open_subdomains(
     # Collect additional arguments to pass to the open function.
     args_for_func = (pattern,)
 
-    return _open_idf_chunked_by_time(
+    return _open_idf_chunked_per_timestep(
         _merge_subdomains_values,
         grouped_by_time,
         template,
