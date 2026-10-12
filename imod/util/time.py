@@ -1,5 +1,6 @@
 import datetime
 import warnings
+from typing import Any
 
 import cftime
 import dateutil
@@ -155,7 +156,7 @@ def forcing_starts_ends(package_times: np.ndarray, globaltimes: np.ndarray):
     return starts_ends
 
 
-def _convert_datetimes(times: np.ndarray, use_cftime: bool):
+def _convert_datetimes(times: list[Any], use_cftime: bool):
     """
     Return times as np.datetime64[ns] or cftime.DatetimeProlepticGregorian
     depending on whether the dates fall within the inclusive bounds of

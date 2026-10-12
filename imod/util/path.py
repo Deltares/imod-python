@@ -8,6 +8,7 @@ import datetime
 import pathlib
 import re
 import tempfile
+from re import Pattern
 from typing import Any, Optional
 
 import cftime
@@ -76,7 +77,7 @@ def _groupdict(stem: str, pattern: Optional[str | re.Pattern[str]]) -> dict[str,
     return d
 
 
-def decompose(path, pattern: Optional[str] = None) -> dict[str, Any]:
+def decompose(path, pattern: str | Pattern[str] | None = None) -> dict[str, Any]:
     r"""
     Parse a path, returning a dict of the parts, following the iMOD conventions.
 

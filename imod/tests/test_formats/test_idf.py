@@ -1,6 +1,9 @@
 import datetime
 
+import dask
+import dask.array
 import numpy as np
+import pandas as pd
 import pytest
 import xarray as xr
 from pytest import approx
@@ -299,6 +302,80 @@ def test_open_subdomains_error(subdomains, expected, equidistant, tmp_path):
         idf.open_subdomains(tmp_path / "subdomains_*.idf")
 
 
+class TemporalCases:
+    def create_da(self, ntime):
+        nlayer, nrow, ncol = 3, 6, 8
+        dx = 1.0
+        dy = -1.0
+        xmin, xmax = 0.0, 8.0
+        ymin, ymax = 0.0, 6.0
+        layer = [1, 2, 3]
+
+        time = pd.date_range("2000-01-01", periods=ntime, freq="D")
+
+        kwargs = {"name": "temporal_data", "dims": ("time", "layer", "y", "x")}
+        kwargs["coords"] = util.spatial._xycoords((xmin, xmax, ymin, ymax), (dx, dy))
+        kwargs["coords"]["layer"] = layer
+        kwargs["coords"]["time"] = time
+        kwargs["data"] = np.ones((ntime, nlayer, nrow, ncol), dtype=np.float64)
+        return xr.DataArray(**kwargs).cumsum(dim="time")
+
+    def case_single_time(self):
+        ntime = 1
+        return self.create_da(ntime=ntime), ntime
+
+    def case_multiple_times(self):
+        ntime = 5
+        return self.create_da(ntime=ntime), ntime
+
+
+@parametrize_with_cases("temporal_data,ntime", cases=TemporalCases)
+@parametrize("pattern", [None, r"{name}_{time}_l{layer}"])
+def test_open_chunked_per_timestep(temporal_data, ntime, pattern, tmp_path):
+    idf.save(tmp_path / "temporal_data", temporal_data)
+
+    # Test with pattern
+    da = idf.open_chunked_per_timestep(
+        tmp_path / "temporal_data_*.idf", pattern=pattern
+    )
+
+    assert da.dims == ("time", "layer", "y", "x")
+    assert da.name == "temporal_data"
+    assert da.sizes["layer"] == 3
+    assert da.sizes["y"] == 6
+    assert da.sizes["x"] == 8
+    assert da.sizes["time"] == ntime
+    time_chunk_shape = (1,) * ntime
+    assert da.chunks == (
+        time_chunk_shape,
+        (da.sizes["layer"],),
+        (da.sizes["y"],),
+        (da.sizes["x"],),
+    )
+
+    # Compute and see if no error is thrown
+    da = da.compute()
+
+    np.testing.assert_allclose(da, temporal_data)
+
+
+def test_open_chunked_per_timestep__delayed_chunk_returns_numpy(tmp_path):
+    """
+    Test that the dask chunks returned by open_chunked_per_timestep is a numpy array,
+    and not a dask array, as that would mean there are nested dask arrays, which
+    are problematic.
+    """
+    temporal_data = TemporalCases().create_da(ntime=2)
+    idf.save(tmp_path / "temporal_data", temporal_data)
+
+    da = idf.open_chunked_per_timestep(tmp_path / "temporal_data_*.idf")
+    first_chunk_delayed = da.data.to_delayed().ravel()[0]
+    first_chunk = dask.compute(first_chunk_delayed)[0]
+
+    assert isinstance(first_chunk, np.ndarray)
+    assert not isinstance(first_chunk, dask.array.Array)
+
+
 def test_xycoords_equidistant():
     dx, dy = 1.0, -1.0
     xmin, xmax = 0.0, 4.0
@@ -355,6 +432,17 @@ def test_save_topbot__single_layer(test_da, tmp_path):
     da_read = idf.open(tmp_path / "test.idf")
     assert da_read["z"] == approx(0.5)
     assert da_read["dz"] == approx(1.0)
+
+
+@parametrize("chunk_layout", ["per_idf", "per_timestep"])
+def test_saveopen_layer_chunking(test_layerda, chunk_layout, tmp_path):
+    da = test_layerda
+    idf.save(tmp_path / "layer", da)
+    actual = idf.open(tmp_path / "layer_l*.idf", chunk_layout=chunk_layout)
+    if chunk_layout == "per_idf":
+        assert actual.chunks[0] == (1,) * actual.sizes["layer"]
+    elif chunk_layout == "per_timestep":
+        assert actual.chunks[0] == (actual.sizes["layer"],)
 
 
 def test_save_topbot__layers(test_layerda, tmp_path):
@@ -554,3 +642,58 @@ def test_open_subdomains_large_scale(tmp_path):
     assert result.sizes["x"] == grid_cols * ncol
     assert result.values.dtype == np.float32
     assert np.all(result.values == 1.0)
+
+
+@pytest.mark.timeout(600, method="thread")  # 10 minutes
+@pytest.mark.user_acceptance
+def test_open_chunked_per_timestep_large_scale(tmp_path):
+    """
+    Test the performance and correctness of opening large-scale IDF files
+    chunked by time.
+    """
+    n_layers = 40
+    n_times = 800
+    nrow, ncol = 20, 20  # cells per subdomain
+    dx, dy = 1.0, -1.0
+
+    assert n_layers * n_times == 32_000
+
+    # Generate 50 daily timesteps starting 2000-01-01
+    start = datetime.date(2000, 1, 1)
+    date_strs = [
+        (start + datetime.timedelta(days=i)).strftime("%Y%m%d") for i in range(n_times)
+    ]
+    # Create the DataArray for each timestep
+    data = np.ones((nrow, ncol), dtype=np.float32)
+    xmin, xmax = 0, ncol * dx
+    ymin, ymax = 0, nrow * abs(dy)
+    coords = util.spatial._xycoords((xmin, xmax, ymin, ymax), (dx, dy))
+    da = xr.DataArray(data, dims=("y", "x"), coords=coords, name="head")
+
+    idf_dir = tmp_path / "idf_files"
+    idf_dir.mkdir(exist_ok=True)
+
+    # Write all 32,000 IDF files
+    for layer in range(1, n_layers + 1):
+        for date_str in date_strs:
+            idf.write(
+                idf_dir / f"head_{date_str}_l{layer}.idf",
+                da,
+            )
+
+    # Open subdomains and load into memory
+    t0 = datetime.datetime.now()
+    result = idf.open_chunked_per_timestep(idf_dir / "head_*.idf").compute()
+    elapsed = datetime.datetime.now() - t0
+    with open(tmp_path / "open_chunked_per_timestep_large_scale.log", "w") as f:
+        f.write(
+            f"Elapsed time for open_chunked_per_timestep + load: {elapsed.total_seconds():.2f}s\n"
+        )
+
+    assert isinstance(result, xr.DataArray)
+    assert result.dims == ("time", "layer", "y", "x")
+    assert result.sizes["time"] == n_times
+    assert result.sizes["layer"] == n_layers
+    assert result.sizes["y"] == nrow
+    assert result.sizes["x"] == ncol
+    assert result.values.dtype == np.float32
