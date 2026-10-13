@@ -2,21 +2,23 @@ import collections
 import glob
 import itertools
 import pathlib
+from typing import Callable
 
 import dask
 import numpy as np
 import xarray as xr
 
+from imod.typing import DataArrayComponents
 from imod.util import nested_dict, spatial, time
 
 
-def _all_equal(seq, elem):
+def _all_equal(seq: list[str], elem: str) -> None:
     """Raise an error if not all elements of a list are equal"""
     if not seq.count(seq[0]) == len(seq):
         raise ValueError(f"All {elem} must be the same, found: {set(seq)}")
 
 
-def _check_cellsizes(cellsizes):
+def _check_cellsizes(cellsizes: list[tuple]) -> None:
     """
     Checks if cellsizes match, raises ValueError otherwise
 
@@ -64,7 +66,7 @@ def _check_cellsizes(cellsizes):
                     raise ValueError(msg)
 
 
-def _has_dim(seq):
+def _has_dim(seq: list[None | float]) -> bool:
     """Check if either 0 or all None are present
 
     Returns
@@ -80,7 +82,7 @@ def _has_dim(seq):
     return True
 
 
-def _to_nan(a, nodata):
+def _to_nan(a: np.ndarray, nodata: float) -> np.ndarray:
     """Change all nodata values in the array to NaN"""
     # it needs to be NaN for xarray to deal with it properly
     # no need to store the nodata value if it is always NaN
@@ -92,7 +94,7 @@ def _to_nan(a, nodata):
         return a
 
 
-def _array_z_coord(coords, tops, bots, unique_indices):
+def _array_z_coord(coords: dict, tops, bots, unique_indices):
     top = np.array(tops)[unique_indices]
     bot = np.array(bots)[unique_indices]
     dz = top - bot
@@ -280,7 +282,12 @@ def _dask(path, attrs=None, pattern=None, _read=None, header=None):
     return x, attrs
 
 
-def load_as_components(paths, use_cftime, _read, headers):
+def load_as_components(
+    paths: list[str | pathlib.Path],
+    use_cftime: bool,
+    _read: Callable,
+    headers: list[dict],
+) -> DataArrayComponents:
     """
     Combine a list of paths to IDFs to components that can be used to construct
     a single xarray.DataArray.
