@@ -22,6 +22,7 @@ from numpy.typing import DTypeLike
 
 import imod
 from imod.formats import array_io
+from imod.typing import DataArrayComponents
 from imod.typing.structured import merge_partitions_as_da_components
 
 # Make sure we can still use the built-in function...
@@ -284,7 +285,7 @@ def _open(
     return array_io.reading._open(path, use_cftime, pattern, header, _read)
 
 
-def _more_than_one_unique_value(values: Iterable[Any]):
+def _more_than_one_unique_value(values: Iterable[Any]) -> bool:
     """Returns if more than one unique value in list"""
     return len(set(values)) != 1
 
@@ -293,7 +294,7 @@ def _merge_subdomains(
     paths_per_subdomain: DefaultDict[Any, list[PathType]],
     use_cftime: bool,
     pattern: PatternType | None,
-):
+) -> DataArrayComponents:
     """
     Open and spatially merge all subdomain IDF files for one timestep.
     Returns an ``xr.DataArray`` with all coordinates computed by
@@ -344,7 +345,7 @@ def _merge_subdomains_to_dataarray(
 
 def check_subdomain_consistency(
     parsed: list[dict[str, Any]], paths: Sequence[PathType], pattern: PatternType
-):
+) -> None:
     """Check that each subdomain has the same number of IDF files."""
     grouped = defaultdict(list)
     for match, p in zip(parsed, paths):
@@ -404,7 +405,7 @@ def _open_idf_chunked_per_timestep(
     has_time: bool,
     use_cftime: bool,
     *args,
-):
+) -> xr.DataArray:
     """
     Open IDF files chunked per timestep using a template DataArray.
 
@@ -476,7 +477,7 @@ def open_chunked_per_timestep(
     use_cftime: bool = False,
     pattern: PatternType | None = None,
     headers: list[dict[str, Any]] | None = None,
-):
+) -> xr.DataArray:
     """
     Open IDF files chunked per timestep.
 
@@ -633,7 +634,7 @@ def open_dataset(
     globpath: str | pathlib.Path,
     use_cftime: bool = False,
     pattern: PatternType | None = None,
-):
+) -> dict[str, xr.DataArray]:
     """
     Open a set of IDFs to a dict of xarray.DataArrays.
 
@@ -712,7 +713,7 @@ def write(
     a: xr.DataArray,
     nodata: float = 1.0e20,
     dtype: DTypeLike = np.float32,
-):
+) -> None:
     """
     Write a 2D xarray.DataArray to a IDF file
 
@@ -822,7 +823,7 @@ def write(
         a.values.tofile(f)
 
 
-def _as_voxeldata(a: xr.DataArray):
+def _as_voxeldata(a: xr.DataArray) -> xr.DataArray:
     """
     If "z" is present as a dimension, generate layer if necessary. Ensure that
     layer is the dimension (via swap_dims). Infer "dz" if necessary, and if
@@ -875,7 +876,7 @@ def save(
     nodata: float = 1.0e20,
     pattern: PatternType | None = None,
     dtype: DTypeLike = np.float32,
-):
+) -> None:
     """
     Write a xarray.DataArray to one or more IDF files
 

@@ -3,7 +3,7 @@ Module to define type aliases.
 """
 
 from datetime import datetime
-from typing import TYPE_CHECKING, Literal, TypeAlias, TypedDict, TypeVar, Union
+from typing import TYPE_CHECKING, Any, Literal, TypeAlias, TypedDict, TypeVar, Union
 
 import numpy as np
 import xarray as xr
@@ -19,6 +19,7 @@ UnstructuredData: TypeAlias = Union[xu.UgridDataset, xu.UgridDataArray]
 FloatArray: TypeAlias = NDArray[np.floating]
 IntArray: TypeAlias = NDArray[np.int_]
 StressPeriodTimesType: TypeAlias = list[datetime] | Literal["steady-state"]
+DataArrayComponents: TypeAlias = tuple[np.ndarray, dict[str, Any], tuple[str, ...], str]
 
 
 class SelSettingsType(TypedDict, total=False):
