@@ -365,7 +365,7 @@ def check_subdomain_consistency(
 
 
 def _open_idf_data_from_group(
-    group: tuple[list[str], list[dict[str, Any]]],
+    group: tuple[list[PathType], list[dict[str, Any]]],
     use_cftime: bool,
 ) -> np.ndarray:
     """Open IDF files from a group and return as numpy array."""
