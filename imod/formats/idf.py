@@ -10,9 +10,7 @@ import pathlib
 import struct
 from collections import defaultdict
 from collections.abc import Iterable
-from pathlib import Path
-from re import Pattern
-from typing import Any, Callable, DefaultDict, Literal, Sequence, TypeAlias
+from typing import Any, Callable, DefaultDict, Literal, Sequence
 
 import dask
 import dask.array
@@ -22,14 +20,12 @@ from numpy.typing import DTypeLike
 
 import imod
 from imod.formats import array_io
+from imod.formats.array_io.reading import PathType, PatternType
 from imod.typing import DataArrayComponents
 from imod.typing.structured import merge_partitions_as_da_components
 
 # Make sure we can still use the built-in function...
 f_open = open
-
-PatternType: TypeAlias = Pattern[str] | str
-PathType: TypeAlias = str | Path
 
 
 def header(path: PathType, pattern: PatternType | None) -> dict[str, Any]:

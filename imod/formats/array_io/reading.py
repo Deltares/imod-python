@@ -2,6 +2,7 @@ import collections
 import glob
 import itertools
 import pathlib
+from re import Pattern
 from typing import Any, Callable, TypeAlias
 
 import dask
@@ -11,6 +12,8 @@ import xarray as xr
 from imod.typing import DataArrayComponents
 from imod.util import nested_dict, spatial, time
 
+PatternType: TypeAlias = Pattern[str] | str
+PathType: TypeAlias = str | pathlib.Path
 BoundsType: TypeAlias = list[tuple[float, float, float, float]]
 CellsizesType: TypeAlias = list[tuple[float, float]]
 ZInterfaceType: TypeAlias = list[float | None]
@@ -99,7 +102,10 @@ def _to_nan(a: np.ndarray, nodata: float) -> np.ndarray:
 
 
 def _array_z_coord(
-    coords: dict[str, Any], tops, bots, unique_indices: np.ndarray
+    coords: dict[str, Any],
+    tops: ZInterfaceType,
+    bots: ZInterfaceType,
+    unique_indices: np.ndarray,
 ) -> dict[str, Any]:
     top = np.array(tops)[unique_indices]
     bot = np.array(bots)[unique_indices]
@@ -115,7 +121,7 @@ def _array_z_coord(
     return coords
 
 
-def _scalar_z_coord(coords, tops, bots):
+def _scalar_z_coord(coords: dict[str, Any], tops: ZInterfaceType, bots: ZInterfaceType):
     # They must be all the same to be used, as they cannot be assigned
     # to layer.
     top = np.unique(tops)
@@ -130,7 +136,7 @@ def _scalar_z_coord(coords, tops, bots):
     return coords
 
 
-def _initialize_groupby(ndims):
+def _initialize_groupby(ndims: int):
     """
     This function generates a data structure consisting of defaultdicts, to use
     for grouping arrays by dimension. The number of dimensions may vary, so the
@@ -165,7 +171,7 @@ def _initialize_groupby(ndims):
     return nested_dict.initialize_nested_dict(ndims - 1)
 
 
-def _ndconcat(arrays, ndim) -> dask.array.Array:
+def _ndconcat(arrays: list[list[Any]], ndim: int) -> dask.array.Array:
     """
     Parameters
     ----------
@@ -243,7 +249,9 @@ def _dims_coordinates(
     return dims, coords
 
 
-def _dask(path, attrs=None, pattern=None, _read=None, header=None) -> dask.array.Array:
+def _dask(
+    path: PathType, attrs: dict = None, pattern=None, _read=None, header=None
+) -> dask.array.Array:
     """
     Read a single IDF file to a dask.array
 
