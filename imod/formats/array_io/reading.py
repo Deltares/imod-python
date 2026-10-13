@@ -2,7 +2,7 @@ import collections
 import glob
 import itertools
 import pathlib
-from typing import Callable
+from typing import Any, Callable, TypeAlias
 
 import dask
 import numpy as np
@@ -11,14 +11,18 @@ import xarray as xr
 from imod.typing import DataArrayComponents
 from imod.util import nested_dict, spatial, time
 
+BoundsType: TypeAlias = list[tuple[float, float, float, float]]
+CellsizesType: TypeAlias = list[tuple[float, float]]
+ZInterfaceType: TypeAlias = list[float | None]
 
-def _all_equal(seq: list[str], elem: str) -> None:
+
+def _all_equal(seq: list[Any], elem: str) -> None:
     """Raise an error if not all elements of a list are equal"""
     if not seq.count(seq[0]) == len(seq):
         raise ValueError(f"All {elem} must be the same, found: {set(seq)}")
 
 
-def _check_cellsizes(cellsizes: list[tuple]) -> None:
+def _check_cellsizes(cellsizes: CellsizesType) -> None:
     """
     Checks if cellsizes match, raises ValueError otherwise
 
@@ -94,7 +98,9 @@ def _to_nan(a: np.ndarray, nodata: float) -> np.ndarray:
         return a
 
 
-def _array_z_coord(coords: dict, tops, bots, unique_indices):
+def _array_z_coord(
+    coords: dict[str, Any], tops, bots, unique_indices: np.ndarray
+) -> dict[str, Any]:
     top = np.array(tops)[unique_indices]
     bot = np.array(bots)[unique_indices]
     dz = top - bot
@@ -159,7 +165,7 @@ def _initialize_groupby(ndims):
     return nested_dict.initialize_nested_dict(ndims - 1)
 
 
-def _ndconcat(arrays, ndim):
+def _ndconcat(arrays, ndim) -> dask.array.Array:
     """
     Parameters
     ----------
@@ -182,7 +188,14 @@ def _ndconcat(arrays, ndim):
         return dask.array.stack(out, axis=0)
 
 
-def _dims_coordinates(header_coords, bounds, cellsizes, tops, bots, use_cftime):
+def _dims_coordinates(
+    header_coords: dict[str, list[Any]],
+    bounds: BoundsType,
+    cellsizes: CellsizesType,
+    tops: ZInterfaceType,
+    bots: ZInterfaceType,
+    use_cftime: bool,
+) -> tuple[list[str], dict[str, Any]]:
     # create coordinates
     coords = spatial._xycoords(bounds[0], cellsizes[0])
     dims = ["y", "x"]
@@ -230,7 +243,7 @@ def _dims_coordinates(header_coords, bounds, cellsizes, tops, bots, use_cftime):
     return dims, coords
 
 
-def _dask(path, attrs=None, pattern=None, _read=None, header=None):
+def _dask(path, attrs=None, pattern=None, _read=None, header=None) -> dask.array.Array:
     """
     Read a single IDF file to a dask.array
 
@@ -315,15 +328,15 @@ def load_as_components(
         Name of the DataArray.
     """
     # this function also works for single IDFs
-    names = [h["name"] for h in headers]
+    names: list[str] = [h["name"] for h in headers]
     _all_equal(names, "names")
 
     # Extract data from headers
-    bounds = []
-    cellsizes = []
-    tops = []
-    bots = []
-    header_coords = collections.defaultdict(list)
+    bounds: BoundsType = []
+    cellsizes: CellsizesType = []
+    tops: ZInterfaceType = []
+    bots: ZInterfaceType = []
+    header_coords: dict[str, list[Any]] = collections.defaultdict(list)
     for h in headers:
         bounds.append((h["xmin"], h["xmax"], h["ymin"], h["ymax"]))
         cellsizes.append((h["dx"], h["dy"]))
