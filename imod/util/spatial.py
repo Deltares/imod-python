@@ -46,7 +46,7 @@ except ImportError:
 
 
 def _xycoords(
-    bounds: tuple[float, float, float, float], cellsizes: tuple[float, float]
+    bounds: tuple[float, float, float, float], cellsizes: tuple[Any, Any]
 ) -> Dict[str, Any]:
     """Based on bounds and cellsizes, construct coords with spatial information"""
     # unpack tuples
