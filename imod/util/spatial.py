@@ -45,7 +45,9 @@ except ImportError:
     rasterio = MissingOptionalModule("rioxarray")
 
 
-def _xycoords(bounds, cellsizes) -> Dict[str, Any]:
+def _xycoords(
+    bounds: tuple[float, float, float, float], cellsizes: tuple[float, float]
+) -> Dict[str, Any]:
     """Based on bounds and cellsizes, construct coords with spatial information"""
     # unpack tuples
     xmin, xmax, ymin, ymax = bounds
