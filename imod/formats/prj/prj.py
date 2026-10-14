@@ -44,7 +44,6 @@ KEYS = {
     "(pwt)": (None),
     "(sft)": (None),
     "(obs)": (None),
-    "(cbi)": (None),
     "(sco)": (None),
     "(dsp)": (None),
     "(ics)": (None),
@@ -209,6 +208,7 @@ def _tokenize(line: str) -> List[str]:
 def _wrap_error_message(
     exception: Exception, description: str, lines: _LineIterator
 ) -> None:
+    """Re-raise an error with context from the offending input line."""
     lines.back()
     content = next(lines)
     number = lines.count + 1
@@ -219,6 +219,7 @@ def _wrap_error_message(
 
 
 def _parse_blockheader(lines: _LineIterator) -> Tuple[int, str, str]:
+    """Parse a block header, returning ``None`` values for non-header lines."""
     try:
         no_result = None, None, None
         line = next(lines)
@@ -244,6 +245,7 @@ def _parse_blockheader(lines: _LineIterator) -> Tuple[int, str, str]:
 
 
 def _parse_time(lines: _LineIterator) -> str:
+    """Parse the date and optional time from the next input line."""
     try:
         line = next(lines)
         date = line[0].lower()
@@ -257,6 +259,7 @@ def _parse_time(lines: _LineIterator) -> str:
 
 
 def _parse_blockline(lines: _LineIterator, time: str = None) -> Dict[str, Any]:
+    """Parse one package-entry line into typed values."""
     try:
         line = next(lines)
         content = {
@@ -277,6 +280,7 @@ def _parse_blockline(lines: _LineIterator, time: str = None) -> Dict[str, Any]:
 
 
 def _parse_nsub_nsystem(lines: _LineIterator) -> Tuple[int, int]:
+    """Read the number of sub-entries and systems from the next line."""
     try:
         line = next(lines)
         n_entry = int(line[0])
@@ -290,6 +294,7 @@ def _parse_notimeblock(
     lines: _LineIterator,
     fields: List[str],
 ) -> Dict[str, Any]:
+    """Parse a package block whose entries are not time-dependent."""
     n_entry, n_system = _parse_nsub_nsystem(lines)
 
     if len(fields) != n_entry:
@@ -306,6 +311,7 @@ def _parse_notimeblock(
 def _parse_capblock(
     lines: _LineIterator,
 ) -> Dict[str, Any]:
+    """Parse a MetaSWAP CAP block using its declared field count."""
     fields = METASWAP_VARS
     n_entry, n_system = _parse_nsub_nsystem(lines)
 
@@ -340,6 +346,7 @@ def _parse_timeblock(
     fields: List[str],
     n: int,
 ) -> Dict[str, Any]:
+    """Parse the declared time periods and their package entries."""
     n_fields = len(fields)
     content = defaultdict(list)
     for _ in range(n):
@@ -362,6 +369,7 @@ def _parse_timeblock(
 
 
 def _parse_pcgblock(lines: _LineIterator) -> Dict[str, Any]:
+    """Parse PCG solver settings from the next line or lines."""
     try:
         line = next(lines)
 
@@ -407,6 +415,7 @@ def _parse_pcgblock(lines: _LineIterator) -> Dict[str, Any]:
 
 
 def _parse_periodsblock(lines: _LineIterator) -> Dict[str, str]:
+    """Parse period aliases and their associated start times."""
     try:
         periods = {}
         while not lines.finished:
@@ -425,6 +434,8 @@ def _parse_periodsblock(lines: _LineIterator) -> Dict[str, str]:
 
 
 def _parse_speciesblock(lines: _LineIterator):
+    
+    """Parse species names indexed by species number."""
     try:
         species = {}
         while not lines.finished:
@@ -441,8 +452,11 @@ def _parse_speciesblock(lines: _LineIterator):
 
 
 def _parse_block(lines: _LineIterator, content: Dict[str, Any]) -> None:
-    """
-    Mutates content dict.
+    """Parse the next project-file block and add it to ``content``.
+
+    Consumes the header and body lines from ``lines``. Lines outside a topic
+    block are skipped. If no further block header is found, ``content`` is
+    left unchanged.
     """
     n = key = active = None
 
