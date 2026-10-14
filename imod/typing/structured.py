@@ -8,6 +8,8 @@ import dask
 import numpy as np
 import xarray as xr
 
+from imod.typing import DataArrayComponents
+
 # %%
 
 
@@ -157,7 +159,7 @@ def _merge_nonequidistant_coords(
 
 def merge_partitions_as_da_components(
     das: List[xr.DataArray],
-) -> tuple[np.ndarray, dict[str, Any], tuple[str, ...], str]:
+) -> DataArrayComponents:
     """
     Merge a list of xarray DataArrays into components for a single DataArray.
 
