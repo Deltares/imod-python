@@ -405,10 +405,12 @@ def test_parse_pcgblock():
 def test__parse_block__header_error():
     lines = prj._LineIterator([["1", "(bla)", "1"]])
     content = {}
-    with pytest.raises(
-        ValueError, match=re.escape("Failed to recognize header keyword: (bla)")
-    ):
+    with pytest.raises(ValueError) as raised_error:
         prj._parse_block(lines, content)
+
+    error_message = str(raised_error.value)
+    assert "Failed to parse project-file block '(bla)' near line 1" in error_message
+    assert "Failed to recognize header keyword: (bla)" in error_message
 
 
 def test__parse_blockline__path_resolved():

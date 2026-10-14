@@ -485,7 +485,8 @@ def _parse_block(lines: _LineIterator, content: Dict[str, Any]) -> None:
 
     except Exception as e:
         raise type(e)(
-            f"{e}\nError occurred for keyword: {key} in line {lines.count + 1}"
+            f"Failed to parse project-file block {key!r} near line "
+            f"{lines.count + 1}.\nDetails: {e}"
         )
 
     if blockcontent is not None and active is not None:
