@@ -55,6 +55,7 @@ SUGGESTION_TEXT = (
     "-> You might fix this by calling the package's ``.cleanup()`` method."
 )
 PKGTYPES_WITH_CLEANUP = [River, Drainage, GeneralHeadBoundary, GridAgnosticWell]
+CHARLEN = 40
 
 
 def pkg_has_cleanup(pkg: Package):
@@ -96,10 +97,10 @@ class Modflow6Model(collections.UserDict[str, Package], IModel, abc.ABC):
         )
 
     def __setitem__(self, key, value):
-        if len(key) > 40:
+        if len(key) > CHARLEN:
             raise KeyError(
-                f"Received key with more than 40 characters: '{key}'"
-                "Modflow 6 has a character limit of 40 characters."
+                f"Received key with more than {CHARLEN} characters: '{key}'"
+                f"Modflow 6 has a character limit of {CHARLEN} characters."
             )
 
         super().__setitem__(key, value)
