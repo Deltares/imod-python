@@ -55,7 +55,7 @@ SUGGESTION_TEXT = (
     "-> You might fix this by calling the package's ``.cleanup()`` method."
 )
 PKGTYPES_WITH_CLEANUP = [River, Drainage, GeneralHeadBoundary, GridAgnosticWell]
-CHARLEN = 40
+CHARLEN = 16
 
 
 def pkg_has_cleanup(pkg: Package):
