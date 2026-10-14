@@ -3,11 +3,12 @@ import glob
 import itertools
 import pathlib
 from re import Pattern
-from typing import Any, Callable, TypeAlias
+from typing import Any, Callable, TypeAlias, cast
 
 import dask
 import numpy as np
 import xarray as xr
+from numpy.typing import DTypeLike
 
 from imod.typing import DataArrayComponents
 from imod.util import nested_dict, spatial, time
@@ -15,7 +16,7 @@ from imod.util import nested_dict, spatial, time
 PatternType: TypeAlias = Pattern[str] | str
 PathType: TypeAlias = str | pathlib.Path
 BoundsType: TypeAlias = list[tuple[float, float, float, float]]
-CellsizesType: TypeAlias = list[tuple[float, float]]
+CellsizesType: TypeAlias = list[tuple[float | np.ndarray, float | np.ndarray]]
 ZInterfaceType: TypeAlias = list[float | None]
 
 
@@ -25,7 +26,7 @@ def _all_equal(seq: list[Any], elem: str) -> None:
         raise ValueError(f"All {elem} must be the same, found: {set(seq)}")
 
 
-def _check_cellsizes(cellsizes: CellsizesType) -> None:
+def _check_cellsizes(cellsizes: tuple[Any, Any]) -> None:
     """
     Checks if cellsizes match, raises ValueError otherwise
 
@@ -103,8 +104,8 @@ def _to_nan(a: np.ndarray, nodata: float) -> np.ndarray:
 
 def _array_z_coord(
     coords: dict[str, Any],
-    tops: ZInterfaceType,
-    bots: ZInterfaceType,
+    tops: list[float],
+    bots: list[float],
     unique_indices: np.ndarray,
 ) -> dict[str, Any]:
     top = np.array(tops)[unique_indices]
@@ -121,11 +122,11 @@ def _array_z_coord(
     return coords
 
 
-def _scalar_z_coord(coords: dict[str, Any], tops: ZInterfaceType, bots: ZInterfaceType):
+def _scalar_z_coord(coords: dict[str, Any], tops: list[float], bots: list[float]):
     # They must be all the same to be used, as they cannot be assigned
     # to layer.
-    top = np.unique(tops)
-    bot = np.unique(bots)
+    top: np.ndarray = np.unique(tops)
+    bot: np.ndarray = np.unique(bots)
     if top.size == bot.size == 1:
         top = top.item()
         bot = bot.item()
@@ -241,17 +242,23 @@ def _dims_coordinates(
     # Deal with voxel idf top and bottom data
     all_have_z = all((v is not None for v in itertools.chain(tops, bots)))
     if all_have_z:
+        tops_float = cast(list[float], tops)
+        bots_float = cast(list[float], bots)
         if haslayer and coords["layer"].size > 1:
-            coords = _array_z_coord(coords, tops, bots, unique_indices)
+            coords = _array_z_coord(coords, tops_float, bots_float, unique_indices)
         else:
-            coords = _scalar_z_coord(coords, tops, bots)
+            coords = _scalar_z_coord(coords, tops_float, bots_float)
 
     return dims, coords
 
 
 def _dask(
-    path: PathType, attrs: dict = None, pattern=None, _read=None, header=None
-) -> dask.array.Array:
+    path: PathType,
+    attrs: dict[str, Any] | None = None,
+    pattern: PatternType | None = None,
+    _read: Callable[[str, int, int, int, Any, DTypeLike], np.ndarray] | None = None,
+    header: Callable[[PathType, PatternType | None], dict[str, Any]] | None = None,
+) -> tuple[dask.array.Array, dict[str, Any]]:
     """
     Read a single IDF file to a dask.array
 
@@ -267,6 +274,11 @@ def _dask(
         {name}_{time}_l{layer}, a custom pattern can be defined here either
         as a string, or as a compiled regular expression pattern. Please refer
         to the examples in ``imod.idf.open``.
+    _read : Callable[[str, int, int, int, Any, DTypeLike], np.ndarray], optional
+        Function to read individual files. Must be provided.
+    header : Callable[[PathType, PatternType | None], dict[str, Any]], optional
+        Function to read the header of a file. Must be provided if attrs is not
+        supplied.
 
     Returns
     -------
@@ -281,6 +293,10 @@ def _dask(
     path = pathlib.Path(path)
 
     if attrs is None:
+        if header is None:
+            raise ValueError(
+                "Header function must be provided if attrs is not supplied."
+            )
         attrs = header(path, pattern)
     # If we don't unpack, it seems we run into trouble with the dask array later
     # on, probably because attrs isn't immutable. This works fine instead.
