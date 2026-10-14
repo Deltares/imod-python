@@ -10,6 +10,7 @@ from shapely import linestrings
 import imod
 from imod.mf6.adv import AdvectionCentral
 from imod.mf6.hfb import SingleLayerHorizontalFlowBarrierResistance
+from imod.mf6.model import CHARLEN
 from imod.mf6.write_context import WriteContext
 
 
@@ -17,7 +18,7 @@ def test_long_package_name():
     m = imod.mf6.GroundwaterTransportModel()
     with pytest.raises(
         KeyError,
-        match="Received key with more than 40 characters: 'my_extremely_long_and_verbose_package_name'Modflow 6 has a character limit of 40.",
+        match=f"Received key with more than {CHARLEN} characters: 'my_extremely_long_and_verbose_package_name'Modflow 6 has a character limit of {CHARLEN}.",
     ):
         m["my_extremely_long_and_verbose_package_name"] = imod.mf6.AdvectionCentral()
 

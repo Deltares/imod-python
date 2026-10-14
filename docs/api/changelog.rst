@@ -85,6 +85,8 @@ Changed
 - :func:`imod.formats.prj.open_projectfile_data` now chunks the data by time
   only instead of by both time and layer. This should enhance performance when
   working with large datasets.
+- Reduced the character limit for package keys to 16 characters again in
+  :class:`imod.mf6.GroundwaterFlowModel` and :class:`imod.mf6.TransportModel`.
 
 [1.1.0] - 2026-08-03
 --------------------
