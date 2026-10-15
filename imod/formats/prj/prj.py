@@ -44,6 +44,7 @@ KEYS = {
     "(pwt)": (None),
     "(sft)": (None),
     "(obs)": (None),
+    "(cbi)": (None),
     "(sco)": (None),
     "(dsp)": (None),
     "(ics)": (None),
