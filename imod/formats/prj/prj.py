@@ -290,6 +290,50 @@ def _parse_nsub_nsystem(lines: _LineIterator) -> Tuple[int, int]:
         _wrap_error_message(e, "number of sub-entries and number of systems", lines)
 
 
+def _is_block_header(line: List[str]) -> bool:
+    if not line:
+        return False
+    if line[0].lower() in ("periods", "species"):
+        return True
+    if len(line) < 3:
+        return False
+    try:
+        int(line[0])
+    except ValueError:
+        return False
+    keyword = line[1].lower()
+    return keyword == "extra" or (keyword.startswith("(") and keyword.endswith(")"))
+
+
+def _parse_package_entries(
+    lines: _LineIterator,
+    n_entry: int,
+    n_system: int,
+    time: Optional[str] = None,
+) -> List[Dict[str, Any]]:
+    """Read package entries to a boundary and validate their declared count."""
+    entries = []
+    expected = n_entry * n_system
+    while not lines.finished:
+        line = next(lines)
+        if not line:
+            continue
+        if _is_block_header(line) or (
+            time is not None and len(entries) >= expected and len(line) <= 2
+        ):
+            lines.back()
+            break
+        lines.back()
+        entries.append(_parse_blockline(lines, time))
+
+    if len(entries) != expected:
+        raise ValueError(
+            f"Expected {expected} package entries "
+            f"(NSUB={n_entry}, NSYSTEM={n_system}), found {len(entries)}"
+        )
+    return entries
+
+
 def _parse_notimeblock(
     lines: _LineIterator,
     fields: List[str],
@@ -301,8 +345,10 @@ def _parse_notimeblock(
         raise ValueError(
             f"Expected NSUB entry of {len(fields)} for {fields}, read: {n_entry}"
         )
+    entries = _parse_package_entries(lines, n_entry, n_system)
     content = {
-        field: [_parse_blockline(lines) for _ in range(n_system)] for field in fields
+        field: entries[index * n_system : (index + 1) * n_system]
+        for index, field in enumerate(fields)
     }
     content["n_system"] = n_system
     return content
@@ -327,8 +373,10 @@ def _parse_capblock(
             f"Expected NSUB entry of 21, 22, or 26 for {fields}, read: {n_entry}"
         )
 
+    entries = _parse_package_entries(lines, n_entry, n_system)
     content = {
-        field: [_parse_blockline(lines) for _ in range(n_system)] for field in fields
+        field: entries[index * n_system : (index + 1) * n_system]
+        for index, field in enumerate(fields)
     }
     content["n_system"] = n_system
     return content
@@ -359,10 +407,9 @@ def _parse_timeblock(
                 f"Expected NSUB entry of {n_fields} for {fields}, read: {n_entry}"
             )
 
-        for field in fields:
-            content[field].extend(
-                [_parse_blockline(lines, time) for _ in range(n_system)]
-            )
+        entries = _parse_package_entries(lines, n_entry, n_system, time)
+        for index, field in enumerate(fields):
+            content[field].extend(entries[index * n_system : (index + 1) * n_system])
 
     content["n_system"] = n_system
     return content
@@ -434,7 +481,6 @@ def _parse_periodsblock(lines: _LineIterator) -> Dict[str, str]:
 
 
 def _parse_speciesblock(lines: _LineIterator):
-    
     """Parse species names indexed by species number."""
     try:
         species = {}
