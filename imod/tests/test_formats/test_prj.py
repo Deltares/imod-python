@@ -466,7 +466,9 @@ def test_parse_timeblock_entry_count(difference):
     )
     if difference:
         expected_error = (
-            "Failed to parse entries" if difference < 0 else "Expected 2 package entries"
+            "Failed to parse entries"
+            if difference < 0
+            else "Expected 2 package entries"
         )
         with pytest.raises(ValueError, match=expected_error):
             prj._parse_timeblock(lines, ["rate"], 2)
