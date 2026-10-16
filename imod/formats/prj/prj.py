@@ -314,7 +314,7 @@ def _parse_package_entries(
 ) -> List[Dict[str, Any]]:
     """Read package data and check that its entry count matches the count line.
 
-    Ignore blank lines and read entries until the next block header, 
+    Ignore blank lines and read entries until the next block header,
     leaving the header for the next block parser to read by going back a line.
     """
     entries = []
@@ -326,9 +326,9 @@ def _parse_package_entries(
         if _is_block_header(line) or (
             time is not None and len(entries) >= expected and len(line) <= 2
         ):
-            lines.back() # leave the header for the next block parser to read
+            lines.back()  # leave the header for the next block parser to read
             break
-        lines.back() # Rewind so that the data line can be parsed correctly
+        lines.back()  # Rewind so that the data line can be parsed correctly
         entries.append(_parse_blockline(lines, time))
 
     if len(entries) != expected:
