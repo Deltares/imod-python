@@ -69,6 +69,9 @@ Fixed
   cause errors when calling :meth:`imod.msw.MetaSwapModel.dump`.
 - Fixed issue where a TypeError was thrown for string data when calling
   :meth:`imod.mf6.Modflow6Simulation.from_file` when reading from a zarr file.
+- :func:`imod.formats.prj.read_projectfile` now validates that the number of
+  package entries matches the declared count for static, time-dependent, and
+  MetaSWAP CAP blocks, and provides clearer parsing errors for invalid input.
 
 Changed
 ~~~~~~~

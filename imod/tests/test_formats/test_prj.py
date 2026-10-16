@@ -405,10 +405,99 @@ def test_parse_pcgblock():
 def test__parse_block__header_error():
     lines = prj._LineIterator([["1", "(bla)", "1"]])
     content = {}
-    with pytest.raises(
-        ValueError, match=re.escape("Failed to recognize header keyword: (bla)")
-    ):
+    with pytest.raises(ValueError) as raised_error:
         prj._parse_block(lines, content)
+
+    error_message = str(raised_error.value)
+    assert "Failed to parse project-file block '(bla)' near line 1" in error_message
+    assert "Failed to recognize header keyword: (bla)" in error_message
+
+
+@pytest.mark.parametrize("n_system", [1, 2])
+@pytest.mark.parametrize("difference", [-1, 0, 1])
+@pytest.mark.parametrize("separator", [[], [[]], [[], []]])
+@pytest.mark.parametrize("at_eof", [False, True])
+def test_parse_capblock_entry_count(n_system, difference, separator, at_eof):
+    expected = 22 * n_system
+    entry = ["1", "1", "1", "1.0", "0.0", "25.0"]
+    following = [] if at_eof else [["008", "EXTRA", "FILES"]]
+    lines = prj._LineIterator(
+        [["22", str(n_system)]]
+        + [entry] * (expected + difference)
+        + separator
+        + following
+    )
+
+    if difference:
+        with pytest.raises(
+            ValueError,
+            match=f"Expected {expected} package entries .*found {expected + difference}",
+        ):
+            prj._parse_capblock(lines)
+    else:
+        content = prj._parse_capblock(lines)
+        assert len(content["boundary"]) == n_system
+        assert len(content["conductivity_factor"]) == n_system
+        if not at_eof:
+            assert next(lines) == following[0]
+
+
+@pytest.mark.parametrize("difference", [-1, 0, 1])
+def test_parse_notimeblock_entry_count(difference):
+    entry = ["1", "1", "1", "1.0", "0.0", "25.0"]
+    lines = prj._LineIterator(
+        [["1", "2"]] + [entry] * (2 + difference) + [["1", "(top)", "1"]]
+    )
+    if difference:
+        with pytest.raises(ValueError, match="Expected 2 package entries"):
+            prj._parse_notimeblock(lines, ["ibound"])
+    else:
+        assert len(prj._parse_notimeblock(lines, ["ibound"])["ibound"]) == 2
+        assert next(lines) == ["1", "(top)", "1"]
+
+
+@pytest.mark.parametrize("difference", [-1, 0, 1])
+def test_parse_timeblock_entry_count(difference):
+    entry = ["1", "1", "1", "1.0", "0.0", "25.0"]
+    lines = prj._LineIterator(
+        [["2000-01-01"], ["1", "2"]]
+        + [entry] * (2 + difference)
+        + [[], ["SUMMER"], ["1", "2"], entry, entry, ["1", "(top)", "1"]]
+    )
+    if difference:
+        expected_error = (
+            "Failed to parse entries"
+            if difference < 0
+            else "Expected 2 package entries"
+        )
+        with pytest.raises(ValueError, match=expected_error):
+            prj._parse_timeblock(lines, ["rate"], 2)
+    else:
+        content = prj._parse_timeblock(lines, ["rate"], 2)
+        assert content["time"] == ["2000-01-01", "summer"]
+        assert [entry["time"] for entry in content["rate"]] == [
+            "2000-01-01",
+            "2000-01-01",
+            "summer",
+            "summer",
+        ]
+        assert next(lines) == ["1", "(top)", "1"]
+
+
+@pytest.mark.parametrize(
+    "line, error_type",
+    [
+        (["#", "comment"], ValueError),
+        (["some", "text"], ValueError),
+        (["1", "2"], IndexError),
+        (["1", "2", "001", "bad", "0.0", "25.0"], ValueError),
+    ],
+)
+def test_parse_timeblock_rejects_malformed_entry(line, error_type):
+    lines = prj._LineIterator([["2000-01-01"], ["1", "1"], line])
+
+    with pytest.raises(error_type, match="Failed to parse entries"):
+        prj._parse_timeblock(lines, ["rate"], 1)
 
 
 def test__parse_blockline__path_resolved():
