@@ -317,6 +317,7 @@ def _parse_package_entries(
     Ignore blank lines and read entries until the next block header,
     leaving the header for the next block parser to read by going back a line.
     """
+    # TODO: Consider ingesting line directly instead of the iterator
     entries = []
     expected = n_entry * n_system
     while not lines.finished:
