@@ -312,7 +312,11 @@ def _parse_package_entries(
     n_system: int,
     time: Optional[str] = None,
 ) -> List[Dict[str, Any]]:
-    """Read package entries to a boundary and validate their declared count."""
+    """Read package data and check that its entry count matches the count line.
+
+    Ignore blank lines and read entries until the next block header, 
+    leaving the header for the next block parser to read by going back a line.
+    """
     entries = []
     expected = n_entry * n_system
     while not lines.finished:
@@ -322,9 +326,9 @@ def _parse_package_entries(
         if _is_block_header(line) or (
             time is not None and len(entries) >= expected and len(line) <= 2
         ):
-            lines.back()
+            lines.back() # leave the header for the next block parser to read
             break
-        lines.back()
+        lines.back() # Rewind so that the data line can be parsed correctly
         entries.append(_parse_blockline(lines, time))
 
     if len(entries) != expected:
