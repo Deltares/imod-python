@@ -30,7 +30,7 @@ def _is_parsable_and_existing_path(potential_path: str, mete_grid_path: Path) ->
         return False
     except ValueError:
         # Resolve paths relative to mete_grid.inp path.
-        path = mete_grid_path / ".." / Path(potential_path)
+        path = mete_grid_path.parent / Path(potential_path)
         return path.is_file()
 
 
@@ -54,7 +54,7 @@ def open_first_meteo_grid(mete_grid_path: str | Path, column_nr: int) -> xr.Data
             potential_path = cols[column_nr].replace('"', "")
             potential_paths.append(potential_path)
             if _is_parsable_and_existing_path(potential_path, mete_grid_path):
-                resolved_path = mete_grid_path / ".." / Path(potential_path)
+                resolved_path = mete_grid_path.parent / Path(potential_path)
                 return imod.rasterio.open(resolved_path)
 
     error_message = dedent(f"""    
