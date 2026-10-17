@@ -50,6 +50,12 @@ Added
 Fixed
 ~~~~~
 
+- :func:`imod.idf.open_subdomains` returned different results for overlapping
+  subdomains depending on the filesystem's file listing order (e.g. on macOS
+  and Linux). Globbed paths are now sorted.
+- Relative meteo grid paths in ``mete_grid.inp`` could not be resolved on macOS
+  and Linux, causing :meth:`imod.msw.PrecipitationMapping.from_imod5_data` and
+  :meth:`imod.msw.EvapotranspirationMapping.from_imod5_data` to fail.
 - Fixed resampling in :meth:`imod.mf6.Well.from_imod5_data` and
   :meth:`imod.mf6.LayeredWell.from_imod5_data` when simulation timesteps precede
   the first well timestep.

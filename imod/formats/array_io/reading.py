@@ -391,7 +391,9 @@ def handle_path(
     if isinstance(path, list):
         paths = path
     else:
-        paths = [pathlib.Path(p) for p in glob.glob(path)]
+        # Sort: glob order is filesystem dependent (alphabetical on NTFS, not
+        # on e.g. APFS or ext4), and downstream merging can depend on order.
+        paths = [pathlib.Path(p) for p in sorted(glob.glob(path))]
 
     n = len(paths)
     if n == 0:
