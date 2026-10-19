@@ -929,8 +929,8 @@ class IpfResult:
 
 
 def _process_ipf_time(
-    entry: Dict[str, Any], periods: Dict[str, datetime], repeats: list[str]
-) -> tuple[Optional[str], list[str]]:
+    entry: Dict[str, Any], periods: Dict[str, datetime], repeats: List[datetime]
+) -> Tuple[Optional[datetime], List[datetime]]:
     timestring = entry["time"]
     time = periods.get(timestring)
     if time is None:
@@ -941,7 +941,7 @@ def _process_ipf_time(
 
 
 def _prepare_df_unassociated(ipf_df: pd.DataFrame, layer: int) -> pd.DataFrame:
-    columns = ("x", "y", "rate")
+    columns: Tuple[str, ...] = ("x", "y", "rate")
     if layer <= 0:
         df = ipf_df.iloc[:, :5]
         columns = columns + ("filt_top", "filt_bot")
@@ -997,13 +997,12 @@ def _prepare_df_associated(
 
 def _read_package_ipf(
     block_content: Dict[str, Any], periods: Dict[str, datetime]
-) -> Tuple[Dict[str, Dict], List[datetime]]:
-    out = defaultdict(IpfResult)
-    repeats = []
-
+) -> Tuple[Dict[str, Dict[str, Any]], List[datetime]]:
+    out: Dict[str, IpfResult] = defaultdict(IpfResult)
+    repeats: List[datetime] = []
     # we will store in this set the tuples of (x, y, id, well_top, well_bot)
     # which should be unique for each well
-    imported_wells = {}
+    imported_wells: Dict[Tuple[Any, ...], int] = {}
 
     for entry in block_content["ipf"]:
         time, repeats = _process_ipf_time(entry, periods, repeats)
@@ -1035,7 +1034,9 @@ def _read_package_ipf(
         out[path.stem].has_associated = has_associated
         out[path.stem].append(df, layer, time, factor, addition)
 
-    out_dict_ls: dict[str, dict] = {key: asdict(o) for key, o in out.items()}
+    out_dict_ls: Dict[str, Dict[str, Any]] = {
+        key: asdict(o) for key, o in out.items()
+    }
     repeats = sorted(repeats)
     return out_dict_ls, repeats
 
