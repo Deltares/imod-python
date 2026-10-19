@@ -322,7 +322,7 @@ def _parse_package_entries(
     leaving the header for the next block parser to read by going back a line.
     """
     # TODO: Consider ingesting line directly instead of the iterator
-    entries = []
+    entries: List[Dict[str, Any]] = []
     expected = n_entry * n_system
     while not lines.finished:
         line = next(lines)
@@ -346,7 +346,7 @@ def _parse_package_entries(
 
 def _parse_notimeblock(
     lines: _LineIterator,
-    fields: List[str],
+    fields: Sequence[Optional[str]],
 ) -> Dict[str, Any]:
     """Parse a package block whose entries are not time-dependent."""
     n_entry, n_system = _parse_nsub_nsystem(lines)
@@ -356,7 +356,7 @@ def _parse_notimeblock(
             f"Expected NSUB entry of {len(fields)} for {fields}, read: {n_entry}"
         )
     entries = _parse_package_entries(lines, n_entry, n_system)
-    content = {
+    content: Dict[str, Any] = {
         field: entries[index * n_system : (index + 1) * n_system]
         for index, field in enumerate(fields)
     }
@@ -368,12 +368,14 @@ def _parse_capblock(
     lines: _LineIterator,
 ) -> Dict[str, Any]:
     """Parse a MetaSWAP CAP block using its declared field count."""
-    fields = METASWAP_VARS
+    fields: Sequence[str] = METASWAP_VARS
     n_entry, n_system = _parse_nsub_nsystem(lines)
 
     if n_entry == 21:
         # Remove layer entry.
-        fields = list(fields[:22]).pop(8)
+        fields_list = list(fields[:22])
+        fields_list.pop(8)
+        fields = fields_list
     elif n_entry == 22:
         fields = fields[:22]
     elif n_entry == 26:
@@ -384,7 +386,7 @@ def _parse_capblock(
         )
 
     entries = _parse_package_entries(lines, n_entry, n_system)
-    content = {
+    content: Dict[str, Any] = {
         field: entries[index * n_system : (index + 1) * n_system]
         for index, field in enumerate(fields)
     }
@@ -392,21 +394,21 @@ def _parse_capblock(
     return content
 
 
-def _parse_extrablock(lines: _LineIterator, n: int) -> Dict[str, List[str]]:
+def _parse_extrablock(lines: _LineIterator, n: int) -> Dict[str, Any]:
     """Parse the MetaSWAP "extra files" block"""
-    content = {"paths": [next(lines) for _ in range(n)]}
+    content: Dict[str, Any] = {"paths": [next(lines) for _ in range(n)]}
     content["paths"] = [[Path(x[0]).resolve()] for x in content["paths"]]
     return content
 
 
 def _parse_timeblock(
-    lines: List[str],
-    fields: List[str],
+    lines: _LineIterator,
+    fields: Sequence[Optional[str]],
     n: int,
 ) -> Dict[str, Any]:
     """Parse the declared time periods and their package entries."""
     n_fields = len(fields)
-    content = defaultdict(list)
+    content: Dict[str, Any] = defaultdict(list)
     for _ in range(n):
         time = _parse_time(lines)
         content["time"].append(time)
