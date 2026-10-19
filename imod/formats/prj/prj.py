@@ -523,15 +523,14 @@ def _parse_block(lines: _LineIterator, content: Dict[str, Any]) -> None:
 
     if key is None:
         return
+    blockcontent: Optional[Dict[str, Any]]
     try:
         if key in KEYS:
             if n != 1:
                 raise ValueError(f"Expected N=1 for {key}, read: {n}")
-            fields = KEYS[key]
-            blockcontent = _parse_notimeblock(lines, fields)
+            blockcontent = _parse_notimeblock(lines, KEYS[key])
         elif key in DATE_KEYS:
-            fields = DATE_KEYS[key]
-            blockcontent = _parse_timeblock(lines, fields, n)
+            blockcontent = _parse_timeblock(lines, DATE_KEYS[key], n)
         elif key == "(cap)":
             blockcontent = _parse_capblock(lines)
         elif key == "(pcg)":
