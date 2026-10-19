@@ -740,32 +740,44 @@ def _open_package_idf(
     return [das]
 
 
-def _process_time(time: str, yearfirst: bool = True):
-    if time == "steady-state":
-        time = None
-    else:
-        if yearfirst:
-            if len(time) == 19:
-                time = datetime.strptime(time, "%Y-%m-%d %H:%M:%S")
-            elif len(time) == 10:
-                time = datetime.strptime(time, "%Y-%m-%d")
-            else:
-                raise ValueError(
-                    f"time data {time} does not match format "
-                    '"%Y-%m-%d %H:%M:%S" or "%Y-%m-%d"'
-                )
-        else:
-            if len(time) == 19:
-                time = datetime.strptime(time, "%d-%m-%Y %H:%M:%S")
-            elif len(time) == 10:
-                time = datetime.strptime(time, "%d-%m-%Y")
-            else:
-                raise ValueError(
-                    f"time data {time} does not match format "
-                    '"%d-%m-%Y %H:%M:%S" or "%d-%m-%Y"'
-                )
-    return time
+def _process_time(timestring: str, yearfirst: bool = True) -> Optional[datetime]:
+    if timestring == "steady-state":
+        return None
+    if yearfirst:
+        if len(timestring) == 19:
+            return datetime.strptime(timestring, "%Y-%m-%d %H:%M:%S")
+        elif len(timestring) == 10:
+            return datetime.strptime(timestring, "%Y-%m-%d")
+        raise ValueError(
+            f"time data {timestring} does not match format "
+            '"%Y-%m-%d %H:%M:%S" or "%Y-%m-%d"'
+        )
+    if len(timestring) == 19:
+        return datetime.strptime(timestring, "%d-%m-%Y %H:%M:%S")
+    elif len(timestring) == 10:
+        return datetime.strptime(timestring, "%d-%m-%Y")
+    raise ValueError(
+        f"time data {timestring} does not match format "
+        '"%d-%m-%Y %H:%M:%S" or "%d-%m-%Y"'
+    )
 
+
+def _process_timestring_period(timestring: str) -> datetime:
+    """
+    Process a time string for a repeating period.
+
+    The year of the resulting datetime is set to 1899 to ensure it falls outside
+    of the iMOD calendar, avoiding collisions.
+
+    Raises a ValueError if the time string cannot be used for a repeating
+    period.
+    """
+    result = _process_time(timestring, yearfirst=False)
+    if result is None:
+        raise ValueError(
+            f"Time string {timestring} cannot be used for a repeating period."
+        )
+    return result.replace(year=1899)
 
 def _process_boundary_condition_entry(entry: Dict, periods: Dict[str, datetime]):
     """
@@ -1145,10 +1157,8 @@ def open_projectfile_data(path: FilePath) -> tuple[dict[str, Any], dict[str, Any
     if periods_block is None:
         periods = {}
     else:
-        # Set the year of a repeat date to 1899: this ensures it falls outside
-        # of the iMOD calendar. Collisions are then always avoided.
         periods = {
-            key.lower(): _process_time(time, yearfirst=False).replace(year=1899)
+            key.lower(): _process_timestring_period(time)
             for key, time in periods_block.items()
         }
 
