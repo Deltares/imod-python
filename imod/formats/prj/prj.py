@@ -494,7 +494,7 @@ def _parse_periodsblock(lines: _LineIterator) -> Dict[str, str]:
 def _parse_speciesblock(lines: _LineIterator):
     """Parse species names indexed by species number."""
     try:
-        species = {}
+        species: Dict[int, str] = {}
         while not lines.finished:
             line = next(lines)
             # Stop if we encounter an empty line.
