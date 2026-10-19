@@ -779,14 +779,17 @@ def _process_timestring_period(timestring: str) -> datetime:
         )
     return result.replace(year=1899)
 
-def _process_boundary_condition_entry(entry: Dict, periods: Dict[str, datetime]):
+
+def _process_boundary_condition_entry(
+    entry: Dict[str, Any], periods: Dict[str, datetime]
+):
     """
     The iMOD project file supports constants in lieu of IDFs.
 
     Also process repeated stress periods (on a yearly basis): substitute the
     original date here.
     """
-    coords = {}
+    coords: Dict[str, Any] = {}
     timestring = entry["time"]
 
     # Resolve repeating periods first:
@@ -808,6 +811,7 @@ def _process_boundary_condition_entry(entry: Dict, periods: Dict[str, datetime])
     coords["layer"] = layer
     dims = dims + ("layer",)
 
+    header: Dict[str, Any]
     if "path" not in entry:
         path = None
         header = {"coords": coords}
