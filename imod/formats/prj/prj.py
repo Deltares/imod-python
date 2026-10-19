@@ -840,7 +840,7 @@ def _open_boundary_condition_idf(
     n_time = len(block_content["time"])
     n_total = n_system * n_time
 
-    das = [{} for _ in range(n_system)]
+    das: List[Dict[str, xr.DataArray]] = [{} for _ in range(n_system)]
     for variable in variables:
         variable_content = block_content[variable]
 
