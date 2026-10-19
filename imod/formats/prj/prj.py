@@ -565,12 +565,13 @@ def _parse_block(lines: _LineIterator, content: Dict[str, Any]) -> None:
     return
 
 
-def _process_package_entry(entry: Dict):
+def _process_package_entry(entry: Dict[str, Any]):
     """
     The iMOD project file supports constants in lieu of IDFs.
     """
     coords = {"layer": entry["layer"]}
     dims = ("layer",)
+    header: Dict[str, Any]
 
     if "path" not in entry:
         path = None
