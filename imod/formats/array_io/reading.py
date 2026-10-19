@@ -26,7 +26,7 @@ def _all_equal(seq: list[Any], elem: str) -> None:
         raise ValueError(f"All {elem} must be the same, found: {set(seq)}")
 
 
-def _check_cellsizes(cellsizes: tuple[Any, Any]) -> None:
+def _check_cellsizes(cellsizes: CellsizesType) -> None:
     """
     Checks if cellsizes match, raises ValueError otherwise
 
@@ -320,11 +320,11 @@ def _dask(
 
 
 def load_as_components(
-    paths: list[str | pathlib.Path],
+    paths: list[pathlib.Path],
     use_cftime: bool,
-    _read: Callable,
-    headers: list[dict],
-) -> DataArrayComponents:
+    _read: Callable[..., np.ndarray],
+    headers: list[dict[str, Any]],
+) -> tuple[dask.array.Array, dict[str, Any], list[str], str]:
     """
     Combine a list of paths to IDFs to components that can be used to construct
     a single xarray.DataArray.
@@ -392,7 +392,12 @@ def load_as_components(
     return dask_array, coords, dims, names[0]
 
 
-def _load(paths, use_cftime, _read, headers):
+def _load(
+    paths: list[pathlib.Path],
+    use_cftime: bool,
+    _read: Callable[..., np.ndarray],
+    headers: list[dict[str, Any]],
+) -> xr.DataArray:
     dask_array, coords, dims, name = load_as_components(
         paths, use_cftime, _read, headers
     )
