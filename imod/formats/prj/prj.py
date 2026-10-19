@@ -909,7 +909,7 @@ class IpfResult:
     has_associated: bool = data_field(default_factory=bool)
     dataframe: list[pd.DataFrame] = data_field(default_factory=list)
     layer: list[int] = data_field(default_factory=list)
-    time: list[str] = data_field(default_factory=list)
+    time: list[datetime | None] = data_field(default_factory=list)
     factor: list[float] = data_field(default_factory=list)
     addition: list[float] = data_field(default_factory=list)
 
@@ -917,7 +917,7 @@ class IpfResult:
         self,
         dataframe: pd.DataFrame,
         layer: int,
-        time: str,
+        time: datetime | None,
         factor: float,
         addition: float,
     ):
