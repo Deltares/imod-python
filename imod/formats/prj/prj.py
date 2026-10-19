@@ -1097,20 +1097,20 @@ def read_projectfile(path: FilePath) -> Dict[str, Any]:
     with open(path) as f:
         lines = f.readlines()
 
-    tokenized = []
+    tokenized: List[List[str]] = []
     for i, line in enumerate(lines):
         try:
             tokenized.append(_tokenize(line))
         except Exception as e:
             raise type(e)(f"{e}\nError occurred in line {i}")
 
-    lines = _LineIterator(tokenized)
-    content = {}
+    line_iterator = _LineIterator(tokenized)
+    content: Dict[str, Any] = {}
     wdir = path.parent
     # Change dir temporarely to projectfile dir to resolve relative paths
     with imod.util.cd(wdir):
-        while not lines.finished:
-            _parse_block(lines, content)
+        while not line_iterator.finished:
+            _parse_block(line_iterator, content)
 
     return content
 
