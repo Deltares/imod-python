@@ -1230,8 +1230,8 @@ def open_projectfile_data(path: FilePath) -> tuple[dict[str, Any], dict[str, Any
     return prj_data, repeat_stress
 
 
-def read_timfile(path: FilePath) -> List[Dict]:
-    def parsetime(time: str) -> datetime:
+def read_timfile(path: FilePath) -> List[Dict[str, Any]]:
+    def parsetime(time: str) -> Optional[datetime]:
         # Check for steady-state:
         if time == "00000000000000":
             return None
@@ -1242,19 +1242,19 @@ def read_timfile(path: FilePath) -> List[Dict]:
 
     # A line contains 2, 3, or 4 values:
     # time, isave, nstp, tmult
-    casters = {
+    casters: Dict[str, Callable[[str], Any]] = {
         "time": parsetime,
         "save": lambda x: bool(int(x)),
         "n_timestep": int,
         "timestep_multiplier": float,
     }
-    content = []
+    content: List[Dict[str, Any]] = []
     for line in lines:
         stripped = line.strip()
         if stripped == "":
             continue
         parts = stripped.split(",")
-        entry = {k: cast(s.strip()) for s, (k, cast) in zip(parts, casters.items())}
+        entry = {k: caster(s.strip()) for s, (k, caster) in zip(parts, casters.items())}
         content.append(entry)
 
     return content
