@@ -50,6 +50,12 @@ Added
 Fixed
 ~~~~~
 
+- :func:`imod.idf.open_subdomains` returned different results for overlapping
+  subdomains depending on the filesystem's file listing order (e.g. on macOS
+  and Linux). Globbed paths are now sorted.
+- Relative meteo grid paths in ``mete_grid.inp`` could not be resolved on macOS
+  and Linux, causing :meth:`imod.msw.PrecipitationMapping.from_imod5_data` and
+  :meth:`imod.msw.EvapotranspirationMapping.from_imod5_data` to fail.
 - Fixed resampling in :meth:`imod.mf6.Well.from_imod5_data` and
   :meth:`imod.mf6.LayeredWell.from_imod5_data` when simulation timesteps precede
   the first well timestep.
@@ -67,6 +73,11 @@ Fixed
 - :class:`imod.msw.FileCopier` and :class:`imod.msw.MeteoGridCopy` now force
   paths to be stored as strings in the dataset. ``pathlib.Path`` objects could
   cause errors when calling :meth:`imod.msw.MetaSwapModel.dump`.
+- Fixed issue where a TypeError was thrown for string data when calling
+  :meth:`imod.mf6.Modflow6Simulation.from_file` when reading from a zarr file.
+- :func:`imod.formats.prj.read_projectfile` now validates that the number of
+  package entries matches the declared count for static, time-dependent, and
+  MetaSWAP CAP blocks, and provides clearer parsing errors for invalid input.
 
 Changed
 ~~~~~~~
@@ -83,6 +94,8 @@ Changed
 - :func:`imod.formats.prj.open_projectfile_data` now chunks the data by time
   only instead of by both time and layer. This should enhance performance when
   working with large datasets.
+- Reduced the character limit for package keys to 16 characters again in
+  :class:`imod.mf6.GroundwaterFlowModel` and :class:`imod.mf6.TransportModel`.
 
 [1.1.0] - 2026-08-03
 --------------------

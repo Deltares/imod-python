@@ -1,3 +1,4 @@
+import os
 import textwrap
 from pathlib import Path
 
@@ -60,7 +61,7 @@ def test_lake_render__options(lake_package):
     expected = textwrap.dedent(
         """\
         begin options
-          stage fileout path\\to\\stagefile.bin
+          stage fileout path{sep}to{sep}stagefile.bin
           budget fileout path/to/budgetfile.bin
           budgetcsv fileout path/to/budgetcsvfile.bin
         end options
@@ -76,7 +77,7 @@ def test_lake_render__options(lake_package):
           2 15.0 3 IJsselmeer
         end packagedata
         """
-    )
+    ).format(sep=os.sep)
     assert actual == expected
 
 
