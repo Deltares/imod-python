@@ -11,7 +11,7 @@ from datetime import datetime
 from itertools import chain
 from os import PathLike
 from pathlib import Path
-from typing import Any, Dict, List, Optional, Sequence, Tuple, Union
+from typing import Any, Dict, List, Optional, Sequence, Tuple, Union, NoReturn, Callable
 
 import numpy as np
 import pandas as pd
@@ -23,8 +23,8 @@ from imod.logging.loglevel import LogLevel
 
 FilePath = Union[str, "PathLike[str]"]
 
-
-KEYS = {
+# Fields may contain None for unsupported packages.
+KEYS: Dict[str, Tuple[Optional[str], ...]] = {
     "(bnd)": ("ibound",),
     "(top)": ("top",),
     "(bot)": ("bottom",),
@@ -40,24 +40,24 @@ KEYS = {
     "(por)": ("porosity",),
     "(ani)": ("factor", "angle"),
     "(hfb)": ("gen",),
-    "(ibs)": (None),
-    "(pwt)": (None),
-    "(sft)": (None),
-    "(obs)": (None),
-    "(cbi)": (None),
-    "(sco)": (None),
-    "(dsp)": (None),
-    "(ics)": (None),
-    "(fcs)": (None),
-    "(ssc)": (None),
-    "(fod)": (None),
-    "(fos)": (None),
-    "(rct)": (None),
-    "(con)": (None),
-    "(pst)": (None),
+    "(ibs)": (None,),
+    "(pwt)": (None,),
+    "(sft)": (None,),
+    "(obs)": (None,),
+    "(cbi)": (None,),
+    "(sco)": (None,),
+    "(dsp)": (None,),
+    "(ics)": (None,),
+    "(fcs)": (None,),
+    "(ssc)": (None,),
+    "(fod)": (None,),
+    "(fos)": (None,),
+    "(rct)": (None,),
+    "(con)": (None,),
+    "(pst)": (None,),
 }
 
-DATE_KEYS = {
+DATE_KEYS: Dict[str, Tuple[Optional[str], ...]] = {
     "(uzf)": (None,),
     "(rch)": ("rate",),
     "(evt)": ("rate", "surface", "depth"),
