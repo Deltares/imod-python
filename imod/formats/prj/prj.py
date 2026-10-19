@@ -208,7 +208,7 @@ def _tokenize(line: str) -> List[str]:
 
 def _wrap_error_message(
     exception: Exception, description: str, lines: _LineIterator
-) -> None:
+) -> NoReturn:
     """Re-raise an error with context from the offending input line."""
     lines.back()
     content = next(lines)
