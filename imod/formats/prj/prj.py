@@ -603,7 +603,7 @@ def _try_read_with_func(func, path, *args, **kwargs):
 
 def _get_array_transformation_parameters(
     headers: List[Dict[str, Any]], key: str, dim: str
-) -> Union[xr.DataArray | float]:
+) -> Union[xr.DataArray, float]:
     """
     In imod5 prj files one can add linear transformation parameters to transform
     the data read from an idf file: we can specify a multiplication factor and a
@@ -632,6 +632,17 @@ def _get_array_transformation_parameters(
     else:
         return headers[0][key]
 
+def _limit_dims_to_reference(float_or_da: xr.DataArray | float, reference_da: xr.DataArray) -> xr.DataArray:
+    """
+    Ensure that the DataArray `float_or_da` does not have more dimensions than
+    the `reference_da` DataArray. Extra dimensions in `float_or_da` will be
+    reduced by selecting the first index along those dimensions.
+    """
+    if isinstance(float_or_da, xr.DataArray):
+        missing_dims = set(float_or_da.dims) - set(reference_da.dims)
+        if missing_dims:
+            float_or_da = float_or_da.isel(dict.fromkeys(missing_dims, 0), drop=True)
+    return float_or_da
 
 def _create_dataarray_from_paths(
     paths: List[str], headers: List[Dict[str, Any]], dim: str
@@ -647,11 +658,8 @@ def _create_dataarray_from_paths(
     )
 
     # Ensure factor and addition do not have more dimensions than da
-    if isinstance(factor, xr.DataArray):
-        missing_dims = set(factor.dims) - set(da.dims)
-        if missing_dims:
-            factor = factor.isel(dict.fromkeys(missing_dims, 0), drop=True)
-            addition = addition.isel(dict.fromkeys(missing_dims, 0), drop=True)
+    factor = _limit_dims_to_reference(factor, da)
+    addition = _limit_dims_to_reference(addition, da)
 
     return da * factor + addition
 
@@ -678,10 +686,10 @@ def _create_dataarray(
     contain only a single constant value, and the others are specified as IDFs.
     In that case, we cannot do a straightforward concatenation.
     """
-    values_valid = []
-    paths_valid = []
-    headers_paths = []
-    headers_values = []
+    values_valid: List[float] = []
+    paths_valid: List[str] = []
+    headers_paths: List[Dict[str, Any]] = []
+    headers_values: List[Dict[str, Any]] = []
     for path, header, value in zip(paths, headers, values):
         if path is None:
             headers_values.append(header)
