@@ -40,6 +40,7 @@ GeometryT: TypeAlias = PointT | PolygonT | LineStringT
 
 # If scipy is untyped in this environment, avoid subclassing Any in type-checking.
 if TYPE_CHECKING:
+
     class _FortranFileBase:  # minimal typed base
         pass
 else:
@@ -299,9 +300,7 @@ def read_binary(path: str | Path) -> "geopandas.GeoDataFrame":  # type: ignore #
     return gpd.GeoDataFrame(df, geometry=geometry)
 
 
-def vertices(
-    geometry: GeometryT, ftype: str
-) -> tuple[int, np.ndarray, int]:
+def vertices(geometry: GeometryT, ftype: str) -> tuple[int, np.ndarray, int]:
     """
     Infer from geometry, or convert from string, the feature type to the GEN
     expected Enum (int).

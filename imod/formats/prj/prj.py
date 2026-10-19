@@ -11,7 +11,7 @@ from datetime import datetime
 from itertools import chain
 from os import PathLike
 from pathlib import Path
-from typing import Any, Dict, List, Optional, Sequence, Tuple, Union, NoReturn, Callable
+from typing import Any, Callable, Dict, List, NoReturn, Optional, Sequence, Tuple, Union
 
 import numpy as np
 import pandas as pd
@@ -633,7 +633,10 @@ def _get_array_transformation_parameters(
     else:
         return headers[0][key]
 
-def _limit_dims_to_reference(float_or_da: xr.DataArray | float, reference_da: xr.DataArray) -> xr.DataArray | float:
+
+def _limit_dims_to_reference(
+    float_or_da: xr.DataArray | float, reference_da: xr.DataArray
+) -> xr.DataArray | float:
     """
     Ensure that the DataArray `float_or_da` does not have more dimensions than
     the `reference_da` DataArray. Extra dimensions in `float_or_da` will be
@@ -644,6 +647,7 @@ def _limit_dims_to_reference(float_or_da: xr.DataArray | float, reference_da: xr
         if missing_dims:
             float_or_da = float_or_da.isel(dict.fromkeys(missing_dims, 0), drop=True)
     return float_or_da
+
 
 def _create_dataarray_from_paths(
     paths: List[str], headers: List[Dict[str, Any]], dim: str
@@ -1036,9 +1040,7 @@ def _read_package_ipf(
         out[path.stem].has_associated = has_associated
         out[path.stem].append(df, layer, time, factor, addition)
 
-    out_dict_ls: Dict[str, Dict[str, Any]] = {
-        key: asdict(o) for key, o in out.items()
-    }
+    out_dict_ls: Dict[str, Dict[str, Any]] = {key: asdict(o) for key, o in out.items()}
     repeats = sorted(repeats)
     return out_dict_ls, repeats
 

@@ -10,7 +10,6 @@ import numpy as np
 import xarray as xr
 from numpy.typing import DTypeLike
 
-from imod.typing import DataArrayComponents
 from imod.util import nested_dict, spatial, time
 
 PatternType: TypeAlias = Pattern[str] | str
