@@ -7,7 +7,7 @@ Currently only :func:`imod.rasterio.write` is implemented.
 """
 
 import pathlib
-from typing import Dict
+from typing import Any, Dict
 
 import numpy as np
 import pandas as pd
@@ -249,7 +249,7 @@ def open(path, use_cftime=False, pattern=None):
     return array_io.reading._open(path, use_cftime, pattern, header, _read)
 
 
-def write_aaigrid(path: pathlib.Path, a: np.ndarray, profile: Dict) -> None:
+def write_aaigrid(path: pathlib.Path, a: np.ndarray, profile: Dict[str, Any]) -> None:
     """
     Fall-back function to write ESRII ASCII grids even if rasterio is not
     installed.

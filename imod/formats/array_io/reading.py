@@ -3,7 +3,7 @@ import glob
 import itertools
 import pathlib
 from re import Pattern
-from typing import Any, Callable, TypeAlias, cast
+from typing import Any, Callable, Sequence, TypeAlias, cast
 
 import dask
 import numpy as np
@@ -59,12 +59,8 @@ def _check_cellsizes(cellsizes: CellsizesType) -> None:
         except ValueError:
             # some ndarrays, some floats
             # create floats for comparison with allclose
-            try:
-                dx = cellsizes[0][0][0]
-                dy = cellsizes[0][1][0]
-            except TypeError:
-                dx = cellsizes[0][0]
-                dy = cellsizes[0][1]
+            dx = np.atleast_1d(cellsizes[0][0])[0]
+            dy = np.atleast_1d(cellsizes[0][1])[0]
             # comparison
             for cellsize in cellsizes:
                 # Unfortunately this allocates by broadcasting dx and dy
@@ -320,7 +316,7 @@ def _dask(
 
 
 def load_as_components(
-    paths: list[pathlib.Path],
+    paths: Sequence[PathType],
     use_cftime: bool,
     _read: Callable[..., np.ndarray],
     headers: list[dict[str, Any]],
@@ -393,7 +389,7 @@ def load_as_components(
 
 
 def _load(
-    paths: list[pathlib.Path],
+    paths: Sequence[PathType],
     use_cftime: bool,
     _read: Callable[..., np.ndarray],
     headers: list[dict[str, Any]],
@@ -438,7 +434,7 @@ def handle_path(
         path = str(path)
 
     if isinstance(path, list):
-        paths = path
+        paths = [pathlib.Path(p) for p in path]
     else:
         # Sort: glob order is filesystem dependent (alphabetical on NTFS, not
         # on e.g. APFS or ext4), and downstream merging can depend on order.

@@ -694,7 +694,7 @@ def open_dataset(
     ]
 
     # store each DataArray under its own name in a dictionary
-    dataset_dict = {da.name: da for da in dataarrays}
+    dataset_dict = {str(da.name): da for da in dataarrays}
     # Initially I wanted to return a xarray Dataset here,
     # but then realised that it is not always aligned, and therefore not possible, see
     # https://github.com/pydata/xarray/issues/1471#issuecomment-313719395
