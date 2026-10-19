@@ -118,10 +118,6 @@ warn_return_any = false
 module = [
     "imod.data.*",
     "imod.evaluate.*",
-    "imod.formats.gen.*",
-    "imod.formats.prj.*",
-    "imod.formats.ipf",
-    "imod.formats.rasterio",
     "imod.schemata.*",
     "imod.templates.*",
     "imod.tests.*",
