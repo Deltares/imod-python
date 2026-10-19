@@ -434,7 +434,7 @@ def _parse_pcgblock(lines: _LineIterator) -> Dict[str, Any]:
 
         # TODO: which are optional? How many to expect?
         # Check for an empty line to terminate the block?
-        types = {
+        types: Dict[str, Callable[[Any], Any]] = {
             "mxiter": int,
             "iter1": int,
             "hclose": float,
@@ -457,12 +457,11 @@ def _parse_pcgblock(lines: _LineIterator) -> Dict[str, Any]:
         elif any("=" in s for s in line):
             pcglines = [line] + [next(lines) for _ in range(11)]
             content = {}
-            for line in pcglines:
+            for pcgline in pcglines:
                 # undo separation, partition on equality sign instead.
-                line = "".join(line)
-                key, _, value = line.lower().partition("=")
-                value = types[key](value)
-                content[key] = value
+                joined = "".join(pcgline)
+                key, _, value = joined.lower().partition("=")
+                content[key] = types[key](value)
         else:
             raise ValueError(
                 f"Expected 12 KEY = VALUE pairs, or 12 values. Found {len(line)}"
