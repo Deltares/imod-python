@@ -500,9 +500,8 @@ def _parse_speciesblock(lines: _LineIterator):
             # Stop if we encounter an empty line.
             if len(line) == 0:
                 break
-            name, nr = line
-            nr = int(nr)
-            species[nr] = name
+            name, nr_str = line
+            species[int(nr_str)] = name
         return species
     except Exception as e:
         _wrap_error_message(e, "species entry", lines)
