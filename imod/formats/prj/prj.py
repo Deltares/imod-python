@@ -716,9 +716,9 @@ def _create_dataarray(
 
 
 def _open_package_idf(
-    block_content: Dict[str, Any], variables: Sequence[str]
+    block_content: Dict[str, Any], variables: Sequence[str | None]
 ) -> list[dict[str, xr.DataArray]]:
-    das = {}
+    das: dict[str, xr.DataArray]  = {}
     for variable in variables:
         variable_content = block_content[variable]
         paths = []
