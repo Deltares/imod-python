@@ -181,6 +181,19 @@ def test_has_dim():
         reading._has_dim([t, 2, None])
 
 
+def test_handle_path__sorted(tmp_path, monkeypatch):
+    """
+    glob order is filesystem dependent (alphabetical on NTFS, arbitrary on
+    e.g. APFS), handle_path should return paths in a deterministic order.
+    """
+    names = ["b_p002.idf", "c_p000.idf", "a_p001.idf"]
+    monkeypatch.setattr(
+        reading.glob, "glob", lambda _: [str(tmp_path / n) for n in names]
+    )
+    paths = reading.handle_path(tmp_path / "*.idf")
+    assert [p.name for p in paths] == sorted(names)
+
+
 @pytest.mark.parametrize("kind", [(imod.rasterio, "tif"), (imod.idf, "idf")])
 def test_save__dims_error(test_da, tmp_path, kind):
     module, ext = kind
