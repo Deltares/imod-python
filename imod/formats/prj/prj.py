@@ -219,10 +219,12 @@ def _wrap_error_message(
     )
 
 
-def _parse_blockheader(lines: _LineIterator) -> Tuple[int, str, str]:
+def _parse_blockheader(
+    lines: _LineIterator,
+) -> Tuple[Optional[int], Optional[str], Optional[str]]:
     """Parse a block header, returning ``None`` values for non-header lines."""
     try:
-        no_result = None, None, None
+        no_result: Tuple[None, None, None] = (None, None, None)
         line = next(lines)
 
         # Skip if it's an empty line.
@@ -259,11 +261,13 @@ def _parse_time(lines: _LineIterator) -> str:
         _wrap_error_message(e, "date time", lines)
 
 
-def _parse_blockline(lines: _LineIterator, time: str = None) -> Dict[str, Any]:
+def _parse_blockline(
+    lines: _LineIterator, time: Optional[str] = None
+) -> Dict[str, Any]:
     """Parse one package-entry line into typed values."""
     try:
         line = next(lines)
-        content = {
+        content: Dict[str, Any] = {
             "active": bool(int(line[0])),
             "is_constant": int(line[1]),
             "layer": int(line[2]),
