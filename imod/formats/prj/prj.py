@@ -356,7 +356,7 @@ def _parse_notimeblock(
             f"Expected NSUB entry of {len(fields)} for {fields}, read: {n_entry}"
         )
     entries = _parse_package_entries(lines, n_entry, n_system)
-    content: Dict[str, Any] = {
+    content: Dict[Any, Any] = {
         field: entries[index * n_system : (index + 1) * n_system]
         for index, field in enumerate(fields)
     }
@@ -408,7 +408,7 @@ def _parse_timeblock(
 ) -> Dict[str, Any]:
     """Parse the declared time periods and their package entries."""
     n_fields = len(fields)
-    content: Dict[str, Any] = defaultdict(list)
+    content: Dict[Any, Any] = defaultdict(list)
     for _ in range(n):
         time = _parse_time(lines)
         content["time"].append(time)
@@ -523,6 +523,7 @@ def _parse_block(lines: _LineIterator, content: Dict[str, Any]) -> None:
 
     if key is None:
         return
+    assert n is not None
     blockcontent: Optional[Dict[str, Any]]
     try:
         if key in KEYS:
@@ -632,7 +633,7 @@ def _get_array_transformation_parameters(
     else:
         return headers[0][key]
 
-def _limit_dims_to_reference(float_or_da: xr.DataArray | float, reference_da: xr.DataArray) -> xr.DataArray:
+def _limit_dims_to_reference(float_or_da: xr.DataArray | float, reference_da: xr.DataArray) -> xr.DataArray | float:
     """
     Ensure that the DataArray `float_or_da` does not have more dimensions than
     the `reference_da` DataArray. Extra dimensions in `float_or_da` will be
@@ -716,9 +717,9 @@ def _create_dataarray(
 
 
 def _open_package_idf(
-    block_content: Dict[str, Any], variables: Sequence[str | None]
-) -> list[dict[str, xr.DataArray]]:
-    das: dict[str, xr.DataArray]  = {}
+    block_content: Dict[Any, Any], variables: Sequence[str | None]
+) -> list[dict[str | None, xr.DataArray]]:
+    das: dict[str | None, xr.DataArray] = {}
     for variable in variables:
         variable_content = block_content[variable]
         paths = []
@@ -801,6 +802,7 @@ def _process_boundary_condition_entry(
         time = _process_time(timestring)
         repeat = None
 
+    dims: Tuple[str, ...]
     if time is None:
         dims = ()
     else:
@@ -953,7 +955,7 @@ def _prepare_df_unassociated(ipf_df: pd.DataFrame, layer: int) -> pd.DataFrame:
 
 def _prepare_df_associated(
     ipf_df: pd.DataFrame,
-    imported_wells: dict[tuple, int],
+    imported_wells: dict[tuple[Any, ...], int],
     indexcol: int,
     path: Path,
     ext: str,
@@ -1176,6 +1178,8 @@ def open_projectfile_data(path: FilePath) -> tuple[dict[str, Any], dict[str, Any
     repeat_stress = {}
     for key, block_content in content.items():
         repeats = None
+        data: Any
+        variables: Sequence[Optional[str]]
         try:
             if key == "(hfb)":
                 data = _read_package_gen(block_content, has_topbot)
@@ -1191,7 +1195,7 @@ def open_projectfile_data(path: FilePath) -> tuple[dict[str, Any], dict[str, Any
                 # doesnt need any special treatment.
                 if is_ipf:
                     block_content.pop(maybe_ipf_var)
-                variables = set(METASWAP_VARS).intersection(block_content.keys())
+                variables = [v for v in METASWAP_VARS if v in block_content]
                 data = _open_package_idf(block_content, variables)
                 # Read and reattach ipf data to package data.
                 if is_ipf:
