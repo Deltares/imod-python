@@ -3,6 +3,7 @@ import warnings
 import numpy as np
 import pandas as pd
 import xarray as xr
+import xugrid as xu
 
 from imod.typing import GridDataArray
 
@@ -38,7 +39,7 @@ def convert_pointwaterhead_freshwaterhead(
 
     Returns
     -------
-    freshwaterhead : float or xr.xr.DataArray/xu.UgridDataArray of floats
+    freshwaterhead : float or xr.DataArray/xu.UgridDataArray of floats
     """
 
     freshwaterhead = (
@@ -49,7 +50,10 @@ def convert_pointwaterhead_freshwaterhead(
     # edge case: point water head below z
     # return freshwater head of top underlying cell where elevation < pointwaterhead
     # only for grids with layers
-    if isinstance(pointwaterhead, xr.DataArray) and "layer" in pointwaterhead.dims:
+    if (
+        isinstance(pointwaterhead, (xr.DataArray, xu.UgridDataArray))
+        and "layer" in pointwaterhead.dims
+    ):
         freshwaterhead = freshwaterhead.where(pointwaterhead > elevation)
         freshwaterhead = freshwaterhead.bfill(dim="layer")
 
