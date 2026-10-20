@@ -3,7 +3,7 @@ class MissingOptionalModule:
     Presents a clear error for optional modules.
     """
 
-    def __init__(self, name):
+    def __init__(self, name) -> None:
         self.name = name
 
     def __getattr__(self, name):
