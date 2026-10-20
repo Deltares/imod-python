@@ -26,7 +26,7 @@ class ZarrSerializer(IPackageSerializer):
         self.use_zip = use_zip
 
     def to_file(
-        self, pkg: IPackageBase, directory: Path, file_name: str, **kwargs
+        self, pkg: IPackageBase, directory: Path, file_name: str, **kwargs: Any
     ) -> Path:
         store: zarr.storage.ZipStore | Path
         write_context: zarr.storage.ZipStore | nullcontext[Any]

@@ -20,7 +20,7 @@ def get_version() -> str:
 
 def prepend_content_with_version_info(
     content: str,
-    comment_char="#",
+    comment_char: str = "#",
 ) -> str:
     """
     Prepends file content with comment with iMOD Python version information.

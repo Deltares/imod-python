@@ -41,7 +41,7 @@ def mask_all_models(
     simulation: ISimulation,
     mask: GridDataArray,
     ignore_time_purge_empty: bool = False,
-):
+) -> None:
     _validate_coords_mask(mask)
     if simulation.is_split():
         raise ValueError(
@@ -174,7 +174,7 @@ def _adjust_mask_for_unlayered_data(
     return array_mask
 
 
-def make_mask(da: GridDataArray):
+def make_mask(da: GridDataArray) -> GridDataArray:
     """
     Make a boolean mask from a DataArray. The mask is True where the values are
     not equal to the nodata value. The nodata value is determined by the dtype
