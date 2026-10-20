@@ -82,7 +82,9 @@ class Package(PackageBase, IPackage, abc.ABC):
     _regrid_method: DataclassType = EmptyRegridMethod()
     _template: jinja2.Template
 
-    def __init__(self, allargs: Mapping[str, GridDataArray | float | int | bool | str]) -> None:
+    def __init__(
+        self, allargs: Mapping[str, GridDataArray | float | int | bool | str]
+    ) -> None:
         super().__init__(allargs)
 
     @staticmethod
@@ -118,7 +120,9 @@ class Package(PackageBase, IPackage, abc.ABC):
             fname = f"gwf-{pkg_id}.j2"
         return env.get_template(fname)
 
-    def _write_blockfile(self, pkgname, globaltimes, write_context: WriteContext) -> None:
+    def _write_blockfile(
+        self, pkgname, globaltimes, write_context: WriteContext
+    ) -> None:
         directory = write_context.get_formatted_write_directory()
 
         content = self._render(

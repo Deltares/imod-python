@@ -122,7 +122,9 @@ def timestep_duration(times: np.ndarray, use_cftime: bool) -> np.ndarray:
     return np.array(timestep_duration)
 
 
-def forcing_starts_ends(package_times: np.ndarray, globaltimes: np.ndarray) -> list[str]:
+def forcing_starts_ends(
+    package_times: np.ndarray, globaltimes: np.ndarray
+) -> list[str]:
     """
     Determines the stress period numbers for start and end for a forcing defined
     at a starting time, until the next starting time.

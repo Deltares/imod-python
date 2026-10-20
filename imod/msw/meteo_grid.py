@@ -42,7 +42,9 @@ class MeteoGrid(MetaSwapPackage, IRegridPackage):
 
     _regrid_method = MeteoGridRegridMethod()
 
-    def __init__(self, precipitation: xr.DataArray, evapotranspiration: xr.DataArray) -> None:
+    def __init__(
+        self, precipitation: xr.DataArray, evapotranspiration: xr.DataArray
+    ) -> None:
         super().__init__()
 
         self.dataset["precipitation"] = precipitation
@@ -50,7 +52,9 @@ class MeteoGrid(MetaSwapPackage, IRegridPackage):
 
         self._pkgcheck()
 
-    def _write_free_format_file(self, path: Union[str, Path], dataframe: pd.DataFrame) -> None:
+    def _write_free_format_file(
+        self, path: Union[str, Path], dataframe: pd.DataFrame
+    ) -> None:
         """
         Write free format file. The mete_grid.inp file is free format.
         """

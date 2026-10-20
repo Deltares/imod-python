@@ -154,7 +154,9 @@ class MetaSwapModel(Model, IDict):
         self.starttime = starttime
         self.simulation_settings["unsa_svat_path"] = unsaturated_database
 
-    def _render_unsaturated_database_path(self, unsaturated_database: Union[str, Path]) -> str:
+    def _render_unsaturated_database_path(
+        self, unsaturated_database: Union[str, Path]
+    ) -> str:
         # Force to Path object
         unsaturated_database = Path(unsaturated_database)
 

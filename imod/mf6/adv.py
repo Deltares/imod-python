@@ -38,7 +38,9 @@ class AdvectionBase(Package, IRegridPackage, ABC):
         ],
     }
 
-    def __init__(self, ats_percel: Optional[float] = None, validate: bool = True) -> None:
+    def __init__(
+        self, ats_percel: Optional[float] = None, validate: bool = True
+    ) -> None:
         dict_dataset = {"scheme": self._scheme, "ats_percel": ats_percel}
         super().__init__(dict_dataset)
         self._validate_init_schemata(validate)

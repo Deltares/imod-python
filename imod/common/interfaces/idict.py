@@ -1,6 +1,6 @@
 import abc
 from collections.abc import ItemsView, Iterator, KeysView, ValuesView
-from typing import Self, Any
+from typing import Any, Self
 
 
 class IDict(abc.ABC):

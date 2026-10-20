@@ -174,7 +174,9 @@ class Modflow6Simulation(collections.UserDict[str, Any], ISimulation):
             return None
 
     @standard_log_decorator()
-    def create_time_discretization(self, additional_times, validate: bool = True) -> None:
+    def create_time_discretization(
+        self, additional_times, validate: bool = True
+    ) -> None:
         """
         Collect all unique times from model packages and additional given
         `times`. These unique times are used as stress periods in the model. All
