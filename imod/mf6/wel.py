@@ -1035,7 +1035,7 @@ class Well(GridAgnosticWell):
 
         if top is not None:
             # Bug in mypy when using unions in isInstance
-            if not isinstance(top, GridDataArray) or "layer" not in top.coords:  # type: ignore
+            if not isinstance(top, GridDataArray) or "layer" not in top.coords:
                 top = create_layered_top(bottom, top)
 
         # The super method will select in the time dimension without issues.
