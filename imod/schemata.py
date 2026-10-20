@@ -225,7 +225,7 @@ class DTypeSchema(BaseSchema):
 
 
 class TypeSchema(BaseSchema):
-    def __init__(self, dtype: Type) -> None:
+    def __init__(self, dtype: Type[Any]) -> None:
         """
         Validate type, used for model options instead of GridDataArrays.
 
@@ -245,7 +245,7 @@ class TypeSchema(BaseSchema):
 
 
 class GeometryTypeSchema(BaseSchema):
-    def __init__(self, dtype: DTypeLike) -> None:
+    def __init__(self, dtype: Type[Any]) -> None:
         """
         Validate geometry types
 
@@ -392,7 +392,7 @@ class ShapeSchema(BaseSchema):
 
 
 class CompatibleSettingsSchema(BaseSchema):
-    def __init__(self, other: ScalarAsDataArray, other_value: bool) -> None:
+    def __init__(self, other: str, other_value: bool) -> None:
         """
         Validate if settings are compatible
         """
@@ -466,7 +466,7 @@ class OtherCoordsSchema(BaseSchema):
 
     def validate(self, obj: GridDataArray, **kwargs) -> None:
         other_obj = kwargs[self.other]
-        other_coords = list(other_obj.coords.keys())
+        other_coords = tuple(other_obj.coords.keys())
         return CoordsSchema(
             other_coords,
             self.require_all_keys,
@@ -531,11 +531,11 @@ class ValueSchema(BaseSchema, abc.ABC):
             self.ignore_varname = ignore[0]
             self.to_ignore = partial_operator(ignore[1], ignore[2])
 
-    def get_explicitly_ignored(self, kwargs: Dict) -> Any:
+    def get_explicitly_ignored(self, kwargs: Dict[str, Any]) -> Any:
         """
         Get cells that should be explicitly ignored by the schema
         """
-        if self.to_ignore:
+        if self.to_ignore and self.ignore_varname:
             ignore_obj = kwargs[self.ignore_varname]
             return self.to_ignore(ignore_obj)
         else:
@@ -622,7 +622,7 @@ class MaxNUniqueValuesSchema(BaseSchema):
 
 
 class UniqueValuesSchema(BaseSchema):
-    def __init__(self, other_value: list) -> None:
+    def __init__(self, other_value: list[Any]) -> None:
         """
         Validate if unique values in other values list
         """
@@ -639,7 +639,7 @@ class UniqueValuesSchema(BaseSchema):
 class NoDataSchema(BaseSchema):
     def __init__(
         self,
-        is_notnull: Union[Callable, Tuple[str, Any]] = notnull,
+        is_notnull: Union[Callable[..., Any], Tuple[str, Any]] = notnull,
     ):
         if isinstance(is_notnull, tuple):
             op, value = is_notnull
@@ -678,8 +678,8 @@ class NoDataComparisonSchema(BaseSchema):
     def __init__(
         self,
         other: str,
-        is_notnull: Union[Callable, Tuple[str, Any]] = notnull,
-        is_other_notnull: Union[Callable, Tuple[str, Any]] = notnull,
+        is_notnull: Union[Callable[..., Any], Tuple[str, Any]] = notnull,
+        is_other_notnull: Union[Callable[..., Any], Tuple[str, Any]] = notnull,
     ):
         self.other = other
         if isinstance(is_notnull, tuple):
@@ -748,7 +748,7 @@ class ActiveCellsConnectedSchema(BaseSchema):
 
     def __init__(
         self,
-        is_notnull: Union[Callable, Tuple[str, Any]] = notnull,
+        is_notnull: Union[Callable[..., Any], Tuple[str, Any]] = notnull,
     ):
         if isinstance(is_notnull, tuple):
             op, value = is_notnull
@@ -760,7 +760,7 @@ class ActiveCellsConnectedSchema(BaseSchema):
         if isinstance(obj, xu.UgridDataArray):
             # TODO: https://deltares.github.io/xugrid/api/xugrid.UgridDataArrayAccessor.connected_components.html
             raise NotImplementedError(
-                f"Schema {self.__name__} only works for structured grids, received xu.UgridDataArray."
+                f"Schema {type(self).__name__} only works for structured grids, received xu.UgridDataArray."
             )
 
         active = self.is_notnull(obj)
