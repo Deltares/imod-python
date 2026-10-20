@@ -70,7 +70,7 @@ class VariableOutputControl(MetaSwapPackage, IRegridPackage):
         qmodf=True,
         ETact=True,
         **kwargs,
-    ):
+    ) -> None:
         super().__init__()
 
         # Convert to integer, as MetaSWAP expects its values as integers.
@@ -120,7 +120,7 @@ class TimeOutputControl(MetaSwapPackage, IRegridPackage):
         "option": VariableMetaData(6, 1, 7, int),
     }
 
-    def __init__(self, time):
+    def __init__(self, time) -> None:
         super().__init__()
 
         self.dataset["times"] = time

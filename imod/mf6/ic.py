@@ -69,7 +69,7 @@ class InitialConditions(Package, IRegridPackage):
     _regrid_method = InitialConditionsRegridMethod()
 
     @init_log_decorator()
-    def __init__(self, start, validate: bool = True):
+    def __init__(self, start, validate: bool = True) -> None:
         dict_dataset = {"start": start}
         super().__init__(dict_dataset)
         self._validate_init_schemata(validate)

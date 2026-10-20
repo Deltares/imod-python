@@ -130,14 +130,14 @@ class Modflow6Simulation(collections.UserDict[str, Any], ISimulation):
     namely the Well and HFB packages.
     """
 
-    def _initialize_template(self):
+    def _initialize_template(self) -> None:
         loader = jinja2.PackageLoader("imod", "templates/mf6")
         env = jinja2.Environment(loader=loader, keep_trailing_newline=True)
         self._template = env.get_template("sim-nam.j2")
 
     def __init__(
         self, name: str, validation_settings: Optional[ValidationSettings] = None
-    ):
+    ) -> None:
         super().__init__()
         self.name = name
         self.directory = None
@@ -148,10 +148,10 @@ class Modflow6Simulation(collections.UserDict[str, Any], ISimulation):
         else:
             self.set_validation_settings(validation_settings)
 
-    def __setitem__(self, key, value):
+    def __setitem__(self, key, value) -> None:
         super().__setitem__(key, value)
 
-    def update(self, *args, **kwargs):
+    def update(self, *args, **kwargs) -> None:
         for k, v in dict(*args, **kwargs).items():
             self[k] = v
 
@@ -174,7 +174,7 @@ class Modflow6Simulation(collections.UserDict[str, Any], ISimulation):
             return None
 
     @standard_log_decorator()
-    def create_time_discretization(self, additional_times, validate: bool = True):
+    def create_time_discretization(self, additional_times, validate: bool = True) -> None:
         """
         Collect all unique times from model packages and additional given
         `times`. These unique times are used as stress periods in the model. All
@@ -286,7 +286,7 @@ class Modflow6Simulation(collections.UserDict[str, Any], ISimulation):
         d["solutiongroups"] = [solutiongroups]
         return self._template.render(d)
 
-    def _write_tdis_package(self, globaltimes, write_context):
+    def _write_tdis_package(self, globaltimes, write_context) -> None:
         """Write time discretization package, and set/clear ats filename if needed"""
         ats_pkgname = self._get_pkgkey("ats")
         if ats_pkgname:
@@ -405,7 +405,7 @@ class Modflow6Simulation(collections.UserDict[str, Any], ISimulation):
 
         self.directory = directory
 
-    def set_validation_settings(self, validation_settings: ValidationSettings):
+    def set_validation_settings(self, validation_settings: ValidationSettings) -> None:
         """
         Set validation settings for the simulation. Configuring
         :class:`imod.mf6.ValidationSettings` can help performance or reduce the

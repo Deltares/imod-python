@@ -71,7 +71,7 @@ class ScalingFactors(MetaSwapPackage, IRegridPackage):
         scale_hydraulic_conductivity,
         scale_pressure_head,
         depth_perched_water_table,
-    ):
+    ) -> None:
         super().__init__()
         self.dataset["scale_soil_moisture"] = scale_soil_moisture
         self.dataset["scale_hydraulic_conductivity"] = scale_hydraulic_conductivity

@@ -124,7 +124,7 @@ def _weights_1d(src_x, dst_x, use_relative_weights=False):
     return max_len, (np_dst_inds, np_src_inds, np_weights)
 
 
-def _is_subset(a1, a2):
+def _is_subset(a1, a2) -> bool:
     if np.isin(a2, a1).all():
         # This means all are present
         # now check if it's an actual subset

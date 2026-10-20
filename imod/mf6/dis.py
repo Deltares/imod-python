@@ -115,7 +115,7 @@ class StructuredDiscretization(Package, IRegridPackage, IMaskingSettings):
         bottom: GridDataArray,
         idomain: GridDataArray,
         validate: bool = True,
-    ):
+    ) -> None:
         dict_dataset = {
             "idomain": idomain,
             "top": top,
@@ -124,7 +124,7 @@ class StructuredDiscretization(Package, IRegridPackage, IMaskingSettings):
         super().__init__(dict_dataset)
         self._validate_init_schemata(validate)
 
-    def _delrc(self, dx):
+    def _delrc(self, dx) -> str:
         """
         dx means dx or dy
         """

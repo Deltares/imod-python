@@ -110,11 +110,11 @@ DEFAULT_SETTINGS: dict[str, Any] = {
 
 
 class Model(collections.UserDict[str, Any]):
-    def __setitem__(self, key, value):
+    def __setitem__(self, key, value) -> None:
         # TODO: Add packagecheck
         super().__setitem__(key, value)
 
-    def update(self, *args, **kwargs):
+    def update(self, *args, **kwargs) -> None:
         for k, v in dict(*args, **kwargs).items():
             self[k] = v
 
@@ -143,7 +143,7 @@ class MetaSwapModel(Model, IDict):
         unsaturated_database: Path | str,
         settings: Optional[dict[str, Any]] = None,
         starttime: Optional[str] = None,
-    ):
+    ) -> None:
         super().__init__()
 
         if settings is None:
@@ -154,7 +154,7 @@ class MetaSwapModel(Model, IDict):
         self.starttime = starttime
         self.simulation_settings["unsa_svat_path"] = unsaturated_database
 
-    def _render_unsaturated_database_path(self, unsaturated_database: Union[str, Path]):
+    def _render_unsaturated_database_path(self, unsaturated_database: Union[str, Path]) -> str:
         # Force to Path object
         unsaturated_database = Path(unsaturated_database)
 
@@ -337,7 +337,7 @@ class MetaSwapModel(Model, IDict):
         )
         return self.get_pkgkey(pkg_type, optional_package)
 
-    def _model_checks(self, validate: Optional[bool] = True):
+    def _model_checks(self, validate: Optional[bool] = True) -> None:
         if validate and not self._has_file_copier():
             self._check_required_packages()
             self._check_vegetation_indices_in_annual_crop_factors()
@@ -382,7 +382,7 @@ class MetaSwapModel(Model, IDict):
         mf6_dis: StructuredDiscretization,
         mf6_wel: Optional[Mf6Wel] = None,
         validate: Optional[bool] = True,
-    ):
+    ) -> None:
         """
         Write packages and simulation settings (para_sim.inp).
 
@@ -550,7 +550,7 @@ class MetaSwapModel(Model, IDict):
     def mask_all_packages(
         self,
         mask: GridDataArray,
-    ):
+    ) -> None:
         """
          This function applies a mask to all packages in a model. The mask must
          be presented as a GridDataArray, which contains idomain-like integers.

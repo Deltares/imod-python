@@ -98,7 +98,7 @@ class Buoyancy(Package):
         hhformulation_rhs: bool = False,
         densityfile: Optional[str] = None,
         validate: bool = True,
-    ):
+    ) -> None:
         dict_dataset = {
             "reference_density": reference_density,
             # Assign a shared index: this also forces equal lenghts

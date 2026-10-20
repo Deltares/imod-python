@@ -28,7 +28,7 @@ class ExchangeCreator_Unstructured(ExchangeCreator):
 
     def __init__(
         self, submodel_labels: GridDataArray, partition_info: List[PartitionInfo]
-    ):
+    ) -> None:
         self._connected_cell_edge_indices = (
             self._find_subdomain_connection_edge_indices(submodel_labels)
         )

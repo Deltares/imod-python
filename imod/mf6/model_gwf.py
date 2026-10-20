@@ -108,7 +108,7 @@ class GroundwaterFlowModel(Modflow6Model):
         newton: bool = False,
         under_relaxation: bool = False,
         validate: bool = True,
-    ):
+    ) -> None:
         super().__init__()
         self._options = {
             "listing_file": listing_file,

@@ -503,7 +503,7 @@ def write_assoc(path, df, itype=1, nodata=1.0e20, assoc_columns=None):
     )
 
 
-def write(path, df, indexcolumn=0, assoc_ext="txt", nodata=1.0e20):
+def write(path, df, indexcolumn=0, assoc_ext="txt", nodata=1.0e20) -> None:
     """
     Writes a single IPF file.
 

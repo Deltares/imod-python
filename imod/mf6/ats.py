@@ -162,7 +162,7 @@ class AdaptiveTimeStepping(Package):
         dt_multiplier=0.0,
         dt_fail_divisor=0.0,
         validate=True,
-    ):
+    ) -> None:
         dict_dataset = {
             "dt_init": dt_init,
             "dt_min": dt_min,

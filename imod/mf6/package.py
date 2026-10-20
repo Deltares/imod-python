@@ -82,7 +82,7 @@ class Package(PackageBase, IPackage, abc.ABC):
     _regrid_method: DataclassType = EmptyRegridMethod()
     _template: jinja2.Template
 
-    def __init__(self, allargs: Mapping[str, GridDataArray | float | int | bool | str]):
+    def __init__(self, allargs: Mapping[str, GridDataArray | float | int | bool | str]) -> None:
         super().__init__(allargs)
 
     @staticmethod
@@ -90,7 +90,7 @@ class Package(PackageBase, IPackage, abc.ABC):
         return is_valid(value)
 
     @staticmethod
-    def _number_format(dtype: type):
+    def _number_format(dtype: type) -> str:
         if np.issubdtype(dtype, np.integer):
             return "%i"
         elif np.issubdtype(dtype, np.floating):
@@ -118,7 +118,7 @@ class Package(PackageBase, IPackage, abc.ABC):
             fname = f"gwf-{pkg_id}.j2"
         return env.get_template(fname)
 
-    def _write_blockfile(self, pkgname, globaltimes, write_context: WriteContext):
+    def _write_blockfile(self, pkgname, globaltimes, write_context: WriteContext) -> None:
         directory = write_context.get_formatted_write_directory()
 
         content = self._render(
@@ -132,7 +132,7 @@ class Package(PackageBase, IPackage, abc.ABC):
         with open(filename, "w") as f:
             f.write(content)
 
-    def _write_binary_griddata(self, outpath, da, dtype):
+    def _write_binary_griddata(self, outpath, da, dtype) -> None:
         # From the modflow6 source, the header is defined as:
         # integer(I4B) :: kstp --> np.int32 : 1
         # integer(I4B) :: kper --> np.int32 : 2
@@ -167,7 +167,7 @@ class Package(PackageBase, IPackage, abc.ABC):
             header.tofile(f)
             da.values.flatten().astype(dtype).tofile(f)
 
-    def _write_text_griddata(self, outpath, da, dtype):
+    def _write_text_griddata(self, outpath, da, dtype) -> None:
         # Note: reshaping here avoids writing newlines after every number.
         # This dumps all the values in a single row rather than a single
         # column. This is to be preferred, since editors can easily
@@ -270,7 +270,7 @@ class Package(PackageBase, IPackage, abc.ABC):
         directory: str | Path,
         use_binary: bool = False,
         use_absolute_paths: bool = False,
-    ):
+    ) -> None:
         """
         Write package to file
 

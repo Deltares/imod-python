@@ -73,7 +73,7 @@ class BoundaryCondition(Package, IBoundaryCondition, abc.ABC):
 
     def __init__(
         self, allargs: MutableMapping[str, GridDataArray | float | int | bool | str]
-    ):
+    ) -> None:
         # Convert repeat_stress in dict to a xr.DataArray in the right shape if
         # necessary, which is required to merge it into the dataset.
         if "repeat_stress" in allargs.keys() and isinstance(
@@ -106,17 +106,17 @@ class BoundaryCondition(Package, IBoundaryCondition, abc.ABC):
             nmax = int(da.count())
         return nmax
 
-    def _write_binaryfile(self, outpath, struct_array):
+    def _write_binaryfile(self, outpath, struct_array) -> None:
         with open(outpath, "w") as f:
             struct_array.tofile(f)
 
-    def _write_textfile(self, outpath, struct_array):
+    def _write_textfile(self, outpath, struct_array) -> None:
         fields = struct_array.dtype.fields
         fmt = [self._number_format(field[0]) for field in fields.values()]
         header = " ".join(list(fields.keys()))
         np.savetxt(fname=outpath, X=struct_array, fmt=fmt, header=header)
 
-    def _write_datafile(self, outpath, ds, binary):
+    def _write_datafile(self, outpath, ds, binary) -> None:
         """
         Writes a modflow6 binary data file
         """
@@ -263,7 +263,7 @@ class BoundaryCondition(Package, IBoundaryCondition, abc.ABC):
 
         return self._template.render(d)
 
-    def _write_perioddata(self, directory, pkgname, binary):
+    def _write_perioddata(self, directory, pkgname, binary) -> None:
         if len(self._get_period_varnames()) == 0:
             return
         bin_ds = self._get_bin_ds()
@@ -288,7 +288,7 @@ class BoundaryCondition(Package, IBoundaryCondition, abc.ABC):
         pkgname: str,
         globaltimes: Union[list[np.datetime64], np.ndarray],
         write_context: WriteContext,
-    ):
+    ) -> None:
         """
         writes the blockfile and binary data
 
@@ -356,7 +356,7 @@ class AdvancedBoundaryCondition(BoundaryCondition, abc.ABC):
             for x, y in sorted(recarr.dtype.fields.items(), key=lambda k: k[1])
         ]
 
-    def _write_file(self, outpath, sparse_data):
+    def _write_file(self, outpath, sparse_data) -> None:
         """
         Write to textfile, which is necessary for Advanced Stress Packages
         """
@@ -373,7 +373,7 @@ class AdvancedBoundaryCondition(BoundaryCondition, abc.ABC):
         """
         return
 
-    def _write_packagedata(self, directory, pkgname, binary):
+    def _write_packagedata(self, directory, pkgname, binary) -> None:
         outpath = directory / pkgname / f"{self._pkg_id}-pkgdata.dat"
         outpath.parent.mkdir(exist_ok=True, parents=True)
         package_data = self._package_data_to_sparse()
@@ -384,7 +384,7 @@ class AdvancedBoundaryCondition(BoundaryCondition, abc.ABC):
         pkgname: str,
         globaltimes: Union[list[np.datetime64], np.ndarray],
         write_context: WriteContext,
-    ):
+    ) -> None:
         boundary_condition_write_context = deepcopy(write_context)
         boundary_condition_write_context.use_binary = False
 

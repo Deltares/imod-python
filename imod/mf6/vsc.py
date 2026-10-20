@@ -132,7 +132,7 @@ class Viscosity(Package):
         thermal_a4: float = 133.15,
         viscosityfile: Optional[str] = None,
         validate: bool = True,
-    ):
+    ) -> None:
         dict_dataset = {
             "reference_viscosity": reference_viscosity,
             # Assign a shared index: this also forces equal lengths

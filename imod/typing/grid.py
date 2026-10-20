@@ -512,7 +512,7 @@ def has_negative_layer(
 
 def is_transient_data_grid(
     grid: xr.DataArray | xr.Dataset | xu.UgridDataArray | xu.UgridDataset,
-):
+) -> bool:
     # Returns True if there is a time coordinate on the object with more than one value.
     if "time" in grid.coords:
         if len(grid["time"]) > 1:
@@ -526,7 +526,7 @@ class GridCache:
     unique geometry hash.
     """
 
-    def __init__(self, func: Callable[..., Any], max_cache_size: int = 5):
+    def __init__(self, func: Callable[..., Any], max_cache_size: int = 5) -> None:
         self.max_cache_size = max_cache_size
         self.grid_cache: dict[int, GridDataArray] = {}
         self.func = func
@@ -539,11 +539,11 @@ class GridCache:
             self.grid_cache[geom_hash] = self.func(grid)
         return self.grid_cache[geom_hash]
 
-    def remove_first(self):
+    def remove_first(self) -> None:
         keys = list(self.grid_cache.keys())
         self.grid_cache.pop(keys[0])
 
-    def clear(self):
+    def clear(self) -> None:
         self.grid_cache = {}
 
 

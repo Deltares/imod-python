@@ -35,7 +35,7 @@ class LakeApi_Base(PackageBase):
     Base class for lake and outlet object.
     """
 
-    def __init__(self, allargs):
+    def __init__(self, allargs) -> None:
         super().__init__(allargs)
 
 
@@ -101,7 +101,7 @@ class LakeData(LakeApi_Base):
         withdrawal=None,
         auxiliary=None,
         lake_table=None,
-    ):
+    ) -> None:
         dict_dataset = {
             "starting_stage": starting_stage,
             "boundname": boundname,
@@ -152,7 +152,7 @@ class OutletBase(LakeApi_Base):
 
     timeseries_names = ["rate", "invert", "rough", "width", "slope"]
 
-    def __init__(self, allargs):
+    def __init__(self, allargs) -> None:
         super().__init__(allargs)
 
 
@@ -172,7 +172,7 @@ class OutletManning(OutletBase):
         width,
         roughness,
         slope,
-    ):
+    ) -> None:
         dict_dataset = {
             "lakein": lakein,
             "lakeout": lakeout,
@@ -191,7 +191,7 @@ class OutletWeir(OutletBase):
 
     _couttype = "weir"
 
-    def __init__(self, lakein: str, lakeout: str, invert, width):
+    def __init__(self, lakein: str, lakeout: str, invert, width) -> None:
         dict_dataset = {
             "lakein": lakein,
             "lakeout": lakeout,
@@ -210,7 +210,7 @@ class OutletSpecified(OutletBase):
 
     _couttype = "specified"
 
-    def __init__(self, lakein: str, lakeout: str, rate):
+    def __init__(self, lakein: str, lakeout: str, rate) -> None:
         dict_dataset = {
             "lakein": lakein,
             "lakeout": lakeout,
@@ -389,7 +389,7 @@ def join_lake_tables(lake_numbers, lakes):
     return result["lake_table"]
 
 
-def da_is_none(array):
+def da_is_none(array) -> bool:
     """
     when the None value is appended as a dataarray it gets converted to an array with zero values.
     """
@@ -742,7 +742,7 @@ class Lake(BoundaryCondition):
         time_conversion=None,
         length_conversion=None,
         validate=True,
-    ):
+    ) -> None:
         if ts_status is not None:
             ts_status = self._convert_to_string_dataarray(xr.DataArray(ts_status))
 
@@ -873,7 +873,7 @@ class Lake(BoundaryCondition):
         package_content["lake_tables"] = join_lake_tables(lake_numbers, lakes)
         return mf6.Lake(**package_content)
 
-    def _has_outlets(self):
+    def _has_outlets(self) -> bool:
         # item() will not work here if the object is an array.
         # .values[()] will simply return the full numpy array.
         outlet_lakein = self.dataset["outlet_lakein"].values[()]
@@ -883,7 +883,7 @@ class Lake(BoundaryCondition):
             return False
         return True
 
-    def _has_laketables(self):
+    def _has_laketables(self) -> bool:
         # item() will not work here if the object is an array.
         # .values[()] will simply return the full numpy array.
         tables = self.dataset["lake_tables"].values[()]
@@ -893,7 +893,7 @@ class Lake(BoundaryCondition):
             return True
         return False
 
-    def _has_timeseries(self):
+    def _has_timeseries(self) -> bool:
         for name in self._period_data:
             if "time" in self.dataset[name].coords:
                 if len(self.dataset[name].coords["time"]) > 0:
@@ -998,7 +998,7 @@ class Lake(BoundaryCondition):
         df = self.dataset[outlet_vars].to_dataframe()
         return df
 
-    def _write_blockfile(self, pkgname, globaltimes, write_context: WriteContext):
+    def _write_blockfile(self, pkgname, globaltimes, write_context: WriteContext) -> None:
         renderdir = pathlib.Path(write_context.write_directory.stem)
         content = self._render(
             directory=renderdir,
@@ -1031,14 +1031,14 @@ class Lake(BoundaryCondition):
 
             return
 
-    def _write_period_section(self, f, globaltimes):
+    def _write_period_section(self, f, globaltimes) -> None:
         class Period_internal:
             """
             The Period_internal class is used for rendering the lake package in jinja.
             There is no point in instantiating this class as a user.
             """
 
-            def __init__(self, period_number):
+            def __init__(self, period_number) -> None:
                 self.period_number = period_number
                 self.nr_values = 0
                 self.lake_or_outlet_number = []
@@ -1093,14 +1093,14 @@ class Lake(BoundaryCondition):
         period_block = _template.render(d)
         f.write(period_block)
 
-    def _package_data_to_sparse(self):
+    def _package_data_to_sparse(self) -> None:
         return
 
-    def fill_stress_perioddata(self):
+    def fill_stress_perioddata(self) -> None:
         # this function is called from packagebase and should do nothing in this context
         return
 
-    def _write_perioddata(self, directory, pkgname, binary):
+    def _write_perioddata(self, directory, pkgname, binary) -> None:
         # this function is called from packagebase and should do nothing in this context
         return
 
@@ -1146,7 +1146,7 @@ class Lake(BoundaryCondition):
 
         return lake_number_to_lake_table_filename
 
-    def _write_laketable_files(self, directory, lake_number_to_filename):
+    def _write_laketable_files(self, directory, lake_number_to_filename) -> None:
         """
         writes a laketable file, containing a table which specifies the relation between stage,
         volume and area for one single lake.

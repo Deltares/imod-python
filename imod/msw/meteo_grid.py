@@ -42,7 +42,7 @@ class MeteoGrid(MetaSwapPackage, IRegridPackage):
 
     _regrid_method = MeteoGridRegridMethod()
 
-    def __init__(self, precipitation: xr.DataArray, evapotranspiration: xr.DataArray):
+    def __init__(self, precipitation: xr.DataArray, evapotranspiration: xr.DataArray) -> None:
         super().__init__()
 
         self.dataset["precipitation"] = precipitation
@@ -50,7 +50,7 @@ class MeteoGrid(MetaSwapPackage, IRegridPackage):
 
         self._pkgcheck()
 
-    def _write_free_format_file(self, path: Union[str, Path], dataframe: pd.DataFrame):
+    def _write_free_format_file(self, path: Union[str, Path], dataframe: pd.DataFrame) -> None:
         """
         Write free format file. The mete_grid.inp file is free format.
         """
@@ -96,7 +96,7 @@ class MeteoGrid(MetaSwapPackage, IRegridPackage):
         """
         return str(directory / imod.util.path.compose(d, pattern))
 
-    def _is_grid(self, varname: str):
+    def _is_grid(self, varname: str) -> bool:
         coords = self.dataset[varname].coords
 
         if "y" not in coords and "x" not in coords:
@@ -154,7 +154,7 @@ class MeteoGrid(MetaSwapPackage, IRegridPackage):
                 f"Encountered strings longer than 256 characters in columns: {too_long_columns}"
             )
 
-    def write(self, directory: Union[str, Path], *args):
+    def write(self, directory: Union[str, Path], *args) -> None:
         """
         Write mete_grid.inp and accompanying ASCII grid files.
 
@@ -220,13 +220,13 @@ class MeteoGridCopy(MetaSwapPackage, IRegridPackage):
 
     _regrid_method: DataclassType = EmptyRegridMethod()
 
-    def __init__(self, path: Path | str):
+    def __init__(self, path: Path | str) -> None:
         super().__init__()
         # Store as string so that it can be easily serialized and retrieved from
         # the dataset.
         self.dataset["path"] = str(path)
 
-    def write(self, directory: Path | str, *args):
+    def write(self, directory: Path | str, *args) -> None:
         directory = Path(directory)
         path_metegrid = Path(self.dataset["path"].item())
         new_path = directory / self._file_name

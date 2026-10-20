@@ -5,7 +5,7 @@ import xarray as xr
 import imod
 
 
-def _write_chunks(a, pattern, d, nodata, dtype, write):
+def _write_chunks(a, pattern, d, nodata, dtype, write) -> None:
     """
     This function writes one chunk of the DataArray 'a' at a time. This is
     necessary to avoid heavily sub-optimal scheduling by xarray/dask when

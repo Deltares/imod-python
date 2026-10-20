@@ -16,7 +16,7 @@ class GWFGWT(ExchangeBase):
     _template = Package._initialize_template(_pkg_id)
 
     @init_log_decorator()
-    def __init__(self, model_id1: str, model_id2: str):
+    def __init__(self, model_id1: str, model_id2: str) -> None:
         dict_dataset = {
             "model_name_1": model_id1,
             "model_name_2": model_id2,

@@ -79,7 +79,7 @@ class MassSourceLoading(BoundaryCondition):
         save_flows=False,
         observations=None,
         validate: bool = True,
-    ):
+    ) -> None:
         dict_dataset = {
             "rate": rate,
             "print_input": print_input,

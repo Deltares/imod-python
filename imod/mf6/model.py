@@ -75,7 +75,7 @@ class Modflow6Model(collections.UserDict[str, Package], IModel, abc.ABC):
         env = jinja2.Environment(loader=loader, keep_trailing_newline=True)
         return env.get_template(name)
 
-    def __init__(self):
+    def __init__(self) -> None:
         collections.UserDict.__init__(self)
         self._options = {}
 
@@ -105,7 +105,7 @@ class Modflow6Model(collections.UserDict[str, Package], IModel, abc.ABC):
 
         super().__setitem__(key, value)
 
-    def update(self, *args, **kwargs):
+    def update(self, *args, **kwargs) -> None:
         for k, v in dict(*args, **kwargs).items():
             self[k] = v
 
@@ -177,7 +177,7 @@ class Modflow6Model(collections.UserDict[str, Package], IModel, abc.ABC):
                 raise ValueError(f"No {required} package found in model {modelkey}")
         return
 
-    def _use_cftime(self):
+    def _use_cftime(self) -> bool:
         """
         Also checks if datetime types are homogeneous across packages.
         """
@@ -236,7 +236,7 @@ class Modflow6Model(collections.UserDict[str, Package], IModel, abc.ABC):
         d["packages"] = packages
         return self._template.render(d)
 
-    def _model_checks(self, modelkey: str):
+    def _model_checks(self, modelkey: str) -> None:
         """
         Check model integrity (called before writing)
         """
@@ -832,7 +832,7 @@ class Modflow6Model(collections.UserDict[str, Package], IModel, abc.ABC):
         self,
         mask: GridDataArray,
         ignore_time_purge_empty: bool = False,
-    ):
+    ) -> None:
         """
         This function applies a mask to all packages in a model. The mask must
         be presented as an idomain-like integer array that has 0 (inactive) or
@@ -945,7 +945,7 @@ class Modflow6Model(collections.UserDict[str, Package], IModel, abc.ABC):
             content = [f"{typename}("] + options + ["){}"]
         return "\n".join(content)
 
-    def is_use_newton(self):
+    def is_use_newton(self) -> bool:
         """
         Returns whether the Newton-Raphson formulation is used for groundwater
         flow between connected, convertible groundwater cells.

@@ -22,7 +22,7 @@ else:
 
 
 class ZarrSerializer(IPackageSerializer):
-    def __init__(self, use_zip: bool = False):
+    def __init__(self, use_zip: bool = False) -> None:
         self.use_zip = use_zip
 
     def to_file(

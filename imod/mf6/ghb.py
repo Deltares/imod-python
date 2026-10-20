@@ -158,7 +158,7 @@ class GeneralHeadBoundary(TopSystemBoundaryCondition, IRegridPackage):
         observations=None,
         validate: bool = True,
         repeat_stress=None,
-    ):
+    ) -> None:
         dict_dataset = {
             "head": head,
             "conductance": conductance,

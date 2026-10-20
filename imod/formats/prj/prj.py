@@ -111,7 +111,7 @@ class _LineIterator:
     Like iter(lines), but we can go back and we check if we're finished.
     """
 
-    def __init__(self, lines: List[List[str]]):
+    def __init__(self, lines: List[List[str]]) -> None:
         self.lines = lines
         self.count = -1
         self.length = len(lines)
@@ -926,7 +926,7 @@ class IpfResult:
         time: datetime | None,
         factor: float,
         addition: float,
-    ):
+    ) -> None:
         self.dataframe.append(dataframe)
         self.layer.append(layer)
         self.time.append(time)

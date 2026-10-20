@@ -59,13 +59,13 @@ class MetaSwapPackage(IPackageBase, abc.ABC):
     _to_fill: tuple[Any, ...] = ()
     _metadata_dict: dict[str, Any] = {}
 
-    def __init__(self):
+    def __init__(self) -> None:
         self.dataset = xr.Dataset()
 
     def __getitem__(self, key):
         return self.dataset.__getitem__(key)
 
-    def __setitem__(self, key, value):
+    def __setitem__(self, key, value) -> None:
         self.dataset.__setitem__(key, value)
 
     @property
@@ -73,7 +73,7 @@ class MetaSwapPackage(IPackageBase, abc.ABC):
         return self._dataset
 
     @dataset.setter
-    def dataset(self, value):
+    def dataset(self, value) -> None:
         self._dataset = value
 
     @classmethod
@@ -92,7 +92,7 @@ class MetaSwapPackage(IPackageBase, abc.ABC):
         svat: xr.DataArray,
         mf6_dis: StructuredDiscretization,
         mf6_well: Mf6Wel,
-    ):
+    ) -> None:
         """
         Write MetaSWAP package to its corresponding fixed format file. This has
         the `.inp` extension.
@@ -132,7 +132,7 @@ class MetaSwapPackage(IPackageBase, abc.ABC):
                     f"{varname}: not all values are within range ({min_value}-{max_value})."
                 )
 
-    def _write_dataframe_fixed_width(self, file, dataframe):
+    def _write_dataframe_fixed_width(self, file, dataframe) -> None:
         """Write dataframe to fixed format file."""
         for row in dataframe.itertuples():
             for index, metadata in enumerate(self._metadata_dict.values()):
@@ -199,7 +199,7 @@ class MetaSwapPackage(IPackageBase, abc.ABC):
                     "contain 'subunit' coordinate"
                 )
 
-    def _valid(self, value):
+    def _valid(self, value) -> bool:
         return True
 
     def _get_non_grid_data(self, grid_names: list[str]) -> dict[str, Any]:

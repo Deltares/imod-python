@@ -224,7 +224,7 @@ def intra_cell_boundary_conditions(
 
     eff_volume = top_bot["dz"] * top_bot.dx * np.abs(top_bot.dy) * porosity
 
-    def _get_stage_name(sid):
+    def _get_stage_name(sid) -> str:
         if sid in riv:
             return "stage"
         elif sid in ghb:

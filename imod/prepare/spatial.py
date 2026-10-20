@@ -295,7 +295,7 @@ def _handle_dtype(dtype, nodata):
         "int64": (-9223372036854775808, 9223372036854775807),
     }
 
-    def format_invalid(str_dtype):
+    def format_invalid(str_dtype) -> str:
         str_dtypes = dtype_mapping.keys()
         return "Invalid dtype: {0}, must be one of: {1}".format(
             str_dtype, ", ".join(str_dtypes)
@@ -385,12 +385,12 @@ def gdal_rasterize(
 
     # An attempt at decent errors
     class GdalErrorHandler:
-        def __init__(self):
+        def __init__(self) -> None:
             self.err_level = gdal.CE_None
             self.err_no = 0
             self.err_msg = ""
 
-        def handler(self, err_level, err_no, err_msg):
+        def handler(self, err_level, err_no, err_msg) -> None:
             self.err_level = err_level
             self.err_no = err_no
             self.err_msg = err_msg

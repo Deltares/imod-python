@@ -153,7 +153,7 @@ class Drainage(TopSystemBoundaryCondition, IRegridPackage):
         observations=None,
         validate: bool = True,
         repeat_stress=None,
-    ):
+    ) -> None:
         dict_dataset = {
             "elevation": elevation,
             "conductance": conductance,

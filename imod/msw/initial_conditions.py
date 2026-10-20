@@ -21,10 +21,10 @@ class InitialConditionsEquilibrium(MetaSwapPackage, IRegridPackage):
     _option = "Equilibrium"
     _metadata_dict: dict[str, Any] = {}
 
-    def __init__(self):
+    def __init__(self) -> None:
         super().__init__()
 
-    def _render(self, file: TextIO, *args: Any):
+    def _render(self, file: TextIO, *args: Any) -> None:
         file.write(self._option + "\n")
 
 
@@ -47,11 +47,11 @@ class InitialConditionsRootzonePressureHead(MetaSwapPackage, IRegridPackage):
     }
     _regrid_method: DataclassType = EmptyRegridMethod()
 
-    def __init__(self, initial_pF=2.2):
+    def __init__(self, initial_pF=2.2) -> None:
         super().__init__()
         self.dataset["initial_pF"] = initial_pF
 
-    def _render(self, file: TextIO, *args: Any):
+    def _render(self, file: TextIO, *args: Any) -> None:
         file.write(self._option + "\n")
 
         dataframe = self.dataset.assign_coords(index=[0]).to_dataframe()
@@ -76,10 +76,10 @@ class InitialConditionsPercolation(MetaSwapPackage, IRegridPackage):
     _metadata_dict: dict[str, Any] = {}
     _regrid_method: DataclassType = EmptyRegridMethod()
 
-    def __init__(self):
+    def __init__(self) -> None:
         super().__init__()
 
-    def _render(self, file: TextIO, *args: Any):
+    def _render(self, file: TextIO, *args: Any) -> None:
         file.write(self._option + "\n")
 
 
@@ -101,11 +101,11 @@ class InitialConditionsSavedState(MetaSwapPackage):
     _option = "Saved_State"
     _metadata_dict: dict[str, Any] = {}
 
-    def __init__(self, saved_state):
+    def __init__(self, saved_state) -> None:
         super().__init__()
         self.saved_state = saved_state
 
-    def write(self, directory, *args):
+    def write(self, directory, *args) -> None:
         directory = pathlib.Path(directory)
         filename = directory / self._file_name
 

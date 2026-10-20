@@ -78,7 +78,7 @@ class MeteoMapping(MetaSwapPackage, IPackageBase):
     new packages.
     """
 
-    def __init__(self, meteo_grid: GridDataArray):
+    def __init__(self, meteo_grid: GridDataArray) -> None:
         super().__init__()
         self.meteo = meteo_grid
 
@@ -250,7 +250,7 @@ class PrecipitationMapping(MeteoMapping):
     def __init__(
         self,
         precipitation: xr.DataArray,
-    ):
+    ) -> None:
         super().__init__(precipitation)
 
     @classmethod
@@ -307,7 +307,7 @@ class EvapotranspirationMapping(MeteoMapping):
     def __init__(
         self,
         evapotranspiration: xr.DataArray,
-    ):
+    ) -> None:
         super().__init__(evapotranspiration)
 
     @classmethod

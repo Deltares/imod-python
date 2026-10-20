@@ -67,7 +67,7 @@ class AnnualCropFactors(MetaSwapPackage, IRegridPackage):
         interception_factor: xr.DataArray,
         bare_soil_factor: xr.DataArray,
         ponding_factor: xr.DataArray,
-    ):
+    ) -> None:
         super().__init__()
         self.dataset["soil_cover"] = soil_cover
         self.dataset["leaf_area_index"] = leaf_area_index

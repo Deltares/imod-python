@@ -94,7 +94,7 @@ class VerticesDiscretization(Package, IRegridPackage, IMaskingSettings):
         return ["bottom"]
 
     @init_log_decorator()
-    def __init__(self, top, bottom, idomain, validate: bool = True):
+    def __init__(self, top, bottom, idomain, validate: bool = True) -> None:
         dict_dataset = {
             "idomain": idomain,
             "top": top,
@@ -165,7 +165,7 @@ class VerticesDiscretization(Package, IRegridPackage, IMaskingSettings):
 
         return
 
-    def _write_blockfile(self, pkgname, globaltimes, write_context: WriteContext):
+    def _write_blockfile(self, pkgname, globaltimes, write_context: WriteContext) -> None:
         super()._write_blockfile(pkgname, globaltimes, write_context)
         filename = write_context.write_directory / f"{pkgname}.{self._pkg_id}"
         self._append_vertices_and_cell2d(filename)

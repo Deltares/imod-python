@@ -96,7 +96,7 @@ class ExchangeCreator(abc.ABC):
 
     def __init__(
         self, submodel_labels: GridDataArray, partition_info: list[PartitionInfo]
-    ):
+    ) -> None:
         self._submodel_labels = submodel_labels
 
         self._global_cell_indices = to_cell_idx(submodel_labels)
@@ -282,7 +282,7 @@ class ExchangeCreator(abc.ABC):
 
         return local_cell_idx_to_id
 
-    def rearrange_connected_cells(self):
+    def rearrange_connected_cells(self) -> None:
         """
         connections will be shuffled so that the lowest partition number comes first.
         """

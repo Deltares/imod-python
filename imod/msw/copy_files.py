@@ -29,7 +29,7 @@ class FileCopier(MetaSwapPackage):
         initialization.
     """
 
-    def __init__(self, paths: Sequence[str | Path]):
+    def __init__(self, paths: Sequence[str | Path]) -> None:
         super().__init__()
         # Enforce string so that it can be easily serialized and retrieved from
         # the dataset.
@@ -61,7 +61,7 @@ class FileCopier(MetaSwapPackage):
             )
         return cls(paths_included)
 
-    def write(self, directory: str | Path, *_):
+    def write(self, directory: str | Path, *_) -> None:
         directory = Path(directory)
 
         src_paths = [Path(p) for p in self.dataset["paths"].to_numpy()]

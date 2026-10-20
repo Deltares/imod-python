@@ -47,7 +47,7 @@ class PackageBase(IPackageBase, abc.ABC):
 
     def __init__(
         self, variables_to_merge: Mapping[str, GridDataArray | float | int | bool | str]
-    ):
+    ) -> None:
         # Merge variables, perform exact join to verify if coordinates values
         # are consistent amongst variables.
         self.__dataset = merge_with_dictionary(variables_to_merge, join="exact")
@@ -67,7 +67,7 @@ class PackageBase(IPackageBase, abc.ABC):
     def __getitem__(self, key):
         return self.dataset.__getitem__(key)
 
-    def __setitem__(self, key, value):
+    def __setitem__(self, key, value) -> None:
         self.dataset.__setitem__(key, value)
 
     @classmethod

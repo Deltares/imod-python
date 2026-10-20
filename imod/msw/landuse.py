@@ -153,7 +153,7 @@ class LanduseOptions(MetaSwapPackage, IRegridPackage):
         interception_capacity_per_LAI_Rutter=None,
         interception_capacity_per_LAI_VonHoyningen=None,
         interception_intercept=None,
-    ):
+    ) -> None:
         super().__init__()
         self.dataset["landuse_name"] = landuse_name
         self.dataset["vegetation_index"] = vegetation_index

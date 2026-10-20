@@ -130,7 +130,7 @@ def _is_equal_scalar_value(da, value):
     return da.to_numpy()[()] == value
 
 
-def has_active_scaling_factor(imod5_cap: GridDataDict):
+def has_active_scaling_factor(imod5_cap: GridDataDict) -> bool:
     """
     Check if scaling factor grids are active. Carefully checks if data is
     provided as constant (scalar) and if it matches an inactivity value. The

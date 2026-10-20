@@ -275,7 +275,7 @@ class River(TopSystemBoundaryCondition, IRegridPackage):
         observations=None,
         validate: bool = True,
         repeat_stress=None,
-    ):
+    ) -> None:
         dict_dataset = {
             "stage": stage,
             "conductance": conductance,

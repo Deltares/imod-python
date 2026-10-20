@@ -412,7 +412,7 @@ class Solution(Package):
         no_ptc=None,
         ats_outer_maximum_fraction=None,
         validate: bool = True,
-    ):
+    ) -> None:
         dict_dataset = {
             "outer_dvclose": outer_dvclose,
             "outer_maximum": outer_maximum,

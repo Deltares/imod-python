@@ -158,7 +158,7 @@ class Recharge(TopSystemBoundaryCondition, IRegridPackage):
         validate: bool = True,
         repeat_stress=None,
         fixed_cell: bool = False,
-    ):
+    ) -> None:
         dict_dataset = {
             "rate": rate,
             "concentration": concentration,

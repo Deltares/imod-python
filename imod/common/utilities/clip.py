@@ -124,7 +124,7 @@ def _clip_by_grid_line_data(
     return clipped_package
 
 
-def _filter_inactive_cells(package: IPackage, active: GridDataArray):
+def _filter_inactive_cells(package: IPackage, active: GridDataArray) -> None:
     if package._is_grid_agnostic_package():
         return
 

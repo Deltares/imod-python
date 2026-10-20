@@ -1139,7 +1139,7 @@ class HorizontalFlowBarrierHydraulicCharacteristic(HorizontalFlowBarrierBase):
         self,
         geometry: "gpd.GeoDataFrame",
         print_input=False,
-    ):
+    ) -> None:
         super().__init__(geometry, print_input)
 
     def _get_barrier_type(self):
@@ -1216,7 +1216,7 @@ class SingleLayerHorizontalFlowBarrierHydraulicCharacteristic(
         self,
         geometry: "gpd.GeoDataFrame",
         print_input=False,
-    ):
+    ) -> None:
         super().__init__(geometry, print_input)
 
     def _get_barrier_type(self):
@@ -1290,7 +1290,7 @@ class HorizontalFlowBarrierMultiplier(HorizontalFlowBarrierBase):
         self,
         geometry: "gpd.GeoDataFrame",
         print_input=False,
-    ):
+    ) -> None:
         super().__init__(geometry, print_input)
 
     def _get_barrier_type(self):
@@ -1369,7 +1369,7 @@ class SingleLayerHorizontalFlowBarrierMultiplier(HorizontalFlowBarrierBase):
         self,
         geometry: "gpd.GeoDataFrame",
         print_input=False,
-    ):
+    ) -> None:
         super().__init__(geometry, print_input)
 
     def _get_barrier_type(self):
@@ -1463,7 +1463,7 @@ class HorizontalFlowBarrierResistance(HorizontalFlowBarrierBase):
         self,
         geometry: "gpd.GeoDataFrame",
         print_input=False,
-    ):
+    ) -> None:
         super().__init__(geometry, print_input)
 
     def _get_barrier_type(self):
@@ -1581,7 +1581,7 @@ class SingleLayerHorizontalFlowBarrierResistance(HorizontalFlowBarrierBase):
         self,
         geometry: "gpd.GeoDataFrame",
         print_input=False,
-    ):
+    ) -> None:
         super().__init__(geometry, print_input)
 
     def _get_barrier_type(self):

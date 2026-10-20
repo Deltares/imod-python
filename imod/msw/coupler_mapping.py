@@ -36,7 +36,7 @@ class CouplerMapping(MetaSwapPackage, IPackageBase):
 
     def __init__(
         self,
-    ):
+    ) -> None:
         super().__init__()
 
     def _create_mod_id_rch(

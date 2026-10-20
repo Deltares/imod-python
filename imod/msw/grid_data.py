@@ -73,7 +73,7 @@ class GridData(MetaSwapPackage, IRegridPackage):
         surface_elevation: xr.DataArray,
         soil_physical_unit: xr.DataArray,
         active: xr.DataArray,
-    ):
+    ) -> None:
         super().__init__()
 
         self.dataset["area"] = area

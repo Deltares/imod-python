@@ -21,7 +21,7 @@ def _reduce_grid_except_dims(
     return grid.isel(**to_reduce)  # type: ignore [arg-type]
 
 
-def _validate_grid(grid):
+def _validate_grid(grid) -> None:
     # Validate if required dimensions are present
     schemata = [BOUNDARY_DIMS_SCHEMA, DTypeSchema(np.bool_)]
     for schema in schemata:

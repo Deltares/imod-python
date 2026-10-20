@@ -1172,7 +1172,7 @@ class Well(GridAgnosticWell):
             raise ValueError(log_msg)
 
     @standard_log_decorator()
-    def cleanup(self, dis: StructuredDiscretization | VerticesDiscretization):
+    def cleanup(self, dis: StructuredDiscretization | VerticesDiscretization) -> None:
         """
         Clean up package inplace. This method calls
         :func:`imod.prepare.cleanup_wel`, see documentation of that
@@ -1535,7 +1535,7 @@ class LayeredWell(GridAgnosticWell):
         return cls(**data)  # type: ignore
 
     @standard_log_decorator()
-    def cleanup(self, dis: StructuredDiscretization | VerticesDiscretization):
+    def cleanup(self, dis: StructuredDiscretization | VerticesDiscretization) -> None:
         """
         Clean up package inplace. This method calls
         :func:`imod.prepare.cleanup_wel_layered`, see documentation of that

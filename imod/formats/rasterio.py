@@ -38,7 +38,7 @@ def _create_ext_driver_code_map():
 
     else:
 
-        def _check_driver(drv):
+        def _check_driver(drv) -> bool:
             return True
 
     output = {}
@@ -442,7 +442,7 @@ def write(path, da, driver=None, nodata=np.nan, dtype=None):
     return
 
 
-def save(path, a, driver=None, nodata=np.nan, pattern=None, dtype=None):
+def save(path, a, driver=None, nodata=np.nan, pattern=None, dtype=None) -> None:
     """
     Write a xarray.DataArray to one or more rasterio supported files
 

@@ -98,12 +98,12 @@ class LayerRegridder:
         "maximum", "mode", "median", "max_overlap"}``
     """
 
-    def __init__(self, method):
+    def __init__(self, method) -> None:
         _method = common._get_method(method, METHODS)
         self.method = _method
         self._first_call = True
 
-    def _make_regrid(self):
+    def _make_regrid(self) -> None:
         """
         Use closure to avoid numba overhead
         """

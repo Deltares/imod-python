@@ -54,7 +54,7 @@ class GroundwaterTransportModel(Modflow6Model):
         print_flows: bool = False,
         save_flows: bool = False,
         validate: bool = True,
-    ):
+    ) -> None:
         super().__init__()
         self._options = {
             "listing_file": listing_file,

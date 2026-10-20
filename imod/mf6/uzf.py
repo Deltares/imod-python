@@ -252,7 +252,7 @@ class UnsaturatedZoneFlow(AdvancedBoundaryCondition):
         water_mover=None,
         timeseries=None,
         validate: bool = True,
-    ):
+    ) -> None:
         landflag = self._determine_landflag(kv_sat)
         iuzno = self._create_uzf_numbers(landflag)
         ivertcon = self._determine_vertical_connection(iuzno)

@@ -43,7 +43,7 @@ class IdfMapping(MetaSwapPackage, IRegridPackage):
     # increase with increasing col, row." But the example works with decreasing
     # y-coordinates.
 
-    def __init__(self, area, nodata):
+    def __init__(self, area, nodata) -> None:
         super().__init__()
 
         self.dataset["area"] = area

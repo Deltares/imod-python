@@ -175,7 +175,7 @@ class SpecificStorage(StorageBase):
         convertible,
         save_flows: bool = False,
         validate: bool = True,
-    ):
+    ) -> None:
         dict_dataset = {
             "specific_storage": specific_storage,
             "specific_yield": specific_yield,
@@ -303,7 +303,7 @@ class StorageCoefficient(StorageBase):
         convertible,
         save_flows: bool = False,
         validate: bool = True,
-    ):
+    ) -> None:
         dict_dataset = {
             "storage_coefficient": storage_coefficient,
             "specific_yield": specific_yield,

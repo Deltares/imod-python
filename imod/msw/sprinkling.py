@@ -242,7 +242,7 @@ class SprinklingGrid(SprinklingBase):
         self,
         max_abstraction_groundwater: xr.DataArray,
         max_abstraction_surfacewater: xr.DataArray,
-    ):
+    ) -> None:
         super().__init__()
         self.dataset["max_abstraction_groundwater"] = max_abstraction_groundwater
         self.dataset["max_abstraction_surfacewater"] = max_abstraction_surfacewater
@@ -362,7 +362,7 @@ class Sprinkling(SprinklingGrid):
     compatibility and will be removed in a future version.
     """
 
-    def __init__(self, *args, **kwargs):
+    def __init__(self, *args, **kwargs) -> None:
         warnings.warn(
             "Sprinkling is deprecated and will be removed in a future version. "
             "Use SprinklingGrid for the same behavior instead.",
@@ -460,7 +460,7 @@ class SprinklingPoints(SprinklingBase):
         layer_p: np.ndarray | list[int],
         id_sprinkling_p: np.ndarray | list[int],
         capacity_p: np.ndarray | list[float],
-    ):
+    ) -> None:
         super().__init__()
         # Replicate well ids as they were also created in
         # imod.mf6.LayeredWell.from_imod5_cap_data()

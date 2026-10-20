@@ -166,7 +166,7 @@ class Dispersion(Package, IRegridPackage):
         xt3d_off=False,
         xt3d_rhs=False,
         validate: bool = True,
-    ):
+    ) -> None:
         dict_dataset = {
             "xt3d_off": xt3d_off,
             "xt3d_rhs": xt3d_rhs,

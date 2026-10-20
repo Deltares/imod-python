@@ -75,7 +75,7 @@ class SourceSinkMixing(BoundaryCondition, IRegridPackage):
         print_flows: bool = False,
         save_flows: bool = False,
         validate: bool = True,
-    ):
+    ) -> None:
         dict_dataset = {
             # By sharing the index, this will raise an error if lengths do not
             # match.

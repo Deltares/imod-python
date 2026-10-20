@@ -32,7 +32,7 @@ class WriteContext:
     use_absolute_paths: bool = False
     write_directory: Path = None  # type: ignore
 
-    def __post_init__(self):
+    def __post_init__(self) -> None:
         self.simulation_directory = Path(self.simulation_directory)
         self.write_directory = (
             Path(self.write_directory)

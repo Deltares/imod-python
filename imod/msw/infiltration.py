@@ -91,7 +91,7 @@ class Infiltration(MetaSwapPackage, IRegridPackage):
         upward_resistance: xr.DataArray,
         bottom_resistance: xr.DataArray,
         extra_storage_coefficient: xr.DataArray,
-    ):
+    ) -> None:
         super().__init__()
         self.dataset["infiltration_capacity"] = infiltration_capacity
         self.dataset["downward_resistance"] = downward_resistance

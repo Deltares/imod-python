@@ -76,7 +76,7 @@ class ConstantConcentration(BoundaryCondition, IRegridPackage):
         save_flows=False,
         observations=None,
         validate: bool = True,
-    ):
+    ) -> None:
         dict_dataset = {
             "concentration": concentration,
             "print_input": print_input,

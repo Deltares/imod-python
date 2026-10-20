@@ -154,7 +154,7 @@ class Mf6Wel(BoundaryCondition, IPackage):
         print_flows: Optional[bool] = None,
         print_input: Optional[bool] = None,
         validate: bool = True,
-    ):
+    ) -> None:
         dict_dataset = {
             "cellid": cellid,
             "rate": rate,

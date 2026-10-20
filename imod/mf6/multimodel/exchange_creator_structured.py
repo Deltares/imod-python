@@ -28,7 +28,7 @@ class ExchangeCreator_Structured(ExchangeCreator):
 
     def __init__(
         self, submodel_labels: GridDataArray, partition_info: List[PartitionInfo]
-    ):
+    ) -> None:
         super().__init__(submodel_labels, partition_info)
 
     @property

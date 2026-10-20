@@ -13,7 +13,7 @@ from imod.typing.grid import is_spatial_grid
 
 
 class NetCDFSerializer(IPackageSerializer):
-    def __init__(self, mdal_compliant: bool = False, crs: str | None = None):
+    def __init__(self, mdal_compliant: bool = False, crs: str | None = None) -> None:
         self.mdal_compliant = mdal_compliant
         self.crs = crs
 

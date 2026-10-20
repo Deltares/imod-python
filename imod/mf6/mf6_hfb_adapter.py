@@ -114,7 +114,7 @@ class Mf6HorizontalFlowBarrier(BoundaryCondition):
         hydraulic_characteristic: xr.DataArray,
         print_input: Union[bool, xr.DataArray] = False,
         validate: Union[bool, xr.DataArray] = True,
-    ):
+    ) -> None:
         dict_dataset: dict[str, Any] = {
             "cell_id1": cell_id1,
             "cell_id2": cell_id2,
@@ -158,7 +158,7 @@ class Mf6HorizontalFlowBarrier(BoundaryCondition):
         pkgname: str,
         globaltimes: Union[list[np.datetime64], np.ndarray],
         write_context: WriteContext,
-    ):
+    ) -> None:
         # MODFLOW6 does not support binary HFB input.
         hfb_write_context = deepcopy(write_context)
         hfb_write_context.use_binary = False

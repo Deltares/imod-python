@@ -64,7 +64,7 @@ class TimeDiscretization(Package):
         n_timesteps=1,
         timestep_multiplier=1.0,
         validate: bool = True,
-    ):
+    ) -> None:
         dict_dataset = {
             "timestep_duration": timestep_duration,
             "n_timesteps": n_timesteps,
@@ -122,15 +122,15 @@ class TimeDiscretization(Package):
                 f"Got {da.dims}. Can be at max ('time', )."
             )
 
-    def _set_ats_filename(self, ats_pkgname: str, write_context: WriteContext):
+    def _set_ats_filename(self, ats_pkgname: str, write_context: WriteContext) -> None:
         ats_path = write_context.get_formatted_write_directory() / f"{ats_pkgname}.ats"
         self.dataset["ats_filename"] = ats_path
 
-    def _clear_ats_filename(self):
+    def _clear_ats_filename(self) -> None:
         if "ats_filename" in self.dataset.keys():
             del self.dataset["ats_filename"]
 
-    def _write(self, pkgname, globaltimes, write_context):
+    def _write(self, pkgname, globaltimes, write_context) -> None:
         timedis_content = self._render(
             write_context.write_directory,
             pkgname,
