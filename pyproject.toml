@@ -118,7 +118,6 @@ warn_return_any = false
 module = [
     "imod.templates.*",  # Python script here not used
     "imod.tests.*",
-    "imod.visualize.*",
     "imod.wq.*",  # Deprecated
 ]
 ignore_errors = true
