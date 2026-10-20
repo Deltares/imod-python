@@ -36,7 +36,7 @@ The methods below construct pyvista.UnstructuredGrids for voxel models (z1d),
 """
 
 from pathlib import Path
-from typing import Optional, Tuple
+from typing import TYPE_CHECKING, Any, Dict, Optional, Tuple, Union, cast
 
 import numba
 import numpy as np
@@ -49,6 +49,10 @@ import imod
 from imod.select import points_values
 from imod.util.imports import MissingOptionalModule
 
+if TYPE_CHECKING:
+    import pyvista as pv
+    import shapely.geometry
+
 try:
     import pyvista as pv
     import vtk  # type: ignore[import-untyped]
@@ -60,14 +64,16 @@ except ImportError:
     vtk = MissingOptionalModule("vtk")
 
 
-def exterior(da, n):
+def exterior(da: xr.DataArray, n: int) -> xr.DataArray:
     has_data = da.notnull()
     eroded = da.copy(data=scipy.ndimage.binary_erosion(has_data.values, iterations=n))
     return has_data & ~eroded
 
 
 @numba.njit
-def _create_hexahedra_z1d(data, x, y, z):
+def _create_hexahedra_z1d(
+    data: np.ndarray, x: np.ndarray, y: np.ndarray, z: np.ndarray
+) -> Tuple[np.ndarray, np.ndarray, np.ndarray, np.ndarray, np.ndarray, np.ndarray]:
     """
     This function creates the necessary arrays to create hexahedra, based on a
     one-dimensional z array: i.e. one that does not depend on x and y.
@@ -147,7 +153,9 @@ def _create_hexahedra_z1d(data, x, y, z):
 
 
 @numba.njit
-def _create_hexahedra_z3d(data, x, y, z3d):
+def _create_hexahedra_z3d(
+    data: np.ndarray, x: np.ndarray, y: np.ndarray, z3d: np.ndarray
+) -> Tuple[np.ndarray, np.ndarray, np.ndarray, np.ndarray, np.ndarray, np.ndarray]:
     """
     This function creates the necessary arrays to create hexahedra, based on a
     three-dimensional z array: i.e. one that depends on x and y.
@@ -228,7 +236,9 @@ def _create_hexahedra_z3d(data, x, y, z3d):
 
 
 @numba.njit
-def _create_plane_surface(data, x, y):
+def _create_plane_surface(
+    data: np.ndarray, x: np.ndarray, y: np.ndarray
+) -> Tuple[np.ndarray, np.ndarray, np.ndarray, np.ndarray, np.ndarray]:
     """
     This function creates the necessary arrays to create quads, based on a
     two-dimensional data array. The data array is used for the z dimension.
@@ -349,7 +359,9 @@ def _create_plane_surface(data, x, y):
     return offset, cells, cell_type, points, values
 
 
-def vertices_coords(dx, xmin, xmax, nx):
+def vertices_coords(
+    dx: Union[float, np.ndarray], xmin: float, xmax: float, nx: int
+) -> np.ndarray:
     """
     Return the coordinates of the vertices.
     (xarray stores midpoints)
@@ -365,12 +377,12 @@ def vertices_coords(dx, xmin, xmax, nx):
 
 
 def grid_3d(
-    da,
-    vertical_exaggeration=30.0,
-    exterior_only=True,
-    exterior_depth=1,
-    return_index=False,
-):
+    da: xr.DataArray,
+    vertical_exaggeration: float = 30.0,
+    exterior_only: bool = True,
+    exterior_depth: int = 1,
+    return_index: bool = False,
+) -> Union["pv.UnstructuredGrid", Tuple["pv.UnstructuredGrid", np.ndarray]]:
     """
     Constructs a 3D PyVista representation of a DataArray.
     DataArrays should be two-dimensional or three-dimensional:
@@ -505,7 +517,9 @@ def grid_3d(
 # Vectors are located somewhere
 
 
-def line_3d(polygon, z=0.0):
+def line_3d(
+    polygon: "shapely.geometry.Polygon", z: Union[float, xr.DataArray] = 0.0
+) -> "pv.PolyData":
     """
     Returns the exterior line of a shapely polygon.
 
@@ -521,11 +535,12 @@ def line_3d(polygon, z=0.0):
     pyvista.PolyData
     """
     x, y = map(np.array, polygon.exterior.coords.xy)
+    z_values: np.ndarray
     if isinstance(z, xr.DataArray):
-        z = points_values(z, x=x, y=y).values
+        z_values = points_values(z, x=x, y=y).values
     else:
-        z = np.full_like(x, z)
-    coords = np.vstack([x, y, z]).transpose()
+        z_values = np.full_like(x, z)
+    coords = np.vstack([x, y, z_values]).transpose()
     return pv.lines_from_points(coords)
 
 
@@ -594,9 +609,14 @@ class GridAnimation3D:
     >>> animation = imod.visualize.GridAnimation3D(concentration, mesh_kwargs=dict(stitle="Concentration on {timestamp:%Y-%m-%d}"))
     """
 
-    def _initialize(self, da):
-        self.mesh = grid_3d(
-            da, vertical_exaggeration=self.vertical_exaggeration, return_index=False
+    def _initialize(self, da: xr.DataArray) -> None:
+        self.mesh = cast(
+            "pv.UnstructuredGrid",
+            grid_3d(
+                da,
+                vertical_exaggeration=self.vertical_exaggeration,
+                return_index=False,
+            ),
         )
         mesh_kwargs = self.mesh_kwargs.copy()
         if "stitle" in mesh_kwargs and "{timestamp" in mesh_kwargs["stitle"]:
@@ -606,13 +626,17 @@ class GridAnimation3D:
 
         self.mesh_actor = self.plotter.add_mesh(self.mesh, **mesh_kwargs)
 
-    def _update(self, da):
+    def _update(self, da: xr.DataArray) -> None:
         self.plotter.remove_actor(self.mesh_actor)
         self._initialize(da)
 
     def __init__(
-        self, da, vertical_exaggeration=30.0, mesh_kwargs={}, plotter_kwargs={}
-    ):
+        self,
+        da: xr.DataArray,
+        vertical_exaggeration: float = 30.0,
+        mesh_kwargs: Dict[str, Any] = {},
+        plotter_kwargs: Dict[str, Any] = {},
+    ) -> None:
         # Store data
         self.da = da
         self.vertical_exaggeration = vertical_exaggeration
@@ -622,20 +646,20 @@ class GridAnimation3D:
         # Initialize pyvista objects
         self._initialize(da.isel(time=0))
 
-    def peek(self):
+    def peek(self) -> None:
         """
         Display the current state of the animation plotter.
         """
         self.plotter.show(auto_close=False)
 
-    def reset(self):
+    def reset(self) -> None:
         """
         Reset the plotter to its base state.
         """
         self.plotter = pv.Plotter(**self.plotter_kwargs)
         self._update(self.da.isel(time=0))
 
-    def write(self, filename, framerate=24):
+    def write(self, filename: Union[str, Path], framerate: int = 24) -> None:
         """
         Write the animation to a video or gif.
 
@@ -675,12 +699,19 @@ class StaticGridAnimation3D(GridAnimation3D):
     Refer to examples of ``imod.visualize.GridAnimation3D``.
     """
 
-    def _initialize(self, da):
-        self.mesh, self.indices = grid_3d(
-            da, vertical_exaggeration=self.vertical_exaggeration, return_index=True
+    def _initialize(self, da: xr.DataArray) -> None:
+        mesh, indices = cast(
+            Tuple["pv.UnstructuredGrid", np.ndarray],
+            grid_3d(
+                da,
+                vertical_exaggeration=self.vertical_exaggeration,
+                return_index=True,
+            ),
         )
+        self.mesh = mesh
+        self.indices = indices
 
-    def _update(self, da):
+    def _update(self, da: xr.DataArray) -> None:
         self.mesh.cell_data["values"] = da.values.ravel()[self.indices]
 
 
@@ -696,11 +727,11 @@ def velocity_field(
     absolute: Optional[bool] = False,
     clamping: Optional[bool] = False,
     rng: Optional[Tuple[float, float]] = None,
-):
+) -> "pv.PolyData":
     if z is None:
-        z_np = vx["z"].values
+        z_values = vx["z"].values
     else:
-        z_np = z.values
+        z_values = z.values
 
     if not (vx.shape == vy.shape == vz.shape):
         raise ValueError("Shapes of velocity components vx, vy, vz do not match")
@@ -714,15 +745,15 @@ def velocity_field(
     # Start by generating the location of the velocity arrows
     # Ensure the points follow the memory layout of the v DataArrays (z, y, x)
     # otherwise, the result of np.ravel() doesn't match up
-    if z_np.ndim == 1:
-        zz, yy, xx = np.meshgrid(z_np, vx["y"].values, vx["x"].values, indexing="ij")
-    elif z_np.ndim == 3:
-        if not z_np.shape == vx.shape:
+    if z_values.ndim == 1:
+        zz, yy, xx = np.meshgrid(z_values, vx["y"].values, vx["x"].values, indexing="ij")
+    elif z_values.ndim == 3:
+        if not z_values.shape == vx.shape:
             raise ValueError("Shape of `z` does not match velocity components.")
         _, yy, xx = np.meshgrid(
-            np.arange(z_np.shape[0]), vx["x"].values, vy["y"].values, indexing="ij"
+            np.arange(z_values.shape[0]), vx["x"].values, vy["y"].values, indexing="ij"
         )
-        zz = z_np
+        zz = z_values
     else:
         raise ValueError("z should be one or three dimensional.")
 
