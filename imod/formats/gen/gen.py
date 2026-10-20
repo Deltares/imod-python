@@ -356,13 +356,6 @@ def vertices(geometry: GeometryT, ftype: str) -> tuple[int, np.ndarray, int]:
     return ftype_int, xy, n_vertex
 
 
-def _maybe_convert_geometry_to_gen(
-    geometry: GeometryT, ftype: str
-) -> tuple[int, np.ndarray, int]:
-    """Alias of :func:`vertices`."""
-    return vertices(geometry, ftype)
-
-
 def read(path: str | Path):
     """
     Read a GEN file to a geopandas GeoDataFrame. The function first tries to
