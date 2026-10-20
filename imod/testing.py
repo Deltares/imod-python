@@ -2,7 +2,7 @@ import numpy as np
 import pandas as pd
 
 
-def assert_frame_equal(left: pd.DataFrame, right: pd.DataFrame, **kwargs):
+def assert_frame_equal(left: pd.DataFrame, right: pd.DataFrame, **kwargs) -> None:
     """
     Dataframes are regularly created with "platform dependent" integer columns,
     such as int and np.intp; windows behaves differently from linux. This

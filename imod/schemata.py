@@ -176,7 +176,7 @@ class OptionSchema(BaseSchema):
     Check whether the value is one of given valid options.
     """
 
-    def __init__(self, options: Sequence[Any]):
+    def __init__(self, options: Sequence[Any]) -> None:
         self.options = options
 
     def validate(self, obj: ScalarAsDataArray, **kwargs) -> None:
@@ -459,7 +459,7 @@ class OtherCoordsSchema(BaseSchema):
         other: str,
         require_all_keys: bool = True,
         allow_extra_keys: bool = True,
-    ):
+    ) -> None:
         self.other = other
         self.require_all_keys = require_all_keys
         self.allow_extra_keys = allow_extra_keys
@@ -520,7 +520,7 @@ class ValueSchema(BaseSchema, abc.ABC):
         operator: str,
         other: Any,
         ignore: Optional[Tuple[str, str, Any]] = None,
-    ):
+    ) -> None:
         self.operator = OPERATORS[operator]
         self.operator_str = operator
         self.other = other
@@ -611,7 +611,7 @@ class MaxNUniqueValuesSchema(BaseSchema):
     Fails if amount of unique values exceeds a limit.
     """
 
-    def __init__(self, max_unique_values: int):
+    def __init__(self, max_unique_values: int) -> None:
         self.max_unique_values = max_unique_values
 
     def validate(self, obj: GridDataArray, **kwargs) -> None:
@@ -640,7 +640,7 @@ class NoDataSchema(BaseSchema):
     def __init__(
         self,
         is_notnull: Union[Callable[..., Any], Tuple[str, Any]] = notnull,
-    ):
+    ) -> None:
         if isinstance(is_notnull, tuple):
             op, value = is_notnull
             self.is_notnull = partial_operator(op, value)
@@ -680,7 +680,7 @@ class NoDataComparisonSchema(BaseSchema):
         other: str,
         is_notnull: Union[Callable[..., Any], Tuple[str, Any]] = notnull,
         is_other_notnull: Union[Callable[..., Any], Tuple[str, Any]] = notnull,
-    ):
+    ) -> None:
         self.other = other
         if isinstance(is_notnull, tuple):
             op, value = is_notnull
@@ -749,7 +749,7 @@ class ActiveCellsConnectedSchema(BaseSchema):
     def __init__(
         self,
         is_notnull: Union[Callable[..., Any], Tuple[str, Any]] = notnull,
-    ):
+    ) -> None:
         if isinstance(is_notnull, tuple):
             op, value = is_notnull
             self.is_notnull = partial_operator(op, value)
