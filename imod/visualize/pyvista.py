@@ -42,7 +42,7 @@ import numba
 import numpy as np
 import pandas as pd
 import scipy.ndimage
-import tqdm
+import tqdm  # type: ignore[import-untyped]
 import xarray as xr
 
 import imod
@@ -51,7 +51,7 @@ from imod.util.imports import MissingOptionalModule
 
 try:
     import pyvista as pv
-    import vtk
+    import vtk  # type: ignore[import-untyped]
 
     if vtk.vtkVersion().GetVTKMajorVersion() < 9:
         raise ImportError("VTK version of 9.0 or higher required")
@@ -698,7 +698,9 @@ def velocity_field(
     rng: Optional[Tuple[float, float]] = None,
 ):
     if z is None:
-        z = vx["z"].values
+        z_np = vx["z"].values
+    else:
+        z_np = z.values
 
     if not (vx.shape == vy.shape == vz.shape):
         raise ValueError("Shapes of velocity components vx, vy, vz do not match")
@@ -712,15 +714,15 @@ def velocity_field(
     # Start by generating the location of the velocity arrows
     # Ensure the points follow the memory layout of the v DataArrays (z, y, x)
     # otherwise, the result of np.ravel() doesn't match up
-    if z.dim == 1:
-        zz, yy, xx = np.meshgrid(z, vx["y"].values, vx["x"].values, indexing="ij")
-    elif z.dim == 3:
-        if not z.shape == vx.shape:
+    if z_np.ndim == 1:
+        zz, yy, xx = np.meshgrid(z_np, vx["y"].values, vx["x"].values, indexing="ij")
+    elif z_np.ndim == 3:
+        if not z_np.shape == vx.shape:
             raise ValueError("Shape of `z` does not match velocity components.")
         _, yy, xx = np.meshgrid(
-            np.arange(z.shape[0]), vx["x"].values, vy["y"].avlues, indexing="ij"
+            np.arange(z_np.shape[0]), vx["x"].values, vy["y"].values, indexing="ij"
         )
-        zz = z
+        zz = z_np
     else:
         raise ValueError("z should be one or three dimensional.")
 
