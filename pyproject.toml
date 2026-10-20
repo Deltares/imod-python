@@ -116,12 +116,11 @@ warn_return_any = false
 # works with the vscode mypy extension
 [[tool.mypy.overrides]]
 module = [
-    "imod.data.*",
     "imod.evaluate.*",
-    "imod.templates.*",
+    "imod.templates.*",  # Python script here not used
     "imod.tests.*",
     "imod.visualize.*",
-    "imod.wq.*",
+    "imod.wq.*",  # Deprecated
 ]
 ignore_errors = true
 
