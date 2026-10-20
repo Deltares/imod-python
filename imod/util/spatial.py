@@ -7,7 +7,8 @@ used internally, but are not private since they may be useful to users as well.
 
 import collections
 import re
-from typing import TYPE_CHECKING, Any, Dict, Optional, Sequence, Tuple, Union
+from collections.abc import Sequence
+from typing import TYPE_CHECKING, Any
 
 import affine
 import numpy as np
@@ -47,7 +48,7 @@ except ImportError:
 
 def _xycoords(
     bounds: tuple[float, float, float, float], cellsizes: tuple[Any, Any]
-) -> Dict[str, Any]:
+) -> dict[str, Any]:
     """Based on bounds and cellsizes, construct coords with spatial information"""
     # unpack tuples
     xmin, xmax, ymin, ymax = bounds
@@ -74,7 +75,7 @@ def _xycoords(
     return coords
 
 
-def coord_reference(da_coord: xr.DataArray) -> Tuple[float, float, float]:
+def coord_reference(da_coord: xr.DataArray) -> tuple[float, float, float]:
     """
     Extracts dx, xmin, xmax for a coordinate DataArray, where x is any coordinate.
 
@@ -141,7 +142,7 @@ def coord_reference(da_coord: xr.DataArray) -> Tuple[float, float, float]:
 
 def spatial_reference(
     a: xr.DataArray,
-) -> Tuple[float, float, float, float, float, float]:
+) -> tuple[float, float, float, float, float, float]:
     """
     Extracts spatial reference from DataArray.
 
@@ -179,7 +180,7 @@ def transform(a: xr.DataArray) -> affine.Affine:
     """
     dx, xmin, _, dy, _, ymax = spatial_reference(a)
 
-    def equidistant(dx: Union[float, FloatArray], name: str) -> float:
+    def equidistant(dx: float | FloatArray, name: str) -> float:
         if isinstance(dx, np.ndarray):
             if np.unique(dx).size == 1:
                 return dx[0]
@@ -247,9 +248,7 @@ def unstack_dim_into_variable(dataset: GridDataset, dim: str) -> GridDataset:
     return unstacked
 
 
-def mdal_compliant_ugrid2d(
-    dataset: xr.Dataset, crs: Optional[Any] = None
-) -> xr.Dataset:
+def mdal_compliant_ugrid2d(dataset: xr.Dataset, crs: Any | None = None) -> xr.Dataset:
     """
     Ensures the xarray Dataset will be written to a UGRID netCDF that will be
     accepted by MDAL.
@@ -379,7 +378,7 @@ def from_mdal_compliant_ugrid2d(dataset: xu.UgridDataset) -> xu.UgridDataset:
     return xu.UgridDataset(restacked, grids=dataset.ugrid.grids)
 
 
-def to_ugrid2d(data: Union[xr.DataArray, xr.Dataset]) -> xr.Dataset:
+def to_ugrid2d(data: xr.DataArray | xr.Dataset) -> xr.Dataset:
     """
     Convert a structured DataArray or Dataset into its UGRID-2D quadrilateral
     equivalent.
@@ -420,9 +419,9 @@ def to_ugrid2d(data: Union[xr.DataArray, xr.Dataset]) -> xr.Dataset:
 
 
 def gdal_compliant_grid(
-    data: Union[xr.DataArray, xr.Dataset],
-    crs: Optional[Any] = None,
-) -> Union[xr.DataArray, xr.Dataset]:
+    data: xr.DataArray | xr.Dataset,
+    crs: Any | None = None,
+) -> xr.DataArray | xr.Dataset:
     """
     Assign attributes to x,y coordinates to make data accepted by GDAL.
 
@@ -478,10 +477,10 @@ def gdal_compliant_grid(
 
 
 def empty_2d(
-    dx: Union[float, FloatArray],
+    dx: float | FloatArray,
     xmin: float,
     xmax: float,
-    dy: Union[float, FloatArray],
+    dy: float | FloatArray,
     ymin: float,
     ymax: float,
 ) -> xr.DataArray:
@@ -523,13 +522,13 @@ def empty_2d(
 
 
 def empty_3d(
-    dx: Union[float, FloatArray],
+    dx: float | FloatArray,
     xmin: float,
     xmax: float,
-    dy: Union[float, FloatArray],
+    dy: float | FloatArray,
     ymin: float,
     ymax: float,
-    layer: Union[int, Sequence[int], IntArray],
+    layer: int | Sequence[int] | IntArray,
 ) -> xr.DataArray:
     """
     Create an empty 2D (x, y) DataArray.
@@ -575,10 +574,10 @@ def empty_3d(
 
 
 def empty_2d_transient(
-    dx: Union[float, FloatArray],
+    dx: float | FloatArray,
     xmin: float,
     xmax: float,
-    dy: Union[float, FloatArray],
+    dy: float | FloatArray,
     ymin: float,
     ymax: float,
     time: Any,
@@ -627,13 +626,13 @@ def empty_2d_transient(
 
 
 def empty_3d_transient(
-    dx: Union[float, FloatArray],
+    dx: float | FloatArray,
     xmin: float,
     xmax: float,
-    dy: Union[float, FloatArray],
+    dy: float | FloatArray,
     ymin: float,
     ymax: float,
-    layer: Union[int, Sequence[int], IntArray],
+    layer: int | Sequence[int] | IntArray,
     time: Any,
 ) -> xr.DataArray:
     """
@@ -682,7 +681,7 @@ def empty_3d_transient(
     )
 
 
-def _layer(layer: Union[int, Sequence[int], IntArray]) -> IntArray:
+def _layer(layer: int | Sequence[int] | IntArray) -> IntArray:
     layer = np.atleast_1d(layer)
     if layer.ndim > 1:
         raise ValueError("layer must be 1d")
@@ -696,7 +695,7 @@ def _time(time: Any) -> Any:
     return pd.to_datetime(time)
 
 
-def is_divisor(numerator: Union[float, FloatArray], denominator: float) -> bool:
+def is_divisor(numerator: float | FloatArray, denominator: float) -> bool:
     """
     Parameters
     ----------

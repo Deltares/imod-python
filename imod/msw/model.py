@@ -4,7 +4,7 @@ import warnings
 from copy import copy, deepcopy
 from datetime import datetime
 from pathlib import Path
-from typing import Any, Optional, Union, cast
+from typing import Any, cast
 
 import cftime
 import jinja2
@@ -141,8 +141,8 @@ class MetaSwapModel(Model, IDict):
     def __init__(
         self,
         unsaturated_database: Path | str,
-        settings: Optional[dict[str, Any]] = None,
-        starttime: Optional[str] = None,
+        settings: dict[str, Any] | None = None,
+        starttime: str | None = None,
     ) -> None:
         super().__init__()
 
@@ -155,7 +155,7 @@ class MetaSwapModel(Model, IDict):
         self.simulation_settings["unsa_svat_path"] = unsaturated_database
 
     def _render_unsaturated_database_path(
-        self, unsaturated_database: Union[str, Path]
+        self, unsaturated_database: str | Path
     ) -> str:
         # Force to Path object
         unsaturated_database = Path(unsaturated_database)
@@ -339,7 +339,7 @@ class MetaSwapModel(Model, IDict):
         )
         return self.get_pkgkey(pkg_type, optional_package)
 
-    def _model_checks(self, validate: Optional[bool] = True) -> None:
+    def _model_checks(self, validate: bool | None = True) -> None:
         if validate and not self._has_file_copier():
             self._check_required_packages()
             self._check_vegetation_indices_in_annual_crop_factors()
@@ -380,10 +380,10 @@ class MetaSwapModel(Model, IDict):
 
     def write(
         self,
-        directory: Union[str, Path],
+        directory: str | Path,
         mf6_dis: StructuredDiscretization,
-        mf6_wel: Optional[Mf6Wel] = None,
-        validate: Optional[bool] = True,
+        mf6_wel: Mf6Wel | None = None,
+        validate: bool | None = True,
     ) -> None:
         """
         Write packages and simulation settings (para_sim.inp).
@@ -440,11 +440,11 @@ class MetaSwapModel(Model, IDict):
 
     def dump(
         self,
-        directory: Union[str, Path],
-        modelname: Optional[str] = None,
+        directory: str | Path,
+        modelname: str | None = None,
         validate: bool = True,
         mdal_compliant: bool = False,
-        crs: Optional[str] = None,
+        crs: str | None = None,
         engine: EngineType = "netcdf4",
     ):
         """
@@ -500,7 +500,7 @@ class MetaSwapModel(Model, IDict):
     def regrid_like(
         self,
         mf6_regridded_dis: StructuredDiscretization,
-        regrid_cache: Optional[RegridderWeightsCache] = None,
+        regrid_cache: RegridderWeightsCache | None = None,
     ) -> "MetaSwapModel":
         """
         Creates a model by regridding the packages of this model to another
@@ -605,12 +605,12 @@ class MetaSwapModel(Model, IDict):
 
     def clip_box(
         self,
-        time_min: Optional[cftime.datetime | np.datetime64 | str] = None,
-        time_max: Optional[cftime.datetime | np.datetime64 | str] = None,
-        x_min: Optional[float] = None,
-        x_max: Optional[float] = None,
-        y_min: Optional[float] = None,
-        y_max: Optional[float] = None,
+        time_min: cftime.datetime | np.datetime64 | str | None = None,
+        time_max: cftime.datetime | np.datetime64 | str | None = None,
+        x_min: float | None = None,
+        x_max: float | None = None,
+        y_min: float | None = None,
+        y_max: float | None = None,
     ) -> "MetaSwapModel":
         """
         Clip a model by a bounding box (time, y, x). If a package of type

@@ -1,5 +1,5 @@
 from copy import deepcopy
-from typing import Any, Union
+from typing import Any
 
 import numpy as np
 import xarray as xr
@@ -112,8 +112,8 @@ class Mf6HorizontalFlowBarrier(BoundaryCondition):
         cell_id2: xr.DataArray,
         layer: xr.DataArray,
         hydraulic_characteristic: xr.DataArray,
-        print_input: Union[bool, xr.DataArray] = False,
-        validate: Union[bool, xr.DataArray] = True,
+        print_input: bool | xr.DataArray = False,
+        validate: bool | xr.DataArray = True,
     ) -> None:
         dict_dataset: dict[str, Any] = {
             "cell_id1": cell_id1,
@@ -156,7 +156,7 @@ class Mf6HorizontalFlowBarrier(BoundaryCondition):
     def _write(
         self,
         pkgname: str,
-        globaltimes: Union[list[np.datetime64], np.ndarray],
+        globaltimes: list[np.datetime64] | np.ndarray,
         write_context: WriteContext,
     ) -> None:
         # MODFLOW6 does not support binary HFB input.

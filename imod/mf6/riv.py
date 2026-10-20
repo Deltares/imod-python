@@ -1,5 +1,5 @@
 from datetime import datetime
-from typing import Optional, Tuple, cast
+from typing import Optional, cast
 
 import numpy as np
 
@@ -56,7 +56,7 @@ from imod.util.regrid import (
 
 def mask_package__drop_if_empty(
     package: TopSystemBoundaryCondition,
-) -> Optional[TopSystemBoundaryCondition]:
+) -> TopSystemBoundaryCondition | None:
     """ "
     Create an optional package from a package if it has data. Return None if
     package is inactive everywhere.
@@ -67,10 +67,10 @@ def mask_package__drop_if_empty(
 
 
 def clip_time_if_package(
-    package: Optional[TopSystemBoundaryCondition],
+    package: TopSystemBoundaryCondition | None,
     time_min: datetime,
     time_max: datetime,
-) -> Optional[TopSystemBoundaryCondition]:
+) -> TopSystemBoundaryCondition | None:
     if package is not None:
         package = package.clip_box(time_min=time_min, time_max=time_max)
     return package
@@ -445,9 +445,9 @@ class River(TopSystemBoundaryCondition, IRegridPackage):
         time_max: datetime,
         allocation_option: ALLOCATION_OPTION,
         distributing_option: DISTRIBUTING_OPTION,
-        regridder_types: Optional[RiverRegridMethod] = None,
+        regridder_types: RiverRegridMethod | None = None,
         regrid_cache: RegridderWeightsCache = RegridderWeightsCache(),
-    ) -> Tuple[Optional["River"], Optional[Drainage]]:
+    ) -> tuple[Optional["River"], Drainage | None]:
         """
         Construct a river-package from iMOD5 data, loaded with the
         :func:`imod.formats.prj.open_projectfile_data` function.
@@ -553,7 +553,7 @@ class River(TopSystemBoundaryCondition, IRegridPackage):
         optional_drn_pkg = clip_time_if_package(optional_drn_pkg, time_min, time_max)
 
         # Cast for mypy checks
-        optional_riv_pkg = cast(Optional[River], optional_riv_pkg)
-        optional_drn_pkg = cast(Optional[Drainage], optional_drn_pkg)
+        optional_riv_pkg = cast(River | None, optional_riv_pkg)
+        optional_drn_pkg = cast(Drainage | None, optional_drn_pkg)
 
         return (optional_riv_pkg, optional_drn_pkg)

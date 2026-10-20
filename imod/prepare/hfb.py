@@ -1,5 +1,5 @@
 from itertools import pairwise
-from typing import TYPE_CHECKING, List, Tuple
+from typing import TYPE_CHECKING
 
 from imod.typing import PolygonType
 from imod.util.imports import MissingOptionalModule
@@ -14,7 +14,7 @@ else:
 
 
 def _line_to_square_zpolygon(
-    x: Tuple[float, float], y: Tuple[float, float], z: Tuple[float, float]
+    x: tuple[float, float], y: tuple[float, float], z: tuple[float, float]
 ) -> PolygonType:
     """
     Creates polygon as follows::
@@ -36,11 +36,11 @@ def _line_to_square_zpolygon(
 
 
 def linestring_to_square_zpolygons(
-    barrier_x: List[float],
-    barrier_y: List[float],
-    barrier_ztop: List[float],
-    barrier_zbottom: List[float],
-) -> List[PolygonType]:
+    barrier_x: list[float],
+    barrier_y: list[float],
+    barrier_ztop: list[float],
+    barrier_zbottom: list[float],
+) -> list[PolygonType]:
     """
     Create square vertical polygons from linestrings, with a varying ztop and
     zbottom over the line. Note: If the lists of x and y values of length N, the
@@ -111,10 +111,10 @@ def linestring_to_square_zpolygons(
 
 
 def _line_to_trapezoid_zpolygon(
-    x: Tuple[float, float],
-    y: Tuple[float, float],
-    zt: Tuple[float, float],
-    zb: Tuple[float, float],
+    x: tuple[float, float],
+    y: tuple[float, float],
+    zt: tuple[float, float],
+    zb: tuple[float, float],
 ) -> PolygonType:
     r"""
     Creates polygon as follows::
@@ -141,11 +141,11 @@ def _line_to_trapezoid_zpolygon(
 
 
 def linestring_to_trapezoid_zpolygons(
-    barrier_x: List[float],
-    barrier_y: List[float],
-    barrier_ztop: List[float],
-    barrier_zbottom: List[float],
-) -> List[PolygonType]:
+    barrier_x: list[float],
+    barrier_y: list[float],
+    barrier_ztop: list[float],
+    barrier_zbottom: list[float],
+) -> list[PolygonType]:
     r"""
     Create trapezoid vertical polygons from linestrings, with a varying ztop and
     zbottom over the line. These are shaped as follows::

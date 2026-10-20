@@ -1,6 +1,3 @@
-import typing
-from typing import Dict
-
 import numpy as np
 import pandas as pd
 import xarray as xr
@@ -12,7 +9,7 @@ from imod.typing import GridDataArray
 from imod.typing.grid import zeros_like
 from imod.util.spatial import spatial_reference
 
-DomainSlice = Dict[str, slice | np.ndarray]
+DomainSlice = dict[str, slice | np.ndarray]
 
 
 def get_active_domain_slice(active: GridDataArray) -> DomainSlice:
@@ -35,7 +32,7 @@ def broadcast_to_full_domain(
     idomain: GridDataArray,
     top: GridDataArray,
     bottom: GridDataArray,
-) -> typing.Tuple[GridDataArray, GridDataArray]:
+) -> tuple[GridDataArray, GridDataArray]:
     """
     Broadcast the bottom and top array to have the same shape as the idomain
     """

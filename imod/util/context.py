@@ -3,7 +3,6 @@ import os
 import pathlib
 import warnings
 from collections.abc import Iterator
-from typing import Union
 
 
 @contextlib.contextmanager
@@ -24,7 +23,7 @@ def ignore_warnings() -> Iterator[None]:
 
 
 @contextlib.contextmanager
-def cd(path: Union[str, pathlib.Path]) -> Iterator[None]:
+def cd(path: str | pathlib.Path) -> Iterator[None]:
     """
     Change directory, and change it back after the with block.
 

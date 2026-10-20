@@ -36,7 +36,7 @@ The methods below construct pyvista.UnstructuredGrids for voxel models (z1d),
 """
 
 from pathlib import Path
-from typing import TYPE_CHECKING, Any, Dict, Optional, Tuple, Union, cast
+from typing import TYPE_CHECKING, Any, Union, cast
 
 import numba
 import numpy as np
@@ -73,7 +73,7 @@ def exterior(da: xr.DataArray, n: int) -> xr.DataArray:
 @numba.njit
 def _create_hexahedra_z1d(
     data: np.ndarray, x: np.ndarray, y: np.ndarray, z: np.ndarray
-) -> Tuple[np.ndarray, np.ndarray, np.ndarray, np.ndarray, np.ndarray, np.ndarray]:
+) -> tuple[np.ndarray, np.ndarray, np.ndarray, np.ndarray, np.ndarray, np.ndarray]:
     """
     This function creates the necessary arrays to create hexahedra, based on a
     one-dimensional z array: i.e. one that does not depend on x and y.
@@ -155,7 +155,7 @@ def _create_hexahedra_z1d(
 @numba.njit
 def _create_hexahedra_z3d(
     data: np.ndarray, x: np.ndarray, y: np.ndarray, z3d: np.ndarray
-) -> Tuple[np.ndarray, np.ndarray, np.ndarray, np.ndarray, np.ndarray, np.ndarray]:
+) -> tuple[np.ndarray, np.ndarray, np.ndarray, np.ndarray, np.ndarray, np.ndarray]:
     """
     This function creates the necessary arrays to create hexahedra, based on a
     three-dimensional z array: i.e. one that depends on x and y.
@@ -238,7 +238,7 @@ def _create_hexahedra_z3d(
 @numba.njit
 def _create_plane_surface(
     data: np.ndarray, x: np.ndarray, y: np.ndarray
-) -> Tuple[np.ndarray, np.ndarray, np.ndarray, np.ndarray, np.ndarray]:
+) -> tuple[np.ndarray, np.ndarray, np.ndarray, np.ndarray, np.ndarray]:
     """
     This function creates the necessary arrays to create quads, based on a
     two-dimensional data array. The data array is used for the z dimension.
@@ -360,7 +360,7 @@ def _create_plane_surface(
 
 
 def vertices_coords(
-    dx: Union[float, np.ndarray], xmin: float, xmax: float, nx: int
+    dx: float | np.ndarray, xmin: float, xmax: float, nx: int
 ) -> np.ndarray:
     """
     Return the coordinates of the vertices.
@@ -382,7 +382,7 @@ def grid_3d(
     exterior_only: bool = True,
     exterior_depth: int = 1,
     return_index: bool = False,
-) -> Union["pv.UnstructuredGrid", Tuple["pv.UnstructuredGrid", np.ndarray]]:
+) -> Union["pv.UnstructuredGrid", tuple["pv.UnstructuredGrid", np.ndarray]]:
     """
     Constructs a 3D PyVista representation of a DataArray.
     DataArrays should be two-dimensional or three-dimensional:
@@ -518,7 +518,7 @@ def grid_3d(
 
 
 def line_3d(
-    polygon: "shapely.geometry.Polygon", z: Union[float, xr.DataArray] = 0.0
+    polygon: "shapely.geometry.Polygon", z: float | xr.DataArray = 0.0
 ) -> "pv.PolyData":
     """
     Returns the exterior line of a shapely polygon.
@@ -634,8 +634,8 @@ class GridAnimation3D:
         self,
         da: xr.DataArray,
         vertical_exaggeration: float = 30.0,
-        mesh_kwargs: Dict[str, Any] = {},
-        plotter_kwargs: Dict[str, Any] = {},
+        mesh_kwargs: dict[str, Any] = {},
+        plotter_kwargs: dict[str, Any] = {},
     ) -> None:
         # Store data
         self.da = da
@@ -659,7 +659,7 @@ class GridAnimation3D:
         self.plotter = pv.Plotter(**self.plotter_kwargs)
         self._update(self.da.isel(time=0))
 
-    def write(self, filename: Union[str, Path], framerate: int = 24) -> None:
+    def write(self, filename: str | Path, framerate: int = 24) -> None:
         """
         Write the animation to a video or gif.
 
@@ -701,7 +701,7 @@ class StaticGridAnimation3D(GridAnimation3D):
 
     def _initialize(self, da: xr.DataArray) -> None:
         mesh, indices = cast(
-            Tuple["pv.UnstructuredGrid", np.ndarray],
+            tuple["pv.UnstructuredGrid", np.ndarray],
             grid_3d(
                 da,
                 vertical_exaggeration=self.vertical_exaggeration,
@@ -719,14 +719,14 @@ def velocity_field(
     vx: xr.DataArray,
     vy: xr.DataArray,
     vz: xr.DataArray,
-    z: Optional[xr.DataArray] = None,
-    vertical_exaggeration: Optional[float] = 30.0,
-    scale_by_magnitude: Optional[bool] = True,
-    factor: Optional[float] = 1.0,
-    tolerance: Optional[float] = 0.0,
-    absolute: Optional[bool] = False,
-    clamping: Optional[bool] = False,
-    rng: Optional[Tuple[float, float]] = None,
+    z: xr.DataArray | None = None,
+    vertical_exaggeration: float | None = 30.0,
+    scale_by_magnitude: bool | None = True,
+    factor: float | None = 1.0,
+    tolerance: float | None = 0.0,
+    absolute: bool | None = False,
+    clamping: bool | None = False,
+    rng: tuple[float, float] | None = None,
 ) -> "pv.PolyData":
     if z is None:
         z_values = vx["z"].values

@@ -9,7 +9,7 @@ import pathlib
 import textwrap
 from collections import defaultdict
 from pathlib import Path
-from typing import Any, Dict, Optional
+from typing import Any
 
 import jinja2
 import numpy as np
@@ -799,17 +799,17 @@ class Lake(BoundaryCondition):
     @staticmethod
     def from_lakes_and_outlets(
         lakes: list[LakeData],
-        outlets: Optional[list[OutletBase]] = None,
+        outlets: list[OutletBase] | None = None,
         print_input: bool = False,
         print_stage: bool = False,
         print_flows: bool = False,
         save_flows: bool = False,
-        stagefile: Optional[str] = None,
-        budgetfile: Optional[str] = None,
-        budgetcsvfile: Optional[str] = None,
-        package_convergence_filename: Optional[str] = None,
-        time_conversion: Optional[float] = None,
-        length_conversion: Optional[float] = None,
+        stagefile: str | None = None,
+        budgetfile: str | None = None,
+        budgetcsvfile: str | None = None,
+        package_convergence_filename: str | None = None,
+        time_conversion: float | None = None,
+        length_conversion: float | None = None,
     ):
         package_content: dict[str, Any] = {}
         name_to_number = {
@@ -1088,7 +1088,7 @@ class Lake(BoundaryCondition):
             )
         )
 
-        d: Dict[str, Any] = {}
+        d: dict[str, Any] = {}
         d["nperiod"] = len(period_data_list)
         d["periods"] = period_data_list
 

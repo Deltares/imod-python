@@ -1,6 +1,6 @@
 import os
 import struct
-from typing import Any, BinaryIO, Dict, List, Optional, Tuple, cast
+from typing import Any, BinaryIO, cast
 
 import dask
 import numba
@@ -24,7 +24,7 @@ from .common import (
 
 # Binary Grid File / DIS Grids
 # https://water.usgs.gov/water-resources/software/MODFLOW-6/mf6io_6.0.4.pdf#page=162
-def read_grb(f: BinaryIO, ntxt: int, lentxt: int) -> Dict[str, Any]:
+def read_grb(f: BinaryIO, ntxt: int, lentxt: int) -> dict[str, Any]:
     # we don't need any information from the the text lines that follow,
     # they are definitions that aim to make the file more portable,
     # so let's skip straight to the binary data
@@ -139,10 +139,10 @@ def read_dvs_timestep(
 
 def open_hds(
     path: FilePath,
-    grid_info: Dict[str, Any],
+    grid_info: dict[str, Any],
     dry_nan: bool,
-    simulation_start_time: Optional[np.datetime64] = None,
-    time_unit: Optional[str] = "d",
+    simulation_start_time: np.datetime64 | None = None,
+    time_unit: str | None = "d",
 ) -> xr.DataArray:
     nlayer, nrow, ncol = grid_info["nlayer"], grid_info["nrow"], grid_info["ncol"]
     filesize = os.path.getsize(path)
@@ -173,10 +173,10 @@ def open_hds(
 
 def open_dvs(
     path: FilePath,
-    grid_info: Dict[str, Any],
+    grid_info: dict[str, Any],
     indices: np.ndarray,
-    simulation_start_time: Optional[np.datetime64] = None,
-    time_unit: Optional[str] = "d",
+    simulation_start_time: np.datetime64 | None = None,
+    time_unit: str | None = "d",
 ) -> xr.DataArray:
     nlayer, nrow, ncol = grid_info["nlayer"], grid_info["nrow"], grid_info["ncol"]
     filesize = os.path.getsize(path)
@@ -208,7 +208,7 @@ def open_dvs(
 
 
 def open_imeth1_budgets(
-    cbc_path: FilePath, grb_content: Dict[str, Any], header_list: List[cbc.Imeth1Header]
+    cbc_path: FilePath, grb_content: dict[str, Any], header_list: list[cbc.Imeth1Header]
 ) -> xr.DataArray:
     """
     Open the data for an imeth==1 budget section. Data is read lazily per
@@ -252,8 +252,8 @@ def open_imeth1_budgets(
 
 def open_imeth6_budgets(
     cbc_path: FilePath,
-    grb_content: Dict[str, Any],
-    header_list: List[cbc.Imeth6Header],
+    grb_content: dict[str, Any],
+    header_list: list[cbc.Imeth6Header],
     return_variable: str = "budget",
     indices: np.ndarray | None = None,
 ) -> xr.DataArray:
@@ -315,7 +315,7 @@ def dis_indices(
     nlayer: int,
     nrow: int,
     ncol: int,
-) -> Tuple[IntArray, IntArray, IntArray]:
+) -> tuple[IntArray, IntArray, IntArray]:
     """
     Infer type of connection via cell number comparison. Returns arrays that can
     be used for extracting right, front, and lower face flow from the
@@ -374,8 +374,8 @@ def dis_indices(
 
 
 def dis_to_right_front_lower_indices(
-    grb_content: Dict[str, Any],
-) -> Tuple[xr.DataArray, xr.DataArray, xr.DataArray]:
+    grb_content: dict[str, Any],
+) -> tuple[xr.DataArray, xr.DataArray, xr.DataArray]:
     """
     Infer the indices to extract right, front, and lower face flows from the
     flow-ja-face array.
@@ -442,8 +442,8 @@ def dis_extract_face_budgets(
 
 
 def dis_open_face_budgets(
-    cbc_path: FilePath, grb_content: Dict[str, Any], header_list: List[cbc.Imeth1Header]
-) -> Tuple[xr.DataArray, xr.DataArray, xr.DataArray]:
+    cbc_path: FilePath, grb_content: dict[str, Any], header_list: list[cbc.Imeth1Header]
+) -> tuple[xr.DataArray, xr.DataArray, xr.DataArray]:
     """
     Open the flow-ja-face, and extract right, front, and lower face flows.
 
@@ -472,11 +472,11 @@ def dis_open_face_budgets(
 # TODO: Currently assumes dis grb, can be checked & dispatched
 def open_cbc(
     cbc_path: FilePath,
-    grb_content: Dict[str, Any],
+    grb_content: dict[str, Any],
     flowja: bool = False,
-    simulation_start_time: Optional[np.datetime64] = None,
-    time_unit: Optional[str] = "d",
-) -> Dict[str, xr.DataArray]:
+    simulation_start_time: np.datetime64 | None = None,
+    time_unit: str | None = "d",
+) -> dict[str, xr.DataArray]:
     headers = cbc.read_cbc_headers(cbc_path)
     indices = None
     header_advanced_package = get_first_header_advanced_package(headers)
@@ -498,13 +498,13 @@ def open_cbc(
             assert all(isinstance(x, cbc.Imeth1Header) for x in header_list)
             if flowja:
                 flowjaface, nm = cbc.open_face_budgets_as_flowja(
-                    cbc_path, cast(List[cbc.Imeth1Header], header_list), grb_content
+                    cbc_path, cast(list[cbc.Imeth1Header], header_list), grb_content
                 )
                 cbc_content["flow-ja-face"] = flowjaface
                 cbc_content["connectivity"] = nm
             else:
                 right, front, lower = dis_open_face_budgets(
-                    cbc_path, grb_content, cast(List[cbc.Imeth1Header], header_list)
+                    cbc_path, grb_content, cast(list[cbc.Imeth1Header], header_list)
                 )
                 cbc_content["flow-right-face"] = right
                 cbc_content["flow-front-face"] = front
@@ -513,7 +513,7 @@ def open_cbc(
             if isinstance(header_list[0], cbc.Imeth1Header):
                 assert all(isinstance(x, cbc.Imeth1Header) for x in header_list)
                 cbc_content[key] = open_imeth1_budgets(
-                    cbc_path, grb_content, cast(List[cbc.Imeth1Header], header_list)
+                    cbc_path, grb_content, cast(list[cbc.Imeth1Header], header_list)
                 )
             elif isinstance(header_list[0], cbc.Imeth6Header):
                 assert all(isinstance(x, cbc.Imeth6Header) for x in header_list)
@@ -525,7 +525,7 @@ def open_cbc(
                         cbc_content[key_aux] = open_imeth6_budgets(
                             cbc_path,
                             grb_content,
-                            cast(List[cbc.Imeth6Header], header_list),
+                            cast(list[cbc.Imeth6Header], header_list),
                             return_variable,
                             indices=indices,
                         )
@@ -533,7 +533,7 @@ def open_cbc(
                     cbc_content[key] = open_imeth6_budgets(
                         cbc_path,
                         grb_content,
-                        cast(List[cbc.Imeth6Header], header_list),
+                        cast(list[cbc.Imeth6Header], header_list),
                         indices=indices,
                     )
     if simulation_start_time is not None:
@@ -545,7 +545,7 @@ def open_cbc(
     return cbc_content
 
 
-def grid_info(like: xr.DataArray) -> Dict[str, Any]:
+def grid_info(like: xr.DataArray) -> dict[str, Any]:
     return {
         "nlayer": like["layer"].size,
         "nrow": like["y"].size,

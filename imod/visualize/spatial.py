@@ -1,5 +1,6 @@
 import pathlib
-from typing import Any, Optional, Sequence, Union
+from collections.abc import Sequence
+from typing import Any
 
 import matplotlib
 import matplotlib.pyplot as plt
@@ -83,18 +84,18 @@ def _crs2string(crs: Any) -> Any:
 
 def plot_map(
     raster: xr.DataArray,
-    colors: Union[Sequence[Any], str, Colormap],
+    colors: Sequence[Any] | str | Colormap,
     levels: Sequence[float] | np.ndarray,
     overlays: list[dict[str, Any]] = [],
     basemap: Any = None,
-    kwargs_raster: Optional[dict[str, Any]] = None,
-    kwargs_colorbar: Optional[dict[str, Any]] = None,
+    kwargs_raster: dict[str, Any] | None = None,
+    kwargs_colorbar: dict[str, Any] | None = None,
     kwargs_basemap: dict[str, Any] = {},
-    figsize: Optional[tuple[float, float]] = None,
+    figsize: tuple[float, float] | None = None,
     return_cbar: bool = False,
-    fig: Optional[Figure] = None,
-    ax: Optional[Axes] = None,
-) -> Union[tuple[Figure, Axes], tuple[Figure, Axes, Colorbar]]:
+    fig: Figure | None = None,
+    ax: Axes | None = None,
+) -> tuple[Figure, Axes] | tuple[Figure, Axes, Colorbar]:
     """
     Plot raster on a map with optional vector overlays and basemap.
 
@@ -291,10 +292,10 @@ def plot_map(
 
 def _colorscale(
     a_yx: xr.DataArray,
-    levels: Union[int, Sequence[float], np.ndarray, None],
-    cmap: Union[str, Colormap],
+    levels: int | Sequence[float] | np.ndarray | None,
+    cmap: str | Colormap,
     quantile_colorscale: bool,
-) -> tuple[Optional[BoundaryNorm], ListedColormap]:
+) -> tuple[BoundaryNorm | None, ListedColormap]:
     """
     This is an attempt to automatically create somewhat robust color scales.
 
@@ -353,14 +354,14 @@ def _colorscale(
 
 def _imshow_xy(
     a_yx: xr.DataArray,
-    fname: Union[str, pathlib.Path],
+    fname: str | pathlib.Path,
     title: str,
-    cmap: Union[str, Colormap],
+    cmap: str | Colormap,
     overlays: list[dict[str, Any]],
     quantile_colorscale: bool,
     figsize: tuple[float, float],
     settings: dict[str, Any],
-    levels: Union[int, Sequence[float], np.ndarray, None],
+    levels: int | Sequence[float] | np.ndarray | None,
 ) -> None:
     fig, ax = plt.subplots(figsize=figsize)
     norm, cmap = _colorscale(a_yx, levels, cmap, quantile_colorscale)
@@ -379,7 +380,7 @@ def _imshow_xy(
     plt.close()
 
 
-def format_time(time: Union[np.datetime64, Any]) -> str:
+def format_time(time: np.datetime64 | Any) -> str:
     if isinstance(time, np.datetime64):
         # The following line is because numpy.datetime64[ns] does not
         # support converting to datetime, but returns an integer instead.
@@ -392,12 +393,12 @@ def format_time(time: Union[np.datetime64, Any]) -> str:
 def imshow_topview(
     da: xr.DataArray,
     name: str,
-    directory: Union[str, pathlib.Path] = ".",
-    cmap: Union[str, Colormap] = "viridis",
+    directory: str | pathlib.Path = ".",
+    cmap: str | Colormap = "viridis",
     overlays: list[dict[str, Any]] = [],
     quantile_colorscale: bool = True,
     figsize: tuple[float, float] = (8, 8),
-    levels: Union[int, Sequence[float], np.ndarray, None] = None,
+    levels: int | Sequence[float] | np.ndarray | None = None,
 ) -> None:
     """
     Automatically colors by quantile.

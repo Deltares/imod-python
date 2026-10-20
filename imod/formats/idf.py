@@ -9,8 +9,8 @@ import glob
 import pathlib
 import struct
 from collections import defaultdict
-from collections.abc import Iterable
-from typing import Any, Callable, DefaultDict, Literal, Sequence
+from collections.abc import Callable, Iterable, Sequence
+from typing import Any, Literal
 
 import dask
 import dask.array
@@ -287,7 +287,7 @@ def _more_than_one_unique_value(values: Iterable[Any]) -> bool:
 
 
 def _merge_subdomains(
-    paths_per_subdomain: DefaultDict[Any, list[PathType]],
+    paths_per_subdomain: defaultdict[Any, list[PathType]],
     use_cftime: bool,
     pattern: PatternType | None,
 ) -> DataArrayComponents:
@@ -308,7 +308,7 @@ def _merge_subdomains(
 
 
 def _merge_subdomains_values(
-    paths_per_subdomain: DefaultDict[Any, list[PathType]],
+    paths_per_subdomain: defaultdict[Any, list[PathType]],
     use_cftime: bool,
     pattern: PatternType,
 ) -> np.ndarray:
@@ -323,7 +323,7 @@ def _merge_subdomains_values(
 
 
 def _merge_subdomains_to_dataarray(
-    paths_per_subdomain: DefaultDict[Any, list[PathType]],
+    paths_per_subdomain: defaultdict[Any, list[PathType]],
     use_cftime: bool,
     pattern: PatternType,
 ) -> xr.DataArray:
@@ -506,8 +506,8 @@ def open_chunked_per_timestep(
     # Prefer header metadata for grouping and template construction.
     has_time = "time" in headers[0].get("dims", [])
 
-    grouped_paths_by_time: DefaultDict[Any, list[PathType]] = defaultdict(list)
-    grouped_headers_by_time: DefaultDict[Any, list[dict[str, Any]]] = defaultdict(list)
+    grouped_paths_by_time: defaultdict[Any, list[PathType]] = defaultdict(list)
+    grouped_headers_by_time: defaultdict[Any, list[dict[str, Any]]] = defaultdict(list)
     for p, h in zip(paths, headers):
         if has_time:
             time_key = h["time"]
@@ -589,7 +589,7 @@ def open_subdomains(
 
     # Group by time (datetime.datetime from decompose), then by subdomain.
     # Each delayed task processes one timestep, keeping the outer graph at O(n_time).
-    grouped_by_time: DefaultDict[Any, DefaultDict[Any, list[PathType]]] = defaultdict(
+    grouped_by_time: defaultdict[Any, defaultdict[Any, list[PathType]]] = defaultdict(
         lambda: defaultdict(list)
     )
 

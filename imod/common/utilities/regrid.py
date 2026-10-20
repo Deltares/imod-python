@@ -1,7 +1,7 @@
 import copy
 from collections import defaultdict
 from dataclasses import asdict
-from typing import Any, DefaultDict, Optional, Tuple, TypeAlias, Union
+from typing import Any, TypeAlias
 
 import numpy as np
 import xarray as xr
@@ -33,7 +33,7 @@ from imod.util.regrid import (
     RegridderWeightsCache,
 )
 
-RegridVarType: TypeAlias = Tuple[RegridderType, str] | Tuple[RegridderType]
+RegridVarType: TypeAlias = tuple[RegridderType, str] | tuple[RegridderType]
 
 # create dispatcher instance to limit scope of typedispatching
 dispatch = Dispatcher()
@@ -61,10 +61,10 @@ def handle_extra_coords(
 def _regrid_array(
     da: GridDataArray,
     regridder_collection: RegridderWeightsCache,
-    regridder_name: Union[RegridderType, BaseRegridder],
-    regridder_function: Optional[str],
+    regridder_name: RegridderType | BaseRegridder,
+    regridder_function: str | None,
     target_grid: GridDataArray,
-) -> Optional[GridDataArray]:
+) -> GridDataArray | None:
     """
     Regrids a GridDataArray. Each DataArray can represent:
     - a scalar value, valid for the whole grid
@@ -122,7 +122,7 @@ def _regrid_package_data(
     target_grid: GridDataArray,
     regridder_settings: DataclassType,
     regrid_cache: RegridderWeightsCache,
-    new_package_data: Optional[dict[str, GridDataArray]] = None,
+    new_package_data: dict[str, GridDataArray] | None = None,
 ) -> dict[str, GridDataArray]:
     """
     Regrid package data. Loops over regridder settings to regrid variables one
@@ -138,7 +138,7 @@ def _regrid_package_data(
         varname,
         regridder_type_and_function,
     ) in settings_dict.items():
-        regridder_function: Optional[str] = None
+        regridder_function: str | None = None
         regridder_name = regridder_type_and_function[0]
         if len(regridder_type_and_function) > 1:
             regridder_function = regridder_type_and_function[1]
@@ -174,11 +174,11 @@ def __get_regrid_methods_as_dict(package: IRegridPackage) -> dict[str, RegridVar
     return asdict(regrid_methods)  # type: ignore[arg-type]
 
 
-def _get_unique_regridder_types(model: IModel) -> DefaultDict[RegridderType, list[Any]]:
+def _get_unique_regridder_types(model: IModel) -> defaultdict[RegridderType, list[Any]]:
     """
     This function loops over the packages and  collects all regridder-types that are in use.
     """
-    methods: DefaultDict[RegridderType, list[Any]] = defaultdict(list)
+    methods: defaultdict[RegridderType, list[Any]] = defaultdict(list)
     regrid_packages = [pkg for pkg in model.values() if isinstance(pkg, IRegridPackage)]
     regrid_packages_with_methods = {
         pkg: __get_regrid_methods_as_dict(pkg).items()
@@ -208,8 +208,8 @@ def _regrid_like(
     package: IRegridPackage,
     target_grid: GridDataArray,
     regrid_cache: RegridderWeightsCache,
-    regridder_types: Optional[DataclassType] = None,
-    as_pkg_type: Optional[type[IRegridPackage]] = None,
+    regridder_types: DataclassType | None = None,
+    as_pkg_type: type[IRegridPackage] | None = None,
 ) -> IPackage:
     """
     Creates a package of the same type as this package, based on another
@@ -284,7 +284,7 @@ def _regrid_like(
 def _regrid_like(
     model: IModel,
     target_grid: GridDataArray,
-    regrid_cache: Optional[RegridderWeightsCache] = None,
+    regrid_cache: RegridderWeightsCache | None = None,
 ) -> IModel:
     """
     Creates a model by regridding the packages of this model to another

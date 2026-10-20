@@ -12,7 +12,6 @@ unstructured grids.
 
 from abc import ABC
 from copy import deepcopy
-from typing import Optional
 
 import numpy as np
 
@@ -38,9 +37,7 @@ class AdvectionBase(Package, IRegridPackage, ABC):
         ],
     }
 
-    def __init__(
-        self, ats_percel: Optional[float] = None, validate: bool = True
-    ) -> None:
+    def __init__(self, ats_percel: float | None = None, validate: bool = True) -> None:
         dict_dataset = {"scheme": self._scheme, "ats_percel": ats_percel}
         super().__init__(dict_dataset)
         self._validate_init_schemata(validate)
@@ -65,7 +62,7 @@ class AdvectionBase(Package, IRegridPackage, ABC):
         self,
         target_grid: GridDataArray,
         regrid_cache: RegridderWeightsCache,
-        regridder_types: Optional[DataclassType] = None,
+        regridder_types: DataclassType | None = None,
     ) -> Package:
         """
         The regrid_like method is irrelevant for this package, instead this method

@@ -1,4 +1,4 @@
-from typing import Optional, Sequence
+from collections.abc import Sequence
 
 import numpy as np
 
@@ -96,7 +96,7 @@ class Buoyancy(Package):
         modelname: Sequence[str],
         species: Sequence[str],
         hhformulation_rhs: bool = False,
-        densityfile: Optional[str] = None,
+        densityfile: str | None = None,
         validate: bool = True,
     ) -> None:
         dict_dataset = {

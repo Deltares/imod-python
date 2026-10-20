@@ -1,5 +1,6 @@
 import pathlib
-from typing import TYPE_CHECKING, Any, Callable, Iterable, Optional, Union, cast
+from collections.abc import Callable, Iterable
+from typing import TYPE_CHECKING, Any, cast
 
 import dask
 import numba
@@ -62,7 +63,7 @@ def _fill_np(data: np.ndarray) -> np.ndarray:
     return data[tuple(indices)]
 
 
-def fill(da: xr.DataArray, dims: Optional[tuple[str, ...]] = None) -> xr.DataArray:
+def fill(da: xr.DataArray, dims: tuple[str, ...] | None = None) -> xr.DataArray:
     """
     Fill in NaNs using basic nearest neighbour interpolation.
 
@@ -193,9 +194,9 @@ def laplace_interpolate(
 def rasterize(
     geodataframe: "gpd.GeoDataFrame",
     like: xr.DataArray,
-    column: Optional[str | int | float] = None,
-    fill: Optional[float | int] = np.nan,
-    dtype: Optional[DTypeLike] = None,
+    column: str | int | float | None = None,
+    fill: float | int | None = np.nan,
+    dtype: DTypeLike | None = None,
     **kwargs,
 ) -> xr.DataArray:
     """
@@ -852,11 +853,11 @@ def rasterize_celltable(table, column, like):
 
 
 def _zonal_aggregate_raster(
-    path: Union[str, pathlib.Path],
+    path: str | pathlib.Path,
     column: str,
     resolution: float,
     raster: xr.DataArray,
-    method: Union[str, Callable[..., Any]],
+    method: str | Callable[..., Any],
 ) -> pd.DataFrame:
     """
     * Rasterize the polygon at given `resolution`
@@ -910,13 +911,13 @@ def _zonal_aggregate_raster(
 
 
 def _zonal_aggregate_polygons(
-    path_a: Union[str, pathlib.Path],
-    path_b: Union[str, pathlib.Path],
+    path_a: str | pathlib.Path,
+    path_b: str | pathlib.Path,
     column_a: str,
     column_b: str,
     resolution: float,
     like: xr.DataArray,
-    method: Union[str, Callable[..., Any]],
+    method: str | Callable[..., Any],
 ) -> pd.DataFrame:
     """
     * Rasterize a, rasterize b for the same domain
@@ -961,11 +962,11 @@ def _zonal_aggregate_polygons(
 
 
 def zonal_aggregate_raster(
-    path: Union[pathlib.Path, str],
+    path: pathlib.Path | str,
     column: str,
     raster: xr.DataArray,
     resolution: float,
-    method: Union[str, Callable[..., Any]],
+    method: str | Callable[..., Any],
     chunksize: int = 10_000,
 ) -> pd.DataFrame:
     """
@@ -1042,13 +1043,13 @@ def zonal_aggregate_raster(
 
 
 def zonal_aggregate_polygons(
-    path_a: Union[pathlib.Path, str],
-    path_b: Union[pathlib.Path, str],
+    path_a: pathlib.Path | str,
+    path_b: pathlib.Path | str,
     column_a: str,
     column_b: str,
     like: xr.DataArray,
     resolution: float,
-    method: Union[str, Callable[..., Any]],
+    method: str | Callable[..., Any],
     chunksize: int = 10_000,
 ) -> pd.DataFrame:
     """

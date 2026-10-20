@@ -1,5 +1,4 @@
 from datetime import datetime
-from typing import Optional
 
 import numpy as np
 
@@ -284,7 +283,7 @@ class Drainage(TopSystemBoundaryCondition, IRegridPackage):
         time_max: datetime,
         allocation_option: ALLOCATION_OPTION,
         distributing_option: DISTRIBUTING_OPTION,
-        regridder_types: Optional[DrainageRegridMethod] = None,
+        regridder_types: DrainageRegridMethod | None = None,
         regrid_cache: RegridderWeightsCache = RegridderWeightsCache(),
     ) -> "Drainage":
         """

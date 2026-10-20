@@ -1,5 +1,5 @@
+from collections.abc import Callable
 from copy import deepcopy
-from typing import Callable, Union
 
 import numpy as np
 import pytest
@@ -10,7 +10,7 @@ import imod
 
 
 def grid_data_structured(
-    dtype: type, value: Union[int, float], cellsize: float
+    dtype: type, value: int | float, cellsize: float
 ) -> xr.DataArray:
     """
     This function creates a dataarray with scalar values for a grid of configurable cell size.
@@ -35,7 +35,7 @@ def grid_data_structured(
 
 
 def grid_data_structured_layered(
-    dtype: type, value: Union[int, float], cellsize: float
+    dtype: type, value: int | float, cellsize: float
 ) -> xr.DataArray:
     """
     This function creates a dataarray with scalar values for a grid of configurable cell size. The values are
@@ -50,7 +50,7 @@ def grid_data_structured_layered(
 
 
 def grid_data_unstructured(
-    dtype: type, value: Union[int, float], cellsize: float
+    dtype: type, value: int | float, cellsize: float
 ) -> xu.UgridDataArray:
     """
     This function creates a dataarray with scalar values for a grid of configurable cell size.
@@ -62,7 +62,7 @@ def grid_data_unstructured(
 
 
 def grid_data_unstructured_layered(
-    dtype: type, value: Union[int, float], cellsize: float
+    dtype: type, value: int | float, cellsize: float
 ) -> xu.UgridDataArray:
     """
     This function creates a dataarray with scalar values for a grid of configurable cell size. The values are
@@ -75,8 +75,8 @@ def grid_data_unstructured_layered(
 
 def _make_model(
     grid_data_function: (
-        Callable[[type, Union[int, float], float], xr.DataArray]
-        | Callable[[type, Union[int, float], float], xu.UgridDataArray]
+        Callable[[type, int | float, float], xr.DataArray]
+        | Callable[[type, int | float, float], xu.UgridDataArray]
     ),
     cellsize: float,
 ) -> imod.mf6.GroundwaterFlowModel:

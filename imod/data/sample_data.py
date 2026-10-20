@@ -45,7 +45,7 @@ REGISTRY = create_pooch_registry()
 REGISTRY = load_pooch_registry(REGISTRY)
 
 
-def twri_output(path: Union[str, Path]) -> None:
+def twri_output(path: str | Path) -> None:
     # Unzips TWRI output to ``path``. Has a race condition when executed
     # multiple times with the same path.
     lock = FileLock(REGISTRY.path / "ex01-twri-output.zip.lock")
@@ -157,7 +157,7 @@ def circle() -> xu.Ugrid2d:
 
 
 def imod5_projectfile_data(
-    path: Union[str, Path],
+    path: str | Path,
 ) -> tuple[dict[str, Any], dict[str, Any]]:
     lock = FileLock(REGISTRY.path / "iMOD5_model.zip.lock")
     with lock:
@@ -169,7 +169,7 @@ def imod5_projectfile_data(
     return iMOD5_model
 
 
-def fetch_imod5_model(path: Union[str, Path]) -> Path:
+def fetch_imod5_model(path: str | Path) -> Path:
     """
     Fetches the iMOD5 project file from the registry and returns its path.
     """
@@ -195,7 +195,7 @@ def lhm_clip_triangular_grid() -> xr.Dataset:
     return triangular_grid
 
 
-def hondsrug_simulation(path: Union[str, Path]) -> Modflow6Simulation:
+def hondsrug_simulation(path: str | Path) -> Modflow6Simulation:
     lock = FileLock(REGISTRY.path / "hondsrug-simulation.zip.lock")
     with lock:
         _ = REGISTRY.fetch("hondsrug-simulation.zip", processor=Unzip(extract_dir=path))
@@ -281,7 +281,7 @@ def hondsrug_planar_river() -> xr.Dataset:
     return planar_river
 
 
-def colleagues_river_data(path: Union[str, Path]):
+def colleagues_river_data(path: str | Path):
     """
     River data with some mistakes introduced to showcase cleanup
     utilities.

@@ -1,6 +1,5 @@
 from copy import deepcopy
 from pathlib import Path
-from typing import Tuple
 
 import numpy as np
 import pytest
@@ -35,7 +34,7 @@ def test_masked_model_validation_inactive_cell_pillar(
 def test_masked_model_validation_one_inactive_cell(
     tmp_path: Path,
     unstructured_flow_model: GroundwaterFlowModel,
-    layer_and_face: Tuple[int, int],
+    layer_and_face: tuple[int, int],
     inactivity_marker: int,
 ):
     # create mask from idomain. a single cell
@@ -56,7 +55,7 @@ def test_masked_model_validation_one_inactive_cell(
 def test_masked_model_layered_and_scalar_package_input(
     tmp_path: Path,
     unstructured_flow_model: GroundwaterFlowModel,
-    layer_and_face: Tuple[int, int],
+    layer_and_face: tuple[int, int],
 ):
     # Create mask from idomain. a single cell
     layer, face = layer_and_face

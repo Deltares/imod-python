@@ -1,5 +1,5 @@
 from dataclasses import asdict
-from typing import Optional, TextIO
+from typing import TextIO
 
 import numpy as np
 import xarray as xr
@@ -78,7 +78,7 @@ class IdfMapping(MetaSwapPackage, IRegridPackage):
         self,
         target_grid: GridDataArray,
         regrid_cache: RegridderWeightsCache,
-        regridder_types: Optional[DataclassType] = None,
+        regridder_types: DataclassType | None = None,
     ) -> "MetaSwapPackage":
         """
         Creates a package of the same type as this package, based on another

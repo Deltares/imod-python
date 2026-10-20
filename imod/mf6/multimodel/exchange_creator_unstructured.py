@@ -1,5 +1,3 @@
-from typing import Dict, List, Tuple
-
 import numpy as np
 import pandas as pd
 import xarray as xr
@@ -27,7 +25,7 @@ class ExchangeCreator_Unstructured(ExchangeCreator):
     """
 
     def __init__(
-        self, submodel_labels: GridDataArray, partition_info: List[PartitionInfo]
+        self, submodel_labels: GridDataArray, partition_info: list[PartitionInfo]
     ) -> None:
         self._connected_cell_edge_indices = (
             self._find_subdomain_connection_edge_indices(submodel_labels)
@@ -102,8 +100,8 @@ class ExchangeCreator_Unstructured(ExchangeCreator):
 
     @classmethod
     def _create_global_to_local_idx(
-        cls, partition_info: List[PartitionInfo], global_cell_indices: GridDataArray
-    ) -> Dict[int, pd.DataFrame]:
+        cls, partition_info: list[PartitionInfo], global_cell_indices: GridDataArray
+    ) -> dict[int, pd.DataFrame]:
         global_to_local_idx = {}
         global_cell_indices = global_cell_indices.rename("label")
         for submodel_partition_info in partition_info:
@@ -156,7 +154,7 @@ class ExchangeCreator_Unstructured(ExchangeCreator):
     def _get_partition_numbers(self, face: np.ndarray) -> np.ndarray:
         return self._submodel_labels.data[face]
 
-    def _get_partition_sorted_connected_faces(self) -> Tuple[np.ndarray, np.ndarray]:
+    def _get_partition_sorted_connected_faces(self) -> tuple[np.ndarray, np.ndarray]:
         grid = self._submodel_labels.ugrid.grid
         edge_face_connectivity = grid.edge_face_connectivity
 

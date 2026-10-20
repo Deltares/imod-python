@@ -1,5 +1,3 @@
-from typing import Dict, List
-
 import numpy as np
 import pandas as pd
 import xarray as xr
@@ -27,7 +25,7 @@ class ExchangeCreator_Structured(ExchangeCreator):
     """
 
     def __init__(
-        self, submodel_labels: GridDataArray, partition_info: List[PartitionInfo]
+        self, submodel_labels: GridDataArray, partition_info: list[PartitionInfo]
     ) -> None:
         super().__init__(submodel_labels, partition_info)
 
@@ -115,8 +113,8 @@ class ExchangeCreator_Structured(ExchangeCreator):
 
     @classmethod
     def _create_global_to_local_idx(
-        cls, partition_info: List[PartitionInfo], global_cell_indices: GridDataArray
-    ) -> Dict[int, pd.DataFrame]:
+        cls, partition_info: list[PartitionInfo], global_cell_indices: GridDataArray
+    ) -> dict[int, pd.DataFrame]:
         global_cell_indices = global_cell_indices.rename("label")
         global_to_local_idx = {}
         for submodel_partition_info in partition_info:

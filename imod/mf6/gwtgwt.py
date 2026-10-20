@@ -1,5 +1,5 @@
 from pathlib import Path
-from typing import Optional, Self, Union
+from typing import Self
 
 import cftime
 import numpy as np
@@ -38,8 +38,8 @@ class GWTGWT(ExchangeBase):
         cl1: xr.DataArray,
         cl2: xr.DataArray,
         hwva: xr.DataArray,
-        angldegx: Optional[xr.DataArray] = None,
-        cdist: Optional[xr.DataArray] = None,
+        angldegx: xr.DataArray | None = None,
+        cdist: xr.DataArray | None = None,
     ) -> None:
         dict_dataset = {
             "cell_id1": cell_id1,
@@ -65,10 +65,10 @@ class GWTGWT(ExchangeBase):
 
     def set_options(
         self,
-        save_flows: Optional[bool] = None,
-        adv_scheme: Optional[str] = None,
-        dsp_xt3d_off: Optional[bool] = None,
-        dsp_xt3d_rhs: Optional[bool] = None,
+        save_flows: bool | None = None,
+        adv_scheme: str | None = None,
+        dsp_xt3d_off: bool | None = None,
+        dsp_xt3d_rhs: bool | None = None,
     ) -> None:
         self.dataset["save_flows"] = save_flows
         self.dataset["adv_scheme"] = adv_scheme
@@ -77,16 +77,16 @@ class GWTGWT(ExchangeBase):
 
     def clip_box(
         self,
-        time_min: Optional[cftime.datetime | np.datetime64 | str] = None,
-        time_max: Optional[cftime.datetime | np.datetime64 | str] = None,
-        layer_min: Optional[int] = None,
-        layer_max: Optional[int] = None,
-        x_min: Optional[float] = None,
-        x_max: Optional[float] = None,
-        y_min: Optional[float] = None,
-        y_max: Optional[float] = None,
-        top: Optional[GridDataArray] = None,
-        bottom: Optional[GridDataArray] = None,
+        time_min: cftime.datetime | np.datetime64 | str | None = None,
+        time_max: cftime.datetime | np.datetime64 | str | None = None,
+        layer_min: int | None = None,
+        layer_max: int | None = None,
+        x_min: float | None = None,
+        x_max: float | None = None,
+        y_min: float | None = None,
+        y_max: float | None = None,
+        top: GridDataArray | None = None,
+        bottom: GridDataArray | None = None,
     ) -> Self:
         """This package cannot be clipped by a bounding box."""
         raise NotImplementedError("this package cannot be clipped")
@@ -95,7 +95,7 @@ class GWTGWT(ExchangeBase):
         self,
         directory: Path,
         pkgname: str,
-        globaltimes: Union[list[np.datetime64], np.ndarray],
+        globaltimes: list[np.datetime64] | np.ndarray,
         binary: bool,
     ) -> str:
         return self.render_with_geometric_constants(

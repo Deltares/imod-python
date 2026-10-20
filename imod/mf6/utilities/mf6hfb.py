@@ -1,5 +1,3 @@
-from typing import List
-
 import xarray as xr
 
 from imod.mf6.hfb import (
@@ -20,7 +18,7 @@ def inverse_sum(a: xr.Dataset) -> xr.Dataset:
 
 
 def merge_hfb_packages(
-    hfb_ls: List[HorizontalFlowBarrierBase],
+    hfb_ls: list[HorizontalFlowBarrierBase],
     idomain: GridDataArray,
     top: GridDataArray,
     bottom: GridDataArray,

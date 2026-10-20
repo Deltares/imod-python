@@ -1,7 +1,8 @@
 import abc
 import pathlib
+from collections.abc import MutableMapping
 from copy import copy, deepcopy
-from typing import Any, MutableMapping, Optional, Union
+from typing import Any
 
 import numpy as np
 import xarray as xr
@@ -208,7 +209,7 @@ class BoundaryCondition(Package, IBoundaryCondition, abc.ABC):
     def _get_unfiltered_pkg_options(
         self,
         predefined_options: dict[str, Any],
-        not_options: Optional[list[str]] = None,
+        not_options: list[str] | None = None,
     ):
         options = copy(predefined_options)
 
@@ -226,7 +227,7 @@ class BoundaryCondition(Package, IBoundaryCondition, abc.ABC):
     def _get_pkg_options(
         self,
         predefined_options: dict[str, Any],
-        not_options: Optional[list[str]] = None,
+        not_options: list[str] | None = None,
     ):
         unfiltered_options = self._get_unfiltered_pkg_options(
             predefined_options, not_options=not_options
@@ -286,7 +287,7 @@ class BoundaryCondition(Package, IBoundaryCondition, abc.ABC):
     def _write(
         self,
         pkgname: str,
-        globaltimes: Union[list[np.datetime64], np.ndarray],
+        globaltimes: list[np.datetime64] | np.ndarray,
         write_context: WriteContext,
     ) -> None:
         """
@@ -382,7 +383,7 @@ class AdvancedBoundaryCondition(BoundaryCondition, abc.ABC):
     def _write(
         self,
         pkgname: str,
-        globaltimes: Union[list[np.datetime64], np.ndarray],
+        globaltimes: list[np.datetime64] | np.ndarray,
         write_context: WriteContext,
     ) -> None:
         boundary_condition_write_context = deepcopy(write_context)

@@ -4,11 +4,9 @@ from pathlib import Path
 from typing import (
     TYPE_CHECKING,
     Any,
-    Optional,
     Self,
     TextIO,
     TypeAlias,
-    Union,
 )
 
 import cftime
@@ -87,7 +85,7 @@ class MetaSwapPackage(IPackageBase, abc.ABC):
 
     def write(
         self,
-        directory: Union[str, Path],
+        directory: str | Path,
         index: IntArray,
         svat: xr.DataArray,
         mf6_dis: StructuredDiscretization,
@@ -243,7 +241,7 @@ class MetaSwapPackage(IPackageBase, abc.ABC):
         self,
         target_grid: GridDataArray,
         regrid_cache: RegridderWeightsCache,
-        regridder_types: Optional[DataclassType] = None,
+        regridder_types: DataclassType | None = None,
     ) -> "MetaSwapPackage":
         """
         Creates a package of the same type as this package, based on another
@@ -295,12 +293,12 @@ class MetaSwapPackage(IPackageBase, abc.ABC):
 
     def clip_box(
         self,
-        time_min: Optional[cftime.datetime | np.datetime64 | str] = None,
-        time_max: Optional[cftime.datetime | np.datetime64 | str] = None,
-        x_min: Optional[float] = None,
-        x_max: Optional[float] = None,
-        y_min: Optional[float] = None,
-        y_max: Optional[float] = None,
+        time_min: cftime.datetime | np.datetime64 | str | None = None,
+        time_max: cftime.datetime | np.datetime64 | str | None = None,
+        x_min: float | None = None,
+        x_max: float | None = None,
+        y_min: float | None = None,
+        y_max: float | None = None,
     ) -> "MetaSwapPackage":
         """
         Clip a package by a bounding box (time, y, x).
@@ -463,7 +461,7 @@ class MetaSwapPackage(IPackageBase, abc.ABC):
         modeldirectory: Path,
         pkgname: str,
         mdal_compliant: bool = False,
-        crs: Optional[Any] = None,
+        crs: Any | None = None,
         engine: EngineType = "netcdf4",
         **kwargs,
     ) -> Path:

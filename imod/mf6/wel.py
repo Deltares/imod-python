@@ -3,9 +3,9 @@ from __future__ import annotations
 import abc
 import itertools
 import textwrap
-from collections.abc import Iterable
+from collections.abc import Callable, Iterable, Sequence
 from datetime import datetime
-from typing import Any, Callable, Optional, Self, Sequence, Union, cast
+from typing import Any, Self, cast
 
 import cftime
 import numpy as np
@@ -412,7 +412,7 @@ class GridAgnosticWell(BoundaryCondition, IPointDataPackage, abc.ABC):
     def _write(
         self,
         pkgname: str,
-        globaltimes: Union[list[np.datetime64], np.ndarray],
+        globaltimes: list[np.datetime64] | np.ndarray,
         write_context: WriteContext,
     ):
         raise NotImplementedError(
@@ -915,9 +915,9 @@ class Well(GridAgnosticWell):
         screen_top: np.ndarray | list[float],
         screen_bottom: np.ndarray | list[float],
         rate: list[float] | xr.DataArray,
-        concentration: Optional[list[float] | xr.DataArray] = None,
+        concentration: list[float] | xr.DataArray | None = None,
         concentration_boundary_type="aux",
-        id: Optional[list[Any]] = None,
+        id: list[Any] | None = None,
         minimum_k: float = 0.0,
         minimum_thickness: float = 0.0,
         print_input: bool = False,
@@ -925,7 +925,7 @@ class Well(GridAgnosticWell):
         save_flows: bool = False,
         observations=None,
         validate: bool = True,
-        repeat_stress: Optional[xr.DataArray] = None,
+        repeat_stress: xr.DataArray | None = None,
     ):
         if id is None:
             id = [str(i) for i in range(len(x))]
@@ -959,16 +959,16 @@ class Well(GridAgnosticWell):
 
     def clip_box(
         self,
-        time_min: Optional[cftime.datetime | np.datetime64 | str] = None,
-        time_max: Optional[cftime.datetime | np.datetime64 | str] = None,
-        layer_min: Optional[int] = None,
-        layer_max: Optional[int] = None,
-        x_min: Optional[float] = None,
-        x_max: Optional[float] = None,
-        y_min: Optional[float] = None,
-        y_max: Optional[float] = None,
-        top: Optional[GridDataArray] = None,
-        bottom: Optional[GridDataArray] = None,
+        time_min: cftime.datetime | np.datetime64 | str | None = None,
+        time_max: cftime.datetime | np.datetime64 | str | None = None,
+        layer_min: int | None = None,
+        layer_max: int | None = None,
+        x_min: float | None = None,
+        x_max: float | None = None,
+        y_min: float | None = None,
+        y_max: float | None = None,
+        top: GridDataArray | None = None,
+        bottom: GridDataArray | None = None,
     ) -> Self:
         """
         Clip a well package by a bounding box (time, layer, y, x).
@@ -1072,7 +1072,7 @@ class Well(GridAgnosticWell):
 
     @staticmethod
     def _find_well_value_at_layer(
-        well_dataset: xr.Dataset, grid: GridDataArray, layer: Optional[int]
+        well_dataset: xr.Dataset, grid: GridDataArray, layer: int | None
     ):
         value = None if layer is None else grid.isel(layer=layer)
 
@@ -1311,9 +1311,9 @@ class LayeredWell(GridAgnosticWell):
         y: np.ndarray | list[float],
         layer: np.ndarray | list[int],
         rate: list[float] | xr.DataArray,
-        concentration: Optional[list[float] | xr.DataArray] = None,
+        concentration: list[float] | xr.DataArray | None = None,
         concentration_boundary_type="aux",
-        id: Optional[list[Any]] = None,
+        id: list[Any] | None = None,
         minimum_k: float = 0.0,
         minimum_thickness: float = 0.0,
         print_input: bool = False,
@@ -1321,7 +1321,7 @@ class LayeredWell(GridAgnosticWell):
         save_flows: bool = False,
         observations=None,
         validate: bool = True,
-        repeat_stress: Optional[xr.DataArray] = None,
+        repeat_stress: xr.DataArray | None = None,
     ):
         if id is None:
             id = [str(i) for i in range(len(x))]
@@ -1354,16 +1354,16 @@ class LayeredWell(GridAgnosticWell):
 
     def clip_box(
         self,
-        time_min: Optional[cftime.datetime | np.datetime64 | str] = None,
-        time_max: Optional[cftime.datetime | np.datetime64 | str] = None,
-        layer_min: Optional[int] = None,
-        layer_max: Optional[int] = None,
-        x_min: Optional[float] = None,
-        x_max: Optional[float] = None,
-        y_min: Optional[float] = None,
-        y_max: Optional[float] = None,
-        top: Optional[GridDataArray] = None,
-        bottom: Optional[GridDataArray] = None,
+        time_min: cftime.datetime | np.datetime64 | str | None = None,
+        time_max: cftime.datetime | np.datetime64 | str | None = None,
+        layer_min: int | None = None,
+        layer_max: int | None = None,
+        x_min: float | None = None,
+        x_max: float | None = None,
+        y_min: float | None = None,
+        y_max: float | None = None,
+        top: GridDataArray | None = None,
+        bottom: GridDataArray | None = None,
     ) -> Self:
         """
         Clip a well package by a bounding box (time, layer, y, x).
@@ -1477,7 +1477,7 @@ class LayeredWell(GridAgnosticWell):
     def from_imod5_cap_data(
         cls,
         imod5_data: Imod5DataDict,
-        target_dis: Optional[StructuredDiscretization] = None,
+        target_dis: StructuredDiscretization | None = None,
         regridder_types: CapDataWellRegridMethod = CapDataWellRegridMethod(),
         regrid_cache: RegridderWeightsCache = RegridderWeightsCache(),
     ):

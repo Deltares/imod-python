@@ -2,7 +2,6 @@ import sys
 from datetime import datetime
 from shutil import copyfile
 from textwrap import dedent
-from typing import Union
 
 import numpy as np
 import pandas as pd
@@ -829,7 +828,7 @@ def test_open_projectfile_data_out_of_bounds_wells(
 @parametrize("wel_case, expected_dict", argvalues=list(zip(PRJ_ARGS, PKG_ARGS)))
 @parametrize("wel_cls", argvalues=[LayeredWell, Well])
 def test_from_imod5_data_wells(
-    wel_cls: Union[LayeredWell, Well],
+    wel_cls: LayeredWell | Well,
     wel_case,
     expected_dict,
     well_mixed_ipfs,
@@ -878,7 +877,7 @@ def test_from_imod5_data_wells(
 @parametrize("wel_case, expected_dict", argvalues=list(zip(PRJ_ARGS, PKG_ARGS)))
 @parametrize("wel_cls", argvalues=[LayeredWell, Well])
 def test_from_imod5_data_wells__outside_range(
-    wel_cls: Union[LayeredWell, Well],
+    wel_cls: LayeredWell | Well,
     wel_case,
     expected_dict,
     well_mixed_ipfs,
@@ -933,7 +932,7 @@ def test_from_imod5_data_wells__outside_range(
 @parametrize("wel_case, expected_dict", argvalues=list(zip(PRJ_ARGS, PKG_ARGS)))
 @parametrize("wel_cls", argvalues=[LayeredWell, Well])
 def test_from_imod5_data_wells__wells_out_of_bounds(
-    wel_cls: Union[LayeredWell, Well],
+    wel_cls: LayeredWell | Well,
     wel_case,
     expected_dict,
     well_out_of_bounds_ipfs,
@@ -975,7 +974,7 @@ def test_from_imod5_data_wells__wells_out_of_bounds(
 @parametrize("wel_case", argvalues=PRJ_ARGS)
 @parametrize("wel_cls", argvalues=[LayeredWell, Well])
 def test_from_imod5_data_wells__empty_wells(
-    wel_cls: Union[LayeredWell, Well],
+    wel_cls: LayeredWell | Well,
     wel_case,
     well_empty_ipfs,
     tmp_path,

@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 from copy import deepcopy
-from typing import TYPE_CHECKING, Optional
+from typing import TYPE_CHECKING
 
 import cftime
 import numpy as np
@@ -197,10 +197,10 @@ def clip_line_gdf_by_grid(
 
 def bounding_polygon_from_line_data_and_clip_box(
     line_data: GeoDataFrameType,
-    x_min: Optional[float] = None,
-    x_max: Optional[float] = None,
-    y_min: Optional[float] = None,
-    y_max: Optional[float] = None,
+    x_min: float | None = None,
+    x_max: float | None = None,
+    y_min: float | None = None,
+    y_max: float | None = None,
 ) -> GeoDataFrameType:
     line_minx, line_miny, line_maxx, line_maxy = line_data.total_bounds
     # Use pandas clip, as it gracefully deals with lower=None and upper=None
@@ -213,14 +213,14 @@ def bounding_polygon_from_line_data_and_clip_box(
 
 def clip_box_dataset(
     dataset: GridDataset,
-    time_min: Optional[cftime.datetime | np.datetime64 | str] = None,
-    time_max: Optional[cftime.datetime | np.datetime64 | str] = None,
-    layer_min: Optional[int] = None,
-    layer_max: Optional[int] = None,
-    x_min: Optional[float] = None,
-    x_max: Optional[float] = None,
-    y_min: Optional[float] = None,
-    y_max: Optional[float] = None,
+    time_min: cftime.datetime | np.datetime64 | str | None = None,
+    time_max: cftime.datetime | np.datetime64 | str | None = None,
+    layer_min: int | None = None,
+    layer_max: int | None = None,
+    x_min: float | None = None,
+    x_max: float | None = None,
+    y_min: float | None = None,
+    y_max: float | None = None,
 ) -> GridDataset:
     selection = dataset.copy()
     selection = clip_time_slice(selection, time_min=time_min, time_max=time_max)
@@ -237,8 +237,8 @@ def clip_box_dataset(
 
 def clip_time_indexer(
     time: np.ndarray,
-    time_start: Optional[cftime.datetime | np.datetime64 | str] = None,
-    time_end: Optional[cftime.datetime | np.datetime64 | str] = None,
+    time_start: cftime.datetime | np.datetime64 | str | None = None,
+    time_end: cftime.datetime | np.datetime64 | str | None = None,
 ) -> xr.DataArray:
     """
     Return indices which can be used to select a time slice from a
@@ -279,10 +279,10 @@ def clip_time_indexer(
 
 def clip_spatial_box(
     dataset: GridDataset,
-    x_min: Optional[float] = None,
-    x_max: Optional[float] = None,
-    y_min: Optional[float] = None,
-    y_max: Optional[float] = None,
+    x_min: float | None = None,
+    x_max: float | None = None,
+    y_min: float | None = None,
+    y_max: float | None = None,
 ) -> GridDataset:
     """
     Clip a spatial dataset by a bounding box.
@@ -301,8 +301,8 @@ def clip_spatial_box(
 
 def clip_layer_slice(
     dataset: GridDataset,
-    layer_min: Optional[int] = None,
-    layer_max: Optional[int] = None,
+    layer_min: int | None = None,
+    layer_max: int | None = None,
 ) -> GridDataset:
     """
     Clip a dataset by a layer slice.
@@ -321,8 +321,8 @@ def clip_layer_slice(
 
 
 def _to_datetime(
-    time: Optional[cftime.datetime | np.datetime64 | str], use_cftime: bool
-) -> Optional[cftime.datetime | np.datetime64]:
+    time: cftime.datetime | np.datetime64 | str | None, use_cftime: bool
+) -> cftime.datetime | np.datetime64 | None:
     """
     Helper function that converts to datetime, except when None.
     """
@@ -334,8 +334,8 @@ def _to_datetime(
 
 def _is_within_timeslice(
     keys: np.ndarray,
-    time_start: Optional[cftime.datetime | np.datetime64 | str] = None,
-    time_end: Optional[cftime.datetime | np.datetime64 | str] = None,
+    time_start: cftime.datetime | np.datetime64 | str | None = None,
+    time_end: cftime.datetime | np.datetime64 | str | None = None,
 ) -> np.ndarray:
     """
     Return a boolean array indicating whether the keys are within the time slice.
@@ -351,8 +351,8 @@ def _is_within_timeslice(
 def clip_repeat_stress(
     repeat_stress: xr.DataArray,
     time: np.ndarray,
-    time_start: Optional[cftime.datetime | np.datetime64 | str] = None,
-    time_end: Optional[cftime.datetime | np.datetime64 | str] = None,
+    time_start: cftime.datetime | np.datetime64 | str | None = None,
+    time_end: cftime.datetime | np.datetime64 | str | None = None,
 ) -> tuple[xr.DataArray, xr.DataArray]:
     """
     Selection may remove the original data which are repeated.
@@ -413,8 +413,8 @@ def clip_repeat_stress(
 
 def clip_time_slice(
     dataset: GridDataset,
-    time_min: Optional[cftime.datetime | np.datetime64 | str] = None,
-    time_max: Optional[cftime.datetime | np.datetime64 | str] = None,
+    time_min: cftime.datetime | np.datetime64 | str | None = None,
+    time_max: cftime.datetime | np.datetime64 | str | None = None,
 ) -> GridDataset:
     """Clip time slice from dataset, account for repeat stress if present."""
     selection = dataset

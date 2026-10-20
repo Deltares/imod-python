@@ -11,7 +11,6 @@ import glob
 import io
 import pathlib
 import warnings
-from typing import Tuple
 
 import numpy as np
 import pandas as pd
@@ -27,7 +26,7 @@ def _infer_delimwhitespace(line, ncol):
     return delimiter_info.has_whitespace, delimiter_info.has_expected_cols
 
 
-def _read_ipf(path, kwargs=None) -> Tuple[pd.DataFrame, int, str]:
+def _read_ipf(path, kwargs=None) -> tuple[pd.DataFrame, int, str]:
     path = pathlib.Path(path)
     if kwargs is None:
         kwargs = {}

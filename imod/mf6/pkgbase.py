@@ -1,6 +1,7 @@
 import abc
+from collections.abc import Mapping
 from pathlib import Path
-from typing import TYPE_CHECKING, Any, Mapping, Optional, Self, final
+from typing import TYPE_CHECKING, Any, Self, final
 
 import xarray as xr
 import xugrid as xu
@@ -155,7 +156,7 @@ class PackageBase(IPackageBase, abc.ABC):
         modeldirectory: Path,
         pkgname: str,
         mdal_compliant: bool = False,
-        crs: Optional[Any] = None,
+        crs: Any | None = None,
         engine: EngineType = "netcdf4",
         **kwargs,
     ) -> Path:

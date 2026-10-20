@@ -1,6 +1,5 @@
 from copy import deepcopy
 from pathlib import Path
-from typing import List
 
 import numpy as np
 import pytest
@@ -18,7 +17,7 @@ from imod.tests.fixtures.mf6_small_models_fixture import (
 from imod.util.regrid import RegridderWeightsCache
 
 
-def create_package_instances(is_structured: bool) -> List[Package]:
+def create_package_instances(is_structured: bool) -> list[Package]:
     grid_data_function = (
         grid_data_structured if is_structured else grid_data_unstructured
     )

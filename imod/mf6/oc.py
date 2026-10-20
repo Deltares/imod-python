@@ -1,7 +1,7 @@
 import os
 from collections import defaultdict
 from pathlib import Path
-from typing import Any, Dict, Union
+from typing import Any
 
 import numpy as np
 
@@ -163,7 +163,7 @@ class OutputControl(Package, IRegridPackage):
                 output_path = self._get_output_filepath(directory, output_variable)
                 d[varname] = output_path.as_posix()
 
-        periods: defaultdict[int, Dict[str, str]] = defaultdict(dict)
+        periods: defaultdict[int, dict[str, str]] = defaultdict(dict)
         for datavar in ("save_head", "save_concentration", "save_budget"):
             if self.dataset[datavar].values[()] is None:
                 continue
@@ -186,7 +186,7 @@ class OutputControl(Package, IRegridPackage):
     def _write(
         self,
         pkgname: str,
-        globaltimes: Union[list[np.datetime64], np.ndarray],
+        globaltimes: list[np.datetime64] | np.ndarray,
         write_context: WriteContext,
     ):
         # We need to overload the write here to ensure the output directory is
