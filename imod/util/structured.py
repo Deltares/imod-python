@@ -1,10 +1,14 @@
-from typing import Any, Optional
+from typing import Any, Optional, TypeAlias
 
 import numpy as np
 import xarray as xr
 
 
-def where(condition, if_true, if_false, keep_nan: bool = True) -> xr.DataArray:
+Xr_Object: TypeAlias = xr.DataArray | xr.Dataset
+
+def where(
+    condition: Xr_Object, if_true: Any, if_false: Any, keep_nan: bool = True
+) -> xr.DataArray:
     """
     Wrapped version of xarray's ``.where``.
 

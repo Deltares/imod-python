@@ -1,5 +1,5 @@
 from functools import wraps
-from typing import Callable, ParamSpec, TypeVar
+from typing import Any, Callable, ParamSpec, TypeVar
 
 import pandas as pd
 
@@ -25,7 +25,7 @@ def enforced_dim_order(func: Callable[P, T]) -> Callable[P, T]:
     """Decorator to enforce dimension order after function call"""
 
     @wraps(func)
-    def decorator(*args: P.args, **kwargs: P.kwargs):
+    def decorator(*args: P.args, **kwargs: P.kwargs) -> Any:
         x = func(*args, **kwargs)
         # Multiple grids returned
         if isinstance(x, tuple):
