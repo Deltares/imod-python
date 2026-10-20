@@ -3,7 +3,6 @@ This module contains all kinds of utilities to prepare rivers
 """
 
 from enum import Enum
-from typing import Optional
 
 import numpy as np
 
@@ -86,7 +85,7 @@ def allocate_riv_cells(
     stage: GridDataArray,
     bottom_elevation: GridDataArray,
     drop_empty_layers: bool = True,
-) -> tuple[GridDataArray, Optional[GridDataArray]]:
+) -> tuple[GridDataArray, GridDataArray | None]:
     """
     Allocate river cells from a planar grid across the vertical dimension.
     Multiple options are available, which can be selected in ALLOCATION_OPTION.
@@ -610,7 +609,7 @@ def _allocate_cells__at_first_active(
     return topsystem_upper_active, None
 
 
-def _used_layers(mask: GridDataArray) -> tuple[Optional[GridDataArray], LAYERS_USED]:
+def _used_layers(mask: GridDataArray) -> tuple[GridDataArray | None, LAYERS_USED]:
     """
     Return the layer coordinate values of ``mask`` that contain at least one
     True value anywhere in the domain (and, if present, at any timestep), or

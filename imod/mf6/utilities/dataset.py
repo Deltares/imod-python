@@ -1,5 +1,3 @@
-from typing import Optional
-
 import numpy as np
 import pandas as pd
 import xarray as xr
@@ -42,7 +40,7 @@ def remove_inactive(ds: xr.Dataset, active: xr.DataArray) -> xr.Dataset:
 def assign_datetime_coords(
     da: GridDataArray,
     simulation_start_time: np.datetime64,
-    time_unit: Optional[str] = "d",
+    time_unit: str | None = "d",
 ) -> GridDataArray:
     if "time" not in da.coords:
         raise ValueError(

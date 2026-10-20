@@ -1,5 +1,4 @@
 from enum import Enum
-from typing import Optional
 
 import numpy as np
 
@@ -356,8 +355,8 @@ def _compute_crosscut_thickness(
     allocated: GridDataArray,
     top: GridDataArray,
     bottom: GridDataArray,
-    bc_top: Optional[GridDataArray] = None,
-    bc_bottom: Optional[GridDataArray] = None,
+    bc_top: GridDataArray | None = None,
+    bc_bottom: GridDataArray | None = None,
 ):
     """
     Compute 3D grid of thicknesses crosscut by boundary condition (river/drain)
@@ -405,8 +404,8 @@ def _compute_correction_factor(
     allocated: GridDataArray,
     top: GridDataArray,
     bottom: GridDataArray,
-    bc_top: Optional[GridDataArray] = None,
-    bc_bottom: Optional[GridDataArray] = None,
+    bc_top: GridDataArray | None = None,
+    bc_bottom: GridDataArray | None = None,
 ):
     """
     Compute correction factor to correct for a mismatch between the centre of
@@ -450,8 +449,8 @@ def _distribute_weights__by_corrected_transmissivity(
     top: GridDataArray,
     bottom: GridDataArray,
     k: GridDataArray,
-    bc_top: Optional[GridDataArray] = None,
-    bc_bottom: Optional[GridDataArray] = None,
+    bc_top: GridDataArray | None = None,
+    bc_bottom: GridDataArray | None = None,
 ):
     """
     Distribute conductances according to default method in iMOD 5.6, as
@@ -473,8 +472,8 @@ def _distribute_weights__by_corrected_thickness(
     allocated: GridDataArray,
     top: GridDataArray,
     bottom: GridDataArray,
-    bc_top: Optional[GridDataArray] = None,
-    bc_bottom: Optional[GridDataArray] = None,
+    bc_top: GridDataArray | None = None,
+    bc_bottom: GridDataArray | None = None,
 ):
     """
     Distribute conductances according to default method in iMOD 5.6, as
@@ -511,8 +510,8 @@ def _distribute_weights__by_crosscut_thickness(
     allocated: GridDataArray,
     top: GridDataArray,
     bottom: GridDataArray,
-    bc_top: Optional[GridDataArray] = None,
-    bc_bottom: Optional[GridDataArray] = None,
+    bc_top: GridDataArray | None = None,
+    bc_bottom: GridDataArray | None = None,
 ):
     """Compute weights based on crosscut thickness"""
     if bc_top is not None:
@@ -545,8 +544,8 @@ def _distribute_weights__by_crosscut_transmissivity(
     top: GridDataArray,
     bottom: GridDataArray,
     k: GridDataArray,
-    bc_top: Optional[GridDataArray] = None,
-    bc_bottom: Optional[GridDataArray] = None,
+    bc_top: GridDataArray | None = None,
+    bc_bottom: GridDataArray | None = None,
 ):
     """Compute weights based on crosscut transmissivity"""
     if bc_top is not None:

@@ -1,5 +1,4 @@
 from pathlib import Path
-from typing import Union
 
 import numpy as np
 import xarray as xr
@@ -50,7 +49,7 @@ class ExchangeBase(Package):
         self,
         directory: Path,
         pkgname: str,
-        globaltimes: Union[list[np.datetime64], np.ndarray],
+        globaltimes: list[np.datetime64] | np.ndarray,
         binary: bool,
     ) -> str:
         if hasattr(self, "_template"):

@@ -10,12 +10,12 @@ import xarray as xr
 import xugrid as xu
 from numpy.typing import NDArray
 
-GridDataArray: TypeAlias = Union[xr.DataArray, xu.UgridDataArray]
-GridDataset: TypeAlias = Union[xr.Dataset, xu.UgridDataset]
+GridDataArray: TypeAlias = xr.DataArray | xu.UgridDataArray
+GridDataset: TypeAlias = xr.Dataset | xu.UgridDataset
 GridDataDict: TypeAlias = dict[str, GridDataArray]
-ScalarAsDataArray: TypeAlias = Union[xr.DataArray, xu.UgridDataArray]
-ScalarAsDataset: TypeAlias = Union[xr.Dataset, xu.UgridDataset]
-UnstructuredData: TypeAlias = Union[xu.UgridDataset, xu.UgridDataArray]
+ScalarAsDataArray: TypeAlias = xr.DataArray | xu.UgridDataArray
+ScalarAsDataset: TypeAlias = xr.Dataset | xu.UgridDataset
+UnstructuredData: TypeAlias = xu.UgridDataset | xu.UgridDataArray
 FloatArray: TypeAlias = NDArray[np.floating]
 IntArray: TypeAlias = NDArray[np.int_]
 StressPeriodTimesType: TypeAlias = list[datetime] | Literal["steady-state"]

@@ -1,7 +1,6 @@
 """Cleanup utilities"""
 
 from enum import Enum
-from typing import Optional
 
 import pandas as pd
 import xarray as xr
@@ -75,7 +74,7 @@ def cleanup_riv(
     stage: GridDataArray,
     conductance: GridDataArray,
     bottom_elevation: GridDataArray,
-    concentration: Optional[GridDataArray] = None,
+    concentration: GridDataArray | None = None,
 ) -> dict[str, GridDataArray]:
     """
     Clean up river data, fixes some common mistakes causing ValidationErrors by
@@ -142,7 +141,7 @@ def cleanup_drn(
     idomain: GridDataArray,
     elevation: GridDataArray,
     conductance: GridDataArray,
-    concentration: Optional[GridDataArray] = None,
+    concentration: GridDataArray | None = None,
 ) -> dict[str, GridDataArray]:
     """
     Clean up drain data, fixes some common mistakes causing ValidationErrors by
@@ -184,7 +183,7 @@ def cleanup_ghb(
     idomain: GridDataArray,
     head: GridDataArray,
     conductance: GridDataArray,
-    concentration: Optional[GridDataArray] = None,
+    concentration: GridDataArray | None = None,
 ) -> dict[str, GridDataArray]:
     """
     Clean up general head boundary data, fixes some common mistakes causing

@@ -1,4 +1,4 @@
-from typing import Optional, Union, cast
+from typing import cast
 
 import numpy as np
 import pandas as pd
@@ -66,7 +66,7 @@ def convert_unit_rch_rate(rate: xr.DataArray) -> xr.DataArray:
 
 
 def fill_missing_layers(
-    source: xr.DataArray, full: xr.DataArray, fillvalue: Union[float | int]
+    source: xr.DataArray, full: xr.DataArray, fillvalue: float | int
 ) -> xr.DataArray:
     """
     This function takes a source grid in which the layer dimension is
@@ -114,7 +114,7 @@ def _well_from_imod5_cap_grid_data(cap_data: GridDataDict) -> dict[str, np.ndarr
 
 def well_from_imod5_cap_data(
     imod5_data: Imod5DataDict,
-    target_dis: Optional[IRegridPackage],
+    target_dis: IRegridPackage | None,
     regridder_types: DataclassType,
     regrid_cache: RegridderWeightsCache,
 ) -> dict[str, np.ndarray]:
@@ -182,10 +182,10 @@ def well_from_imod5_cap_data(
 
 
 def regrid_imod5_pkg_data(
-    pkg_type: Optional[type[Package]],
+    pkg_type: type[Package] | None,
     imod5_pkg_data: GridDataDict,
     target_dis: Package,
-    regridder_types: Optional[DataclassType],
+    regridder_types: DataclassType | None,
     regrid_cache: RegridderWeightsCache,
 ) -> GridDataDict:
     """
@@ -268,7 +268,7 @@ def chd_cells_from_imod5_data(
 def mask_topsystem_packages_with_ibound(
     imod5_data: dict[str, dict[str, GridDataArray]],
     model: IModel,
-    regridder_types: Optional[ConstantHeadRegridMethod],
+    regridder_types: ConstantHeadRegridMethod | None,
     regrid_cache: RegridderWeightsCache,
     ignore_time_purge_empty: bool,
 ) -> None:

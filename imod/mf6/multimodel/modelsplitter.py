@@ -1,4 +1,4 @@
-from typing import List, cast
+from typing import cast
 
 from imod.common.interfaces.iagnosticpackage import IAgnosticPackage
 from imod.common.interfaces.imodel import IModel
@@ -39,7 +39,7 @@ class ModelSplitter:
     # For these packages we skip the check if the package has any active cells in the partition
     _pkg_id_skip_active_domain_check = ["ssm", "lak"]
 
-    def __init__(self, partition_info: List[PartitionInfo]) -> None:
+    def __init__(self, partition_info: list[PartitionInfo]) -> None:
         self.partition_info = partition_info
 
         # Initialize mapping from original model names to partitioned models
@@ -285,7 +285,7 @@ class ModelSplitter:
 
         return flow_model
 
-    def _get_transport_model_names(self, models: dict[str, IModel]) -> List[str]:
+    def _get_transport_model_names(self, models: dict[str, IModel]) -> list[str]:
         return [
             model_name
             for model_name, model in models.items()
@@ -294,7 +294,7 @@ class ModelSplitter:
 
     def _get_transport_models(
         self, models: dict[str, IModel]
-    ) -> List[GroundwaterTransportModel]:
+    ) -> list[GroundwaterTransportModel]:
         return [
             model
             for model_name, model in models.items()

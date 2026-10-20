@@ -1,5 +1,5 @@
 import pathlib
-from typing import Any, List, Optional, Union
+from typing import Any, Union
 
 import numpy as np
 
@@ -105,7 +105,7 @@ class StructuredDiscretization(Package, IRegridPackage, IMaskingSettings):
     _regrid_method = DiscretizationRegridMethod()
 
     @property
-    def skip_variables(self) -> List[str]:
+    def skip_variables(self) -> list[str]:
         return ["bottom"]
 
     @init_log_decorator()
@@ -174,10 +174,10 @@ class StructuredDiscretization(Package, IRegridPackage, IMaskingSettings):
     def from_imod5_data(
         cls,
         imod5_data: dict[str, dict[str, GridDataArray]],
-        regridder_types: Optional[DataclassType] = None,
+        regridder_types: DataclassType | None = None,
         regrid_cache: RegridderWeightsCache = RegridderWeightsCache(),
         validate: bool = True,
-        target_grid: Optional[GridDataArray] = None,
+        target_grid: GridDataArray | None = None,
     ) -> "StructuredDiscretization":
         """
         Construct package from iMOD5 data, loaded with the
@@ -254,7 +254,7 @@ class StructuredDiscretization(Package, IRegridPackage, IMaskingSettings):
         self,
         target_grid: GridDataArray,
         regrid_cache: RegridderWeightsCache,
-        regridder_types: Optional[DataclassType] = None,
+        regridder_types: DataclassType | None = None,
     ) -> Union["StructuredDiscretization", VerticesDiscretization]:
         """
         Regrid discretization package. Creates a StructuredDiscretization, or

@@ -1,7 +1,7 @@
 import warnings
 from dataclasses import dataclass
 from pathlib import Path
-from typing import Any, Optional, Union
+from typing import Any
 
 import numpy as np
 
@@ -9,8 +9,8 @@ import numpy as np
 @dataclass
 class VariableMetaData:
     column_width: int
-    min_value: Optional[Union[int, float]]
-    max_value: Optional[Union[int, float]]
+    min_value: int | float | None
+    max_value: int | float | None
     dtype: type
 
 
@@ -30,9 +30,7 @@ def format_fixed_width(value, metadata):
     return format_string.format(converted_value)
 
 
-def fixed_format_parser(
-    file: Union[str, Path], metadata_dict: dict[str, VariableMetaData]
-):
+def fixed_format_parser(file: str | Path, metadata_dict: dict[str, VariableMetaData]):
     """
     Read fixed format file, using a metadata_dict from a MetaSWAP package.
 

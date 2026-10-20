@@ -1,4 +1,5 @@
-from typing import Literal, Optional, Sequence, TypeAlias
+from collections.abc import Sequence
+from typing import Literal, TypeAlias
 
 import numpy as np
 
@@ -125,12 +126,12 @@ class Viscosity(Package):
         reference_concentration: Sequence[float],
         modelname: Sequence[str],
         species: Sequence[str],
-        temperature_species_name: Optional[str] = None,
+        temperature_species_name: str | None = None,
         thermal_formulation: ThermalFormulationOption = "linear",
         thermal_a2: float = 10.0,
         thermal_a3: float = 248.37,
         thermal_a4: float = 133.15,
-        viscosityfile: Optional[str] = None,
+        viscosityfile: str | None = None,
         validate: bool = True,
     ):
         dict_dataset = {

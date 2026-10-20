@@ -2,8 +2,9 @@ import collections
 import glob
 import itertools
 import pathlib
+from collections.abc import Callable, Sequence
 from re import Pattern
-from typing import Any, Callable, Sequence, TypeAlias, cast
+from typing import Any, TypeAlias, cast
 
 import dask
 import numpy as np

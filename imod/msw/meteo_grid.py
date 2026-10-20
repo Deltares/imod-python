@@ -1,7 +1,7 @@
 import csv
 from pathlib import Path
 from shutil import copyfile
-from typing import Any, Optional, Union
+from typing import Any
 
 import numpy as np
 import pandas as pd
@@ -50,7 +50,7 @@ class MeteoGrid(MetaSwapPackage, IRegridPackage):
 
         self._pkgcheck()
 
-    def _write_free_format_file(self, path: Union[str, Path], dataframe: pd.DataFrame):
+    def _write_free_format_file(self, path: str | Path, dataframe: pd.DataFrame):
         """
         Write free format file. The mete_grid.inp file is free format.
         """
@@ -75,7 +75,7 @@ class MeteoGrid(MetaSwapPackage, IRegridPackage):
         )
 
     def _compose_filename(
-        self, d: dict[str, Any], directory: Path, pattern: Optional[str] = None
+        self, d: dict[str, Any], directory: Path, pattern: str | None = None
     ):
         """
         Construct a filename, following the iMOD conventions.
@@ -154,7 +154,7 @@ class MeteoGrid(MetaSwapPackage, IRegridPackage):
                 f"Encountered strings longer than 256 characters in columns: {too_long_columns}"
             )
 
-    def write(self, directory: Union[str, Path], *args):
+    def write(self, directory: str | Path, *args):
         """
         Write mete_grid.inp and accompanying ASCII grid files.
 

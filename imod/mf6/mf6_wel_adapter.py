@@ -12,7 +12,7 @@ GIS systems. The low-level classes contain a dataset based on cellid,
 consisting of layer, row, and column, closely resembling input for Modflow6.
 """
 
-from typing import Any, Dict, Optional
+from typing import Any
 
 import numpy as np
 import xarray as xr
@@ -150,9 +150,9 @@ class Mf6Wel(BoundaryCondition, IPackage):
         id,
         concentration=None,
         concentration_boundary_type="aux",
-        save_flows: Optional[bool] = None,
-        print_flows: Optional[bool] = None,
-        print_input: Optional[bool] = None,
+        save_flows: bool | None = None,
+        print_flows: bool | None = None,
+        print_input: bool | None = None,
         validate: bool = True,
     ):
         dict_dataset = {
@@ -172,7 +172,7 @@ class Mf6Wel(BoundaryCondition, IPackage):
         """
         Prepares a dictionary with values needed for the _to_sparse method.
         """
-        arrdict: Dict[str, Any] = {}
+        arrdict: dict[str, Any] = {}
 
         arrdict["data_vars"] = [
             var_name for var_name in ds.data_vars if var_name not in ("cellid", "id")

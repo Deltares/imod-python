@@ -1,4 +1,4 @@
-from typing import Any, Optional
+from typing import Any
 
 import numpy as np
 
@@ -252,7 +252,7 @@ class Evapotranspiration(BoundaryCondition, IRegridPackage):
     def _get_pkg_options(
         self,
         predefined_options: dict[str, Any],
-        not_options: Optional[list[str]] = None,
+        not_options: list[str] | None = None,
     ):
         options = super()._get_pkg_options(predefined_options, not_options=not_options)
         # Add amount of segments

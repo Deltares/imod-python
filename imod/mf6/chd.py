@@ -1,5 +1,4 @@
 from datetime import datetime
-from typing import Optional
 
 import numpy as np
 
@@ -168,7 +167,7 @@ class ConstantHead(BoundaryCondition, IRegridPackage):
         target_dis: StructuredDiscretization,
         time_min: datetime,
         time_max: datetime,
-        regridder_types: Optional[ConstantHeadRegridMethod] = None,
+        regridder_types: ConstantHeadRegridMethod | None = None,
         regrid_cache: RegridderWeightsCache = RegridderWeightsCache(),
     ) -> "ConstantHead":
         """
@@ -233,7 +232,7 @@ class ConstantHead(BoundaryCondition, IRegridPackage):
         imod5_data: dict[str, dict[str, GridDataArray]],
         period_data: dict[str, list[datetime]],
         target_dis: StructuredDiscretization,
-        regridder_types: Optional[ConstantHeadRegridMethod] = None,
+        regridder_types: ConstantHeadRegridMethod | None = None,
         regrid_cache: RegridderWeightsCache = RegridderWeightsCache(),
     ) -> "ConstantHead":
         """
@@ -290,9 +289,9 @@ class ConstantHead(BoundaryCondition, IRegridPackage):
         ibound: GridDataArray,
         period_data: dict[str, list[datetime]],
         target_dis: StructuredDiscretization,
-        time_min: Optional[datetime] = None,
-        time_max: Optional[datetime] = None,
-        regridder_types: Optional[ConstantHeadRegridMethod] = None,
+        time_min: datetime | None = None,
+        time_max: datetime | None = None,
+        regridder_types: ConstantHeadRegridMethod | None = None,
         regrid_cache: RegridderWeightsCache = RegridderWeightsCache(),
     ) -> "ConstantHead":
         target_idomain = target_dis.dataset["idomain"]

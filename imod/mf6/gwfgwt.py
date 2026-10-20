@@ -1,5 +1,5 @@
 from copy import deepcopy
-from typing import Optional, Self
+from typing import Self
 
 import cftime
 import numpy as np
@@ -26,16 +26,16 @@ class GWFGWT(ExchangeBase):
 
     def clip_box(
         self,
-        time_min: Optional[cftime.datetime | np.datetime64 | str] = None,
-        time_max: Optional[cftime.datetime | np.datetime64 | str] = None,
-        layer_min: Optional[int] = None,
-        layer_max: Optional[int] = None,
-        x_min: Optional[float] = None,
-        x_max: Optional[float] = None,
-        y_min: Optional[float] = None,
-        y_max: Optional[float] = None,
-        top: Optional[GridDataArray] = None,
-        bottom: Optional[GridDataArray] = None,
+        time_min: cftime.datetime | np.datetime64 | str | None = None,
+        time_max: cftime.datetime | np.datetime64 | str | None = None,
+        layer_min: int | None = None,
+        layer_max: int | None = None,
+        x_min: float | None = None,
+        x_max: float | None = None,
+        y_min: float | None = None,
+        y_max: float | None = None,
+        top: GridDataArray | None = None,
+        bottom: GridDataArray | None = None,
     ) -> Self:
         """
         The GWF-GWT exchange does not have any spatial coordinates that can be

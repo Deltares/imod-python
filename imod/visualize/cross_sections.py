@@ -1,4 +1,4 @@
-from typing import Any, Optional, Union
+from typing import Any
 
 import matplotlib.pyplot as plt
 import numpy as np
@@ -101,7 +101,7 @@ def _meshcoords(
 def _plot_aquitards(
     aquitards: xr.DataArray,
     ax: Axes,
-    kwargs_aquitards: Optional[dict[str, Any]] = None,
+    kwargs_aquitards: dict[str, Any] | None = None,
 ) -> None:
     """
     Overlay aquitards on ax
@@ -130,20 +130,17 @@ def _plot_aquitards(
 
 def cross_section(
     da: xr.DataArray,
-    colors: Union[list[str], list[tuple[float, float, float]]],
-    levels: Union[list[float], list[int], np.ndarray],
+    colors: list[str] | list[tuple[float, float, float]],
+    levels: list[float] | list[int] | np.ndarray,
     layers: bool = False,
-    aquitards: Optional[xr.DataArray] = None,
-    kwargs_pcolormesh: Optional[dict[str, Any]] = {},
-    kwargs_colorbar: Optional[dict[str, Any]] = {},
-    kwargs_aquitards: Optional[dict[str, Any]] = None,
+    aquitards: xr.DataArray | None = None,
+    kwargs_pcolormesh: dict[str, Any] | None = {},
+    kwargs_colorbar: dict[str, Any] | None = {},
+    kwargs_aquitards: dict[str, Any] | None = None,
     return_cmap_norm: bool = False,
-    fig: Optional[Figure] = None,
-    ax: Optional[Axes] = None,
-) -> Union[
-    tuple[Figure, Axes],
-    tuple[Figure, Axes, ListedColormap, BoundaryNorm],
-]:
+    fig: Figure | None = None,
+    ax: Axes | None = None,
+) -> tuple[Figure, Axes] | tuple[Figure, Axes, ListedColormap, BoundaryNorm]:
     """
     Wraps matplotlib.pcolormesh to draw cross-sections, drawing cell boundaries
     accurately. Aquitards can be plotted on top of the cross-section, by providing
@@ -309,7 +306,7 @@ def cross_section(
 def streamfunction(
     da: xr.DataArray,
     ax: Axes,
-    n_streamlines: Union[int, list[float], np.ndarray] = 10,
+    n_streamlines: int | list[float] | np.ndarray = 10,
     kwargs_contour: dict[str, Any] = {},
 ) -> QuadContourSet:
     """

@@ -1,5 +1,5 @@
 from pathlib import Path
-from typing import Any, List
+from typing import Any
 
 import numpy as np
 import pandas as pd
@@ -90,7 +90,7 @@ class VerticesDiscretization(Package, IRegridPackage, IMaskingSettings):
     _regrid_method = DiscretizationRegridMethod()
 
     @property
-    def skip_variables(self) -> List[str]:
+    def skip_variables(self) -> list[str]:
         return ["bottom"]
 
     @init_log_decorator()

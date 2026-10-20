@@ -1,5 +1,4 @@
 from datetime import datetime
-from typing import Optional
 
 import numpy as np
 import xarray as xr
@@ -240,7 +239,7 @@ class Recharge(TopSystemBoundaryCondition, IRegridPackage):
         target_dis: StructuredDiscretization,
         time_min: datetime,
         time_max: datetime,
-        regridder_types: Optional[RechargeRegridMethod] = None,
+        regridder_types: RechargeRegridMethod | None = None,
         regrid_cache: RegridderWeightsCache = RegridderWeightsCache(),
     ) -> "Recharge":
         """

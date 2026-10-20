@@ -1,5 +1,4 @@
 import copy
-from typing import Optional
 
 import xarray as xr
 import xugrid as xu
@@ -54,7 +53,7 @@ def _partition_idomain(weights: xr.DataArray, npartitions: int) -> GridDataArray
 def create_partition_labels(
     idomain: GridDataArray,
     npartitions: int,
-    weights: Optional[GridDataArray] = None,
+    weights: GridDataArray | None = None,
 ) -> GridDataArray:
     """
     Returns a label array: a 2d array with a similar size to the top layer of

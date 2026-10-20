@@ -6,7 +6,7 @@ import inspect
 import pathlib
 import warnings
 from pathlib import Path
-from typing import Any, List, Optional, Tuple, Union
+from typing import Any
 
 import cftime
 import jinja2
@@ -65,7 +65,7 @@ def pkg_has_cleanup(pkg: Package):
 class Modflow6Model(collections.UserDict[str, Package], IModel, abc.ABC):
     _mandatory_packages: tuple[str, ...] = ()
     _init_schemata: SchemataDict = {}
-    _model_id: Optional[str] = None
+    _model_id: str | None = None
     _template: Template
     _boundary_state_pkg_type: StateClassType
 
@@ -246,9 +246,9 @@ class Modflow6Model(collections.UserDict[str, Package], IModel, abc.ABC):
     def _get_domain_geometry(
         self,
     ) -> tuple[
-        Union[xr.DataArray, xu.UgridDataArray],
-        Union[xr.DataArray, xu.UgridDataArray],
-        Union[xr.DataArray, xu.UgridDataArray],
+        xr.DataArray | xu.UgridDataArray,
+        xr.DataArray | xu.UgridDataArray,
+        xr.DataArray | xu.UgridDataArray,
     ]:
         discretization = self[self.get_diskey()]
         if discretization is None:
@@ -272,7 +272,7 @@ class Modflow6Model(collections.UserDict[str, Package], IModel, abc.ABC):
     def validate(
         self,
         model_name: str = "",
-        validation_context: Optional[ValidationSettings] = None,
+        validation_context: ValidationSettings | None = None,
         **kwargs,
     ) -> StatusInfoBase:
         """
@@ -401,7 +401,7 @@ class Modflow6Model(collections.UserDict[str, Package], IModel, abc.ABC):
     def write(
         self,
         modelname: str,
-        globaltimes: Union[list[np.datetime64], np.ndarray],
+        globaltimes: list[np.datetime64] | np.ndarray,
         directory: str | Path,
         binary: bool = True,
         use_absolute_paths: bool = False,
@@ -446,7 +446,7 @@ class Modflow6Model(collections.UserDict[str, Package], IModel, abc.ABC):
     def _write(
         self,
         modelname: str,
-        globaltimes: Union[list[np.datetime64], np.ndarray],
+        globaltimes: list[np.datetime64] | np.ndarray,
         write_context: WriteContext,
         validate_context: ValidationSettings,
     ) -> StatusInfoBase:
@@ -474,7 +474,7 @@ class Modflow6Model(collections.UserDict[str, Package], IModel, abc.ABC):
         pkg_write_context = write_context.copy_with_new_write_directory(
             new_write_directory=modeldirectory
         )
-        mf6_hfb_ls: List[HorizontalFlowBarrierBase] = []
+        mf6_hfb_ls: list[HorizontalFlowBarrierBase] = []
         for pkg_name, pkg in self.items():
             try:
                 if issubclass(type(pkg), GridAgnosticWell):
@@ -529,7 +529,7 @@ class Modflow6Model(collections.UserDict[str, Package], IModel, abc.ABC):
         modelname,
         validate: bool = True,
         mdal_compliant: bool = False,
-        crs: Optional[Any] = None,
+        crs: Any | None = None,
         engine: EngineType = "netcdf4",
     ) -> Path:
         """
@@ -622,15 +622,15 @@ class Modflow6Model(collections.UserDict[str, Package], IModel, abc.ABC):
 
     def clip_box(
         self,
-        time_min: Optional[cftime.datetime | np.datetime64 | str] = None,
-        time_max: Optional[cftime.datetime | np.datetime64 | str] = None,
-        layer_min: Optional[int] = None,
-        layer_max: Optional[int] = None,
-        x_min: Optional[float] = None,
-        x_max: Optional[float] = None,
-        y_min: Optional[float] = None,
-        y_max: Optional[float] = None,
-        state_for_boundary: Optional[GridDataArray] = None,
+        time_min: cftime.datetime | np.datetime64 | str | None = None,
+        time_max: cftime.datetime | np.datetime64 | str | None = None,
+        layer_min: int | None = None,
+        layer_max: int | None = None,
+        x_min: float | None = None,
+        x_max: float | None = None,
+        y_min: float | None = None,
+        y_max: float | None = None,
+        state_for_boundary: GridDataArray | None = None,
         ignore_time_purge_empty: bool = False,
     ):
         """
@@ -741,14 +741,14 @@ class Modflow6Model(collections.UserDict[str, Package], IModel, abc.ABC):
 
     def _clip_box_packages(
         self,
-        time_min: Optional[cftime.datetime | np.datetime64 | str] = None,
-        time_max: Optional[cftime.datetime | np.datetime64 | str] = None,
-        layer_min: Optional[int] = None,
-        layer_max: Optional[int] = None,
-        x_min: Optional[float] = None,
-        x_max: Optional[float] = None,
-        y_min: Optional[float] = None,
-        y_max: Optional[float] = None,
+        time_min: cftime.datetime | np.datetime64 | str | None = None,
+        time_max: cftime.datetime | np.datetime64 | str | None = None,
+        layer_min: int | None = None,
+        layer_max: int | None = None,
+        x_min: float | None = None,
+        x_max: float | None = None,
+        y_min: float | None = None,
+        y_max: float | None = None,
     ):
         """
         Clip a model by a bounding box (time, layer, y, x).
@@ -800,7 +800,7 @@ class Modflow6Model(collections.UserDict[str, Package], IModel, abc.ABC):
     def regrid_like(
         self,
         target_grid: GridDataArray,
-        regrid_cache: Optional[RegridderWeightsCache] = None,
+        regrid_cache: RegridderWeightsCache | None = None,
     ) -> "Modflow6Model":
         """
         Creates a model by regridding the packages of this model to another
@@ -884,9 +884,9 @@ class Modflow6Model(collections.UserDict[str, Package], IModel, abc.ABC):
 
     def purge_empty_packages(
         self,
-        model_name: Optional[str] = "",
+        model_name: str | None = "",
         ignore_time: bool = False,
-        package_names: Optional[list[str]] = None,
+        package_names: list[str] | None = None,
     ) -> None:
         """
         This method removes empty packages from the model in place.
@@ -957,7 +957,7 @@ class Modflow6Model(collections.UserDict[str, Package], IModel, abc.ABC):
         """
         return False
 
-    def _is_splitting_supported(self) -> Tuple[bool, str]:
+    def _is_splitting_supported(self) -> tuple[bool, str]:
         """
         Returns True if all the packages in the model supports splitting. If one
         of the packages in the model does not support splitting, it returns the
@@ -976,7 +976,7 @@ class Modflow6Model(collections.UserDict[str, Package], IModel, abc.ABC):
                 return False, package_name
         return True, ""
 
-    def _is_regridding_supported(self) -> Tuple[bool, str]:
+    def _is_regridding_supported(self) -> tuple[bool, str]:
         """
         Returns True if all the packages in the model supports regridding. If one
         of the packages in the model does not support regridding, it returns the
@@ -995,7 +995,7 @@ class Modflow6Model(collections.UserDict[str, Package], IModel, abc.ABC):
                 return False, package_name
         return True, ""
 
-    def _is_clipping_supported(self) -> Tuple[bool, str]:
+    def _is_clipping_supported(self) -> tuple[bool, str]:
         """
         Returns True if all the packages in the model supports clipping. If one
         of the packages in the model does not support clipping, it returns the
