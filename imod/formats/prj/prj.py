@@ -523,7 +523,8 @@ def _parse_block(lines: _LineIterator, content: Dict[str, Any]) -> None:
 
     if key is None:
         return
-    assert n is not None
+    if n is None:
+        raise ValueError(f"Expected N to be specified for {key}, but got None.")
     blockcontent: Optional[Dict[str, Any]]
     try:
         if key in KEYS:
