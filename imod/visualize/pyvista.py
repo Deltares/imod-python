@@ -746,7 +746,9 @@ def velocity_field(
     # Ensure the points follow the memory layout of the v DataArrays (z, y, x)
     # otherwise, the result of np.ravel() doesn't match up
     if z_values.ndim == 1:
-        zz, yy, xx = np.meshgrid(z_values, vx["y"].values, vx["x"].values, indexing="ij")
+        zz, yy, xx = np.meshgrid(
+            z_values, vx["y"].values, vx["x"].values, indexing="ij"
+        )
     elif z_values.ndim == 3:
         if not z_values.shape == vx.shape:
             raise ValueError("Shape of `z` does not match velocity components.")
