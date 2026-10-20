@@ -1,4 +1,5 @@
 from abc import ABC, abstractmethod
+from typing import Self
 
 import xarray as xr
 
@@ -22,7 +23,7 @@ class IPackageBase(ABC):
 
     @classmethod
     @abstractmethod
-    def _from_dataset(cls, ds: GridDataset):
+    def _from_dataset(cls, ds: GridDataset) -> Self:
         raise NotImplementedError
 
     @property

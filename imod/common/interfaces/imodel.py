@@ -14,7 +14,7 @@ class IModel(IDict):
     """
 
     @abstractmethod
-    def mask_all_packages(self, mask: GridDataArray):
+    def mask_all_packages(self, mask: GridDataArray) -> None:
         raise NotImplementedError
 
     @abstractmethod
@@ -23,7 +23,7 @@ class IModel(IDict):
         package_names: list[str],
         mask: GridDataArray,
         ignore_time_purge_empty: bool = False,
-    ):
+    ) -> None:
         raise NotImplementedError
 
     @abstractmethod
@@ -45,7 +45,7 @@ class IModel(IDict):
 
     @property
     @abstractmethod
-    def domain(self):
+    def domain(self) -> Any:
         raise NotImplementedError
 
     @property
