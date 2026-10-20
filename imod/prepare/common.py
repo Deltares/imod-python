@@ -6,14 +6,19 @@ xarray.DataArrays, as well as aggregation methods operating on weights and
 values.
 """
 
+from collections.abc import Callable, Iterable, Iterator
 from typing import Any
 
 import numba
 import numpy as np
+import xarray as xr
+from numpy.typing import NDArray
+
+from imod.typing import FloatArray, IntArray
 
 
 @numba.njit
-def _starts(src_x, dst_x):
+def _starts(src_x: FloatArray, dst_x: FloatArray) -> Iterator[tuple[int, int]]:
     """
     Calculate regridding weights for a single dimension
 
@@ -38,7 +43,9 @@ def _starts(src_x, dst_x):
         i += 1
 
 
-def _weights_1d(src_x, dst_x, use_relative_weights=False):
+def _weights_1d(
+    src_x: FloatArray, dst_x: FloatArray, use_relative_weights: bool = False
+) -> tuple[int, tuple[IntArray, IntArray, FloatArray]]:
     """
     Calculate regridding weights and indices for a single dimension
 
@@ -118,13 +125,13 @@ def _weights_1d(src_x, dst_x, use_relative_weights=False):
     if use_relative_weights:
         weights = rel_weights
     for i in range(nrow):
-        for j, ind in enumerate(weights[i]):
-            np_weights[i, j] = ind
+        for j, weight in enumerate(weights[i]):
+            np_weights[i, j] = weight
 
     return max_len, (np_dst_inds, np_src_inds, np_weights)
 
 
-def _is_subset(a1, a2) -> bool:
+def _is_subset(a1: NDArray[Any], a2: NDArray[Any]) -> bool:
     if np.isin(a2, a1).all():
         # This means all are present
         # now check if it's an actual subset
@@ -138,8 +145,10 @@ def _is_subset(a1, a2) -> bool:
     return False
 
 
-def _increasing_dims(da, dims):
-    flip_dims = []
+def _increasing_dims(
+    da: xr.DataArray, dims: Iterable[str]
+) -> tuple[xr.DataArray, list[str]]:
+    flip_dims: list[str] = []
     for dim in dims:
         if not da.indexes[dim].is_monotonic_increasing:
             flip_dims.append(dim)
@@ -147,13 +156,13 @@ def _increasing_dims(da, dims):
     return da, flip_dims
 
 
-def _check_monotonic(dxs, dim):
+def _check_monotonic(dxs: FloatArray, dim: str) -> None:
     # use xor to check if one or the other
     if not ((dxs > 0.0).all() ^ (dxs < 0.0).all()):
         raise ValueError(f"{dim} is not only increasing or only decreasing")
 
 
-def _coord(da, dim):
+def _coord(da: xr.DataArray, dim: str) -> FloatArray:
     """
     Transform N xarray midpoints into N + 1 vertex edges
     """
@@ -200,7 +209,7 @@ def _coord(da, dim):
     return x
 
 
-def _get_method(method, methods):
+def _get_method(method: str | Callable[..., Any], methods: dict[str, Any]) -> Any:
     if isinstance(method, str):
         try:
             _method = methods[method]
@@ -218,11 +227,11 @@ def _get_method(method, methods):
 
 
 @numba.njit
-def _overlap(a, b):
+def _overlap(a: tuple[float, float], b: tuple[float, float]) -> float:
     return max(0, min(a[1], b[1]) - max(a[0], b[0]))
 
 
-def mean(values, weights):
+def mean(values: FloatArray, weights: FloatArray) -> float:
     vsum = 0.0
     wsum = 0.0
     for i in range(values.size):
@@ -238,7 +247,7 @@ def mean(values, weights):
         return vsum / wsum
 
 
-def harmonic_mean(values, weights):
+def harmonic_mean(values: FloatArray, weights: FloatArray) -> float:
     v_agg = 0.0
     w_sum = 0.0
     for i in range(values.size):
@@ -255,7 +264,7 @@ def harmonic_mean(values, weights):
         return w_sum / v_agg
 
 
-def geometric_mean(values, weights):
+def geometric_mean(values: FloatArray, weights: FloatArray) -> float:
     v_agg = 0.0
     w_sum = 0.0
 
@@ -284,7 +293,7 @@ def geometric_mean(values, weights):
         return np.exp((1.0 / w_sum) * v_agg)
 
 
-def sum(values, weights):
+def sum(values: FloatArray, weights: FloatArray) -> float:
     v_sum = 0.0
     w_sum = 0.0
     for i in range(values.size):
@@ -300,15 +309,15 @@ def sum(values, weights):
         return v_sum
 
 
-def minimum(values, weights):
-    return np.nanmin(values)
+def minimum(values: FloatArray, weights: FloatArray) -> float:
+    return float(np.nanmin(values))
 
 
-def maximum(values, weights):
-    return np.nanmax(values)
+def maximum(values: FloatArray, weights: FloatArray) -> float:
+    return float(np.nanmax(values))
 
 
-def mode(values, weights):
+def mode(values: FloatArray, weights: FloatArray) -> float:
     # Area weighted mode
     # Reuse weights to do counting: no allocations
     # The alternative is defining a separate frequency array in which to add
@@ -341,11 +350,11 @@ def mode(values, weights):
         return v
 
 
-def median(values, weights):
-    return np.nanpercentile(values, 50)
+def median(values: FloatArray, weights: FloatArray) -> float:
+    return float(np.nanpercentile(values, 50))
 
 
-def conductance(values, weights):
+def conductance(values: FloatArray, weights: FloatArray) -> float:
     v_agg = 0.0
     w_sum = 0.0
     for i in range(values.size):
@@ -361,7 +370,7 @@ def conductance(values, weights):
         return v_agg
 
 
-def max_overlap(values, weights):
+def max_overlap(values: FloatArray, weights: FloatArray) -> float:
     max_w = 0.0
     v = np.nan
     for i in range(values.size):

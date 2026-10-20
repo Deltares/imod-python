@@ -2,6 +2,8 @@
 Assign wells to layers.
 """
 
+from typing import Any
+
 import numpy as np
 import numpy.typing as npt
 import pandas as pd
@@ -182,7 +184,7 @@ def validate_well_columnnames(
         raise ValueError(f"Columns are missing in wells dataframe: {missing}")
 
 
-def validate_arg_types_equal(**kwargs):
+def validate_arg_types_equal(**kwargs: Any) -> None:
     types = [type(arg) for arg in (kwargs.values()) if arg is not None]
     if len(set(types)) != 1:
         members = ", ".join([t.__name__ for t in types])

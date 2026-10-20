@@ -83,7 +83,7 @@ def c_leakage(
         hydraulic resistance and surface water interaction.
     """
 
-    def f(x):
+    def f(x: GridDataArray) -> GridDataArray:
         """
         two x times cotangens hyperbolicus of x
         """

@@ -4,8 +4,10 @@ import numpy as np
 from scipy import sparse
 from xugrid.ugrid.interpolate import ILU0Preconditioner
 
+from imod.typing import FloatArray
 
-def _build_connectivity(shape):
+
+def _build_connectivity(shape: tuple[int, ...]) -> sparse.csr_matrix:
     # Get the Cartesian neighbors for a finite difference approximation.
     size = np.prod(shape)
     index = np.arange(size).reshape(shape)
@@ -29,7 +31,7 @@ def _build_connectivity(shape):
 
 
 def _interpolate(
-    arr: np.ndarray,
+    arr: FloatArray,
     connectivity: sparse.csr_matrix,
     direct: bool,
     delta: float,
@@ -37,7 +39,7 @@ def _interpolate(
     rtol: float,
     atol: float,
     maxiter: int,
-):
+) -> FloatArray:
     ar1d = arr.ravel()
     unknown = np.isnan(ar1d)
     known = ~unknown
