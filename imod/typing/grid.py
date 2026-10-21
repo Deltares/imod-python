@@ -40,42 +40,50 @@ else:
 
 
 @dispatch
-def zeros_like(grid: xr.DataArray, *args, **kwargs):
+def zeros_like(grid: xr.DataArray, *args: Any, **kwargs: Any) -> xr.DataArray:
     return xr.zeros_like(grid, *args, **kwargs)
 
 
 @dispatch  # type: ignore[no-redef]
-def zeros_like(grid: xu.UgridDataArray, *args, **kwargs):  # noqa: F811
+def zeros_like(grid: xu.UgridDataArray, *args: Any, **kwargs: Any) -> xu.UgridDataArray:  # noqa: F811
     return xu.zeros_like(grid, *args, **kwargs)
 
 
 @dispatch
-def ones_like(grid: xr.DataArray, *args, **kwargs):
+def ones_like(grid: xr.DataArray, *args: Any, **kwargs: Any) -> xr.DataArray:
     return xr.ones_like(grid, *args, **kwargs)
 
 
 @dispatch  # type: ignore[no-redef]
-def ones_like(grid: xu.UgridDataArray, *args, **kwargs):  # noqa: F811
+def ones_like(grid: xu.UgridDataArray, *args: Any, **kwargs: Any) -> xu.UgridDataArray:  # noqa: F811
     return xu.ones_like(grid, *args, **kwargs)
 
 
 @dispatch
-def nan_like(grid: xr.DataArray, dtype=np.float32, *args, **kwargs):
+def nan_like(
+    grid: xr.DataArray, dtype: Any = np.float32, *args: Any, **kwargs: Any
+) -> xr.DataArray:
     return xr.full_like(grid, fill_value=np.nan, dtype=dtype, *args, **kwargs)
 
 
 @dispatch  # type: ignore[no-redef]
-def nan_like(grid: xu.UgridDataArray, dtype=np.float32, *args, **kwargs):  # noqa: F811
+def nan_like(  # noqa: F811
+    grid: xu.UgridDataArray, dtype: Any = np.float32, *args: Any, **kwargs: Any
+) -> xu.UgridDataArray:
     return xu.full_like(grid, fill_value=np.nan, dtype=dtype, *args, **kwargs)
 
 
 @dispatch
-def full_like(grid: xr.DataArray, fill_value, *args, **kwargs):
+def full_like(
+    grid: xr.DataArray, fill_value: Any, *args: Any, **kwargs: Any
+) -> xr.DataArray:
     return xr.full_like(grid, fill_value, *args, **kwargs)
 
 
 @dispatch  # type: ignore [no-redef]
-def full_like(grid: xu.UgridDataArray, fill_value, *args, **kwargs):  # noqa: F811
+def full_like(  # noqa: F811
+    grid: xu.UgridDataArray, fill_value: Any, *args: Any, **kwargs: Any
+) -> xu.UgridDataArray:
     return xu.full_like(grid, fill_value, *args, **kwargs)
 
 
@@ -94,7 +102,9 @@ def is_unstructured(grid: Any) -> bool:  # noqa: F811
     return False
 
 
-def _force_decreasing_y(structured_grid: xr.DataArray | xr.Dataset):
+def _force_decreasing_y(
+    structured_grid: xr.DataArray | xr.Dataset,
+) -> xr.DataArray | xr.Dataset:
     flip = slice(None, None, -1)
     if structured_grid.indexes["y"].is_monotonic_increasing:
         structured_grid = structured_grid.isel(y=flip)
@@ -115,8 +125,8 @@ def _type_dispatch_functions_on_grid_sequence(
     objects: Sequence[GridDataArray | GridDataset],
     unstructured_func: Callable[..., Any],
     structured_func: Callable[..., Any],
-    *args,
-    **kwargs,
+    *args: Any,
+    **kwargs: Any,
 ) -> GridDataArray | GridDataset:
     """
     Type dispatch functions on sequence of grids. Functions like merging or concatenating.
@@ -144,9 +154,9 @@ def _type_dispatch_functions_on_dict(
     dict_of_objects: Mapping[str, GridDataArray | float | bool | int],
     unstructured_func: Callable[..., Any],
     structured_func: Callable[..., Any],
-    *args,
-    **kwargs,
-):
+    *args: Any,
+    **kwargs: Any,
+) -> GridDataset:
     """
     Typedispatch function on grid and scalar variables provided in dictionary.
     Types do not need to be homogeneous as scalars and grids can be mixed. No
@@ -181,7 +191,7 @@ def _type_dispatch_functions_on_dict(
 
 
 def merge(
-    objects: Sequence[GridDataArray | GridDataset], *args, **kwargs
+    objects: Sequence[GridDataArray | GridDataset], *args: Any, **kwargs: Any
 ) -> GridDataset:
     return _type_dispatch_functions_on_grid_sequence(
         objects, xu.merge, xr.merge, *args, compat="no_conflicts", **kwargs
@@ -189,7 +199,7 @@ def merge(
 
 
 def merge_partitions(
-    objects: Sequence[GridDataArray | GridDataset], *args, **kwargs
+    objects: Sequence[GridDataArray | GridDataset], *args: Any, **kwargs: Any
 ) -> GridDataArray | GridDataset:
     return _type_dispatch_functions_on_grid_sequence(
         objects, xu.merge_partitions, structured.merge_partitions, *args, **kwargs
@@ -197,7 +207,7 @@ def merge_partitions(
 
 
 def concat(
-    objects: Sequence[GridDataArray | GridDataset], *args, **kwargs
+    objects: Sequence[GridDataArray | GridDataset], *args: Any, **kwargs: Any
 ) -> GridDataArray | GridDataset:
     return _type_dispatch_functions_on_grid_sequence(
         objects, xu.concat, xr.concat, *args, **kwargs
@@ -205,8 +215,8 @@ def concat(
 
 
 def merge_unstructured_dataset(
-    variables_to_merge: list[dict[str, Any]], *args, **kwargs
-):
+    variables_to_merge: list[dict[str, Any]], *args: Any, **kwargs: Any
+) -> xu.UgridDataset:
     """
     Work around xugrid issue https://github.com/Deltares/xugrid/issues/179
 
@@ -259,9 +269,9 @@ def merge_unstructured_dataset(
 
 def merge_with_dictionary(
     variables_to_merge: Mapping[str, GridDataArray | float | bool | int],
-    *args,
-    **kwargs,
-):
+    *args: Any,
+    **kwargs: Any,
+) -> GridDataset:
     return _type_dispatch_functions_on_dict(
         variables_to_merge,
         merge_unstructured_dataset,
@@ -444,7 +454,7 @@ def preserve_gridtype(func: Callable[P, T]) -> Callable[P, T]:
     """
 
     @wraps(func)
-    def decorator(*args: P.args, **kwargs: P.kwargs):
+    def decorator(*args: P.args, **kwargs: P.kwargs) -> Any:
         unstructured = False
         grid = None
         for arg in args:
@@ -529,7 +539,7 @@ class GridCache:
         self.grid_cache: dict[int, GridDataArray] = {}
         self.func = func
 
-    def get_grid(self, grid: GridDataArray):
+    def get_grid(self, grid: GridDataArray) -> GridDataArray:
         geom_hash = get_grid_geometry_hash(grid)
         if geom_hash not in self.grid_cache.keys():
             if len(self.grid_cache.keys()) >= self.max_cache_size:
