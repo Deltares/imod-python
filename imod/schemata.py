@@ -74,7 +74,7 @@ OPERATORS = {
 }
 
 
-def partial_operator(op, value):
+def partial_operator(op: str, value: Any) -> Callable[[Any], Any]:
     # partial doesn't allow us to insert the 1st arg on call, and
     # operators don't work with kwargs, so resort to lambda to swap
     # args a and b around.
@@ -82,7 +82,7 @@ def partial_operator(op, value):
     return partial(lambda b, a: OPERATORS[op](a, b), value)
 
 
-def scalar_None(obj):
+def scalar_None(obj: Any) -> bool:
     """
     Test if object is a scalar None DataArray, which is the default value for optional
     variables.
@@ -90,7 +90,7 @@ def scalar_None(obj):
     if not isinstance(obj, (xr.DataArray, xu.UgridDataArray)):
         return False
     else:
-        return (len(obj.shape) == 0) and (obj.isnull()).all()
+        return bool((len(obj.shape) == 0) and (obj.isnull()).all())
 
 
 def align_other_obj_with_coords(
@@ -117,10 +117,10 @@ class ValidationError(Exception):
 
 class BaseSchema(abc.ABC):
     @abc.abstractmethod
-    def validate(self, obj: GridDataArray, **kwargs) -> None:
+    def validate(self, obj: GridDataArray, **kwargs: Any) -> None:
         pass
 
-    def __or__(self, other):
+    def __or__(self, other: "BaseSchema") -> "SchemaUnion":
         """
         This allows us to write:
 
@@ -142,13 +142,13 @@ class SchemaUnion:
     Used to validate multiple options.
     """
 
-    def __init__(self, *args):
+    def __init__(self, *args: BaseSchema) -> None:
         ntypes = len({type(arg) for arg in args})
         if ntypes > 1:
             raise TypeError("schemata in a union should have the same type")
         self.schemata = tuple(args)
 
-    def validate(self, obj: Any, **kwargs):
+    def validate(self, obj: Any, **kwargs: Any) -> None:
         errors = []
         for schema in self.schemata:
             try:
@@ -161,7 +161,7 @@ class SchemaUnion:
             message = f"{ws}" + f"{ws}".join(str(error) for error in errors)
             raise ValidationError(f"No option succeeded:{message}")
 
-    def __or__(self, other):
+    def __or__(self, other: BaseSchema) -> "SchemaUnion":
         return SchemaUnion(*self.schemata, other)
 
 
@@ -266,7 +266,9 @@ class DimsSchema(BaseSchema):
     def __init__(self, *dims: DimsT) -> None:
         self.dims = dims
 
-    def _fill_in_face_dim(self, obj: xr.DataArray | xu.UgridDataArray):
+    def _fill_in_face_dim(
+        self, obj: xr.DataArray | xu.UgridDataArray
+    ) -> tuple[DimsT, ...]:
         """
         Return dims with a filled in face dim if necessary.
         """
@@ -311,7 +313,7 @@ class EmptyIndexesSchema(BaseSchema):
     def __init__(self) -> None:
         pass
 
-    def get_dims_to_validate(self, obj: xr.DataArray | xu.UgridDataArray):
+    def get_dims_to_validate(self, obj: xr.DataArray | xu.UgridDataArray) -> list[Any]:
         dims_to_validate = list(obj.dims)
 
         # Remove face dim from list to validate, as it has no ``indexes``
