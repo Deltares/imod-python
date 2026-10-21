@@ -1,4 +1,4 @@
-from typing import cast
+from typing import Any, cast
 
 import numpy as np
 import pandas as pd
@@ -7,7 +7,12 @@ import xarray as xr
 import imod
 
 
-def stability_constraint_wel(wel, top_bot, porosity=0.3, R=1.0):
+def stability_constraint_wel(
+    wel: pd.DataFrame,
+    top_bot: xr.Dataset,
+    porosity: float | xr.DataArray = 0.3,
+    R: float = 1.0,
+) -> pd.DataFrame:
     r"""
     Computes sink/source stability constraint as applied in MT3D for adaptive
     timestepping (Zheng & Wang, 1999 p54).
@@ -57,7 +62,14 @@ def stability_constraint_wel(wel, top_bot, porosity=0.3, R=1.0):
     return wel
 
 
-def stability_constraint_advection(front, lower, right, top_bot, porosity=0.3, R=1.0):
+def stability_constraint_advection(
+    front: xr.DataArray,
+    lower: xr.DataArray,
+    right: xr.DataArray,
+    top_bot: xr.Dataset,
+    porosity: float | xr.DataArray = 0.3,
+    R: float = 1.0,
+) -> tuple[xr.DataArray, xr.DataArray]:
     r"""
     Computes advection stability constraint as applied in MT3D for adaptive
     timestepping (Zheng & Wang, 1999 p54):
@@ -135,13 +147,17 @@ def stability_constraint_advection(front, lower, right, top_bot, porosity=0.3, R
 
 
 def _calculate_intra_cell_dt(
-    source_stage, source_cond, sink_stage, sink_cond, eff_volume
-):
+    source_stage: xr.DataArray,
+    source_cond: xr.DataArray,
+    sink_stage: xr.DataArray,
+    sink_cond: xr.DataArray,
+    eff_volume: xr.DataArray,
+) -> xr.DataArray:
     """Calculate intra-cell dt by assuming a flux from a higher source_stage to a lower sink_stage,
     ignoring other head influences. Use limiting (lowest) conductance. eff_volume is the effective
     volume per cell (cell volume * effective porosity)"""
     source_cond, sink_cond = xr.align(source_cond, sink_cond, join="inner", copy=False)
-    cond = np.minimum(source_cond, sink_cond)
+    cond = cast(xr.DataArray, np.minimum(source_cond, sink_cond))
     Q = cond * (source_stage - sink_stage)
     Q = Q.where(source_stage > sink_stage)
 
@@ -149,8 +165,13 @@ def _calculate_intra_cell_dt(
 
 
 def intra_cell_boundary_conditions(
-    top_bot, porosity=0.3, riv=None, ghb=None, drn=None, drop_allnan=True
-):
+    top_bot: xr.Dataset,
+    porosity: float | xr.DataArray = 0.3,
+    riv: Any = None,
+    ghb: Any = None,
+    drn: Any = None,
+    drop_allnan: bool = True,
+) -> tuple[xr.DataArray, xr.DataArray]:
     """Function to pre-check boundary-conditions against one another for large intra-cell fluxes.
     ghb and river can function as source and sink, drn only as sink.
 
@@ -207,10 +228,10 @@ def intra_cell_boundary_conditions(
         drn = {"drn": drn}
 
     # get sources and sinks:
-    sources = {}
+    sources: dict[str, Any] = {}
     sources.update(ghb)
     sources.update(riv)
-    sinks = {}
+    sinks: dict[str, Any] = {}
     sinks.update(ghb)
     sinks.update(riv)
     sinks.update(drn)
@@ -224,13 +245,15 @@ def intra_cell_boundary_conditions(
 
     eff_volume = top_bot["dz"] * top_bot.dx * np.abs(top_bot.dy) * porosity
 
-    def _get_stage_name(sid) -> str:
+    def _get_stage_name(sid: str) -> str:
         if sid in riv:
             return "stage"
         elif sid in ghb:
             return "head"
         elif sid in drn:
             return "elevation"
+        else:
+            raise ValueError(f"Unknown boundary condition id: {sid}")
 
     # for all possible combinations: determine dt
     resultids = []
