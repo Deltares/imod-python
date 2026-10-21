@@ -131,7 +131,7 @@ def lakes_shp(path: Union[str, Path]) -> "geopandas.GeoDataFrame":  # type: igno
     return lakes
 
 
-def _circle_nodes():
+def _circle_nodes() -> np.ndarray:
     lock = FileLock(REGISTRY.path / "circle-nodes.txt.lock")
     with lock:
         fname_nodes = REGISTRY.fetch("circle-nodes.txt")
@@ -140,7 +140,7 @@ def _circle_nodes():
     return nodes
 
 
-def _circle_triangles():
+def _circle_triangles() -> np.ndarray:
     lock = FileLock(REGISTRY.path / "circle-triangles.txt.lock")
     with lock:
         fname_triangles = REGISTRY.fetch("circle-triangles.txt")
@@ -281,7 +281,7 @@ def hondsrug_planar_river() -> xr.Dataset:
     return planar_river
 
 
-def colleagues_river_data(path: str | Path):
+def colleagues_river_data(path: str | Path) -> xr.Dataset:
     """
     River data with some mistakes introduced to showcase cleanup
     utilities.

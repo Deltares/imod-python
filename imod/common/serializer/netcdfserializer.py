@@ -1,5 +1,6 @@
 from copy import deepcopy
 from pathlib import Path
+from typing import Any
 
 import numpy as np
 import xugrid as xu
@@ -18,7 +19,7 @@ class NetCDFSerializer(IPackageSerializer):
         self.crs = crs
 
     def to_file(
-        self, pkg: IPackageBase, directory: Path, file_name: str, **kwargs
+        self, pkg: IPackageBase, directory: Path, file_name: str, **kwargs: Any
     ) -> Path:
         path = directory / f"{file_name}.nc"
 
