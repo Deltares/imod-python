@@ -131,10 +131,6 @@ class BaseSchema(abc.ABC):
         return SchemaUnion(self, other)
 
 
-SchemaType: TypeAlias = BaseSchema
-SchemataDict: TypeAlias = dict[str, list[SchemaType] | tuple[SchemaType, ...]]
-
-
 class SchemaUnion:
     """
     Succesful validation only requires a single succes.
@@ -163,6 +159,10 @@ class SchemaUnion:
 
     def __or__(self, other: BaseSchema) -> "SchemaUnion":
         return SchemaUnion(*self.schemata, other)
+
+
+SchemaType: TypeAlias = BaseSchema | SchemaUnion
+SchemataDict: TypeAlias = dict[str, list[SchemaType] | tuple[SchemaType, ...]]
 
 
 class OptionSchema(BaseSchema):
