@@ -11,6 +11,8 @@ import glob
 import io
 import pathlib
 import warnings
+from collections.abc import Iterable
+from typing import Any, cast
 
 import numpy as np
 import pandas as pd
@@ -21,12 +23,14 @@ from imod.logging import LogLevel
 from imod.util.time import to_pandas_datetime_series
 
 
-def _infer_delimwhitespace(line, ncol):
+def _infer_delimwhitespace(line: str, ncol: int) -> tuple[bool, bool]:
     delimiter_info = infer_line_delimiter_info(line, ncol)
     return delimiter_info.has_whitespace, delimiter_info.has_expected_cols
 
 
-def _read_ipf(path, kwargs=None) -> tuple[pd.DataFrame, int, str]:
+def _read_ipf(
+    path: pathlib.Path | str, kwargs: dict[str, Any] | None = None
+) -> tuple[pd.DataFrame, int, str]:
     path = pathlib.Path(path)
     if kwargs is None:
         kwargs = {}
@@ -61,7 +65,7 @@ def _read_ipf(path, kwargs=None) -> tuple[pd.DataFrame, int, str]:
         f.seek(position)
         sep = r"\s+" if delim_whitespace else ","
 
-        ipf_kwargs = {
+        ipf_kwargs: dict[str, Any] = {
             "sep": sep,
             "header": None,
             "names": colnames,
@@ -74,7 +78,11 @@ def _read_ipf(path, kwargs=None) -> tuple[pd.DataFrame, int, str]:
     return df, int(indexcol), ext
 
 
-def _read(path, kwargs=None, assoc_kwargs=None):
+def _read(
+    path: pathlib.Path,
+    kwargs: dict[str, Any] | None = None,
+    assoc_kwargs: dict[str, Any] | None = None,
+) -> pd.DataFrame:
     r"""
     Read one IPF file to a single pandas.DataFrame, including associated (TXT) files.
 
@@ -82,10 +90,10 @@ def _read(path, kwargs=None, assoc_kwargs=None):
     ----------
     path: pathlib.Path or str
         globpath for IPF files to read.
-    kwargs : dict
+    kwargs : dict, optional
         Dictionary containing the ``pandas.read_csv()`` keyword arguments for the
         IPF files (e.g. `{"sep": "\s+"}`)
-    assoc_kwargs: dict
+    assoc_kwargs: dict, optional
         Dictionary containing the ``pandas.read_csv()`` keyword arguments for the
         associated (TXT) files (e.g. `{"sep": "\s+"}`)
 
@@ -94,9 +102,6 @@ def _read(path, kwargs=None, assoc_kwargs=None):
     pandas.DataFrame
     """
     df, indexcol, ext = _read_ipf(path, kwargs)
-    if assoc_kwargs is None:
-        assoc_kwargs = {}
-
     # See if reading associated files is necessary
     if indexcol > 1:
         colnames = df.columns
@@ -127,7 +132,9 @@ def _read(path, kwargs=None, assoc_kwargs=None):
     return df
 
 
-def read_associated(path, kwargs={}):
+def read_associated(
+    path: pathlib.Path | str, kwargs: dict[str, Any] | None = None
+) -> pd.DataFrame:
     r"""
     Read an IPF associated file (TXT).
 
@@ -147,6 +154,8 @@ def read_associated(path, kwargs={}):
     # deal with e.g. incorrect capitalization
     path = pathlib.Path(path).resolve()
 
+    if kwargs is None:
+        kwargs = {}
     with open(path) as f:
         nrow = int(f.readline().strip())
         line = f.readline()
@@ -192,7 +201,7 @@ def read_associated(path, kwargs={}):
         # TODO: find out whether this can be replace by csv.reader
         # the challenge lies in replacing the pd.notnull for nodata values.
         # is otherwise quite a bit faster for such a header block.
-        metadata_kwargs = {
+        metadata_kwargs: dict[str, Any] = {
             "sep": sep,
             "header": None,
             "nrows": ncol,
@@ -233,7 +242,7 @@ def read_associated(path, kwargs={}):
             warnings.warn(log_message)
         sep = r"\s+" if delim_whitespace else ","
 
-        itype_kwargs = {
+        itype_kwargs: dict[str, Any] = {
             "header": None,
             "names": colnames,
             "usecols": usecols,
@@ -267,7 +276,11 @@ def read_associated(path, kwargs={}):
     return df
 
 
-def read(path, kwargs={}, assoc_kwargs={}):
+def read(
+    path: str | pathlib.Path | list[pathlib.Path],
+    kwargs: dict[str, Any] | None = None,
+    assoc_kwargs: dict[str, Any] | None = None,
+) -> pd.DataFrame:
     r"""
     Read one or more IPF files to a single pandas.DataFrame, including associated
     (TXT) files.
@@ -350,6 +363,7 @@ def read(path, kwargs={}, assoc_kwargs={}):
     >>> df = df.merge(within_polygon, on="id")
     >>> df = df[df["within"]]
     """
+
     if isinstance(path, list):
         paths = path
     elif isinstance(path, (str, pathlib.Path)):
@@ -382,25 +396,25 @@ def read(path, kwargs={}, assoc_kwargs={}):
     return bigdf
 
 
-def _coerce_itype(itype):
+def _coerce_itype(itype: int | str | None) -> int | None:
     """Changes string itype to int"""
-    if itype in [None, 1, 2, 3, 4]:
-        pass
+    if itype is None or isinstance(itype, int):
+        return itype
     elif itype.lower() == "timeseries":
-        itype = 1
+        return 1
     elif itype.lower() == "borehole1d":
-        itype = 2
+        return 2
     elif itype.lower() == "cpt":
-        itype = 3
+        return 3
     elif itype.lower() == "borehole3d":
-        itype = 4
+        return 4
     else:
         raise ValueError("Invalid IPF itype")
-    return itype
 
 
-def _lower(colnames):
+def _lower(colnames: Iterable[str]) -> list[str]:
     """Lowers colnames, checking for uniqueness"""
+    colnames = list(colnames)
     lowered_colnames = [s.lower() for s in colnames]
     if len(set(lowered_colnames)) != len(colnames):
         seen = set()
@@ -412,7 +426,13 @@ def _lower(colnames):
     return lowered_colnames
 
 
-def write_assoc(path, df, itype=1, nodata=1.0e20, assoc_columns=None):
+def write_assoc(
+    path: pathlib.Path | str,
+    df: pd.DataFrame,
+    itype: int | str = 1,
+    nodata: float = 1.0e20,
+    assoc_columns: list[str] | dict[str, str] | None = None,
+) -> None:
     """
     Writes a single IPF associated (TXT) file.
 
@@ -446,7 +466,7 @@ def write_assoc(path, df, itype=1, nodata=1.0e20, assoc_columns=None):
         Writes a file.
     """
 
-    itype = _coerce_itype(itype)
+    itype_coerced = cast(int, _coerce_itype(itype))
     required_columns = {
         1: ["time"],
         2: ["top"],
@@ -458,7 +478,7 @@ def write_assoc(path, df, itype=1, nodata=1.0e20, assoc_columns=None):
     colnames = _lower(list(df))
     df.columns = colnames
     columnorder = []
-    for colname in required_columns[itype]:
+    for colname in required_columns[itype_coerced]:
         if colname not in colnames:
             raise ValueError(f'given itype requires column "{colname}"')
         colnames.remove(colname)
@@ -472,7 +492,7 @@ def write_assoc(path, df, itype=1, nodata=1.0e20, assoc_columns=None):
 
     nrecords, nfields = df.shape
     with open(path, "w") as f:
-        f.write(f"{nrecords}\n{nfields},{itype}\n")
+        f.write(f"{nrecords}\n{nfields},{itype_coerced}\n")
         for colname in columnorder:
             if "," in colname or " " in colname:
                 colname = '"' + colname + '"'
@@ -502,7 +522,13 @@ def write_assoc(path, df, itype=1, nodata=1.0e20, assoc_columns=None):
     )
 
 
-def write(path, df, indexcolumn=0, assoc_ext="txt", nodata=1.0e20) -> None:
+def write(
+    path: pathlib.Path | str,
+    df: pd.DataFrame,
+    indexcolumn: int = 0,
+    assoc_ext: str = "txt",
+    nodata: float = 1.0e20,
+) -> None:
     """
     Writes a single IPF file.
 
@@ -549,11 +575,18 @@ def write(path, df, indexcolumn=0, assoc_ext="txt", nodata=1.0e20) -> None:
     df.to_csv(path, index=False, header=False, mode="a", quoting=csv.QUOTE_NONE)
 
 
-def _is_single_value(group):
+def _is_single_value(group: pd.Series) -> bool:
     return len(pd.unique(group)) == 1
 
 
-def _compose_ipf(path, df, itype, assoc_ext, nodata=1.0e20, assoc_columns=None):
+def _compose_ipf(
+    path: pathlib.Path,
+    df: pd.DataFrame,
+    itype: int | str | None,
+    assoc_ext: str,
+    nodata: float = 1.0e20,
+    assoc_columns: list[str] | dict[str, str] | None = None,
+) -> None:
     """
     When itype is not None, breaks down the pandas DataFrame into its IPF part
     and its associated TXT files, creating the IPF data structure.
@@ -593,7 +626,7 @@ def _compose_ipf(path, df, itype, assoc_ext, nodata=1.0e20, assoc_columns=None):
     if itype is None:
         write(path, df, nodata=nodata)
     else:
-        itype = _coerce_itype(itype)
+        itype_coerced = cast(int, _coerce_itype(itype))
         colnames = _lower(list(df))
         df.columns = colnames
         for refname in ["x", "y", "id"]:
@@ -612,6 +645,7 @@ def _compose_ipf(path, df, itype, assoc_ext, nodata=1.0e20, assoc_columns=None):
             for colname in colnames
             if grouped[colname].apply(_is_single_value).all()
         ]
+        ipf_column_names = [name for name, _ in ipf_columns]
 
         for idcode, group in grouped:
             assoc_path = path.parent.joinpath(str(idcode) + "." + str(assoc_ext))
@@ -622,10 +656,10 @@ def _compose_ipf(path, df, itype, assoc_ext, nodata=1.0e20, assoc_columns=None):
                 selection = list(assoc_columns.keys())
             else:
                 selection = [
-                    colname for colname in colnames if colname not in ipf_columns
+                    colname for colname in colnames if colname not in ipf_column_names
                 ]
             out_df = group[selection]
-            write_assoc(assoc_path, out_df, itype, nodata, assoc_columns)
+            write_assoc(assoc_path, out_df, itype_coerced, nodata, assoc_columns)
 
         # ensures right order for x, y, id; so that also indexcolumn == 3
         agg_kwargs = collections.OrderedDict(
@@ -636,7 +670,14 @@ def _compose_ipf(path, df, itype, assoc_ext, nodata=1.0e20, assoc_columns=None):
         write(path, agg_df, 3, assoc_ext, nodata=nodata)
 
 
-def save(path, df, itype=None, assoc_ext="txt", nodata=1.0e20, assoc_columns=None):
+def save(
+    path: pathlib.Path | str,
+    df: pd.DataFrame,
+    itype: int | str | None = None,
+    assoc_ext: str = "txt",
+    nodata: float = 1.0e20,
+    assoc_columns: list[str] | dict[str, str] | None = None,
+) -> None:
     """
     Saves the contents of a pandas DataFrame to one or more IPF files, and
     associated (TXT) files.
@@ -698,8 +739,12 @@ def save(path, df, itype=None, assoc_ext="txt", nodata=1.0e20, assoc_columns=Non
 
     path = pathlib.Path(path)
 
-    d = {"extension": ".ipf", "name": path.stem, "directory": path.parent}
-    d["directory"].mkdir(exist_ok=True, parents=True)
+    d: dict[str, Any] = {
+        "extension": ".ipf",
+        "name": path.stem,
+        "directory": path.parent,
+    }
+    path.parent.mkdir(exist_ok=True, parents=True)
 
     colnames = _lower(list(df))
     # Lower assoc_columns as well if available
