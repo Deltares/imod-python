@@ -1,4 +1,5 @@
 from datetime import datetime
+from typing import Any
 
 import numpy as np
 import xarray as xr
@@ -8,7 +9,7 @@ from imod.common.interfaces.ipackage import IPackage
 from imod.util.expand_repetitions import expand_repetitions
 
 
-def get_repeat_stress(times) -> xr.DataArray:
+def get_repeat_stress(times: dict[Any, Any]) -> xr.DataArray:
     """
     Set repeat stresses: re-use data of earlier periods.
 

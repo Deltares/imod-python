@@ -189,13 +189,13 @@ class ImmobileStorageTransfer(Package):
     @init_log_decorator()
     def __init__(
         self,
-        initial_immobile_concentration,
-        immobile_porosity,
-        mobile_immobile_mass_transfer_rate,
-        decay=None,
-        decay_sorbed=None,
+        initial_immobile_concentration: xr.DataArray,
+        immobile_porosity: xr.DataArray,
+        mobile_immobile_mass_transfer_rate: xr.DataArray,
+        decay: xr.DataArray | None = None,
+        decay_sorbed: xr.DataArray | None = None,
         bulk_density: xr.DataArray | None = None,
-        distribution_coefficient=None,
+        distribution_coefficient: xr.DataArray | None = None,
         save_flows: bool | None = None,
         budgetbinfile: str | None = None,
         budgetcsvfile: str | None = None,
@@ -208,7 +208,7 @@ class ImmobileStorageTransfer(Package):
         digits: int = 7,
         format: str = "EXPONENTIAL",
         validate: bool = True,
-    ):
+    ) -> None:
         # is True fails on a np.bool_ True.
         if sorption:
             if bulk_density is None or distribution_coefficient is None:

@@ -2,6 +2,7 @@ from pathlib import Path
 from typing import Any, Self
 
 import numpy as np
+from numpy.typing import ArrayLike
 
 from imod.common.interfaces.iregridpackage import IRegridPackage
 from imod.common.utilities.dtype import normalize_string_dtype
@@ -12,7 +13,7 @@ from imod.mf6.package import Package
 from imod.schemata import DTypeSchema
 
 
-def with_index_dim(array_like) -> tuple[str, list[Any]]:
+def with_index_dim(array_like: ArrayLike) -> tuple[str, list[Any]]:
     # At least1d will also extract the values if array_like is a DataArray.
     arr1d = np.atleast_1d(array_like)
     if arr1d.ndim > 1:
@@ -69,9 +70,9 @@ class SourceSinkMixing(BoundaryCondition, IRegridPackage):
     @init_log_decorator()
     def __init__(
         self,
-        package_names,
-        concentration_boundary_type,
-        auxiliary_variable_name,
+        package_names: ArrayLike,
+        concentration_boundary_type: ArrayLike,
+        auxiliary_variable_name: ArrayLike,
         print_flows: bool = False,
         save_flows: bool = False,
         validate: bool = True,
@@ -89,7 +90,7 @@ class SourceSinkMixing(BoundaryCondition, IRegridPackage):
         self._validate_init_schemata(validate)
 
     @classmethod
-    def from_file(cls, path: str | Path, **kwargs) -> Self:
+    def from_file(cls, path: str | Path, **kwargs: Any) -> Self:
         instance = super().from_file(path, **kwargs)
 
         # to_netcdf converts strings into  NetCDF "variable‑length UTF‑8 strings"
@@ -105,7 +106,13 @@ class SourceSinkMixing(BoundaryCondition, IRegridPackage):
 
         return instance
 
-    def _render(self, directory, pkgname, globaltimes, binary):
+    def _render(
+        self,
+        directory: Path | str,
+        pkgname: str,
+        globaltimes: list[np.datetime64] | np.ndarray,
+        binary: bool,
+    ) -> str:
         d = {
             "sources": list(
                 zip(
@@ -129,7 +136,7 @@ class SourceSinkMixing(BoundaryCondition, IRegridPackage):
         save_flows: bool = False,
         validate: bool = True,
         is_split: bool = False,
-    ):
+    ) -> "SourceSinkMixing | None":
         """
         Derive a Source and Sink Mixing package from a Groundwater Flow model's
         boundary conditions (e.g. GeneralHeadBoundary). Boundary condition
@@ -196,7 +203,7 @@ class SourceSinkMixing(BoundaryCondition, IRegridPackage):
             msg = "flow model does not contain boundary conditions"
             if is_split:
                 logger.info(f"{msg}, returning None instead of SourceSinkMixing")
-                return
+                return None
             else:
                 raise ValueError(msg)
 

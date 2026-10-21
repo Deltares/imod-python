@@ -1,3 +1,5 @@
+from typing import Any
+
 import numpy as np
 
 from imod.logging import init_log_decorator
@@ -12,6 +14,7 @@ from imod.schemata import (
     IndexesSchema,
     OtherCoordsSchema,
 )
+from imod.typing import GridDataArray
 
 
 class MassSourceLoading(BoundaryCondition):
@@ -73,11 +76,11 @@ class MassSourceLoading(BoundaryCondition):
     @init_log_decorator()
     def __init__(
         self,
-        rate,
-        print_input=False,
-        print_flows=False,
-        save_flows=False,
-        observations=None,
+        rate: GridDataArray,
+        print_input: bool = False,
+        print_flows: bool = False,
+        save_flows: bool = False,
+        observations: Any = None,
         validate: bool = True,
     ) -> None:
         dict_dataset = {

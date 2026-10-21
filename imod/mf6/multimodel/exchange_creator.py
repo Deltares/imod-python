@@ -58,7 +58,7 @@ class ExchangeCreator(abc.ABC):
 
     @property
     @abc.abstractmethod
-    def _coordinate_names(self):
+    def _coordinate_names(self) -> list[str]:
         """
         abstract method that returns the names of the coordinates e.g. ["row", "column"] for structured grids or
         ["cell_index"] for usntructured grids
@@ -264,7 +264,9 @@ class ExchangeCreator(abc.ABC):
         return to_cell_idx(local_domain)
 
     @classmethod
-    def _local_cell_idx_to_id(cls, partition_info) -> dict[int, pd.DataFrame]:
+    def _local_cell_idx_to_id(
+        cls, partition_info: list[PartitionInfo]
+    ) -> dict[int, pd.DataFrame]:
         local_cell_idx_to_id = {}
         for submodel_partition_info in partition_info:
             model_id = submodel_partition_info.id

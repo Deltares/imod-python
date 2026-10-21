@@ -1,6 +1,8 @@
 from datetime import datetime
+from typing import Any, cast
 
 import numpy as np
+import xarray as xr
 
 from imod.common.interfaces.iregridpackage import IRegridPackage
 from imod.common.utilities.dataclass_type import DataclassType
@@ -38,6 +40,7 @@ from imod.schemata import (
     IdentityNoDataSchema,
     IndexesSchema,
     OtherCoordsSchema,
+    ValidationError,
 )
 from imod.typing import GridDataArray
 from imod.typing.grid import enforce_dim_order, has_negative_layer, is_planar_grid
@@ -147,18 +150,18 @@ class GeneralHeadBoundary(TopSystemBoundaryCondition, IRegridPackage):
     @init_log_decorator()
     def __init__(
         self,
-        head,
-        conductance,
-        concentration=None,
-        concentration_boundary_type="aux",
-        print_input=False,
-        print_flows=False,
-        save_flows=False,
-        observations=None,
+        head: GridDataArray,
+        conductance: GridDataArray,
+        concentration: GridDataArray | None = None,
+        concentration_boundary_type: str = "aux",
+        print_input: bool = False,
+        print_flows: bool = False,
+        save_flows: bool = False,
+        observations: Any = None,
         validate: bool = True,
-        repeat_stress=None,
+        repeat_stress: dict[Any, Any] | xr.DataArray | None = None,
     ) -> None:
-        dict_dataset = {
+        dict_dataset: dict[str, Any] = {
             "head": head,
             "conductance": conductance,
             "concentration": concentration,
@@ -172,7 +175,9 @@ class GeneralHeadBoundary(TopSystemBoundaryCondition, IRegridPackage):
         super().__init__(dict_dataset)
         self._validate_init_schemata(validate)
 
-    def _validate(self, schemata, **kwargs):
+    def _validate(
+        self, schemata: dict[str, Any], **kwargs: Any
+    ) -> dict[str, list[ValidationError]]:
         # Insert additional kwargs
         kwargs["head"] = self["head"]
         errors = super()._validate(schemata, **kwargs)
@@ -353,7 +358,7 @@ class GeneralHeadBoundary(TopSystemBoundaryCondition, IRegridPackage):
             )
             regridded_package_data.update(layered_data)
 
-        ghb = cls(**regridded_package_data, validate=True)
+        ghb = cls(**cast(dict[str, Any], regridded_package_data), validate=True)
         repeat = period_data.get(key)
         set_repeat_stress_if_available(repeat, time_min, time_max, ghb)
         # Clip the ghb package to the time range of the simulation and ensure

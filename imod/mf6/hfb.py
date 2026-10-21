@@ -256,8 +256,10 @@ def _make_linestring_from_polygon(
 
 
 def _select_dataframe_with_snapped_line_index(
-    snapped_dataset: xr.Dataset, edge_index: np.ndarray, dataframe: GeoDataFrameType
-):
+    snapped_dataset: xr.Dataset,
+    edge_index: np.ndarray,
+    dataframe: GeoDataFrameType,
+) -> GeoDataFrameType:
     """
     Select dataframe rows with line indices of snapped edges. Usually, the
     broadcasting results in a larger dataframe where individual rows of input
@@ -486,7 +488,7 @@ class HorizontalFlowBarrierBase(BoundaryCondition, ILineDataPackage):
         super().__init__(dict_dataset)
         self.line_data = geometry
 
-    def __deepcopy__(self, memo):
+    def __deepcopy__(self, memo: dict[int, Any]) -> Self:
         # There is an issue with deepcopy and the GeoDataFrame geometry.
         # The GeoDataFrame is stored in the dataset as an ExtensionArray.
         # For some reason this object causes an infinite recursion when being deep copied.
@@ -529,14 +531,20 @@ class HorizontalFlowBarrierBase(BoundaryCondition, ILineDataPackage):
             compat="no_conflicts",
         )
 
-    def _render(self, directory, pkgname, globaltimes, binary):
+    def _render(
+        self,
+        directory: Path | str,
+        pkgname: str,
+        globaltimes: list[np.datetime64] | np.ndarray,
+        binary: bool,
+    ) -> str:
         raise NotImplementedError(
             f"""{self.__class__.__name__} is a grid-agnostic package and does not have a render method. To render the
             package, first convert to a Modflow6 package by calling pkg.to_mf6_pkg()"""
         )
 
     @classmethod
-    def from_file(cls, path: str | Path, **kwargs) -> Self:
+    def from_file(cls, path: str | Path, **kwargs: Any) -> Self:
         """
         Loads an imod mf6 package from a file (currently only netcdf and zarr
         are supported). Note that it is expected that this file was saved with
@@ -578,8 +586,14 @@ class HorizontalFlowBarrierBase(BoundaryCondition, ILineDataPackage):
         raise NotImplementedError(f"Method not implemented for {cls.__name__}")
 
     def _compute_barrier_values(
-        self, snapped_dataset, edge_index, idomain, top, bottom, k
-    ):
+        self,
+        snapped_dataset: xu.UgridDataset,
+        edge_index: np.ndarray,
+        idomain: GridDataArray,
+        top: xu.UgridDataArray,
+        bottom: xu.UgridDataArray,
+        k: xu.UgridDataArray,
+    ) -> xr.DataArray:
         raise NotImplementedError()
 
     def _to_connected_cells_dataset(
@@ -687,8 +701,8 @@ class HorizontalFlowBarrierBase(BoundaryCondition, ILineDataPackage):
         top: GridDataArray,
         bottom: GridDataArray,
         k: GridDataArray,
-        validate=True,
-        strict_validation=True,
+        validate: bool = True,
+        strict_validation: bool = True,
     ) -> Mf6HorizontalFlowBarrier:
         """
         Write package to Modflow 6 package.
@@ -753,7 +767,7 @@ class HorizontalFlowBarrierBase(BoundaryCondition, ILineDataPackage):
         self,
         snapped_dataset: xu.UgridDataset,
         edge_index: np.ndarray,
-        idomain: xu.UgridDataArray,
+        idomain: GridDataArray,
     ) -> xr.DataArray:
         """
         Returns layered xarray with barrier resistance distributed over layers
@@ -964,7 +978,7 @@ class HorizontalFlowBarrierBase(BoundaryCondition, ILineDataPackage):
         clipped_line_data = cleanup_hfb(barrier=self.line_data, idomain_2d=idomain_2d)
         self.line_data = clipped_line_data
 
-    def mask(self, _) -> Package:
+    def mask(self, _: GridDataArray) -> Package:
         """
         The mask method is irrelevant for this package as it is
         grid-agnostic, instead this method retuns a copy of itself.
@@ -1068,8 +1082,10 @@ class HorizontalFlowBarrierBase(BoundaryCondition, ILineDataPackage):
 
     @staticmethod
     def _remove_edge_values_connected_to_inactive_cells(
-        values, unstructured_grid: xu.UgridDataArray, edge_index: np.ndarray
-    ):
+        values: xr.DataArray,
+        unstructured_grid: xu.UgridDataArray,
+        edge_index: np.ndarray,
+    ) -> xr.DataArray:
         face_dimension = unstructured_grid.ugrid.grid.face_dimension
 
         face_connectivity = unstructured_grid.ugrid.grid.edge_face_connectivity[
@@ -1138,11 +1154,11 @@ class HorizontalFlowBarrierHydraulicCharacteristic(HorizontalFlowBarrierBase):
     def __init__(
         self,
         geometry: "gpd.GeoDataFrame",
-        print_input=False,
+        print_input: bool = False,
     ) -> None:
         super().__init__(geometry, print_input)
 
-    def _get_barrier_type(self):
+    def _get_barrier_type(self) -> BarrierType:
         return BarrierType.HydraulicCharacteristic
 
     def _get_variable_name(self) -> str:
@@ -1152,8 +1168,14 @@ class HorizontalFlowBarrierHydraulicCharacteristic(HorizontalFlowBarrierBase):
         return []
 
     def _compute_barrier_values(
-        self, snapped_dataset, edge_index, idomain, top, bottom, k
-    ):
+        self,
+        snapped_dataset: xu.UgridDataset,
+        edge_index: np.ndarray,
+        idomain: GridDataArray,
+        top: xu.UgridDataArray,
+        bottom: xu.UgridDataArray,
+        k: xu.UgridDataArray,
+    ) -> xr.DataArray:
         barrier_values = self._resistance_layer_overlap(
             snapped_dataset, edge_index, top, bottom, k
         )
@@ -1215,11 +1237,11 @@ class SingleLayerHorizontalFlowBarrierHydraulicCharacteristic(
     def __init__(
         self,
         geometry: "gpd.GeoDataFrame",
-        print_input=False,
+        print_input: bool = False,
     ) -> None:
         super().__init__(geometry, print_input)
 
-    def _get_barrier_type(self):
+    def _get_barrier_type(self) -> BarrierType:
         return BarrierType.HydraulicCharacteristic
 
     def _get_variable_name(self) -> str:
@@ -1229,8 +1251,14 @@ class SingleLayerHorizontalFlowBarrierHydraulicCharacteristic(
         return ["layer"]
 
     def _compute_barrier_values(
-        self, snapped_dataset, edge_index, idomain, top, bottom, k
-    ):
+        self,
+        snapped_dataset: xu.UgridDataset,
+        edge_index: np.ndarray,
+        idomain: GridDataArray,
+        top: xu.UgridDataArray,
+        bottom: xu.UgridDataArray,
+        k: xu.UgridDataArray,
+    ) -> xr.DataArray:
         barrier_values = self._resistance_layer(
             snapped_dataset,
             edge_index,
@@ -1289,11 +1317,11 @@ class HorizontalFlowBarrierMultiplier(HorizontalFlowBarrierBase):
     def __init__(
         self,
         geometry: "gpd.GeoDataFrame",
-        print_input=False,
+        print_input: bool = False,
     ) -> None:
         super().__init__(geometry, print_input)
 
-    def _get_barrier_type(self):
+    def _get_barrier_type(self) -> BarrierType:
         return BarrierType.Multiplier
 
     def _get_variable_name(self) -> str:
@@ -1303,8 +1331,14 @@ class HorizontalFlowBarrierMultiplier(HorizontalFlowBarrierBase):
         return []
 
     def _compute_barrier_values(
-        self, snapped_dataset, edge_index, idomain, top, bottom, k
-    ):
+        self,
+        snapped_dataset: xu.UgridDataset,
+        edge_index: np.ndarray,
+        idomain: GridDataArray,
+        top: xu.UgridDataArray,
+        bottom: xu.UgridDataArray,
+        k: xu.UgridDataArray,
+    ) -> xr.DataArray:
         dataframe = _select_dataframe_with_snapped_line_index(
             snapped_dataset, edge_index, self.line_data
         )
@@ -1368,11 +1402,11 @@ class SingleLayerHorizontalFlowBarrierMultiplier(HorizontalFlowBarrierBase):
     def __init__(
         self,
         geometry: "gpd.GeoDataFrame",
-        print_input=False,
+        print_input: bool = False,
     ) -> None:
         super().__init__(geometry, print_input)
 
-    def _get_barrier_type(self):
+    def _get_barrier_type(self) -> BarrierType:
         return BarrierType.Multiplier
 
     def _get_variable_name(self) -> str:
@@ -1382,8 +1416,14 @@ class SingleLayerHorizontalFlowBarrierMultiplier(HorizontalFlowBarrierBase):
         return ["layer"]
 
     def _compute_barrier_values(
-        self, snapped_dataset, edge_index, idomain, top, bottom, k
-    ):
+        self,
+        snapped_dataset: xu.UgridDataset,
+        edge_index: np.ndarray,
+        idomain: GridDataArray,
+        top: xu.UgridDataArray,
+        bottom: xu.UgridDataArray,
+        k: xu.UgridDataArray,
+    ) -> xr.DataArray:
         barrier_values = self._multiplier_layer(snapped_dataset, edge_index, idomain)
 
         return barrier_values
@@ -1392,7 +1432,7 @@ class SingleLayerHorizontalFlowBarrierMultiplier(HorizontalFlowBarrierBase):
         self,
         snapped_dataset: xu.UgridDataset,
         edge_index: np.ndarray,
-        idomain: xu.UgridDataArray,
+        idomain: GridDataArray,
     ) -> xr.DataArray:
         """
         Returns layered xarray with barrier multiplier distrubuted over layers
@@ -1462,11 +1502,11 @@ class HorizontalFlowBarrierResistance(HorizontalFlowBarrierBase):
     def __init__(
         self,
         geometry: "gpd.GeoDataFrame",
-        print_input=False,
+        print_input: bool = False,
     ) -> None:
         super().__init__(geometry, print_input)
 
-    def _get_barrier_type(self):
+    def _get_barrier_type(self) -> BarrierType:
         return BarrierType.Resistance
 
     def _get_variable_name(self) -> str:
@@ -1476,8 +1516,14 @@ class HorizontalFlowBarrierResistance(HorizontalFlowBarrierBase):
         return []
 
     def _compute_barrier_values(
-        self, snapped_dataset, edge_index, idomain, top, bottom, k
-    ):
+        self,
+        snapped_dataset: xu.UgridDataset,
+        edge_index: np.ndarray,
+        idomain: GridDataArray,
+        top: xu.UgridDataArray,
+        bottom: xu.UgridDataArray,
+        k: xu.UgridDataArray,
+    ) -> xr.DataArray:
         barrier_values = self._resistance_layer_overlap(
             snapped_dataset, edge_index, top, bottom, k
         )
@@ -1485,7 +1531,7 @@ class HorizontalFlowBarrierResistance(HorizontalFlowBarrierBase):
         return barrier_values
 
     @classmethod
-    def from_imod5_data(cls, key: str, imod5_data: dict[str, GridDataDict]):
+    def from_imod5_data(cls, key: str, imod5_data: dict[str, GridDataDict]) -> Self:
         """
         Import HFB data from imod5 data dictionary. Data from "3D GEN" files, so
         with a polygon geometry, can be loaded with this method.
@@ -1580,11 +1626,11 @@ class SingleLayerHorizontalFlowBarrierResistance(HorizontalFlowBarrierBase):
     def __init__(
         self,
         geometry: "gpd.GeoDataFrame",
-        print_input=False,
+        print_input: bool = False,
     ) -> None:
         super().__init__(geometry, print_input)
 
-    def _get_barrier_type(self):
+    def _get_barrier_type(self) -> BarrierType:
         return BarrierType.Resistance
 
     def _get_variable_name(self) -> str:
@@ -1594,8 +1640,14 @@ class SingleLayerHorizontalFlowBarrierResistance(HorizontalFlowBarrierBase):
         return ["layer"]
 
     def _compute_barrier_values(
-        self, snapped_dataset, edge_index, idomain, top, bottom, k
-    ):
+        self,
+        snapped_dataset: xu.UgridDataset,
+        edge_index: np.ndarray,
+        idomain: GridDataArray,
+        top: xu.UgridDataArray,
+        bottom: xu.UgridDataArray,
+        k: xu.UgridDataArray,
+    ) -> xr.DataArray:
         barrier_values = self._resistance_layer(
             snapped_dataset,
             edge_index,
@@ -1604,7 +1656,7 @@ class SingleLayerHorizontalFlowBarrierResistance(HorizontalFlowBarrierBase):
         return barrier_values
 
     @classmethod
-    def from_imod5_data(cls, key: str, imod5_data: dict[str, GridDataDict]):
+    def from_imod5_data(cls, key: str, imod5_data: dict[str, GridDataDict]) -> Self:
         """
         Import HFB data from imod5 data dictionary. Data from "2D GEN" files, so
         with a line shape, can be loaded with this method.

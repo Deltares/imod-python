@@ -124,7 +124,7 @@ class StructuredDiscretization(Package, IRegridPackage, IMaskingSettings):
         super().__init__(dict_dataset)
         self._validate_init_schemata(validate)
 
-    def _delrc(self, dx) -> str:
+    def _delrc(self, dx: float | np.ndarray) -> str:
         """
         dx means dx or dy
         """
@@ -136,7 +136,13 @@ class StructuredDiscretization(Package, IRegridPackage, IMaskingSettings):
         else:
             raise ValueError(f"Unhandled type of {dx}")
 
-    def _get_render_dictionary(self, directory, pkgname, globaltimes, binary):
+    def _get_render_dictionary(
+        self,
+        directory: pathlib.Path,
+        pkgname: str,
+        globaltimes: list[np.datetime64] | np.ndarray,
+        binary: bool,
+    ) -> dict[str, Any]:
         disdirectory = pathlib.Path(directory) / pkgname
         d: dict[str, Any] = {}
         x = self.dataset["idomain"].coords["x"]
@@ -162,7 +168,9 @@ class StructuredDiscretization(Package, IRegridPackage, IMaskingSettings):
         )
         return d
 
-    def _validate(self, schemata, **kwargs):
+    def _validate(
+        self, schemata: dict[str, Any], **kwargs: Any
+    ) -> dict[str, list[ValidationError]]:
         # Insert additional kwargs
         kwargs["bottom"] = self["bottom"]
         errors = super()._validate(schemata, **kwargs)

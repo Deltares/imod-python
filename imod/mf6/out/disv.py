@@ -382,7 +382,7 @@ def mf6_csr_to_coo(ia: IntArray, ja: IntArray) -> tuple[IntArray, IntArray]:
     return i, j
 
 
-def alt_cumsum(a):
+def alt_cumsum(a: np.ndarray) -> np.ndarray:
     """Alternative cumsum, start 0 and omit the last value."""
     out = np.empty(a.size, a.dtype)
     out[0] = 0
@@ -400,7 +400,7 @@ def disv_indices(
     ja: IntArray,
     idomain: IntArray,
     edge_face_connectivity: IntArray,
-):
+) -> tuple[IntArray, IntArray]:
     """
     Parameters
     ----------

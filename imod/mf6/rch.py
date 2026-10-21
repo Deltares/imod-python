@@ -1,4 +1,5 @@
 from datetime import datetime
+from typing import Any, cast
 
 import numpy as np
 import xarray as xr
@@ -40,6 +41,7 @@ from imod.schemata import (
     IdentityNoDataSchema,
     IndexesSchema,
     OtherCoordsSchema,
+    ValidationError,
 )
 from imod.typing import GridDataArray, Imod5DataDict
 from imod.typing.grid import (
@@ -147,15 +149,15 @@ class Recharge(TopSystemBoundaryCondition, IRegridPackage):
     @init_log_decorator()
     def __init__(
         self,
-        rate,
-        concentration=None,
-        concentration_boundary_type="auxmixed",
-        print_input=False,
-        print_flows=False,
-        save_flows=False,
-        observations=None,
+        rate: GridDataArray,
+        concentration: GridDataArray | None = None,
+        concentration_boundary_type: str = "auxmixed",
+        print_input: bool = False,
+        print_flows: bool = False,
+        save_flows: bool = False,
+        observations: Any = None,
         validate: bool = True,
-        repeat_stress=None,
+        repeat_stress: dict[Any, Any] | xr.DataArray | None = None,
         fixed_cell: bool = False,
     ) -> None:
         dict_dataset = {
@@ -172,7 +174,9 @@ class Recharge(TopSystemBoundaryCondition, IRegridPackage):
         super().__init__(dict_dataset)
         self._validate_init_schemata(validate)
 
-    def _validate(self, schemata, **kwargs):
+    def _validate(
+        self, schemata: dict[str, Any], **kwargs: Any
+    ) -> dict[str, list[ValidationError]]:
         # Insert additional kwargs
         kwargs["rate"] = self["rate"]
         errors = super()._validate(schemata, **kwargs)
@@ -290,7 +294,11 @@ class Recharge(TopSystemBoundaryCondition, IRegridPackage):
                 regridded_package_data, target_dis, allocation_option
             )
             regridded_package_data.update(layered_data)
-        rch = cls(**regridded_package_data, validate=True, fixed_cell=False)
+        rch = cls(
+            **cast(dict[str, Any], regridded_package_data),
+            validate=True,
+            fixed_cell=False,
+        )
         repeat = period_data.get("rch")
         set_repeat_stress_if_available(repeat, time_min, time_max, rch)
         # Clip the rch package to the time range of the simulation and ensure
@@ -322,7 +330,7 @@ class Recharge(TopSystemBoundaryCondition, IRegridPackage):
         msw_active = is_msw_active_cell(target_dis, cap_data, msw_area, bnd_data)
         active = msw_active.all
 
-        data = {}
+        data: dict[str, Any] = {}
         zero_scalar = xr.DataArray(0.0, coords={"layer": 1})
         data["rate"] = zero_scalar.where(active)
 

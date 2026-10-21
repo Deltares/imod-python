@@ -1,7 +1,9 @@
 import abc
+from pathlib import Path
 from typing import Any
 
 import numpy as np
+import xarray as xr
 
 from imod.common.interfaces.iregridpackage import IRegridPackage
 from imod.common.utilities.dataclass_type import (
@@ -31,7 +33,7 @@ from imod.util.regrid import RegridderWeightsCache
 class StorageBase(Package, IRegridPackage, abc.ABC):
     _grid_data: dict[str, type] = {}
 
-    def get_options(self, d):
+    def get_options(self, d: dict[str, Any]) -> dict[str, Any]:
         # Skip both variables in grid_data and "transient".
         not_options = list(self._grid_data.keys())
         not_options += "transient"
@@ -41,10 +43,16 @@ class StorageBase(Package, IRegridPackage, abc.ABC):
                 continue
             v = self.dataset[varname].values[()]
             if self._valid(v):  # skip None and False
-                d[varname] = v
+                d[str(varname)] = v
         return d
 
-    def _render_dict(self, directory, pkgname, globaltimes, binary) -> dict[str, Any]:
+    def _render_dict(
+        self,
+        directory: Path,
+        pkgname: str,
+        globaltimes: list[np.datetime64] | np.ndarray,
+        binary: bool,
+    ) -> dict[str, Any]:
         d: dict[str, Any] = {}
         stodirectory = directory / pkgname
         for varname in self._grid_data:
@@ -169,10 +177,10 @@ class SpecificStorage(StorageBase):
     @init_log_decorator()
     def __init__(
         self,
-        specific_storage,
-        specific_yield,
-        transient,
-        convertible,
+        specific_storage: GridDataArray,
+        specific_yield: GridDataArray | None,
+        transient: bool | xr.DataArray,
+        convertible: GridDataArray,
         save_flows: bool = False,
         validate: bool = True,
     ) -> None:
@@ -186,7 +194,13 @@ class SpecificStorage(StorageBase):
         super().__init__(dict_dataset)
         self._validate_init_schemata(validate)
 
-    def _render(self, directory, pkgname, globaltimes, binary):
+    def _render(
+        self,
+        directory: Path,
+        pkgname: str,
+        globaltimes: list[np.datetime64] | np.ndarray,
+        binary: bool,
+    ) -> str:
         d = self._render_dict(directory, pkgname, globaltimes, binary)
         return self._template.render(d)
 
@@ -297,10 +311,10 @@ class StorageCoefficient(StorageBase):
     @init_log_decorator()
     def __init__(
         self,
-        storage_coefficient,
-        specific_yield,
-        transient,
-        convertible,
+        storage_coefficient: GridDataArray,
+        specific_yield: GridDataArray | None,
+        transient: bool | xr.DataArray,
+        convertible: GridDataArray,
         save_flows: bool = False,
         validate: bool = True,
     ) -> None:
@@ -314,7 +328,13 @@ class StorageCoefficient(StorageBase):
         super().__init__(dict_dataset)
         self._validate_init_schemata(validate)
 
-    def _render(self, directory, pkgname, globaltimes, binary):
+    def _render(
+        self,
+        directory: Path,
+        pkgname: str,
+        globaltimes: list[np.datetime64] | np.ndarray,
+        binary: bool,
+    ) -> str:
         d = self._render_dict(directory, pkgname, globaltimes, binary)
         d["storagecoefficient"] = True
         return self._template.render(d)

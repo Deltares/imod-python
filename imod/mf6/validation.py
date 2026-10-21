@@ -2,7 +2,7 @@
 This module contains specific validation utilities for Modflow 6.
 """
 
-from typing import cast
+from typing import Any, cast
 
 import numpy as np
 
@@ -47,7 +47,7 @@ class DisBottomSchema(NoDataComparisonSchema):
     because of how Modflow 6 computes cell thicknesses.
     """
 
-    def validate(self, obj: GridDataArray, **kwargs) -> None:
+    def validate(self, obj: GridDataArray, **kwargs: Any) -> None:
         other_obj = kwargs[self.other]
 
         active = self.is_other_notnull(other_obj)

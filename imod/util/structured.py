@@ -142,7 +142,9 @@ def replace(da: xr.DataArray, to_replace: Any, value: Any) -> xr.DataArray:
 
 
 def values_within_range(
-    da: xr.DataArray, min: float | None = None, max: float | None = None
+    da: xr.DataArray,
+    min: float | xr.DataArray | None = None,
+    max: float | xr.DataArray | None = None,
 ) -> xr.DataArray | bool:
     """
     Find which values are within range.
@@ -155,9 +157,9 @@ def values_within_range(
     ----------
     da: xr.DataArray
         DataArray to be checked
-    min: float
+    min: float or xr.DataArray
         Minimum value, if None no minimum value is set
-    max: float
+    max: float or xr.DataArray
         Maximum value, if None no maximum value is set
 
     Returns

@@ -30,7 +30,7 @@ class ExchangeCreator_Structured(ExchangeCreator):
         super().__init__(submodel_labels, partition_info)
 
     @property
-    def _coordinate_names(self):
+    def _coordinate_names(self) -> list[str]:
         return ["row", "column"]
 
     def _find_connected_cells(self) -> pd.DataFrame:

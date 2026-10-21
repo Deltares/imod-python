@@ -8,8 +8,9 @@ create a lake package.
 import pathlib
 import textwrap
 from collections import defaultdict
+from collections.abc import Sequence
 from pathlib import Path
-from typing import Any
+from typing import Any, TextIO
 
 import jinja2
 import numpy as np
@@ -35,7 +36,7 @@ class LakeApi_Base(PackageBase):
     Base class for lake and outlet object.
     """
 
-    def __init__(self, allargs) -> None:
+    def __init__(self, allargs: dict[str, Any]) -> None:
         super().__init__(allargs)
 
 
@@ -86,21 +87,21 @@ class LakeData(LakeApi_Base):
         self,
         starting_stage: float,
         boundname: str,
-        connection_type,
-        bed_leak=None,
-        top_elevation=None,
-        bot_elevation=None,
-        connection_length=None,
-        connection_width=None,
-        status=None,
-        stage=None,
-        rainfall=None,
-        evaporation=None,
-        runoff=None,
-        inflow=None,
-        withdrawal=None,
-        auxiliary=None,
-        lake_table=None,
+        connection_type: xr.DataArray,
+        bed_leak: xr.DataArray,
+        top_elevation: xr.DataArray,
+        bot_elevation: xr.DataArray,
+        connection_length: xr.DataArray,
+        connection_width: xr.DataArray,
+        status: xr.DataArray | None = None,
+        stage: xr.DataArray | None = None,
+        rainfall: xr.DataArray | None = None,
+        evaporation: xr.DataArray | None = None,
+        runoff: xr.DataArray | None = None,
+        inflow: xr.DataArray | None = None,
+        withdrawal: xr.DataArray | None = None,
+        auxiliary: xr.DataArray | None = None,
+        lake_table: xr.DataArray | None = None,
     ) -> None:
         dict_dataset = {
             "starting_stage": starting_stage,
@@ -152,7 +153,9 @@ class OutletBase(LakeApi_Base):
 
     timeseries_names = ["rate", "invert", "rough", "width", "slope"]
 
-    def __init__(self, allargs) -> None:
+    _couttype: str
+
+    def __init__(self, allargs: dict[str, Any]) -> None:
         super().__init__(allargs)
 
 
@@ -168,10 +171,10 @@ class OutletManning(OutletBase):
         self,
         lakein: str,
         lakeout: str,
-        invert,
-        width,
-        roughness,
-        slope,
+        invert: float | xr.DataArray,
+        width: float | xr.DataArray,
+        roughness: float | xr.DataArray,
+        slope: float | xr.DataArray,
     ) -> None:
         dict_dataset = {
             "lakein": lakein,
@@ -191,7 +194,13 @@ class OutletWeir(OutletBase):
 
     _couttype = "weir"
 
-    def __init__(self, lakein: str, lakeout: str, invert, width) -> None:
+    def __init__(
+        self,
+        lakein: str,
+        lakeout: str,
+        invert: float | xr.DataArray,
+        width: float | xr.DataArray,
+    ) -> None:
         dict_dataset = {
             "lakein": lakein,
             "lakeout": lakeout,
@@ -210,7 +219,7 @@ class OutletSpecified(OutletBase):
 
     _couttype = "specified"
 
-    def __init__(self, lakein: str, lakeout: str, rate) -> None:
+    def __init__(self, lakein: str, lakeout: str, rate: float | xr.DataArray) -> None:
         dict_dataset = {
             "lakein": lakein,
             "lakeout": lakeout,
@@ -223,7 +232,7 @@ class OutletSpecified(OutletBase):
         super().__init__(dict_dataset)
 
 
-def create_connection_data(lakes):
+def create_connection_data(lakes: Sequence[LakeData]) -> dict[str, xr.DataArray]:
     connection_vars = [
         "bed_leak",
         "top_elevation",
@@ -256,16 +265,17 @@ def create_connection_data(lakes):
 
         # There should be no nodata values in connection_type, so we can use it to index.
         type_numeric = (
-            lake.dataset["connection_type"].isel(**xr_indices).astype(int).values
+            lake.dataset["connection_type"].isel(xr_indices).astype(int).values
         )
         type_string = claktype_string[type_numeric]
         connection_data["connection_type"].append(type_string)
 
-        selection = lake.dataset[connection_vars].isel(**xr_indices)
+        selection = lake.dataset[connection_vars].isel(xr_indices)
         for var, da in selection.items():
-            if not var.startswith("connection_"):
-                var = f"connection_{var}"
-            connection_data[var].append(da.values)
+            name = str(var)
+            if not name.startswith("connection_"):
+                name = f"connection_{name}"
+            connection_data[name].append(da.values)
 
         # Offset by one since MODFLOW is 1-based!
         cell_id = xr.DataArray(
@@ -284,14 +294,16 @@ def create_connection_data(lakes):
     return connection_data_dict
 
 
-def create_outlet_data(outlets, name_to_number):
+def create_outlet_data(
+    outlets: Sequence[OutletBase], name_to_number: dict[str, int]
+) -> dict[str, xr.DataArray]:
     outlet_vars = [
         "invert",
         "roughness",
         "width",
         "slope",
     ]
-    outlet_data = defaultdict(list)
+    outlet_data: dict[str, list[Any]] = defaultdict(list)
     for outlet in outlets:
         outlet_data["outlet_couttype"].append(outlet._couttype)
 
@@ -331,7 +343,9 @@ def create_outlet_data(outlets, name_to_number):
     return outlet_data_dict
 
 
-def concatenate_timeseries(list_of_lakes_or_outlets, timeseries_name):
+def concatenate_timeseries(
+    list_of_lakes_or_outlets: Sequence[LakeApi_Base] | None, timeseries_name: str
+) -> xr.DataArray | None:
     """
     In this function we create a dataarray with a given time coordinate axis. We
     add all the timeseries of lakes or outlets with the given name. We also
@@ -365,7 +379,9 @@ def concatenate_timeseries(list_of_lakes_or_outlets, timeseries_name):
     return out
 
 
-def join_lake_tables(lake_numbers, lakes):
+def join_lake_tables(
+    lake_numbers: list[int], lakes: Sequence[LakeData]
+) -> xr.DataArray | None:
     """
     merges all the lake tables into a single dataarray. The lake number corresponding to each table
     is added in a new dimension
@@ -389,7 +405,7 @@ def join_lake_tables(lake_numbers, lakes):
     return result["lake_table"]
 
 
-def da_is_none(array) -> bool:
+def da_is_none(array: xr.DataArray | None) -> bool:
     """
     when the None value is appended as a dataarray it gets converted to an array with zero values.
     """
@@ -692,56 +708,56 @@ class Lake(BoundaryCondition):
     def __init__(
         # lake
         self,
-        lake_number,
-        lake_starting_stage,
-        lake_boundname,
+        lake_number: xr.DataArray,
+        lake_starting_stage: xr.DataArray,
+        lake_boundname: xr.DataArray,
         # connection
-        connection_lake_number,
-        connection_cell_id,
-        connection_type,
-        connection_bed_leak,
-        connection_bottom_elevation,
-        connection_top_elevation,
-        connection_width,
-        connection_length,
+        connection_lake_number: xr.DataArray,
+        connection_cell_id: xr.DataArray,
+        connection_type: xr.DataArray,
+        connection_bed_leak: xr.DataArray,
+        connection_bottom_elevation: xr.DataArray,
+        connection_top_elevation: xr.DataArray,
+        connection_width: xr.DataArray,
+        connection_length: xr.DataArray,
         # outlet
-        outlet_lakein=None,
-        outlet_lakeout=None,
-        outlet_couttype=None,
-        outlet_invert=None,
-        outlet_roughness=None,
-        outlet_width=None,
-        outlet_slope=None,
+        outlet_lakein: xr.DataArray | None = None,
+        outlet_lakeout: xr.DataArray | None = None,
+        outlet_couttype: xr.DataArray | None = None,
+        outlet_invert: xr.DataArray | None = None,
+        outlet_roughness: xr.DataArray | None = None,
+        outlet_width: xr.DataArray | None = None,
+        outlet_slope: xr.DataArray | None = None,
         # time series (lake)
-        ts_status=None,
-        ts_stage=None,
-        ts_rainfall=None,
-        ts_evaporation=None,
-        ts_runoff=None,
-        ts_inflow=None,
-        ts_withdrawal=None,
-        ts_auxiliary=None,
+        ts_status: xr.DataArray | None = None,
+        ts_stage: xr.DataArray | None = None,
+        ts_rainfall: xr.DataArray | None = None,
+        ts_evaporation: xr.DataArray | None = None,
+        ts_runoff: xr.DataArray | None = None,
+        ts_inflow: xr.DataArray | None = None,
+        ts_withdrawal: xr.DataArray | None = None,
+        ts_auxiliary: xr.DataArray | None = None,
         # time series (outlet)
-        ts_rate=None,
-        ts_invert=None,
-        ts_rough=None,
-        ts_width=None,
-        ts_slope=None,
+        ts_rate: xr.DataArray | None = None,
+        ts_invert: xr.DataArray | None = None,
+        ts_rough: xr.DataArray | None = None,
+        ts_width: xr.DataArray | None = None,
+        ts_slope: xr.DataArray | None = None,
         # lake tables
-        lake_tables=None,
+        lake_tables: xr.DataArray | None = None,
         # options
-        print_input=False,
-        print_stage=False,
-        print_flows=False,
-        save_flows=False,
-        stagefile=None,
-        budgetfile=None,
-        budgetcsvfile=None,
-        package_convergence_filename=None,
-        ts6_filename=None,
-        time_conversion=None,
-        length_conversion=None,
-        validate=True,
+        print_input: bool = False,
+        print_stage: bool = False,
+        print_flows: bool = False,
+        save_flows: bool = False,
+        stagefile: str | None = None,
+        budgetfile: str | None = None,
+        budgetcsvfile: str | None = None,
+        package_convergence_filename: str | None = None,
+        ts6_filename: str | None = None,
+        time_conversion: float | None = None,
+        length_conversion: float | None = None,
+        validate: bool = True,
     ) -> None:
         if ts_status is not None:
             ts_status = self._convert_to_string_dataarray(xr.DataArray(ts_status))
@@ -810,7 +826,7 @@ class Lake(BoundaryCondition):
         package_convergence_filename: str | None = None,
         time_conversion: float | None = None,
         length_conversion: float | None = None,
-    ):
+    ) -> "Lake":
         package_content: dict[str, Any] = {}
         name_to_number = {
             enforce_scalar(lake["boundname"]): i + 1 for i, lake in enumerate(lakes)
@@ -912,8 +928,14 @@ class Lake(BoundaryCondition):
         x[idx[0][:]] = ""
         return x.astype(str)
 
-    def _render(self, directory, pkgname, globaltimes, binary):
-        d = {}
+    def _render(
+        self,
+        directory: pathlib.Path | str,
+        pkgname: str,
+        globaltimes: list[np.datetime64] | np.ndarray,
+        binary: bool,
+    ) -> str:
+        d: dict[str, Any] = {}
         for var in (
             "print_input",
             "print_stage",
@@ -953,7 +975,7 @@ class Lake(BoundaryCondition):
 
         return self._template.render(d)
 
-    def _get_iconn(self, lake_numbers_per_connection):
+    def _get_iconn(self, lake_numbers_per_connection: np.ndarray) -> np.ndarray:
         iconn = np.full_like(lake_numbers_per_connection, dtype=np.int64, fill_value=0)
         maxlake = lake_numbers_per_connection.max()
         connections_per_lake = np.zeros(maxlake + 1)
@@ -999,7 +1021,10 @@ class Lake(BoundaryCondition):
         return df
 
     def _write_blockfile(
-        self, pkgname, globaltimes, write_context: WriteContext
+        self,
+        pkgname: str,
+        globaltimes: list[np.datetime64] | np.ndarray,
+        write_context: WriteContext,
     ) -> None:
         renderdir = pathlib.Path(write_context.write_directory.stem)
         content = self._render(
@@ -1033,19 +1058,21 @@ class Lake(BoundaryCondition):
 
             return
 
-    def _write_period_section(self, f, globaltimes) -> None:
+    def _write_period_section(
+        self, f: TextIO, globaltimes: list[np.datetime64] | np.ndarray
+    ) -> None:
         class Period_internal:
             """
             The Period_internal class is used for rendering the lake package in jinja.
             There is no point in instantiating this class as a user.
             """
 
-            def __init__(self, period_number) -> None:
+            def __init__(self, period_number: int) -> None:
                 self.period_number = period_number
                 self.nr_values = 0
-                self.lake_or_outlet_number = []
-                self.series_name = []
-                self.value = []
+                self.lake_or_outlet_number: list[Any] = []
+                self.series_name: list[Any] = []
+                self.value: list[Any] = []
 
         period_data_list = []
 
@@ -1102,14 +1129,16 @@ class Lake(BoundaryCondition):
         # this function is called from packagebase and should do nothing in this context
         return
 
-    def _write_perioddata(self, directory, pkgname, binary) -> None:
+    def _write_perioddata(
+        self, directory: pathlib.Path, pkgname: str, binary: bool
+    ) -> None:
         # this function is called from packagebase and should do nothing in this context
         return
 
     def _write_laketable_filelist_section(
         self,
-        f,
-    ):
+        f: TextIO,
+    ) -> dict[Any, str]:
         """
         Writes a section of the lake package input file which lists the referenced laketable files.
         Returns a dictionary with as key the lake number and as value the laketable filename- for those
@@ -1148,7 +1177,9 @@ class Lake(BoundaryCondition):
 
         return lake_number_to_lake_table_filename
 
-    def _write_laketable_files(self, directory, lake_number_to_filename) -> None:
+    def _write_laketable_files(
+        self, directory: pathlib.Path, lake_number_to_filename: dict[Any, str]
+    ) -> None:
         """
         writes a laketable file, containing a table which specifies the relation between stage,
         volume and area for one single lake.
@@ -1198,7 +1229,7 @@ class Lake(BoundaryCondition):
                 f.write(laketable_file)
 
     def _write_table_section(
-        self, f, dataframe: pd.DataFrame, title: str, index: bool = False
+        self, f: TextIO, dataframe: pd.DataFrame, title: str, index: bool = False
     ) -> None:
         """
         writes a dataframe to file. Used for the connection data and for the outlet data.

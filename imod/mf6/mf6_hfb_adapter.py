@@ -13,6 +13,7 @@ from imod.schemata import (
     DTypeSchema,
     IndexesSchema,
 )
+from imod.typing import GridDataset
 
 
 class Mf6HorizontalFlowBarrier(BoundaryCondition):
@@ -124,14 +125,14 @@ class Mf6HorizontalFlowBarrier(BoundaryCondition):
         }
         super().__init__(dict_dataset)
 
-    def _ds_to_arrdict(self, ds):
+    def _ds_to_arrdict(self, ds: GridDataset) -> dict[str, Any]:
         arrdict = super()._ds_to_arrdict(ds)
         arrdict["cell_dims1"] = ds.coords["cell_dims1"].values
         arrdict["cell_dims2"] = ds.coords["cell_dims2"].values
 
         return arrdict
 
-    def _to_struct_array(self, arrdict, layer):
+    def _to_struct_array(self, arrdict: dict[str, Any], layer: Any) -> np.ndarray:
         field_spec = (
             [("layer_1", np.int32)]
             + [(dim, np.int32) for dim in arrdict["cell_dims1"]]
