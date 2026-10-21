@@ -126,7 +126,7 @@ def streamfunction_linestring(
     # get cross section of frf and fff
     sfrf = imod.select.cross_section_linestring(frf, linestring)
     sfff = imod.select.cross_section_linestring(fff, linestring)
-    return _streamfunction(sfrf, sfff, frf.dx, fff.dy)
+    return _streamfunction(sfrf, sfff)
 
 
 def _quiver(
