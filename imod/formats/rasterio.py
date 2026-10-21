@@ -7,10 +7,12 @@ Currently only :func:`imod.rasterio.write` is implemented.
 """
 
 import pathlib
+import re
 from typing import Any
 
 import numpy as np
 import pandas as pd
+import xarray as xr
 
 import imod
 from imod.formats import array_io
@@ -28,20 +30,20 @@ f_open = open
 
 # Based on this comment
 # https://github.com/mapbox/rasterio/issues/265#issuecomment-367044836
-def _create_ext_driver_code_map():
+def _create_ext_driver_code_map() -> dict[str, str]:
     from osgeo import gdal
 
     if hasattr(gdal, "DCAP_RASTER"):
 
-        def _check_driver(drv):
-            return drv.GetMetadataItem(gdal.DCAP_RASTER)
+        def _check_driver(drv: Any) -> bool:
+            return bool(drv.GetMetadataItem(gdal.DCAP_RASTER))
 
     else:
 
-        def _check_driver(drv) -> bool:
+        def _check_driver(drv: Any) -> bool:
             return True
 
-    output = {}
+    output: dict[str, str] = {}
     for i in range(gdal.GetDriverCount()):
         drv = gdal.GetDriver(i)
         if _check_driver(drv):
@@ -107,7 +109,7 @@ EXTENSION_GDAL_DRIVER_CODE_MAP = {
 }
 
 
-def _get_driver(path):
+def _get_driver(path: pathlib.Path) -> str:
     ext = path.suffix.lower()[1:]  # skip the period
     try:
         return EXTENSION_GDAL_DRIVER_CODE_MAP[ext]
@@ -118,7 +120,7 @@ def _get_driver(path):
         )
 
 
-def _limitations(riods, path):
+def _limitations(riods: Any, path: pathlib.Path | str) -> None:
     if riods.count != 1:
         raise NotImplementedError(
             f"Cannot open multi-band grid: {path}. Try rioxarray instead."
@@ -129,7 +131,9 @@ def _limitations(riods, path):
         )
 
 
-def header(path, pattern):
+def header(
+    path: pathlib.Path | str, pattern: str | re.Pattern[str] | None
+) -> dict[str, Any]:
     attrs = imod.util.path.decompose(path, pattern)
 
     # TODO:
@@ -156,7 +160,14 @@ def header(path, pattern):
     return attrs
 
 
-def _read(path, headersize, nrow, ncol, nodata, dtype):
+def _read(
+    path: pathlib.Path | str,
+    headersize: int | None,
+    nrow: int,
+    ncol: int,
+    nodata: float | None,
+    dtype: Any,
+) -> np.ndarray:
     with rasterio.open(path, "r") as dataset:
         a = dataset.read(1)
 
@@ -170,7 +181,11 @@ def _read(path, headersize, nrow, ncol, nodata, dtype):
         return a
 
 
-def open(path, use_cftime=False, pattern=None):
+def open(
+    path: str | pathlib.Path | list[str] | list[pathlib.Path],
+    use_cftime: bool = False,
+    pattern: str | re.Pattern[str] | None = None,
+) -> xr.DataArray:
     r"""
     Open one or more GDAL supported raster files as an xarray.DataArray.
 
@@ -342,7 +357,13 @@ def write_aaigrid(path: pathlib.Path, a: np.ndarray, profile: dict[str, Any]) ->
     return
 
 
-def write(path, da, driver=None, nodata=np.nan, dtype=None):
+def write(
+    path: pathlib.Path | str,
+    da: xr.DataArray,
+    driver: str | None = None,
+    nodata: float | None = np.nan,
+    dtype: Any = None,
+) -> None:
     """Write ``xarray.DataArray`` to GDAL supported geospatial rasters using ``rasterio``.
 
     Parameters
@@ -358,6 +379,9 @@ def write(path, da, driver=None, nodata=np.nan, dtype=None):
     nodata: float
         Nodata value to use. Should be convertible to the DataArray and GDAL dtype.
         Default value is np.nan
+    dtype: numpy.dtype; optional
+        The data type to cast the DataArray to before writing. If None, the
+        original dtype is used.
 
     Examples
     --------
@@ -442,7 +466,14 @@ def write(path, da, driver=None, nodata=np.nan, dtype=None):
     return
 
 
-def save(path, a, driver=None, nodata=np.nan, pattern=None, dtype=None) -> None:
+def save(
+    path: str | pathlib.Path,
+    a: xr.DataArray,
+    driver: str | None = None,
+    nodata: float | None = np.nan,
+    pattern: str | None = None,
+    dtype: Any = None,
+) -> None:
     """
     Write a xarray.DataArray to one or more rasterio supported files
 
@@ -510,7 +541,12 @@ def save(path, a, driver=None, nodata=np.nan, pattern=None, dtype=None) -> None:
 
     # Use a closure to skip the driver argument
     # so it takes the same arguments as the idf write
-    def _write(path, a, nodata, dtype):
+    def _write(
+        path: pathlib.Path,
+        a: xr.DataArray,
+        nodata: float | None,
+        dtype: Any,
+    ) -> None:
         return write(path, a, driver, nodata, dtype)
 
     array_io.writing._save(path, a, nodata, pattern, dtype, _write)

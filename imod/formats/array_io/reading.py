@@ -118,7 +118,9 @@ def _array_z_coord(
     return coords
 
 
-def _scalar_z_coord(coords: dict[str, Any], tops: list[float], bots: list[float]):
+def _scalar_z_coord(
+    coords: dict[str, Any], tops: list[float], bots: list[float]
+) -> dict[str, Any]:
     # They must be all the same to be used, as they cannot be assigned
     # to layer.
     top: np.ndarray = np.unique(tops)
@@ -133,7 +135,7 @@ def _scalar_z_coord(coords: dict[str, Any], tops: list[float], bots: list[float]
     return coords
 
 
-def _initialize_groupby(ndims: int):
+def _initialize_groupby(ndims: int) -> collections.defaultdict[Any, Any]:
     """
     This function generates a data structure consisting of defaultdicts, to use
     for grouping arrays by dimension. The number of dimensions may vary, so the
@@ -447,7 +449,13 @@ def handle_path(
     return paths
 
 
-def _open(path, use_cftime, pattern, header, _read):
+def _open(
+    path: PathType | list[PathType],
+    use_cftime: bool,
+    pattern: PatternType | None,
+    header: Callable[[PathType, PatternType | None], dict[str, Any]],
+    _read: Callable[..., np.ndarray],
+) -> xr.DataArray:
     paths = handle_path(path)
 
     headers = [header(p, pattern) for p in paths]

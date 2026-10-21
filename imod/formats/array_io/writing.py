@@ -1,11 +1,20 @@
 import pathlib
+from collections.abc import Callable
+from typing import Any
 
 import xarray as xr
 
 import imod
 
 
-def _write_chunks(a, pattern, d, nodata, dtype, write) -> None:
+def _write_chunks(
+    a: xr.DataArray,
+    pattern: str | None,
+    d: dict[str, Any],
+    nodata: float | None,
+    dtype: Any,
+    write: Callable[..., None],
+) -> None:
     """
     This function writes one chunk of the DataArray 'a' at a time. This is
     necessary to avoid heavily sub-optimal scheduling by xarray/dask when
@@ -58,7 +67,14 @@ def _write_chunks(a, pattern, d, nodata, dtype, write) -> None:
             start = end
 
 
-def _save(path, a, nodata, pattern, dtype, write):
+def _save(
+    path: str | pathlib.Path,
+    a: xr.DataArray,
+    nodata: float | None,
+    pattern: str | None,
+    dtype: Any,
+    write: Callable[..., None],
+) -> None:
     """
     Write a xarray.DataArray to one or more IDF files
 
@@ -100,7 +116,11 @@ def _save(path, a, nodata, pattern, dtype, write):
     # such as species, for concentration. The straightforward way is by giving
     # a format string, e.g.: {name}_{time}_l{layer}
     # Find the vars in curly braces, and validate with da.coords
-    d = {"extension": path.suffix, "name": path.stem, "directory": path.parent}
+    d: dict[str, Any] = {
+        "extension": path.suffix,
+        "name": path.stem,
+        "directory": path.parent,
+    }
     d["directory"].mkdir(exist_ok=True, parents=True)
 
     # Make sure all non-xy dims are ascending

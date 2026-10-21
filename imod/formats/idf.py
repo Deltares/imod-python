@@ -142,7 +142,7 @@ def _read(
 
 def open(
     path: PathType | list[PathType],
-    use_cftime=False,
+    use_cftime: bool = False,
     pattern: PatternType | None = None,
     chunk_layout: Literal["per_idf", "per_timestep"] = "per_idf",
 ) -> xr.DataArray:
@@ -258,7 +258,7 @@ def open(
 # Open IDFs for multiple times and/or layers into one DataArray
 def _open(
     path: PathType | list[PathType],
-    use_cftime=False,
+    use_cftime: bool = False,
     pattern: PatternType | None = None,
 ) -> xr.DataArray:
     """
@@ -400,7 +400,7 @@ def _open_idf_chunked_per_timestep(
     template: xr.DataArray,
     has_time: bool,
     use_cftime: bool,
-    *args,
+    *args: Any,
 ) -> xr.DataArray:
     """
     Open IDF files chunked per timestep using a template DataArray.
