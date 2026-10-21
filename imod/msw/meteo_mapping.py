@@ -1,7 +1,7 @@
 from copy import deepcopy
 from pathlib import Path
 from textwrap import dedent
-from typing import Any, TextIO
+from typing import Any, Self, TextIO
 
 import cftime
 import numpy as np
@@ -64,7 +64,9 @@ def open_first_meteo_grid(mete_grid_path: str | Path, column_nr: int) -> xr.Data
     raise ValueError(error_message)
 
 
-def open_first_meteo_grid_from_imod5_data(imod5_data: Imod5DataDict, column_nr: int):
+def open_first_meteo_grid_from_imod5_data(
+    imod5_data: Imod5DataDict, column_nr: int
+) -> xr.DataArray:
     paths = imod5_data["extra"]["paths"]
     metegrid_path = find_in_file_list("mete_grid.inp", paths)
     return open_first_meteo_grid(metegrid_path, column_nr=column_nr)
@@ -88,7 +90,7 @@ class MeteoMapping(MetaSwapPackage, IPackageBase):
         index: IntArray,
         svat: xr.DataArray,
         *args: Any,
-    ):
+    ) -> None:
         data_dict = {"svat": svat.values.ravel()[index]}
 
         row, column = self._grid_mapping(svat, self.meteo)
@@ -146,7 +148,7 @@ class MeteoMapping(MetaSwapPackage, IPackageBase):
         target_grid: GridDataArray,
         regrid_cache: RegridderWeightsCache,
         regridder_types: DataclassType | None = None,
-    ):
+    ) -> Self:
         """
         Returns a deepcopy of this instance, as regridding this package is
         irrelevant: The meteo data is not on model grid and the mapping is
@@ -162,7 +164,7 @@ class MeteoMapping(MetaSwapPackage, IPackageBase):
         x_max: float | None = None,
         y_min: float | None = None,
         y_max: float | None = None,
-    ):
+    ) -> Self:
         """
         Clip a package by a bounding box (time, y, x).
 
@@ -254,7 +256,7 @@ class PrecipitationMapping(MeteoMapping):
         super().__init__(precipitation)
 
     @classmethod
-    def from_imod5_data(cls, imod5_data: Imod5DataDict) -> "PrecipitationMapping":
+    def from_imod5_data(cls, imod5_data: Imod5DataDict) -> Self:
         """
         Construct a MetaSWAP PrecipitationMapping package from iMOD5 data in the
         CAP package, loaded with the
@@ -311,7 +313,7 @@ class EvapotranspirationMapping(MeteoMapping):
         super().__init__(evapotranspiration)
 
     @classmethod
-    def from_imod5_data(cls, imod5_data: Imod5DataDict) -> "EvapotranspirationMapping":
+    def from_imod5_data(cls, imod5_data: Imod5DataDict) -> Self:
         """
         Construct a MetaSWAP EvapotranspirationMapping package from iMOD5 data
         in the CAP package, loaded with the

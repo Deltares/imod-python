@@ -123,10 +123,6 @@ module = [
 ]
 ignore_errors = true
 
-[[tool.mypy.overrides]]
-module = ["imod.msw.*"]
-check_untyped_defs = false
-
 # pyvista triggers a mypy daemon crash (mypy bug with partial types)
 [[tool.mypy.overrides]]
 module = ["pyvista.*"]

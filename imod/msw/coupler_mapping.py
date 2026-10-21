@@ -66,7 +66,7 @@ class CouplerMapping(MetaSwapPackage, IPackageBase):
         mf6_dis: StructuredDiscretization,
         mf6_well: Mf6Wel,
         *args: Any,
-    ):
+    ) -> None:
         if mf6_well and (not isinstance(mf6_well, Mf6Wel)):
             raise TypeError(rf"mf6_well not of type 'Mf6Wel', got '{type(mf6_well)}'")
         # Test if equal or larger than 1, to ignore idomain == -1 as well. Don't

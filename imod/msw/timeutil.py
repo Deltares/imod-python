@@ -1,8 +1,10 @@
+from typing import Any
+
 import numpy as np
 import pandas as pd
 
 
-def to_metaswap_timeformat(times):
+def to_metaswap_timeformat(times: Any) -> tuple[Any, Any]:
     """
     Convert times to MetaSWAP's own time format, which consists of a year as
     integer and the number of days since the start of the year as float.

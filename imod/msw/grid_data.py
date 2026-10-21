@@ -144,15 +144,15 @@ class GridData(MetaSwapPackage, IRegridPackage):
         )
         return self.generate_isactive_svat_arrays()
 
-    def _pkgcheck(self):
+    def _pkgcheck(self) -> None:
         super()._pkgcheck()
 
-        dx, _, _, dy, _, _ = spatial_reference(self.dataset)
+        active = self.dataset["active"]
+
+        dx, _, _, dy, _, _ = spatial_reference(active)
 
         if (not np.isscalar(dx)) or (not np.isscalar(dy)):
             raise ValueError("MetaSWAP only supports equidistant grids")
-
-        active = self.dataset["active"]
 
         cell_area = get_cell_area(active)
         total_area = self.dataset["area"].sum(dim="subunit")
@@ -166,8 +166,9 @@ class GridData(MetaSwapPackage, IRegridPackage):
                 "Provided area grid with total areas larger than cell area"
             )
 
+    # Returns a tuple instead of Self, as the active cells are required as well.
     @classmethod
-    def from_imod5_data(
+    def from_imod5_data(  # type: ignore[override]
         cls,
         imod5_data: Imod5DataDict,
         target_dis: StructuredDiscretization,

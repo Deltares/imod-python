@@ -122,12 +122,12 @@ def is_msw_active_cell(
     return MetaSwapActive(active, subunit_active)
 
 
-def _is_equal_scalar_value(da, value):
+def _is_equal_scalar_value(da: GridDataArray, value: float) -> bool:
     """
     Helper function to guarantee that the check in ``has_active_scaling_factor``
     can shortcut after is_scalar returns False.
     """
-    return da.to_numpy()[()] == value
+    return bool(da.to_numpy()[()] == value)
 
 
 def has_active_scaling_factor(imod5_cap: GridDataDict) -> bool:

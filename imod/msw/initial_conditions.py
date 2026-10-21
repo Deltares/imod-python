@@ -47,7 +47,7 @@ class InitialConditionsRootzonePressureHead(MetaSwapPackage, IRegridPackage):
     }
     _regrid_method: DataclassType = EmptyRegridMethod()
 
-    def __init__(self, initial_pF=2.2) -> None:
+    def __init__(self, initial_pF: float = 2.2) -> None:
         super().__init__()
         self.dataset["initial_pF"] = initial_pF
 
@@ -101,11 +101,11 @@ class InitialConditionsSavedState(MetaSwapPackage):
     _option = "Saved_State"
     _metadata_dict: dict[str, Any] = {}
 
-    def __init__(self, saved_state) -> None:
+    def __init__(self, saved_state: str | pathlib.Path) -> None:
         super().__init__()
         self.saved_state = saved_state
 
-    def write(self, directory, *args) -> None:
+    def write(self, directory: str | pathlib.Path, *args: Any) -> None:
         directory = pathlib.Path(directory)
         filename = directory / self._file_name
 

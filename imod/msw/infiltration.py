@@ -1,4 +1,5 @@
 from textwrap import dedent
+from typing import Self
 
 import xarray as xr
 
@@ -13,7 +14,7 @@ from imod.typing import GridDataDict, Imod5DataDict
 from imod.typing.grid import ones_like
 
 
-def deactivate_small_resistances_in_data(data: GridDataDict):
+def deactivate_small_resistances_in_data(data: GridDataDict) -> GridDataDict:
     """
     Deactivate cells where resistance smaller than 5 days are set to
     -9999.0.
@@ -102,7 +103,7 @@ class Infiltration(MetaSwapPackage, IRegridPackage):
         self._pkgcheck()
 
     @classmethod
-    def from_imod5_data(cls, imod5_data: Imod5DataDict) -> "Infiltration":
+    def from_imod5_data(cls, imod5_data: Imod5DataDict) -> Self:
         """
         Construct a MetaSWAP Infiltration package from iMOD5 data in the CAP
         package, loaded with the :func:`imod.formats.prj.open_projectfile_data`

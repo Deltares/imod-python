@@ -14,7 +14,7 @@ class VariableMetaData:
     dtype: type
 
 
-def format_fixed_width(value, metadata):
+def format_fixed_width(value: Any, metadata: VariableMetaData) -> str:
     if metadata.dtype == str:
         format_string = "{:" + f"{metadata.column_width}" + "}"
     elif metadata.dtype == int:
@@ -30,7 +30,9 @@ def format_fixed_width(value, metadata):
     return format_string.format(converted_value)
 
 
-def fixed_format_parser(file: str | Path, metadata_dict: dict[str, VariableMetaData]):
+def fixed_format_parser(
+    file: str | Path, metadata_dict: dict[str, VariableMetaData]
+) -> dict[str, list[Any]]:
     """
     Read fixed format file, using a metadata_dict from a MetaSWAP package.
 

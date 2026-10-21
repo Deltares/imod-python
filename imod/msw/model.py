@@ -4,7 +4,7 @@ import warnings
 from copy import copy, deepcopy
 from datetime import datetime
 from pathlib import Path
-from typing import Any, cast
+from typing import Any, Self, cast
 
 import cftime
 import jinja2
@@ -110,11 +110,11 @@ DEFAULT_SETTINGS: dict[str, Any] = {
 
 
 class Model(collections.UserDict[str, Any]):
-    def __setitem__(self, key, value) -> None:
+    def __setitem__(self, key: str, value: Any) -> None:
         # TODO: Add packagecheck
         super().__setitem__(key, value)
 
-    def update(self, *args, **kwargs) -> None:
+    def update(self, *args: Any, **kwargs: Any) -> None:
         for k, v in dict(*args, **kwargs).items():
             self[k] = v
 
@@ -192,9 +192,9 @@ class MetaSwapModel(Model, IDict):
                 f"{initial_condition_set}"
             )
 
-    def _check_landuse_indices_in_lookup_options(self):
-        grid_key = self.get_pkgkey(GridData)
-        landuse_options_key = self.get_pkgkey(LanduseOptions)
+    def _check_landuse_indices_in_lookup_options(self) -> None:
+        grid_key = cast(str, self.get_pkgkey(GridData))
+        landuse_options_key = cast(str, self.get_pkgkey(LanduseOptions))
 
         indices_in_grid = set(self[grid_key]["landuse"].values.ravel())
         indices_in_options = set(
@@ -209,9 +209,9 @@ class MetaSwapModel(Model, IDict):
                 f"were not in LanduseOptions: {missing_indices}"
             )
 
-    def _check_vegetation_indices_in_annual_crop_factors(self):
-        landuse_options_key = self.get_pkgkey(LanduseOptions)
-        annual_crop_factors_key = self.get_pkgkey(AnnualCropFactors)
+    def _check_vegetation_indices_in_annual_crop_factors(self) -> None:
+        landuse_options_key = cast(str, self.get_pkgkey(LanduseOptions))
+        annual_crop_factors_key = cast(str, self.get_pkgkey(AnnualCropFactors))
 
         indices_in_options = set(
             np.unique(self[landuse_options_key]["vegetation_index"])
@@ -232,7 +232,7 @@ class MetaSwapModel(Model, IDict):
         pkg_types_included = {type(pkg) for pkg in self.values()}
         return FileCopier in pkg_types_included
 
-    def _get_starttime(self):
+    def _get_starttime(self) -> tuple[int, float]:
         if self.starttime is not None:
             starttime = to_datetime_internal(self.starttime, use_cftime=False)
         else:
@@ -245,7 +245,7 @@ class MetaSwapModel(Model, IDict):
 
         return year, time_since_start_year
 
-    def _get_minimum_package_time(self):
+    def _get_minimum_package_time(self) -> Any:
         """
         Loop over all packages to get the minimum time.
 
@@ -414,7 +414,7 @@ class MetaSwapModel(Model, IDict):
             self[pkgname].write(directory, index, svat, mf6_dis, mf6_wel)
 
     @classmethod
-    def from_file(cls, directory, modelname):
+    def from_file(cls, directory: str | Path, modelname: str) -> Self:
         pkg_classes = {
             name: pkg_cls
             for name, pkg_cls in inspect.getmembers(imod.msw, inspect.isclass)
@@ -446,7 +446,7 @@ class MetaSwapModel(Model, IDict):
         mdal_compliant: bool = False,
         crs: str | None = None,
         engine: EngineType = "netcdf4",
-    ):
+    ) -> Path:
         """
         Dump model packages to netCDF files and create a toml file with paths to these files.
         The MetaSWAP model can be reloaded from the dumped files using the :func:`from_file` method.
@@ -485,6 +485,9 @@ class MetaSwapModel(Model, IDict):
         >>> toml_path = msw_model.dump(tmp_path, name, engine=engine, validate=False)
         >>> back = MetaSwapModel.from_file(tmp_path, name)
         """
+
+        if modelname is None:
+            modelname = self._model_name
 
         toml_path = dump_model(
             self,
@@ -744,8 +747,8 @@ class MetaSwapModel(Model, IDict):
             partition_id_to_models[submodel_partition_info.id][submodel_name] = submodel
 
         # First, handle the grid data and determine the overlap.
-        grid_key = self.get_pkgkey(GridData)
-        grid_pkg = cast(GridData, self[grid_key])  # type: ignore[index]
+        grid_key = cast(str, self.get_pkgkey(GridData))
+        grid_pkg = cast(GridData, self[grid_key])
         is_in_active_domain = {}
 
         for submodel_name, submodel in partitioned_submodels.items():
