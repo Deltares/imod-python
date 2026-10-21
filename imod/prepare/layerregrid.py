@@ -16,7 +16,9 @@ METHODS.pop("multilinear")
 
 
 @numba.njit(cache=True)
-def _valid_layer_indices(top_col: FloatArray, bot_col: FloatArray, out: IntArray) -> int:
+def _valid_layer_indices(
+    top_col: FloatArray, bot_col: FloatArray, out: IntArray
+) -> int:
     """
     Fill `out` (int64 array, same length as top_col) with the indices of
     layers that have non-nan top AND bottom, at a single (row, col) column.
