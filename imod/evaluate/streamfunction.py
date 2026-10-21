@@ -7,7 +7,8 @@ import imod
 
 
 def _streamfunction(
-    sfrf: xr.DataArray, sfff: xr.DataArray,
+    sfrf: xr.DataArray,
+    sfff: xr.DataArray,
 ) -> xr.DataArray:
     # Scale total flux to length of cell traversed
     # --> no, this gives really akward patterns
