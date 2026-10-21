@@ -1,7 +1,7 @@
 import io
 import warnings
 from pathlib import Path
-from typing import List, Optional, Tuple, Union
+from typing import TYPE_CHECKING, Any, TypeAlias
 
 import numpy as np
 import pandas as pd
@@ -23,9 +23,33 @@ except ImportError:
     gpd = MissingOptionalModule("geopandas")
 
 
+if TYPE_CHECKING:
+    from shapely.geometry import LineString as _LineString
+    from shapely.geometry import Point as _Point
+    from shapely.geometry import Polygon as _Polygon
+
+    PointT: TypeAlias = _Point
+    PolygonT: TypeAlias = _Polygon
+    LineStringT: TypeAlias = _LineString
+else:
+    PointT = Any
+    PolygonT = Any
+    LineStringT = Any
+
+GeometryT: TypeAlias = PointT | PolygonT | LineStringT
+
+# If scipy is untyped in this environment, avoid subclassing Any in type-checking.
+if TYPE_CHECKING:
+
+    class _FortranFileBase:  # minimal typed base
+        pass
+else:
+    _FortranFileBase = FortranFile
+
+
 # ASCII text format:
 # ------------------
-def parse_ascii_points(lines: List[str]) -> "geopandas.GeoDataFrame":  # type: ignore # noqa
+def parse_ascii_points(lines: list[str]) -> "geopandas.GeoDataFrame":  # type: ignore # noqa
     n = len(lines) - 1
     fid = np.empty(n, dtype=int)
     x = np.empty(n, dtype=float)
@@ -37,7 +61,7 @@ def parse_ascii_points(lines: List[str]) -> "geopandas.GeoDataFrame":  # type: i
     return gpd.GeoDataFrame(data={"id": fid}, geometry=points)
 
 
-def parse_ascii_segments(lines: List[str]):
+def parse_ascii_segments(lines: list[str]) -> "geopandas.GeoDataFrame":  # type: ignore # noqa
     end = [i for i, line in enumerate(lines) if line == "end"][:-1]
     start = [-1] + end[:-1]
     features = [lines[s + 1 : e] for s, e in zip(start, end)]
@@ -80,7 +104,7 @@ def parse_ascii_segments(lines: List[str]):
     return gpd.GeoDataFrame(data={"id": fid}, geometry=geometry)
 
 
-def read_ascii(path: Union[Path, str]) -> "geopandas.GeoDataFrame":  # type: ignore # noqa
+def read_ascii(path: Path | str) -> "geopandas.GeoDataFrame":  # type: ignore # noqa
     """
     Read a text ASCII GEN file to a geopandas GeoDataFrame.
 
@@ -133,7 +157,7 @@ Polygon = "shapely.geometry.Polygon"
 LineString = "shapely.geometry.LineString"
 
 
-class MyFortranFile(FortranFile):
+class MyFortranFile(FortranFile):  # type: ignore[misc]
     """
     Unfortunately, the binary GEN files are written as Fortran Record files, so
     they cannot be read directly with e.g. numpy.fromfile (like direct access)
@@ -142,7 +166,7 @@ class MyFortranFile(FortranFile):
     vice versa). Those are added here.
     """
 
-    def read_char_record(self):
+    def read_char_record(self) -> str:
         first_size = self._read_size(eof_ok=True)
         string = self._fp.read(first_size).decode("utf-8")
         if len(string) != first_size:
@@ -152,7 +176,7 @@ class MyFortranFile(FortranFile):
             raise IOError("Sizes do not agree in the header and footer for this record")
         return string
 
-    def write_char_record(self, string: str):
+    def write_char_record(self, string: str) -> None:
         total_size = len(string)
         bytes_string = string.encode("ascii")
         nb = np.array([total_size], dtype=self._header_dtype)
@@ -173,25 +197,25 @@ class MyFortranFile(FortranFile):
 # The other shapely geometries can be generated directly from the vertices.
 
 
-def from_circle(xy: np.ndarray) -> Polygon:
+def from_circle(xy: np.ndarray) -> PolygonT:
     radius = np.sqrt(np.sum((xy[1] - xy[0]) ** 2))
     return sg.Point(xy[0]).buffer(radius)
 
 
-def from_point(xy: np.ndarray) -> Polygon:
+def from_point(xy: np.ndarray) -> PolygonT:
     return sg.Point(xy[0])
 
 
-def from_rectangle(xy: np.ndarray) -> Polygon:
+def from_rectangle(xy: np.ndarray) -> PolygonT:
     return sg.box(xy[0, 0], xy[0, 1], xy[1, 0], xy[1, 1])
 
 
-def to_circle(geometry: Polygon) -> Tuple[np.ndarray, int]:
+def to_circle(geometry: PolygonT) -> tuple[np.ndarray, int]:
     xy = np.array([geometry.centroid.coords[0], geometry.exterior.coords[0]])
     return xy, 2
 
 
-def to_rectangle(geometry: Polygon) -> Tuple[np.ndarray, int]:
+def to_rectangle(geometry: PolygonT) -> tuple[np.ndarray, int]:
     xy = np.array(geometry.exterior.coords)
     if (geometry.area / geometry.minimum_rotated_rectangle.area) < 0.999:
         raise ValueError("Feature_type is rectangle, but geometry is not a rectangular")
@@ -199,21 +223,21 @@ def to_rectangle(geometry: Polygon) -> Tuple[np.ndarray, int]:
     return xy[[0, 2]], 2
 
 
-def to_polygon(geometry: Polygon) -> Tuple[np.ndarray, int]:
+def to_polygon(geometry: PolygonT) -> tuple[np.ndarray, int]:
     xy = np.array(geometry.exterior.coords)
     return xy, xy.shape[0]
 
 
-def to_point(geometry: Point) -> Tuple[np.ndarray, int]:
+def to_point(geometry: PointT) -> tuple[np.ndarray, int]:
     return np.array(geometry.coords), 1
 
 
-def to_line(geometry: LineString) -> Tuple[np.ndarray, int]:
+def to_line(geometry: LineStringT) -> tuple[np.ndarray, int]:
     xy = np.array(geometry.coords)
     return xy, xy.shape[0]
 
 
-def read_binary(path: Union[str, Path]) -> "geopandas.GeoDataFrame":  # type: ignore # noqa
+def read_binary(path: str | Path) -> "geopandas.GeoDataFrame":  # type: ignore # noqa
     """
     Read a binary GEN file to a geopandas GeoDataFrame.
 
@@ -276,9 +300,7 @@ def read_binary(path: Union[str, Path]) -> "geopandas.GeoDataFrame":  # type: ig
     return gpd.GeoDataFrame(df, geometry=geometry)
 
 
-def vertices(
-    geometry: Union[Point, Polygon, LineString], ftype: str
-) -> Tuple[int, np.ndarray, int]:
+def vertices(geometry: GeometryT, ftype: str) -> tuple[int, np.ndarray, int]:
     """
     Infer from geometry, or convert from string, the feature type to the GEN
     expected Enum (int).
@@ -320,21 +342,21 @@ def vertices(
             raise ValueError(
                 f"Feature type is {ftype}, expected {expected}. Got instead: {type(geometry)}"
             )
-        ftype: int = NAME_TO_GENTYPE[ftype]
+        ftype_int: int = NAME_TO_GENTYPE[ftype]
     else:
         try:
-            ftype: int = GEOM_TO_GENTYPE[type(geometry)]
+            ftype_int = GEOM_TO_GENTYPE[type(geometry)]
         except KeyError as e:
             raise TypeError(
                 "Geometry type not allowed. Should be Polygon, Linestring, or Point."
                 f" Got {type(geometry)} instead."
             ) from e
 
-    xy, n_vertex = GENTYPE_TO_VERTICES[ftype](geometry)
-    return ftype, xy, n_vertex
+    xy, n_vertex = GENTYPE_TO_VERTICES[ftype_int](geometry)
+    return ftype_int, xy, n_vertex
 
 
-def read(path):
+def read(path: str | Path):
     """
     Read a GEN file to a geopandas GeoDataFrame. The function first tries to
     read as binary, if this fails, it tries to read the gen file as ASCII.
@@ -362,9 +384,9 @@ def read(path):
 
 
 def write(
-    path: Union[str, Path],
+    path: str | Path,
     geodataframe: "geopandas.GeoDataFrame",  # type: ignore # noqa
-    feature_type: Optional[str] = None,
+    feature_type: str | None = None,
 ) -> None:
     """
     Write a GeoDataFrame to a binary GEN file.
@@ -416,10 +438,10 @@ def write(
             if n_column > 0:
                 f.write_record(np.array(widths).astype(INT_TYPE))
                 f.write_char_record(column_names)  # pylint:disable=no-member
-            for geometry, (_, row), ftype in zip(
+            for geometry, (_, row), ftype_name in zip(
                 geodataframe.geometry, df.iterrows(), types
             ):
-                ftype, xy, n_vertex = vertices(geometry, ftype)
+                ftype, xy, n_vertex = vertices(geometry, ftype_name)
                 f.write_record(np.array([n_vertex, ftype], dtype=INT_TYPE))
                 if n_column > 0:
                     f.write_char_record("".join(row.values))  # pylint:disable=no-member

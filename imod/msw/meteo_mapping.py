@@ -1,7 +1,7 @@
 from copy import deepcopy
 from pathlib import Path
 from textwrap import dedent
-from typing import Any, Optional, TextIO
+from typing import Any, TextIO
 
 import cftime
 import numpy as np
@@ -145,7 +145,7 @@ class MeteoMapping(MetaSwapPackage, IPackageBase):
         self,
         target_grid: GridDataArray,
         regrid_cache: RegridderWeightsCache,
-        regridder_types: Optional[DataclassType] = None,
+        regridder_types: DataclassType | None = None,
     ):
         """
         Returns a deepcopy of this instance, as regridding this package is
@@ -156,12 +156,12 @@ class MeteoMapping(MetaSwapPackage, IPackageBase):
 
     def clip_box(
         self,
-        time_min: Optional[cftime.datetime | np.datetime64 | str] = None,
-        time_max: Optional[cftime.datetime | np.datetime64 | str] = None,
-        x_min: Optional[float] = None,
-        x_max: Optional[float] = None,
-        y_min: Optional[float] = None,
-        y_max: Optional[float] = None,
+        time_min: cftime.datetime | np.datetime64 | str | None = None,
+        time_max: cftime.datetime | np.datetime64 | str | None = None,
+        x_min: float | None = None,
+        x_max: float | None = None,
+        y_min: float | None = None,
+        y_max: float | None = None,
     ):
         """
         Clip a package by a bounding box (time, y, x).

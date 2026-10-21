@@ -33,18 +33,12 @@ validation xarray library becomes.
 
 import abc
 import operator
+from collections.abc import Callable, Sequence
 from functools import partial
 from typing import (
     TYPE_CHECKING,
     Any,
-    Callable,
-    Dict,
-    Optional,
-    Sequence,
-    Tuple,
-    Type,
     TypeAlias,
-    Union,
 )
 
 import numpy as np
@@ -66,9 +60,9 @@ else:
     except ImportError:
         gpd = MissingOptionalModule("geopandas")
 
-DimsT = Union[str, None]
-ShapeT = Tuple[Union[int, None]]
-ChunksT = Union[bool, Dict[str, Union[int, None]]]
+DimsT: TypeAlias = str | None
+ShapeT: TypeAlias = tuple[int | None]
+ChunksT: TypeAlias = bool | dict[str, int | None]
 
 OPERATORS = {
     "<": operator.lt,
@@ -101,7 +95,7 @@ def scalar_None(obj):
 
 def align_other_obj_with_coords(
     obj: GridDataArray, other_obj: GridDataArray
-) -> Tuple[xr.DataArray, xr.DataArray]:
+) -> tuple[xr.DataArray, xr.DataArray]:
     """
     Align other_obj with obj if coordname in obj but not in its dims.
     Avoid issues like:
@@ -138,7 +132,7 @@ class BaseSchema(abc.ABC):
 
 
 SchemaType: TypeAlias = BaseSchema
-SchemataDict: TypeAlias = dict[str, list[SchemaType] | Tuple[SchemaType, ...]]
+SchemataDict: TypeAlias = dict[str, list[SchemaType] | tuple[SchemaType, ...]]
 
 
 class SchemaUnion:
@@ -225,7 +219,7 @@ class DTypeSchema(BaseSchema):
 
 
 class TypeSchema(BaseSchema):
-    def __init__(self, dtype: Type) -> None:
+    def __init__(self, dtype: type[Any]) -> None:
         """
         Validate type, used for model options instead of GridDataArrays.
 
@@ -245,7 +239,7 @@ class TypeSchema(BaseSchema):
 
 
 class GeometryTypeSchema(BaseSchema):
-    def __init__(self, dtype: DTypeLike) -> None:
+    def __init__(self, dtype: type[Any]) -> None:
         """
         Validate geometry types
 
@@ -272,7 +266,7 @@ class DimsSchema(BaseSchema):
     def __init__(self, *dims: DimsT) -> None:
         self.dims = dims
 
-    def _fill_in_face_dim(self, obj: Union[xr.DataArray, xu.UgridDataArray]):
+    def _fill_in_face_dim(self, obj: xr.DataArray | xu.UgridDataArray):
         """
         Return dims with a filled in face dim if necessary.
         """
@@ -317,7 +311,7 @@ class EmptyIndexesSchema(BaseSchema):
     def __init__(self) -> None:
         pass
 
-    def get_dims_to_validate(self, obj: Union[xr.DataArray, xu.UgridDataArray]):
+    def get_dims_to_validate(self, obj: xr.DataArray | xu.UgridDataArray):
         dims_to_validate = list(obj.dims)
 
         # Remove face dim from list to validate, as it has no ``indexes``
@@ -392,7 +386,7 @@ class ShapeSchema(BaseSchema):
 
 
 class CompatibleSettingsSchema(BaseSchema):
-    def __init__(self, other: ScalarAsDataArray, other_value: bool) -> None:
+    def __init__(self, other: str, other_value: bool) -> None:
         """
         Validate if settings are compatible
         """
@@ -423,7 +417,7 @@ class CoordsSchema(BaseSchema):
 
     def __init__(
         self,
-        coords: Tuple[str, ...],
+        coords: tuple[str, ...],
         require_all_keys: bool = True,
         allow_extra_keys: bool = True,
     ) -> None:
@@ -466,7 +460,7 @@ class OtherCoordsSchema(BaseSchema):
 
     def validate(self, obj: GridDataArray, **kwargs) -> None:
         other_obj = kwargs[self.other]
-        other_coords = list(other_obj.coords.keys())
+        other_coords = tuple(other_obj.coords.keys())
         return CoordsSchema(
             other_coords,
             self.require_all_keys,
@@ -519,7 +513,7 @@ class ValueSchema(BaseSchema, abc.ABC):
         self,
         operator: str,
         other: Any,
-        ignore: Optional[Tuple[str, str, Any]] = None,
+        ignore: tuple[str, str, Any] | None = None,
     ):
         self.operator = OPERATORS[operator]
         self.operator_str = operator
@@ -531,11 +525,11 @@ class ValueSchema(BaseSchema, abc.ABC):
             self.ignore_varname = ignore[0]
             self.to_ignore = partial_operator(ignore[1], ignore[2])
 
-    def get_explicitly_ignored(self, kwargs: Dict) -> Any:
+    def get_explicitly_ignored(self, kwargs: dict[str, Any]) -> Any:
         """
         Get cells that should be explicitly ignored by the schema
         """
-        if self.to_ignore:
+        if self.to_ignore and self.ignore_varname:
             ignore_obj = kwargs[self.ignore_varname]
             return self.to_ignore(ignore_obj)
         else:
@@ -622,7 +616,7 @@ class MaxNUniqueValuesSchema(BaseSchema):
 
 
 class UniqueValuesSchema(BaseSchema):
-    def __init__(self, other_value: list) -> None:
+    def __init__(self, other_value: list[Any]) -> None:
         """
         Validate if unique values in other values list
         """
@@ -639,7 +633,7 @@ class UniqueValuesSchema(BaseSchema):
 class NoDataSchema(BaseSchema):
     def __init__(
         self,
-        is_notnull: Union[Callable, Tuple[str, Any]] = notnull,
+        is_notnull: Callable[..., Any] | tuple[str, Any] = notnull,
     ):
         if isinstance(is_notnull, tuple):
             op, value = is_notnull
@@ -678,8 +672,8 @@ class NoDataComparisonSchema(BaseSchema):
     def __init__(
         self,
         other: str,
-        is_notnull: Union[Callable, Tuple[str, Any]] = notnull,
-        is_other_notnull: Union[Callable, Tuple[str, Any]] = notnull,
+        is_notnull: Callable[..., Any] | tuple[str, Any] = notnull,
+        is_other_notnull: Callable[..., Any] | tuple[str, Any] = notnull,
     ):
         self.other = other
         if isinstance(is_notnull, tuple):
@@ -748,7 +742,7 @@ class ActiveCellsConnectedSchema(BaseSchema):
 
     def __init__(
         self,
-        is_notnull: Union[Callable, Tuple[str, Any]] = notnull,
+        is_notnull: Callable[..., Any] | tuple[str, Any] = notnull,
     ):
         if isinstance(is_notnull, tuple):
             op, value = is_notnull
@@ -760,7 +754,7 @@ class ActiveCellsConnectedSchema(BaseSchema):
         if isinstance(obj, xu.UgridDataArray):
             # TODO: https://deltares.github.io/xugrid/api/xugrid.UgridDataArrayAccessor.connected_components.html
             raise NotImplementedError(
-                f"Schema {self.__name__} only works for structured grids, received xu.UgridDataArray."
+                f"Schema {type(self).__name__} only works for structured grids, received xu.UgridDataArray."
             )
 
         active = self.is_notnull(obj)

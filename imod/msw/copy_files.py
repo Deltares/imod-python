@@ -1,6 +1,7 @@
+from collections.abc import Sequence
 from pathlib import Path
 from shutil import copy2
-from typing import Sequence, cast
+from typing import cast
 
 import numpy as np
 import xarray as xr

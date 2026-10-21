@@ -1,4 +1,4 @@
-from typing import Any, Optional
+from typing import Any
 
 import numpy as np
 import xarray as xr
@@ -138,7 +138,7 @@ def replace(da: xr.DataArray, to_replace: Any, value: Any) -> xr.DataArray:
 
 
 def values_within_range(
-    da: xr.DataArray, min: Optional[float] = None, max: Optional[float] = None
+    da: xr.DataArray, min: float | None = None, max: float | None = None
 ) -> xr.DataArray | bool:
     """
     Find which values are within range.

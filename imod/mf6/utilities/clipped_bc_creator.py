@@ -1,4 +1,4 @@
-from typing import Any, Optional, Tuple, TypeAlias, cast
+from typing import Any, TypeAlias, cast
 
 import xarray as xr
 
@@ -35,7 +35,7 @@ def _find_unassigned_grid_boundaries(
 def _align_time_indexes_boundaries(
     state_for_clipped_boundary: GridDataArray,
     unassigned_grid_boundaries: GridDataArray,
-) -> Optional[GridDataArray]:
+) -> GridDataArray | None:
     """
     Create an outer time index for aligning boundaries. Furthermore deal with
     cases where one or both boundaries don't have a time dimension. In a graphic
@@ -63,8 +63,8 @@ def _align_time_indexes_boundaries(
 
 def _align_boundaries(
     state_for_clipped_boundary: GridDataArray,
-    unassigned_grid_boundaries: Optional[GridDataArray],
-) -> Tuple[GridDataArray, Optional[GridDataArray]]:
+    unassigned_grid_boundaries: GridDataArray | None,
+) -> tuple[GridDataArray, GridDataArray | None]:
     """
     Customly align the state_for_clipped_boundary and unassigned grid boundaries.
     - "layer" dimension requires outer alignment
@@ -161,9 +161,9 @@ def _create_clipped_boundary_pkg(
 
 def _create_boundary_condition_for_unassigned_boundary(
     model: IModel,
-    state_for_boundary: Optional[GridDataArray],
-    additional_boundaries: list[Optional[StateType]] = [None],
-) -> Optional[StateType]:
+    state_for_boundary: GridDataArray | None,
+    additional_boundaries: list[StateType | None] = [None],
+) -> StateType | None:
     """
     Create a boundary condition for the unnassigned boundary cells of a model.
 
@@ -194,9 +194,9 @@ def _create_boundary_condition_for_unassigned_boundary(
 def create_boundary_condition_clipped_boundary(
     original_model: IModel,
     clipped_model: IModel,
-    state_for_boundary: Optional[GridDataArray],
+    state_for_boundary: GridDataArray | None,
     clip_box_args: tuple[Any, ...],
-) -> Optional[StateType]:
+) -> StateType | None:
     """
     Create a boundary condition for the clipped model.
 

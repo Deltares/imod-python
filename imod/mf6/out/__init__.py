@@ -38,7 +38,8 @@ def open_cbc(
 state or a class with exclusively staticmethods?)
 """
 
-from typing import Any, Callable, Dict, Optional, Union
+from collections.abc import Callable
+from typing import Any
 
 import numpy as np
 import xarray as xr
@@ -63,7 +64,7 @@ _OPEN_HDS = {
     "disu": disu.open_hds,
 }
 
-_OPEN_CBC: Dict[str, Callable[..., Any]] = {
+_OPEN_CBC: dict[str, Callable[..., Any]] = {
     "dis": dis.open_cbc,
     "disv": disv.open_cbc,
     "disu": disu.open_cbc,
@@ -76,7 +77,7 @@ _OPEN_DVS = {
 }
 
 
-def _get_function(d: Dict[str, Callable[..., Any]], key: str) -> Callable[..., Any]:
+def _get_function(d: dict[str, Callable[..., Any]], key: str) -> Callable[..., Any]:
     try:
         func = d[key]
     except KeyError:
@@ -85,7 +86,7 @@ def _get_function(d: Dict[str, Callable[..., Any]], key: str) -> Callable[..., A
     return func
 
 
-def read_grb(path: FilePath) -> Dict[str, Any]:
+def read_grb(path: FilePath) -> dict[str, Any]:
     """
     Read the data in a MODFLOW6 binary grid (.grb) file.
 
@@ -119,8 +120,8 @@ def open_hds(
     hds_path: FilePath,
     grb_path: FilePath,
     dry_nan: bool = False,
-    simulation_start_time: Optional[np.datetime64] = None,
-    time_unit: Optional[str] = "d",
+    simulation_start_time: np.datetime64 | None = None,
+    time_unit: str | None = "d",
 ) -> GridDataArray:
     """
     Open modflow6 heads (.hds) file.
@@ -190,8 +191,8 @@ def open_dvs(
     dvs_path: FilePath,
     grb_path: FilePath,
     indices: np.ndarray,
-    simulation_start_time: Optional[np.datetime64] = None,
-    time_unit: Optional[str] = "d",
+    simulation_start_time: np.datetime64 | None = None,
+    time_unit: str | None = "d",
 ) -> GridDataArray:
     """
     Open modflow6 dependent variable output for complex packages (like the watercontent file for the UZF-package).
@@ -260,8 +261,8 @@ def open_conc(
     ucn_path: FilePath,
     grb_path: FilePath,
     dry_nan: bool = False,
-    simulation_start_time: Optional[np.datetime64] = None,
-    time_unit: Optional[str] = "d",
+    simulation_start_time: np.datetime64 | None = None,
+    time_unit: str | None = "d",
 ) -> GridDataArray:
     """
     Open Modflow6 "Unformatted Concentration" (.ucn) file.
@@ -328,7 +329,7 @@ def open_conc(
 
 def open_hds_like(
     path: FilePath,
-    like: Union[xr.DataArray, xu.UgridDataArray],
+    like: xr.DataArray | xu.UgridDataArray,
     dry_nan: bool = False,
 ) -> GridDataArray:
     """
@@ -368,10 +369,10 @@ def open_cbc(
     cbc_path: FilePath,
     grb_path: FilePath,
     flowja: bool = False,
-    simulation_start_time: Optional[np.datetime64] = None,
-    time_unit: Optional[str] = "d",
+    simulation_start_time: np.datetime64 | None = None,
+    time_unit: str | None = "d",
     merge_to_dataset: bool = False,
-) -> GridDataset | Dict[str, GridDataArray]:
+) -> GridDataset | dict[str, GridDataArray]:
     """
     Open modflow6 cell-by-cell (.cbc) file.
 

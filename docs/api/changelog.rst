@@ -78,6 +78,10 @@ Fixed
 - :func:`imod.formats.prj.read_projectfile` now validates that the number of
   package entries matches the declared count for static, time-dependent, and
   MetaSWAP CAP blocks, and provides clearer parsing errors for invalid input.
+- Fixed bug where :func:`imod.formats.prj.read_projectfile` didn't correctly
+  parse the CAP package if it had 21 entries.
+- Fixed bug in :func:`imod.visualize.pyvista.velocity_field` where an error was
+  raised incorrectly when the ``z`` coordinate array is three-dimensional.
 
 Changed
 ~~~~~~~

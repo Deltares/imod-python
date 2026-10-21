@@ -1,5 +1,5 @@
 from abc import abstractmethod
-from typing import Any, Optional, Tuple
+from typing import Any
 
 from imod.common.interfaces.idict import IDict
 from imod.common.interfaces.ipackage import IPackage
@@ -29,7 +29,7 @@ class IModel(IDict):
     @abstractmethod
     def purge_empty_packages(
         self,
-        model_name: Optional[str] = "",
+        model_name: str | None = "",
         ignore_time: bool = False,
         package_names: list[str] | None = None,
     ) -> None:
@@ -39,7 +39,7 @@ class IModel(IDict):
     def validate(
         self,
         model_name: str = "",
-        validation_context: Optional[ValidationSettings] = None,
+        validation_context: ValidationSettings | None = None,
     ) -> StatusInfoBase:
         raise NotImplementedError
 
@@ -59,15 +59,15 @@ class IModel(IDict):
         raise NotImplementedError
 
     @abstractmethod
-    def _is_regridding_supported(self) -> Tuple[bool, str]:
+    def _is_regridding_supported(self) -> tuple[bool, str]:
         raise NotImplementedError
 
     @abstractmethod
-    def _is_splitting_supported(self) -> Tuple[bool, str]:
+    def _is_splitting_supported(self) -> tuple[bool, str]:
         raise NotImplementedError
 
     @abstractmethod
-    def _is_clipping_supported(self) -> Tuple[bool, str]:
+    def _is_clipping_supported(self) -> tuple[bool, str]:
         raise NotImplementedError
 
     @property

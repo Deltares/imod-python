@@ -1,5 +1,5 @@
 from copy import deepcopy
-from typing import Any, Optional, TextIO
+from typing import Any, TextIO
 
 import pandas as pd
 
@@ -142,7 +142,7 @@ class TimeOutputControl(MetaSwapPackage, IRegridPackage):
         self,
         target_grid: GridDataArray,
         regrid_cache: RegridderWeightsCache,
-        regridder_types: Optional[DataclassType] = None,
+        regridder_types: DataclassType | None = None,
     ) -> "MetaSwapPackage":
         """
         Returns a deepcopy of this instance, as regridding this package is

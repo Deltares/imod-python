@@ -1,7 +1,7 @@
 import tempfile
+from collections.abc import Callable
 from dataclasses import dataclass
 from pathlib import Path
-from typing import Callable, Optional
 
 import numpy as np
 import pytest
@@ -47,28 +47,28 @@ def sprinkling_svat_index():
 
 @dataclass
 class ExpectedCaseData:
-    xfail: Optional[str] = None
-    abs_gw: Optional[np.ndarray] = None
-    abs_sw: Optional[np.ndarray] = None
-    layer: Optional[np.ndarray] = None
-    svat: Optional[np.ndarray] = None
-    svat_gw: Optional[np.ndarray] = None
+    xfail: str | None = None
+    abs_gw: np.ndarray | None = None
+    abs_sw: np.ndarray | None = None
+    layer: np.ndarray | None = None
+    svat: np.ndarray | None = None
+    svat_gw: np.ndarray | None = None
 
 
 @dataclass
 class SprinklingGridCaseData:
-    max_abstraction_groundwater: Optional[xr.DataArray] = None
-    max_abstraction_surfacewater: Optional[xr.DataArray] = None
+    max_abstraction_groundwater: xr.DataArray | None = None
+    max_abstraction_surfacewater: xr.DataArray | None = None
 
 
 @dataclass
 class SprinklingPointsCaseData:
-    art_grid: Optional[xr.DataArray] = None
-    x_p: Optional[np.ndarray] = None
-    y_p: Optional[np.ndarray] = None
-    layer_p: Optional[np.ndarray] = None
-    id_sprinkling_p: Optional[np.ndarray] = None
-    capacity_p: Optional[np.ndarray] = None
+    art_grid: xr.DataArray | None = None
+    x_p: np.ndarray | None = None
+    y_p: np.ndarray | None = None
+    layer_p: np.ndarray | None = None
+    id_sprinkling_p: np.ndarray | None = None
+    capacity_p: np.ndarray | None = None
 
 
 class SprinklingGridCases:

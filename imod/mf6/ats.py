@@ -1,5 +1,5 @@
 import pathlib
-from typing import Any, Dict, TypeAlias, Union
+from typing import Any, TypeAlias
 
 import numpy as np
 
@@ -177,9 +177,9 @@ class AdaptiveTimeStepping(Package):
         self,
         directory: pathlib.Path,
         pkgname: str,
-        globaltimes: Union[list[np.datetime64], np.ndarray],
+        globaltimes: list[np.datetime64] | np.ndarray,
         binary: bool,
-    ) -> Dict[str, Any]:
+    ) -> dict[str, Any]:
         perioddata: _PeriodDataType = {}
         # Force to np.int64 for mypy and numpy >= 2.2.4
         one = np.int64(1)
@@ -218,7 +218,7 @@ class AdaptiveTimeStepping(Package):
     def _write(
         self,
         pkgname: str,
-        globaltimes: Union[list[np.datetime64], np.ndarray],
+        globaltimes: list[np.datetime64] | np.ndarray,
         write_context: WriteContext,
     ) -> None:
         ats_content = self._render(

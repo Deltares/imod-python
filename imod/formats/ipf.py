@@ -11,7 +11,6 @@ import glob
 import io
 import pathlib
 import warnings
-from typing import Tuple
 
 import numpy as np
 import pandas as pd
@@ -27,7 +26,7 @@ def _infer_delimwhitespace(line, ncol):
     return delimiter_info.has_whitespace, delimiter_info.has_expected_cols
 
 
-def _read_ipf(path, kwargs=None) -> Tuple[pd.DataFrame, int, str]:
+def _read_ipf(path, kwargs=None) -> tuple[pd.DataFrame, int, str]:
     path = pathlib.Path(path)
     if kwargs is None:
         kwargs = {}
@@ -188,7 +187,7 @@ def read_associated(path, kwargs={}):
         # TODO: replace when bugfix is released
         # try both comma and whitespace delimited, everything can be be mixed
         # in a single file...
-        lines = "".join(lines)
+        lines_str = "".join(lines)
 
         # TODO: find out whether this can be replace by csv.reader
         # the challenge lies in replacing the pd.notnull for nodata values.
@@ -200,7 +199,7 @@ def read_associated(path, kwargs={}):
             "skipinitialspace": True,
         }
         metadata_kwargs.update(kwargs)
-        metadata = pd.read_csv(io.StringIO(lines), **metadata_kwargs)
+        metadata = pd.read_csv(io.StringIO(lines_str), **metadata_kwargs)
         # header description possibly includes nodata
         usecols = np.arange(ncol)[pd.notnull(metadata[0])]
         metadata = metadata.iloc[usecols, :]
@@ -716,7 +715,7 @@ def save(path, df, itype=None, assoc_ext="txt", nodata=1.0e20, assoc_columns=Non
         if "time" in colnames:
             groupcols = ["time", "id"]
         else:
-            groupcols = "id"
+            groupcols = ["id"]
 
         n_layer_per_id = df.groupby(groupcols)["layer"].nunique()
         if (n_layer_per_id > 1).any():

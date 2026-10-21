@@ -1,5 +1,5 @@
 import abc
-from typing import Any, Dict, Optional
+from typing import Any
 
 import numpy as np
 
@@ -29,7 +29,7 @@ from imod.util.regrid import RegridderWeightsCache
 
 
 class StorageBase(Package, IRegridPackage, abc.ABC):
-    _grid_data: Dict[str, type] = {}
+    _grid_data: dict[str, type] = {}
 
     def get_options(self, d):
         # Skip both variables in grid_data and "transient".
@@ -44,8 +44,8 @@ class StorageBase(Package, IRegridPackage, abc.ABC):
                 d[varname] = v
         return d
 
-    def _render_dict(self, directory, pkgname, globaltimes, binary) -> Dict[str, Any]:
-        d: Dict[str, Any] = {}
+    def _render_dict(self, directory, pkgname, globaltimes, binary) -> dict[str, Any]:
+        d: dict[str, Any] = {}
         stodirectory = directory / pkgname
         for varname in self._grid_data:
             key = self._keyword_map.get(varname, varname)
@@ -324,7 +324,7 @@ class StorageCoefficient(StorageBase):
         cls,
         imod5_data: dict[str, dict[str, GridDataArray]],
         target_grid: GridDataArray,
-        regridder_types: Optional[DataclassType] = None,
+        regridder_types: DataclassType | None = None,
         regrid_cache: RegridderWeightsCache = RegridderWeightsCache(),
     ) -> "StorageCoefficient":
         """

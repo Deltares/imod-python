@@ -1,7 +1,7 @@
 import abc
 from copy import deepcopy
 from dataclasses import asdict
-from typing import Optional, Self, cast
+from typing import Self, cast
 
 from imod.common.interfaces.itopsystembc import ITopSystemBoundaryCondition
 from imod.common.utilities.dataclass_type import DataclassType
@@ -22,10 +22,10 @@ from imod.typing import GridDataDict, GridDataset
 def _handle_reallocate_arguments(
     pkg_id: str,
     has_conductance: bool,
-    npf: Optional[NodePropertyFlow],
-    allocation_option: Optional[ALLOCATION_OPTION],
-    distributing_option: Optional[DISTRIBUTING_OPTION],
-) -> tuple[ALLOCATION_OPTION, Optional[DISTRIBUTING_OPTION]]:
+    npf: NodePropertyFlow | None,
+    allocation_option: ALLOCATION_OPTION | None,
+    distributing_option: DISTRIBUTING_OPTION | None,
+) -> tuple[ALLOCATION_OPTION, DISTRIBUTING_OPTION | None]:
     if allocation_option is None:
         allocation_option = asdict(SimulationAllocationOptions())[pkg_id]
     elif allocation_option == ALLOCATION_OPTION.stage_to_riv_bot_drn_above:
@@ -55,9 +55,9 @@ class TopSystemBoundaryCondition(
     def reallocate(
         self,
         dis: StructuredDiscretization | VerticesDiscretization,
-        npf: Optional[NodePropertyFlow] = None,
-        allocation_option: Optional[ALLOCATION_OPTION] = None,
-        distributing_option: Optional[DISTRIBUTING_OPTION] = None,
+        npf: NodePropertyFlow | None = None,
+        allocation_option: ALLOCATION_OPTION | None = None,
+        distributing_option: DISTRIBUTING_OPTION | None = None,
         drop_empty_layers: bool = True,
     ) -> Self:
         """

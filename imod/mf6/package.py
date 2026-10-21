@@ -2,18 +2,12 @@ from __future__ import annotations
 
 import abc
 import pathlib
+from collections.abc import Callable, Mapping
 from copy import deepcopy
 from pathlib import Path
 from typing import (
     Any,
-    Callable,
-    Dict,
-    List,
-    Mapping,
-    Optional,
     Self,
-    Tuple,
-    Union,
     cast,
 )
 
@@ -184,10 +178,10 @@ class Package(PackageBase, IPackage, abc.ABC):
         self,
         directory: pathlib.Path,
         pkgname: str,
-        globaltimes: Union[list[np.datetime64], np.ndarray],
+        globaltimes: list[np.datetime64] | np.ndarray,
         binary: bool,
-    ) -> Dict[str, Any]:
-        d: Dict[str, Any] = {}
+    ) -> dict[str, Any]:
+        d: dict[str, Any] = {}
         if directory is None:
             pkg_directory = pkgname
         else:
@@ -231,7 +225,7 @@ class Package(PackageBase, IPackage, abc.ABC):
 
     def _compose_values(
         self, da, directory, name, binary
-    ) -> Tuple[bool, Optional[List[str]]]:
+    ) -> tuple[bool, list[str] | None]:
         """
         Compose values of dictionary.
 
@@ -299,7 +293,7 @@ class Package(PackageBase, IPackage, abc.ABC):
     def _write(
         self,
         pkgname: str,
-        globaltimes: Union[list[np.datetime64], np.ndarray],
+        globaltimes: list[np.datetime64] | np.ndarray,
         write_context: WriteContext,
     ) -> None:
         directory = write_context.write_directory
@@ -381,16 +375,16 @@ class Package(PackageBase, IPackage, abc.ABC):
 
     def clip_box(
         self,
-        time_min: Optional[cftime.datetime | np.datetime64 | str] = None,
-        time_max: Optional[cftime.datetime | np.datetime64 | str] = None,
-        layer_min: Optional[int] = None,
-        layer_max: Optional[int] = None,
-        x_min: Optional[float] = None,
-        x_max: Optional[float] = None,
-        y_min: Optional[float] = None,
-        y_max: Optional[float] = None,
-        top: Optional[GridDataArray] = None,
-        bottom: Optional[GridDataArray] = None,
+        time_min: cftime.datetime | np.datetime64 | str | None = None,
+        time_max: cftime.datetime | np.datetime64 | str | None = None,
+        layer_min: int | None = None,
+        layer_max: int | None = None,
+        x_min: float | None = None,
+        x_max: float | None = None,
+        y_min: float | None = None,
+        y_max: float | None = None,
+        top: GridDataArray | None = None,
+        bottom: GridDataArray | None = None,
     ) -> Self:
         """
         Clip a package by a bounding box (time, layer, y, x).
@@ -505,7 +499,7 @@ class Package(PackageBase, IPackage, abc.ABC):
         self,
         target_grid: GridDataArray,
         regrid_cache: RegridderWeightsCache,
-        regridder_types: Optional[DataclassType] = None,
+        regridder_types: DataclassType | None = None,
     ) -> "Package":
         """
         Creates a package of the same type as this package, based on another

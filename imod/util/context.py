@@ -2,7 +2,6 @@ import contextlib
 import os
 import pathlib
 import warnings
-from typing import Union
 
 
 @contextlib.contextmanager
@@ -23,7 +22,7 @@ def ignore_warnings():
 
 
 @contextlib.contextmanager
-def cd(path: Union[str, pathlib.Path]):
+def cd(path: str | pathlib.Path):
     """
     Change directory, and change it back after the with block.
 

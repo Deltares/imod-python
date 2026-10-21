@@ -2,8 +2,6 @@
 Assign wells to layers.
 """
 
-from typing import Optional
-
 import numpy as np
 import numpy.typing as npt
 import pandas as pd
@@ -134,7 +132,7 @@ def locate_wells(
     wells: pd.DataFrame,
     top: GridDataArray,
     bottom: GridDataArray,
-    k: Optional[GridDataArray] = None,
+    k: GridDataArray | None = None,
     validate: bool = True,
 ) -> tuple[
     npt.NDArray[np.object_], GridDataArray, GridDataArray, float | GridDataArray
@@ -196,9 +194,9 @@ def assign_wells(
     wells: pd.DataFrame,
     top: GridDataArray,
     bottom: GridDataArray,
-    k: Optional[GridDataArray] = None,
-    minimum_thickness: Optional[float] = 0.0,
-    minimum_k: Optional[float] = 0.0,
+    k: GridDataArray | None = None,
+    minimum_thickness: float | None = 0.0,
+    minimum_k: float | None = 0.0,
     validate: bool = True,
 ) -> pd.DataFrame:
     """

@@ -1,3 +1,5 @@
+from typing import cast
+
 import numpy as np
 import pandas as pd
 import xarray as xr
@@ -113,9 +115,9 @@ def stability_constraint_advection(front, lower, right, top_bot, porosity=0.3, R
         raise ValueError("All dz values should be positive")
 
     # absolute velocities (m/d)
-    abs_v_x = np.abs(v_x)
-    abs_v_y = np.abs(v_y)
-    abs_v_z = np.abs(v_z)
+    abs_v_x = cast(xr.DataArray, np.abs(v_x))
+    abs_v_y = cast(xr.DataArray, np.abs(v_y))
+    abs_v_z = cast(xr.DataArray, np.abs(v_z))
 
     # dt of constituents (d), set zero velocities to nans
     dt_x = R / (abs_v_x.where(abs_v_x > 0) / top_bot.dx)

@@ -1,5 +1,4 @@
 from pathlib import Path
-from typing import Tuple
 
 import numpy as np
 import pytest
@@ -45,7 +44,7 @@ def create_regridding_idomain(domain: xr.DataArray, ncol: int, nrow: int):
 def test_regrid_transport(
     tmp_path: Path,
     flow_transport_simulation: imod.mf6.Modflow6Simulation,
-    col_row_dimension: Tuple[int, int],
+    col_row_dimension: tuple[int, int],
 ):
     # Run the original simulation
     flow_transport_simulation.write(tmp_path / "original", binary=False)

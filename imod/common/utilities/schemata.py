@@ -1,6 +1,6 @@
 from collections import defaultdict
 from copy import deepcopy
-from typing import Any, Optional, Protocol
+from typing import Any, Protocol
 
 from imod.common.statusinfo import NestedStatusInfo, StatusInfo, StatusInfoBase
 from imod.schemata import BaseSchema, SchemataDict, ValidationError
@@ -91,7 +91,7 @@ def validation_pkg_error_message(pkg_errors: dict[str, list[ValidationError]]) -
 def pkg_errors_to_status_info(
     pkg_name: str,
     pkg_errors: dict[str, list[ValidationError]],
-    footer_text: Optional[str],
+    footer_text: str | None,
 ) -> StatusInfoBase:
     pkg_status_info = NestedStatusInfo(f"{pkg_name} package")
     for var_name, var_errors in pkg_errors.items():

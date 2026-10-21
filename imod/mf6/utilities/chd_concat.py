@@ -1,5 +1,3 @@
-from typing import Optional
-
 import xarray as xr
 
 from imod.mf6.chd import ConstantHead
@@ -9,7 +7,7 @@ def concat_layered_chd_packages(
     name: str,
     dict_packages: dict[str, ConstantHead],
     remove_merged_packages: bool = True,
-) -> Optional[ConstantHead]:
+) -> ConstantHead | None:
     """
 
     Parameters

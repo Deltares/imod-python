@@ -1,4 +1,4 @@
-from typing import List, NamedTuple
+from typing import NamedTuple
 
 import numpy as np
 
@@ -11,7 +11,7 @@ class PartitionInfo(NamedTuple):
     id: int
 
 
-def create_partition_info(submodel_labels: GridDataArray) -> List[PartitionInfo]:
+def create_partition_info(submodel_labels: GridDataArray) -> list[PartitionInfo]:
     """
     A PartitionInfo is used to partition a model or package. The partition
     info's of a domain are created using a submodel_labels array. The

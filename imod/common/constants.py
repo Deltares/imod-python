@@ -4,8 +4,12 @@ imports and to have a single source of truth for these values.
 """
 
 from dataclasses import dataclass
+from typing import TypeAlias
 
 import numpy as np
+
+BoolType: TypeAlias = bool
+FloatType: TypeAlias = float
 
 
 @dataclass
@@ -15,7 +19,7 @@ class MaskValues:
     here, such as the -9999.0 for MetaSWAP.
     """
 
-    bool = False
-    float = np.nan
-    integer = 0
-    msw_default = -9999.0
+    bool: BoolType = False
+    float: FloatType = np.nan
+    integer: int = 0
+    msw_default: FloatType = -9999.0

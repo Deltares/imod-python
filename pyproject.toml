@@ -76,6 +76,7 @@ exclude_lines = [
 
 [tool.ruff.lint]
 select = ["C4", "E", "F", "I", "NPY201", "PD"]
+extend-select = ["UP006", "UP007", "UP035", "UP045"]
 ignore = [
     "E501", # line-too-long. This rule can't be fullfilled by the ruff formatter. The same behavior as black.
     "PD003",
@@ -116,18 +117,9 @@ warn_return_any = false
 # works with the vscode mypy extension
 [[tool.mypy.overrides]]
 module = [
-    "imod.data.*",
-    "imod.evaluate.*",
-    "imod.formats.array_io.*",
-    "imod.formats.gen.*",
-    "imod.formats.prj.*",
-    "imod.formats.ipf",
-    "imod.formats.rasterio",
-    "imod.schemata.*",
-    "imod.templates.*",
+    "imod.templates.*",  # Python script here not used
     "imod.tests.*",
-    "imod.visualize.*",
-    "imod.wq.*",
+    "imod.wq.*",  # Deprecated
 ]
 ignore_errors = true
 

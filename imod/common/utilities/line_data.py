@@ -1,4 +1,4 @@
-from typing import TYPE_CHECKING, Tuple
+from typing import TYPE_CHECKING
 
 import pandas as pd
 
@@ -94,7 +94,7 @@ def _prepare_index_names(
 
 def _extract_zbounds_from_vertical_polygons(
     dataframe: GeoDataFrameType,
-) -> Tuple[pd.DataFrame, pd.DataFrame]:
+) -> tuple[pd.DataFrame, pd.DataFrame]:
     """
     Extract z bounds from dataframe. Requires dataframe geometry to be of type
     shapely "Z Polygon".

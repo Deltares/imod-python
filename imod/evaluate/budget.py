@@ -1,5 +1,3 @@
-from typing import Tuple
-
 import dask
 import dask.array
 import numba
@@ -342,7 +340,7 @@ def flow_velocity(
     right: xr.DataArray,
     top_bot: xr.DataArray,
     porosity: float = 0.3,
-) -> Tuple[xr.DataArray, xr.DataArray, xr.DataArray]:
+) -> tuple[xr.DataArray, xr.DataArray, xr.DataArray]:
     """
     Compute flow velocities (m/d) from budgets (m3/d).
 

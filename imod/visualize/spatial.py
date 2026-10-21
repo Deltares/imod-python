@@ -1,17 +1,24 @@
 import pathlib
+from collections.abc import Sequence
+from typing import Any
 
 import matplotlib
 import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
-from mpl_toolkits.axes_grid1 import make_axes_locatable
+import xarray as xr
+from matplotlib.axes import Axes
+from matplotlib.colorbar import Colorbar
+from matplotlib.colors import BoundaryNorm, Colormap, ListedColormap
+from matplotlib.figure import Figure
+from mpl_toolkits.axes_grid1 import make_axes_locatable  # type: ignore[import-untyped]
 
 import imod
 from imod.util.imports import MissingOptionalModule
 from imod.visualize import common
 
 try:
-    import contextily as ctx
+    import contextily as ctx  # type: ignore[import-untyped]
 except ImportError:
     ctx = MissingOptionalModule("contextily")
 
@@ -62,7 +69,7 @@ def read_imod_legend(
     return colors, levels, labels
 
 
-def _crs2string(crs):
+def _crs2string(crs: Any) -> Any:
     if isinstance(crs, str):
         if "epsg" in crs.lower():
             return crs
@@ -76,19 +83,19 @@ def _crs2string(crs):
 
 
 def plot_map(
-    raster,
-    colors,
-    levels,
-    overlays=[],
-    basemap=None,
-    kwargs_raster=None,
-    kwargs_colorbar=None,
-    kwargs_basemap={},
-    figsize=None,
-    return_cbar=False,
-    fig=None,
-    ax=None,
-):
+    raster: xr.DataArray,
+    colors: Sequence[Any] | str | Colormap,
+    levels: Sequence[float] | np.ndarray,
+    overlays: list[dict[str, Any]] = [],
+    basemap: Any = None,
+    kwargs_raster: dict[str, Any] | None = None,
+    kwargs_colorbar: dict[str, Any] | None = None,
+    kwargs_basemap: dict[str, Any] = {},
+    figsize: tuple[float, float] | None = None,
+    return_cbar: bool = False,
+    fig: Figure | None = None,
+    ax: Axes | None = None,
+) -> tuple[Figure, Axes] | tuple[Figure, Axes, Colorbar]:
     """
     Plot raster on a map with optional vector overlays and basemap.
 
@@ -183,7 +190,10 @@ def plot_map(
     _, xmin, xmax, _, ymin, ymax = imod.util.spatial.spatial_reference(raster)
 
     # raster kwargs
-    settings_raster = {"interpolation": "nearest", "extent": [xmin, xmax, ymin, ymax]}
+    settings_raster: dict[str, Any] = {
+        "interpolation": "nearest",
+        "extent": [xmin, xmax, ymin, ymax],
+    }
     # if a basemap is added: set alpha of raster
     if add_basemap:
         settings_raster["alpha"] = kwargs_basemap.pop("alpha", 0.7)
@@ -191,7 +201,7 @@ def plot_map(
         settings_raster.update(kwargs_raster)
 
     # cbar kwargs
-    settings_cbar = {"ticks": levels, "extend": "both"}
+    settings_cbar: dict[str, Any] = {"ticks": levels, "extend": "both"}
 
     # Find a unit in the raster to use in the colorbar label
     try:
@@ -280,7 +290,12 @@ def plot_map(
         return fig, ax
 
 
-def _colorscale(a_yx, levels, cmap, quantile_colorscale):
+def _colorscale(
+    a_yx: xr.DataArray,
+    levels: int | Sequence[float] | np.ndarray | None,
+    cmap: str | Colormap,
+    quantile_colorscale: bool,
+) -> tuple[BoundaryNorm | None, ListedColormap]:
     """
     This is an attempt to automatically create somewhat robust color scales.
 
@@ -338,8 +353,16 @@ def _colorscale(a_yx, levels, cmap, quantile_colorscale):
 
 
 def _imshow_xy(
-    a_yx, fname, title, cmap, overlays, quantile_colorscale, figsize, settings, levels
-):
+    a_yx: xr.DataArray,
+    fname: str | pathlib.Path,
+    title: str,
+    cmap: str | Colormap,
+    overlays: list[dict[str, Any]],
+    quantile_colorscale: bool,
+    figsize: tuple[float, float],
+    settings: dict[str, Any],
+    levels: int | Sequence[float] | np.ndarray | None,
+) -> None:
     fig, ax = plt.subplots(figsize=figsize)
     norm, cmap = _colorscale(a_yx, levels, cmap, quantile_colorscale)
     ax1 = ax.imshow(a_yx, cmap=cmap, norm=norm, **settings)
@@ -357,7 +380,7 @@ def _imshow_xy(
     plt.close()
 
 
-def format_time(time):
+def format_time(time: np.datetime64 | Any) -> str:
     if isinstance(time, np.datetime64):
         # The following line is because numpy.datetime64[ns] does not
         # support converting to datetime, but returns an integer instead.
@@ -368,15 +391,15 @@ def format_time(time):
 
 
 def imshow_topview(
-    da,
-    name,
-    directory=".",
-    cmap="viridis",
-    overlays=[],
-    quantile_colorscale=True,
-    figsize=(8, 8),
-    levels=None,
-):
+    da: xr.DataArray,
+    name: str,
+    directory: str | pathlib.Path = ".",
+    cmap: str | Colormap = "viridis",
+    overlays: list[dict[str, Any]] = [],
+    quantile_colorscale: bool = True,
+    figsize: tuple[float, float] = (8, 8),
+    levels: int | Sequence[float] | np.ndarray | None = None,
+) -> None:
     """
     Automatically colors by quantile.
 
@@ -418,10 +441,10 @@ def imshow_topview(
                     coordval = format_time(coordval)
                 fname_parts.append(f"{key}{coordval}")
 
-            fname_parts = "_".join(fname_parts)
-            title_parts = ", ".join(title_parts)
-            fname = directory / f"{name}_{fname_parts}.png"
-            title = f"{name}, {title_parts}"
+            fname_parts_str = "_".join(fname_parts)
+            title_parts_str = ", ".join(title_parts)
+            fname = directory / f"{name}_{fname_parts_str}.png"
+            title = f"{name}, {title_parts_str}"
             _imshow_xy(
                 a_yx,
                 fname,

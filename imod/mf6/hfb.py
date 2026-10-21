@@ -5,7 +5,7 @@ import typing
 from copy import deepcopy
 from enum import Enum
 from pathlib import Path
-from typing import TYPE_CHECKING, Any, Dict, List, Optional, Self, Tuple
+from typing import TYPE_CHECKING, Any, Self
 
 import cftime
 import numpy as np
@@ -236,7 +236,7 @@ def to_connected_cells_dataset(
 
 def _make_linestring_from_polygon(
     dataframe: GeoDataFrameType,
-) -> List[LineStringType]:
+) -> list[LineStringType]:
     """
     Make linestring from a polygon with one axis in the vertical dimension (z),
     and one axis in the horizontal plane (x & y dimension).
@@ -270,7 +270,7 @@ def _select_dataframe_with_snapped_line_index(
 
 def _extract_mean_hfb_bounds_from_dataframe(
     dataframe: GeoDataFrameType,
-) -> Tuple[pd.Series, pd.Series]:
+) -> tuple[pd.Series, pd.Series]:
     r"""
     Extract hfb bounds from dataframe. Requires dataframe geometry to be of type
     shapely "Z Polygon".
@@ -869,16 +869,16 @@ class HorizontalFlowBarrierBase(BoundaryCondition, ILineDataPackage):
 
     def clip_box(
         self,
-        time_min: Optional[cftime.datetime | np.datetime64 | str] = None,
-        time_max: Optional[cftime.datetime | np.datetime64 | str] = None,
-        layer_min: Optional[int] = None,
-        layer_max: Optional[int] = None,
-        x_min: Optional[float] = None,
-        x_max: Optional[float] = None,
-        y_min: Optional[float] = None,
-        y_max: Optional[float] = None,
-        top: Optional[GridDataArray] = None,
-        bottom: Optional[GridDataArray] = None,
+        time_min: cftime.datetime | np.datetime64 | str | None = None,
+        time_max: cftime.datetime | np.datetime64 | str | None = None,
+        layer_min: int | None = None,
+        layer_max: int | None = None,
+        x_min: float | None = None,
+        x_max: float | None = None,
+        y_min: float | None = None,
+        y_max: float | None = None,
+        top: GridDataArray | None = None,
+        bottom: GridDataArray | None = None,
     ) -> Self:
         """
         Clip a barrier by a bounding box (y, x).
@@ -1007,7 +1007,7 @@ class HorizontalFlowBarrierBase(BoundaryCondition, ILineDataPackage):
 
     def _snap_to_grid(
         self, idomain: GridDataArray
-    ) -> Tuple[xu.UgridDataset, np.ndarray]:
+    ) -> tuple[xu.UgridDataset, np.ndarray]:
         variable_name = self._get_variable_name()
         has_layer = "layer" in self._get_vertical_variables()
         # Create geodataframe with barriers
@@ -1485,7 +1485,7 @@ class HorizontalFlowBarrierResistance(HorizontalFlowBarrierBase):
         return barrier_values
 
     @classmethod
-    def from_imod5_data(cls, key: str, imod5_data: Dict[str, GridDataDict]):
+    def from_imod5_data(cls, key: str, imod5_data: dict[str, GridDataDict]):
         """
         Import HFB data from imod5 data dictionary. Data from "3D GEN" files, so
         with a polygon geometry, can be loaded with this method.
@@ -1604,7 +1604,7 @@ class SingleLayerHorizontalFlowBarrierResistance(HorizontalFlowBarrierBase):
         return barrier_values
 
     @classmethod
-    def from_imod5_data(cls, key: str, imod5_data: Dict[str, GridDataDict]):
+    def from_imod5_data(cls, key: str, imod5_data: dict[str, GridDataDict]):
         """
         Import HFB data from imod5 data dictionary. Data from "2D GEN" files, so
         with a line shape, can be loaded with this method.

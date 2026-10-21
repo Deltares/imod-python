@@ -1,5 +1,4 @@
 from datetime import datetime
-from typing import Optional
 
 import numpy as np
 import xarray as xr
@@ -33,10 +32,10 @@ def get_repeat_stress(times) -> xr.DataArray:
 
 
 def set_repeat_stress_if_available(
-    repeat: Optional[list[datetime]],
+    repeat: list[datetime] | None,
     time_min: datetime,
     time_max: datetime,
-    optional_package: Optional[IPackage],
+    optional_package: IPackage | None,
 ) -> None:
     """Set repeat stress for optional package if repeat is not None."""
     if repeat is not None:

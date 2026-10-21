@@ -1,13 +1,11 @@
 import pickle
 import textwrap
+from collections.abc import Callable, Mapping, Sequence
 from functools import wraps
 from typing import (
     TYPE_CHECKING,
     Any,
-    Callable,
-    Mapping,
     ParamSpec,
-    Sequence,
     TypeVar,
     cast,
 )

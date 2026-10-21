@@ -9,7 +9,7 @@ import pathlib
 import re
 import tempfile
 from re import Pattern
-from typing import Any, Optional
+from typing import Any
 
 import cftime
 import numpy as np
@@ -45,7 +45,7 @@ def _groupdict_from_pattern(stem: str, pattern: re.Pattern[str]) -> dict[str, An
         return match.groupdict()
 
 
-def _groupdict(stem: str, pattern: Optional[str | re.Pattern[str]]) -> dict[str, Any]:
+def _groupdict(stem: str, pattern: str | re.Pattern[str] | None) -> dict[str, Any]:
     if pattern is not None:
         if isinstance(pattern, re.Pattern):
             d = _groupdict_from_pattern(stem, pattern)

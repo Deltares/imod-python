@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 from datetime import datetime
-from typing import Optional, cast
+from typing import cast
 
 import numpy as np
 
@@ -101,7 +101,7 @@ class GroundwaterFlowModel(Modflow6Model):
     @init_log_decorator()
     def __init__(
         self,
-        listing_file: Optional[str] = None,
+        listing_file: str | None = None,
         print_input: bool = False,
         print_flows: bool = False,
         save_flows: bool = False,
@@ -160,7 +160,7 @@ class GroundwaterFlowModel(Modflow6Model):
     def validate(
         self,
         model_name: str = "",
-        validation_context: Optional[ValidationSettings] = None,
+        validation_context: ValidationSettings | None = None,
         **kwargs,
     ) -> StatusInfoBase:
         """
@@ -204,10 +204,10 @@ class GroundwaterFlowModel(Modflow6Model):
         imod5_data: dict[str, dict[str, GridDataArray]],
         period_data: dict[str, list[datetime]],
         times: list[datetime],
-        allocation_options: Optional[SimulationAllocationOptions] = None,
-        distributing_options: Optional[SimulationDistributingOptions] = None,
-        regridder_types: Optional[dict[str, DataclassType]] = None,
-        target_grid: Optional[GridDataArray] = None,
+        allocation_options: SimulationAllocationOptions | None = None,
+        distributing_options: SimulationDistributingOptions | None = None,
+        regridder_types: dict[str, DataclassType] | None = None,
+        target_grid: GridDataArray | None = None,
     ) -> "GroundwaterFlowModel":
         """
         Imports a GroundwaterFlowModel (GWF) from the data in an iMOD5 project

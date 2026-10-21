@@ -1,5 +1,3 @@
-from typing import Optional
-
 import numpy as np
 import xarray as xr
 
@@ -33,7 +31,7 @@ from imod.util.regrid import RegridderWeightsCache
 
 
 def _dataarray_to_bool(griddataarray: GridDataArray) -> bool:
-    scalar_value: Optional[bool] = enforce_scalar(griddataarray)
+    scalar_value: bool | None = enforce_scalar(griddataarray)
 
     if scalar_value is None:
         return False
@@ -461,7 +459,7 @@ class NodePropertyFlow(Package, IRegridPackage):
         cls,
         imod5_data: dict[str, dict[str, GridDataArray]],
         target_grid: GridDataArray,
-        regridder_types: Optional[DataclassType] = None,
+        regridder_types: DataclassType | None = None,
         regrid_cache: RegridderWeightsCache = RegridderWeightsCache(),
     ) -> "NodePropertyFlow":
         """
