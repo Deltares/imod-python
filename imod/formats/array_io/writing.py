@@ -1,6 +1,6 @@
 import pathlib
 from collections.abc import Callable
-from typing import Any
+from typing import Any, cast
 
 import xarray as xr
 
@@ -40,7 +40,9 @@ def _write_chunks(
     nochunks = a.chunks is None or max(map(len, a.chunks)) == 1
     if nochunks or dim_is_xy:  # Base case
         a = a.compute()
-        extradims = list(filter(lambda dim: dim not in ("y", "x"), a.dims))
+        extradims = cast(
+            list[str], list(filter(lambda dim: dim not in ("y", "x"), a.dims))
+        )
         if extradims:
             stacked = a.stack(idf=extradims)
             for coordvals, a_yx in list(stacked.groupby("idf")):
@@ -55,6 +57,8 @@ def _write_chunks(
             fn = imod.util.path.compose(d, pattern)
             write(fn, a, nodata, dtype)
     else:  # recursive case
+        if a.chunks is None:
+            raise ValueError("DataArray has no chunks, but reached recursive case.")
         for dim, chunksizes in zip(a.dims, a.chunks):
             if len(chunksizes) > 1:
                 break

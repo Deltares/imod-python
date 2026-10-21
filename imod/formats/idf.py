@@ -870,7 +870,7 @@ def save(
     path: PathType,
     a: xr.DataArray,
     nodata: float = 1.0e20,
-    pattern: PatternType | None = None,
+    pattern: str | None = None,
     dtype: DTypeLike = np.float32,
 ) -> None:
     """

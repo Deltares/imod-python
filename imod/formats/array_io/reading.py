@@ -412,7 +412,7 @@ def _load(
 
 
 def handle_path(
-    path: pathlib.Path | str | list[pathlib.Path | str],
+    path: PathType | Sequence[PathType],
 ) -> list[pathlib.Path]:
     """
     Handle a path input and return a list of pathlib.Path objects.
@@ -432,15 +432,12 @@ def handle_path(
     FileNotFoundError
         If no files matching the input path(s) are found.
     """
-    if isinstance(path, pathlib.Path):
-        path = str(path)
-
-    if isinstance(path, list):
-        paths = [pathlib.Path(p) for p in path]
-    else:
+    if isinstance(path, str | pathlib.Path):
         # Sort: glob order is filesystem dependent (alphabetical on NTFS, not
         # on e.g. APFS or ext4), and downstream merging can depend on order.
-        paths = [pathlib.Path(p) for p in sorted(glob.glob(path))]
+        paths = [pathlib.Path(p) for p in sorted(glob.glob(str(path)))]
+    else:
+        paths = [pathlib.Path(p) for p in path]
 
     n = len(paths)
     if n == 0:
@@ -450,7 +447,7 @@ def handle_path(
 
 
 def _open(
-    path: PathType | list[PathType],
+    path: PathType | Sequence[PathType],
     use_cftime: bool,
     pattern: PatternType | None,
     header: Callable[[PathType, PatternType | None], dict[str, Any]],
