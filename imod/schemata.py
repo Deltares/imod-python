@@ -173,7 +173,7 @@ class OptionSchema(BaseSchema):
     def __init__(self, options: Sequence[Any]) -> None:
         self.options = options
 
-    def validate(self, obj: ScalarAsDataArray, **kwargs) -> None:
+    def validate(self, obj: ScalarAsDataArray, **kwargs: Any) -> None:
         if scalar_None(obj):
             return
 
@@ -210,7 +210,7 @@ class DTypeSchema(BaseSchema):
         else:
             self.dtype = np.dtype(dtype)
 
-    def validate(self, obj: GridDataArray, **kwargs) -> None:
+    def validate(self, obj: GridDataArray, **kwargs: Any) -> None:
         if scalar_None(obj):
             return
 
@@ -230,7 +230,7 @@ class TypeSchema(BaseSchema):
         """
         self.dtype = dtype
 
-    def validate(self, obj: Any, **kwargs) -> None:
+    def validate(self, obj: Any, **kwargs: Any) -> None:
         if obj is None:
             return
 
@@ -250,7 +250,7 @@ class GeometryTypeSchema(BaseSchema):
         """
         self.dtype = dtype
 
-    def validate(self, obj: GridDataArray, **kwargs) -> None:
+    def validate(self, obj: GridDataArray, **kwargs: Any) -> None:
         is_geometry_type = [isinstance(i, self.dtype) for i in obj.data.ravel()]
         if not all(is_geometry_type):
             is_wrong_type = ~np.array(is_geometry_type)
@@ -289,7 +289,7 @@ class DimsSchema(BaseSchema):
         else:
             return self.dims
 
-    def validate(self, obj: GridDataArray, **kwargs) -> None:
+    def validate(self, obj: GridDataArray, **kwargs: Any) -> None:
         """Validate dimensions
         Parameters
         ----------
@@ -325,7 +325,7 @@ class EmptyIndexesSchema(BaseSchema):
             ]
         return dims_to_validate
 
-    def validate(self, obj: GridDataArray, **kwargs) -> None:
+    def validate(self, obj: GridDataArray, **kwargs: Any) -> None:
         dims_to_validate = self.get_dims_to_validate(obj)
 
         for dim in dims_to_validate:
@@ -342,7 +342,7 @@ class IndexesSchema(EmptyIndexesSchema):
     def __init__(self) -> None:
         pass
 
-    def validate(self, obj: GridDataArray, **kwargs) -> None:
+    def validate(self, obj: GridDataArray, **kwargs: Any) -> None:
         # Test if indexes all empty
         super().validate(obj)
 
@@ -374,7 +374,7 @@ class ShapeSchema(BaseSchema):
         """
         self.shape = shape
 
-    def validate(self, obj: GridDataArray, **kwargs) -> None:
+    def validate(self, obj: GridDataArray, **kwargs: Any) -> None:
         if len(self.shape) != len(obj.shape):
             raise ValidationError(
                 f"number of dimensions in shape ({len(obj.shape)}) o!= da.ndim ({len(self.shape)})"
@@ -395,7 +395,7 @@ class CompatibleSettingsSchema(BaseSchema):
         self.other = other
         self.other_value = other_value
 
-    def validate(self, obj: ScalarAsDataArray, **kwargs) -> None:
+    def validate(self, obj: ScalarAsDataArray, **kwargs: Any) -> None:
         other_obj = kwargs[self.other]
         if scalar_None(obj) or scalar_None(other_obj):
             return
@@ -427,7 +427,7 @@ class CoordsSchema(BaseSchema):
         self.require_all_keys = require_all_keys
         self.allow_extra_keys = allow_extra_keys
 
-    def validate(self, obj: GridDataArray, **kwargs) -> None:
+    def validate(self, obj: GridDataArray, **kwargs: Any) -> None:
         coords = list(obj.coords.keys())
 
         if self.require_all_keys:
@@ -460,7 +460,7 @@ class OtherCoordsSchema(BaseSchema):
         self.require_all_keys = require_all_keys
         self.allow_extra_keys = allow_extra_keys
 
-    def validate(self, obj: GridDataArray, **kwargs) -> None:
+    def validate(self, obj: GridDataArray, **kwargs: Any) -> None:
         other_obj = kwargs[self.other]
         other_coords = tuple(other_obj.coords.keys())
         return CoordsSchema(
@@ -491,7 +491,7 @@ class AllCoordsValueSchema(BaseSchema):
         self.operator_str = operator
         self.other = other
 
-    def validate(self, obj: GridDataArray, **kwargs) -> None:
+    def validate(self, obj: GridDataArray, **kwargs: Any) -> None:
         obj_coords = list(obj.coords.keys())
         # Shortcut if coord is not in obj, use Coordinate schema to throw error if
         # coord is missing.
@@ -547,7 +547,7 @@ class AllValueSchema(ValueSchema):
     assert (values > threshold).all()
     """
 
-    def validate(self, obj: GridDataArray, **kwargs) -> None:
+    def validate(self, obj: GridDataArray, **kwargs: Any) -> None:
         if isinstance(self.other, str):
             other_obj = kwargs[self.other]
         else:
@@ -579,7 +579,7 @@ class AnyValueSchema(ValueSchema):
     assert (values > threshold).any()
     """
 
-    def validate(self, obj: GridDataArray, **kwargs) -> None:
+    def validate(self, obj: GridDataArray, **kwargs: Any) -> None:
         if isinstance(self.other, str):
             other_obj = kwargs[self.other]
         else:
@@ -610,7 +610,7 @@ class MaxNUniqueValuesSchema(BaseSchema):
     def __init__(self, max_unique_values: int) -> None:
         self.max_unique_values = max_unique_values
 
-    def validate(self, obj: GridDataArray, **kwargs) -> None:
+    def validate(self, obj: GridDataArray, **kwargs: Any) -> None:
         if len(np.unique(obj)) > self.max_unique_values:
             raise ValidationError(
                 f"Amount of unique values exceeds limit of {self.max_unique_values}"
@@ -624,7 +624,7 @@ class UniqueValuesSchema(BaseSchema):
         """
         self.other_value = other_value
 
-    def validate(self, obj: GridDataArray, **kwargs) -> None:
+    def validate(self, obj: GridDataArray, **kwargs: Any) -> None:
         unique_values = np.unique(obj)
         if not np.all(np.isin(unique_values, self.other_value)):
             raise ValidationError(
@@ -649,7 +649,7 @@ class AllNoDataSchema(NoDataSchema):
     Fails when all data is NoData.
     """
 
-    def validate(self, obj: GridDataArray, **kwargs) -> None:
+    def validate(self, obj: GridDataArray, **kwargs: Any) -> None:
         valid = self.is_notnull(obj)
         if ~valid.any():
             raise ValidationError("all nodata")
@@ -660,7 +660,7 @@ class AnyNoDataSchema(NoDataSchema):
     Fails when any data is NoData.
     """
 
-    def validate(self, obj: GridDataArray, **kwargs) -> None:
+    def validate(self, obj: GridDataArray, **kwargs: Any) -> None:
         valid = self.is_notnull(obj)
         if ~valid.all():
             raise ValidationError("found a nodata value")
@@ -701,7 +701,7 @@ class IdentityNoDataSchema(NoDataComparisonSchema):
     "idomain" `{layer, y, x}`
     """
 
-    def validate(self, obj: GridDataArray, **kwargs) -> None:
+    def validate(self, obj: GridDataArray, **kwargs: Any) -> None:
         other_obj = kwargs[self.other]
 
         # Only test if object has all dimensions in other object.
@@ -719,7 +719,7 @@ class AllInsideNoDataSchema(NoDataComparisonSchema):
     Checks that all notnull values all occur within the notnull values of other.
     """
 
-    def validate(self, obj: GridDataArray, **kwargs) -> None:
+    def validate(self, obj: GridDataArray, **kwargs: Any) -> None:
         other_obj = kwargs[self.other]
 
         valid = self.is_notnull(obj)
@@ -752,7 +752,7 @@ class ActiveCellsConnectedSchema(BaseSchema):
         else:
             self.is_notnull = is_notnull
 
-    def validate(self, obj: GridDataArray, **kwargs) -> None:
+    def validate(self, obj: GridDataArray, **kwargs: Any) -> None:
         if isinstance(obj, xu.UgridDataArray):
             # TODO: https://deltares.github.io/xugrid/api/xugrid.UgridDataArrayAccessor.connected_components.html
             raise NotImplementedError(
