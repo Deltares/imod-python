@@ -1,5 +1,4 @@
 import collections
-import glob
 import itertools
 import pathlib
 from collections.abc import Callable, Sequence
@@ -435,7 +434,8 @@ def handle_path(
     if isinstance(path, str | pathlib.Path):
         # Sort: glob order is filesystem dependent (alphabetical on NTFS, not
         # on e.g. APFS or ext4), and downstream merging can depend on order.
-        paths = [pathlib.Path(p) for p in sorted(glob.glob(str(path)))]
+        globpath = pathlib.Path(path)
+        paths = sorted(globpath.parent.glob(globpath.name))
     else:
         paths = [pathlib.Path(p) for p in path]
 
