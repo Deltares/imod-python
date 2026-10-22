@@ -24,6 +24,7 @@ except ImportError:
 
 
 if TYPE_CHECKING:
+    from geopandas import GeoDataFrame as _GeoDataFrame
     from shapely.geometry import LineString as _LineString
     from shapely.geometry import Point as _Point
     from shapely.geometry import Polygon as _Polygon
@@ -31,10 +32,12 @@ if TYPE_CHECKING:
     PointT: TypeAlias = _Point
     PolygonT: TypeAlias = _Polygon
     LineStringT: TypeAlias = _LineString
+    GeoDataFrameT: TypeAlias = _GeoDataFrame
 else:
     PointT = Any
     PolygonT = Any
     LineStringT = Any
+    GeoDataFrameT = Any
 
 GeometryT: TypeAlias = PointT | PolygonT | LineStringT
 
@@ -49,7 +52,7 @@ else:
 
 # ASCII text format:
 # ------------------
-def parse_ascii_points(lines: list[str]) -> "geopandas.GeoDataFrame":  # type: ignore # noqa
+def parse_ascii_points(lines: list[str]) -> GeoDataFrameT:
     n = len(lines) - 1
     fid = np.empty(n, dtype=int)
     x = np.empty(n, dtype=float)
@@ -61,7 +64,7 @@ def parse_ascii_points(lines: list[str]) -> "geopandas.GeoDataFrame":  # type: i
     return gpd.GeoDataFrame(data={"id": fid}, geometry=points)
 
 
-def parse_ascii_segments(lines: list[str]) -> "geopandas.GeoDataFrame":  # type: ignore # noqa
+def parse_ascii_segments(lines: list[str]) -> GeoDataFrameT:
     end = [i for i, line in enumerate(lines) if line == "end"][:-1]
     start = [-1] + end[:-1]
     features = [lines[s + 1 : e] for s, e in zip(start, end)]
@@ -104,7 +107,7 @@ def parse_ascii_segments(lines: list[str]) -> "geopandas.GeoDataFrame":  # type:
     return gpd.GeoDataFrame(data={"id": fid}, geometry=geometry)
 
 
-def read_ascii(path: Path | str) -> "geopandas.GeoDataFrame":  # type: ignore # noqa
+def read_ascii(path: Path | str) -> GeoDataFrameT:
     """
     Read a text ASCII GEN file to a geopandas GeoDataFrame.
 
@@ -237,7 +240,7 @@ def to_line(geometry: LineStringT) -> tuple[np.ndarray, int]:
     return xy, xy.shape[0]
 
 
-def read_binary(path: str | Path) -> "geopandas.GeoDataFrame":  # type: ignore # noqa
+def read_binary(path: str | Path) -> GeoDataFrameT:
     """
     Read a binary GEN file to a geopandas GeoDataFrame.
 
@@ -356,7 +359,7 @@ def vertices(geometry: GeometryT, ftype: str) -> tuple[int, np.ndarray, int]:
     return ftype_int, xy, n_vertex
 
 
-def read(path: str | Path):
+def read(path: str | Path) -> GeoDataFrameT:
     """
     Read a GEN file to a geopandas GeoDataFrame. The function first tries to
     read as binary, if this fails, it tries to read the gen file as ASCII.
@@ -385,7 +388,7 @@ def read(path: str | Path):
 
 def write(
     path: str | Path,
-    geodataframe: "geopandas.GeoDataFrame",  # type: ignore # noqa
+    geodataframe: GeoDataFrameT,
     feature_type: str | None = None,
 ) -> None:
     """

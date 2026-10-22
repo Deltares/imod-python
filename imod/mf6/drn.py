@@ -1,6 +1,8 @@
 from datetime import datetime
+from typing import Any, cast
 
 import numpy as np
+import xarray as xr
 
 from imod.common.interfaces.iregridpackage import IRegridPackage
 from imod.common.utilities.dataclass_type import DataclassType
@@ -36,6 +38,7 @@ from imod.schemata import (
     IdentityNoDataSchema,
     IndexesSchema,
     OtherCoordsSchema,
+    ValidationError,
 )
 from imod.typing import GridDataArray
 from imod.typing.grid import enforce_dim_order, has_negative_layer, is_planar_grid
@@ -142,18 +145,18 @@ class Drainage(TopSystemBoundaryCondition, IRegridPackage):
     @init_log_decorator()
     def __init__(
         self,
-        elevation,
-        conductance,
-        concentration=None,
-        concentration_boundary_type="aux",
-        print_input=False,
-        print_flows=False,
-        save_flows=False,
-        observations=None,
+        elevation: GridDataArray,
+        conductance: GridDataArray,
+        concentration: GridDataArray | None = None,
+        concentration_boundary_type: str = "aux",
+        print_input: bool = False,
+        print_flows: bool = False,
+        save_flows: bool = False,
+        observations: Any = None,
         validate: bool = True,
-        repeat_stress=None,
-    ):
-        dict_dataset = {
+        repeat_stress: dict[Any, Any] | xr.DataArray | None = None,
+    ) -> None:
+        dict_dataset: dict[str, Any] = {
             "elevation": elevation,
             "conductance": conductance,
             "concentration": concentration,
@@ -167,7 +170,9 @@ class Drainage(TopSystemBoundaryCondition, IRegridPackage):
         super().__init__(dict_dataset)
         self._validate_init_schemata(validate)
 
-    def _validate(self, schemata, **kwargs):
+    def _validate(
+        self, schemata: dict[str, Any], **kwargs: Any
+    ) -> dict[str, list[ValidationError]]:
         # Insert additional kwargs
         kwargs["elevation"] = self["elevation"]
         errors = super()._validate(schemata, **kwargs)
@@ -352,7 +357,7 @@ class Drainage(TopSystemBoundaryCondition, IRegridPackage):
             )
             regridded_package_data.update(layered_data)
 
-        drn = cls(**regridded_package_data, validate=True)
+        drn = cls(**cast(dict[str, Any], regridded_package_data), validate=True)
         repeat = period_data.get(key)
         set_repeat_stress_if_available(repeat, time_min, time_max, drn)
         # Clip the drain package to the time range of the simulation and ensure

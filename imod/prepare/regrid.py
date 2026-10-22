@@ -1,4 +1,5 @@
 import textwrap
+from typing import Any
 
 ERROR_MSG = textwrap.dedent(
     """{name} is removed. Use the
@@ -33,5 +34,5 @@ class Regridder(object):
 
     """
 
-    def __init__(self, *args, **kwargs):
+    def __init__(self, *args: Any, **kwargs: Any) -> None:
         raise NotImplementedError(ERROR_MSG.format(name=self.__class__.__name__))

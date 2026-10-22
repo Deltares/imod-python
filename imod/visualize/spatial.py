@@ -42,7 +42,7 @@ def read_imod_legend(
     """
 
     # Read file. Do not rely the headers in the leg file.
-    def _read(sep):
+    def _read(sep: str) -> pd.DataFrame:
         return pd.read_csv(
             path,
             header=1,

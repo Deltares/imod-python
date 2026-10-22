@@ -1,6 +1,8 @@
 from datetime import datetime
+from typing import Any, cast
 
 import numpy as np
+import xarray as xr
 
 from imod.common.interfaces.iregridpackage import IRegridPackage
 from imod.logging import init_log_decorator
@@ -24,6 +26,7 @@ from imod.schemata import (
     IdentityNoDataSchema,
     IndexesSchema,
     OtherCoordsSchema,
+    ValidationError,
 )
 from imod.typing import GridDataArray
 from imod.util.regrid import RegridderWeightsCache
@@ -126,17 +129,17 @@ class ConstantHead(BoundaryCondition, IRegridPackage):
     @init_log_decorator()
     def __init__(
         self,
-        head,
-        concentration=None,
-        concentration_boundary_type="aux",
-        print_input=False,
-        print_flows=False,
-        save_flows=False,
-        observations=None,
+        head: GridDataArray,
+        concentration: GridDataArray | None = None,
+        concentration_boundary_type: str = "aux",
+        print_input: bool = False,
+        print_flows: bool = False,
+        save_flows: bool = False,
+        observations: Any = None,
         validate: bool = True,
-        repeat_stress=None,
-    ):
-        dict_dataset = {
+        repeat_stress: dict[Any, Any] | xr.DataArray | None = None,
+    ) -> None:
+        dict_dataset: dict[str, Any] = {
             "head": head,
             "concentration": concentration,
             "concentration_boundary_type": concentration_boundary_type,
@@ -150,7 +153,9 @@ class ConstantHead(BoundaryCondition, IRegridPackage):
 
         self._validate_init_schemata(validate)
 
-    def _validate(self, schemata, **kwargs):
+    def _validate(
+        self, schemata: dict[str, Any], **kwargs: Any
+    ) -> dict[str, list[ValidationError]]:
         # Insert additional kwargs
         kwargs["head"] = self["head"]
         errors = super()._validate(schemata, **kwargs)
@@ -302,7 +307,7 @@ class ConstantHead(BoundaryCondition, IRegridPackage):
             cls, data, target_dis, regridder_types, regrid_cache
         )
         chd_pkg_data = chd_cells_from_imod5_data(regridded_pkg_data, target_idomain)
-        chd = cls(**chd_pkg_data, validate=True)
+        chd = cls(**cast(dict[str, Any], chd_pkg_data), validate=True)
         if time_min is not None and time_max is not None:
             repeat = period_data.get(key)
             set_repeat_stress_if_available(repeat, time_min, time_max, chd)

@@ -207,7 +207,7 @@ def open_imeth1_budgets(
     )
 
 
-def expand_indptr(ia) -> np.ndarray:
+def expand_indptr(ia: np.ndarray) -> np.ndarray:
     n = np.diff(ia)
     return np.repeat(np.arange(ia.size - 1), n)
 

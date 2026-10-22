@@ -26,14 +26,14 @@ class ExchangeCreator_Unstructured(ExchangeCreator):
 
     def __init__(
         self, submodel_labels: GridDataArray, partition_info: list[PartitionInfo]
-    ):
+    ) -> None:
         self._connected_cell_edge_indices = (
             self._find_subdomain_connection_edge_indices(submodel_labels)
         )
         super().__init__(submodel_labels, partition_info)
 
     @property
-    def _coordinate_names(self):
+    def _coordinate_names(self) -> list[str]:
         return ["cell_index"]
 
     def _find_connected_cells(self) -> pd.DataFrame:
@@ -136,7 +136,9 @@ class ExchangeCreator_Unstructured(ExchangeCreator):
         return global_to_local_idx
 
     @staticmethod
-    def _find_subdomain_connection_edge_indices(submodel_labels):
+    def _find_subdomain_connection_edge_indices(
+        submodel_labels: GridDataArray,
+    ) -> np.ndarray:
         edge_face_connectivity = submodel_labels.ugrid.grid.edge_face_connectivity
 
         face1 = edge_face_connectivity[:, 0]

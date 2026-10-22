@@ -40,7 +40,7 @@ class GWTGWT(ExchangeBase):
         hwva: xr.DataArray,
         angldegx: xr.DataArray | None = None,
         cdist: xr.DataArray | None = None,
-    ):
+    ) -> None:
         dict_dataset = {
             "cell_id1": cell_id1,
             "cell_id2": cell_id2,
@@ -69,7 +69,7 @@ class GWTGWT(ExchangeBase):
         adv_scheme: str | None = None,
         dsp_xt3d_off: bool | None = None,
         dsp_xt3d_rhs: bool | None = None,
-    ):
+    ) -> None:
         self.dataset["save_flows"] = save_flows
         self.dataset["adv_scheme"] = adv_scheme
         self.dataset["dsp_xt3d_off"] = dsp_xt3d_off

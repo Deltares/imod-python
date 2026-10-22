@@ -19,7 +19,9 @@ from imod.schemata import (
     DTypeSchema,
     IdentityNoDataSchema,
     IndexesSchema,
+    ValidationError,
 )
+from imod.typing import GridDataArray
 
 
 class VerticesDiscretization(Package, IRegridPackage, IMaskingSettings):
@@ -94,7 +96,13 @@ class VerticesDiscretization(Package, IRegridPackage, IMaskingSettings):
         return ["bottom"]
 
     @init_log_decorator()
-    def __init__(self, top, bottom, idomain, validate: bool = True):
+    def __init__(
+        self,
+        top: GridDataArray,
+        bottom: GridDataArray,
+        idomain: GridDataArray,
+        validate: bool = True,
+    ) -> None:
         dict_dataset = {
             "idomain": idomain,
             "top": top,
@@ -103,7 +111,13 @@ class VerticesDiscretization(Package, IRegridPackage, IMaskingSettings):
         super().__init__(dict_dataset)
         self._validate_init_schemata(validate)
 
-    def _get_render_dictionary(self, directory, pkgname, globaltimes, binary):
+    def _get_render_dictionary(
+        self,
+        directory: Path,
+        pkgname: str,
+        globaltimes: list[np.datetime64] | np.ndarray,
+        binary: bool,
+    ) -> dict[str, Any]:
         disdirectory = directory / pkgname
         d: dict[str, Any] = {}
         grid = self.dataset.ugrid.grid
@@ -165,14 +179,21 @@ class VerticesDiscretization(Package, IRegridPackage, IMaskingSettings):
 
         return
 
-    def _write_blockfile(self, pkgname, globaltimes, write_context: WriteContext):
+    def _write_blockfile(
+        self,
+        pkgname: str,
+        globaltimes: list[np.datetime64] | np.ndarray,
+        write_context: WriteContext,
+    ) -> None:
         super()._write_blockfile(pkgname, globaltimes, write_context)
         filename = write_context.write_directory / f"{pkgname}.{self._pkg_id}"
         self._append_vertices_and_cell2d(filename)
 
         return
 
-    def _validate(self, schemata, **kwargs):
+    def _validate(
+        self, schemata: dict[str, Any], **kwargs: Any
+    ) -> dict[str, list[ValidationError]]:
         # Insert additional kwargs
         kwargs["bottom"] = self["bottom"]
         errors = super()._validate(schemata, **kwargs)

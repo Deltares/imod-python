@@ -104,7 +104,7 @@ strict = true
 # These next few are various gradations of forcing use of type annotations
 disallow_untyped_calls = false
 disallow_incomplete_defs = false
-disallow_untyped_defs = false
+disallow_untyped_defs = true
 
 # This one isn't too hard to get passing, but return on investment is lower
 no_implicit_reexport = false
@@ -122,10 +122,6 @@ module = [
     "imod.wq.*",  # Deprecated
 ]
 ignore_errors = true
-
-[[tool.mypy.overrides]]
-module = ["imod.msw.*"]
-check_untyped_defs = false
 
 # pyvista triggers a mypy daemon crash (mypy bug with partial types)
 [[tool.mypy.overrides]]

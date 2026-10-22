@@ -5,7 +5,7 @@ from imod.logging.ilogger import ILogger
 from imod.logging.loglevel import LogLevel
 
 
-def _formatter():
+def _formatter() -> logging.Formatter:
     return logging.Formatter(
         "%(name)s: %(asctime)s | %(levelname)s | %(filename)s:%(lineno)s | %(process)d >>> %(message)s"
     )

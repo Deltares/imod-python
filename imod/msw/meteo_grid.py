@@ -1,7 +1,7 @@
 import csv
 from pathlib import Path
 from shutil import copyfile
-from typing import Any
+from typing import Any, Self
 
 import numpy as np
 import pandas as pd
@@ -42,7 +42,9 @@ class MeteoGrid(MetaSwapPackage, IRegridPackage):
 
     _regrid_method = MeteoGridRegridMethod()
 
-    def __init__(self, precipitation: xr.DataArray, evapotranspiration: xr.DataArray):
+    def __init__(
+        self, precipitation: xr.DataArray, evapotranspiration: xr.DataArray
+    ) -> None:
         super().__init__()
 
         self.dataset["precipitation"] = precipitation
@@ -50,7 +52,9 @@ class MeteoGrid(MetaSwapPackage, IRegridPackage):
 
         self._pkgcheck()
 
-    def _write_free_format_file(self, path: str | Path, dataframe: pd.DataFrame):
+    def _write_free_format_file(
+        self, path: str | Path, dataframe: pd.DataFrame
+    ) -> None:
         """
         Write free format file. The mete_grid.inp file is free format.
         """
@@ -76,7 +80,7 @@ class MeteoGrid(MetaSwapPackage, IRegridPackage):
 
     def _compose_filename(
         self, d: dict[str, Any], directory: Path, pattern: str | None = None
-    ):
+    ) -> str:
         """
         Construct a filename, following the iMOD conventions.
 
@@ -96,7 +100,7 @@ class MeteoGrid(MetaSwapPackage, IRegridPackage):
         """
         return str(directory / imod.util.path.compose(d, pattern))
 
-    def _is_grid(self, varname: str):
+    def _is_grid(self, varname: str) -> bool:
         coords = self.dataset[varname].coords
 
         if "y" not in coords and "x" not in coords:
@@ -104,7 +108,7 @@ class MeteoGrid(MetaSwapPackage, IRegridPackage):
         else:
             return True
 
-    def _compose_dataframe(self, times: np.ndarray):
+    def _compose_dataframe(self, times: np.ndarray) -> pd.DataFrame:
         dataframe = pd.DataFrame(index=times)
 
         year, time_since_start_year = to_metaswap_timeformat(times)
@@ -131,7 +135,7 @@ class MeteoGrid(MetaSwapPackage, IRegridPackage):
 
         return dataframe
 
-    def _check_string_lengths(self, dataframe: pd.DataFrame):
+    def _check_string_lengths(self, dataframe: pd.DataFrame) -> None:
         """
         Check if strings lengths do not exceed 256 characters.
         With absolute paths this might be an issue.
@@ -154,7 +158,7 @@ class MeteoGrid(MetaSwapPackage, IRegridPackage):
                 f"Encountered strings longer than 256 characters in columns: {too_long_columns}"
             )
 
-    def write(self, directory: str | Path, *args):
+    def write(self, directory: str | Path, *args: Any) -> None:
         """
         Write mete_grid.inp and accompanying ASCII grid files.
 
@@ -181,7 +185,7 @@ class MeteoGrid(MetaSwapPackage, IRegridPackage):
                     path, self.dataset[str(varname)], nodata=MaskValues.msw_default
                 )
 
-    def _pkgcheck(self):
+    def _pkgcheck(self) -> None:
         for varname in self.dataset.data_vars:
             coords = self.dataset[varname].coords
             if "time" not in coords:
@@ -220,20 +224,20 @@ class MeteoGridCopy(MetaSwapPackage, IRegridPackage):
 
     _regrid_method: DataclassType = EmptyRegridMethod()
 
-    def __init__(self, path: Path | str):
+    def __init__(self, path: Path | str) -> None:
         super().__init__()
         # Store as string so that it can be easily serialized and retrieved from
         # the dataset.
         self.dataset["path"] = str(path)
 
-    def write(self, directory: Path | str, *args):
+    def write(self, directory: Path | str, *args: Any) -> None:
         directory = Path(directory)
         path_metegrid = Path(self.dataset["path"].item())
         new_path = directory / self._file_name
         copyfile(path_metegrid, new_path)
 
     @classmethod
-    def from_imod5_data(cls, imod5_data: Imod5DataDict) -> "MeteoGridCopy":
+    def from_imod5_data(cls, imod5_data: Imod5DataDict) -> Self:
         """
         Construct a MetaSWAP MeteoGridCopy package from iMOD5 data in the CAP
         package, loaded with the :func:`imod.formats.prj.open_projectfile_data`

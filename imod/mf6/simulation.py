@@ -46,6 +46,7 @@ from imod.mf6.multimodel.exchange_creator_unstructured import (
     ExchangeCreator_Unstructured,
 )
 from imod.mf6.multimodel.modelsplitter import ModelSplitter
+from imod.mf6.oc import OutputControl
 from imod.mf6.out import open_cbc, open_conc, open_hds
 from imod.mf6.package import Package
 from imod.mf6.validation_settings import ValidationSettings
@@ -131,17 +132,17 @@ class Modflow6Simulation(collections.UserDict[str, Any], ISimulation):
     namely the Well and HFB packages.
     """
 
-    def _initialize_template(self):
+    def _initialize_template(self) -> None:
         loader = jinja2.PackageLoader("imod", "templates/mf6")
         env = jinja2.Environment(loader=loader, keep_trailing_newline=True)
         self._template = env.get_template("sim-nam.j2")
 
     def __init__(
         self, name: str, validation_settings: ValidationSettings | None = None
-    ):
+    ) -> None:
         super().__init__()
         self.name = name
-        self.directory = None
+        self.directory: Path | None = None
         self._initialize_template()
         self._validation_context: ValidationSettings
         if validation_settings is None:
@@ -149,14 +150,14 @@ class Modflow6Simulation(collections.UserDict[str, Any], ISimulation):
         else:
             self.set_validation_settings(validation_settings)
 
-    def __setitem__(self, key, value):
+    def __setitem__(self, key: str, value: Any) -> None:
         super().__setitem__(key, value)
 
-    def update(self, *args, **kwargs):
+    def update(self, *args: Any, **kwargs: Any) -> None:
         for k, v in dict(*args, **kwargs).items():
             self[k] = v
 
-    def _get_pkgkey(self, pkg_id):
+    def _get_pkgkey(self, pkg_id: str) -> str | None:
         """
         Get package key that belongs to a certain pkg_id, since the keys are
         user specified.
@@ -175,7 +176,11 @@ class Modflow6Simulation(collections.UserDict[str, Any], ISimulation):
             return None
 
     @standard_log_decorator()
-    def create_time_discretization(self, additional_times, validate: bool = True):
+    def create_time_discretization(
+        self,
+        additional_times: Iterable[str | datetime | np.datetime64 | cftime.datetime],
+        validate: bool = True,
+    ) -> None:
         """
         Collect all unique times from model packages and additional given
         `times`. These unique times are used as stress periods in the model. All
@@ -251,7 +256,7 @@ class Modflow6Simulation(collections.UserDict[str, Any], ISimulation):
             timestep_duration=timestep_duration, validate=validate
         )
 
-    def _render(self, write_context: WriteContext):
+    def _render(self, write_context: WriteContext) -> str:
         """Renders simulation namefile"""
         d: dict[str, Any] = {}
         models = []
@@ -287,7 +292,9 @@ class Modflow6Simulation(collections.UserDict[str, Any], ISimulation):
         d["solutiongroups"] = [solutiongroups]
         return self._template.render(d)
 
-    def _write_tdis_package(self, globaltimes, write_context):
+    def _write_tdis_package(
+        self, globaltimes: np.ndarray, write_context: WriteContext
+    ) -> None:
         """Write time discretization package, and set/clear ats filename if needed"""
         ats_pkgname = self._get_pkgkey("ats")
         if ats_pkgname:
@@ -304,11 +311,11 @@ class Modflow6Simulation(collections.UserDict[str, Any], ISimulation):
     @standard_log_decorator()
     def write(
         self,
-        directory=".",
-        binary=True,
+        directory: str | Path = ".",
+        binary: bool = True,
         validate: bool = True,
-        use_absolute_paths=False,
-    ):
+        use_absolute_paths: bool = False,
+    ) -> None:
         """
         Write Modflow6 simulation, including assigned groundwater flow and
         transport models.
@@ -339,7 +346,7 @@ class Modflow6Simulation(collections.UserDict[str, Any], ISimulation):
         >>> simulation.write("path/to/simulation", validate=False)
         """
         # create write context
-        write_context = WriteContext(directory, binary, use_absolute_paths)
+        write_context = WriteContext(Path(directory), binary, use_absolute_paths)
         self._validation_context.validate = validate
         if self.is_split():
             self._validation_context.strict_well_validation = False
@@ -406,7 +413,7 @@ class Modflow6Simulation(collections.UserDict[str, Any], ISimulation):
 
         self.directory = directory
 
-    def set_validation_settings(self, validation_settings: ValidationSettings):
+    def set_validation_settings(self, validation_settings: ValidationSettings) -> None:
         """
         Set validation settings for the simulation. Configuring
         :class:`imod.mf6.ValidationSettings` can help performance or reduce the
@@ -694,7 +701,7 @@ class Modflow6Simulation(collections.UserDict[str, Any], ISimulation):
             time_unit=time_unit,
         )
 
-    def _open_output(self, output: str, **settings) -> GridDataArray | GridDataset:
+    def _open_output(self, output: str, **settings: Any) -> GridDataArray | GridDataset:
         """
         Opens output of one or multiple models.
 
@@ -725,7 +732,7 @@ class Modflow6Simulation(collections.UserDict[str, Any], ISimulation):
             )
 
     def _open_single_output(
-        self, modelnames: list[str], output: str, **settings
+        self, modelnames: list[str], output: str, **settings: Any
     ) -> GridDataArray | GridDataset:
         """
         Open single output, e.g. concentration of single species, or heads. This
@@ -748,7 +755,7 @@ class Modflow6Simulation(collections.UserDict[str, Any], ISimulation):
         raise ValueError("error in _open_single_output")
 
     def _merge_states(
-        self, modelnames: list[str], output: str, **settings
+        self, modelnames: list[str], output: str, **settings: Any
     ) -> GridDataArray:
         state_partitions = []
         for modelname in modelnames:
@@ -804,7 +811,7 @@ class Modflow6Simulation(collections.UserDict[str, Any], ISimulation):
                 cbc[missing] = missing_grid
 
     def _merge_budgets(
-        self, modelnames: list[str], output: str, **settings
+        self, modelnames: list[str], output: str, **settings: Any
     ) -> GridDataset:
         if settings["flowja"] is True:
             raise ValueError("``flowja`` cannot be set to True when merging budgets.")
@@ -825,7 +832,7 @@ class Modflow6Simulation(collections.UserDict[str, Any], ISimulation):
         return merge_partitions(cbc_per_partition)
 
     def _concat_species(
-        self, output: str, species_ls: list[str] | None = None, **settings
+        self, output: str, species_ls: list[str] | None = None, **settings: Any
     ) -> GridDataArray | GridDataset:
         # groupby flow model, to somewhat enforce consistent transport model
         # ordening. Say:
@@ -874,7 +881,7 @@ class Modflow6Simulation(collections.UserDict[str, Any], ISimulation):
         return concat(outputs, dim="species")
 
     def _open_single_output_single_model(
-        self, modelname: str, output: str, **settings
+        self, modelname: str, output: str, **settings: Any
     ) -> GridDataArray | GridDataset:
         """
         Opens single output of single model
@@ -904,7 +911,11 @@ class Modflow6Simulation(collections.UserDict[str, Any], ISimulation):
             )
         # Get output file path
         oc_key = model._get_pkgkey("oc")
-        oc_pkg = model[oc_key]
+        if oc_key is None:
+            raise RuntimeError(
+                f"Output control package not found for model {modelname}"
+            )
+        oc_pkg = cast(OutputControl, model[oc_key])
         # Ensure "-transport" and "-flow" are stripped from "budget"
         oc_output = output.split("-")[0]
         output_path = oc_pkg._get_output_filepath(model_path, oc_output)
@@ -966,10 +977,10 @@ class Modflow6Simulation(collections.UserDict[str, Any], ISimulation):
     @standard_log_decorator()
     def dump(
         self,
-        directory=".",
+        directory: str | Path = ".",
         validate: bool = True,
         mdal_compliant: bool = False,
-        crs=None,
+        crs: Any | None = None,
         engine: EngineType = "netcdf4",
     ) -> None:
         """
@@ -1076,7 +1087,7 @@ class Modflow6Simulation(collections.UserDict[str, Any], ISimulation):
 
     @staticmethod
     @standard_log_decorator()
-    def from_file(toml_path):
+    def from_file(toml_path: str | Path) -> Modflow6Simulation:
         """
         Load Modflow6Simulation, previously dumped to TOML file with
         :meth:`imod.mf6.Modflow6Simulation.dump` from a TOML file.
@@ -1159,7 +1170,7 @@ class Modflow6Simulation(collections.UserDict[str, Any], ISimulation):
                 result.append(exchange.get_specification())
         return result
 
-    def get_models_of_type(self, model_id) -> dict[str, IModel]:
+    def get_models_of_type(self, model_id: str) -> dict[str, IModel]:
         """
         Get all models in the simulation of a specific type.
 

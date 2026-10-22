@@ -1,4 +1,5 @@
 import warnings
+from typing import Any
 
 import affine
 import numpy as np
@@ -16,7 +17,9 @@ except ImportError:
     rasterio = MissingOptionalModule("rasterio")
 
 
-def _reproject_dst(source, src_crs, dst_crs, src_transform):
+def _reproject_dst(
+    source: xr.DataArray, src_crs: Any, dst_crs: Any, src_transform: affine.Affine
+) -> tuple[affine.Affine, xr.DataArray]:
     """
     Prepares destination transform Affine and DataArray for projection.
     """
@@ -38,15 +41,15 @@ def _reproject_dst(source, src_crs, dst_crs, src_transform):
 
 
 def reproject(
-    source,
-    like=None,
-    src_crs=None,
-    dst_crs=None,
-    method="nearest",
-    use_src_attrs=False,
-    src_nodata=np.nan,
-    **reproject_kwargs,
-):
+    source: xr.DataArray,
+    like: xr.DataArray | None = None,
+    src_crs: Any = None,
+    dst_crs: Any = None,
+    method: Any = "nearest",
+    use_src_attrs: bool = False,
+    src_nodata: float = np.nan,
+    **reproject_kwargs: Any,
+) -> xr.DataArray:
     """
 
     .. attention::

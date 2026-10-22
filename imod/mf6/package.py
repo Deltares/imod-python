@@ -16,6 +16,7 @@ import jinja2
 import numpy as np
 import xarray as xr
 import xugrid as xu
+from numpy.typing import DTypeLike
 
 from imod.common.interfaces.ipackage import IPackage
 from imod.common.utilities.clip import (
@@ -76,7 +77,9 @@ class Package(PackageBase, IPackage, abc.ABC):
     _regrid_method: DataclassType = EmptyRegridMethod()
     _template: jinja2.Template
 
-    def __init__(self, allargs: Mapping[str, GridDataArray | float | int | bool | str]):
+    def __init__(
+        self, allargs: Mapping[str, GridDataArray | float | int | bool | str]
+    ) -> None:
         super().__init__(allargs)
 
     @staticmethod
@@ -84,7 +87,7 @@ class Package(PackageBase, IPackage, abc.ABC):
         return is_valid(value)
 
     @staticmethod
-    def _number_format(dtype: type):
+    def _number_format(dtype: DTypeLike) -> str:
         if np.issubdtype(dtype, np.integer):
             return "%i"
         elif np.issubdtype(dtype, np.floating):
@@ -93,7 +96,7 @@ class Package(PackageBase, IPackage, abc.ABC):
             raise TypeError("dtype should be either integer or float")
 
     @staticmethod
-    def _initialize_template(pkg_id):
+    def _initialize_template(pkg_id: str) -> jinja2.Template:
         loader = jinja2.PackageLoader("imod", "templates/mf6")
         env = jinja2.Environment(loader=loader, keep_trailing_newline=True)
         if pkg_id == "ims":
@@ -112,7 +115,12 @@ class Package(PackageBase, IPackage, abc.ABC):
             fname = f"gwf-{pkg_id}.j2"
         return env.get_template(fname)
 
-    def _write_blockfile(self, pkgname, globaltimes, write_context: WriteContext):
+    def _write_blockfile(
+        self,
+        pkgname: str,
+        globaltimes: list[np.datetime64] | np.ndarray,
+        write_context: WriteContext,
+    ) -> None:
         directory = write_context.get_formatted_write_directory()
 
         content = self._render(
@@ -126,7 +134,9 @@ class Package(PackageBase, IPackage, abc.ABC):
         with open(filename, "w") as f:
             f.write(content)
 
-    def _write_binary_griddata(self, outpath, da, dtype):
+    def _write_binary_griddata(
+        self, outpath: str | Path, da: GridDataArray, dtype: Any
+    ) -> None:
         # From the modflow6 source, the header is defined as:
         # integer(I4B) :: kstp --> np.int32 : 1
         # integer(I4B) :: kper --> np.int32 : 2
@@ -161,7 +171,9 @@ class Package(PackageBase, IPackage, abc.ABC):
             header.tofile(f)
             da.values.flatten().astype(dtype).tofile(f)
 
-    def _write_text_griddata(self, outpath, da, dtype):
+    def _write_text_griddata(
+        self, outpath: str | Path, da: GridDataArray, dtype: Any
+    ) -> None:
         # Note: reshaping here avoids writing newlines after every number.
         # This dumps all the values in a single row rather than a single
         # column. This is to be preferred, since editors can easily
@@ -206,12 +218,18 @@ class Package(PackageBase, IPackage, abc.ABC):
             d["auxiliary"] = names
         return d
 
-    def _render(self, directory, pkgname, globaltimes, binary):
+    def _render(
+        self,
+        directory: pathlib.Path,
+        pkgname: str,
+        globaltimes: list[np.datetime64] | np.ndarray,
+        binary: bool,
+    ) -> str:
         d = self._get_render_dictionary(directory, pkgname, globaltimes, binary)
         return self._template.render(d)
 
     @staticmethod
-    def _is_xy_data(obj):
+    def _is_xy_data(obj: Any) -> bool:
         if isinstance(obj, (xr.DataArray, xr.Dataset)):
             xy = "x" in obj.dims and "y" in obj.dims
         elif isinstance(obj, (xu.UgridDataArray, xu.UgridDataset)):
@@ -224,7 +242,7 @@ class Package(PackageBase, IPackage, abc.ABC):
         return xy
 
     def _compose_values(
-        self, da, directory, name, binary
+        self, da: GridDataArray, directory: Any, name: str, binary: bool
     ) -> tuple[bool, list[str] | None]:
         """
         Compose values of dictionary.
@@ -264,7 +282,7 @@ class Package(PackageBase, IPackage, abc.ABC):
         directory: str | Path,
         use_binary: bool = False,
         use_absolute_paths: bool = False,
-    ):
+    ) -> None:
         """
         Write package to file
 
@@ -317,7 +335,7 @@ class Package(PackageBase, IPackage, abc.ABC):
 
     @standard_log_decorator()
     def _validate(
-        self, schemata: dict[str, Any], **kwargs
+        self, schemata: dict[str, Any], **kwargs: Any
     ) -> dict[str, list[ValidationError]]:
         ds = trim_time_dimension(self.dataset, **kwargs)
         return validate_schemata_dict(schemata, ds, **kwargs)
@@ -349,7 +367,7 @@ class Package(PackageBase, IPackage, abc.ABC):
         allnodata_errors = validate_schemata_dict(allnodata_schemata, ds)
         return len(allnodata_errors) > 0
 
-    def _validate_init_schemata(self, validate: bool, **kwargs) -> None:
+    def _validate_init_schemata(self, validate: bool, **kwargs: Any) -> None:
         """
         Run the "cheap" schema validations.
 

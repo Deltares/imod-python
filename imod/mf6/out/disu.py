@@ -6,7 +6,7 @@ import xarray as xr
 import xugrid as xu
 
 from . import cbc
-from .common import FilePath, _grb_text
+from .common import FilePath, FloatArray, _grb_text
 
 
 def read_grb(f: BinaryIO, ntxt: int, lentxt: int) -> dict[str, Any]:
@@ -57,13 +57,13 @@ def read_grb(f: BinaryIO, ntxt: int, lentxt: int) -> dict[str, Any]:
     return out
 
 
-def read_times(path: FilePath, ntime: int, ncell: int):
+def read_times(path: FilePath, ntime: int, ncell: int) -> FloatArray:
     raise NotImplementedError
 
 
 def read_hds_timestep(
     path: FilePath, nlayer: int, ncell_per_layer: int, dry_nan: bool, pos: int
-):
+) -> FloatArray:
     raise NotImplementedError
 
 

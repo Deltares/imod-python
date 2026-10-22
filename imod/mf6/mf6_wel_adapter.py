@@ -12,6 +12,7 @@ GIS systems. The low-level classes contain a dataset based on cellid,
 consisting of layer, row, and column, closely resembling input for Modflow6.
 """
 
+from pathlib import Path
 from typing import Any
 
 import numpy as np
@@ -21,6 +22,7 @@ from numpy.typing import NDArray
 from imod.common.interfaces.ipackage import IPackage
 from imod.mf6.boundary_condition import BoundaryCondition
 from imod.schemata import DTypeSchema
+from imod.typing import GridDataset
 
 # FUTURE: There was an idea to autogenerate modflow 6 adapters.
 # This was relevant:
@@ -29,7 +31,7 @@ from imod.schemata import DTypeSchema
 
 def cellid_from_arrays__structured(
     layer: NDArray[np.int_], row: NDArray[np.int_], column: NDArray[np.int_]
-):
+) -> xr.DataArray:
     """
     Create DataArray of cellids for structured indices.
 
@@ -50,7 +52,9 @@ def cellid_from_arrays__structured(
     return _cellid_from_kwargs(layer=layer, row=row, column=column)
 
 
-def cellid_from_arrays__unstructured(layer: NDArray[np.int_], cell2d: NDArray[np.int_]):
+def cellid_from_arrays__unstructured(
+    layer: NDArray[np.int_], cell2d: NDArray[np.int_]
+) -> xr.DataArray:
     """
     Create DataArray of cellids for unstructured indices.
 
@@ -69,7 +73,7 @@ def cellid_from_arrays__unstructured(layer: NDArray[np.int_], cell2d: NDArray[np
     return _cellid_from_kwargs(layer=layer, cell2d=cell2d)
 
 
-def _cellid_from_kwargs(**kwargs):
+def _cellid_from_kwargs(**kwargs: NDArray[np.int_]) -> xr.DataArray:
     dim_cellid_coord = list(kwargs.keys())
     arr_ls = list(kwargs.values())
     index = np.arange(len(arr_ls[0]))
@@ -145,17 +149,17 @@ class Mf6Wel(BoundaryCondition, IPackage):
 
     def __init__(
         self,
-        cellid,
-        rate,
-        id,
-        concentration=None,
-        concentration_boundary_type="aux",
+        cellid: xr.DataArray,
+        rate: xr.DataArray,
+        id: xr.DataArray,
+        concentration: xr.DataArray | None = None,
+        concentration_boundary_type: str = "aux",
         save_flows: bool | None = None,
         print_flows: bool | None = None,
         print_input: bool | None = None,
         validate: bool = True,
-    ):
-        dict_dataset = {
+    ) -> None:
+        dict_dataset: dict[str, Any] = {
             "cellid": cellid,
             "rate": rate,
             "id": id,
@@ -168,7 +172,7 @@ class Mf6Wel(BoundaryCondition, IPackage):
         super().__init__(dict_dataset)
         self._validate_init_schemata(validate)
 
-    def _ds_to_arrdict(self, ds):
+    def _ds_to_arrdict(self, ds: GridDataset) -> dict[str, Any]:
         """
         Prepares a dictionary with values needed for the _to_sparse method.
         """
@@ -189,7 +193,7 @@ class Mf6Wel(BoundaryCondition, IPackage):
 
         return arrdict
 
-    def _to_struct_array(self, arrdict, _):
+    def _to_struct_array(self, arrdict: dict[str, Any], _: Any) -> np.ndarray:
         index_spec = [(index, np.int32) for index in arrdict["cellid_names"]]
         field_spec = [(var, np.float64) for var in arrdict["data_vars"]]
         sparse_dtype = np.dtype(index_spec + field_spec)
@@ -205,7 +209,7 @@ class Mf6Wel(BoundaryCondition, IPackage):
         return recarr
 
     @classmethod
-    def from_file(cls, path, **kwargs) -> "Mf6Wel":
+    def from_file(cls, path: str | Path, **kwargs: Any) -> "Mf6Wel":
         """
         Instantiate class from modflow 6 file
         """

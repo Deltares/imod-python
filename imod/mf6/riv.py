@@ -1,7 +1,8 @@
 from datetime import datetime
-from typing import Optional, cast
+from typing import Any, Optional, cast
 
 import numpy as np
+import xarray as xr
 
 from imod import logging
 from imod.common.interfaces.iregridpackage import IRegridPackage
@@ -41,6 +42,7 @@ from imod.schemata import (
     IdentityNoDataSchema,
     IndexesSchema,
     OtherCoordsSchema,
+    ValidationError,
 )
 from imod.typing import GridDataArray, GridDataDict
 from imod.typing.grid import (
@@ -264,18 +266,18 @@ class River(TopSystemBoundaryCondition, IRegridPackage):
     @init_log_decorator()
     def __init__(
         self,
-        stage,
-        conductance,
-        bottom_elevation,
-        concentration=None,
-        concentration_boundary_type="aux",
-        print_input=False,
-        print_flows=False,
-        save_flows=False,
-        observations=None,
+        stage: GridDataArray,
+        conductance: GridDataArray,
+        bottom_elevation: GridDataArray,
+        concentration: GridDataArray | None = None,
+        concentration_boundary_type: str = "aux",
+        print_input: bool = False,
+        print_flows: bool = False,
+        save_flows: bool = False,
+        observations: Any = None,
         validate: bool = True,
-        repeat_stress=None,
-    ):
+        repeat_stress: dict[Any, Any] | xr.DataArray | None = None,
+    ) -> None:
         dict_dataset = {
             "stage": stage,
             "conductance": conductance,
@@ -291,7 +293,9 @@ class River(TopSystemBoundaryCondition, IRegridPackage):
         super().__init__(dict_dataset)
         self._validate_init_schemata(validate)
 
-    def _validate(self, schemata, **kwargs):
+    def _validate(
+        self, schemata: dict[str, Any], **kwargs: Any
+    ) -> dict[str, list[ValidationError]]:
         # Insert additional kwargs
         kwargs["stage"] = self["stage"]
         kwargs["bottom_elevation"] = self["bottom_elevation"]
@@ -534,7 +538,7 @@ class River(TopSystemBoundaryCondition, IRegridPackage):
         regridded_riv_pkg_data, infiltration_drn_data = _separate_infiltration_data(
             regridded_riv_pkg_data, infiltration_factor
         )
-        riv_pkg = cls(**regridded_riv_pkg_data, validate=True)
+        riv_pkg = cls(**cast(dict[str, Any], regridded_riv_pkg_data), validate=True)
         drn_pkg = _create_drain_from_leftover_riv_imod5_data(
             allocation_drn_data,
             infiltration_drn_data,

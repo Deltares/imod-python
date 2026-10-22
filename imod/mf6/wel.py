@@ -5,6 +5,7 @@ import itertools
 import textwrap
 from collections.abc import Callable, Iterable, Sequence
 from datetime import datetime
+from pathlib import Path
 from typing import Any, Self, cast
 
 import cftime
@@ -136,7 +137,7 @@ def _prepare_well_rates_from_groups(
 
 def _process_timeseries(
     df_group: pd.api.typing.DataFrameGroupBy, start_times: StressPeriodTimesType
-):
+) -> pd.DataFrame:
     if _is_steady_state(start_times):
         return average_timeseries(df_group)
     else:
@@ -400,7 +401,13 @@ class GridAgnosticWell(BoundaryCondition, IPointDataPackage, abc.ABC):
 
         return ds_vars
 
-    def _render(self, directory, pkgname, globaltimes, binary):
+    def _render(
+        self,
+        directory: Path | str,
+        pkgname: str,
+        globaltimes: list[np.datetime64] | np.ndarray,
+        binary: bool,
+    ) -> str:
         raise NotImplementedError(
             textwrap.dedent(
                 f"""{self.__class__.__name__} is a grid-agnostic package and does not
@@ -414,7 +421,7 @@ class GridAgnosticWell(BoundaryCondition, IPointDataPackage, abc.ABC):
         pkgname: str,
         globaltimes: list[np.datetime64] | np.ndarray,
         write_context: WriteContext,
-    ):
+    ) -> None:
         raise NotImplementedError(
             "To write a wel package first convert it to a MF6 well using to_mf6_pkg."
         )
@@ -739,7 +746,7 @@ class GridAgnosticWell(BoundaryCondition, IPointDataPackage, abc.ABC):
         self,
         dis: StructuredDiscretization | VerticesDiscretization,
         cleanup_func: Callable[..., Any],
-        **cleanup_kwargs,
+        **cleanup_kwargs: Any,
     ) -> None:
         # Work around mypy error, .data_vars cannot be used with xu.UgridDataset
         dict_to_broadcast: dict[str, GridDataArray] = dict(**dis.dataset)  # type: ignore
@@ -916,17 +923,17 @@ class Well(GridAgnosticWell):
         screen_bottom: np.ndarray | list[float],
         rate: list[float] | xr.DataArray,
         concentration: list[float] | xr.DataArray | None = None,
-        concentration_boundary_type="aux",
+        concentration_boundary_type: str = "aux",
         id: list[Any] | None = None,
         minimum_k: float = 0.0,
         minimum_thickness: float = 0.0,
         print_input: bool = False,
         print_flows: bool = False,
         save_flows: bool = False,
-        observations=None,
+        observations: Any = None,
         validate: bool = True,
         repeat_stress: xr.DataArray | None = None,
-    ):
+    ) -> None:
         if id is None:
             id = [str(i) for i in range(len(x))]
         else:
@@ -1073,7 +1080,7 @@ class Well(GridAgnosticWell):
     @staticmethod
     def _find_well_value_at_layer(
         well_dataset: xr.Dataset, grid: GridDataArray, layer: int | None
-    ):
+    ) -> tuple[GridDataArray | None, npt.NDArray[np.bool_]]:
         value = None if layer is None else grid.isel(layer=layer)
 
         # if value is a grid select the values at the well locations and drop the dimensions
@@ -1105,7 +1112,7 @@ class Well(GridAgnosticWell):
 
     @standard_log_decorator()
     def _validate(
-        self, schemata: dict[str, Any], **kwargs
+        self, schemata: dict[str, Any], **kwargs: Any
     ) -> dict[str, list[ValidationError]]:
         kwargs["screen_top"] = self.dataset["screen_top"]
         return Package._validate(self, schemata, **kwargs)
@@ -1172,7 +1179,7 @@ class Well(GridAgnosticWell):
             raise ValueError(log_msg)
 
     @standard_log_decorator()
-    def cleanup(self, dis: StructuredDiscretization | VerticesDiscretization):
+    def cleanup(self, dis: StructuredDiscretization | VerticesDiscretization) -> None:
         """
         Clean up package inplace. This method calls
         :func:`imod.prepare.cleanup_wel`, see documentation of that
@@ -1312,17 +1319,17 @@ class LayeredWell(GridAgnosticWell):
         layer: np.ndarray | list[int],
         rate: list[float] | xr.DataArray,
         concentration: list[float] | xr.DataArray | None = None,
-        concentration_boundary_type="aux",
+        concentration_boundary_type: str = "aux",
         id: list[Any] | None = None,
         minimum_k: float = 0.0,
         minimum_thickness: float = 0.0,
         print_input: bool = False,
         print_flows: bool = False,
         save_flows: bool = False,
-        observations=None,
+        observations: Any = None,
         validate: bool = True,
         repeat_stress: xr.DataArray | None = None,
-    ):
+    ) -> None:
         if id is None:
             id = [str(i) for i in range(len(x))]
         else:
@@ -1480,7 +1487,7 @@ class LayeredWell(GridAgnosticWell):
         target_dis: StructuredDiscretization | None = None,
         regridder_types: CapDataWellRegridMethod = CapDataWellRegridMethod(),
         regrid_cache: RegridderWeightsCache = RegridderWeightsCache(),
-    ):
+    ) -> Self:
         """
         Create LayeredWell from imod5_data in "cap" package. Abstraction data
         for sprinkling is defined in iMOD5 either with grids (IDF) or points
@@ -1535,7 +1542,7 @@ class LayeredWell(GridAgnosticWell):
         return cls(**data)  # type: ignore
 
     @standard_log_decorator()
-    def cleanup(self, dis: StructuredDiscretization | VerticesDiscretization):
+    def cleanup(self, dis: StructuredDiscretization | VerticesDiscretization) -> None:
         """
         Clean up package inplace. This method calls
         :func:`imod.prepare.cleanup_wel_layered`, see documentation of that

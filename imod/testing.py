@@ -1,8 +1,10 @@
+from typing import Any
+
 import numpy as np
 import pandas as pd
 
 
-def assert_frame_equal(left: pd.DataFrame, right: pd.DataFrame, **kwargs):
+def assert_frame_equal(left: pd.DataFrame, right: pd.DataFrame, **kwargs: Any) -> None:
     """
     Dataframes are regularly created with "platform dependent" integer columns,
     such as int and np.intp; windows behaves differently from linux. This
@@ -13,7 +15,7 @@ def assert_frame_equal(left: pd.DataFrame, right: pd.DataFrame, **kwargs):
     https://pandas.pydata.org/docs/reference/api/pandas.testing.assert_frame_equal.html
     """
 
-    def always_int64(df):
+    def always_int64(df: pd.DataFrame) -> pd.DataFrame:
         df = df.copy()
         for column, dtype in df.dtypes.items():
             if pd.api.types.is_integer_dtype(dtype):

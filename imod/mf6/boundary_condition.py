@@ -18,9 +18,10 @@ from imod.mf6.package import Package
 from imod.mf6.utilities.package import get_repeat_stress
 from imod.mf6.write_context import WriteContext
 from imod.typing import GridDataArray
+from imod.typing.grid import GridDataset
 
 
-def _dis_recarr(arrdict, layer, notnull):
+def _dis_recarr(arrdict: dict[str, Any], layer: Any, notnull: Any) -> np.ndarray:
     # Define the numpy structured array dtype
     index_spec = [("layer", np.int32), ("row", np.int32), ("column", np.int32)]
     field_spec = [(key, np.float64) for key in arrdict]
@@ -40,7 +41,7 @@ def _dis_recarr(arrdict, layer, notnull):
     return recarr
 
 
-def _disv_recarr(arrdict, layer, notnull):
+def _disv_recarr(arrdict: dict[str, Any], layer: Any, notnull: Any) -> np.ndarray:
     # Define the numpy structured array dtype
     index_spec = [("layer", np.int32), ("cell2d", np.int32)]
     field_spec = [(key, np.float64) for key in arrdict]
@@ -74,7 +75,7 @@ class BoundaryCondition(Package, IBoundaryCondition, abc.ABC):
 
     def __init__(
         self, allargs: MutableMapping[str, GridDataArray | float | int | bool | str]
-    ):
+    ) -> None:
         # Convert repeat_stress in dict to a xr.DataArray in the right shape if
         # necessary, which is required to merge it into the dataset.
         if "repeat_stress" in allargs.keys() and isinstance(
@@ -90,7 +91,7 @@ class BoundaryCondition(Package, IBoundaryCondition, abc.ABC):
         else:
             expand_transient_auxiliary_variables(self)
 
-    def _max_active_n(self):
+    def _max_active_n(self) -> int:
         """
         Determine the maximum active number of cells that are active
         during a stress period.
@@ -107,17 +108,25 @@ class BoundaryCondition(Package, IBoundaryCondition, abc.ABC):
             nmax = int(da.count())
         return nmax
 
-    def _write_binaryfile(self, outpath, struct_array):
+    def _write_binaryfile(
+        self, outpath: str | pathlib.Path, struct_array: np.ndarray
+    ) -> None:
         with open(outpath, "w") as f:
             struct_array.tofile(f)
 
-    def _write_textfile(self, outpath, struct_array):
+    def _write_textfile(
+        self, outpath: str | pathlib.Path, struct_array: np.ndarray
+    ) -> None:
         fields = struct_array.dtype.fields
+        if fields is None:
+            raise ValueError("struct_array should be a structured array")
         fmt = [self._number_format(field[0]) for field in fields.values()]
         header = " ".join(list(fields.keys()))
         np.savetxt(fname=outpath, X=struct_array, fmt=fmt, header=header)
 
-    def _write_datafile(self, outpath, ds, binary):
+    def _write_datafile(
+        self, outpath: pathlib.Path, ds: GridDataset, binary: bool
+    ) -> None:
         """
         Writes a modflow6 binary data file
         """
@@ -130,20 +139,22 @@ class BoundaryCondition(Package, IBoundaryCondition, abc.ABC):
         else:
             self._write_textfile(outpath, struct_array)
 
-    def _ds_to_arrdict(self, ds):
+    def _ds_to_arrdict(self, ds: GridDataset) -> dict[str, np.ndarray]:
         for datavar in ds.data_vars:
             if ds[datavar].shape == ():
                 raise ValueError(
                     f"{datavar} in {self._pkg_id} package cannot be a scalar"
                 )
 
-        arrdict = {}
+        arrdict: dict[str, np.ndarray] = {}
         for datavar in ds.data_vars:
-            arrdict[datavar] = ds[datavar].values
+            arrdict[str(datavar)] = ds[datavar].values
 
         return arrdict
 
-    def _to_struct_array(self, arrdict, layer):
+    def _to_struct_array(
+        self, arrdict: dict[str, np.ndarray], layer: np.ndarray | None
+    ) -> np.ndarray:
         """Convert from dense arrays to list based input"""
         # TODO stream the data per stress period
         # TODO add pkgcheck that period table aligns
@@ -171,8 +182,13 @@ class BoundaryCondition(Package, IBoundaryCondition, abc.ABC):
         return recarr
 
     def _period_paths(
-        self, directory: pathlib.Path | str, pkgname: str, globaltimes, bin_ds, binary
-    ):
+        self,
+        directory: pathlib.Path | str,
+        pkgname: str,
+        globaltimes: list[np.datetime64] | np.ndarray,
+        bin_ds: GridDataset,
+        binary: bool,
+    ) -> dict[np.int64, str]:
         directory = pathlib.Path(directory) / pkgname
 
         if binary:
@@ -210,7 +226,7 @@ class BoundaryCondition(Package, IBoundaryCondition, abc.ABC):
         self,
         predefined_options: dict[str, Any],
         not_options: list[str] | None = None,
-    ):
+    ) -> dict[str, Any]:
         options = copy(predefined_options)
 
         if not_options is None:
@@ -228,7 +244,7 @@ class BoundaryCondition(Package, IBoundaryCondition, abc.ABC):
         self,
         predefined_options: dict[str, Any],
         not_options: list[str] | None = None,
-    ):
+    ) -> dict[str, Any]:
         unfiltered_options = self._get_unfiltered_pkg_options(
             predefined_options, not_options=not_options
         )
@@ -240,7 +256,7 @@ class BoundaryCondition(Package, IBoundaryCondition, abc.ABC):
         }
         return options
 
-    def _get_bin_ds(self):
+    def _get_bin_ds(self) -> GridDataset:
         """
         Get binary dataset data for stress periods, this data will be written to
         datafiles. This method can be overriden to do some extra operations on
@@ -248,9 +264,15 @@ class BoundaryCondition(Package, IBoundaryCondition, abc.ABC):
         """
         return self[self._get_period_varnames()]
 
-    def _render(self, directory, pkgname, globaltimes, binary):
+    def _render(
+        self,
+        directory: pathlib.Path | str,
+        pkgname: str,
+        globaltimes: list[np.datetime64] | np.ndarray,
+        binary: bool,
+    ) -> str:
         """Render fills in the template only, doesn't write binary data"""
-        d = {"binary": binary}
+        d: dict[str, Any] = {"binary": binary}
         bin_ds = self._get_bin_ds()
         # construct the rest (dict for render)
         d = self._get_pkg_options(d)
@@ -264,7 +286,9 @@ class BoundaryCondition(Package, IBoundaryCondition, abc.ABC):
 
         return self._template.render(d)
 
-    def _write_perioddata(self, directory, pkgname, binary):
+    def _write_perioddata(
+        self, directory: pathlib.Path, pkgname: str, binary: bool
+    ) -> None:
         if len(self._get_period_varnames()) == 0:
             return
         bin_ds = self._get_bin_ds()
@@ -289,7 +313,7 @@ class BoundaryCondition(Package, IBoundaryCondition, abc.ABC):
         pkgname: str,
         globaltimes: list[np.datetime64] | np.ndarray,
         write_context: WriteContext,
-    ):
+    ) -> None:
         """
         writes the blockfile and binary data
 
@@ -348,7 +372,7 @@ class AdvancedBoundaryCondition(BoundaryCondition, abc.ABC):
 
     """
 
-    def _get_field_spec_from_dtype(self, recarr):
+    def _get_field_spec_from_dtype(self, recarr: Any) -> list[tuple[str, Any]]:
         """
         From https://stackoverflow.com/questions/21777125/how-to-output-dtype-to-a-list-or-dict
         """
@@ -357,7 +381,7 @@ class AdvancedBoundaryCondition(BoundaryCondition, abc.ABC):
             for x, y in sorted(recarr.dtype.fields.items(), key=lambda k: k[1])
         ]
 
-    def _write_file(self, outpath, sparse_data):
+    def _write_file(self, outpath: str | pathlib.Path, sparse_data: Any) -> None:
         """
         Write to textfile, which is necessary for Advanced Stress Packages
         """
@@ -367,14 +391,16 @@ class AdvancedBoundaryCondition(BoundaryCondition, abc.ABC):
         np.savetxt(fname=outpath, X=sparse_data, fmt=fmt, header=header)
 
     @abc.abstractmethod
-    def _package_data_to_sparse(self):
+    def _package_data_to_sparse(self) -> Any:
         """
         Get packagedata, override with function for the advanced boundary
         condition in particular
         """
         return
 
-    def _write_packagedata(self, directory, pkgname, binary):
+    def _write_packagedata(
+        self, directory: pathlib.Path, pkgname: str, binary: bool
+    ) -> None:
         outpath = directory / pkgname / f"{self._pkg_id}-pkgdata.dat"
         outpath.parent.mkdir(exist_ok=True, parents=True)
         package_data = self._package_data_to_sparse()
@@ -385,7 +411,7 @@ class AdvancedBoundaryCondition(BoundaryCondition, abc.ABC):
         pkgname: str,
         globaltimes: list[np.datetime64] | np.ndarray,
         write_context: WriteContext,
-    ):
+    ) -> None:
         boundary_condition_write_context = deepcopy(write_context)
         boundary_condition_write_context.use_binary = False
 
@@ -396,5 +422,5 @@ class AdvancedBoundaryCondition(BoundaryCondition, abc.ABC):
         self._write_packagedata(directory, pkgname, binary=False)
 
     @abc.abstractmethod
-    def _fill_stress_perioddata(self):
+    def _fill_stress_perioddata(self) -> None:
         raise NotImplementedError

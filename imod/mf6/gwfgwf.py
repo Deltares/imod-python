@@ -37,7 +37,7 @@ class GWFGWF(ExchangeBase):
         hwva: xr.DataArray,
         angldegx: xr.DataArray | None = None,
         cdist: xr.DataArray | None = None,
-    ):
+    ) -> None:
         ihc = ones_like(cl1, dtype=int)
         dict_dataset = {
             "cell_id1": cell_id1,
@@ -69,7 +69,7 @@ class GWFGWF(ExchangeBase):
         variablecv: bool | None = None,
         xt3d: bool | None = None,
         newton: bool | None = None,
-    ):
+    ) -> None:
         self.dataset["print_input"] = print_input
         self.dataset["print_flows"] = print_flows
         self.dataset["save_flows"] = save_flows

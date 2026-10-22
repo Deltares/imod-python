@@ -2,10 +2,11 @@ import contextlib
 import os
 import pathlib
 import warnings
+from collections.abc import Iterator
 
 
 @contextlib.contextmanager
-def ignore_warnings():
+def ignore_warnings() -> Iterator[None]:
     """
     Contextmanager to ignore RuntimeWarnings as they are frequently
     raised by the Dask delayed scheduler.
@@ -22,7 +23,7 @@ def ignore_warnings():
 
 
 @contextlib.contextmanager
-def cd(path: str | pathlib.Path):
+def cd(path: str | pathlib.Path) -> Iterator[None]:
     """
     Change directory, and change it back after the with block.
 
@@ -41,7 +42,7 @@ def cd(path: str | pathlib.Path):
 
 
 @contextlib.contextmanager
-def print_if_error(exception_type: type[BaseException]):
+def print_if_error(exception_type: type[BaseException]) -> Iterator[None]:
     """
     Prints error instead of raising it. Useful for cases when pieces of code are
     expected to fail, but the script needs to continue. This is a common

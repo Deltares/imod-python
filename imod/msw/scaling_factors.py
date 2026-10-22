@@ -1,3 +1,7 @@
+from typing import Self
+
+import xarray as xr
+
 from imod.common.interfaces.iregridpackage import IRegridPackage
 from imod.msw.fixed_format import VariableMetaData
 from imod.msw.pkgbase import MetaSwapPackage
@@ -67,11 +71,11 @@ class ScalingFactors(MetaSwapPackage, IRegridPackage):
 
     def __init__(
         self,
-        scale_soil_moisture,
-        scale_hydraulic_conductivity,
-        scale_pressure_head,
-        depth_perched_water_table,
-    ):
+        scale_soil_moisture: xr.DataArray,
+        scale_hydraulic_conductivity: xr.DataArray,
+        scale_pressure_head: xr.DataArray,
+        depth_perched_water_table: xr.DataArray,
+    ) -> None:
         super().__init__()
         self.dataset["scale_soil_moisture"] = scale_soil_moisture
         self.dataset["scale_hydraulic_conductivity"] = scale_hydraulic_conductivity
@@ -81,7 +85,7 @@ class ScalingFactors(MetaSwapPackage, IRegridPackage):
         self._pkgcheck()
 
     @classmethod
-    def from_imod5_data(cls, imod5_data: Imod5DataDict) -> "ScalingFactors":
+    def from_imod5_data(cls, imod5_data: Imod5DataDict) -> Self:
         """
         Construct a MetaSWAP Ponding package from iMOD5 data in the CAP
         package, loaded with the :func:`imod.formats.prj.open_projectfile_data`

@@ -1,4 +1,5 @@
 import abc
+from collections.abc import Callable
 from copy import deepcopy
 from dataclasses import asdict
 from typing import Self, cast
@@ -127,7 +128,8 @@ class TopSystemBoundaryCondition(
             grid_dict, _ = grid_dict
         options = self._get_unfiltered_pkg_options({})
         data_dict = grid_dict | options
-        return self.__class__(**data_dict)
+        pkg_class: Callable[..., Self] = self.__class__
+        return pkg_class(**data_dict)
 
     @classmethod
     def _allocate_and_distribute_planar_data(

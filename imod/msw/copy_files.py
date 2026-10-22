@@ -1,7 +1,7 @@
 from collections.abc import Sequence
 from pathlib import Path
 from shutil import copy2
-from typing import cast
+from typing import Any, Self, cast
 
 import numpy as np
 import xarray as xr
@@ -30,7 +30,7 @@ class FileCopier(MetaSwapPackage):
         initialization.
     """
 
-    def __init__(self, paths: Sequence[str | Path]):
+    def __init__(self, paths: Sequence[str | Path]) -> None:
         super().__init__()
         # Enforce string so that it can be easily serialized and retrieved from
         # the dataset.
@@ -41,7 +41,7 @@ class FileCopier(MetaSwapPackage):
         self.dataset["paths"] = paths_da
 
     @classmethod
-    def from_imod5_data(cls, imod5_data: Imod5DataDict):
+    def from_imod5_data(cls, imod5_data: Imod5DataDict) -> Self:
         paths = cast(list[list[str]], imod5_data["extra"]["paths"])
         paths_unpacked = {Path(p[0]) for p in paths}
         files_to_filter = (
@@ -62,7 +62,7 @@ class FileCopier(MetaSwapPackage):
             )
         return cls(paths_included)
 
-    def write(self, directory: str | Path, *_):
+    def write(self, directory: str | Path, *_: Any) -> None:
         directory = Path(directory)
 
         src_paths = [Path(p) for p in self.dataset["paths"].to_numpy()]

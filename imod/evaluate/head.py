@@ -69,7 +69,7 @@ def _calculate_gxg(
     # partition. See:
     # https://bottleneck.readthedocs.io/en/latest/reference.html#bottleneck.partition
 
-    def lowest3_mean(da: xr.DataArray):
+    def lowest3_mean(da: xr.DataArray) -> xr.DataArray:
         a = bn.partition(da.values, kth=2, axis=-1)
 
         with warnings.catch_warnings():
@@ -79,7 +79,7 @@ def _calculate_gxg(
         template = da.isel(bimonth=0)
         return template.copy(data=result)
 
-    def highest3_mean(da: xr.DataArray):
+    def highest3_mean(da: xr.DataArray) -> xr.DataArray:
         a = bn.partition(-da.values, kth=2, axis=-1)
 
         with warnings.catch_warnings():
@@ -216,7 +216,9 @@ def calculate_gxg_points(
     >>> )
     """
 
-    def bimonthly(series: pd.Series, dates: pd.DatetimeIndex, tolerance: pd.Timedelta):
+    def bimonthly(
+        series: pd.Series, dates: pd.DatetimeIndex, tolerance: pd.Timedelta
+    ) -> pd.Series:
         series = series[~series.index.duplicated(keep="first")]
         return series.reindex(dates, method="nearest", tolerance=tolerance)
 

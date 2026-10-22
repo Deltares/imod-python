@@ -4,7 +4,13 @@ import xarray as xr
 
 
 @numba.njit
-def _interpolate_value_boundaries_z1d(values, z, dz, threshold, out):
+def _interpolate_value_boundaries_z1d(
+    values: np.ndarray,
+    z: np.ndarray,
+    dz: np.ndarray,
+    threshold: float,
+    out: np.ndarray,
+) -> None:
     nlay, nrow, ncol = values.shape
     for i in range(nrow):
         for j in range(ncol):
@@ -32,7 +38,13 @@ def _interpolate_value_boundaries_z1d(values, z, dz, threshold, out):
 
 
 @numba.njit
-def _interpolate_value_boundaries_z3d(values, z, dz, threshold, out):
+def _interpolate_value_boundaries_z3d(
+    values: np.ndarray,
+    z: np.ndarray,
+    dz: np.ndarray,
+    threshold: float,
+    out: np.ndarray,
+) -> None:
     nlay, nrow, ncol = values.shape
     for i in range(nrow):
         for j in range(ncol):
@@ -62,7 +74,13 @@ def _interpolate_value_boundaries_z3d(values, z, dz, threshold, out):
 
 
 @numba.njit
-def _interpolate_value_boundaries_z3ddz1d(values, z, dz, threshold, out):
+def _interpolate_value_boundaries_z3ddz1d(
+    values: np.ndarray,
+    z: np.ndarray,
+    dz: np.ndarray,
+    threshold: float,
+    out: np.ndarray,
+) -> None:
     nlay, nrow, ncol = values.shape
     for i in range(nrow):
         for j in range(ncol):
@@ -92,28 +110,35 @@ def _interpolate_value_boundaries_z3ddz1d(values, z, dz, threshold, out):
                     n += 1
 
 
-def interpolate_value_boundaries(values, z, threshold):
+def interpolate_value_boundaries(
+    values: xr.DataArray, z: xr.DataArray, threshold: float
+) -> tuple[xr.DataArray, xr.DataArray]:
     """Function that returns all exceedance and non-exceedance boundaries for
     a given threshold in a 3D values DataArray. Returned z-coordinates are
-    linearly interpolated between cell mids. As many boundaries are returned as are maximally
-    present in the 3D values DataArray. Function returns xr.DataArray of exceedance boundaries
-    and xr.DataArray of z-coordinates where values fall below the set treshold.
+    linearly interpolated between cell mids. As many boundaries are returned as
+    are maximally present in the 3D values DataArray. Function returns
+    xr.DataArray of exceedance boundaries and xr.DataArray of z-coordinates
+    where values fall below the set treshold.
 
     Parameters
     ----------
     values : 3D xr.DataArray
-        The datarray containing the values to search for boundaries. Dimensions ``layer``, ``y``, ``x``
+        The datarray containing the values to search for boundaries. Dimensions
+        ``layer``, ``y``, ``x``
     z : 1D or 3D xr.DataArray
-        Datarray containing z-coordinates of cell midpoints. Dimensions ``layer``, ``y``, ``x``. Should contain a dz coordinate.
+        Datarray containing z-coordinates of cell midpoints. Dimensions
+        ``layer``, ``y``, ``x``. Should contain a dz coordinate.
     threshold : float
         Value threshold
 
     Returns
     -------
     xr.DataArray
-        Z locations of successive exceedances of threshold from the top down. Dimensions ``boundary``, ``y``, ``x``
+        Z locations of successive exceedances of threshold from the top down.
+        Dimensions ``boundary``, ``y``, ``x``
     xr.DataArray
-        Z locations of successive instances of falling below threshold from the top down. Dimensions ``boundary``, ``y``, ``x``
+        Z locations of successive instances of falling below threshold from the
+        top down. Dimensions ``boundary``, ``y``, ``x``
     """
 
     if "dz" not in z.coords:

@@ -1,5 +1,6 @@
 from copy import deepcopy
 from pathlib import Path
+from typing import Any
 
 import numpy as np
 import xugrid as xu
@@ -13,12 +14,12 @@ from imod.typing.grid import is_spatial_grid
 
 
 class NetCDFSerializer(IPackageSerializer):
-    def __init__(self, mdal_compliant: bool = False, crs: str | None = None):
+    def __init__(self, mdal_compliant: bool = False, crs: str | None = None) -> None:
         self.mdal_compliant = mdal_compliant
         self.crs = crs
 
     def to_file(
-        self, pkg: IPackageBase, directory: Path, file_name: str, **kwargs
+        self, pkg: IPackageBase, directory: Path, file_name: str, **kwargs: Any
     ) -> Path:
         path = directory / f"{file_name}.nc"
 

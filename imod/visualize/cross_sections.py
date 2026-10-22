@@ -4,7 +4,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 import xarray as xr
 from matplotlib.axes import Axes
-from matplotlib.colors import BoundaryNorm, ListedColormap
+from matplotlib.colors import BoundaryNorm, Colormap
 from matplotlib.contour import QuadContourSet
 from matplotlib.figure import Figure
 from matplotlib.quiver import Quiver
@@ -140,7 +140,7 @@ def cross_section(
     return_cmap_norm: bool = False,
     fig: Figure | None = None,
     ax: Axes | None = None,
-) -> tuple[Figure, Axes] | tuple[Figure, Axes, ListedColormap, BoundaryNorm]:
+) -> tuple[Figure, Axes] | tuple[Figure, Axes, Colormap, BoundaryNorm]:
     """
     Wraps matplotlib.pcolormesh to draw cross-sections, drawing cell boundaries
     accurately. Aquitards can be plotted on top of the cross-section, by providing

@@ -39,7 +39,9 @@ RegridVarType: TypeAlias = tuple[RegridderType, str] | tuple[RegridderType]
 dispatch = Dispatcher()
 
 
-def handle_extra_coords(coordname: str, target_grid: GridDataArray, variable_data: Any):
+def handle_extra_coords(
+    coordname: str, target_grid: GridDataArray, variable_data: Any
+) -> Any:
     """
     If ``variable_data`` has a ``coords`` attribute and if ``coordname`` in
     ``target_grid``, copy coord. If ``coordname`` not in ``target_grid``, but in
@@ -197,7 +199,7 @@ def _get_unique_regridder_types(model: IModel) -> defaultdict[RegridderType, lis
 
 
 @dispatch
-def _regrid_like(package: object, target_grid: object, *_) -> None:
+def _regrid_like(package: object, target_grid: object, *_: Any) -> None:
     raise TypeError("this object cannot be regridded")
 
 
@@ -403,7 +405,7 @@ def _regrid_like(
 
 @dispatch  # type: ignore[no-redef]
 def _regrid_like(
-    package: ILineDataPackage, target_grid: GridDataArray, *_
+    package: ILineDataPackage, target_grid: GridDataArray, *_: Any
 ) -> ILineDataPackage:
     """
     The regrid_like method is irrelevant for this package as it is
@@ -415,7 +417,7 @@ def _regrid_like(
 
 @dispatch  # type: ignore[no-redef]
 def _regrid_like(
-    package: IPointDataPackage, target_grid: GridDataArray, *_
+    package: IPointDataPackage, target_grid: GridDataArray, *_: Any
 ) -> IPointDataPackage:
     """
     he regrid_like method is irrelevant for this package as it is

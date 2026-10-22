@@ -373,18 +373,20 @@ def allocate_rch_cells(
     return _drop_empty_layers(result) if drop_empty_layers else result
 
 
-def _is_layered(grid: GridDataArray):
+def _is_layered(grid: GridDataArray) -> bool:
     return "layer" in grid.sizes and grid.sizes["layer"] > 1
 
 
-def _enforce_layered_top(top: GridDataArray, bottom: GridDataArray):
+def _enforce_layered_top(top: GridDataArray, bottom: GridDataArray) -> GridDataArray:
     if _is_layered(top):
         return top
     else:
         return create_layered_top(bottom, top)
 
 
-def get_above_lower_bound(bottom_elevation: GridDataArray, top_layered: GridDataArray):
+def get_above_lower_bound(
+    bottom_elevation: GridDataArray, top_layered: GridDataArray
+) -> GridDataArray:
     """
     Returns boolean array that indicates cells are above the lower vertical
     limit of the topsystem. These are the cells located above the

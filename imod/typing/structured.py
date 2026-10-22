@@ -2,6 +2,7 @@
 
 import itertools
 from collections import defaultdict
+from collections.abc import Mapping
 from typing import Any, cast
 
 import dask
@@ -61,12 +62,12 @@ def check_dim_sizes(das: list[xr.DataArray]) -> None:
     return
 
 
-def check_coords(das: list[xr.DataArray]):
-    def drop_xy(coords) -> xr.Coordinates:
-        coords = dict(coords)
-        coords.pop("y")
-        coords.pop("x")
-        return xr.Coordinates(coords)
+def check_coords(das: list[xr.DataArray]) -> None:
+    def drop_xy(coords: Mapping[Any, Any]) -> xr.Coordinates:
+        coords_dict = dict(coords)
+        coords_dict.pop("y")
+        coords_dict.pop("x")
+        return xr.Coordinates(coords_dict)
 
     first_coords = drop_xy(das[0].coords)
     disjoint = [
@@ -148,7 +149,7 @@ def _is_nonequidistant_coord(da: xr.DataArray, dim: str) -> bool:
 
 def _merge_nonequidistant_coords(
     das: list[xr.DataArray], coordname: str, indices: list[np.ndarray], nsize: int
-):
+) -> np.ndarray:
     dtype = das[0].coords[coordname].dtype
     out = np.full((nsize,), np.nan, dtype=dtype)
     for da, index in zip(das, indices):

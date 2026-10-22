@@ -1,3 +1,4 @@
+import pathlib
 from typing import Any
 
 import numpy as np
@@ -69,15 +70,21 @@ class InitialConditions(Package, IRegridPackage):
     _regrid_method = InitialConditionsRegridMethod()
 
     @init_log_decorator()
-    def __init__(self, start, validate: bool = True):
+    def __init__(self, start: GridDataArray, validate: bool = True) -> None:
         dict_dataset = {"start": start}
         super().__init__(dict_dataset)
         self._validate_init_schemata(validate)
 
-    def _render(self, directory, pkgname, globaltimes, binary):
+    def _render(
+        self,
+        directory: pathlib.Path | str,
+        pkgname: str,
+        globaltimes: list[np.datetime64] | np.ndarray,
+        binary: bool,
+    ) -> str:
         d: dict[str, Any] = {}
 
-        icdirectory = directory / pkgname
+        icdirectory = pathlib.Path(directory) / pkgname
         d["layered"], d["strt"] = self._compose_values(
             self["start"], icdirectory, "strt", binary=binary
         )

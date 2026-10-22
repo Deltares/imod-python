@@ -124,7 +124,7 @@ def _clip_by_grid_line_data(
     return clipped_package
 
 
-def _filter_inactive_cells(package: IPackage, active: GridDataArray):
+def _filter_inactive_cells(package: IPackage, active: GridDataArray) -> None:
     if package._is_grid_agnostic_package():
         return
 
@@ -221,7 +221,7 @@ def clip_box_dataset(
     x_max: float | None = None,
     y_min: float | None = None,
     y_max: float | None = None,
-):
+) -> GridDataset:
     selection = dataset.copy()
     selection = clip_time_slice(selection, time_min=time_min, time_max=time_max)
     selection = clip_layer_slice(selection, layer_min=layer_min, layer_max=layer_max)
@@ -239,7 +239,7 @@ def clip_time_indexer(
     time: np.ndarray,
     time_start: cftime.datetime | np.datetime64 | str | None = None,
     time_end: cftime.datetime | np.datetime64 | str | None = None,
-):
+) -> xr.DataArray:
     """
     Return indices which can be used to select a time slice from a
     DataArray or Dataset.
@@ -283,7 +283,7 @@ def clip_spatial_box(
     x_max: float | None = None,
     y_min: float | None = None,
     y_max: float | None = None,
-):
+) -> GridDataset:
     """
     Clip a spatial dataset by a bounding box.
     """
@@ -303,7 +303,7 @@ def clip_layer_slice(
     dataset: GridDataset,
     layer_min: int | None = None,
     layer_max: int | None = None,
-):
+) -> GridDataset:
     """
     Clip a dataset by a layer slice.
     """
@@ -320,7 +320,9 @@ def clip_layer_slice(
     return selection
 
 
-def _to_datetime(time: cftime.datetime | np.datetime64 | str | None, use_cftime: bool):
+def _to_datetime(
+    time: cftime.datetime | np.datetime64 | str | None, use_cftime: bool
+) -> cftime.datetime | np.datetime64 | None:
     """
     Helper function that converts to datetime, except when None.
     """
@@ -351,7 +353,7 @@ def clip_repeat_stress(
     time: np.ndarray,
     time_start: cftime.datetime | np.datetime64 | str | None = None,
     time_end: cftime.datetime | np.datetime64 | str | None = None,
-):
+) -> tuple[xr.DataArray, xr.DataArray]:
     """
     Selection may remove the original data which are repeated.
     These should be re-inserted at the first occuring "key".
@@ -413,7 +415,7 @@ def clip_time_slice(
     dataset: GridDataset,
     time_min: cftime.datetime | np.datetime64 | str | None = None,
     time_max: cftime.datetime | np.datetime64 | str | None = None,
-):
+) -> GridDataset:
     """Clip time slice from dataset, account for repeat stress if present."""
     selection = dataset
     if "time" in selection.coords:

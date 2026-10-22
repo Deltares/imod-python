@@ -1,5 +1,4 @@
 import collections
-import glob
 import itertools
 import pathlib
 from collections.abc import Callable, Sequence
@@ -118,7 +117,9 @@ def _array_z_coord(
     return coords
 
 
-def _scalar_z_coord(coords: dict[str, Any], tops: list[float], bots: list[float]):
+def _scalar_z_coord(
+    coords: dict[str, Any], tops: list[float], bots: list[float]
+) -> dict[str, Any]:
     # They must be all the same to be used, as they cannot be assigned
     # to layer.
     top: np.ndarray = np.unique(tops)
@@ -133,7 +134,7 @@ def _scalar_z_coord(coords: dict[str, Any], tops: list[float], bots: list[float]
     return coords
 
 
-def _initialize_groupby(ndims: int):
+def _initialize_groupby(ndims: int) -> collections.defaultdict[Any, Any]:
     """
     This function generates a data structure consisting of defaultdicts, to use
     for grouping arrays by dimension. The number of dimensions may vary, so the
@@ -410,7 +411,7 @@ def _load(
 
 
 def handle_path(
-    path: pathlib.Path | str | list[pathlib.Path | str],
+    path: PathType | Sequence[PathType],
 ) -> list[pathlib.Path]:
     """
     Handle a path input and return a list of pathlib.Path objects.
@@ -430,15 +431,13 @@ def handle_path(
     FileNotFoundError
         If no files matching the input path(s) are found.
     """
-    if isinstance(path, pathlib.Path):
-        path = str(path)
-
-    if isinstance(path, list):
-        paths = [pathlib.Path(p) for p in path]
-    else:
+    if isinstance(path, str | pathlib.Path):
         # Sort: glob order is filesystem dependent (alphabetical on NTFS, not
         # on e.g. APFS or ext4), and downstream merging can depend on order.
-        paths = [pathlib.Path(p) for p in sorted(glob.glob(path))]
+        globpath = pathlib.Path(path)
+        paths = sorted(globpath.parent.glob(globpath.name))
+    else:
+        paths = [pathlib.Path(p) for p in path]
 
     n = len(paths)
     if n == 0:
@@ -447,7 +446,13 @@ def handle_path(
     return paths
 
 
-def _open(path, use_cftime, pattern, header, _read):
+def _open(
+    path: PathType | Sequence[PathType],
+    use_cftime: bool,
+    pattern: PatternType | None,
+    header: Callable[[PathType, PatternType | None], dict[str, Any]],
+    _read: Callable[..., np.ndarray],
+) -> xr.DataArray:
     paths = handle_path(path)
 
     headers = [header(p, pattern) for p in paths]

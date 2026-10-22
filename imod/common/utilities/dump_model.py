@@ -14,8 +14,8 @@ from imod.schemata import ValidationError
 @standard_log_decorator()
 def dump_model(
     model: IDict,
-    directory,
-    modelname,
+    directory: str | Path,
+    modelname: str,
     validate: bool = True,
     mdal_compliant: bool = False,
     crs: Any | None = None,

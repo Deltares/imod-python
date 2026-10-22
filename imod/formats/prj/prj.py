@@ -12,7 +12,7 @@ from datetime import datetime
 from itertools import chain
 from os import PathLike
 from pathlib import Path
-from typing import Any, NoReturn, Union
+from typing import Any, NoReturn, Self, TypeAlias, Union
 
 import numpy as np
 import pandas as pd
@@ -22,7 +22,7 @@ import imod
 import imod.logging
 from imod.logging.loglevel import LogLevel
 
-FilePath = Union[str, "PathLike[str]"]
+FilePath: TypeAlias = Union[str, "PathLike[str]"]
 
 # Fields may contain None for unsupported packages.
 KEYS: dict[str, tuple[str | None, ...]] = {
@@ -112,12 +112,12 @@ class _LineIterator:
     Like iter(lines), but we can go back and we check if we're finished.
     """
 
-    def __init__(self, lines: list[list[str]]):
+    def __init__(self, lines: list[list[str]]) -> None:
         self.lines = lines
         self.count = -1
         self.length = len(lines)
 
-    def __iter__(self):
+    def __iter__(self) -> Self:
         return self
 
     def __next__(self) -> list[str]:
@@ -490,7 +490,7 @@ def _parse_periodsblock(lines: _LineIterator) -> dict[str, str]:
         _wrap_error_message(e, "periods data block", lines)
 
 
-def _parse_speciesblock(lines: _LineIterator):
+def _parse_speciesblock(lines: _LineIterator) -> dict[Any, Any]:
     """Parse species names indexed by species number."""
     try:
         species: dict[int, str] = {}
@@ -522,9 +522,8 @@ def _parse_block(lines: _LineIterator, content: dict[str, Any]) -> None:
 
     if key is None:
         return
-    if n is None:
-        raise ValueError(f"Expected N to be specified for {key}, but got None.")
-    blockcontent: dict[str, Any] | None
+    assert n is not None
+    blockcontent: dict[Any, Any] | None
     try:
         if key in KEYS:
             if n != 1:
@@ -566,7 +565,9 @@ def _parse_block(lines: _LineIterator, content: dict[str, Any]) -> None:
     return
 
 
-def _process_package_entry(entry: dict[str, Any]):
+def _process_package_entry(
+    entry: dict[str, Any],
+) -> tuple[Path | None, dict[str, Any], float | None]:
     """
     The iMOD project file supports constants in lieu of IDFs.
     """
@@ -595,7 +596,12 @@ def _merge_coords(headers: list[dict[str, Any]]) -> dict[str, np.ndarray]:
     return {k: np.unique(coords[k]) for k in coords}
 
 
-def _try_read_with_func(func, path, *args, **kwargs):
+def _try_read_with_func(
+    func: Callable[..., Any],
+    path: Sequence[FilePath] | FilePath,
+    *args: Any,
+    **kwargs: Any,
+) -> Any:
     try:
         return func(path, *args, **kwargs)
     except Exception as e:
@@ -650,7 +656,7 @@ def _limit_dims_to_reference(
 
 
 def _create_dataarray_from_paths(
-    paths: list[str], headers: list[dict[str, Any]], dim: str
+    paths: Sequence[Path | str], headers: list[dict[str, Any]], dim: str
 ) -> xr.DataArray:
     factor = _get_array_transformation_parameters(headers, "factor", dim)
     addition = _get_array_transformation_parameters(headers, "addition", dim)
@@ -671,7 +677,7 @@ def _create_dataarray_from_paths(
 
 def _create_dataarray_from_values(
     values: list[float], headers: list[dict[str, Any]], dim: str
-):
+) -> xr.DataArray:
     factor = _get_array_transformation_parameters(headers, "factor", dim)
     addition = _get_array_transformation_parameters(headers, "addition", dim)
     coords = _merge_coords(headers)
@@ -682,7 +688,10 @@ def _create_dataarray_from_values(
 
 
 def _create_dataarray(
-    paths: list[str], headers: list[dict[str, Any]], values: list[float], dim: str
+    paths: Sequence[Path | str | None],
+    headers: list[dict[str, Any]],
+    values: Sequence[float | None],
+    dim: str,
 ) -> xr.DataArray:
     """
     Create a DataArray from a list of IDF paths, or from constant values.
@@ -692,11 +701,13 @@ def _create_dataarray(
     In that case, we cannot do a straightforward concatenation.
     """
     values_valid: list[float] = []
-    paths_valid: list[str] = []
+    paths_valid: list[Path | str] = []
     headers_paths: list[dict[str, Any]] = []
     headers_values: list[dict[str, Any]] = []
     for path, header, value in zip(paths, headers, values):
         if path is None:
+            if value is None:
+                raise ValueError("Entry has neither a path nor a constant value.")
             headers_values.append(header)
             values_valid.append(value)
         else:
@@ -787,7 +798,7 @@ def _process_timestring_period(timestring: str) -> datetime:
 
 def _process_boundary_condition_entry(
     entry: dict[str, Any], periods: dict[str, datetime]
-):
+) -> tuple[Path | None, dict[str, Any], float | None, datetime | None]:
     """
     The iMOD project file supports constants in lieu of IDFs.
 
@@ -837,8 +848,10 @@ def _process_boundary_condition_entry(
 
 
 def _open_boundary_condition_idf(
-    block_content, variables, periods: dict[str, datetime]
-) -> tuple[list[dict[str, xr.DataArray]], list[datetime]]:
+    block_content: dict[Any, Any],
+    variables: Sequence[str | None],
+    periods: dict[str, datetime],
+) -> tuple[list[dict[str | None, xr.DataArray]], list[datetime]]:
     """
     Read the variables specified from block_content.
     """
@@ -846,7 +859,7 @@ def _open_boundary_condition_idf(
     n_time = len(block_content["time"])
     n_total = n_system * n_time
 
-    das: list[dict[str, xr.DataArray]] = [{} for _ in range(n_system)]
+    das: list[dict[str | None, xr.DataArray]] = [{} for _ in range(n_system)]
     for variable in variables:
         variable_content = block_content[variable]
 
@@ -926,7 +939,7 @@ class IpfResult:
         time: datetime | None,
         factor: float,
         addition: float,
-    ):
+    ) -> None:
         self.dataframe.append(dataframe)
         self.layer.append(layer)
         self.time.append(time)
@@ -1119,7 +1132,7 @@ def read_projectfile(path: FilePath) -> dict[str, Any]:
     return content
 
 
-def _is_var_ipf_and_path(block_content: dict[str, Any], var: str):
+def _is_var_ipf_and_path(block_content: dict[str, Any], var: str) -> tuple[bool, Path]:
     block_item = block_content[var]
     path = block_item[0]["path"]
     is_ipf = path.suffix.lower() == ".ipf"

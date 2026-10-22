@@ -17,7 +17,7 @@ import numpy as np
 from imod.util.time import _compose_timestring, to_datetime
 
 
-def _custom_pattern_to_regex_pattern(pattern: str):
+def _custom_pattern_to_regex_pattern(pattern: str) -> re.Pattern[str]:
     """
     Compile iMOD Python's simplified custom pattern to regex pattern:
     _custom_pattern_to_regex_pattern({name}_c{species})
@@ -77,7 +77,9 @@ def _groupdict(stem: str, pattern: str | re.Pattern[str] | None) -> dict[str, An
     return d
 
 
-def decompose(path, pattern: str | Pattern[str] | None = None) -> dict[str, Any]:
+def decompose(
+    path: str | pathlib.Path, pattern: str | Pattern[str] | None = None
+) -> dict[str, Any]:
     r"""
     Parse a path, returning a dict of the parts, following the iMOD conventions.
 
@@ -157,7 +159,7 @@ def decompose(path, pattern: str | Pattern[str] | None = None) -> dict[str, Any]
     return d
 
 
-def compose(d, pattern=None) -> pathlib.Path:
+def compose(d: dict[str, Any], pattern: str | None = None) -> pathlib.Path:
     """
     From a dict of parts, construct a filename, following the iMOD
     conventions.

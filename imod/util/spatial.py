@@ -75,7 +75,7 @@ def _xycoords(
     return coords
 
 
-def coord_reference(da_coord) -> tuple[float, float, float]:
+def coord_reference(da_coord: xr.DataArray) -> tuple[float, float, float]:
     """
     Extracts dx, xmin, xmax for a coordinate DataArray, where x is any coordinate.
 
@@ -141,17 +141,17 @@ def coord_reference(da_coord) -> tuple[float, float, float]:
 
 
 def spatial_reference(
-    a: xr.DataArray,
+    a: xr.DataArray | xr.Dataset,
 ) -> tuple[float, float, float, float, float, float]:
     """
-    Extracts spatial reference from DataArray.
+    Extracts spatial reference from DataArray or Dataset.
 
     If the DataArray coordinates are nonequidistant, dx and dy will be returned
     as 1D ndarray instead of float.
 
     Parameters
     ----------
-    a : xarray.DataArray
+    a : xarray.DataArray or xarray.Dataset
 
     Returns
     --------------
@@ -180,7 +180,7 @@ def transform(a: xr.DataArray) -> affine.Affine:
     """
     dx, xmin, _, dy, _, ymax = spatial_reference(a)
 
-    def equidistant(dx, name):
+    def equidistant(dx: float | FloatArray, name: str) -> float:
         if isinstance(dx, np.ndarray):
             if np.unique(dx).size == 1:
                 return dx[0]

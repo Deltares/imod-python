@@ -11,7 +11,7 @@ from imod.typing import GridDataArray
 
 
 def get_unstructured_cell2d_from_xy(
-    uda: xu.UgridDataArray, **points
+    uda: xu.UgridDataArray, **points: Any
 ) -> npt.NDArray[np.intp]:
     # Unstructured grids always require to be tested both on x and y coordinates
     # to see if points are within bounds.
@@ -66,7 +66,7 @@ def _arr_like_points(points: dict[str, Any], fill_value: Any) -> npt.NDArray[Any
     return np.full(shape, fill_value)
 
 
-def points_in_bounds(da: GridDataArray, **points) -> npt.NDArray[np.bool_]:
+def points_in_bounds(da: GridDataArray, **points: Any) -> npt.NDArray[np.bool_]:
     """
     Returns whether points specified by keyword arguments fall within the bounds
     of ``da``.
@@ -124,7 +124,7 @@ def points_in_bounds(da: GridDataArray, **points) -> npt.NDArray[np.bool_]:
 
 def check_points_in_bounds(
     da: GridDataArray, points: dict[str, Any], out_of_bounds: str
-):
+) -> tuple[dict[str, Any], npt.NDArray[np.bool_]]:
     inside = points_in_bounds(da, **points)
     # Error handling
     msg = "Not all points are located within the bounds of the DataArray"
@@ -182,7 +182,7 @@ def _get_indices_1d(
 
 
 def points_indices(
-    da: GridDataArray, out_of_bounds: str = "raise", **points
+    da: GridDataArray, out_of_bounds: str = "raise", **points: Any
 ) -> dict[str, xr.DataArray]:
     """
     Get the indices for points as defined by the arrays x and y.
@@ -257,7 +257,9 @@ def points_indices(
     return indices
 
 
-def points_values(da: GridDataArray, out_of_bounds="raise", **points) -> GridDataArray:
+def points_values(
+    da: GridDataArray, out_of_bounds: str = "raise", **points: Any
+) -> GridDataArray:
     """
     Get values from specified points.
 
@@ -307,8 +309,8 @@ def points_set_values(
     da: GridDataArray,
     values: int | float | npt.NDArray[np.number],
     out_of_bounds: str = "raise",
-    **points,
-):
+    **points: Any,
+) -> GridDataArray:
     """
     Set values at specified points.
 

@@ -8,14 +8,16 @@ from xarray.core.utils import is_scalar
 from imod.typing import GridDataArray, GridDataset
 
 
-def is_scalar_nan(da: GridDataArray):
+def is_scalar_nan(da: GridDataArray) -> bool:
     """
     Test if is_scalar_nan, carefully avoid loading grids in memory
     """
     scalar_data: bool = is_scalar(da)
     if scalar_data:
         stripped_value = enforce_scalar(da)
-        return isinstance(stripped_value, numbers.Real) and np.isnan(stripped_value)  # type: ignore[call-overload]
+        return bool(
+            isinstance(stripped_value, numbers.Real) and np.isnan(stripped_value)  # type: ignore[call-overload]
+        )
     return False
 
 

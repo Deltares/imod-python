@@ -1,7 +1,9 @@
+from typing import Any
+
 from imod.common.interfaces.ipackage import IPackage
 
 
-def get_variable_names(package: IPackage):
+def get_variable_names(package: IPackage) -> list[str]:
     auxiliaries = _get_auxiliary_data_variable_names_mapping(
         package
     )  # returns something like {"concentration": "species"}
@@ -21,7 +23,7 @@ def get_variable_names(package: IPackage):
     return []
 
 
-def _get_auxiliary_data_variable_names_mapping(package: IPackage):
+def _get_auxiliary_data_variable_names_mapping(package: IPackage) -> dict[str, Any]:
     result = {}
     if hasattr(package, "_auxiliary_data"):
         result.update(package._auxiliary_data)

@@ -4,6 +4,7 @@ from pathlib import Path
 from typing import Any
 
 import numpy as np
+import xarray as xr
 
 from imod.common.interfaces.iregridpackage import IRegridPackage
 from imod.common.utilities.value_filters import enforce_scalar, is_empty_dataarray
@@ -85,14 +86,14 @@ class OutputControl(Package, IRegridPackage):
     @init_log_decorator()
     def __init__(
         self,
-        save_head=None,
-        save_budget=None,
-        save_concentration=None,
-        head_file=None,
-        budget_file=None,
-        concentration_file=None,
+        save_head: str | int | xr.DataArray | None = None,
+        save_budget: str | int | xr.DataArray | None = None,
+        save_concentration: str | int | xr.DataArray | None = None,
+        head_file: str | Path | None = None,
+        budget_file: str | Path | None = None,
+        concentration_file: str | Path | None = None,
         validate: bool = True,
-    ):
+    ) -> None:
         save_concentration = (
             None if is_empty_dataarray(save_concentration) else save_concentration
         )
@@ -113,7 +114,7 @@ class OutputControl(Package, IRegridPackage):
         super().__init__(dict_dataset)
         self._validate_init_schemata(validate)
 
-    def _get_ocsetting(self, setting):
+    def _get_ocsetting(self, setting: Any) -> str:
         """Get oc setting based on its type. If integers return f'frequency {setting}', if"""
         if isinstance(setting, (int, np.integer)) and not isinstance(setting, bool):
             return f"frequency {setting}"
@@ -153,7 +154,13 @@ class OutputControl(Package, IRegridPackage):
 
         return path
 
-    def _render(self, directory, pkgname, globaltimes, binary):
+    def _render(
+        self,
+        directory: Path,
+        pkgname: str,
+        globaltimes: list[np.datetime64] | np.ndarray,
+        binary: bool,
+    ) -> str:
         d: dict[str, Any] = {}
 
         for output_variable in OUTPUT_EXT_MAPPING.keys():
@@ -188,7 +195,7 @@ class OutputControl(Package, IRegridPackage):
         pkgname: str,
         globaltimes: list[np.datetime64] | np.ndarray,
         write_context: WriteContext,
-    ):
+    ) -> None:
         # We need to overload the write here to ensure the output directory is
         # created in advance for MODFLOW6.
         super()._write(pkgname, globaltimes, write_context)

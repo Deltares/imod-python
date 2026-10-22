@@ -1,5 +1,5 @@
 from dataclasses import asdict
-from typing import TextIO
+from typing import Any, TextIO, cast
 
 import numpy as np
 import xarray as xr
@@ -43,13 +43,13 @@ class IdfMapping(MetaSwapPackage, IRegridPackage):
     # increase with increasing col, row." But the example works with decreasing
     # y-coordinates.
 
-    def __init__(self, area, nodata):
+    def __init__(self, area: xr.DataArray, nodata: float) -> None:
         super().__init__()
 
         self.dataset["area"] = area
         self.dataset["nodata"] = nodata
 
-    def _get_output_settings(self):
+    def _get_output_settings(self) -> dict[str, Any]:
         grid = self.dataset["area"]
         dx, xmin, _, dy, ymin, _ = spatial_reference(grid)
         ncol = grid["x"].size
@@ -125,7 +125,7 @@ class IdfMapping(MetaSwapPackage, IRegridPackage):
         else:
             regridder_settings = asdict(regridder_types, dict_factory=dict)
 
-        nodata = self.dataset["nodata"].values[()]
+        nodata = cast(float, self.dataset["nodata"].values[()])
         regridded_area = _regrid_array(
             self.dataset["area"],
             regrid_cache,
@@ -134,7 +134,7 @@ class IdfMapping(MetaSwapPackage, IRegridPackage):
             target_grid,
         )
 
-        return type(self)(regridded_area, nodata)
+        return type(self)(cast(xr.DataArray, regridded_area), nodata)
 
     def _render(
         self,

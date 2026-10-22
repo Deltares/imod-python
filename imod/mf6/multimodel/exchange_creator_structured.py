@@ -26,11 +26,11 @@ class ExchangeCreator_Structured(ExchangeCreator):
 
     def __init__(
         self, submodel_labels: GridDataArray, partition_info: list[PartitionInfo]
-    ):
+    ) -> None:
         super().__init__(submodel_labels, partition_info)
 
     @property
-    def _coordinate_names(self):
+    def _coordinate_names(self) -> list[str]:
         return ["row", "column"]
 
     def _find_connected_cells(self) -> pd.DataFrame:

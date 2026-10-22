@@ -1,7 +1,8 @@
 from __future__ import annotations
 
+from collections.abc import Sequence
 from datetime import datetime
-from typing import cast
+from typing import Any, cast
 
 import numpy as np
 
@@ -108,7 +109,7 @@ class GroundwaterFlowModel(Modflow6Model):
         newton: bool = False,
         under_relaxation: bool = False,
         validate: bool = True,
-    ):
+    ) -> None:
         super().__init__()
         self._options = {
             "listing_file": listing_file,
@@ -120,7 +121,7 @@ class GroundwaterFlowModel(Modflow6Model):
         }
         self._validate_init_schemata_options(validate)
 
-    def is_use_newton(self):
+    def is_use_newton(self) -> bool:
         """
         Returns whether the Newton-Raphson formulation is used for groundwater
         flow between connected, convertible groundwater cells.
@@ -144,7 +145,9 @@ class GroundwaterFlowModel(Modflow6Model):
         """
         self._options["newton"] = is_newton
 
-    def _update_buoyancy_package(self, transport_models_per_flow_model) -> None:
+    def _update_buoyancy_package(
+        self, transport_models_per_flow_model: Sequence[str]
+    ) -> None:
         """
         If the simulation is partitioned, then the buoyancy package, if present,
         must be updated for the renamed transport models.
@@ -161,7 +164,7 @@ class GroundwaterFlowModel(Modflow6Model):
         self,
         model_name: str = "",
         validation_context: ValidationSettings | None = None,
-        **kwargs,
+        **kwargs: Any,
     ) -> StatusInfoBase:
         """
         Validate model.
@@ -184,6 +187,10 @@ class GroundwaterFlowModel(Modflow6Model):
         """
         try:
             npfkey = self._get_pkgkey(NodePropertyFlow._pkg_id)
+            if npfkey is None:
+                raise ValueError(
+                    f"No {NodePropertyFlow.__name__} package found in model"
+                )
         except Exception as e:
             status_info = StatusInfo(f"{model_name} model")
             status_info.add_error(str(e))

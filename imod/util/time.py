@@ -16,7 +16,7 @@ DATETIME_FORMATS = {
 }
 
 
-def to_pandas_datetime_series(series: pd.Series):
+def to_pandas_datetime_series(series: pd.Series) -> pd.Series:
     """
     Convert series to pandas datetime, uses length of first string to find the
     appropriate format. This takes nanosecond as base in pandas 2, which only
@@ -97,7 +97,7 @@ def to_datetime_internal(
         return np.datetime64(time, "ns")
 
 
-def timestep_duration(times: np.ndarray, use_cftime: bool):
+def timestep_duration(times: np.ndarray, use_cftime: bool) -> np.ndarray:
     """
     Generates dictionary containing stress period time discretization data.
 
@@ -122,7 +122,9 @@ def timestep_duration(times: np.ndarray, use_cftime: bool):
     return np.array(timestep_duration)
 
 
-def forcing_starts_ends(package_times: np.ndarray, globaltimes: np.ndarray):
+def forcing_starts_ends(
+    package_times: np.ndarray, globaltimes: np.ndarray
+) -> list[str]:
     """
     Determines the stress period numbers for start and end for a forcing defined
     at a starting time, until the next starting time.
@@ -156,7 +158,7 @@ def forcing_starts_ends(package_times: np.ndarray, globaltimes: np.ndarray):
     return starts_ends
 
 
-def _convert_datetimes(times: list[Any], use_cftime: bool):
+def _convert_datetimes(times: list[Any], use_cftime: bool) -> tuple[list[Any], bool]:
     """
     Return times as np.datetime64[ns] or cftime.DatetimeProlepticGregorian
     depending on whether the dates fall within the inclusive bounds of

@@ -1,5 +1,5 @@
 from dataclasses import dataclass
-from typing import cast, overload
+from typing import Any, cast, overload
 
 from imod.typing import GridDataArray, GridDataset
 
@@ -54,15 +54,15 @@ class ValidationSettings:
 
 
 @overload
-def trim_time_dimension(ds: GridDataset, **kwargs) -> GridDataset: ...
+def trim_time_dimension(ds: GridDataset, **kwargs: Any) -> GridDataset: ...
 
 
 @overload
-def trim_time_dimension(ds: GridDataArray, **kwargs) -> GridDataArray: ...
+def trim_time_dimension(ds: GridDataArray, **kwargs: Any) -> GridDataArray: ...
 
 
 def trim_time_dimension(
-    ds: GridDataArray | GridDataset, **kwargs
+    ds: GridDataArray | GridDataset, **kwargs: Any
 ) -> GridDataArray | GridDataset:
     """
     Prepare object for validation, drop time dimension if

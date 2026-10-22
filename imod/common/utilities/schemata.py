@@ -3,13 +3,13 @@ from copy import deepcopy
 from typing import Any, Protocol
 
 from imod.common.statusinfo import NestedStatusInfo, StatusInfo, StatusInfoBase
-from imod.schemata import BaseSchema, SchemataDict, ValidationError
+from imod.schemata import BaseSchema, SchemataDict, SchemaUnion, ValidationError
 from imod.typing import GridDataset
 
 
 def filter_schemata_dict(
     schemata_dict: SchemataDict,
-    schema_types: tuple[type[BaseSchema], ...],
+    schema_types: tuple[type[BaseSchema] | type[SchemaUnion], ...],
 ) -> SchemataDict:
     """
     Filter schemata dict with a tuple of schema types. Keys which do not have

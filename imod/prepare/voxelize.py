@@ -1,3 +1,4 @@
+from collections.abc import Callable, Hashable, Iterable
 from typing import Any
 
 import numba
@@ -5,6 +6,7 @@ import numpy as np
 import xarray as xr
 
 from imod.prepare import common
+from imod.typing import FloatArray
 
 # Voxelize does not support conductance method, nearest, or linear
 METHODS: dict[str, Any] = common.METHODS.copy()
@@ -14,7 +16,14 @@ METHODS.pop("multilinear")
 
 
 @numba.njit(cache=True)
-def _voxelize(src, dst, src_top, src_bot, dst_z, method):
+def _voxelize(
+    src: FloatArray,
+    dst: FloatArray,
+    src_top: FloatArray,
+    src_bot: FloatArray,
+    dst_z: FloatArray,
+    method: Callable[[FloatArray, FloatArray], float],
+) -> FloatArray:
     nlayer, nrow, ncol = src.shape
     nz = dst_z.size - 1
     values = np.zeros(nlayer)
@@ -103,24 +112,38 @@ class Voxelizer:
     voxelizing needs.
     """
 
-    def __init__(self, method, use_relative_weights=False):
+    def __init__(
+        self, method: str | Callable[..., Any], use_relative_weights: bool = False
+    ) -> None:
         _method = common._get_method(method, METHODS)
         self.method = _method
         self._first_call = True
 
-    def _make_voxelize(self):
+    def _make_voxelize(self) -> None:
         """
         Use closure to avoid numba overhead
         """
         jit_method = numba.njit(self.method)
 
         @numba.njit
-        def voxelize(src, dst, src_top, src_bot, dst_z):
+        def voxelize(
+            src: FloatArray,
+            dst: FloatArray,
+            src_top: FloatArray,
+            src_bot: FloatArray,
+            dst_z: FloatArray,
+        ) -> FloatArray:
             return _voxelize(src, dst, src_top, src_bot, dst_z, jit_method)
 
         self._voxelize = voxelize
 
-    def voxelize(self, source, top, bottom, like):
+    def voxelize(
+        self,
+        source: xr.DataArray,
+        top: xr.DataArray,
+        bottom: xr.DataArray,
+        like: xr.DataArray,
+    ) -> xr.DataArray:
         """
 
         Parameters
@@ -141,8 +164,8 @@ class Voxelizer:
         voxelized : xr.DataArray
         """
 
-        def dim_format(dims):
-            return ", ".join(dim for dim in dims)
+        def dim_format(dims: Iterable[Hashable]) -> str:
+            return ", ".join(str(dim) for dim in dims)
 
         # Checks on inputs
         if "z" not in like.dims:

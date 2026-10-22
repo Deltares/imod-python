@@ -1,4 +1,5 @@
 from enum import Enum
+from typing import cast
 
 import numpy as np
 
@@ -338,7 +339,7 @@ def distribute_ghb_conductance(
 @preserve_gridtype
 def _compute_layer_thickness(
     allocated: GridDataArray, top: GridDataArray, bottom: GridDataArray
-):
+) -> GridDataArray:
     """
     Compute 3D grid of thicknesses in allocated cells
     """
@@ -357,7 +358,7 @@ def _compute_crosscut_thickness(
     bottom: GridDataArray,
     bc_top: GridDataArray | None = None,
     bc_bottom: GridDataArray | None = None,
-):
+) -> GridDataArray:
     """
     Compute 3D grid of thicknesses crosscut by boundary condition (river/drain)
     in allocated cells. So the thickness in the upper allocated layer is bc_top
@@ -406,7 +407,7 @@ def _compute_correction_factor(
     bottom: GridDataArray,
     bc_top: GridDataArray | None = None,
     bc_bottom: GridDataArray | None = None,
-):
+) -> GridDataArray:
     """
     Compute correction factor to correct for a mismatch between the centre of
     the partially penetrated model layer and the vertical midpoint of the
@@ -435,7 +436,7 @@ def _compute_correction_factor(
 
     # Correction factor for mismatch between midpoints of crosscut layers and
     # layer midpoints.
-    F = 1.0 - np.abs(midpoints - Fc) / (layer_thickness * 0.5)
+    F = cast(GridDataArray, 1.0 - np.abs(midpoints - Fc) / (layer_thickness * 0.5))
     # Negative values can be introduced when elevation above surface level, set
     # these to 1.0.
     top_layer_index = {"layer": min(top_layered.coords["layer"])}
@@ -451,7 +452,7 @@ def _distribute_weights__by_corrected_transmissivity(
     k: GridDataArray,
     bc_top: GridDataArray | None = None,
     bc_bottom: GridDataArray | None = None,
-):
+) -> GridDataArray:
     """
     Distribute conductances according to default method in iMOD 5.6, as
     described on page 690 of the iMOD 5.6 manual (but then to distribute WEL
@@ -474,7 +475,7 @@ def _distribute_weights__by_corrected_thickness(
     bottom: GridDataArray,
     bc_top: GridDataArray | None = None,
     bc_bottom: GridDataArray | None = None,
-):
+) -> GridDataArray:
     """
     Distribute conductances according to default method in iMOD 5.6, as
     described on page 690 of the iMOD 5.6 manual (but then to distribute WEL
@@ -490,7 +491,7 @@ def _distribute_weights__by_corrected_thickness(
     return corrected_thickness / corrected_thickness.sum(dim="layer")
 
 
-def _distribute_weights__equally(allocated: GridDataArray):
+def _distribute_weights__equally(allocated: GridDataArray) -> GridDataArray:
     """Compute weights over layers equally."""
     return ones_like(allocated) / allocated.sum(dim="layer")
 
@@ -499,7 +500,7 @@ def _distribute_weights__by_layer_thickness(
     allocated: GridDataArray,
     top: GridDataArray,
     bottom: GridDataArray,
-):
+) -> GridDataArray:
     """Compute weights based on layer thickness"""
     layer_thickness = _compute_layer_thickness(allocated, top, bottom)
 
@@ -512,7 +513,7 @@ def _distribute_weights__by_crosscut_thickness(
     bottom: GridDataArray,
     bc_top: GridDataArray | None = None,
     bc_bottom: GridDataArray | None = None,
-):
+) -> GridDataArray:
     """Compute weights based on crosscut thickness"""
     if bc_top is not None:
         PLANAR_GRID.validate(bc_top)
@@ -531,7 +532,7 @@ def _distribute_weights__by_layer_transmissivity(
     top: GridDataArray,
     bottom: GridDataArray,
     k: GridDataArray,
-):
+) -> GridDataArray:
     """Compute weights based on layer transmissivity"""
     layer_thickness = _compute_layer_thickness(allocated, top, bottom)
     transmissivity = layer_thickness * k
@@ -546,7 +547,7 @@ def _distribute_weights__by_crosscut_transmissivity(
     k: GridDataArray,
     bc_top: GridDataArray | None = None,
     bc_bottom: GridDataArray | None = None,
-):
+) -> GridDataArray:
     """Compute weights based on crosscut transmissivity"""
     if bc_top is not None:
         PLANAR_GRID.validate(bc_top)
@@ -561,7 +562,9 @@ def _distribute_weights__by_crosscut_transmissivity(
     return transmissivity / transmissivity.sum(dim="layer")
 
 
-def _distribute_weights__by_conductivity(allocated: GridDataArray, k: GridDataArray):
+def _distribute_weights__by_conductivity(
+    allocated: GridDataArray, k: GridDataArray
+) -> GridDataArray:
     """Compute weights based on hydraulic conductivity"""
     k_allocated = allocated * k
 

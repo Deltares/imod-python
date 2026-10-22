@@ -1,8 +1,14 @@
+from collections.abc import Sequence
+from typing import Any
+
 import matplotlib
 import numpy as np
 
 
-def _cmapnorm_from_colorslevels(colors, levels):
+def _cmapnorm_from_colorslevels(
+    colors: Sequence[Any] | np.ndarray | str | matplotlib.colors.Colormap,
+    levels: Sequence[float] | np.ndarray,
+) -> tuple[matplotlib.colors.Colormap, matplotlib.colors.BoundaryNorm]:
     """
     Create ListedColormap and BoundaryNorm from colors (either a list of colors
     or a named colormap) and a list of levels. Number of levels must be at least

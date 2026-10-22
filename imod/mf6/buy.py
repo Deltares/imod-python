@@ -1,3 +1,4 @@
+import pathlib
 from collections.abc import Sequence
 
 import numpy as np
@@ -98,7 +99,7 @@ class Buoyancy(Package):
         hhformulation_rhs: bool = False,
         densityfile: str | None = None,
         validate: bool = True,
-    ):
+    ) -> None:
         dict_dataset = {
             "reference_density": reference_density,
             # Assign a shared index: this also forces equal lenghts
@@ -112,7 +113,13 @@ class Buoyancy(Package):
         super().__init__(dict_dataset)
         self._validate_init_schemata(validate)
 
-    def _render(self, directory, pkgname, globaltimes, binary):
+    def _render(
+        self,
+        directory: pathlib.Path | str,
+        pkgname: str,
+        globaltimes: list[np.datetime64] | np.ndarray,
+        binary: bool,
+    ) -> str:
         ds = self.dataset
         packagedata = []
 
@@ -138,7 +145,7 @@ class Buoyancy(Package):
 
         return self._template.render(d)
 
-    def _update_transport_models(self, new_modelnames: Sequence[str]):
+    def _update_transport_models(self, new_modelnames: Sequence[str]) -> None:
         """
         The names of the transport models can change in some cases, for example
         when partitioning. Use this function to update the names of the

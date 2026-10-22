@@ -1,7 +1,7 @@
 import abc
 import textwrap
 import warnings
-from typing import TextIO, cast
+from typing import Any, Self, TextIO, cast
 
 import numpy as np
 import pandas as pd
@@ -32,7 +32,7 @@ def _ravel_per_subunit(da: xr.DataArray) -> np.ndarray:
     return array_out[np.isfinite(array_out)]
 
 
-def _extract_indexer_for_svat(df: pd.DataFrame, columns: list[str]):
+def _extract_indexer_for_svat(df: pd.DataFrame, columns: list[str]) -> np.ndarray:
     """
     Get the indexer for a dataframe of wells to select the SVAT subunit for each
     well based on its row/col location in the model grid.
@@ -184,7 +184,7 @@ class SprinklingBase(MetaSwapPackage, IRegridPackage):
 
     @classmethod
     @abc.abstractmethod
-    def from_imod5_data(cls, imod5_data: Imod5DataDict):
+    def from_imod5_data(cls, imod5_data: Imod5DataDict) -> Self:
         raise NotImplementedError(
             "method from_imod5_data() must be implemented in subclasses of SprinklingBase."
         )
@@ -242,7 +242,7 @@ class SprinklingGrid(SprinklingBase):
         self,
         max_abstraction_groundwater: xr.DataArray,
         max_abstraction_surfacewater: xr.DataArray,
-    ):
+    ) -> None:
         super().__init__()
         self.dataset["max_abstraction_groundwater"] = max_abstraction_groundwater
         self.dataset["max_abstraction_surfacewater"] = max_abstraction_surfacewater
@@ -303,7 +303,7 @@ class SprinklingGrid(SprinklingBase):
         return self._write_dataframe_fixed_width(file, dataframe)
 
     @classmethod
-    def from_imod5_data(cls, imod5_data: Imod5DataDict) -> "SprinklingGrid":
+    def from_imod5_data(cls, imod5_data: Imod5DataDict) -> Self:
         """
         Import sprinkling data from imod5 data artificial recharge grids.
         Abstraction data for sprinkling is defined in iMOD5 either with grids
@@ -362,7 +362,7 @@ class Sprinkling(SprinklingGrid):
     compatibility and will be removed in a future version.
     """
 
-    def __init__(self, *args, **kwargs):
+    def __init__(self, *args: Any, **kwargs: Any) -> None:
         warnings.warn(
             "Sprinkling is deprecated and will be removed in a future version. "
             "Use SprinklingGrid for the same behavior instead.",
@@ -460,7 +460,7 @@ class SprinklingPoints(SprinklingBase):
         layer_p: np.ndarray | list[int],
         id_sprinkling_p: np.ndarray | list[int],
         capacity_p: np.ndarray | list[float],
-    ):
+    ) -> None:
         super().__init__()
         # Replicate well ids as they were also created in
         # imod.mf6.LayeredWell.from_imod5_cap_data()
@@ -481,7 +481,7 @@ class SprinklingPoints(SprinklingBase):
         self._pkgcheck()
 
     @classmethod
-    def from_imod5_data(cls, imod5_data: Imod5DataDict) -> "SprinklingPoints":
+    def from_imod5_data(cls, imod5_data: Imod5DataDict) -> Self:
         """
         Import sprinkling data from imod5 data artificial recharge grids.
         Abstraction data for sprinkling is defined in iMOD5 either with grids
@@ -531,7 +531,14 @@ class SprinklingPoints(SprinklingBase):
             )
             raise TypeError(msg)
 
-    def _render(self, file, index, svat, mf6_dis, mf6_well):
+    def _render(
+        self,
+        file: TextIO,
+        index: IntArray,
+        svat: xr.DataArray,
+        mf6_dis: StructuredDiscretization,
+        mf6_well: Mf6Wel,
+    ) -> None:
         """
         Render the sprinkling points to the scap_svat.inp file.
 
