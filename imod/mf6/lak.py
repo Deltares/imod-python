@@ -894,7 +894,7 @@ class Lake(BoundaryCondition):
         # .values[()] will simply return the full numpy array.
         outlet_lakein = self.dataset["outlet_lakein"].values[()]
         if outlet_lakein is None or (
-            np.isscalar(outlet_lakein) and np.isnan(outlet_lakein)
+            np.ndim(outlet_lakein) == 0 and bool(np.isnan(outlet_lakein))
         ):
             return False
         return True
