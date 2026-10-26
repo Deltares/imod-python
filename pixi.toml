@@ -1,6 +1,6 @@
 [workspace]
 name = "imod-python"
-exclude-newer = "7d"
+# exclude-newer = "7d"
 version = "1.1.1.dev0"
 description = "Make massive MODFLOW models"
 authors = ["Deltares <imod.info@deltares.nl>"]
@@ -67,6 +67,7 @@ generate-sbom = { cmd = [
 affine = "*"
 black = "*"
 bottleneck = "*"
+certifi = ">=2026.10.19"
 cftime = ">=1"
 contextily = ">=1"
 cytoolz = "*"
