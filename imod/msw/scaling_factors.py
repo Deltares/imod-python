@@ -40,7 +40,7 @@ class ScalingFactors(MetaSwapPackage, IRegridPackage):
         Scaling factor which adjusts the pressure head applied to the pressure
         parameters defined in LUSE_SVAT.INP. This array must have a subunit coordinate to describe
         different landuses.
-    depth_perched_water_table: array of floats (xr.DataArray)
+    depth_perched_water_table: array of floats (xr.DataArray), optional
         Sets the depth of the perched watertable base. If the groundwater depth
         exeeds this depth, the capillary rise is set to zero. This option has
         been included in the model on the request of a specific project (MIPWA),
@@ -56,7 +56,9 @@ class ScalingFactors(MetaSwapPackage, IRegridPackage):
         "scale_soil_moisture": VariableMetaData(8, 0.1, 10.0, float),
         "scale_hydraulic_conductivity": VariableMetaData(8, 0.1, 10.0, float),
         "scale_pressure_head": VariableMetaData(8, 0.1, 10.0, float),
-        "depth_perched_water_table": VariableMetaData(8, 0.1, 10.0, float),
+        "depth_perched_water_table": VariableMetaData(
+            8, 0.1, 10.0, float, optional=True
+        ),
     }
 
     _with_subunit = (
@@ -74,7 +76,7 @@ class ScalingFactors(MetaSwapPackage, IRegridPackage):
         scale_soil_moisture: xr.DataArray,
         scale_hydraulic_conductivity: xr.DataArray,
         scale_pressure_head: xr.DataArray,
-        depth_perched_water_table: xr.DataArray,
+        depth_perched_water_table: xr.DataArray | None = None,
     ) -> None:
         super().__init__()
         self.dataset["scale_soil_moisture"] = scale_soil_moisture

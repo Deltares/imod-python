@@ -8,6 +8,7 @@ from numpy import nan
 from numpy.testing import assert_almost_equal, assert_equal
 
 from imod.msw import ScalingFactors
+from imod.msw.fixed_format import fixed_format_parser
 from imod.typing.grid import ones_like
 from imod.util.regrid import (
     RegridderWeightsCache,
@@ -68,7 +69,8 @@ def setup_scaling_factor_grids():
     return scale, depth_perched_water_table, index, svat
 
 
-def test_simple_model(fixed_format_parser):
+def test_simple_model__with_optional_pwt(fixed_format_parser):
+    """Test the simple model with the optional perched water table."""
     scale, depth_perched_water_table, index, svat = setup_scaling_factor_grids()
 
     scaling_factors = ScalingFactors(
@@ -95,6 +97,33 @@ def test_simple_model(fixed_format_parser):
     assert_almost_equal(
         results["depth_perched_water_table"], np.array([0.5, 1.0, 0.5, 0.7])
     )
+
+
+def test_simple_model__without_optional_pwt():
+    """Test the simple model without the optional perched water table."""
+    scale, _, index, svat = setup_scaling_factor_grids()
+
+    scaling_factors = ScalingFactors(
+        scale_soil_moisture=scale,
+        scale_hydraulic_conductivity=scale,
+        scale_pressure_head=scale,
+    )
+
+    with tempfile.TemporaryDirectory() as output_dir:
+        output_dir = Path(output_dir)
+        scaling_factors.write(output_dir, index, svat, None, None)
+
+        results = fixed_format_parser(
+            output_dir / ScalingFactors._file_name, ScalingFactors._metadata_dict
+        )
+
+    assert "depth_perched_water_table" not in results
+    assert_equal(results["svat"], np.array([1, 2, 3, 4]))
+    assert_almost_equal(results["scale_soil_moisture"], np.array([0.5, 1.0, 0.5, 1.0]))
+    assert_almost_equal(
+        results["scale_hydraulic_conductivity"], np.array([0.5, 1.0, 0.5, 1.0])
+    )
+    assert_almost_equal(results["scale_pressure_head"], np.array([0.5, 1.0, 0.5, 1.0]))
 
 
 def test_regrid_scaling_factor(simple_2d_grid_with_subunits):
