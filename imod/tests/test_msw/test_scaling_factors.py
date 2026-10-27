@@ -7,6 +7,7 @@ import xarray as xr
 from numpy import nan
 from numpy.testing import assert_almost_equal, assert_equal
 
+from imod.common.constants import MaskValues
 from imod.msw import ScalingFactors
 from imod.msw.fixed_format import fixed_format_parser
 from imod.typing.grid import ones_like
@@ -161,7 +162,7 @@ def test_clip_box():
 
 
 @pytest.mark.unittest_jit
-def test_from_imod5_data():
+def test_from_imod5_data__with_pwt():
     scale, depth_perched_water_table, index, svat = setup_scaling_factor_grids()
 
     imod5_data = {"cap": {}}
@@ -190,3 +191,35 @@ def test_from_imod5_data():
     assert_almost_equal(
         results["depth_perched_water_table"], np.array([0.5, 1.0, 0.5, 0.7])
     )
+
+
+@pytest.mark.unittest_jit
+def test_from_imod5_data__without_pwt():
+    scale, _, index, svat = setup_scaling_factor_grids()
+
+    imod5_data = {"cap": {}}
+    scale_rural = scale.sel(subunit=0, drop=True)
+    imod5_data["cap"]["boundary"] = ones_like(scale_rural)
+    imod5_data["cap"]["soil_moisture_fraction"] = scale_rural
+    imod5_data["cap"]["conductivity_factor"] = scale_rural
+    imod5_data["cap"]["perched_water_table_level"] = xr.DataArray(
+        MaskValues.msw_default
+    )
+
+    scaling_factors = ScalingFactors.from_imod5_data(imod5_data)
+
+    with tempfile.TemporaryDirectory() as output_dir:
+        output_dir = Path(output_dir)
+        scaling_factors.write(output_dir, index, svat, None, None)
+
+        results = fixed_format_parser(
+            output_dir / ScalingFactors._file_name, ScalingFactors._metadata_dict
+        )
+
+    assert "depth_perched_water_table" not in results
+    assert_equal(results["svat"], np.array([1, 2, 3, 4]))
+    assert_almost_equal(results["scale_soil_moisture"], np.array([0.5, 1.0, 1.0, 1.0]))
+    assert_almost_equal(
+        results["scale_hydraulic_conductivity"], np.array([0.5, 1.0, 1.0, 1.0])
+    )
+    assert_almost_equal(results["scale_pressure_head"], np.array([1.0, 1.0, 1.0, 1.0]))

@@ -124,10 +124,18 @@ def is_msw_active_cell(
 
 def _is_equal_scalar_value(da: GridDataArray, value: float) -> bool:
     """
-    Helper function to guarantee that the check in ``has_active_scaling_factor``
+    Helper function to guarantee that the check in ``is_equal_scalar_value``
     can shortcut after is_scalar returns False.
     """
     return bool(da.to_numpy()[()] == value)
+
+
+def is_scalar_and_equal(da: GridDataArray, value: float) -> bool:
+    """
+    Check if a GridDataArray is equal to a scalar value. Shortcuts if the array
+    is not scalar to preserve performance.
+    """
+    return is_scalar(da) and _is_equal_scalar_value(da, value)
 
 
 def has_active_scaling_factor(imod5_cap: GridDataDict) -> bool:
@@ -144,9 +152,7 @@ def has_active_scaling_factor(imod5_cap: GridDataDict) -> bool:
     scaling_factor_inactive = True
     for var, inactive_value in variable_inactive_mapping.items():
         da = imod5_cap[var]
-        scaling_factor_inactive &= is_scalar(da) and _is_equal_scalar_value(
-            da, inactive_value
-        )
+        scaling_factor_inactive &= is_scalar_and_equal(da, inactive_value)
 
     return not scaling_factor_inactive
 
