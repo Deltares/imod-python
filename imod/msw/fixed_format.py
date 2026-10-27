@@ -61,7 +61,7 @@ def fixed_format_parser(
                 try:
                     converted_value = metadata.dtype(value)
                 except ValueError:
-                    if metadata.optional:
+                    if not metadata.optional:
                         troublesome.add(varname)
                     converted_value = None if metadata.optional else np.nan
                 # Add to results
@@ -70,8 +70,5 @@ def fixed_format_parser(
                 # Truncate line
                 line = line[metadata.column_width :]
         if len(troublesome) > 0:
-            warnings.warn(
-                f"Had trouble reading the variables: {troublesome}",
-                UserWarning,
-            )
+            raise ValueError(f"Had trouble reading the variables: {troublesome}")
     return results
