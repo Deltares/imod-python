@@ -46,6 +46,10 @@ Added
 - Added :class:`imod.mf6.AdvectionUTVD` to the transport packages. This is the
   most accurate advection scheme in most cases, and is recommended for when
   sharp fronts need to be preserved or when computing on an unstructured grid.
+- :class:`imod.mf6.SingleLayerHorizontalFlowBarrierResistance`,
+  :class:`imod.mf6.SingleLayerHorizontalFlowBarrierMultiplier` and
+  :class:`imod.mf6.SingleLayerHorizontalFlowBarrierHydraulicCharacteristic` now
+  also accept ``LinearRing`` geometries, for example to simulate building pits.
 
 Fixed
 ~~~~~
@@ -82,10 +86,16 @@ Fixed
   parse the CAP package if it had 21 entries.
 - Fixed bug in :func:`imod.visualize.pyvista.velocity_field` where an error was
   raised incorrectly when the ``z`` coordinate array is three-dimensional.
+- :func:`imod.gen.read` (ASCII GEN files) can now read files that contain both
+  linestrings and closed rings. Closed rings are read as polygons, features keep
+  their order in the file.
 
 Changed
 ~~~~~~~
 
+- :meth:`imod.mf6.SingleLayerHorizontalFlowBarrierResistance.from_imod5_data`
+  converts closed rings (read as polygons from GEN files) to ``LinearRing``
+  geometries.
 - Deprecated :class:`imod.msw.Sprinkling` in favor of
   :class:`imod.msw.SprinklingGrid`. Call :class:`imod.msw.SprinklingGrid` to get
   the same behavior as you were used to.

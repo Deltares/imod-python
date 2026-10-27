@@ -1198,7 +1198,8 @@ class SingleLayerHorizontalFlowBarrierHydraulicCharacteristic(
     ----------
     geometry: gpd.GeoDataFrame
         Dataframe that describes:
-         - geometry: the geometries of the barriers,
+         - geometry: the geometries of the barriers, as ``LineString`` or
+           ``LinearRing`` (e.g. a building pit),
          - hydraulic_characteristic: the hydraulic characteristic of the
            barriers
          - layer: model layer for the barrier, only 1 single layer can be
@@ -1367,7 +1368,8 @@ class SingleLayerHorizontalFlowBarrierMultiplier(HorizontalFlowBarrierBase):
     ----------
     geometry: gpd.GeoDataFrame
         Dataframe that describes:
-         - geometry: the geometries of the barriers,
+         - geometry: the geometries of the barriers, as ``LineString`` or
+           ``LinearRing`` (e.g. a building pit),
          - multiplier: the multiplier of the barriers
          - layer: model layer for the barrier, only 1 single layer can be
            entered.
@@ -1590,7 +1592,8 @@ class SingleLayerHorizontalFlowBarrierResistance(HorizontalFlowBarrierBase):
     ----------
     geometry: gpd.GeoDataFrame
         Dataframe that describes:
-         - geometry: the geometries of the barriers,
+         - geometry: the geometries of the barriers, as ``LineString`` or
+           ``LinearRing`` (e.g. a building pit),
          - resistance: the resistance of the barriers
          - layer: model layer for the barrier, only 1 single layer can be
            entered.
@@ -1659,7 +1662,9 @@ class SingleLayerHorizontalFlowBarrierResistance(HorizontalFlowBarrierBase):
     def from_imod5_data(cls, key: str, imod5_data: dict[str, GridDataDict]) -> Self:
         """
         Import HFB data from imod5 data dictionary. Data from "2D GEN" files, so
-        with a line shape, can be loaded with this method.
+        with a line shape, can be loaded with this method. Closed rings in the
+        GEN file, which are read as polygons, are converted to ``LinearRing``
+        geometries.
 
         Parameters
         ----------
@@ -1699,7 +1704,16 @@ class SingleLayerHorizontalFlowBarrierResistance(HorizontalFlowBarrierBase):
                 "SingleLayerHorizontalFlowBarrierResistance. "
                 "Try HorizontalFlowBarrierResistance class."
             )
-        geometry_layer = hfb_dict["geodataframe"]
+        geometry_layer = hfb_dict["geodataframe"].copy()
+        geometries = geometry_layer.geometry.to_numpy()
+        is_polygon = shapely.get_type_id(geometries) == shapely.GeometryType.POLYGON
+        # Closed rings from GEN files are read as polygons, whereas barriers
+        # are expected to be lines. Use the exterior ring, as polygons with
+        # interior rings are not supported.
+        if is_polygon.any():
+            geometry_layer["geometry"] = np.where(
+                is_polygon, shapely.get_exterior_ring(geometries), geometries
+            )
         geometry_layer["layer"] = layer
 
         return cls(geometry_layer)
