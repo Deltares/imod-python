@@ -82,6 +82,10 @@ Fixed
   parse the CAP package if it had 21 entries.
 - Fixed bug in :func:`imod.visualize.pyvista.velocity_field` where an error was
   raised incorrectly when the ``z`` coordinate array is three-dimensional.
+- Fixed issue where :class:`imod.msw.ScalingFactors` did not correctly handle
+  the absence of perched water table data.
+  :meth:`imod.msw.ScalingFactors.from_imod5_data` now ignores the perched water
+  table if it is set to -9999.0 in the iMOD5 projectfile.
 
 Changed
 ~~~~~~~
