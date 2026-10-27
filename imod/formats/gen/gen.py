@@ -64,19 +64,44 @@ def parse_ascii_points(lines: list[str]) -> GeoDataFrameT:
     return gpd.GeoDataFrame(data={"id": fid}, geometry=points)
 
 
+def _to_shapely_geometries(
+    vertex_coords: list[np.ndarray], is_polygon: np.ndarray
+) -> np.ndarray:
+    """
+    Convert vertices of features to shapely geometries. Linestrings and
+    polygons are created separately and merged again in the original feature
+    order.
+    """
+    geometry = np.empty(len(vertex_coords), dtype=object)
+
+    for polygon in (False, True):
+        feature_index = np.flatnonzero(is_polygon == polygon)
+        if feature_index.size == 0:
+            continue
+        group_coords = [vertex_coords[i] for i in feature_index]
+        n_vertex = [len(c) for c in group_coords]
+        indices = np.repeat(np.arange(feature_index.size), n_vertex)
+        coordinates = np.vstack(group_coords)
+        if polygon:
+            rings = shapely.linearrings(coordinates, indices=indices)
+            geometry[feature_index] = shapely.polygons(rings)
+        else:
+            geometry[feature_index] = shapely.linestrings(coordinates, indices=indices)
+
+    return geometry
+
+
 def parse_ascii_segments(lines: list[str]) -> GeoDataFrameT:
     end = [i for i, line in enumerate(lines) if line == "end"][:-1]
     start = [-1] + end[:-1]
     features = [lines[s + 1 : e] for s, e in zip(start, end)]
 
     n_feature = len(features)
-    n_vertex = [len(f) - 1 for f in features]
 
     # Process the feature id as a string. This adds support for id's containing
     # commas and spaces
     fid = np.full(n_feature, "", dtype=object)
     is_polygon = np.empty(n_feature, dtype=bool)
-    indices = np.repeat(np.arange(n_feature), n_vertex)
 
     first_coord = features[0][1:][0]
     has_whitespace, _ = infer_line_delimiter_info(first_coord, 3)
@@ -90,19 +115,12 @@ def parse_ascii_segments(lines: list[str]) -> GeoDataFrameT:
         feature_buffer = io.StringIO(initial_value="\n".join(feature[1:]))
         coords_df = pd.read_csv(feature_buffer, sep=sep, header=None)
         coords = coords_df.values
-        is_polygon[i] = (coords[0] == coords[-1]).all()
+        # A ring requires at least 4 coordinates, shorter closed features
+        # remain linestrings.
+        is_polygon[i] = len(coords) >= 4 and (coords[0] == coords[-1]).all()
         vertex_coords.append(coords)
 
-    coordinates = np.vstack(vertex_coords)
-    polygon = is_polygon.any()
-    if polygon != is_polygon.all():
-        raise ValueError("Some features are linestrings, some are polygons")
-
-    if polygon:
-        rings = shapely.linearrings(coordinates, indices=indices)
-        geometry = shapely.polygons(rings)
-    else:
-        geometry = shapely.linestrings(coordinates, indices=indices)
+    geometry = _to_shapely_geometries(vertex_coords, is_polygon)
 
     return gpd.GeoDataFrame(data={"id": fid}, geometry=geometry)
 
