@@ -1,5 +1,4 @@
 import tempfile
-from collections.abc import Callable
 from dataclasses import dataclass
 from pathlib import Path
 
@@ -11,10 +10,10 @@ from numpy.testing import assert_almost_equal, assert_equal
 from pytest_cases import parametrize_with_cases
 
 from imod import msw
-from imod.msw.fixed_format import fixed_format_parser
 from imod.mf6.dis import StructuredDiscretization
 from imod.mf6.mf6_wel_adapter import Mf6Wel
 from imod.mf6.wel import derive_cellid_from_points
+from imod.msw.fixed_format import fixed_format_parser
 
 
 @pytest.fixture(scope="function")
