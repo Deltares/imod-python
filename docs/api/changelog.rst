@@ -98,6 +98,11 @@ Fixed
   :meth:`imod.mf6.LayeredWell.from_imod5_data` giving each stress period the
   rate of the previous period, when the well timeseries has records before the
   start of the simulation.
+- :meth:`imod.mf6.LayeredWell.from_imod5_cap_data` now raises a clear error if
+  the iMOD5 sprinkling data contains NoData where a layer is required (cells
+  without sprinkling should be 0 in ``artificial_recharge``), mentioning the
+  IDF file(s) the data was read from, instead of failing with an obscure
+  ``IndexError``.
 
 Changed
 ~~~~~~~

@@ -494,6 +494,12 @@ def regrid_imod5_cap_and_bnd_data(
     cap_data_regridded = _regrid_package_data(
         imod5_no_layer["cap"], target_grid, regridder_types, regrid_cache
     )
+    # Regridding drops attrs, restore the source paths for informative error
+    # messages downstream.
+    for key, da in cap_data_regridded.items():
+        sources = getattr(imod5_data["cap"].get(key), "attrs", {}).get("source_paths")
+        if sources is not None and hasattr(da, "attrs"):
+            da.attrs["source_paths"] = sources
     bnd_data_regridded = _regrid_package_data(
         imod5_no_layer["bnd"], target_grid, regridder_types, regrid_cache
     )
