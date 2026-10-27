@@ -1,4 +1,3 @@
-import warnings
 from collections import defaultdict
 from dataclasses import dataclass
 from pathlib import Path
@@ -50,10 +49,10 @@ def fixed_format_parser(
 
     with open(file) as f:
         lines = f.readlines()
+        troublesome = set()
         for line in lines:
             if line == "\n":
                 continue
-            troublesome = set()
             for varname, metadata in metadata_dict.items():
                 # Take first part of line
                 value = line[: metadata.column_width]

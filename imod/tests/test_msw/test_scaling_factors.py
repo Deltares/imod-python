@@ -69,7 +69,7 @@ def setup_scaling_factor_grids():
     return scale, depth_perched_water_table, index, svat
 
 
-def test_simple_model__with_optional_pwt(fixed_format_parser):
+def test_simple_model__with_optional_pwt():
     """Test the simple model with the optional perched water table."""
     scale, depth_perched_water_table, index, svat = setup_scaling_factor_grids()
 
@@ -161,7 +161,7 @@ def test_clip_box():
 
 
 @pytest.mark.unittest_jit
-def test_from_imod5_data(fixed_format_parser):
+def test_from_imod5_data():
     scale, depth_perched_water_table, index, svat = setup_scaling_factor_grids()
 
     imod5_data = {"cap": {}}
