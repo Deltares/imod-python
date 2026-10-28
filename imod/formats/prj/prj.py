@@ -957,7 +957,7 @@ def _read_package_isg(
     """
     entries = block_content["isg"]
     n_system = block_content["n_system"]
-    models: dict[Path, ISG] = {}
+    models: dict[Path, ISG[Any]] = {}
     repeats: list[datetime] = []
     out = []
     for system in range(n_system):
