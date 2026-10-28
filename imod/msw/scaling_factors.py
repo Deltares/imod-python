@@ -7,8 +7,7 @@ from imod.common.interfaces.iregridpackage import IRegridPackage
 from imod.msw.fixed_format import VariableMetaData
 from imod.msw.pkgbase import MetaSwapPackage
 from imod.msw.regrid.regrid_schemes import ScalingRegridMethod
-from imod.msw.utilities.common import concat_imod5
-from imod.msw.utilities.imod5_converter import is_scalar_and_equal
+from imod.msw.utilities.common import concat_imod5, is_scalar_and_equal
 from imod.typing import Imod5DataDict
 from imod.typing.grid import ones_like
 
@@ -62,6 +61,7 @@ class ScalingFactors(MetaSwapPackage, IRegridPackage):
             8, 0.1, 10.0, float, optional=True
         ),
     }
+    _optional_imod5_variables = ["perched_water_table_level"]
 
     _with_subunit = (
         "scale_soil_moisture",
@@ -121,7 +121,8 @@ class ScalingFactors(MetaSwapPackage, IRegridPackage):
         )
         data["scale_pressure_head"] = concat_imod5(grid_ones, grid_ones)
         if not is_scalar_and_equal(
-            cap_data["perched_water_table_level"], MaskValues.msw_default
+            cap_data["perched_water_table_level"],
+            MaskValues.msw_default,
         ):
             data["depth_perched_water_table"] = cap_data["perched_water_table_level"]
 

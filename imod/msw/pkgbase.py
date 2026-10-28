@@ -57,6 +57,7 @@ class MetaSwapPackage(IPackageBase, abc.ABC):
     _without_subunit: tuple[Any, ...] = ()
     _to_fill: tuple[Any, ...] = ()
     _metadata_dict: dict[str, Any] = {}
+    _optional_imod5_variables: list[str] = []
 
     def __init__(self) -> None:
         self.dataset = xr.Dataset()

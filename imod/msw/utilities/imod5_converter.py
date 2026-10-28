@@ -7,12 +7,11 @@ from typing import TypedDict, cast
 import numpy as np
 import pandas as pd
 import xarray as xr
-from xarray.core.utils import is_scalar
 
 from imod.common.constants import MaskValues
 from imod.logging import LogLevel, logger
 from imod.mf6 import StructuredDiscretization
-from imod.msw.utilities.common import concat_imod5
+from imod.msw.utilities.common import concat_imod5, is_scalar_and_equal
 from imod.msw.utilities.mask import MetaSwapActive
 from imod.typing import GridDataArray, GridDataDict, Imod5DataDict
 from imod.typing.grid import ones_like, zeros_like
@@ -120,22 +119,6 @@ def is_msw_active_cell(
     subunit_active = imod5_active & (msw_area > 0) & (mf6_top_active > 0)
     active = subunit_active.any(dim="subunit")
     return MetaSwapActive(active, subunit_active)
-
-
-def _is_equal_scalar_value(da: GridDataArray, value: float) -> bool:
-    """
-    Helper function to guarantee that the check in ``is_equal_scalar_value``
-    can shortcut after is_scalar returns False.
-    """
-    return bool(da.to_numpy()[()] == value)
-
-
-def is_scalar_and_equal(da: GridDataArray, value: float) -> bool:
-    """
-    Check if a GridDataArray is equal to a scalar value. Shortcuts if the array
-    is not scalar to preserve performance.
-    """
-    return is_scalar(da) and _is_equal_scalar_value(da, value)
 
 
 def has_active_scaling_factor(imod5_cap: GridDataDict) -> bool:
