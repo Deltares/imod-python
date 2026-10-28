@@ -321,3 +321,17 @@ def tutorial_03(path: Path | str) -> Path:
         _ = REGISTRY.fetch(filename, processor=Unzip(extract_dir=path))
 
     return path / "tutorial_03" / "GWF_model_Hondsrug.prj"
+
+
+def isg_tutorials(path: Path | str) -> Path:
+    """
+    The SFR and LAK tutorials of the iMOD User Manual, with ISG-files: unzips
+    the directories TUT_SFR and TUT_LAK to ``path`` and returns ``path``.
+    """
+    path = Path(path)
+    filename = "isg_tutorials.zip"
+    lock = FileLock(REGISTRY.path / f"{filename}.lock")
+    with lock:
+        _ = REGISTRY.fetch(filename, processor=Unzip(extract_dir=path))
+
+    return path

@@ -50,6 +50,8 @@ Added
   associated binary files, single and double precision) with
   :meth:`imod.formats.isg.ISG.read`, including segment geometry, cross-sections
   and plots.
+- :func:`imod.data.isg_tutorials` to load the SFR and LAK tutorials of the iMOD
+  User Manual, with ISG-files.
 
 Fixed
 ~~~~~

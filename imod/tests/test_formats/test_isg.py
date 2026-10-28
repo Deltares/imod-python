@@ -9,13 +9,106 @@ import shapely
 
 import imod
 from imod.formats import isg
+from imod.formats.isg.common import BinaryFile
 from imod.formats.isg.utils import to_datetime
-
-EXAMPLES = Path(__file__).parents[3] / "examples" / "isg"
-
+from imod.formats.isg.views import PACKED
 
 SFR, RIV = isg.SurfaceFlowRouting.SFR, isg.SurfaceFlowRouting.RIV
 CS1D, CS2DREF = isg.CrossSection1D, isg.CrossSection2DReferenceHeight
+
+
+def write(path: Path, model: type[BinaryFile], real, **columns) -> None:
+    """Write ``columns`` as the records of a binary file, after the header."""
+    dtype = model.record(real).newbyteorder("<")
+    records = np.zeros(len(next(iter(columns.values()), ())), dtype)
+    for name, column in columns.items():
+        if name in dtype.names:
+            records[name] = column
+    header = np.array([dtype.itemsize * 256 + 247], "<i4").tobytes()
+    data = header.ljust(dtype.itemsize, b"\0") + records.tobytes()
+    path.with_suffix(model.extension()).write_bytes(data)
+
+
+def write_riv(directory: Path, real) -> Path:
+    """
+    A RIV ISG of two segments, each with two calculation points and a 2-D
+    cross-section with a reference height; segment 2 has a weir.
+    """
+    directory.mkdir(parents=True)
+    path = directory / "RIV.ISG"
+    time = '"Time",' if real is np.float64 else ""
+    path.write_text(
+        f'2,0,"Date",{time}"Water level","Bottom level","Resistance","Inf.factor"\n'
+        '"Segment 1",1,2,1,2,1,1,0,0,0,0\n'
+        '"Segment 2",3,3,3,2,2,1,1,1,0,0\n'
+    )
+    write(path, isg.ISP, real, x=[0, 100, 100, 100, 200], y=[0, 0, 0, 50, 50])
+    write(
+        path,
+        isg.ISD1,
+        real,
+        n=[2, 2, 2, 2],
+        iref=[1, 3, 5, 7],
+        dist=[0, 100, 0, 150],
+        cname=["CP 1", "CP 2", "CP 3", "CP 4"],
+    )
+    write(
+        path,
+        isg.RivISD2,
+        real,
+        idate=[19800101, 19800201] * 4,
+        ctime=["00:00:00"] * 8,
+        wlvl=10 + 0.25 * np.arange(8),
+        btml=[8.0] * 8,
+        resis=[1.0] * 8,
+        inff=[0.5] * 8,
+    )
+    write(
+        path,
+        isg.ISC1,
+        real,
+        n=[-3, -3],
+        iref=[1, 4],
+        dist=[50, 75],
+        cname=["XS 1", "XS 2"],
+    )
+    # The first record of each cross-section holds DX, DY and HREF.
+    c = np.array([5.0, 0, 0, 6.0, 0, 0], dtype=real)
+    packed = c.view(np.dtype({**PACKED, "itemsize": c.itemsize}))
+    pixels = [1, 2, 4, 5]
+    packed["zm"][pixels] = [3, -23, 3, 3]
+    packed["zc"][pixels] = [88, -43, 88, 88]
+    packed["zp"][pixels] = [15, -1, 15, 15]
+    write(
+        path,
+        isg.ISC2,
+        real,
+        a=[-25, 12.5, 37.5, -25, 112.5, 112.5],
+        b=[-25, 0, 0, -25, 12.5, 37.5],
+        c=c,
+    )
+    write(path, isg.IST1, real, n=[2], iref=[1], dist=[75], cname=["Weir 1"])
+    write(
+        path,
+        isg.IST2,
+        real,
+        idate=[19800101, 19800201],
+        ctime=["00:00:00"] * 2,
+        wlvl_up=[4.0, 4.5],
+        wlvl_dwn=[3.0, 3.5],
+    )
+    write(path, isg.ISQ1, real)
+    write(path, isg.ISQ2, real)
+    return path
+
+
+@pytest.fixture(scope="module")
+def examples(tmp_path_factory) -> Path:
+    """The ISG tutorials, and a RIV ISG in single and double precision."""
+    directory = imod.data.isg_tutorials(tmp_path_factory.mktemp("isg"))
+    write_riv(directory / "RIV" / "single", np.float32)
+    write_riv(directory / "RIV" / "double", np.float64)
+    return directory
 
 
 @pytest.mark.parametrize(
@@ -24,12 +117,12 @@ CS1D, CS2DREF = isg.CrossSection1D, isg.CrossSection2DReferenceHeight
         ("TUT_SFR/DBASE/SFR.ISG", np.float32, SFR, 3, CS1D),
         ("TUT_SFR/DBASE/SFR2.ISG", np.float32, SFR, 3, CS1D),
         ("TUT_LAK/DBASE/SFR.ISG", np.float32, SFR, 2, CS1D),
-        ("isg/rivier_nstat_NW.ISG", np.float32, RIV, 8, CS2DREF),
-        ("double/rivier.ISG", np.float64, RIV, 8, CS2DREF),
+        ("RIV/single/RIV.ISG", np.float32, RIV, 2, CS2DREF),
+        ("RIV/double/RIV.ISG", np.float64, RIV, 2, CS2DREF),
     ],
 )
-def test_read(path, real, asfr, nseg, kind):
-    model = isg.ISG.read(EXAMPLES / path)
+def test_read(examples, path, real, asfr, nseg, kind):
+    model = isg.ISG.read(examples / path)
     assert isinstance(model, isg.ISG[real])
     assert model.asfr == model.isd2.asfr == asfr
     assert len(model) == nseg
@@ -43,8 +136,8 @@ def test_read(path, real, asfr, nseg, kind):
     assert model.isd2.dataframe().shape[0] == len(model.isd2)
 
 
-def test_read_values():
-    sfr = isg.ISG[np.float32](EXAMPLES / "TUT_SFR/DBASE/SFR.ISG")
+def test_read_values(examples):
+    sfr = isg.ISG[np.float32](examples / "TUT_SFR/DBASE/SFR.ISG")
     # Segment 3 is a diversion (DIVOPT=3) from segment 1, which feeds segment 2.
     assert sfr.isd2.iupseg.tolist() == [0, 0, 0, 1, 1, 1]
     assert sfr.isd2.idownseg.tolist() == [2, 2, 0, 0, 0, 0]
@@ -59,34 +152,35 @@ def test_read_values():
     length = sfr.geodataframe().length.to_numpy()
     assert np.allclose(length, sfr.isd1.dist[1::2], rtol=1e-5)
 
-    lak = isg.ISG.read(EXAMPLES / "TUT_LAK/DBASE/SFR.ISG")
+    lak = isg.ISG.read(examples / "TUT_LAK/DBASE/SFR.ISG")
     # Segment 1 discharges into lake 1, segment 2 flows out of it.
     assert (lak.isd2.idownseg[1], lak.isd2.iupseg[2]) == (-1, -1)
 
-    riv = isg.ISG.read(EXAMPLES / "isg/rivier_nstat_NW.ISG")
+    riv = isg.ISG.read(examples / "RIV/single/RIV.ISG")
     assert riv.isd2.ctime is None
     assert riv.isd2.idate[0] == 19800101
     assert len(riv.isc2) == np.abs(riv.isc1.n).sum()
     cross_section = riv.cross_sections()[0]
     assert (cross_section.dx, cross_section.dy) == (-25.0, -25.0)
-    assert len(cross_section) == 561
+    assert len(cross_section) == 2
     assert (cross_section.zm[0], cross_section.zc[0], cross_section.zp[0]) == (
         3,
         88,
         15,
     )
+    weir = riv.ist1.split(riv.ist2)[0]
+    assert weir.wlvl_up.tolist() == [4.0, 4.5]
+    assert weir.time()[1] == pd.Timestamp("1980-02-01")
 
 
-def test_double_matches_single():
-    single = isg.ISG.read(EXAMPLES / "isg/rivier_nstat_NW.ISG")
-    double = isg.ISG.read(EXAMPLES / "double/rivier.ISG")
+def test_double_matches_single(examples):
+    single = isg.ISG.read(examples / "RIV/single/RIV.ISG")
+    double = isg.ISG.read(examples / "RIV/double/RIV.ISG")
     assert np.array_equal(double.isp.x, single.isp.x)
     assert np.array_equal(double.isd2.wlvl, single.isd2.wlvl)
     assert double.isd2.ctime[0] == "00:00:00"
-    # Zc was rounded differently when converting: up to 1 cm.
     for d, s in zip(double.cross_sections(), single.cross_sections()):
-        assert np.array_equal(d.zm, s.zm) and np.array_equal(d.zp, s.zp)
-        assert np.abs(d.zc.astype(int) - s.zc).max() <= 1
+        assert np.array_equal(d.bottom(), s.bottom()) and np.array_equal(d.zp, s.zp)
 
 
 def test_cross_section_kinds():
@@ -115,15 +209,15 @@ def test_cross_section_kinds():
     assert np.isnan(profile.x)
 
 
-def test_read_list_directed(tmp_path):
+def test_read_list_directed(examples, tmp_path):
     # A header of only NSEG means ASFR=0; values may be separated by blanks;
     # rows after the NSEG rows are ignored.
-    source = EXAMPLES / "isg/rivier_nstat_NW.ISG"
-    for path in source.parent.glob("rivier_nstat_NW.IS*"):
+    source = examples / "RIV/single/RIV.ISG"
+    for path in source.parent.glob("RIV.IS*"):
         shutil.copy(path, tmp_path / path.name)
     rows = source.read_text().splitlines()[1:]
     text = [
-        "8",
+        "2",
         *(row.replace(",", "  ") for row in rows),
         "'extra' 1 1 0 0 0 0 0 0 0 0",
     ]
@@ -135,8 +229,8 @@ def test_read_list_directed(tmp_path):
     assert np.array_equal(model.nseg, expected.nseg)
 
 
-def test_invalid_reference():
-    model = isg.ISG.read(EXAMPLES / "TUT_SFR/DBASE/SFR.ISG")
+def test_invalid_reference(examples):
+    model = isg.ISG.read(examples / "TUT_SFR/DBASE/SFR.ISG")
     data = {**dict(model), "iseg": np.array([1, 3, 10], dtype=np.int32)}
     with pytest.raises(ValueError, match="ISG.ISEG: records \\[3\\]"):
         isg.ISG[np.float32].model_validate(data)
@@ -149,8 +243,8 @@ def test_record_length_mismatch(tmp_path):
         isg.ISP[np.float32](path)
 
 
-def test_geometry():
-    sfr = isg.ISG.read(EXAMPLES / "TUT_SFR/DBASE/SFR2.ISG")
+def test_geometry(examples):
+    sfr = isg.ISG.read(examples / "TUT_SFR/DBASE/SFR2.ISG")
     # Calculation points lie on the first and last node of their segment.
     located = sfr.locate("isd1")
     ends = sfr.isp.geometry()[[0, 1, 2, 5, 6, 9]]
@@ -162,22 +256,23 @@ def test_geometry():
     # Segment 1 runs along the x-axis, so its profile runs along the y-axis.
     assert np.allclose(profile.coordinates()[0], profile.x)
 
-    riv = isg.ISG.read(EXAMPLES / "isg/rivier_nstat_NW.ISG")
+    riv = isg.ISG.read(examples / "RIV/single/RIV.ISG")
     raster = riv.cross_sections()[0]
     assert raster.__geo_interface__["type"] == "MultiPolygon"
     assert raster.geodataframe().area.iloc[0] == 625.0
     assert raster.bottom()[0] == pytest.approx(3.88)
 
 
-def test_plot():
-    sfr = isg.ISG.read(EXAMPLES / "TUT_SFR/DBASE/SFR2.ISG")
-    riv = isg.ISG.read(EXAMPLES / "isg/rivier_nstat_NW.ISG")
+def test_plot(examples):
+    sfr = isg.ISG.read(examples / "TUT_SFR/DBASE/SFR2.ISG")
+    riv = isg.ISG.read(examples / "RIV/single/RIV.ISG")
     maps = (sfr, sfr.isp, sfr.cross_sections()[0], riv, riv.cross_sections()[0])
     for model in maps:
         model.plot()
     sfr.isd1.split(sfr.isd2)[0].plot()
     sfr.isq1.split(sfr.isq2)[0].plot()
     riv.isd1.split(riv.isd2)[0].plot()
+    riv.ist1.split(riv.ist2)[0].plot()
     sfr.isc1.plot(sfr.isc2, "b")
     ax = riv.isd1.plot(riv.isd2, "wlvl")
     assert len(ax.get_lines()) == len(riv.isd1)
@@ -187,9 +282,9 @@ def test_plot():
     assert time[0] == pd.Timestamp("2016-11-12")
 
 
-def test_open_projectfile_data(tmp_path):
+def test_open_projectfile_data(examples, tmp_path):
     entry = " 1,2, 001, 1.0, 0.0, -999.99, '{}'\n"
-    paths = [EXAMPLES / "TUT_SFR/DBASE/SFR.ISG", EXAMPLES / "TUT_SFR/DBASE/SFR2.ISG"]
+    paths = [examples / "TUT_SFR/DBASE/SFR.ISG", examples / "TUT_SFR/DBASE/SFR2.ISG"]
     prj = tmp_path / "isg.prj"
     prj.write_text(
         "0001,(ISG),1, iMOD segment rivers\nSTEADY-STATE\n001,002\n"

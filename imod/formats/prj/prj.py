@@ -949,16 +949,16 @@ class IpfResult:
 
 
 def _read_package_isg(
-    block_content: Dict[str, Any], periods: Dict[str, datetime]
-) -> Tuple[List[Dict[str, Any]], List[datetime]]:
+    block_content: dict[str, Any], periods: dict[str, datetime]
+) -> tuple[list[dict[str, Any]], list[datetime]]:
     """
     Read the ISG-file of each system and time; the factor, addition and constant
     of the entries do not apply to ISG-files.
     """
     entries = block_content["isg"]
     n_system = block_content["n_system"]
-    models: Dict[Path, ISG] = {}
-    repeats: List[datetime] = []
+    models: dict[Path, ISG] = {}
+    repeats: list[datetime] = []
     out = []
     for system in range(n_system):
         system_entries = entries[system::n_system]
