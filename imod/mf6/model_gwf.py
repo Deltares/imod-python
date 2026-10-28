@@ -5,10 +5,12 @@ from typing import Optional, cast
 
 import numpy as np
 
+import imod.logging
 from imod.common.statusinfo import StatusInfo, StatusInfoBase
 from imod.common.utilities.dataclass_type import DataclassType
 from imod.logging import init_log_decorator
 from imod.logging.logging_decorators import standard_log_decorator
+from imod.logging.loglevel import LogLevel
 from imod.mf6.buy import Buoyancy
 from imod.mf6.chd import ConstantHead
 from imod.mf6.dis import StructuredDiscretization
@@ -326,6 +328,13 @@ class GroundwaterFlowModel(Modflow6Model):
 
         # now import the non-singleton packages'
         imod5_keys = list(imod5_data.keys())
+        isg_keys = [key for key in imod5_keys if key[0:3] in ("isg", "sfr")]
+        if isg_keys:
+            imod.logging.logger.log(
+                loglevel=LogLevel.WARNING,
+                message=f"ISG data is not converted, skipping: {isg_keys}",
+                additional_depth=0,
+            )
 
         # import wells
         wel_times: StressPeriodTimesType = times if is_transient else "steady-state"

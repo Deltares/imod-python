@@ -39,7 +39,7 @@ dependencies = [
     "numpy",
     "pandas",
     "pooch",
-    "pydantic",
+    "pydantic>=2.7",
     "scipy",
     "tomli >= 1.1.0",
     "tomli_w",
