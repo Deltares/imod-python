@@ -1,5 +1,7 @@
 from typing import Any, TextIO
 
+import xarray as xr
+
 from imod.common.interfaces.iregridpackage import IRegridPackage
 from imod.common.utilities.dataclass_type import DataclassType, EmptyRegridMethod
 from imod.msw.fixed_format import VariableMetaData
@@ -130,30 +132,30 @@ class LanduseOptions(MetaSwapPackage, IRegridPackage):
 
     def __init__(
         self,
-        landuse_name,
-        vegetation_index,
-        jarvis_o2_stress,
-        jarvis_drought_stress,
-        feddes_p1,
-        feddes_p2,
-        feddes_p3h,
-        feddes_p3l,
-        feddes_p4,
-        feddes_t3h,
-        feddes_t3l,
-        threshold_sprinkling,
-        fraction_evaporated_sprinkling,
-        gift,
-        gift_duration,
-        rotational_period,
-        start_sprinkling_season,
-        end_sprinkling_season,
-        interception_option,
-        interception_capacity_per_LAI=None,
-        interception_capacity_per_LAI_Rutter=None,
-        interception_capacity_per_LAI_VonHoyningen=None,
-        interception_intercept=None,
-    ):
+        landuse_name: xr.DataArray,
+        vegetation_index: xr.DataArray,
+        jarvis_o2_stress: xr.DataArray,
+        jarvis_drought_stress: xr.DataArray,
+        feddes_p1: xr.DataArray,
+        feddes_p2: xr.DataArray,
+        feddes_p3h: xr.DataArray,
+        feddes_p3l: xr.DataArray,
+        feddes_p4: xr.DataArray,
+        feddes_t3h: xr.DataArray,
+        feddes_t3l: xr.DataArray,
+        threshold_sprinkling: xr.DataArray,
+        fraction_evaporated_sprinkling: xr.DataArray,
+        gift: xr.DataArray,
+        gift_duration: xr.DataArray,
+        rotational_period: xr.DataArray,
+        start_sprinkling_season: xr.DataArray,
+        end_sprinkling_season: xr.DataArray,
+        interception_option: xr.DataArray,
+        interception_capacity_per_LAI: xr.DataArray | None = None,
+        interception_capacity_per_LAI_Rutter: xr.DataArray | None = None,
+        interception_capacity_per_LAI_VonHoyningen: xr.DataArray | None = None,
+        interception_intercept: xr.DataArray | None = None,
+    ) -> None:
         super().__init__()
         self.dataset["landuse_name"] = landuse_name
         self.dataset["vegetation_index"] = vegetation_index
@@ -194,7 +196,7 @@ class LanduseOptions(MetaSwapPackage, IRegridPackage):
 
         self._pkgcheck()
 
-    def _render(self, file: TextIO, *args: Any):
+    def _render(self, file: TextIO, *args: Any) -> None:
         dataframe = self.dataset.to_dataframe(
             dim_order=("landuse_index",)
         ).reset_index()
@@ -213,7 +215,7 @@ class LanduseOptions(MetaSwapPackage, IRegridPackage):
 
         return self._write_dataframe_fixed_width(file, dataframe)
 
-    def _pkgcheck(self):
+    def _pkgcheck(self) -> None:
         dims = self.dataset.dims
         dims_expected = ("landuse_index",)
         if len(set(dims) - set(dims_expected)) > 0:

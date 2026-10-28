@@ -1,3 +1,6 @@
+from pathlib import Path
+from typing import Any
+
 import numpy as np
 import xarray as xr
 import xugrid as xu
@@ -16,8 +19,10 @@ from imod.schemata import (
     IdentityNoDataSchema,
     IndexesSchema,
     OtherCoordsSchema,
+    ValidationError,
 )
 from imod.select.layers import get_upper_active_grid_cells
+from imod.typing import GridDataArray
 
 
 class UnsaturatedZoneFlow(AdvancedBoundaryCondition):
@@ -225,34 +230,34 @@ class UnsaturatedZoneFlow(AdvancedBoundaryCondition):
     @init_log_decorator()
     def __init__(
         self,
-        surface_depression_depth,
-        kv_sat,
-        theta_res,
-        theta_sat,
-        theta_init,
-        epsilon,
-        infiltration_rate,
-        et_pot=None,
-        extinction_depth=None,
-        extinction_theta=None,
-        air_entry_potential=None,
-        root_potential=None,
-        root_activity=None,
-        ntrailwaves=7,  # Recommended in manual
-        nwavesets=40,
-        groundwater_ET_function=None,
-        simulate_groundwater_seepage=False,
-        print_input=False,
-        print_flows=False,
-        save_flows=False,
-        budget_fileout=None,
-        budgetcsv_fileout=None,
-        water_content_file=None,
-        observations=None,
-        water_mover=None,
-        timeseries=None,
+        surface_depression_depth: GridDataArray,
+        kv_sat: GridDataArray,
+        theta_res: GridDataArray,
+        theta_sat: GridDataArray,
+        theta_init: GridDataArray,
+        epsilon: GridDataArray,
+        infiltration_rate: GridDataArray,
+        et_pot: GridDataArray | None = None,
+        extinction_depth: GridDataArray | None = None,
+        extinction_theta: GridDataArray | None = None,
+        air_entry_potential: GridDataArray | None = None,
+        root_potential: GridDataArray | None = None,
+        root_activity: GridDataArray | None = None,
+        ntrailwaves: int = 7,  # Recommended in manual
+        nwavesets: int = 40,
+        groundwater_ET_function: str | None = None,
+        simulate_groundwater_seepage: bool = False,
+        print_input: bool = False,
+        print_flows: bool = False,
+        save_flows: bool = False,
+        budget_fileout: str | None = None,
+        budgetcsv_fileout: str | None = None,
+        water_content_file: str | None = None,
+        observations: Any = None,
+        water_mover: Any = None,
+        timeseries: Any = None,
         validate: bool = True,
-    ):
+    ) -> None:
         landflag = self._determine_landflag(kv_sat)
         iuzno = self._create_uzf_numbers(landflag)
         ivertcon = self._determine_vertical_connection(iuzno)
@@ -308,7 +313,7 @@ class UnsaturatedZoneFlow(AdvancedBoundaryCondition):
         )
         self._validate_init_schemata(validate)
 
-    def _fill_stress_perioddata(self):
+    def _fill_stress_perioddata(self) -> None:
         """Modflow6 requires something to be filled in the stress perioddata,
         even though the data is not used in the current configuration.
         Only an infiltration rate is required,
@@ -326,14 +331,14 @@ class UnsaturatedZoneFlow(AdvancedBoundaryCondition):
 
     def _check_options(
         self,
-        groundwater_ET_function,
-        et_pot,
-        extinction_depth,
-        extinction_theta,
-        air_entry_potential,
-        root_potential,
-        root_activity,
-    ):
+        groundwater_ET_function: str | None,
+        et_pot: GridDataArray | None,
+        extinction_depth: GridDataArray | None,
+        extinction_theta: GridDataArray | None,
+        air_entry_potential: GridDataArray | None,
+        root_potential: GridDataArray | None,
+        root_activity: GridDataArray | None,
+    ) -> None:
         simulate_et = [x is not None for x in [et_pot, extinction_depth]]
         unsat_etae = [
             x is not None for x in [air_entry_potential, root_potential, root_activity]
@@ -371,20 +376,22 @@ class UnsaturatedZoneFlow(AdvancedBoundaryCondition):
                 "Groundwater ET function should be either 'linear','square' or None"
             )
 
-    def _create_uzf_numbers(self, landflag):
+    def _create_uzf_numbers(self, landflag: GridDataArray) -> GridDataArray:
         """Create unique UZF ID's. Inactive cells equal 0"""
         active_nodes = landflag.notnull().astype(np.int8)
         return np.nancumsum(active_nodes).reshape(landflag.shape) * active_nodes
 
-    def _determine_landflag(self, kv_sat):
+    def _determine_landflag(self, kv_sat: GridDataArray) -> GridDataArray:
         """returns the landflag for uzf-model. Landflag == 1 for top active UZF-nodes"""
         land_nodes = get_upper_active_grid_cells(kv_sat).astype(np.int32)
         return land_nodes.where(kv_sat.notnull())
 
-    def _determine_vertical_connection(self, uzf_number):
+    def _determine_vertical_connection(
+        self, uzf_number: GridDataArray
+    ) -> GridDataArray:
         return uzf_number.shift(layer=-1, fill_value=0)
 
-    def _package_data_to_sparse(self):
+    def _package_data_to_sparse(self) -> np.ndarray:
         notnull = self.dataset["landflag"].notnull().to_numpy()
         iuzno = self.dataset["iuzno"].values[notnull]
         landflag = self.dataset["landflag"].values[notnull]
@@ -415,9 +422,15 @@ class UnsaturatedZoneFlow(AdvancedBoundaryCondition):
 
         return recarr_new
 
-    def _render(self, directory, pkgname, globaltimes, binary):
+    def _render(
+        self,
+        directory: Path | str,
+        pkgname: str,
+        globaltimes: list[np.datetime64] | np.ndarray,
+        binary: bool,
+    ) -> str:
         """Render fills in the template only, doesn't write binary data"""
-        d = {}
+        d: dict[str, Any] = {}
         bin_ds = self.dataset[list(self._period_data)]
         d["periods"] = self._period_paths(
             directory, pkgname, globaltimes, bin_ds, binary=False
@@ -429,13 +442,15 @@ class UnsaturatedZoneFlow(AdvancedBoundaryCondition):
             list(self._period_data) + list(self._package_data) + vars_from_init
         )
         d = self._get_pkg_options(d, not_options=not_options)
-        path = directory / pkgname / f"{self._pkg_id}-pkgdata.dat"
+        path = Path(directory) / pkgname / f"{self._pkg_id}-pkgdata.dat"
         d["packagedata"] = path.as_posix()
         # max uzf-cells for which time period data will be supplied
         d["nuzfcells"] = np.count_nonzero(np.isfinite(self.dataset["landflag"]))
         return self._template.render(d)
 
-    def _to_struct_array(self, arrdict, layer):
+    def _to_struct_array(
+        self, arrdict: dict[str, np.ndarray], layer: np.ndarray | None
+    ) -> np.ndarray:
         """Convert from dense arrays to list based input,
         since the perioddata does not require cellids but iuzno, we hgave to override"""
         # TODO add pkgcheck that period table aligns
@@ -459,7 +474,9 @@ class UnsaturatedZoneFlow(AdvancedBoundaryCondition):
 
         return recarr
 
-    def _validate(self, schemata, **kwargs):
+    def _validate(
+        self, schemata: dict[str, Any], **kwargs: Any
+    ) -> dict[str, list[ValidationError]]:
         # Insert additional kwargs
         kwargs["kv_sat"] = self["kv_sat"]
         kwargs["stress_period_active"] = self["stress_period_active"]

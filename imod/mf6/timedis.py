@@ -1,5 +1,9 @@
+from pathlib import Path
+from typing import Any
+
 import cftime
 import numpy as np
+import xarray as xr
 
 from imod.common.utilities.value_filters import enforce_scalar
 from imod.logging import init_log_decorator
@@ -8,7 +12,7 @@ from imod.mf6.write_context import WriteContext
 from imod.schemata import DimsSchema, DTypeSchema
 
 
-def iso8601(datetime):
+def iso8601(datetime: Any) -> str:
     datetype = type(datetime)
     if issubclass(datetype, np.datetime64):
         return np.datetime_as_string(datetime)
@@ -60,11 +64,11 @@ class TimeDiscretization(Package):
     @init_log_decorator()
     def __init__(
         self,
-        timestep_duration,
-        n_timesteps=1,
-        timestep_multiplier=1.0,
+        timestep_duration: xr.DataArray,
+        n_timesteps: int | xr.DataArray = 1,
+        timestep_multiplier: float | xr.DataArray = 1.0,
         validate: bool = True,
-    ):
+    ) -> None:
         dict_dataset = {
             "timestep_duration": timestep_duration,
             "n_timesteps": n_timesteps,
@@ -73,9 +77,15 @@ class TimeDiscretization(Package):
         super().__init__(dict_dataset)
         self._validate_init_schemata(validate)
 
-    def _render(self, directory, pkgname, globaltimes, binary):
+    def _render(
+        self,
+        directory: Path,
+        pkgname: str,
+        globaltimes: list[np.datetime64] | np.ndarray,
+        binary: bool,
+    ) -> str:
         start_date_time = iso8601(self.dataset["time"].values[0])
-        d = {
+        d: dict[str, Any] = {
             "time_units": "days",
             "start_date_time": start_date_time,
         }
@@ -104,7 +114,7 @@ class TimeDiscretization(Package):
 
         return self._template.render(d)
 
-    def _structured_grid_dim_check(self, da):
+    def _structured_grid_dim_check(self, da: xr.DataArray) -> None:
         if da.ndim == 0:
             return  # Scalar, no check necessary
         elif da.ndim == 1:
@@ -122,15 +132,20 @@ class TimeDiscretization(Package):
                 f"Got {da.dims}. Can be at max ('time', )."
             )
 
-    def _set_ats_filename(self, ats_pkgname: str, write_context: WriteContext):
+    def _set_ats_filename(self, ats_pkgname: str, write_context: WriteContext) -> None:
         ats_path = write_context.get_formatted_write_directory() / f"{ats_pkgname}.ats"
         self.dataset["ats_filename"] = ats_path
 
-    def _clear_ats_filename(self):
+    def _clear_ats_filename(self) -> None:
         if "ats_filename" in self.dataset.keys():
             del self.dataset["ats_filename"]
 
-    def _write(self, pkgname, globaltimes, write_context):
+    def _write(
+        self,
+        pkgname: str,
+        globaltimes: list[np.datetime64] | np.ndarray,
+        write_context: WriteContext,
+    ) -> None:
         timedis_content = self._render(
             write_context.write_directory,
             pkgname,

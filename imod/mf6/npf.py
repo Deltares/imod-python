@@ -1,4 +1,4 @@
-from typing import Optional
+from typing import Any, cast
 
 import numpy as np
 import xarray as xr
@@ -26,6 +26,7 @@ from imod.schemata import (
     DTypeSchema,
     IdentityNoDataSchema,
     IndexesSchema,
+    ValidationError,
 )
 from imod.typing import GridDataArray
 from imod.typing.grid import zeros_like
@@ -33,7 +34,7 @@ from imod.util.regrid import RegridderWeightsCache
 
 
 def _dataarray_to_bool(griddataarray: GridDataArray) -> bool:
-    scalar_value: Optional[bool] = enforce_scalar(griddataarray)
+    scalar_value: bool | None = enforce_scalar(griddataarray)
 
     if scalar_value is None:
         return False
@@ -362,30 +363,30 @@ class NodePropertyFlow(Package, IRegridPackage):
     @init_log_decorator()
     def __init__(
         self,
-        icelltype,
-        k,
-        rewet=False,
-        rewet_layer=None,
-        rewet_factor=None,
-        rewet_iterations=None,
-        rewet_method=None,
-        k22=None,
-        k33=None,
-        angle1=None,
-        angle2=None,
-        angle3=None,
-        alternative_cell_averaging=None,
-        save_flows=False,
-        starting_head_as_confined_thickness=False,
-        variable_vertical_conductance=False,
-        dewatered=False,
-        perched=False,
-        save_specific_discharge=False,
-        save_saturation=False,
-        xt3d_option=False,
-        rhs_option=False,
+        icelltype: xr.DataArray,
+        k: xr.DataArray,
+        rewet: bool = False,
+        rewet_layer: float | None = None,
+        rewet_factor: float | None = None,
+        rewet_iterations: int | None = None,
+        rewet_method: int | None = None,
+        k22: xr.DataArray | None = None,
+        k33: xr.DataArray | None = None,
+        angle1: xr.DataArray | None = None,
+        angle2: xr.DataArray | None = None,
+        angle3: xr.DataArray | None = None,
+        alternative_cell_averaging: str | None = None,
+        save_flows: bool = False,
+        starting_head_as_confined_thickness: bool = False,
+        variable_vertical_conductance: bool = False,
+        dewatered: bool = False,
+        perched: bool = False,
+        save_specific_discharge: bool = False,
+        save_saturation: bool = False,
+        xt3d_option: bool = False,
+        rhs_option: bool = False,
         validate: bool = True,
-    ):
+    ) -> None:
         # check rewetting
         if not rewet and any(
             [rewet_layer, rewet_factor, rewet_iterations, rewet_method]
@@ -449,7 +450,9 @@ class NodePropertyFlow(Package, IRegridPackage):
         """
         return _dataarray_to_bool(self.dataset["dewatered"])
 
-    def _validate(self, schemata, **kwargs):
+    def _validate(
+        self, schemata: dict[str, Any], **kwargs: Any
+    ) -> dict[str, list[ValidationError]]:
         # Insert additional kwargs
         kwargs["xt3d_option"] = self["xt3d_option"]
         errors = super()._validate(schemata, **kwargs)
@@ -461,7 +464,7 @@ class NodePropertyFlow(Package, IRegridPackage):
         cls,
         imod5_data: dict[str, dict[str, GridDataArray]],
         target_grid: GridDataArray,
-        regridder_types: Optional[DataclassType] = None,
+        regridder_types: DataclassType | None = None,
         regrid_cache: RegridderWeightsCache = RegridderWeightsCache(),
     ) -> "NodePropertyFlow":
         """
@@ -526,6 +529,6 @@ class NodePropertyFlow(Package, IRegridPackage):
         )
         new_package_data["icelltype"] = icelltype
 
-        pkg = cls(**new_package_data, validate=True)
+        pkg = cls(**cast(dict[str, Any], new_package_data), validate=True)
         pkg.dataset.load()  # Force dask dataset into memory
         return pkg

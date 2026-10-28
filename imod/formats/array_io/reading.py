@@ -1,22 +1,31 @@
 import collections
-import glob
 import itertools
 import pathlib
+from collections.abc import Callable, Sequence
+from re import Pattern
+from typing import Any, TypeAlias, cast
 
 import dask
 import numpy as np
 import xarray as xr
+from numpy.typing import DTypeLike
 
 from imod.util import nested_dict, spatial, time
 
+PatternType: TypeAlias = Pattern[str] | str
+PathType: TypeAlias = str | pathlib.Path
+BoundsType: TypeAlias = list[tuple[float, float, float, float]]
+CellsizesType: TypeAlias = list[tuple[float | np.ndarray, float | np.ndarray]]
+ZInterfaceType: TypeAlias = list[float | None]
 
-def _all_equal(seq, elem):
+
+def _all_equal(seq: list[Any], elem: str) -> None:
     """Raise an error if not all elements of a list are equal"""
     if not seq.count(seq[0]) == len(seq):
         raise ValueError(f"All {elem} must be the same, found: {set(seq)}")
 
 
-def _check_cellsizes(cellsizes):
+def _check_cellsizes(cellsizes: CellsizesType) -> None:
     """
     Checks if cellsizes match, raises ValueError otherwise
 
@@ -49,12 +58,8 @@ def _check_cellsizes(cellsizes):
         except ValueError:
             # some ndarrays, some floats
             # create floats for comparison with allclose
-            try:
-                dx = cellsizes[0][0][0]
-                dy = cellsizes[0][1][0]
-            except TypeError:
-                dx = cellsizes[0][0]
-                dy = cellsizes[0][1]
+            dx = np.atleast_1d(cellsizes[0][0])[0]
+            dy = np.atleast_1d(cellsizes[0][1])[0]
             # comparison
             for cellsize in cellsizes:
                 # Unfortunately this allocates by broadcasting dx and dy
@@ -64,7 +69,7 @@ def _check_cellsizes(cellsizes):
                     raise ValueError(msg)
 
 
-def _has_dim(seq):
+def _has_dim(seq: list[None | float]) -> bool:
     """Check if either 0 or all None are present
 
     Returns
@@ -80,7 +85,7 @@ def _has_dim(seq):
     return True
 
 
-def _to_nan(a, nodata):
+def _to_nan(a: np.ndarray, nodata: float) -> np.ndarray:
     """Change all nodata values in the array to NaN"""
     # it needs to be NaN for xarray to deal with it properly
     # no need to store the nodata value if it is always NaN
@@ -92,7 +97,12 @@ def _to_nan(a, nodata):
         return a
 
 
-def _array_z_coord(coords, tops, bots, unique_indices):
+def _array_z_coord(
+    coords: dict[str, Any],
+    tops: list[float],
+    bots: list[float],
+    unique_indices: np.ndarray,
+) -> dict[str, Any]:
     top = np.array(tops)[unique_indices]
     bot = np.array(bots)[unique_indices]
     dz = top - bot
@@ -107,11 +117,13 @@ def _array_z_coord(coords, tops, bots, unique_indices):
     return coords
 
 
-def _scalar_z_coord(coords, tops, bots):
+def _scalar_z_coord(
+    coords: dict[str, Any], tops: list[float], bots: list[float]
+) -> dict[str, Any]:
     # They must be all the same to be used, as they cannot be assigned
     # to layer.
-    top = np.unique(tops)
-    bot = np.unique(bots)
+    top: np.ndarray = np.unique(tops)
+    bot: np.ndarray = np.unique(bots)
     if top.size == bot.size == 1:
         top = top.item()
         bot = bot.item()
@@ -122,7 +134,7 @@ def _scalar_z_coord(coords, tops, bots):
     return coords
 
 
-def _initialize_groupby(ndims):
+def _initialize_groupby(ndims: int) -> collections.defaultdict[Any, Any]:
     """
     This function generates a data structure consisting of defaultdicts, to use
     for grouping arrays by dimension. The number of dimensions may vary, so the
@@ -157,7 +169,7 @@ def _initialize_groupby(ndims):
     return nested_dict.initialize_nested_dict(ndims - 1)
 
 
-def _ndconcat(arrays, ndim):
+def _ndconcat(arrays: list[list[Any]], ndim: int) -> dask.array.Array:
     """
     Parameters
     ----------
@@ -180,7 +192,14 @@ def _ndconcat(arrays, ndim):
         return dask.array.stack(out, axis=0)
 
 
-def _dims_coordinates(header_coords, bounds, cellsizes, tops, bots, use_cftime):
+def _dims_coordinates(
+    header_coords: dict[str, list[Any]],
+    bounds: BoundsType,
+    cellsizes: CellsizesType,
+    tops: ZInterfaceType,
+    bots: ZInterfaceType,
+    use_cftime: bool,
+) -> tuple[list[str], dict[str, Any]]:
     # create coordinates
     coords = spatial._xycoords(bounds[0], cellsizes[0])
     dims = ["y", "x"]
@@ -220,15 +239,23 @@ def _dims_coordinates(header_coords, bounds, cellsizes, tops, bots, use_cftime):
     # Deal with voxel idf top and bottom data
     all_have_z = all((v is not None for v in itertools.chain(tops, bots)))
     if all_have_z:
+        tops_float = cast(list[float], tops)
+        bots_float = cast(list[float], bots)
         if haslayer and coords["layer"].size > 1:
-            coords = _array_z_coord(coords, tops, bots, unique_indices)
+            coords = _array_z_coord(coords, tops_float, bots_float, unique_indices)
         else:
-            coords = _scalar_z_coord(coords, tops, bots)
+            coords = _scalar_z_coord(coords, tops_float, bots_float)
 
     return dims, coords
 
 
-def _dask(path, attrs=None, pattern=None, _read=None, header=None):
+def _dask(
+    path: PathType,
+    attrs: dict[str, Any] | None = None,
+    pattern: PatternType | None = None,
+    _read: Callable[[str, int, int, int, Any, DTypeLike], np.ndarray] | None = None,
+    header: Callable[[PathType, PatternType | None], dict[str, Any]] | None = None,
+) -> tuple[dask.array.Array, dict[str, Any]]:
     """
     Read a single IDF file to a dask.array
 
@@ -244,6 +271,11 @@ def _dask(path, attrs=None, pattern=None, _read=None, header=None):
         {name}_{time}_l{layer}, a custom pattern can be defined here either
         as a string, or as a compiled regular expression pattern. Please refer
         to the examples in ``imod.idf.open``.
+    _read : Callable[[str, int, int, int, Any, DTypeLike], np.ndarray], optional
+        Function to read individual files. Must be provided.
+    header : Callable[[PathType, PatternType | None], dict[str, Any]], optional
+        Function to read the header of a file. Must be provided if attrs is not
+        supplied.
 
     Returns
     -------
@@ -258,6 +290,10 @@ def _dask(path, attrs=None, pattern=None, _read=None, header=None):
     path = pathlib.Path(path)
 
     if attrs is None:
+        if header is None:
+            raise ValueError(
+                "Header function must be provided if attrs is not supplied."
+            )
         attrs = header(path, pattern)
     # If we don't unpack, it seems we run into trouble with the dask array later
     # on, probably because attrs isn't immutable. This works fine instead.
@@ -280,7 +316,12 @@ def _dask(path, attrs=None, pattern=None, _read=None, header=None):
     return x, attrs
 
 
-def load_as_components(paths, use_cftime, _read, headers):
+def load_as_components(
+    paths: Sequence[PathType],
+    use_cftime: bool,
+    _read: Callable[..., np.ndarray],
+    headers: list[dict[str, Any]],
+) -> tuple[dask.array.Array, dict[str, Any], list[str], str]:
     """
     Combine a list of paths to IDFs to components that can be used to construct
     a single xarray.DataArray.
@@ -308,15 +349,15 @@ def load_as_components(paths, use_cftime, _read, headers):
         Name of the DataArray.
     """
     # this function also works for single IDFs
-    names = [h["name"] for h in headers]
+    names: list[str] = [h["name"] for h in headers]
     _all_equal(names, "names")
 
     # Extract data from headers
-    bounds = []
-    cellsizes = []
-    tops = []
-    bots = []
-    header_coords = collections.defaultdict(list)
+    bounds: BoundsType = []
+    cellsizes: CellsizesType = []
+    tops: ZInterfaceType = []
+    bots: ZInterfaceType = []
+    header_coords: dict[str, list[Any]] = collections.defaultdict(list)
     for h in headers:
         bounds.append((h["xmin"], h["xmax"], h["ymin"], h["ymax"]))
         cellsizes.append((h["dx"], h["dy"]))
@@ -348,7 +389,12 @@ def load_as_components(paths, use_cftime, _read, headers):
     return dask_array, coords, dims, names[0]
 
 
-def _load(paths, use_cftime, _read, headers):
+def _load(
+    paths: Sequence[PathType],
+    use_cftime: bool,
+    _read: Callable[..., np.ndarray],
+    headers: list[dict[str, Any]],
+) -> xr.DataArray:
     dask_array, coords, dims, name = load_as_components(
         paths, use_cftime, _read, headers
     )
@@ -365,7 +411,7 @@ def _load(paths, use_cftime, _read, headers):
 
 
 def handle_path(
-    path: pathlib.Path | str | list[pathlib.Path | str],
+    path: PathType | Sequence[PathType],
 ) -> list[pathlib.Path]:
     """
     Handle a path input and return a list of pathlib.Path objects.
@@ -385,15 +431,13 @@ def handle_path(
     FileNotFoundError
         If no files matching the input path(s) are found.
     """
-    if isinstance(path, pathlib.Path):
-        path = str(path)
-
-    if isinstance(path, list):
-        paths = path
-    else:
+    if isinstance(path, str | pathlib.Path):
         # Sort: glob order is filesystem dependent (alphabetical on NTFS, not
         # on e.g. APFS or ext4), and downstream merging can depend on order.
-        paths = [pathlib.Path(p) for p in sorted(glob.glob(path))]
+        globpath = pathlib.Path(path)
+        paths = sorted(globpath.parent.glob(globpath.name))
+    else:
+        paths = [pathlib.Path(p) for p in path]
 
     n = len(paths)
     if n == 0:
@@ -402,7 +446,13 @@ def handle_path(
     return paths
 
 
-def _open(path, use_cftime, pattern, header, _read):
+def _open(
+    path: PathType | Sequence[PathType],
+    use_cftime: bool,
+    pattern: PatternType | None,
+    header: Callable[[PathType, PatternType | None], dict[str, Any]],
+    _read: Callable[..., np.ndarray],
+) -> xr.DataArray:
     paths = handle_path(path)
 
     headers = [header(p, pattern) for p in paths]

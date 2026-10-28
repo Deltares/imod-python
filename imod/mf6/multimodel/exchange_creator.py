@@ -1,5 +1,4 @@
 import abc
-from typing import Dict
 
 import numpy as np
 import pandas as pd
@@ -59,7 +58,7 @@ class ExchangeCreator(abc.ABC):
 
     @property
     @abc.abstractmethod
-    def _coordinate_names(self):
+    def _coordinate_names(self) -> list[str]:
         """
         abstract method that returns the names of the coordinates e.g. ["row", "column"] for structured grids or
         ["cell_index"] for usntructured grids
@@ -87,7 +86,7 @@ class ExchangeCreator(abc.ABC):
     @abc.abstractmethod
     def _create_global_to_local_idx(
         cls, partition_info: list[PartitionInfo], global_cell_indices: GridDataArray
-    ) -> Dict[int, pd.DataFrame]:
+    ) -> dict[int, pd.DataFrame]:
         """
         abstract method that creates for each partition a mapping from global cell indices to local cells in that
         partition.
@@ -96,7 +95,7 @@ class ExchangeCreator(abc.ABC):
 
     def __init__(
         self, submodel_labels: GridDataArray, partition_info: list[PartitionInfo]
-    ):
+    ) -> None:
         self._submodel_labels = submodel_labels
 
         self._global_cell_indices = to_cell_idx(submodel_labels)
@@ -240,7 +239,7 @@ class ExchangeCreator(abc.ABC):
 
     def _create_global_cellidx_to_local_cellid_mapping(
         self, partition_info: list[PartitionInfo]
-    ) -> Dict[int, pd.DataFrame]:
+    ) -> dict[int, pd.DataFrame]:
         global_to_local_idx = self._create_global_to_local_idx(
             partition_info, self._global_cell_indices
         )
@@ -265,7 +264,9 @@ class ExchangeCreator(abc.ABC):
         return to_cell_idx(local_domain)
 
     @classmethod
-    def _local_cell_idx_to_id(cls, partition_info) -> Dict[int, pd.DataFrame]:
+    def _local_cell_idx_to_id(
+        cls, partition_info: list[PartitionInfo]
+    ) -> dict[int, pd.DataFrame]:
         local_cell_idx_to_id = {}
         for submodel_partition_info in partition_info:
             model_id = submodel_partition_info.id
@@ -282,7 +283,7 @@ class ExchangeCreator(abc.ABC):
 
         return local_cell_idx_to_id
 
-    def rearrange_connected_cells(self):
+    def rearrange_connected_cells(self) -> None:
         """
         connections will be shuffled so that the lowest partition number comes first.
         """

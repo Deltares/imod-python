@@ -1,3 +1,5 @@
+import pathlib
+
 import cftime
 import numpy as np
 import pandas as pd
@@ -188,7 +190,9 @@ def test_handle_path__sorted(tmp_path, monkeypatch):
     """
     names = ["b_p002.idf", "c_p000.idf", "a_p001.idf"]
     monkeypatch.setattr(
-        reading.glob, "glob", lambda _: [str(tmp_path / n) for n in names]
+        pathlib.Path,
+        "glob",
+        lambda self, pattern: iter([tmp_path / n for n in names]),
     )
     paths = reading.handle_path(tmp_path / "*.idf")
     assert [p.name for p in paths] == sorted(names)

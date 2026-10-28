@@ -3,6 +3,7 @@ import warnings
 import numpy as np
 import pandas as pd
 import xarray as xr
+import xugrid as xu
 
 from imod.typing import GridDataArray
 
@@ -38,7 +39,7 @@ def convert_pointwaterhead_freshwaterhead(
 
     Returns
     -------
-    freshwaterhead : float or xr.xr.DataArray/xu.UgridDataArray of floats
+    freshwaterhead : float or xr.DataArray/xu.UgridDataArray of floats
     """
 
     freshwaterhead = (
@@ -49,7 +50,10 @@ def convert_pointwaterhead_freshwaterhead(
     # edge case: point water head below z
     # return freshwater head of top underlying cell where elevation < pointwaterhead
     # only for grids with layers
-    if isinstance(pointwaterhead, GridDataArray) and "layer" in pointwaterhead.dims:
+    if (
+        isinstance(pointwaterhead, (xr.DataArray, xu.UgridDataArray))
+        and "layer" in pointwaterhead.dims
+    ):
         freshwaterhead = freshwaterhead.where(pointwaterhead > elevation)
         freshwaterhead = freshwaterhead.bfill(dim="layer")
 
@@ -58,14 +62,14 @@ def convert_pointwaterhead_freshwaterhead(
 
 def _calculate_gxg(
     head_bimonthly: xr.DataArray, below_surfacelevel: bool = False
-) -> xr.DataArray:
-    import bottleneck as bn
+) -> xr.Dataset:
+    import bottleneck as bn  # type: ignore[import-untyped]
 
     # Most efficient way of finding the three highest and three lowest is via a
     # partition. See:
     # https://bottleneck.readthedocs.io/en/latest/reference.html#bottleneck.partition
 
-    def lowest3_mean(da: xr.DataArray):
+    def lowest3_mean(da: xr.DataArray) -> xr.DataArray:
         a = bn.partition(da.values, kth=2, axis=-1)
 
         with warnings.catch_warnings():
@@ -75,7 +79,7 @@ def _calculate_gxg(
         template = da.isel(bimonth=0)
         return template.copy(data=result)
 
-    def highest3_mean(da: xr.DataArray):
+    def highest3_mean(da: xr.DataArray) -> xr.DataArray:
         a = bn.partition(-da.values, kth=2, axis=-1)
 
         with warnings.catch_warnings():
@@ -212,7 +216,9 @@ def calculate_gxg_points(
     >>> )
     """
 
-    def bimonthly(series: pd.Series, dates: pd.DatetimeIndex, tolerance: pd.Timedelta):
+    def bimonthly(
+        series: pd.Series, dates: pd.DatetimeIndex, tolerance: pd.Timedelta
+    ) -> pd.Series:
         series = series[~series.index.duplicated(keep="first")]
         return series.reindex(dates, method="nearest", tolerance=tolerance)
 
@@ -246,7 +252,7 @@ def calculate_gxg(
     head: xr.DataArray,
     below_surfacelevel: bool = False,
     tolerance: pd.Timedelta = pd.Timedelta(days=7),
-) -> xr.DataArray:
+) -> xr.Dataset:
     """
     Calculate GxG groundwater characteristics from head time series.
 

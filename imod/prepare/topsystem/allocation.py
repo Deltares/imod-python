@@ -3,7 +3,6 @@ This module contains all kinds of utilities to prepare rivers
 """
 
 from enum import Enum
-from typing import Optional
 
 import numpy as np
 
@@ -86,7 +85,7 @@ def allocate_riv_cells(
     stage: GridDataArray,
     bottom_elevation: GridDataArray,
     drop_empty_layers: bool = True,
-) -> tuple[GridDataArray, Optional[GridDataArray]]:
+) -> tuple[GridDataArray, GridDataArray | None]:
     """
     Allocate river cells from a planar grid across the vertical dimension.
     Multiple options are available, which can be selected in ALLOCATION_OPTION.
@@ -374,18 +373,20 @@ def allocate_rch_cells(
     return _drop_empty_layers(result) if drop_empty_layers else result
 
 
-def _is_layered(grid: GridDataArray):
+def _is_layered(grid: GridDataArray) -> bool:
     return "layer" in grid.sizes and grid.sizes["layer"] > 1
 
 
-def _enforce_layered_top(top: GridDataArray, bottom: GridDataArray):
+def _enforce_layered_top(top: GridDataArray, bottom: GridDataArray) -> GridDataArray:
     if _is_layered(top):
         return top
     else:
         return create_layered_top(bottom, top)
 
 
-def get_above_lower_bound(bottom_elevation: GridDataArray, top_layered: GridDataArray):
+def get_above_lower_bound(
+    bottom_elevation: GridDataArray, top_layered: GridDataArray
+) -> GridDataArray:
     """
     Returns boolean array that indicates cells are above the lower vertical
     limit of the topsystem. These are the cells located above the
@@ -610,7 +611,7 @@ def _allocate_cells__at_first_active(
     return topsystem_upper_active, None
 
 
-def _used_layers(mask: GridDataArray) -> tuple[Optional[GridDataArray], LAYERS_USED]:
+def _used_layers(mask: GridDataArray) -> tuple[GridDataArray | None, LAYERS_USED]:
     """
     Return the layer coordinate values of ``mask`` that contain at least one
     True value anywhere in the domain (and, if present, at any timestep), or

@@ -1,7 +1,8 @@
 from datetime import datetime
-from typing import Optional, Tuple, cast
+from typing import Any, Optional, cast
 
 import numpy as np
+import xarray as xr
 
 from imod import logging
 from imod.common.interfaces.iregridpackage import IRegridPackage
@@ -41,6 +42,7 @@ from imod.schemata import (
     IdentityNoDataSchema,
     IndexesSchema,
     OtherCoordsSchema,
+    ValidationError,
 )
 from imod.typing import GridDataArray, GridDataDict
 from imod.typing.grid import (
@@ -56,7 +58,7 @@ from imod.util.regrid import (
 
 def mask_package__drop_if_empty(
     package: TopSystemBoundaryCondition,
-) -> Optional[TopSystemBoundaryCondition]:
+) -> TopSystemBoundaryCondition | None:
     """ "
     Create an optional package from a package if it has data. Return None if
     package is inactive everywhere.
@@ -67,10 +69,10 @@ def mask_package__drop_if_empty(
 
 
 def clip_time_if_package(
-    package: Optional[TopSystemBoundaryCondition],
+    package: TopSystemBoundaryCondition | None,
     time_min: datetime,
     time_max: datetime,
-) -> Optional[TopSystemBoundaryCondition]:
+) -> TopSystemBoundaryCondition | None:
     if package is not None:
         package = package.clip_box(time_min=time_min, time_max=time_max)
     return package
@@ -264,18 +266,18 @@ class River(TopSystemBoundaryCondition, IRegridPackage):
     @init_log_decorator()
     def __init__(
         self,
-        stage,
-        conductance,
-        bottom_elevation,
-        concentration=None,
-        concentration_boundary_type="aux",
-        print_input=False,
-        print_flows=False,
-        save_flows=False,
-        observations=None,
+        stage: GridDataArray,
+        conductance: GridDataArray,
+        bottom_elevation: GridDataArray,
+        concentration: GridDataArray | None = None,
+        concentration_boundary_type: str = "aux",
+        print_input: bool = False,
+        print_flows: bool = False,
+        save_flows: bool = False,
+        observations: Any = None,
         validate: bool = True,
-        repeat_stress=None,
-    ):
+        repeat_stress: dict[Any, Any] | xr.DataArray | None = None,
+    ) -> None:
         dict_dataset = {
             "stage": stage,
             "conductance": conductance,
@@ -291,7 +293,9 @@ class River(TopSystemBoundaryCondition, IRegridPackage):
         super().__init__(dict_dataset)
         self._validate_init_schemata(validate)
 
-    def _validate(self, schemata, **kwargs):
+    def _validate(
+        self, schemata: dict[str, Any], **kwargs: Any
+    ) -> dict[str, list[ValidationError]]:
         # Insert additional kwargs
         kwargs["stage"] = self["stage"]
         kwargs["bottom_elevation"] = self["bottom_elevation"]
@@ -445,9 +449,9 @@ class River(TopSystemBoundaryCondition, IRegridPackage):
         time_max: datetime,
         allocation_option: ALLOCATION_OPTION,
         distributing_option: DISTRIBUTING_OPTION,
-        regridder_types: Optional[RiverRegridMethod] = None,
+        regridder_types: RiverRegridMethod | None = None,
         regrid_cache: RegridderWeightsCache = RegridderWeightsCache(),
-    ) -> Tuple[Optional["River"], Optional[Drainage]]:
+    ) -> tuple[Optional["River"], Drainage | None]:
         """
         Construct a river-package from iMOD5 data, loaded with the
         :func:`imod.formats.prj.open_projectfile_data` function.
@@ -534,7 +538,7 @@ class River(TopSystemBoundaryCondition, IRegridPackage):
         regridded_riv_pkg_data, infiltration_drn_data = _separate_infiltration_data(
             regridded_riv_pkg_data, infiltration_factor
         )
-        riv_pkg = cls(**regridded_riv_pkg_data, validate=True)
+        riv_pkg = cls(**cast(dict[str, Any], regridded_riv_pkg_data), validate=True)
         drn_pkg = _create_drain_from_leftover_riv_imod5_data(
             allocation_drn_data,
             infiltration_drn_data,
@@ -553,7 +557,7 @@ class River(TopSystemBoundaryCondition, IRegridPackage):
         optional_drn_pkg = clip_time_if_package(optional_drn_pkg, time_min, time_max)
 
         # Cast for mypy checks
-        optional_riv_pkg = cast(Optional[River], optional_riv_pkg)
-        optional_drn_pkg = cast(Optional[Drainage], optional_drn_pkg)
+        optional_riv_pkg = cast(River | None, optional_riv_pkg)
+        optional_drn_pkg = cast(Drainage | None, optional_drn_pkg)
 
         return (optional_riv_pkg, optional_drn_pkg)

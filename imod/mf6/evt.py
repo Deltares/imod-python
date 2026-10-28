@@ -1,6 +1,7 @@
-from typing import Any, Optional
+from typing import Any
 
 import numpy as np
+import xarray as xr
 
 from imod.common.interfaces.iregridpackage import IRegridPackage
 from imod.logging import init_log_decorator
@@ -18,7 +19,9 @@ from imod.schemata import (
     IdentityNoDataSchema,
     IndexesSchema,
     OtherCoordsSchema,
+    ValidationError,
 )
+from imod.typing import GridDataArray, GridDataset
 from imod.util.spatial import unstack_dim_into_variable
 
 SEGMENT_BOUNDARY_DIMS_SCHEMA = (
@@ -200,27 +203,27 @@ class Evapotranspiration(BoundaryCondition, IRegridPackage):
     @init_log_decorator()
     def __init__(
         self,
-        surface,
-        rate,
-        depth,
-        proportion_rate=None,
-        proportion_depth=None,
-        concentration=None,
-        concentration_boundary_type="auxmixed",
-        fixed_cell=False,
-        print_input=False,
-        print_flows=False,
-        save_flows=False,
-        observations=None,
+        surface: GridDataArray,
+        rate: GridDataArray,
+        depth: GridDataArray,
+        proportion_rate: GridDataArray | None = None,
+        proportion_depth: GridDataArray | None = None,
+        concentration: GridDataArray | None = None,
+        concentration_boundary_type: str = "auxmixed",
+        fixed_cell: bool | GridDataArray = False,
+        print_input: bool = False,
+        print_flows: bool = False,
+        save_flows: bool = False,
+        observations: Any = None,
         validate: bool = True,
-        repeat_stress=None,
-    ):
+        repeat_stress: dict[Any, Any] | xr.DataArray | None = None,
+    ) -> None:
         if (proportion_rate is None) ^ (proportion_depth is None):
             raise ValueError(
                 "Both 'proportion_rate' and 'proportion_depth' must both be provided,"
                 " or neither of them."
             )
-        dict_dataset = {
+        dict_dataset: dict[str, Any] = {
             "surface": surface,
             "rate": rate,
             "depth": depth,
@@ -242,7 +245,9 @@ class Evapotranspiration(BoundaryCondition, IRegridPackage):
         super().__init__(dict_dataset)
         self._validate_init_schemata(validate)
 
-    def _validate(self, schemata, **kwargs):
+    def _validate(
+        self, schemata: dict[str, Any], **kwargs: Any
+    ) -> dict[str, list[ValidationError]]:
         # Insert additional kwargs
         kwargs["surface"] = self["surface"]
         errors = super()._validate(schemata, **kwargs)
@@ -252,8 +257,8 @@ class Evapotranspiration(BoundaryCondition, IRegridPackage):
     def _get_pkg_options(
         self,
         predefined_options: dict[str, Any],
-        not_options: Optional[list[str]] = None,
-    ):
+        not_options: list[str] | None = None,
+    ) -> dict[str, Any]:
         options = super()._get_pkg_options(predefined_options, not_options=not_options)
         # Add amount of segments
         if "segment" in self.dataset.dims:
@@ -262,7 +267,7 @@ class Evapotranspiration(BoundaryCondition, IRegridPackage):
             options["nseg"] = 1
         return options
 
-    def _get_bin_ds(self):
+    def _get_bin_ds(self) -> GridDataset:
         bin_ds = super()._get_bin_ds()
 
         # Unstack "segment" dimension into different variables

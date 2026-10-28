@@ -1,7 +1,8 @@
 from __future__ import annotations
 
+from collections.abc import Sequence
 from datetime import datetime
-from typing import Optional, cast
+from typing import Any, cast
 
 import numpy as np
 
@@ -103,14 +104,14 @@ class GroundwaterFlowModel(Modflow6Model):
     @init_log_decorator()
     def __init__(
         self,
-        listing_file: Optional[str] = None,
+        listing_file: str | None = None,
         print_input: bool = False,
         print_flows: bool = False,
         save_flows: bool = False,
         newton: bool = False,
         under_relaxation: bool = False,
         validate: bool = True,
-    ):
+    ) -> None:
         super().__init__()
         self._options = {
             "listing_file": listing_file,
@@ -122,7 +123,7 @@ class GroundwaterFlowModel(Modflow6Model):
         }
         self._validate_init_schemata_options(validate)
 
-    def is_use_newton(self):
+    def is_use_newton(self) -> bool:
         """
         Returns whether the Newton-Raphson formulation is used for groundwater
         flow between connected, convertible groundwater cells.
@@ -146,7 +147,9 @@ class GroundwaterFlowModel(Modflow6Model):
         """
         self._options["newton"] = is_newton
 
-    def _update_buoyancy_package(self, transport_models_per_flow_model) -> None:
+    def _update_buoyancy_package(
+        self, transport_models_per_flow_model: Sequence[str]
+    ) -> None:
         """
         If the simulation is partitioned, then the buoyancy package, if present,
         must be updated for the renamed transport models.
@@ -162,8 +165,8 @@ class GroundwaterFlowModel(Modflow6Model):
     def validate(
         self,
         model_name: str = "",
-        validation_context: Optional[ValidationSettings] = None,
-        **kwargs,
+        validation_context: ValidationSettings | None = None,
+        **kwargs: Any,
     ) -> StatusInfoBase:
         """
         Validate model.
@@ -186,6 +189,10 @@ class GroundwaterFlowModel(Modflow6Model):
         """
         try:
             npfkey = self._get_pkgkey(NodePropertyFlow._pkg_id)
+            if npfkey is None:
+                raise ValueError(
+                    f"No {NodePropertyFlow.__name__} package found in model"
+                )
         except Exception as e:
             status_info = StatusInfo(f"{model_name} model")
             status_info.add_error(str(e))
@@ -206,10 +213,10 @@ class GroundwaterFlowModel(Modflow6Model):
         imod5_data: dict[str, dict[str, GridDataArray]],
         period_data: dict[str, list[datetime]],
         times: list[datetime],
-        allocation_options: Optional[SimulationAllocationOptions] = None,
-        distributing_options: Optional[SimulationDistributingOptions] = None,
-        regridder_types: Optional[dict[str, DataclassType]] = None,
-        target_grid: Optional[GridDataArray] = None,
+        allocation_options: SimulationAllocationOptions | None = None,
+        distributing_options: SimulationDistributingOptions | None = None,
+        regridder_types: dict[str, DataclassType] | None = None,
+        target_grid: GridDataArray | None = None,
     ) -> "GroundwaterFlowModel":
         """
         Imports a GroundwaterFlowModel (GWF) from the data in an iMOD5 project

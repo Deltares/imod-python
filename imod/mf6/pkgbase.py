@@ -1,6 +1,7 @@
 import abc
+from collections.abc import Mapping
 from pathlib import Path
-from typing import TYPE_CHECKING, Any, Mapping, Optional, Self, final
+from typing import TYPE_CHECKING, Any, Self, final
 
 import xarray as xr
 import xugrid as xu
@@ -42,12 +43,12 @@ class PackageBase(IPackageBase, abc.ABC):
 
     # This method has been added to allow mock.patch to mock created objects
     # https://stackoverflow.com/questions/64737213/how-to-patch-the-new-method-of-a-class
-    def __new__(cls, *_, **__):
+    def __new__(cls, *_: Any, **__: Any) -> Self:
         return super(PackageBase, cls).__new__(cls)
 
     def __init__(
         self, variables_to_merge: Mapping[str, GridDataArray | float | int | bool | str]
-    ):
+    ) -> None:
         # Merge variables, perform exact join to verify if coordinates values
         # are consistent amongst variables.
         self.__dataset = merge_with_dictionary(variables_to_merge, join="exact")
@@ -64,10 +65,10 @@ class PackageBase(IPackageBase, abc.ABC):
     def pkg_id(self) -> str:
         return self._pkg_id
 
-    def __getitem__(self, key):
+    def __getitem__(self, key: Any) -> Any:
         return self.dataset.__getitem__(key)
 
-    def __setitem__(self, key, value):
+    def __setitem__(self, key: Any, value: Any) -> None:
         self.dataset.__setitem__(key, value)
 
     @classmethod
@@ -81,7 +82,7 @@ class PackageBase(IPackageBase, abc.ABC):
         return instance
 
     @classmethod
-    def from_file(cls, path: str | Path, **kwargs) -> Self:
+    def from_file(cls, path: str | Path, **kwargs: Any) -> Self:
         """
         Loads an imod mf6 package from a file (currently only netcdf and zarr are supported).
         Note that it is expected that this file was saved with imod.mf6.Package.dataset.to_netcdf(),
@@ -155,9 +156,9 @@ class PackageBase(IPackageBase, abc.ABC):
         modeldirectory: Path,
         pkgname: str,
         mdal_compliant: bool = False,
-        crs: Optional[Any] = None,
+        crs: Any | None = None,
         engine: EngineType = "netcdf4",
-        **kwargs,
+        **kwargs: Any,
     ) -> Path:
         """
         Write package to file.

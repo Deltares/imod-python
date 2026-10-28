@@ -1,6 +1,5 @@
 import abc
 from enum import Enum
-from typing import Dict, Optional, Tuple, Union
 
 import xugrid as xu
 from xugrid.regrid.regridder import BaseRegridder
@@ -35,7 +34,7 @@ class RegridderType(Enum):
     RELATIVEOVERLAP = xu.RelativeOverlapRegridder
 
 
-HashRegridderMapping = Tuple[int, int, BaseRegridder]
+HashRegridderMapping = tuple[int, int, BaseRegridder]
 
 
 class RegridderWeightsCache:
@@ -91,9 +90,9 @@ class RegridderWeightsCache:
         max_cache_size: int = 6,
     ) -> None:
         self.regridder_instances: dict[
-            tuple[type[BaseRegridder], Optional[str]], BaseRegridder
+            tuple[type[BaseRegridder], str | None], BaseRegridder
         ] = {}
-        self.weights_cache: Dict[HashRegridderMapping, GridDataArray] = {}
+        self.weights_cache: dict[HashRegridderMapping, GridDataArray] = {}
         self.max_cache_size = max_cache_size
 
     def _get_regridder_class(
@@ -114,8 +113,8 @@ class RegridderWeightsCache:
         self,
         source_grid: GridDataArray,
         target_grid: GridDataArray,
-        regridder_type: Union[RegridderType, BaseRegridder],
-        method: Optional[str] = None,
+        regridder_type: RegridderType | BaseRegridder,
+        method: str | None = None,
     ) -> BaseRegridder:
         """
         Returns a regridder of the specified type and with the specified method.
@@ -163,6 +162,6 @@ class RegridderWeightsCache:
 
         return regridder
 
-    def _remove_first_regridder(self):
+    def _remove_first_regridder(self) -> None:
         keys = list(self.weights_cache.keys())
         self.weights_cache.pop(keys[0])

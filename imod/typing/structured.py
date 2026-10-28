@@ -2,16 +2,19 @@
 
 import itertools
 from collections import defaultdict
-from typing import Any, DefaultDict, List, Set, Tuple, cast
+from collections.abc import Mapping
+from typing import Any, cast
 
 import dask
 import numpy as np
 import xarray as xr
 
+from imod.typing import DataArrayComponents
+
 # %%
 
 
-def check_dtypes(das: List[xr.DataArray]) -> None:
+def check_dtypes(das: list[xr.DataArray]) -> None:
     """Check whether the dtypes of all arrays are the same."""
     dtypes = {da.dtype for da in das}
     if len(dtypes) != 1:
@@ -19,11 +22,11 @@ def check_dtypes(das: List[xr.DataArray]) -> None:
     return
 
 
-def _is_nonunique_dimsize(sizes: Set[int]) -> bool:
+def _is_nonunique_dimsize(sizes: set[int]) -> bool:
     return len(sizes) != 1
 
 
-def check_sizes(sizes: DefaultDict[str, Set[int]], attribute: str) -> None:
+def check_sizes(sizes: defaultdict[str, set[int]], attribute: str) -> None:
     """Utility for checking a dict of dimension names and sizes. Skips x and y."""
     sizes.pop("x", None)
     sizes.pop("y", None)
@@ -37,7 +40,7 @@ def check_sizes(sizes: DefaultDict[str, Set[int]], attribute: str) -> None:
     return
 
 
-def check_dims(das: List[xr.DataArray]) -> None:
+def check_dims(das: list[xr.DataArray]) -> None:
     all_dims = {da.dims for da in das}
     if len(all_dims) != 1:
         raise ValueError(
@@ -49,7 +52,7 @@ def check_dims(das: List[xr.DataArray]) -> None:
     check_dim_sizes(das)
 
 
-def check_dim_sizes(das: List[xr.DataArray]) -> None:
+def check_dim_sizes(das: list[xr.DataArray]) -> None:
     """Check whether all non-xy dims are equally sized."""
     sizes = defaultdict(set)
     for da in das:
@@ -59,12 +62,12 @@ def check_dim_sizes(das: List[xr.DataArray]) -> None:
     return
 
 
-def check_coords(das: List[xr.DataArray]):
-    def drop_xy(coords) -> xr.Coordinates:
-        coords = dict(coords)
-        coords.pop("y")
-        coords.pop("x")
-        return xr.Coordinates(coords)
+def check_coords(das: list[xr.DataArray]) -> None:
+    def drop_xy(coords: Mapping[Any, Any]) -> xr.Coordinates:
+        coords_dict = dict(coords)
+        coords_dict.pop("y")
+        coords_dict.pop("x")
+        return xr.Coordinates(coords_dict)
 
     first_coords = drop_xy(das[0].coords)
     disjoint = [
@@ -79,7 +82,7 @@ def check_coords(das: List[xr.DataArray]):
     return
 
 
-def check_chunk_sizes(das: List[xr.DataArray]) -> None:
+def check_chunk_sizes(das: list[xr.DataArray]) -> None:
     """Check whether all chunks are equal on non-xy dims."""
     chunks = [da.chunks for da in das]
     iterator = (item is None for item in chunks)
@@ -98,10 +101,10 @@ def check_chunk_sizes(das: List[xr.DataArray]) -> None:
 
 
 def merge_arrays(
-    arrays: List[np.ndarray],
-    ixs: List[np.ndarray],
-    iys: List[np.ndarray],
-    yx_shape: Tuple[int, int],
+    arrays: list[np.ndarray],
+    ixs: list[np.ndarray],
+    iys: list[np.ndarray],
+    yx_shape: tuple[int, int],
 ) -> np.ndarray:
     """
     Merge the arrays in the last two (y, x) dimensions.
@@ -135,7 +138,7 @@ def merge_arrays(
     return out
 
 
-def _unique_coords(das: List[xr.DataArray], dim: str) -> np.ndarray:
+def _unique_coords(das: list[xr.DataArray], dim: str) -> np.ndarray:
     """Collect unique coords in list of dataarrays"""
     return np.unique(np.concatenate([da.coords[dim].values for da in das]))
 
@@ -145,8 +148,8 @@ def _is_nonequidistant_coord(da: xr.DataArray, dim: str) -> bool:
 
 
 def _merge_nonequidistant_coords(
-    das: List[xr.DataArray], coordname: str, indices: List[np.ndarray], nsize: int
-):
+    das: list[xr.DataArray], coordname: str, indices: list[np.ndarray], nsize: int
+) -> np.ndarray:
     dtype = das[0].coords[coordname].dtype
     out = np.full((nsize,), np.nan, dtype=dtype)
     for da, index in zip(das, indices):
@@ -156,8 +159,8 @@ def _merge_nonequidistant_coords(
 
 
 def merge_partitions_as_da_components(
-    das: List[xr.DataArray],
-) -> tuple[np.ndarray, dict[str, Any], tuple[str, ...], str]:
+    das: list[xr.DataArray],
+) -> DataArrayComponents:
     """
     Merge a list of xarray DataArrays into components for a single DataArray.
 
@@ -256,7 +259,7 @@ def merge_partitions_as_da_components(
     return data, coords, dims, name
 
 
-def _merge_partitions_da(das: List[xr.DataArray]) -> xr.DataArray:
+def _merge_partitions_da(das: list[xr.DataArray]) -> xr.DataArray:
     """
     Merge a list of xarray DataArrays into a single DataArray.
     """
@@ -270,7 +273,7 @@ def _merge_partitions_da(das: List[xr.DataArray]) -> xr.DataArray:
 
 
 def merge_partitions(
-    das: List[xr.DataArray | xr.Dataset],
+    das: list[xr.DataArray | xr.Dataset],
 ) -> xr.Dataset:
     first_item = das[0]
     if isinstance(first_item, xr.Dataset):

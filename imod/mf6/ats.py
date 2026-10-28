@@ -1,11 +1,12 @@
 import pathlib
-from typing import Any, Dict, TypeAlias, Union
+from typing import Any, TypeAlias
 
 import numpy as np
+import xarray as xr
 
 from imod.mf6.package import Package
 from imod.mf6.write_context import WriteContext
-from imod.schemata import AllValueSchema, DimsSchema, DTypeSchema
+from imod.schemata import AllValueSchema, DimsSchema, DTypeSchema, ValidationError
 from imod.typing import GridDataset
 
 _PeriodDataType: TypeAlias = dict[np.int64, list[Any]]
@@ -156,13 +157,13 @@ class AdaptiveTimeStepping(Package):
 
     def __init__(
         self,
-        dt_init,
-        dt_min,
-        dt_max,
-        dt_multiplier=0.0,
-        dt_fail_divisor=0.0,
-        validate=True,
-    ):
+        dt_init: xr.DataArray | float,
+        dt_min: xr.DataArray | float,
+        dt_max: xr.DataArray | float,
+        dt_multiplier: xr.DataArray | float = 0.0,
+        dt_fail_divisor: xr.DataArray | float = 0.0,
+        validate: bool = True,
+    ) -> None:
         dict_dataset = {
             "dt_init": dt_init,
             "dt_min": dt_min,
@@ -177,9 +178,9 @@ class AdaptiveTimeStepping(Package):
         self,
         directory: pathlib.Path,
         pkgname: str,
-        globaltimes: Union[list[np.datetime64], np.ndarray],
+        globaltimes: list[np.datetime64] | np.ndarray,
         binary: bool,
-    ) -> Dict[str, Any]:
+    ) -> dict[str, Any]:
         perioddata: _PeriodDataType = {}
         # Force to np.int64 for mypy and numpy >= 2.2.4
         one = np.int64(1)
@@ -208,7 +209,9 @@ class AdaptiveTimeStepping(Package):
         d["perioddata"] = perioddata
         return d
 
-    def _validate(self, schemata: dict[str, Any], **kwargs):
+    def _validate(
+        self, schemata: dict[str, Any], **kwargs: Any
+    ) -> dict[str, list[ValidationError]]:
         # Insert additional kwargs
         kwargs["dt_max"] = self["dt_max"]
         errors = super()._validate(schemata, **kwargs)
@@ -218,7 +221,7 @@ class AdaptiveTimeStepping(Package):
     def _write(
         self,
         pkgname: str,
-        globaltimes: Union[list[np.datetime64], np.ndarray],
+        globaltimes: list[np.datetime64] | np.ndarray,
         write_context: WriteContext,
     ) -> None:
         ats_content = self._render(

@@ -2,7 +2,7 @@
 Assign wells to layers.
 """
 
-from typing import Optional
+from typing import Any
 
 import numpy as np
 import numpy.typing as npt
@@ -134,7 +134,7 @@ def locate_wells(
     wells: pd.DataFrame,
     top: GridDataArray,
     bottom: GridDataArray,
-    k: Optional[GridDataArray] = None,
+    k: GridDataArray | None = None,
     validate: bool = True,
 ) -> tuple[
     npt.NDArray[np.object_], GridDataArray, GridDataArray, float | GridDataArray
@@ -184,7 +184,7 @@ def validate_well_columnnames(
         raise ValueError(f"Columns are missing in wells dataframe: {missing}")
 
 
-def validate_arg_types_equal(**kwargs):
+def validate_arg_types_equal(**kwargs: Any) -> None:
     types = [type(arg) for arg in (kwargs.values()) if arg is not None]
     if len(set(types)) != 1:
         members = ", ".join([t.__name__ for t in types])
@@ -196,9 +196,9 @@ def assign_wells(
     wells: pd.DataFrame,
     top: GridDataArray,
     bottom: GridDataArray,
-    k: Optional[GridDataArray] = None,
-    minimum_thickness: Optional[float] = 0.0,
-    minimum_k: Optional[float] = 0.0,
+    k: GridDataArray | None = None,
+    minimum_thickness: float | None = 0.0,
+    minimum_k: float | None = 0.0,
     validate: bool = True,
 ) -> pd.DataFrame:
     """

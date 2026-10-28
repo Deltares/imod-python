@@ -1,3 +1,6 @@
+from collections.abc import Sequence
+from typing import Any
+
 import numpy as np
 import xarray as xr
 
@@ -383,37 +386,37 @@ class Solution(Package):
     @init_log_decorator()
     def __init__(
         self,
-        modelnames,
-        outer_dvclose,
-        outer_maximum,
-        inner_maximum,
-        inner_dvclose,
-        inner_rclose,
-        linear_acceleration,
-        under_relaxation=None,
-        under_relaxation_theta=None,
-        under_relaxation_kappa=None,
-        under_relaxation_gamma=None,
-        under_relaxation_momentum=None,
-        backtracking_number=None,
-        backtracking_tolerance=None,
-        backtracking_reduction_factor=None,
-        backtracking_residual_limit=None,
-        rclose_option=None,
-        relaxation_factor=None,
-        preconditioner_levels=None,
-        preconditioner_drop_tolerance=None,
-        number_orthogonalizations=None,
-        scaling_method=None,
-        reordering_method=None,
-        print_option="summary",
-        outer_csvfile=None,
-        inner_csvfile=None,
-        no_ptc=None,
-        ats_outer_maximum_fraction=None,
+        modelnames: Sequence[str] | xr.DataArray,
+        outer_dvclose: float,
+        outer_maximum: int,
+        inner_maximum: int,
+        inner_dvclose: float,
+        inner_rclose: float,
+        linear_acceleration: str,
+        under_relaxation: str | None = None,
+        under_relaxation_theta: float | None = None,
+        under_relaxation_kappa: float | None = None,
+        under_relaxation_gamma: float | None = None,
+        under_relaxation_momentum: float | None = None,
+        backtracking_number: int | None = None,
+        backtracking_tolerance: float | None = None,
+        backtracking_reduction_factor: float | None = None,
+        backtracking_residual_limit: float | None = None,
+        rclose_option: str | None = None,
+        relaxation_factor: float | None = None,
+        preconditioner_levels: int | None = None,
+        preconditioner_drop_tolerance: float | None = None,
+        number_orthogonalizations: int | None = None,
+        scaling_method: str | None = None,
+        reordering_method: str | None = None,
+        print_option: str = "summary",
+        outer_csvfile: str | None = None,
+        inner_csvfile: str | None = None,
+        no_ptc: str | None = None,
+        ats_outer_maximum_fraction: float | None = None,
         validate: bool = True,
-    ):
-        dict_dataset = {
+    ) -> None:
+        dict_dataset: dict[str, Any] = {
             "outer_dvclose": outer_dvclose,
             "outer_maximum": outer_maximum,
             "under_relaxation": under_relaxation,
@@ -480,12 +483,12 @@ class Solution(Package):
 
 
 def SolutionPresetSimple(
-    modelnames,
-    print_option="summary",
-    outer_csvfile=None,
-    inner_csvfile=None,
-    no_ptc=None,
-):
+    modelnames: Sequence[str] | xr.DataArray,
+    print_option: str = "summary",
+    outer_csvfile: str | None = None,
+    inner_csvfile: str | None = None,
+    no_ptc: str | None = None,
+) -> Solution:
     """
     Preset solution for simple models, where small mass balance errors are
     wanted. This therefore is the strictest solution of all presets. We advice
@@ -525,12 +528,12 @@ def SolutionPresetSimple(
 
 
 def SolutionPresetModerate(
-    modelnames,
-    print_option="summary",
-    outer_csvfile=None,
-    inner_csvfile=None,
-    no_ptc=None,
-):
+    modelnames: Sequence[str] | xr.DataArray,
+    print_option: str = "summary",
+    outer_csvfile: str | None = None,
+    inner_csvfile: str | None = None,
+    no_ptc: str | None = None,
+) -> Solution:
     """
     Preset solution for models of moderate complexity. We advice users to always
     try :func:`imod.mf6.SolutionPresetSimple` first, even for more complex
@@ -570,12 +573,12 @@ def SolutionPresetModerate(
 
 
 def SolutionPresetComplex(
-    modelnames,
-    print_option="summary",
-    outer_csvfile=None,
-    inner_csvfile=None,
-    no_ptc=None,
-):
+    modelnames: Sequence[str] | xr.DataArray,
+    print_option: str = "summary",
+    outer_csvfile: str | None = None,
+    inner_csvfile: str | None = None,
+    no_ptc: str | None = None,
+) -> Solution:
     """
     Preset solution for models of large complexity. We advice users to always
     try :func:`imod.mf6.SolutionPresetSimple` first, even for more complex

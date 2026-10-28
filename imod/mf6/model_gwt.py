@@ -1,7 +1,5 @@
 from __future__ import annotations
 
-from typing import Optional
-
 from imod.logging import init_log_decorator
 from imod.mf6.cnc import ConstantConcentration
 from imod.mf6.model import Modflow6Model
@@ -49,12 +47,12 @@ class GroundwaterTransportModel(Modflow6Model):
     @init_log_decorator()
     def __init__(
         self,
-        listing_file: Optional[str] = None,
+        listing_file: str | None = None,
         print_input: bool = False,
         print_flows: bool = False,
         save_flows: bool = False,
         validate: bool = True,
-    ):
+    ) -> None:
         super().__init__()
         self._options = {
             "listing_file": listing_file,

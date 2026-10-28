@@ -3,10 +3,11 @@ from __future__ import annotations
 import collections
 import pathlib
 import subprocess
+from collections.abc import Callable, Iterable
 from copy import deepcopy
 from datetime import datetime
 from pathlib import Path
-from typing import Any, Callable, DefaultDict, Iterable, Optional, Union, cast
+from typing import Any, cast
 
 import cftime
 import dask
@@ -45,6 +46,7 @@ from imod.mf6.multimodel.exchange_creator_unstructured import (
     ExchangeCreator_Unstructured,
 )
 from imod.mf6.multimodel.modelsplitter import ModelSplitter
+from imod.mf6.oc import OutputControl
 from imod.mf6.out import open_cbc, open_conc, open_hds
 from imod.mf6.package import Package
 from imod.mf6.validation_settings import ValidationSettings
@@ -130,17 +132,17 @@ class Modflow6Simulation(collections.UserDict[str, Any], ISimulation):
     namely the Well and HFB packages.
     """
 
-    def _initialize_template(self):
+    def _initialize_template(self) -> None:
         loader = jinja2.PackageLoader("imod", "templates/mf6")
         env = jinja2.Environment(loader=loader, keep_trailing_newline=True)
         self._template = env.get_template("sim-nam.j2")
 
     def __init__(
-        self, name: str, validation_settings: Optional[ValidationSettings] = None
-    ):
+        self, name: str, validation_settings: ValidationSettings | None = None
+    ) -> None:
         super().__init__()
         self.name = name
-        self.directory = None
+        self.directory: Path | None = None
         self._initialize_template()
         self._validation_context: ValidationSettings
         if validation_settings is None:
@@ -148,14 +150,14 @@ class Modflow6Simulation(collections.UserDict[str, Any], ISimulation):
         else:
             self.set_validation_settings(validation_settings)
 
-    def __setitem__(self, key, value):
+    def __setitem__(self, key: str, value: Any) -> None:
         super().__setitem__(key, value)
 
-    def update(self, *args, **kwargs):
+    def update(self, *args: Any, **kwargs: Any) -> None:
         for k, v in dict(*args, **kwargs).items():
             self[k] = v
 
-    def _get_pkgkey(self, pkg_id):
+    def _get_pkgkey(self, pkg_id: str) -> str | None:
         """
         Get package key that belongs to a certain pkg_id, since the keys are
         user specified.
@@ -174,7 +176,11 @@ class Modflow6Simulation(collections.UserDict[str, Any], ISimulation):
             return None
 
     @standard_log_decorator()
-    def create_time_discretization(self, additional_times, validate: bool = True):
+    def create_time_discretization(
+        self,
+        additional_times: Iterable[str | datetime | np.datetime64 | cftime.datetime],
+        validate: bool = True,
+    ) -> None:
         """
         Collect all unique times from model packages and additional given
         `times`. These unique times are used as stress periods in the model. All
@@ -250,7 +256,7 @@ class Modflow6Simulation(collections.UserDict[str, Any], ISimulation):
             timestep_duration=timestep_duration, validate=validate
         )
 
-    def _render(self, write_context: WriteContext):
+    def _render(self, write_context: WriteContext) -> str:
         """Renders simulation namefile"""
         d: dict[str, Any] = {}
         models = []
@@ -286,7 +292,9 @@ class Modflow6Simulation(collections.UserDict[str, Any], ISimulation):
         d["solutiongroups"] = [solutiongroups]
         return self._template.render(d)
 
-    def _write_tdis_package(self, globaltimes, write_context):
+    def _write_tdis_package(
+        self, globaltimes: np.ndarray, write_context: WriteContext
+    ) -> None:
         """Write time discretization package, and set/clear ats filename if needed"""
         ats_pkgname = self._get_pkgkey("ats")
         if ats_pkgname:
@@ -303,11 +311,11 @@ class Modflow6Simulation(collections.UserDict[str, Any], ISimulation):
     @standard_log_decorator()
     def write(
         self,
-        directory=".",
-        binary=True,
+        directory: str | Path = ".",
+        binary: bool = True,
         validate: bool = True,
-        use_absolute_paths=False,
-    ):
+        use_absolute_paths: bool = False,
+    ) -> None:
         """
         Write Modflow6 simulation, including assigned groundwater flow and
         transport models.
@@ -338,7 +346,7 @@ class Modflow6Simulation(collections.UserDict[str, Any], ISimulation):
         >>> simulation.write("path/to/simulation", validate=False)
         """
         # create write context
-        write_context = WriteContext(directory, binary, use_absolute_paths)
+        write_context = WriteContext(Path(directory), binary, use_absolute_paths)
         self._validation_context.validate = validate
         if self.is_split():
             self._validation_context.strict_well_validation = False
@@ -405,7 +413,7 @@ class Modflow6Simulation(collections.UserDict[str, Any], ISimulation):
 
         self.directory = directory
 
-    def set_validation_settings(self, validation_settings: ValidationSettings):
+    def set_validation_settings(self, validation_settings: ValidationSettings) -> None:
         """
         Set validation settings for the simulation. Configuring
         :class:`imod.mf6.ValidationSettings` can help performance or reduce the
@@ -442,7 +450,7 @@ class Modflow6Simulation(collections.UserDict[str, Any], ISimulation):
         self._validation_context = validation_settings
 
     @standard_log_decorator()
-    def run(self, mf6path: Union[str, Path] = "mf6") -> None:
+    def run(self, mf6path: str | Path = "mf6") -> None:
         """
         Run Modflow 6 simulation. This method runs a subprocess calling
         ``mf6path``. This argument is set to ``mf6``, which means the Modflow 6
@@ -478,8 +486,8 @@ class Modflow6Simulation(collections.UserDict[str, Any], ISimulation):
     def open_head(
         self,
         dry_nan: bool = False,
-        simulation_start_time: Optional[np.datetime64] = None,
-        time_unit: Optional[str] = "d",
+        simulation_start_time: np.datetime64 | None = None,
+        time_unit: str | None = "d",
     ) -> GridDataArray:
         """
         Open heads of finished simulation, requires that the ``run`` method has
@@ -536,9 +544,9 @@ class Modflow6Simulation(collections.UserDict[str, Any], ISimulation):
     @standard_log_decorator()
     def open_transport_budget(
         self,
-        species_ls: Optional[list[str]] = None,
-        simulation_start_time: Optional[np.datetime64] = None,
-        time_unit: Optional[str] = "d",
+        species_ls: list[str] | None = None,
+        simulation_start_time: np.datetime64 | None = None,
+        time_unit: str | None = "d",
     ) -> GridDataArray | GridDataset:
         """
         Open transport budgets of finished simulation, requires that the ``run``
@@ -577,8 +585,8 @@ class Modflow6Simulation(collections.UserDict[str, Any], ISimulation):
     def open_flow_budget(
         self,
         flowja: bool = False,
-        simulation_start_time: Optional[np.datetime64] = None,
-        time_unit: Optional[str] = "d",
+        simulation_start_time: np.datetime64 | None = None,
+        time_unit: str | None = "d",
     ) -> GridDataArray | GridDataset:
         """
         Open flow budgets of finished simulation, requires that the ``run``
@@ -646,10 +654,10 @@ class Modflow6Simulation(collections.UserDict[str, Any], ISimulation):
     @standard_log_decorator()
     def open_concentration(
         self,
-        species_ls: Optional[list[str]] = None,
+        species_ls: list[str] | None = None,
         dry_nan: bool = False,
-        simulation_start_time: Optional[np.datetime64] = None,
-        time_unit: Optional[str] = "d",
+        simulation_start_time: np.datetime64 | None = None,
+        time_unit: str | None = "d",
     ) -> GridDataArray:
         """
         Open concentration of finished simulation, requires that the ``run``
@@ -693,7 +701,7 @@ class Modflow6Simulation(collections.UserDict[str, Any], ISimulation):
             time_unit=time_unit,
         )
 
-    def _open_output(self, output: str, **settings) -> GridDataArray | GridDataset:
+    def _open_output(self, output: str, **settings: Any) -> GridDataArray | GridDataset:
         """
         Opens output of one or multiple models.
 
@@ -724,7 +732,7 @@ class Modflow6Simulation(collections.UserDict[str, Any], ISimulation):
             )
 
     def _open_single_output(
-        self, modelnames: list[str], output: str, **settings
+        self, modelnames: list[str], output: str, **settings: Any
     ) -> GridDataArray | GridDataset:
         """
         Open single output, e.g. concentration of single species, or heads. This
@@ -747,7 +755,7 @@ class Modflow6Simulation(collections.UserDict[str, Any], ISimulation):
         raise ValueError("error in _open_single_output")
 
     def _merge_states(
-        self, modelnames: list[str], output: str, **settings
+        self, modelnames: list[str], output: str, **settings: Any
     ) -> GridDataArray:
         state_partitions = []
         for modelname in modelnames:
@@ -803,7 +811,7 @@ class Modflow6Simulation(collections.UserDict[str, Any], ISimulation):
                 cbc[missing] = missing_grid
 
     def _merge_budgets(
-        self, modelnames: list[str], output: str, **settings
+        self, modelnames: list[str], output: str, **settings: Any
     ) -> GridDataset:
         if settings["flowja"] is True:
             raise ValueError("``flowja`` cannot be set to True when merging budgets.")
@@ -824,7 +832,7 @@ class Modflow6Simulation(collections.UserDict[str, Any], ISimulation):
         return merge_partitions(cbc_per_partition)
 
     def _concat_species(
-        self, output: str, species_ls: Optional[list[str]] = None, **settings
+        self, output: str, species_ls: list[str] | None = None, **settings: Any
     ) -> GridDataArray | GridDataset:
         # groupby flow model, to somewhat enforce consistent transport model
         # ordening. Say:
@@ -873,7 +881,7 @@ class Modflow6Simulation(collections.UserDict[str, Any], ISimulation):
         return concat(outputs, dim="species")
 
     def _open_single_output_single_model(
-        self, modelname: str, output: str, **settings
+        self, modelname: str, output: str, **settings: Any
     ) -> GridDataArray | GridDataset:
         """
         Opens single output of single model
@@ -903,7 +911,11 @@ class Modflow6Simulation(collections.UserDict[str, Any], ISimulation):
             )
         # Get output file path
         oc_key = model._get_pkgkey("oc")
-        oc_pkg = model[oc_key]
+        if oc_key is None:
+            raise RuntimeError(
+                f"Output control package not found for model {modelname}"
+            )
+        oc_pkg = cast(OutputControl, model[oc_key])
         # Ensure "-transport" and "-flow" are stripped from "budget"
         oc_output = output.split("-")[0]
         output_path = oc_pkg._get_output_filepath(model_path, oc_output)
@@ -965,10 +977,10 @@ class Modflow6Simulation(collections.UserDict[str, Any], ISimulation):
     @standard_log_decorator()
     def dump(
         self,
-        directory=".",
+        directory: str | Path = ".",
         validate: bool = True,
         mdal_compliant: bool = False,
-        crs=None,
+        crs: Any | None = None,
         engine: EngineType = "netcdf4",
     ) -> None:
         """
@@ -1028,7 +1040,9 @@ class Modflow6Simulation(collections.UserDict[str, Any], ISimulation):
         directory = pathlib.Path(directory)
         directory.mkdir(parents=True, exist_ok=True)
 
-        toml_content: DefaultDict[str, dict[str, Any]] = collections.defaultdict(dict)
+        toml_content: collections.defaultdict[str, dict[str, Any]] = (
+            collections.defaultdict(dict)
+        )
         # Dump version number
         version = get_version()
         toml_content["version"] = {"imod-python": version}
@@ -1073,7 +1087,7 @@ class Modflow6Simulation(collections.UserDict[str, Any], ISimulation):
 
     @staticmethod
     @standard_log_decorator()
-    def from_file(toml_path):
+    def from_file(toml_path: str | Path) -> Modflow6Simulation:
         """
         Load Modflow6Simulation, previously dumped to TOML file with
         :meth:`imod.mf6.Modflow6Simulation.dump` from a TOML file.
@@ -1156,7 +1170,7 @@ class Modflow6Simulation(collections.UserDict[str, Any], ISimulation):
                 result.append(exchange.get_specification())
         return result
 
-    def get_models_of_type(self, model_id) -> dict[str, IModel]:
+    def get_models_of_type(self, model_id: str) -> dict[str, IModel]:
         """
         Get all models in the simulation of a specific type.
 
@@ -1191,16 +1205,16 @@ class Modflow6Simulation(collections.UserDict[str, Any], ISimulation):
     @standard_log_decorator()
     def clip_box(
         self,
-        time_min: Optional[cftime.datetime | np.datetime64 | str] = None,
-        time_max: Optional[cftime.datetime | np.datetime64 | str] = None,
-        layer_min: Optional[int] = None,
-        layer_max: Optional[int] = None,
-        x_min: Optional[float] = None,
-        x_max: Optional[float] = None,
-        y_min: Optional[float] = None,
-        y_max: Optional[float] = None,
-        states_for_boundary: Optional[dict[str, GridDataArray]] = None,
-        ignore_time_purge_empty: Optional[bool] = None,
+        time_min: cftime.datetime | np.datetime64 | str | None = None,
+        time_max: cftime.datetime | np.datetime64 | str | None = None,
+        layer_min: int | None = None,
+        layer_max: int | None = None,
+        x_min: float | None = None,
+        x_max: float | None = None,
+        y_min: float | None = None,
+        y_max: float | None = None,
+        states_for_boundary: dict[str, GridDataArray] | None = None,
+        ignore_time_purge_empty: bool | None = None,
     ) -> Modflow6Simulation:
         """
         Clip a simulation by a bounding box (time, layer, y, x).
@@ -1336,7 +1350,7 @@ class Modflow6Simulation(collections.UserDict[str, Any], ISimulation):
     def create_partition_labels(
         self,
         npartitions: int,
-        weights: Optional[GridDataArray] = None,
+        weights: GridDataArray | None = None,
     ) -> GridDataArray:
         """
         Returns a label array: a 2d array with a similar size to the top layer of
@@ -1394,7 +1408,7 @@ class Modflow6Simulation(collections.UserDict[str, Any], ISimulation):
     def split(
         self,
         submodel_labels: GridDataArray,
-        ignore_time_purge_empty: Optional[bool] = None,
+        ignore_time_purge_empty: bool | None = None,
     ) -> Modflow6Simulation:
         """
         Split a simulation in different partitions using a submodel_labels
@@ -1628,7 +1642,7 @@ class Modflow6Simulation(collections.UserDict[str, Any], ISimulation):
         active_exchange_domain = active_exchange_domain.dropna("index")
         ex.dataset = ex.dataset.sel(index=active_exchange_domain["index"])
 
-    def get_solution_name(self, model_name: str) -> Optional[str]:
+    def get_solution_name(self, model_name: str) -> str | None:
         for k, v in self.items():
             if isinstance(v, Solution):
                 if model_name in v.dataset["modelnames"]:
@@ -1703,7 +1717,7 @@ class Modflow6Simulation(collections.UserDict[str, Any], ISimulation):
     def mask_all_models(
         self,
         mask: GridDataArray,
-        ignore_time_purge_empty: Optional[bool] = None,
+        ignore_time_purge_empty: bool | None = None,
     ) -> None:
         """
         This function applies a mask to all models in a simulation, provided they use
@@ -1748,10 +1762,10 @@ class Modflow6Simulation(collections.UserDict[str, Any], ISimulation):
         imod5_data: dict[str, dict[str, GridDataArray]],
         period_data: dict[str, list[datetime]],
         times: list[datetime],
-        allocation_options: Optional[SimulationAllocationOptions] = None,
-        distributing_options: Optional[SimulationDistributingOptions] = None,
-        regridder_types: Optional[dict[str, DataclassType]] = None,
-        target_grid: Optional[GridDataArray] = None,
+        allocation_options: SimulationAllocationOptions | None = None,
+        distributing_options: SimulationDistributingOptions | None = None,
+        regridder_types: dict[str, DataclassType] | None = None,
+        target_grid: GridDataArray | None = None,
         name: str = "imported",
     ) -> "Modflow6Simulation":
         """

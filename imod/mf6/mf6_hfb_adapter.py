@@ -1,5 +1,5 @@
 from copy import deepcopy
-from typing import Any, Union
+from typing import Any
 
 import numpy as np
 import xarray as xr
@@ -13,6 +13,7 @@ from imod.schemata import (
     DTypeSchema,
     IndexesSchema,
 )
+from imod.typing import GridDataset
 
 
 class Mf6HorizontalFlowBarrier(BoundaryCondition):
@@ -112,9 +113,9 @@ class Mf6HorizontalFlowBarrier(BoundaryCondition):
         cell_id2: xr.DataArray,
         layer: xr.DataArray,
         hydraulic_characteristic: xr.DataArray,
-        print_input: Union[bool, xr.DataArray] = False,
-        validate: Union[bool, xr.DataArray] = True,
-    ):
+        print_input: bool | xr.DataArray = False,
+        validate: bool | xr.DataArray = True,
+    ) -> None:
         dict_dataset: dict[str, Any] = {
             "cell_id1": cell_id1,
             "cell_id2": cell_id2,
@@ -124,14 +125,14 @@ class Mf6HorizontalFlowBarrier(BoundaryCondition):
         }
         super().__init__(dict_dataset)
 
-    def _ds_to_arrdict(self, ds):
+    def _ds_to_arrdict(self, ds: GridDataset) -> dict[str, Any]:
         arrdict = super()._ds_to_arrdict(ds)
         arrdict["cell_dims1"] = ds.coords["cell_dims1"].values
         arrdict["cell_dims2"] = ds.coords["cell_dims2"].values
 
         return arrdict
 
-    def _to_struct_array(self, arrdict, layer):
+    def _to_struct_array(self, arrdict: dict[str, Any], layer: Any) -> np.ndarray:
         field_spec = (
             [("layer_1", np.int32)]
             + [(dim, np.int32) for dim in arrdict["cell_dims1"]]
@@ -156,9 +157,9 @@ class Mf6HorizontalFlowBarrier(BoundaryCondition):
     def _write(
         self,
         pkgname: str,
-        globaltimes: Union[list[np.datetime64], np.ndarray],
+        globaltimes: list[np.datetime64] | np.ndarray,
         write_context: WriteContext,
-    ):
+    ) -> None:
         # MODFLOW6 does not support binary HFB input.
         hfb_write_context = deepcopy(write_context)
         hfb_write_context.use_binary = False

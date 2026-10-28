@@ -5,7 +5,7 @@ Cell-by-cell flows
 import os
 import struct
 from collections import defaultdict
-from typing import Any, BinaryIO, Dict, List, NamedTuple, Tuple, Union
+from typing import Any, BinaryIO, NamedTuple
 
 import dask
 import numpy as np
@@ -45,11 +45,11 @@ class Imeth6Header(NamedTuple):
     txt1id2: str
     txt2id2: str
     ndat: int
-    auxtxt: List[str]
+    auxtxt: list[str]
     nlist: int
 
 
-def read_common_cbc_header(f: BinaryIO) -> Dict[str, Any]:
+def read_common_cbc_header(f: BinaryIO) -> dict[str, Any]:
     """
     Read the common part (shared by imeth=1 and imeth6) of a CBC header section.
     """
@@ -67,11 +67,11 @@ def read_common_cbc_header(f: BinaryIO) -> Dict[str, Any]:
     return content
 
 
-def read_imeth6_header(f: BinaryIO) -> Dict[str, Any]:
+def read_imeth6_header(f: BinaryIO) -> dict[str, Any]:
     """
     Read the imeth=6 specific data of a CBC header section.
     """
-    content: Dict[str, str | List[str]] = {}
+    content: dict[str, str | list[str]] = {}
     content["txt1id1"] = f.read(16).decode("utf-8").strip().lower()
     content["txt2id1"] = f.read(16).decode("utf-8").strip().lower()
     content["txt1id2"] = f.read(16).decode("utf-8").strip().lower()
@@ -87,7 +87,7 @@ def read_imeth6_header(f: BinaryIO) -> Dict[str, Any]:
 
 def read_cbc_headers(
     cbc_path: FilePath,
-) -> Dict[str, List[Union[Imeth1Header, Imeth6Header]]]:
+) -> dict[str, list[Imeth1Header | Imeth6Header]]:
     """
     Read all the header data from a cell-by-cell (.cbc) budget file.
 
@@ -111,7 +111,7 @@ def read_cbc_headers(
         Dictionary containing a list of headers per TEXT record in the budget
         file.
     """
-    headers: Dict[str, List[Union[Imeth1Header, Imeth6Header]]] = defaultdict(list)
+    headers: dict[str, list[Imeth1Header | Imeth6Header]] = defaultdict(list)
     with open(cbc_path, "rb") as f:
         filesize = os.fstat(f.fileno()).st_size
         while f.tell() < filesize:
@@ -174,7 +174,7 @@ def read_imeth1_budgets(cbc_path: FilePath, count: int, pos: int) -> FloatArray:
 
 
 def open_imeth1_budgets(
-    cbc_path: FilePath, header_list: List[Imeth1Header]
+    cbc_path: FilePath, header_list: list[Imeth1Header]
 ) -> xr.DataArray:
     """
     Open the data for an imeth==1 budget section. Data is read lazily per
@@ -207,14 +207,14 @@ def open_imeth1_budgets(
     )
 
 
-def expand_indptr(ia) -> np.ndarray:
+def expand_indptr(ia: np.ndarray) -> np.ndarray:
     n = np.diff(ia)
     return np.repeat(np.arange(ia.size - 1), n)
 
 
 def open_face_budgets_as_flowja(
-    cbc_path: FilePath, header_list: List[Imeth1Header], grb_content: Dict[str, Any]
-) -> Tuple[xr.DataArray, xr.DataArray]:
+    cbc_path: FilePath, header_list: list[Imeth1Header], grb_content: dict[str, Any]
+) -> tuple[xr.DataArray, xr.DataArray]:
     flowja = open_imeth1_budgets(cbc_path, header_list)
     flowja = flowja.rename({"linear_index": "connection"})
     n = expand_indptr(grb_content["ia"])
@@ -266,7 +266,7 @@ def read_imeth6_budgets_dense(
     dtype: np.dtype,
     pos: int,
     size: int,
-    shape: Tuple[int, ...],
+    shape: tuple[int, ...],
     return_variable: str,
     indices: np.ndarray | None,
 ) -> FloatArray:

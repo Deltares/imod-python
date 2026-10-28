@@ -4,7 +4,7 @@ import warnings
 from copy import copy, deepcopy
 from datetime import datetime
 from pathlib import Path
-from typing import Any, Optional, Union, cast
+from typing import Any, Self, cast
 
 import cftime
 import jinja2
@@ -110,11 +110,11 @@ DEFAULT_SETTINGS: dict[str, Any] = {
 
 
 class Model(collections.UserDict[str, Any]):
-    def __setitem__(self, key, value):
+    def __setitem__(self, key: str, value: Any) -> None:
         # TODO: Add packagecheck
         super().__setitem__(key, value)
 
-    def update(self, *args, **kwargs):
+    def update(self, *args: Any, **kwargs: Any) -> None:
         for k, v in dict(*args, **kwargs).items():
             self[k] = v
 
@@ -141,9 +141,9 @@ class MetaSwapModel(Model, IDict):
     def __init__(
         self,
         unsaturated_database: Path | str,
-        settings: Optional[dict[str, Any]] = None,
-        starttime: Optional[str] = None,
-    ):
+        settings: dict[str, Any] | None = None,
+        starttime: str | None = None,
+    ) -> None:
         super().__init__()
 
         if settings is None:
@@ -154,7 +154,9 @@ class MetaSwapModel(Model, IDict):
         self.starttime = starttime
         self.simulation_settings["unsa_svat_path"] = unsaturated_database
 
-    def _render_unsaturated_database_path(self, unsaturated_database: Union[str, Path]):
+    def _render_unsaturated_database_path(
+        self, unsaturated_database: str | Path
+    ) -> str:
         # Force to Path object
         unsaturated_database = Path(unsaturated_database)
 
@@ -190,9 +192,9 @@ class MetaSwapModel(Model, IDict):
                 f"{initial_condition_set}"
             )
 
-    def _check_landuse_indices_in_lookup_options(self):
-        grid_key = self.get_pkgkey(GridData)
-        landuse_options_key = self.get_pkgkey(LanduseOptions)
+    def _check_landuse_indices_in_lookup_options(self) -> None:
+        grid_key = cast(str, self.get_pkgkey(GridData))
+        landuse_options_key = cast(str, self.get_pkgkey(LanduseOptions))
 
         indices_in_grid = set(self[grid_key]["landuse"].values.ravel())
         indices_in_options = set(
@@ -207,9 +209,9 @@ class MetaSwapModel(Model, IDict):
                 f"were not in LanduseOptions: {missing_indices}"
             )
 
-    def _check_vegetation_indices_in_annual_crop_factors(self):
-        landuse_options_key = self.get_pkgkey(LanduseOptions)
-        annual_crop_factors_key = self.get_pkgkey(AnnualCropFactors)
+    def _check_vegetation_indices_in_annual_crop_factors(self) -> None:
+        landuse_options_key = cast(str, self.get_pkgkey(LanduseOptions))
+        annual_crop_factors_key = cast(str, self.get_pkgkey(AnnualCropFactors))
 
         indices_in_options = set(
             np.unique(self[landuse_options_key]["vegetation_index"])
@@ -230,7 +232,7 @@ class MetaSwapModel(Model, IDict):
         pkg_types_included = {type(pkg) for pkg in self.values()}
         return FileCopier in pkg_types_included
 
-    def _get_starttime(self):
+    def _get_starttime(self) -> tuple[int, float]:
         if self.starttime is not None:
             starttime = to_datetime_internal(self.starttime, use_cftime=False)
         else:
@@ -243,7 +245,7 @@ class MetaSwapModel(Model, IDict):
 
         return year, time_since_start_year
 
-    def _get_minimum_package_time(self):
+    def _get_minimum_package_time(self) -> Any:
         """
         Loop over all packages to get the minimum time.
 
@@ -337,7 +339,7 @@ class MetaSwapModel(Model, IDict):
         )
         return self.get_pkgkey(pkg_type, optional_package)
 
-    def _model_checks(self, validate: Optional[bool] = True):
+    def _model_checks(self, validate: bool | None = True) -> None:
         if validate and not self._has_file_copier():
             self._check_required_packages()
             self._check_vegetation_indices_in_annual_crop_factors()
@@ -378,11 +380,11 @@ class MetaSwapModel(Model, IDict):
 
     def write(
         self,
-        directory: Union[str, Path],
+        directory: str | Path,
         mf6_dis: StructuredDiscretization,
-        mf6_wel: Optional[Mf6Wel] = None,
-        validate: Optional[bool] = True,
-    ):
+        mf6_wel: Mf6Wel | None = None,
+        validate: bool | None = True,
+    ) -> None:
         """
         Write packages and simulation settings (para_sim.inp).
 
@@ -412,7 +414,7 @@ class MetaSwapModel(Model, IDict):
             self[pkgname].write(directory, index, svat, mf6_dis, mf6_wel)
 
     @classmethod
-    def from_file(cls, directory, modelname):
+    def from_file(cls, directory: str | Path, modelname: str) -> Self:
         pkg_classes = {
             name: pkg_cls
             for name, pkg_cls in inspect.getmembers(imod.msw, inspect.isclass)
@@ -438,13 +440,13 @@ class MetaSwapModel(Model, IDict):
 
     def dump(
         self,
-        directory: Union[str, Path],
-        modelname: Optional[str] = None,
+        directory: str | Path,
+        modelname: str | None = None,
         validate: bool = True,
         mdal_compliant: bool = False,
-        crs: Optional[str] = None,
+        crs: str | None = None,
         engine: EngineType = "netcdf4",
-    ):
+    ) -> Path:
         """
         Dump model packages to netCDF files and create a toml file with paths to these files.
         The MetaSWAP model can be reloaded from the dumped files using the :func:`from_file` method.
@@ -484,6 +486,9 @@ class MetaSwapModel(Model, IDict):
         >>> back = MetaSwapModel.from_file(tmp_path, name)
         """
 
+        if modelname is None:
+            modelname = self._model_name
+
         toml_path = dump_model(
             self,
             directory=directory,
@@ -498,7 +503,7 @@ class MetaSwapModel(Model, IDict):
     def regrid_like(
         self,
         mf6_regridded_dis: StructuredDiscretization,
-        regrid_cache: Optional[RegridderWeightsCache] = None,
+        regrid_cache: RegridderWeightsCache | None = None,
     ) -> "MetaSwapModel":
         """
         Creates a model by regridding the packages of this model to another
@@ -550,7 +555,7 @@ class MetaSwapModel(Model, IDict):
     def mask_all_packages(
         self,
         mask: GridDataArray,
-    ):
+    ) -> None:
         """
          This function applies a mask to all packages in a model. The mask must
          be presented as a GridDataArray, which contains idomain-like integers.
@@ -603,12 +608,12 @@ class MetaSwapModel(Model, IDict):
 
     def clip_box(
         self,
-        time_min: Optional[cftime.datetime | np.datetime64 | str] = None,
-        time_max: Optional[cftime.datetime | np.datetime64 | str] = None,
-        x_min: Optional[float] = None,
-        x_max: Optional[float] = None,
-        y_min: Optional[float] = None,
-        y_max: Optional[float] = None,
+        time_min: cftime.datetime | np.datetime64 | str | None = None,
+        time_max: cftime.datetime | np.datetime64 | str | None = None,
+        x_min: float | None = None,
+        x_max: float | None = None,
+        y_min: float | None = None,
+        y_max: float | None = None,
     ) -> "MetaSwapModel":
         """
         Clip a model by a bounding box (time, y, x). If a package of type
@@ -742,8 +747,8 @@ class MetaSwapModel(Model, IDict):
             partition_id_to_models[submodel_partition_info.id][submodel_name] = submodel
 
         # First, handle the grid data and determine the overlap.
-        grid_key = self.get_pkgkey(GridData)
-        grid_pkg = cast(GridData, self[grid_key])  # type: ignore[index]
+        grid_key = cast(str, self.get_pkgkey(GridData))
+        grid_pkg = cast(GridData, self[grid_key])
         is_in_active_domain = {}
 
         for submodel_name, submodel in partitioned_submodels.items():

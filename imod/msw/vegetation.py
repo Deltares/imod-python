@@ -67,7 +67,7 @@ class AnnualCropFactors(MetaSwapPackage, IRegridPackage):
         interception_factor: xr.DataArray,
         bare_soil_factor: xr.DataArray,
         ponding_factor: xr.DataArray,
-    ):
+    ) -> None:
         super().__init__()
         self.dataset["soil_cover"] = soil_cover
         self.dataset["leaf_area_index"] = leaf_area_index
@@ -79,7 +79,7 @@ class AnnualCropFactors(MetaSwapPackage, IRegridPackage):
 
         self._pkgcheck()
 
-    def _render(self, file: TextIO, *args: Any):
+    def _render(self, file: TextIO, *args: Any) -> None:
         dataframe = self.dataset.to_dataframe(
             dim_order=("vegetation_index", "day_of_year")
         ).reset_index()
@@ -88,7 +88,7 @@ class AnnualCropFactors(MetaSwapPackage, IRegridPackage):
 
         return self._write_dataframe_fixed_width(file, dataframe)
 
-    def _pkgcheck(self):
+    def _pkgcheck(self) -> None:
         dims = self.dataset.dims
         dims_expected = ("day_of_year", "vegetation_index")
         if len(set(dims) - set(dims_expected)) > 0:

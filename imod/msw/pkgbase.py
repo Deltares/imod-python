@@ -4,11 +4,9 @@ from pathlib import Path
 from typing import (
     TYPE_CHECKING,
     Any,
-    Optional,
     Self,
     TextIO,
     TypeAlias,
-    Union,
 )
 
 import cftime
@@ -59,13 +57,13 @@ class MetaSwapPackage(IPackageBase, abc.ABC):
     _to_fill: tuple[Any, ...] = ()
     _metadata_dict: dict[str, Any] = {}
 
-    def __init__(self):
+    def __init__(self) -> None:
         self.dataset = xr.Dataset()
 
-    def __getitem__(self, key):
+    def __getitem__(self, key: str) -> GridDataArray:
         return self.dataset.__getitem__(key)
 
-    def __setitem__(self, key, value):
+    def __setitem__(self, key: str, value: Any) -> None:
         self.dataset.__setitem__(key, value)
 
     @property
@@ -73,11 +71,11 @@ class MetaSwapPackage(IPackageBase, abc.ABC):
         return self._dataset
 
     @dataset.setter
-    def dataset(self, value):
+    def dataset(self, value: GridDataset) -> None:
         self._dataset = value
 
     @classmethod
-    def _from_dataset(cls, ds: GridDataset):
+    def _from_dataset(cls, ds: GridDataset) -> Self:
         """
         Create package from dataset. Note that no initialization is done.
         """
@@ -87,12 +85,12 @@ class MetaSwapPackage(IPackageBase, abc.ABC):
 
     def write(
         self,
-        directory: Union[str, Path],
+        directory: str | Path,
         index: IntArray,
         svat: xr.DataArray,
         mf6_dis: StructuredDiscretization,
         mf6_well: Mf6Wel,
-    ):
+    ) -> None:
         """
         Write MetaSWAP package to its corresponding fixed format file. This has
         the `.inp` extension.
@@ -117,7 +115,7 @@ class MetaSwapPackage(IPackageBase, abc.ABC):
         with open(filename, "w") as f:
             self._render(f, index, svat, mf6_dis, mf6_well)
 
-    def _check_range(self, dataframe):
+    def _check_range(self, dataframe: pd.DataFrame) -> None:
         """
         Check if provided data does not exceeds MetaSWAPs ranges. These ranges
         are specified in the ``self._metadata_dict`` for each variable.
@@ -132,7 +130,9 @@ class MetaSwapPackage(IPackageBase, abc.ABC):
                     f"{varname}: not all values are within range ({min_value}-{max_value})."
                 )
 
-    def _write_dataframe_fixed_width(self, file, dataframe):
+    def _write_dataframe_fixed_width(
+        self, file: TextIO, dataframe: pd.DataFrame
+    ) -> None:
         """Write dataframe to fixed format file."""
         for row in dataframe.itertuples():
             for index, metadata in enumerate(self._metadata_dict.values()):
@@ -181,7 +181,7 @@ class MetaSwapPackage(IPackageBase, abc.ABC):
 
         return self._write_dataframe_fixed_width(file, dataframe)
 
-    def _pkgcheck(self):
+    def _pkgcheck(self) -> None:
         """
         Method to do package checks. The base class version checks if provided
         data has a subunit coordinate or not.
@@ -199,7 +199,7 @@ class MetaSwapPackage(IPackageBase, abc.ABC):
                     "contain 'subunit' coordinate"
                 )
 
-    def _valid(self, value):
+    def _valid(self, value: Any) -> bool:
         return True
 
     def _get_non_grid_data(self, grid_names: list[str]) -> dict[str, Any]:
@@ -243,7 +243,7 @@ class MetaSwapPackage(IPackageBase, abc.ABC):
         self,
         target_grid: GridDataArray,
         regrid_cache: RegridderWeightsCache,
-        regridder_types: Optional[DataclassType] = None,
+        regridder_types: DataclassType | None = None,
     ) -> "MetaSwapPackage":
         """
         Creates a package of the same type as this package, based on another
@@ -295,12 +295,12 @@ class MetaSwapPackage(IPackageBase, abc.ABC):
 
     def clip_box(
         self,
-        time_min: Optional[cftime.datetime | np.datetime64 | str] = None,
-        time_max: Optional[cftime.datetime | np.datetime64 | str] = None,
-        x_min: Optional[float] = None,
-        x_max: Optional[float] = None,
-        y_min: Optional[float] = None,
-        y_max: Optional[float] = None,
+        time_min: cftime.datetime | np.datetime64 | str | None = None,
+        time_max: cftime.datetime | np.datetime64 | str | None = None,
+        x_min: float | None = None,
+        x_max: float | None = None,
+        y_min: float | None = None,
+        y_max: float | None = None,
     ) -> "MetaSwapPackage":
         """
         Clip a package by a bounding box (time, y, x).
@@ -397,7 +397,8 @@ class MetaSwapPackage(IPackageBase, abc.ABC):
         """
         return deepcopy(cls._regrid_method)
 
-    def from_imod5_data(self, *args, **kwargs):
+    @classmethod
+    def from_imod5_data(cls, *args: Any, **kwargs: Any) -> Self:
         """
         This package cannot be constructed from iMOD5 data.
         """
@@ -407,7 +408,7 @@ class MetaSwapPackage(IPackageBase, abc.ABC):
         return True
 
     @classmethod
-    def from_file(cls, path: str | Path, **kwargs) -> Self:
+    def from_file(cls, path: str | Path, **kwargs: Any) -> Self:
         """
         Loads an imod msw package from a file (netcdf or zarr).
         Note that the checks upon package initialization are not done again!
@@ -463,9 +464,9 @@ class MetaSwapPackage(IPackageBase, abc.ABC):
         modeldirectory: Path,
         pkgname: str,
         mdal_compliant: bool = False,
-        crs: Optional[Any] = None,
+        crs: Any | None = None,
         engine: EngineType = "netcdf4",
-        **kwargs,
+        **kwargs: Any,
     ) -> Path:
         """
         Write package to file.

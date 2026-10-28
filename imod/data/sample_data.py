@@ -4,11 +4,11 @@ Functions to load sample data.
 
 import importlib
 from pathlib import Path
-from typing import Union
+from typing import Any, Union
 
 import numpy as np
 import pandas as pd
-import pooch
+import pooch  # type: ignore[import-untyped]
 import xarray as xr
 import xugrid as xu
 from filelock import FileLock
@@ -45,7 +45,7 @@ REGISTRY = create_pooch_registry()
 REGISTRY = load_pooch_registry(REGISTRY)
 
 
-def twri_output(path: Union[str, Path]) -> None:
+def twri_output(path: str | Path) -> None:
     # Unzips TWRI output to ``path``. Has a race condition when executed
     # multiple times with the same path.
     lock = FileLock(REGISTRY.path / "ex01-twri-output.zip.lock")
@@ -131,7 +131,7 @@ def lakes_shp(path: Union[str, Path]) -> "geopandas.GeoDataFrame":  # type: igno
     return lakes
 
 
-def _circle_nodes():
+def _circle_nodes() -> np.ndarray:
     lock = FileLock(REGISTRY.path / "circle-nodes.txt.lock")
     with lock:
         fname_nodes = REGISTRY.fetch("circle-nodes.txt")
@@ -140,7 +140,7 @@ def _circle_nodes():
     return nodes
 
 
-def _circle_triangles():
+def _circle_triangles() -> np.ndarray:
     lock = FileLock(REGISTRY.path / "circle-triangles.txt.lock")
     with lock:
         fname_triangles = REGISTRY.fetch("circle-triangles.txt")
@@ -156,7 +156,9 @@ def circle() -> xu.Ugrid2d:
     return xu.Ugrid2d(*nodes.T, -1, triangles)
 
 
-def imod5_projectfile_data(path: Union[str, Path]) -> dict:
+def imod5_projectfile_data(
+    path: str | Path,
+) -> tuple[dict[str, Any], dict[str, Any]]:
     lock = FileLock(REGISTRY.path / "iMOD5_model.zip.lock")
     with lock:
         _ = REGISTRY.fetch("iMOD5_model.zip", processor=Unzip(extract_dir=path))
@@ -167,7 +169,7 @@ def imod5_projectfile_data(path: Union[str, Path]) -> dict:
     return iMOD5_model
 
 
-def fetch_imod5_model(path: Union[str, Path]) -> Path:
+def fetch_imod5_model(path: str | Path) -> Path:
     """
     Fetches the iMOD5 project file from the registry and returns its path.
     """
@@ -193,7 +195,7 @@ def lhm_clip_triangular_grid() -> xr.Dataset:
     return triangular_grid
 
 
-def hondsrug_simulation(path: Union[str, Path]) -> Modflow6Simulation:
+def hondsrug_simulation(path: str | Path) -> Modflow6Simulation:
     lock = FileLock(REGISTRY.path / "hondsrug-simulation.zip.lock")
     with lock:
         _ = REGISTRY.fetch("hondsrug-simulation.zip", processor=Unzip(extract_dir=path))
@@ -279,7 +281,7 @@ def hondsrug_planar_river() -> xr.Dataset:
     return planar_river
 
 
-def colleagues_river_data(path: Union[str, Path]):
+def colleagues_river_data(path: str | Path) -> xr.Dataset:
     """
     River data with some mistakes introduced to showcase cleanup
     utilities.
@@ -306,7 +308,7 @@ def colleagues_river_data(path: Union[str, Path]):
     return riv_ds
 
 
-def tutorial_03(path: Path | str) -> None:
+def tutorial_03(path: Path | str) -> Path:
     """
     Starting dataset for tutorial 3 in the iMOD Documentation.
     """

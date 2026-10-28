@@ -1,5 +1,6 @@
 import pathlib
-from typing import TYPE_CHECKING, Any, Callable, Iterable, Optional, Union, cast
+from collections.abc import Callable, Iterable
+from typing import TYPE_CHECKING, Any, cast
 
 import dask
 import numba
@@ -7,7 +8,7 @@ import numpy as np
 import pandas as pd
 import scipy.ndimage
 import xarray as xr
-from numpy.typing import DTypeLike
+from numpy.typing import DTypeLike, NDArray
 
 import imod
 from imod.prepare import common, laplace
@@ -40,7 +41,7 @@ def round_extent(
     return xmin, ymin, xmax, ymax
 
 
-def round_z(z_extent: tuple[float, float], dz: float):
+def round_z(z_extent: tuple[float, float], dz: float) -> tuple[float, float]:
     """Increases the extent until all sides lie on a coordinate
     divisible by dz."""
     zmin, zmax = z_extent
@@ -62,7 +63,7 @@ def _fill_np(data: np.ndarray) -> np.ndarray:
     return data[tuple(indices)]
 
 
-def fill(da: xr.DataArray, dims: Optional[tuple[str, ...]] = None) -> xr.DataArray:
+def fill(da: xr.DataArray, dims: tuple[str, ...] | None = None) -> xr.DataArray:
     """
     Fill in NaNs using basic nearest neighbour interpolation.
 
@@ -127,7 +128,7 @@ def laplace_interpolate(
     atol: float = 0.0,
     rtol: float = 1.0e-5,
     maxiter: int = 500,
-):
+) -> xr.DataArray:
     """
     Fills gaps in ``source`` (NaN values) by interpolating from existing values
     using Laplace interpolation.
@@ -193,10 +194,10 @@ def laplace_interpolate(
 def rasterize(
     geodataframe: "gpd.GeoDataFrame",
     like: xr.DataArray,
-    column: Optional[str | int | float] = None,
-    fill: Optional[float | int] = np.nan,
-    dtype: Optional[DTypeLike] = None,
-    **kwargs,
+    column: str | int | float | None = None,
+    fill: float | int | None = np.nan,
+    dtype: DTypeLike | None = None,
+    **kwargs: Any,
 ) -> xr.DataArray:
     """
     Rasterize a geopandas GeoDataFrame onto the given
@@ -267,7 +268,7 @@ def polygonize(da: xr.DataArray) -> "gpd.GeoDataFrame":
     return _polygonize(da)
 
 
-def _handle_dtype(dtype, nodata):
+def _handle_dtype(dtype: DTypeLike, nodata: float | None) -> tuple[int, float | None]:
     # Largely taken from rasterio.dtypes
     # https://github.com/mapbox/rasterio/blob/master/rasterio/dtypes.py
     # Not supported:
@@ -295,7 +296,7 @@ def _handle_dtype(dtype, nodata):
         "int64": (-9223372036854775808, 9223372036854775807),
     }
 
-    def format_invalid(str_dtype):
+    def format_invalid(str_dtype: str) -> str:
         str_dtypes = dtype_mapping.keys()
         return "Invalid dtype: {0}, must be one of: {1}".format(
             str_dtype, ", ".join(str_dtypes)
@@ -322,14 +323,14 @@ def _handle_dtype(dtype, nodata):
 
 
 def gdal_rasterize(
-    path,
-    column,
-    like=None,
-    nodata=None,
-    dtype=None,
-    spatial_reference=None,
-    all_touched=False,
-):
+    path: str | pathlib.Path,
+    column: str,
+    like: xr.DataArray | None = None,
+    nodata: float | None = None,
+    dtype: DTypeLike | None = None,
+    spatial_reference: dict[str, Any] | None = None,
+    all_touched: bool = False,
+) -> xr.DataArray:
     """
     Use GDAL to rasterize a vector file into an xarray.DataArray.
 
@@ -385,12 +386,12 @@ def gdal_rasterize(
 
     # An attempt at decent errors
     class GdalErrorHandler:
-        def __init__(self):
+        def __init__(self) -> None:
             self.err_level = gdal.CE_None
             self.err_no = 0
             self.err_msg = ""
 
-        def handler(self, err_level, err_no, err_msg):
+        def handler(self, err_level: int, err_no: int, err_msg: str) -> None:
             self.err_level = err_level
             self.err_no = err_no
             self.err_msg = err_msg
@@ -403,7 +404,7 @@ def gdal_rasterize(
     if like is not None:
         dx, xmin, _, dy, _, ymax = imod.util.spatial.spatial_reference(like)
         nrow, ncol = like.shape
-    else:
+    elif spatial_reference is not None:
         cellsizes = spatial_reference["cellsizes"]
         bounds = spatial_reference["bounds"]
         dx, dy = cellsizes
@@ -414,6 +415,10 @@ def gdal_rasterize(
         nrow = coords["y"].size
         ncol = coords["x"].size
         dims = ("y", "x")
+    else:
+        raise ValueError(
+            "Either ``like`` has to be provided, or ``spatial_reference`` has to be given"
+        )
 
     # File will be closed when vector is dereferenced, after return
     vector = ogr.Open(path)
@@ -446,7 +451,13 @@ def gdal_rasterize(
 
 
 @numba.njit(cache=True)
-def _cell_count(src, values, frequencies, nodata, *inds_weights):
+def _cell_count(
+    src: NDArray[Any],
+    values: NDArray[Any],
+    frequencies: NDArray[Any],
+    nodata: float,
+    *inds_weights: NDArray[Any],
+) -> tuple[NDArray[Any], NDArray[Any], NDArray[Any], NDArray[Any]]:
     """
     numba compiled function to count the number of src cells occuring in the dst
     cells.
@@ -477,8 +488,8 @@ def _cell_count(src, values, frequencies, nodata, *inds_weights):
     # advance.
     row_indices = []
     col_indices = []
-    value_list = []
-    count_list = []
+    value_list: list[Any] = []
+    count_list: list[Any] = []
 
     # j, k are indices of dst array
     # block_i contains indices of src array
@@ -626,7 +637,9 @@ def _celltable(
     return df
 
 
-def _create_chunks(like, resolution, chunksize):
+def _create_chunks(
+    like: xr.DataArray, resolution: float, chunksize: int
+) -> tuple[list[xr.DataArray], list[int], list[int]]:
     """
     Cuts data into chunksize by chunksize.
 
@@ -803,7 +816,9 @@ def celltable(
 
 
 @numba.njit
-def _burn_cells(raster, rows, cols, values):
+def _burn_cells(
+    raster: NDArray[Any], rows: NDArray[Any], cols: NDArray[Any], values: NDArray[Any]
+) -> NDArray[Any]:
     """
     Burn values of sparse COO-matrix into raster.
     rows, cols, and values form a sparse matrix in coordinate format (COO)
@@ -825,7 +840,9 @@ def _burn_cells(raster, rows, cols, values):
     return raster
 
 
-def rasterize_celltable(table, column, like):
+def rasterize_celltable(
+    table: pd.DataFrame, column: str | int | float, like: xr.DataArray
+) -> xr.DataArray:
     """
     Rasterizes a table, such as produced by ``imod.prepare.spatial.celltable``.
     Before rasterization, multiple values should be grouped and aggregated per
@@ -852,11 +869,11 @@ def rasterize_celltable(table, column, like):
 
 
 def _zonal_aggregate_raster(
-    path: Union[str, pathlib.Path],
+    path: str | pathlib.Path,
     column: str,
     resolution: float,
     raster: xr.DataArray,
-    method: Union[str, Callable[..., Any]],
+    method: str | Callable[..., Any],
 ) -> pd.DataFrame:
     """
     * Rasterize the polygon at given `resolution`
@@ -910,13 +927,13 @@ def _zonal_aggregate_raster(
 
 
 def _zonal_aggregate_polygons(
-    path_a: Union[str, pathlib.Path],
-    path_b: Union[str, pathlib.Path],
+    path_a: str | pathlib.Path,
+    path_b: str | pathlib.Path,
     column_a: str,
     column_b: str,
     resolution: float,
     like: xr.DataArray,
-    method: Union[str, Callable[..., Any]],
+    method: str | Callable[..., Any],
 ) -> pd.DataFrame:
     """
     * Rasterize a, rasterize b for the same domain
@@ -961,11 +978,11 @@ def _zonal_aggregate_polygons(
 
 
 def zonal_aggregate_raster(
-    path: Union[pathlib.Path, str],
+    path: pathlib.Path | str,
     column: str,
     raster: xr.DataArray,
     resolution: float,
-    method: Union[str, Callable[..., Any]],
+    method: str | Callable[..., Any],
     chunksize: int = 10_000,
 ) -> pd.DataFrame:
     """
@@ -1042,13 +1059,13 @@ def zonal_aggregate_raster(
 
 
 def zonal_aggregate_polygons(
-    path_a: Union[pathlib.Path, str],
-    path_b: Union[pathlib.Path, str],
+    path_a: pathlib.Path | str,
+    path_b: pathlib.Path | str,
     column_a: str,
     column_b: str,
     like: xr.DataArray,
     resolution: float,
-    method: Union[str, Callable[..., Any]],
+    method: str | Callable[..., Any],
     chunksize: int = 10_000,
 ) -> pd.DataFrame:
     """

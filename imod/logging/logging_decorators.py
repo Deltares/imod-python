@@ -1,6 +1,7 @@
+from collections.abc import Callable
 from functools import wraps
 from time import time
-from typing import Callable, ParamSpec, TypeVar
+from typing import ParamSpec, TypeVar
 
 from imod.logging.loglevel import LogLevel
 
@@ -17,7 +18,7 @@ def standard_log_decorator(
 
     def decorator(fun: Callable[P, T]) -> Callable[P, T]:
         @wraps(fun)
-        def wrapper(*args: P.args, **kwargs: P.kwargs):
+        def wrapper(*args: P.args, **kwargs: P.kwargs) -> T:
             from imod.logging import logger
 
             # anounce start of function
@@ -51,7 +52,7 @@ def init_log_decorator(
 
     def decorator(fun: Callable[P, T]) -> Callable[P, T]:
         @wraps(fun)
-        def wrapper(*args: P.args, **kwargs: P.kwargs):
+        def wrapper(*args: P.args, **kwargs: P.kwargs) -> T:
             from imod.logging import logger
 
             # anounce start of function

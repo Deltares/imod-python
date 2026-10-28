@@ -1,5 +1,5 @@
 from datetime import datetime
-from typing import Optional
+from typing import Any
 
 import numpy as np
 import xarray as xr
@@ -9,7 +9,7 @@ from imod.common.interfaces.ipackage import IPackage
 from imod.util.expand_repetitions import expand_repetitions
 
 
-def get_repeat_stress(times) -> xr.DataArray:
+def get_repeat_stress(times: dict[Any, Any]) -> xr.DataArray:
     """
     Set repeat stresses: re-use data of earlier periods.
 
@@ -33,10 +33,10 @@ def get_repeat_stress(times) -> xr.DataArray:
 
 
 def set_repeat_stress_if_available(
-    repeat: Optional[list[datetime]],
+    repeat: list[datetime] | None,
     time_min: datetime,
     time_max: datetime,
-    optional_package: Optional[IPackage],
+    optional_package: IPackage | None,
 ) -> None:
     """Set repeat stress for optional package if repeat is not None."""
     if repeat is not None:

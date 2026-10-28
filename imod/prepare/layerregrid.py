@@ -1,8 +1,12 @@
+from collections.abc import Callable, Hashable, Iterable
+from typing import Any
+
 import numba
 import numpy as np
 import xarray as xr
 
 from imod.prepare import common
+from imod.typing import FloatArray, IntArray
 
 # LayerRegrid does not support conductance method, nearest, or linear
 METHODS = common.METHODS.copy()
@@ -12,7 +16,9 @@ METHODS.pop("multilinear")
 
 
 @numba.njit(cache=True)
-def _valid_layer_indices(top_col, bot_col, out):
+def _valid_layer_indices(
+    top_col: FloatArray, bot_col: FloatArray, out: IntArray
+) -> int:
     """
     Fill `out` (int64 array, same length as top_col) with the indices of
     layers that have non-nan top AND bottom, at a single (row, col) column.
@@ -29,7 +35,15 @@ def _valid_layer_indices(top_col, bot_col, out):
 
 
 @numba.njit(cache=True)
-def _regrid_layers(src, dst, src_top, dst_top, src_bot, dst_bot, method):
+def _regrid_layers(
+    src: FloatArray,
+    dst: FloatArray,
+    src_top: FloatArray,
+    dst_top: FloatArray,
+    src_bot: FloatArray,
+    dst_bot: FloatArray,
+    method: Callable[[FloatArray, FloatArray], float],
+) -> FloatArray:
     """Maps one set of layers onto the other."""
     nlayer_src, nrow, ncol = src.shape
     nlayer_dst = dst.shape[0]
@@ -98,19 +112,26 @@ class LayerRegridder:
         "maximum", "mode", "median", "max_overlap"}``
     """
 
-    def __init__(self, method):
+    def __init__(self, method: str | Callable[..., Any]) -> None:
         _method = common._get_method(method, METHODS)
         self.method = _method
         self._first_call = True
 
-    def _make_regrid(self):
+    def _make_regrid(self) -> None:
         """
         Use closure to avoid numba overhead
         """
         jit_method = numba.njit(self.method)
 
         @numba.njit
-        def regrid(src, dst, src_top, dst_top, src_bot, dst_bot):
+        def regrid(
+            src: FloatArray,
+            dst: FloatArray,
+            src_top: FloatArray,
+            dst_top: FloatArray,
+            src_bot: FloatArray,
+            dst_bot: FloatArray,
+        ) -> FloatArray:
             return _regrid_layers(
                 src, dst, src_top, dst_top, src_bot, dst_bot, jit_method
             )
@@ -118,8 +139,13 @@ class LayerRegridder:
         self._regrid = regrid
 
     def regrid(
-        self, source, source_top, source_bottom, destination_top, destination_bottom
-    ):
+        self,
+        source: xr.DataArray,
+        source_top: xr.DataArray,
+        source_bottom: xr.DataArray,
+        destination_top: xr.DataArray,
+        destination_bottom: xr.DataArray,
+    ) -> xr.DataArray:
         """
         Parameters
         ----------
@@ -139,8 +165,8 @@ class LayerRegridder:
         regridded : xr.DataArray
         """
 
-        def dim_format(dims):
-            return ", ".join(dim for dim in dims)
+        def dim_format(dims: Iterable[Hashable]) -> str:
+            return ", ".join(str(dim) for dim in dims)
 
         # Checks on inputs
         for da in [

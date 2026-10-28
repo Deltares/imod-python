@@ -53,7 +53,7 @@ class ApiPackage(Package):
         print_flows: bool = False,
         save_flows: bool = False,
         validate: bool = True,
-    ):
+    ) -> None:
         dict_dataset = {
             "maxbound": maxbound,
             "print_input": print_input,

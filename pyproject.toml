@@ -28,6 +28,7 @@ classifiers = [
 ]
 dependencies = [
     "affine",
+    "certifi >=2026.10.19",  # https://discuss.python.org/t/information-for-python-users-regarding-emudhra-emsign-ca-certificate-security-incident/109576
     "cftime >=1",
     "dask",
     "plum-dispatch",
@@ -76,6 +77,7 @@ exclude_lines = [
 
 [tool.ruff.lint]
 select = ["C4", "E", "F", "I", "NPY201", "PD"]
+extend-select = ["UP006", "UP007", "UP035", "UP045"]
 ignore = [
     "E501", # line-too-long. This rule can't be fullfilled by the ruff formatter. The same behavior as black.
     "PD003",
@@ -103,7 +105,7 @@ strict = true
 # These next few are various gradations of forcing use of type annotations
 disallow_untyped_calls = false
 disallow_incomplete_defs = false
-disallow_untyped_defs = false
+disallow_untyped_defs = true
 
 # This one isn't too hard to get passing, but return on investment is lower
 no_implicit_reexport = false
@@ -116,24 +118,11 @@ warn_return_any = false
 # works with the vscode mypy extension
 [[tool.mypy.overrides]]
 module = [
-    "imod.data.*",
-    "imod.evaluate.*",
-    "imod.formats.array_io.*",
-    "imod.formats.gen.*",
-    "imod.formats.prj.*",
-    "imod.formats.ipf",
-    "imod.formats.rasterio",
-    "imod.schemata.*",
-    "imod.templates.*",
+    "imod.templates.*",  # Python script here not used
     "imod.tests.*",
-    "imod.visualize.*",
-    "imod.wq.*",
+    "imod.wq.*",  # Deprecated
 ]
 ignore_errors = true
-
-[[tool.mypy.overrides]]
-module = ["imod.msw.*"]
-check_untyped_defs = false
 
 # pyvista triggers a mypy daemon crash (mypy bug with partial types)
 [[tool.mypy.overrides]]

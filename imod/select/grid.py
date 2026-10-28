@@ -1,5 +1,3 @@
-from typing import List
-
 import numpy as np
 import xarray as xr
 import xugrid as xu
@@ -15,17 +13,16 @@ dispatch = Dispatcher()
 
 
 def _reduce_grid_except_dims(
-    grid: GridDataArray, preserve_dims: List[str]
+    grid: GridDataArray, preserve_dims: list[str]
 ) -> GridDataArray:
     to_reduce = {dim: 0 for dim in grid.dims if dim not in preserve_dims}
     return grid.isel(**to_reduce)  # type: ignore [arg-type]
 
 
-def _validate_grid(grid):
+def _validate_grid(grid: GridDataArray) -> None:
     # Validate if required dimensions are present
-    schemata = [BOUNDARY_DIMS_SCHEMA, DTypeSchema(np.bool_)]
-    for schema in schemata:
-        schema.validate(grid)
+    BOUNDARY_DIMS_SCHEMA.validate(grid)
+    DTypeSchema(np.bool_).validate(grid)
 
 
 def grid_boundary_xy(grid: GridDataArray) -> GridDataArray:

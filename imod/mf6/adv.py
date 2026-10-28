@@ -10,9 +10,9 @@ alternative, and UTVD is the most accurate for sharp concentration fronts and
 unstructured grids.
 """
 
+import pathlib
 from abc import ABC
 from copy import deepcopy
-from typing import Optional
 
 import numpy as np
 
@@ -38,12 +38,18 @@ class AdvectionBase(Package, IRegridPackage, ABC):
         ],
     }
 
-    def __init__(self, ats_percel: Optional[float] = None, validate: bool = True):
+    def __init__(self, ats_percel: float | None = None, validate: bool = True) -> None:
         dict_dataset = {"scheme": self._scheme, "ats_percel": ats_percel}
         super().__init__(dict_dataset)
         self._validate_init_schemata(validate)
 
-    def _render(self, directory, pkgname, globaltimes, binary):
+    def _render(
+        self,
+        directory: pathlib.Path | str,
+        pkgname: str,
+        globaltimes: list[np.datetime64] | np.ndarray,
+        binary: bool,
+    ) -> str:
         render_dict = {}
         render_dict["scheme"] = enforce_scalar(self.dataset["scheme"])
         if "ats_percel" in self.dataset:
@@ -52,7 +58,7 @@ class AdvectionBase(Package, IRegridPackage, ABC):
                 render_dict["ats_percel"] = ats_percel
         return self._template.render(render_dict)
 
-    def mask(self, _) -> Package:
+    def mask(self, _: GridDataArray) -> Package:
         """
         The mask method is irrelevant for this package, instead this method
         retuns a copy of itself.
@@ -63,7 +69,7 @@ class AdvectionBase(Package, IRegridPackage, ABC):
         self,
         target_grid: GridDataArray,
         regrid_cache: RegridderWeightsCache,
-        regridder_types: Optional[DataclassType] = None,
+        regridder_types: DataclassType | None = None,
     ) -> Package:
         """
         The regrid_like method is irrelevant for this package, instead this method

@@ -1,5 +1,8 @@
+from typing import Any, TypeVar
+
 import numba
 import numpy as np
+import numpy.typing as npt
 import xarray as xr
 
 import imod
@@ -10,17 +13,19 @@ try:
 except ImportError:
     sg = MissingOptionalModule("shapely")
 
+DataT = TypeVar("DataT", xr.DataArray, xr.Dataset)
+
 
 @numba.njit
-def _index(edges, coord, coef):
+def _index(edges: npt.NDArray[np.float64], coord: float, coef: float) -> int:
     if coef < 0:
-        return np.searchsorted(edges, coord, side="left") - 1
+        return int(np.searchsorted(edges, coord, side="left")) - 1
     else:
-        return np.searchsorted(edges, coord, side="right") - 1
+        return int(np.searchsorted(edges, coord, side="right")) - 1
 
 
 @numba.njit
-def _increment(x0, x1):
+def _increment(x0: float, x1: float) -> int:
     if x1 > x0:
         return 1
     else:
@@ -28,7 +33,24 @@ def _increment(x0, x1):
 
 
 @numba.njit
-def _draw_line(xs, ys, x0, x1, y0, y1, xmin, xmax, ymin, ymax):
+def _draw_line(
+    xs: npt.NDArray[np.float64],
+    ys: npt.NDArray[np.float64],
+    x0: float,
+    x1: float,
+    y0: float,
+    y1: float,
+    xmin: float,
+    xmax: float,
+    ymin: float,
+    ymax: float,
+) -> tuple[
+    npt.NDArray[np.intp],
+    npt.NDArray[np.intp],
+    npt.NDArray[np.float64],
+    npt.NDArray[np.float64],
+    npt.NDArray[np.float64],
+]:
     """
     Generate line cell coordinates.
 
@@ -106,10 +128,10 @@ def _draw_line(xs, ys, x0, x1, y0, y1, xmin, xmax, ymin, ymax):
         t_y = 1.0 / a_y
 
     # Vector equations
-    def x(t):
+    def x(t: float) -> float:
         return x0 + a_x * t
 
-    def y(t):
+    def y(t: float) -> float:
         return y0 + a_y * t
 
     # Set increments; 1 or -1
@@ -242,7 +264,7 @@ def _draw_line(xs, ys, x0, x1, y0, y1, xmin, xmax, ymin, ymax):
     return ixs_a[use], iys_a[use], segment_length_a[use], dxs_a[use], dys_a[use]
 
 
-def _bounding_box(xmin, xmax, ymin, ymax):
+def _bounding_box(xmin: float, xmax: float, ymin: float, ymax: float) -> Any:
     a = (xmin, ymin)
     b = (xmax, ymin)
     c = (xmax, ymax)
@@ -250,7 +272,7 @@ def _bounding_box(xmin, xmax, ymin, ymax):
     return sg.Polygon([a, b, c, d])
 
 
-def _cross_section(data, linecoords):
+def _cross_section(data: DataT, linecoords: Any) -> DataT:
     dx, xmin, xmax, dy, ymin, ymax = imod.util.spatial.spatial_reference(data)
     if isinstance(dx, float):
         dx_a = np.full(data.x.size, dx)
@@ -340,7 +362,11 @@ def _cross_section(data, linecoords):
     return section
 
 
-def cross_section_line(data, start, end):
+def cross_section_line(
+    data: DataT,
+    start: npt.ArrayLike,
+    end: npt.ArrayLike,
+) -> DataT:
     r"""
     Obtain an interpolated cross-sectional slice through gridded data.
     Utilizing the interpolation functionality in ``xarray``, this function
@@ -382,7 +408,7 @@ def cross_section_line(data, start, end):
     return _cross_section(data, linecoords)
 
 
-def cross_section_linestring(data, linestring):
+def cross_section_linestring(data: DataT, linestring: Any) -> DataT:
     r"""
     Obtain an interpolated cross-sectional slice through gridded data.
     Utilizing the interpolation functionality in ``xarray``, this function

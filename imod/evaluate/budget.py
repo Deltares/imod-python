@@ -1,5 +1,3 @@
-from typing import Tuple
-
 import dask
 import dask.array
 import numba
@@ -18,7 +16,7 @@ RIGHT = 7
 LEFT = 8
 
 
-def _outer_edge(da):
+def _outer_edge(da: xr.DataArray) -> xr.DataArray:
     faces = np.full(da.shape, np.nan)
     unique_ids = np.unique(da.values)
     unique_ids = unique_ids[~np.isnan(unique_ids)]
@@ -32,7 +30,7 @@ def _outer_edge(da):
 
 
 @numba.njit
-def _face_indices(face, budgetzone):
+def _face_indices(face: np.ndarray, budgetzone: np.ndarray) -> np.ndarray:
     nface = int(np.isfinite(face).sum())
     shape = (nface, 9)
     indices = np.zeros(shape, dtype=np.int32)
@@ -85,7 +83,7 @@ def _face_indices(face, budgetzone):
 
 
 @numba.njit
-def _collect_flowfront(indices, flow):
+def _collect_flowfront(indices: np.ndarray, flow: np.ndarray) -> np.ndarray:
     result = np.zeros(flow.shape)
     nface = indices.shape[0]
     for count in range(nface):
@@ -100,7 +98,7 @@ def _collect_flowfront(indices, flow):
 
 
 @numba.njit
-def _collect_flowlower(indices, flow):
+def _collect_flowlower(indices: np.ndarray, flow: np.ndarray) -> np.ndarray:
     result = np.zeros(flow.shape)
     nface = indices.shape[0]
     for count in range(nface):
@@ -115,7 +113,7 @@ def _collect_flowlower(indices, flow):
 
 
 @numba.njit
-def _collect_flowright(indices, flow):
+def _collect_flowright(indices: np.ndarray, flow: np.ndarray) -> np.ndarray:
     result = np.zeros(flow.shape)
     nface = indices.shape[0]
     for count in range(nface):
@@ -129,7 +127,12 @@ def _collect_flowright(indices, flow):
     return result
 
 
-def delayed_collect(indices, front, lower, right):
+def delayed_collect(
+    indices: dask.array.Array,
+    front: xr.DataArray,
+    lower: xr.DataArray,
+    right: xr.DataArray,
+) -> tuple[dask.array.Array, dask.array.Array, dask.array.Array]:
     indices = indices.compute()
     result_front = dask.delayed(_collect_flowfront, nout=1)(indices, front.values)
     result_lower = dask.delayed(_collect_flowlower, nout=1)(indices, lower.values)
@@ -140,7 +143,13 @@ def delayed_collect(indices, front, lower, right):
     return dask_front, dask_lower, dask_right
 
 
-def facebudget(budgetzone, front=None, lower=None, right=None, netflow=True):
+def facebudget(
+    budgetzone: xr.DataArray,
+    front: xr.DataArray | None = None,
+    lower: xr.DataArray | None = None,
+    right: xr.DataArray | None = None,
+    netflow: bool = True,
+) -> xr.DataArray | tuple[xr.DataArray, xr.DataArray, xr.DataArray]:
     """
     Computes net face flow into a control volume, as defined by ``budgetzone``.
 
@@ -340,9 +349,9 @@ def flow_velocity(
     front: xr.DataArray,
     lower: xr.DataArray,
     right: xr.DataArray,
-    top_bot: xr.DataArray,
-    porosity: float = 0.3,
-) -> Tuple[xr.DataArray, xr.DataArray, xr.DataArray]:
+    top_bot: xr.Dataset,
+    porosity: float | xr.DataArray = 0.3,
+) -> tuple[xr.DataArray, xr.DataArray, xr.DataArray]:
     """
     Compute flow velocities (m/d) from budgets (m3/d).
 

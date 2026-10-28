@@ -11,11 +11,11 @@ class IPackage(IPackageBase, metaclass=abc.ABCMeta):
     """
 
     @abstractmethod
-    def _valid(self, value):
+    def _valid(self, value: Any) -> bool:
         raise NotImplementedError
 
     @abstractmethod
-    def __init__(self, *args, **kwargs) -> None:
+    def __init__(self, *args: Any, **kwargs: Any) -> None:
         raise NotImplementedError
 
     @abc.abstractmethod

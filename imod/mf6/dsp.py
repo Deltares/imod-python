@@ -1,3 +1,5 @@
+from typing import Any
+
 import numpy as np
 
 from imod.common.interfaces.iregridpackage import IRegridPackage
@@ -12,7 +14,9 @@ from imod.schemata import (
     DTypeSchema,
     IdentityNoDataSchema,
     IndexesSchema,
+    ValidationError,
 )
+from imod.typing import GridDataArray
 
 
 class Dispersion(Package, IRegridPackage):
@@ -157,17 +161,17 @@ class Dispersion(Package, IRegridPackage):
     @init_log_decorator()
     def __init__(
         self,
-        diffusion_coefficient,
-        longitudinal_horizontal,
-        transversal_horizontal1,
-        longitudinal_vertical=None,
-        transversal_horizontal2=None,
-        transversal_vertical=None,
-        xt3d_off=False,
-        xt3d_rhs=False,
+        diffusion_coefficient: GridDataArray,
+        longitudinal_horizontal: GridDataArray,
+        transversal_horizontal1: GridDataArray,
+        longitudinal_vertical: GridDataArray | None = None,
+        transversal_horizontal2: GridDataArray | None = None,
+        transversal_vertical: GridDataArray | None = None,
+        xt3d_off: bool = False,
+        xt3d_rhs: bool = False,
         validate: bool = True,
-    ):
-        dict_dataset = {
+    ) -> None:
+        dict_dataset: dict[str, Any] = {
             "xt3d_off": xt3d_off,
             "xt3d_rhs": xt3d_rhs,
             "diffusion_coefficient": diffusion_coefficient,
@@ -180,7 +184,9 @@ class Dispersion(Package, IRegridPackage):
         super().__init__(dict_dataset)
         self._validate_init_schemata(validate)
 
-    def _validate(self, schemata, **kwargs):
+    def _validate(
+        self, schemata: dict[str, Any], **kwargs: Any
+    ) -> dict[str, list[ValidationError]]:
         # Insert additional kwargs
         kwargs["xt3d_off"] = self["xt3d_off"]
         errors = super()._validate(schemata, **kwargs)

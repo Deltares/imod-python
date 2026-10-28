@@ -1,6 +1,6 @@
 import os
 import struct
-from typing import Any, BinaryIO, Dict, List, Optional, Tuple, cast
+from typing import Any, BinaryIO, cast
 
 import dask
 import numpy as np
@@ -27,7 +27,7 @@ IDOMAIN_ACTIVE = 1
 
 def _ugrid_iavert_javert(
     iavert: IntArray, javert: IntArray
-) -> Tuple[IntArray, IntArray]:
+) -> tuple[IntArray, IntArray]:
     # The node numbers of MODFLOW loop around: the first equals the last
     # We have to remove these for the UGRID conventions, which do not loop around.
     n = np.diff(iavert) - 1
@@ -39,7 +39,7 @@ def _ugrid_iavert_javert(
     return ia, javert[keep] - 1
 
 
-def read_grb(f: BinaryIO, ntxt: int, lentxt: int) -> Dict[str, Any]:
+def read_grb(f: BinaryIO, ntxt: int, lentxt: int) -> dict[str, Any]:
     # we don't need any information from the the text lines that follow,
     # they are definitions that aim to make the file more portable,
     # so let's skip straight to the binary data
@@ -170,10 +170,10 @@ def read_dvs_timestep(
 
 def open_hds(
     path: FilePath,
-    grid_info: Dict[str, Any],
+    grid_info: dict[str, Any],
     dry_nan: bool,
-    simulation_start_time: Optional[np.datetime64] = None,
-    time_unit: Optional[str] = "d",
+    simulation_start_time: np.datetime64 | None = None,
+    time_unit: str | None = "d",
 ) -> xu.UgridDataArray:
     grid = grid_info["grid"]
     nlayer, ncells_per_layer = grid_info["nlayer"], grid_info["ncells_per_layer"]
@@ -208,10 +208,10 @@ def open_hds(
 
 def open_dvs(
     path: FilePath,
-    grid_info: Dict[str, Any],
+    grid_info: dict[str, Any],
     indices: np.ndarray,
-    simulation_start_time: Optional[np.datetime64] = None,
-    time_unit: Optional[str] = "d",
+    simulation_start_time: np.datetime64 | None = None,
+    time_unit: str | None = "d",
 ) -> xu.UgridDataArray:
     grid = grid_info["grid"]
     nlayer, ncells_per_layer = grid_info["nlayer"], grid_info["ncells_per_layer"]
@@ -246,7 +246,7 @@ def open_dvs(
 
 
 def open_imeth1_budgets(
-    cbc_path: FilePath, grb_content: Dict[str, Any], header_list: List[cbc.Imeth1Header]
+    cbc_path: FilePath, grb_content: dict[str, Any], header_list: list[cbc.Imeth1Header]
 ) -> xu.UgridDataArray:
     """
     Open the data for an imeth==1 budget section. Data is read lazily per
@@ -292,8 +292,8 @@ def open_imeth1_budgets(
 
 def open_imeth6_budgets(
     cbc_path: FilePath,
-    grb_content: Dict[str, Any],
-    header_list: List[cbc.Imeth6Header],
+    grb_content: dict[str, Any],
+    header_list: list[cbc.Imeth6Header],
     return_variable: str = "budget",
     return_id: np.ndarray | None = None,
 ) -> xu.UgridDataArray:
@@ -353,7 +353,7 @@ def open_imeth6_budgets(
 
 def compute_flow_orientation(
     edge_face_connectivity: IntArray, face_coordinates: FloatArray
-) -> Tuple[FloatArray, FloatArray]:
+) -> tuple[FloatArray, FloatArray]:
     # Compute unit components (x: u, y: v)
     nedge = len(edge_face_connectivity)
     is_connection = edge_face_connectivity[:, 1] != XUGRID_FILL_VALUE
@@ -371,7 +371,7 @@ def compute_flow_orientation(
     return u, v
 
 
-def mf6_csr_to_coo(ia: IntArray, ja: IntArray) -> Tuple[IntArray, IntArray]:
+def mf6_csr_to_coo(ia: IntArray, ja: IntArray) -> tuple[IntArray, IntArray]:
     """
     Convert MODFLOW 6 Compressed Sparse Row (CSR) matrix 1-based arrays into
     0-based COO(rdinate) arrays.
@@ -382,7 +382,7 @@ def mf6_csr_to_coo(ia: IntArray, ja: IntArray) -> Tuple[IntArray, IntArray]:
     return i, j
 
 
-def alt_cumsum(a):
+def alt_cumsum(a: np.ndarray) -> np.ndarray:
     """Alternative cumsum, start 0 and omit the last value."""
     out = np.empty(a.size, a.dtype)
     out[0] = 0
@@ -400,7 +400,7 @@ def disv_indices(
     ja: IntArray,
     idomain: IntArray,
     edge_face_connectivity: IntArray,
-):
+) -> tuple[IntArray, IntArray]:
     """
     Parameters
     ----------
@@ -476,8 +476,8 @@ def disv_indices(
 
 
 def disv_to_horizontal_lower_indices(
-    grb_content: Dict[str, Any],
-) -> Tuple[xr.DataArray, xr.DataArray, xr.DataArray, xr.DataArray]:
+    grb_content: dict[str, Any],
+) -> tuple[xr.DataArray, xr.DataArray, xr.DataArray, xr.DataArray]:
     grid = grb_content["grid"]
     lower, horizontal = disv_indices(
         ia=grb_content["ia"],
@@ -552,8 +552,8 @@ def disv_extract_horizontal_budget(
 
 
 def disv_open_face_budgets(
-    cbc_path: FilePath, grb_content: Dict[str, Any], header_list: List[cbc.Imeth1Header]
-) -> Tuple[xu.UgridDataArray, xu.UgridDataArray, xu.UgridDataArray, xu.UgridDataArray]:
+    cbc_path: FilePath, grb_content: dict[str, Any], header_list: list[cbc.Imeth1Header]
+) -> tuple[xu.UgridDataArray, xu.UgridDataArray, xu.UgridDataArray, xu.UgridDataArray]:
     horizontal_index, u, v, lower_index = disv_to_horizontal_lower_indices(grb_content)
     budgets = cbc.open_imeth1_budgets(cbc_path, header_list)
     horizontal = disv_extract_horizontal_budget(budgets, horizontal_index)
@@ -571,11 +571,11 @@ def disv_open_face_budgets(
 
 def open_cbc(
     cbc_path: FilePath,
-    grb_content: Dict[str, Any],
+    grb_content: dict[str, Any],
     flowja: bool = False,
-    simulation_start_time: Optional[np.datetime64] = None,
-    time_unit: Optional[str] = "d",
-) -> Dict[str, xu.UgridDataArray]:
+    simulation_start_time: np.datetime64 | None = None,
+    time_unit: str | None = "d",
+) -> dict[str, xu.UgridDataArray]:
     headers = cbc.read_cbc_headers(cbc_path)
     indices = None
     header_advanced_package = get_first_header_advanced_package(headers)
@@ -596,14 +596,14 @@ def open_cbc(
             if flowja:
                 assert all(isinstance(x, cbc.Imeth1Header) for x in header_list)
                 flowjaface, ij = cbc.open_face_budgets_as_flowja(
-                    cbc_path, cast(List[cbc.Imeth1Header], header_list), grb_content
+                    cbc_path, cast(list[cbc.Imeth1Header], header_list), grb_content
                 )
                 cbc_content["flow-ja-face"] = flowjaface
                 cbc_content["connectivity"] = ij
             else:
                 assert all(isinstance(x, cbc.Imeth1Header) for x in header_list)
                 flow_xy, flow_x, flow_y, lower = disv_open_face_budgets(
-                    cbc_path, grb_content, cast(List[cbc.Imeth1Header], header_list)
+                    cbc_path, grb_content, cast(list[cbc.Imeth1Header], header_list)
                 )
                 cbc_content["flow-horizontal-face"] = flow_xy
                 cbc_content["flow-horizontal-face-x"] = flow_x
@@ -612,7 +612,7 @@ def open_cbc(
         elif isinstance(header_list[0], cbc.Imeth1Header):
             assert all(isinstance(x, cbc.Imeth1Header) for x in header_list)
             cbc_content[key] = open_imeth1_budgets(
-                cbc_path, grb_content, cast(List[cbc.Imeth1Header], header_list)
+                cbc_path, grb_content, cast(list[cbc.Imeth1Header], header_list)
             )
         elif isinstance(header_list[0], cbc.Imeth6Header):
             assert all(isinstance(x, cbc.Imeth6Header) for x in header_list)
@@ -624,7 +624,7 @@ def open_cbc(
                     cbc_content[key_aux] = open_imeth6_budgets(
                         cbc_path,
                         grb_content,
-                        cast(List[cbc.Imeth6Header], header_list),
+                        cast(list[cbc.Imeth6Header], header_list),
                         return_variable,
                         return_id=indices,
                     )
@@ -632,7 +632,7 @@ def open_cbc(
                 cbc_content[key] = open_imeth6_budgets(
                     cbc_path,
                     grb_content,
-                    cast(List[cbc.Imeth6Header], header_list),
+                    cast(list[cbc.Imeth6Header], header_list),
                     return_id=indices,
                 )
 
@@ -644,7 +644,7 @@ def open_cbc(
     return cbc_content
 
 
-def grid_info(like: xu.UgridDataArray) -> Dict[str, Any]:
+def grid_info(like: xu.UgridDataArray) -> dict[str, Any]:
     grid = like.ugrid.grid
     facedim = grid.face_dimension
     return {

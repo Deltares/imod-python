@@ -1,10 +1,17 @@
+from typing import Any
+
 import numba
 import numpy as np
+import pandas as pd
 import xarray as xr
+
+from imod.typing import FloatArray, IntArray
 
 
 @numba.njit
-def _build_lookup_table(lithoclass, lithostrat, values):
+def _build_lookup_table(
+    lithoclass: IntArray, lithostrat: IntArray, values: FloatArray
+) -> FloatArray:
     """
     Takes three arrays, read in from a .csv file giving parameter information.
 
@@ -32,7 +39,9 @@ def _build_lookup_table(lithoclass, lithostrat, values):
     return array
 
 
-def build_lookup_table(df, lithoclass, lithostrat, kcolumn):
+def build_lookup_table(
+    df: pd.DataFrame, lithoclass: str, lithostrat: str, kcolumn: str
+) -> FloatArray:
     return _build_lookup_table(
         df[lithoclass].values.astype(np.int8),
         df[lithostrat].values.astype(np.int16),
@@ -41,8 +50,10 @@ def build_lookup_table(df, lithoclass, lithostrat, kcolumn):
 
 
 @numba.njit
-def _check_litho_strat_combinations(lithostrat, lithology, lookup_table):
-    missing = [(0, 0)]  # for type inference
+def _check_litho_strat_combinations(
+    lithostrat: IntArray, lithology: IntArray, lookup_table: FloatArray
+) -> list[tuple[Any, Any]]:
+    missing: list[tuple[Any, Any]] = [(0, 0)]  # for type inference
     for strat, litho in zip(lithostrat.flatten(), lithology.flatten()):
         if np.isnan(lookup_table[strat, litho]):
             missing.append((strat, litho))
@@ -50,7 +61,9 @@ def _check_litho_strat_combinations(lithostrat, lithology, lookup_table):
 
 
 @numba.njit
-def _fill_in_k(lithostrat, lithology, lookup_table):
+def _fill_in_k(
+    lithostrat: IntArray, lithology: IntArray, lookup_table: FloatArray
+) -> FloatArray:
     shape = lithostrat.shape
     nlay, nrow, ncol = shape
     out = np.full(shape, np.nan)
@@ -64,7 +77,9 @@ def _fill_in_k(lithostrat, lithology, lookup_table):
     return out
 
 
-def fill_in_k(lithostrat, lithology, lookup_table):
+def fill_in_k(
+    lithostrat: xr.DataArray, lithology: xr.DataArray, lookup_table: FloatArray
+) -> xr.DataArray:
     missing = _check_litho_strat_combinations(
         lithostrat.values.flatten(), lithology.values.flatten(), lookup_table
     )

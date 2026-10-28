@@ -1,4 +1,4 @@
-from typing import Optional
+from typing import Any
 
 import numpy as np
 import pandas as pd
@@ -19,7 +19,7 @@ def remove_inactive(ds: xr.Dataset, active: xr.DataArray) -> xr.Dataset:
         Grid with active cells.
     """
 
-    def unstack_columns(array):
+    def unstack_columns(array: np.ndarray) -> tuple[np.ndarray, ...]:
         # Unstack columns:
         # https://stackoverflow.com/questions/64097426/is-there-unstack-in-numpy
         # Make sure to use tuples, since these get the special treatment
@@ -42,7 +42,7 @@ def remove_inactive(ds: xr.Dataset, active: xr.DataArray) -> xr.Dataset:
 def assign_datetime_coords(
     da: GridDataArray,
     simulation_start_time: np.datetime64,
-    time_unit: Optional[str] = "d",
+    time_unit: str | None = "d",
 ) -> GridDataArray:
     if "time" not in da.coords:
         raise ValueError(
@@ -55,7 +55,7 @@ def assign_datetime_coords(
     return da.assign_coords(time=time)
 
 
-def assign_index(arg):
+def assign_index(arg: Any) -> xr.DataArray:
     if isinstance(arg, xr.DataArray):
         arg = arg.values
     elif not isinstance(arg, (np.ndarray, list, tuple)):

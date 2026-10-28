@@ -1,5 +1,3 @@
-from typing import Optional
-
 import imod
 from imod.logging import LogLevel, logger
 
@@ -20,7 +18,7 @@ def get_version() -> str:
 
 def prepend_content_with_version_info(
     content: str,
-    comment_char="#",
+    comment_char: str = "#",
 ) -> str:
     """
     Prepends file content with comment with iMOD Python version information.
@@ -43,7 +41,7 @@ def prepend_content_with_version_info(
     return f"{comment_char} {line_text}: {version}\n\n{content}"
 
 
-def log_versions(version_saved: Optional[dict[str, str]]) -> None:
+def log_versions(version_saved: dict[str, str] | None) -> None:
     version = get_version()
     logger.log(LogLevel.INFO, f"iMOD Python version in current environment: {version}")
     if version_saved:

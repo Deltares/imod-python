@@ -1,11 +1,20 @@
 import pathlib
+from collections.abc import Callable
+from typing import Any, cast
 
 import xarray as xr
 
 import imod
 
 
-def _write_chunks(a, pattern, d, nodata, dtype, write):
+def _write_chunks(
+    a: xr.DataArray,
+    pattern: str | None,
+    d: dict[str, Any],
+    nodata: float | None,
+    dtype: Any,
+    write: Callable[..., None],
+) -> None:
     """
     This function writes one chunk of the DataArray 'a' at a time. This is
     necessary to avoid heavily sub-optimal scheduling by xarray/dask when
@@ -31,7 +40,9 @@ def _write_chunks(a, pattern, d, nodata, dtype, write):
     nochunks = a.chunks is None or max(map(len, a.chunks)) == 1
     if nochunks or dim_is_xy:  # Base case
         a = a.compute()
-        extradims = list(filter(lambda dim: dim not in ("y", "x"), a.dims))
+        extradims = cast(
+            list[str], list(filter(lambda dim: dim not in ("y", "x"), a.dims))
+        )
         if extradims:
             stacked = a.stack(idf=extradims)
             for coordvals, a_yx in list(stacked.groupby("idf")):
@@ -46,6 +57,8 @@ def _write_chunks(a, pattern, d, nodata, dtype, write):
             fn = imod.util.path.compose(d, pattern)
             write(fn, a, nodata, dtype)
     else:  # recursive case
+        if a.chunks is None:
+            raise ValueError("DataArray has no chunks, but reached recursive case.")
         for dim, chunksizes in zip(a.dims, a.chunks):
             if len(chunksizes) > 1:
                 break
@@ -58,7 +71,14 @@ def _write_chunks(a, pattern, d, nodata, dtype, write):
             start = end
 
 
-def _save(path, a, nodata, pattern, dtype, write):
+def _save(
+    path: str | pathlib.Path,
+    a: xr.DataArray,
+    nodata: float | None,
+    pattern: str | None,
+    dtype: Any,
+    write: Callable[..., None],
+) -> None:
     """
     Write a xarray.DataArray to one or more IDF files
 
@@ -100,7 +120,11 @@ def _save(path, a, nodata, pattern, dtype, write):
     # such as species, for concentration. The straightforward way is by giving
     # a format string, e.g.: {name}_{time}_l{layer}
     # Find the vars in curly braces, and validate with da.coords
-    d = {"extension": path.suffix, "name": path.stem, "directory": path.parent}
+    d: dict[str, Any] = {
+        "extension": path.suffix,
+        "name": path.stem,
+        "directory": path.parent,
+    }
     d["directory"].mkdir(exist_ok=True, parents=True)
 
     # Make sure all non-xy dims are ascending

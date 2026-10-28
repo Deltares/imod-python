@@ -1,13 +1,22 @@
+from typing import Any
+
 import matplotlib.pyplot as plt
 import numpy as np
 import xarray as xr
-from mpl_toolkits.axes_grid1 import make_axes_locatable
+from matplotlib.axes import Axes
+from matplotlib.colors import BoundaryNorm, Colormap
+from matplotlib.contour import QuadContourSet
+from matplotlib.figure import Figure
+from matplotlib.quiver import Quiver
+from mpl_toolkits.axes_grid1 import make_axes_locatable  # type: ignore[import-untyped]
 
 import imod
 from imod.visualize import common
 
 
-def _meshcoords(da, continuous=True):
+def _meshcoords(
+    da: xr.DataArray, continuous: bool = True
+) -> tuple[np.ndarray, np.ndarray, np.ndarray, np.ndarray]:
     """
     Generate coordinates for pcolormesh, or fill_between
 
@@ -27,6 +36,8 @@ def _meshcoords(da, continuous=True):
         y coordinates of mesh
     C : np.array
         values of the mesh
+    nodata : np.array
+        mask of nodata
     """
     dims = tuple(da.dims)
     if not dims[0] == "layer":
@@ -87,7 +98,11 @@ def _meshcoords(da, continuous=True):
     return X, Y, C, nodata
 
 
-def _plot_aquitards(aquitards, ax, kwargs_aquitards):
+def _plot_aquitards(
+    aquitards: xr.DataArray,
+    ax: Axes,
+    kwargs_aquitards: dict[str, Any] | None = None,
+) -> None:
     """
     Overlay aquitards on ax
 
@@ -114,18 +129,18 @@ def _plot_aquitards(aquitards, ax, kwargs_aquitards):
 
 
 def cross_section(
-    da,
-    colors,
-    levels,
-    layers=False,
-    aquitards=None,
-    kwargs_pcolormesh={},
-    kwargs_colorbar={},
-    kwargs_aquitards=None,
-    return_cmap_norm=False,
-    fig=None,
-    ax=None,
-):
+    da: xr.DataArray,
+    colors: list[str] | list[tuple[float, float, float]],
+    levels: list[float] | list[int] | np.ndarray,
+    layers: bool = False,
+    aquitards: xr.DataArray | None = None,
+    kwargs_pcolormesh: dict[str, Any] | None = {},
+    kwargs_colorbar: dict[str, Any] | None = {},
+    kwargs_aquitards: dict[str, Any] | None = None,
+    return_cmap_norm: bool = False,
+    fig: Figure | None = None,
+    ax: Axes | None = None,
+) -> tuple[Figure, Axes] | tuple[Figure, Axes, Colormap, BoundaryNorm]:
     """
     Wraps matplotlib.pcolormesh to draw cross-sections, drawing cell boundaries
     accurately. Aquitards can be plotted on top of the cross-section, by providing
@@ -231,7 +246,7 @@ def cross_section(
     cmap, norm = common._cmapnorm_from_colorslevels(colors, levels)
 
     # cbar kwargs
-    settings_cbar = {"ticks": levels, "extend": "both"}
+    settings_cbar: dict[str, Any] = {"ticks": levels, "extend": "both"}
 
     # Find a unit in the raster to use in the colorbar label
     try:
@@ -250,7 +265,7 @@ def cross_section(
         settings_cbar.update(kwargs_colorbar)
 
     # pcmesh kwargs
-    settings_pcmesh = {"cmap": cmap, "norm": norm}
+    settings_pcmesh: dict[str, Any] = {"cmap": cmap, "norm": norm}
     if kwargs_pcolormesh is not None:
         settings_pcmesh.update(kwargs_pcolormesh)
 
@@ -288,7 +303,12 @@ def cross_section(
         return fig, ax, cmap, norm
 
 
-def streamfunction(da, ax, n_streamlines=10, kwargs_contour={}):
+def streamfunction(
+    da: xr.DataArray,
+    ax: Axes,
+    n_streamlines: int | list[float] | np.ndarray = 10,
+    kwargs_contour: dict[str, Any] = {},
+) -> QuadContourSet:
     """
     Wraps matplotlib.contour to draw stream lines. Function can be used to draw
     stream lines on top of a cross-section.
@@ -365,7 +385,12 @@ def streamfunction(da, ax, n_streamlines=10, kwargs_contour={}):
     return CS
 
 
-def quiver(u, v, ax, kwargs_quiver={}):
+def quiver(
+    u: xr.DataArray,
+    v: xr.DataArray,
+    ax: Axes,
+    kwargs_quiver: dict[str, Any] = {},
+) -> Quiver:
     """
     Wraps matplotlib.quiver to draw quiver plots. Function can be used to draw
     flow quivers on top of a cross-section.

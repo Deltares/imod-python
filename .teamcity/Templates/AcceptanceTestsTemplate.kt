@@ -3,6 +3,7 @@ package Templates
 import jetbrains.buildServer.configs.kotlin.DslContext
 import jetbrains.buildServer.configs.kotlin.Template
 import jetbrains.buildServer.configs.kotlin.buildFeatures.XmlReport
+import jetbrains.buildServer.configs.kotlin.buildFeatures.dockerSupport
 import jetbrains.buildServer.configs.kotlin.buildFeatures.xmlReport
 import jetbrains.buildServer.configs.kotlin.buildSteps.ScriptBuildStep
 import jetbrains.buildServer.configs.kotlin.buildSteps.script
@@ -48,6 +49,11 @@ object AcceptanceTestsTemplate : Template({
     }
 
     features {
+        dockerSupport {
+            loginToRegistry = on {
+                dockerRegistryId = "PROJECT_EXT_134"
+            }
+        }
         xmlReport {
             reportType = XmlReport.XmlReportType.JUNIT
             rules = "imod-python/imod/tests/*report.xml"

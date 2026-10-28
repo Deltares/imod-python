@@ -1,7 +1,15 @@
+from collections.abc import Sequence
+from typing import Any
+
+import xarray as xr
+
 import imod
 
 
-def _streamfunction(sfrf, sfff, dx, dy):
+def _streamfunction(
+    sfrf: xr.DataArray,
+    sfff: xr.DataArray,
+) -> xr.DataArray:
     # Scale total flux to length of cell traversed
     # --> no, this gives really akward patterns
     scale_factor = (
@@ -27,7 +35,12 @@ def _streamfunction(sfrf, sfff, dx, dy):
     return Fi_proj
 
 
-def streamfunction_line(frf, fff, start, end):
+def streamfunction_line(
+    frf: xr.DataArray,
+    fff: xr.DataArray,
+    start: Sequence[float],
+    end: Sequence[float],
+) -> xr.DataArray:
     """Obtain the streamfunction for a line cross section through
     a three-dimensional flow field. The streamfunction is obtained
     by first projecting the horizontal flow components onto the provided
@@ -68,10 +81,12 @@ def streamfunction_line(frf, fff, start, end):
     # get cross section of frf and fff
     sfrf = imod.select.cross_section_line(frf, start, end)
     sfff = imod.select.cross_section_line(fff, start, end)
-    return _streamfunction(sfrf, sfff, frf.dx, fff.dy)
+    return _streamfunction(sfrf, sfff)
 
 
-def streamfunction_linestring(frf, fff, linestring):
+def streamfunction_linestring(
+    frf: xr.DataArray, fff: xr.DataArray, linestring: Any
+) -> xr.DataArray:
     """Obtain the streamfunction for a linestring cross section through
     a three-dimensional flow field. The streamfunction is obtained
     by first projecting the horizontal flow components onto the provided
@@ -111,10 +126,12 @@ def streamfunction_linestring(frf, fff, linestring):
     # get cross section of frf and fff
     sfrf = imod.select.cross_section_linestring(frf, linestring)
     sfff = imod.select.cross_section_linestring(fff, linestring)
-    return _streamfunction(sfrf, sfff, frf.dx, fff.dy)
+    return _streamfunction(sfrf, sfff)
 
 
-def _quiver(sfrf, sfff, sflf):  # , dx, dy, dz):
+def _quiver(
+    sfrf: xr.DataArray, sfff: xr.DataArray, sflf: xr.DataArray
+) -> tuple[xr.DataArray, xr.DataArray]:  # , dx, dy, dz):
     # Scale total flux to length of cell traversed
     # --> no, this gives really akward patterns -> also for quivers? here it might seem like a good idea
     scale_factor = (
@@ -136,7 +153,13 @@ def _quiver(sfrf, sfff, sflf):  # , dx, dy, dz):
     return Fi_proj_u, Fi_proj_v
 
 
-def quiver_line(frf, fff, flf, start, end):
+def quiver_line(
+    frf: xr.DataArray,
+    fff: xr.DataArray,
+    flf: xr.DataArray,
+    start: Sequence[float],
+    end: Sequence[float],
+) -> tuple[xr.DataArray, xr.DataArray]:
     """Obtain the u and v components for quiver plots for a line cross section
     through a three-dimensional flux field. The u and v components are obtained
     by first projecting the threedimensional flux components onto the provided
@@ -184,7 +207,9 @@ def quiver_line(frf, fff, flf, start, end):
     return _quiver(sfrf, sfff, sflf)
 
 
-def quiver_linestring(frf, fff, flf, linestring):
+def quiver_linestring(
+    frf: xr.DataArray, fff: xr.DataArray, flf: xr.DataArray, linestring: Any
+) -> tuple[xr.DataArray, xr.DataArray]:
     """Obtain the u and v components for quiver plots for a linestring cross section
     through a three-dimensional flow field. The u and v components are obtained
     by first projecting the threedimensional flow components onto the provided

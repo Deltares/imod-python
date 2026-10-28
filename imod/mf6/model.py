@@ -6,7 +6,7 @@ import inspect
 import pathlib
 import warnings
 from pathlib import Path
-from typing import Any, List, Optional, Tuple, Union
+from typing import Any, Self
 
 import cftime
 import jinja2
@@ -58,14 +58,14 @@ PKGTYPES_WITH_CLEANUP = [River, Drainage, GeneralHeadBoundary, GridAgnosticWell]
 CHARLEN = 16
 
 
-def pkg_has_cleanup(pkg: Package):
+def pkg_has_cleanup(pkg: Package) -> bool:
     return any(isinstance(pkg, pkgtype) for pkgtype in PKGTYPES_WITH_CLEANUP)
 
 
 class Modflow6Model(collections.UserDict[str, Package], IModel, abc.ABC):
     _mandatory_packages: tuple[str, ...] = ()
     _init_schemata: SchemataDict = {}
-    _model_id: Optional[str] = None
+    _model_id: str | None = None
     _template: Template
     _boundary_state_pkg_type: StateClassType
 
@@ -75,13 +75,13 @@ class Modflow6Model(collections.UserDict[str, Package], IModel, abc.ABC):
         env = jinja2.Environment(loader=loader, keep_trailing_newline=True)
         return env.get_template(name)
 
-    def __init__(self):
+    def __init__(self) -> None:
         collections.UserDict.__init__(self)
-        self._options = {}
+        self._options: dict[str, Any] = {}
 
     @standard_log_decorator()
     def _validate_options(
-        self, schemata: dict[str, Any], **kwargs
+        self, schemata: dict[str, Any], **kwargs: Any
     ) -> dict[str, list[ValidationError]]:
         return validate_schemata_dict(schemata, self._options, **kwargs)
 
@@ -96,7 +96,7 @@ class Modflow6Model(collections.UserDict[str, Package], IModel, abc.ABC):
             self._validate_options, validate, self._init_schemata
         )
 
-    def __setitem__(self, key, value):
+    def __setitem__(self, key: str, value: Package) -> None:
         if len(key) > CHARLEN:
             raise KeyError(
                 f"Received key with more than {CHARLEN} characters: '{key}'"
@@ -105,7 +105,7 @@ class Modflow6Model(collections.UserDict[str, Package], IModel, abc.ABC):
 
         super().__setitem__(key, value)
 
-    def update(self, *args, **kwargs):
+    def update(self, *args: Any, **kwargs: Any) -> None:
         for k, v in dict(*args, **kwargs).items():
             self[k] = v
 
@@ -130,9 +130,9 @@ class Modflow6Model(collections.UserDict[str, Package], IModel, abc.ABC):
         dis_pkg_ids = ["dis", "disv", "disu"]
 
         diskeys = [
-            self._get_pkgkey(pkg_id)
+            key
             for pkg_id in dis_pkg_ids
-            if self._get_pkgkey(pkg_id) is not None
+            if (key := self._get_pkgkey(pkg_id)) is not None
         ]
 
         if len(diskeys) > 1:
@@ -142,7 +142,7 @@ class Modflow6Model(collections.UserDict[str, Package], IModel, abc.ABC):
         else:
             return diskeys[0]
 
-    def _get_diskey(self):
+    def _get_diskey(self) -> str:
         """ "
         Preserves backwards compatibility with old code (primod) that used this.
         """
@@ -152,7 +152,7 @@ class Modflow6Model(collections.UserDict[str, Package], IModel, abc.ABC):
         )
         return self.get_diskey()
 
-    def _get_pkgkey(self, pkg_id):
+    def _get_pkgkey(self, pkg_id: str) -> str | None:
         """
         Get package key that belongs to a certain pkg_id, since the keys are
         user specified.
@@ -177,7 +177,7 @@ class Modflow6Model(collections.UserDict[str, Package], IModel, abc.ABC):
                 raise ValueError(f"No {required} package found in model {modelkey}")
         return
 
-    def _use_cftime(self):
+    def _use_cftime(self) -> bool:
         """
         Also checks if datetime types are homogeneous across packages.
         """
@@ -204,7 +204,7 @@ class Modflow6Model(collections.UserDict[str, Package], IModel, abc.ABC):
             else:
                 raise ValueError("Use either cftime or numpy.datetime64[ns].")
 
-    def _yield_times(self):
+    def _yield_times(self) -> list[np.ndarray]:
         modeltimes = []
         for pkg in self.values():
             if "time" in pkg.dataset.coords:
@@ -214,7 +214,7 @@ class Modflow6Model(collections.UserDict[str, Package], IModel, abc.ABC):
                 modeltimes.append(repeat_stress.isel(repeat_items=0).values)
         return modeltimes
 
-    def _render(self, modelname: str, write_context: WriteContext):
+    def _render(self, modelname: str, write_context: WriteContext) -> str:
         dir_for_render = write_context.root_directory / modelname
 
         d = {k: v for k, v in self._options.items() if not (v is None or v is False)}
@@ -236,7 +236,7 @@ class Modflow6Model(collections.UserDict[str, Package], IModel, abc.ABC):
         d["packages"] = packages
         return self._template.render(d)
 
-    def _model_checks(self, modelkey: str):
+    def _model_checks(self, modelkey: str) -> None:
         """
         Check model integrity (called before writing)
         """
@@ -246,9 +246,9 @@ class Modflow6Model(collections.UserDict[str, Package], IModel, abc.ABC):
     def _get_domain_geometry(
         self,
     ) -> tuple[
-        Union[xr.DataArray, xu.UgridDataArray],
-        Union[xr.DataArray, xu.UgridDataArray],
-        Union[xr.DataArray, xu.UgridDataArray],
+        xr.DataArray | xu.UgridDataArray,
+        xr.DataArray | xu.UgridDataArray,
+        xr.DataArray | xu.UgridDataArray,
     ]:
         discretization = self[self.get_diskey()]
         if discretization is None:
@@ -258,7 +258,7 @@ class Modflow6Model(collections.UserDict[str, Package], IModel, abc.ABC):
         idomain = discretization["idomain"]
         return top, bottom, idomain
 
-    def _get_k(self):
+    def _get_k(self) -> GridDataArray:
         npf_key = self._get_pkgkey(imod.mf6.NodePropertyFlow._pkg_id)
         if not npf_key:
             raise KeyError(
@@ -272,8 +272,8 @@ class Modflow6Model(collections.UserDict[str, Package], IModel, abc.ABC):
     def validate(
         self,
         model_name: str = "",
-        validation_context: Optional[ValidationSettings] = None,
-        **kwargs,
+        validation_context: ValidationSettings | None = None,
+        **kwargs: Any,
     ) -> StatusInfoBase:
         """
         Validate model.
@@ -401,12 +401,12 @@ class Modflow6Model(collections.UserDict[str, Package], IModel, abc.ABC):
     def write(
         self,
         modelname: str,
-        globaltimes: Union[list[np.datetime64], np.ndarray],
+        globaltimes: list[np.datetime64] | np.ndarray,
         directory: str | Path,
         binary: bool = True,
         use_absolute_paths: bool = False,
         validate: bool = True,
-    ):
+    ) -> None:
         """
         Write MODFLOW6 model to file. Note that this method is purely intended
         for debugging purposes. It does not result in a functional model. For
@@ -446,7 +446,7 @@ class Modflow6Model(collections.UserDict[str, Package], IModel, abc.ABC):
     def _write(
         self,
         modelname: str,
-        globaltimes: Union[list[np.datetime64], np.ndarray],
+        globaltimes: list[np.datetime64] | np.ndarray,
         write_context: WriteContext,
         validate_context: ValidationSettings,
     ) -> StatusInfoBase:
@@ -474,7 +474,7 @@ class Modflow6Model(collections.UserDict[str, Package], IModel, abc.ABC):
         pkg_write_context = write_context.copy_with_new_write_directory(
             new_write_directory=modeldirectory
         )
-        mf6_hfb_ls: List[HorizontalFlowBarrierBase] = []
+        mf6_hfb_ls: list[HorizontalFlowBarrierBase] = []
         for pkg_name, pkg in self.items():
             try:
                 if issubclass(type(pkg), GridAgnosticWell):
@@ -525,11 +525,11 @@ class Modflow6Model(collections.UserDict[str, Package], IModel, abc.ABC):
     @standard_log_decorator()
     def dump(
         self,
-        directory,
-        modelname,
+        directory: str | Path,
+        modelname: str,
         validate: bool = True,
         mdal_compliant: bool = False,
-        crs: Optional[Any] = None,
+        crs: Any | None = None,
         engine: EngineType = "netcdf4",
     ) -> Path:
         """
@@ -588,7 +588,7 @@ class Modflow6Model(collections.UserDict[str, Package], IModel, abc.ABC):
         return toml_path
 
     @classmethod
-    def from_file(cls, toml_path):
+    def from_file(cls, toml_path: str | Path) -> Self:
         pkg_classes = {
             name: pkg_cls
             for name, pkg_cls in inspect.getmembers(imod.mf6, inspect.isclass)
@@ -622,17 +622,17 @@ class Modflow6Model(collections.UserDict[str, Package], IModel, abc.ABC):
 
     def clip_box(
         self,
-        time_min: Optional[cftime.datetime | np.datetime64 | str] = None,
-        time_max: Optional[cftime.datetime | np.datetime64 | str] = None,
-        layer_min: Optional[int] = None,
-        layer_max: Optional[int] = None,
-        x_min: Optional[float] = None,
-        x_max: Optional[float] = None,
-        y_min: Optional[float] = None,
-        y_max: Optional[float] = None,
-        state_for_boundary: Optional[GridDataArray] = None,
+        time_min: cftime.datetime | np.datetime64 | str | None = None,
+        time_max: cftime.datetime | np.datetime64 | str | None = None,
+        layer_min: int | None = None,
+        layer_max: int | None = None,
+        x_min: float | None = None,
+        x_max: float | None = None,
+        y_min: float | None = None,
+        y_max: float | None = None,
+        state_for_boundary: GridDataArray | None = None,
         ignore_time_purge_empty: bool = False,
-    ):
+    ) -> Self:
         """
         Clip a model by a bounding box (time, layer, y, x).
 
@@ -741,15 +741,15 @@ class Modflow6Model(collections.UserDict[str, Package], IModel, abc.ABC):
 
     def _clip_box_packages(
         self,
-        time_min: Optional[cftime.datetime | np.datetime64 | str] = None,
-        time_max: Optional[cftime.datetime | np.datetime64 | str] = None,
-        layer_min: Optional[int] = None,
-        layer_max: Optional[int] = None,
-        x_min: Optional[float] = None,
-        x_max: Optional[float] = None,
-        y_min: Optional[float] = None,
-        y_max: Optional[float] = None,
-    ):
+        time_min: cftime.datetime | np.datetime64 | str | None = None,
+        time_max: cftime.datetime | np.datetime64 | str | None = None,
+        layer_min: int | None = None,
+        layer_max: int | None = None,
+        x_min: float | None = None,
+        x_max: float | None = None,
+        y_min: float | None = None,
+        y_max: float | None = None,
+    ) -> Self:
         """
         Clip a model by a bounding box (time, layer, y, x).
 
@@ -800,7 +800,7 @@ class Modflow6Model(collections.UserDict[str, Package], IModel, abc.ABC):
     def regrid_like(
         self,
         target_grid: GridDataArray,
-        regrid_cache: Optional[RegridderWeightsCache] = None,
+        regrid_cache: RegridderWeightsCache | None = None,
     ) -> "Modflow6Model":
         """
         Creates a model by regridding the packages of this model to another
@@ -832,7 +832,7 @@ class Modflow6Model(collections.UserDict[str, Package], IModel, abc.ABC):
         self,
         mask: GridDataArray,
         ignore_time_purge_empty: bool = False,
-    ):
+    ) -> None:
         """
         This function applies a mask to all packages in a model. The mask must
         be presented as an idomain-like integer array that has 0 (inactive) or
@@ -884,9 +884,9 @@ class Modflow6Model(collections.UserDict[str, Package], IModel, abc.ABC):
 
     def purge_empty_packages(
         self,
-        model_name: Optional[str] = "",
+        model_name: str | None = "",
         ignore_time: bool = False,
-        package_names: Optional[list[str]] = None,
+        package_names: list[str] | None = None,
     ) -> None:
         """
         This method removes empty packages from the model in place.
@@ -919,12 +919,12 @@ class Modflow6Model(collections.UserDict[str, Package], IModel, abc.ABC):
             self.pop(package_name)
 
     @property
-    def domain(self):
+    def domain(self) -> GridDataArray:
         dis = self.get_diskey()
         return self[dis]["idomain"]
 
     @property
-    def bottom(self):
+    def bottom(self) -> GridDataArray:
         dis = self.get_diskey()
         return self[dis]["bottom"]
 
@@ -945,7 +945,7 @@ class Modflow6Model(collections.UserDict[str, Package], IModel, abc.ABC):
             content = [f"{typename}("] + options + ["){}"]
         return "\n".join(content)
 
-    def is_use_newton(self):
+    def is_use_newton(self) -> bool:
         """
         Returns whether the Newton-Raphson formulation is used for groundwater
         flow between connected, convertible groundwater cells.
@@ -957,7 +957,7 @@ class Modflow6Model(collections.UserDict[str, Package], IModel, abc.ABC):
         """
         return False
 
-    def _is_splitting_supported(self) -> Tuple[bool, str]:
+    def _is_splitting_supported(self) -> tuple[bool, str]:
         """
         Returns True if all the packages in the model supports splitting. If one
         of the packages in the model does not support splitting, it returns the
@@ -976,7 +976,7 @@ class Modflow6Model(collections.UserDict[str, Package], IModel, abc.ABC):
                 return False, package_name
         return True, ""
 
-    def _is_regridding_supported(self) -> Tuple[bool, str]:
+    def _is_regridding_supported(self) -> tuple[bool, str]:
         """
         Returns True if all the packages in the model supports regridding. If one
         of the packages in the model does not support regridding, it returns the
@@ -995,7 +995,7 @@ class Modflow6Model(collections.UserDict[str, Package], IModel, abc.ABC):
                 return False, package_name
         return True, ""
 
-    def _is_clipping_supported(self) -> Tuple[bool, str]:
+    def _is_clipping_supported(self) -> tuple[bool, str]:
         """
         Returns True if all the packages in the model supports clipping. If one
         of the packages in the model does not support clipping, it returns the

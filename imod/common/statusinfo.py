@@ -1,9 +1,8 @@
 from abc import ABC, abstractmethod
-from typing import Optional
 
 
 class StatusInfoBase(ABC):
-    def __init__(self, title: str = ""):
+    def __init__(self, title: str = "") -> None:
         self.__title: str = title
 
     @property
@@ -35,7 +34,7 @@ class StatusInfo(StatusInfoBase):
     But this can be extended later with e.g. warnings.
     """
 
-    def __init__(self, title: str = ""):
+    def __init__(self, title: str = "") -> None:
         super().__init__(title)
         self.__errors: list[str] = []
 
@@ -61,12 +60,12 @@ class NestedStatusInfo(StatusInfoBase):
     This class can be used to collect any nested status messages.
     """
 
-    def __init__(self, title: str = ""):
+    def __init__(self, title: str = "") -> None:
         super().__init__(title)
         self.__children: list[StatusInfoBase] = []
         self.__footer_text: str = ""
 
-    def add(self, status_info: StatusInfoBase):
+    def add(self, status_info: StatusInfoBase) -> None:
         self.__children.append(status_info)
 
     @property
@@ -82,7 +81,7 @@ class NestedStatusInfo(StatusInfoBase):
                 return True
         return False
 
-    def set_footer_text(self, text: Optional[str]) -> None:
+    def set_footer_text(self, text: str | None) -> None:
         if text:
             self.__footer_text = "\n" + text
 

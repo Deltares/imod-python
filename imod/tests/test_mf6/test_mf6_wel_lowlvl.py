@@ -1,6 +1,5 @@
 import textwrap
 from pathlib import Path
-from typing import Tuple
 
 import numpy as np
 import pandas as pd
@@ -136,7 +135,7 @@ def test_mf6wel_write__transient(
 
 
 def test_mf6wel_render__transient(
-    tmp_path: Path, mf6wel_test_data_transient: Tuple[xr.DataArray, xr.DataArray]
+    tmp_path: Path, mf6wel_test_data_transient: tuple[xr.DataArray, xr.DataArray]
 ):
     # Arrange
     cellid, rate = mf6wel_test_data_transient

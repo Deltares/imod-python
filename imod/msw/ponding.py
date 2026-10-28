@@ -1,4 +1,4 @@
-from typing import Any, TextIO
+from typing import Any, Self, TextIO
 
 import pandas as pd
 import xarray as xr
@@ -48,7 +48,12 @@ class Ponding(MetaSwapPackage, IRegridPackage):
 
     _regrid_method = PondingRegridMethod()
 
-    def __init__(self, ponding_depth, runon_resistance, runoff_resistance) -> None:
+    def __init__(
+        self,
+        ponding_depth: xr.DataArray,
+        runon_resistance: xr.DataArray,
+        runoff_resistance: xr.DataArray,
+    ) -> None:
         super().__init__()
         self.dataset["ponding_depth"] = ponding_depth
         self.dataset["runon_resistance"] = runon_resistance
@@ -56,7 +61,9 @@ class Ponding(MetaSwapPackage, IRegridPackage):
 
         self._pkgcheck()
 
-    def _render(self, file: TextIO, index: IntArray, svat: xr.DataArray, *args: Any):
+    def _render(
+        self, file: TextIO, index: IntArray, svat: xr.DataArray, *args: Any
+    ) -> None:
         data_dict: DataDictType = {"svat": svat.values.ravel()[index]}
 
         for var in self._with_subunit:
@@ -73,7 +80,7 @@ class Ponding(MetaSwapPackage, IRegridPackage):
         return self._write_dataframe_fixed_width(file, dataframe)
 
     @classmethod
-    def from_imod5_data(cls, imod5_data: Imod5DataDict) -> "Ponding":
+    def from_imod5_data(cls, imod5_data: Imod5DataDict) -> Self:
         """
         Construct a MetaSWAP Ponding package from iMOD5 data in the CAP
         package, loaded with the :func:`imod.formats.prj.open_projectfile_data`

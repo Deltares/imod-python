@@ -1,13 +1,13 @@
 import pathlib
 import struct
-from typing import Any, BinaryIO, Dict, List, Union
+from typing import Any, BinaryIO, TypeAlias
 
 import numpy as np
 
 # Type annotations
 IntArray = np.ndarray
 FloatArray = np.ndarray
-FilePath = Union[str, pathlib.Path]
+FilePath: TypeAlias = str | pathlib.Path
 
 
 def _grb_text(f: BinaryIO, lentxt: int = 50) -> str:
@@ -23,7 +23,7 @@ def _to_nan(a: FloatArray, dry_nan: bool) -> FloatArray:
 
 
 def get_first_header_advanced_package(
-    headers: Dict[str, List[Any]],
+    headers: dict[str, list[Any]],
 ) -> Any:
     for key, header_list in headers.items():
         # multimodels have a gwf-gwf budget for flow-ja-face between domains

@@ -1,5 +1,5 @@
 from copy import deepcopy
-from typing import Any, Optional, TextIO
+from typing import Any, TextIO
 
 import pandas as pd
 
@@ -61,16 +61,16 @@ class VariableOutputControl(MetaSwapPackage, IRegridPackage):
 
     def __init__(
         self,
-        Pm=True,
-        Psgw=True,
-        Pssw=True,
-        qrun=True,
-        qdr=True,
-        qspgw=True,
-        qmodf=True,
-        ETact=True,
-        **kwargs,
-    ):
+        Pm: bool = True,
+        Psgw: bool = True,
+        Pssw: bool = True,
+        qrun: bool = True,
+        qdr: bool = True,
+        qspgw: bool = True,
+        qmodf: bool = True,
+        ETact: bool = True,
+        **kwargs: bool,
+    ) -> None:
         super().__init__()
 
         # Convert to integer, as MetaSWAP expects its values as integers.
@@ -87,7 +87,7 @@ class VariableOutputControl(MetaSwapPackage, IRegridPackage):
         for key, value in kwargs.items():
             self.dataset[key] = int(value)
 
-    def _render(self, file: TextIO, *args: Any):
+    def _render(self, file: TextIO, *args: Any) -> None:
         variable, option = zip(
             *[(var, self.dataset[var].values) for var in self.dataset.data_vars]
         )
@@ -120,12 +120,12 @@ class TimeOutputControl(MetaSwapPackage, IRegridPackage):
         "option": VariableMetaData(6, 1, 7, int),
     }
 
-    def __init__(self, time):
+    def __init__(self, time: GridDataArray) -> None:
         super().__init__()
 
         self.dataset["times"] = time
 
-    def _render(self, file: TextIO, *args: Any):
+    def _render(self, file: TextIO, *args: Any) -> None:
         year, time_since_start_year = to_metaswap_timeformat(self.dataset["times"])
 
         dataframe = pd.DataFrame(
@@ -142,7 +142,7 @@ class TimeOutputControl(MetaSwapPackage, IRegridPackage):
         self,
         target_grid: GridDataArray,
         regrid_cache: RegridderWeightsCache,
-        regridder_types: Optional[DataclassType] = None,
+        regridder_types: DataclassType | None = None,
     ) -> "MetaSwapPackage":
         """
         Returns a deepcopy of this instance, as regridding this package is

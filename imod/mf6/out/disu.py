@@ -1,15 +1,15 @@
 import struct
-from typing import Any, BinaryIO, Dict, List, Optional
+from typing import Any, BinaryIO
 
 import numpy as np
 import xarray as xr
 import xugrid as xu
 
 from . import cbc
-from .common import FilePath, _grb_text
+from .common import FilePath, FloatArray, _grb_text
 
 
-def read_grb(f: BinaryIO, ntxt: int, lentxt: int) -> Dict[str, Any]:
+def read_grb(f: BinaryIO, ntxt: int, lentxt: int) -> dict[str, Any]:
     read_vertices = lentxt > 10
 
     if read_vertices:
@@ -57,49 +57,49 @@ def read_grb(f: BinaryIO, ntxt: int, lentxt: int) -> Dict[str, Any]:
     return out
 
 
-def read_times(path: FilePath, ntime: int, ncell: int):
+def read_times(path: FilePath, ntime: int, ncell: int) -> FloatArray:
     raise NotImplementedError
 
 
 def read_hds_timestep(
     path: FilePath, nlayer: int, ncell_per_layer: int, dry_nan: bool, pos: int
-):
+) -> FloatArray:
     raise NotImplementedError
 
 
 def open_hds(
     path: FilePath,
-    grid_info: Dict[str, Any],
+    grid_info: dict[str, Any],
     dry_nan: bool,
-    simulation_start_time: Optional[np.datetime64] = None,
-    time_unit: Optional[str] = "d",
+    simulation_start_time: np.datetime64 | None = None,
+    time_unit: str | None = "d",
 ) -> xr.DataArray:
     raise NotImplementedError
 
 
 def open_dvs(
     path: FilePath,
-    grid_info: Dict[str, Any],
+    grid_info: dict[str, Any],
     indices: np.ndarray,
-    simulation_start_time: Optional[np.datetime64] = None,
-    time_unit: Optional[str] = "d",
+    simulation_start_time: np.datetime64 | None = None,
+    time_unit: str | None = "d",
 ) -> xr.DataArray:
     raise NotImplementedError
 
 
 def open_imeth1_budgets(
-    cbc_path: FilePath, grb_content: Dict[str, Any], header_list: List[cbc.Imeth1Header]
+    cbc_path: FilePath, grb_content: dict[str, Any], header_list: list[cbc.Imeth1Header]
 ) -> xr.DataArray:
     raise NotImplementedError
 
 
 def open_imeth6_budgets(
-    cbc_path: FilePath, grb_content: Dict[str, Any], header_list: List[cbc.Imeth6Header]
+    cbc_path: FilePath, grb_content: dict[str, Any], header_list: list[cbc.Imeth6Header]
 ) -> xr.DataArray:
     raise NotImplementedError
 
 
 def open_cbc(
-    cbc_path: FilePath, grb_content: Dict[str, Any]
-) -> Dict[str, xu.UgridDataArray]:
+    cbc_path: FilePath, grb_content: dict[str, Any]
+) -> dict[str, xu.UgridDataArray]:
     raise NotImplementedError

@@ -1,4 +1,5 @@
 import numpy as np
+import xarray as xr
 
 from imod.common.interfaces.iregridpackage import IRegridPackage
 from imod.logging import init_log_decorator
@@ -102,18 +103,18 @@ class MobileStorageTransfer(Package, IRegridPackage):
     @init_log_decorator()
     def __init__(
         self,
-        porosity,
-        decay=None,
-        decay_sorbed=None,
-        bulk_density=None,
-        distcoef=None,
-        sp2=None,
-        save_flows=False,
+        porosity: xr.DataArray,
+        decay: xr.DataArray | None = None,
+        decay_sorbed: xr.DataArray | None = None,
+        bulk_density: xr.DataArray | None = None,
+        distcoef: xr.DataArray | None = None,
+        sp2: xr.DataArray | None = None,
+        save_flows: bool = False,
         zero_order_decay: bool = False,
         first_order_decay: bool = False,
-        sorption=None,
+        sorption: str | None = None,
         validate: bool = True,
-    ):
+    ) -> None:
         if zero_order_decay and first_order_decay:
             raise ValueError(
                 "zero_order_decay and first_order_decay may not both be True"

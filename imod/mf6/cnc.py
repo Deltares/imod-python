@@ -1,3 +1,5 @@
+from typing import Any
+
 import numpy as np
 
 from imod.common.interfaces.iregridpackage import IRegridPackage
@@ -13,6 +15,7 @@ from imod.schemata import (
     IndexesSchema,
     OtherCoordsSchema,
 )
+from imod.typing import GridDataArray
 
 
 class ConstantConcentration(BoundaryCondition, IRegridPackage):
@@ -70,14 +73,14 @@ class ConstantConcentration(BoundaryCondition, IRegridPackage):
     @init_log_decorator()
     def __init__(
         self,
-        concentration,
-        print_input=False,
-        print_flows=False,
-        save_flows=False,
-        observations=None,
+        concentration: GridDataArray,
+        print_input: bool = False,
+        print_flows: bool = False,
+        save_flows: bool = False,
+        observations: Any = None,
         validate: bool = True,
-    ):
-        dict_dataset = {
+    ) -> None:
+        dict_dataset: dict[str, Any] = {
             "concentration": concentration,
             "print_input": print_input,
             "print_flows": print_flows,

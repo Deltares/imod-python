@@ -1,5 +1,5 @@
 import pathlib
-from typing import Any, List, Optional, Union
+from typing import Any, Union
 
 import numpy as np
 
@@ -105,7 +105,7 @@ class StructuredDiscretization(Package, IRegridPackage, IMaskingSettings):
     _regrid_method = DiscretizationRegridMethod()
 
     @property
-    def skip_variables(self) -> List[str]:
+    def skip_variables(self) -> list[str]:
         return ["bottom"]
 
     @init_log_decorator()
@@ -115,7 +115,7 @@ class StructuredDiscretization(Package, IRegridPackage, IMaskingSettings):
         bottom: GridDataArray,
         idomain: GridDataArray,
         validate: bool = True,
-    ):
+    ) -> None:
         dict_dataset = {
             "idomain": idomain,
             "top": top,
@@ -124,7 +124,7 @@ class StructuredDiscretization(Package, IRegridPackage, IMaskingSettings):
         super().__init__(dict_dataset)
         self._validate_init_schemata(validate)
 
-    def _delrc(self, dx):
+    def _delrc(self, dx: float | np.ndarray) -> str:
         """
         dx means dx or dy
         """
@@ -136,7 +136,13 @@ class StructuredDiscretization(Package, IRegridPackage, IMaskingSettings):
         else:
             raise ValueError(f"Unhandled type of {dx}")
 
-    def _get_render_dictionary(self, directory, pkgname, globaltimes, binary):
+    def _get_render_dictionary(
+        self,
+        directory: pathlib.Path,
+        pkgname: str,
+        globaltimes: list[np.datetime64] | np.ndarray,
+        binary: bool,
+    ) -> dict[str, Any]:
         disdirectory = pathlib.Path(directory) / pkgname
         d: dict[str, Any] = {}
         x = self.dataset["idomain"].coords["x"]
@@ -162,7 +168,9 @@ class StructuredDiscretization(Package, IRegridPackage, IMaskingSettings):
         )
         return d
 
-    def _validate(self, schemata, **kwargs):
+    def _validate(
+        self, schemata: dict[str, Any], **kwargs: Any
+    ) -> dict[str, list[ValidationError]]:
         # Insert additional kwargs
         kwargs["bottom"] = self["bottom"]
         errors = super()._validate(schemata, **kwargs)
@@ -174,10 +182,10 @@ class StructuredDiscretization(Package, IRegridPackage, IMaskingSettings):
     def from_imod5_data(
         cls,
         imod5_data: dict[str, dict[str, GridDataArray]],
-        regridder_types: Optional[DataclassType] = None,
+        regridder_types: DataclassType | None = None,
         regrid_cache: RegridderWeightsCache = RegridderWeightsCache(),
         validate: bool = True,
-        target_grid: Optional[GridDataArray] = None,
+        target_grid: GridDataArray | None = None,
     ) -> "StructuredDiscretization":
         """
         Construct package from iMOD5 data, loaded with the
@@ -254,7 +262,7 @@ class StructuredDiscretization(Package, IRegridPackage, IMaskingSettings):
         self,
         target_grid: GridDataArray,
         regrid_cache: RegridderWeightsCache,
-        regridder_types: Optional[DataclassType] = None,
+        regridder_types: DataclassType | None = None,
     ) -> Union["StructuredDiscretization", VerticesDiscretization]:
         """
         Regrid discretization package. Creates a StructuredDiscretization, or
