@@ -16,6 +16,7 @@ from .sample_data import (
     hondsrug_river,
     hondsrug_simulation,
     imod5_projectfile_data,
+    isg_tutorials,
     lakes_shp,
     lhm_clip_triangular_grid,
     tutorial_03,
