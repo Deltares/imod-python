@@ -145,6 +145,26 @@ def test_timeseries_resampling_5():
     )
 
 
+@pytest.mark.parametrize(
+    "output_days, expected_rates",
+    [([1, 11], [-13.0, 0.0]), ([1, 6, 11], [-14.0, -12.0, 0.0])],
+)
+def test_timeseries_resampling_varying_rates(output_days, expected_rates):
+    """Test resampling with varying output days and expected rates."""
+    timeseries = initialize_timeseries(
+        [datetime(2019, 12, 1), datetime(2020, 1, 4), datetime(2020, 1, 9)],
+        [-10.0, -20.0, 0.0],
+    )
+    new_dates = pd.DatetimeIndex([datetime(2020, 1, day) for day in output_days])
+
+    new_timeseries = resample_timeseries(timeseries, new_dates)
+
+    expected_timeseries = initialize_timeseries(new_dates, expected_rates)
+    pd.testing.assert_frame_equal(
+        new_timeseries, expected_timeseries, check_dtype=False
+    )
+
+
 def test_timeseries_resampling_6():
     # In this test, we resample a timeseries after the last timestep of
     # timeseries, should be forward filled.
