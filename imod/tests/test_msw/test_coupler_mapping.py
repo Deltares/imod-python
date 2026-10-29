@@ -9,6 +9,7 @@ from pytest_cases import parametrize_with_cases
 from imod import mf6, msw
 from imod.mf6.mf6_wel_adapter import Mf6Wel
 from imod.mf6.wel import derive_cellid_from_points
+from imod.msw.fixed_format import fixed_format_parser
 
 
 def case_svat_data():
@@ -75,7 +76,7 @@ def test_clip_box():
 
 
 @parametrize_with_cases("svat_data", cases=[case_svat_data, case_svat_data__dask])
-def test_simple_model_with_sprinkling(fixed_format_parser, svat_data):
+def test_simple_model_with_sprinkling(svat_data):
     index = get_index(svat_data)
     mf6_dis = get_mf6_dis(svat_data)
     mf6_wel = get_mf6_wel(svat_data)
@@ -97,7 +98,7 @@ def test_simple_model_with_sprinkling(fixed_format_parser, svat_data):
 
 
 @parametrize_with_cases("svat_data", cases=[case_svat_data, case_svat_data__dask])
-def test_simple_model_with_sprinkling_1_subunit(fixed_format_parser, svat_data):
+def test_simple_model_with_sprinkling_1_subunit(svat_data):
     svat_data = svat_data.sel(subunit=[0])
     index = get_index(svat_data)
     mf6_dis = get_mf6_dis(svat_data)
@@ -120,7 +121,7 @@ def test_simple_model_with_sprinkling_1_subunit(fixed_format_parser, svat_data):
 
 
 @parametrize_with_cases("svat_data", cases=[case_svat_data, case_svat_data__dask])
-def test_simple_model_without_sprinkling(fixed_format_parser, svat_data):
+def test_simple_model_without_sprinkling(svat_data):
     index = get_index(svat_data)
     mf6_dis = get_mf6_dis(svat_data)
     coupler_mapping = msw.CouplerMapping()
