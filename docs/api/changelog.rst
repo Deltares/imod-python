@@ -86,6 +86,10 @@ Fixed
   the absence of perched water table data.
   :meth:`imod.msw.ScalingFactors.from_imod5_data` now ignores the perched water
   table if it is set to -9999.0 in the iMOD5 projectfile.
+- Fixed :meth:`imod.mf6.Well.from_imod5_data` and
+  :meth:`imod.mf6.LayeredWell.from_imod5_data` giving each stress period the
+  rate of the previous period, when the well timeseries has records before the
+  start of the simulation.
 
 Changed
 ~~~~~~~

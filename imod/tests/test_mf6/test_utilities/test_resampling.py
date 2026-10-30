@@ -137,9 +137,30 @@ def test_timeseries_resampling_5():
     new_timeseries = resample_timeseries(original_timeseries, new_dates)
 
     expected_times = [datetime(1989, 1, 2), datetime(1989, 1, 3), datetime(1989, 1, 4)]
-    expected_rates = [200.0, 200.0, 200.0]
+    # The final output period includes the remaining input intervals until January 9.
+    expected_rates = [200.0, 200.0, 320.0]
     expected_timeseries = initialize_timeseries(expected_times, expected_rates)
 
+    pd.testing.assert_frame_equal(
+        new_timeseries, expected_timeseries, check_dtype=False
+    )
+
+
+@pytest.mark.parametrize(
+    "output_days, expected_rates",
+    [([1, 11], [-13.0, 0.0]), ([1, 6, 11], [-14.0, -12.0, 0.0])],
+)
+def test_timeseries_resampling_varying_rates(output_days, expected_rates):
+    """Test resampling with varying output days and expected rates."""
+    timeseries = initialize_timeseries(
+        [datetime(2019, 12, 1), datetime(2020, 1, 4), datetime(2020, 1, 9)],
+        [-10.0, -20.0, 0.0],
+    )
+    new_dates = pd.DatetimeIndex([datetime(2020, 1, day) for day in output_days])
+
+    new_timeseries = resample_timeseries(timeseries, new_dates)
+
+    expected_timeseries = initialize_timeseries(new_dates, expected_rates)
     pd.testing.assert_frame_equal(
         new_timeseries, expected_timeseries, check_dtype=False
     )
