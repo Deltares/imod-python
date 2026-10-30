@@ -50,10 +50,6 @@ Added
 Fixed
 ~~~~~
 
-- Fixed :meth:`imod.mf6.Well.from_imod5_data` and
-  :meth:`imod.mf6.LayeredWell.from_imod5_data` giving each stress period the
-  rate of the previous period, when the well timeseries has records before the
-  start of the simulation.
 - :func:`imod.idf.open_subdomains` returned different results for overlapping
   subdomains depending on the filesystem's file listing order (e.g. on macOS
   and Linux). Globbed paths are now sorted.
@@ -86,6 +82,10 @@ Fixed
   parse the CAP package if it had 21 entries.
 - Fixed bug in :func:`imod.visualize.pyvista.velocity_field` where an error was
   raised incorrectly when the ``z`` coordinate array is three-dimensional.
+- Fixed :meth:`imod.mf6.Well.from_imod5_data` and
+  :meth:`imod.mf6.LayeredWell.from_imod5_data` giving each stress period the
+  rate of the previous period, when the well timeseries has records before the
+  start of the simulation.
 
 Changed
 ~~~~~~~
