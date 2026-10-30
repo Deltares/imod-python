@@ -136,7 +136,7 @@ def resample_timeseries(
     )
     intermediate_df["period_nr"] = intermediate_df["time"].isin(times).cumsum()
     # Drop the kept record before the first output time (period_nr 0). Its rate
-    # is already forward filled to the first output time. 
+    # is already forward filled to the first output time.
     intermediate_df = intermediate_df[intermediate_df["period_nr"] > 0]
     gb = intermediate_df.groupby("period_nr")
 

@@ -137,7 +137,8 @@ def test_timeseries_resampling_5():
     new_timeseries = resample_timeseries(original_timeseries, new_dates)
 
     expected_times = [datetime(1989, 1, 2), datetime(1989, 1, 3), datetime(1989, 1, 4)]
-    expected_rates = [200.0, 200.0, 200.0]
+    # The final output period includes the remaining input intervals until January 9.
+    expected_rates = [200.0, 200.0, 320.0]
     expected_timeseries = initialize_timeseries(expected_times, expected_rates)
 
     pd.testing.assert_frame_equal(
