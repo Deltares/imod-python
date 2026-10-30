@@ -1,5 +1,4 @@
 import tempfile
-from collections.abc import Callable
 from dataclasses import dataclass
 from pathlib import Path
 
@@ -14,6 +13,7 @@ from imod import msw
 from imod.mf6.dis import StructuredDiscretization
 from imod.mf6.mf6_wel_adapter import Mf6Wel
 from imod.mf6.wel import derive_cellid_from_points
+from imod.msw.fixed_format import fixed_format_parser
 
 
 @pytest.fixture(scope="function")
@@ -491,7 +491,6 @@ class SprinklingPointsCases:
 
 @parametrize_with_cases("case_data, expected_data", cases=SprinklingGridCases)
 def test_grid_simple_model(
-    fixed_format_parser: Callable,
     sprinkling_svat_index: tuple[xr.DataArray, np.ndarray],
     case_data: SprinklingGridCaseData,
     expected_data: ExpectedCaseData,
@@ -538,7 +537,6 @@ def test_grid_simple_model(
 
 @parametrize_with_cases("case_data, expected_data", cases=SprinklingGridCases)
 def test_grid_simple_model_1_subunit(
-    fixed_format_parser: Callable,
     sprinkling_svat_index: tuple[xr.DataArray, np.ndarray],
     case_data: SprinklingGridCaseData,
     expected_data: ExpectedCaseData,
@@ -588,7 +586,6 @@ def test_grid_simple_model_1_subunit(
 
 @parametrize_with_cases("case_data, expected_data", cases=SprinklingPointsCases)
 def test_points_simple_model(
-    fixed_format_parser: Callable,
     sprinkling_svat_index: tuple[xr.DataArray, np.ndarray],
     case_data: SprinklingPointsCaseData,
     expected_data: ExpectedCaseData,
@@ -724,7 +721,6 @@ def test_sprinklingpoints_from_imod5_data__points(cap_data_sprinkling_points):
 @pytest.mark.unittest_jit
 def test_sprinklingpoints_from_imod5_data_write__points(
     sprinkling_svat_index,
-    fixed_format_parser,
     cap_data_sprinkling_points,
     cap_coupled_dis_grid,
     tmp_path,
