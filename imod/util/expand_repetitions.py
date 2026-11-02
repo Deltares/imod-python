@@ -77,10 +77,8 @@ def _forward_fill_rates_to_output_times(
         on="time",
         validate="m:m",
     ).ffill()
-    # Catch case where multiple well rates precede first timestep on multiple
-    # occasions, these have to be clipped to avoid including them in the
-    # computation of weighted averages later in the function. We only want to
-    # include the last well timestep BEFORE the first output timestep.
+    # Only keep the last well record BEFORE the first output time, earlier
+    # records would distort the weighted averages.
     n_before_first_timestep = (intermediate_df["time"] < times[0]).cumsum()
     to_preserve = n_before_first_timestep == n_before_first_timestep.max()
     return intermediate_df[to_preserve]
@@ -107,12 +105,12 @@ def _zero_fill_before_first_record(
 
 def _add_durations_and_volumes(intermediate_df: pd.DataFrame) -> None:
     """Add the duration until the next row and the rate volume. In place."""
-    # compute time difference from perious to current row
+    # Compute time difference from previous to current row
     time_diff_col = intermediate_df["time"].diff()
     col_index = intermediate_df.shape[1] - 1
     intermediate_df.insert(col_index, "time_to_next", time_diff_col.values)
 
-    # shift the new column 1 place down so that they become the time to the next row
+    # Shift the column up so each row holds the time until the next row
     intermediate_df["time_to_next"] = intermediate_df["time_to_next"].shift(-1)
 
     intermediate_df["duration_sec"] = intermediate_df["time_to_next"].dt.total_seconds()
@@ -125,21 +123,33 @@ def resample_timeseries(
     well_rate: pd.DataFrame, times: list[datetime] | pd.DatetimeIndex
 ) -> pd.DataFrame:
     """
-    On input, well_rate is a dataframe containing a timeseries for rate for one well
-    while "times" is a list of datetimes.
-    This function creates a new dataframe containing a timeseries defined on the
-    times in "times".
+    Resample the rate timeseries of a single well to the given output times.
+
+    Calculate the average rate of a single well for each period between the
+    output times. A period starts at an output time and ends at the next one.
+    Rates are weighted by their duration: a rate of -10 for 3 days and -20 for
+    7 days gives an average of -17 over those 10 days. The average is stored at
+    the start time of the period.
+
+    If the well has records before the first output time, the last of these
+    sets the rate at the start of the first period. If the first output time 
+    is before the first record, the rate is zero until that record.
+    The last output time has no period after it, so it gets the last well
+    rate.
 
     Parameters
     ----------
-    well_rate:  pd.DataFrame
-        input timeseries for a single well
-    times: datetime
-        list of times on which the output dataframe should have entries.
+    well_rate: pd.DataFrame
+        Timeseries of a single well, with columns "time", "rate", "x", "y",
+        "id", "filt_top", "filt_bot" and "index".
+    times: list of datetime or pd.DatetimeIndex
+        Times on which the output dataframe should have entries.
 
-    returns:
-    --------
-    a new dataframe containing a timeseries defined on the times in "times".
+    Returns
+    -------
+    pd.DataFrame
+        Timeseries with the same columns as ``well_rate``, with one row per
+        entry in ``times``.
     """
     is_steady_state = len(times) == 0
 
@@ -153,9 +163,9 @@ def resample_timeseries(
 
     # Integrate by grouping by the period number
     intermediate_df["period_nr"] = intermediate_df["time"].isin(times).cumsum()
-    # Drop the kept record before the first output time (period_nr 0). Its rate
-    # is already forward filled to the first output time. If not dropped, the
-    # results below shift one row, as the first group is not the first period.
+    # Drop the record before the first output time (period_nr 0), as it is
+    # already forward filled onto the first output time. Keeping it would shift
+    # all averages one row. 
     intermediate_df = intermediate_df[intermediate_df["period_nr"] > 0]
     gb = intermediate_df.groupby("period_nr")
 
