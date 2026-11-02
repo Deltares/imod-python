@@ -4,6 +4,8 @@ from datetime import datetime
 import numpy as np
 import pandas as pd
 
+LOCATION_COLUMNS = ["x", "y", "id", "filt_top", "filt_bot", "index"]
+
 
 def expand_repetitions(
     repeat_stress: list[datetime], time_min: datetime, time_max: datetime
@@ -61,6 +63,64 @@ def average_timeseries(well_rate: pd.DataFrame) -> pd.DataFrame:
     return output_frame
 
 
+def _forward_fill_rates_to_output_times(
+    well_rate: pd.DataFrame, output_frame: pd.DataFrame, times: pd.Index | list
+) -> pd.DataFrame:
+    """
+    Merge well records and output times, forward fill the rate to the output
+    times and clip records before the first output time.
+    """
+    intermediate_df = pd.merge(
+        output_frame,
+        well_rate,
+        how="outer",
+        on="time",
+        validate="m:m",
+    ).ffill()
+    # Catch case where multiple well rates precede first timestep on multiple
+    # occasions, these have to be clipped to avoid including them in the
+    # computation of weighted averages later in the function. We only want to
+    # include the last well timestep BEFORE the first output timestep.
+    n_before_first_timestep = (intermediate_df["time"] < times[0]).cumsum()
+    to_preserve = n_before_first_timestep == n_before_first_timestep.max()
+    return intermediate_df[to_preserve]
+
+
+def _zero_fill_before_first_record(
+    intermediate_df: pd.DataFrame, well_rate: pd.DataFrame
+) -> None:
+    """
+    The entries before the start of the well timeseries do not have data yet,
+    so we fill them in here. Keep rate to zero and pad the location columns with
+    the first entry. Modifies intermediate_df in place.
+    """
+    time_before_start_input = (
+        intermediate_df["time"].values < well_rate["time"].values[0]
+    )
+    if time_before_start_input[0]:
+        intermediate_df.loc[time_before_start_input, "rate"] = 0.0
+        first_well_location_values = well_rate.iloc[0][LOCATION_COLUMNS].values
+        intermediate_df.loc[time_before_start_input, LOCATION_COLUMNS] = (
+            first_well_location_values
+        )
+
+
+def _add_durations_and_volumes(intermediate_df: pd.DataFrame) -> None:
+    """Add the duration until the next row and the rate volume. In place."""
+    # compute time difference from perious to current row
+    time_diff_col = intermediate_df["time"].diff()
+    col_index = intermediate_df.shape[1] - 1
+    intermediate_df.insert(col_index, "time_to_next", time_diff_col.values)
+
+    # shift the new column 1 place down so that they become the time to the next row
+    intermediate_df["time_to_next"] = intermediate_df["time_to_next"].shift(-1)
+
+    intermediate_df["duration_sec"] = intermediate_df["time_to_next"].dt.total_seconds()
+    intermediate_df["volume"] = (
+        intermediate_df["rate"] * intermediate_df["duration_sec"]
+    )
+
+
 def resample_timeseries(
     well_rate: pd.DataFrame, times: list[datetime] | pd.DatetimeIndex
 ) -> pd.DataFrame:
@@ -82,61 +142,20 @@ def resample_timeseries(
     a new dataframe containing a timeseries defined on the times in "times".
     """
     is_steady_state = len(times) == 0
-    # Fill NaT for the last timestep in well_rate if it is outside
-    # pandas' Timestamp nanosecond range (2262), for example 2999-12-31.
-    # FUTURE: Can be removed when we require pandas 3.0
-    tc_index = well_rate.columns.get_loc("time")
-    well_rate.iloc[-1:, tc_index] = well_rate.iloc[-1:, tc_index].fillna(
-        pd.Timestamp.max
-    )
 
     output_frame = pd.DataFrame(times)
     output_frame = output_frame.rename(columns={0: "time"})
-    intermediate_df = pd.merge(
-        output_frame,
-        well_rate,
-        how="outer",
-        on="time",
-        validate="m:m",
-    ).ffill()
-    # Catch case where multiple well rates precede first timestep on multiple
-    # occasions, these have to be clipped to avoid including them in the
-    # computation of weighted averages later in the function. We only want to
-    # include the last well timestep BEFORE the first output timestep.
-    n_before_first_timestep = (intermediate_df["time"] < times[0]).cumsum()
-    to_preserve = n_before_first_timestep == n_before_first_timestep.max()
-    intermediate_df = intermediate_df[to_preserve]
-
-    # The entries before the start of the well timeseries do not have data yet,
-    # so we fill them in here. Keep rate to zero and pad the location columns with
-    # the first entry.
-    location_columns = ["x", "y", "id", "filt_top", "filt_bot", "index"]
-    time_before_start_input = (
-        intermediate_df["time"].values < well_rate["time"].values[0]
+    intermediate_df = _forward_fill_rates_to_output_times(
+        well_rate, output_frame, times
     )
-    if time_before_start_input[0]:
-        intermediate_df.loc[time_before_start_input, "rate"] = 0.0
-        first_well_location_values = well_rate.iloc[0][location_columns].values
-        intermediate_df.loc[time_before_start_input, location_columns] = (
-            first_well_location_values
-        )
-
-    # compute time difference from perious to current row
-    time_diff_col = intermediate_df["time"].diff()
-    col_index = intermediate_df.shape[1] - 1
-    intermediate_df.insert(col_index, "time_to_next", time_diff_col.values)
-
-    # shift the new column 1 place down so that they become the time to the next row
-    intermediate_df["time_to_next"] = intermediate_df["time_to_next"].shift(-1)
+    _zero_fill_before_first_record(intermediate_df, well_rate)
+    _add_durations_and_volumes(intermediate_df)
 
     # Integrate by grouping by the period number
-    intermediate_df["duration_sec"] = intermediate_df["time_to_next"].dt.total_seconds()
-    intermediate_df["volume"] = (
-        intermediate_df["rate"] * intermediate_df["duration_sec"]
-    )
     intermediate_df["period_nr"] = intermediate_df["time"].isin(times).cumsum()
     # Drop the kept record before the first output time (period_nr 0). Its rate
-    # is already forward filled to the first output time.
+    # is already forward filled to the first output time. If not dropped, the
+    # results below shift one row, as the first group is not the first period.
     intermediate_df = intermediate_df[intermediate_df["period_nr"] > 0]
     gb = intermediate_df.groupby("period_nr")
 
@@ -151,13 +170,13 @@ def resample_timeseries(
     if is_steady_state:
         # Take first element, the slice is to force pandas to return it as
         # dataframe instead of series.
-        location_dataframe = intermediate_df[location_columns].iloc[slice(0, 1), :]
+        location_dataframe = intermediate_df[LOCATION_COLUMNS].iloc[slice(0, 1), :]
         # Concat along columns and drop time column
         return pd.concat([output_frame, location_dataframe], axis=1).drop(
             columns="time"
         )
     else:
-        columns_to_merge = ["time"] + location_columns
+        columns_to_merge = ["time"] + LOCATION_COLUMNS
         return pd.merge(
             output_frame,
             intermediate_df[columns_to_merge],
