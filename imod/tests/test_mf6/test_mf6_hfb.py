@@ -1165,9 +1165,7 @@ def test_single_layer_resistance_from_imod5_data_polygon_to_linearring():
         holes=[[(2.0, 2.0), (4.0, 2.0), (4.0, 4.0)]],
     )
     line = linestrings([20.0, 30.0], [0.0, 0.0])
-    gdf = gpd.GeoDataFrame(
-        geometry=[line, shell], data={"resistance": [100.0, 200.0]}
-    )
+    gdf = gpd.GeoDataFrame(geometry=[line, shell], data={"resistance": [100.0, 200.0]})
     imod5_data = {"hfb-1": {"geodataframe": gdf, "layer": 2}}
 
     # Act

@@ -507,9 +507,7 @@ class Modflow6Simulation(collections.UserDict[str, Any], ISimulation):
             # Absolute, so it keeps working after changing directory in run().
             return str(Path(resolved).resolve())
 
-        hint = (
-            "Set the MODFLOW6_EXECUTABLE environment variable or add its parent directory to your PATH."
-        )
+        hint = "Set the MODFLOW6_EXECUTABLE environment variable or add its parent directory to your PATH."
         path = Path(candidate)
         if source == "PATH":
             raise RuntimeError(f"Modflow 6 executable 'mf6' not found on PATH. {hint}")
@@ -526,7 +524,6 @@ class Modflow6Simulation(collections.UserDict[str, Any], ISimulation):
         raise RuntimeError(
             f"Modflow 6 executable (from {source}) not found: {candidate}. {hint}"
         )
-
 
     @standard_log_decorator()
     def open_head(
