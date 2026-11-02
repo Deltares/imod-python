@@ -147,8 +147,8 @@ def resample_timeseries(
     Resample the rate timeseries of a single well to the given output times.
 
     The rate at each output time is the average rate over the period until the
-    next output time, weighted by duration. The last record before the first 
-    output time sets the rate at the start, the rate is zero before the first 
+    next output time, weighted by duration. The last record before the first
+    output time sets the rate at the start, the rate is zero before the first
     record, and the last output time gets the last well rate.
 
     NaN rates are forward filled by default. With ``skipna=True`` they are left
