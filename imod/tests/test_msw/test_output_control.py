@@ -8,6 +8,7 @@ from numpy import nan
 from numpy.testing import assert_almost_equal, assert_equal
 
 from imod.msw import IdfMapping, TimeOutputControl, VariableOutputControl
+from imod.msw.fixed_format import fixed_format_parser
 
 DUMMY_ARGS = None, None, None, None
 
@@ -55,7 +56,7 @@ def grid():
     return area, index, svat
 
 
-def test_var_oc(fixed_format_parser):
+def test_var_oc():
     var_output_control = VariableOutputControl()
 
     with tempfile.TemporaryDirectory() as output_dir:
@@ -74,7 +75,7 @@ def test_var_oc(fixed_format_parser):
     assert_equal(results["option"], np.array([1, 1, 1, 1, 1, 1, 1, 1]))
 
 
-def test_time_oc(fixed_format_parser):
+def test_time_oc():
     freq = "D"
     times = pd.date_range(start="1/1/1971", end="1/3/1971", freq=freq)
 
@@ -93,7 +94,7 @@ def test_time_oc(fixed_format_parser):
     assert_equal(results["option"], [7, 7, 7])
 
 
-def test_idf_oc_write_simple_model(fixed_format_parser):
+def test_idf_oc_write_simple_model():
     area, index, svat = grid()
     nodata = -9999.0
 
@@ -114,7 +115,7 @@ def test_idf_oc_write_simple_model(fixed_format_parser):
     assert_almost_equal(results["x_grid"], np.array([2.0, 2.0, 2.0, 2.0, 4.0]))
 
 
-def test_idf_oc_write_simple_model_clip(fixed_format_parser):
+def test_idf_oc_write_simple_model_clip():
     area, index, svat = grid()
     nodata = -9999.0
     x_min, x_max, y_min, y_max = 1.5, 4.5, 1.5, 3.5
@@ -142,7 +143,7 @@ def test_idf_oc_write_simple_model_clip(fixed_format_parser):
     assert_almost_equal(results["x_grid"], np.array([2.0, 2.0, 4.0]))
 
 
-def test_idf_oc_mapping_order(fixed_format_parser):
+def test_idf_oc_mapping_order():
     area, index, svat = grid()
     nodata = -9999.0
 

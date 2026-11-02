@@ -101,7 +101,7 @@ from .fixtures.mf6_welltest_fixture import (
     well_test_data_stationary,
     well_test_data_transient,
 )
-from .fixtures.msw_fixture import fixed_format_parser, simple_2d_grid_with_subunits
+from .fixtures.msw_fixture import simple_2d_grid_with_subunits
 from .fixtures.msw_imod5_cap_fixture import imod5_cap_data
 from .fixtures.msw_meteo_fixture import meteo_grids
 from .fixtures.msw_model_fixture import (

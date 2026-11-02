@@ -6,6 +6,7 @@ import xarray as xr
 from numpy.testing import assert_almost_equal, assert_equal
 
 from imod.msw import LanduseOptions
+from imod.msw.fixed_format import fixed_format_parser
 from imod.util.regrid import (
     RegridderWeightsCache,
 )
@@ -49,7 +50,7 @@ def create_landuse_dict():
     return options
 
 
-def test_landuse_options(fixed_format_parser):
+def test_landuse_options():
     options = create_landuse_dict()
     lu_options = LanduseOptions(**options)
 

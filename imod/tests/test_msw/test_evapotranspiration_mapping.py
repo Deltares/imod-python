@@ -9,6 +9,7 @@ from numpy.testing import assert_equal
 from pytest_cases import parametrize_with_cases
 
 from imod import msw
+from imod.msw.fixed_format import fixed_format_parser
 
 
 @pytest.fixture(scope="function")
@@ -60,7 +61,7 @@ def create_meteo_grid(x, y, subunit, dx, dy):
     # fmt: on
 
 
-def test_evapotranspiration_mapping_simple(fixed_format_parser, svat_index):
+def test_evapotranspiration_mapping_simple(svat_index):
     svat, index = svat_index
 
     x = [-0.5, 1.5, 3.5]
@@ -85,7 +86,7 @@ def test_evapotranspiration_mapping_simple(fixed_format_parser, svat_index):
     assert_equal(results["column"], np.array([2, 2, 2, 2, 2, 3]))
 
 
-def test_evapotranspiration_mapping_negative_dx(fixed_format_parser, svat_index):
+def test_evapotranspiration_mapping_negative_dx(svat_index):
     svat, index = svat_index
 
     x = [3.5, 1.5, -0.5]

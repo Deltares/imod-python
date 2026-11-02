@@ -55,7 +55,7 @@ from imod.msw.utilities.imod5_converter import (
 )
 from imod.msw.utilities.mask import (
     MetaSwapActive,
-    mask_and_broadcast_cap_data,
+    mask_and_broadcast_imod5_data,
     mask_and_broadcast_pkg_data,
 )
 from imod.msw.utilities.parse import read_para_sim
@@ -84,6 +84,19 @@ INITIAL_CONDITIONS_PACKAGES = (
     InitialConditionsPercolation,
     InitialConditionsRootzonePressureHead,
     InitialConditionsSavedState,
+)
+
+IMOD5_CONVERTED_PACKAGES: tuple[type[MetaSwapPackage], ...] = (
+    GridData,
+    Infiltration,
+    Ponding,
+    SprinklingGrid,
+    SprinklingPoints,
+    MeteoGridCopy,
+    PrecipitationMapping,
+    EvapotranspirationMapping,
+    ScalingFactors,
+    FileCopier,
 )
 
 DEFAULT_SETTINGS: dict[str, Any] = {
@@ -840,13 +853,16 @@ class MetaSwapModel(Model, IDict):
         model["grid"], msw_active = GridData.from_imod5_data(
             imod5_regridded, target_dis
         )
-        cap_data_masked = mask_and_broadcast_cap_data(
-            imod5_regridded["cap"], msw_active
+        optional_variables = [
+            variable
+            for pkg_type in IMOD5_CONVERTED_PACKAGES
+            for variable in pkg_type._optional_imod5_variables
+        ]
+        imod5_masked = mask_and_broadcast_imod5_data(
+            imod5_regridded,
+            msw_active,
+            optional_variables,
         )
-        imod5_masked: Imod5DataDict = {
-            "cap": cap_data_masked,
-            "extra": {"paths": extra_paths},
-        }
         model["infiltration"] = Infiltration.from_imod5_data(imod5_masked)
         model["ponding"] = Ponding.from_imod5_data(imod5_masked)
         if is_sprinkling_from_points(imod5_masked):

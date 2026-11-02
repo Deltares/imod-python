@@ -15,6 +15,7 @@ from imod.msw.meteo_mapping import MeteoMapping
 from imod.msw.model import DEFAULT_SETTINGS, MetaSwapModel
 from imod.msw.utilities.mask import MetaSwapActive
 from imod.msw.utilities.parse import read_para_sim
+from imod.schemata import scalar_None
 from imod.typing import GridDataArray, Imod5DataDict
 from imod.typing.grid import zeros_like
 from imod.util.regrid import RegridderWeightsCache
@@ -412,26 +413,42 @@ def setup_extra_files(meteo_grids: tuple[GridDataArray], directory: Path):
 
 
 class Imod5DataCases:
-    def case_grid(self, imod5_cap_data: Imod5DataDict) -> tuple[Imod5DataDict, bool]:
+    def case_grid(
+        self, imod5_cap_data: Imod5DataDict
+    ) -> tuple[Imod5DataDict, bool, bool]:
+        """
+        Case with grid data.
+        Scaling factors are active.
+        """
         has_scaling_factor = True
-        return imod5_cap_data, has_scaling_factor
+        has_perched_water_table = True
+        return imod5_cap_data, has_scaling_factor, has_perched_water_table
 
     def case_no_scaling_factors(
         self, imod5_cap_data: Imod5DataDict
-    ) -> tuple[Imod5DataDict, bool]:
+    ) -> tuple[Imod5DataDict, bool, bool]:
+        """
+        Case with no scaling factors.
+        """
         has_scaling_factor = False
+        has_perched_water_table = False
         cap_data = imod5_cap_data["cap"]
         # open_projectfile_data adds layer kwargs to constants
         layer_kwargs = {"coords": {"layer": [1]}, "dims": ("layer",)}
         cap_data["perched_water_table_level"] = xr.DataArray([-9999.0], **layer_kwargs)
         cap_data["soil_moisture_fraction"] = xr.DataArray([1.0], **layer_kwargs)
         cap_data["conductivity_factor"] = xr.DataArray([1.0], **layer_kwargs)
-        return imod5_cap_data, has_scaling_factor
+        return imod5_cap_data, has_scaling_factor, has_perched_water_table
 
     def case_constants(
         self, imod5_cap_data: Imod5DataDict
-    ) -> tuple[Imod5DataDict, bool]:
+    ) -> tuple[Imod5DataDict, bool, bool]:
+        """
+        Case with constants and no perched water table.
+        Scaling factors are not active.
+        """
         has_scaling_factor = False
+        has_perched_water_table = False
         cap_data = imod5_cap_data["cap"]
         # open_projectfile_data adds layer kwargs to constants
         layer_kwargs = {"coords": {"layer": [1]}, "dims": ("layer",)}
@@ -446,7 +463,32 @@ class Imod5DataCases:
         cap_data["rural_runon_resistance"] = xr.DataArray([1.0], **layer_kwargs)
         cap_data["urban_infiltration_capacity"] = xr.DataArray([1.0], **layer_kwargs)
         cap_data["rural_infiltration_capacity"] = xr.DataArray([1.0], **layer_kwargs)
-        return imod5_cap_data, has_scaling_factor
+        return imod5_cap_data, has_scaling_factor, has_perched_water_table
+
+    def case_constants__no_pwt(
+        self, imod5_cap_data: Imod5DataDict
+    ) -> tuple[Imod5DataDict, bool, bool]:
+        """
+        Case with no perched water table and modified scaling factors, so
+        that ScalingFactors should be active.
+        """
+        has_scaling_factor = True
+        has_perched_water_table = False
+        cap_data = imod5_cap_data["cap"]
+        # open_projectfile_data adds layer kwargs to constants
+        layer_kwargs = {"coords": {"layer": [1]}, "dims": ("layer",)}
+        cap_data["perched_water_table_level"] = xr.DataArray([-9999.0], **layer_kwargs)
+        cap_data["soil_moisture_fraction"] = xr.DataArray([2.0], **layer_kwargs)
+        cap_data["conductivity_factor"] = xr.DataArray([3.0], **layer_kwargs)
+        cap_data["urban_ponding_depth"] = xr.DataArray([1.0], **layer_kwargs)
+        cap_data["rural_ponding_depth"] = xr.DataArray([1.0], **layer_kwargs)
+        cap_data["urban_runoff_resistance"] = xr.DataArray([1.0], **layer_kwargs)
+        cap_data["rural_runoff_resistance"] = xr.DataArray([1.0], **layer_kwargs)
+        cap_data["urban_runon_resistance"] = xr.DataArray([1.0], **layer_kwargs)
+        cap_data["rural_runon_resistance"] = xr.DataArray([1.0], **layer_kwargs)
+        cap_data["urban_infiltration_capacity"] = xr.DataArray([1.0], **layer_kwargs)
+        cap_data["rural_infiltration_capacity"] = xr.DataArray([1.0], **layer_kwargs)
+        return imod5_cap_data, has_scaling_factor, has_perched_water_table
 
 
 class TargetDisCases:
@@ -477,11 +519,14 @@ class TargetDisCases:
 
 
 @pytest.mark.unittest_jit
-@parametrize_with_cases("imod5_data, has_scaling_factor", cases=Imod5DataCases)
+@parametrize_with_cases(
+    "imod5_data, has_scaling_factor, has_perched_water_table", cases=Imod5DataCases
+)
 @parametrize_with_cases("dis_pkg, times", cases=TargetDisCases)
 def test_import_from_imod5(
     imod5_data: Imod5DataDict,
     has_scaling_factor: bool,
+    has_perched_water_table: bool,
     meteo_grids: tuple[GridDataArray],
     dis_pkg: mf6.StructuredDiscretization,
     times: xr.DataArray,
@@ -515,16 +560,27 @@ def test_import_from_imod5(
         assert not missing_dims
     assert "time" in model["time_oc"].dataset.sizes.keys()
     assert len(model["meteo_grid"].dataset.dims) == 0
+    # Test if the optional package for scaling factor is correctly handled
     assert ("scaling_factor" in model.keys()) == has_scaling_factor
+    # Test if the optional variable for perched water table is correctly
+    # handled: it should exist but be a scalar None in the dataset.
+    if has_scaling_factor:
+        optional_var = model["scaling_factor"].dataset["depth_perched_water_table"]
+        assert scalar_None(optional_var) != has_perched_water_table
+    # Test if the grid coordinates match the discretization package and thus
+    # regridding worked
     assert dis_pkg.dataset["x"].equals(model["grid"].dataset["x"])
     assert dis_pkg.dataset["y"].equals(model["grid"].dataset["y"])
 
 
 @pytest.mark.unittest_jit
-@parametrize_with_cases("imod5_data, has_scaling_factor", cases=Imod5DataCases)
+@parametrize_with_cases(
+    "imod5_data, has_scaling_factor, has_perched_water_table", cases=Imod5DataCases
+)
 def test_import_from_imod5_and_write(
     imod5_data: Imod5DataDict,
     has_scaling_factor: bool,
+    has_perched_water_table: bool,
     meteo_grids: tuple[GridDataArray],
     coupled_mf6_model: mf6.Modflow6Simulation,
     tmp_path: Path,
@@ -552,10 +608,13 @@ def test_import_from_imod5_and_write(
 
 
 @pytest.mark.unittest_jit
-@parametrize_with_cases("imod5_data, has_scaling_factor", cases=Imod5DataCases)
+@parametrize_with_cases(
+    "imod5_data, has_scaling_factor, has_perched_water_table", cases=Imod5DataCases
+)
 def test_import_from_imod5_and_clip(
     imod5_data: Imod5DataDict,
     has_scaling_factor: bool,
+    has_perched_water_table: bool,
     meteo_grids: tuple[GridDataArray],
     coupled_mf6_model: mf6.Modflow6Simulation,
     tmp_path: Path,

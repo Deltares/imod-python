@@ -7,12 +7,11 @@ from typing import TypedDict, cast
 import numpy as np
 import pandas as pd
 import xarray as xr
-from xarray.core.utils import is_scalar
 
 from imod.common.constants import MaskValues
 from imod.logging import LogLevel, logger
 from imod.mf6 import StructuredDiscretization
-from imod.msw.utilities.common import concat_imod5
+from imod.msw.utilities.common import concat_imod5, is_scalar_and_equal
 from imod.msw.utilities.mask import MetaSwapActive
 from imod.typing import GridDataArray, GridDataDict, Imod5DataDict
 from imod.typing.grid import ones_like, zeros_like
@@ -122,14 +121,6 @@ def is_msw_active_cell(
     return MetaSwapActive(active, subunit_active)
 
 
-def _is_equal_scalar_value(da: GridDataArray, value: float) -> bool:
-    """
-    Helper function to guarantee that the check in ``has_active_scaling_factor``
-    can shortcut after is_scalar returns False.
-    """
-    return bool(da.to_numpy()[()] == value)
-
-
 def has_active_scaling_factor(imod5_cap: GridDataDict) -> bool:
     """
     Check if scaling factor grids are active. Carefully checks if data is
@@ -144,9 +135,7 @@ def has_active_scaling_factor(imod5_cap: GridDataDict) -> bool:
     scaling_factor_inactive = True
     for var, inactive_value in variable_inactive_mapping.items():
         da = imod5_cap[var]
-        scaling_factor_inactive &= is_scalar(da) and _is_equal_scalar_value(
-            da, inactive_value
-        )
+        scaling_factor_inactive &= is_scalar_and_equal(da, inactive_value)
 
     return not scaling_factor_inactive
 

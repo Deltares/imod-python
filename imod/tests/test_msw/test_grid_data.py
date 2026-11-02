@@ -13,7 +13,7 @@ from pytest_cases import case, parametrize_with_cases
 
 from imod.mf6.dis import StructuredDiscretization
 from imod.msw import GridData
-from imod.msw.fixed_format import format_fixed_width
+from imod.msw.fixed_format import fixed_format_parser, format_fixed_width
 from imod.util.regrid import RegridderWeightsCache
 from imod.util.spatial import get_total_grid_area
 
@@ -42,7 +42,6 @@ from imod.util.spatial import get_total_grid_area
 )
 @settings(deadline=400, suppress_health_check=[HealthCheck.too_slow])
 def test_write(
-    fixed_format_parser,
     area,
     landuse,
     rootzone_depth,
@@ -343,7 +342,7 @@ def test_generate_isactive_svat_arrays(
 
 
 @parametrize_with_cases("grid_data_dict", cases=".", has_tag="two_subunit")
-def test_simple_model(fixed_format_parser, grid_data_dict: dict[str, xr.DataArray]):
+def test_write__roundtrip(grid_data_dict: dict[str, xr.DataArray]):
     grid_data = GridData(**grid_data_dict)
 
     index, svat = grid_data.generate_isactive_svat_arrays()
@@ -362,6 +361,27 @@ def test_simple_model(fixed_format_parser, grid_data_dict: dict[str, xr.DataArra
     assert_equal(results["soil_physical_unit"], np.array([2, 8, 2, 5]))
     assert_equal(results["landuse"], np.array([1, 1, 2, 2]))
     assert_almost_equal(results["rootzone_depth"], np.array([1.0, 1.0, 1.0, 1.0]))
+
+
+@parametrize_with_cases("grid_data_dict", cases=".")
+def test_write__file_contents(grid_data_dict: dict[str, xr.DataArray]):
+    """
+    Test writing grid data to a fixed format file and check the file contents of
+    the first line.
+    """
+    grid_data = GridData(**grid_data_dict)
+
+    index, svat = grid_data.generate_isactive_svat_arrays()
+
+    with tempfile.TemporaryDirectory() as output_dir:
+        output_dir = Path(output_dir)
+        grid_data.write(output_dir, index, svat, None, None)
+
+        lines = (output_dir / GridData._file_name).read_text().splitlines()
+        assert all(len(line) == 72 for line in lines)
+        assert lines[0] == (
+            "         1 0.5000000 2.00000             2                     1 1.00000"
+        )
 
 
 # Only use two subunit case, as this one sums to total area whereas the one
@@ -383,9 +403,7 @@ def test_simple_model_regrid(
 
 
 @parametrize_with_cases("grid_data_dict", cases=".", has_tag="one_subunit")
-def test_simple_model_1_subunit(
-    fixed_format_parser, grid_data_dict: dict[str, xr.DataArray]
-):
+def test_write__roundtrip_1_subunit(grid_data_dict: dict[str, xr.DataArray]):
     grid_data = GridData(**grid_data_dict)
 
     index, svat = grid_data.generate_isactive_svat_arrays()

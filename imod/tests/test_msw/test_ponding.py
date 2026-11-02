@@ -8,6 +8,7 @@ from numpy import nan
 from numpy.testing import assert_almost_equal, assert_equal
 
 from imod.msw import Ponding
+from imod.msw.fixed_format import fixed_format_parser
 from imod.typing import GridDataArray, GridDataDict
 from imod.util.regrid import (
     RegridderWeightsCache,
@@ -79,7 +80,7 @@ def setup_ponding() -> tuple[GridDataDict, np.ndarray, GridDataArray]:
     return data_ponding, index, svat
 
 
-def test_simple_model(fixed_format_parser):
+def test_simple_model():
     data_ponding, index, svat = setup_ponding()
     ponding = Ponding(**data_ponding)
     with tempfile.TemporaryDirectory() as output_dir:

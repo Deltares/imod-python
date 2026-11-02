@@ -2,11 +2,12 @@ from typing import Self
 
 import xarray as xr
 
+from imod.common.constants import MaskValues
 from imod.common.interfaces.iregridpackage import IRegridPackage
 from imod.msw.fixed_format import VariableMetaData
 from imod.msw.pkgbase import MetaSwapPackage
 from imod.msw.regrid.regrid_schemes import ScalingRegridMethod
-from imod.msw.utilities.common import concat_imod5
+from imod.msw.utilities.common import concat_imod5, is_scalar_and_equal
 from imod.typing import Imod5DataDict
 from imod.typing.grid import ones_like
 
@@ -40,7 +41,7 @@ class ScalingFactors(MetaSwapPackage, IRegridPackage):
         Scaling factor which adjusts the pressure head applied to the pressure
         parameters defined in LUSE_SVAT.INP. This array must have a subunit coordinate to describe
         different landuses.
-    depth_perched_water_table: array of floats (xr.DataArray)
+    depth_perched_water_table: array of floats (xr.DataArray), optional
         Sets the depth of the perched watertable base. If the groundwater depth
         exeeds this depth, the capillary rise is set to zero. This option has
         been included in the model on the request of a specific project (MIPWA),
@@ -56,8 +57,11 @@ class ScalingFactors(MetaSwapPackage, IRegridPackage):
         "scale_soil_moisture": VariableMetaData(8, 0.1, 10.0, float),
         "scale_hydraulic_conductivity": VariableMetaData(8, 0.1, 10.0, float),
         "scale_pressure_head": VariableMetaData(8, 0.1, 10.0, float),
-        "depth_perched_water_table": VariableMetaData(8, 0.1, 10.0, float),
+        "depth_perched_water_table": VariableMetaData(
+            8, 0.1, 10.0, float, optional=True
+        ),
     }
+    _optional_imod5_variables = ["perched_water_table_level"]
 
     _with_subunit = (
         "scale_soil_moisture",
@@ -74,7 +78,7 @@ class ScalingFactors(MetaSwapPackage, IRegridPackage):
         scale_soil_moisture: xr.DataArray,
         scale_hydraulic_conductivity: xr.DataArray,
         scale_pressure_head: xr.DataArray,
-        depth_perched_water_table: xr.DataArray,
+        depth_perched_water_table: xr.DataArray | None = None,
     ) -> None:
         super().__init__()
         self.dataset["scale_soil_moisture"] = scale_soil_moisture
@@ -116,6 +120,10 @@ class ScalingFactors(MetaSwapPackage, IRegridPackage):
             cap_data["conductivity_factor"], grid_ones
         )
         data["scale_pressure_head"] = concat_imod5(grid_ones, grid_ones)
-        data["depth_perched_water_table"] = cap_data["perched_water_table_level"]
+        if not is_scalar_and_equal(
+            cap_data["perched_water_table_level"],
+            MaskValues.msw_default,
+        ):
+            data["depth_perched_water_table"] = cap_data["perched_water_table_level"]
 
         return cls(**data)
