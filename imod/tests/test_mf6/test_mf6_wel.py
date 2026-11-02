@@ -1,3 +1,4 @@
+import copy
 import sys
 from contextlib import nullcontext as does_not_raise
 from datetime import datetime
@@ -918,6 +919,24 @@ def test_import__as_steady_state(imod5_dataset, wel_class):
     assert "time" not in wel.dataset.coords
     assert wel.dataset["rate"].shape == (1,)
     np.testing.assert_almost_equal(wel.dataset["rate"].values, -323.89361702)
+
+
+@parametrize("wel_class", [Well, LayeredWell])
+def test_import__skipna(imod5_dataset, wel_class):
+    data = copy.deepcopy(imod5_dataset[0])
+    times = list(pd.date_range(datetime(1989, 1, 1), datetime(2013, 1, 1), 8400))
+    # Set a rate in the middle of the associated timeseries to NaN
+    df = data["wel-1-WELLS_L3"]["dataframe"][0]
+    df.loc[df.index[len(df) // 2], "rate"] = np.nan
+
+    wel_ffill = wel_class.from_imod5_data("wel-1-WELLS_L3", data, times)
+    wel_skipna = wel_class.from_imod5_data("wel-1-WELLS_L3", data, times, skipna=True)
+
+    rate_ffill = wel_ffill.dataset["rate"].values
+    rate_skipna = wel_skipna.dataset["rate"].values
+    assert np.isfinite(rate_ffill).all()
+    assert np.isfinite(rate_skipna).all()
+    assert not np.array_equal(rate_ffill, rate_skipna)
 
 
 @pytest.mark.unittest_jit
