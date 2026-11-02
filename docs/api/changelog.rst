@@ -50,6 +50,10 @@ Added
   :class:`imod.mf6.SingleLayerHorizontalFlowBarrierMultiplier` and
   :class:`imod.mf6.SingleLayerHorizontalFlowBarrierHydraulicCharacteristic` now
   also accept ``LinearRing`` geometries, for example to simulate building pits.
+- :meth:`imod.mf6.Modflow6Simulation.run` now also reads the path to the
+  Modflow 6 executable from the ``MODFLOW6_EXECUTABLE`` environment variable, if
+  ``mf6path`` is not provided. If the executable is not found, is a directory,
+  or is not executable, a descriptive error is raised before running.
 
 Fixed
 ~~~~~
@@ -100,6 +104,10 @@ Changed
 - :meth:`imod.mf6.SingleLayerHorizontalFlowBarrierResistance.from_imod5_data`
   converts closed rings (read as polygons from GEN files) to ``LinearRing``
   geometries.
+- The ``mf6path`` argument of :meth:`imod.mf6.Modflow6Simulation.run` now
+  defaults to ``None`` instead of ``"mf6"``. ``None`` resolves to the
+  ``MODFLOW6_EXECUTABLE`` environment variable, and otherwise to ``mf6`` on the
+  PATH, so the previous behavior is kept.
 - Deprecated :class:`imod.msw.Sprinkling` in favor of
   :class:`imod.msw.SprinklingGrid`. Call :class:`imod.msw.SprinklingGrid` to get
   the same behavior as you were used to.
