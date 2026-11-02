@@ -478,11 +478,12 @@ class Modflow6Simulation(collections.UserDict[str, Any], ISimulation):
         if self.directory is None:
             raise RuntimeError(f"Simulation {self.name} has not been written yet.")
         with imod.util.cd(self.directory):
-            result = subprocess.run(_mf6path, capture_output=True)
+            result = subprocess.run(_mf6path, capture_output=True, text=True)
             if result.returncode != 0:
                 raise RuntimeError(
-                    f"Simulation {self.name}: {_mf6path} failed to run with returncode "
-                    f"{result.returncode}, and error message:\n\n{result.stderr.decode()} "
+                    f"Simulation {self.name}: {_mf6path} failed to run with returncode {result.returncode}\n\n"
+                    f"stdout:\n{result.stdout}\n\n"
+                    f"stderr:\n{result.stderr}\n\n"
                 )
 
     @staticmethod
