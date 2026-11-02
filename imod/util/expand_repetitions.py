@@ -70,13 +70,19 @@ def _forward_fill_rates_to_output_times(
     Merge well records and output times, forward fill the rate to the output
     times and clip records before the first output time.
     """
+    # Look up the rate of each row from the record in effect, so a NaN rate stays
+    # a property of its record instead of being filled by the forward fill.
+    well_rate_numbered = well_rate.assign(record_nr=np.arange(len(well_rate)))
     intermediate_df = pd.merge(
         output_frame,
-        well_rate,
+        well_rate_numbered,
         how="outer",
         on="time",
         validate="m:m",
     ).ffill()
+    rates = pd.Series(well_rate["rate"].to_numpy(dtype=float, na_value=np.nan))
+    intermediate_df["rate"] = intermediate_df["record_nr"].map(rates).ffill()
+    intermediate_df = intermediate_df.drop(columns="record_nr")
     # Only keep the last well record BEFORE the first output time, earlier
     # records would distort the weighted averages.
     n_before_first_timestep = (intermediate_df["time"] < times[0]).cumsum()
