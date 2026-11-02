@@ -183,9 +183,9 @@ def test_timeseries_resampling_varying_rates(output_days, expected_rates):
             True,
             [-10.0, 0.0, -30.0, -30.0],
         ),
-        # Leading NaN is unaffected by skipna.
+        # Leading NaN: zero by default, left out of the weights with skipna.
         ([1, 4], [np.nan, -20.0], [1, 11], False, [-14.0, -20.0]),
-        ([1, 4], [np.nan, -20.0], [1, 11], True, [-14.0, -20.0]),
+        ([1, 4], [np.nan, -20.0], [1, 11], True, [-20.0, -20.0]),
         # Only NaN rates.
         ([1, 4], [np.nan, np.nan], [1, 11], False, [0.0, 0.0]),
         ([1, 4], [np.nan, np.nan], [1, 11], True, [0.0, 0.0]),

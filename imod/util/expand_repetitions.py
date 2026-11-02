@@ -78,8 +78,7 @@ def _align_records_to_output_times(
     """
     Merge well records and output times, so that every row holds the record in
     effect at that time, and clip records before the first output time. NaN
-    rates in the records are kept, except those before the first valid rate,
-    which become zero.
+    rates in the records are kept.
     """
     # Look up the rate of each row from the record in effect, so a NaN rate stays
     # a property of its record instead of being filled by the forward fill.
@@ -92,9 +91,7 @@ def _align_records_to_output_times(
         validate="m:m",
     ).ffill()
     rates = pd.Series(well_rate["rate"].to_numpy(dtype=float, na_value=np.nan))
-    rate = intermediate_df["record_nr"].map(rates)
-    is_leading = rate.notna().cumsum() == 0
-    intermediate_df["rate"] = rate.mask(is_leading, 0.0)
+    intermediate_df["rate"] = intermediate_df["record_nr"].map(rates)
     intermediate_df = intermediate_df.drop(columns="record_nr")
     # Only keep the last well record BEFORE the first output time, earlier
     # records would distort the weighted averages.
@@ -153,10 +150,10 @@ def resample_timeseries(
     output time sets the rate at the start, the rate is zero before the first
     record, and the last output time gets the last well rate.
 
-    NaN rates are forward filled by default. With ``skipna=True`` they are left
-    out of the weights instead. NaN rates before the first valid rate and
-    periods with only NaN rates count as zero, and the last output time gets
-    the last valid rate.
+    NaN rates are forward filled by default, or set to zero if they come before
+    the first valid rate. With ``skipna=True`` they are left out of the weights
+    instead. Periods with only NaN rates count as zero, and the last output
+    time gets the last valid rate.
 
     Parameters
     ----------
@@ -176,7 +173,8 @@ def resample_timeseries(
     """
     is_steady_state = len(times) == 0
     if not skipna:
-        well_rate = well_rate.assign(rate=well_rate["rate"].ffill())
+        # NaN rates before the first valid rate have nothing to fill from.
+        well_rate = well_rate.assign(rate=well_rate["rate"].ffill().fillna(0.0))
 
     output_frame = pd.DataFrame(times)
     output_frame = output_frame.rename(columns={0: "time"})
