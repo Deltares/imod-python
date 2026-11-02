@@ -71,7 +71,9 @@ def average_timeseries(well_rate: pd.DataFrame) -> pd.DataFrame:
 
 
 def _align_records_to_output_times(
-    well_rate: pd.DataFrame, output_frame: pd.DataFrame, times: pd.Index | list
+    well_rate: pd.DataFrame,
+    output_frame: pd.DataFrame,
+    times: list[datetime] | pd.DatetimeIndex,
 ) -> pd.DataFrame:
     """
     Merge well records and output times, so that every row holds the record in
