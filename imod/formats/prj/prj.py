@@ -20,6 +20,7 @@ import xarray as xr
 
 import imod
 import imod.logging
+from imod.formats.isg import ISG
 from imod.logging.loglevel import LogLevel
 
 FilePath: TypeAlias = Union[str, "PathLike[str]"]
@@ -947,6 +948,36 @@ class IpfResult:
         self.addition.append(addition)
 
 
+def _read_package_isg(
+    block_content: dict[str, Any], periods: dict[str, datetime]
+) -> tuple[list[dict[str, Any]], list[datetime]]:
+    """
+    Read the ISG-file of each system and time; the factor, addition and constant
+    of the entries do not apply to ISG-files.
+    """
+    entries = block_content["isg"]
+    n_system = block_content["n_system"]
+    models: dict[Path, ISG[Any]] = {}
+    repeats: list[datetime] = []
+    out = []
+    for system in range(n_system):
+        system_entries = entries[system::n_system]
+        times = []
+        for entry in system_entries:
+            if entry["path"] not in models:
+                models[entry["path"]] = _try_read_with_func(ISG.read, entry["path"])
+            time, repeats = _process_ipf_time(entry, periods, repeats)
+            times.append(time)
+        out.append(
+            {
+                "isg": [models[entry["path"]] for entry in system_entries],
+                "time": times,
+                "layer": [entry["layer"] for entry in system_entries],
+            }
+        )
+    return out, sorted(set(repeats))
+
+
 def _process_ipf_time(
     entry: dict[str, Any], periods: dict[str, datetime], repeats: list[datetime]
 ) -> tuple[datetime | None, list[datetime]]:
@@ -1147,6 +1178,7 @@ def open_projectfile_data(path: FilePath) -> tuple[dict[str, Any], dict[str, Any
     * IDF data is lazily loaded into xarray.DataArrays.
     * GEN data is eagerly loaded into geopandas.GeoDataFrames
     * IPF data is eagerly loaded into pandas.DataFrames
+    * ISG data is eagerly loaded into :class:`imod.formats.isg.ISG` models
     * Non-file based entries (such as the PCG settings) are kept as a dictionary.
 
     When multiple systems are present, they are numbered starting from one, e.g.:
@@ -1200,6 +1232,8 @@ def open_projectfile_data(path: FilePath) -> tuple[dict[str, Any], dict[str, Any
                 data = _read_package_gen(block_content, has_topbot)
             elif key == "(wel)":
                 data, repeats = _read_package_ipf(block_content, periods)
+            elif key in ("(isg)", "(sfr)"):
+                data, repeats = _read_package_isg(block_content, periods)
             elif key == "(cap)":
                 maybe_ipf_var = "artificial_recharge_layer"
                 is_ipf, maybe_ipf_path = _is_var_ipf_and_path(
