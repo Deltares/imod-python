@@ -48,18 +48,25 @@ def expand_repetitions(
 def average_timeseries(well_rate: pd.DataFrame) -> pd.DataFrame:
     """
     Compute the mean value of the timeseries for a single well. Time column is
-    dropped.
+    dropped. If no records are valid, the rate is set to 0.0.
 
     Parameters
     ----------
     well_rate:  pd.DataFrame
         input timeseries for a single well
+
+    Returns
+    -------
+    pd.DataFrame
+        A single-row DataFrame with the mean rate and the location columns 
+        from the first record.
     """
     # Take first item
     output_frame = well_rate.iloc[[0]].drop(columns=["time", "rate"])
-    # Compute mean
+    # Compute mean.
+    rate = well_rate["rate"].mean()
     col_index = output_frame.shape[1]
-    output_frame.insert(col_index, "rate", well_rate["rate"].mean())
+    output_frame.insert(col_index, "rate", 0.0 if pd.isna(rate) else rate)
     return output_frame
 
 
@@ -110,7 +117,7 @@ def _zero_fill_before_first_record(
 
 
 def _add_durations_and_volumes(intermediate_df: pd.DataFrame) -> None:
-    """Add the duration until the next row and the rate volume. In place."""
+    """Add the duration until the next row and the rate volume"""
     # Compute time difference from previous to current row
     time_diff_col = intermediate_df["time"].diff()
     col_index = intermediate_df.shape[1] - 1
