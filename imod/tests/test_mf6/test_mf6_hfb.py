@@ -1201,9 +1201,7 @@ def test_all_layer_hfb_linearring_full_column(
 ):
     idomain, top, bottom = basic_dis
     ring = LinearRing([(20.0, 20.0), (60.0, 20.0), (60.0, 60.0), (20.0, 60.0)])
-    geometry = gpd.GeoDataFrame(
-        geometry=[ring], data={value_name: [value]}
-    )
+    geometry = gpd.GeoDataFrame(geometry=[ring], data={value_name: [value]})
     hfb = barrier_class(geometry)
 
     assert not hfb._validate(hfb._write_schemata)
@@ -1218,15 +1216,11 @@ def test_all_layer_hfb_linearring_full_column(
 def test_all_layer_hfb_mixed_linearring_and_z_polygon(basic_dis):
     idomain, top, bottom = basic_dis
     ring = LinearRing([(20.0, 20.0), (60.0, 20.0), (60.0, 60.0), (20.0, 60.0)])
-    polygon = linestring_to_square_zpolygons(
-        [0.0, 20.0], [70.0, 70.0], [-2.5], [-7.5]
-    )[0]
-    ring_gdf = gpd.GeoDataFrame(
-        geometry=[ring], data={"resistance": [1000.0]}
-    )
-    polygon_gdf = gpd.GeoDataFrame(
-        geometry=[polygon], data={"resistance": [1000.0]}
-    )
+    polygon = linestring_to_square_zpolygons([0.0, 20.0], [70.0, 70.0], [-2.5], [-7.5])[
+        0
+    ]
+    ring_gdf = gpd.GeoDataFrame(geometry=[ring], data={"resistance": [1000.0]})
+    polygon_gdf = gpd.GeoDataFrame(geometry=[polygon], data={"resistance": [1000.0]})
     mixed_gdf = gpd.GeoDataFrame(
         geometry=[ring, polygon], data={"resistance": [1000.0, 1000.0]}
     )
@@ -1246,9 +1240,7 @@ def test_all_layer_hfb_mixed_linearring_and_z_polygon(basic_dis):
 def test_all_layer_hfb_linearring_full_column_on_spatially_varying_grid(basic_dis):
     idomain, top, bottom = basic_dis
     ring = LinearRing([(20.0, 20.0), (60.0, 20.0), (60.0, 60.0), (20.0, 60.0)])
-    geometry = gpd.GeoDataFrame(
-        geometry=[ring], data={"resistance": [1000.0]}
-    )
+    geometry = gpd.GeoDataFrame(geometry=[ring], data={"resistance": [1000.0]})
     hfb = HorizontalFlowBarrierResistance(geometry)
     offset = xr.DataArray(
         np.arange(idomain.sizes["y"] * idomain.sizes["x"], dtype=float).reshape(
@@ -1260,9 +1252,7 @@ def test_all_layer_hfb_linearring_full_column_on_spatially_varying_grid(basic_di
     top_3d = top.broadcast_like(idomain) + offset
     bottom_3d = bottom.broadcast_like(idomain) + offset
 
-    mf6_hfb = hfb.to_mf6_pkg(
-        idomain, top_3d, bottom_3d, ones_like(top_3d)
-    )
+    mf6_hfb = hfb.to_mf6_pkg(idomain, top_3d, bottom_3d, ones_like(top_3d))
 
     values = mf6_hfb["hydraulic_characteristic"].values
     assert values.size == 16 * idomain.sizes["layer"]
@@ -1270,9 +1260,7 @@ def test_all_layer_hfb_linearring_full_column_on_spatially_varying_grid(basic_di
 
 
 def test_all_layer_resistance_from_imod5_converts_2d_polygon_only():
-    ring_polygon = Polygon(
-        [(0.0, 0.0), (10.0, 0.0), (10.0, 10.0), (0.0, 10.0)]
-    )
+    ring_polygon = Polygon([(0.0, 0.0), (10.0, 0.0), (10.0, 10.0), (0.0, 10.0)])
     z_polygon = Polygon(
         [
             (20.0, 0.0, 0.0),
@@ -1303,9 +1291,7 @@ def test_all_layer_resistance_from_imod5_converts_2d_polygon_only():
 )
 def test_all_layer_hfb_rejects_plain_linestring(barrier_class, value_name):
     line = linestrings([20.0, 60.0], [20.0, 60.0])
-    geometry = gpd.GeoDataFrame(
-        geometry=[line], data={value_name: [1000.0]}
-    )
+    geometry = gpd.GeoDataFrame(geometry=[line], data={value_name: [1000.0]})
     hfb = barrier_class(geometry)
 
     errors = hfb._validate(hfb._write_schemata)

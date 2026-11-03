@@ -1645,9 +1645,8 @@ class HorizontalFlowBarrierResistance(HorizontalFlowBarrierBase):
         geometry_layer = hfb_dict["geodataframe"].copy()
         geometries = geometry_layer.geometry.to_numpy()
         is_2d_polygon = (
-            (shapely.get_type_id(geometries) == shapely.GeometryType.POLYGON)
-            & ~geometry_layer.geometry.has_z.to_numpy()
-        )
+            shapely.get_type_id(geometries) == shapely.GeometryType.POLYGON
+        ) & ~geometry_layer.geometry.has_z.to_numpy()
         if is_2d_polygon.any():
             geometries[is_2d_polygon] = shapely.get_exterior_ring(
                 geometries[is_2d_polygon]
