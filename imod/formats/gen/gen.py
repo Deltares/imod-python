@@ -74,15 +74,15 @@ def _to_shapely_geometries(
     """
     geometry = np.empty(len(vertex_coords), dtype=object)
 
-    for polygon in (False, True):
-        feature_index = np.flatnonzero(is_polygon == polygon)
+    for as_polygons in (False, True):
+        feature_index = np.flatnonzero(is_polygon == as_polygons)
         if feature_index.size == 0:
             continue
         group_coords = [vertex_coords[i] for i in feature_index]
         n_vertex = [len(c) for c in group_coords]
         indices = np.repeat(np.arange(feature_index.size), n_vertex)
         coordinates = np.vstack(group_coords)
-        if polygon:
+        if as_polygons:
             rings = shapely.linearrings(coordinates, indices=indices)
             geometry[feature_index] = shapely.polygons(rings)
         else:
