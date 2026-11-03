@@ -62,16 +62,19 @@ if TYPE_CHECKING:
 
     _POLYGON = shapely.geometry.Polygon
     _LINESTRING = shapely.geometry.LineString
+    _LINEARRING = shapely.geometry.LinearRing
 else:
     try:
         import shapely
 
         _POLYGON = shapely.geometry.Polygon
         _LINESTRING = shapely.geometry.LineString
+        _LINEARRING = shapely.geometry.LinearRing
     except ImportError:
         shapely = MissingOptionalModule("shapely")
         _POLYGON = ""
         _LINESTRING = ""
+        _LINEARRING = ""
 
 # create dispatcher instance to limit scope of typedispatching
 dispatch = Dispatcher()
@@ -309,6 +312,39 @@ def _extract_mean_hfb_bounds_from_dataframe(
     return df_to_broadcast["lower"], df_to_broadcast["upper"]
 
 
+def _make_linestrings_for_snapping(
+    dataframe: GeoDataFrameType,
+) -> GeoDataFrameType:
+    """Convert vertical polygons and rings to line geometries for snapping."""
+    geometries = dataframe.geometry.to_numpy()
+    geometry_type = shapely.get_type_id(geometries)
+    has_z = dataframe.geometry.has_z.to_numpy()
+    is_ring = (geometry_type == shapely.GeometryType.LINEARRING) & ~has_z
+    is_z_polygon = (geometry_type == shapely.GeometryType.POLYGON) & has_z
+    supported = is_ring | is_z_polygon
+    if not supported.all():
+        raise TypeError(
+            "All-layer HFB geometries should be Z Polygons or 2D LinearRings."
+        )
+
+    lines = geometries.copy()
+    for i in np.flatnonzero(is_ring):
+        lines[i] = shapely.LineString(geometries[i].coords)
+
+    polygon_indices = np.flatnonzero(is_z_polygon)
+    if polygon_indices.size:
+        polygons = dataframe.iloc[polygon_indices]
+        lower, _ = _extract_zbounds_from_vertical_polygons(polygons)
+        polygon_lines = _create_zbound_gdf_from_zbound_df(lower)
+        lines_by_index = polygon_lines.geometry.to_dict()
+        for i in polygon_indices:
+            lines[i] = lines_by_index[dataframe.index[i]]
+
+    result = dataframe.copy()
+    result.geometry = lines
+    return result
+
+
 def _fraction_layer_overlap(
     snapped_dataset: xu.UgridDataset,
     edge_index: np.ndarray,
@@ -328,10 +364,32 @@ def _fraction_layer_overlap(
     layer_bounds[..., 0] = typing.cast(np.ndarray, bottom_mean.values).T
     layer_bounds[..., 1] = typing.cast(np.ndarray, top_mean.values).T
 
-    zmin, zmax = _extract_mean_hfb_bounds_from_dataframe(dataframe)
+    n_edge = len(dataframe)
+    zmin = np.empty(n_edge, dtype=float)
+    zmax = np.empty(n_edge, dtype=float)
+    geometry_type = shapely.get_type_id(dataframe.geometry)
+    has_z = dataframe.geometry.has_z.to_numpy()
+    is_z_polygon = (geometry_type == shapely.GeometryType.POLYGON) & has_z
+    is_ring = geometry_type == shapely.GeometryType.LINEARRING
+
+    polygon_indices = np.flatnonzero(is_z_polygon)
+    if polygon_indices.size:
+        lower, upper = _extract_mean_hfb_bounds_from_dataframe(
+            dataframe.iloc[polygon_indices]
+        )
+        zmin[polygon_indices] = lower.to_numpy()
+        zmax[polygon_indices] = upper.to_numpy()
+
+    ring_indices = np.flatnonzero(is_ring)
+    if ring_indices.size:
+        model_top = top_mean.isel(layer=0).values
+        model_bottom = bottom_mean.isel(layer=-1).values
+        zmin[ring_indices] = model_bottom[ring_indices]
+        zmax[ring_indices] = model_top[ring_indices]
+
     hfb_bounds = np.empty((n_edge, n_layer, 2), dtype=float)
-    hfb_bounds[..., 0] = zmin.values[:, np.newaxis]
-    hfb_bounds[..., 1] = zmax.values[:, np.newaxis]
+    hfb_bounds[..., 0] = zmin[:, np.newaxis]
+    hfb_bounds[..., 1] = zmax[:, np.newaxis]
 
     overlap = _vectorized_overlap(hfb_bounds, layer_bounds)
     height = layer_bounds[..., 1] - layer_bounds[..., 0]
@@ -1032,11 +1090,9 @@ class HorizontalFlowBarrierBase(BoundaryCondition, ILineDataPackage):
         barrier_dataframe = gpd.GeoDataFrame(
             self.dataset[varnames_for_df].to_dataframe()
         )
-        # Convert vertical polygon to linestring
+        # Convert vertical polygons and rings to linestrings for snapping.
         if not has_layer:
-            lower, _ = _extract_zbounds_from_vertical_polygons(barrier_dataframe)
-            linestring = _create_zbound_gdf_from_zbound_df(lower)
-            barrier_dataframe["geometry"] = linestring["geometry"]
+            barrier_dataframe = _make_linestrings_for_snapping(barrier_dataframe)
         # Clip barriers outside domain
         active = ones_like(idomain.sel(layer=1, drop=True))
         barrier_dataframe = clip_line_gdf_by_grid(barrier_dataframe, active)
@@ -1117,7 +1173,9 @@ class HorizontalFlowBarrierHydraulicCharacteristic(HorizontalFlowBarrierBase):
     ----------
     geometry: gpd.GeoDataFrame
         Dataframe that describes:
-         - geometry: the geometries of the barriers,
+         - geometry: Z ``Polygon`` geometries or 2D ``LinearRing`` geometries.
+           A ring spans the model's full vertical column, from model top to
+           bottom.
          - hydraulic_characteristic: the hydraulic characteristic of the barriers
     print_input: bool
 
@@ -1146,7 +1204,7 @@ class HorizontalFlowBarrierHydraulicCharacteristic(HorizontalFlowBarrierBase):
     _write_schemata = {
         "geometry": [
             EmptyIndexesSchema(),
-            GeometryTypeSchema(_POLYGON),
+            GeometryTypeSchema((_POLYGON, _LINEARRING)),
         ],
     }
 
@@ -1284,7 +1342,9 @@ class HorizontalFlowBarrierMultiplier(HorizontalFlowBarrierBase):
     ----------
     geometry: gpd.GeoDataFrame
         Dataframe that describes:
-         - geometry: the geometries of the barriers,
+         - geometry: Z ``Polygon`` geometries or 2D ``LinearRing`` geometries.
+           A ring spans the model's full vertical column, from model top to
+           bottom.
          - multiplier: the multiplier of the barriers
     print_input: bool
 
@@ -1311,7 +1371,10 @@ class HorizontalFlowBarrierMultiplier(HorizontalFlowBarrierBase):
     }
 
     _write_schemata = {
-        "geometry": [EmptyIndexesSchema(), GeometryTypeSchema(_POLYGON)],
+        "geometry": [
+            EmptyIndexesSchema(),
+            GeometryTypeSchema((_POLYGON, _LINEARRING)),
+        ],
     }
 
     @init_log_decorator()
@@ -1468,7 +1531,9 @@ class HorizontalFlowBarrierResistance(HorizontalFlowBarrierBase):
     ----------
     geometry: gpd.GeoDataFrame
         Dataframe that describes:
-         - geometry: the geometries of the barriers,
+         - geometry: Z ``Polygon`` geometries or 2D ``LinearRing`` geometries.
+           A ring spans the model's full vertical column, from model top to
+           bottom.
          - resistance: the resistance of the barriers
 
     print_input: bool
@@ -1497,7 +1562,10 @@ class HorizontalFlowBarrierResistance(HorizontalFlowBarrierBase):
     }
 
     _write_schemata = {
-        "geometry": [EmptyIndexesSchema(), GeometryTypeSchema(_POLYGON)],
+        "geometry": [
+            EmptyIndexesSchema(),
+            GeometryTypeSchema((_POLYGON, _LINEARRING)),
+        ],
     }
 
     @init_log_decorator()
@@ -1574,7 +1642,17 @@ class HorizontalFlowBarrierResistance(HorizontalFlowBarrierBase):
                 "HorizontalFlowBarrierResistance. "
                 "Try SingleLayerHorizontalFlowBarrierResistance class."
             )
-        geometry_layer = hfb_dict["geodataframe"]
+        geometry_layer = hfb_dict["geodataframe"].copy()
+        geometries = geometry_layer.geometry.to_numpy()
+        is_2d_polygon = (
+            (shapely.get_type_id(geometries) == shapely.GeometryType.POLYGON)
+            & ~geometry_layer.geometry.has_z.to_numpy()
+        )
+        if is_2d_polygon.any():
+            geometries[is_2d_polygon] = shapely.get_exterior_ring(
+                geometries[is_2d_polygon]
+            )
+            geometry_layer.geometry = geometries
 
         return cls(geometry_layer)
 

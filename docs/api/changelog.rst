@@ -22,6 +22,9 @@ Added
   :meth:`imod.mf6.GroundwaterTransportModel.mask_packages` to mask specific
   packages of a groundwater flow model and a groundwater transport model
   respectively.
+- The all-layer MODFLOW 6 HFB packages now accept 2D ``LinearRing`` barriers,
+  spanning from model top to bottom. Existing Z-enabled ``Polygon`` barriers
+  retain their previous behavior.
 - Added ``drop_empty_layers: bool = True`` to various cell allocation functions 
   in :mod:`imod.prepare.topsystem.allocation` to remove fully empty layers from the grids.
   Strips the empty layers before they are passed along to 

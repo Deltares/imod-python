@@ -239,7 +239,7 @@ class TypeSchema(BaseSchema):
 
 
 class GeometryTypeSchema(BaseSchema):
-    def __init__(self, dtype: type[Any]) -> None:
+    def __init__(self, dtype: type[Any] | tuple[type[Any], ...]) -> None:
         """
         Validate geometry types
 
