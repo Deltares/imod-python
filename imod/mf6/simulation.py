@@ -474,10 +474,10 @@ class Modflow6Simulation(collections.UserDict[str, Any], ISimulation):
         >>> simulation.write(path/to/model)
         >>> simulation.run()
         """
-        _mf6path = self._validate_mf6_executable(mf6path)
         if self.directory is None:
             raise RuntimeError(f"Simulation {self.name} has not been written yet.")
         with imod.util.cd(self.directory):
+            _mf6path = self._validate_mf6_executable(mf6path)
             result = subprocess.run(_mf6path, capture_output=True, text=True)
             if result.returncode != 0:
                 raise RuntimeError(
