@@ -53,6 +53,8 @@ Added
   resampling to the simulation times. The last stress period now also gets the
   last valid rate instead of NaN when the last rate is NaN, or zero if there
   are no valid rates.
+- Added the ``synthetic_valley`` example, which sets up the MODFLOW 6 "Synthetic
+  Valley" (McDonald Valley) flow model on a Voronoi grid with imod-python.
 
 
 Fixed
