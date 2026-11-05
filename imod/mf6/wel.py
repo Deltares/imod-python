@@ -120,6 +120,7 @@ def _prepare_well_rates_from_groups(
     pkg_data: dict[str, Any],
     unique_well_groups: Sequence[pd.api.typing.DataFrameGroupBy],
     start_times: StressPeriodTimesType,
+    skipna: bool = False,
 ) -> xr.DataArray:
     """
     Prepare well rates from dataframe groups, grouped by unique well locations.
@@ -129,19 +130,21 @@ def _prepare_well_rates_from_groups(
     if has_associated:
         # Resample times per group
         unique_well_groups = [
-            _process_timeseries(df_group, start_times)
+            _process_timeseries(df_group, start_times, skipna)
             for df_group in unique_well_groups
         ]
     return _df_groups_to_da_rates(unique_well_groups)
 
 
 def _process_timeseries(
-    df_group: pd.api.typing.DataFrameGroupBy, start_times: StressPeriodTimesType
+    df_group: pd.api.typing.DataFrameGroupBy,
+    start_times: StressPeriodTimesType,
+    skipna: bool = False,
 ) -> pd.DataFrame:
     if _is_steady_state(start_times):
         return average_timeseries(df_group)
     else:
-        return resample_timeseries(df_group, start_times)
+        return resample_timeseries(df_group, start_times, skipna=skipna)
 
 
 def _prepare_df_ipf_associated(
@@ -616,6 +619,7 @@ class GridAgnosticWell(BoundaryCondition, IPointDataPackage, abc.ABC):
         times: StressPeriodTimesType,
         minimum_k: float = 0.0,
         minimum_thickness: float = 0.0,
+        skipna: bool = False,
     ) -> "GridAgnosticWell":
         """
         Convert wells to imod5 data, loaded with
@@ -707,6 +711,11 @@ class GridAgnosticWell(BoundaryCondition, IPointDataPackage, abc.ABC):
             On creating point wells, no point wells will be placed in cells with
             a lower thickness than this. Wells are placed when ``to_mf6_pkg`` is
             called.
+        skipna: bool, default False
+            How to treat NaN rates in the timeseries of associated wells, when
+            ``times`` is a list of datetimes. By default, NaN rates are forward
+            filled. If True, NaN rates are instead left out of the time
+            weighted mean.
         """
 
         pkg_data = imod5_data[key]
@@ -735,7 +744,7 @@ class GridAgnosticWell(BoundaryCondition, IPointDataPackage, abc.ABC):
             for (var, dtype), value in zip(varnames, index_values)
         }
         cls_input["rate"] = _prepare_well_rates_from_groups(
-            pkg_data, unique_well_groups, start_times
+            pkg_data, unique_well_groups, start_times, skipna
         )
         cls_input["minimum_k"] = minimum_k
         cls_input["minimum_thickness"] = minimum_thickness

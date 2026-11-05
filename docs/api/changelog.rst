@@ -49,6 +49,14 @@ Added
 - Added :class:`imod.mf6.AdvectionUTVD` to the transport packages. This is the
   most accurate advection scheme in most cases, and is recommended for when
   sharp fronts need to be preserved or when computing on an unstructured grid.
+- Added ``skipna: bool = False`` to :meth:`imod.mf6.Well.from_imod5_data` and
+  :meth:`imod.mf6.LayeredWell.from_imod5_data`. NaN rates in the timeseries of
+  associated wells are forward filled by default, as before. With
+  ``skipna=True`` they are instead left out of the time weighted mean when
+  resampling to the simulation times. The last stress period now also gets the
+  last valid rate instead of NaN when the last rate is NaN, or zero if there
+  are no valid rates.
+
 - :class:`imod.mf6.SingleLayerHorizontalFlowBarrierResistance`,
   :class:`imod.mf6.SingleLayerHorizontalFlowBarrierMultiplier` and
   :class:`imod.mf6.SingleLayerHorizontalFlowBarrierHydraulicCharacteristic` now
@@ -97,6 +105,10 @@ Fixed
   the absence of perched water table data.
   :meth:`imod.msw.ScalingFactors.from_imod5_data` now ignores the perched water
   table if it is set to -9999.0 in the iMOD5 projectfile.
+- Fixed :meth:`imod.mf6.Well.from_imod5_data` and
+  :meth:`imod.mf6.LayeredWell.from_imod5_data` giving each stress period the
+  rate of the previous period, when the well timeseries has records before the
+  start of the simulation.
 - :func:`imod.gen.read` (ASCII GEN files) can now read files that contain both
   linestrings and closed rings. Closed rings are read as polygons, features keep
   their order in the file.

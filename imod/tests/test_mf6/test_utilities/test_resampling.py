@@ -137,9 +137,72 @@ def test_timeseries_resampling_5():
     new_timeseries = resample_timeseries(original_timeseries, new_dates)
 
     expected_times = [datetime(1989, 1, 2), datetime(1989, 1, 3), datetime(1989, 1, 4)]
-    expected_rates = [200.0, 200.0, 200.0]
+    # The final output period includes the remaining input intervals until January 9.
+    expected_rates = [200.0, 200.0, 320.0]
     expected_timeseries = initialize_timeseries(expected_times, expected_rates)
 
+    pd.testing.assert_frame_equal(
+        new_timeseries, expected_timeseries, check_dtype=False
+    )
+
+
+@pytest.mark.parametrize(
+    "output_days, expected_rates",
+    [([1, 11], [-13.0, 0.0]), ([1, 6, 11], [-14.0, -12.0, 0.0])],
+)
+def test_timeseries_resampling_varying_rates(output_days, expected_rates):
+    """Test resampling with varying output days and expected rates."""
+    timeseries = initialize_timeseries(
+        [datetime(2019, 12, 1), datetime(2020, 1, 4), datetime(2020, 1, 9)],
+        [-10.0, -20.0, 0.0],
+    )
+    new_dates = pd.DatetimeIndex([datetime(2020, 1, day) for day in output_days])
+
+    new_timeseries = resample_timeseries(timeseries, new_dates)
+
+    expected_timeseries = initialize_timeseries(new_dates, expected_rates)
+    pd.testing.assert_frame_equal(
+        new_timeseries, expected_timeseries, check_dtype=False
+    )
+
+
+@pytest.mark.parametrize(
+    "record_days, rates, output_days, skipna, expected_rates",
+    [
+        # Inner NaN: forward filled by default, left out of the weights with skipna.
+        ([1, 4, 9], [-10.0, np.nan, 0.0], [1, 11], False, [-8.0, 0.0]),
+        ([1, 4, 9], [-10.0, np.nan, 0.0], [1, 11], True, [-6.0, 0.0]),
+        # Trailing NaN: left out of the weights, last row gets the last valid rate.
+        ([1, 4, 9], [-10.0, -20.0, np.nan], [1, 11], False, [-17.0, -20.0]),
+        ([1, 4, 9], [-10.0, -20.0, np.nan], [1, 11], True, [-16.25, -20.0]),
+        # Period with only NaN rates gets zero.
+        (
+            [1, 4, 9],
+            [-10.0, np.nan, -30.0],
+            [1, 4, 9, 11],
+            True,
+            [-10.0, 0.0, -30.0, -30.0],
+        ),
+        # Leading NaN: zero by default, left out of the weights with skipna.
+        ([1, 4], [np.nan, -20.0], [1, 11], False, [-14.0, -20.0]),
+        ([1, 4], [np.nan, -20.0], [1, 11], True, [-20.0, -20.0]),
+        # Only NaN rates.
+        ([1, 4], [np.nan, np.nan], [1, 11], False, [0.0, 0.0]),
+        ([1, 4], [np.nan, np.nan], [1, 11], True, [0.0, 0.0]),
+    ],
+)
+def test_timeseries_resampling_nan_rates(
+    record_days, rates, output_days, skipna, expected_rates
+):
+    # Tests resampling of timeseries with NaN rates, checking both skipna options.
+    timeseries = initialize_timeseries(
+        [datetime(2020, 1, day) for day in record_days], rates
+    )
+    new_dates = pd.DatetimeIndex([datetime(2020, 1, day) for day in output_days])
+
+    new_timeseries = resample_timeseries(timeseries, new_dates, skipna=skipna)
+
+    expected_timeseries = initialize_timeseries(new_dates, expected_rates)
     pd.testing.assert_frame_equal(
         new_timeseries, expected_timeseries, check_dtype=False
     )
