@@ -1,7 +1,6 @@
 import abc
 import json
 import textwrap
-import typing
 from copy import deepcopy
 from enum import Enum
 from pathlib import Path
@@ -361,8 +360,8 @@ def _fraction_layer_overlap(
 
     n_layer, n_edge = top_mean.shape
     layer_bounds = np.empty((n_edge, n_layer, 2), dtype=float)
-    layer_bounds[..., 0] = typing.cast(np.ndarray, bottom_mean.values).T
-    layer_bounds[..., 1] = typing.cast(np.ndarray, top_mean.values).T
+    layer_bounds[..., 0] = bottom_mean.values.T
+    layer_bounds[..., 1] = top_mean.values.T
 
     n_edge = len(dataframe)
     zmin = np.empty(n_edge, dtype=float)
@@ -402,7 +401,7 @@ def _fraction_layer_overlap(
 
 def _mean_left_and_right(
     cell_values: xu.UgridDataArray, left: np.ndarray, right: np.ndarray
-) -> xr.Dataset:
+) -> xr.DataArray:
     """
     This method computes the mean value of cell pairs. The left array specifies the first cell, the right array
     the second cells. The mean is computed by (first_cell+second_cell/2.0)
