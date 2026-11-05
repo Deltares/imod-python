@@ -1,5 +1,6 @@
 import os
 import re
+import shutil
 import sys
 import textwrap
 from copy import deepcopy
@@ -308,6 +309,26 @@ def test_simulation_open_concentration_fail(circle_model, tmp_path):
 
     with pytest.raises(ValueError):
         simulation.open_concentration()
+
+
+def test_simulation_validate_mf6_executable_env_var_empty_is_ignored(monkeypatch):
+    monkeypatch.setenv("MODFLOW6_EXECUTABLE", "")
+    monkeypatch.setattr(shutil, "which", lambda _: None)
+    with pytest.raises(RuntimeError, match="not found on PATH"):
+        Modflow6Simulation._validate_mf6_executable()
+
+
+def test_simulation_validate_mf6_executable_directory_rejected(monkeypatch, tmp_path):
+    with pytest.raises(RuntimeError, match="is a directory"):
+        Modflow6Simulation._validate_mf6_executable(tmp_path)
+
+
+def test_simulation_validate_mf6_executable_argument_beats_env(monkeypatch, tmp_path):
+    exe = tmp_path / ("mf6.exe" if os.name == "nt" else "mf6")
+    exe.write_text("")
+    exe.chmod(0o755)
+    monkeypatch.setenv("MODFLOW6_EXECUTABLE", "/does/not/exist")
+    assert Modflow6Simulation._validate_mf6_executable(exe) == str(exe.resolve())
 
 
 @pytest.fixture(scope="function")
