@@ -1140,9 +1140,13 @@ def test_linearring_clip_box_and_cleanup(basic_dis, geometry_ring):
     # Left side (40) + bottom (20) + top (20)
     assert clipped.line_data.geometry.length.sum() == pytest.approx(80.0)
 
-    top_2d = xr.full_like(idomain.isel(layer=0, drop=True), 0.0, dtype=float)
-    dis = StructuredDiscretization(top=top_2d, bottom=bottom, idomain=idomain)
-    hfb.cleanup(dis)
+    active_idomain = idomain.where(idomain.coords["y"] <= 40.0, 0)
+    top_2d = xr.full_like(active_idomain.isel(layer=0, drop=True), 0.0, dtype=float)
+    dis = StructuredDiscretization(top=top_2d, bottom=bottom, idomain=active_idomain)
+    clipped.cleanup(dis)
+    # After cleanup, only the portion of the line within the active idomain should remain
+    # Left side (0) + bottom (20) + top (20)
+    assert clipped.line_data.geometry.length.sum() == pytest.approx(40.0)
     assert hfb.line_data.geometry.length.sum() == pytest.approx(160.0)
 
 
