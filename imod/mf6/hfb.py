@@ -36,12 +36,14 @@ from imod.mf6.package import Package
 from imod.mf6.validation_settings import ValidationSettings
 from imod.prepare.cleanup import cleanup_hfb
 from imod.schemata import (
+    BaseSchema,
     DimsSchema,
     DTypeSchema,
     EmptyIndexesSchema,
     GeometryHasZSchema,
     GeometryTypeSchema,
     MaxNUniqueValuesSchema,
+    SchemaUnion,
     ValidationError,
 )
 from imod.typing import GeoDataFrameType, GridDataArray, GridDataDict, LineStringType
@@ -78,7 +80,7 @@ dispatch = Dispatcher()
 
 # Z Polygons have their own z bounds. 2D LinearRings, and the LineStrings they
 # become when clipped, span the full vertical column of the model.
-_ALL_LAYER_GEOMETRY_SCHEMATA = [
+_ALL_LAYER_GEOMETRY_SCHEMATA: list[BaseSchema | SchemaUnion] = [
     EmptyIndexesSchema(),
     GeometryTypeSchema(dtype=(_POLYGON, _LINESTRING)),
     GeometryHasZSchema(dtype=_POLYGON, z_required=True),
