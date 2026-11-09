@@ -454,18 +454,29 @@ class Modflow6Simulation(collections.UserDict[str, Any], ISimulation):
     @standard_log_decorator()
     def run(self, mf6path: str | Path | None = None) -> None:
         """
-        Run Modflow 6 simulation. This method runs a subprocess calling
-        ``mf6path``. This argument is set to ``mf6``, which means the Modflow 6
-        executable is expected to be added to your PATH environment variable.
+        Run Modflow 6 simulation. This method runs a subprocess calling the
+        Modflow 6 executable. The executable is determined in the following
+        order of precedence:
+
+        1. The ``mf6path`` argument.
+        2. The ``MODFLOW6_EXECUTABLE`` environment variable.
+        3. ``mf6``, which means the Modflow 6 executable is expected to be
+           added to your PATH environment variable.
+
         :doc:`See this writeup how to add Modflow 6 to your PATH on Windows </examples/mf6/index>`
 
         Note that the ``write`` method needs to be called before this method is
-        called.
+        called. The executable is looked up from within the directory the
+        simulation was written to, so relative paths are relative to this
+        directory. Provide an absolute path to avoid ambiguity.
 
         Parameters
         ----------
-        mf6path: Union[str, Path]
-            Path to the Modflow 6 executable. Defaults to calling ``mf6``.
+        mf6path: str | Path, optional
+            Path to the Modflow 6 executable. Defaults to the
+            ``MODFLOW6_EXECUTABLE`` environment variable if set, otherwise to
+            calling ``mf6``. The value should be a path to the executable
+            only: arguments are not supported.
 
         Examples
         --------
@@ -478,7 +489,9 @@ class Modflow6Simulation(collections.UserDict[str, Any], ISimulation):
             raise RuntimeError(f"Simulation {self.name} has not been written yet.")
         with imod.util.cd(self.directory):
             _mf6path = self._validate_mf6_executable(mf6path)
-            result = subprocess.run(_mf6path, capture_output=True, text=True)
+            result = subprocess.run(
+                _mf6path, capture_output=True, text=True, errors="replace"
+            )
             if result.returncode != 0:
                 raise RuntimeError(
                     f"Simulation {self.name}: {_mf6path} failed to run with returncode {result.returncode}\n\n"
@@ -505,8 +518,9 @@ class Modflow6Simulation(collections.UserDict[str, Any], ISimulation):
         candidate = os.path.expandvars(os.path.expanduser(candidate))
         resolved = shutil.which(candidate)
         if resolved is not None:
-            # Absolute, so it keeps working after changing directory in run().
-            return str(Path(resolved).resolve())
+            # Absolute, so it keeps working after changing directory. Do not
+            # resolve symlinks, as executables may depend on how they are called.
+            return os.path.abspath(resolved)
 
         hint = "Set the MODFLOW6_EXECUTABLE environment variable or add its parent directory to your PATH."
         path = Path(candidate)

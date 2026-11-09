@@ -336,6 +336,24 @@ def test_parse_ascii_segment_closed_feature_with_too_few_vertices_is_linestring(
     assert list(gdf.geometry.geom_type) == ["LineString"]
 
 
+def test_parse_ascii_segment_mixed_2d_and_3d_raises():
+    from imod.formats.gen.gen import parse_ascii_segments
+
+    lines = [
+        "1",
+        "0.0, 0.0",
+        "1.0, 1.0",
+        "end",
+        "2",
+        "0.0, 0.0, 1.0",
+        "1.0, 1.0, 1.0",
+        "end",
+        "end",
+    ]
+    with pytest.raises(ValueError, match="different number of coordinate columns"):
+        parse_ascii_segments(lines)
+
+
 def test_read_ascii(tmp_path):
     from imod.formats.gen.gen import read_ascii
 

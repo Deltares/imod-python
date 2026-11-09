@@ -238,6 +238,10 @@ class TypeSchema(BaseSchema):
             raise ValidationError(f"type {type(obj)} != {self.dtype}")
 
 
+def _is_missing_geometry(geometry: Any) -> bool:
+    return geometry is None or (isinstance(geometry, float) and np.isnan(geometry))
+
+
 class GeometryTypeSchema(BaseSchema):
     def __init__(self, dtype: type[Any] | tuple[type[Any], ...]) -> None:
         """
@@ -245,20 +249,62 @@ class GeometryTypeSchema(BaseSchema):
 
         Parameters
         ----------
-        dtype : Any
-            Dtype of the DataArray.
+        dtype : type or tuple of types
+            Geometry type(s) that are allowed.
         """
         self.dtype = dtype
 
     def validate(self, obj: GridDataArray, **kwargs: Any) -> None:
-        is_geometry_type = [isinstance(i, self.dtype) for i in obj.data.ravel()]
+        geometries = obj.data.ravel()
+        # Missing geometries are empty slots of features with fewer parts than
+        # others, e.g. after clipping.
+        is_geometry_type = [
+            _is_missing_geometry(i) or isinstance(i, self.dtype) for i in geometries
+        ]
         if not all(is_geometry_type):
             is_wrong_type = ~np.array(is_geometry_type)
             wrong_type_index = np.argwhere(is_wrong_type).ravel()
-            wrong_types = [o.geom_type for o in obj.data.ravel()[is_wrong_type]]
+            wrong_types = [o.geom_type for o in geometries[is_wrong_type]]
+            dtypes = self.dtype if isinstance(self.dtype, tuple) else (self.dtype,)
+            expected = ", ".join(repr(d.__name__) for d in dtypes)
             raise ValidationError(
-                f"Geometry not of expected type '{self.dtype}'. "
+                f"Geometry not of expected type {expected}. "
                 f"Got wrong types for geometry number {wrong_type_index}, namely {wrong_types}"
+            )
+
+
+class GeometryHasZSchema(BaseSchema):
+    def __init__(self, dtype: type[Any], z_required: bool) -> None:
+        """
+        Validate that geometries of a certain type do (not) have z coordinates.
+        Geometries of other types are ignored.
+
+        Parameters
+        ----------
+        dtype : type
+            Geometry type to check, e.g. ``shapely.Polygon``.
+        z_required : bool
+            Whether geometries of this type are required to have z coordinates
+            (True) or are required to not have them (False).
+        """
+        self.dtype = dtype
+        self.z_required = z_required
+
+    def validate(self, obj: GridDataArray, **kwargs: Any) -> None:
+        geometries = obj.data.ravel()
+        is_wrong = np.array(
+            [
+                isinstance(i, self.dtype) and i.has_z != self.z_required
+                for i in geometries
+            ],
+            dtype=bool,
+        )
+        if is_wrong.any():
+            wrong_index = np.argwhere(is_wrong).ravel()
+            requirement = "have" if self.z_required else "not have"
+            raise ValidationError(
+                f"Geometries of type {self.dtype.__name__!r} should {requirement} "
+                f"z coordinates. Got wrong dimensions for geometry number {wrong_index}"
             )
 
 

@@ -24,7 +24,9 @@ Added
   respectively.
 - The all-layer MODFLOW 6 HFB packages now accept 2D ``LinearRing`` barriers,
   spanning from model top to bottom. Existing Z-enabled ``Polygon`` barriers
-  retain their previous behavior.
+  retain their previous behavior. Rings can be combined with Z polygons in one
+  package, and clipped with ``clip_box`` or ``cleanup``, which turns them into
+  2D ``LineString`` geometries that are also accepted.
 - Added ``drop_empty_layers: bool = True`` to various cell allocation functions 
   in :mod:`imod.prepare.topsystem.allocation` to remove fully empty layers from the grids.
   Strips the empty layers before they are passed along to 
@@ -117,12 +119,18 @@ Changed
 ~~~~~~~
 
 - :meth:`imod.mf6.SingleLayerHorizontalFlowBarrierResistance.from_imod5_data`
-  converts closed rings (read as polygons from GEN files) to ``LinearRing``
-  geometries.
+  and :meth:`imod.mf6.HorizontalFlowBarrierResistance.from_imod5_data` convert
+  closed rings (read as 2D polygons from GEN files) to ``LinearRing``
+  geometries. Interior rings of these polygons are ignored, with a warning.
 - The ``mf6path`` argument of :meth:`imod.mf6.Modflow6Simulation.run` now
   defaults to ``None`` instead of ``"mf6"``. ``None`` resolves to the
   ``MODFLOW6_EXECUTABLE`` environment variable, and otherwise to ``mf6`` on the
-  PATH, so the previous behavior is kept.
+  PATH, so the previous behavior is kept. The executable is looked up in the
+  simulation directory, so relative paths are relative to that directory. A
+  missing executable now raises a ``RuntimeError`` instead of a
+  ``FileNotFoundError``, and arguments can no longer be passed as part of
+  ``mf6path``. Error messages for a failed run now contain both stdout and
+  stderr.
 - Deprecated :class:`imod.msw.Sprinkling` in favor of
   :class:`imod.msw.SprinklingGrid`. Call :class:`imod.msw.SprinklingGrid` to get
   the same behavior as you were used to.

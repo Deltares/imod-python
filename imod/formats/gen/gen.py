@@ -79,6 +79,11 @@ def _to_shapely_geometries(
         if feature_index.size == 0:
             continue
         group_coords = [vertex_coords[i] for i in feature_index]
+        if len({c.shape[1] for c in group_coords}) > 1:
+            raise ValueError(
+                "Features have a different number of coordinate columns, cannot "
+                "mix 2D and 3D features of the same type in a GEN file."
+            )
         n_vertex = [len(c) for c in group_coords]
         indices = np.repeat(np.arange(feature_index.size), n_vertex)
         coordinates = np.vstack(group_coords)

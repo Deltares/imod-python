@@ -39,6 +39,7 @@ from imod.schemata import (
     DimsSchema,
     DTypeSchema,
     EmptyIndexesSchema,
+    GeometryHasZSchema,
     GeometryTypeSchema,
     MaxNUniqueValuesSchema,
     ValidationError,
@@ -61,22 +62,28 @@ if TYPE_CHECKING:
 
     _POLYGON = shapely.geometry.Polygon
     _LINESTRING = shapely.geometry.LineString
-    _LINEARRING = shapely.geometry.LinearRing
 else:
     try:
         import shapely
 
         _POLYGON = shapely.geometry.Polygon
         _LINESTRING = shapely.geometry.LineString
-        _LINEARRING = shapely.geometry.LinearRing
     except ImportError:
         shapely = MissingOptionalModule("shapely")
         _POLYGON = ""
         _LINESTRING = ""
-        _LINEARRING = ""
 
 # create dispatcher instance to limit scope of typedispatching
 dispatch = Dispatcher()
+
+# Z Polygons have their own z bounds. 2D LinearRings, and the LineStrings they
+# become when clipped, span the full vertical column of the model.
+_ALL_LAYER_GEOMETRY_SCHEMATA = [
+    EmptyIndexesSchema(),
+    GeometryTypeSchema(dtype=(_POLYGON, _LINESTRING)),
+    GeometryHasZSchema(dtype=_POLYGON, z_required=True),
+    GeometryHasZSchema(dtype=_LINESTRING, z_required=False),
+]
 
 NO_BARRIER_MSG = textwrap.dedent(
     """
@@ -311,23 +318,74 @@ def _extract_mean_hfb_bounds_from_dataframe(
     return df_to_broadcast["lower"], df_to_broadcast["upper"]
 
 
+def _replace_polygons_by_exterior_rings(
+    dataframe: GeoDataFrameType, only_2d: bool
+) -> GeoDataFrameType:
+    """
+    Return copy of dataframe where polygons, which are how closed rings from GEN
+    files are read, are replaced by the ``LinearRing`` of their exterior.
+    Interior rings are not supported and are dropped with a warning.
+    """
+    result = dataframe.copy()
+    geometries = result.geometry.to_numpy()
+    is_polygon = shapely.get_type_id(geometries) == shapely.GeometryType.POLYGON
+    if only_2d:
+        is_polygon &= ~result.geometry.has_z.to_numpy()
+    if not is_polygon.any():
+        return result
+
+    if (shapely.get_num_interior_rings(geometries[is_polygon]) > 0).any():
+        logger.log(
+            loglevel=LogLevel.WARNING,
+            message=(
+                "Found polygons with interior rings in HFB data. Only the "
+                "exterior ring is used, interior rings are ignored."
+            ),
+            additional_depth=0,
+        )
+    geometries[is_polygon] = shapely.get_exterior_ring(geometries[is_polygon])
+    result.geometry = geometries
+    return result
+
+
+def _full_column_and_z_polygon_masks(
+    dataframe: GeoDataFrameType,
+) -> tuple[np.ndarray, np.ndarray]:
+    """
+    Classify the geometries of an all-layer HFB. Z polygons have their own z
+    bounds, whereas 2D rings and lines span the full vertical column of the
+    model. 2D lines occur when rings are clipped. Raises a TypeError for other
+    geometries.
+    """
+    geometries = dataframe.geometry.to_numpy()
+    geometry_type = shapely.get_type_id(geometries)
+    has_z = dataframe.geometry.has_z.to_numpy()
+    is_line = (geometry_type == shapely.GeometryType.LINEARRING) | (
+        geometry_type == shapely.GeometryType.LINESTRING
+    )
+    is_full_column = is_line & ~has_z
+    is_z_polygon = (geometry_type == shapely.GeometryType.POLYGON) & has_z
+    # Missing geometries are empty slots of features with fewer parts than
+    # others, e.g. after clipping.
+    is_supported = is_full_column | is_z_polygon | shapely.is_missing(geometries)
+    if not is_supported.all():
+        raise TypeError(
+            "All-layer HFB geometries should be Z Polygons or 2D LinearRings "
+            "or LineStrings."
+        )
+    return is_full_column, is_z_polygon
+
+
 def _make_linestrings_for_snapping(
     dataframe: GeoDataFrameType,
 ) -> GeoDataFrameType:
     """Convert vertical polygons and rings to line geometries for snapping."""
     geometries = dataframe.geometry.to_numpy()
-    geometry_type = shapely.get_type_id(geometries)
-    has_z = dataframe.geometry.has_z.to_numpy()
-    is_ring = (geometry_type == shapely.GeometryType.LINEARRING) & ~has_z
-    is_z_polygon = (geometry_type == shapely.GeometryType.POLYGON) & has_z
-    supported = is_ring | is_z_polygon
-    if not supported.all():
-        raise TypeError(
-            "All-layer HFB geometries should be Z Polygons or 2D LinearRings."
-        )
+    is_full_column, is_z_polygon = _full_column_and_z_polygon_masks(dataframe)
+    is_ring = shapely.get_type_id(geometries) == shapely.GeometryType.LINEARRING
 
     lines = geometries.copy()
-    for i in np.flatnonzero(is_ring):
+    for i in np.flatnonzero(is_full_column & is_ring):
         lines[i] = shapely.LineString(geometries[i].coords)
 
     polygon_indices = np.flatnonzero(is_z_polygon)
@@ -366,10 +424,7 @@ def _fraction_layer_overlap(
     n_edge = len(dataframe)
     zmin = np.empty(n_edge, dtype=float)
     zmax = np.empty(n_edge, dtype=float)
-    geometry_type = shapely.get_type_id(dataframe.geometry)
-    has_z = dataframe.geometry.has_z.to_numpy()
-    is_z_polygon = (geometry_type == shapely.GeometryType.POLYGON) & has_z
-    is_ring = geometry_type == shapely.GeometryType.LINEARRING
+    is_full_column, is_z_polygon = _full_column_and_z_polygon_masks(dataframe)
 
     polygon_indices = np.flatnonzero(is_z_polygon)
     if polygon_indices.size:
@@ -379,12 +434,12 @@ def _fraction_layer_overlap(
         zmin[polygon_indices] = lower.to_numpy()
         zmax[polygon_indices] = upper.to_numpy()
 
-    ring_indices = np.flatnonzero(is_ring)
-    if ring_indices.size:
+    full_column_indices = np.flatnonzero(is_full_column)
+    if full_column_indices.size:
         model_top = top_mean.isel(layer=0).values
         model_bottom = bottom_mean.isel(layer=-1).values
-        zmin[ring_indices] = model_bottom[ring_indices]
-        zmax[ring_indices] = model_top[ring_indices]
+        zmin[full_column_indices] = model_bottom[full_column_indices]
+        zmax[full_column_indices] = model_top[full_column_indices]
 
     hfb_bounds = np.empty((n_edge, n_layer, 2), dtype=float)
     hfb_bounds[..., 0] = zmin[:, np.newaxis]
@@ -1174,7 +1229,8 @@ class HorizontalFlowBarrierHydraulicCharacteristic(HorizontalFlowBarrierBase):
         Dataframe that describes:
          - geometry: Z ``Polygon`` geometries or 2D ``LinearRing`` geometries.
            A ring spans the model's full vertical column, from model top to
-           bottom.
+           bottom. Open 2D ``LineString`` geometries, which are what rings
+           become when they are clipped, are treated the same way.
          - hydraulic_characteristic: the hydraulic characteristic of the barriers
     print_input: bool
 
@@ -1200,12 +1256,7 @@ class HorizontalFlowBarrierHydraulicCharacteristic(HorizontalFlowBarrierBase):
         "print_flows": [DTypeSchema(np.bool_), DimsSchema()],
     }
 
-    _write_schemata = {
-        "geometry": [
-            EmptyIndexesSchema(),
-            GeometryTypeSchema((_POLYGON, _LINEARRING)),
-        ],
-    }
+    _write_schemata = {"geometry": _ALL_LAYER_GEOMETRY_SCHEMATA}
 
     @init_log_decorator()
     def __init__(
@@ -1343,7 +1394,8 @@ class HorizontalFlowBarrierMultiplier(HorizontalFlowBarrierBase):
         Dataframe that describes:
          - geometry: Z ``Polygon`` geometries or 2D ``LinearRing`` geometries.
            A ring spans the model's full vertical column, from model top to
-           bottom.
+           bottom. Open 2D ``LineString`` geometries, which are what rings
+           become when they are clipped, are treated the same way.
          - multiplier: the multiplier of the barriers
     print_input: bool
 
@@ -1369,12 +1421,7 @@ class HorizontalFlowBarrierMultiplier(HorizontalFlowBarrierBase):
         "print_flows": [DTypeSchema(np.bool_), DimsSchema()],
     }
 
-    _write_schemata = {
-        "geometry": [
-            EmptyIndexesSchema(),
-            GeometryTypeSchema((_POLYGON, _LINEARRING)),
-        ],
-    }
+    _write_schemata = {"geometry": _ALL_LAYER_GEOMETRY_SCHEMATA}
 
     @init_log_decorator()
     def __init__(
@@ -1532,7 +1579,8 @@ class HorizontalFlowBarrierResistance(HorizontalFlowBarrierBase):
         Dataframe that describes:
          - geometry: Z ``Polygon`` geometries or 2D ``LinearRing`` geometries.
            A ring spans the model's full vertical column, from model top to
-           bottom.
+           bottom. Open 2D ``LineString`` geometries, which are what rings
+           become when they are clipped, are treated the same way.
          - resistance: the resistance of the barriers
 
     print_input: bool
@@ -1560,12 +1608,7 @@ class HorizontalFlowBarrierResistance(HorizontalFlowBarrierBase):
         "print_flows": [DTypeSchema(np.bool_), DimsSchema()],
     }
 
-    _write_schemata = {
-        "geometry": [
-            EmptyIndexesSchema(),
-            GeometryTypeSchema((_POLYGON, _LINEARRING)),
-        ],
-    }
+    _write_schemata = {"geometry": _ALL_LAYER_GEOMETRY_SCHEMATA}
 
     @init_log_decorator()
     def __init__(
@@ -1603,7 +1646,10 @@ class HorizontalFlowBarrierResistance(HorizontalFlowBarrierBase):
     def from_imod5_data(cls, key: str, imod5_data: dict[str, GridDataDict]) -> Self:
         """
         Import HFB data from imod5 data dictionary. Data from "3D GEN" files, so
-        with a polygon geometry, can be loaded with this method.
+        with a polygon geometry, can be loaded with this method. Closed rings
+        in the GEN file without z coordinates, which are read as 2D polygons,
+        are converted to ``LinearRing`` geometries which span the full vertical
+        column of the model. Interior rings of such polygons are ignored.
 
         Parameters
         ----------
@@ -1641,16 +1687,9 @@ class HorizontalFlowBarrierResistance(HorizontalFlowBarrierBase):
                 "HorizontalFlowBarrierResistance. "
                 "Try SingleLayerHorizontalFlowBarrierResistance class."
             )
-        geometry_layer = hfb_dict["geodataframe"].copy()
-        geometries = geometry_layer.geometry.to_numpy()
-        is_2d_polygon = (
-            shapely.get_type_id(geometries) == shapely.GeometryType.POLYGON
-        ) & ~geometry_layer.geometry.has_z.to_numpy()
-        if is_2d_polygon.any():
-            geometries[is_2d_polygon] = shapely.get_exterior_ring(
-                geometries[is_2d_polygon]
-            )
-            geometry_layer.geometry = geometries
+        geometry_layer = _replace_polygons_by_exterior_rings(
+            hfb_dict["geodataframe"], only_2d=True
+        )
 
         return cls(geometry_layer)
 
@@ -1740,7 +1779,7 @@ class SingleLayerHorizontalFlowBarrierResistance(HorizontalFlowBarrierBase):
         Import HFB data from imod5 data dictionary. Data from "2D GEN" files, so
         with a line shape, can be loaded with this method. Closed rings in the
         GEN file, which are read as polygons, are converted to ``LinearRing``
-        geometries.
+        geometries. Interior rings of such polygons are ignored.
 
         Parameters
         ----------
@@ -1780,16 +1819,9 @@ class SingleLayerHorizontalFlowBarrierResistance(HorizontalFlowBarrierBase):
                 "SingleLayerHorizontalFlowBarrierResistance. "
                 "Try HorizontalFlowBarrierResistance class."
             )
-        geometry_layer = hfb_dict["geodataframe"].copy()
-        geometries = geometry_layer.geometry.to_numpy()
-        is_polygon = shapely.get_type_id(geometries) == shapely.GeometryType.POLYGON
-        # Closed rings from GEN files are read as polygons, whereas barriers
-        # are expected to be lines. Use the exterior ring, as polygons with
-        # interior rings are not supported.
-        if is_polygon.any():
-            geometry_layer["geometry"] = np.where(
-                is_polygon, shapely.get_exterior_ring(geometries), geometries
-            )
+        geometry_layer = _replace_polygons_by_exterior_rings(
+            hfb_dict["geodataframe"], only_2d=False
+        )
         geometry_layer["layer"] = layer
 
         return cls(geometry_layer)
