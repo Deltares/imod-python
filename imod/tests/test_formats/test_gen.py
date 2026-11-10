@@ -293,23 +293,64 @@ def test_parse_ascii_segment_polygon():
     assert np.array_equal(gdf["id"], ["1", "2"])
 
 
-def test_parse_ascii_segment_mixed_topology_error():
+def test_parse_ascii_segment_mixed_linestring_and_polygon():
     from imod.formats.gen.gen import parse_ascii_segments
 
-    with pytest.raises(ValueError, match="Some features are linestrings"):
-        lines = [
-            "1",
-            "0.0, 0.0",
-            "1.0, 1.0",
-            "end",
-            "2",
-            "0.0, 0.0",
-            "1.0, 1.0",
-            "2.0, 3.0",
-            "0.0, 0.0",
-            "end",
-            "end",
-        ]
+    lines = [
+        "1",
+        "0.0, 0.0",
+        "1.0, 1.0",
+        "2.0, 0.0",
+        "end",
+        "2",
+        "0.0, 0.0",
+        "4.0, 0.0",
+        "4.0, 4.0",
+        "0.0, 4.0",
+        "0.0, 0.0",
+        "end",
+        "3",
+        "5.0, 5.0",
+        "6.0, 6.0",
+        "end",
+        "end",
+    ]
+    gdf = parse_ascii_segments(lines)
+    assert list(gdf.geometry.geom_type) == ["LineString", "Polygon", "LineString"]
+    assert list(gdf["id"]) == ["1", "2", "3"]
+    assert list(gdf.geometry.iloc[1].exterior.coords) == [
+        (0.0, 0.0),
+        (4.0, 0.0),
+        (4.0, 4.0),
+        (0.0, 4.0),
+        (0.0, 0.0),
+    ]
+    assert list(gdf.geometry.iloc[2].coords) == [(5.0, 5.0), (6.0, 6.0)]
+
+
+def test_parse_ascii_segment_closed_feature_with_too_few_vertices_is_linestring():
+    from imod.formats.gen.gen import parse_ascii_segments
+
+    lines = ["1", "0.0, 0.0", "1.0, 1.0", "0.0, 0.0", "end", "end"]
+    gdf = parse_ascii_segments(lines)
+    assert list(gdf.geometry.geom_type) == ["LineString"]
+
+
+def test_parse_ascii_segment_mixed_2d_and_3d_raises():
+    from imod.formats.gen.gen import parse_ascii_segments
+
+    lines = [
+        "1",
+        "0.0, 0.0",
+        "1.0, 1.0",
+        "end",
+        "2",
+        "0.0, 0.0, 1.0",
+        "1.0, 1.0, 1.0",
+        "end",
+        "end",
+    ]
+    with pytest.raises(ValueError, match="different number of coordinate columns"):
         parse_ascii_segments(lines)
 
 

@@ -175,15 +175,35 @@ def _clip_linestring(
 def clip_line_gdf_by_bounding_polygon(
     gdf: GeoDataFrameType, bounding_gdf: GeoDataFrameType
 ) -> GeoDataFrameType:
-    if (shapely.get_type_id(gdf.geometry) == shapely.GeometryType.POLYGON).any():
-        # Shapely returns z linestrings when clipping our vertical z polygons.
-        # To work around this convert polygons to zlinestrings to clip.
-        # Consequently construct polygons from these clipped linestrings.
-        gdf_linestrings = vertical_polygons_to_zbound_linestrings(gdf)
-        clipped_linestrings = _clip_linestring(gdf_linestrings, bounding_gdf)
-        return clipped_zbound_linestrings_to_vertical_polygons(clipped_linestrings)
-    else:
+    is_polygon = shapely.get_type_id(gdf.geometry) == shapely.GeometryType.POLYGON
+    if not is_polygon.any():
         return _clip_linestring(gdf, bounding_gdf)
+
+    # Shapely returns z linestrings when clipping our vertical z polygons.
+    # To work around this convert polygons to zlinestrings to clip.
+    # Consequently construct polygons from these clipped linestrings.
+    gdf_linestrings = vertical_polygons_to_zbound_linestrings(gdf[is_polygon])
+    clipped_linestrings = _clip_linestring(gdf_linestrings, bounding_gdf)
+    clipped_polygons = clipped_zbound_linestrings_to_vertical_polygons(
+        clipped_linestrings
+    )
+    if is_polygon.all():
+        return clipped_polygons
+
+    # Geometries which are not polygons, e.g. (2D) rings and lines, are clipped
+    # as lines. A ring that is clipped becomes a line.
+    clipped_lines = _clip_linestring(gdf[~is_polygon], bounding_gdf)
+    if clipped_lines.empty:
+        return clipped_polygons
+    if clipped_polygons.empty:
+        return clipped_lines
+    # Carry over the attributes of the polygons, as these are lost when
+    # converting to linestrings and back.
+    attributes = gdf.drop(columns=gdf.geometry.name)
+    polygon_index = clipped_polygons.index.get_level_values("index")
+    for column in attributes.columns:
+        clipped_polygons[column] = attributes[column].loc[polygon_index].to_numpy()
+    return pd.concat([clipped_polygons, clipped_lines]).sort_index()
 
 
 def clip_line_gdf_by_grid(
