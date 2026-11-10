@@ -115,7 +115,7 @@ def _well_from_imod5_cap_grid_data(
     return data
 
 
-def _describe_source(da: GridDataArray | None) -> str:
+def describe_source(da: GridDataArray | None) -> str:
     """
     Describe where data came from, based on the paths the project file reader
     attached to the array. Constants and processed (e.g. regridded) data have
@@ -154,8 +154,8 @@ def validate_sprinkling_grid_cap_data(
     nodata_layer = layer.isnull() & (artificial_rch_type != 0)
     n_nodata = int(nodata_layer.sum())
     if n_nodata > 0:
-        type_source = _describe_source(source_data["artificial_recharge"])
-        layer_source = _describe_source(source_data["artificial_recharge_layer"])
+        type_source = describe_source(source_data["artificial_recharge"])
+        layer_source = describe_source(source_data["artificial_recharge_layer"])
         raise ValueError(
             f"Found {n_nodata} cell(s) with NoData in 'artificial_recharge_layer' "
             "where sprinkling is specified: 'artificial_recharge' is not 0 "

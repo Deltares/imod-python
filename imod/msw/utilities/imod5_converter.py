@@ -11,6 +11,7 @@ import xarray as xr
 from imod.common.constants import MaskValues
 from imod.logging import LogLevel, logger
 from imod.mf6 import StructuredDiscretization
+from imod.mf6.utilities.imod5_converter import describe_source
 from imod.msw.utilities.common import concat_imod5, is_scalar_and_equal
 from imod.msw.utilities.mask import MetaSwapActive
 from imod.typing import GridDataArray, GridDataDict, Imod5DataDict
@@ -119,6 +120,77 @@ def is_msw_active_cell(
     subunit_active = imod5_active & (msw_area > 0) & (mf6_top_active > 0)
     active = subunit_active.any(dim="subunit")
     return MetaSwapActive(active, subunit_active)
+
+
+def warn_nodata_in_area(
+    target_dis: StructuredDiscretization,
+    imod5_cap: GridDataDict,
+    imod5_bnd: GridDataArray,
+) -> None:
+    """
+    Log a warning for cells that are active in MODFLOW6 and in the iMOD5 boundary
+    arrays, but have NoData in ``"wetted_area"`` or ``"urban_area"``. The area
+    of these cells is unknown, so they silently become inactive in MetaSWAP.
+    """
+    mf6_top_active = target_dis["idomain"].isel(layer=0, drop=True)
+    candidate = (
+        (imod5_bnd["ibound"] > 0) & (imod5_cap["boundary"] > 0) & (mf6_top_active > 0)
+    )
+    for var in ("wetted_area", "urban_area"):
+        da = imod5_cap.get(var)
+        if da is None:
+            continue
+        n_nodata = int((da.isnull() & candidate).sum())
+        if n_nodata > 0:
+            logger.log(
+                loglevel=LogLevel.WARNING,
+                message=(
+                    f"Found {n_nodata} cell(s) with NoData in '{var}' where "
+                    "MODFLOW6 and the iMOD5 boundary are active. These cells "
+                    "will be inactive in MetaSWAP. If this is unintended, "
+                    f"fill them with 0. Source: {describe_source(da)}"
+                ),
+                additional_depth=0,
+            )
+
+
+def validate_no_nodata_in_active_cells(
+    imod5_cap: GridDataDict, msw_active: MetaSwapActive
+) -> None:
+    """
+    Raise a ValueError if variables required for active MetaSWAP cells contain
+    NoData in those cells. The error lists the variables, the number of cells
+    affected and, if known, the IDF file(s) the data was read from.
+
+    Needs to be called with data that was not yet converted to integers, as
+    NoData is lost in that conversion.
+    """
+    active_rural = msw_active.per_subunit.sel(subunit=0, drop=True)
+    required_where_active = {
+        "landuse": active_rural,
+        "soil_physical_unit": msw_active.all,
+        "rootzone_thickness": msw_active.all,
+        "surface_elevation": msw_active.all,
+    }
+    messages = []
+    for var, active in required_where_active.items():
+        da = imod5_cap.get(var)
+        if da is None:
+            continue
+        n_nodata = int((da.isnull() & active).sum())
+        if n_nodata > 0:
+            messages.append(
+                f"- '{var}': {n_nodata} active cell(s) with NoData. "
+                f"Source: {describe_source(da)}"
+            )
+    if messages:
+        raise ValueError(
+            "Found NoData in iMOD5 CAP data where MetaSWAP is active:\n"
+            + "\n".join(messages)
+            + "\nNoData is not supported in active cells. Fill these cells "
+            "with valid values, or deactivate them (e.g. by setting the "
+            "boundary in the CAP package to 0)."
+        )
 
 
 def has_active_scaling_factor(imod5_cap: GridDataDict) -> bool:
