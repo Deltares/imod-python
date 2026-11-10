@@ -9,9 +9,9 @@ import pandas as pd
 import xarray as xr
 
 from imod.common.constants import MaskValues
+from imod.common.utilities.nodata import describe_nodata
 from imod.logging import LogLevel, logger
 from imod.mf6 import StructuredDiscretization
-from imod.mf6.utilities.imod5_converter import describe_source
 from imod.msw.utilities.common import concat_imod5, is_scalar_and_equal
 from imod.msw.utilities.mask import MetaSwapActive
 from imod.typing import GridDataArray, GridDataDict, Imod5DataDict
@@ -137,18 +137,14 @@ def warn_nodata_in_area(
         (imod5_bnd["ibound"] > 0) & (imod5_cap["boundary"] > 0) & (mf6_top_active > 0)
     )
     for var in ("wetted_area", "urban_area"):
-        da = imod5_cap.get(var)
-        if da is None:
-            continue
-        n_nodata = int((da.isnull() & candidate).sum())
-        if n_nodata > 0:
+        message = describe_nodata(var, imod5_cap, candidate)
+        if message is not None:
             logger.log(
                 loglevel=LogLevel.WARNING,
                 message=(
-                    f"Found {n_nodata} cell(s) with NoData in '{var}' where "
-                    "MODFLOW6 and the iMOD5 boundary are active. These cells "
-                    "will be inactive in MetaSWAP. If this is unintended, "
-                    f"fill them with 0. Source: {describe_source(da)}"
+                    f"Found NoData where MODFLOW6 and the iMOD5 boundary are "
+                    f"active, {message}\nThese cells will be inactive in "
+                    "MetaSWAP. If this is unintended, fill them with 0."
                 ),
                 additional_depth=0,
             )
@@ -172,21 +168,15 @@ def validate_no_nodata_in_active_cells(
         "rootzone_thickness": msw_active.all,
         "surface_elevation": msw_active.all,
     }
-    messages = []
-    for var, active in required_where_active.items():
-        da = imod5_cap.get(var)
-        if da is None:
-            continue
-        n_nodata = int((da.isnull() & active).sum())
-        if n_nodata > 0:
-            messages.append(
-                f"- '{var}': {n_nodata} active cell(s) with NoData. "
-                f"Source: {describe_source(da)}"
-            )
+    messages = [
+        message
+        for var, active in required_where_active.items()
+        if (message := describe_nodata(var, imod5_cap, active))
+    ]
     if messages:
         raise ValueError(
-            "Found NoData in iMOD5 CAP data where MetaSWAP is active:\n"
-            + "\n".join(messages)
+            "Found NoData in iMOD5 CAP data where MetaSWAP is active:\n- "
+            + "\n- ".join(messages)
             + "\nNoData is not supported in active cells. Fill these cells "
             "with valid values, or deactivate them (e.g. by setting the "
             "boundary in the CAP package to 0)."

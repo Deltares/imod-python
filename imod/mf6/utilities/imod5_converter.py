@@ -7,6 +7,7 @@ import xarray as xr
 from imod.common.interfaces.imodel import IModel
 from imod.common.interfaces.iregridpackage import IRegridPackage
 from imod.common.utilities.dataclass_type import DataclassType
+from imod.common.utilities.nodata import describe_nodata
 from imod.common.utilities.regrid import (
     _regrid_package_data,
     regrid_imod5_cap_and_bnd_data,
@@ -95,7 +96,7 @@ def _well_from_imod5_cap_point_data(cap_data: GridDataDict) -> dict[str, np.ndar
 def _well_from_imod5_cap_grid_data(
     cap_data: GridDataDict, source_data: GridDataDict | None = None
 ) -> dict[str, np.ndarray]:
-    validate_sprinkling_grid_cap_data(cap_data, source_data)
+    validate_sprinkling_grid_cap_data(cap_data, source_data, check_type=False)
     artificial_rch_type = cap_data["artificial_recharge"]
     layer = cap_data["artificial_recharge_layer"].astype(int)
     # Workaround to be able to later specify groundwater abstraction rates as
@@ -115,27 +116,18 @@ def _well_from_imod5_cap_grid_data(
     return data
 
 
-def describe_source(da: GridDataArray | None) -> str:
-    """
-    Describe where data came from, based on the paths the project file reader
-    attached to the array. Constants and processed (e.g. regridded) data have
-    no paths.
-    """
-    sources = getattr(da, "attrs", {}).get("source_paths")
-    if sources:
-        return ", ".join(str(s) for s in sources)
-    return "unknown (constant value or processed data)"
-
-
 def validate_sprinkling_grid_cap_data(
-    cap_data: GridDataDict, source_data: GridDataDict | None = None
+    cap_data: GridDataDict,
+    source_data: GridDataDict | None = None,
+    check_type: bool = True,
 ) -> None:
     """
-    Check that the layer grid for sprinkling wells does not contain NoData where
-    a well is required. A well is required where ``"artificial_recharge"`` is
-    not 0, which includes NoData in ``"artificial_recharge"``: cells without
-    sprinkling should be 0, not NoData. Raises a ValueError mentioning the
-    variables and, if known, the IDF file(s) they were read from.
+    Check that the sprinkling grids do not contain NoData where a well is
+    required. Cells with sprinkling (not 0 in ``"artificial_recharge"``) need a
+    valid layer in ``"artificial_recharge_layer"``. Cells without sprinkling
+    should be 0 in ``"artificial_recharge"``, not NoData. Raises a ValueError
+    mentioning the variables, cell locations and, if known, the IDF file(s)
+    they were read from.
 
     Parameters
     ----------
@@ -145,25 +137,36 @@ def validate_sprinkling_grid_cap_data(
     source_data: GridDataDict, optional
         iMOD5 CAP data to retrieve the source file paths from, as these get
         lost when processing data. Defaults to ``cap_data``.
+    check_type: bool
+        Whether to check ``"artificial_recharge"`` for NoData. This is only
+        reported where the iMOD5 ``"boundary"`` is active, as the type of cells
+        outside the model area is irrelevant. If ``cap_data`` has no
+        ``"boundary"`` (e.g. as it is not regridded), set this to False.
     """
-    if source_data is None:
-        source_data = cap_data
-
     artificial_rch_type = cap_data["artificial_recharge"]
-    layer = cap_data["artificial_recharge_layer"]
-    nodata_layer = layer.isnull() & (artificial_rch_type != 0)
-    n_nodata = int(nodata_layer.sum())
-    if n_nodata > 0:
-        type_source = describe_source(source_data["artificial_recharge"])
-        layer_source = describe_source(source_data["artificial_recharge_layer"])
+    # NoData in type counts as sprinkling, as it is not 0. Therefore, layers are
+    # required for these cells as well.
+    required = {"artificial_recharge_layer": artificial_rch_type != 0}
+    if check_type:
+        boundary = cap_data.get("boundary")
+        required["artificial_recharge"] = (
+            full_like(artificial_rch_type, True, dtype=bool)
+            if boundary is None
+            else boundary > 0
+        )
+    messages = [
+        message
+        for name, mask in required.items()
+        if (message := describe_nodata(name, cap_data, mask, source_data))
+    ]
+    if messages:
         raise ValueError(
-            f"Found {n_nodata} cell(s) with NoData in 'artificial_recharge_layer' "
-            "where sprinkling is specified: 'artificial_recharge' is not 0 "
-            "(this includes NoData). NoData is not supported: cells without "
-            "sprinkling must be 0 in 'artificial_recharge', and cells with "
-            "sprinkling must have a valid layer in 'artificial_recharge_layer'."
-            f"\nSource of 'artificial_recharge': {type_source}"
-            f"\nSource of 'artificial_recharge_layer': {layer_source}"
+            "Found NoData in iMOD5 CAP sprinkling data where a sprinkling well "
+            "is required:\n- "
+            + "\n- ".join(messages)
+            + "\nNoData is not supported: cells without sprinkling must be 0 in "
+            "'artificial_recharge', and cells with sprinkling must have a valid "
+            "layer in 'artificial_recharge_layer'."
         )
 
 
@@ -230,6 +233,9 @@ def well_from_imod5_cap_data(
                 "target_dis must be provided when converting iMOD5 cap data "
                 "from grids (IDF)"
             )
+        # Validate before regridding: only then the iMOD5 boundary and the
+        # locations in the source grids are available.
+        validate_sprinkling_grid_cap_data(cap_data)
         cap_data_regridded = regrid_imod5_cap_and_bnd_data(
             imod5_data, target_dis, regridder_types, regrid_cache
         )["cap"]

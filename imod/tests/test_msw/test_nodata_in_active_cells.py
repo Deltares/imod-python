@@ -56,9 +56,7 @@ def test_from_imod5_data__valid(imod5_data_and_dis):
         ("surface_elevation", "surface_elevation.idf"),
     ],
 )
-def test_from_imod5_data__nodata_in_active_cell(
-    imod5_data_and_dis, variable, filename
-):
+def test_from_imod5_data__nodata_in_active_cell(imod5_data_and_dis, variable, filename):
     imod5_data, dis = imod5_data_and_dis
     imod5_data["cap"][variable][0, 0] = np.nan
 
@@ -66,7 +64,8 @@ def test_from_imod5_data__nodata_in_active_cell(
         GridData.from_imod5_data(imod5_data, target_dis=dis)
     message = str(excinfo.value)
     assert variable in message
-    assert "1 active cell(s)" in message
+    assert "1 cell(s)" in message
+    assert "(1.0, 3.0)" in message
     assert filename in message
 
 

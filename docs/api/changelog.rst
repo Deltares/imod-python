@@ -99,15 +99,18 @@ Fixed
   rate of the previous period, when the well timeseries has records before the
   start of the simulation.
 - :meth:`imod.mf6.LayeredWell.from_imod5_cap_data` now raises a clear error if
-  the iMOD5 sprinkling data contains NoData where a layer is required (cells
-  without sprinkling should be 0 in ``artificial_recharge``), mentioning the
-  IDF file(s) the data was read from, instead of failing with an obscure
+  the iMOD5 sprinkling data contains NoData in ``artificial_recharge`` where the
+  CAP boundary is active (cells
+  without sprinkling should be 0) or where a layer is required in
+  ``artificial_recharge_layer``, mentioning the cell locations and IDF file(s)
+  the data was read from, instead of failing with an obscure
   ``IndexError``.
 - :meth:`imod.msw.GridData.from_imod5_data` (and therefore
   :meth:`imod.msw.MetaSwapModel.from_imod5_data`) now raises a clear error if
   ``landuse``, ``soil_physical_unit``, ``rootzone_thickness`` or
   ``surface_elevation`` contain NoData in cells where MetaSWAP is active,
-  mentioning the IDF file(s) the data was read from. Previously, NoData in
+  mentioning the cell locations and IDF file(s) the data was read from.
+  Previously, NoData in
   ``landuse`` and ``soil_physical_unit`` was silently converted to an arbitrary
   integer. It also logs a warning for cells that are active in MODFLOW6 and the
   iMOD5 boundary, but have NoData in ``wetted_area`` or ``urban_area``, as these
@@ -115,6 +118,7 @@ Fixed
 - Writing MetaSWAP packages now raises an error mentioning the variable name
   if it contains NaN values in active cells, instead of ``cannot convert float
   NaN to integer``.
+
 Changed
 ~~~~~~~
 
