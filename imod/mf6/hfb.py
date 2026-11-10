@@ -41,7 +41,9 @@ from imod.schemata import (
     DTypeSchema,
     EmptyIndexesSchema,
     GeometryHasZSchema,
+    GeometryNoInteriorsSchema,
     GeometryTypeSchema,
+    GeometryVerticalSchema,
     MaxNUniqueValuesSchema,
     SchemaUnion,
     ValidationError,
@@ -83,8 +85,10 @@ dispatch = Dispatcher()
 _ALL_LAYER_GEOMETRY_SCHEMATA: list[BaseSchema | SchemaUnion] = [
     EmptyIndexesSchema(),
     GeometryTypeSchema(dtype=(_POLYGON, _LINESTRING)),
-    GeometryHasZSchema(dtype=_POLYGON, z_required=True),
-    GeometryHasZSchema(dtype=_LINESTRING, z_required=False),
+    GeometryHasZSchema(dtype=_POLYGON, has_z=True),
+    GeometryHasZSchema(dtype=_LINESTRING, has_z=False),
+    GeometryNoInteriorsSchema(dtype=_POLYGON),
+    GeometryVerticalSchema(dtype=_POLYGON),
 ]
 
 NO_BARRIER_MSG = textwrap.dedent(
@@ -320,13 +324,25 @@ def _extract_mean_hfb_bounds_from_dataframe(
     return df_to_broadcast["lower"], df_to_broadcast["upper"]
 
 
-def _replace_polygons_by_exterior_rings(
+def _replace_polygons_by_rings(
     dataframe: GeoDataFrameType, only_2d: bool
 ) -> GeoDataFrameType:
     """
-    Return copy of dataframe where polygons, which are how closed rings from GEN
-    files are read, are replaced by the ``LinearRing`` of their exterior.
-    Interior rings are not supported and are dropped with a warning.
+    Replace polygons in the dataframe with their exterior and interior rings.
+
+    Parameters
+    ----------
+    dataframe : GeoDataFrameType
+        Input GeoDataFrame containing polygon geometries.
+    only_2d : bool
+        If True, only 2D polygons (without z coordinates) are replaced by rings.
+        Z polygons are not affected.
+
+    Returns
+    -------
+    GeoDataFrameType
+        Copy of the input GeoDataFrame with polygons replaced by their exterior
+        and interior rings.
     """
     result = dataframe.copy()
     geometries = result.geometry.to_numpy()
@@ -336,17 +352,26 @@ def _replace_polygons_by_exterior_rings(
     if not is_polygon.any():
         return result
 
-    if (shapely.get_num_interior_rings(geometries[is_polygon]) > 0).any():
-        logger.log(
-            loglevel=LogLevel.WARNING,
-            message=(
-                "Found polygons with interior rings in HFB data. Only the "
-                "exterior ring is used, interior rings are ignored."
-            ),
-            additional_depth=0,
-        )
-    geometries[is_polygon] = shapely.get_exterior_ring(geometries[is_polygon])
-    result.geometry = geometries
+    rings_per_feature = np.ones(len(geometries), dtype=int)
+    rings_per_feature[is_polygon] += shapely.get_num_interior_rings(
+        geometries[is_polygon]
+    )
+    if (rings_per_feature == 1).all():
+        geometries[is_polygon] = shapely.get_exterior_ring(geometries[is_polygon])
+        result.geometry = geometries
+        return result
+
+    rings = []
+    for geometry, as_polygon in zip(geometries, is_polygon):
+        if as_polygon:
+            rings.extend([geometry.exterior, *geometry.interiors])
+        else:
+            rings.append(geometry)
+    index_name = result.index.name
+    result = result.iloc[np.repeat(np.arange(len(geometries)), rings_per_feature)]
+    result = result.reset_index(drop=True)
+    result.index.name = index_name
+    result.geometry = np.array(rings, dtype=object)
     return result
 
 
@@ -1651,7 +1676,9 @@ class HorizontalFlowBarrierResistance(HorizontalFlowBarrierBase):
         with a polygon geometry, can be loaded with this method. Closed rings
         in the GEN file without z coordinates, which are read as 2D polygons,
         are converted to ``LinearRing`` geometries which span the full vertical
-        column of the model. Interior rings of such polygons are ignored.
+        column of the model. Polygons with interior rings become one
+        ``LinearRing`` for each ring, as each of them is a barrier. Z polygons
+        with interior rings are not supported.
 
         Parameters
         ----------
@@ -1689,7 +1716,7 @@ class HorizontalFlowBarrierResistance(HorizontalFlowBarrierBase):
                 "HorizontalFlowBarrierResistance. "
                 "Try SingleLayerHorizontalFlowBarrierResistance class."
             )
-        geometry_layer = _replace_polygons_by_exterior_rings(
+        geometry_layer = _replace_polygons_by_rings(
             hfb_dict["geodataframe"], only_2d=True
         )
 
@@ -1781,7 +1808,8 @@ class SingleLayerHorizontalFlowBarrierResistance(HorizontalFlowBarrierBase):
         Import HFB data from imod5 data dictionary. Data from "2D GEN" files, so
         with a line shape, can be loaded with this method. Closed rings in the
         GEN file, which are read as polygons, are converted to ``LinearRing``
-        geometries. Interior rings of such polygons are ignored.
+        geometries. Polygons with interior rings become one ``LinearRing`` for
+        each ring, as each of them is a barrier.
 
         Parameters
         ----------
@@ -1812,7 +1840,7 @@ class SingleLayerHorizontalFlowBarrierResistance(HorizontalFlowBarrierBase):
             raise ValueError("hfb key not present.")
 
         hfb_dict = imod5_data[key]
-        if not list(hfb_dict.keys()) == ["geodataframe", "layer"]:
+        if list(hfb_dict.keys()) != ["geodataframe", "layer"]:
             raise ValueError("hfb is not a SingleLayerHorizontalFlowBarrierResistance")
         layer = hfb_dict["layer"]
         if layer == 0:
@@ -1821,7 +1849,7 @@ class SingleLayerHorizontalFlowBarrierResistance(HorizontalFlowBarrierBase):
                 "SingleLayerHorizontalFlowBarrierResistance. "
                 "Try HorizontalFlowBarrierResistance class."
             )
-        geometry_layer = _replace_polygons_by_exterior_rings(
+        geometry_layer = _replace_polygons_by_rings(
             hfb_dict["geodataframe"], only_2d=False
         )
         geometry_layer["layer"] = layer

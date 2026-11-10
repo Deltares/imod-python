@@ -121,7 +121,10 @@ Changed
 - :meth:`imod.mf6.SingleLayerHorizontalFlowBarrierResistance.from_imod5_data`
   and :meth:`imod.mf6.HorizontalFlowBarrierResistance.from_imod5_data` convert
   closed rings (read as 2D polygons from GEN files) to ``LinearRing``
-  geometries. Interior rings of these polygons are ignored, with a warning.
+  geometries. Polygons with interior rings, for example a circular barrier with
+  an outer and an inner wall, become one ``LinearRing`` for each ring.
+  Z polygons with interior rings are not supported by the all-layer HFB
+  packages and raise a validation error.
 - The ``mf6path`` argument of :meth:`imod.mf6.Modflow6Simulation.run` now
   defaults to ``None`` instead of ``"mf6"``. ``None`` resolves to the
   ``MODFLOW6_EXECUTABLE`` environment variable, and otherwise to ``mf6`` on the
