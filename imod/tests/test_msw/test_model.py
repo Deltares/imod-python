@@ -634,6 +634,10 @@ def test_import_from_imod5_and_clip(
 
     # Assert model clipped
     for pkg in clipped_model.values():
+        if isinstance(pkg, MeteoMapping):
+            # Skip MeteoMapping packages as they are not spatially clipped
+            # and have an independent grid
+            continue 
         coords = pkg.dataset.coords
         if "x" in coords:
             assert coords["x"].min() >= 1.0
