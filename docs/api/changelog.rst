@@ -98,6 +98,12 @@ Fixed
   :meth:`imod.mf6.LayeredWell.from_imod5_data` giving each stress period the
   rate of the previous period, when the well timeseries has records before the
   start of the simulation.
+- Fixed :class:`imod.msw.PrecipitationMapping` and
+  :class:`imod.msw.EvapotranspirationMapping` losing their ``meteo`` attribute
+  after :meth:`imod.msw.MetaSwapModel.dump` followed by
+  :meth:`imod.msw.MetaSwapModel.from_file`. The meteo grid is now stored in the
+  package dataset, so it is written to file and restored when the model is
+  reloaded.
 
 Changed
 ~~~~~~~
