@@ -82,7 +82,13 @@ class MeteoMapping(MetaSwapPackage, IPackageBase):
 
     def __init__(self, meteo_grid: GridDataArray) -> None:
         super().__init__()
-        self.meteo = meteo_grid
+        self.dataset["meteo"] = meteo_grid
+
+    @property
+    def meteo(self) -> GridDataArray:
+        if "meteo" not in self.dataset:
+            raise ValueError("Meteo grid has not been set in the dataset.")
+        return self.dataset["meteo"]
 
     def _render(
         self,

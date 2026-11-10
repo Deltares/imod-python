@@ -12,8 +12,8 @@ from imod import msw
 from imod.msw.fixed_format import fixed_format_parser
 
 
-@pytest.fixture(scope="function")
-def svat_index() -> xr.DataArray:
+@pytest.fixture
+def svat_index() -> tuple[xr.DataArray, np.ndarray]:
     x_svat = [1.0, 2.0, 3.0]
     y_svat = [1.0, 2.0, 3.0]
     subunit_svat = [0, 1]
@@ -239,3 +239,80 @@ def test_precipitation_from_imod5(tmpdir_factory, replace_string, request):
         # Assert
         assert len(actual.coords["time"]) == 1
         xr.testing.assert_equal(precipitation, actual.isel(time=0, drop=True))
+
+
+def test_precipitation_mapping_netcdf_roundtrip(tmp_path):
+    # Arrange
+    x = [-0.5, 1.5, 3.5]
+    y = [4.5, 2.5, 0.5]
+    precipitation = create_meteo_grid(x, y, [0, 1], 2.0, -2.0)
+    precipitation_mapping = msw.PrecipitationMapping(precipitation)
+
+    # Act
+    path = precipitation_mapping.to_file(tmp_path, "prec_mapping")
+    with xr.open_dataset(path) as ds:
+        assert "meteo" in ds  # the file must not be empty
+
+    reloaded = msw.PrecipitationMapping.from_file(path)
+
+    # Assert
+    xr.testing.assert_equal(reloaded.meteo, precipitation)
+
+
+def test_precipitation_mapping_dump_and_from_file(tmp_path):
+    """
+    Regression test: after MetaSwapModel.dump() followed by
+    MetaSwapModel.from_file(), PrecipitationMapping should still have its
+    ``meteo`` attribute. Currently raises:
+    AttributeError: 'PrecipitationMapping' object has no attribute 'meteo'
+    """
+    # Arrange
+    modelname = "MSW"
+    x = [-0.5, 1.5, 3.5]
+    y = [4.5, 2.5, 0.5]
+    subunit = [0, 1]
+    dx = 2.0
+    dy = -2.0
+    precipitation = create_meteo_grid(x, y, subunit, dx, dy)
+
+    model = msw.MetaSwapModel(unsaturated_database="./unsat_database")
+    model["prec_mapping"] = msw.PrecipitationMapping(precipitation)
+
+    # The original model works before dumping
+    xr.testing.assert_equal(model["prec_mapping"].meteo, precipitation)
+
+    # Act
+    dump_dir: Path = tmp_path / "dump"
+    model.dump(dump_dir)
+    reloaded = msw.MetaSwapModel.from_file(dump_dir, modelname=modelname)
+
+    # Assert
+    # The serialized file should not be empty
+    with xr.open_dataset(dump_dir / modelname / "prec_mapping.nc") as ds:
+        assert len(ds.data_vars) > 0
+
+    # The meteo attribute should be restored
+    assert hasattr(reloaded["prec_mapping"], "meteo")
+    xr.testing.assert_equal(reloaded["prec_mapping"].meteo, precipitation)
+
+
+@pytest.mark.unittest_jit
+def test_precipitation_mapping_dump_and_from_file_imod5(tmp_path, tmpdir_factory):
+    # Arrange
+    datadir = Path(tmpdir_factory.mktemp("precipitation_mapping"))
+    setup_meteo_grid(datadir)
+    paths = [["foo"], [datadir / "mete_grid.inp"], ["bar"]]
+    imod5_data = {"extra": {"paths": paths}}
+
+    model = msw.MetaSwapModel(unsaturated_database="./unsat_database")
+    model["prec_mapping"] = msw.PrecipitationMapping.from_imod5_data(imod5_data)
+    expected = model["prec_mapping"].meteo
+
+    # Act
+    dump_dir = tmp_path / "dump"
+    model.dump(dump_dir)
+    reloaded = msw.MetaSwapModel.from_file(dump_dir, "MSW")
+
+    # Assert
+    assert hasattr(reloaded["prec_mapping"], "meteo")
+    xr.testing.assert_equal(reloaded["prec_mapping"].meteo, expected)
