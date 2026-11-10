@@ -325,7 +325,7 @@ def _extract_mean_hfb_bounds_from_dataframe(
 
 
 def _replace_polygons_by_rings(
-    dataframe: GeoDataFrameType, only_2d: bool
+    dataframe: GeoDataFrameType, only_planar: bool
 ) -> GeoDataFrameType:
     """
     Replace polygons in the dataframe with their exterior and interior rings.
@@ -334,9 +334,8 @@ def _replace_polygons_by_rings(
     ----------
     dataframe : GeoDataFrameType
         Input GeoDataFrame containing polygon geometries.
-    only_2d : bool
-        If True, only 2D polygons (without z coordinates) are replaced by rings.
-        Z polygons are not affected.
+    only_planar : bool
+        If True, only planar polygons (without z coordinates) are replaced by rings.
 
     Returns
     -------
@@ -347,7 +346,7 @@ def _replace_polygons_by_rings(
     result = dataframe.copy()
     geometries = result.geometry.to_numpy()
     is_polygon = shapely.get_type_id(geometries) == shapely.GeometryType.POLYGON
-    if only_2d:
+    if only_planar:
         is_polygon &= ~result.geometry.has_z.to_numpy()
     if not is_polygon.any():
         return result
@@ -1717,7 +1716,7 @@ class HorizontalFlowBarrierResistance(HorizontalFlowBarrierBase):
                 "Try SingleLayerHorizontalFlowBarrierResistance class."
             )
         geometry_layer = _replace_polygons_by_rings(
-            hfb_dict["geodataframe"], only_2d=True
+            hfb_dict["geodataframe"], only_planar=True
         )
 
         return cls(geometry_layer)
@@ -1850,7 +1849,7 @@ class SingleLayerHorizontalFlowBarrierResistance(HorizontalFlowBarrierBase):
                 "Try HorizontalFlowBarrierResistance class."
             )
         geometry_layer = _replace_polygons_by_rings(
-            hfb_dict["geodataframe"], only_2d=False
+            hfb_dict["geodataframe"], only_planar=False
         )
         geometry_layer["layer"] = layer
 
