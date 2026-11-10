@@ -1,5 +1,6 @@
 import os
 import re
+import shutil
 import sys
 import textwrap
 from copy import deepcopy
@@ -308,6 +309,65 @@ def test_simulation_open_concentration_fail(circle_model, tmp_path):
 
     with pytest.raises(ValueError):
         simulation.open_concentration()
+
+
+def test_simulation_validate_mf6_executable_env_var_empty_is_ignored(monkeypatch):
+    monkeypatch.setenv("MODFLOW6_EXECUTABLE", "")
+    monkeypatch.setattr(shutil, "which", lambda _: None)
+    with pytest.raises(RuntimeError, match="not found on PATH"):
+        Modflow6Simulation._validate_mf6_executable()
+
+
+def test_simulation_validate_mf6_executable_directory_rejected(monkeypatch, tmp_path):
+    with pytest.raises(RuntimeError, match="is a directory"):
+        Modflow6Simulation._validate_mf6_executable(tmp_path)
+
+
+def _make_fake_executable(directory):
+    exe = directory / ("mf6.exe" if os.name == "nt" else "mf6")
+    exe.write_text("")
+    exe.chmod(0o755)
+    return exe
+
+
+def test_simulation_validate_mf6_executable_argument_beats_env(monkeypatch, tmp_path):
+    exe = _make_fake_executable(tmp_path)
+    monkeypatch.setenv("MODFLOW6_EXECUTABLE", "/does/not/exist")
+    assert Modflow6Simulation._validate_mf6_executable(exe) == os.path.abspath(exe)
+
+
+def test_simulation_validate_mf6_executable_env_var(monkeypatch, tmp_path):
+    exe = _make_fake_executable(tmp_path)
+    monkeypatch.setenv("MODFLOW6_EXECUTABLE", str(exe))
+    assert Modflow6Simulation._validate_mf6_executable() == os.path.abspath(exe)
+
+
+def test_simulation_validate_mf6_executable_env_var_not_found(monkeypatch, tmp_path):
+    missing = tmp_path / "missing_mf6"
+    monkeypatch.setenv("MODFLOW6_EXECUTABLE", str(missing))
+    with pytest.raises(RuntimeError, match="MODFLOW6_EXECUTABLE.*not found"):
+        Modflow6Simulation._validate_mf6_executable()
+
+
+def test_simulation_validate_mf6_executable_argument_not_found(tmp_path):
+    with pytest.raises(RuntimeError, match="function argument.*not found"):
+        Modflow6Simulation._validate_mf6_executable(tmp_path / "missing_mf6")
+
+
+def test_simulation_validate_mf6_executable_not_executable(tmp_path):
+    not_executable = tmp_path / "mf6.txt"
+    not_executable.write_text("")
+    not_executable.chmod(0o644)
+    with pytest.raises(RuntimeError, match="not executable"):
+        Modflow6Simulation._validate_mf6_executable(not_executable)
+
+
+def test_simulation_validate_mf6_executable_relative_path(monkeypatch, tmp_path):
+    exe = _make_fake_executable(tmp_path)
+    monkeypatch.chdir(tmp_path)
+    resolved = Modflow6Simulation._validate_mf6_executable(f".{os.sep}{exe.name}")
+    assert resolved == os.path.abspath(exe)
+    assert os.path.isabs(resolved)
 
 
 @pytest.fixture(scope="function")
