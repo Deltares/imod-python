@@ -235,7 +235,7 @@ def test_clip_box(msw_model):
 
     for pkg in clipped_model.values():
         if isinstance(pkg, MeteoMapping):
-            coords = pkg.meteo.coords
+            coords = pkg.dataset["meteo"].coords
         else:
             coords = pkg.dataset.coords
         if "x" in coords:

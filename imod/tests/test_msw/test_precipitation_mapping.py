@@ -172,7 +172,7 @@ def test_precipitation_mapping_clip():
     precipitation_mapping = msw.PrecipitationMapping(precipitation)
     clipped = precipitation_mapping.clip_box(x_max=x_max, y_max=y_max)
     # Assert
-    actual_meteo = clipped.meteo
+    actual_meteo = clipped.dataset["meteo"]
     assert actual_meteo.x.max().values[()] <= x_max
     assert actual_meteo.y.max().values[()] <= y_max
 
@@ -234,7 +234,7 @@ def test_precipitation_from_imod5(tmpdir_factory, replace_string, request):
 
     else:
         precipitation_mapping = msw.PrecipitationMapping.from_imod5_data(imod5_data)
-        actual = precipitation_mapping.meteo
+        actual = precipitation_mapping.dataset["meteo"]
 
         # Assert
         assert len(actual.coords["time"]) == 1
@@ -256,7 +256,7 @@ def test_precipitation_mapping_netcdf_roundtrip(tmp_path):
     reloaded = msw.PrecipitationMapping.from_file(path)
 
     # Assert
-    xr.testing.assert_equal(reloaded.meteo, precipitation)
+    xr.testing.assert_equal(reloaded.dataset["meteo"], precipitation)
 
 
 def test_precipitation_mapping_dump_and_from_file(tmp_path):
@@ -279,7 +279,7 @@ def test_precipitation_mapping_dump_and_from_file(tmp_path):
     model["prec_mapping"] = msw.PrecipitationMapping(precipitation)
 
     # The original model works before dumping
-    xr.testing.assert_equal(model["prec_mapping"].meteo, precipitation)
+    xr.testing.assert_equal(model["prec_mapping"].dataset["meteo"], precipitation)
 
     # Act
     dump_dir: Path = tmp_path / "dump"
@@ -293,7 +293,7 @@ def test_precipitation_mapping_dump_and_from_file(tmp_path):
 
     # The meteo attribute should be restored
     assert hasattr(reloaded["prec_mapping"], "meteo")
-    xr.testing.assert_equal(reloaded["prec_mapping"].meteo, precipitation)
+    xr.testing.assert_equal(reloaded["prec_mapping"].dataset["meteo"], precipitation)
 
 
 @pytest.mark.unittest_jit
@@ -306,7 +306,7 @@ def test_precipitation_mapping_dump_and_from_file_imod5(tmp_path, tmpdir_factory
 
     model = msw.MetaSwapModel(unsaturated_database="./unsat_database")
     model["prec_mapping"] = msw.PrecipitationMapping.from_imod5_data(imod5_data)
-    expected = model["prec_mapping"].meteo
+    expected = model["prec_mapping"].dataset["meteo"]
 
     # Act
     dump_dir = tmp_path / "dump"
@@ -315,4 +315,4 @@ def test_precipitation_mapping_dump_and_from_file_imod5(tmp_path, tmpdir_factory
 
     # Assert
     assert hasattr(reloaded["prec_mapping"], "meteo")
-    xr.testing.assert_equal(reloaded["prec_mapping"].meteo, expected)
+    xr.testing.assert_equal(reloaded["prec_mapping"].dataset["meteo"], expected)

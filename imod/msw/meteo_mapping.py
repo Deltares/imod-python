@@ -84,12 +84,6 @@ class MeteoMapping(MetaSwapPackage, IPackageBase):
         super().__init__()
         self.dataset["meteo"] = meteo_grid
 
-    @property
-    def meteo(self) -> GridDataArray:
-        if "meteo" not in self.dataset:
-            raise ValueError("Meteo grid has not been set in the dataset.")
-        return self.dataset["meteo"]
-
     def _render(
         self,
         file: TextIO,
@@ -99,7 +93,7 @@ class MeteoMapping(MetaSwapPackage, IPackageBase):
     ) -> None:
         data_dict = {"svat": svat.values.ravel()[index]}
 
-        row, column = self._grid_mapping(svat, self.meteo)
+        row, column = self._grid_mapping(svat, self.dataset["meteo"])
 
         data_dict["row"] = row[index]
         data_dict["column"] = column[index]
@@ -217,7 +211,7 @@ class MeteoMapping(MetaSwapPackage, IPackageBase):
         >>> pkg.clip_box(time_min=np.datetime64("2020-01-01"), time_max=np.datetime64("2020-12-31"))
 
         """
-        selection = self.meteo.to_dataset(name="meteo")  # Force to dataset
+        selection = self.dataset["meteo"].to_dataset(name="meteo")  # Force to dataset
         selection = clip_time_slice(selection, time_min=time_min, time_max=time_max)
         selection = clip_spatial_box(
             selection,
