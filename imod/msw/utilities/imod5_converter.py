@@ -92,6 +92,22 @@ def get_rootzone_depth_from_imod5_data(
     return concat_imod5(rootzone_thickness, rootzone_thickness)
 
 
+def _is_active_in_mf6_and_imod5_boundary(
+    target_dis: StructuredDiscretization,
+    imod5_cap: GridDataDict,
+    imod5_bnd: GridDataArray,
+) -> GridDataArray:
+    """
+    Cells that are active in the top layer of MODFLOW6 and in the iMOD5
+    boundary arrays (IBOUND and the CAP boundary).
+    """
+    mf6_top_active = target_dis["idomain"].isel(layer=0, drop=True)
+    # Where IBOUND = -1, there also shouldn't be any active cells in the CAP
+    # boundary array.
+    imod5_active = (imod5_bnd["ibound"] > 0) & (imod5_cap["boundary"] > 0)
+    return imod5_active & (mf6_top_active > 0)
+
+
 def is_msw_active_cell(
     target_dis: StructuredDiscretization,
     imod5_cap: GridDataDict,
@@ -113,11 +129,8 @@ def is_msw_active_cell(
     subunit_active: xr.DataArray
         Cells active per subunit
     """
-    mf6_top_active = target_dis["idomain"].isel(layer=0, drop=True)
-    # Where IBOUND = -1, there also shouldn't be any active cells in the CAP
-    # boundary array.
-    imod5_active = (imod5_bnd["ibound"] > 0) & (imod5_cap["boundary"] > 0)
-    subunit_active = imod5_active & (msw_area > 0) & (mf6_top_active > 0)
+    candidate = _is_active_in_mf6_and_imod5_boundary(target_dis, imod5_cap, imod5_bnd)
+    subunit_active = candidate & (msw_area > 0)
     active = subunit_active.any(dim="subunit")
     return MetaSwapActive(active, subunit_active)
 
@@ -132,10 +145,7 @@ def warn_nodata_in_area(
     arrays, but have NoData in ``"wetted_area"`` or ``"urban_area"``. The area
     of these cells is unknown, so they silently become inactive in MetaSWAP.
     """
-    mf6_top_active = target_dis["idomain"].isel(layer=0, drop=True)
-    candidate = (
-        (imod5_bnd["ibound"] > 0) & (imod5_cap["boundary"] > 0) & (mf6_top_active > 0)
-    )
+    candidate = _is_active_in_mf6_and_imod5_boundary(target_dis, imod5_cap, imod5_bnd)
     for var in ("wetted_area", "urban_area"):
         message = describe_nodata(var, imod5_cap, candidate)
         if message is not None:
