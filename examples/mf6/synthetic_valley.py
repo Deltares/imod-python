@@ -74,9 +74,6 @@ import pooch
 import shapely
 import xarray as xr
 import xugrid as xu
-from scipy.sparse import coo_matrix
-from scipy.sparse.csgraph import connected_components
-from scipy.spatial import cKDTree
 
 import imod
 
@@ -181,20 +178,16 @@ triangles = pm.TriangleMesher(mesh_input).generate_ugrid()
 
 
 def merge_close_nodes(grid, tolerance=1.0e-3):
-    xy = np.column_stack([grid.node_x, grid.node_y])
-    pairs = cKDTree(xy).query_pairs(tolerance, output_type="ndarray")
-    n = len(xy)
-    graph = coo_matrix((np.ones(len(pairs)), (pairs[:, 0], pairs[:, 1])), shape=(n, n))
-    _, labels = connected_components(graph, directed=False)
-    _, first = np.unique(labels, return_index=True)
-    new_xy = xy[first]
+    inverse, x, y = xu.snap_nodes(grid.node_x, grid.node_y, tolerance)
+    if inverse is None:
+        return grid
 
     faces = np.full(grid.face_node_connectivity.shape, grid.fill_value)
     for i, row in enumerate(grid.face_node_connectivity):
-        nodes = labels[row[row != grid.fill_value]]
+        nodes = inverse[row[row != grid.fill_value]]
         keep = nodes != np.roll(nodes, 1)  # drop consecutive repeated nodes
         faces[i, : keep.sum()] = nodes[keep]
-    return xu.Ugrid2d(new_xy[:, 0], new_xy[:, 1], grid.fill_value, faces)
+    return xu.Ugrid2d(x, y, grid.fill_value, faces)
 
 
 grid = merge_close_nodes(triangles.tesselate_circumcenter_voronoi())
@@ -270,6 +263,10 @@ def drop_raster_coords(da):
 
 
 def regrid_linear(da):
+    """
+    Regrid a DataArray using linear interpolation with nearest neighbor fallback
+    for cells around the edges of the domain.
+    """
     linear = xu.BarycentricInterpolator(da, grid).regrid(da)
     nearest = xu.CentroidLocatorRegridder(da, grid).regrid(da)
     return drop_raster_coords(linear.fillna(nearest))
