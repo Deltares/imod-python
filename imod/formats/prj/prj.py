@@ -756,6 +756,20 @@ def _open_package_idf(
     return [das]
 
 
+def _attach_source_paths(
+    das: dict[str | None, xr.DataArray],
+    block_content: dict[Any, Any],
+    variables: Sequence[str | None],
+) -> None:
+    """Store the IDF paths each variable is read from in the DataArray attrs."""
+    for variable in variables:
+        paths = [
+            str(entry["path"]) for entry in block_content[variable] if "path" in entry
+        ]
+        if paths:
+            das[variable].attrs["source_paths"] = paths
+
+
 def _process_time(timestring: str, yearfirst: bool = True) -> datetime | None:
     if timestring == "steady-state":
         return None
@@ -1212,6 +1226,9 @@ def open_projectfile_data(path: FilePath) -> tuple[dict[str, Any], dict[str, Any
                     block_content.pop(maybe_ipf_var)
                 variables = [v for v in METASWAP_VARS if v in block_content]
                 data = _open_package_idf(block_content, variables)
+                # Keep track of the files the arrays were read from, to be able
+                # to give informative error messages downstream.
+                _attach_source_paths(data[0], block_content, variables)
                 # Read and reattach ipf data to package data.
                 if is_ipf:
                     data[0][maybe_ipf_var] = imod.ipf.read(maybe_ipf_path)

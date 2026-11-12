@@ -9,6 +9,7 @@ import pandas as pd
 import xarray as xr
 
 from imod.common.constants import MaskValues
+from imod.common.utilities.nodata import describe_nodata
 from imod.logging import LogLevel, logger
 from imod.mf6 import StructuredDiscretization
 from imod.msw.utilities.common import concat_imod5, is_scalar_and_equal
@@ -91,6 +92,22 @@ def get_rootzone_depth_from_imod5_data(
     return concat_imod5(rootzone_thickness, rootzone_thickness)
 
 
+def _is_active_in_mf6_and_imod5_boundary(
+    target_dis: StructuredDiscretization,
+    imod5_cap: GridDataDict,
+    imod5_bnd: GridDataArray,
+) -> GridDataArray:
+    """
+    Cells that are active in the top layer of MODFLOW6 and in the iMOD5
+    boundary arrays (IBOUND and the CAP boundary).
+    """
+    mf6_top_active = target_dis["idomain"].isel(layer=0, drop=True)
+    # Where IBOUND = -1, there also shouldn't be any active cells in the CAP
+    # boundary array.
+    imod5_active = (imod5_bnd["ibound"] > 0) & (imod5_cap["boundary"] > 0)
+    return imod5_active & (mf6_top_active > 0)
+
+
 def is_msw_active_cell(
     target_dis: StructuredDiscretization,
     imod5_cap: GridDataDict,
@@ -112,13 +129,68 @@ def is_msw_active_cell(
     subunit_active: xr.DataArray
         Cells active per subunit
     """
-    mf6_top_active = target_dis["idomain"].isel(layer=0, drop=True)
-    # Where IBOUND = -1, there also shouldn't be any active cells in the CAP
-    # boundary array.
-    imod5_active = (imod5_bnd["ibound"] > 0) & (imod5_cap["boundary"] > 0)
-    subunit_active = imod5_active & (msw_area > 0) & (mf6_top_active > 0)
+    candidate = _is_active_in_mf6_and_imod5_boundary(target_dis, imod5_cap, imod5_bnd)
+    subunit_active = candidate & (msw_area > 0)
     active = subunit_active.any(dim="subunit")
     return MetaSwapActive(active, subunit_active)
+
+
+def warn_nodata_in_area(
+    target_dis: StructuredDiscretization,
+    imod5_cap: GridDataDict,
+    imod5_bnd: GridDataArray,
+) -> None:
+    """
+    Log a warning for cells that are active in MODFLOW6 and in the iMOD5 boundary
+    arrays, but have NoData in ``"wetted_area"`` or ``"urban_area"``. The area
+    of these cells is unknown, so they silently become inactive in MetaSWAP.
+    """
+    candidate = _is_active_in_mf6_and_imod5_boundary(target_dis, imod5_cap, imod5_bnd)
+    for var in ("wetted_area", "urban_area"):
+        message = describe_nodata(var, imod5_cap, candidate)
+        if message is not None:
+            logger.log(
+                loglevel=LogLevel.WARNING,
+                message=(
+                    f"Found NoData where MODFLOW6 and the iMOD5 boundary are "
+                    f"active, {message}\nThese cells will be inactive in "
+                    "MetaSWAP. If this is unintended, fill them with 0."
+                ),
+                additional_depth=0,
+            )
+
+
+def validate_no_nodata_in_active_cells(
+    imod5_cap: GridDataDict, msw_active: MetaSwapActive
+) -> None:
+    """
+    Raise a ValueError if variables required for active MetaSWAP cells contain
+    NoData in those cells. The error lists the variables, the number of cells
+    affected and, if known, the IDF file(s) the data was read from.
+
+    Needs to be called with data that was not yet converted to integers, as
+    NoData is lost in that conversion.
+    """
+    active_rural = msw_active.per_subunit.sel(subunit=0, drop=True)
+    required_where_active = {
+        "landuse": active_rural,
+        "soil_physical_unit": msw_active.all,
+        "rootzone_thickness": msw_active.all,
+        "surface_elevation": msw_active.all,
+    }
+    messages = [
+        message
+        for var, active in required_where_active.items()
+        if (message := describe_nodata(var, imod5_cap, active))
+    ]
+    if messages:
+        raise ValueError(
+            "Found NoData in iMOD5 CAP data where MetaSWAP is active:\n- "
+            + "\n- ".join(messages)
+            + "\nNoData is not supported in active cells. Fill these cells "
+            "with valid values, or deactivate them (e.g. by setting the "
+            "boundary in the CAP package to 0)."
+        )
 
 
 def has_active_scaling_factor(imod5_cap: GridDataDict) -> bool:
