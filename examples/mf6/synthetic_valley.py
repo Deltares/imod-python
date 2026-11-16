@@ -70,7 +70,6 @@ import matplotlib.pyplot as plt
 import numpy as np
 import pandamesh as pm
 import pandas as pd
-import pooch
 import shapely
 import xarray as xr
 import xugrid as xu
@@ -221,27 +220,8 @@ fig.tight_layout()
 # lake are provided as GeoTIFFs in the MODFLOW 6 examples repository. These are
 # 40 by 25 rasters with a cell size of 500 feet (152.4 m).
 
-base_url = (
-    "https://github.com/MODFLOW-ORG/modflow6-examples/raw/master/data/"
-    "ex-gwt-synthetic-valley"
-)
-raster_files = {
-    "top": ("top_SI.tif", "md5:781155bdcc2b9914e1cad6b10de0e9c7"),
-    "bottom": ("bottom_SI.tif", "md5:00b4a39fbf5180e65c0367cdb6f15c93"),
-    "k_aquifer": ("k_aq_SI.tif", "md5:d233e5c393ab6c029c63860d73818856"),
-    "k_clay": ("k_clay_SI.tif", "md5:a08999c37f42b35884468e4ef896d5f9"),
-    "lake": ("lake_location_SI.tif", "md5:38600d6f0eef7c033ede278252dc6343"),
-}
-rasters = {}
-for name, (fname, known_hash) in raster_files.items():
-    path = pooch.retrieve(
-        url=f"{base_url}/{fname}",
-        fname=fname,
-        known_hash=known_hash,
-        path=pooch.os_cache("imod-python"),
-    )
-    rasters[name] = imod.rasterio.open(path)
-
+from imod.data.sample_data import synth_valley_flopy_data
+rasters = synth_valley_flopy_data()
 rasters["top"]
 
 # %%
