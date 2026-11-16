@@ -12,16 +12,20 @@ from pytest_cases import parametrize, parametrize_with_cases
 
 import imod
 from imod.common.utilities.grid import broadcast_to_full_domain
+from imod.common.utilities.regrid import regrid_imod5_cap_and_bnd_data
 from imod.formats.prj.prj import open_projectfile_data
 from imod.logging.config import LoggerType
 from imod.logging.loglevel import LogLevel
 from imod.mf6.dis import StructuredDiscretization
 from imod.mf6.npf import NodePropertyFlow
+from imod.mf6.regrid.regrid_schemes import CapDataWellRegridMethod
 from imod.mf6.wel import LayeredWell, Well, derive_cellid_from_points
 from imod.mf6.write_context import WriteContext
 from imod.schemata import ValidationError
 from imod.tests.fixtures.flow_basic_fixture import BasicDisSettings
+from imod.tests.fixtures.imod5_cap_data import zeros_grid
 from imod.typing.grid import ones_like
+from imod.util.regrid import RegridderWeightsCache
 
 times = [
     datetime(1981, 11, 30),
@@ -1198,3 +1202,134 @@ def test_from_imod5_cap_data__points(cap_data_sprinkling_points, cap_coupled_dis
     np.testing.assert_equal(ds["layer"].to_numpy(), np.array([2, 3]))
     np.testing.assert_allclose(ds["rate"].to_numpy(), np.array([0.0, 0.0]))
     np.testing.assert_equal(ds["id"].to_numpy(), np.array(["0", "1"]))
+
+
+SPRINKLING_PRJ = """
+0001,(CAP),1,MetaSwap,[bnd,lus,rtz,slt,mst,sfl,rti,rti,rti,wra,wua,pua,pra,rua,rra,rua,rra,iua,ira,pwd,smf,spf]
+022,001
+1,2, 001, 1.0, 0.0, -999.9900,"{path}/other.idf"
+1,2, 001, 1.0, 0.0, -999.9900,"{path}/other.idf"
+1,2, 001, 1.0, 0.0, -999.9900,"{path}/other.idf"
+1,2, 001, 1.0, 0.0, -999.9900,"{path}/other.idf"
+1,2, 001, 1.0, 0.0, -999.9900,"{path}/other.idf"
+1,2, 001, 1.0, 0.0, -999.9900,"{path}/other.idf"
+1,2, 001, 1.0, 0.0, -999.9900,"{path}/type.idf"
+1,2, 001, 1.0, 0.0, -999.9900,"{path}/layer.idf"
+1,1, 001, 1.0, 0.0,  25.00000,''
+1,2, 001, 1.0, 0.0, -999.9900,"{path}/other.idf"
+1,2, 001, 1.0, 0.0, -999.9900,"{path}/other.idf"
+1,2, 001, 1.0, 0.0, -999.9900,"{path}/other.idf"
+1,2, 001, 1.0, 0.0, -999.9900,"{path}/other.idf"
+1,1, 001, 1.0, 0.0,  1.0     ,''
+1,1, 001, 1.0, 0.0,  1.0     ,''
+1,1, 001, 1.0, 0.0,  1.0     ,''
+1,1, 001, 1.0, 0.0,  1.0     ,''
+1,1, 001, 1.0, 0.0,  0.0     ,''
+1,1, 001, 1.0, 0.0,  0.05    ,''
+1,1, 001, 1.0, 0.0,  0.0     ,''
+1,1, 001, 1.0, 0.0,  1.0     ,''
+1,1, 001, 1.0, 0.0,  1.0     ,''
+001,EXTRA FILES
+extra.idf
+
+0001,(BND),1, Boundary Condition,[BND]
+001,001
+    1,2, 001, 1.0, 0.0, -999.9900,"{path}/other.idf",
+"""
+
+
+def _dis_with_refinement(refinement: int) -> StructuredDiscretization:
+    """Discretization covering the 3x3 grid of the sprinkling data."""
+    dx = 1.0 / refinement
+    n = 3 * refinement
+    x = 1.0 - 0.5 + dx / 2 + np.arange(n) * dx
+    y = 3.0 + 0.5 - dx / 2 - np.arange(n) * dx
+    layer = np.arange(3) + 1
+    idomain = xr.DataArray(
+        np.ones((3, n, n), dtype=int),
+        coords={"layer": layer, "y": y, "x": x, "dx": dx, "dy": -dx},
+        dims=("layer", "y", "x"),
+    )
+    bottom = xr.DataArray([0.0, -10.0, -20.0], dims="layer", coords={"layer": layer})
+    return StructuredDiscretization(idomain=idomain, top=10.0, bottom=bottom)
+
+
+def _write_sprinkling_prj(path, grids=None):
+    ones = zeros_grid(3) + 1.0
+    sprinkling_type = zeros_grid(3)
+    sprinkling_type[:, 1] = 1
+    sprinkling_type[:, 2] = 2
+    grids = grids or {"other": ones, "type": sprinkling_type, "layer": ones}
+    for name, da in grids.items():
+        imod.idf.save(path / name, da)
+    prj_path = path / "model.prj"
+    prj_path.write_text(SPRINKLING_PRJ.format(path=path.as_posix()))
+    return prj_path
+
+
+def _open_sprinkling_prj(path):
+    imod5_data, _ = open_projectfile_data(_write_sprinkling_prj(path))
+    return imod5_data
+
+
+@pytest.mark.parametrize("refinement", [1, 2])
+@pytest.mark.parametrize(
+    "nodata_variable, nodata_index, filename",
+    [
+        # Cell [0, 1] has sprinkling type 1, so a layer is required.
+        ("layer", (0, 1), "layer.idf"),
+        # Layer is valid everywhere, but type is NoData.
+        ("type", (0, 0), "type.idf"),
+    ],
+)
+def test_from_imod5_cap_data__nodata_in_prj_idf(
+    tmp_path, refinement, nodata_variable, nodata_index, filename
+):
+    # Arrange
+    ones = zeros_grid(3) + 1.0
+    sprinkling_type = zeros_grid(3)
+    sprinkling_type[:, 1] = 1
+    sprinkling_type[:, 2] = 2
+    grids = {"other": ones, "type": sprinkling_type, "layer": ones.copy()}
+    grids[nodata_variable][nodata_index] = np.nan
+    prj_path = _write_sprinkling_prj(tmp_path, grids)
+    imod5_data, _ = open_projectfile_data(prj_path)
+    target_dis = _dis_with_refinement(refinement)
+
+    # Act & Assert
+    with pytest.raises(ValueError, match="NoData") as excinfo:
+        LayeredWell.from_imod5_cap_data(imod5_data, target_dis)
+    message = str(excinfo.value)
+    assert filename in message
+    assert "(x, y)" in message
+
+
+def test_open_projectfile_data__cap_source_paths(tmp_path):
+    imod5_data = _open_sprinkling_prj(tmp_path)
+    cap = imod5_data["cap"]
+    assert cap["artificial_recharge"].attrs["source_paths"] == [
+        str(tmp_path / "type.idf")
+    ]
+    assert cap["artificial_recharge_layer"].attrs["source_paths"] == [
+        str(tmp_path / "layer.idf")
+    ]
+    assert cap["landuse"].attrs["source_paths"] == [str(tmp_path / "other.idf")]
+    # Constant, not read from file
+    assert "source_paths" not in cap["artificial_recharge_capacity"].attrs
+
+
+@pytest.mark.parametrize("refinement", [1, 2])
+def test_regrid_imod5_cap_and_bnd_data__source_paths(tmp_path, refinement):
+    imod5_data = _open_sprinkling_prj(tmp_path)
+    target_dis = _dis_with_refinement(refinement)
+
+    regridded = regrid_imod5_cap_and_bnd_data(
+        imod5_data, target_dis, CapDataWellRegridMethod(), RegridderWeightsCache()
+    )["cap"]
+
+    assert regridded["artificial_recharge"].attrs["source_paths"] == [
+        str(tmp_path / "type.idf")
+    ]
+    assert regridded["artificial_recharge_layer"].attrs["source_paths"] == [
+        str(tmp_path / "layer.idf")
+    ]

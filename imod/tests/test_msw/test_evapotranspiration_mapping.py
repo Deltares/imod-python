@@ -145,7 +145,7 @@ def test_evapotranspiration_mapping_clip():
     evapotranspiration_mapping = msw.PrecipitationMapping(evapotranspiration)
     clipped = evapotranspiration_mapping.clip_box(x_max=x_max, y_max=y_max)
     # Assert
-    actual_meteo = clipped.meteo
+    actual_meteo = clipped.dataset["meteo"]
     assert actual_meteo.x.max().values[()] <= x_max
     assert actual_meteo.y.max().values[()] <= y_max
 
@@ -211,7 +211,7 @@ def test_evapotranspiration_from_imod5(tmpdir_factory, replace_string, request):
         evapotranspiration_mapping = msw.EvapotranspirationMapping.from_imod5_data(
             imod5_data
         )
-        actual = evapotranspiration_mapping.meteo
+        actual = evapotranspiration_mapping.dataset["meteo"]
 
         # Assert
         assert len(actual.coords["time"]) == 1

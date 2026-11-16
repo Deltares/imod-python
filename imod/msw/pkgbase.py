@@ -123,8 +123,18 @@ class MetaSwapPackage(IPackageBase, abc.ABC):
         are specified in the ``self._metadata_dict`` for each variable.
         """
         for varname in dataframe:
-            min_value = self._metadata_dict[varname].min_value
-            max_value = self._metadata_dict[varname].max_value
+            metadata = self._metadata_dict[varname]
+            if metadata.dtype in (int, float):
+                n_nan = int(dataframe[varname].isna().sum())
+                if n_nan > 0:
+                    raise ValueError(
+                        f"{varname}: found {n_nan} NaN (NoData) value(s) in "
+                        "active cells, which cannot be written to MetaSWAP "
+                        "input. Provide valid values for all active cells, "
+                        "or deactivate these cells."
+                    )
+            min_value = metadata.min_value
+            max_value = metadata.max_value
             if (dataframe[varname] < min_value).any() or (
                 dataframe[varname] > max_value
             ).any():

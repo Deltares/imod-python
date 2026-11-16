@@ -1,3 +1,4 @@
+import re
 from copy import deepcopy
 from unittest.mock import patch
 
@@ -8,8 +9,10 @@ import xarray as xr
 import xugrid as xu
 from numpy.testing import assert_array_equal
 from pytest_cases import parametrize_with_cases
-from shapely import Polygon, get_coordinates, linestrings
+from shapely import LinearRing, Polygon, get_coordinates, linestrings
 
+import imod
+from imod.common.utilities.clip import clip_line_gdf_by_grid
 from imod.mf6 import (
     HorizontalFlowBarrierHydraulicCharacteristic,
     HorizontalFlowBarrierMultiplier,
@@ -33,6 +36,7 @@ from imod.prepare.hfb import (
     linestring_to_square_zpolygons,
     linestring_to_trapezoid_zpolygons,
 )
+from imod.schemata import GeometryTypeSchema, ValidationError
 from imod.tests.fixtures.flow_basic_fixture import BasicDisSettings
 from imod.typing.grid import nan_like, ones_like
 from imod.util.regrid import RegridderWeightsCache
@@ -1041,3 +1045,558 @@ def test_cleanup__split_in_two(structured_flow_model, hfb_case, _):
     hfb.cleanup(dis)
     # Assert
     assert len(hfb.line_data) == 2
+
+
+@pytest.fixture
+def geometry_ring():
+    ring = LinearRing([(20.0, 20.0), (60.0, 20.0), (60.0, 60.0), (20.0, 60.0)])
+    return gpd.GeoDataFrame(
+        geometry=[ring], data={"resistance": [1000.0], "layer": [1]}
+    )
+
+
+def _validate_geometry_schemata(hfb):
+    for schema in hfb._write_schemata["geometry"]:
+        if isinstance(schema, GeometryTypeSchema):
+            schema.validate(hfb.dataset["geometry"])
+
+
+@pytest.mark.parametrize(
+    "barrier_class, barrier_value_name, barrier_value",
+    [
+        (SingleLayerHorizontalFlowBarrierResistance, "resistance", 1e3),
+        (SingleLayerHorizontalFlowBarrierMultiplier, "multiplier", 1.5),
+        (
+            SingleLayerHorizontalFlowBarrierHydraulicCharacteristic,
+            "hydraulic_characteristic",
+            1e-3,
+        ),
+    ],
+)
+def test_linearring_validates(barrier_class, barrier_value_name, barrier_value):
+    ring = LinearRing([(20.0, 20.0), (60.0, 20.0), (60.0, 60.0), (20.0, 60.0)])
+    geometry = gpd.GeoDataFrame(
+        geometry=[ring], data={barrier_value_name: [barrier_value], "layer": [1]}
+    )
+    hfb = barrier_class(geometry)
+
+    _validate_geometry_schemata(hfb)
+
+
+def test_polygon_rejected_by_single_layer_hfb():
+    polygon = Polygon([(20.0, 20.0), (60.0, 20.0), (60.0, 60.0), (20.0, 60.0)])
+    geometry = gpd.GeoDataFrame(
+        geometry=[polygon], data={"resistance": [1000.0], "layer": [1]}
+    )
+    hfb = SingleLayerHorizontalFlowBarrierResistance(geometry)
+
+    with pytest.raises(ValidationError):
+        _validate_geometry_schemata(hfb)
+
+
+def test_linearring_to_mf6_pkg(basic_dis, geometry_ring):
+    idomain, top, bottom = basic_dis
+    hfb = SingleLayerHorizontalFlowBarrierResistance(geometry_ring)
+
+    mf6_hfb = hfb.to_mf6_pkg(idomain, top, bottom, ones_like(top))
+
+    # 4 sides of 4 cells each, closing vertex does not duplicate an edge.
+    assert mf6_hfb["hydraulic_characteristic"].size == 16
+    np.testing.assert_allclose(mf6_hfb["hydraulic_characteristic"].values, 1e-3)
+    assert (mf6_hfb["layer"].values == 1).all()
+
+
+def test_linearring_mixed_with_linestring(basic_dis, geometry_ring):
+    idomain, top, bottom = basic_dis
+    line = linestrings([80.0, 80.0], [10.0, 40.0])
+    geometry = gpd.GeoDataFrame(
+        geometry=[geometry_ring.geometry.iloc[0], line],
+        data={"resistance": [1000.0, 1000.0], "layer": [1, 1]},
+    )
+    hfb = SingleLayerHorizontalFlowBarrierResistance(geometry)
+
+    mf6_hfb = hfb.to_mf6_pkg(idomain, top, bottom, ones_like(top))
+
+    assert mf6_hfb["hydraulic_characteristic"].size == 16 + 3
+
+
+def test_linearring_partly_outside_grid(basic_dis):
+    idomain, top, bottom = basic_dis
+    ring = LinearRing([(60.0, 60.0), (120.0, 60.0), (120.0, 120.0), (60.0, 120.0)])
+    geometry = gpd.GeoDataFrame(
+        geometry=[ring], data={"resistance": [1000.0], "layer": [1]}
+    )
+    hfb = SingleLayerHorizontalFlowBarrierResistance(geometry)
+
+    mf6_hfb = hfb.to_mf6_pkg(idomain, top, bottom, ones_like(top))
+
+    assert mf6_hfb["hydraulic_characteristic"].size == 6
+
+
+def test_linearring_clip_box_and_cleanup(basic_dis, geometry_ring):
+    idomain, top, bottom = basic_dis
+    hfb = SingleLayerHorizontalFlowBarrierResistance(geometry_ring)
+
+    clipped = hfb.clip_box(x_min=0.0, x_max=40.0, y_min=0.0, y_max=90.0)
+
+    assert set(clipped.line_data.geometry.geom_type) <= {"LineString", "LinearRing"}
+    # Left side (40) + bottom (20) + top (20)
+    assert clipped.line_data.geometry.length.sum() == pytest.approx(80.0)
+
+    active_idomain = idomain.where(idomain.coords["y"] <= 40.0, 0)
+    top_2d = xr.full_like(active_idomain.isel(layer=0, drop=True), 0.0, dtype=float)
+    dis = StructuredDiscretization(top=top_2d, bottom=bottom, idomain=active_idomain)
+    clipped.cleanup(dis)
+    remaining_segments = sorted(
+        map(tuple, clipped.line_data.geometry.bounds.to_numpy())
+    )
+    assert remaining_segments == [
+        (20.0, 20.0, 20.0, 40.0),
+        (20.0, 20.0, 40.0, 20.0),
+    ]
+    assert hfb.line_data.geometry.length.sum() == pytest.approx(160.0)
+
+
+def test_linearring_netcdf_roundtrip(tmp_path, geometry_ring):
+    hfb = SingleLayerHorizontalFlowBarrierResistance(geometry_ring)
+
+    path = hfb.to_file(tmp_path, "hfb")
+    reloaded = SingleLayerHorizontalFlowBarrierResistance.from_file(path)
+
+    assert_array_equal(
+        get_coordinates(reloaded.line_data.geometry.iloc[0]),
+        get_coordinates(geometry_ring.geometry.iloc[0]),
+    )
+
+
+def test_single_layer_resistance_from_imod5_data_polygon_to_linearring():
+    # Arrange
+    hole = [(2.0, 2.0), (4.0, 2.0), (4.0, 4.0)]
+    shell = Polygon(
+        [(0.0, 0.0), (10.0, 0.0), (10.0, 10.0), (0.0, 10.0)],
+        holes=[hole],
+    )
+    line = linestrings([20.0, 30.0], [0.0, 0.0])
+    gdf = gpd.GeoDataFrame(geometry=[line, shell], data={"resistance": [100.0, 200.0]})
+    imod5_data = {"hfb-1": {"geodataframe": gdf, "layer": 2}}
+
+    # Act
+    hfb = SingleLayerHorizontalFlowBarrierResistance.from_imod5_data(
+        "hfb-1", imod5_data
+    )
+
+    # Assert: the exterior and interior ring each become a barrier.
+    geoms = hfb.line_data.geometry
+    assert list(geoms.geom_type) == ["LineString", "LinearRing", "LinearRing"]
+    assert_array_equal(get_coordinates(geoms.iloc[1]), get_coordinates(shell.exterior))
+    assert_array_equal(
+        get_coordinates(geoms.iloc[2]), get_coordinates(shell.interiors[0])
+    )
+    assert list(hfb.line_data["resistance"]) == [100.0, 200.0, 200.0]
+    assert list(hfb.line_data["layer"]) == [2, 2, 2]
+    # Input is not mutated
+    assert list(gdf.geometry.geom_type) == ["LineString", "Polygon"]
+    assert "layer" not in gdf.columns
+
+
+@pytest.mark.parametrize(
+    "barrier_class, value_name, value, expected",
+    [
+        (HorizontalFlowBarrierResistance, "resistance", 1000.0, 1e-3),
+        (HorizontalFlowBarrierMultiplier, "multiplier", 1.5, -1.5),
+        (
+            HorizontalFlowBarrierHydraulicCharacteristic,
+            "hydraulic_characteristic",
+            1e-3,
+            1e-3,
+        ),
+    ],
+)
+def test_all_layer_hfb_linearring_full_column(
+    basic_dis, barrier_class, value_name, value, expected
+):
+    idomain, top, bottom = basic_dis
+    ring = LinearRing([(20.0, 20.0), (60.0, 20.0), (60.0, 60.0), (20.0, 60.0)])
+    geometry = gpd.GeoDataFrame(geometry=[ring], data={value_name: [value]})
+    hfb = barrier_class(geometry)
+
+    assert not hfb._validate(hfb._write_schemata)
+    mf6_hfb = hfb.to_mf6_pkg(idomain, top, bottom, ones_like(top))
+
+    values = mf6_hfb["hydraulic_characteristic"].values
+    assert values.size == 16 * idomain.sizes["layer"]
+    np.testing.assert_allclose(values, expected)
+    assert set(mf6_hfb["layer"].values) == set(idomain.coords["layer"].values)
+
+
+def test_all_layer_hfb_mixed_linearring_and_z_polygon(basic_dis):
+    idomain, top, bottom = basic_dis
+    ring = LinearRing([(20.0, 20.0), (60.0, 20.0), (60.0, 60.0), (20.0, 60.0)])
+    polygon = linestring_to_square_zpolygons([0.0, 20.0], [70.0, 70.0], [-2.5], [-7.5])[
+        0
+    ]
+    ring_gdf = gpd.GeoDataFrame(geometry=[ring], data={"resistance": [1000.0]})
+    polygon_gdf = gpd.GeoDataFrame(geometry=[polygon], data={"resistance": [1000.0]})
+    mixed_gdf = gpd.GeoDataFrame(
+        geometry=[ring, polygon], data={"resistance": [1000.0, 1000.0]}
+    )
+
+    def values(geometry):
+        hfb = HorizontalFlowBarrierResistance(geometry)
+        assert not hfb._validate(hfb._write_schemata)
+        package = hfb.to_mf6_pkg(idomain, top, bottom, ones_like(top))
+        return package["hydraulic_characteristic"].values
+
+    mixed_values = np.sort(values(mixed_gdf))
+    separate_values = np.sort(np.concatenate([values(ring_gdf), values(polygon_gdf)]))
+
+    np.testing.assert_allclose(mixed_values, separate_values)
+
+
+def test_all_layer_hfb_linearring_full_column_on_spatially_varying_grid(basic_dis):
+    idomain, top, bottom = basic_dis
+    ring = LinearRing([(20.0, 20.0), (60.0, 20.0), (60.0, 60.0), (20.0, 60.0)])
+    geometry = gpd.GeoDataFrame(geometry=[ring], data={"resistance": [1000.0]})
+    hfb = HorizontalFlowBarrierResistance(geometry)
+    offset = xr.DataArray(
+        np.arange(idomain.sizes["y"] * idomain.sizes["x"], dtype=float).reshape(
+            idomain.sizes["y"], idomain.sizes["x"]
+        ),
+        coords={"y": idomain.coords["y"], "x": idomain.coords["x"]},
+        dims=("y", "x"),
+    )
+    top_3d = top.broadcast_like(idomain) + offset
+    bottom_3d = bottom.broadcast_like(idomain) + offset
+
+    mf6_hfb = hfb.to_mf6_pkg(idomain, top_3d, bottom_3d, ones_like(top_3d))
+
+    values = mf6_hfb["hydraulic_characteristic"].values
+    assert values.size == 16 * idomain.sizes["layer"]
+    np.testing.assert_allclose(values, 1e-3)
+
+
+def test_all_layer_resistance_from_imod5_converts_2d_polygon_only():
+    ring_polygon = Polygon([(0.0, 0.0), (10.0, 0.0), (10.0, 10.0), (0.0, 10.0)])
+    z_polygon = Polygon(
+        [
+            (20.0, 0.0, 0.0),
+            (20.0, 0.0, -5.0),
+            (30.0, 0.0, -5.0),
+            (30.0, 0.0, 0.0),
+        ]
+    )
+    geometry = gpd.GeoDataFrame(
+        geometry=[ring_polygon, z_polygon], data={"resistance": [1000.0, 2000.0]}
+    )
+    imod5_data = {"hfb-1": {"geodataframe": geometry, "layer": 0}}
+
+    hfb = HorizontalFlowBarrierResistance.from_imod5_data("hfb-1", imod5_data)
+
+    assert list(hfb.line_data.geometry.geom_type) == ["LinearRing", "Polygon"]
+    assert list(hfb.line_data.geometry.has_z) == [False, True]
+    assert list(geometry.geometry.geom_type) == ["Polygon", "Polygon"]
+
+
+# id: (geometry, error_match)
+INVALID_GEOMETRIES = {
+    "z_line": (
+        linestrings(coords=[(20.0, 20.0, 0.0), (60.0, 60.0, 0.0)]),
+        "LineString.*should not have z coordinates",
+    ),
+    "polygon_without_z": (
+        Polygon([(20.0, 20.0), (60.0, 20.0), (60.0, 60.0), (20.0, 60.0)]),
+        "Polygon.*should have z coordinates",
+    ),
+    "horizontal_z_polygon": (
+        Polygon(
+            [(20.0, 20.0, 0.0), (60.0, 20.0, 0.0), (60.0, 60.0, 0.0), (20.0, 60.0, 0.0)]
+        ),
+        "Polygon.*should be vertical",
+    ),
+}
+INVALID_GEOMETRY_PARAMS = [
+    pytest.param(geometry, error_match, id=name)
+    for name, (geometry, error_match) in INVALID_GEOMETRIES.items()
+]
+
+# A vertical wall: constant x/y along the top and bottom edges, z varies.
+VALID_VERTICAL_WALL = Polygon(
+    [(20.0, 20.0, 0.0), (60.0, 60.0, 0.0), (60.0, 60.0, -10.0), (20.0, 20.0, -10.0)]
+)
+
+
+@pytest.mark.parametrize(
+    "barrier_class, value_name",
+    [
+        (HorizontalFlowBarrierResistance, "resistance"),
+        (HorizontalFlowBarrierMultiplier, "multiplier"),
+        (HorizontalFlowBarrierHydraulicCharacteristic, "hydraulic_characteristic"),
+    ],
+)
+def test_all_layer_hfb_write_validation_accepts_vertical_wall(
+    barrier_class, value_name
+):
+    gdf = gpd.GeoDataFrame(geometry=[VALID_VERTICAL_WALL], data={value_name: [1000.0]})
+    hfb = barrier_class(gdf)
+
+    validation_errors = hfb._validate(hfb._write_schemata)
+
+    assert validation_errors == {}
+
+
+def test_all_layer_hfb_write_validation_accepts_bent_vertical_wall():
+    bent_wall = linestring_to_square_zpolygons(
+        [20.0, 40.0, 60.0], [20.0, 60.0, 20.0], [0.0, 0.0], [-10.0, -10.0]
+    )[0]
+    gdf = gpd.GeoDataFrame(geometry=[bent_wall], data={"resistance": [1000.0]})
+    hfb = HorizontalFlowBarrierResistance(gdf)
+
+    assert hfb._validate(hfb._write_schemata) == {}
+
+
+@pytest.mark.parametrize(
+    "barrier_class, value_name",
+    [
+        (HorizontalFlowBarrierResistance, "resistance"),
+        (HorizontalFlowBarrierMultiplier, "multiplier"),
+        (HorizontalFlowBarrierHydraulicCharacteristic, "hydraulic_characteristic"),
+    ],
+)
+@pytest.mark.parametrize("geometry, error_match", INVALID_GEOMETRY_PARAMS)
+def test_all_layer_hfb_write_validation_reports_errors_for_invalid_geometries(
+    barrier_class, value_name, geometry, error_match
+):
+    # Arrange
+    gdf = gpd.GeoDataFrame(geometry=[geometry], data={value_name: [1000.0]})
+    hfb = barrier_class(gdf)
+
+    # Act
+    validation_errors = hfb._validate(hfb._write_schemata)
+
+    # Assert: _validate returns {variable: [errors]}; empty means valid.
+    assert len(validation_errors) > 0
+    messages = [str(err) for errors in validation_errors.values() for err in errors]
+    assert any(re.search(error_match, msg) for msg in messages), messages
+
+
+@pytest.mark.parametrize(
+    "barrier_class, value_name",
+    [
+        (HorizontalFlowBarrierResistance, "resistance"),
+        (HorizontalFlowBarrierMultiplier, "multiplier"),
+        (HorizontalFlowBarrierHydraulicCharacteristic, "hydraulic_characteristic"),
+    ],
+)
+def test_all_layer_hfb_accepts_2d_linestring(barrier_class, value_name):
+    # Clipping a ring results in 2D linestrings, which should remain valid.
+    line = linestrings(coords=[(20.0, 20.0), (60.0, 60.0)])
+    geometry = gpd.GeoDataFrame(geometry=[line], data={value_name: [1000.0]})
+    hfb = barrier_class(geometry)
+
+    assert not hfb._validate(hfb._write_schemata)
+
+
+@pytest.fixture
+def all_layer_ring_and_z_polygon():
+    ring = LinearRing([(20.0, 20.0), (60.0, 20.0), (60.0, 60.0), (20.0, 60.0)])
+    polygon = linestring_to_square_zpolygons([0.0, 20.0], [70.0, 70.0], [-2.5], [-7.5])[
+        0
+    ]
+    ring_gdf = gpd.GeoDataFrame(geometry=[ring], data={"resistance": [1000.0]})
+    polygon_gdf = gpd.GeoDataFrame(geometry=[polygon], data={"resistance": [2000.0]})
+    mixed_gdf = gpd.GeoDataFrame(
+        geometry=[ring, polygon], data={"resistance": [1000.0, 2000.0]}
+    )
+    return ring_gdf, polygon_gdf, mixed_gdf
+
+
+def _all_layer_values(hfb, basic_dis):
+    idomain, top, bottom = basic_dis
+    assert not hfb._validate(hfb._write_schemata)
+    package = hfb.to_mf6_pkg(idomain, top, bottom, ones_like(top))
+    return np.sort(package["hydraulic_characteristic"].values)
+
+
+_CLIP_BOX_ARGS = {"x_min": 0.0, "x_max": 40.0, "y_min": 0.0, "y_max": 90.0}
+
+
+def test_all_layer_hfb_linearring_clip_box(basic_dis):
+    idomain, _, _ = basic_dis
+    ring = LinearRing([(20.0, 20.0), (60.0, 20.0), (60.0, 60.0), (20.0, 60.0)])
+    gdf = gpd.GeoDataFrame(geometry=[ring], data={"resistance": [1000.0]})
+    hfb = HorizontalFlowBarrierResistance(gdf)
+
+    clipped = hfb.clip_box(**_CLIP_BOX_ARGS)
+
+    # Left side (40) + bottom (20) + top (20)
+    assert clipped.line_data.geometry.length.sum() == pytest.approx(80.0)
+    values = _all_layer_values(clipped, basic_dis)
+    assert values.size == 8 * idomain.sizes["layer"]
+    np.testing.assert_allclose(values, 1e-3)
+
+
+def test_all_layer_hfb_mixed_linearring_and_z_polygon_clip_box(
+    basic_dis, all_layer_ring_and_z_polygon
+):
+    ring_gdf, polygon_gdf, mixed_gdf = all_layer_ring_and_z_polygon
+
+    clipped_mixed = HorizontalFlowBarrierResistance(mixed_gdf).clip_box(
+        **_CLIP_BOX_ARGS
+    )
+
+    # Parts of features are stored in a dense (index, parts) grid, with missing
+    # parts as NaN.
+    line_data = clipped_mixed.line_data.dropna(subset="geometry")
+    assert set(line_data.geometry.geom_type) == {"LineString", "Polygon"}
+    assert not line_data["resistance"].isna().any()
+    separate_values = [
+        _all_layer_values(
+            HorizontalFlowBarrierResistance(gdf).clip_box(**_CLIP_BOX_ARGS), basic_dis
+        )
+        for gdf in (ring_gdf, polygon_gdf)
+    ]
+    np.testing.assert_allclose(
+        _all_layer_values(clipped_mixed, basic_dis),
+        np.sort(np.concatenate(separate_values)),
+    )
+
+
+@pytest.fixture
+def dis_with_inactive_top(basic_dis):
+    idomain, _, bottom = basic_dis
+    active_idomain = idomain.where(idomain.coords["y"] <= 40.0, 0)
+    top_2d = xr.full_like(active_idomain.isel(layer=0, drop=True), 0.0, dtype=float)
+    return StructuredDiscretization(top=top_2d, bottom=bottom, idomain=active_idomain)
+
+
+def test_all_layer_hfb_linearring_cleanup(basic_dis, dis_with_inactive_top):
+    ring = LinearRing([(20.0, 20.0), (60.0, 20.0), (60.0, 60.0), (20.0, 60.0)])
+    gdf = gpd.GeoDataFrame(geometry=[ring], data={"resistance": [1000.0]})
+    hfb = HorizontalFlowBarrierResistance(gdf)
+
+    hfb.cleanup(dis_with_inactive_top)
+
+    assert set(hfb.line_data.geometry.geom_type) == {"LineString"}
+    # Left side (20) + bottom (40) + right side (20) remain
+    assert hfb.line_data.geometry.length.sum() == pytest.approx(80.0)
+    assert _all_layer_values(hfb, basic_dis).size > 0
+
+
+def test_all_layer_hfb_mixed_linearring_and_z_polygon_cleanup(
+    basic_dis, dis_with_inactive_top, all_layer_ring_and_z_polygon
+):
+    _, _, mixed_gdf = all_layer_ring_and_z_polygon
+    hfb = HorizontalFlowBarrierResistance(mixed_gdf)
+
+    hfb.cleanup(dis_with_inactive_top)
+
+    # The polygon at y=70 is outside the active domain
+    line_data = hfb.line_data.dropna(subset="geometry")
+    assert set(line_data.geometry.geom_type) == {"LineString"}
+    assert not line_data["resistance"].isna().any()
+    assert not hfb._validate(hfb._write_schemata)
+
+
+def test_all_layer_hfb_linearring_clip_by_grid(basic_dis):
+    ring = LinearRing([(20.0, 20.0), (60.0, 20.0), (60.0, 60.0), (20.0, 60.0)])
+    gdf = gpd.GeoDataFrame(geometry=[ring], data={"resistance": [1000.0]})
+    hfb = HorizontalFlowBarrierResistance(gdf)
+    idomain, _, _ = basic_dis
+
+    clipped = clip_line_gdf_by_grid(hfb.line_data, idomain.isel(layer=0, drop=True) > 0)
+
+    assert set(clipped.geometry.geom_type) == {"LineString"}
+    assert not clipped.geometry.has_z.any()
+    assert clipped.geometry.length.sum() == pytest.approx(160.0)
+
+
+@pytest.fixture
+def polygon_with_interior_ring():
+    return Polygon(
+        [(20.0, 20.0), (60.0, 20.0), (60.0, 60.0), (20.0, 60.0)],
+        holes=[[(30.0, 30.0), (50.0, 30.0), (50.0, 50.0), (30.0, 50.0)]],
+    )
+
+
+def test_single_layer_from_imod5_data_polygon_with_interior_ring_to_mf6(
+    basic_dis, polygon_with_interior_ring
+):
+    idomain, top, bottom = basic_dis
+    gdf = gpd.GeoDataFrame(
+        geometry=[polygon_with_interior_ring], data={"resistance": [1000.0]}
+    )
+    imod5_data = {"hfb-1": {"geodataframe": gdf, "layer": 1}}
+
+    hfb = SingleLayerHorizontalFlowBarrierResistance.from_imod5_data(
+        "hfb-1", imod5_data
+    )
+    mf6_hfb = hfb.to_mf6_pkg(idomain, top, bottom, ones_like(top))
+
+    # Outer wall of 16 edges and inner wall of 8 edges.
+    assert mf6_hfb["hydraulic_characteristic"].size == 16 + 8
+
+
+def test_all_layer_from_imod5_data_polygon_with_interior_ring_to_mf6(
+    basic_dis, polygon_with_interior_ring
+):
+    idomain, top, bottom = basic_dis
+    gdf = gpd.GeoDataFrame(
+        geometry=[polygon_with_interior_ring], data={"resistance": [1000.0]}
+    )
+    imod5_data = {"hfb-1": {"geodataframe": gdf, "layer": 0}}
+
+    hfb = HorizontalFlowBarrierResistance.from_imod5_data("hfb-1", imod5_data)
+    mf6_hfb = hfb.to_mf6_pkg(idomain, top, bottom, ones_like(top))
+
+    assert list(hfb.line_data.geometry.geom_type) == ["LinearRing", "LinearRing"]
+    assert mf6_hfb["hydraulic_characteristic"].size == (16 + 8) * idomain.sizes["layer"]
+
+
+def test_from_imod5_data_polygon_without_interior_ring_keeps_index():
+    polygon = Polygon([(0.0, 0.0), (10.0, 0.0), (10.0, 10.0), (0.0, 10.0)])
+    gdf = gpd.GeoDataFrame(
+        geometry=[polygon, polygon], data={"resistance": [100.0, 200.0]}, index=[5, 7]
+    )
+    imod5_data = {"hfb-1": {"geodataframe": gdf, "layer": 2}}
+
+    hfb = SingleLayerHorizontalFlowBarrierResistance.from_imod5_data(
+        "hfb-1", imod5_data
+    )
+
+    assert list(hfb.line_data.index) == [5, 7]
+
+
+def test_all_layer_from_imod5_data_z_polygon_with_interior_ring_rejected():
+    z_polygon = Polygon(
+        [(20.0, 0.0, 0.0), (20.0, 0.0, -5.0), (30.0, 0.0, -5.0), (30.0, 0.0, 0.0)],
+        holes=[[(22.0, 0.0, -1.0), (22.0, 0.0, -2.0), (24.0, 0.0, -2.0)]],
+    )
+    gdf = gpd.GeoDataFrame(geometry=[z_polygon], data={"resistance": [1000.0]})
+    imod5_data = {"hfb-1": {"geodataframe": gdf, "layer": 0}}
+
+    hfb = HorizontalFlowBarrierResistance.from_imod5_data("hfb-1", imod5_data)
+
+    # Z polygons are left alone, but should be rejected by validation.
+    assert list(hfb.line_data.geometry.geom_type) == ["Polygon"]
+    errors = hfb._validate(hfb._write_schemata)
+    assert "interior rings" in str(errors)
+
+
+def test_from_imod5_data_from_mixed_gen_file(tmp_path, basic_dis):
+    gen_path = tmp_path / "hfb.gen"
+    gen_path.write_text(
+        "1\n20.0, 20.0\n60.0, 20.0\n60.0, 60.0\n20.0, 60.0\n20.0, 20.0\nend\n"
+        "2\n80.0, 10.0\n80.0, 40.0\nend\nend\n"
+    )
+    gdf = imod.gen.read(gen_path)
+    gdf["resistance"] = 1000.0
+    imod5_data = {"hfb-1": {"geodataframe": gdf, "layer": 1}}
+    idomain, top, bottom = basic_dis
+
+    hfb = SingleLayerHorizontalFlowBarrierResistance.from_imod5_data(
+        "hfb-1", imod5_data
+    )
+    mf6_hfb = hfb.to_mf6_pkg(idomain, top, bottom, ones_like(top))
+
+    assert list(hfb.line_data.geometry.geom_type) == ["LinearRing", "LineString"]
+    assert mf6_hfb["hydraulic_characteristic"].size == 16 + 3
