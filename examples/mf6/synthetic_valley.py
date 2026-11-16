@@ -221,6 +221,7 @@ fig.tight_layout()
 # 40 by 25 rasters with a cell size of 500 feet (152.4 m).
 
 from imod.data.sample_data import synth_valley_flopy_data
+
 rasters = synth_valley_flopy_data()
 rasters["top"]
 

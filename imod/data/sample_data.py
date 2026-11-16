@@ -328,6 +328,7 @@ def synth_valley_flopy_data() -> xr.Dataset:
     Load the synthetic valley Flopy data in SI units as an xarray Dataset.
     """
     import xarray as xr
+
     filename = "synth_valley_flopy_data_SI.nc"
     lock = FileLock(REGISTRY.path / f"{filename}.lock")
     with lock:
