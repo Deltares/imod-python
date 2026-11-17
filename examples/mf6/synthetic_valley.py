@@ -614,6 +614,7 @@ simulation["time_discretization"] = imod.mf6.TimeDiscretization(
 # Running requires the MODFLOW 6 executable to be on your PATH.
 
 modeldir = imod.util.temporary_directory()
+
 simulation.write(modeldir / "unstructured", binary=True)
 simulation.run()
 
