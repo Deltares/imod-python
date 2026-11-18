@@ -243,7 +243,7 @@ def drop_raster_coords(da):
     return da.drop_vars(["dx", "dy"], errors="ignore")
 
 
-def regrid_linear(da):
+def regrid_linear(da, grid):
     """
     Regrid a DataArray using linear interpolation with nearest neighbor fallback
     for cells around the edges of the domain.
@@ -253,15 +253,15 @@ def regrid_linear(da):
     return drop_raster_coords(linear.fillna(nearest))
 
 
-def regrid_nearest(da):
+def regrid_nearest(da, grid):
     return drop_raster_coords(xu.CentroidLocatorRegridder(da, grid).regrid(da))
 
 
-top = regrid_linear(rasters["top"])
-bottom_aquifer = regrid_linear(rasters["bottom"])
-k_aquifer = regrid_nearest(rasters["k_aquifer"])
-k_clay = regrid_nearest(rasters["k_clay"])
-is_lake = regrid_nearest(rasters["lake"]) == 1.0
+top = regrid_linear(rasters["top"], grid)
+bottom_aquifer = regrid_linear(rasters["bottom"], grid)
+k_aquifer = regrid_nearest(rasters["k_aquifer"], grid)
+k_clay = regrid_nearest(rasters["k_clay"], grid)
+is_lake = regrid_nearest(rasters["lake"], grid) == 1.0
 
 # %%
 # The confining unit (layer 3) is present where the clay conductivity raster
@@ -614,7 +614,8 @@ simulation["time_discretization"] = imod.mf6.TimeDiscretization(
 # Running requires the MODFLOW 6 executable to be on your PATH.
 
 modeldir = imod.util.temporary_directory()
-simulation.write(modeldir, binary=True)
+
+simulation.write(modeldir / "unstructured", binary=True)
 simulation.run()
 
 # %%
@@ -694,14 +695,108 @@ ax.set_xlabel("flow into the model (m3/d)")
 fig.tight_layout()
 
 # %%
-# From here
-# ---------
 #
-# The original example continues with a groundwater transport model, coupled with the
-# flow model by the ``FMI`` and ``SSM`` packages. imod-python has classes for
-# transport models too: see :class:`imod.mf6.GroundwaterTransportModel`, and the
-# ``transport_2d`` example for the workflow.
+# Before we regrid, we have to pop the Lake package, as it is unfortunately not
+# supported by the regridder (yet). This is not a big problem for this specific
+# case, as its effect on the water balance was limited.
+
+gwf_model.pop("lak")
+
+# %%
 #
-# Also have a look at the ``lake`` example for a lake with outlets, and at the
-# ``hondsrug`` example for a larger regional model that is built from data of
-# the Dutch subsurface.
+# Let's test this model now on a structured grid to see if the unstructured grid
+# was worth the effort. We'll start fetching the bounding box of the grid, from
+# which we can construct the structured grid.
+
+xmin, ymin, xmax, ymax = grid.bounding_polygon().bounds
+dx, dy = 10.0, 10.0
+
+target_grid = imod.util.empty_2d(dx, xmin, xmax, dy, ymin, ymax).fillna(1)
+
+print(f"unstructured grid amount of cells: {grid.sizes['mesh2d_nFaces']}")
+print(f"structured grid amount of cells: {target_grid.size}")
+
+# %%
+#
+# Now we can create a structured grid simulation using the target grid.
+
+simulation_structured = simulation.regrid_like("structured_sim", target_grid)
+
+# Some testing showed that we need to reduce the solver tolerances for the
+# structured grid simulation to somewhat reduce water balance errors.
+simulation_structured["solver"] = imod.mf6.Solution(
+    modelnames=["gwf"],
+    print_option="summary",
+    outer_dvclose=1.0e-4,
+    outer_maximum=25,
+    inner_maximum=50,
+    inner_dvclose=1.0e-4,
+    inner_rclose=0.01,
+    linear_acceleration="bicgstab",
+    preconditioner_levels=7,
+    preconditioner_drop_tolerance=1.0e-3,
+    relaxation_factor=0.0,
+)
+
+# %%
+simulation_structured.write(modeldir / "structured", binary=True)
+simulation_structured.run()
+
+# %%
+#
+# That seems roughly similar to the unstructured grid results. Let's compute
+# differences for the head between the structured and unstructured grids. For
+# that we'll upscale the structured head onto the unstructured grid.
+
+head_unstructured = simulation.open_head().isel(time=0).compute()
+head_structured = simulation_structured.open_head().isel(time=0).compute()
+head_regridded = xu.OverlapRegridder(head_structured, head_unstructured, "mean").regrid(
+    head_structured
+)
+head_diff = np.abs(head_regridded - head_unstructured)
+
+fig, axes = plt.subplots(1, 2, figsize=(11, 8))
+for ax, lay in zip(axes, [1, 6]):
+    head_diff.sel(layer=lay).ugrid.plot(
+        ax=ax, cmap="RdBu_r", vmin=0.0, cbar_kwargs={"label": "head difference (m)"}
+    )
+    ax.set_title(f"Head difference in layer {lay}")
+    ax.set_aspect(1.0)
+fig.tight_layout()
+
+# %%
+#
+# That is pretty good, there are some local differences around the river and
+# wells, but most of the domain shows good agreement. Let's take a look at the
+# water balance of the structured model.
+
+# %%
+#
+# Head
+budget_structured = simulation_structured.open_flow_budget()
+packages = ["rch", "evt", "wel", "drn", "riv"]
+flows_structured = {
+    name: float(budget_structured[f"{name}_{name}"].isel(time=0).sum())
+    for name in packages
+}
+water_balance_structured = pd.DataFrame(
+    {"flow (m3/d)": flows_structured}, index=pd.Index(packages, name="package")
+)
+water_balance_structured.loc["total"] = water_balance_structured["flow (m3/d)"].sum()
+water_balance_structured.round(1)
+
+# %%
+#
+# The total balance error is worse than that of the unstructured model (-22), despite
+# finer cells and stricter solver settings! The overall picture of the water
+# balance is similar though:
+
+fig, ax = plt.subplots(figsize=(7, 4))
+water_balance_structured["flow (m3/d)"].iloc[:-1].plot.barh(ax=ax, color="tab:blue")
+ax.axvline(0.0, color="black", linewidth=0.5)
+ax.set_xlabel("flow into the model (m3/d)")
+fig.tight_layout()
+# %%
+#
+# To conclude: The unstructured model seems to provide a better overall water
+# balance with comparable heads. And that with a lot less cells overall.

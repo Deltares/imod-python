@@ -1,5 +1,5 @@
 import pathlib
-from typing import Any, Union
+from typing import TYPE_CHECKING, Any, Union
 
 import numpy as np
 
@@ -30,6 +30,9 @@ from imod.schemata import (
 )
 from imod.typing.grid import GridDataArray, is_unstructured
 from imod.util.regrid import RegridderWeightsCache
+
+if TYPE_CHECKING:
+    from imod.mf6.disv import VerticesDiscretization
 
 
 class StructuredDiscretization(Package, IRegridPackage, IMaskingSettings):
@@ -297,6 +300,8 @@ class StructuredDiscretization(Package, IRegridPackage, IMaskingSettings):
         """
         as_pkg_type = None
         if is_unstructured(target_grid):
+            from imod.mf6.disv import VerticesDiscretization
+
             as_pkg_type = VerticesDiscretization
 
         try:
@@ -305,6 +310,6 @@ class StructuredDiscretization(Package, IRegridPackage, IMaskingSettings):
             )
         except ValueError as e:
             raise e
-        except Exception:
-            raise ValueError("package could not be regridded.")
+        except Exception as e:
+            raise ValueError(f"package could not be regridded. {e}")
         return result

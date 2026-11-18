@@ -1,11 +1,15 @@
 from pathlib import Path
-from typing import Any
+from typing import TYPE_CHECKING, Any
 
 import numpy as np
 import pandas as pd
 
 from imod.common.interfaces.imaskingsettings import IMaskingSettings
 from imod.common.interfaces.iregridpackage import IRegridPackage
+from imod.common.utilities.dataclass_type import DataclassType
+from imod.common.utilities.regrid import (
+    _regrid_like,
+)
 from imod.logging import init_log_decorator
 from imod.mf6.package import Package
 from imod.mf6.regrid.regrid_schemes import DiscretizationRegridMethod
@@ -22,6 +26,11 @@ from imod.schemata import (
     ValidationError,
 )
 from imod.typing import GridDataArray
+from imod.typing.grid import is_unstructured
+from imod.util.regrid import RegridderWeightsCache
+
+if TYPE_CHECKING:
+    from imod.mf6.dis import StructuredDiscretization
 
 
 class VerticesDiscretization(Package, IRegridPackage, IMaskingSettings):
@@ -199,3 +208,25 @@ class VerticesDiscretization(Package, IRegridPackage, IMaskingSettings):
         errors = super()._validate(schemata, **kwargs)
 
         return errors
+
+    def regrid_like(
+        self,
+        target_grid: GridDataArray,
+        regrid_cache: RegridderWeightsCache,
+        regridder_types: DataclassType | None = None,
+    ) -> "StructuredDiscretization | VerticesDiscretization":
+        as_pkg_type = None
+        if not is_unstructured(target_grid):
+            from imod.mf6.dis import StructuredDiscretization
+
+            as_pkg_type = StructuredDiscretization
+
+        try:
+            result = _regrid_like(
+                self, target_grid, regrid_cache, regridder_types, as_pkg_type
+            )
+        except ValueError as e:
+            raise e
+        except Exception as e:
+            raise ValueError(f"package could not be regridded. {e}")
+        return result
