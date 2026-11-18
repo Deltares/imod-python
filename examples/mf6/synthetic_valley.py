@@ -718,7 +718,6 @@ target_grid = imod.util.empty_2d(dx, xmin, xmax, dy, ymin, ymax).fillna(1)
 gwf_model.pop("lak")
 
 
-
 # %%
 simulation_structured = simulation.regrid_like("structured_sim", target_grid)
 

@@ -1,5 +1,5 @@
 import pathlib
-from typing import Any, Union, TYPE_CHECKING
+from typing import TYPE_CHECKING, Any, Union
 
 import numpy as np
 
@@ -33,6 +33,7 @@ from imod.util.regrid import RegridderWeightsCache
 
 if TYPE_CHECKING:
     from imod.mf6.disv import VerticesDiscretization
+
 
 class StructuredDiscretization(Package, IRegridPackage, IMaskingSettings):
     """
@@ -300,7 +301,7 @@ class StructuredDiscretization(Package, IRegridPackage, IMaskingSettings):
         as_pkg_type = None
         if is_unstructured(target_grid):
             from imod.mf6.disv import VerticesDiscretization
-            
+
             as_pkg_type = VerticesDiscretization
 
         try:

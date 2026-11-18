@@ -24,7 +24,6 @@ from imod.typing import Imod5DataDict
 from imod.typing.grid import (
     GridDataArray,
     GridDataset,
-    is_unstructured,
     ones_like,
 )
 from imod.util.dims import drop_layer_dim_cap_and_bnd_data, enforced_dim_order

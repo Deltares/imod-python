@@ -1,15 +1,15 @@
 from pathlib import Path
-from typing import Any, TYPE_CHECKING
+from typing import TYPE_CHECKING, Any
 
 import numpy as np
 import pandas as pd
 
 from imod.common.interfaces.imaskingsettings import IMaskingSettings
 from imod.common.interfaces.iregridpackage import IRegridPackage
+from imod.common.utilities.dataclass_type import DataclassType
 from imod.common.utilities.regrid import (
     _regrid_like,
 )
-from imod.common.utilities.dataclass_type import DataclassType
 from imod.logging import init_log_decorator
 from imod.mf6.package import Package
 from imod.mf6.regrid.regrid_schemes import DiscretizationRegridMethod
@@ -26,7 +26,7 @@ from imod.schemata import (
     ValidationError,
 )
 from imod.typing import GridDataArray
-from imod.typing.grid import GridDataArray, is_unstructured
+from imod.typing.grid import is_unstructured
 from imod.util.regrid import RegridderWeightsCache
 
 if TYPE_CHECKING:
