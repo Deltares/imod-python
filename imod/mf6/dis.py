@@ -310,6 +310,6 @@ class StructuredDiscretization(Package, IRegridPackage, IMaskingSettings):
             )
         except ValueError as e:
             raise e
-        except Exception:
-            raise ValueError("package could not be regridded.")
+        except Exception as e:
+            raise ValueError(f"package could not be regridded. {e}")
         return result
