@@ -802,6 +802,11 @@ def _process_timestring_period(timestring: str) -> datetime:
     Raises a ValueError if the time string cannot be used for a repeating
     period.
     """
+    # The year of a repeating period is not used, iMOD5 project files may
+    # therefore contain years such as 0000, which datetime cannot represent.
+    # Replace the year before parsing "dd-mm-yyyy" or "dd-mm-yyyy hh:mm:ss".
+    if len(timestring) in (10, 19):
+        timestring = timestring[:6] + "1899" + timestring[10:]
     result = _process_time(timestring, yearfirst=False)
     if result is None:
         raise ValueError(
