@@ -563,6 +563,23 @@ def test_process_time():
         prj._process_time("2000-01-01 00:00", yearfirst=False)
 
 
+def test_process_timestring_period_year_0000():
+    expected = datetime(1899, 4, 1)
+    assert prj._process_timestring_period("01-04-0000") == expected
+    assert prj._process_timestring_period("01-04-0000 00:00:00") == expected
+
+
+def test_process_timestring_period():
+    expected = datetime(1899, 4, 1)
+    assert prj._process_timestring_period("01-04-1900") == expected
+    assert prj._process_timestring_period("01-04-2000 00:00:00") == expected
+
+    with pytest.raises(ValueError, match="cannot be used for a repeating period"):
+        prj._process_timestring_period("steady-state")
+    with pytest.raises(ValueError, match="time data"):
+        prj._process_timestring_period("01-04-2000 00:00")
+
+
 class SprinklingWellCases:
     def case_sprinkling_idf(self):
         return "a.idf"

@@ -73,6 +73,10 @@ Added
 Fixed
 ~~~~~
 
+- :func:`imod.formats.prj.open_projectfile_data` failed with ``ValueError: year
+  0 is out of range`` for project files with year 0000 in the Periods block.
+  Since the year of a repeating period is not used, such dates are now accepted
+  and their year is set to 1899, like other periods.
 - :func:`imod.idf.open_subdomains` returned different results for overlapping
   subdomains depending on the filesystem's file listing order (e.g. on macOS
   and Linux). Globbed paths are now sorted.
