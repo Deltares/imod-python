@@ -723,7 +723,8 @@ print(f"structured grid amount of cells: {target_grid.size}")
 simulation_structured = simulation.regrid_like("structured_sim", target_grid)
 
 # Some testing showed that we need to reduce the solver tolerances for the
-# structured grid simulation to somewhat reduce water balance errors.
+# structured grid simulation to somewhat reduce water balance errors. For that
+# we'll reduce the outer and inner solver tolerances by an order of magnitude.
 solver = simulation_structured["solver"]
 solver["outer_dvclose"] /= 10.0
 solver["inner_dvclose"] /= 10.0
