@@ -723,20 +723,12 @@ print(f"structured grid amount of cells: {target_grid.size}")
 simulation_structured = simulation.regrid_like("structured_sim", target_grid)
 
 # Some testing showed that we need to reduce the solver tolerances for the
-# structured grid simulation to somewhat reduce water balance errors.
-simulation_structured["solver"] = imod.mf6.Solution(
-    modelnames=["gwf"],
-    print_option="summary",
-    outer_dvclose=1.0e-4,
-    outer_maximum=25,
-    inner_maximum=50,
-    inner_dvclose=1.0e-4,
-    inner_rclose=0.01,
-    linear_acceleration="bicgstab",
-    preconditioner_levels=7,
-    preconditioner_drop_tolerance=1.0e-3,
-    relaxation_factor=0.0,
-)
+# structured grid simulation to somewhat reduce water balance errors. For that
+# we'll reduce the outer and inner solver tolerances by an order of magnitude.
+solver = simulation_structured["solver"]
+solver["outer_dvclose"] /= 10.0
+solver["inner_dvclose"] /= 10.0
+solver["inner_rclose"] /= 100.0
 
 # %%
 simulation_structured.write(modeldir / "structured", binary=True)
@@ -744,12 +736,30 @@ simulation_structured.run()
 
 # %%
 #
+# Plot the head distribution for the structured grid simulation. Let's see how
+# smooth it is.
+
+head_structured = simulation_structured.open_head().isel(time=0).compute()
+
+fig, axes = plt.subplots(1, 2, figsize=(11, 8))
+for ax, lay in zip(axes, [1, 6]):
+    head_structured.sel(layer=lay).plot(
+        ax=ax, cmap="viridis", vmin=0.0, vmax=5.0, cbar_kwargs={"label": "head (m)"}
+    )
+    ax.plot(*river.xy, color="tab:cyan", linewidth=2)
+    ax.scatter(*well_xy.T, color="tab:red", zorder=3)
+    ax.set_title(f"Head in layer {lay}")
+    ax.set_aspect(1.0)
+fig.tight_layout()
+
+# %%
+#
 # That seems roughly similar to the unstructured grid results. Let's compute
 # differences for the head between the structured and unstructured grids. For
-# that we'll upscale the structured head onto the unstructured grid.
+# that we'll first upscale the structured head onto the unstructured grid, then
+# subtract them from each other to get the differences.
 
 head_unstructured = simulation.open_head().isel(time=0).compute()
-head_structured = simulation_structured.open_head().isel(time=0).compute()
 head_regridded = xu.OverlapRegridder(head_structured, head_unstructured, "mean").regrid(
     head_structured
 )
