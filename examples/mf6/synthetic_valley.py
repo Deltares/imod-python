@@ -160,8 +160,18 @@ points = gpd.GeoDataFrame(
     {"cellsize": np.full(len(point_geometry), np.nan)}, geometry=point_geometry
 )
 mesh_input = pd.concat([zones, points], ignore_index=True)
+mesh_input[1:].plot()
+
+# %%
+#
+# Let's generate the triangular mesh and create a plot of it. Notice the
+# refinement around the river, the lake, and the wells.#
 
 triangles = pm.TriangleMesher(mesh_input).generate_ugrid()
+
+fig, ax = plt.subplots()
+triangles.plot(linewidth=0.3, color="grey", ax=ax)
+ax.set_aspect(1.0)
 
 # %%
 # The Voronoi diagram of the triangulation is the dual of the triangulation:
@@ -780,9 +790,6 @@ fig.tight_layout()
 # wells, but most of the domain shows good agreement. Let's take a look at the
 # water balance of the structured model.
 
-# %%
-#
-# Head
 budget_structured = simulation_structured.open_flow_budget()
 packages = ["rch", "evt", "wel", "drn", "riv"]
 flows_structured = {
