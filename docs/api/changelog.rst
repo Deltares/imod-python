@@ -69,6 +69,11 @@ Added
   Modflow 6 executable from the ``MODFLOW6_EXECUTABLE`` environment variable, if
   ``mf6path`` is not provided. If the executable is not found, is a directory,
   or is not executable, a descriptive error is raised before running.
+- Support for :meth:`imod.mf6.Modflow6Simulation.regrid_like` to regrid
+  unstructured grids to structured grids.
+- :meth:`imod.mf6.VerticesDiscretization.regrid_like` now returns a
+  :class:`imod.mf6.StructuredDiscretization` object when called with a
+  structured target grid.
 
 Fixed
 ~~~~~
