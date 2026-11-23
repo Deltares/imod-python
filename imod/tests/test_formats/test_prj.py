@@ -112,9 +112,9 @@ PRJ_TEMPLATE = textwrap.dedent(
 
     Periods
     SUMMER
-    01-04-1900 00:00:00
+    01-04-{periodyear} 00:00:00
     WINTER
-    01-10-1900 00:00:00
+    01-10-{periodyear} 00:00:00
 
     Species
     "benzene",1
@@ -656,13 +656,16 @@ class TestProjectFile:
     @pytest_cases.parametrize_with_cases(
         "sprinkling_well_file", cases=SprinklingWellCases
     )
-    def projectfile(self, sprinkling_well_file):
+    @pytest_cases.parametrize("periodyear", ["0000", "2000"])
+    def projectfile(self, sprinkling_well_file, periodyear):
         sprinkling_ext = sprinkling_well_file[:3]
         prj_path = self.basepath / f"testprojectfile_sprinkling_{sprinkling_ext}.prj"
         with open(prj_path, "w") as f:
             f.write(
                 PRJ_TEMPLATE.format(
-                    basepath=self.basepath, sprinkling_well=sprinkling_well_file
+                    basepath=self.basepath,
+                    sprinkling_well=sprinkling_well_file,
+                    periodyear=periodyear,
                 )
             )
         return prj_path
@@ -697,6 +700,7 @@ class TestProjectFile:
         assert isinstance(content["hfb-1"]["geodataframe"], gpd.GeoDataFrame)
         assert isinstance(content["hfb-2"]["geodataframe"], gpd.GeoDataFrame)
         assert isinstance(content["pcg"], dict)
+        # Period year should be forced to 1899, just outside the iMOD5 calendar
         assert set(repeats["rch"]) == {datetime(1899, 4, 1), datetime(1899, 10, 1)}
 
         # Test if chunking of topsystem IDF data went correctly, should be
