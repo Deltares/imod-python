@@ -112,9 +112,9 @@ PRJ_TEMPLATE = textwrap.dedent(
 
     Periods
     SUMMER
-    01-04-1900 00:00:00
+    01-04-{periodyear} 00:00:00
     WINTER
-    01-10-1900 00:00:00
+    01-10-{periodyear} 00:00:00
 
     Species
     "benzene",1
@@ -563,6 +563,23 @@ def test_process_time():
         prj._process_time("2000-01-01 00:00", yearfirst=False)
 
 
+def test_process_timestring_period_year_0000():
+    expected = datetime(1899, 4, 1)
+    assert prj._process_timestring_period("01-04-0000") == expected
+    assert prj._process_timestring_period("01-04-0000 00:00:00") == expected
+
+
+def test_process_timestring_period():
+    expected = datetime(1899, 4, 1)
+    assert prj._process_timestring_period("01-04-1900") == expected
+    assert prj._process_timestring_period("01-04-2000 00:00:00") == expected
+
+    with pytest.raises(ValueError, match="cannot be used for a repeating period"):
+        prj._process_timestring_period("steady-state")
+    with pytest.raises(ValueError, match="time data"):
+        prj._process_timestring_period("01-04-2000 00:00")
+
+
 class SprinklingWellCases:
     def case_sprinkling_idf(self):
         return "a.idf"
@@ -639,13 +656,16 @@ class TestProjectFile:
     @pytest_cases.parametrize_with_cases(
         "sprinkling_well_file", cases=SprinklingWellCases
     )
-    def projectfile(self, sprinkling_well_file):
+    @pytest_cases.parametrize("periodyear", ["0000", "2000"])
+    def projectfile(self, sprinkling_well_file, periodyear):
         sprinkling_ext = sprinkling_well_file[:3]
         prj_path = self.basepath / f"testprojectfile_sprinkling_{sprinkling_ext}.prj"
         with open(prj_path, "w") as f:
             f.write(
                 PRJ_TEMPLATE.format(
-                    basepath=self.basepath, sprinkling_well=sprinkling_well_file
+                    basepath=self.basepath,
+                    sprinkling_well=sprinkling_well_file,
+                    periodyear=periodyear,
                 )
             )
         return prj_path
@@ -680,6 +700,7 @@ class TestProjectFile:
         assert isinstance(content["hfb-1"]["geodataframe"], gpd.GeoDataFrame)
         assert isinstance(content["hfb-2"]["geodataframe"], gpd.GeoDataFrame)
         assert isinstance(content["pcg"], dict)
+        # Period year should be forced to 1899, just outside the iMOD5 calendar
         assert set(repeats["rch"]) == {datetime(1899, 4, 1), datetime(1899, 10, 1)}
 
         # Test if chunking of topsystem IDF data went correctly, should be
