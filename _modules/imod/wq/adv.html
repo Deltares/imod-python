@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 
 
@@ -7,7 +6,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>imod.wq.adv &#8212; iMOD Python 1.1.0 documentation</title>
+    <title>imod.wq.adv &#8212; iMOD Python 1.2.0 documentation</title>
   
   
   
@@ -26,22 +25,22 @@
   </noscript>
   
   <!-- Loaded before other Sphinx assets -->
-  <link href="../../../_static/styles/theme.css?digest=90905a2f556bf617f1a9" rel="stylesheet" />
-<link href="../../../_static/styles/pydata-sphinx-theme.css?digest=90905a2f556bf617f1a9" rel="stylesheet" />
+  <link href="../../../_static/styles/theme.css?digest=75c7c72ae941e8b558d8" rel="stylesheet" />
+<link href="../../../_static/styles/pydata-sphinx-theme.css?digest=75c7c72ae941e8b558d8" rel="stylesheet" />
 
     <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=03e43079" />
-    <link rel="stylesheet" type="text/css" href="../../../_static/sg_gallery.css?v=fd6457a4" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/sg_gallery.css?v=c83e6b79" />
     <link rel="stylesheet" type="text/css" href="../../../_static/sg_gallery-binder.css?v=f4aeca0c" />
     <link rel="stylesheet" type="text/css" href="../../../_static/sg_gallery-dataframe.css?v=2082cf3c" />
     <link rel="stylesheet" type="text/css" href="../../../_static/sg_gallery-rendered-html.css?v=1277b6f3" />
   
   <!-- So that users can add custom icons -->
-  <script defer src="../../../_static/scripts/fontawesome.js?digest=90905a2f556bf617f1a9"></script>
+  <script defer src="../../../_static/scripts/fontawesome.js?digest=75c7c72ae941e8b558d8"></script>
   <!-- Pre-loaded scripts that we'll load fully later -->
-  <link rel="preload" as="script" href="../../../_static/scripts/bootstrap.js?digest=90905a2f556bf617f1a9" />
-<link rel="preload" as="script" href="../../../_static/scripts/pydata-sphinx-theme.js?digest=90905a2f556bf617f1a9" />
+  <link rel="preload" as="script" href="../../../_static/scripts/bootstrap.js?digest=75c7c72ae941e8b558d8" />
+<link rel="preload" as="script" href="../../../_static/scripts/pydata-sphinx-theme.js?digest=75c7c72ae941e8b558d8" />
 
-    <script src="../../../_static/documentation_options.js?v=fc837d61"></script>
+    <script src="../../../_static/documentation_options.js?v=6efca38a"></script>
     <script src="../../../_static/doctools.js?v=fd6eb6e6"></script>
     <script src="../../../_static/sphinx_highlight.js?v=6ffebe34"></script>
     <script src="../../../_static/sg-tags.js?v=d80f6fa4"></script>
@@ -51,8 +50,9 @@
     <link rel="index" title="Index" href="../../../genindex.html" />
     <link rel="search" title="Search" href="../../../search.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <meta name="color-scheme" content="light dark"/>
   <meta name="docsearch:language" content="en"/>
-  <meta name="docsearch:version" content="1.1.0.dev" />
+  <meta name="docsearch:version" content="1.2.0.dev" />
   
     
     <script src="../../../_static/searchtools.js"></script>
@@ -100,7 +100,7 @@
   
     <header id="pst-header" class="bd-header navbar navbar-expand-lg bd-navbar d-print-none">
 <div class="bd-header__inner bd-page-width">
-  <button class="pst-navbar-icon sidebar-toggle primary-toggle" aria-label="Site navigation">
+  <button type="button" class="pst-navbar-icon sidebar-toggle primary-toggle" aria-label="Site navigation" aria-expanded="false" aria-controls="pst-primary-sidebar-modal">
     <span class="fa-solid fa-bars"></span>
   </button>
   
@@ -122,8 +122,8 @@
     
     
     
-    <img src="../../../_static/imod-python-logo-light.svg" class="logo__image only-light" alt="iMOD Python 1.1.0 documentation - Home"/>
-    <img src="../../../_static/imod-python-logo-dark.svg" class="logo__image only-dark pst-js-only" alt="iMOD Python 1.1.0 documentation - Home"/>
+    <img src="../../../_static/imod-python-logo-light.svg" class="logo__image only-light" alt="iMOD Python 1.2.0 documentation - Home"/>
+    <img src="../../../_static/imod-python-logo-dark.svg" class="logo__image only-dark pst-js-only" alt="iMOD Python 1.2.0 documentation - Home"/>
   
   
 </a></div>
@@ -190,7 +190,7 @@
         <div class="navbar-item navbar-persistent--container">
           
 
-<button class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+<button type="button" class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
  <i class="fa-solid fa-magnifying-glass"></i>
  <span class="search-button__default-text">Search</span>
  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
@@ -201,15 +201,15 @@
         <div class="navbar-item">
 
 <div class="theme-switch-container dropdown pst-js-only" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Color mode">
-  <button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button dropdown-toggle" aria-label="Color mode" data-bs-toggle="dropdown">
-    <i class="theme-switch fa-solid fa-sun fa-lg fa-fw" data-mode="light" title="Light"></i>
-    <i class="theme-switch fa-solid fa-moon fa-lg fa-fw" data-mode="dark" title="Dark"></i>
-    <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg fa-fw" data-mode="auto" title="System Settings"></i>
+  <button type="button" class="btn btn-sm nav-link pst-navbar-icon theme-switch-button dropdown-toggle" aria-label="Color mode" data-bs-toggle="dropdown">
+    <i class="theme-switch fa-solid fa-sun fa-lg" data-mode="light" title="Light"></i>
+    <i class="theme-switch fa-solid fa-moon fa-lg" data-mode="dark" title="Dark"></i>
+    <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg" data-mode="auto" title="System Settings"></i>
   </button>
   <ul class="dropdown-menu dropdown-menu-end">
-    <li><button class="dropdown-item d-flex align-items-center theme-change-button" data-mode="auto"><i class="fa-solid fa-circle-half-stroke fa-lg fa-fw me-1"></i>System Settings</button></li>
-    <li><button class="dropdown-item d-flex align-items-center theme-change-button" data-mode="light"><i class="fa-solid fa-sun fa-lg fa-fw me-1"></i>Light</button></li>
-    <li><button class="dropdown-item d-flex align-items-center theme-change-button" data-mode="dark"><i class="fa-solid fa-moon fa-lg fa-fw me-1"></i>Dark</button></li>
+    <li><button type="button" class="dropdown-item d-flex align-items-center theme-change-button" data-mode="auto"><i class="fa-solid fa-circle-half-stroke fa-lg me-1"></i>System Settings</button></li>
+    <li><button type="button" class="dropdown-item d-flex align-items-center theme-change-button" data-mode="light"><i class="fa-solid fa-sun fa-lg me-1"></i>Light</button></li>
+    <li><button type="button" class="dropdown-item d-flex align-items-center theme-change-button" data-mode="dark"><i class="fa-solid fa-moon fa-lg me-1"></i>Dark</button></li>
   </ul>
 </div></div>
       
@@ -246,7 +246,7 @@
   
     <div class="navbar-persistent--mobile">
 
-<button class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+<button type="button" class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
  <i class="fa-solid fa-magnifying-glass"></i>
  <span class="search-button__default-text">Search</span>
  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
@@ -267,7 +267,7 @@
       
         
       
-      <dialog id="pst-primary-sidebar-modal"></dialog>
+      <dialog id="pst-primary-sidebar-modal" tabindex="-1"></dialog>
       <div id="pst-primary-sidebar" class="bd-sidebar-primary bd-sidebar hide-on-wide">
         
 
@@ -337,15 +337,15 @@
           <div class="navbar-item">
 
 <div class="theme-switch-container dropdown pst-js-only" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Color mode">
-  <button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button dropdown-toggle" aria-label="Color mode" data-bs-toggle="dropdown">
-    <i class="theme-switch fa-solid fa-sun fa-lg fa-fw" data-mode="light" title="Light"></i>
-    <i class="theme-switch fa-solid fa-moon fa-lg fa-fw" data-mode="dark" title="Dark"></i>
-    <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg fa-fw" data-mode="auto" title="System Settings"></i>
+  <button type="button" class="btn btn-sm nav-link pst-navbar-icon theme-switch-button dropdown-toggle" aria-label="Color mode" data-bs-toggle="dropdown">
+    <i class="theme-switch fa-solid fa-sun fa-lg" data-mode="light" title="Light"></i>
+    <i class="theme-switch fa-solid fa-moon fa-lg" data-mode="dark" title="Dark"></i>
+    <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg" data-mode="auto" title="System Settings"></i>
   </button>
   <ul class="dropdown-menu dropdown-menu-end">
-    <li><button class="dropdown-item d-flex align-items-center theme-change-button" data-mode="auto"><i class="fa-solid fa-circle-half-stroke fa-lg fa-fw me-1"></i>System Settings</button></li>
-    <li><button class="dropdown-item d-flex align-items-center theme-change-button" data-mode="light"><i class="fa-solid fa-sun fa-lg fa-fw me-1"></i>Light</button></li>
-    <li><button class="dropdown-item d-flex align-items-center theme-change-button" data-mode="dark"><i class="fa-solid fa-moon fa-lg fa-fw me-1"></i>Dark</button></li>
+    <li><button type="button" class="dropdown-item d-flex align-items-center theme-change-button" data-mode="auto"><i class="fa-solid fa-circle-half-stroke fa-lg me-1"></i>System Settings</button></li>
+    <li><button type="button" class="dropdown-item d-flex align-items-center theme-change-button" data-mode="light"><i class="fa-solid fa-sun fa-lg me-1"></i>Light</button></li>
+    <li><button type="button" class="dropdown-item d-flex align-items-center theme-change-button" data-mode="dark"><i class="fa-solid fa-moon fa-lg me-1"></i>Dark</button></li>
   </ul>
 </div></div>
         
@@ -411,7 +411,7 @@
     
     <li class="breadcrumb-item breadcrumb-home">
       <a href="../../../index.html" class="nav-link" aria-label="Home">
-        <i class="fa-solid fa-home"></i>
+        <i class="fa-solid fa-house"></i>
       </a>
     </li>
     
@@ -443,7 +443,7 @@
 <div class="viewcode-block" id="AdvectionFiniteDifference">
 <a class="viewcode-back" href="../../../api/generated/wq/imod.wq.AdvectionFiniteDifference.html#imod.wq.AdvectionFiniteDifference">[docs]</a>
 <span class="k">class</span><span class="w"> </span><span class="nc">AdvectionFiniteDifference</span><span class="p">(</span><span class="n">Package</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">"""</span>
 <span class="sd">    Solve the advection term using the explicit Finite Difference method</span>
 <span class="sd">    (MIXELM = 0) with upstream weighting</span>
 
@@ -460,37 +460,37 @@
 <span class="sd">        finite-difference, PERCEL is also a stability constraint, which must not</span>
 <span class="sd">        exceed one and will be automatically reset to one if a value greater</span>
 <span class="sd">        than one is specified.</span>
-<span class="sd">    weighting : string {&quot;upstream&quot;, &quot;central&quot;}, optional</span>
+<span class="sd">    weighting : string {"upstream", "central"}, optional</span>
 <span class="sd">        Indication of which weighting scheme should be used, set to default</span>
-<span class="sd">        value &quot;upstream&quot; (NADVFD = 0 or 1)</span>
-<span class="sd">        Default value: &quot;upstream&quot;</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">        value "upstream" (NADVFD = 0 or 1)</span>
+<span class="sd">        Default value: "upstream"</span>
+<span class="sd">    """</span>
 
-    <span class="n">_pkg_id</span> <span class="o">=</span> <span class="s2">&quot;adv&quot;</span>
+    <span class="n">_pkg_id</span> <span class="o">=</span> <span class="s2">"adv"</span>
 
-    <span class="n">_keywords</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;weighting&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;upstream&quot;</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span> <span class="s2">&quot;central&quot;</span><span class="p">:</span> <span class="mi">1</span><span class="p">}}</span>
+    <span class="n">_keywords</span> <span class="o">=</span> <span class="p">{</span><span class="s2">"weighting"</span><span class="p">:</span> <span class="p">{</span><span class="s2">"upstream"</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span> <span class="s2">"central"</span><span class="p">:</span> <span class="mi">1</span><span class="p">}}</span>
 
     <span class="n">_template</span> <span class="o">=</span> <span class="p">(</span>
-        <span class="s2">&quot;[adv]</span><span class="se">\n</span><span class="s2">    mixelm = 0</span><span class="se">\n</span><span class="s2">    percel = </span><span class="si">{courant}</span><span class="se">\n</span><span class="s2">    nadvfd = </span><span class="si">{weighting}</span><span class="se">\n</span><span class="s2">&quot;</span>
+        <span class="s2">"[adv]</span><span class="se">\n</span><span class="s2">    mixelm = 0</span><span class="se">\n</span><span class="s2">    percel = </span><span class="si">{courant}</span><span class="se">\n</span><span class="s2">    nadvfd = </span><span class="si">{weighting}</span><span class="se">\n</span><span class="s2">"</span>
     <span class="p">)</span>
 
 <div class="viewcode-block" id="AdvectionFiniteDifference.__init__">
 <a class="viewcode-back" href="../../../api/generated/wq/imod.wq.AdvectionFiniteDifference.html#imod.wq.AdvectionFiniteDifference.__init__">[docs]</a>
-    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">courant</span><span class="o">=</span><span class="mf">0.75</span><span class="p">,</span> <span class="n">weighting</span><span class="o">=</span><span class="s2">&quot;upstream&quot;</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">courant</span><span class="o">=</span><span class="mf">0.75</span><span class="p">,</span> <span class="n">weighting</span><span class="o">=</span><span class="s2">"upstream"</span><span class="p">):</span>
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span>
-        <span class="bp">self</span><span class="p">[</span><span class="s2">&quot;courant&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">courant</span>
-        <span class="bp">self</span><span class="p">[</span><span class="s2">&quot;weighting&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">weighting</span></div>
+        <span class="bp">self</span><span class="p">[</span><span class="s2">"courant"</span><span class="p">]</span> <span class="o">=</span> <span class="n">courant</span>
+        <span class="bp">self</span><span class="p">[</span><span class="s2">"weighting"</span><span class="p">]</span> <span class="o">=</span> <span class="n">weighting</span></div>
 
 
     <span class="k">def</span><span class="w"> </span><span class="nf">_pkgcheck</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">ibound</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_check_positive</span><span class="p">([</span><span class="s2">&quot;courant&quot;</span><span class="p">])</span></div>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_check_positive</span><span class="p">([</span><span class="s2">"courant"</span><span class="p">])</span></div>
 
 
 
 <div class="viewcode-block" id="AdvectionMOC">
 <a class="viewcode-back" href="../../../api/generated/wq/imod.wq.AdvectionMOC.html#imod.wq.AdvectionMOC">[docs]</a>
 <span class="k">class</span><span class="w"> </span><span class="nc">AdvectionMOC</span><span class="p">(</span><span class="n">Package</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">"""</span>
 <span class="sd">    Solve the advection term using the Method of Characteristics (MIXELM = 1)</span>
 
 <span class="sd">    Nota bene: number of particles settings have not been tested. The defaults</span>
@@ -512,7 +512,7 @@
 <span class="sd">        than one is specified.</span>
 <span class="sd">    max_nparticles: int</span>
 <span class="sd">        is the maximum total number of moving particles allowed (MXPART).</span>
-<span class="sd">    tracking: string {&quot;euler&quot;, &quot;runge-kutta&quot;, &quot;hybrid&quot;}, optional</span>
+<span class="sd">    tracking: string {"euler", "runge-kutta", "hybrid"}, optional</span>
 <span class="sd">        indicates which particle tracking algorithm is selected for the</span>
 <span class="sd">        Eulerian-Lagrangian methods. ITRACK = 1, the first-order Euler algorithm is</span>
 <span class="sd">        used; ITRACK = 2, the fourth-order Runge-Kutta algorithm is used; this</span>
@@ -520,7 +520,7 @@
 <span class="sd">        set greater than one. ITRACK = 3, the hybrid 1st and 4th order algorithm is</span>
 <span class="sd">        used; the Runge- Kutta algorithm is used in sink/source cells and the cells</span>
 <span class="sd">        next to sinks/sources while the Euler algorithm is used elsewhere.</span>
-<span class="sd">        Default value is &quot;hybrid&quot;.</span>
+<span class="sd">        Default value is "hybrid".</span>
 <span class="sd">    weighting_factor: float, optional</span>
 <span class="sd">        is a concentration weighting factor (WD) between 0.5 and 1. It is used for</span>
 <span class="sd">        operator splitting in the particle tracking based methods. The value of</span>
@@ -541,7 +541,7 @@
 <span class="sd">        generator. This option is usually preferred and leads to smaller mass</span>
 <span class="sd">        balance discrepancy in nonuniform or diverging/converging flow fields.</span>
 <span class="sd">        NPLANE &gt; 0, the fixed pattern is selected for initial placement. The</span>
-<span class="sd">        value of NPLANE serves as the number of vertical &quot;planes&quot; on which</span>
+<span class="sd">        value of NPLANE serves as the number of vertical "planes" on which</span>
 <span class="sd">        initial particles are placed within each cell block. The fixed pattern</span>
 <span class="sd">        may work better than the random pattern only in relatively uniform flow</span>
 <span class="sd">        fields. For two-dimensional simulations in plan view, set NPLANE = 1.</span>
@@ -584,13 +584,13 @@
 <span class="sd">        cell and replaced by a new set of particles equal to NPH to maintain</span>
 <span class="sd">        mass balance. Generally, NPMAX can be set to approximately twice of NPH.</span>
 <span class="sd">        Default value: 80.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
 
-    <span class="n">_pkg_id</span> <span class="o">=</span> <span class="s2">&quot;adv&quot;</span>
-    <span class="n">_keywords</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;tracking&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;euler&quot;</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span> <span class="s2">&quot;runge-kutta&quot;</span><span class="p">:</span> <span class="mi">2</span><span class="p">,</span> <span class="s2">&quot;hybrid&quot;</span><span class="p">:</span> <span class="mi">3</span><span class="p">}}</span>
+    <span class="n">_pkg_id</span> <span class="o">=</span> <span class="s2">"adv"</span>
+    <span class="n">_keywords</span> <span class="o">=</span> <span class="p">{</span><span class="s2">"tracking"</span><span class="p">:</span> <span class="p">{</span><span class="s2">"euler"</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span> <span class="s2">"runge-kutta"</span><span class="p">:</span> <span class="mi">2</span><span class="p">,</span> <span class="s2">"hybrid"</span><span class="p">:</span> <span class="mi">3</span><span class="p">}}</span>
 
     <span class="n">_template</span> <span class="o">=</span> <span class="n">textwrap</span><span class="o">.</span><span class="n">dedent</span><span class="p">(</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">"""</span>
 <span class="sd">        [adv]</span>
 <span class="sd">            mixelm = 1</span>
 <span class="sd">            percel = {courant}</span>
@@ -603,7 +603,7 @@
 <span class="sd">            nph = {nparticles_advection}</span>
 <span class="sd">            npmin = {cell_min_nparticles}</span>
 <span class="sd">            npmax = {cell_max_nparticles}</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="p">)</span>
 
 <div class="viewcode-block" id="AdvectionMOC.__init__">
@@ -611,7 +611,7 @@
     <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">courant</span><span class="o">=</span><span class="mf">0.75</span><span class="p">,</span>
-        <span class="n">tracking</span><span class="o">=</span><span class="s2">&quot;hybrid&quot;</span><span class="p">,</span>
+        <span class="n">tracking</span><span class="o">=</span><span class="s2">"hybrid"</span><span class="p">,</span>
         <span class="n">weighting_factor</span><span class="o">=</span><span class="mf">0.5</span><span class="p">,</span>
         <span class="n">dconcentration_epsilon</span><span class="o">=</span><span class="mf">1.0e-5</span><span class="p">,</span>
         <span class="n">nplane</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span>
@@ -621,26 +621,26 @@
         <span class="n">cell_max_nparticles</span><span class="o">=</span><span class="mi">80</span><span class="p">,</span>
     <span class="p">):</span>
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span>
-        <span class="bp">self</span><span class="p">[</span><span class="s2">&quot;courant&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">courant</span>
-        <span class="bp">self</span><span class="p">[</span><span class="s2">&quot;tracking&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">tracking</span>
-        <span class="bp">self</span><span class="p">[</span><span class="s2">&quot;weighting_factor&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">weighting_factor</span>
-        <span class="bp">self</span><span class="p">[</span><span class="s2">&quot;dconcentration_epsilon&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">dconcentration_epsilon</span>
-        <span class="bp">self</span><span class="p">[</span><span class="s2">&quot;nplane&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">nplane</span>
-        <span class="bp">self</span><span class="p">[</span><span class="s2">&quot;nparticles_no_advection&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">nparticles_no_advection</span>
-        <span class="bp">self</span><span class="p">[</span><span class="s2">&quot;nparticles_advection&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">nparticles_advection</span>
-        <span class="bp">self</span><span class="p">[</span><span class="s2">&quot;cell_min_nparticles&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">cell_min_nparticles</span>
-        <span class="bp">self</span><span class="p">[</span><span class="s2">&quot;cell_max_nparticles&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">cell_max_nparticles</span></div>
+        <span class="bp">self</span><span class="p">[</span><span class="s2">"courant"</span><span class="p">]</span> <span class="o">=</span> <span class="n">courant</span>
+        <span class="bp">self</span><span class="p">[</span><span class="s2">"tracking"</span><span class="p">]</span> <span class="o">=</span> <span class="n">tracking</span>
+        <span class="bp">self</span><span class="p">[</span><span class="s2">"weighting_factor"</span><span class="p">]</span> <span class="o">=</span> <span class="n">weighting_factor</span>
+        <span class="bp">self</span><span class="p">[</span><span class="s2">"dconcentration_epsilon"</span><span class="p">]</span> <span class="o">=</span> <span class="n">dconcentration_epsilon</span>
+        <span class="bp">self</span><span class="p">[</span><span class="s2">"nplane"</span><span class="p">]</span> <span class="o">=</span> <span class="n">nplane</span>
+        <span class="bp">self</span><span class="p">[</span><span class="s2">"nparticles_no_advection"</span><span class="p">]</span> <span class="o">=</span> <span class="n">nparticles_no_advection</span>
+        <span class="bp">self</span><span class="p">[</span><span class="s2">"nparticles_advection"</span><span class="p">]</span> <span class="o">=</span> <span class="n">nparticles_advection</span>
+        <span class="bp">self</span><span class="p">[</span><span class="s2">"cell_min_nparticles"</span><span class="p">]</span> <span class="o">=</span> <span class="n">cell_min_nparticles</span>
+        <span class="bp">self</span><span class="p">[</span><span class="s2">"cell_max_nparticles"</span><span class="p">]</span> <span class="o">=</span> <span class="n">cell_max_nparticles</span></div>
 
 
     <span class="k">def</span><span class="w"> </span><span class="nf">_pkgcheck</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">ibound</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_check_positive</span><span class="p">([</span><span class="s2">&quot;courant&quot;</span><span class="p">,</span> <span class="s2">&quot;weighting_factor&quot;</span><span class="p">])</span></div>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_check_positive</span><span class="p">([</span><span class="s2">"courant"</span><span class="p">,</span> <span class="s2">"weighting_factor"</span><span class="p">])</span></div>
 
 
 
 <div class="viewcode-block" id="AdvectionModifiedMOC">
 <a class="viewcode-back" href="../../../api/generated/wq/imod.wq.AdvectionModifiedMOC.html#imod.wq.AdvectionModifiedMOC">[docs]</a>
 <span class="k">class</span><span class="w"> </span><span class="nc">AdvectionModifiedMOC</span><span class="p">(</span><span class="n">Package</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">"""</span>
 <span class="sd">    Solve the advention term using the Modified Method of Characteristics (MIXELM = 2)</span>
 <span class="sd">    Courant number (PERCEL) is the number of cells (or a fraction of a</span>
 <span class="sd">    cell) advection will be allowed in any direction in one transport step.</span>
@@ -658,7 +658,7 @@
 <span class="sd">        finite-difference, PERCEL is also a stability constraint, which must not</span>
 <span class="sd">        exceed one and will be automatically reset to one if a value greater</span>
 <span class="sd">        than one is specified.</span>
-<span class="sd">    tracking: string, {&quot;euler&quot;, &quot;runge-kutta&quot;, &quot;hybrid&quot;}</span>
+<span class="sd">    tracking: string, {"euler", "runge-kutta", "hybrid"}</span>
 <span class="sd">        indicates which particle tracking algorithm is selected for the</span>
 <span class="sd">        Eulerian-Lagrangian methods. ITRACK = 1, the first-order Euler algorithm is</span>
 <span class="sd">        used; ITRACK = 2, the fourth-order Runge-Kutta algorithm is used; this</span>
@@ -684,21 +684,21 @@
 <span class="sd">    sink_nparticles: int</span>
 <span class="sd">        is the number of particles used to approximate sink cells in the MMOC</span>
 <span class="sd">        scheme. (NPSINK)</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
 
-    <span class="n">_pkg_id</span> <span class="o">=</span> <span class="s2">&quot;adv&quot;</span>
+    <span class="n">_pkg_id</span> <span class="o">=</span> <span class="s2">"adv"</span>
 
-    <span class="n">_keywords</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;tracking&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;euler&quot;</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span> <span class="s2">&quot;runge-kutta&quot;</span><span class="p">:</span> <span class="mi">2</span><span class="p">,</span> <span class="s2">&quot;hybrid&quot;</span><span class="p">:</span> <span class="mi">3</span><span class="p">}}</span>
+    <span class="n">_keywords</span> <span class="o">=</span> <span class="p">{</span><span class="s2">"tracking"</span><span class="p">:</span> <span class="p">{</span><span class="s2">"euler"</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span> <span class="s2">"runge-kutta"</span><span class="p">:</span> <span class="mi">2</span><span class="p">,</span> <span class="s2">"hybrid"</span><span class="p">:</span> <span class="mi">3</span><span class="p">}}</span>
 
     <span class="n">_template</span> <span class="o">=</span> <span class="p">(</span>
-        <span class="s2">&quot;[adv]</span><span class="se">\n</span><span class="s2">&quot;</span>
-        <span class="s2">&quot;    mixelm = 2</span><span class="se">\n</span><span class="s2">&quot;</span>
-        <span class="s2">&quot;    percel = </span><span class="si">{courant}</span><span class="se">\n</span><span class="s2">&quot;</span>
-        <span class="s2">&quot;    itrack = </span><span class="si">{tracking}</span><span class="se">\n</span><span class="s2">&quot;</span>
-        <span class="s2">&quot;    wd = </span><span class="si">{weighting_factor}</span><span class="se">\n</span><span class="s2">&quot;</span>
-        <span class="s2">&quot;    interp = 1</span><span class="se">\n</span><span class="s2">&quot;</span>
-        <span class="s2">&quot;    nlsink = </span><span class="si">{sink_particle_placement}</span><span class="se">\n</span><span class="s2">&quot;</span>
-        <span class="s2">&quot;    npsink = </span><span class="si">{sink_nparticles}</span><span class="se">\n</span><span class="s2">&quot;</span>
+        <span class="s2">"[adv]</span><span class="se">\n</span><span class="s2">"</span>
+        <span class="s2">"    mixelm = 2</span><span class="se">\n</span><span class="s2">"</span>
+        <span class="s2">"    percel = </span><span class="si">{courant}</span><span class="se">\n</span><span class="s2">"</span>
+        <span class="s2">"    itrack = </span><span class="si">{tracking}</span><span class="se">\n</span><span class="s2">"</span>
+        <span class="s2">"    wd = </span><span class="si">{weighting_factor}</span><span class="se">\n</span><span class="s2">"</span>
+        <span class="s2">"    interp = 1</span><span class="se">\n</span><span class="s2">"</span>
+        <span class="s2">"    nlsink = </span><span class="si">{sink_particle_placement}</span><span class="se">\n</span><span class="s2">"</span>
+        <span class="s2">"    npsink = </span><span class="si">{sink_nparticles}</span><span class="se">\n</span><span class="s2">"</span>
     <span class="p">)</span>
 
 <div class="viewcode-block" id="AdvectionModifiedMOC.__init__">
@@ -706,29 +706,29 @@
     <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">courant</span><span class="o">=</span><span class="mf">1.0</span><span class="p">,</span>
-        <span class="n">tracking</span><span class="o">=</span><span class="s2">&quot;hybrid&quot;</span><span class="p">,</span>
+        <span class="n">tracking</span><span class="o">=</span><span class="s2">"hybrid"</span><span class="p">,</span>
         <span class="n">weighting_factor</span><span class="o">=</span><span class="mf">0.5</span><span class="p">,</span>
         <span class="n">dconcentration_epsilon</span><span class="o">=</span><span class="mf">1.0e-5</span><span class="p">,</span>
         <span class="n">sink_particle_placement</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span>
         <span class="n">sink_nparticles</span><span class="o">=</span><span class="mi">40</span><span class="p">,</span>
     <span class="p">):</span>
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span>
-        <span class="bp">self</span><span class="p">[</span><span class="s2">&quot;courant&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">courant</span>
-        <span class="bp">self</span><span class="p">[</span><span class="s2">&quot;tracking&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">tracking</span>
-        <span class="bp">self</span><span class="p">[</span><span class="s2">&quot;weighting_factor&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">weighting_factor</span>
-        <span class="bp">self</span><span class="p">[</span><span class="s2">&quot;sink_particle_placement&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">sink_particle_placement</span>
-        <span class="bp">self</span><span class="p">[</span><span class="s2">&quot;sink_nparticles&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">sink_nparticles</span></div>
+        <span class="bp">self</span><span class="p">[</span><span class="s2">"courant"</span><span class="p">]</span> <span class="o">=</span> <span class="n">courant</span>
+        <span class="bp">self</span><span class="p">[</span><span class="s2">"tracking"</span><span class="p">]</span> <span class="o">=</span> <span class="n">tracking</span>
+        <span class="bp">self</span><span class="p">[</span><span class="s2">"weighting_factor"</span><span class="p">]</span> <span class="o">=</span> <span class="n">weighting_factor</span>
+        <span class="bp">self</span><span class="p">[</span><span class="s2">"sink_particle_placement"</span><span class="p">]</span> <span class="o">=</span> <span class="n">sink_particle_placement</span>
+        <span class="bp">self</span><span class="p">[</span><span class="s2">"sink_nparticles"</span><span class="p">]</span> <span class="o">=</span> <span class="n">sink_nparticles</span></div>
 
 
     <span class="k">def</span><span class="w"> </span><span class="nf">_pkgcheck</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">ibound</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_check_positive</span><span class="p">([</span><span class="s2">&quot;courant&quot;</span><span class="p">,</span> <span class="s2">&quot;weighting_factor&quot;</span><span class="p">])</span></div>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_check_positive</span><span class="p">([</span><span class="s2">"courant"</span><span class="p">,</span> <span class="s2">"weighting_factor"</span><span class="p">])</span></div>
 
 
 
 <div class="viewcode-block" id="AdvectionHybridMOC">
 <a class="viewcode-back" href="../../../api/generated/wq/imod.wq.AdvectionHybridMOC.html#imod.wq.AdvectionHybridMOC">[docs]</a>
 <span class="k">class</span><span class="w"> </span><span class="nc">AdvectionHybridMOC</span><span class="p">(</span><span class="n">Package</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">"""</span>
 <span class="sd">    Hybrid Method of Characteristics and Modified Method of Characteristics with</span>
 <span class="sd">    MOC or MMOC automatically and dynamically selected (MIXELM = 3)</span>
 
@@ -773,7 +773,7 @@
 <span class="sd">        generator. This option is usually preferred and leads to smaller mass</span>
 <span class="sd">        balance discrepancy in nonuniform or diverging/converging flow fields.</span>
 <span class="sd">        NPLANE &gt; 0, the fixed pattern is selected for initial placement. The</span>
-<span class="sd">        value of NPLANE serves as the number of vertical &quot;planes&quot; on which</span>
+<span class="sd">        value of NPLANE serves as the number of vertical "planes" on which</span>
 <span class="sd">        initial particles are placed within each cell block. The fixed pattern</span>
 <span class="sd">        may work better than the random pattern only in relatively uniform flow</span>
 <span class="sd">        fields. For two-dimensional simulations in plan view, set NPLANE = 1.</span>
@@ -817,16 +817,16 @@
 <span class="sd">        solution is selected at cells where the Relative Concentration Gradient</span>
 <span class="sd">        is greater than DCHMOC; The MMOC solution is selected at cells where the</span>
 <span class="sd">        Relative Concentration Gradient is less than or equal to DCHMOC</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
 
-    <span class="n">_pkg_id</span> <span class="o">=</span> <span class="s2">&quot;adv&quot;</span>
+    <span class="n">_pkg_id</span> <span class="o">=</span> <span class="s2">"adv"</span>
 
 <div class="viewcode-block" id="AdvectionHybridMOC.__init__">
 <a class="viewcode-back" href="../../../api/generated/wq/imod.wq.AdvectionHybridMOC.html#imod.wq.AdvectionHybridMOC.__init__">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">courant</span><span class="o">=</span><span class="mf">0.75</span><span class="p">,</span>
-        <span class="n">tracking</span><span class="o">=</span><span class="s2">&quot;hybrid&quot;</span><span class="p">,</span>
+        <span class="n">tracking</span><span class="o">=</span><span class="s2">"hybrid"</span><span class="p">,</span>
         <span class="n">weighting_factor</span><span class="o">=</span><span class="mf">0.5</span><span class="p">,</span>
         <span class="n">dconcentration_epsilon</span><span class="o">=</span><span class="mf">1.0e-5</span><span class="p">,</span>
         <span class="n">nplane</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span>
@@ -839,29 +839,29 @@
         <span class="n">dconcentration_hybrid</span><span class="o">=</span><span class="mf">1.0e-4</span><span class="p">,</span>
     <span class="p">):</span>
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span>
-        <span class="bp">self</span><span class="p">[</span><span class="s2">&quot;courant&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">courant</span>
-        <span class="bp">self</span><span class="p">[</span><span class="s2">&quot;tracking&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">tracking</span>
-        <span class="bp">self</span><span class="p">[</span><span class="s2">&quot;weighting_factor&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">weighting_factor</span>
-        <span class="bp">self</span><span class="p">[</span><span class="s2">&quot;dconcentration_epsilon&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">dconcentration_epsilon</span>
-        <span class="bp">self</span><span class="p">[</span><span class="s2">&quot;nplane&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">nplane</span>
-        <span class="bp">self</span><span class="p">[</span><span class="s2">&quot;nparticles_no_advection&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">nparticles_no_advection</span>
-        <span class="bp">self</span><span class="p">[</span><span class="s2">&quot;nparticles_advection&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">nparticles_advection</span>
-        <span class="bp">self</span><span class="p">[</span><span class="s2">&quot;cell_min_nparticles&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">cell_min_nparticles</span>
-        <span class="bp">self</span><span class="p">[</span><span class="s2">&quot;cell_max_nparticles&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">cell_max_nparticles</span>
-        <span class="bp">self</span><span class="p">[</span><span class="s2">&quot;sink_particle_placement&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">sink_particle_placement</span>
-        <span class="bp">self</span><span class="p">[</span><span class="s2">&quot;sink_nparticles&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">sink_nparticles</span>
-        <span class="bp">self</span><span class="p">[</span><span class="s2">&quot;dconcentration_hybrid&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">dconcentration_hybrid</span></div>
+        <span class="bp">self</span><span class="p">[</span><span class="s2">"courant"</span><span class="p">]</span> <span class="o">=</span> <span class="n">courant</span>
+        <span class="bp">self</span><span class="p">[</span><span class="s2">"tracking"</span><span class="p">]</span> <span class="o">=</span> <span class="n">tracking</span>
+        <span class="bp">self</span><span class="p">[</span><span class="s2">"weighting_factor"</span><span class="p">]</span> <span class="o">=</span> <span class="n">weighting_factor</span>
+        <span class="bp">self</span><span class="p">[</span><span class="s2">"dconcentration_epsilon"</span><span class="p">]</span> <span class="o">=</span> <span class="n">dconcentration_epsilon</span>
+        <span class="bp">self</span><span class="p">[</span><span class="s2">"nplane"</span><span class="p">]</span> <span class="o">=</span> <span class="n">nplane</span>
+        <span class="bp">self</span><span class="p">[</span><span class="s2">"nparticles_no_advection"</span><span class="p">]</span> <span class="o">=</span> <span class="n">nparticles_no_advection</span>
+        <span class="bp">self</span><span class="p">[</span><span class="s2">"nparticles_advection"</span><span class="p">]</span> <span class="o">=</span> <span class="n">nparticles_advection</span>
+        <span class="bp">self</span><span class="p">[</span><span class="s2">"cell_min_nparticles"</span><span class="p">]</span> <span class="o">=</span> <span class="n">cell_min_nparticles</span>
+        <span class="bp">self</span><span class="p">[</span><span class="s2">"cell_max_nparticles"</span><span class="p">]</span> <span class="o">=</span> <span class="n">cell_max_nparticles</span>
+        <span class="bp">self</span><span class="p">[</span><span class="s2">"sink_particle_placement"</span><span class="p">]</span> <span class="o">=</span> <span class="n">sink_particle_placement</span>
+        <span class="bp">self</span><span class="p">[</span><span class="s2">"sink_nparticles"</span><span class="p">]</span> <span class="o">=</span> <span class="n">sink_nparticles</span>
+        <span class="bp">self</span><span class="p">[</span><span class="s2">"dconcentration_hybrid"</span><span class="p">]</span> <span class="o">=</span> <span class="n">dconcentration_hybrid</span></div>
 
 
     <span class="k">def</span><span class="w"> </span><span class="nf">_pkgcheck</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">ibound</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_check_positive</span><span class="p">([</span><span class="s2">&quot;courant&quot;</span><span class="p">,</span> <span class="s2">&quot;weighting_factor&quot;</span><span class="p">])</span></div>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_check_positive</span><span class="p">([</span><span class="s2">"courant"</span><span class="p">,</span> <span class="s2">"weighting_factor"</span><span class="p">])</span></div>
 
 
 
 <div class="viewcode-block" id="AdvectionTVD">
 <a class="viewcode-back" href="../../../api/generated/wq/imod.wq.AdvectionTVD.html#imod.wq.AdvectionTVD">[docs]</a>
 <span class="k">class</span><span class="w"> </span><span class="nc">AdvectionTVD</span><span class="p">(</span><span class="n">Package</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">"""</span>
 <span class="sd">    Total Variation Diminishing (TVD) formulation (ULTIMATE, MIXELM = -1).</span>
 
 <span class="sd">    Attributes</span>
@@ -877,21 +877,21 @@
 <span class="sd">        finite-difference, PERCEL is also a stability constraint, which must not</span>
 <span class="sd">        exceed one and will be automatically reset to one if a value greater</span>
 <span class="sd">        than one is specified.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
 
-    <span class="n">_pkg_id</span> <span class="o">=</span> <span class="s2">&quot;adv&quot;</span>
+    <span class="n">_pkg_id</span> <span class="o">=</span> <span class="s2">"adv"</span>
 
-    <span class="n">_template</span> <span class="o">=</span> <span class="s2">&quot;[adv]</span><span class="se">\n</span><span class="s2">    mixelm = -1</span><span class="se">\n</span><span class="s2">    percel = </span><span class="si">{courant}</span><span class="se">\n</span><span class="s2">&quot;</span>
+    <span class="n">_template</span> <span class="o">=</span> <span class="s2">"[adv]</span><span class="se">\n</span><span class="s2">    mixelm = -1</span><span class="se">\n</span><span class="s2">    percel = </span><span class="si">{courant}</span><span class="se">\n</span><span class="s2">"</span>
 
 <div class="viewcode-block" id="AdvectionTVD.__init__">
 <a class="viewcode-back" href="../../../api/generated/wq/imod.wq.AdvectionTVD.html#imod.wq.AdvectionTVD.__init__">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">courant</span><span class="o">=</span><span class="mf">0.75</span><span class="p">):</span>
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span>
-        <span class="bp">self</span><span class="p">[</span><span class="s2">&quot;courant&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">courant</span></div>
+        <span class="bp">self</span><span class="p">[</span><span class="s2">"courant"</span><span class="p">]</span> <span class="o">=</span> <span class="n">courant</span></div>
 
 
     <span class="k">def</span><span class="w"> </span><span class="nf">_pkgcheck</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">ibound</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_check_positive</span><span class="p">([</span><span class="s2">&quot;courant&quot;</span><span class="p">])</span></div>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_check_positive</span><span class="p">([</span><span class="s2">"courant"</span><span class="p">])</span></div>
 
 </pre></div>
 
@@ -922,8 +922,8 @@
   </div>
   
   <!-- Scripts loaded after <body> so the DOM is not blocked -->
-  <script defer src="../../../_static/scripts/bootstrap.js?digest=90905a2f556bf617f1a9"></script>
-<script defer src="../../../_static/scripts/pydata-sphinx-theme.js?digest=90905a2f556bf617f1a9"></script>
+  <script defer src="../../../_static/scripts/bootstrap.js?digest=75c7c72ae941e8b558d8"></script>
+<script defer src="../../../_static/scripts/pydata-sphinx-theme.js?digest=75c7c72ae941e8b558d8"></script>
 
   <footer class="bd-footer">
 <div class="bd-footer__inner bd-page-width">
@@ -943,8 +943,7 @@
         <div class="footer-item">
 
   <p class="sphinx-version">
-    Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 9.1.0.
-    <br/>
+    Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 9.2.0.
   </p>
 </div>
       
@@ -957,7 +956,7 @@
         <div class="footer-item">
 <p class="theme-version">
   <!-- # L10n: Setting the PST URL as an argument as this does not need to be localized -->
-  Built with the <a href="https://pydata-sphinx-theme.readthedocs.io/en/stable/index.html">PyData Sphinx Theme</a> 0.20.0.
+  Built with the <a href="https://pydata-sphinx-theme.readthedocs.io/en/stable/index.html">PyData Sphinx Theme</a> 0.24.0.
 </p></div>
       
     </div>

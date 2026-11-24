@@ -28,6 +28,7 @@
       ~GroundwaterFlowModel.items
       ~GroundwaterFlowModel.keys
       ~GroundwaterFlowModel.mask_all_packages
+      ~GroundwaterFlowModel.mask_packages
       ~GroundwaterFlowModel.pop
       ~GroundwaterFlowModel.popitem
       ~GroundwaterFlowModel.prepare_wel_for_mf6

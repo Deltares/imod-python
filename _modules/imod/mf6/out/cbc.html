@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 
 
@@ -7,7 +6,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>imod.mf6.out.cbc &#8212; iMOD Python 1.1.0 documentation</title>
+    <title>imod.mf6.out.cbc &#8212; iMOD Python 1.2.0 documentation</title>
   
   
   
@@ -26,22 +25,22 @@
   </noscript>
   
   <!-- Loaded before other Sphinx assets -->
-  <link href="../../../../_static/styles/theme.css?digest=90905a2f556bf617f1a9" rel="stylesheet" />
-<link href="../../../../_static/styles/pydata-sphinx-theme.css?digest=90905a2f556bf617f1a9" rel="stylesheet" />
+  <link href="../../../../_static/styles/theme.css?digest=75c7c72ae941e8b558d8" rel="stylesheet" />
+<link href="../../../../_static/styles/pydata-sphinx-theme.css?digest=75c7c72ae941e8b558d8" rel="stylesheet" />
 
     <link rel="stylesheet" type="text/css" href="../../../../_static/pygments.css?v=03e43079" />
-    <link rel="stylesheet" type="text/css" href="../../../../_static/sg_gallery.css?v=fd6457a4" />
+    <link rel="stylesheet" type="text/css" href="../../../../_static/sg_gallery.css?v=c83e6b79" />
     <link rel="stylesheet" type="text/css" href="../../../../_static/sg_gallery-binder.css?v=f4aeca0c" />
     <link rel="stylesheet" type="text/css" href="../../../../_static/sg_gallery-dataframe.css?v=2082cf3c" />
     <link rel="stylesheet" type="text/css" href="../../../../_static/sg_gallery-rendered-html.css?v=1277b6f3" />
   
   <!-- So that users can add custom icons -->
-  <script defer src="../../../../_static/scripts/fontawesome.js?digest=90905a2f556bf617f1a9"></script>
+  <script defer src="../../../../_static/scripts/fontawesome.js?digest=75c7c72ae941e8b558d8"></script>
   <!-- Pre-loaded scripts that we'll load fully later -->
-  <link rel="preload" as="script" href="../../../../_static/scripts/bootstrap.js?digest=90905a2f556bf617f1a9" />
-<link rel="preload" as="script" href="../../../../_static/scripts/pydata-sphinx-theme.js?digest=90905a2f556bf617f1a9" />
+  <link rel="preload" as="script" href="../../../../_static/scripts/bootstrap.js?digest=75c7c72ae941e8b558d8" />
+<link rel="preload" as="script" href="../../../../_static/scripts/pydata-sphinx-theme.js?digest=75c7c72ae941e8b558d8" />
 
-    <script src="../../../../_static/documentation_options.js?v=fc837d61"></script>
+    <script src="../../../../_static/documentation_options.js?v=6efca38a"></script>
     <script src="../../../../_static/doctools.js?v=fd6eb6e6"></script>
     <script src="../../../../_static/sphinx_highlight.js?v=6ffebe34"></script>
     <script src="../../../../_static/sg-tags.js?v=d80f6fa4"></script>
@@ -51,8 +50,9 @@
     <link rel="index" title="Index" href="../../../../genindex.html" />
     <link rel="search" title="Search" href="../../../../search.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <meta name="color-scheme" content="light dark"/>
   <meta name="docsearch:language" content="en"/>
-  <meta name="docsearch:version" content="1.1.0.dev" />
+  <meta name="docsearch:version" content="1.2.0.dev" />
   
     
     <script src="../../../../_static/searchtools.js"></script>
@@ -100,7 +100,7 @@
   
     <header id="pst-header" class="bd-header navbar navbar-expand-lg bd-navbar d-print-none">
 <div class="bd-header__inner bd-page-width">
-  <button class="pst-navbar-icon sidebar-toggle primary-toggle" aria-label="Site navigation">
+  <button type="button" class="pst-navbar-icon sidebar-toggle primary-toggle" aria-label="Site navigation" aria-expanded="false" aria-controls="pst-primary-sidebar-modal">
     <span class="fa-solid fa-bars"></span>
   </button>
   
@@ -122,8 +122,8 @@
     
     
     
-    <img src="../../../../_static/imod-python-logo-light.svg" class="logo__image only-light" alt="iMOD Python 1.1.0 documentation - Home"/>
-    <img src="../../../../_static/imod-python-logo-dark.svg" class="logo__image only-dark pst-js-only" alt="iMOD Python 1.1.0 documentation - Home"/>
+    <img src="../../../../_static/imod-python-logo-light.svg" class="logo__image only-light" alt="iMOD Python 1.2.0 documentation - Home"/>
+    <img src="../../../../_static/imod-python-logo-dark.svg" class="logo__image only-dark pst-js-only" alt="iMOD Python 1.2.0 documentation - Home"/>
   
   
 </a></div>
@@ -190,7 +190,7 @@
         <div class="navbar-item navbar-persistent--container">
           
 
-<button class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+<button type="button" class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
  <i class="fa-solid fa-magnifying-glass"></i>
  <span class="search-button__default-text">Search</span>
  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
@@ -201,15 +201,15 @@
         <div class="navbar-item">
 
 <div class="theme-switch-container dropdown pst-js-only" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Color mode">
-  <button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button dropdown-toggle" aria-label="Color mode" data-bs-toggle="dropdown">
-    <i class="theme-switch fa-solid fa-sun fa-lg fa-fw" data-mode="light" title="Light"></i>
-    <i class="theme-switch fa-solid fa-moon fa-lg fa-fw" data-mode="dark" title="Dark"></i>
-    <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg fa-fw" data-mode="auto" title="System Settings"></i>
+  <button type="button" class="btn btn-sm nav-link pst-navbar-icon theme-switch-button dropdown-toggle" aria-label="Color mode" data-bs-toggle="dropdown">
+    <i class="theme-switch fa-solid fa-sun fa-lg" data-mode="light" title="Light"></i>
+    <i class="theme-switch fa-solid fa-moon fa-lg" data-mode="dark" title="Dark"></i>
+    <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg" data-mode="auto" title="System Settings"></i>
   </button>
   <ul class="dropdown-menu dropdown-menu-end">
-    <li><button class="dropdown-item d-flex align-items-center theme-change-button" data-mode="auto"><i class="fa-solid fa-circle-half-stroke fa-lg fa-fw me-1"></i>System Settings</button></li>
-    <li><button class="dropdown-item d-flex align-items-center theme-change-button" data-mode="light"><i class="fa-solid fa-sun fa-lg fa-fw me-1"></i>Light</button></li>
-    <li><button class="dropdown-item d-flex align-items-center theme-change-button" data-mode="dark"><i class="fa-solid fa-moon fa-lg fa-fw me-1"></i>Dark</button></li>
+    <li><button type="button" class="dropdown-item d-flex align-items-center theme-change-button" data-mode="auto"><i class="fa-solid fa-circle-half-stroke fa-lg me-1"></i>System Settings</button></li>
+    <li><button type="button" class="dropdown-item d-flex align-items-center theme-change-button" data-mode="light"><i class="fa-solid fa-sun fa-lg me-1"></i>Light</button></li>
+    <li><button type="button" class="dropdown-item d-flex align-items-center theme-change-button" data-mode="dark"><i class="fa-solid fa-moon fa-lg me-1"></i>Dark</button></li>
   </ul>
 </div></div>
       
@@ -246,7 +246,7 @@
   
     <div class="navbar-persistent--mobile">
 
-<button class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+<button type="button" class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
  <i class="fa-solid fa-magnifying-glass"></i>
  <span class="search-button__default-text">Search</span>
  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
@@ -267,7 +267,7 @@
       
         
       
-      <dialog id="pst-primary-sidebar-modal"></dialog>
+      <dialog id="pst-primary-sidebar-modal" tabindex="-1"></dialog>
       <div id="pst-primary-sidebar" class="bd-sidebar-primary bd-sidebar hide-on-wide">
         
 
@@ -337,15 +337,15 @@
           <div class="navbar-item">
 
 <div class="theme-switch-container dropdown pst-js-only" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Color mode">
-  <button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button dropdown-toggle" aria-label="Color mode" data-bs-toggle="dropdown">
-    <i class="theme-switch fa-solid fa-sun fa-lg fa-fw" data-mode="light" title="Light"></i>
-    <i class="theme-switch fa-solid fa-moon fa-lg fa-fw" data-mode="dark" title="Dark"></i>
-    <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg fa-fw" data-mode="auto" title="System Settings"></i>
+  <button type="button" class="btn btn-sm nav-link pst-navbar-icon theme-switch-button dropdown-toggle" aria-label="Color mode" data-bs-toggle="dropdown">
+    <i class="theme-switch fa-solid fa-sun fa-lg" data-mode="light" title="Light"></i>
+    <i class="theme-switch fa-solid fa-moon fa-lg" data-mode="dark" title="Dark"></i>
+    <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg" data-mode="auto" title="System Settings"></i>
   </button>
   <ul class="dropdown-menu dropdown-menu-end">
-    <li><button class="dropdown-item d-flex align-items-center theme-change-button" data-mode="auto"><i class="fa-solid fa-circle-half-stroke fa-lg fa-fw me-1"></i>System Settings</button></li>
-    <li><button class="dropdown-item d-flex align-items-center theme-change-button" data-mode="light"><i class="fa-solid fa-sun fa-lg fa-fw me-1"></i>Light</button></li>
-    <li><button class="dropdown-item d-flex align-items-center theme-change-button" data-mode="dark"><i class="fa-solid fa-moon fa-lg fa-fw me-1"></i>Dark</button></li>
+    <li><button type="button" class="dropdown-item d-flex align-items-center theme-change-button" data-mode="auto"><i class="fa-solid fa-circle-half-stroke fa-lg me-1"></i>System Settings</button></li>
+    <li><button type="button" class="dropdown-item d-flex align-items-center theme-change-button" data-mode="light"><i class="fa-solid fa-sun fa-lg me-1"></i>Light</button></li>
+    <li><button type="button" class="dropdown-item d-flex align-items-center theme-change-button" data-mode="dark"><i class="fa-solid fa-moon fa-lg me-1"></i>Dark</button></li>
   </ul>
 </div></div>
         
@@ -411,7 +411,7 @@
     
     <li class="breadcrumb-item breadcrumb-home">
       <a href="../../../../index.html" class="nav-link" aria-label="Home">
-        <i class="fa-solid fa-home"></i>
+        <i class="fa-solid fa-house"></i>
       </a>
     </li>
     
@@ -438,14 +438,14 @@
                 <article class="bd-article">
                   
   <h1>Source code for imod.mf6.out.cbc</h1><div class="highlight"><pre>
-<span></span><span class="sd">&quot;&quot;&quot;</span>
+<span></span><span class="sd">"""</span>
 <span class="sd">Cell-by-cell flows</span>
-<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">"""</span>
 
 <span class="kn">import</span><span class="w"> </span><span class="nn">os</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">struct</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">collections</span><span class="w"> </span><span class="kn">import</span> <span class="n">defaultdict</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Any</span><span class="p">,</span> <span class="n">BinaryIO</span><span class="p">,</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">List</span><span class="p">,</span> <span class="n">NamedTuple</span><span class="p">,</span> <span class="n">Tuple</span><span class="p">,</span> <span class="n">Union</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Any</span><span class="p">,</span> <span class="n">BinaryIO</span><span class="p">,</span> <span class="n">NamedTuple</span>
 
 <span class="kn">import</span><span class="w"> </span><span class="nn">dask</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
@@ -485,43 +485,43 @@
     <span class="n">txt1id2</span><span class="p">:</span> <span class="nb">str</span>
     <span class="n">txt2id2</span><span class="p">:</span> <span class="nb">str</span>
     <span class="n">ndat</span><span class="p">:</span> <span class="nb">int</span>
-    <span class="n">auxtxt</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span>
+    <span class="n">auxtxt</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span>
     <span class="n">nlist</span><span class="p">:</span> <span class="nb">int</span>
 
 
-<span class="k">def</span><span class="w"> </span><span class="nf">read_common_cbc_header</span><span class="p">(</span><span class="n">f</span><span class="p">:</span> <span class="n">BinaryIO</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">read_common_cbc_header</span><span class="p">(</span><span class="n">f</span><span class="p">:</span> <span class="n">BinaryIO</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]:</span>
+<span class="w">    </span><span class="sd">"""</span>
 <span class="sd">    Read the common part (shared by imeth=1 and imeth6) of a CBC header section.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="n">content</span> <span class="o">=</span> <span class="p">{}</span>
-    <span class="n">content</span><span class="p">[</span><span class="s2">&quot;kstp&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">struct</span><span class="o">.</span><span class="n">unpack</span><span class="p">(</span><span class="s2">&quot;i&quot;</span><span class="p">,</span> <span class="n">f</span><span class="o">.</span><span class="n">read</span><span class="p">(</span><span class="mi">4</span><span class="p">))[</span><span class="mi">0</span><span class="p">]</span>
-    <span class="n">content</span><span class="p">[</span><span class="s2">&quot;kper&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">struct</span><span class="o">.</span><span class="n">unpack</span><span class="p">(</span><span class="s2">&quot;i&quot;</span><span class="p">,</span> <span class="n">f</span><span class="o">.</span><span class="n">read</span><span class="p">(</span><span class="mi">4</span><span class="p">))[</span><span class="mi">0</span><span class="p">]</span>
-    <span class="n">content</span><span class="p">[</span><span class="s2">&quot;text&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">f</span><span class="o">.</span><span class="n">read</span><span class="p">(</span><span class="mi">16</span><span class="p">)</span><span class="o">.</span><span class="n">decode</span><span class="p">(</span><span class="s2">&quot;utf-8&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span>
-    <span class="n">content</span><span class="p">[</span><span class="s2">&quot;ndim1&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">struct</span><span class="o">.</span><span class="n">unpack</span><span class="p">(</span><span class="s2">&quot;i&quot;</span><span class="p">,</span> <span class="n">f</span><span class="o">.</span><span class="n">read</span><span class="p">(</span><span class="mi">4</span><span class="p">))[</span><span class="mi">0</span><span class="p">]</span>
-    <span class="n">content</span><span class="p">[</span><span class="s2">&quot;ndim2&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">struct</span><span class="o">.</span><span class="n">unpack</span><span class="p">(</span><span class="s2">&quot;i&quot;</span><span class="p">,</span> <span class="n">f</span><span class="o">.</span><span class="n">read</span><span class="p">(</span><span class="mi">4</span><span class="p">))[</span><span class="mi">0</span><span class="p">]</span>
-    <span class="n">content</span><span class="p">[</span><span class="s2">&quot;ndim3&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">struct</span><span class="o">.</span><span class="n">unpack</span><span class="p">(</span><span class="s2">&quot;i&quot;</span><span class="p">,</span> <span class="n">f</span><span class="o">.</span><span class="n">read</span><span class="p">(</span><span class="mi">4</span><span class="p">))[</span><span class="mi">0</span><span class="p">]</span>
-    <span class="n">content</span><span class="p">[</span><span class="s2">&quot;imeth&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">struct</span><span class="o">.</span><span class="n">unpack</span><span class="p">(</span><span class="s2">&quot;i&quot;</span><span class="p">,</span> <span class="n">f</span><span class="o">.</span><span class="n">read</span><span class="p">(</span><span class="mi">4</span><span class="p">))[</span><span class="mi">0</span><span class="p">]</span>
-    <span class="n">content</span><span class="p">[</span><span class="s2">&quot;delt&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">struct</span><span class="o">.</span><span class="n">unpack</span><span class="p">(</span><span class="s2">&quot;d&quot;</span><span class="p">,</span> <span class="n">f</span><span class="o">.</span><span class="n">read</span><span class="p">(</span><span class="mi">8</span><span class="p">))[</span><span class="mi">0</span><span class="p">]</span>
-    <span class="n">content</span><span class="p">[</span><span class="s2">&quot;pertim&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">struct</span><span class="o">.</span><span class="n">unpack</span><span class="p">(</span><span class="s2">&quot;d&quot;</span><span class="p">,</span> <span class="n">f</span><span class="o">.</span><span class="n">read</span><span class="p">(</span><span class="mi">8</span><span class="p">))[</span><span class="mi">0</span><span class="p">]</span>
-    <span class="n">content</span><span class="p">[</span><span class="s2">&quot;totim&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">struct</span><span class="o">.</span><span class="n">unpack</span><span class="p">(</span><span class="s2">&quot;d&quot;</span><span class="p">,</span> <span class="n">f</span><span class="o">.</span><span class="n">read</span><span class="p">(</span><span class="mi">8</span><span class="p">))[</span><span class="mi">0</span><span class="p">]</span>
+    <span class="n">content</span><span class="p">[</span><span class="s2">"kstp"</span><span class="p">]</span> <span class="o">=</span> <span class="n">struct</span><span class="o">.</span><span class="n">unpack</span><span class="p">(</span><span class="s2">"i"</span><span class="p">,</span> <span class="n">f</span><span class="o">.</span><span class="n">read</span><span class="p">(</span><span class="mi">4</span><span class="p">))[</span><span class="mi">0</span><span class="p">]</span>
+    <span class="n">content</span><span class="p">[</span><span class="s2">"kper"</span><span class="p">]</span> <span class="o">=</span> <span class="n">struct</span><span class="o">.</span><span class="n">unpack</span><span class="p">(</span><span class="s2">"i"</span><span class="p">,</span> <span class="n">f</span><span class="o">.</span><span class="n">read</span><span class="p">(</span><span class="mi">4</span><span class="p">))[</span><span class="mi">0</span><span class="p">]</span>
+    <span class="n">content</span><span class="p">[</span><span class="s2">"text"</span><span class="p">]</span> <span class="o">=</span> <span class="n">f</span><span class="o">.</span><span class="n">read</span><span class="p">(</span><span class="mi">16</span><span class="p">)</span><span class="o">.</span><span class="n">decode</span><span class="p">(</span><span class="s2">"utf-8"</span><span class="p">)</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span>
+    <span class="n">content</span><span class="p">[</span><span class="s2">"ndim1"</span><span class="p">]</span> <span class="o">=</span> <span class="n">struct</span><span class="o">.</span><span class="n">unpack</span><span class="p">(</span><span class="s2">"i"</span><span class="p">,</span> <span class="n">f</span><span class="o">.</span><span class="n">read</span><span class="p">(</span><span class="mi">4</span><span class="p">))[</span><span class="mi">0</span><span class="p">]</span>
+    <span class="n">content</span><span class="p">[</span><span class="s2">"ndim2"</span><span class="p">]</span> <span class="o">=</span> <span class="n">struct</span><span class="o">.</span><span class="n">unpack</span><span class="p">(</span><span class="s2">"i"</span><span class="p">,</span> <span class="n">f</span><span class="o">.</span><span class="n">read</span><span class="p">(</span><span class="mi">4</span><span class="p">))[</span><span class="mi">0</span><span class="p">]</span>
+    <span class="n">content</span><span class="p">[</span><span class="s2">"ndim3"</span><span class="p">]</span> <span class="o">=</span> <span class="n">struct</span><span class="o">.</span><span class="n">unpack</span><span class="p">(</span><span class="s2">"i"</span><span class="p">,</span> <span class="n">f</span><span class="o">.</span><span class="n">read</span><span class="p">(</span><span class="mi">4</span><span class="p">))[</span><span class="mi">0</span><span class="p">]</span>
+    <span class="n">content</span><span class="p">[</span><span class="s2">"imeth"</span><span class="p">]</span> <span class="o">=</span> <span class="n">struct</span><span class="o">.</span><span class="n">unpack</span><span class="p">(</span><span class="s2">"i"</span><span class="p">,</span> <span class="n">f</span><span class="o">.</span><span class="n">read</span><span class="p">(</span><span class="mi">4</span><span class="p">))[</span><span class="mi">0</span><span class="p">]</span>
+    <span class="n">content</span><span class="p">[</span><span class="s2">"delt"</span><span class="p">]</span> <span class="o">=</span> <span class="n">struct</span><span class="o">.</span><span class="n">unpack</span><span class="p">(</span><span class="s2">"d"</span><span class="p">,</span> <span class="n">f</span><span class="o">.</span><span class="n">read</span><span class="p">(</span><span class="mi">8</span><span class="p">))[</span><span class="mi">0</span><span class="p">]</span>
+    <span class="n">content</span><span class="p">[</span><span class="s2">"pertim"</span><span class="p">]</span> <span class="o">=</span> <span class="n">struct</span><span class="o">.</span><span class="n">unpack</span><span class="p">(</span><span class="s2">"d"</span><span class="p">,</span> <span class="n">f</span><span class="o">.</span><span class="n">read</span><span class="p">(</span><span class="mi">8</span><span class="p">))[</span><span class="mi">0</span><span class="p">]</span>
+    <span class="n">content</span><span class="p">[</span><span class="s2">"totim"</span><span class="p">]</span> <span class="o">=</span> <span class="n">struct</span><span class="o">.</span><span class="n">unpack</span><span class="p">(</span><span class="s2">"d"</span><span class="p">,</span> <span class="n">f</span><span class="o">.</span><span class="n">read</span><span class="p">(</span><span class="mi">8</span><span class="p">))[</span><span class="mi">0</span><span class="p">]</span>
     <span class="k">return</span> <span class="n">content</span>
 
 
-<span class="k">def</span><span class="w"> </span><span class="nf">read_imeth6_header</span><span class="p">(</span><span class="n">f</span><span class="p">:</span> <span class="n">BinaryIO</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">read_imeth6_header</span><span class="p">(</span><span class="n">f</span><span class="p">:</span> <span class="n">BinaryIO</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]:</span>
+<span class="w">    </span><span class="sd">"""</span>
 <span class="sd">    Read the imeth=6 specific data of a CBC header section.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
-    <span class="n">content</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span> <span class="o">|</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]]</span> <span class="o">=</span> <span class="p">{}</span>
-    <span class="n">content</span><span class="p">[</span><span class="s2">&quot;txt1id1&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">f</span><span class="o">.</span><span class="n">read</span><span class="p">(</span><span class="mi">16</span><span class="p">)</span><span class="o">.</span><span class="n">decode</span><span class="p">(</span><span class="s2">&quot;utf-8&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span>
-    <span class="n">content</span><span class="p">[</span><span class="s2">&quot;txt2id1&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">f</span><span class="o">.</span><span class="n">read</span><span class="p">(</span><span class="mi">16</span><span class="p">)</span><span class="o">.</span><span class="n">decode</span><span class="p">(</span><span class="s2">&quot;utf-8&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span>
-    <span class="n">content</span><span class="p">[</span><span class="s2">&quot;txt1id2&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">f</span><span class="o">.</span><span class="n">read</span><span class="p">(</span><span class="mi">16</span><span class="p">)</span><span class="o">.</span><span class="n">decode</span><span class="p">(</span><span class="s2">&quot;utf-8&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span>
-    <span class="n">content</span><span class="p">[</span><span class="s2">&quot;txt2id2&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">f</span><span class="o">.</span><span class="n">read</span><span class="p">(</span><span class="mi">16</span><span class="p">)</span><span class="o">.</span><span class="n">decode</span><span class="p">(</span><span class="s2">&quot;utf-8&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span>
-    <span class="n">ndat</span> <span class="o">=</span> <span class="n">struct</span><span class="o">.</span><span class="n">unpack</span><span class="p">(</span><span class="s2">&quot;i&quot;</span><span class="p">,</span> <span class="n">f</span><span class="o">.</span><span class="n">read</span><span class="p">(</span><span class="mi">4</span><span class="p">))[</span><span class="mi">0</span><span class="p">]</span>
-    <span class="n">content</span><span class="p">[</span><span class="s2">&quot;ndat&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">ndat</span>
-    <span class="n">content</span><span class="p">[</span><span class="s2">&quot;auxtxt&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span>
-        <span class="n">f</span><span class="o">.</span><span class="n">read</span><span class="p">(</span><span class="mi">16</span><span class="p">)</span><span class="o">.</span><span class="n">decode</span><span class="p">(</span><span class="s2">&quot;utf-8&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span> <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">ndat</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span>
+<span class="sd">    """</span>
+    <span class="n">content</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span> <span class="o">|</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]]</span> <span class="o">=</span> <span class="p">{}</span>
+    <span class="n">content</span><span class="p">[</span><span class="s2">"txt1id1"</span><span class="p">]</span> <span class="o">=</span> <span class="n">f</span><span class="o">.</span><span class="n">read</span><span class="p">(</span><span class="mi">16</span><span class="p">)</span><span class="o">.</span><span class="n">decode</span><span class="p">(</span><span class="s2">"utf-8"</span><span class="p">)</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span>
+    <span class="n">content</span><span class="p">[</span><span class="s2">"txt2id1"</span><span class="p">]</span> <span class="o">=</span> <span class="n">f</span><span class="o">.</span><span class="n">read</span><span class="p">(</span><span class="mi">16</span><span class="p">)</span><span class="o">.</span><span class="n">decode</span><span class="p">(</span><span class="s2">"utf-8"</span><span class="p">)</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span>
+    <span class="n">content</span><span class="p">[</span><span class="s2">"txt1id2"</span><span class="p">]</span> <span class="o">=</span> <span class="n">f</span><span class="o">.</span><span class="n">read</span><span class="p">(</span><span class="mi">16</span><span class="p">)</span><span class="o">.</span><span class="n">decode</span><span class="p">(</span><span class="s2">"utf-8"</span><span class="p">)</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span>
+    <span class="n">content</span><span class="p">[</span><span class="s2">"txt2id2"</span><span class="p">]</span> <span class="o">=</span> <span class="n">f</span><span class="o">.</span><span class="n">read</span><span class="p">(</span><span class="mi">16</span><span class="p">)</span><span class="o">.</span><span class="n">decode</span><span class="p">(</span><span class="s2">"utf-8"</span><span class="p">)</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span>
+    <span class="n">ndat</span> <span class="o">=</span> <span class="n">struct</span><span class="o">.</span><span class="n">unpack</span><span class="p">(</span><span class="s2">"i"</span><span class="p">,</span> <span class="n">f</span><span class="o">.</span><span class="n">read</span><span class="p">(</span><span class="mi">4</span><span class="p">))[</span><span class="mi">0</span><span class="p">]</span>
+    <span class="n">content</span><span class="p">[</span><span class="s2">"ndat"</span><span class="p">]</span> <span class="o">=</span> <span class="n">ndat</span>
+    <span class="n">content</span><span class="p">[</span><span class="s2">"auxtxt"</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span>
+        <span class="n">f</span><span class="o">.</span><span class="n">read</span><span class="p">(</span><span class="mi">16</span><span class="p">)</span><span class="o">.</span><span class="n">decode</span><span class="p">(</span><span class="s2">"utf-8"</span><span class="p">)</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span> <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">ndat</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span>
     <span class="p">]</span>
-    <span class="n">content</span><span class="p">[</span><span class="s2">&quot;nlist&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">struct</span><span class="o">.</span><span class="n">unpack</span><span class="p">(</span><span class="s2">&quot;i&quot;</span><span class="p">,</span> <span class="n">f</span><span class="o">.</span><span class="n">read</span><span class="p">(</span><span class="mi">4</span><span class="p">))[</span><span class="mi">0</span><span class="p">]</span>
+    <span class="n">content</span><span class="p">[</span><span class="s2">"nlist"</span><span class="p">]</span> <span class="o">=</span> <span class="n">struct</span><span class="o">.</span><span class="n">unpack</span><span class="p">(</span><span class="s2">"i"</span><span class="p">,</span> <span class="n">f</span><span class="o">.</span><span class="n">read</span><span class="p">(</span><span class="mi">4</span><span class="p">))[</span><span class="mi">0</span><span class="p">]</span>
     <span class="k">return</span> <span class="n">content</span>
 
 
@@ -529,16 +529,16 @@
 <a class="viewcode-back" href="../../../../api/generated/mf6/imod.mf6.read_cbc_headers.html#imod.mf6.read_cbc_headers">[docs]</a>
 <span class="k">def</span><span class="w"> </span><span class="nf">read_cbc_headers</span><span class="p">(</span>
     <span class="n">cbc_path</span><span class="p">:</span> <span class="n">FilePath</span><span class="p">,</span>
-<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">List</span><span class="p">[</span><span class="n">Union</span><span class="p">[</span><span class="n">Imeth1Header</span><span class="p">,</span> <span class="n">Imeth6Header</span><span class="p">]]]:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">list</span><span class="p">[</span><span class="n">Imeth1Header</span> <span class="o">|</span> <span class="n">Imeth6Header</span><span class="p">]]:</span>
+<span class="w">    </span><span class="sd">"""</span>
 <span class="sd">    Read all the header data from a cell-by-cell (.cbc) budget file.</span>
 
 <span class="sd">    All budget data for a MODFLOW6 model is stored in a single file. This</span>
 <span class="sd">    function collects all header data, as well as the starting byte position of</span>
 <span class="sd">    the actual budget data.</span>
 
-<span class="sd">    This function groups the headers per TEXT record (e.g. &quot;flow-ja-face&quot;,</span>
-<span class="sd">    &quot;drn&quot;, etc.). The headers are stored as a list of named tuples.</span>
+<span class="sd">    This function groups the headers per TEXT record (e.g. "flow-ja-face",</span>
+<span class="sd">    "drn", etc.). The headers are stored as a list of named tuples.</span>
 <span class="sd">    flow-ja-face, storage-ss, and storage-sy are written using IMETH=1, all</span>
 <span class="sd">    others with IMETH=6.</span>
 
@@ -552,41 +552,41 @@
 <span class="sd">    headers: Dict[List[UnionImeth1Header, Imeth6Header]]</span>
 <span class="sd">        Dictionary containing a list of headers per TEXT record in the budget</span>
 <span class="sd">        file.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
-    <span class="n">headers</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">List</span><span class="p">[</span><span class="n">Union</span><span class="p">[</span><span class="n">Imeth1Header</span><span class="p">,</span> <span class="n">Imeth6Header</span><span class="p">]]]</span> <span class="o">=</span> <span class="n">defaultdict</span><span class="p">(</span><span class="nb">list</span><span class="p">)</span>
-    <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">cbc_path</span><span class="p">,</span> <span class="s2">&quot;rb&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+<span class="sd">    """</span>
+    <span class="n">headers</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">list</span><span class="p">[</span><span class="n">Imeth1Header</span> <span class="o">|</span> <span class="n">Imeth6Header</span><span class="p">]]</span> <span class="o">=</span> <span class="n">defaultdict</span><span class="p">(</span><span class="nb">list</span><span class="p">)</span>
+    <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">cbc_path</span><span class="p">,</span> <span class="s2">"rb"</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
         <span class="n">filesize</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">fstat</span><span class="p">(</span><span class="n">f</span><span class="o">.</span><span class="n">fileno</span><span class="p">())</span><span class="o">.</span><span class="n">st_size</span>
         <span class="k">while</span> <span class="n">f</span><span class="o">.</span><span class="n">tell</span><span class="p">()</span> <span class="o">&lt;</span> <span class="n">filesize</span><span class="p">:</span>
             <span class="n">header</span> <span class="o">=</span> <span class="n">read_common_cbc_header</span><span class="p">(</span><span class="n">f</span><span class="p">)</span>
-            <span class="k">if</span> <span class="n">header</span><span class="p">[</span><span class="s2">&quot;imeth&quot;</span><span class="p">]</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">header</span><span class="p">[</span><span class="s2">"imeth"</span><span class="p">]</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
                 <span class="c1"># Multiply by -1 because ndim3 is stored as a negative for some reason.</span>
                 <span class="c1"># (ndim3 is the integer size of the third dimension)</span>
                 <span class="n">datasize</span> <span class="o">=</span> <span class="p">(</span>
-                    <span class="n">header</span><span class="p">[</span><span class="s2">&quot;ndim1&quot;</span><span class="p">]</span> <span class="o">*</span> <span class="n">header</span><span class="p">[</span><span class="s2">&quot;ndim2&quot;</span><span class="p">]</span> <span class="o">*</span> <span class="n">header</span><span class="p">[</span><span class="s2">&quot;ndim3&quot;</span><span class="p">]</span> <span class="o">*</span> <span class="o">-</span><span class="mi">1</span>
+                    <span class="n">header</span><span class="p">[</span><span class="s2">"ndim1"</span><span class="p">]</span> <span class="o">*</span> <span class="n">header</span><span class="p">[</span><span class="s2">"ndim2"</span><span class="p">]</span> <span class="o">*</span> <span class="n">header</span><span class="p">[</span><span class="s2">"ndim3"</span><span class="p">]</span> <span class="o">*</span> <span class="o">-</span><span class="mi">1</span>
                 <span class="p">)</span> <span class="o">*</span> <span class="mi">8</span>
-                <span class="n">header</span><span class="p">[</span><span class="s2">&quot;pos&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">f</span><span class="o">.</span><span class="n">tell</span><span class="p">()</span>
-                <span class="n">key</span> <span class="o">=</span> <span class="n">header</span><span class="p">[</span><span class="s2">&quot;text&quot;</span><span class="p">]</span>
+                <span class="n">header</span><span class="p">[</span><span class="s2">"pos"</span><span class="p">]</span> <span class="o">=</span> <span class="n">f</span><span class="o">.</span><span class="n">tell</span><span class="p">()</span>
+                <span class="n">key</span> <span class="o">=</span> <span class="n">header</span><span class="p">[</span><span class="s2">"text"</span><span class="p">]</span>
                 <span class="n">headers</span><span class="p">[</span><span class="n">key</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">Imeth1Header</span><span class="p">(</span><span class="o">**</span><span class="n">header</span><span class="p">))</span>
-            <span class="k">elif</span> <span class="n">header</span><span class="p">[</span><span class="s2">&quot;imeth&quot;</span><span class="p">]</span> <span class="o">==</span> <span class="mi">6</span><span class="p">:</span>
+            <span class="k">elif</span> <span class="n">header</span><span class="p">[</span><span class="s2">"imeth"</span><span class="p">]</span> <span class="o">==</span> <span class="mi">6</span><span class="p">:</span>
                 <span class="n">imeth6_header</span> <span class="o">=</span> <span class="n">read_imeth6_header</span><span class="p">(</span><span class="n">f</span><span class="p">)</span>
-                <span class="n">datasize</span> <span class="o">=</span> <span class="n">imeth6_header</span><span class="p">[</span><span class="s2">&quot;nlist&quot;</span><span class="p">]</span> <span class="o">*</span> <span class="p">(</span><span class="mi">8</span> <span class="o">+</span> <span class="n">imeth6_header</span><span class="p">[</span><span class="s2">&quot;ndat&quot;</span><span class="p">]</span> <span class="o">*</span> <span class="mi">8</span><span class="p">)</span>
-                <span class="n">header</span><span class="p">[</span><span class="s2">&quot;pos&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">f</span><span class="o">.</span><span class="n">tell</span><span class="p">()</span>
-                <span class="c1"># key-format: &quot;package type&quot;-&quot;optional_package_variable&quot;_&quot;package name&quot;</span>
+                <span class="n">datasize</span> <span class="o">=</span> <span class="n">imeth6_header</span><span class="p">[</span><span class="s2">"nlist"</span><span class="p">]</span> <span class="o">*</span> <span class="p">(</span><span class="mi">8</span> <span class="o">+</span> <span class="n">imeth6_header</span><span class="p">[</span><span class="s2">"ndat"</span><span class="p">]</span> <span class="o">*</span> <span class="mi">8</span><span class="p">)</span>
+                <span class="n">header</span><span class="p">[</span><span class="s2">"pos"</span><span class="p">]</span> <span class="o">=</span> <span class="n">f</span><span class="o">.</span><span class="n">tell</span><span class="p">()</span>
+                <span class="c1"># key-format: "package type"-"optional_package_variable"_"package name"</span>
                 <span class="c1"># for river output: riv_sys1</span>
                 <span class="c1"># for uzf output: uzf-gwrch_uzf_sys1</span>
-                <span class="n">key</span> <span class="o">=</span> <span class="n">header</span><span class="p">[</span><span class="s2">&quot;text&quot;</span><span class="p">]</span> <span class="o">+</span> <span class="s2">&quot;_&quot;</span> <span class="o">+</span> <span class="n">imeth6_header</span><span class="p">[</span><span class="s2">&quot;txt2id2&quot;</span><span class="p">]</span>
+                <span class="n">key</span> <span class="o">=</span> <span class="n">header</span><span class="p">[</span><span class="s2">"text"</span><span class="p">]</span> <span class="o">+</span> <span class="s2">"_"</span> <span class="o">+</span> <span class="n">imeth6_header</span><span class="p">[</span><span class="s2">"txt2id2"</span><span class="p">]</span>
                 <span class="c1"># npf-key can be present multiple times in cases of saved saturation + specific discharge</span>
-                <span class="k">if</span> <span class="n">header</span><span class="p">[</span><span class="s2">&quot;text&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s2">&quot;data-&quot;</span><span class="p">):</span>
+                <span class="k">if</span> <span class="n">header</span><span class="p">[</span><span class="s2">"text"</span><span class="p">]</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s2">"data-"</span><span class="p">):</span>
                     <span class="n">key</span> <span class="o">=</span> <span class="p">(</span>
-                        <span class="n">imeth6_header</span><span class="p">[</span><span class="s2">&quot;txt2id2&quot;</span><span class="p">]</span>
-                        <span class="o">+</span> <span class="s2">&quot;_&quot;</span>
-                        <span class="o">+</span> <span class="n">header</span><span class="p">[</span><span class="s2">&quot;text&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s2">&quot;data-&quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">)</span>
+                        <span class="n">imeth6_header</span><span class="p">[</span><span class="s2">"txt2id2"</span><span class="p">]</span>
+                        <span class="o">+</span> <span class="s2">"_"</span>
+                        <span class="o">+</span> <span class="n">header</span><span class="p">[</span><span class="s2">"text"</span><span class="p">]</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s2">"data-"</span><span class="p">,</span> <span class="s2">""</span><span class="p">)</span>
                     <span class="p">)</span>
                 <span class="n">headers</span><span class="p">[</span><span class="n">key</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">Imeth6Header</span><span class="p">(</span><span class="o">**</span><span class="n">header</span><span class="p">,</span> <span class="o">**</span><span class="n">imeth6_header</span><span class="p">))</span>
             <span class="k">else</span><span class="p">:</span>
                 <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
-                    <span class="sa">f</span><span class="s2">&quot;Invalid imeth value in CBC file </span><span class="si">{</span><span class="n">cbc_path</span><span class="si">}</span><span class="s2">. &quot;</span>
-                    <span class="sa">f</span><span class="s2">&quot;Should be 1 or 6, received: </span><span class="si">{</span><span class="n">header</span><span class="p">[</span><span class="s1">&#39;imeth&#39;</span><span class="p">]</span><span class="si">}</span><span class="s2">.&quot;</span>
+                    <span class="sa">f</span><span class="s2">"Invalid imeth value in CBC file </span><span class="si">{</span><span class="n">cbc_path</span><span class="si">}</span><span class="s2">. "</span>
+                    <span class="sa">f</span><span class="s2">"Should be 1 or 6, received: </span><span class="si">{</span><span class="n">header</span><span class="p">[</span><span class="s1">'imeth'</span><span class="p">]</span><span class="si">}</span><span class="s2">."</span>
                 <span class="p">)</span>
             <span class="c1"># Skip the data</span>
             <span class="n">f</span><span class="o">.</span><span class="n">seek</span><span class="p">(</span><span class="n">datasize</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
@@ -595,7 +595,7 @@
 
 
 <span class="k">def</span><span class="w"> </span><span class="nf">read_imeth1_budgets</span><span class="p">(</span><span class="n">cbc_path</span><span class="p">:</span> <span class="n">FilePath</span><span class="p">,</span> <span class="n">count</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">pos</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">FloatArray</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">"""</span>
 <span class="sd">    Read the data for an imeth=1 budget section.</span>
 
 <span class="sd">    Parameters</span>
@@ -609,17 +609,17 @@
 <span class="sd">    Returns</span>
 <span class="sd">    -------</span>
 <span class="sd">    1-D array of floats</span>
-<span class="sd">    &quot;&quot;&quot;</span>
-    <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">cbc_path</span><span class="p">,</span> <span class="s2">&quot;rb&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+<span class="sd">    """</span>
+    <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">cbc_path</span><span class="p">,</span> <span class="s2">"rb"</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
         <span class="n">f</span><span class="o">.</span><span class="n">seek</span><span class="p">(</span><span class="n">pos</span><span class="p">)</span>
         <span class="n">timestep_budgets</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">fromfile</span><span class="p">(</span><span class="n">f</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">,</span> <span class="n">count</span><span class="p">)</span>
     <span class="k">return</span> <span class="n">timestep_budgets</span>
 
 
 <span class="k">def</span><span class="w"> </span><span class="nf">open_imeth1_budgets</span><span class="p">(</span>
-    <span class="n">cbc_path</span><span class="p">:</span> <span class="n">FilePath</span><span class="p">,</span> <span class="n">header_list</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">Imeth1Header</span><span class="p">]</span>
+    <span class="n">cbc_path</span><span class="p">:</span> <span class="n">FilePath</span><span class="p">,</span> <span class="n">header_list</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="n">Imeth1Header</span><span class="p">]</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">xr</span><span class="o">.</span><span class="n">DataArray</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">"""</span>
 <span class="sd">    Open the data for an imeth==1 budget section. Data is read lazily per</span>
 <span class="sd">    timestep. The cell data is not spatially labelled.</span>
 
@@ -630,8 +630,8 @@
 
 <span class="sd">    Returns</span>
 <span class="sd">    -------</span>
-<span class="sd">    xr.DataArray with dims (&quot;time&quot;, &quot;linear_index&quot;)</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    xr.DataArray with dims ("time", "linear_index")</span>
+<span class="sd">    """</span>
     <span class="c1"># Gather times from the headers</span>
     <span class="n">dask_list</span> <span class="o">=</span> <span class="p">[]</span>
     <span class="n">time</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">empty</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">header_list</span><span class="p">),</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">)</span>
@@ -644,28 +644,28 @@
 
     <span class="k">return</span> <span class="n">xr</span><span class="o">.</span><span class="n">DataArray</span><span class="p">(</span>
         <span class="n">data</span><span class="o">=</span><span class="n">dask</span><span class="o">.</span><span class="n">array</span><span class="o">.</span><span class="n">stack</span><span class="p">(</span><span class="n">dask_list</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">),</span>
-        <span class="n">coords</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;time&quot;</span><span class="p">:</span> <span class="n">time</span><span class="p">},</span>
-        <span class="n">dims</span><span class="o">=</span><span class="p">(</span><span class="s2">&quot;time&quot;</span><span class="p">,</span> <span class="s2">&quot;linear_index&quot;</span><span class="p">),</span>
+        <span class="n">coords</span><span class="o">=</span><span class="p">{</span><span class="s2">"time"</span><span class="p">:</span> <span class="n">time</span><span class="p">},</span>
+        <span class="n">dims</span><span class="o">=</span><span class="p">(</span><span class="s2">"time"</span><span class="p">,</span> <span class="s2">"linear_index"</span><span class="p">),</span>
         <span class="n">name</span><span class="o">=</span><span class="n">header_list</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">text</span><span class="p">,</span>
     <span class="p">)</span>
 
 
-<span class="k">def</span><span class="w"> </span><span class="nf">expand_indptr</span><span class="p">(</span><span class="n">ia</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">:</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">expand_indptr</span><span class="p">(</span><span class="n">ia</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">:</span>
     <span class="n">n</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">diff</span><span class="p">(</span><span class="n">ia</span><span class="p">)</span>
     <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">repeat</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="n">ia</span><span class="o">.</span><span class="n">size</span> <span class="o">-</span> <span class="mi">1</span><span class="p">),</span> <span class="n">n</span><span class="p">)</span>
 
 
 <span class="k">def</span><span class="w"> </span><span class="nf">open_face_budgets_as_flowja</span><span class="p">(</span>
-    <span class="n">cbc_path</span><span class="p">:</span> <span class="n">FilePath</span><span class="p">,</span> <span class="n">header_list</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">Imeth1Header</span><span class="p">],</span> <span class="n">grb_content</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]</span>
-<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="n">xr</span><span class="o">.</span><span class="n">DataArray</span><span class="p">,</span> <span class="n">xr</span><span class="o">.</span><span class="n">DataArray</span><span class="p">]:</span>
+    <span class="n">cbc_path</span><span class="p">:</span> <span class="n">FilePath</span><span class="p">,</span> <span class="n">header_list</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="n">Imeth1Header</span><span class="p">],</span> <span class="n">grb_content</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">tuple</span><span class="p">[</span><span class="n">xr</span><span class="o">.</span><span class="n">DataArray</span><span class="p">,</span> <span class="n">xr</span><span class="o">.</span><span class="n">DataArray</span><span class="p">]:</span>
     <span class="n">flowja</span> <span class="o">=</span> <span class="n">open_imeth1_budgets</span><span class="p">(</span><span class="n">cbc_path</span><span class="p">,</span> <span class="n">header_list</span><span class="p">)</span>
-    <span class="n">flowja</span> <span class="o">=</span> <span class="n">flowja</span><span class="o">.</span><span class="n">rename</span><span class="p">({</span><span class="s2">&quot;linear_index&quot;</span><span class="p">:</span> <span class="s2">&quot;connection&quot;</span><span class="p">})</span>
-    <span class="n">n</span> <span class="o">=</span> <span class="n">expand_indptr</span><span class="p">(</span><span class="n">grb_content</span><span class="p">[</span><span class="s2">&quot;ia&quot;</span><span class="p">])</span>
-    <span class="n">m</span> <span class="o">=</span> <span class="n">grb_content</span><span class="p">[</span><span class="s2">&quot;ja&quot;</span><span class="p">]</span> <span class="o">-</span> <span class="mi">1</span>
+    <span class="n">flowja</span> <span class="o">=</span> <span class="n">flowja</span><span class="o">.</span><span class="n">rename</span><span class="p">({</span><span class="s2">"linear_index"</span><span class="p">:</span> <span class="s2">"connection"</span><span class="p">})</span>
+    <span class="n">n</span> <span class="o">=</span> <span class="n">expand_indptr</span><span class="p">(</span><span class="n">grb_content</span><span class="p">[</span><span class="s2">"ia"</span><span class="p">])</span>
+    <span class="n">m</span> <span class="o">=</span> <span class="n">grb_content</span><span class="p">[</span><span class="s2">"ja"</span><span class="p">]</span> <span class="o">-</span> <span class="mi">1</span>
     <span class="n">nm</span> <span class="o">=</span> <span class="n">xr</span><span class="o">.</span><span class="n">DataArray</span><span class="p">(</span>
         <span class="n">np</span><span class="o">.</span><span class="n">column_stack</span><span class="p">([</span><span class="n">n</span><span class="p">,</span> <span class="n">m</span><span class="p">]),</span>
-        <span class="n">coords</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;cell&quot;</span><span class="p">:</span> <span class="p">[</span><span class="s2">&quot;n&quot;</span><span class="p">,</span> <span class="s2">&quot;m&quot;</span><span class="p">]},</span>
-        <span class="n">dims</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;connection&quot;</span><span class="p">,</span> <span class="s2">&quot;cell&quot;</span><span class="p">],</span>
+        <span class="n">coords</span><span class="o">=</span><span class="p">{</span><span class="s2">"cell"</span><span class="p">:</span> <span class="p">[</span><span class="s2">"n"</span><span class="p">,</span> <span class="s2">"m"</span><span class="p">]},</span>
+        <span class="n">dims</span><span class="o">=</span><span class="p">[</span><span class="s2">"connection"</span><span class="p">,</span> <span class="s2">"cell"</span><span class="p">],</span>
     <span class="p">)</span>
     <span class="k">return</span> <span class="n">flowja</span><span class="p">,</span> <span class="n">nm</span>
 
@@ -673,7 +673,7 @@
 <span class="k">def</span><span class="w"> </span><span class="nf">read_imeth6_budgets</span><span class="p">(</span>
     <span class="n">cbc_path</span><span class="p">:</span> <span class="n">FilePath</span><span class="p">,</span> <span class="n">count</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">dtype</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">dtype</span><span class="p">,</span> <span class="n">pos</span><span class="p">:</span> <span class="nb">int</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Any</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">"""</span>
 <span class="sd">    Read the data for an imeth==6 budget section for a single timestep.</span>
 
 <span class="sd">    Returns a numpy structured array containing:</span>
@@ -688,7 +688,7 @@
 <span class="sd">    count: int</span>
 <span class="sd">        number of values to read</span>
 <span class="sd">    dtype: numpy dtype</span>
-<span class="sd">        Data type of the structured array. Contains at least &quot;id1&quot;, &quot;id2&quot;, and &quot;budget&quot;.</span>
+<span class="sd">        Data type of the structured array. Contains at least "id1", "id2", and "budget".</span>
 <span class="sd">        Optionally contains auxiliary columns.</span>
 <span class="sd">    pos:</span>
 <span class="sd">        position in the file where the data for a timestep starts</span>
@@ -696,8 +696,8 @@
 <span class="sd">    Returns</span>
 <span class="sd">    -------</span>
 <span class="sd">    Numpy structured array of type dtype</span>
-<span class="sd">    &quot;&quot;&quot;</span>
-    <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">cbc_path</span><span class="p">,</span> <span class="s2">&quot;rb&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+<span class="sd">    """</span>
+    <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">cbc_path</span><span class="p">,</span> <span class="s2">"rb"</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
         <span class="n">f</span><span class="o">.</span><span class="n">seek</span><span class="p">(</span><span class="n">pos</span><span class="p">)</span>
         <span class="n">table</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">fromfile</span><span class="p">(</span><span class="n">f</span><span class="p">,</span> <span class="n">dtype</span><span class="p">,</span> <span class="n">count</span><span class="p">)</span>
     <span class="k">return</span> <span class="n">table</span>
@@ -709,11 +709,11 @@
     <span class="n">dtype</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">dtype</span><span class="p">,</span>
     <span class="n">pos</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
     <span class="n">size</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
-    <span class="n">shape</span><span class="p">:</span> <span class="n">Tuple</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="o">...</span><span class="p">],</span>
+    <span class="n">shape</span><span class="p">:</span> <span class="nb">tuple</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="o">...</span><span class="p">],</span>
     <span class="n">return_variable</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
     <span class="n">indices</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span> <span class="o">|</span> <span class="kc">None</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">FloatArray</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">"""</span>
 <span class="sd">    Read the data for an imeth==6 budget section.</span>
 
 <span class="sd">    Utilizes the shape information from the DIS GRB file to create a dense numpy</span>
@@ -725,7 +725,7 @@
 <span class="sd">    count: int</span>
 <span class="sd">        number of values to read</span>
 <span class="sd">    dtype: numpy dtype</span>
-<span class="sd">        Data type of the structured array. Contains at least &quot;id1&quot;, &quot;id2&quot;, and &quot;budget&quot;.</span>
+<span class="sd">        Data type of the structured array. Contains at least "id1", "id2", and "budget".</span>
 <span class="sd">        Optionally contains auxiliary columns.</span>
 <span class="sd">    pos: int</span>
 <span class="sd">        position in the file where the data for a timestep starts</span>
@@ -741,12 +741,12 @@
 <span class="sd">    Returns</span>
 <span class="sd">    -------</span>
 <span class="sd">    Three-dimensional array of floats</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="c1"># Allocates a dense array for the entire domain</span>
     <span class="n">out</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">full</span><span class="p">(</span><span class="n">size</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">)</span>
     <span class="n">table</span> <span class="o">=</span> <span class="n">read_imeth6_budgets</span><span class="p">(</span><span class="n">cbc_path</span><span class="p">,</span> <span class="n">count</span><span class="p">,</span> <span class="n">dtype</span><span class="p">,</span> <span class="n">pos</span><span class="p">)</span>
     <span class="k">if</span> <span class="n">indices</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-        <span class="n">indices</span> <span class="o">=</span> <span class="n">table</span><span class="p">[</span><span class="s2">&quot;id1&quot;</span><span class="p">]</span> <span class="o">-</span> <span class="mi">1</span>  <span class="c1"># Convert to 0 based index</span>
+        <span class="n">indices</span> <span class="o">=</span> <span class="n">table</span><span class="p">[</span><span class="s2">"id1"</span><span class="p">]</span> <span class="o">-</span> <span class="mi">1</span>  <span class="c1"># Convert to 0 based index</span>
     <span class="c1"># Zero the relevant values, overwrite the NaN value.</span>
     <span class="n">out</span><span class="p">[</span><span class="n">indices</span><span class="p">]</span> <span class="o">=</span> <span class="mi">0</span>
     <span class="c1"># Sum all the budget terms.</span>
@@ -781,8 +781,8 @@
   </div>
   
   <!-- Scripts loaded after <body> so the DOM is not blocked -->
-  <script defer src="../../../../_static/scripts/bootstrap.js?digest=90905a2f556bf617f1a9"></script>
-<script defer src="../../../../_static/scripts/pydata-sphinx-theme.js?digest=90905a2f556bf617f1a9"></script>
+  <script defer src="../../../../_static/scripts/bootstrap.js?digest=75c7c72ae941e8b558d8"></script>
+<script defer src="../../../../_static/scripts/pydata-sphinx-theme.js?digest=75c7c72ae941e8b558d8"></script>
 
   <footer class="bd-footer">
 <div class="bd-footer__inner bd-page-width">
@@ -802,8 +802,7 @@
         <div class="footer-item">
 
   <p class="sphinx-version">
-    Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 9.1.0.
-    <br/>
+    Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 9.2.0.
   </p>
 </div>
       
@@ -816,7 +815,7 @@
         <div class="footer-item">
 <p class="theme-version">
   <!-- # L10n: Setting the PST URL as an argument as this does not need to be localized -->
-  Built with the <a href="https://pydata-sphinx-theme.readthedocs.io/en/stable/index.html">PyData Sphinx Theme</a> 0.20.0.
+  Built with the <a href="https://pydata-sphinx-theme.readthedocs.io/en/stable/index.html">PyData Sphinx Theme</a> 0.24.0.
 </p></div>
       
     </div>

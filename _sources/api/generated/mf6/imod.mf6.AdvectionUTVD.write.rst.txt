@@ -1,0 +1,6 @@
+﻿imod.mf6.AdvectionUTVD.write
+============================
+
+.. currentmodule:: imod.mf6
+
+.. automethod:: AdvectionUTVD.write

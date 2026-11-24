@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 
 
@@ -8,7 +7,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>Data cleanup &#8212; iMOD Python 1.1.0 documentation</title>
+    <title>Data cleanup &#8212; iMOD Python 1.2.0 documentation</title>
   
   
   
@@ -27,22 +26,22 @@
   </noscript>
   
   <!-- Loaded before other Sphinx assets -->
-  <link href="../_static/styles/theme.css?digest=90905a2f556bf617f1a9" rel="stylesheet" />
-<link href="../_static/styles/pydata-sphinx-theme.css?digest=90905a2f556bf617f1a9" rel="stylesheet" />
+  <link href="../_static/styles/theme.css?digest=75c7c72ae941e8b558d8" rel="stylesheet" />
+<link href="../_static/styles/pydata-sphinx-theme.css?digest=75c7c72ae941e8b558d8" rel="stylesheet" />
 
     <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=03e43079" />
-    <link rel="stylesheet" type="text/css" href="../_static/sg_gallery.css?v=fd6457a4" />
+    <link rel="stylesheet" type="text/css" href="../_static/sg_gallery.css?v=c83e6b79" />
     <link rel="stylesheet" type="text/css" href="../_static/sg_gallery-binder.css?v=f4aeca0c" />
     <link rel="stylesheet" type="text/css" href="../_static/sg_gallery-dataframe.css?v=2082cf3c" />
     <link rel="stylesheet" type="text/css" href="../_static/sg_gallery-rendered-html.css?v=1277b6f3" />
   
   <!-- So that users can add custom icons -->
-  <script defer src="../_static/scripts/fontawesome.js?digest=90905a2f556bf617f1a9"></script>
+  <script defer src="../_static/scripts/fontawesome.js?digest=75c7c72ae941e8b558d8"></script>
   <!-- Pre-loaded scripts that we'll load fully later -->
-  <link rel="preload" as="script" href="../_static/scripts/bootstrap.js?digest=90905a2f556bf617f1a9" />
-<link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=90905a2f556bf617f1a9" />
+  <link rel="preload" as="script" href="../_static/scripts/bootstrap.js?digest=75c7c72ae941e8b558d8" />
+<link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=75c7c72ae941e8b558d8" />
 
-    <script src="../_static/documentation_options.js?v=fc837d61"></script>
+    <script src="../_static/documentation_options.js?v=6efca38a"></script>
     <script src="../_static/doctools.js?v=fd6eb6e6"></script>
     <script src="../_static/sphinx_highlight.js?v=6ffebe34"></script>
     <script src="../_static/sg-tags.js?v=d80f6fa4"></script>
@@ -54,8 +53,9 @@
     <link rel="next" title="Reading and writing iMOD5 files in Python" href="11-imod5-files.html" />
     <link rel="prev" title="Topsystem: from 2D map to 3D model" href="09-topsystem.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <meta name="color-scheme" content="light dark"/>
   <meta name="docsearch:language" content="en"/>
-  <meta name="docsearch:version" content="1.1.0.dev" />
+  <meta name="docsearch:version" content="1.2.0.dev" />
   
     
     <script src="../_static/searchtools.js"></script>
@@ -103,7 +103,7 @@
   
     <header id="pst-header" class="bd-header navbar navbar-expand-lg bd-navbar d-print-none">
 <div class="bd-header__inner bd-page-width">
-  <button class="pst-navbar-icon sidebar-toggle primary-toggle" aria-label="Site navigation">
+  <button type="button" class="pst-navbar-icon sidebar-toggle primary-toggle" aria-label="Site navigation" aria-expanded="false" aria-controls="pst-primary-sidebar-modal">
     <span class="fa-solid fa-bars"></span>
   </button>
   
@@ -125,8 +125,8 @@
     
     
     
-    <img src="../_static/imod-python-logo-light.svg" class="logo__image only-light" alt="iMOD Python 1.1.0 documentation - Home"/>
-    <img src="../_static/imod-python-logo-dark.svg" class="logo__image only-dark pst-js-only" alt="iMOD Python 1.1.0 documentation - Home"/>
+    <img src="../_static/imod-python-logo-light.svg" class="logo__image only-light" alt="iMOD Python 1.2.0 documentation - Home"/>
+    <img src="../_static/imod-python-logo-dark.svg" class="logo__image only-dark pst-js-only" alt="iMOD Python 1.2.0 documentation - Home"/>
   
   
 </a></div>
@@ -193,7 +193,7 @@
         <div class="navbar-item navbar-persistent--container">
           
 
-<button class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+<button type="button" class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
  <i class="fa-solid fa-magnifying-glass"></i>
  <span class="search-button__default-text">Search</span>
  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
@@ -204,15 +204,15 @@
         <div class="navbar-item">
 
 <div class="theme-switch-container dropdown pst-js-only" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Color mode">
-  <button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button dropdown-toggle" aria-label="Color mode" data-bs-toggle="dropdown">
-    <i class="theme-switch fa-solid fa-sun fa-lg fa-fw" data-mode="light" title="Light"></i>
-    <i class="theme-switch fa-solid fa-moon fa-lg fa-fw" data-mode="dark" title="Dark"></i>
-    <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg fa-fw" data-mode="auto" title="System Settings"></i>
+  <button type="button" class="btn btn-sm nav-link pst-navbar-icon theme-switch-button dropdown-toggle" aria-label="Color mode" data-bs-toggle="dropdown">
+    <i class="theme-switch fa-solid fa-sun fa-lg" data-mode="light" title="Light"></i>
+    <i class="theme-switch fa-solid fa-moon fa-lg" data-mode="dark" title="Dark"></i>
+    <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg" data-mode="auto" title="System Settings"></i>
   </button>
   <ul class="dropdown-menu dropdown-menu-end">
-    <li><button class="dropdown-item d-flex align-items-center theme-change-button" data-mode="auto"><i class="fa-solid fa-circle-half-stroke fa-lg fa-fw me-1"></i>System Settings</button></li>
-    <li><button class="dropdown-item d-flex align-items-center theme-change-button" data-mode="light"><i class="fa-solid fa-sun fa-lg fa-fw me-1"></i>Light</button></li>
-    <li><button class="dropdown-item d-flex align-items-center theme-change-button" data-mode="dark"><i class="fa-solid fa-moon fa-lg fa-fw me-1"></i>Dark</button></li>
+    <li><button type="button" class="dropdown-item d-flex align-items-center theme-change-button" data-mode="auto"><i class="fa-solid fa-circle-half-stroke fa-lg me-1"></i>System Settings</button></li>
+    <li><button type="button" class="dropdown-item d-flex align-items-center theme-change-button" data-mode="light"><i class="fa-solid fa-sun fa-lg me-1"></i>Light</button></li>
+    <li><button type="button" class="dropdown-item d-flex align-items-center theme-change-button" data-mode="dark"><i class="fa-solid fa-moon fa-lg me-1"></i>Dark</button></li>
   </ul>
 </div></div>
       
@@ -249,7 +249,7 @@
   
     <div class="navbar-persistent--mobile">
 
-<button class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+<button type="button" class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
  <i class="fa-solid fa-magnifying-glass"></i>
  <span class="search-button__default-text">Search</span>
  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
@@ -258,7 +258,7 @@
   
 
   
-    <button class="pst-navbar-icon sidebar-toggle secondary-toggle" aria-label="On this page">
+    <button type="button" class="pst-navbar-icon sidebar-toggle secondary-toggle" aria-label="On this page" aria-expanded="false" aria-controls="pst-secondary-sidebar-modal">
       <span class="fa-solid fa-outdent"></span>
     </button>
   
@@ -272,7 +272,7 @@
       
       
       
-      <dialog id="pst-primary-sidebar-modal"></dialog>
+      <dialog id="pst-primary-sidebar-modal" tabindex="-1"></dialog>
       <div id="pst-primary-sidebar" class="bd-sidebar-primary bd-sidebar">
         
 
@@ -342,15 +342,15 @@
           <div class="navbar-item">
 
 <div class="theme-switch-container dropdown pst-js-only" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Color mode">
-  <button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button dropdown-toggle" aria-label="Color mode" data-bs-toggle="dropdown">
-    <i class="theme-switch fa-solid fa-sun fa-lg fa-fw" data-mode="light" title="Light"></i>
-    <i class="theme-switch fa-solid fa-moon fa-lg fa-fw" data-mode="dark" title="Dark"></i>
-    <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg fa-fw" data-mode="auto" title="System Settings"></i>
+  <button type="button" class="btn btn-sm nav-link pst-navbar-icon theme-switch-button dropdown-toggle" aria-label="Color mode" data-bs-toggle="dropdown">
+    <i class="theme-switch fa-solid fa-sun fa-lg" data-mode="light" title="Light"></i>
+    <i class="theme-switch fa-solid fa-moon fa-lg" data-mode="dark" title="Dark"></i>
+    <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg" data-mode="auto" title="System Settings"></i>
   </button>
   <ul class="dropdown-menu dropdown-menu-end">
-    <li><button class="dropdown-item d-flex align-items-center theme-change-button" data-mode="auto"><i class="fa-solid fa-circle-half-stroke fa-lg fa-fw me-1"></i>System Settings</button></li>
-    <li><button class="dropdown-item d-flex align-items-center theme-change-button" data-mode="light"><i class="fa-solid fa-sun fa-lg fa-fw me-1"></i>Light</button></li>
-    <li><button class="dropdown-item d-flex align-items-center theme-change-button" data-mode="dark"><i class="fa-solid fa-moon fa-lg fa-fw me-1"></i>Dark</button></li>
+    <li><button type="button" class="dropdown-item d-flex align-items-center theme-change-button" data-mode="auto"><i class="fa-solid fa-circle-half-stroke fa-lg me-1"></i>System Settings</button></li>
+    <li><button type="button" class="dropdown-item d-flex align-items-center theme-change-button" data-mode="light"><i class="fa-solid fa-sun fa-lg me-1"></i>Light</button></li>
+    <li><button type="button" class="dropdown-item d-flex align-items-center theme-change-button" data-mode="dark"><i class="fa-solid fa-moon fa-lg me-1"></i>Dark</button></li>
   </ul>
 </div></div>
         
@@ -385,7 +385,7 @@
   </div>
   
     <div class="sidebar-primary-items__start sidebar-primary__section">
-        <div class="sidebar-primary-item pst-sidebar-collapse"><button id="pst-collapse-sidebar-button" aria-expanded="true" aria-controls="pst-primary-sidebar">
+        <div class="sidebar-primary-item pst-sidebar-collapse"><button type="button" id="pst-collapse-sidebar-button" aria-expanded="true" aria-controls="pst-primary-sidebar">
   <svg class="pst-icon" role="img" aria-hidden="true" focusable="false" viewBox="0 0 16 16" xmlns="http://www.w3.org/2000/svg">
     <path fill="currentColor" d="M3 15.5C2.36232 15.5 1.74874 15.2564 1.28478 14.8189C0.820828 14.3815 0.541576 13.7832 0.504167 13.1467L0.5 13L0.5 3C0.499965 2.36232 0.743605 1.74874 1.18107 1.28478C1.61854 0.820828 2.21676 0.541576 2.85333 0.504167L3 0.5L13 0.5C13.6377 0.499965 14.2513 0.743605 14.7152 1.18107C15.1792 1.61854 15.4584 2.21676 15.4958 2.85333L15.5 3L15.5 13C15.5 13.6377 15.2564 14.2513 14.8189 14.7152C14.3815 15.1792 13.7832 15.4584 13.1467 15.4958L13 15.5L3 15.5ZM3 13.8333L10.5 13.8333L10.5 2.16667L3 2.16667C2.79589 2.16669 2.59889 2.24163 2.44636 2.37726C2.29383 2.5129 2.19638 2.69979 2.1725 2.9025L2.16667 3L2.16667 13C2.16669 13.2041 2.24163 13.4011 2.37726 13.5536C2.5129 13.7062 2.69979 13.8036 2.9025 13.8275L3 13.8333ZM6.65583 10.325L6.5775 10.2558L4.91083 8.58917C4.76735 8.44567 4.68116 8.25476 4.66843 8.05223C4.65569 7.84971 4.71729 7.6495 4.84167 7.48917L4.91083 7.41083L6.5775 5.74417C6.72747 5.59471 6.9287 5.50794 7.14032 5.50148C7.35194 5.49502 7.55809 5.56935 7.7169 5.70937C7.8757 5.8494 7.97525 6.04463 7.99533 6.25539C8.01541 6.46616 7.95451 6.67667 7.825 6.84417L7.75583 6.9225L6.67917 8L7.75583 9.0775C7.89931 9.22099 7.98551 9.41191 7.99824 9.61443C8.01097 9.81695 7.94938 10.0172 7.825 10.1775L7.75583 10.2558C7.61234 10.3993 7.42142 10.4855 7.2189 10.4982C7.01638 10.511 6.81617 10.4494 6.65583 10.325Z"/>
   </svg>
@@ -408,7 +408,7 @@
 <li class="toctree-l1"><a class="reference internal" href="07-regridding.html">Regridding</a></li>
 <li class="toctree-l1"><a class="reference internal" href="08-assign-wells.html">Assigning Wells to Model Layers</a></li>
 <li class="toctree-l1"><a class="reference internal" href="09-topsystem.html">Topsystem: from 2D map to 3D model</a></li>
-<li class="toctree-l1 current active"><a class="current reference internal" href="#">Data cleanup</a></li>
+<li class="toctree-l1 current active"><a aria-current="page" class="current reference internal" href="#">Data cleanup</a></li>
 <li class="toctree-l1"><a class="reference internal" href="11-imod5-files.html">Reading and writing iMOD5 files in Python</a></li>
 <li class="toctree-l1"><a class="reference internal" href="12-imod5-model-to-modflow6.html">Working with iMOD5 models in MODFLOW 6</a></li>
 <li class="toctree-l1"><a class="reference internal" href="13-logging.html">Logging in iMOD Python</a></li>
@@ -449,7 +449,7 @@
     
     <li class="breadcrumb-item breadcrumb-home">
       <a href="../index.html" class="nav-link" aria-label="Home">
-        <i class="fa-solid fa-home"></i>
+        <i class="fa-solid fa-house"></i>
       </a>
     </li>
     
@@ -483,44 +483,38 @@ to download the full example code.</p>
 causing errors. It therefore is useful to have some utilities at hand to clean
 up data. We included some convenience methods to help clean up inconsistent
 datasets.</p>
-<div class="highlight-Python notranslate"><div class="highlight"><pre><span></span>
-</pre></div>
-</div>
+<div class="highlight-Python notranslate"><div class="highlight"><pre><span class="w">
+</span></pre></div></div>
 <p>We’ll start with the usual imports</p>
-<div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
-
-<span class="kn">import</span><span class="w"> </span><span class="nn">imod</span>
-</pre></div>
-</div>
+<div class="highlight-Python notranslate"><div class="highlight"><pre><span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span><span class="w">
+</span><span class="w">
+</span><span class="kn">import</span><span class="w"> </span><span class="nn">imod</span><span class="w">
+</span></pre></div></div>
 <p>These imports can be ignored</p>
-<div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">imod.schemata</span><span class="w"> </span><span class="kn">import</span> <span class="n">ValidationError</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">imod.util</span><span class="w"> </span><span class="kn">import</span> <span class="n">print_if_error</span>
-</pre></div>
-</div>
+<div class="highlight-Python notranslate"><div class="highlight"><pre><span class="kn">from</span><span class="w"> </span><span class="nn">imod</span><span class="nn">.</span><span class="nn">schemata</span><span class="w"> </span><span class="kn">import</span> <span class="n">ValidationError</span><span class="w">
+</span><span class="kn">from</span><span class="w"> </span><span class="nn">imod</span><span class="nn">.</span><span class="nn">util</span><span class="w"> </span><span class="kn">import</span> <a class="sphx-glr-backref-module-imod-util sphx-glr-backref-type-py-function reference internal" href="../api/generated/util/imod.util.print_if_error.html#imod.util.print_if_error" title="imod.util.print_if_error"><span class="n">print_if_error</span></a><span class="w">
+</span></pre></div></div>
 <p>There is a separate example contained in
 <a class="reference internal" href="../examples/mf6/hondsrug.html"><span class="doc">hondsrug</span></a>
 that you should look at if you are interested in the model building</p>
-<div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="n">tmpdir</span> <span class="o">=</span> <span class="n">imod</span><span class="o">.</span><span class="n">util</span><span class="o">.</span><span class="n">temporary_directory</span><span class="p">()</span>
-
-<span class="n">gwf_simulation</span> <span class="o">=</span> <span class="n">imod</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">hondsrug_simulation</span><span class="p">(</span><span class="n">tmpdir</span> <span class="o">/</span> <span class="s2">&quot;hondsrug_saved&quot;</span><span class="p">)</span>
-</pre></div>
-</div>
+<div class="highlight-Python notranslate"><div class="highlight"><pre><span class="n">tmpdir</span> <span class="o">=</span> <span class="n">imod</span><span class="o">.</span><span class="n">util</span><span class="o">.</span><span class="n">temporary_directory</span><span class="p">(</span><span class="p">)</span><span class="w">
+</span><span class="w">
+</span><a class="sphx-glr-backref-module-imod-mf6 sphx-glr-backref-type-py-class sphx-glr-backref-instance reference internal" href="../api/generated/mf6/imod.mf6.Modflow6Simulation.html#imod.mf6.Modflow6Simulation" title="imod.mf6.Modflow6Simulation"><span class="n">gwf_simulation</span></a> <span class="o">=</span> <span class="n">imod</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">hondsrug_simulation</span><span class="p">(</span><span class="n">tmpdir</span> <span class="o">/</span> <span class="s2">&quot;</span><span class="s2">hondsrug_saved</span><span class="s2">&quot;</span><span class="p">)</span><span class="w">
+</span></pre></div></div>
 <section id="update-existing-model-with-new-data">
 <h2>Update existing model with new data<a class="headerlink" href="#update-existing-model-with-new-data" title="Link to this heading">#</a></h2>
 <p>Your dear colleague has brought you some new data for the river package, which
 should be much better than the previous dataset “riv” included in the
 database.</p>
-<div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="n">gwf_model</span> <span class="o">=</span> <span class="n">gwf_simulation</span><span class="p">[</span><span class="s2">&quot;GWF&quot;</span><span class="p">]</span>
-<span class="n">new_riv_ds</span> <span class="o">=</span> <span class="n">imod</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">colleagues_river_data</span><span class="p">(</span><span class="n">tmpdir</span> <span class="o">/</span> <span class="s2">&quot;hondsrug_saved&quot;</span><span class="p">)</span>
-</pre></div>
-</div>
+<div class="highlight-Python notranslate"><div class="highlight"><pre><a class="sphx-glr-backref-module-imod-mf6 sphx-glr-backref-type-py-class sphx-glr-backref-instance reference internal" href="../api/generated/mf6/imod.mf6.GroundwaterFlowModel.html#imod.mf6.GroundwaterFlowModel" title="imod.mf6.GroundwaterFlowModel"><span class="n">gwf_model</span></a> <span class="o">=</span> <a class="sphx-glr-backref-module-imod-mf6 sphx-glr-backref-type-py-class sphx-glr-backref-instance reference internal" href="../api/generated/mf6/imod.mf6.Modflow6Simulation.html#imod.mf6.Modflow6Simulation" title="imod.mf6.Modflow6Simulation"><span class="n">gwf_simulation</span></a><span class="p">[</span><span class="s2">&quot;</span><span class="s2">GWF</span><span class="s2">&quot;</span><span class="p">]</span><span class="w">
+</span><span class="n">new_riv_ds</span> <span class="o">=</span> <span class="n">imod</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">colleagues_river_data</span><span class="p">(</span><span class="n">tmpdir</span> <span class="o">/</span> <span class="s2">&quot;</span><span class="s2">hondsrug_saved</span><span class="s2">&quot;</span><span class="p">)</span><span class="w">
+</span></pre></div></div>
 <p>Let’s do a brief visual check if the colleague’s data seems alright:</p>
-<div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="n">imod</span><span class="o">.</span><span class="n">visualize</span><span class="o">.</span><span class="n">plot_map</span><span class="p">(</span>
-    <span class="n">new_riv_ds</span><span class="p">[</span><span class="s2">&quot;stage&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">max</span><span class="p">(</span><span class="n">dim</span><span class="o">=</span><span class="s2">&quot;layer&quot;</span><span class="p">),</span> <span class="s2">&quot;viridis&quot;</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">19</span><span class="p">,</span> <span class="mi">9</span><span class="p">)</span>
-<span class="p">)</span>
-</pre></div>
-</div>
-<img src="../_images/sphx_glr_10-cleanup_001.png" srcset="../_images/sphx_glr_10-cleanup_001.png" alt="10 cleanup" class = "sphx-glr-single-img"/><div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>C:\pixi_envs\imod-python-1825887385235446013\envs\default\Lib\site-packages\dask\array\reductions.py:327: RuntimeWarning: All-NaN slice encountered
+<div class="highlight-Python notranslate"><div class="highlight"><pre><a class="sphx-glr-backref-module-imod-visualize sphx-glr-backref-type-py-function reference internal" href="../api/generated/visualize/imod.visualize.plot_map.html#imod.visualize.plot_map" title="imod.visualize.plot_map"><span class="n">imod</span><span class="o">.</span><span class="n">visualize</span><span class="o">.</span><span class="n">plot_map</span></a><span class="p">(</span><span class="w">
+</span>    <span class="n">new_riv_ds</span><span class="p">[</span><span class="s2">&quot;</span><span class="s2">stage</span><span class="s2">&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">max</span><span class="p">(</span><span class="n">dim</span><span class="o">=</span><span class="s2">&quot;</span><span class="s2">layer</span><span class="s2">&quot;</span><span class="p">)</span><span class="p">,</span> <span class="s2">&quot;</span><span class="s2">viridis</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">19</span><span class="p">,</span> <span class="mi">9</span><span class="p">)</span><span class="w">
+</span><span class="p">)</span><span class="w">
+</span></pre></div></div>
+<img src="../_images/sphx_glr_10-cleanup_001.png" srcset="../_images/sphx_glr_10-cleanup_001.png" alt="10 cleanup" class = "sphx-glr-single-img"/><div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>C:\pixi_envs\imod-python-3999283135534880650\envs\default\Lib\site-packages\dask\array\reductions.py:327: RuntimeWarning: All-NaN slice encountered
   return np.nanmax(x_chunk, axis=axis, keepdims=keepdims)
 
 (&lt;Figure size 640x480 with 2 Axes&gt;, &lt;Axes: &gt;)
@@ -529,20 +523,18 @@ database.</p>
 <p>Hmmmm, the western side of the river stage grid seems suspiciously inactive…
 We have to contact our colleague later. For now, let’s work with what we have
 and update the model.</p>
-<div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="n">old_riv</span> <span class="o">=</span> <span class="n">gwf_model</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s2">&quot;riv&quot;</span><span class="p">)</span>
-
-<span class="n">gwf_model</span><span class="p">[</span><span class="s2">&quot;new_riv&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">imod</span><span class="o">.</span><span class="n">mf6</span><span class="o">.</span><span class="n">River</span><span class="p">(</span><span class="o">**</span><span class="n">new_riv_ds</span><span class="p">)</span>
-</pre></div>
-</div>
+<div class="highlight-Python notranslate"><div class="highlight"><pre><a class="sphx-glr-backref-module-imod-mf6 sphx-glr-backref-type-py-class sphx-glr-backref-instance reference internal" href="../api/generated/mf6/imod.mf6.River.html#imod.mf6.River" title="imod.mf6.River"><span class="n">old_riv</span></a> <span class="o">=</span> <a class="sphx-glr-backref-module-imod-mf6 sphx-glr-backref-type-py-class sphx-glr-backref-instance reference internal" href="../api/generated/mf6/imod.mf6.GroundwaterFlowModel.html#imod.mf6.GroundwaterFlowModel" title="imod.mf6.GroundwaterFlowModel"><span class="n">gwf_model</span></a><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s2">&quot;</span><span class="s2">riv</span><span class="s2">&quot;</span><span class="p">)</span><span class="w">
+</span><span class="w">
+</span><a class="sphx-glr-backref-module-imod-mf6 sphx-glr-backref-type-py-class sphx-glr-backref-instance reference internal" href="../api/generated/mf6/imod.mf6.GroundwaterFlowModel.html#imod.mf6.GroundwaterFlowModel" title="imod.mf6.GroundwaterFlowModel"><span class="n">gwf_model</span></a><span class="p">[</span><span class="s2">&quot;</span><span class="s2">new_riv</span><span class="s2">&quot;</span><span class="p">]</span> <span class="o">=</span> <a class="sphx-glr-backref-module-imod-mf6 sphx-glr-backref-type-py-class reference internal" href="../api/generated/mf6/imod.mf6.River.html#imod.mf6.River" title="imod.mf6.River"><span class="n">imod</span><span class="o">.</span><span class="n">mf6</span><span class="o">.</span><span class="n">River</span></a><span class="p">(</span><span class="o">*</span><span class="o">*</span><span class="n">new_riv_ds</span><span class="p">)</span><span class="w">
+</span></pre></div></div>
 <p>Lets’s write the simulation with our updated model!</p>
-<div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="n">tmp_dir</span> <span class="o">=</span> <span class="n">imod</span><span class="o">.</span><span class="n">util</span><span class="o">.</span><span class="n">temporary_directory</span><span class="p">()</span>
-
-<span class="c1"># Ignore the &quot;with&quot; statement, it is to succesfully render the Jupyter notebook</span>
-<span class="c1"># online.</span>
-<span class="k">with</span> <span class="n">print_if_error</span><span class="p">(</span><span class="n">ValidationError</span><span class="p">):</span>
-    <span class="n">gwf_simulation</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">tmp_dir</span><span class="p">)</span>
-</pre></div>
-</div>
+<div class="highlight-Python notranslate"><div class="highlight"><pre><span class="n">tmp_dir</span> <span class="o">=</span> <span class="n">imod</span><span class="o">.</span><span class="n">util</span><span class="o">.</span><span class="n">temporary_directory</span><span class="p">(</span><span class="p">)</span><span class="w">
+</span><span class="w">
+</span><span class="c1"># Ignore the &quot;with&quot; statement, it is to succesfully render the Jupyter notebook</span><span class="w">
+</span><span class="c1"># online.</span><span class="w">
+</span><span class="k">with</span> <a class="sphx-glr-backref-module-imod-util sphx-glr-backref-type-py-function reference internal" href="../api/generated/util/imod.util.print_if_error.html#imod.util.print_if_error" title="imod.util.print_if_error"><span class="n">print_if_error</span></a><span class="p">(</span><span class="n">ValidationError</span><span class="p">)</span><span class="p">:</span><span class="w">
+</span>    <a class="sphx-glr-backref-module-imod-mf6 sphx-glr-backref-type-py-method reference internal" href="../api/generated/mf6/imod.mf6.Modflow6Simulation.write.html#imod.mf6.Modflow6Simulation.write" title="imod.mf6.Modflow6Simulation.write"><span class="n">gwf_simulation</span><span class="o">.</span><span class="n">write</span></a><span class="p">(</span><span class="n">tmp_dir</span><span class="p">)</span><span class="w">
+</span></pre></div></div>
 <div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>Simulation validation status:
     - GWF model:
         - model options package:
@@ -554,7 +546,7 @@ and update the model.</p>
                 - not all values comply with criterion: &gt; 0.0
             - bottom_elevation:
                 - nodata is not aligned with stage
-            -&gt; You might fix this by calling the package&#39;s ``.cleanup()`` method.
+            -&gt; You might fix this by calling the package's ``.cleanup()`` method.
 </pre></div>
 </div>
 <p>Oh no! Our river package has a completely inconsistent dataset.
@@ -568,45 +560,41 @@ The model validation raises the following issues:</p>
 <p><em>Exercise</em>: Use the function <code class="docutils literal notranslate"><span class="pre">imod.visualize.plot_map</span></code> to visually inspect
 the errors in your colleagues dataset. You can alter the variable name to
 inspect different variables.</p>
-<div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="n">imod</span><span class="o">.</span><span class="n">visualize</span><span class="o">.</span><span class="n">plot_map</span><span class="p">(</span>
-    <span class="n">new_riv_ds</span><span class="p">[</span><span class="s2">&quot;stage&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">max</span><span class="p">(</span><span class="n">dim</span><span class="o">=</span><span class="s2">&quot;layer&quot;</span><span class="p">),</span> <span class="s2">&quot;viridis&quot;</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">19</span><span class="p">,</span> <span class="mi">9</span><span class="p">)</span>
-<span class="p">)</span>
-</pre></div>
-</div>
+<div class="highlight-Python notranslate"><div class="highlight"><pre><a class="sphx-glr-backref-module-imod-visualize sphx-glr-backref-type-py-function reference internal" href="../api/generated/visualize/imod.visualize.plot_map.html#imod.visualize.plot_map" title="imod.visualize.plot_map"><span class="n">imod</span><span class="o">.</span><span class="n">visualize</span><span class="o">.</span><span class="n">plot_map</span></a><span class="p">(</span><span class="w">
+</span>    <span class="n">new_riv_ds</span><span class="p">[</span><span class="s2">&quot;</span><span class="s2">stage</span><span class="s2">&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">max</span><span class="p">(</span><span class="n">dim</span><span class="o">=</span><span class="s2">&quot;</span><span class="s2">layer</span><span class="s2">&quot;</span><span class="p">)</span><span class="p">,</span> <span class="s2">&quot;</span><span class="s2">viridis</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">19</span><span class="p">,</span> <span class="mi">9</span><span class="p">)</span><span class="w">
+</span><span class="p">)</span><span class="w">
+</span></pre></div></div>
 <img src="../_images/sphx_glr_10-cleanup_002.png" srcset="../_images/sphx_glr_10-cleanup_002.png" alt="10 cleanup" class = "sphx-glr-single-img"/><div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>(&lt;Figure size 640x480 with 2 Axes&gt;, &lt;Axes: &gt;)
 </pre></div>
 </div>
 <p>We can also check where stage exceeds river bottom elevation using basic
 xarray functionality.</p>
-<div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="n">stage_above_riv_bot</span> <span class="o">=</span> <span class="n">new_riv_ds</span><span class="p">[</span><span class="s2">&quot;stage&quot;</span><span class="p">]</span> <span class="o">&lt;</span> <span class="n">new_riv_ds</span><span class="p">[</span><span class="s2">&quot;bottom_elevation&quot;</span><span class="p">]</span>
-
-<span class="n">imod</span><span class="o">.</span><span class="n">visualize</span><span class="o">.</span><span class="n">plot_map</span><span class="p">(</span><span class="n">stage_above_riv_bot</span><span class="o">.</span><span class="n">max</span><span class="p">(</span><span class="n">dim</span><span class="o">=</span><span class="s2">&quot;layer&quot;</span><span class="p">),</span> <span class="s2">&quot;viridis&quot;</span><span class="p">,</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">])</span>
-</pre></div>
-</div>
+<div class="highlight-Python notranslate"><div class="highlight"><pre><span class="n">stage_above_riv_bot</span> <span class="o">=</span> <span class="n">new_riv_ds</span><span class="p">[</span><span class="s2">&quot;</span><span class="s2">stage</span><span class="s2">&quot;</span><span class="p">]</span> <span class="o">&lt;</span> <span class="n">new_riv_ds</span><span class="p">[</span><span class="s2">&quot;</span><span class="s2">bottom_elevation</span><span class="s2">&quot;</span><span class="p">]</span><span class="w">
+</span><span class="w">
+</span><a class="sphx-glr-backref-module-imod-visualize sphx-glr-backref-type-py-function reference internal" href="../api/generated/visualize/imod.visualize.plot_map.html#imod.visualize.plot_map" title="imod.visualize.plot_map"><span class="n">imod</span><span class="o">.</span><span class="n">visualize</span><span class="o">.</span><span class="n">plot_map</span></a><span class="p">(</span><span class="n">stage_above_riv_bot</span><span class="o">.</span><span class="n">max</span><span class="p">(</span><span class="n">dim</span><span class="o">=</span><span class="s2">&quot;</span><span class="s2">layer</span><span class="s2">&quot;</span><span class="p">)</span><span class="p">,</span> <span class="s2">&quot;</span><span class="s2">viridis</span><span class="s2">&quot;</span><span class="p">,</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">]</span><span class="p">)</span><span class="w">
+</span></pre></div></div>
 <img src="../_images/sphx_glr_10-cleanup_003.png" srcset="../_images/sphx_glr_10-cleanup_003.png" alt="10 cleanup" class = "sphx-glr-single-img"/><div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>(&lt;Figure size 640x480 with 2 Axes&gt;, &lt;Axes: &gt;)
 </pre></div>
 </div>
 <p>So luckily the area affected by this error is only small. Let’s investigate
 the size of the error here.</p>
-<div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="n">diff</span> <span class="o">=</span> <span class="n">new_riv_ds</span><span class="p">[</span><span class="s2">&quot;bottom_elevation&quot;</span><span class="p">]</span> <span class="o">-</span> <span class="n">new_riv_ds</span><span class="p">[</span><span class="s2">&quot;stage&quot;</span><span class="p">]</span>
-
-<span class="n">max_diff</span> <span class="o">=</span> <span class="n">diff</span><span class="o">.</span><span class="n">max</span><span class="p">()</span><span class="o">.</span><span class="n">values</span>
-
-<span class="n">max_diff</span>
-</pre></div>
-</div>
+<div class="highlight-Python notranslate"><div class="highlight"><pre><span class="n">diff</span> <span class="o">=</span> <span class="n">new_riv_ds</span><span class="p">[</span><span class="s2">&quot;</span><span class="s2">bottom_elevation</span><span class="s2">&quot;</span><span class="p">]</span> <span class="o">-</span> <span class="n">new_riv_ds</span><span class="p">[</span><span class="s2">&quot;</span><span class="s2">stage</span><span class="s2">&quot;</span><span class="p">]</span><span class="w">
+</span><span class="w">
+</span><span class="n">max_diff</span> <span class="o">=</span> <span class="n">diff</span><span class="o">.</span><span class="n">max</span><span class="p">(</span><span class="p">)</span><span class="o">.</span><span class="n">values</span><span class="w">
+</span><span class="w">
+</span><span class="n">max_diff</span><span class="w">
+</span></pre></div></div>
 <div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>array(0.10000038, dtype=float32)
 </pre></div>
 </div>
 <p>That is a relatively subtle error, which is probably why it slipped your
 colleague’s attention. Let’s plot the troublesome area:</p>
-<div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="n">imod</span><span class="o">.</span><span class="n">visualize</span><span class="o">.</span><span class="n">plot_map</span><span class="p">(</span>
-    <span class="n">diff</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">stage_above_riv_bot</span><span class="p">)</span><span class="o">.</span><span class="n">max</span><span class="p">(</span><span class="n">dim</span><span class="o">=</span><span class="s2">&quot;layer&quot;</span><span class="p">),</span>
-    <span class="s2">&quot;viridis&quot;</span><span class="p">,</span>
-    <span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">max_diff</span><span class="p">,</span> <span class="mi">9</span><span class="p">),</span>
-<span class="p">)</span>
-</pre></div>
-</div>
+<div class="highlight-Python notranslate"><div class="highlight"><pre><a class="sphx-glr-backref-module-imod-visualize sphx-glr-backref-type-py-function reference internal" href="../api/generated/visualize/imod.visualize.plot_map.html#imod.visualize.plot_map" title="imod.visualize.plot_map"><span class="n">imod</span><span class="o">.</span><span class="n">visualize</span><span class="o">.</span><span class="n">plot_map</span></a><span class="p">(</span><span class="w">
+</span>    <span class="n">diff</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">stage_above_riv_bot</span><span class="p">)</span><span class="o">.</span><span class="n">max</span><span class="p">(</span><span class="n">dim</span><span class="o">=</span><span class="s2">&quot;</span><span class="s2">layer</span><span class="s2">&quot;</span><span class="p">)</span><span class="p">,</span><span class="w">
+</span>    <span class="s2">&quot;</span><span class="s2">viridis</span><span class="s2">&quot;</span><span class="p">,</span><span class="w">
+</span>    <span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">max_diff</span><span class="p">,</span> <span class="mi">9</span><span class="p">)</span><span class="p">,</span><span class="w">
+</span><span class="p">)</span><span class="w">
+</span></pre></div></div>
 <img src="../_images/sphx_glr_10-cleanup_004.png" srcset="../_images/sphx_glr_10-cleanup_004.png" alt="10 cleanup" class = "sphx-glr-single-img"/><div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>(&lt;Figure size 640x480 with 2 Axes&gt;, &lt;Axes: &gt;)
 </pre></div>
 </div>
@@ -627,47 +615,43 @@ verify if you think the fixes are correct in this case.</p>
 inplace. This means that the package will be updated, without returning a new
 copy of the package. This means that we need to copy the dirty dataset first,
 before we can do comparisons of the dataset before and after the fix.</p>
-<div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="n">dirty_ds</span> <span class="o">=</span> <span class="n">gwf_model</span><span class="p">[</span><span class="s2">&quot;new_riv&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">dataset</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
-</pre></div>
-</div>
+<div class="highlight-Python notranslate"><div class="highlight"><pre><span class="n">dirty_ds</span> <span class="o">=</span> <a class="sphx-glr-backref-module-imod-mf6 sphx-glr-backref-type-py-class sphx-glr-backref-instance reference internal" href="../api/generated/mf6/imod.mf6.GroundwaterFlowModel.html#imod.mf6.GroundwaterFlowModel" title="imod.mf6.GroundwaterFlowModel"><span class="n">gwf_model</span></a><span class="p">[</span><span class="s2">&quot;</span><span class="s2">new_riv</span><span class="s2">&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">dataset</span><span class="o">.</span><span class="n">copy</span><span class="p">(</span><span class="p">)</span><span class="w">
+</span></pre></div></div>
 <p>We can now clean up the package. To clean up the River package, the method
 requires the model discretization, contained in the
 <a class="reference internal" href="../api/generated/mf6/imod.mf6.StructuredDiscretization.html#imod.mf6.StructuredDiscretization" title="imod.mf6.StructuredDiscretization"><code class="xref py py-class docutils literal notranslate"><span class="pre">imod.mf6.StructuredDiscretization</span></code></a> package. In this model, we named
 this package “dis”.</p>
-<div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="n">dis_pkg</span> <span class="o">=</span> <span class="n">gwf_model</span><span class="p">[</span><span class="s2">&quot;dis&quot;</span><span class="p">]</span>
-<span class="n">gwf_model</span><span class="p">[</span><span class="s2">&quot;new_riv&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">cleanup</span><span class="p">(</span><span class="n">dis</span><span class="o">=</span><span class="n">dis_pkg</span><span class="p">)</span>
-
-<span class="n">cleaned_ds</span> <span class="o">=</span> <span class="n">gwf_model</span><span class="p">[</span><span class="s2">&quot;new_riv&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">dataset</span>
-</pre></div>
-</div>
+<div class="highlight-Python notranslate"><div class="highlight"><pre><a class="sphx-glr-backref-module-imod-mf6 sphx-glr-backref-type-py-class sphx-glr-backref-instance reference internal" href="../api/generated/mf6/imod.mf6.StructuredDiscretization.html#imod.mf6.StructuredDiscretization" title="imod.mf6.StructuredDiscretization"><span class="n">dis_pkg</span></a> <span class="o">=</span> <a class="sphx-glr-backref-module-imod-mf6 sphx-glr-backref-type-py-class sphx-glr-backref-instance reference internal" href="../api/generated/mf6/imod.mf6.GroundwaterFlowModel.html#imod.mf6.GroundwaterFlowModel" title="imod.mf6.GroundwaterFlowModel"><span class="n">gwf_model</span></a><span class="p">[</span><span class="s2">&quot;</span><span class="s2">dis</span><span class="s2">&quot;</span><span class="p">]</span><span class="w">
+</span><a class="sphx-glr-backref-module-imod-mf6 sphx-glr-backref-type-py-class sphx-glr-backref-instance reference internal" href="../api/generated/mf6/imod.mf6.GroundwaterFlowModel.html#imod.mf6.GroundwaterFlowModel" title="imod.mf6.GroundwaterFlowModel"><span class="n">gwf_model</span></a><span class="p">[</span><span class="s2">&quot;</span><span class="s2">new_riv</span><span class="s2">&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">cleanup</span><span class="p">(</span><span class="n">dis</span><span class="o">=</span><a class="sphx-glr-backref-module-imod-mf6 sphx-glr-backref-type-py-class sphx-glr-backref-instance reference internal" href="../api/generated/mf6/imod.mf6.StructuredDiscretization.html#imod.mf6.StructuredDiscretization" title="imod.mf6.StructuredDiscretization"><span class="n">dis_pkg</span></a><span class="p">)</span><span class="w">
+</span><span class="w">
+</span><span class="n">cleaned_ds</span> <span class="o">=</span> <a class="sphx-glr-backref-module-imod-mf6 sphx-glr-backref-type-py-class sphx-glr-backref-instance reference internal" href="../api/generated/mf6/imod.mf6.GroundwaterFlowModel.html#imod.mf6.GroundwaterFlowModel" title="imod.mf6.GroundwaterFlowModel"><span class="n">gwf_model</span></a><span class="p">[</span><span class="s2">&quot;</span><span class="s2">new_riv</span><span class="s2">&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">dataset</span><span class="w">
+</span></pre></div></div>
 <p>According to the method’s explanation (the method calls
 <a class="reference internal" href="../api/generated/prepare/imod.prepare.cleanup_riv.html#imod.prepare.cleanup_riv" title="imod.prepare.cleanup_riv"><code class="xref py py-func docutils literal notranslate"><span class="pre">imod.prepare.cleanup_riv()</span></code></a>), the bottom elevation should be altered by
 the cleanup function.</p>
 <p>Let’s first see if the stages were altered, we’ll calculate the difference
 between the original stage and cleaned version.</p>
-<div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="n">diff_stage</span> <span class="o">=</span> <span class="n">dirty_ds</span><span class="p">[</span><span class="s2">&quot;stage&quot;</span><span class="p">]</span> <span class="o">-</span> <span class="n">cleaned_ds</span><span class="p">[</span><span class="s2">&quot;stage&quot;</span><span class="p">]</span>
-
-<span class="n">fig</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">imod</span><span class="o">.</span><span class="n">visualize</span><span class="o">.</span><span class="n">plot_map</span><span class="p">(</span>
-    <span class="n">diff_stage</span><span class="o">.</span><span class="n">max</span><span class="p">(</span><span class="n">dim</span><span class="o">=</span><span class="s2">&quot;layer&quot;</span><span class="p">),</span> <span class="s2">&quot;viridis&quot;</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">max_diff</span><span class="p">,</span> <span class="mi">9</span><span class="p">)</span>
-<span class="p">)</span>
-<span class="n">ax</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="s2">&quot;stage lowered by cleanup (m)&quot;</span><span class="p">)</span>
-</pre></div>
-</div>
-<img src="../_images/sphx_glr_10-cleanup_005.png" srcset="../_images/sphx_glr_10-cleanup_005.png" alt="stage lowered by cleanup (m)" class = "sphx-glr-single-img"/><div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>Text(0.5, 1.0, &#39;stage lowered by cleanup (m)&#39;)
+<div class="highlight-Python notranslate"><div class="highlight"><pre><span class="n">diff_stage</span> <span class="o">=</span> <span class="n">dirty_ds</span><span class="p">[</span><span class="s2">&quot;</span><span class="s2">stage</span><span class="s2">&quot;</span><span class="p">]</span> <span class="o">-</span> <span class="n">cleaned_ds</span><span class="p">[</span><span class="s2">&quot;</span><span class="s2">stage</span><span class="s2">&quot;</span><span class="p">]</span><span class="w">
+</span><span class="w">
+</span><span class="n">fig</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <a class="sphx-glr-backref-module-imod-visualize sphx-glr-backref-type-py-function reference internal" href="../api/generated/visualize/imod.visualize.plot_map.html#imod.visualize.plot_map" title="imod.visualize.plot_map"><span class="n">imod</span><span class="o">.</span><span class="n">visualize</span><span class="o">.</span><span class="n">plot_map</span></a><span class="p">(</span><span class="w">
+</span>    <span class="n">diff_stage</span><span class="o">.</span><span class="n">max</span><span class="p">(</span><span class="n">dim</span><span class="o">=</span><span class="s2">&quot;</span><span class="s2">layer</span><span class="s2">&quot;</span><span class="p">)</span><span class="p">,</span> <span class="s2">&quot;</span><span class="s2">viridis</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">max_diff</span><span class="p">,</span> <span class="mi">9</span><span class="p">)</span><span class="w">
+</span><span class="p">)</span><span class="w">
+</span><span class="n">ax</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="s2">&quot;</span><span class="s2">stage lowered by cleanup (m)</span><span class="s2">&quot;</span><span class="p">)</span><span class="w">
+</span></pre></div></div>
+<img src="../_images/sphx_glr_10-cleanup_005.png" srcset="../_images/sphx_glr_10-cleanup_005.png" alt="stage lowered by cleanup (m)" class = "sphx-glr-single-img"/><div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>Text(0.5, 1.0, 'stage lowered by cleanup (m)')
 </pre></div>
 </div>
 <p>The stages are indeed not altered.</p>
 <p>Let’s see if the bottom elevations are lowered, we’ll calculate the difference
 between the original bottom elevation and cleaned version.</p>
-<div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="n">diff_riv_bot</span> <span class="o">=</span> <span class="n">dirty_ds</span><span class="p">[</span><span class="s2">&quot;bottom_elevation&quot;</span><span class="p">]</span> <span class="o">-</span> <span class="n">cleaned_ds</span><span class="p">[</span><span class="s2">&quot;bottom_elevation&quot;</span><span class="p">]</span>
-
-<span class="n">fig</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">imod</span><span class="o">.</span><span class="n">visualize</span><span class="o">.</span><span class="n">plot_map</span><span class="p">(</span>
-    <span class="n">diff_riv_bot</span><span class="o">.</span><span class="n">max</span><span class="p">(</span><span class="n">dim</span><span class="o">=</span><span class="s2">&quot;layer&quot;</span><span class="p">),</span> <span class="s2">&quot;viridis&quot;</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">max_diff</span><span class="p">,</span> <span class="mi">9</span><span class="p">)</span>
-<span class="p">)</span>
-<span class="n">ax</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="s2">&quot;river bottom lowered by cleanup (m)&quot;</span><span class="p">)</span>
-</pre></div>
-</div>
-<img src="../_images/sphx_glr_10-cleanup_006.png" srcset="../_images/sphx_glr_10-cleanup_006.png" alt="river bottom lowered by cleanup (m)" class = "sphx-glr-single-img"/><div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>Text(0.5, 1.0, &#39;river bottom lowered by cleanup (m)&#39;)
+<div class="highlight-Python notranslate"><div class="highlight"><pre><span class="n">diff_riv_bot</span> <span class="o">=</span> <span class="n">dirty_ds</span><span class="p">[</span><span class="s2">&quot;</span><span class="s2">bottom_elevation</span><span class="s2">&quot;</span><span class="p">]</span> <span class="o">-</span> <span class="n">cleaned_ds</span><span class="p">[</span><span class="s2">&quot;</span><span class="s2">bottom_elevation</span><span class="s2">&quot;</span><span class="p">]</span><span class="w">
+</span><span class="w">
+</span><span class="n">fig</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <a class="sphx-glr-backref-module-imod-visualize sphx-glr-backref-type-py-function reference internal" href="../api/generated/visualize/imod.visualize.plot_map.html#imod.visualize.plot_map" title="imod.visualize.plot_map"><span class="n">imod</span><span class="o">.</span><span class="n">visualize</span><span class="o">.</span><span class="n">plot_map</span></a><span class="p">(</span><span class="w">
+</span>    <span class="n">diff_riv_bot</span><span class="o">.</span><span class="n">max</span><span class="p">(</span><span class="n">dim</span><span class="o">=</span><span class="s2">&quot;</span><span class="s2">layer</span><span class="s2">&quot;</span><span class="p">)</span><span class="p">,</span> <span class="s2">&quot;</span><span class="s2">viridis</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">max_diff</span><span class="p">,</span> <span class="mi">9</span><span class="p">)</span><span class="w">
+</span><span class="p">)</span><span class="w">
+</span><span class="n">ax</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="s2">&quot;</span><span class="s2">river bottom lowered by cleanup (m)</span><span class="s2">&quot;</span><span class="p">)</span><span class="w">
+</span></pre></div></div>
+<img src="../_images/sphx_glr_10-cleanup_006.png" srcset="../_images/sphx_glr_10-cleanup_006.png" alt="river bottom lowered by cleanup (m)" class = "sphx-glr-single-img"/><div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>Text(0.5, 1.0, 'river bottom lowered by cleanup (m)')
 </pre></div>
 </div>
 <p>You can see the bottom elevation was lowered by the cleanup method.
@@ -684,9 +668,8 @@ but is not guaranteed to be the “best” way to clean up your data!</p>
 <h2>Writing the cleaned model<a class="headerlink" href="#writing-the-cleaned-model" title="Link to this heading">#</a></h2>
 <p>Now that the river package has been cleaned, let’s see if we can write the
 model.</p>
-<div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="n">gwf_simulation</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">tmp_dir</span><span class="p">)</span>
-</pre></div>
-</div>
+<div class="highlight-Python notranslate"><div class="highlight"><pre><a class="sphx-glr-backref-module-imod-mf6 sphx-glr-backref-type-py-method reference internal" href="../api/generated/mf6/imod.mf6.Modflow6Simulation.write.html#imod.mf6.Modflow6Simulation.write" title="imod.mf6.Modflow6Simulation.write"><span class="n">gwf_simulation</span><span class="o">.</span><span class="n">write</span></a><span class="p">(</span><span class="n">tmp_dir</span><span class="p">)</span><span class="w">
+</span></pre></div></div>
 <p>Great! The model was succesfully written!</p>
 </section>
 <section id="cleaning-data-without-a-modflow-6-simulation">
@@ -696,34 +679,33 @@ package at hand, and you still want to clean up your river grids. In this
 case, you can use the <a class="reference internal" href="../api/generated/prepare/imod.prepare.cleanup_riv.html#imod.prepare.cleanup_riv" title="imod.prepare.cleanup_riv"><code class="xref py py-func docutils literal notranslate"><span class="pre">imod.prepare.cleanup_riv()</span></code></a> function. This function
 requires you to to separately provide your grids and returns a dictionary of
 grids.</p>
-<div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="n">idomain</span> <span class="o">=</span> <span class="n">dis_pkg</span><span class="p">[</span><span class="s2">&quot;idomain&quot;</span><span class="p">]</span>
-<span class="n">bottom</span> <span class="o">=</span> <span class="n">dis_pkg</span><span class="p">[</span><span class="s2">&quot;bottom&quot;</span><span class="p">]</span>
-<span class="n">stage</span> <span class="o">=</span> <span class="n">dirty_ds</span><span class="p">[</span><span class="s2">&quot;stage&quot;</span><span class="p">]</span>
-<span class="n">conductance</span> <span class="o">=</span> <span class="n">dirty_ds</span><span class="p">[</span><span class="s2">&quot;conductance&quot;</span><span class="p">]</span>
-<span class="n">bottom_elevation</span> <span class="o">=</span> <span class="n">dirty_ds</span><span class="p">[</span><span class="s2">&quot;bottom_elevation&quot;</span><span class="p">]</span>
-
-<span class="n">riv_cleaned_dict</span> <span class="o">=</span> <span class="n">imod</span><span class="o">.</span><span class="n">prepare</span><span class="o">.</span><span class="n">cleanup_riv</span><span class="p">(</span>
-    <span class="n">idomain</span><span class="p">,</span> <span class="n">bottom</span><span class="p">,</span> <span class="n">stage</span><span class="p">,</span> <span class="n">conductance</span><span class="p">,</span> <span class="n">bottom_elevation</span>
-<span class="p">)</span>
-
-<span class="n">riv_cleaned_dict</span>
-</pre></div>
-</div>
-<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>{&#39;stage&#39;: &lt;xarray.DataArray &#39;stage&#39; (layer: 13, y: 200, x: 500)&gt; Size: 5MB
+<div class="highlight-Python notranslate"><div class="highlight"><pre><span class="n">idomain</span> <span class="o">=</span> <a class="sphx-glr-backref-module-imod-mf6 sphx-glr-backref-type-py-class sphx-glr-backref-instance reference internal" href="../api/generated/mf6/imod.mf6.StructuredDiscretization.html#imod.mf6.StructuredDiscretization" title="imod.mf6.StructuredDiscretization"><span class="n">dis_pkg</span></a><span class="p">[</span><span class="s2">&quot;</span><span class="s2">idomain</span><span class="s2">&quot;</span><span class="p">]</span><span class="w">
+</span><span class="n">bottom</span> <span class="o">=</span> <a class="sphx-glr-backref-module-imod-mf6 sphx-glr-backref-type-py-class sphx-glr-backref-instance reference internal" href="../api/generated/mf6/imod.mf6.StructuredDiscretization.html#imod.mf6.StructuredDiscretization" title="imod.mf6.StructuredDiscretization"><span class="n">dis_pkg</span></a><span class="p">[</span><span class="s2">&quot;</span><span class="s2">bottom</span><span class="s2">&quot;</span><span class="p">]</span><span class="w">
+</span><span class="n">stage</span> <span class="o">=</span> <span class="n">dirty_ds</span><span class="p">[</span><span class="s2">&quot;</span><span class="s2">stage</span><span class="s2">&quot;</span><span class="p">]</span><span class="w">
+</span><span class="n">conductance</span> <span class="o">=</span> <span class="n">dirty_ds</span><span class="p">[</span><span class="s2">&quot;</span><span class="s2">conductance</span><span class="s2">&quot;</span><span class="p">]</span><span class="w">
+</span><span class="n">bottom_elevation</span> <span class="o">=</span> <span class="n">dirty_ds</span><span class="p">[</span><span class="s2">&quot;</span><span class="s2">bottom_elevation</span><span class="s2">&quot;</span><span class="p">]</span><span class="w">
+</span><span class="w">
+</span><span class="n">riv_cleaned_dict</span> <span class="o">=</span> <a class="sphx-glr-backref-module-imod-prepare sphx-glr-backref-type-py-function reference internal" href="../api/generated/prepare/imod.prepare.cleanup_riv.html#imod.prepare.cleanup_riv" title="imod.prepare.cleanup_riv"><span class="n">imod</span><span class="o">.</span><span class="n">prepare</span><span class="o">.</span><span class="n">cleanup_riv</span></a><span class="p">(</span><span class="w">
+</span>    <span class="n">idomain</span><span class="p">,</span> <span class="n">bottom</span><span class="p">,</span> <span class="n">stage</span><span class="p">,</span> <span class="n">conductance</span><span class="p">,</span> <span class="n">bottom_elevation</span><span class="w">
+</span><span class="p">)</span><span class="w">
+</span><span class="w">
+</span><span class="n">riv_cleaned_dict</span><span class="w">
+</span></pre></div></div>
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>{'stage': &lt;xarray.DataArray 'stage' (layer: 13, y: 200, x: 500)&gt; Size: 5MB
 dask.array&lt;where, shape=(13, 200, 500), dtype=float32, chunksize=(5, 200, 500), chunktype=numpy.ndarray&gt;
 Coordinates:
   * layer    (layer) int32 52B 1 2 3 4 5 6 7 8 9 10 11 12 13
   * y        (y) float64 2kB 5.64e+05 5.64e+05 5.639e+05 ... 5.59e+05 5.59e+05
   * x        (x) float64 4kB 2.375e+05 2.375e+05 2.376e+05 ... 2.5e+05 2.5e+05
     dx       float64 8B 25.0
-    dy       float64 8B -25.0, &#39;conductance&#39;: &lt;xarray.DataArray &#39;conductance&#39; (layer: 13, y: 200, x: 500)&gt; Size: 5MB
+    dy       float64 8B -25.0, 'conductance': &lt;xarray.DataArray 'conductance' (layer: 13, y: 200, x: 500)&gt; Size: 5MB
 dask.array&lt;where, shape=(13, 200, 500), dtype=float32, chunksize=(5, 200, 500), chunktype=numpy.ndarray&gt;
 Coordinates:
   * layer    (layer) int32 52B 1 2 3 4 5 6 7 8 9 10 11 12 13
   * y        (y) float64 2kB 5.64e+05 5.64e+05 5.639e+05 ... 5.59e+05 5.59e+05
   * x        (x) float64 4kB 2.375e+05 2.375e+05 2.376e+05 ... 2.5e+05 2.5e+05
     dx       float64 8B 25.0
-    dy       float64 8B -25.0, &#39;bottom_elevation&#39;: &lt;xarray.DataArray &#39;bottom_elevation&#39; (layer: 13, y: 200, x: 500)&gt; Size: 5MB
+    dy       float64 8B -25.0, 'bottom_elevation': &lt;xarray.DataArray 'bottom_elevation' (layer: 13, y: 200, x: 500)&gt; Size: 5MB
 dask.array&lt;where, shape=(13, 200, 500), dtype=float32, chunksize=(5, 200, 500), chunktype=numpy.ndarray&gt;
 Coordinates:
   * layer    (layer) int32 52B 1 2 3 4 5 6 7 8 9 10 11 12 13
@@ -735,11 +717,10 @@ Coordinates:
 </div>
 <p>This returns a dictionary which you can use however you want, and furthermore
 feed to the River package.</p>
-<div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="n">riv_pkg</span> <span class="o">=</span> <span class="n">imod</span><span class="o">.</span><span class="n">mf6</span><span class="o">.</span><span class="n">River</span><span class="p">(</span><span class="o">**</span><span class="n">riv_cleaned_dict</span><span class="p">)</span>
-
-<span class="n">riv_pkg</span>
-</pre></div>
-</div>
+<div class="highlight-Python notranslate"><div class="highlight"><pre><a class="sphx-glr-backref-module-imod-mf6 sphx-glr-backref-type-py-class sphx-glr-backref-instance reference internal" href="../api/generated/mf6/imod.mf6.River.html#imod.mf6.River" title="imod.mf6.River"><span class="n">riv_pkg</span></a> <span class="o">=</span> <a class="sphx-glr-backref-module-imod-mf6 sphx-glr-backref-type-py-class reference internal" href="../api/generated/mf6/imod.mf6.River.html#imod.mf6.River" title="imod.mf6.River"><span class="n">imod</span><span class="o">.</span><span class="n">mf6</span><span class="o">.</span><span class="n">River</span></a><span class="p">(</span><span class="o">*</span><span class="o">*</span><span class="n">riv_cleaned_dict</span><span class="p">)</span><span class="w">
+</span><span class="w">
+</span><a class="sphx-glr-backref-module-imod-mf6 sphx-glr-backref-type-py-class sphx-glr-backref-instance reference internal" href="../api/generated/mf6/imod.mf6.River.html#imod.mf6.River" title="imod.mf6.River"><span class="n">riv_pkg</span></a><span class="w">
+</span></pre></div></div>
 <div class="output_subarea output_html rendered_html output_result">
 <div>River</div><div><svg style="position: absolute; width: 0; height: 0; overflow: hidden">
 <defs>
@@ -1299,8 +1280,8 @@ Data variables:
     print_flows       bool 1B False
     save_flows        bool 1B False
     observations      object 8B None
-    repeat_stress     object 8B None</pre><div class='xr-wrap' style='display:none'><div class='xr-header'><div class='xr-obj-type'>xarray.Dataset</div></div><ul class='xr-sections'><li class='xr-section-item'><input id='section-fcb28aa9-558b-4669-a9a1-e060f691bceb' class='xr-section-summary-in' type='checkbox' disabled /><label for='section-fcb28aa9-558b-4669-a9a1-e060f691bceb' class='xr-section-summary'>Dimensions:</label><div class='xr-section-inline-details'><ul class='xr-dim-list'><li><span class='xr-has-index'>x</span>: 500</li><li><span class='xr-has-index'>y</span>: 200</li><li><span class='xr-has-index'>layer</span>: 13</li></ul></div></li><li class='xr-section-item'><input id='section-3263e03f-4efb-4cb1-93f8-fd0c091ff77f' class='xr-section-summary-in' type='checkbox' checked /><label for='section-3263e03f-4efb-4cb1-93f8-fd0c091ff77f' class='xr-section-summary' title='Expand/collapse section'>Coordinates: <span>(5)</span></label><div class='xr-section-inline-details'></div><div class='xr-section-details'><ul class='xr-var-list'><li class='xr-var-item'><div class='xr-var-name'><span class='xr-has-index'>x</span></div><div class='xr-var-dims'>(x)</div><div class='xr-var-dtype'>float64</div><div class='xr-var-preview xr-preview'>2.375e+05 2.375e+05 ... 2.5e+05</div><input id='attrs-1c1cdd8e-fa15-4f6b-8de0-a44046c8280a' class='xr-var-attrs-in' type='checkbox' disabled><label for='attrs-1c1cdd8e-fa15-4f6b-8de0-a44046c8280a' title='Show/Hide attributes'><svg class='icon xr-icon-file-text2'><use xlink:href='#icon-file-text2'></use></svg></label><input id='data-3dc4b6ee-bb95-4bd1-a045-6ec5b1b66887' class='xr-var-data-in' type='checkbox'><label for='data-3dc4b6ee-bb95-4bd1-a045-6ec5b1b66887' title='Show/Hide data repr'><svg class='icon xr-icon-database'><use xlink:href='#icon-database'></use></svg></label><div class='xr-var-attrs'><dl class='xr-attrs'></dl></div><div class='xr-var-data'><pre>array([237512.5, 237537.5, 237562.5, ..., 249937.5, 249962.5, 249987.5],
-      shape=(500,))</pre></div></li><li class='xr-var-item'><div class='xr-var-name'><span class='xr-has-index'>y</span></div><div class='xr-var-dims'>(y)</div><div class='xr-var-dtype'>float64</div><div class='xr-var-preview xr-preview'>5.64e+05 5.64e+05 ... 5.59e+05</div><input id='attrs-187c6876-2849-4f11-9135-a6baf3e9c4ea' class='xr-var-attrs-in' type='checkbox' disabled><label for='attrs-187c6876-2849-4f11-9135-a6baf3e9c4ea' title='Show/Hide attributes'><svg class='icon xr-icon-file-text2'><use xlink:href='#icon-file-text2'></use></svg></label><input id='data-e45dbc59-f35e-482d-90a6-2949529e253b' class='xr-var-data-in' type='checkbox'><label for='data-e45dbc59-f35e-482d-90a6-2949529e253b' title='Show/Hide data repr'><svg class='icon xr-icon-database'><use xlink:href='#icon-database'></use></svg></label><div class='xr-var-attrs'><dl class='xr-attrs'></dl></div><div class='xr-var-data'><pre>array([563987.5, 563962.5, 563937.5, 563912.5, 563887.5, 563862.5, 563837.5,
+    repeat_stress     object 8B None</pre><div class='xr-wrap' style='display:none'><div class='xr-header'><div class='xr-obj-type'>xarray.Dataset</div></div><ul class='xr-sections'><li class='xr-section-item'><input id='section-db74fa2c-f80d-45c6-a372-3639eb227480' class='xr-section-summary-in' type='checkbox' disabled /><label for='section-db74fa2c-f80d-45c6-a372-3639eb227480' class='xr-section-summary'>Dimensions:</label><div class='xr-section-inline-details'><ul class='xr-dim-list'><li><span class='xr-has-index'>x</span>: 500</li><li><span class='xr-has-index'>y</span>: 200</li><li><span class='xr-has-index'>layer</span>: 13</li></ul></div></li><li class='xr-section-item'><input id='section-f0d012f2-9a93-4a4b-9981-f77973622e13' class='xr-section-summary-in' type='checkbox' checked /><label for='section-f0d012f2-9a93-4a4b-9981-f77973622e13' class='xr-section-summary' title='Expand/collapse section'>Coordinates: <span>(5)</span></label><div class='xr-section-inline-details'></div><div class='xr-section-details'><ul class='xr-var-list'><li class='xr-var-item'><div class='xr-var-name'><span class='xr-has-index'>x</span></div><div class='xr-var-dims'>(x)</div><div class='xr-var-dtype'>float64</div><div class='xr-var-preview xr-preview'>2.375e+05 2.375e+05 ... 2.5e+05</div><input id='attrs-939e355a-c52d-44f2-8397-3c3b1c16be6b' class='xr-var-attrs-in' type='checkbox' disabled><label for='attrs-939e355a-c52d-44f2-8397-3c3b1c16be6b' title='Show/Hide attributes'><svg class='icon xr-icon-file-text2'><use xlink:href='#icon-file-text2'></use></svg></label><input id='data-0561d4a5-295c-4eff-bf80-32dbcb62c2e1' class='xr-var-data-in' type='checkbox'><label for='data-0561d4a5-295c-4eff-bf80-32dbcb62c2e1' title='Show/Hide data repr'><svg class='icon xr-icon-database'><use xlink:href='#icon-database'></use></svg></label><div class='xr-var-attrs'><dl class='xr-attrs'></dl></div><div class='xr-var-data'><pre>array([237512.5, 237537.5, 237562.5, ..., 249937.5, 249962.5, 249987.5],
+      shape=(500,))</pre></div></li><li class='xr-var-item'><div class='xr-var-name'><span class='xr-has-index'>y</span></div><div class='xr-var-dims'>(y)</div><div class='xr-var-dtype'>float64</div><div class='xr-var-preview xr-preview'>5.64e+05 5.64e+05 ... 5.59e+05</div><input id='attrs-3017e7af-88af-4738-8484-de1a00ca7216' class='xr-var-attrs-in' type='checkbox' disabled><label for='attrs-3017e7af-88af-4738-8484-de1a00ca7216' title='Show/Hide attributes'><svg class='icon xr-icon-file-text2'><use xlink:href='#icon-file-text2'></use></svg></label><input id='data-e76330a7-8617-4c52-920f-3afd8052bd53' class='xr-var-data-in' type='checkbox'><label for='data-e76330a7-8617-4c52-920f-3afd8052bd53' title='Show/Hide data repr'><svg class='icon xr-icon-database'><use xlink:href='#icon-database'></use></svg></label><div class='xr-var-attrs'><dl class='xr-attrs'></dl></div><div class='xr-var-data'><pre>array([563987.5, 563962.5, 563937.5, 563912.5, 563887.5, 563862.5, 563837.5,
        563812.5, 563787.5, 563762.5, 563737.5, 563712.5, 563687.5, 563662.5,
        563637.5, 563612.5, 563587.5, 563562.5, 563537.5, 563512.5, 563487.5,
        563462.5, 563437.5, 563412.5, 563387.5, 563362.5, 563337.5, 563312.5,
@@ -1328,7 +1309,7 @@ Data variables:
        559612.5, 559587.5, 559562.5, 559537.5, 559512.5, 559487.5, 559462.5,
        559437.5, 559412.5, 559387.5, 559362.5, 559337.5, 559312.5, 559287.5,
        559262.5, 559237.5, 559212.5, 559187.5, 559162.5, 559137.5, 559112.5,
-       559087.5, 559062.5, 559037.5, 559012.5])</pre></div></li><li class='xr-var-item'><div class='xr-var-name'><span class='xr-has-index'>layer</span></div><div class='xr-var-dims'>(layer)</div><div class='xr-var-dtype'>int32</div><div class='xr-var-preview xr-preview'>1 2 3 4 5 6 7 8 9 10 11 12 13</div><input id='attrs-e0cc07eb-2da2-4123-a5bc-d0bd9279c2c0' class='xr-var-attrs-in' type='checkbox' disabled><label for='attrs-e0cc07eb-2da2-4123-a5bc-d0bd9279c2c0' title='Show/Hide attributes'><svg class='icon xr-icon-file-text2'><use xlink:href='#icon-file-text2'></use></svg></label><input id='data-2721e3ff-6b08-4996-ba8d-d7b97e9a7bfb' class='xr-var-data-in' type='checkbox'><label for='data-2721e3ff-6b08-4996-ba8d-d7b97e9a7bfb' title='Show/Hide data repr'><svg class='icon xr-icon-database'><use xlink:href='#icon-database'></use></svg></label><div class='xr-var-attrs'><dl class='xr-attrs'></dl></div><div class='xr-var-data'><pre>array([ 1,  2,  3,  4,  5,  6,  7,  8,  9, 10, 11, 12, 13], dtype=int32)</pre></div></li><li class='xr-var-item'><div class='xr-var-name'><span>dx</span></div><div class='xr-var-dims'>()</div><div class='xr-var-dtype'>float64</div><div class='xr-var-preview xr-preview'>25.0</div><input id='attrs-7c03a05a-68ff-4e5c-9fad-34cdd363be03' class='xr-var-attrs-in' type='checkbox' disabled><label for='attrs-7c03a05a-68ff-4e5c-9fad-34cdd363be03' title='Show/Hide attributes'><svg class='icon xr-icon-file-text2'><use xlink:href='#icon-file-text2'></use></svg></label><input id='data-bd3b6cfc-1892-4333-8afb-ca820969ce38' class='xr-var-data-in' type='checkbox'><label for='data-bd3b6cfc-1892-4333-8afb-ca820969ce38' title='Show/Hide data repr'><svg class='icon xr-icon-database'><use xlink:href='#icon-database'></use></svg></label><div class='xr-var-attrs'><dl class='xr-attrs'></dl></div><div class='xr-var-data'><pre>array(25.)</pre></div></li><li class='xr-var-item'><div class='xr-var-name'><span>dy</span></div><div class='xr-var-dims'>()</div><div class='xr-var-dtype'>float64</div><div class='xr-var-preview xr-preview'>-25.0</div><input id='attrs-7bb83a46-8358-430b-bb3d-a704e27854d0' class='xr-var-attrs-in' type='checkbox' disabled><label for='attrs-7bb83a46-8358-430b-bb3d-a704e27854d0' title='Show/Hide attributes'><svg class='icon xr-icon-file-text2'><use xlink:href='#icon-file-text2'></use></svg></label><input id='data-ba7da47f-9d82-48ca-bd07-485bfa8606ef' class='xr-var-data-in' type='checkbox'><label for='data-ba7da47f-9d82-48ca-bd07-485bfa8606ef' title='Show/Hide data repr'><svg class='icon xr-icon-database'><use xlink:href='#icon-database'></use></svg></label><div class='xr-var-attrs'><dl class='xr-attrs'></dl></div><div class='xr-var-data'><pre>array(-25.)</pre></div></li></ul></div></li><li class='xr-section-item'><input id='section-7cdcebb8-7581-4a39-b5f9-e6d1780ade16' class='xr-section-summary-in' type='checkbox' checked /><label for='section-7cdcebb8-7581-4a39-b5f9-e6d1780ade16' class='xr-section-summary' title='Expand/collapse section'>Data variables: <span>(8)</span></label><div class='xr-section-inline-details'></div><div class='xr-section-details'><ul class='xr-var-list'><li class='xr-var-item'><div class='xr-var-name'><span>stage</span></div><div class='xr-var-dims'>(layer, y, x)</div><div class='xr-var-dtype'>float32</div><div class='xr-var-preview xr-preview'>dask.array&lt;chunksize=(4, 200, 500), meta=np.ndarray&gt;</div><input id='attrs-b5ecf979-bb97-4c50-a63c-0c7db34e0522' class='xr-var-attrs-in' type='checkbox' disabled><label for='attrs-b5ecf979-bb97-4c50-a63c-0c7db34e0522' title='Show/Hide attributes'><svg class='icon xr-icon-file-text2'><use xlink:href='#icon-file-text2'></use></svg></label><input id='data-ba5fb4e1-8123-44f7-8251-999f5ff87a0b' class='xr-var-data-in' type='checkbox'><label for='data-ba5fb4e1-8123-44f7-8251-999f5ff87a0b' title='Show/Hide data repr'><svg class='icon xr-icon-database'><use xlink:href='#icon-database'></use></svg></label><div class='xr-var-attrs'><dl class='xr-attrs'></dl></div><div class='xr-var-data'><table>
+       559087.5, 559062.5, 559037.5, 559012.5])</pre></div></li><li class='xr-var-item'><div class='xr-var-name'><span class='xr-has-index'>layer</span></div><div class='xr-var-dims'>(layer)</div><div class='xr-var-dtype'>int32</div><div class='xr-var-preview xr-preview'>1 2 3 4 5 6 7 8 9 10 11 12 13</div><input id='attrs-4b46ccd2-221b-4072-85fd-6b448bc349d9' class='xr-var-attrs-in' type='checkbox' disabled><label for='attrs-4b46ccd2-221b-4072-85fd-6b448bc349d9' title='Show/Hide attributes'><svg class='icon xr-icon-file-text2'><use xlink:href='#icon-file-text2'></use></svg></label><input id='data-cedc04e2-6c43-41c0-8f95-3b1558153a9a' class='xr-var-data-in' type='checkbox'><label for='data-cedc04e2-6c43-41c0-8f95-3b1558153a9a' title='Show/Hide data repr'><svg class='icon xr-icon-database'><use xlink:href='#icon-database'></use></svg></label><div class='xr-var-attrs'><dl class='xr-attrs'></dl></div><div class='xr-var-data'><pre>array([ 1,  2,  3,  4,  5,  6,  7,  8,  9, 10, 11, 12, 13], dtype=int32)</pre></div></li><li class='xr-var-item'><div class='xr-var-name'><span>dx</span></div><div class='xr-var-dims'>()</div><div class='xr-var-dtype'>float64</div><div class='xr-var-preview xr-preview'>25.0</div><input id='attrs-873766b0-c587-4378-b1b8-8d5dd2268a77' class='xr-var-attrs-in' type='checkbox' disabled><label for='attrs-873766b0-c587-4378-b1b8-8d5dd2268a77' title='Show/Hide attributes'><svg class='icon xr-icon-file-text2'><use xlink:href='#icon-file-text2'></use></svg></label><input id='data-93ad6195-754a-409b-acf5-199ff6116520' class='xr-var-data-in' type='checkbox'><label for='data-93ad6195-754a-409b-acf5-199ff6116520' title='Show/Hide data repr'><svg class='icon xr-icon-database'><use xlink:href='#icon-database'></use></svg></label><div class='xr-var-attrs'><dl class='xr-attrs'></dl></div><div class='xr-var-data'><pre>array(25.)</pre></div></li><li class='xr-var-item'><div class='xr-var-name'><span>dy</span></div><div class='xr-var-dims'>()</div><div class='xr-var-dtype'>float64</div><div class='xr-var-preview xr-preview'>-25.0</div><input id='attrs-adbac008-f4d5-4138-8605-bcc4208460bd' class='xr-var-attrs-in' type='checkbox' disabled><label for='attrs-adbac008-f4d5-4138-8605-bcc4208460bd' title='Show/Hide attributes'><svg class='icon xr-icon-file-text2'><use xlink:href='#icon-file-text2'></use></svg></label><input id='data-27326af1-ada7-456d-b550-2d7e8cd7fc26' class='xr-var-data-in' type='checkbox'><label for='data-27326af1-ada7-456d-b550-2d7e8cd7fc26' title='Show/Hide data repr'><svg class='icon xr-icon-database'><use xlink:href='#icon-database'></use></svg></label><div class='xr-var-attrs'><dl class='xr-attrs'></dl></div><div class='xr-var-data'><pre>array(-25.)</pre></div></li></ul></div></li><li class='xr-section-item'><input id='section-0a415c67-ac67-42bb-b6b6-df5d9bd32325' class='xr-section-summary-in' type='checkbox' checked /><label for='section-0a415c67-ac67-42bb-b6b6-df5d9bd32325' class='xr-section-summary' title='Expand/collapse section'>Data variables: <span>(8)</span></label><div class='xr-section-inline-details'></div><div class='xr-section-details'><ul class='xr-var-list'><li class='xr-var-item'><div class='xr-var-name'><span>stage</span></div><div class='xr-var-dims'>(layer, y, x)</div><div class='xr-var-dtype'>float32</div><div class='xr-var-preview xr-preview'>dask.array&lt;chunksize=(4, 200, 500), meta=np.ndarray&gt;</div><input id='attrs-c9408f0e-fae2-498d-8b3c-e5ea91309149' class='xr-var-attrs-in' type='checkbox' disabled><label for='attrs-c9408f0e-fae2-498d-8b3c-e5ea91309149' title='Show/Hide attributes'><svg class='icon xr-icon-file-text2'><use xlink:href='#icon-file-text2'></use></svg></label><input id='data-7474ebcc-85ad-442e-9fbb-073bfab5938b' class='xr-var-data-in' type='checkbox'><label for='data-7474ebcc-85ad-442e-9fbb-073bfab5938b' title='Show/Hide data repr'><svg class='icon xr-icon-database'><use xlink:href='#icon-database'></use></svg></label><div class='xr-var-attrs'><dl class='xr-attrs'></dl></div><div class='xr-var-data'><table>
     <tr>
         <td>
             <table style="border-collapse: collapse;">
@@ -1410,7 +1391,7 @@ Data variables:
 </svg>
         </td>
     </tr>
-</table></div></li><li class='xr-var-item'><div class='xr-var-name'><span>conductance</span></div><div class='xr-var-dims'>(layer, y, x)</div><div class='xr-var-dtype'>float32</div><div class='xr-var-preview xr-preview'>dask.array&lt;chunksize=(4, 200, 500), meta=np.ndarray&gt;</div><input id='attrs-0e274485-30d6-4b7f-926c-5ec3f4bc7e0e' class='xr-var-attrs-in' type='checkbox' disabled><label for='attrs-0e274485-30d6-4b7f-926c-5ec3f4bc7e0e' title='Show/Hide attributes'><svg class='icon xr-icon-file-text2'><use xlink:href='#icon-file-text2'></use></svg></label><input id='data-2ac6c68a-f947-4955-9bfa-8731c2fa2445' class='xr-var-data-in' type='checkbox'><label for='data-2ac6c68a-f947-4955-9bfa-8731c2fa2445' title='Show/Hide data repr'><svg class='icon xr-icon-database'><use xlink:href='#icon-database'></use></svg></label><div class='xr-var-attrs'><dl class='xr-attrs'></dl></div><div class='xr-var-data'><table>
+</table></div></li><li class='xr-var-item'><div class='xr-var-name'><span>conductance</span></div><div class='xr-var-dims'>(layer, y, x)</div><div class='xr-var-dtype'>float32</div><div class='xr-var-preview xr-preview'>dask.array&lt;chunksize=(4, 200, 500), meta=np.ndarray&gt;</div><input id='attrs-1e4073de-6811-418c-bf12-208cfb1744d7' class='xr-var-attrs-in' type='checkbox' disabled><label for='attrs-1e4073de-6811-418c-bf12-208cfb1744d7' title='Show/Hide attributes'><svg class='icon xr-icon-file-text2'><use xlink:href='#icon-file-text2'></use></svg></label><input id='data-a72c6d12-d335-4941-8111-cbb9c45304df' class='xr-var-data-in' type='checkbox'><label for='data-a72c6d12-d335-4941-8111-cbb9c45304df' title='Show/Hide data repr'><svg class='icon xr-icon-database'><use xlink:href='#icon-database'></use></svg></label><div class='xr-var-attrs'><dl class='xr-attrs'></dl></div><div class='xr-var-data'><table>
     <tr>
         <td>
             <table style="border-collapse: collapse;">
@@ -1492,7 +1473,7 @@ Data variables:
 </svg>
         </td>
     </tr>
-</table></div></li><li class='xr-var-item'><div class='xr-var-name'><span>bottom_elevation</span></div><div class='xr-var-dims'>(layer, y, x)</div><div class='xr-var-dtype'>float32</div><div class='xr-var-preview xr-preview'>dask.array&lt;chunksize=(4, 200, 500), meta=np.ndarray&gt;</div><input id='attrs-f54f1445-d373-432f-a2c7-54342eb05675' class='xr-var-attrs-in' type='checkbox' disabled><label for='attrs-f54f1445-d373-432f-a2c7-54342eb05675' title='Show/Hide attributes'><svg class='icon xr-icon-file-text2'><use xlink:href='#icon-file-text2'></use></svg></label><input id='data-10183606-50f7-405d-abff-4f37fc22ff8c' class='xr-var-data-in' type='checkbox'><label for='data-10183606-50f7-405d-abff-4f37fc22ff8c' title='Show/Hide data repr'><svg class='icon xr-icon-database'><use xlink:href='#icon-database'></use></svg></label><div class='xr-var-attrs'><dl class='xr-attrs'></dl></div><div class='xr-var-data'><table>
+</table></div></li><li class='xr-var-item'><div class='xr-var-name'><span>bottom_elevation</span></div><div class='xr-var-dims'>(layer, y, x)</div><div class='xr-var-dtype'>float32</div><div class='xr-var-preview xr-preview'>dask.array&lt;chunksize=(4, 200, 500), meta=np.ndarray&gt;</div><input id='attrs-471aa49d-4053-4777-be03-f4cd6ee7121a' class='xr-var-attrs-in' type='checkbox' disabled><label for='attrs-471aa49d-4053-4777-be03-f4cd6ee7121a' title='Show/Hide attributes'><svg class='icon xr-icon-file-text2'><use xlink:href='#icon-file-text2'></use></svg></label><input id='data-be463c2e-787a-4815-9989-65db87b0f04e' class='xr-var-data-in' type='checkbox'><label for='data-be463c2e-787a-4815-9989-65db87b0f04e' title='Show/Hide data repr'><svg class='icon xr-icon-database'><use xlink:href='#icon-database'></use></svg></label><div class='xr-var-attrs'><dl class='xr-attrs'></dl></div><div class='xr-var-data'><table>
     <tr>
         <td>
             <table style="border-collapse: collapse;">
@@ -1518,7 +1499,7 @@ Data variables:
                     </tr>
                     <tr>
                         <th> Dask graph </th>
-                        <td colspan="2"> 3 chunks in 60 graph layers </td>
+                        <td colspan="2"> 3 chunks in 62 graph layers </td>
                     </tr>
                     <tr>
                         <th> Data type </th>
@@ -1574,10 +1555,10 @@ Data variables:
 </svg>
         </td>
     </tr>
-</table></div></li><li class='xr-var-item'><div class='xr-var-name'><span>print_input</span></div><div class='xr-var-dims'>()</div><div class='xr-var-dtype'>bool</div><div class='xr-var-preview xr-preview'>False</div><input id='attrs-6bb7b2df-f87a-46f6-a312-65fcb89b8446' class='xr-var-attrs-in' type='checkbox' disabled><label for='attrs-6bb7b2df-f87a-46f6-a312-65fcb89b8446' title='Show/Hide attributes'><svg class='icon xr-icon-file-text2'><use xlink:href='#icon-file-text2'></use></svg></label><input id='data-43dd1d09-fe79-48ff-b43c-0fc434f343ae' class='xr-var-data-in' type='checkbox'><label for='data-43dd1d09-fe79-48ff-b43c-0fc434f343ae' title='Show/Hide data repr'><svg class='icon xr-icon-database'><use xlink:href='#icon-database'></use></svg></label><div class='xr-var-attrs'><dl class='xr-attrs'></dl></div><div class='xr-var-data'><pre>array(False)</pre></div></li><li class='xr-var-item'><div class='xr-var-name'><span>print_flows</span></div><div class='xr-var-dims'>()</div><div class='xr-var-dtype'>bool</div><div class='xr-var-preview xr-preview'>False</div><input id='attrs-ef93c28f-09d3-40e3-adb6-e468cc036665' class='xr-var-attrs-in' type='checkbox' disabled><label for='attrs-ef93c28f-09d3-40e3-adb6-e468cc036665' title='Show/Hide attributes'><svg class='icon xr-icon-file-text2'><use xlink:href='#icon-file-text2'></use></svg></label><input id='data-548e7c62-ab14-4210-b980-c0a9c58d8933' class='xr-var-data-in' type='checkbox'><label for='data-548e7c62-ab14-4210-b980-c0a9c58d8933' title='Show/Hide data repr'><svg class='icon xr-icon-database'><use xlink:href='#icon-database'></use></svg></label><div class='xr-var-attrs'><dl class='xr-attrs'></dl></div><div class='xr-var-data'><pre>array(False)</pre></div></li><li class='xr-var-item'><div class='xr-var-name'><span>save_flows</span></div><div class='xr-var-dims'>()</div><div class='xr-var-dtype'>bool</div><div class='xr-var-preview xr-preview'>False</div><input id='attrs-aeb798a1-560e-40b9-b536-d24173d47aec' class='xr-var-attrs-in' type='checkbox' disabled><label for='attrs-aeb798a1-560e-40b9-b536-d24173d47aec' title='Show/Hide attributes'><svg class='icon xr-icon-file-text2'><use xlink:href='#icon-file-text2'></use></svg></label><input id='data-aeac232c-b318-44b6-91d5-bffe8f0f300f' class='xr-var-data-in' type='checkbox'><label for='data-aeac232c-b318-44b6-91d5-bffe8f0f300f' title='Show/Hide data repr'><svg class='icon xr-icon-database'><use xlink:href='#icon-database'></use></svg></label><div class='xr-var-attrs'><dl class='xr-attrs'></dl></div><div class='xr-var-data'><pre>array(False)</pre></div></li><li class='xr-var-item'><div class='xr-var-name'><span>observations</span></div><div class='xr-var-dims'>()</div><div class='xr-var-dtype'>object</div><div class='xr-var-preview xr-preview'>None</div><input id='attrs-fbad95e9-f519-4e2f-8843-62e2cb68ad42' class='xr-var-attrs-in' type='checkbox' disabled><label for='attrs-fbad95e9-f519-4e2f-8843-62e2cb68ad42' title='Show/Hide attributes'><svg class='icon xr-icon-file-text2'><use xlink:href='#icon-file-text2'></use></svg></label><input id='data-f58ef1c5-5be1-44d7-bc55-cef07f9e82ae' class='xr-var-data-in' type='checkbox'><label for='data-f58ef1c5-5be1-44d7-bc55-cef07f9e82ae' title='Show/Hide data repr'><svg class='icon xr-icon-database'><use xlink:href='#icon-database'></use></svg></label><div class='xr-var-attrs'><dl class='xr-attrs'></dl></div><div class='xr-var-data'><pre>array(None, dtype=object)</pre></div></li><li class='xr-var-item'><div class='xr-var-name'><span>repeat_stress</span></div><div class='xr-var-dims'>()</div><div class='xr-var-dtype'>object</div><div class='xr-var-preview xr-preview'>None</div><input id='attrs-93d4db1f-b19f-4c1d-9793-6b06657dd119' class='xr-var-attrs-in' type='checkbox' disabled><label for='attrs-93d4db1f-b19f-4c1d-9793-6b06657dd119' title='Show/Hide attributes'><svg class='icon xr-icon-file-text2'><use xlink:href='#icon-file-text2'></use></svg></label><input id='data-f884af47-9511-42dc-b500-d76552fc2369' class='xr-var-data-in' type='checkbox'><label for='data-f884af47-9511-42dc-b500-d76552fc2369' title='Show/Hide data repr'><svg class='icon xr-icon-database'><use xlink:href='#icon-database'></use></svg></label><div class='xr-var-attrs'><dl class='xr-attrs'></dl></div><div class='xr-var-data'><pre>array(None, dtype=object)</pre></div></li></ul></div></li></ul></div></div>
+</table></div></li><li class='xr-var-item'><div class='xr-var-name'><span>print_input</span></div><div class='xr-var-dims'>()</div><div class='xr-var-dtype'>bool</div><div class='xr-var-preview xr-preview'>False</div><input id='attrs-e74cd427-2a02-43bd-8c14-4cc56461715c' class='xr-var-attrs-in' type='checkbox' disabled><label for='attrs-e74cd427-2a02-43bd-8c14-4cc56461715c' title='Show/Hide attributes'><svg class='icon xr-icon-file-text2'><use xlink:href='#icon-file-text2'></use></svg></label><input id='data-a5f00aa3-373a-4b0b-b530-577545f9ec04' class='xr-var-data-in' type='checkbox'><label for='data-a5f00aa3-373a-4b0b-b530-577545f9ec04' title='Show/Hide data repr'><svg class='icon xr-icon-database'><use xlink:href='#icon-database'></use></svg></label><div class='xr-var-attrs'><dl class='xr-attrs'></dl></div><div class='xr-var-data'><pre>array(False)</pre></div></li><li class='xr-var-item'><div class='xr-var-name'><span>print_flows</span></div><div class='xr-var-dims'>()</div><div class='xr-var-dtype'>bool</div><div class='xr-var-preview xr-preview'>False</div><input id='attrs-cb4be666-851d-4224-876e-8536d970e4f9' class='xr-var-attrs-in' type='checkbox' disabled><label for='attrs-cb4be666-851d-4224-876e-8536d970e4f9' title='Show/Hide attributes'><svg class='icon xr-icon-file-text2'><use xlink:href='#icon-file-text2'></use></svg></label><input id='data-f246e734-6ba6-48a6-8994-7fe0bd11aa7c' class='xr-var-data-in' type='checkbox'><label for='data-f246e734-6ba6-48a6-8994-7fe0bd11aa7c' title='Show/Hide data repr'><svg class='icon xr-icon-database'><use xlink:href='#icon-database'></use></svg></label><div class='xr-var-attrs'><dl class='xr-attrs'></dl></div><div class='xr-var-data'><pre>array(False)</pre></div></li><li class='xr-var-item'><div class='xr-var-name'><span>save_flows</span></div><div class='xr-var-dims'>()</div><div class='xr-var-dtype'>bool</div><div class='xr-var-preview xr-preview'>False</div><input id='attrs-2dd85b7b-8054-4266-998f-c573d014e79e' class='xr-var-attrs-in' type='checkbox' disabled><label for='attrs-2dd85b7b-8054-4266-998f-c573d014e79e' title='Show/Hide attributes'><svg class='icon xr-icon-file-text2'><use xlink:href='#icon-file-text2'></use></svg></label><input id='data-4f1f2b08-f13a-4f6e-830a-7f21ae3798fd' class='xr-var-data-in' type='checkbox'><label for='data-4f1f2b08-f13a-4f6e-830a-7f21ae3798fd' title='Show/Hide data repr'><svg class='icon xr-icon-database'><use xlink:href='#icon-database'></use></svg></label><div class='xr-var-attrs'><dl class='xr-attrs'></dl></div><div class='xr-var-data'><pre>array(False)</pre></div></li><li class='xr-var-item'><div class='xr-var-name'><span>observations</span></div><div class='xr-var-dims'>()</div><div class='xr-var-dtype'>object</div><div class='xr-var-preview xr-preview'>None</div><input id='attrs-d9999bcc-e475-469a-acd7-06fbccdb4d2d' class='xr-var-attrs-in' type='checkbox' disabled><label for='attrs-d9999bcc-e475-469a-acd7-06fbccdb4d2d' title='Show/Hide attributes'><svg class='icon xr-icon-file-text2'><use xlink:href='#icon-file-text2'></use></svg></label><input id='data-639edde6-9e9f-40b8-9bfe-276bd677c12b' class='xr-var-data-in' type='checkbox'><label for='data-639edde6-9e9f-40b8-9bfe-276bd677c12b' title='Show/Hide data repr'><svg class='icon xr-icon-database'><use xlink:href='#icon-database'></use></svg></label><div class='xr-var-attrs'><dl class='xr-attrs'></dl></div><div class='xr-var-data'><pre>array(None, dtype=object)</pre></div></li><li class='xr-var-item'><div class='xr-var-name'><span>repeat_stress</span></div><div class='xr-var-dims'>()</div><div class='xr-var-dtype'>object</div><div class='xr-var-preview xr-preview'>None</div><input id='attrs-5762014c-f935-4e34-a2e9-4b92f703cfea' class='xr-var-attrs-in' type='checkbox' disabled><label for='attrs-5762014c-f935-4e34-a2e9-4b92f703cfea' title='Show/Hide attributes'><svg class='icon xr-icon-file-text2'><use xlink:href='#icon-file-text2'></use></svg></label><input id='data-c8106df2-2423-403a-9839-17233c871cf9' class='xr-var-data-in' type='checkbox'><label for='data-c8106df2-2423-403a-9839-17233c871cf9' title='Show/Hide data repr'><svg class='icon xr-icon-database'><use xlink:href='#icon-database'></use></svg></label><div class='xr-var-attrs'><dl class='xr-attrs'></dl></div><div class='xr-var-data'><pre>array(None, dtype=object)</pre></div></li></ul></div></li></ul></div></div>
 </div>
 <br />
-<br /><p class="sphx-glr-timing"><strong>Total running time of the script:</strong> (0 minutes 5.919 seconds)</p>
+<br /><p class="sphx-glr-timing"><strong>Total running time of the script:</strong> (0 minutes 7.528 seconds)</p>
 <div class="sphx-glr-footer sphx-glr-footer-example docutils container" id="sphx-glr-download-user-guide-10-cleanup-py">
 <div class="sphx-glr-download sphx-glr-download-jupyter docutils container">
 <p><a class="reference download internal" download="" href="../_downloads/298256835a80471bb31d7b401edf265e/10-cleanup.ipynb"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Jupyter</span> <span class="pre">notebook:</span> <span class="pre">10-cleanup.ipynb</span></code></a></p>
@@ -1628,7 +1609,7 @@ Data variables:
             
             
               
-                <dialog id="pst-secondary-sidebar-modal"></dialog>
+                <dialog id="pst-secondary-sidebar-modal" tabindex="-1"></dialog>
                 <div id="pst-secondary-sidebar" class="bd-sidebar-secondary bd-toc"><div class="sidebar-secondary-items sidebar-secondary__inner">
 
 
@@ -1669,8 +1650,8 @@ Data variables:
   </div>
   
   <!-- Scripts loaded after <body> so the DOM is not blocked -->
-  <script defer src="../_static/scripts/bootstrap.js?digest=90905a2f556bf617f1a9"></script>
-<script defer src="../_static/scripts/pydata-sphinx-theme.js?digest=90905a2f556bf617f1a9"></script>
+  <script defer src="../_static/scripts/bootstrap.js?digest=75c7c72ae941e8b558d8"></script>
+<script defer src="../_static/scripts/pydata-sphinx-theme.js?digest=75c7c72ae941e8b558d8"></script>
 
   <footer class="bd-footer">
 <div class="bd-footer__inner bd-page-width">
@@ -1690,8 +1671,7 @@ Data variables:
         <div class="footer-item">
 
   <p class="sphinx-version">
-    Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 9.1.0.
-    <br/>
+    Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 9.2.0.
   </p>
 </div>
       
@@ -1704,7 +1684,7 @@ Data variables:
         <div class="footer-item">
 <p class="theme-version">
   <!-- # L10n: Setting the PST URL as an argument as this does not need to be localized -->
-  Built with the <a href="https://pydata-sphinx-theme.readthedocs.io/en/stable/index.html">PyData Sphinx Theme</a> 0.20.0.
+  Built with the <a href="https://pydata-sphinx-theme.readthedocs.io/en/stable/index.html">PyData Sphinx Theme</a> 0.24.0.
 </p></div>
       
     </div>

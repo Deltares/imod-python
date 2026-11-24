@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 
 
@@ -8,7 +7,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>Flow velocities and streamlines &#8212; iMOD Python 1.1.0 documentation</title>
+    <title>Flow velocities and streamlines &#8212; iMOD Python 1.2.0 documentation</title>
   
   
   
@@ -27,22 +26,22 @@
   </noscript>
   
   <!-- Loaded before other Sphinx assets -->
-  <link href="../../_static/styles/theme.css?digest=90905a2f556bf617f1a9" rel="stylesheet" />
-<link href="../../_static/styles/pydata-sphinx-theme.css?digest=90905a2f556bf617f1a9" rel="stylesheet" />
+  <link href="../../_static/styles/theme.css?digest=75c7c72ae941e8b558d8" rel="stylesheet" />
+<link href="../../_static/styles/pydata-sphinx-theme.css?digest=75c7c72ae941e8b558d8" rel="stylesheet" />
 
     <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=03e43079" />
-    <link rel="stylesheet" type="text/css" href="../../_static/sg_gallery.css?v=fd6457a4" />
+    <link rel="stylesheet" type="text/css" href="../../_static/sg_gallery.css?v=c83e6b79" />
     <link rel="stylesheet" type="text/css" href="../../_static/sg_gallery-binder.css?v=f4aeca0c" />
     <link rel="stylesheet" type="text/css" href="../../_static/sg_gallery-dataframe.css?v=2082cf3c" />
     <link rel="stylesheet" type="text/css" href="../../_static/sg_gallery-rendered-html.css?v=1277b6f3" />
   
   <!-- So that users can add custom icons -->
-  <script defer src="../../_static/scripts/fontawesome.js?digest=90905a2f556bf617f1a9"></script>
+  <script defer src="../../_static/scripts/fontawesome.js?digest=75c7c72ae941e8b558d8"></script>
   <!-- Pre-loaded scripts that we'll load fully later -->
-  <link rel="preload" as="script" href="../../_static/scripts/bootstrap.js?digest=90905a2f556bf617f1a9" />
-<link rel="preload" as="script" href="../../_static/scripts/pydata-sphinx-theme.js?digest=90905a2f556bf617f1a9" />
+  <link rel="preload" as="script" href="../../_static/scripts/bootstrap.js?digest=75c7c72ae941e8b558d8" />
+<link rel="preload" as="script" href="../../_static/scripts/pydata-sphinx-theme.js?digest=75c7c72ae941e8b558d8" />
 
-    <script src="../../_static/documentation_options.js?v=fc837d61"></script>
+    <script src="../../_static/documentation_options.js?v=6efca38a"></script>
     <script src="../../_static/doctools.js?v=fd6eb6e6"></script>
     <script src="../../_static/sphinx_highlight.js?v=6ffebe34"></script>
     <script src="../../_static/sg-tags.js?v=d80f6fa4"></script>
@@ -54,8 +53,9 @@
     <link rel="next" title="Plot maps" href="plot_map.html" />
     <link rel="prev" title="Visualization" href="index.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <meta name="color-scheme" content="light dark"/>
   <meta name="docsearch:language" content="en"/>
-  <meta name="docsearch:version" content="1.1.0.dev" />
+  <meta name="docsearch:version" content="1.2.0.dev" />
   
     
     <script src="../../_static/searchtools.js"></script>
@@ -103,7 +103,7 @@
   
     <header id="pst-header" class="bd-header navbar navbar-expand-lg bd-navbar d-print-none">
 <div class="bd-header__inner bd-page-width">
-  <button class="pst-navbar-icon sidebar-toggle primary-toggle" aria-label="Site navigation">
+  <button type="button" class="pst-navbar-icon sidebar-toggle primary-toggle" aria-label="Site navigation" aria-expanded="false" aria-controls="pst-primary-sidebar-modal">
     <span class="fa-solid fa-bars"></span>
   </button>
   
@@ -125,8 +125,8 @@
     
     
     
-    <img src="../../_static/imod-python-logo-light.svg" class="logo__image only-light" alt="iMOD Python 1.1.0 documentation - Home"/>
-    <img src="../../_static/imod-python-logo-dark.svg" class="logo__image only-dark pst-js-only" alt="iMOD Python 1.1.0 documentation - Home"/>
+    <img src="../../_static/imod-python-logo-light.svg" class="logo__image only-light" alt="iMOD Python 1.2.0 documentation - Home"/>
+    <img src="../../_static/imod-python-logo-dark.svg" class="logo__image only-dark pst-js-only" alt="iMOD Python 1.2.0 documentation - Home"/>
   
   
 </a></div>
@@ -193,7 +193,7 @@
         <div class="navbar-item navbar-persistent--container">
           
 
-<button class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+<button type="button" class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
  <i class="fa-solid fa-magnifying-glass"></i>
  <span class="search-button__default-text">Search</span>
  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
@@ -204,15 +204,15 @@
         <div class="navbar-item">
 
 <div class="theme-switch-container dropdown pst-js-only" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Color mode">
-  <button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button dropdown-toggle" aria-label="Color mode" data-bs-toggle="dropdown">
-    <i class="theme-switch fa-solid fa-sun fa-lg fa-fw" data-mode="light" title="Light"></i>
-    <i class="theme-switch fa-solid fa-moon fa-lg fa-fw" data-mode="dark" title="Dark"></i>
-    <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg fa-fw" data-mode="auto" title="System Settings"></i>
+  <button type="button" class="btn btn-sm nav-link pst-navbar-icon theme-switch-button dropdown-toggle" aria-label="Color mode" data-bs-toggle="dropdown">
+    <i class="theme-switch fa-solid fa-sun fa-lg" data-mode="light" title="Light"></i>
+    <i class="theme-switch fa-solid fa-moon fa-lg" data-mode="dark" title="Dark"></i>
+    <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg" data-mode="auto" title="System Settings"></i>
   </button>
   <ul class="dropdown-menu dropdown-menu-end">
-    <li><button class="dropdown-item d-flex align-items-center theme-change-button" data-mode="auto"><i class="fa-solid fa-circle-half-stroke fa-lg fa-fw me-1"></i>System Settings</button></li>
-    <li><button class="dropdown-item d-flex align-items-center theme-change-button" data-mode="light"><i class="fa-solid fa-sun fa-lg fa-fw me-1"></i>Light</button></li>
-    <li><button class="dropdown-item d-flex align-items-center theme-change-button" data-mode="dark"><i class="fa-solid fa-moon fa-lg fa-fw me-1"></i>Dark</button></li>
+    <li><button type="button" class="dropdown-item d-flex align-items-center theme-change-button" data-mode="auto"><i class="fa-solid fa-circle-half-stroke fa-lg me-1"></i>System Settings</button></li>
+    <li><button type="button" class="dropdown-item d-flex align-items-center theme-change-button" data-mode="light"><i class="fa-solid fa-sun fa-lg me-1"></i>Light</button></li>
+    <li><button type="button" class="dropdown-item d-flex align-items-center theme-change-button" data-mode="dark"><i class="fa-solid fa-moon fa-lg me-1"></i>Dark</button></li>
   </ul>
 </div></div>
       
@@ -249,7 +249,7 @@
   
     <div class="navbar-persistent--mobile">
 
-<button class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+<button type="button" class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
  <i class="fa-solid fa-magnifying-glass"></i>
  <span class="search-button__default-text">Search</span>
  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
@@ -258,7 +258,7 @@
   
 
   
-    <button class="pst-navbar-icon sidebar-toggle secondary-toggle" aria-label="On this page">
+    <button type="button" class="pst-navbar-icon sidebar-toggle secondary-toggle" aria-label="On this page" aria-expanded="false" aria-controls="pst-secondary-sidebar-modal">
       <span class="fa-solid fa-outdent"></span>
     </button>
   
@@ -272,7 +272,7 @@
       
       
       
-      <dialog id="pst-primary-sidebar-modal"></dialog>
+      <dialog id="pst-primary-sidebar-modal" tabindex="-1"></dialog>
       <div id="pst-primary-sidebar" class="bd-sidebar-primary bd-sidebar">
         
 
@@ -342,15 +342,15 @@
           <div class="navbar-item">
 
 <div class="theme-switch-container dropdown pst-js-only" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Color mode">
-  <button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button dropdown-toggle" aria-label="Color mode" data-bs-toggle="dropdown">
-    <i class="theme-switch fa-solid fa-sun fa-lg fa-fw" data-mode="light" title="Light"></i>
-    <i class="theme-switch fa-solid fa-moon fa-lg fa-fw" data-mode="dark" title="Dark"></i>
-    <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg fa-fw" data-mode="auto" title="System Settings"></i>
+  <button type="button" class="btn btn-sm nav-link pst-navbar-icon theme-switch-button dropdown-toggle" aria-label="Color mode" data-bs-toggle="dropdown">
+    <i class="theme-switch fa-solid fa-sun fa-lg" data-mode="light" title="Light"></i>
+    <i class="theme-switch fa-solid fa-moon fa-lg" data-mode="dark" title="Dark"></i>
+    <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg" data-mode="auto" title="System Settings"></i>
   </button>
   <ul class="dropdown-menu dropdown-menu-end">
-    <li><button class="dropdown-item d-flex align-items-center theme-change-button" data-mode="auto"><i class="fa-solid fa-circle-half-stroke fa-lg fa-fw me-1"></i>System Settings</button></li>
-    <li><button class="dropdown-item d-flex align-items-center theme-change-button" data-mode="light"><i class="fa-solid fa-sun fa-lg fa-fw me-1"></i>Light</button></li>
-    <li><button class="dropdown-item d-flex align-items-center theme-change-button" data-mode="dark"><i class="fa-solid fa-moon fa-lg fa-fw me-1"></i>Dark</button></li>
+    <li><button type="button" class="dropdown-item d-flex align-items-center theme-change-button" data-mode="auto"><i class="fa-solid fa-circle-half-stroke fa-lg me-1"></i>System Settings</button></li>
+    <li><button type="button" class="dropdown-item d-flex align-items-center theme-change-button" data-mode="light"><i class="fa-solid fa-sun fa-lg me-1"></i>Light</button></li>
+    <li><button type="button" class="dropdown-item d-flex align-items-center theme-change-button" data-mode="dark"><i class="fa-solid fa-moon fa-lg me-1"></i>Dark</button></li>
   </ul>
 </div></div>
         
@@ -385,7 +385,7 @@
   </div>
   
     <div class="sidebar-primary-items__start sidebar-primary__section">
-        <div class="sidebar-primary-item pst-sidebar-collapse"><button id="pst-collapse-sidebar-button" aria-expanded="true" aria-controls="pst-primary-sidebar">
+        <div class="sidebar-primary-item pst-sidebar-collapse"><button type="button" id="pst-collapse-sidebar-button" aria-expanded="true" aria-controls="pst-primary-sidebar">
   <svg class="pst-icon" role="img" aria-hidden="true" focusable="false" viewBox="0 0 16 16" xmlns="http://www.w3.org/2000/svg">
     <path fill="currentColor" d="M3 15.5C2.36232 15.5 1.74874 15.2564 1.28478 14.8189C0.820828 14.3815 0.541576 13.7832 0.504167 13.1467L0.5 13L0.5 3C0.499965 2.36232 0.743605 1.74874 1.18107 1.28478C1.61854 0.820828 2.21676 0.541576 2.85333 0.504167L3 0.5L13 0.5C13.6377 0.499965 14.2513 0.743605 14.7152 1.18107C15.1792 1.61854 15.4584 2.21676 15.4958 2.85333L15.5 3L15.5 13C15.5 13.6377 15.2564 14.2513 14.8189 14.7152C14.3815 15.1792 13.7832 15.4584 13.1467 15.4958L13 15.5L3 15.5ZM3 13.8333L10.5 13.8333L10.5 2.16667L3 2.16667C2.79589 2.16669 2.59889 2.24163 2.44636 2.37726C2.29383 2.5129 2.19638 2.69979 2.1725 2.9025L2.16667 3L2.16667 13C2.16669 13.2041 2.24163 13.4011 2.37726 13.5536C2.5129 13.7062 2.69979 13.8036 2.9025 13.8275L3 13.8333ZM6.65583 10.325L6.5775 10.2558L4.91083 8.58917C4.76735 8.44567 4.68116 8.25476 4.66843 8.05223C4.65569 7.84971 4.71729 7.6495 4.84167 7.48917L4.91083 7.41083L6.5775 5.74417C6.72747 5.59471 6.9287 5.50794 7.14032 5.50148C7.35194 5.49502 7.55809 5.56935 7.7169 5.70937C7.8757 5.8494 7.97525 6.04463 7.99533 6.25539C8.01541 6.46616 7.95451 6.67667 7.825 6.84417L7.75583 6.9225L6.67917 8L7.75583 9.0775C7.89931 9.22099 7.98551 9.41191 7.99824 9.61443C8.01097 9.81695 7.94938 10.0172 7.825 10.1775L7.75583 10.2558C7.61234 10.3993 7.42142 10.4855 7.2189 10.4982C7.01638 10.511 6.81617 10.4494 6.65583 10.325Z"/>
   </svg>
@@ -420,6 +420,7 @@
 
 <li class="toctree-l2"><a class="reference internal" href="../mf6/hondsrug_partitioning.html">Partitioning a regional model</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../mf6/lake.html">Lake package example</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../mf6/synthetic_valley.html">Synthetic valley</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../mf6/transport_2d.html">Transport 2d example</a></li>
 </ul>
 </details></li>
@@ -445,7 +446,7 @@
 </ul>
 </details></li>
 <li class="toctree-l1 current active has-children"><a class="reference internal" href="index.html">Visualization</a><details open="open"><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul class="current">
-<li class="toctree-l2 current active"><a class="current reference internal" href="#">Flow velocities and streamlines</a></li>
+<li class="toctree-l2 current active"><a aria-current="page" class="current reference internal" href="#">Flow velocities and streamlines</a></li>
 <li class="toctree-l2"><a class="reference internal" href="plot_map.html">Plot maps</a></li>
 </ul>
 </details></li>
@@ -486,7 +487,7 @@
     
     <li class="breadcrumb-item breadcrumb-home">
       <a href="../../index.html" class="nav-link" aria-label="Home">
-        <i class="fa-solid fa-home"></i>
+        <i class="fa-solid fa-house"></i>
       </a>
     </li>
     
@@ -520,39 +521,35 @@ to download the full example code.</p>
 <section class="sphx-glr-example-title" id="flow-velocities-and-streamlines">
 <span id="sphx-glr-examples-visualize-flowvel-streamlines-py"></span><h1>Flow velocities and streamlines<a class="headerlink" href="#flow-velocities-and-streamlines" title="Link to this heading">#</a></h1>
 <p>In this section we will plot flow velocities and streamlines for some model results.</p>
-<div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">matplotlib.pyplot</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">plt</span>
-<span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
-<span class="kn">import</span><span class="w"> </span><span class="nn">xarray</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">xr</span>
-</pre></div>
-</div>
+<div class="highlight-Python notranslate"><div class="highlight"><pre><span class="kn">import</span><span class="w"> </span><span class="nn">matplotlib</span><span class="nn">.</span><span class="nn">pyplot</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">plt</span><span class="w">
+</span><span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span><span class="w">
+</span><span class="kn">import</span><span class="w"> </span><span class="nn">xarray</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">xr</span><span class="w">
+</span></pre></div></div>
 <p>We’ll start with the usual imports</p>
-<div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">imod</span>
-</pre></div>
-</div>
+<div class="highlight-Python notranslate"><div class="highlight"><pre><span class="kn">import</span><span class="w"> </span><span class="nn">imod</span><span class="w">
+</span></pre></div></div>
 <p>Load and unpack the data</p>
-<div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="n">ds_fluxes</span> <span class="o">=</span> <span class="n">imod</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">fluxes</span><span class="p">()</span>
-<span class="n">ds_fluxes</span> <span class="o">=</span> <span class="n">ds_fluxes</span><span class="o">.</span><span class="n">isel</span><span class="p">(</span><span class="n">time</span><span class="o">=-</span><span class="mi">1</span><span class="p">)</span>
-
-<span class="n">ds_fluxes</span>
-
-<span class="n">lower</span> <span class="o">=</span> <span class="n">ds_fluxes</span><span class="p">[</span><span class="s2">&quot;bdgflf&quot;</span><span class="p">]</span>
-<span class="n">right</span> <span class="o">=</span> <span class="n">ds_fluxes</span><span class="p">[</span><span class="s2">&quot;bdgfrf&quot;</span><span class="p">]</span>
-<span class="n">front</span> <span class="o">=</span> <span class="n">ds_fluxes</span><span class="p">[</span><span class="s2">&quot;bdgfff&quot;</span><span class="p">]</span>
-<span class="n">heads</span> <span class="o">=</span> <span class="n">ds_fluxes</span><span class="p">[</span><span class="s2">&quot;head&quot;</span><span class="p">]</span>
-</pre></div>
-</div>
+<div class="highlight-Python notranslate"><div class="highlight"><pre><span class="n">ds_fluxes</span> <span class="o">=</span> <span class="n">imod</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">fluxes</span><span class="p">(</span><span class="p">)</span><span class="w">
+</span><span class="n">ds_fluxes</span> <span class="o">=</span> <span class="n">ds_fluxes</span><span class="o">.</span><span class="n">isel</span><span class="p">(</span><span class="n">time</span><span class="o">=</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span><span class="w">
+</span><span class="w">
+</span><span class="n">ds_fluxes</span><span class="w">
+</span><span class="w">
+</span><span class="n">lower</span> <span class="o">=</span> <span class="n">ds_fluxes</span><span class="p">[</span><span class="s2">&quot;</span><span class="s2">bdgflf</span><span class="s2">&quot;</span><span class="p">]</span><span class="w">
+</span><span class="n">right</span> <span class="o">=</span> <span class="n">ds_fluxes</span><span class="p">[</span><span class="s2">&quot;</span><span class="s2">bdgfrf</span><span class="s2">&quot;</span><span class="p">]</span><span class="w">
+</span><span class="n">front</span> <span class="o">=</span> <span class="n">ds_fluxes</span><span class="p">[</span><span class="s2">&quot;</span><span class="s2">bdgfff</span><span class="s2">&quot;</span><span class="p">]</span><span class="w">
+</span><span class="n">heads</span> <span class="o">=</span> <span class="n">ds_fluxes</span><span class="p">[</span><span class="s2">&quot;</span><span class="s2">head</span><span class="s2">&quot;</span><span class="p">]</span><span class="w">
+</span></pre></div></div>
 <section id="calculating-flow-velocity">
 <h2>Calculating flow velocity<a class="headerlink" href="#calculating-flow-velocity" title="Link to this heading">#</a></h2>
 <p>The imod-python function imod.evaluate.flow_velocity() computes flow
 velocities in m/d based on the budget results (bdgflf - flow lower face,
 bdgfrf - flow right face and bdgfff - flow front face). To apply this
 function, we first need to define a top_bot array.</p>
-<div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="n">top_bot</span> <span class="o">=</span> <span class="n">xr</span><span class="o">.</span><span class="n">full_like</span><span class="p">(</span><span class="n">lower</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">)</span>
-<span class="n">top_bot</span><span class="p">[</span><span class="s2">&quot;top&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">top_bot</span><span class="p">[</span><span class="s2">&quot;z&quot;</span><span class="p">]</span> <span class="o">-</span> <span class="mf">0.5</span> <span class="o">*</span> <span class="n">top_bot</span><span class="p">[</span><span class="s2">&quot;dz&quot;</span><span class="p">]</span>
-<span class="n">top_bot</span><span class="p">[</span><span class="s2">&quot;bot&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">top_bot</span><span class="p">[</span><span class="s2">&quot;z&quot;</span><span class="p">]</span> <span class="o">+</span> <span class="mf">0.5</span> <span class="o">*</span> <span class="n">top_bot</span><span class="p">[</span><span class="s2">&quot;dz&quot;</span><span class="p">]</span>
-<span class="n">top_bot</span>
-</pre></div>
-</div>
+<div class="highlight-Python notranslate"><div class="highlight"><pre><span class="n">top_bot</span> <span class="o">=</span> <span class="n">xr</span><span class="o">.</span><span class="n">full_like</span><span class="p">(</span><span class="n">lower</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">)</span><span class="w">
+</span><span class="n">top_bot</span><span class="p">[</span><span class="s2">&quot;</span><span class="s2">top</span><span class="s2">&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">top_bot</span><span class="p">[</span><span class="s2">&quot;</span><span class="s2">z</span><span class="s2">&quot;</span><span class="p">]</span> <span class="o">-</span> <span class="mf">0.5</span> <span class="o">*</span> <span class="n">top_bot</span><span class="p">[</span><span class="s2">&quot;</span><span class="s2">dz</span><span class="s2">&quot;</span><span class="p">]</span><span class="w">
+</span><span class="n">top_bot</span><span class="p">[</span><span class="s2">&quot;</span><span class="s2">bot</span><span class="s2">&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">top_bot</span><span class="p">[</span><span class="s2">&quot;</span><span class="s2">z</span><span class="s2">&quot;</span><span class="p">]</span> <span class="o">+</span> <span class="mf">0.5</span> <span class="o">*</span> <span class="n">top_bot</span><span class="p">[</span><span class="s2">&quot;</span><span class="s2">dz</span><span class="s2">&quot;</span><span class="p">]</span><span class="w">
+</span><span class="n">top_bot</span><span class="w">
+</span></pre></div></div>
 <div class="output_subarea output_html rendered_html output_result">
 <div><svg style="position: absolute; width: 0; height: 0; overflow: hidden">
 <defs>
@@ -1148,7 +1145,7 @@ Coordinates:
   * x        (x) float64 2kB 9.095e+04 9.105e+04 ... 1.156e+05 1.156e+05
     dx       float64 8B 100.0
     dy       float64 8B -100.0
-    time     datetime64[ns] 8B 1979-12-31</pre><div class='xr-wrap' style='display:none'><div class='xr-header'><div class='xr-obj-type'>xarray.DataArray</div><div class='xr-obj-name'>&#x27;bdgflf&#x27;</div><ul class='xr-dim-list'><li><span class='xr-has-index'>layer</span>: 49</li><li><span class='xr-has-index'>y</span>: 218</li><li><span class='xr-has-index'>x</span>: 248</li></ul></div><ul class='xr-sections'><li class='xr-section-item'><div class='xr-array-wrap'><input id='section-4adc2ad4-85a1-4a7d-979d-f0cf41b4673b' class='xr-array-in' type='checkbox' checked><label for='section-4adc2ad4-85a1-4a7d-979d-f0cf41b4673b' title='Show/hide data repr'><svg class='icon xr-icon-database'><use xlink:href='#icon-database'></use></svg></label><div class='xr-array-preview xr-preview'><span>1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 ... 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0</span></div><div class='xr-array-data'><pre>array([[[1., 1., 1., ..., 1., 1., 1.],
+    time     datetime64[ns] 8B 1979-12-31</pre><div class='xr-wrap' style='display:none'><div class='xr-header'><div class='xr-obj-type'>xarray.DataArray</div><div class='xr-obj-name'>&#x27;bdgflf&#x27;</div><ul class='xr-dim-list'><li><span class='xr-has-index'>layer</span>: 49</li><li><span class='xr-has-index'>y</span>: 218</li><li><span class='xr-has-index'>x</span>: 248</li></ul></div><ul class='xr-sections'><li class='xr-section-item'><div class='xr-array-wrap'><input id='section-d02a54f9-8303-4e65-80c8-6be9c70d063d' class='xr-array-in' type='checkbox' checked><label for='section-d02a54f9-8303-4e65-80c8-6be9c70d063d' title='Show/hide data repr'><svg class='icon xr-icon-database'><use xlink:href='#icon-database'></use></svg></label><div class='xr-array-preview xr-preview'><span>1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 ... 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0</span></div><div class='xr-array-data'><pre>array([[[1., 1., 1., ..., 1., 1., 1.],
         [1., 1., 1., ..., 1., 1., 1.],
         [1., 1., 1., ..., 1., 1., 1.],
         ...,
@@ -1188,43 +1185,42 @@ Coordinates:
         [1., 1., 1., ..., 1., 1., 1.],
         [1., 1., 1., ..., 1., 1., 1.],
         [1., 1., 1., ..., 1., 1., 1.]]],
-      shape=(49, 218, 248), dtype=float32)</pre></div></div></li><li class='xr-section-item'><input id='section-34482b84-e25f-4476-807f-9de452914058' class='xr-section-summary-in' type='checkbox' checked /><label for='section-34482b84-e25f-4476-807f-9de452914058' class='xr-section-summary' title='Expand/collapse section'>Coordinates: <span>(10)</span></label><div class='xr-section-inline-details'></div><div class='xr-section-details'><ul class='xr-var-list'><li class='xr-var-item'><div class='xr-var-name'><span class='xr-has-index'>layer</span></div><div class='xr-var-dims'>(layer)</div><div class='xr-var-dtype'>int32</div><div class='xr-var-preview xr-preview'>1 2 3 4 5 6 7 ... 44 45 46 47 48 49</div><input id='attrs-34e8b662-1d29-44c1-9e47-5d5b00e293db' class='xr-var-attrs-in' type='checkbox' disabled><label for='attrs-34e8b662-1d29-44c1-9e47-5d5b00e293db' title='Show/Hide attributes'><svg class='icon xr-icon-file-text2'><use xlink:href='#icon-file-text2'></use></svg></label><input id='data-d0cbd869-bb16-4964-a83e-304bd64b1fb6' class='xr-var-data-in' type='checkbox'><label for='data-d0cbd869-bb16-4964-a83e-304bd64b1fb6' title='Show/Hide data repr'><svg class='icon xr-icon-database'><use xlink:href='#icon-database'></use></svg></label><div class='xr-var-attrs'><dl class='xr-attrs'></dl></div><div class='xr-var-data'><pre>array([ 1,  2,  3,  4,  5,  6,  7,  8,  9, 10, 11, 12, 13, 14, 15, 16, 17, 18,
+      shape=(49, 218, 248), dtype=float32)</pre></div></div></li><li class='xr-section-item'><input id='section-a76c531f-9f01-4318-87d9-7d96d9106d67' class='xr-section-summary-in' type='checkbox' checked /><label for='section-a76c531f-9f01-4318-87d9-7d96d9106d67' class='xr-section-summary' title='Expand/collapse section'>Coordinates: <span>(10)</span></label><div class='xr-section-inline-details'></div><div class='xr-section-details'><ul class='xr-var-list'><li class='xr-var-item'><div class='xr-var-name'><span class='xr-has-index'>layer</span></div><div class='xr-var-dims'>(layer)</div><div class='xr-var-dtype'>int32</div><div class='xr-var-preview xr-preview'>1 2 3 4 5 6 7 ... 44 45 46 47 48 49</div><input id='attrs-eee741d4-06c7-4342-94b5-356709ab3c7d' class='xr-var-attrs-in' type='checkbox' disabled><label for='attrs-eee741d4-06c7-4342-94b5-356709ab3c7d' title='Show/Hide attributes'><svg class='icon xr-icon-file-text2'><use xlink:href='#icon-file-text2'></use></svg></label><input id='data-9f8d364b-e20f-4e76-a909-fda64650acd6' class='xr-var-data-in' type='checkbox'><label for='data-9f8d364b-e20f-4e76-a909-fda64650acd6' title='Show/Hide data repr'><svg class='icon xr-icon-database'><use xlink:href='#icon-database'></use></svg></label><div class='xr-var-attrs'><dl class='xr-attrs'></dl></div><div class='xr-var-data'><pre>array([ 1,  2,  3,  4,  5,  6,  7,  8,  9, 10, 11, 12, 13, 14, 15, 16, 17, 18,
        19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36,
-       37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47, 48, 49], dtype=int32)</pre></div></li><li class='xr-var-item'><div class='xr-var-name'><span>dz</span></div><div class='xr-var-dims'>(layer)</div><div class='xr-var-dtype'>float64</div><div class='xr-var-preview xr-preview'>-2.0 -2.0 -2.0 ... -10.0 -10.0</div><input id='attrs-c4e2d6bc-9de4-4c16-977c-23676b2b4d38' class='xr-var-attrs-in' type='checkbox' disabled><label for='attrs-c4e2d6bc-9de4-4c16-977c-23676b2b4d38' title='Show/Hide attributes'><svg class='icon xr-icon-file-text2'><use xlink:href='#icon-file-text2'></use></svg></label><input id='data-8538a661-f996-4da7-b09d-e8a78830e450' class='xr-var-data-in' type='checkbox'><label for='data-8538a661-f996-4da7-b09d-e8a78830e450' title='Show/Hide data repr'><svg class='icon xr-icon-database'><use xlink:href='#icon-database'></use></svg></label><div class='xr-var-attrs'><dl class='xr-attrs'></dl></div><div class='xr-var-data'><pre>array([ -2.,  -2.,  -2.,  -2.,  -2.,  -2.,  -2.,  -2.,  -2.,  -2.,  -2.,
+       37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47, 48, 49], dtype=int32)</pre></div></li><li class='xr-var-item'><div class='xr-var-name'><span>dz</span></div><div class='xr-var-dims'>(layer)</div><div class='xr-var-dtype'>float64</div><div class='xr-var-preview xr-preview'>-2.0 -2.0 -2.0 ... -10.0 -10.0</div><input id='attrs-aca9c666-1f5b-435e-a326-2ab506b37ea6' class='xr-var-attrs-in' type='checkbox' disabled><label for='attrs-aca9c666-1f5b-435e-a326-2ab506b37ea6' title='Show/Hide attributes'><svg class='icon xr-icon-file-text2'><use xlink:href='#icon-file-text2'></use></svg></label><input id='data-526a638f-e0a7-4c2f-a20e-5aa986a3b0fb' class='xr-var-data-in' type='checkbox'><label for='data-526a638f-e0a7-4c2f-a20e-5aa986a3b0fb' title='Show/Hide data repr'><svg class='icon xr-icon-database'><use xlink:href='#icon-database'></use></svg></label><div class='xr-var-attrs'><dl class='xr-attrs'></dl></div><div class='xr-var-data'><pre>array([ -2.,  -2.,  -2.,  -2.,  -2.,  -2.,  -2.,  -2.,  -2.,  -2.,  -2.,
         -2.,  -2.,  -2.,  -2.,  -5.,  -5.,  -5.,  -5.,  -5.,  -5.,  -5.,
         -5.,  -5.,  -5.,  -5.,  -5.,  -5.,  -5.,  -5.,  -5.,  -5.,  -5.,
         -5.,  -5.,  -5.,  -5., -10., -10., -10., -10., -10., -10., -10.,
-       -10., -10., -10., -10., -10.])</pre></div></li><li class='xr-var-item'><div class='xr-var-name'><span>z</span></div><div class='xr-var-dims'>(layer)</div><div class='xr-var-dtype'>float64</div><div class='xr-var-preview xr-preview'>9.0 7.0 5.0 ... -235.0 -245.0</div><input id='attrs-30b39ecb-1877-4f36-892b-0085f8f3c618' class='xr-var-attrs-in' type='checkbox' disabled><label for='attrs-30b39ecb-1877-4f36-892b-0085f8f3c618' title='Show/Hide attributes'><svg class='icon xr-icon-file-text2'><use xlink:href='#icon-file-text2'></use></svg></label><input id='data-d164b2cc-1d0b-45d7-aabf-64cc3c8d7a25' class='xr-var-data-in' type='checkbox'><label for='data-d164b2cc-1d0b-45d7-aabf-64cc3c8d7a25' title='Show/Hide data repr'><svg class='icon xr-icon-database'><use xlink:href='#icon-database'></use></svg></label><div class='xr-var-attrs'><dl class='xr-attrs'></dl></div><div class='xr-var-data'><pre>array([   9. ,    7. ,    5. ,    3. ,    1. ,   -1. ,   -3. ,   -5. ,
+       -10., -10., -10., -10., -10.])</pre></div></li><li class='xr-var-item'><div class='xr-var-name'><span>z</span></div><div class='xr-var-dims'>(layer)</div><div class='xr-var-dtype'>float64</div><div class='xr-var-preview xr-preview'>9.0 7.0 5.0 ... -235.0 -245.0</div><input id='attrs-50f1c4e7-0c92-4573-8956-959414313bef' class='xr-var-attrs-in' type='checkbox' disabled><label for='attrs-50f1c4e7-0c92-4573-8956-959414313bef' title='Show/Hide attributes'><svg class='icon xr-icon-file-text2'><use xlink:href='#icon-file-text2'></use></svg></label><input id='data-f12ab022-63b0-4a89-9b14-185ed266343c' class='xr-var-data-in' type='checkbox'><label for='data-f12ab022-63b0-4a89-9b14-185ed266343c' title='Show/Hide data repr'><svg class='icon xr-icon-database'><use xlink:href='#icon-database'></use></svg></label><div class='xr-var-attrs'><dl class='xr-attrs'></dl></div><div class='xr-var-data'><pre>array([   9. ,    7. ,    5. ,    3. ,    1. ,   -1. ,   -3. ,   -5. ,
          -7. ,   -9. ,  -11. ,  -13. ,  -15. ,  -17. ,  -19. ,  -22.5,
         -27.5,  -32.5,  -37.5,  -42.5,  -47.5,  -52.5,  -57.5,  -62.5,
         -67.5,  -72.5,  -77.5,  -82.5,  -87.5,  -92.5,  -97.5, -102.5,
        -107.5, -112.5, -117.5, -122.5, -127.5, -135. , -145. , -155. ,
        -165. , -175. , -185. , -195. , -205. , -215. , -225. , -235. ,
-       -245. ])</pre></div></li><li class='xr-var-item'><div class='xr-var-name'><span>top</span></div><div class='xr-var-dims'>(layer)</div><div class='xr-var-dtype'>float64</div><div class='xr-var-preview xr-preview'>10.0 8.0 6.0 ... -230.0 -240.0</div><input id='attrs-b7d861a0-3b8d-457d-8987-f28af1b091e5' class='xr-var-attrs-in' type='checkbox' disabled><label for='attrs-b7d861a0-3b8d-457d-8987-f28af1b091e5' title='Show/Hide attributes'><svg class='icon xr-icon-file-text2'><use xlink:href='#icon-file-text2'></use></svg></label><input id='data-b7c1cd8d-9ffb-4b77-a4e7-d238c459e367' class='xr-var-data-in' type='checkbox'><label for='data-b7c1cd8d-9ffb-4b77-a4e7-d238c459e367' title='Show/Hide data repr'><svg class='icon xr-icon-database'><use xlink:href='#icon-database'></use></svg></label><div class='xr-var-attrs'><dl class='xr-attrs'></dl></div><div class='xr-var-data'><pre>array([  10.,    8.,    6.,    4.,    2.,    0.,   -2.,   -4.,   -6.,
+       -245. ])</pre></div></li><li class='xr-var-item'><div class='xr-var-name'><span>top</span></div><div class='xr-var-dims'>(layer)</div><div class='xr-var-dtype'>float64</div><div class='xr-var-preview xr-preview'>10.0 8.0 6.0 ... -230.0 -240.0</div><input id='attrs-0394726e-2ef4-422a-bb1a-ed971a2bd603' class='xr-var-attrs-in' type='checkbox' disabled><label for='attrs-0394726e-2ef4-422a-bb1a-ed971a2bd603' title='Show/Hide attributes'><svg class='icon xr-icon-file-text2'><use xlink:href='#icon-file-text2'></use></svg></label><input id='data-22e3090c-aecf-4ba4-81e4-eb104c7630b9' class='xr-var-data-in' type='checkbox'><label for='data-22e3090c-aecf-4ba4-81e4-eb104c7630b9' title='Show/Hide data repr'><svg class='icon xr-icon-database'><use xlink:href='#icon-database'></use></svg></label><div class='xr-var-attrs'><dl class='xr-attrs'></dl></div><div class='xr-var-data'><pre>array([  10.,    8.,    6.,    4.,    2.,    0.,   -2.,   -4.,   -6.,
          -8.,  -10.,  -12.,  -14.,  -16.,  -18.,  -20.,  -25.,  -30.,
         -35.,  -40.,  -45.,  -50.,  -55.,  -60.,  -65.,  -70.,  -75.,
         -80.,  -85.,  -90.,  -95., -100., -105., -110., -115., -120.,
        -125., -130., -140., -150., -160., -170., -180., -190., -200.,
-       -210., -220., -230., -240.])</pre></div></li><li class='xr-var-item'><div class='xr-var-name'><span>bot</span></div><div class='xr-var-dims'>(layer)</div><div class='xr-var-dtype'>float64</div><div class='xr-var-preview xr-preview'>8.0 6.0 4.0 ... -240.0 -250.0</div><input id='attrs-5a319ec4-03d1-475b-b499-379e211288d5' class='xr-var-attrs-in' type='checkbox' disabled><label for='attrs-5a319ec4-03d1-475b-b499-379e211288d5' title='Show/Hide attributes'><svg class='icon xr-icon-file-text2'><use xlink:href='#icon-file-text2'></use></svg></label><input id='data-f2f336fc-012d-4d64-9381-61ec01626192' class='xr-var-data-in' type='checkbox'><label for='data-f2f336fc-012d-4d64-9381-61ec01626192' title='Show/Hide data repr'><svg class='icon xr-icon-database'><use xlink:href='#icon-database'></use></svg></label><div class='xr-var-attrs'><dl class='xr-attrs'></dl></div><div class='xr-var-data'><pre>array([   8.,    6.,    4.,    2.,    0.,   -2.,   -4.,   -6.,   -8.,
+       -210., -220., -230., -240.])</pre></div></li><li class='xr-var-item'><div class='xr-var-name'><span>bot</span></div><div class='xr-var-dims'>(layer)</div><div class='xr-var-dtype'>float64</div><div class='xr-var-preview xr-preview'>8.0 6.0 4.0 ... -240.0 -250.0</div><input id='attrs-37dbedff-8a73-4c86-80e3-eeb283d5ab21' class='xr-var-attrs-in' type='checkbox' disabled><label for='attrs-37dbedff-8a73-4c86-80e3-eeb283d5ab21' title='Show/Hide attributes'><svg class='icon xr-icon-file-text2'><use xlink:href='#icon-file-text2'></use></svg></label><input id='data-89a10973-b9b0-4f6d-a445-b395aca461af' class='xr-var-data-in' type='checkbox'><label for='data-89a10973-b9b0-4f6d-a445-b395aca461af' title='Show/Hide data repr'><svg class='icon xr-icon-database'><use xlink:href='#icon-database'></use></svg></label><div class='xr-var-attrs'><dl class='xr-attrs'></dl></div><div class='xr-var-data'><pre>array([   8.,    6.,    4.,    2.,    0.,   -2.,   -4.,   -6.,   -8.,
         -10.,  -12.,  -14.,  -16.,  -18.,  -20.,  -25.,  -30.,  -35.,
         -40.,  -45.,  -50.,  -55.,  -60.,  -65.,  -70.,  -75.,  -80.,
         -85.,  -90.,  -95., -100., -105., -110., -115., -120., -125.,
        -130., -140., -150., -160., -170., -180., -190., -200., -210.,
-       -220., -230., -240., -250.])</pre></div></li><li class='xr-var-item'><div class='xr-var-name'><span class='xr-has-index'>y</span></div><div class='xr-var-dims'>(y)</div><div class='xr-var-dtype'>float64</div><div class='xr-var-preview xr-preview'>4.676e+05 4.674e+05 ... 4.458e+05</div><input id='attrs-844aa976-faae-42fe-9f31-a4be3a11574f' class='xr-var-attrs-in' type='checkbox' disabled><label for='attrs-844aa976-faae-42fe-9f31-a4be3a11574f' title='Show/Hide attributes'><svg class='icon xr-icon-file-text2'><use xlink:href='#icon-file-text2'></use></svg></label><input id='data-e78a38db-18ca-47b6-a7b5-c4c260db0faa' class='xr-var-data-in' type='checkbox'><label for='data-e78a38db-18ca-47b6-a7b5-c4c260db0faa' title='Show/Hide data repr'><svg class='icon xr-icon-database'><use xlink:href='#icon-database'></use></svg></label><div class='xr-var-attrs'><dl class='xr-attrs'></dl></div><div class='xr-var-data'><pre>array([467550., 467450., 467350., ..., 446050., 445950., 445850.], shape=(218,))</pre></div></li><li class='xr-var-item'><div class='xr-var-name'><span class='xr-has-index'>x</span></div><div class='xr-var-dims'>(x)</div><div class='xr-var-dtype'>float64</div><div class='xr-var-preview xr-preview'>9.095e+04 9.105e+04 ... 1.156e+05</div><input id='attrs-4e83a93c-b372-4ae4-9f25-32ac62c4ce61' class='xr-var-attrs-in' type='checkbox' disabled><label for='attrs-4e83a93c-b372-4ae4-9f25-32ac62c4ce61' title='Show/Hide attributes'><svg class='icon xr-icon-file-text2'><use xlink:href='#icon-file-text2'></use></svg></label><input id='data-fba9d49b-63c5-4138-91c7-070095d194d6' class='xr-var-data-in' type='checkbox'><label for='data-fba9d49b-63c5-4138-91c7-070095d194d6' title='Show/Hide data repr'><svg class='icon xr-icon-database'><use xlink:href='#icon-database'></use></svg></label><div class='xr-var-attrs'><dl class='xr-attrs'></dl></div><div class='xr-var-data'><pre>array([ 90950.,  91050.,  91150., ..., 115450., 115550., 115650.], shape=(248,))</pre></div></li><li class='xr-var-item'><div class='xr-var-name'><span>dx</span></div><div class='xr-var-dims'>()</div><div class='xr-var-dtype'>float64</div><div class='xr-var-preview xr-preview'>100.0</div><input id='attrs-cbabfa65-1692-4317-a59a-fb6fbe17f3e9' class='xr-var-attrs-in' type='checkbox' disabled><label for='attrs-cbabfa65-1692-4317-a59a-fb6fbe17f3e9' title='Show/Hide attributes'><svg class='icon xr-icon-file-text2'><use xlink:href='#icon-file-text2'></use></svg></label><input id='data-f31bb398-ee8f-43d8-b664-fa2cfdf066c9' class='xr-var-data-in' type='checkbox'><label for='data-f31bb398-ee8f-43d8-b664-fa2cfdf066c9' title='Show/Hide data repr'><svg class='icon xr-icon-database'><use xlink:href='#icon-database'></use></svg></label><div class='xr-var-attrs'><dl class='xr-attrs'></dl></div><div class='xr-var-data'><pre>array(100.)</pre></div></li><li class='xr-var-item'><div class='xr-var-name'><span>dy</span></div><div class='xr-var-dims'>()</div><div class='xr-var-dtype'>float64</div><div class='xr-var-preview xr-preview'>-100.0</div><input id='attrs-a36c4f5a-add5-44b5-9450-0c04c3089afb' class='xr-var-attrs-in' type='checkbox' disabled><label for='attrs-a36c4f5a-add5-44b5-9450-0c04c3089afb' title='Show/Hide attributes'><svg class='icon xr-icon-file-text2'><use xlink:href='#icon-file-text2'></use></svg></label><input id='data-943d5f50-db47-4223-9bd7-18bd6f78f6e8' class='xr-var-data-in' type='checkbox'><label for='data-943d5f50-db47-4223-9bd7-18bd6f78f6e8' title='Show/Hide data repr'><svg class='icon xr-icon-database'><use xlink:href='#icon-database'></use></svg></label><div class='xr-var-attrs'><dl class='xr-attrs'></dl></div><div class='xr-var-data'><pre>array(-100.)</pre></div></li><li class='xr-var-item'><div class='xr-var-name'><span>time</span></div><div class='xr-var-dims'>()</div><div class='xr-var-dtype'>datetime64[ns]</div><div class='xr-var-preview xr-preview'>1979-12-31</div><input id='attrs-9ff22146-e1dc-42dd-b510-b3626c59cdfe' class='xr-var-attrs-in' type='checkbox' disabled><label for='attrs-9ff22146-e1dc-42dd-b510-b3626c59cdfe' title='Show/Hide attributes'><svg class='icon xr-icon-file-text2'><use xlink:href='#icon-file-text2'></use></svg></label><input id='data-9d3134a5-2c7e-453a-8586-c64091e9a6c6' class='xr-var-data-in' type='checkbox'><label for='data-9d3134a5-2c7e-453a-8586-c64091e9a6c6' title='Show/Hide data repr'><svg class='icon xr-icon-database'><use xlink:href='#icon-database'></use></svg></label><div class='xr-var-attrs'><dl class='xr-attrs'></dl></div><div class='xr-var-data'><pre>array(&#x27;1979-12-31T00:00:00.000000000&#x27;, dtype=&#x27;datetime64[ns]&#x27;)</pre></div></li></ul></div></li></ul></div></div>
+       -220., -230., -240., -250.])</pre></div></li><li class='xr-var-item'><div class='xr-var-name'><span class='xr-has-index'>y</span></div><div class='xr-var-dims'>(y)</div><div class='xr-var-dtype'>float64</div><div class='xr-var-preview xr-preview'>4.676e+05 4.674e+05 ... 4.458e+05</div><input id='attrs-cfd04fbf-63b4-484d-ad99-8d16d02bb909' class='xr-var-attrs-in' type='checkbox' disabled><label for='attrs-cfd04fbf-63b4-484d-ad99-8d16d02bb909' title='Show/Hide attributes'><svg class='icon xr-icon-file-text2'><use xlink:href='#icon-file-text2'></use></svg></label><input id='data-73af0648-2eda-4daf-b6e2-78b7f4f65ca9' class='xr-var-data-in' type='checkbox'><label for='data-73af0648-2eda-4daf-b6e2-78b7f4f65ca9' title='Show/Hide data repr'><svg class='icon xr-icon-database'><use xlink:href='#icon-database'></use></svg></label><div class='xr-var-attrs'><dl class='xr-attrs'></dl></div><div class='xr-var-data'><pre>array([467550., 467450., 467350., ..., 446050., 445950., 445850.], shape=(218,))</pre></div></li><li class='xr-var-item'><div class='xr-var-name'><span class='xr-has-index'>x</span></div><div class='xr-var-dims'>(x)</div><div class='xr-var-dtype'>float64</div><div class='xr-var-preview xr-preview'>9.095e+04 9.105e+04 ... 1.156e+05</div><input id='attrs-3fd0484d-322a-4d86-bd26-26772af96d69' class='xr-var-attrs-in' type='checkbox' disabled><label for='attrs-3fd0484d-322a-4d86-bd26-26772af96d69' title='Show/Hide attributes'><svg class='icon xr-icon-file-text2'><use xlink:href='#icon-file-text2'></use></svg></label><input id='data-04a0b5cf-94f7-4bf5-9f27-81fbe369a21c' class='xr-var-data-in' type='checkbox'><label for='data-04a0b5cf-94f7-4bf5-9f27-81fbe369a21c' title='Show/Hide data repr'><svg class='icon xr-icon-database'><use xlink:href='#icon-database'></use></svg></label><div class='xr-var-attrs'><dl class='xr-attrs'></dl></div><div class='xr-var-data'><pre>array([ 90950.,  91050.,  91150., ..., 115450., 115550., 115650.], shape=(248,))</pre></div></li><li class='xr-var-item'><div class='xr-var-name'><span>dx</span></div><div class='xr-var-dims'>()</div><div class='xr-var-dtype'>float64</div><div class='xr-var-preview xr-preview'>100.0</div><input id='attrs-f78c40c7-ace5-4c99-9db8-5a4589174a88' class='xr-var-attrs-in' type='checkbox' disabled><label for='attrs-f78c40c7-ace5-4c99-9db8-5a4589174a88' title='Show/Hide attributes'><svg class='icon xr-icon-file-text2'><use xlink:href='#icon-file-text2'></use></svg></label><input id='data-578cc889-9084-47d8-b1bb-301c67d69184' class='xr-var-data-in' type='checkbox'><label for='data-578cc889-9084-47d8-b1bb-301c67d69184' title='Show/Hide data repr'><svg class='icon xr-icon-database'><use xlink:href='#icon-database'></use></svg></label><div class='xr-var-attrs'><dl class='xr-attrs'></dl></div><div class='xr-var-data'><pre>array(100.)</pre></div></li><li class='xr-var-item'><div class='xr-var-name'><span>dy</span></div><div class='xr-var-dims'>()</div><div class='xr-var-dtype'>float64</div><div class='xr-var-preview xr-preview'>-100.0</div><input id='attrs-9ae2bf4a-1984-4cd7-8640-0fddbd2930f0' class='xr-var-attrs-in' type='checkbox' disabled><label for='attrs-9ae2bf4a-1984-4cd7-8640-0fddbd2930f0' title='Show/Hide attributes'><svg class='icon xr-icon-file-text2'><use xlink:href='#icon-file-text2'></use></svg></label><input id='data-6d9b2608-4664-4e19-80fa-62c545725061' class='xr-var-data-in' type='checkbox'><label for='data-6d9b2608-4664-4e19-80fa-62c545725061' title='Show/Hide data repr'><svg class='icon xr-icon-database'><use xlink:href='#icon-database'></use></svg></label><div class='xr-var-attrs'><dl class='xr-attrs'></dl></div><div class='xr-var-data'><pre>array(-100.)</pre></div></li><li class='xr-var-item'><div class='xr-var-name'><span>time</span></div><div class='xr-var-dims'>()</div><div class='xr-var-dtype'>datetime64[ns]</div><div class='xr-var-preview xr-preview'>1979-12-31</div><input id='attrs-3448df77-044e-4f99-a814-6d2d155615fa' class='xr-var-attrs-in' type='checkbox' disabled><label for='attrs-3448df77-044e-4f99-a814-6d2d155615fa' title='Show/Hide attributes'><svg class='icon xr-icon-file-text2'><use xlink:href='#icon-file-text2'></use></svg></label><input id='data-1be78471-d589-456b-8bb3-5f26258c2744' class='xr-var-data-in' type='checkbox'><label for='data-1be78471-d589-456b-8bb3-5f26258c2744' title='Show/Hide data repr'><svg class='icon xr-icon-database'><use xlink:href='#icon-database'></use></svg></label><div class='xr-var-attrs'><dl class='xr-attrs'></dl></div><div class='xr-var-data'><pre>array(&#x27;1979-12-31T00:00:00.000000000&#x27;, dtype=&#x27;datetime64[ns]&#x27;)</pre></div></li></ul></div></li></ul></div></div>
 </div>
 <br />
 <br /><p>Next we’ll calculate the velocities and plot a cross-section of the vertical
 velocity at for y = 450050</p>
-<div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="n">fig</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">()</span>
-<span class="n">vx</span><span class="p">,</span> <span class="n">vy</span><span class="p">,</span> <span class="n">vz</span> <span class="o">=</span> <span class="n">imod</span><span class="o">.</span><span class="n">evaluate</span><span class="o">.</span><span class="n">flow_velocity</span><span class="p">(</span>
-    <span class="n">front</span><span class="o">=</span><span class="n">front</span><span class="p">,</span> <span class="n">lower</span><span class="o">=</span><span class="n">lower</span><span class="p">,</span> <span class="n">right</span><span class="o">=</span><span class="n">right</span><span class="p">,</span> <span class="n">top_bot</span><span class="o">=</span><span class="n">top_bot</span><span class="p">,</span> <span class="n">porosity</span><span class="o">=</span><span class="mf">0.3</span>
-<span class="p">)</span>
-<span class="n">vz</span><span class="o">.</span><span class="n">sel</span><span class="p">(</span><span class="n">y</span><span class="o">=</span><span class="mf">450050.0</span><span class="p">,</span> <span class="n">method</span><span class="o">=</span><span class="s2">&quot;nearest&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">cmap</span><span class="o">=</span><span class="s2">&quot;RdYlBu&quot;</span><span class="p">,</span> <span class="n">yincrease</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
-
-<span class="n">plt</span><span class="o">.</span><span class="n">title</span><span class="p">(</span><span class="s2">&quot;Vz&quot;</span><span class="p">)</span>
-</pre></div>
-</div>
-<img src="../../_images/sphx_glr_flowvel_streamlines_001.png" srcset="../../_images/sphx_glr_flowvel_streamlines_001.png" alt="Vz" class = "sphx-glr-single-img"/><div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>Text(0.5, 1.0, &#39;Vz&#39;)
+<div class="highlight-Python notranslate"><div class="highlight"><pre><span class="n">fig</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="p">)</span><span class="w">
+</span><span class="n">vx</span><span class="p">,</span> <span class="n">vy</span><span class="p">,</span> <span class="n">vz</span> <span class="o">=</span> <a class="sphx-glr-backref-module-imod-evaluate sphx-glr-backref-type-py-function reference internal" href="../../api/generated/evaluate/imod.evaluate.flow_velocity.html#imod.evaluate.flow_velocity" title="imod.evaluate.flow_velocity"><span class="n">imod</span><span class="o">.</span><span class="n">evaluate</span><span class="o">.</span><span class="n">flow_velocity</span></a><span class="p">(</span><span class="w">
+</span>    <span class="n">front</span><span class="o">=</span><span class="n">front</span><span class="p">,</span> <span class="n">lower</span><span class="o">=</span><span class="n">lower</span><span class="p">,</span> <span class="n">right</span><span class="o">=</span><span class="n">right</span><span class="p">,</span> <span class="n">top_bot</span><span class="o">=</span><span class="n">top_bot</span><span class="p">,</span> <span class="n">porosity</span><span class="o">=</span><span class="mf">0.3</span><span class="w">
+</span><span class="p">)</span><span class="w">
+</span><span class="n">vz</span><span class="o">.</span><span class="n">sel</span><span class="p">(</span><span class="n">y</span><span class="o">=</span><span class="mf">450050.0</span><span class="p">,</span> <span class="n">method</span><span class="o">=</span><span class="s2">&quot;</span><span class="s2">nearest</span><span class="s2">&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">cmap</span><span class="o">=</span><span class="s2">&quot;</span><span class="s2">RdYlBu</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">yincrease</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span><span class="w">
+</span><span class="w">
+</span><span class="n">plt</span><span class="o">.</span><span class="n">title</span><span class="p">(</span><span class="s2">&quot;</span><span class="s2">Vz</span><span class="s2">&quot;</span><span class="p">)</span><span class="w">
+</span></pre></div></div>
+<img src="../../_images/sphx_glr_flowvel_streamlines_001.png" srcset="../../_images/sphx_glr_flowvel_streamlines_001.png" alt="Vz" class = "sphx-glr-single-img"/><div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>Text(0.5, 1.0, 'Vz')
 </pre></div>
 </div>
 </section>
@@ -1233,41 +1229,36 @@ velocity at for y = 450050</p>
 <p>It is also possible to make quiver plots for a cross section defined by two
 pairs of coordinates. We will first define arrays indicating the start and end
 location of the cross section to be evaluated.</p>
-<div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="n">start</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mf">97132.710</span><span class="p">,</span> <span class="mf">457177.928</span><span class="p">])</span>
-<span class="n">end</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mf">103736.517</span><span class="p">,</span> <span class="mf">457215.557</span><span class="p">])</span>
-</pre></div>
-</div>
+<div class="highlight-Python notranslate"><div class="highlight"><pre><span class="n">start</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="p">[</span><span class="mf">97132.710</span><span class="p">,</span> <span class="mf">457177.928</span><span class="p">]</span><span class="p">)</span><span class="w">
+</span><span class="n">end</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="p">[</span><span class="mf">103736.517</span><span class="p">,</span> <span class="mf">457215.557</span><span class="p">]</span><span class="p">)</span><span class="w">
+</span></pre></div></div>
 <p>Using the function <code class="docutils literal notranslate"><span class="pre">imod.evaluate.quiver_line()</span></code> considering the starting and ending points</p>
-<div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="n">u</span><span class="p">,</span> <span class="n">v</span> <span class="o">=</span> <span class="n">imod</span><span class="o">.</span><span class="n">evaluate</span><span class="o">.</span><span class="n">quiver_line</span><span class="p">(</span><span class="n">right</span><span class="p">,</span> <span class="n">front</span><span class="p">,</span> <span class="n">lower</span><span class="p">,</span> <span class="n">start</span><span class="p">,</span> <span class="n">end</span><span class="p">)</span>
-</pre></div>
-</div>
+<div class="highlight-Python notranslate"><div class="highlight"><pre><span class="n">u</span><span class="p">,</span> <span class="n">v</span> <span class="o">=</span> <a class="sphx-glr-backref-module-imod-evaluate sphx-glr-backref-type-py-function reference internal" href="../../api/generated/evaluate/imod.evaluate.quiver_line.html#imod.evaluate.quiver_line" title="imod.evaluate.quiver_line"><span class="n">imod</span><span class="o">.</span><span class="n">evaluate</span><span class="o">.</span><span class="n">quiver_line</span></a><span class="p">(</span><span class="n">right</span><span class="p">,</span> <span class="n">front</span><span class="p">,</span> <span class="n">lower</span><span class="p">,</span> <span class="n">start</span><span class="p">,</span> <span class="n">end</span><span class="p">)</span><span class="w">
+</span></pre></div></div>
 <p>Adding top and bottom information to the previously obtained arrays</p>
-<div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="n">u</span><span class="p">[</span><span class="s2">&quot;top&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">u</span><span class="p">[</span><span class="s2">&quot;z&quot;</span><span class="p">]</span> <span class="o">+</span> <span class="mf">0.5</span> <span class="o">*</span> <span class="n">u</span><span class="p">[</span><span class="s2">&quot;dz&quot;</span><span class="p">]</span>
-<span class="n">u</span><span class="p">[</span><span class="s2">&quot;bottom&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">u</span><span class="p">[</span><span class="s2">&quot;z&quot;</span><span class="p">]</span> <span class="o">-</span> <span class="mf">0.5</span> <span class="o">*</span> <span class="n">u</span><span class="p">[</span><span class="s2">&quot;dz&quot;</span><span class="p">]</span>
-
-<span class="n">v</span><span class="p">[</span><span class="s2">&quot;top&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">v</span><span class="p">[</span><span class="s2">&quot;z&quot;</span><span class="p">]</span> <span class="o">+</span> <span class="mf">0.5</span> <span class="o">*</span> <span class="n">v</span><span class="p">[</span><span class="s2">&quot;dz&quot;</span><span class="p">]</span>
-<span class="n">v</span><span class="p">[</span><span class="s2">&quot;bottom&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">v</span><span class="p">[</span><span class="s2">&quot;z&quot;</span><span class="p">]</span> <span class="o">-</span> <span class="mf">0.5</span> <span class="o">*</span> <span class="n">v</span><span class="p">[</span><span class="s2">&quot;dz&quot;</span><span class="p">]</span>
-</pre></div>
-</div>
+<div class="highlight-Python notranslate"><div class="highlight"><pre><span class="n">u</span><span class="p">[</span><span class="s2">&quot;</span><span class="s2">top</span><span class="s2">&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">u</span><span class="p">[</span><span class="s2">&quot;</span><span class="s2">z</span><span class="s2">&quot;</span><span class="p">]</span> <span class="o">+</span> <span class="mf">0.5</span> <span class="o">*</span> <span class="n">u</span><span class="p">[</span><span class="s2">&quot;</span><span class="s2">dz</span><span class="s2">&quot;</span><span class="p">]</span><span class="w">
+</span><span class="n">u</span><span class="p">[</span><span class="s2">&quot;</span><span class="s2">bottom</span><span class="s2">&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">u</span><span class="p">[</span><span class="s2">&quot;</span><span class="s2">z</span><span class="s2">&quot;</span><span class="p">]</span> <span class="o">-</span> <span class="mf">0.5</span> <span class="o">*</span> <span class="n">u</span><span class="p">[</span><span class="s2">&quot;</span><span class="s2">dz</span><span class="s2">&quot;</span><span class="p">]</span><span class="w">
+</span><span class="w">
+</span><span class="n">v</span><span class="p">[</span><span class="s2">&quot;</span><span class="s2">top</span><span class="s2">&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">v</span><span class="p">[</span><span class="s2">&quot;</span><span class="s2">z</span><span class="s2">&quot;</span><span class="p">]</span> <span class="o">+</span> <span class="mf">0.5</span> <span class="o">*</span> <span class="n">v</span><span class="p">[</span><span class="s2">&quot;</span><span class="s2">dz</span><span class="s2">&quot;</span><span class="p">]</span><span class="w">
+</span><span class="n">v</span><span class="p">[</span><span class="s2">&quot;</span><span class="s2">bottom</span><span class="s2">&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">v</span><span class="p">[</span><span class="s2">&quot;</span><span class="s2">z</span><span class="s2">&quot;</span><span class="p">]</span> <span class="o">-</span> <span class="mf">0.5</span> <span class="o">*</span> <span class="n">v</span><span class="p">[</span><span class="s2">&quot;</span><span class="s2">dz</span><span class="s2">&quot;</span><span class="p">]</span><span class="w">
+</span></pre></div></div>
 <p>Defining a cross section that shows the heads for the same location where the start and end points
 were defined, to use as a background image for the plot</p>
-<div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="n">cross_section</span> <span class="o">=</span> <span class="n">imod</span><span class="o">.</span><span class="n">select</span><span class="o">.</span><span class="n">cross_section_line</span><span class="p">(</span><span class="n">heads</span><span class="p">,</span> <span class="n">start</span><span class="p">,</span> <span class="n">end</span><span class="p">)</span>
-<span class="n">cross_section</span><span class="p">[</span><span class="s2">&quot;top&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">cross_section</span><span class="p">[</span><span class="s2">&quot;z&quot;</span><span class="p">]</span> <span class="o">-</span> <span class="mf">0.5</span> <span class="o">*</span> <span class="n">cross_section</span><span class="p">[</span><span class="s2">&quot;dz&quot;</span><span class="p">]</span>
-<span class="n">cross_section</span><span class="p">[</span><span class="s2">&quot;bottom&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">cross_section</span><span class="p">[</span><span class="s2">&quot;z&quot;</span><span class="p">]</span> <span class="o">+</span> <span class="mf">0.5</span> <span class="o">*</span> <span class="n">cross_section</span><span class="p">[</span><span class="s2">&quot;dz&quot;</span><span class="p">]</span>
-</pre></div>
-</div>
+<div class="highlight-Python notranslate"><div class="highlight"><pre><span class="n">cross_section</span> <span class="o">=</span> <a class="sphx-glr-backref-module-imod-select sphx-glr-backref-type-py-function reference internal" href="../../api/generated/select/imod.select.cross_section_line.html#imod.select.cross_section_line" title="imod.select.cross_section_line"><span class="n">imod</span><span class="o">.</span><span class="n">select</span><span class="o">.</span><span class="n">cross_section_line</span></a><span class="p">(</span><span class="n">heads</span><span class="p">,</span> <span class="n">start</span><span class="p">,</span> <span class="n">end</span><span class="p">)</span><span class="w">
+</span><span class="n">cross_section</span><span class="p">[</span><span class="s2">&quot;</span><span class="s2">top</span><span class="s2">&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">cross_section</span><span class="p">[</span><span class="s2">&quot;</span><span class="s2">z</span><span class="s2">&quot;</span><span class="p">]</span> <span class="o">-</span> <span class="mf">0.5</span> <span class="o">*</span> <span class="n">cross_section</span><span class="p">[</span><span class="s2">&quot;</span><span class="s2">dz</span><span class="s2">&quot;</span><span class="p">]</span><span class="w">
+</span><span class="n">cross_section</span><span class="p">[</span><span class="s2">&quot;</span><span class="s2">bottom</span><span class="s2">&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">cross_section</span><span class="p">[</span><span class="s2">&quot;</span><span class="s2">z</span><span class="s2">&quot;</span><span class="p">]</span> <span class="o">+</span> <span class="mf">0.5</span> <span class="o">*</span> <span class="n">cross_section</span><span class="p">[</span><span class="s2">&quot;</span><span class="s2">dz</span><span class="s2">&quot;</span><span class="p">]</span><span class="w">
+</span></pre></div></div>
 <p>Ploting the cross section</p>
-<div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="n">colors</span> <span class="o">=</span> <span class="s2">&quot;magma&quot;</span>
-<span class="n">levels</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="o">-</span><span class="mi">8</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">,</span> <span class="mf">0.5</span><span class="p">)</span>
-<span class="n">skip</span> <span class="o">=</span> <span class="p">(</span><span class="nb">slice</span><span class="p">(</span><span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="mi">2</span><span class="p">),</span> <span class="nb">slice</span><span class="p">(</span><span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="mi">2</span><span class="p">))</span>
-<span class="n">fig</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">()</span>
-<span class="n">fig</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">imod</span><span class="o">.</span><span class="n">visualize</span><span class="o">.</span><span class="n">cross_section</span><span class="p">(</span>
-    <span class="n">cross_section</span><span class="p">,</span> <span class="n">colors</span><span class="o">=</span><span class="n">colors</span><span class="p">,</span> <span class="n">levels</span><span class="o">=</span><span class="n">levels</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="n">ax</span><span class="p">,</span> <span class="n">fig</span><span class="o">=</span><span class="n">fig</span>
-<span class="p">)</span>
-<span class="n">imod</span><span class="o">.</span><span class="n">visualize</span><span class="o">.</span><span class="n">quiver</span><span class="p">(</span><span class="n">u</span><span class="p">[</span><span class="n">skip</span><span class="p">],</span> <span class="n">v</span><span class="p">[</span><span class="n">skip</span><span class="p">],</span> <span class="n">ax</span><span class="p">,</span> <span class="n">kwargs_quiver</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;color&quot;</span><span class="p">:</span> <span class="s2">&quot;k&quot;</span><span class="p">})</span>
-</pre></div>
-</div>
-<img src="../../_images/sphx_glr_flowvel_streamlines_002.png" srcset="../../_images/sphx_glr_flowvel_streamlines_002.png" alt="flowvel streamlines" class = "sphx-glr-single-img"/><div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>&lt;matplotlib.quiver.Quiver object at 0x00000146415DEFD0&gt;
+<div class="highlight-Python notranslate"><div class="highlight"><pre><span class="n">colors</span> <span class="o">=</span> <span class="s2">&quot;</span><span class="s2">magma</span><span class="s2">&quot;</span><span class="w">
+</span><span class="n">levels</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="o">-</span><span class="mi">8</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">,</span> <span class="mf">0.5</span><span class="p">)</span><span class="w">
+</span><span class="n">skip</span> <span class="o">=</span> <span class="p">(</span><span class="nb">slice</span><span class="p">(</span><span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span><span class="p">,</span> <span class="nb">slice</span><span class="p">(</span><span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span><span class="p">)</span><span class="w">
+</span><span class="n">fig</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="p">)</span><span class="w">
+</span><span class="n">fig</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <a class="sphx-glr-backref-module-imod-visualize sphx-glr-backref-type-py-function reference internal" href="../../api/generated/visualize/imod.visualize.cross_section.html#imod.visualize.cross_section" title="imod.visualize.cross_section"><span class="n">imod</span><span class="o">.</span><span class="n">visualize</span><span class="o">.</span><span class="n">cross_section</span></a><span class="p">(</span><span class="w">
+</span>    <span class="n">cross_section</span><span class="p">,</span> <span class="n">colors</span><span class="o">=</span><span class="n">colors</span><span class="p">,</span> <span class="n">levels</span><span class="o">=</span><span class="n">levels</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="n">ax</span><span class="p">,</span> <span class="n">fig</span><span class="o">=</span><span class="n">fig</span><span class="w">
+</span><span class="p">)</span><span class="w">
+</span><a class="sphx-glr-backref-module-imod-visualize sphx-glr-backref-type-py-function reference internal" href="../../api/generated/visualize/imod.visualize.quiver.html#imod.visualize.quiver" title="imod.visualize.quiver"><span class="n">imod</span><span class="o">.</span><span class="n">visualize</span><span class="o">.</span><span class="n">quiver</span></a><span class="p">(</span><span class="n">u</span><span class="p">[</span><span class="n">skip</span><span class="p">]</span><span class="p">,</span> <span class="n">v</span><span class="p">[</span><span class="n">skip</span><span class="p">]</span><span class="p">,</span> <span class="n">ax</span><span class="p">,</span> <span class="n">kwargs_quiver</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;</span><span class="s2">color</span><span class="s2">&quot;</span><span class="p">:</span> <span class="s2">&quot;</span><span class="s2">k</span><span class="s2">&quot;</span><span class="p">}</span><span class="p">)</span><span class="w">
+</span></pre></div></div>
+<img src="../../_images/sphx_glr_flowvel_streamlines_002.png" srcset="../../_images/sphx_glr_flowvel_streamlines_002.png" alt="flowvel streamlines" class = "sphx-glr-single-img"/><div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>&lt;matplotlib.quiver.Quiver object at 0x000001F573D68410&gt;
 </pre></div>
 </div>
 </section>
@@ -1275,29 +1266,27 @@ were defined, to use as a background image for the plot</p>
 <h2>Streamline function<a class="headerlink" href="#streamline-function" title="Link to this heading">#</a></h2>
 <p>This function shows the streamlines for a line cross section through a 3D flow field.
 We will use the previously created arrays that indicate the start and end location of the cross section and apply them in the function imod.evaluate.streamfunction_line()</p>
-<div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="n">streamfunction</span> <span class="o">=</span> <span class="n">imod</span><span class="o">.</span><span class="n">evaluate</span><span class="o">.</span><span class="n">streamfunction_line</span><span class="p">(</span><span class="n">right</span><span class="p">,</span> <span class="n">front</span><span class="p">,</span> <span class="n">start</span><span class="p">,</span> <span class="n">end</span><span class="p">)</span>
-</pre></div>
-</div>
+<div class="highlight-Python notranslate"><div class="highlight"><pre><span class="n">streamfunction</span> <span class="o">=</span> <a class="sphx-glr-backref-module-imod-evaluate sphx-glr-backref-type-py-function reference internal" href="../../api/generated/evaluate/imod.evaluate.streamfunction_line.html#imod.evaluate.streamfunction_line" title="imod.evaluate.streamfunction_line"><span class="n">imod</span><span class="o">.</span><span class="n">evaluate</span><span class="o">.</span><span class="n">streamfunction_line</span></a><span class="p">(</span><span class="n">right</span><span class="p">,</span> <span class="n">front</span><span class="p">,</span> <span class="n">start</span><span class="p">,</span> <span class="n">end</span><span class="p">)</span><span class="w">
+</span></pre></div></div>
 <p>The previous array contains the streamfunction projected on the cross-section defined
 by provided linestring, with new dimension “s” along the cross-section.
 The cellsizes along “s” are given in the “ds” coordinate.
 The streamline function can be plotted using imod.visualize.streamfunction(),
 but first we need to define the ‘top’ and ‘bottom’ of the layers in the array
 Note: By default the steamlines are plotted in white.</p>
-<div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="n">streamfunction</span><span class="p">[</span><span class="s2">&quot;bottom&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">streamfunction</span><span class="p">[</span><span class="s2">&quot;z&quot;</span><span class="p">]</span> <span class="o">+</span> <span class="n">streamfunction</span><span class="p">[</span><span class="s2">&quot;dz&quot;</span><span class="p">]</span>
-<span class="n">streamfunction</span><span class="p">[</span><span class="s2">&quot;top&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">streamfunction</span><span class="p">[</span><span class="s2">&quot;z&quot;</span><span class="p">]</span>
-
-<span class="n">fig</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">()</span>
-<span class="n">fig</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">imod</span><span class="o">.</span><span class="n">visualize</span><span class="o">.</span><span class="n">cross_section</span><span class="p">(</span>
-    <span class="n">cross_section</span><span class="p">,</span> <span class="n">colors</span><span class="o">=</span><span class="n">colors</span><span class="p">,</span> <span class="n">levels</span><span class="o">=</span><span class="n">levels</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="n">ax</span><span class="p">,</span> <span class="n">fig</span><span class="o">=</span><span class="n">fig</span>
-<span class="p">)</span>
-<span class="n">imod</span><span class="o">.</span><span class="n">visualize</span><span class="o">.</span><span class="n">streamfunction</span><span class="p">(</span><span class="n">streamfunction</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="n">ax</span><span class="p">,</span> <span class="n">n_streamlines</span><span class="o">=</span><span class="mi">10</span><span class="p">)</span>
+<div class="highlight-Python notranslate"><div class="highlight"><pre><span class="n">streamfunction</span><span class="p">[</span><span class="s2">&quot;</span><span class="s2">bottom</span><span class="s2">&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">streamfunction</span><span class="p">[</span><span class="s2">&quot;</span><span class="s2">z</span><span class="s2">&quot;</span><span class="p">]</span> <span class="o">+</span> <span class="n">streamfunction</span><span class="p">[</span><span class="s2">&quot;</span><span class="s2">dz</span><span class="s2">&quot;</span><span class="p">]</span><span class="w">
+</span><span class="n">streamfunction</span><span class="p">[</span><span class="s2">&quot;</span><span class="s2">top</span><span class="s2">&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">streamfunction</span><span class="p">[</span><span class="s2">&quot;</span><span class="s2">z</span><span class="s2">&quot;</span><span class="p">]</span><span class="w">
+</span><span class="w">
+</span><span class="n">fig</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="p">)</span><span class="w">
+</span><span class="n">fig</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <a class="sphx-glr-backref-module-imod-visualize sphx-glr-backref-type-py-function reference internal" href="../../api/generated/visualize/imod.visualize.cross_section.html#imod.visualize.cross_section" title="imod.visualize.cross_section"><span class="n">imod</span><span class="o">.</span><span class="n">visualize</span><span class="o">.</span><span class="n">cross_section</span></a><span class="p">(</span><span class="w">
+</span>    <span class="n">cross_section</span><span class="p">,</span> <span class="n">colors</span><span class="o">=</span><span class="n">colors</span><span class="p">,</span> <span class="n">levels</span><span class="o">=</span><span class="n">levels</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="n">ax</span><span class="p">,</span> <span class="n">fig</span><span class="o">=</span><span class="n">fig</span><span class="w">
+</span><span class="p">)</span><span class="w">
+</span><a class="sphx-glr-backref-module-imod-visualize sphx-glr-backref-type-py-function reference internal" href="../../api/generated/visualize/imod.visualize.streamfunction.html#imod.visualize.streamfunction" title="imod.visualize.streamfunction"><span class="n">imod</span><span class="o">.</span><span class="n">visualize</span><span class="o">.</span><span class="n">streamfunction</span></a><span class="p">(</span><span class="n">streamfunction</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="n">ax</span><span class="p">,</span> <span class="n">n_streamlines</span><span class="o">=</span><span class="mi">10</span><span class="p">)</span><span class="w">
+</span></pre></div></div>
+<img src="../../_images/sphx_glr_flowvel_streamlines_003.png" srcset="../../_images/sphx_glr_flowvel_streamlines_003.png" alt="flowvel streamlines" class = "sphx-glr-single-img"/><div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>&lt;matplotlib.contour.QuadContourSet object at 0x000001F54E6220D0&gt;
 </pre></div>
 </div>
-<img src="../../_images/sphx_glr_flowvel_streamlines_003.png" srcset="../../_images/sphx_glr_flowvel_streamlines_003.png" alt="flowvel streamlines" class = "sphx-glr-single-img"/><div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>&lt;matplotlib.contour.QuadContourSet object at 0x0000014641721450&gt;
-</pre></div>
-</div>
-<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> (0 minutes 2.467 seconds)</p>
+<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> (0 minutes 3.253 seconds)</p>
 <div class="sphx-glr-footer sphx-glr-footer-example docutils container" id="sphx-glr-download-examples-visualize-flowvel-streamlines-py">
 <div class="sphx-glr-download sphx-glr-download-jupyter docutils container">
 <p><a class="reference download internal" download="" href="../../_downloads/be3f5446a51de431f09fed114fa9dc7e/flowvel_streamlines.ipynb"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Jupyter</span> <span class="pre">notebook:</span> <span class="pre">flowvel_streamlines.ipynb</span></code></a></p>
@@ -1348,7 +1337,7 @@ Note: By default the steamlines are plotted in white.</p>
             
             
               
-                <dialog id="pst-secondary-sidebar-modal"></dialog>
+                <dialog id="pst-secondary-sidebar-modal" tabindex="-1"></dialog>
                 <div id="pst-secondary-sidebar" class="bd-sidebar-secondary bd-toc"><div class="sidebar-secondary-items sidebar-secondary__inner">
 
 
@@ -1388,8 +1377,8 @@ Note: By default the steamlines are plotted in white.</p>
   </div>
   
   <!-- Scripts loaded after <body> so the DOM is not blocked -->
-  <script defer src="../../_static/scripts/bootstrap.js?digest=90905a2f556bf617f1a9"></script>
-<script defer src="../../_static/scripts/pydata-sphinx-theme.js?digest=90905a2f556bf617f1a9"></script>
+  <script defer src="../../_static/scripts/bootstrap.js?digest=75c7c72ae941e8b558d8"></script>
+<script defer src="../../_static/scripts/pydata-sphinx-theme.js?digest=75c7c72ae941e8b558d8"></script>
 
   <footer class="bd-footer">
 <div class="bd-footer__inner bd-page-width">
@@ -1409,8 +1398,7 @@ Note: By default the steamlines are plotted in white.</p>
         <div class="footer-item">
 
   <p class="sphinx-version">
-    Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 9.1.0.
-    <br/>
+    Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 9.2.0.
   </p>
 </div>
       
@@ -1423,7 +1411,7 @@ Note: By default the steamlines are plotted in white.</p>
         <div class="footer-item">
 <p class="theme-version">
   <!-- # L10n: Setting the PST URL as an argument as this does not need to be localized -->
-  Built with the <a href="https://pydata-sphinx-theme.readthedocs.io/en/stable/index.html">PyData Sphinx Theme</a> 0.20.0.
+  Built with the <a href="https://pydata-sphinx-theme.readthedocs.io/en/stable/index.html">PyData Sphinx Theme</a> 0.24.0.
 </p></div>
       
     </div>

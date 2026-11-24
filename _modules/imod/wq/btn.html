@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 
 
@@ -7,7 +6,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>imod.wq.btn &#8212; iMOD Python 1.1.0 documentation</title>
+    <title>imod.wq.btn &#8212; iMOD Python 1.2.0 documentation</title>
   
   
   
@@ -26,22 +25,22 @@
   </noscript>
   
   <!-- Loaded before other Sphinx assets -->
-  <link href="../../../_static/styles/theme.css?digest=90905a2f556bf617f1a9" rel="stylesheet" />
-<link href="../../../_static/styles/pydata-sphinx-theme.css?digest=90905a2f556bf617f1a9" rel="stylesheet" />
+  <link href="../../../_static/styles/theme.css?digest=75c7c72ae941e8b558d8" rel="stylesheet" />
+<link href="../../../_static/styles/pydata-sphinx-theme.css?digest=75c7c72ae941e8b558d8" rel="stylesheet" />
 
     <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=03e43079" />
-    <link rel="stylesheet" type="text/css" href="../../../_static/sg_gallery.css?v=fd6457a4" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/sg_gallery.css?v=c83e6b79" />
     <link rel="stylesheet" type="text/css" href="../../../_static/sg_gallery-binder.css?v=f4aeca0c" />
     <link rel="stylesheet" type="text/css" href="../../../_static/sg_gallery-dataframe.css?v=2082cf3c" />
     <link rel="stylesheet" type="text/css" href="../../../_static/sg_gallery-rendered-html.css?v=1277b6f3" />
   
   <!-- So that users can add custom icons -->
-  <script defer src="../../../_static/scripts/fontawesome.js?digest=90905a2f556bf617f1a9"></script>
+  <script defer src="../../../_static/scripts/fontawesome.js?digest=75c7c72ae941e8b558d8"></script>
   <!-- Pre-loaded scripts that we'll load fully later -->
-  <link rel="preload" as="script" href="../../../_static/scripts/bootstrap.js?digest=90905a2f556bf617f1a9" />
-<link rel="preload" as="script" href="../../../_static/scripts/pydata-sphinx-theme.js?digest=90905a2f556bf617f1a9" />
+  <link rel="preload" as="script" href="../../../_static/scripts/bootstrap.js?digest=75c7c72ae941e8b558d8" />
+<link rel="preload" as="script" href="../../../_static/scripts/pydata-sphinx-theme.js?digest=75c7c72ae941e8b558d8" />
 
-    <script src="../../../_static/documentation_options.js?v=fc837d61"></script>
+    <script src="../../../_static/documentation_options.js?v=6efca38a"></script>
     <script src="../../../_static/doctools.js?v=fd6eb6e6"></script>
     <script src="../../../_static/sphinx_highlight.js?v=6ffebe34"></script>
     <script src="../../../_static/sg-tags.js?v=d80f6fa4"></script>
@@ -51,8 +50,9 @@
     <link rel="index" title="Index" href="../../../genindex.html" />
     <link rel="search" title="Search" href="../../../search.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <meta name="color-scheme" content="light dark"/>
   <meta name="docsearch:language" content="en"/>
-  <meta name="docsearch:version" content="1.1.0.dev" />
+  <meta name="docsearch:version" content="1.2.0.dev" />
   
     
     <script src="../../../_static/searchtools.js"></script>
@@ -100,7 +100,7 @@
   
     <header id="pst-header" class="bd-header navbar navbar-expand-lg bd-navbar d-print-none">
 <div class="bd-header__inner bd-page-width">
-  <button class="pst-navbar-icon sidebar-toggle primary-toggle" aria-label="Site navigation">
+  <button type="button" class="pst-navbar-icon sidebar-toggle primary-toggle" aria-label="Site navigation" aria-expanded="false" aria-controls="pst-primary-sidebar-modal">
     <span class="fa-solid fa-bars"></span>
   </button>
   
@@ -122,8 +122,8 @@
     
     
     
-    <img src="../../../_static/imod-python-logo-light.svg" class="logo__image only-light" alt="iMOD Python 1.1.0 documentation - Home"/>
-    <img src="../../../_static/imod-python-logo-dark.svg" class="logo__image only-dark pst-js-only" alt="iMOD Python 1.1.0 documentation - Home"/>
+    <img src="../../../_static/imod-python-logo-light.svg" class="logo__image only-light" alt="iMOD Python 1.2.0 documentation - Home"/>
+    <img src="../../../_static/imod-python-logo-dark.svg" class="logo__image only-dark pst-js-only" alt="iMOD Python 1.2.0 documentation - Home"/>
   
   
 </a></div>
@@ -190,7 +190,7 @@
         <div class="navbar-item navbar-persistent--container">
           
 
-<button class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+<button type="button" class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
  <i class="fa-solid fa-magnifying-glass"></i>
  <span class="search-button__default-text">Search</span>
  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
@@ -201,15 +201,15 @@
         <div class="navbar-item">
 
 <div class="theme-switch-container dropdown pst-js-only" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Color mode">
-  <button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button dropdown-toggle" aria-label="Color mode" data-bs-toggle="dropdown">
-    <i class="theme-switch fa-solid fa-sun fa-lg fa-fw" data-mode="light" title="Light"></i>
-    <i class="theme-switch fa-solid fa-moon fa-lg fa-fw" data-mode="dark" title="Dark"></i>
-    <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg fa-fw" data-mode="auto" title="System Settings"></i>
+  <button type="button" class="btn btn-sm nav-link pst-navbar-icon theme-switch-button dropdown-toggle" aria-label="Color mode" data-bs-toggle="dropdown">
+    <i class="theme-switch fa-solid fa-sun fa-lg" data-mode="light" title="Light"></i>
+    <i class="theme-switch fa-solid fa-moon fa-lg" data-mode="dark" title="Dark"></i>
+    <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg" data-mode="auto" title="System Settings"></i>
   </button>
   <ul class="dropdown-menu dropdown-menu-end">
-    <li><button class="dropdown-item d-flex align-items-center theme-change-button" data-mode="auto"><i class="fa-solid fa-circle-half-stroke fa-lg fa-fw me-1"></i>System Settings</button></li>
-    <li><button class="dropdown-item d-flex align-items-center theme-change-button" data-mode="light"><i class="fa-solid fa-sun fa-lg fa-fw me-1"></i>Light</button></li>
-    <li><button class="dropdown-item d-flex align-items-center theme-change-button" data-mode="dark"><i class="fa-solid fa-moon fa-lg fa-fw me-1"></i>Dark</button></li>
+    <li><button type="button" class="dropdown-item d-flex align-items-center theme-change-button" data-mode="auto"><i class="fa-solid fa-circle-half-stroke fa-lg me-1"></i>System Settings</button></li>
+    <li><button type="button" class="dropdown-item d-flex align-items-center theme-change-button" data-mode="light"><i class="fa-solid fa-sun fa-lg me-1"></i>Light</button></li>
+    <li><button type="button" class="dropdown-item d-flex align-items-center theme-change-button" data-mode="dark"><i class="fa-solid fa-moon fa-lg me-1"></i>Dark</button></li>
   </ul>
 </div></div>
       
@@ -246,7 +246,7 @@
   
     <div class="navbar-persistent--mobile">
 
-<button class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+<button type="button" class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
  <i class="fa-solid fa-magnifying-glass"></i>
  <span class="search-button__default-text">Search</span>
  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
@@ -267,7 +267,7 @@
       
         
       
-      <dialog id="pst-primary-sidebar-modal"></dialog>
+      <dialog id="pst-primary-sidebar-modal" tabindex="-1"></dialog>
       <div id="pst-primary-sidebar" class="bd-sidebar-primary bd-sidebar hide-on-wide">
         
 
@@ -337,15 +337,15 @@
           <div class="navbar-item">
 
 <div class="theme-switch-container dropdown pst-js-only" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Color mode">
-  <button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button dropdown-toggle" aria-label="Color mode" data-bs-toggle="dropdown">
-    <i class="theme-switch fa-solid fa-sun fa-lg fa-fw" data-mode="light" title="Light"></i>
-    <i class="theme-switch fa-solid fa-moon fa-lg fa-fw" data-mode="dark" title="Dark"></i>
-    <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg fa-fw" data-mode="auto" title="System Settings"></i>
+  <button type="button" class="btn btn-sm nav-link pst-navbar-icon theme-switch-button dropdown-toggle" aria-label="Color mode" data-bs-toggle="dropdown">
+    <i class="theme-switch fa-solid fa-sun fa-lg" data-mode="light" title="Light"></i>
+    <i class="theme-switch fa-solid fa-moon fa-lg" data-mode="dark" title="Dark"></i>
+    <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg" data-mode="auto" title="System Settings"></i>
   </button>
   <ul class="dropdown-menu dropdown-menu-end">
-    <li><button class="dropdown-item d-flex align-items-center theme-change-button" data-mode="auto"><i class="fa-solid fa-circle-half-stroke fa-lg fa-fw me-1"></i>System Settings</button></li>
-    <li><button class="dropdown-item d-flex align-items-center theme-change-button" data-mode="light"><i class="fa-solid fa-sun fa-lg fa-fw me-1"></i>Light</button></li>
-    <li><button class="dropdown-item d-flex align-items-center theme-change-button" data-mode="dark"><i class="fa-solid fa-moon fa-lg fa-fw me-1"></i>Dark</button></li>
+    <li><button type="button" class="dropdown-item d-flex align-items-center theme-change-button" data-mode="auto"><i class="fa-solid fa-circle-half-stroke fa-lg me-1"></i>System Settings</button></li>
+    <li><button type="button" class="dropdown-item d-flex align-items-center theme-change-button" data-mode="light"><i class="fa-solid fa-sun fa-lg me-1"></i>Light</button></li>
+    <li><button type="button" class="dropdown-item d-flex align-items-center theme-change-button" data-mode="dark"><i class="fa-solid fa-moon fa-lg me-1"></i>Dark</button></li>
   </ul>
 </div></div>
         
@@ -411,7 +411,7 @@
     
     <li class="breadcrumb-item breadcrumb-home">
       <a href="../../../index.html" class="nav-link" aria-label="Home">
-        <i class="fa-solid fa-home"></i>
+        <i class="fa-solid fa-house"></i>
       </a>
     </li>
     
@@ -445,7 +445,7 @@
 <div class="viewcode-block" id="BasicTransport">
 <a class="viewcode-back" href="../../../api/generated/wq/imod.wq.BasicTransport.html#imod.wq.BasicTransport">[docs]</a>
 <span class="k">class</span><span class="w"> </span><span class="nc">BasicTransport</span><span class="p">(</span><span class="n">Package</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">"""</span>
 <span class="sd">    Handles basic tasks that are required by the entire transport model. Among</span>
 <span class="sd">    these tasks are definition of the problem, specification of the boundary and</span>
 <span class="sd">    initial conditions, determination of the stepsize, preparation of mass</span>
@@ -461,7 +461,7 @@
 <span class="sd">        different constant-concentration conditions through an option in the</span>
 <span class="sd">        Source and Sink Mixing Package.</span>
 <span class="sd">        ICBUND=0, the cell is an inactive concentration cell for all species.</span>
-<span class="sd">        Note that no-flow or &quot;dry&quot; cells are automatically converted into</span>
+<span class="sd">        Note that no-flow or "dry" cells are automatically converted into</span>
 <span class="sd">        inactive concentration cells. Furthermore, active cells in terms of flow</span>
 <span class="sd">        can be treated as inactive concentration cells to minimize the area</span>
 <span class="sd">        needed for transport simulation, as long as the solute transport is</span>
@@ -481,7 +481,7 @@
 <span class="sd">        starting concentration must be specified for all species, one species at</span>
 <span class="sd">        a time.</span>
 <span class="sd">    porosity: float, optional</span>
-<span class="sd">        is the &quot;effective&quot; porosity of the porous medium in a single porosity</span>
+<span class="sd">        is the "effective" porosity of the porous medium in a single porosity</span>
 <span class="sd">        system (PRSITY).</span>
 <span class="sd">        Default value is 0.35.</span>
 <span class="sd">    n_species: int, optional</span>
@@ -498,28 +498,28 @@
 <span class="sd">        decimal fraction of the model layer thickness, below which the cell is</span>
 <span class="sd">        considered inactive.</span>
 <span class="sd">        Default value is 0.01 (i.e., 1% of the model layer thickness).</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
 
-    <span class="n">_pkg_id</span> <span class="o">=</span> <span class="s2">&quot;btn&quot;</span>
+    <span class="n">_pkg_id</span> <span class="o">=</span> <span class="s2">"btn"</span>
 
-    <span class="n">_mapping</span> <span class="o">=</span> <span class="p">((</span><span class="s2">&quot;icbund&quot;</span><span class="p">,</span> <span class="s2">&quot;icbund&quot;</span><span class="p">),</span> <span class="p">(</span><span class="s2">&quot;dz&quot;</span><span class="p">,</span> <span class="s2">&quot;thickness&quot;</span><span class="p">),</span> <span class="p">(</span><span class="s2">&quot;prsity&quot;</span><span class="p">,</span> <span class="s2">&quot;porosity&quot;</span><span class="p">))</span>
+    <span class="n">_mapping</span> <span class="o">=</span> <span class="p">((</span><span class="s2">"icbund"</span><span class="p">,</span> <span class="s2">"icbund"</span><span class="p">),</span> <span class="p">(</span><span class="s2">"dz"</span><span class="p">,</span> <span class="s2">"thickness"</span><span class="p">),</span> <span class="p">(</span><span class="s2">"prsity"</span><span class="p">,</span> <span class="s2">"porosity"</span><span class="p">))</span>
 
     <span class="n">_template</span> <span class="o">=</span> <span class="n">jinja2</span><span class="o">.</span><span class="n">Template</span><span class="p">(</span>
-        <span class="s2">&quot;[btn]</span><span class="se">\n</span><span class="s2">&quot;</span>
-        <span class="s2">&quot;    ncomp = {{n_species}}</span><span class="se">\n</span><span class="s2">&quot;</span>  <span class="c1"># Number of components</span>
-        <span class="s2">&quot;    mcomp = {{n_species}}</span><span class="se">\n</span><span class="s2">&quot;</span>  <span class="c1"># Number of mobile components</span>
-        <span class="s2">&quot;    thkmin = {{minimum_active_thickness}}</span><span class="se">\n</span><span class="s2">&quot;</span>
-        <span class="s2">&quot;    cinact = {{inactive_concentration}}</span><span class="se">\n</span><span class="s2">&quot;</span>
-        <span class="s2">&quot;    {</span><span class="si">%- f</span><span class="s2">or species, layerdict in starting_concentration.items() %}</span><span class="se">\n</span><span class="s2">&quot;</span>
-        <span class="s2">&quot;        {</span><span class="si">%- f</span><span class="s2">or layer, value in layerdict.items() %}</span><span class="se">\n</span><span class="s2">&quot;</span>
-        <span class="s2">&quot;    sconc_t{{species}}_l{{layer}} = {{value}}</span><span class="se">\n</span><span class="s2">&quot;</span>
-        <span class="s2">&quot;        {</span><span class="si">%- e</span><span class="s2">ndfor -%}</span><span class="se">\n</span><span class="s2">&quot;</span>
-        <span class="s2">&quot;    {</span><span class="si">%- e</span><span class="s2">ndfor -%}</span><span class="se">\n</span><span class="s2">&quot;</span>
-        <span class="s2">&quot;    {</span><span class="si">%- f</span><span class="s2">or name, dictname in mapping -%}</span><span class="se">\n</span><span class="s2">&quot;</span>
-        <span class="s2">&quot;        {</span><span class="si">%- f</span><span class="s2">or layer, value in dicts[dictname].items() %}</span><span class="se">\n</span><span class="s2">&quot;</span>
-        <span class="s2">&quot;    {{name}}_l{{layer}} = {{value}}</span><span class="se">\n</span><span class="s2">&quot;</span>
-        <span class="s2">&quot;        {</span><span class="si">%- e</span><span class="s2">ndfor -%}</span><span class="se">\n</span><span class="s2">&quot;</span>
-        <span class="s2">&quot;    {</span><span class="si">%- e</span><span class="s2">ndfor -%}</span><span class="se">\n</span><span class="s2">&quot;</span>
+        <span class="s2">"[btn]</span><span class="se">\n</span><span class="s2">"</span>
+        <span class="s2">"    ncomp = {{n_species}}</span><span class="se">\n</span><span class="s2">"</span>  <span class="c1"># Number of components</span>
+        <span class="s2">"    mcomp = {{n_species}}</span><span class="se">\n</span><span class="s2">"</span>  <span class="c1"># Number of mobile components</span>
+        <span class="s2">"    thkmin = {{minimum_active_thickness}}</span><span class="se">\n</span><span class="s2">"</span>
+        <span class="s2">"    cinact = {{inactive_concentration}}</span><span class="se">\n</span><span class="s2">"</span>
+        <span class="s2">"    {</span><span class="si">%- f</span><span class="s2">or species, layerdict in starting_concentration.items() %}</span><span class="se">\n</span><span class="s2">"</span>
+        <span class="s2">"        {</span><span class="si">%- f</span><span class="s2">or layer, value in layerdict.items() %}</span><span class="se">\n</span><span class="s2">"</span>
+        <span class="s2">"    sconc_t{{species}}_l{{layer}} = {{value}}</span><span class="se">\n</span><span class="s2">"</span>
+        <span class="s2">"        {</span><span class="si">%- e</span><span class="s2">ndfor -%}</span><span class="se">\n</span><span class="s2">"</span>
+        <span class="s2">"    {</span><span class="si">%- e</span><span class="s2">ndfor -%}</span><span class="se">\n</span><span class="s2">"</span>
+        <span class="s2">"    {</span><span class="si">%- f</span><span class="s2">or name, dictname in mapping -%}</span><span class="se">\n</span><span class="s2">"</span>
+        <span class="s2">"        {</span><span class="si">%- f</span><span class="s2">or layer, value in dicts[dictname].items() %}</span><span class="se">\n</span><span class="s2">"</span>
+        <span class="s2">"    {{name}}_l{{layer}} = {{value}}</span><span class="se">\n</span><span class="s2">"</span>
+        <span class="s2">"        {</span><span class="si">%- e</span><span class="s2">ndfor -%}</span><span class="se">\n</span><span class="s2">"</span>
+        <span class="s2">"    {</span><span class="si">%- e</span><span class="s2">ndfor -%}</span><span class="se">\n</span><span class="s2">"</span>
     <span class="p">)</span>
 
 <div class="viewcode-block" id="BasicTransport.__init__">
@@ -534,16 +534,16 @@
         <span class="n">minimum_active_thickness</span><span class="o">=</span><span class="mf">0.01</span><span class="p">,</span>
     <span class="p">):</span>
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span>
-        <span class="bp">self</span><span class="p">[</span><span class="s2">&quot;icbund&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">icbund</span>
-        <span class="bp">self</span><span class="p">[</span><span class="s2">&quot;starting_concentration&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">starting_concentration</span>
-        <span class="bp">self</span><span class="p">[</span><span class="s2">&quot;porosity&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">porosity</span>
-        <span class="bp">self</span><span class="p">[</span><span class="s2">&quot;n_species&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">n_species</span>
-        <span class="bp">self</span><span class="p">[</span><span class="s2">&quot;inactive_concentration&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">inactive_concentration</span>
-        <span class="bp">self</span><span class="p">[</span><span class="s2">&quot;minimum_active_thickness&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">minimum_active_thickness</span></div>
+        <span class="bp">self</span><span class="p">[</span><span class="s2">"icbund"</span><span class="p">]</span> <span class="o">=</span> <span class="n">icbund</span>
+        <span class="bp">self</span><span class="p">[</span><span class="s2">"starting_concentration"</span><span class="p">]</span> <span class="o">=</span> <span class="n">starting_concentration</span>
+        <span class="bp">self</span><span class="p">[</span><span class="s2">"porosity"</span><span class="p">]</span> <span class="o">=</span> <span class="n">porosity</span>
+        <span class="bp">self</span><span class="p">[</span><span class="s2">"n_species"</span><span class="p">]</span> <span class="o">=</span> <span class="n">n_species</span>
+        <span class="bp">self</span><span class="p">[</span><span class="s2">"inactive_concentration"</span><span class="p">]</span> <span class="o">=</span> <span class="n">inactive_concentration</span>
+        <span class="bp">self</span><span class="p">[</span><span class="s2">"minimum_active_thickness"</span><span class="p">]</span> <span class="o">=</span> <span class="n">minimum_active_thickness</span></div>
 
 
     <span class="k">def</span><span class="w"> </span><span class="nf">_render</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">directory</span><span class="p">,</span> <span class="n">nlayer</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">"""</span>
 <span class="sd">        Renders part of [btn] section that does not depend on time,</span>
 <span class="sd">        and can be inferred without checking the BoundaryConditions.</span>
 
@@ -556,35 +556,35 @@
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
 <span class="sd">        rendered : str</span>
-<span class="sd">        &quot;&quot;&quot;</span>
+<span class="sd">        """</span>
         <span class="n">d</span> <span class="o">=</span> <span class="p">{}</span>
         <span class="n">dicts</span> <span class="o">=</span> <span class="p">{}</span>
-        <span class="n">d</span><span class="p">[</span><span class="s2">&quot;mapping&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_mapping</span>
-        <span class="c1"># Starting concentration also includes a species, and can&#39;t be written</span>
+        <span class="n">d</span><span class="p">[</span><span class="s2">"mapping"</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_mapping</span>
+        <span class="c1"># Starting concentration also includes a species, and can't be written</span>
         <span class="c1"># in the same way as the other variables; _T? in the runfile</span>
-        <span class="k">if</span> <span class="s2">&quot;species&quot;</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">dataset</span><span class="p">[</span><span class="s2">&quot;starting_concentration&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">coords</span><span class="p">:</span>
+        <span class="k">if</span> <span class="s2">"species"</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">dataset</span><span class="p">[</span><span class="s2">"starting_concentration"</span><span class="p">]</span><span class="o">.</span><span class="n">coords</span><span class="p">:</span>
             <span class="n">starting_concentration</span> <span class="o">=</span> <span class="p">{}</span>
 
             <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">species</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">dataset</span><span class="p">[</span><span class="s2">&quot;starting_concentration&quot;</span><span class="p">][</span><span class="s2">&quot;species&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">values</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">dataset</span><span class="p">[</span><span class="s2">"starting_concentration"</span><span class="p">][</span><span class="s2">"species"</span><span class="p">]</span><span class="o">.</span><span class="n">values</span>
             <span class="p">):</span>
-                <span class="n">da</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">dataset</span><span class="p">[</span><span class="s2">&quot;starting_concentration&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">sel</span><span class="p">(</span><span class="n">species</span><span class="o">=</span><span class="n">species</span><span class="p">)</span>
+                <span class="n">da</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">dataset</span><span class="p">[</span><span class="s2">"starting_concentration"</span><span class="p">]</span><span class="o">.</span><span class="n">sel</span><span class="p">(</span><span class="n">species</span><span class="o">=</span><span class="n">species</span><span class="p">)</span>
                 <span class="n">starting_concentration</span><span class="p">[</span><span class="n">i</span> <span class="o">+</span> <span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_compose_values_layer</span><span class="p">(</span>
-                    <span class="s2">&quot;starting_concentration&quot;</span><span class="p">,</span> <span class="n">directory</span><span class="p">,</span> <span class="n">nlayer</span><span class="o">=</span><span class="n">nlayer</span><span class="p">,</span> <span class="n">da</span><span class="o">=</span><span class="n">da</span>
+                    <span class="s2">"starting_concentration"</span><span class="p">,</span> <span class="n">directory</span><span class="p">,</span> <span class="n">nlayer</span><span class="o">=</span><span class="n">nlayer</span><span class="p">,</span> <span class="n">da</span><span class="o">=</span><span class="n">da</span>
                 <span class="p">)</span>
 
-            <span class="n">d</span><span class="p">[</span><span class="s2">&quot;starting_concentration&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">starting_concentration</span>
+            <span class="n">d</span><span class="p">[</span><span class="s2">"starting_concentration"</span><span class="p">]</span> <span class="o">=</span> <span class="n">starting_concentration</span>
         <span class="k">else</span><span class="p">:</span>
-            <span class="n">d</span><span class="p">[</span><span class="s2">&quot;starting_concentration&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="n">d</span><span class="p">[</span><span class="s2">"starting_concentration"</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span>
                 <span class="mi">1</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">_compose_values_layer</span><span class="p">(</span>
-                    <span class="s2">&quot;starting_concentration&quot;</span><span class="p">,</span> <span class="n">directory</span><span class="p">,</span> <span class="n">nlayer</span><span class="o">=</span><span class="n">nlayer</span>
+                    <span class="s2">"starting_concentration"</span><span class="p">,</span> <span class="n">directory</span><span class="p">,</span> <span class="n">nlayer</span><span class="o">=</span><span class="n">nlayer</span>
                 <span class="p">)</span>
             <span class="p">}</span>
 
         <span class="c1"># Collect which entries are complex (multi-dim)</span>
         <span class="n">data_vars</span> <span class="o">=</span> <span class="p">[</span><span class="n">t</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="k">for</span> <span class="n">t</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_mapping</span><span class="p">]</span>
         <span class="k">for</span> <span class="n">varname</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">dataset</span><span class="o">.</span><span class="n">data_vars</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
-            <span class="k">if</span> <span class="n">varname</span> <span class="o">==</span> <span class="s2">&quot;starting_concentration&quot;</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">varname</span> <span class="o">==</span> <span class="s2">"starting_concentration"</span><span class="p">:</span>
                 <span class="k">continue</span>  <span class="c1"># skip it, as mentioned above</span>
             <span class="k">if</span> <span class="n">varname</span> <span class="ow">in</span> <span class="n">data_vars</span><span class="p">:</span>  <span class="c1"># multi-dim entry</span>
                 <span class="n">dicts</span><span class="p">[</span><span class="n">varname</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_compose_values_layer</span><span class="p">(</span>
@@ -595,25 +595,25 @@
 
         <span class="c1"># Add these from the outside, thickness from BasicFlow</span>
         <span class="c1"># layer_type from LayerPropertyFlow</span>
-        <span class="n">dicts</span><span class="p">[</span><span class="s2">&quot;thickness&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_compose_values_layer</span><span class="p">(</span>
-            <span class="s2">&quot;thickness&quot;</span><span class="p">,</span> <span class="n">directory</span><span class="p">,</span> <span class="n">nlayer</span><span class="o">=</span><span class="n">nlayer</span><span class="p">,</span> <span class="n">da</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">dataset</span><span class="o">.</span><span class="n">thickness</span>
+        <span class="n">dicts</span><span class="p">[</span><span class="s2">"thickness"</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_compose_values_layer</span><span class="p">(</span>
+            <span class="s2">"thickness"</span><span class="p">,</span> <span class="n">directory</span><span class="p">,</span> <span class="n">nlayer</span><span class="o">=</span><span class="n">nlayer</span><span class="p">,</span> <span class="n">da</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">dataset</span><span class="o">.</span><span class="n">thickness</span>
         <span class="p">)</span>
-        <span class="n">d</span><span class="p">[</span><span class="s2">&quot;dicts&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">dicts</span>
+        <span class="n">d</span><span class="p">[</span><span class="s2">"dicts"</span><span class="p">]</span> <span class="o">=</span> <span class="n">dicts</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_template</span><span class="o">.</span><span class="n">render</span><span class="p">(</span><span class="n">d</span><span class="p">)</span>
 
     <span class="k">def</span><span class="w"> </span><span class="nf">_pkgcheck</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">ibound</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
         <span class="n">to_check</span> <span class="o">=</span> <span class="p">[</span>
-            <span class="s2">&quot;starting_concentration&quot;</span><span class="p">,</span>
-            <span class="s2">&quot;porosity&quot;</span><span class="p">,</span>
-            <span class="s2">&quot;n_species&quot;</span><span class="p">,</span>
-            <span class="s2">&quot;minimum_active_thickness&quot;</span><span class="p">,</span>
+            <span class="s2">"starting_concentration"</span><span class="p">,</span>
+            <span class="s2">"porosity"</span><span class="p">,</span>
+            <span class="s2">"n_species"</span><span class="p">,</span>
+            <span class="s2">"minimum_active_thickness"</span><span class="p">,</span>
         <span class="p">]</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_check_positive</span><span class="p">(</span><span class="n">to_check</span><span class="p">)</span>
 
-        <span class="n">active_cells</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">dataset</span><span class="p">[</span><span class="s2">&quot;icbund&quot;</span><span class="p">]</span> <span class="o">!=</span> <span class="mi">0</span>
-        <span class="k">if</span> <span class="p">(</span><span class="n">active_cells</span> <span class="o">&amp;</span> <span class="n">np</span><span class="o">.</span><span class="n">isnan</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">dataset</span><span class="p">[</span><span class="s2">&quot;starting_concentration&quot;</span><span class="p">]))</span><span class="o">.</span><span class="n">any</span><span class="p">():</span>
+        <span class="n">active_cells</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">dataset</span><span class="p">[</span><span class="s2">"icbund"</span><span class="p">]</span> <span class="o">!=</span> <span class="mi">0</span>
+        <span class="k">if</span> <span class="p">(</span><span class="n">active_cells</span> <span class="o">&amp;</span> <span class="n">np</span><span class="o">.</span><span class="n">isnan</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">dataset</span><span class="p">[</span><span class="s2">"starting_concentration"</span><span class="p">]))</span><span class="o">.</span><span class="n">any</span><span class="p">():</span>
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
-                <span class="sa">f</span><span class="s2">&quot;Active cells in icbund may not have a nan value in starting_concentration in </span><span class="si">{</span><span class="bp">self</span><span class="si">}</span><span class="s2">&quot;</span>
+                <span class="sa">f</span><span class="s2">"Active cells in icbund may not have a nan value in starting_concentration in </span><span class="si">{</span><span class="bp">self</span><span class="si">}</span><span class="s2">"</span>
             <span class="p">)</span>
 
         <span class="n">_</span><span class="p">,</span> <span class="n">nlabels</span> <span class="o">=</span> <span class="n">scipy</span><span class="o">.</span><span class="n">ndimage</span><span class="o">.</span><span class="n">label</span><span class="p">(</span><span class="n">active_cells</span><span class="o">.</span><span class="n">values</span><span class="p">)</span></div>
@@ -622,7 +622,7 @@
 
 <span class="c1">#        if nlabels &gt; 1:</span>
 <span class="c1">#            raise ValueError(</span>
-<span class="c1">#                f&quot;{nlabels} disconnected model domain detected in the icbund in {self}&quot;</span>
+<span class="c1">#                f"{nlabels} disconnected model domain detected in the icbund in {self}"</span>
 <span class="c1">#            )</span>
 </pre></div>
 
@@ -653,8 +653,8 @@
   </div>
   
   <!-- Scripts loaded after <body> so the DOM is not blocked -->
-  <script defer src="../../../_static/scripts/bootstrap.js?digest=90905a2f556bf617f1a9"></script>
-<script defer src="../../../_static/scripts/pydata-sphinx-theme.js?digest=90905a2f556bf617f1a9"></script>
+  <script defer src="../../../_static/scripts/bootstrap.js?digest=75c7c72ae941e8b558d8"></script>
+<script defer src="../../../_static/scripts/pydata-sphinx-theme.js?digest=75c7c72ae941e8b558d8"></script>
 
   <footer class="bd-footer">
 <div class="bd-footer__inner bd-page-width">
@@ -674,8 +674,7 @@
         <div class="footer-item">
 
   <p class="sphinx-version">
-    Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 9.1.0.
-    <br/>
+    Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 9.2.0.
   </p>
 </div>
       
@@ -688,7 +687,7 @@
         <div class="footer-item">
 <p class="theme-version">
   <!-- # L10n: Setting the PST URL as an argument as this does not need to be localized -->
-  Built with the <a href="https://pydata-sphinx-theme.readthedocs.io/en/stable/index.html">PyData Sphinx Theme</a> 0.20.0.
+  Built with the <a href="https://pydata-sphinx-theme.readthedocs.io/en/stable/index.html">PyData Sphinx Theme</a> 0.24.0.
 </p></div>
       
     </div>

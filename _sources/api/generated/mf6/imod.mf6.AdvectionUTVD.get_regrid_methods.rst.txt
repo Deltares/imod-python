@@ -1,0 +1,6 @@
+﻿imod.mf6.AdvectionUTVD.get\_regrid\_methods
+===========================================
+
+.. currentmodule:: imod.mf6
+
+.. automethod:: AdvectionUTVD.get_regrid_methods

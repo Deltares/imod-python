@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 
 
@@ -7,7 +6,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>imod.wq.wel &#8212; iMOD Python 1.1.0 documentation</title>
+    <title>imod.wq.wel &#8212; iMOD Python 1.2.0 documentation</title>
   
   
   
@@ -26,22 +25,22 @@
   </noscript>
   
   <!-- Loaded before other Sphinx assets -->
-  <link href="../../../_static/styles/theme.css?digest=90905a2f556bf617f1a9" rel="stylesheet" />
-<link href="../../../_static/styles/pydata-sphinx-theme.css?digest=90905a2f556bf617f1a9" rel="stylesheet" />
+  <link href="../../../_static/styles/theme.css?digest=75c7c72ae941e8b558d8" rel="stylesheet" />
+<link href="../../../_static/styles/pydata-sphinx-theme.css?digest=75c7c72ae941e8b558d8" rel="stylesheet" />
 
     <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=03e43079" />
-    <link rel="stylesheet" type="text/css" href="../../../_static/sg_gallery.css?v=fd6457a4" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/sg_gallery.css?v=c83e6b79" />
     <link rel="stylesheet" type="text/css" href="../../../_static/sg_gallery-binder.css?v=f4aeca0c" />
     <link rel="stylesheet" type="text/css" href="../../../_static/sg_gallery-dataframe.css?v=2082cf3c" />
     <link rel="stylesheet" type="text/css" href="../../../_static/sg_gallery-rendered-html.css?v=1277b6f3" />
   
   <!-- So that users can add custom icons -->
-  <script defer src="../../../_static/scripts/fontawesome.js?digest=90905a2f556bf617f1a9"></script>
+  <script defer src="../../../_static/scripts/fontawesome.js?digest=75c7c72ae941e8b558d8"></script>
   <!-- Pre-loaded scripts that we'll load fully later -->
-  <link rel="preload" as="script" href="../../../_static/scripts/bootstrap.js?digest=90905a2f556bf617f1a9" />
-<link rel="preload" as="script" href="../../../_static/scripts/pydata-sphinx-theme.js?digest=90905a2f556bf617f1a9" />
+  <link rel="preload" as="script" href="../../../_static/scripts/bootstrap.js?digest=75c7c72ae941e8b558d8" />
+<link rel="preload" as="script" href="../../../_static/scripts/pydata-sphinx-theme.js?digest=75c7c72ae941e8b558d8" />
 
-    <script src="../../../_static/documentation_options.js?v=fc837d61"></script>
+    <script src="../../../_static/documentation_options.js?v=6efca38a"></script>
     <script src="../../../_static/doctools.js?v=fd6eb6e6"></script>
     <script src="../../../_static/sphinx_highlight.js?v=6ffebe34"></script>
     <script src="../../../_static/sg-tags.js?v=d80f6fa4"></script>
@@ -51,8 +50,9 @@
     <link rel="index" title="Index" href="../../../genindex.html" />
     <link rel="search" title="Search" href="../../../search.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <meta name="color-scheme" content="light dark"/>
   <meta name="docsearch:language" content="en"/>
-  <meta name="docsearch:version" content="1.1.0.dev" />
+  <meta name="docsearch:version" content="1.2.0.dev" />
   
     
     <script src="../../../_static/searchtools.js"></script>
@@ -100,7 +100,7 @@
   
     <header id="pst-header" class="bd-header navbar navbar-expand-lg bd-navbar d-print-none">
 <div class="bd-header__inner bd-page-width">
-  <button class="pst-navbar-icon sidebar-toggle primary-toggle" aria-label="Site navigation">
+  <button type="button" class="pst-navbar-icon sidebar-toggle primary-toggle" aria-label="Site navigation" aria-expanded="false" aria-controls="pst-primary-sidebar-modal">
     <span class="fa-solid fa-bars"></span>
   </button>
   
@@ -122,8 +122,8 @@
     
     
     
-    <img src="../../../_static/imod-python-logo-light.svg" class="logo__image only-light" alt="iMOD Python 1.1.0 documentation - Home"/>
-    <img src="../../../_static/imod-python-logo-dark.svg" class="logo__image only-dark pst-js-only" alt="iMOD Python 1.1.0 documentation - Home"/>
+    <img src="../../../_static/imod-python-logo-light.svg" class="logo__image only-light" alt="iMOD Python 1.2.0 documentation - Home"/>
+    <img src="../../../_static/imod-python-logo-dark.svg" class="logo__image only-dark pst-js-only" alt="iMOD Python 1.2.0 documentation - Home"/>
   
   
 </a></div>
@@ -190,7 +190,7 @@
         <div class="navbar-item navbar-persistent--container">
           
 
-<button class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+<button type="button" class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
  <i class="fa-solid fa-magnifying-glass"></i>
  <span class="search-button__default-text">Search</span>
  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
@@ -201,15 +201,15 @@
         <div class="navbar-item">
 
 <div class="theme-switch-container dropdown pst-js-only" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Color mode">
-  <button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button dropdown-toggle" aria-label="Color mode" data-bs-toggle="dropdown">
-    <i class="theme-switch fa-solid fa-sun fa-lg fa-fw" data-mode="light" title="Light"></i>
-    <i class="theme-switch fa-solid fa-moon fa-lg fa-fw" data-mode="dark" title="Dark"></i>
-    <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg fa-fw" data-mode="auto" title="System Settings"></i>
+  <button type="button" class="btn btn-sm nav-link pst-navbar-icon theme-switch-button dropdown-toggle" aria-label="Color mode" data-bs-toggle="dropdown">
+    <i class="theme-switch fa-solid fa-sun fa-lg" data-mode="light" title="Light"></i>
+    <i class="theme-switch fa-solid fa-moon fa-lg" data-mode="dark" title="Dark"></i>
+    <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg" data-mode="auto" title="System Settings"></i>
   </button>
   <ul class="dropdown-menu dropdown-menu-end">
-    <li><button class="dropdown-item d-flex align-items-center theme-change-button" data-mode="auto"><i class="fa-solid fa-circle-half-stroke fa-lg fa-fw me-1"></i>System Settings</button></li>
-    <li><button class="dropdown-item d-flex align-items-center theme-change-button" data-mode="light"><i class="fa-solid fa-sun fa-lg fa-fw me-1"></i>Light</button></li>
-    <li><button class="dropdown-item d-flex align-items-center theme-change-button" data-mode="dark"><i class="fa-solid fa-moon fa-lg fa-fw me-1"></i>Dark</button></li>
+    <li><button type="button" class="dropdown-item d-flex align-items-center theme-change-button" data-mode="auto"><i class="fa-solid fa-circle-half-stroke fa-lg me-1"></i>System Settings</button></li>
+    <li><button type="button" class="dropdown-item d-flex align-items-center theme-change-button" data-mode="light"><i class="fa-solid fa-sun fa-lg me-1"></i>Light</button></li>
+    <li><button type="button" class="dropdown-item d-flex align-items-center theme-change-button" data-mode="dark"><i class="fa-solid fa-moon fa-lg me-1"></i>Dark</button></li>
   </ul>
 </div></div>
       
@@ -246,7 +246,7 @@
   
     <div class="navbar-persistent--mobile">
 
-<button class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+<button type="button" class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
  <i class="fa-solid fa-magnifying-glass"></i>
  <span class="search-button__default-text">Search</span>
  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
@@ -267,7 +267,7 @@
       
         
       
-      <dialog id="pst-primary-sidebar-modal"></dialog>
+      <dialog id="pst-primary-sidebar-modal" tabindex="-1"></dialog>
       <div id="pst-primary-sidebar" class="bd-sidebar-primary bd-sidebar hide-on-wide">
         
 
@@ -337,15 +337,15 @@
           <div class="navbar-item">
 
 <div class="theme-switch-container dropdown pst-js-only" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Color mode">
-  <button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button dropdown-toggle" aria-label="Color mode" data-bs-toggle="dropdown">
-    <i class="theme-switch fa-solid fa-sun fa-lg fa-fw" data-mode="light" title="Light"></i>
-    <i class="theme-switch fa-solid fa-moon fa-lg fa-fw" data-mode="dark" title="Dark"></i>
-    <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg fa-fw" data-mode="auto" title="System Settings"></i>
+  <button type="button" class="btn btn-sm nav-link pst-navbar-icon theme-switch-button dropdown-toggle" aria-label="Color mode" data-bs-toggle="dropdown">
+    <i class="theme-switch fa-solid fa-sun fa-lg" data-mode="light" title="Light"></i>
+    <i class="theme-switch fa-solid fa-moon fa-lg" data-mode="dark" title="Dark"></i>
+    <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg" data-mode="auto" title="System Settings"></i>
   </button>
   <ul class="dropdown-menu dropdown-menu-end">
-    <li><button class="dropdown-item d-flex align-items-center theme-change-button" data-mode="auto"><i class="fa-solid fa-circle-half-stroke fa-lg fa-fw me-1"></i>System Settings</button></li>
-    <li><button class="dropdown-item d-flex align-items-center theme-change-button" data-mode="light"><i class="fa-solid fa-sun fa-lg fa-fw me-1"></i>Light</button></li>
-    <li><button class="dropdown-item d-flex align-items-center theme-change-button" data-mode="dark"><i class="fa-solid fa-moon fa-lg fa-fw me-1"></i>Dark</button></li>
+    <li><button type="button" class="dropdown-item d-flex align-items-center theme-change-button" data-mode="auto"><i class="fa-solid fa-circle-half-stroke fa-lg me-1"></i>System Settings</button></li>
+    <li><button type="button" class="dropdown-item d-flex align-items-center theme-change-button" data-mode="light"><i class="fa-solid fa-sun fa-lg me-1"></i>Light</button></li>
+    <li><button type="button" class="dropdown-item d-flex align-items-center theme-change-button" data-mode="dark"><i class="fa-solid fa-moon fa-lg me-1"></i>Dark</button></li>
   </ul>
 </div></div>
         
@@ -411,7 +411,7 @@
     
     <li class="breadcrumb-item breadcrumb-home">
       <a href="../../../index.html" class="nav-link" aria-label="Home">
-        <i class="fa-solid fa-home"></i>
+        <i class="fa-solid fa-house"></i>
       </a>
     </li>
     
@@ -445,28 +445,28 @@
 
 
 <span class="k">def</span><span class="w"> </span><span class="nf">_column_order</span><span class="p">(</span><span class="n">df</span><span class="p">,</span> <span class="n">variable</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">"""</span>
 <span class="sd">    Return ordered columns, and associated timeseries columns.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
-    <span class="k">if</span> <span class="s2">&quot;time&quot;</span> <span class="ow">in</span> <span class="n">df</span><span class="p">:</span>
-        <span class="n">assoc_columns</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;time&quot;</span><span class="p">,</span> <span class="n">variable</span><span class="p">]</span>
-        <span class="k">if</span> <span class="s2">&quot;layer&quot;</span> <span class="ow">in</span> <span class="n">df</span><span class="p">:</span>
-            <span class="n">columns</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;x&quot;</span><span class="p">,</span> <span class="s2">&quot;y&quot;</span><span class="p">,</span> <span class="s2">&quot;id&quot;</span><span class="p">,</span> <span class="s2">&quot;time&quot;</span><span class="p">,</span> <span class="s2">&quot;layer&quot;</span><span class="p">,</span> <span class="n">variable</span><span class="p">]</span>
+<span class="sd">    """</span>
+    <span class="k">if</span> <span class="s2">"time"</span> <span class="ow">in</span> <span class="n">df</span><span class="p">:</span>
+        <span class="n">assoc_columns</span> <span class="o">=</span> <span class="p">[</span><span class="s2">"time"</span><span class="p">,</span> <span class="n">variable</span><span class="p">]</span>
+        <span class="k">if</span> <span class="s2">"layer"</span> <span class="ow">in</span> <span class="n">df</span><span class="p">:</span>
+            <span class="n">columns</span> <span class="o">=</span> <span class="p">[</span><span class="s2">"x"</span><span class="p">,</span> <span class="s2">"y"</span><span class="p">,</span> <span class="s2">"id"</span><span class="p">,</span> <span class="s2">"time"</span><span class="p">,</span> <span class="s2">"layer"</span><span class="p">,</span> <span class="n">variable</span><span class="p">]</span>
         <span class="k">else</span><span class="p">:</span>
-            <span class="n">columns</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;x&quot;</span><span class="p">,</span> <span class="s2">&quot;y&quot;</span><span class="p">,</span> <span class="s2">&quot;id&quot;</span><span class="p">,</span> <span class="s2">&quot;time&quot;</span><span class="p">,</span> <span class="n">variable</span><span class="p">]</span>
+            <span class="n">columns</span> <span class="o">=</span> <span class="p">[</span><span class="s2">"x"</span><span class="p">,</span> <span class="s2">"y"</span><span class="p">,</span> <span class="s2">"id"</span><span class="p">,</span> <span class="s2">"time"</span><span class="p">,</span> <span class="n">variable</span><span class="p">]</span>
     <span class="k">else</span><span class="p">:</span>
         <span class="n">assoc_columns</span> <span class="o">=</span> <span class="kc">None</span>
-        <span class="k">if</span> <span class="s2">&quot;layer&quot;</span> <span class="ow">in</span> <span class="n">df</span><span class="p">:</span>
-            <span class="n">columns</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;x&quot;</span><span class="p">,</span> <span class="s2">&quot;y&quot;</span><span class="p">,</span> <span class="n">variable</span><span class="p">,</span> <span class="s2">&quot;layer&quot;</span><span class="p">,</span> <span class="s2">&quot;id&quot;</span><span class="p">]</span>
+        <span class="k">if</span> <span class="s2">"layer"</span> <span class="ow">in</span> <span class="n">df</span><span class="p">:</span>
+            <span class="n">columns</span> <span class="o">=</span> <span class="p">[</span><span class="s2">"x"</span><span class="p">,</span> <span class="s2">"y"</span><span class="p">,</span> <span class="n">variable</span><span class="p">,</span> <span class="s2">"layer"</span><span class="p">,</span> <span class="s2">"id"</span><span class="p">]</span>
         <span class="k">else</span><span class="p">:</span>
-            <span class="n">columns</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;x&quot;</span><span class="p">,</span> <span class="s2">&quot;y&quot;</span><span class="p">,</span> <span class="n">variable</span><span class="p">,</span> <span class="s2">&quot;id&quot;</span><span class="p">]</span>
+            <span class="n">columns</span> <span class="o">=</span> <span class="p">[</span><span class="s2">"x"</span><span class="p">,</span> <span class="s2">"y"</span><span class="p">,</span> <span class="n">variable</span><span class="p">,</span> <span class="s2">"id"</span><span class="p">]</span>
     <span class="k">return</span> <span class="n">columns</span><span class="p">,</span> <span class="n">assoc_columns</span>
 
 
 <div class="viewcode-block" id="Well">
 <a class="viewcode-back" href="../../../api/generated/wq/imod.wq.Well.html#imod.wq.Well">[docs]</a>
 <span class="k">class</span><span class="w"> </span><span class="nc">Well</span><span class="p">(</span><span class="n">BoundaryCondition</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">"""</span>
 <span class="sd">    The Well package is used to simulate a specified flux to individual cells</span>
 <span class="sd">    and specified in units of length3/time.</span>
 
@@ -480,25 +480,25 @@
 <span class="sd">        y coordinate of the well(s).</span>
 <span class="sd">    rate: float or list of floats.</span>
 <span class="sd">        pumping rate in the well(s).</span>
-<span class="sd">    layer: &quot;None&quot; or int, optional</span>
+<span class="sd">    layer: "None" or int, optional</span>
 <span class="sd">        layer from which the pumping takes place.</span>
-<span class="sd">    time: &quot;None&quot; or listlike of np.datetime64, datetime.datetime, pd.Timestamp,</span>
+<span class="sd">    time: "None" or listlike of np.datetime64, datetime.datetime, pd.Timestamp,</span>
 <span class="sd">    cftime.datetime</span>
 <span class="sd">        time during which the pumping takes place. Only need to specify if model</span>
 <span class="sd">        is transient.</span>
 <span class="sd">    save_budget: bool, optional</span>
 <span class="sd">        is a flag indicating if the budget should be saved (IRIVCB).</span>
 <span class="sd">        Default is False.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
 
-    <span class="n">_pkg_id</span> <span class="o">=</span> <span class="s2">&quot;wel&quot;</span>
+    <span class="n">_pkg_id</span> <span class="o">=</span> <span class="s2">"wel"</span>
 
     <span class="n">_template</span> <span class="o">=</span> <span class="n">jinja2</span><span class="o">.</span><span class="n">Template</span><span class="p">(</span>
-        <span class="s2">&quot;    {</span><span class="si">%- f</span><span class="s2">or time, timedict in wels.items() -%}&quot;</span>
-        <span class="s2">&quot;        {</span><span class="si">%- f</span><span class="s2">or layer, value in timedict.items() %}</span><span class="se">\n</span><span class="s2">&quot;</span>
-        <span class="s2">&quot;    wel_p{{time}}_s{{system_index}}_l{{layer}} = {{value}}&quot;</span>
-        <span class="s2">&quot;        {</span><span class="si">%- e</span><span class="s2">ndfor -%}</span><span class="se">\n</span><span class="s2">&quot;</span>
-        <span class="s2">&quot;    {</span><span class="si">%- e</span><span class="s2">ndfor -%}&quot;</span>
+        <span class="s2">"    {</span><span class="si">%- f</span><span class="s2">or time, timedict in wels.items() -%}"</span>
+        <span class="s2">"        {</span><span class="si">%- f</span><span class="s2">or layer, value in timedict.items() %}</span><span class="se">\n</span><span class="s2">"</span>
+        <span class="s2">"    wel_p{{time}}_s{{system_index}}_l{{layer}} = {{value}}"</span>
+        <span class="s2">"        {</span><span class="si">%- e</span><span class="s2">ndfor -%}</span><span class="se">\n</span><span class="s2">"</span>
+        <span class="s2">"    {</span><span class="si">%- e</span><span class="s2">ndfor -%}"</span>
     <span class="p">)</span>
 
     <span class="c1"># TODO: implement well to concentration IDF and use ssm_template</span>
@@ -519,32 +519,32 @@
     <span class="p">):</span>
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span>
         <span class="n">variables</span> <span class="o">=</span> <span class="p">{</span>
-            <span class="s2">&quot;id_name&quot;</span><span class="p">:</span> <span class="n">id_name</span><span class="p">,</span>
-            <span class="s2">&quot;x&quot;</span><span class="p">:</span> <span class="n">x</span><span class="p">,</span>
-            <span class="s2">&quot;y&quot;</span><span class="p">:</span> <span class="n">y</span><span class="p">,</span>
-            <span class="s2">&quot;rate&quot;</span><span class="p">:</span> <span class="n">rate</span><span class="p">,</span>
-            <span class="s2">&quot;layer&quot;</span><span class="p">:</span> <span class="n">layer</span><span class="p">,</span>
-            <span class="s2">&quot;time&quot;</span><span class="p">:</span> <span class="n">time</span><span class="p">,</span>
-            <span class="s2">&quot;concentration&quot;</span><span class="p">:</span> <span class="n">concentration</span><span class="p">,</span>
+            <span class="s2">"id_name"</span><span class="p">:</span> <span class="n">id_name</span><span class="p">,</span>
+            <span class="s2">"x"</span><span class="p">:</span> <span class="n">x</span><span class="p">,</span>
+            <span class="s2">"y"</span><span class="p">:</span> <span class="n">y</span><span class="p">,</span>
+            <span class="s2">"rate"</span><span class="p">:</span> <span class="n">rate</span><span class="p">,</span>
+            <span class="s2">"layer"</span><span class="p">:</span> <span class="n">layer</span><span class="p">,</span>
+            <span class="s2">"time"</span><span class="p">:</span> <span class="n">time</span><span class="p">,</span>
+            <span class="s2">"concentration"</span><span class="p">:</span> <span class="n">concentration</span><span class="p">,</span>
         <span class="p">}</span>
         <span class="n">variables</span> <span class="o">=</span> <span class="p">{</span><span class="n">k</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">atleast_1d</span><span class="p">(</span><span class="n">v</span><span class="p">)</span> <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">variables</span><span class="o">.</span><span class="n">items</span><span class="p">()</span> <span class="k">if</span> <span class="n">v</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">}</span>
         <span class="n">length</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="nb">map</span><span class="p">(</span><span class="nb">len</span><span class="p">,</span> <span class="n">variables</span><span class="o">.</span><span class="n">values</span><span class="p">()))</span>
         <span class="n">index</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">length</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span>
-        <span class="bp">self</span><span class="p">[</span><span class="s2">&quot;index&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">index</span>
+        <span class="bp">self</span><span class="p">[</span><span class="s2">"index"</span><span class="p">]</span> <span class="o">=</span> <span class="n">index</span>
 
         <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">variables</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
             <span class="k">if</span> <span class="n">v</span><span class="o">.</span><span class="n">size</span> <span class="o">==</span> <span class="n">index</span><span class="o">.</span><span class="n">size</span><span class="p">:</span>
-                <span class="bp">self</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="s2">&quot;index&quot;</span><span class="p">,</span> <span class="n">v</span><span class="p">)</span>
+                <span class="bp">self</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="s2">"index"</span><span class="p">,</span> <span class="n">v</span><span class="p">)</span>
             <span class="k">elif</span> <span class="n">v</span><span class="o">.</span><span class="n">size</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
-                <span class="bp">self</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="s2">&quot;index&quot;</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">full</span><span class="p">(</span><span class="n">length</span><span class="p">,</span> <span class="n">v</span><span class="p">))</span>
+                <span class="bp">self</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="s2">"index"</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">full</span><span class="p">(</span><span class="n">length</span><span class="p">,</span> <span class="n">v</span><span class="p">))</span>
             <span class="k">else</span><span class="p">:</span>
-                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Length of </span><span class="si">{</span><span class="n">k</span><span class="si">}</span><span class="s2"> does not match other arguments&quot;</span><span class="p">)</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Length of </span><span class="si">{</span><span class="n">k</span><span class="si">}</span><span class="s2"> does not match other arguments"</span><span class="p">)</span>
 
-        <span class="bp">self</span><span class="p">[</span><span class="s2">&quot;save_budget&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">save_budget</span></div>
+        <span class="bp">self</span><span class="p">[</span><span class="s2">"save_budget"</span><span class="p">]</span> <span class="o">=</span> <span class="n">save_budget</span></div>
 
 
     <span class="k">def</span><span class="w"> </span><span class="nf">_max_active_n</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">varname</span><span class="p">,</span> <span class="n">nlayer</span><span class="p">,</span> <span class="n">nrow</span><span class="p">,</span> <span class="n">ncol</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">"""</span>
 <span class="sd">        Determine the maximum active number of cells that are active</span>
 <span class="sd">        during a stress period.</span>
 
@@ -554,9 +554,9 @@
 <span class="sd">            name of the variable to use to calculate the maximum number of</span>
 <span class="sd">            active cells. Not used for well, here for polymorphism.</span>
 <span class="sd">        nlayer, nrow, ncol : int</span>
-<span class="sd">        &quot;&quot;&quot;</span>
-        <span class="n">nmax</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">unique</span><span class="p">(</span><span class="bp">self</span><span class="p">[</span><span class="s2">&quot;id_name&quot;</span><span class="p">])</span><span class="o">.</span><span class="n">size</span>
-        <span class="k">if</span> <span class="s2">&quot;layer&quot;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">dataset</span><span class="o">.</span><span class="n">coords</span><span class="p">:</span>  <span class="c1"># Then it applies to every layer</span>
+<span class="sd">        """</span>
+        <span class="n">nmax</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">unique</span><span class="p">(</span><span class="bp">self</span><span class="p">[</span><span class="s2">"id_name"</span><span class="p">])</span><span class="o">.</span><span class="n">size</span>
+        <span class="k">if</span> <span class="s2">"layer"</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">dataset</span><span class="o">.</span><span class="n">coords</span><span class="p">:</span>  <span class="c1"># Then it applies to every layer</span>
             <span class="n">nmax</span> <span class="o">*=</span> <span class="n">nlayer</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_cellcount</span> <span class="o">=</span> <span class="n">nmax</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_ssm_cellcount</span> <span class="o">=</span> <span class="n">nmax</span>
@@ -564,39 +564,39 @@
 
     <span class="k">def</span><span class="w"> </span><span class="nf">_compose_values_layer</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">directory</span><span class="p">,</span> <span class="n">nlayer</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">time</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">compress</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
         <span class="n">values</span> <span class="o">=</span> <span class="p">{}</span>
-        <span class="n">d</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;directory&quot;</span><span class="p">:</span> <span class="n">directory</span><span class="p">,</span> <span class="s2">&quot;name&quot;</span><span class="p">:</span> <span class="n">name</span><span class="p">,</span> <span class="s2">&quot;extension&quot;</span><span class="p">:</span> <span class="s2">&quot;.ipf&quot;</span><span class="p">}</span>
+        <span class="n">d</span> <span class="o">=</span> <span class="p">{</span><span class="s2">"directory"</span><span class="p">:</span> <span class="n">directory</span><span class="p">,</span> <span class="s2">"name"</span><span class="p">:</span> <span class="n">name</span><span class="p">,</span> <span class="s2">"extension"</span><span class="p">:</span> <span class="s2">".ipf"</span><span class="p">}</span>
 
         <span class="k">if</span> <span class="n">time</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="k">if</span> <span class="s2">&quot;layer&quot;</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">dataset</span><span class="p">:</span>
-                <span class="k">for</span> <span class="n">layer</span> <span class="ow">in</span> <span class="n">np</span><span class="o">.</span><span class="n">unique</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">dataset</span><span class="p">[</span><span class="s2">&quot;layer&quot;</span><span class="p">]):</span>
+            <span class="k">if</span> <span class="s2">"layer"</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">dataset</span><span class="p">:</span>
+                <span class="k">for</span> <span class="n">layer</span> <span class="ow">in</span> <span class="n">np</span><span class="o">.</span><span class="n">unique</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">dataset</span><span class="p">[</span><span class="s2">"layer"</span><span class="p">]):</span>
                     <span class="n">layer</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">layer</span><span class="p">)</span>
-                    <span class="n">d</span><span class="p">[</span><span class="s2">&quot;layer&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">layer</span>
+                    <span class="n">d</span><span class="p">[</span><span class="s2">"layer"</span><span class="p">]</span> <span class="o">=</span> <span class="n">layer</span>
                     <span class="n">values</span><span class="p">[</span><span class="n">layer</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_compose_path</span><span class="p">(</span><span class="n">d</span><span class="p">)</span>
             <span class="k">else</span><span class="p">:</span>
-                <span class="n">values</span><span class="p">[</span><span class="s2">&quot;$&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_compose_path</span><span class="p">(</span><span class="n">d</span><span class="p">)</span>
+                <span class="n">values</span><span class="p">[</span><span class="s2">"$"</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_compose_path</span><span class="p">(</span><span class="n">d</span><span class="p">)</span>
 
         <span class="k">else</span><span class="p">:</span>
-            <span class="n">d</span><span class="p">[</span><span class="s2">&quot;time&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">time</span>
-            <span class="k">if</span> <span class="s2">&quot;layer&quot;</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">dataset</span><span class="p">:</span>
-                <span class="c1"># Since the well data is in long table format, it&#39;s the only</span>
+            <span class="n">d</span><span class="p">[</span><span class="s2">"time"</span><span class="p">]</span> <span class="o">=</span> <span class="n">time</span>
+            <span class="k">if</span> <span class="s2">"layer"</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">dataset</span><span class="p">:</span>
+                <span class="c1"># Since the well data is in long table format, it's the only</span>
                 <span class="c1"># input that has to be inspected.</span>
-                <span class="n">select</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">argwhere</span><span class="p">((</span><span class="bp">self</span><span class="o">.</span><span class="n">dataset</span><span class="p">[</span><span class="s2">&quot;time&quot;</span><span class="p">]</span> <span class="o">==</span> <span class="n">time</span><span class="p">)</span><span class="o">.</span><span class="n">values</span><span class="p">)</span>
-                <span class="k">for</span> <span class="n">layer</span> <span class="ow">in</span> <span class="n">np</span><span class="o">.</span><span class="n">unique</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">dataset</span><span class="p">[</span><span class="s2">&quot;layer&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">values</span><span class="p">[</span><span class="n">select</span><span class="p">]):</span>
-                    <span class="n">d</span><span class="p">[</span><span class="s2">&quot;layer&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">layer</span>
+                <span class="n">select</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">argwhere</span><span class="p">((</span><span class="bp">self</span><span class="o">.</span><span class="n">dataset</span><span class="p">[</span><span class="s2">"time"</span><span class="p">]</span> <span class="o">==</span> <span class="n">time</span><span class="p">)</span><span class="o">.</span><span class="n">values</span><span class="p">)</span>
+                <span class="k">for</span> <span class="n">layer</span> <span class="ow">in</span> <span class="n">np</span><span class="o">.</span><span class="n">unique</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">dataset</span><span class="p">[</span><span class="s2">"layer"</span><span class="p">]</span><span class="o">.</span><span class="n">values</span><span class="p">[</span><span class="n">select</span><span class="p">]):</span>
+                    <span class="n">d</span><span class="p">[</span><span class="s2">"layer"</span><span class="p">]</span> <span class="o">=</span> <span class="n">layer</span>
                     <span class="n">values</span><span class="p">[</span><span class="n">layer</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_compose_path</span><span class="p">(</span><span class="n">d</span><span class="p">)</span>
             <span class="k">else</span><span class="p">:</span>
-                <span class="n">values</span><span class="p">[</span><span class="s2">&quot;?&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_compose_path</span><span class="p">(</span><span class="n">d</span><span class="p">)</span>
+                <span class="n">values</span><span class="p">[</span><span class="s2">"?"</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_compose_path</span><span class="p">(</span><span class="n">d</span><span class="p">)</span>
 
-        <span class="k">if</span> <span class="s2">&quot;layer&quot;</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">dataset</span><span class="p">:</span>
+        <span class="k">if</span> <span class="s2">"layer"</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">dataset</span><span class="p">:</span>
             <span class="c1"># Compose does not accept non-integers, so use 0, then replace</span>
-            <span class="n">d</span><span class="p">[</span><span class="s2">&quot;layer&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">0</span>
-            <span class="k">if</span> <span class="n">np</span><span class="o">.</span><span class="n">unique</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">dataset</span><span class="p">[</span><span class="s2">&quot;layer&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">values</span><span class="p">)</span><span class="o">.</span><span class="n">size</span> <span class="o">==</span> <span class="n">nlayer</span><span class="p">:</span>
+            <span class="n">d</span><span class="p">[</span><span class="s2">"layer"</span><span class="p">]</span> <span class="o">=</span> <span class="mi">0</span>
+            <span class="k">if</span> <span class="n">np</span><span class="o">.</span><span class="n">unique</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">dataset</span><span class="p">[</span><span class="s2">"layer"</span><span class="p">]</span><span class="o">.</span><span class="n">values</span><span class="p">)</span><span class="o">.</span><span class="n">size</span> <span class="o">==</span> <span class="n">nlayer</span><span class="p">:</span>
                 <span class="n">token_path</span> <span class="o">=</span> <span class="n">imod</span><span class="o">.</span><span class="n">util</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">compose</span><span class="p">(</span><span class="n">d</span><span class="p">)</span><span class="o">.</span><span class="n">as_posix</span><span class="p">()</span>
-                <span class="n">token_path</span> <span class="o">=</span> <span class="n">token_path</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s2">&quot;_l0&quot;</span><span class="p">,</span> <span class="s2">&quot;_l$&quot;</span><span class="p">)</span>
-                <span class="n">values</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;$&quot;</span><span class="p">:</span> <span class="n">token_path</span><span class="p">}</span>
+                <span class="n">token_path</span> <span class="o">=</span> <span class="n">token_path</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s2">"_l0"</span><span class="p">,</span> <span class="s2">"_l$"</span><span class="p">)</span>
+                <span class="n">values</span> <span class="o">=</span> <span class="p">{</span><span class="s2">"$"</span><span class="p">:</span> <span class="n">token_path</span><span class="p">}</span>
             <span class="k">elif</span> <span class="n">compress</span><span class="p">:</span>
                 <span class="n">range_path</span> <span class="o">=</span> <span class="n">imod</span><span class="o">.</span><span class="n">util</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">compose</span><span class="p">(</span><span class="n">d</span><span class="p">)</span><span class="o">.</span><span class="n">as_posix</span><span class="p">()</span>
-                <span class="n">range_path</span> <span class="o">=</span> <span class="n">range_path</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s2">&quot;_l0&quot;</span><span class="p">,</span> <span class="s2">&quot;_l:&quot;</span><span class="p">)</span>
+                <span class="n">range_path</span> <span class="o">=</span> <span class="n">range_path</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s2">"_l0"</span><span class="p">,</span> <span class="s2">"_l:"</span><span class="p">)</span>
                 <span class="c1"># TODO: temporarily disable until imod-wq is fixed</span>
                 <span class="n">values</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_compress_idflayers</span><span class="p">(</span><span class="n">values</span><span class="p">,</span> <span class="n">range_path</span><span class="p">)</span>
 
@@ -604,23 +604,23 @@
 
     <span class="k">def</span><span class="w"> </span><span class="nf">_compose_values_time</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">directory</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">globaltimes</span><span class="p">,</span> <span class="n">nlayer</span><span class="p">):</span>
         <span class="c1"># TODO: rename to _compose_values_timelayer?</span>
-        <span class="n">values</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;?&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">_compose_values_layer</span><span class="p">(</span><span class="n">directory</span><span class="p">,</span> <span class="n">nlayer</span><span class="o">=</span><span class="n">nlayer</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="n">name</span><span class="p">)}</span>
+        <span class="n">values</span> <span class="o">=</span> <span class="p">{</span><span class="s2">"?"</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">_compose_values_layer</span><span class="p">(</span><span class="n">directory</span><span class="p">,</span> <span class="n">nlayer</span><span class="o">=</span><span class="n">nlayer</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="n">name</span><span class="p">)}</span>
         <span class="k">return</span> <span class="n">values</span>
 
     <span class="k">def</span><span class="w"> </span><span class="nf">_render</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">directory</span><span class="p">,</span> <span class="n">globaltimes</span><span class="p">,</span> <span class="n">system_index</span><span class="p">,</span> <span class="n">nlayer</span><span class="p">):</span>
-        <span class="n">d</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;system_index&quot;</span><span class="p">:</span> <span class="n">system_index</span><span class="p">}</span>
-        <span class="n">d</span><span class="p">[</span><span class="s2">&quot;wels&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_compose_values_time</span><span class="p">(</span><span class="n">directory</span><span class="p">,</span> <span class="s2">&quot;rate&quot;</span><span class="p">,</span> <span class="n">globaltimes</span><span class="p">,</span> <span class="n">nlayer</span><span class="p">)</span>
+        <span class="n">d</span> <span class="o">=</span> <span class="p">{</span><span class="s2">"system_index"</span><span class="p">:</span> <span class="n">system_index</span><span class="p">}</span>
+        <span class="n">d</span><span class="p">[</span><span class="s2">"wels"</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_compose_values_time</span><span class="p">(</span><span class="n">directory</span><span class="p">,</span> <span class="s2">"rate"</span><span class="p">,</span> <span class="n">globaltimes</span><span class="p">,</span> <span class="n">nlayer</span><span class="p">)</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_template</span><span class="o">.</span><span class="n">render</span><span class="p">(</span><span class="n">d</span><span class="p">)</span>
 
     <span class="k">def</span><span class="w"> </span><span class="nf">_render_ssm</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">directory</span><span class="p">,</span> <span class="n">globaltimes</span><span class="p">,</span> <span class="n">nlayer</span><span class="p">):</span>
-        <span class="k">if</span> <span class="s2">&quot;concentration&quot;</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">dataset</span><span class="o">.</span><span class="n">data_vars</span><span class="p">:</span>
-            <span class="n">d</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;pkg_id&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">_pkg_id</span><span class="p">}</span>
-            <span class="n">name</span> <span class="o">=</span> <span class="s2">&quot;concentration&quot;</span>
-            <span class="k">if</span> <span class="s2">&quot;species&quot;</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">dataset</span><span class="p">[</span><span class="s2">&quot;concentration&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">coords</span><span class="p">:</span>
+        <span class="k">if</span> <span class="s2">"concentration"</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">dataset</span><span class="o">.</span><span class="n">data_vars</span><span class="p">:</span>
+            <span class="n">d</span> <span class="o">=</span> <span class="p">{</span><span class="s2">"pkg_id"</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">_pkg_id</span><span class="p">}</span>
+            <span class="n">name</span> <span class="o">=</span> <span class="s2">"concentration"</span>
+            <span class="k">if</span> <span class="s2">"species"</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">dataset</span><span class="p">[</span><span class="s2">"concentration"</span><span class="p">]</span><span class="o">.</span><span class="n">coords</span><span class="p">:</span>
                 <span class="n">concentration</span> <span class="o">=</span> <span class="p">{}</span>
-                <span class="k">for</span> <span class="n">species</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">dataset</span><span class="p">[</span><span class="s2">&quot;concentration&quot;</span><span class="p">][</span><span class="s2">&quot;species&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">values</span><span class="p">:</span>
+                <span class="k">for</span> <span class="n">species</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">dataset</span><span class="p">[</span><span class="s2">"concentration"</span><span class="p">][</span><span class="s2">"species"</span><span class="p">]</span><span class="o">.</span><span class="n">values</span><span class="p">:</span>
                     <span class="n">concentration</span><span class="p">[</span><span class="n">species</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_compose_values_time</span><span class="p">(</span>
-                        <span class="n">directory</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">name</span><span class="si">}</span><span class="s2">_c</span><span class="si">{</span><span class="n">species</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">globaltimes</span><span class="p">,</span> <span class="n">nlayer</span><span class="o">=</span><span class="n">nlayer</span>
+                        <span class="n">directory</span><span class="p">,</span> <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">name</span><span class="si">}</span><span class="s2">_c</span><span class="si">{</span><span class="n">species</span><span class="si">}</span><span class="s2">"</span><span class="p">,</span> <span class="n">globaltimes</span><span class="p">,</span> <span class="n">nlayer</span><span class="o">=</span><span class="n">nlayer</span>
                     <span class="p">)</span>
             <span class="k">else</span><span class="p">:</span>
                 <span class="n">concentration</span> <span class="o">=</span> <span class="p">{</span>
@@ -628,27 +628,27 @@
                         <span class="n">directory</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">globaltimes</span><span class="p">,</span> <span class="n">nlayer</span><span class="o">=</span><span class="n">nlayer</span>
                     <span class="p">)</span>
                 <span class="p">}</span>
-            <span class="n">d</span><span class="p">[</span><span class="s2">&quot;concentration&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">concentration</span>
+            <span class="n">d</span><span class="p">[</span><span class="s2">"concentration"</span><span class="p">]</span> <span class="o">=</span> <span class="n">concentration</span>
             <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_ssm_template</span><span class="o">.</span><span class="n">render</span><span class="p">(</span><span class="n">d</span><span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
-            <span class="k">return</span> <span class="s2">&quot;&quot;</span>
+            <span class="k">return</span> <span class="s2">""</span>
 
     <span class="k">def</span><span class="w"> </span><span class="nf">_save_layers</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">df</span><span class="p">,</span> <span class="n">directory</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">variable</span><span class="p">):</span>
-        <span class="n">d</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;directory&quot;</span><span class="p">:</span> <span class="n">directory</span><span class="p">,</span> <span class="s2">&quot;name&quot;</span><span class="p">:</span> <span class="n">name</span><span class="p">,</span> <span class="s2">&quot;extension&quot;</span><span class="p">:</span> <span class="s2">&quot;.ipf&quot;</span><span class="p">}</span>
-        <span class="n">d</span><span class="p">[</span><span class="s2">&quot;directory&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">mkdir</span><span class="p">(</span><span class="n">exist_ok</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">parents</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+        <span class="n">d</span> <span class="o">=</span> <span class="p">{</span><span class="s2">"directory"</span><span class="p">:</span> <span class="n">directory</span><span class="p">,</span> <span class="s2">"name"</span><span class="p">:</span> <span class="n">name</span><span class="p">,</span> <span class="s2">"extension"</span><span class="p">:</span> <span class="s2">".ipf"</span><span class="p">}</span>
+        <span class="n">d</span><span class="p">[</span><span class="s2">"directory"</span><span class="p">]</span><span class="o">.</span><span class="n">mkdir</span><span class="p">(</span><span class="n">exist_ok</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">parents</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 
-        <span class="k">if</span> <span class="s2">&quot;time&quot;</span> <span class="ow">in</span> <span class="n">df</span><span class="p">:</span>
-            <span class="n">itype</span> <span class="o">=</span> <span class="s2">&quot;timeseries&quot;</span>
+        <span class="k">if</span> <span class="s2">"time"</span> <span class="ow">in</span> <span class="n">df</span><span class="p">:</span>
+            <span class="n">itype</span> <span class="o">=</span> <span class="s2">"timeseries"</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="n">itype</span> <span class="o">=</span> <span class="kc">None</span>
 
         <span class="n">columns</span><span class="p">,</span> <span class="n">assoc_columns</span> <span class="o">=</span> <span class="n">_column_order</span><span class="p">(</span><span class="n">df</span><span class="p">,</span> <span class="n">variable</span><span class="p">)</span>
         <span class="n">path</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_compose_path</span><span class="p">(</span><span class="n">d</span><span class="p">)</span>
         <span class="n">df</span> <span class="o">=</span> <span class="n">df</span><span class="p">[</span><span class="n">columns</span><span class="p">]</span>
-        <span class="k">if</span> <span class="s2">&quot;layer&quot;</span> <span class="ow">in</span> <span class="n">df</span><span class="p">:</span>
-            <span class="k">for</span> <span class="n">layer</span><span class="p">,</span> <span class="n">layerdf</span> <span class="ow">in</span> <span class="n">df</span><span class="o">.</span><span class="n">groupby</span><span class="p">(</span><span class="s2">&quot;layer&quot;</span><span class="p">):</span>
+        <span class="k">if</span> <span class="s2">"layer"</span> <span class="ow">in</span> <span class="n">df</span><span class="p">:</span>
+            <span class="k">for</span> <span class="n">layer</span><span class="p">,</span> <span class="n">layerdf</span> <span class="ow">in</span> <span class="n">df</span><span class="o">.</span><span class="n">groupby</span><span class="p">(</span><span class="s2">"layer"</span><span class="p">):</span>
                 <span class="c1"># Ensure different IDs per layer are not overwritten.</span>
-                <span class="n">layerdf</span><span class="p">[</span><span class="s2">&quot;id&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">name</span><span class="si">}</span><span class="s2">_l</span><span class="si">{</span><span class="n">layer</span><span class="si">}</span><span class="s2">/&quot;</span> <span class="o">+</span> <span class="n">layerdf</span><span class="p">[</span><span class="s2">&quot;id&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">str</span><span class="p">)</span>
+                <span class="n">layerdf</span><span class="p">[</span><span class="s2">"id"</span><span class="p">]</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">name</span><span class="si">}</span><span class="s2">_l</span><span class="si">{</span><span class="n">layer</span><span class="si">}</span><span class="s2">/"</span> <span class="o">+</span> <span class="n">layerdf</span><span class="p">[</span><span class="s2">"id"</span><span class="p">]</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">str</span><span class="p">)</span>
                 <span class="n">imod</span><span class="o">.</span><span class="n">ipf</span><span class="o">.</span><span class="n">save</span><span class="p">(</span>
                     <span class="n">path</span><span class="o">=</span><span class="n">path</span><span class="p">,</span> <span class="n">df</span><span class="o">=</span><span class="n">layerdf</span><span class="p">,</span> <span class="n">itype</span><span class="o">=</span><span class="n">itype</span><span class="p">,</span> <span class="n">assoc_columns</span><span class="o">=</span><span class="n">assoc_columns</span>
                 <span class="p">)</span>
@@ -661,26 +661,26 @@
         <span class="n">directory</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="n">directory</span><span class="p">)</span>
 
         <span class="n">all_species</span> <span class="o">=</span> <span class="p">[</span><span class="kc">None</span><span class="p">]</span>
-        <span class="k">if</span> <span class="s2">&quot;concentration&quot;</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">dataset</span><span class="o">.</span><span class="n">data_vars</span><span class="p">:</span>
-            <span class="k">if</span> <span class="s2">&quot;species&quot;</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">dataset</span><span class="p">[</span><span class="s2">&quot;concentration&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">coords</span><span class="p">:</span>
-                <span class="n">all_species</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">dataset</span><span class="p">[</span><span class="s2">&quot;concentration&quot;</span><span class="p">][</span><span class="s2">&quot;species&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">values</span>
+        <span class="k">if</span> <span class="s2">"concentration"</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">dataset</span><span class="o">.</span><span class="n">data_vars</span><span class="p">:</span>
+            <span class="k">if</span> <span class="s2">"species"</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">dataset</span><span class="p">[</span><span class="s2">"concentration"</span><span class="p">]</span><span class="o">.</span><span class="n">coords</span><span class="p">:</span>
+                <span class="n">all_species</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">dataset</span><span class="p">[</span><span class="s2">"concentration"</span><span class="p">][</span><span class="s2">"species"</span><span class="p">]</span><span class="o">.</span><span class="n">values</span>
 
-        <span class="n">df</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">dataset</span><span class="o">.</span><span class="n">to_dataframe</span><span class="p">()</span><span class="o">.</span><span class="n">rename</span><span class="p">(</span><span class="n">columns</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;id_name&quot;</span><span class="p">:</span> <span class="s2">&quot;id&quot;</span><span class="p">})</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_save_layers</span><span class="p">(</span><span class="n">df</span><span class="p">,</span> <span class="n">directory</span><span class="p">,</span> <span class="s2">&quot;rate&quot;</span><span class="p">,</span> <span class="s2">&quot;rate&quot;</span><span class="p">)</span>
+        <span class="n">df</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">dataset</span><span class="o">.</span><span class="n">to_dataframe</span><span class="p">()</span><span class="o">.</span><span class="n">rename</span><span class="p">(</span><span class="n">columns</span><span class="o">=</span><span class="p">{</span><span class="s2">"id_name"</span><span class="p">:</span> <span class="s2">"id"</span><span class="p">})</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_save_layers</span><span class="p">(</span><span class="n">df</span><span class="p">,</span> <span class="n">directory</span><span class="p">,</span> <span class="s2">"rate"</span><span class="p">,</span> <span class="s2">"rate"</span><span class="p">)</span>
 
         <span class="c1"># Loop over species if applicable</span>
-        <span class="k">if</span> <span class="s2">&quot;concentration&quot;</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">dataset</span><span class="p">:</span>
+        <span class="k">if</span> <span class="s2">"concentration"</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">dataset</span><span class="p">:</span>
             <span class="k">for</span> <span class="n">species</span> <span class="ow">in</span> <span class="n">all_species</span><span class="p">:</span>
                 <span class="k">if</span> <span class="n">species</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
                     <span class="n">ds</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">dataset</span><span class="o">.</span><span class="n">sel</span><span class="p">(</span><span class="n">species</span><span class="o">=</span><span class="n">species</span><span class="p">)</span>
                 <span class="k">else</span><span class="p">:</span>
                     <span class="n">ds</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">dataset</span>
 
-                <span class="n">df</span> <span class="o">=</span> <span class="n">ds</span><span class="o">.</span><span class="n">to_dataframe</span><span class="p">()</span><span class="o">.</span><span class="n">rename</span><span class="p">(</span><span class="n">columns</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;id_name&quot;</span><span class="p">:</span> <span class="s2">&quot;id&quot;</span><span class="p">})</span>
-                <span class="n">name</span> <span class="o">=</span> <span class="s2">&quot;concentration&quot;</span>
+                <span class="n">df</span> <span class="o">=</span> <span class="n">ds</span><span class="o">.</span><span class="n">to_dataframe</span><span class="p">()</span><span class="o">.</span><span class="n">rename</span><span class="p">(</span><span class="n">columns</span><span class="o">=</span><span class="p">{</span><span class="s2">"id_name"</span><span class="p">:</span> <span class="s2">"id"</span><span class="p">})</span>
+                <span class="n">name</span> <span class="o">=</span> <span class="s2">"concentration"</span>
                 <span class="k">if</span> <span class="n">species</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-                    <span class="n">name</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">name</span><span class="si">}</span><span class="s2">_c</span><span class="si">{</span><span class="n">species</span><span class="si">}</span><span class="s2">&quot;</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">_save_layers</span><span class="p">(</span><span class="n">df</span><span class="p">,</span> <span class="n">directory</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="s2">&quot;concentration&quot;</span><span class="p">)</span>
+                    <span class="n">name</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">name</span><span class="si">}</span><span class="s2">_c</span><span class="si">{</span><span class="n">species</span><span class="si">}</span><span class="s2">"</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_save_layers</span><span class="p">(</span><span class="n">df</span><span class="p">,</span> <span class="n">directory</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="s2">"concentration"</span><span class="p">)</span>
 
         <span class="k">return</span>
 
@@ -690,8 +690,8 @@
 
     <span class="k">def</span><span class="w"> </span><span class="nf">repeat_stress</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">stress_repeats</span><span class="p">,</span> <span class="n">use_cftime</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
         <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span>
-            <span class="s2">&quot;Well does not support repeated stresses: time-varying data is &quot;</span>
-            <span class="s2">&quot;saved into associated IPF files. Set explicit timeseries intead.&quot;</span>
+            <span class="s2">"Well does not support repeated stresses: time-varying data is "</span>
+            <span class="s2">"saved into associated IPF files. Set explicit timeseries intead."</span>
         <span class="p">)</span></div>
 
 </pre></div>
@@ -723,8 +723,8 @@
   </div>
   
   <!-- Scripts loaded after <body> so the DOM is not blocked -->
-  <script defer src="../../../_static/scripts/bootstrap.js?digest=90905a2f556bf617f1a9"></script>
-<script defer src="../../../_static/scripts/pydata-sphinx-theme.js?digest=90905a2f556bf617f1a9"></script>
+  <script defer src="../../../_static/scripts/bootstrap.js?digest=75c7c72ae941e8b558d8"></script>
+<script defer src="../../../_static/scripts/pydata-sphinx-theme.js?digest=75c7c72ae941e8b558d8"></script>
 
   <footer class="bd-footer">
 <div class="bd-footer__inner bd-page-width">
@@ -744,8 +744,7 @@
         <div class="footer-item">
 
   <p class="sphinx-version">
-    Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 9.1.0.
-    <br/>
+    Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 9.2.0.
   </p>
 </div>
       
@@ -758,7 +757,7 @@
         <div class="footer-item">
 <p class="theme-version">
   <!-- # L10n: Setting the PST URL as an argument as this does not need to be localized -->
-  Built with the <a href="https://pydata-sphinx-theme.readthedocs.io/en/stable/index.html">PyData Sphinx Theme</a> 0.20.0.
+  Built with the <a href="https://pydata-sphinx-theme.readthedocs.io/en/stable/index.html">PyData Sphinx Theme</a> 0.24.0.
 </p></div>
       
     </div>

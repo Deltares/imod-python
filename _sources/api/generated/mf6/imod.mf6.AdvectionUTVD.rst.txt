@@ -1,0 +1,39 @@
+﻿imod.mf6.AdvectionUTVD
+======================
+
+.. currentmodule:: imod.mf6
+
+.. autoclass:: AdvectionUTVD
+
+   
+   .. automethod:: __init__
+
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      ~AdvectionUTVD.__init__
+      ~AdvectionUTVD.clip_box
+      ~AdvectionUTVD.copy
+      ~AdvectionUTVD.from_file
+      ~AdvectionUTVD.get_regrid_methods
+      ~AdvectionUTVD.is_empty
+      ~AdvectionUTVD.mask
+      ~AdvectionUTVD.regrid_like
+      ~AdvectionUTVD.to_file
+      ~AdvectionUTVD.write
+   
+   
+
+   
+   
+   .. rubric:: Attributes
+
+   .. autosummary::
+   
+      ~AdvectionUTVD.auxiliary_data_fields
+      ~AdvectionUTVD.dataset
+      ~AdvectionUTVD.pkg_id
+   
+   

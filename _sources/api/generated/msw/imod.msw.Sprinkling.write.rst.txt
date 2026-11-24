@@ -1,6 +1,0 @@
-﻿imod.msw.Sprinkling.write
-=========================
-
-.. currentmodule:: imod.msw
-
-.. automethod:: Sprinkling.write

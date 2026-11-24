@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 
 
@@ -7,7 +6,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>imod.formats.rasterio &#8212; iMOD Python 1.1.0 documentation</title>
+    <title>imod.formats.rasterio &#8212; iMOD Python 1.2.0 documentation</title>
   
   
   
@@ -26,22 +25,22 @@
   </noscript>
   
   <!-- Loaded before other Sphinx assets -->
-  <link href="../../../_static/styles/theme.css?digest=90905a2f556bf617f1a9" rel="stylesheet" />
-<link href="../../../_static/styles/pydata-sphinx-theme.css?digest=90905a2f556bf617f1a9" rel="stylesheet" />
+  <link href="../../../_static/styles/theme.css?digest=75c7c72ae941e8b558d8" rel="stylesheet" />
+<link href="../../../_static/styles/pydata-sphinx-theme.css?digest=75c7c72ae941e8b558d8" rel="stylesheet" />
 
     <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=03e43079" />
-    <link rel="stylesheet" type="text/css" href="../../../_static/sg_gallery.css?v=fd6457a4" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/sg_gallery.css?v=c83e6b79" />
     <link rel="stylesheet" type="text/css" href="../../../_static/sg_gallery-binder.css?v=f4aeca0c" />
     <link rel="stylesheet" type="text/css" href="../../../_static/sg_gallery-dataframe.css?v=2082cf3c" />
     <link rel="stylesheet" type="text/css" href="../../../_static/sg_gallery-rendered-html.css?v=1277b6f3" />
   
   <!-- So that users can add custom icons -->
-  <script defer src="../../../_static/scripts/fontawesome.js?digest=90905a2f556bf617f1a9"></script>
+  <script defer src="../../../_static/scripts/fontawesome.js?digest=75c7c72ae941e8b558d8"></script>
   <!-- Pre-loaded scripts that we'll load fully later -->
-  <link rel="preload" as="script" href="../../../_static/scripts/bootstrap.js?digest=90905a2f556bf617f1a9" />
-<link rel="preload" as="script" href="../../../_static/scripts/pydata-sphinx-theme.js?digest=90905a2f556bf617f1a9" />
+  <link rel="preload" as="script" href="../../../_static/scripts/bootstrap.js?digest=75c7c72ae941e8b558d8" />
+<link rel="preload" as="script" href="../../../_static/scripts/pydata-sphinx-theme.js?digest=75c7c72ae941e8b558d8" />
 
-    <script src="../../../_static/documentation_options.js?v=fc837d61"></script>
+    <script src="../../../_static/documentation_options.js?v=6efca38a"></script>
     <script src="../../../_static/doctools.js?v=fd6eb6e6"></script>
     <script src="../../../_static/sphinx_highlight.js?v=6ffebe34"></script>
     <script src="../../../_static/sg-tags.js?v=d80f6fa4"></script>
@@ -51,8 +50,9 @@
     <link rel="index" title="Index" href="../../../genindex.html" />
     <link rel="search" title="Search" href="../../../search.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <meta name="color-scheme" content="light dark"/>
   <meta name="docsearch:language" content="en"/>
-  <meta name="docsearch:version" content="1.1.0.dev" />
+  <meta name="docsearch:version" content="1.2.0.dev" />
   
     
     <script src="../../../_static/searchtools.js"></script>
@@ -100,7 +100,7 @@
   
     <header id="pst-header" class="bd-header navbar navbar-expand-lg bd-navbar d-print-none">
 <div class="bd-header__inner bd-page-width">
-  <button class="pst-navbar-icon sidebar-toggle primary-toggle" aria-label="Site navigation">
+  <button type="button" class="pst-navbar-icon sidebar-toggle primary-toggle" aria-label="Site navigation" aria-expanded="false" aria-controls="pst-primary-sidebar-modal">
     <span class="fa-solid fa-bars"></span>
   </button>
   
@@ -122,8 +122,8 @@
     
     
     
-    <img src="../../../_static/imod-python-logo-light.svg" class="logo__image only-light" alt="iMOD Python 1.1.0 documentation - Home"/>
-    <img src="../../../_static/imod-python-logo-dark.svg" class="logo__image only-dark pst-js-only" alt="iMOD Python 1.1.0 documentation - Home"/>
+    <img src="../../../_static/imod-python-logo-light.svg" class="logo__image only-light" alt="iMOD Python 1.2.0 documentation - Home"/>
+    <img src="../../../_static/imod-python-logo-dark.svg" class="logo__image only-dark pst-js-only" alt="iMOD Python 1.2.0 documentation - Home"/>
   
   
 </a></div>
@@ -190,7 +190,7 @@
         <div class="navbar-item navbar-persistent--container">
           
 
-<button class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+<button type="button" class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
  <i class="fa-solid fa-magnifying-glass"></i>
  <span class="search-button__default-text">Search</span>
  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
@@ -201,15 +201,15 @@
         <div class="navbar-item">
 
 <div class="theme-switch-container dropdown pst-js-only" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Color mode">
-  <button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button dropdown-toggle" aria-label="Color mode" data-bs-toggle="dropdown">
-    <i class="theme-switch fa-solid fa-sun fa-lg fa-fw" data-mode="light" title="Light"></i>
-    <i class="theme-switch fa-solid fa-moon fa-lg fa-fw" data-mode="dark" title="Dark"></i>
-    <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg fa-fw" data-mode="auto" title="System Settings"></i>
+  <button type="button" class="btn btn-sm nav-link pst-navbar-icon theme-switch-button dropdown-toggle" aria-label="Color mode" data-bs-toggle="dropdown">
+    <i class="theme-switch fa-solid fa-sun fa-lg" data-mode="light" title="Light"></i>
+    <i class="theme-switch fa-solid fa-moon fa-lg" data-mode="dark" title="Dark"></i>
+    <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg" data-mode="auto" title="System Settings"></i>
   </button>
   <ul class="dropdown-menu dropdown-menu-end">
-    <li><button class="dropdown-item d-flex align-items-center theme-change-button" data-mode="auto"><i class="fa-solid fa-circle-half-stroke fa-lg fa-fw me-1"></i>System Settings</button></li>
-    <li><button class="dropdown-item d-flex align-items-center theme-change-button" data-mode="light"><i class="fa-solid fa-sun fa-lg fa-fw me-1"></i>Light</button></li>
-    <li><button class="dropdown-item d-flex align-items-center theme-change-button" data-mode="dark"><i class="fa-solid fa-moon fa-lg fa-fw me-1"></i>Dark</button></li>
+    <li><button type="button" class="dropdown-item d-flex align-items-center theme-change-button" data-mode="auto"><i class="fa-solid fa-circle-half-stroke fa-lg me-1"></i>System Settings</button></li>
+    <li><button type="button" class="dropdown-item d-flex align-items-center theme-change-button" data-mode="light"><i class="fa-solid fa-sun fa-lg me-1"></i>Light</button></li>
+    <li><button type="button" class="dropdown-item d-flex align-items-center theme-change-button" data-mode="dark"><i class="fa-solid fa-moon fa-lg me-1"></i>Dark</button></li>
   </ul>
 </div></div>
       
@@ -246,7 +246,7 @@
   
     <div class="navbar-persistent--mobile">
 
-<button class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+<button type="button" class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
  <i class="fa-solid fa-magnifying-glass"></i>
  <span class="search-button__default-text">Search</span>
  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
@@ -267,7 +267,7 @@
       
         
       
-      <dialog id="pst-primary-sidebar-modal"></dialog>
+      <dialog id="pst-primary-sidebar-modal" tabindex="-1"></dialog>
       <div id="pst-primary-sidebar" class="bd-sidebar-primary bd-sidebar hide-on-wide">
         
 
@@ -337,15 +337,15 @@
           <div class="navbar-item">
 
 <div class="theme-switch-container dropdown pst-js-only" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Color mode">
-  <button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button dropdown-toggle" aria-label="Color mode" data-bs-toggle="dropdown">
-    <i class="theme-switch fa-solid fa-sun fa-lg fa-fw" data-mode="light" title="Light"></i>
-    <i class="theme-switch fa-solid fa-moon fa-lg fa-fw" data-mode="dark" title="Dark"></i>
-    <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg fa-fw" data-mode="auto" title="System Settings"></i>
+  <button type="button" class="btn btn-sm nav-link pst-navbar-icon theme-switch-button dropdown-toggle" aria-label="Color mode" data-bs-toggle="dropdown">
+    <i class="theme-switch fa-solid fa-sun fa-lg" data-mode="light" title="Light"></i>
+    <i class="theme-switch fa-solid fa-moon fa-lg" data-mode="dark" title="Dark"></i>
+    <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg" data-mode="auto" title="System Settings"></i>
   </button>
   <ul class="dropdown-menu dropdown-menu-end">
-    <li><button class="dropdown-item d-flex align-items-center theme-change-button" data-mode="auto"><i class="fa-solid fa-circle-half-stroke fa-lg fa-fw me-1"></i>System Settings</button></li>
-    <li><button class="dropdown-item d-flex align-items-center theme-change-button" data-mode="light"><i class="fa-solid fa-sun fa-lg fa-fw me-1"></i>Light</button></li>
-    <li><button class="dropdown-item d-flex align-items-center theme-change-button" data-mode="dark"><i class="fa-solid fa-moon fa-lg fa-fw me-1"></i>Dark</button></li>
+    <li><button type="button" class="dropdown-item d-flex align-items-center theme-change-button" data-mode="auto"><i class="fa-solid fa-circle-half-stroke fa-lg me-1"></i>System Settings</button></li>
+    <li><button type="button" class="dropdown-item d-flex align-items-center theme-change-button" data-mode="light"><i class="fa-solid fa-sun fa-lg me-1"></i>Light</button></li>
+    <li><button type="button" class="dropdown-item d-flex align-items-center theme-change-button" data-mode="dark"><i class="fa-solid fa-moon fa-lg me-1"></i>Dark</button></li>
   </ul>
 </div></div>
         
@@ -411,7 +411,7 @@
     
     <li class="breadcrumb-item breadcrumb-home">
       <a href="../../../index.html" class="nav-link" aria-label="Home">
-        <i class="fa-solid fa-home"></i>
+        <i class="fa-solid fa-house"></i>
       </a>
     </li>
     
@@ -435,19 +435,21 @@
                 <article class="bd-article">
                   
   <h1>Source code for imod.formats.rasterio</h1><div class="highlight"><pre>
-<span></span><span class="sd">&quot;&quot;&quot;</span>
+<span></span><span class="sd">"""</span>
 <span class="sd">Functions that make use of `rasterio</span>
 <span class="sd">&lt;https://rasterio.readthedocs.io/en/stable/&gt;`_ for input and output to other</span>
 <span class="sd">raster formats.</span>
 
 <span class="sd">Currently only :func:`imod.rasterio.write` is implemented.</span>
-<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">"""</span>
 
 <span class="kn">import</span><span class="w"> </span><span class="nn">pathlib</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Dict</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">re</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Any</span>
 
 <span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">pandas</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">pd</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">xarray</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">xr</span>
 
 <span class="kn">import</span><span class="w"> </span><span class="nn">imod</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">imod.formats</span><span class="w"> </span><span class="kn">import</span> <span class="n">array_io</span>
@@ -458,27 +460,27 @@
 <span class="k">try</span><span class="p">:</span>
     <span class="kn">import</span><span class="w"> </span><span class="nn">rasterio</span>
 <span class="k">except</span> <span class="ne">ImportError</span><span class="p">:</span>
-    <span class="n">rasterio</span> <span class="o">=</span> <span class="n">MissingOptionalModule</span><span class="p">(</span><span class="s2">&quot;rasterio&quot;</span><span class="p">)</span>
+    <span class="n">rasterio</span> <span class="o">=</span> <span class="n">MissingOptionalModule</span><span class="p">(</span><span class="s2">"rasterio"</span><span class="p">)</span>
 
 <span class="n">f_open</span> <span class="o">=</span> <span class="nb">open</span>
 
 
 <span class="c1"># Based on this comment</span>
 <span class="c1"># https://github.com/mapbox/rasterio/issues/265#issuecomment-367044836</span>
-<span class="k">def</span><span class="w"> </span><span class="nf">_create_ext_driver_code_map</span><span class="p">():</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">_create_ext_driver_code_map</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">]:</span>
     <span class="kn">from</span><span class="w"> </span><span class="nn">osgeo</span><span class="w"> </span><span class="kn">import</span> <span class="n">gdal</span>
 
-    <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">gdal</span><span class="p">,</span> <span class="s2">&quot;DCAP_RASTER&quot;</span><span class="p">):</span>
+    <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">gdal</span><span class="p">,</span> <span class="s2">"DCAP_RASTER"</span><span class="p">):</span>
 
-        <span class="k">def</span><span class="w"> </span><span class="nf">_check_driver</span><span class="p">(</span><span class="n">drv</span><span class="p">):</span>
-            <span class="k">return</span> <span class="n">drv</span><span class="o">.</span><span class="n">GetMetadataItem</span><span class="p">(</span><span class="n">gdal</span><span class="o">.</span><span class="n">DCAP_RASTER</span><span class="p">)</span>
+        <span class="k">def</span><span class="w"> </span><span class="nf">_check_driver</span><span class="p">(</span><span class="n">drv</span><span class="p">:</span> <span class="n">Any</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+            <span class="k">return</span> <span class="nb">bool</span><span class="p">(</span><span class="n">drv</span><span class="o">.</span><span class="n">GetMetadataItem</span><span class="p">(</span><span class="n">gdal</span><span class="o">.</span><span class="n">DCAP_RASTER</span><span class="p">))</span>
 
     <span class="k">else</span><span class="p">:</span>
 
-        <span class="k">def</span><span class="w"> </span><span class="nf">_check_driver</span><span class="p">(</span><span class="n">drv</span><span class="p">):</span>
+        <span class="k">def</span><span class="w"> </span><span class="nf">_check_driver</span><span class="p">(</span><span class="n">drv</span><span class="p">:</span> <span class="n">Any</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
             <span class="k">return</span> <span class="kc">True</span>
 
-    <span class="n">output</span> <span class="o">=</span> <span class="p">{}</span>
+    <span class="n">output</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="p">{}</span>
     <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">gdal</span><span class="o">.</span><span class="n">GetDriverCount</span><span class="p">()):</span>
         <span class="n">drv</span> <span class="o">=</span> <span class="n">gdal</span><span class="o">.</span><span class="n">GetDriver</span><span class="p">(</span><span class="n">i</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">_check_driver</span><span class="p">(</span><span class="n">drv</span><span class="p">):</span>
@@ -495,109 +497,118 @@
 
 <span class="c1"># tiff and jpeg keys have been added manually.</span>
 <span class="n">EXTENSION_GDAL_DRIVER_CODE_MAP</span> <span class="o">=</span> <span class="p">{</span>
-    <span class="s2">&quot;asc&quot;</span><span class="p">:</span> <span class="s2">&quot;AAIGrid&quot;</span><span class="p">,</span>
-    <span class="s2">&quot;bag&quot;</span><span class="p">:</span> <span class="s2">&quot;BAG&quot;</span><span class="p">,</span>
-    <span class="s2">&quot;bil&quot;</span><span class="p">:</span> <span class="s2">&quot;EHdr&quot;</span><span class="p">,</span>
-    <span class="s2">&quot;blx&quot;</span><span class="p">:</span> <span class="s2">&quot;BLX&quot;</span><span class="p">,</span>
-    <span class="s2">&quot;bmp&quot;</span><span class="p">:</span> <span class="s2">&quot;BMP&quot;</span><span class="p">,</span>
-    <span class="s2">&quot;bt&quot;</span><span class="p">:</span> <span class="s2">&quot;BT&quot;</span><span class="p">,</span>
-    <span class="s2">&quot;dat&quot;</span><span class="p">:</span> <span class="s2">&quot;ZMap&quot;</span><span class="p">,</span>
-    <span class="s2">&quot;dem&quot;</span><span class="p">:</span> <span class="s2">&quot;USGSDEM&quot;</span><span class="p">,</span>
-    <span class="s2">&quot;ers&quot;</span><span class="p">:</span> <span class="s2">&quot;ERS&quot;</span><span class="p">,</span>
-    <span class="s2">&quot;gen&quot;</span><span class="p">:</span> <span class="s2">&quot;ADRG&quot;</span><span class="p">,</span>
-    <span class="s2">&quot;gif&quot;</span><span class="p">:</span> <span class="s2">&quot;GIF&quot;</span><span class="p">,</span>
-    <span class="s2">&quot;gpkg&quot;</span><span class="p">:</span> <span class="s2">&quot;GPKG&quot;</span><span class="p">,</span>
-    <span class="s2">&quot;grd&quot;</span><span class="p">:</span> <span class="s2">&quot;NWT_GRD&quot;</span><span class="p">,</span>
-    <span class="s2">&quot;gsb&quot;</span><span class="p">:</span> <span class="s2">&quot;NTv2&quot;</span><span class="p">,</span>
-    <span class="s2">&quot;gtx&quot;</span><span class="p">:</span> <span class="s2">&quot;GTX&quot;</span><span class="p">,</span>
-    <span class="s2">&quot;hdr&quot;</span><span class="p">:</span> <span class="s2">&quot;MFF&quot;</span><span class="p">,</span>
-    <span class="s2">&quot;hf2&quot;</span><span class="p">:</span> <span class="s2">&quot;HF2&quot;</span><span class="p">,</span>
-    <span class="s2">&quot;hgt&quot;</span><span class="p">:</span> <span class="s2">&quot;SRTMHGT&quot;</span><span class="p">,</span>
-    <span class="s2">&quot;img&quot;</span><span class="p">:</span> <span class="s2">&quot;HFA&quot;</span><span class="p">,</span>
-    <span class="s2">&quot;jp2&quot;</span><span class="p">:</span> <span class="s2">&quot;JP2OpenJPEG&quot;</span><span class="p">,</span>
-    <span class="s2">&quot;jpg&quot;</span><span class="p">:</span> <span class="s2">&quot;JPEG&quot;</span><span class="p">,</span>
-    <span class="s2">&quot;jpeg&quot;</span><span class="p">:</span> <span class="s2">&quot;JPEG&quot;</span><span class="p">,</span>
-    <span class="s2">&quot;kea&quot;</span><span class="p">:</span> <span class="s2">&quot;KEA&quot;</span><span class="p">,</span>
-    <span class="s2">&quot;kro&quot;</span><span class="p">:</span> <span class="s2">&quot;KRO&quot;</span><span class="p">,</span>
-    <span class="s2">&quot;lcp&quot;</span><span class="p">:</span> <span class="s2">&quot;LCP&quot;</span><span class="p">,</span>
-    <span class="s2">&quot;map&quot;</span><span class="p">:</span> <span class="s2">&quot;PCRaster&quot;</span><span class="p">,</span>
-    <span class="s2">&quot;mbtiles&quot;</span><span class="p">:</span> <span class="s2">&quot;MBTiles&quot;</span><span class="p">,</span>
-    <span class="s2">&quot;mrf&quot;</span><span class="p">:</span> <span class="s2">&quot;MRF&quot;</span><span class="p">,</span>
-    <span class="s2">&quot;nc&quot;</span><span class="p">:</span> <span class="s2">&quot;netCDF&quot;</span><span class="p">,</span>
-    <span class="s2">&quot;ntf&quot;</span><span class="p">:</span> <span class="s2">&quot;NITF&quot;</span><span class="p">,</span>
-    <span class="s2">&quot;pdf&quot;</span><span class="p">:</span> <span class="s2">&quot;PDF&quot;</span><span class="p">,</span>
-    <span class="s2">&quot;pix&quot;</span><span class="p">:</span> <span class="s2">&quot;PCIDSK&quot;</span><span class="p">,</span>
-    <span class="s2">&quot;png&quot;</span><span class="p">:</span> <span class="s2">&quot;PNG&quot;</span><span class="p">,</span>
-    <span class="s2">&quot;rda&quot;</span><span class="p">:</span> <span class="s2">&quot;R&quot;</span><span class="p">,</span>
-    <span class="s2">&quot;rgb&quot;</span><span class="p">:</span> <span class="s2">&quot;SGI&quot;</span><span class="p">,</span>
-    <span class="s2">&quot;rst&quot;</span><span class="p">:</span> <span class="s2">&quot;RST&quot;</span><span class="p">,</span>
-    <span class="s2">&quot;rsw&quot;</span><span class="p">:</span> <span class="s2">&quot;RMF&quot;</span><span class="p">,</span>
-    <span class="s2">&quot;sigdem&quot;</span><span class="p">:</span> <span class="s2">&quot;SIGDEM&quot;</span><span class="p">,</span>
-    <span class="s2">&quot;sqlite&quot;</span><span class="p">:</span> <span class="s2">&quot;Rasterlite&quot;</span><span class="p">,</span>
-    <span class="s2">&quot;ter&quot;</span><span class="p">:</span> <span class="s2">&quot;Terragen&quot;</span><span class="p">,</span>
-    <span class="s2">&quot;tif&quot;</span><span class="p">:</span> <span class="s2">&quot;GTiff&quot;</span><span class="p">,</span>
-    <span class="s2">&quot;tiff&quot;</span><span class="p">:</span> <span class="s2">&quot;GTiff&quot;</span><span class="p">,</span>
-    <span class="s2">&quot;vrt&quot;</span><span class="p">:</span> <span class="s2">&quot;VRT&quot;</span><span class="p">,</span>
-    <span class="s2">&quot;xml&quot;</span><span class="p">:</span> <span class="s2">&quot;PDS4&quot;</span><span class="p">,</span>
-    <span class="s2">&quot;xpm&quot;</span><span class="p">:</span> <span class="s2">&quot;XPM&quot;</span><span class="p">,</span>
-    <span class="s2">&quot;xyz&quot;</span><span class="p">:</span> <span class="s2">&quot;XYZ&quot;</span><span class="p">,</span>
+    <span class="s2">"asc"</span><span class="p">:</span> <span class="s2">"AAIGrid"</span><span class="p">,</span>
+    <span class="s2">"bag"</span><span class="p">:</span> <span class="s2">"BAG"</span><span class="p">,</span>
+    <span class="s2">"bil"</span><span class="p">:</span> <span class="s2">"EHdr"</span><span class="p">,</span>
+    <span class="s2">"blx"</span><span class="p">:</span> <span class="s2">"BLX"</span><span class="p">,</span>
+    <span class="s2">"bmp"</span><span class="p">:</span> <span class="s2">"BMP"</span><span class="p">,</span>
+    <span class="s2">"bt"</span><span class="p">:</span> <span class="s2">"BT"</span><span class="p">,</span>
+    <span class="s2">"dat"</span><span class="p">:</span> <span class="s2">"ZMap"</span><span class="p">,</span>
+    <span class="s2">"dem"</span><span class="p">:</span> <span class="s2">"USGSDEM"</span><span class="p">,</span>
+    <span class="s2">"ers"</span><span class="p">:</span> <span class="s2">"ERS"</span><span class="p">,</span>
+    <span class="s2">"gen"</span><span class="p">:</span> <span class="s2">"ADRG"</span><span class="p">,</span>
+    <span class="s2">"gif"</span><span class="p">:</span> <span class="s2">"GIF"</span><span class="p">,</span>
+    <span class="s2">"gpkg"</span><span class="p">:</span> <span class="s2">"GPKG"</span><span class="p">,</span>
+    <span class="s2">"grd"</span><span class="p">:</span> <span class="s2">"NWT_GRD"</span><span class="p">,</span>
+    <span class="s2">"gsb"</span><span class="p">:</span> <span class="s2">"NTv2"</span><span class="p">,</span>
+    <span class="s2">"gtx"</span><span class="p">:</span> <span class="s2">"GTX"</span><span class="p">,</span>
+    <span class="s2">"hdr"</span><span class="p">:</span> <span class="s2">"MFF"</span><span class="p">,</span>
+    <span class="s2">"hf2"</span><span class="p">:</span> <span class="s2">"HF2"</span><span class="p">,</span>
+    <span class="s2">"hgt"</span><span class="p">:</span> <span class="s2">"SRTMHGT"</span><span class="p">,</span>
+    <span class="s2">"img"</span><span class="p">:</span> <span class="s2">"HFA"</span><span class="p">,</span>
+    <span class="s2">"jp2"</span><span class="p">:</span> <span class="s2">"JP2OpenJPEG"</span><span class="p">,</span>
+    <span class="s2">"jpg"</span><span class="p">:</span> <span class="s2">"JPEG"</span><span class="p">,</span>
+    <span class="s2">"jpeg"</span><span class="p">:</span> <span class="s2">"JPEG"</span><span class="p">,</span>
+    <span class="s2">"kea"</span><span class="p">:</span> <span class="s2">"KEA"</span><span class="p">,</span>
+    <span class="s2">"kro"</span><span class="p">:</span> <span class="s2">"KRO"</span><span class="p">,</span>
+    <span class="s2">"lcp"</span><span class="p">:</span> <span class="s2">"LCP"</span><span class="p">,</span>
+    <span class="s2">"map"</span><span class="p">:</span> <span class="s2">"PCRaster"</span><span class="p">,</span>
+    <span class="s2">"mbtiles"</span><span class="p">:</span> <span class="s2">"MBTiles"</span><span class="p">,</span>
+    <span class="s2">"mrf"</span><span class="p">:</span> <span class="s2">"MRF"</span><span class="p">,</span>
+    <span class="s2">"nc"</span><span class="p">:</span> <span class="s2">"netCDF"</span><span class="p">,</span>
+    <span class="s2">"ntf"</span><span class="p">:</span> <span class="s2">"NITF"</span><span class="p">,</span>
+    <span class="s2">"pdf"</span><span class="p">:</span> <span class="s2">"PDF"</span><span class="p">,</span>
+    <span class="s2">"pix"</span><span class="p">:</span> <span class="s2">"PCIDSK"</span><span class="p">,</span>
+    <span class="s2">"png"</span><span class="p">:</span> <span class="s2">"PNG"</span><span class="p">,</span>
+    <span class="s2">"rda"</span><span class="p">:</span> <span class="s2">"R"</span><span class="p">,</span>
+    <span class="s2">"rgb"</span><span class="p">:</span> <span class="s2">"SGI"</span><span class="p">,</span>
+    <span class="s2">"rst"</span><span class="p">:</span> <span class="s2">"RST"</span><span class="p">,</span>
+    <span class="s2">"rsw"</span><span class="p">:</span> <span class="s2">"RMF"</span><span class="p">,</span>
+    <span class="s2">"sigdem"</span><span class="p">:</span> <span class="s2">"SIGDEM"</span><span class="p">,</span>
+    <span class="s2">"sqlite"</span><span class="p">:</span> <span class="s2">"Rasterlite"</span><span class="p">,</span>
+    <span class="s2">"ter"</span><span class="p">:</span> <span class="s2">"Terragen"</span><span class="p">,</span>
+    <span class="s2">"tif"</span><span class="p">:</span> <span class="s2">"GTiff"</span><span class="p">,</span>
+    <span class="s2">"tiff"</span><span class="p">:</span> <span class="s2">"GTiff"</span><span class="p">,</span>
+    <span class="s2">"vrt"</span><span class="p">:</span> <span class="s2">"VRT"</span><span class="p">,</span>
+    <span class="s2">"xml"</span><span class="p">:</span> <span class="s2">"PDS4"</span><span class="p">,</span>
+    <span class="s2">"xpm"</span><span class="p">:</span> <span class="s2">"XPM"</span><span class="p">,</span>
+    <span class="s2">"xyz"</span><span class="p">:</span> <span class="s2">"XYZ"</span><span class="p">,</span>
 <span class="p">}</span>
 
 
-<span class="k">def</span><span class="w"> </span><span class="nf">_get_driver</span><span class="p">(</span><span class="n">path</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">_get_driver</span><span class="p">(</span><span class="n">path</span><span class="p">:</span> <span class="n">pathlib</span><span class="o">.</span><span class="n">Path</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
     <span class="n">ext</span> <span class="o">=</span> <span class="n">path</span><span class="o">.</span><span class="n">suffix</span><span class="o">.</span><span class="n">lower</span><span class="p">()[</span><span class="mi">1</span><span class="p">:]</span>  <span class="c1"># skip the period</span>
     <span class="k">try</span><span class="p">:</span>
         <span class="k">return</span> <span class="n">EXTENSION_GDAL_DRIVER_CODE_MAP</span><span class="p">[</span><span class="n">ext</span><span class="p">]</span>
     <span class="k">except</span> <span class="ne">KeyError</span><span class="p">:</span>
         <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
-            <span class="sa">f</span><span class="s1">&#39;Unknown extension &quot;</span><span class="si">{</span><span class="n">ext</span><span class="si">}</span><span class="s1">&quot;, available extensions: &#39;</span>
-            <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="s1">&#39;, &#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">EXTENSION_GDAL_DRIVER_CODE_MAP</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span><span class="si">}</span><span class="s2">&quot;</span>
+            <span class="sa">f</span><span class="s1">'Unknown extension "</span><span class="si">{</span><span class="n">ext</span><span class="si">}</span><span class="s1">", available extensions: '</span>
+            <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="s1">', '</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">EXTENSION_GDAL_DRIVER_CODE_MAP</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span><span class="si">}</span><span class="s2">"</span>
         <span class="p">)</span>
 
 
-<span class="k">def</span><span class="w"> </span><span class="nf">_limitations</span><span class="p">(</span><span class="n">riods</span><span class="p">,</span> <span class="n">path</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">_limitations</span><span class="p">(</span><span class="n">riods</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span> <span class="n">path</span><span class="p">:</span> <span class="n">pathlib</span><span class="o">.</span><span class="n">Path</span> <span class="o">|</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
     <span class="k">if</span> <span class="n">riods</span><span class="o">.</span><span class="n">count</span> <span class="o">!=</span> <span class="mi">1</span><span class="p">:</span>
         <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span>
-            <span class="sa">f</span><span class="s2">&quot;Cannot open multi-band grid: </span><span class="si">{</span><span class="n">path</span><span class="si">}</span><span class="s2">. Try rioxarray instead.&quot;</span>
+            <span class="sa">f</span><span class="s2">"Cannot open multi-band grid: </span><span class="si">{</span><span class="n">path</span><span class="si">}</span><span class="s2">. Try rioxarray instead."</span>
         <span class="p">)</span>
     <span class="k">if</span> <span class="ow">not</span> <span class="n">riods</span><span class="o">.</span><span class="n">transform</span><span class="o">.</span><span class="n">is_rectilinear</span><span class="p">:</span>
         <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span>
-            <span class="sa">f</span><span class="s2">&quot;Cannot open non-rectilinear grid: </span><span class="si">{</span><span class="n">path</span><span class="si">}</span><span class="s2">. Try rioxarray instead.&quot;</span>
+            <span class="sa">f</span><span class="s2">"Cannot open non-rectilinear grid: </span><span class="si">{</span><span class="n">path</span><span class="si">}</span><span class="s2">. Try rioxarray instead."</span>
         <span class="p">)</span>
 
 
 <div class="viewcode-block" id="header">
 <a class="viewcode-back" href="../../../api/generated/io/imod.formats.rasterio.header.html#imod.formats.rasterio.header">[docs]</a>
-<span class="k">def</span><span class="w"> </span><span class="nf">header</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="n">pattern</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">header</span><span class="p">(</span>
+    <span class="n">path</span><span class="p">:</span> <span class="n">pathlib</span><span class="o">.</span><span class="n">Path</span> <span class="o">|</span> <span class="nb">str</span><span class="p">,</span> <span class="n">pattern</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="n">re</span><span class="o">.</span><span class="n">Pattern</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]:</span>
     <span class="n">attrs</span> <span class="o">=</span> <span class="n">imod</span><span class="o">.</span><span class="n">util</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">decompose</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="n">pattern</span><span class="p">)</span>
 
     <span class="c1"># TODO:</span>
     <span class="c1"># Check bands, rotation, etc.</span>
     <span class="c1"># Raise NotImplementedErrors and point to rioxarray.open_rasterio</span>
-    <span class="k">with</span> <span class="n">rasterio</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="s2">&quot;r&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">riods</span><span class="p">:</span>
+    <span class="k">with</span> <span class="n">rasterio</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="s2">"r"</span><span class="p">)</span> <span class="k">as</span> <span class="n">riods</span><span class="p">:</span>
         <span class="n">_limitations</span><span class="p">(</span><span class="n">riods</span><span class="p">,</span> <span class="n">path</span><span class="p">)</span>
-        <span class="n">attrs</span><span class="p">[</span><span class="s2">&quot;nrow&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">riods</span><span class="o">.</span><span class="n">height</span>
-        <span class="n">attrs</span><span class="p">[</span><span class="s2">&quot;ncol&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">riods</span><span class="o">.</span><span class="n">width</span>
+        <span class="n">attrs</span><span class="p">[</span><span class="s2">"nrow"</span><span class="p">]</span> <span class="o">=</span> <span class="n">riods</span><span class="o">.</span><span class="n">height</span>
+        <span class="n">attrs</span><span class="p">[</span><span class="s2">"ncol"</span><span class="p">]</span> <span class="o">=</span> <span class="n">riods</span><span class="o">.</span><span class="n">width</span>
         <span class="n">xmin</span><span class="p">,</span> <span class="n">ymin</span><span class="p">,</span> <span class="n">xmax</span><span class="p">,</span> <span class="n">ymax</span> <span class="o">=</span> <span class="n">riods</span><span class="o">.</span><span class="n">bounds</span>
-        <span class="n">attrs</span><span class="p">[</span><span class="s2">&quot;dx&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">riods</span><span class="o">.</span><span class="n">transform</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
-        <span class="n">attrs</span><span class="p">[</span><span class="s2">&quot;dy&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">riods</span><span class="o">.</span><span class="n">transform</span><span class="p">[</span><span class="mi">4</span><span class="p">]</span>
-        <span class="n">attrs</span><span class="p">[</span><span class="s2">&quot;nodata&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">riods</span><span class="o">.</span><span class="n">nodata</span>
-        <span class="n">attrs</span><span class="p">[</span><span class="s2">&quot;dtype&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">riods</span><span class="o">.</span><span class="n">dtypes</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="n">attrs</span><span class="p">[</span><span class="s2">"dx"</span><span class="p">]</span> <span class="o">=</span> <span class="n">riods</span><span class="o">.</span><span class="n">transform</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="n">attrs</span><span class="p">[</span><span class="s2">"dy"</span><span class="p">]</span> <span class="o">=</span> <span class="n">riods</span><span class="o">.</span><span class="n">transform</span><span class="p">[</span><span class="mi">4</span><span class="p">]</span>
+        <span class="n">attrs</span><span class="p">[</span><span class="s2">"nodata"</span><span class="p">]</span> <span class="o">=</span> <span class="n">riods</span><span class="o">.</span><span class="n">nodata</span>
+        <span class="n">attrs</span><span class="p">[</span><span class="s2">"dtype"</span><span class="p">]</span> <span class="o">=</span> <span class="n">riods</span><span class="o">.</span><span class="n">dtypes</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
         <span class="n">crs</span> <span class="o">=</span> <span class="n">riods</span><span class="o">.</span><span class="n">crs</span>
         <span class="k">if</span> <span class="n">crs</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="n">attrs</span><span class="p">[</span><span class="s2">&quot;crs&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">crs</span>
+            <span class="n">attrs</span><span class="p">[</span><span class="s2">"crs"</span><span class="p">]</span> <span class="o">=</span> <span class="n">crs</span>
 
-    <span class="n">attrs</span><span class="p">[</span><span class="s2">&quot;xmin&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">xmin</span>
-    <span class="n">attrs</span><span class="p">[</span><span class="s2">&quot;xmax&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">xmax</span>
-    <span class="n">attrs</span><span class="p">[</span><span class="s2">&quot;ymin&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">ymin</span>
-    <span class="n">attrs</span><span class="p">[</span><span class="s2">&quot;ymax&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">ymax</span>
-    <span class="n">attrs</span><span class="p">[</span><span class="s2">&quot;headersize&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="n">attrs</span><span class="p">[</span><span class="s2">"xmin"</span><span class="p">]</span> <span class="o">=</span> <span class="n">xmin</span>
+    <span class="n">attrs</span><span class="p">[</span><span class="s2">"xmax"</span><span class="p">]</span> <span class="o">=</span> <span class="n">xmax</span>
+    <span class="n">attrs</span><span class="p">[</span><span class="s2">"ymin"</span><span class="p">]</span> <span class="o">=</span> <span class="n">ymin</span>
+    <span class="n">attrs</span><span class="p">[</span><span class="s2">"ymax"</span><span class="p">]</span> <span class="o">=</span> <span class="n">ymax</span>
+    <span class="n">attrs</span><span class="p">[</span><span class="s2">"headersize"</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
     <span class="k">return</span> <span class="n">attrs</span></div>
 
 
 
-<span class="k">def</span><span class="w"> </span><span class="nf">_read</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="n">headersize</span><span class="p">,</span> <span class="n">nrow</span><span class="p">,</span> <span class="n">ncol</span><span class="p">,</span> <span class="n">nodata</span><span class="p">,</span> <span class="n">dtype</span><span class="p">):</span>
-    <span class="k">with</span> <span class="n">rasterio</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="s2">&quot;r&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">dataset</span><span class="p">:</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">_read</span><span class="p">(</span>
+    <span class="n">path</span><span class="p">:</span> <span class="n">pathlib</span><span class="o">.</span><span class="n">Path</span> <span class="o">|</span> <span class="nb">str</span><span class="p">,</span>
+    <span class="n">headersize</span><span class="p">:</span> <span class="nb">int</span> <span class="o">|</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">nrow</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+    <span class="n">ncol</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+    <span class="n">nodata</span><span class="p">:</span> <span class="nb">float</span> <span class="o">|</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">dtype</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">:</span>
+    <span class="k">with</span> <span class="n">rasterio</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="s2">"r"</span><span class="p">)</span> <span class="k">as</span> <span class="n">dataset</span><span class="p">:</span>
         <span class="n">a</span> <span class="o">=</span> <span class="n">dataset</span><span class="o">.</span><span class="n">read</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
 
     <span class="c1"># None signifies no replacement; skip if nodata already is nan</span>
@@ -612,11 +623,15 @@
 
 <div class="viewcode-block" id="open">
 <a class="viewcode-back" href="../../../api/generated/io/imod.formats.rasterio.open.html#imod.formats.rasterio.open">[docs]</a>
-<span class="k">def</span><span class="w"> </span><span class="nf">open</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="n">use_cftime</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">pattern</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
-<span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">open</span><span class="p">(</span>
+    <span class="n">path</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="n">pathlib</span><span class="o">.</span><span class="n">Path</span> <span class="o">|</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">|</span> <span class="nb">list</span><span class="p">[</span><span class="n">pathlib</span><span class="o">.</span><span class="n">Path</span><span class="p">],</span>
+    <span class="n">use_cftime</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
+    <span class="n">pattern</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="n">re</span><span class="o">.</span><span class="n">Pattern</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">xr</span><span class="o">.</span><span class="n">DataArray</span><span class="p">:</span>
+<span class="w">    </span><span class="sa">r</span><span class="sd">"""</span>
 <span class="sd">    Open one or more GDAL supported raster files as an xarray.DataArray.</span>
 
-<span class="sd">    In accordance with xarray&#39;s design, ``open`` loads the data of the files</span>
+<span class="sd">    In accordance with xarray's design, ``open`` loads the data of the files</span>
 <span class="sd">    lazily. This means the data of the rasters are not loaded into memory until the</span>
 <span class="sd">    data is needed. This allows for easier handling of large datasets, and</span>
 <span class="sd">    more efficient computations.</span>
@@ -624,8 +639,8 @@
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
 <span class="sd">    path : str, Path or list</span>
-<span class="sd">        This can be a single file, &#39;head_l1.tif&#39;, a glob pattern expansion,</span>
-<span class="sd">        &#39;head_l*.tif&#39;, or a list of files, [&#39;head_l1.tif&#39;, &#39;head_l2.tif&#39;].</span>
+<span class="sd">        This can be a single file, 'head_l1.tif', a glob pattern expansion,</span>
+<span class="sd">        'head_l*.tif', or a list of files, ['head_l1.tif', 'head_l2.tif'].</span>
 <span class="sd">        Note that each file needs to be of the same name (part before the</span>
 <span class="sd">        first underscore) but have a different layer and/or timestamp,</span>
 <span class="sd">        such that they can be combined in a single xarray.DataArray.</span>
@@ -654,46 +669,46 @@
 <span class="sd">    --------</span>
 <span class="sd">    Open a raster file:</span>
 
-<span class="sd">    &gt;&gt;&gt; da = imod.rasterio.open(&quot;example.tif&quot;)</span>
+<span class="sd">    &gt;&gt;&gt; da = imod.rasterio.open("example.tif")</span>
 
 <span class="sd">    Open a raster file, relying on default naming conventions to identify</span>
 <span class="sd">    layer:</span>
 
-<span class="sd">    &gt;&gt;&gt; da = imod.rasterio.open(&quot;example_l1.tif&quot;)</span>
+<span class="sd">    &gt;&gt;&gt; da = imod.rasterio.open("example_l1.tif")</span>
 
 <span class="sd">    Open an IDF file, relying on default naming conventions to identify layer</span>
 <span class="sd">    and time:</span>
 
-<span class="sd">    &gt;&gt;&gt; head = imod.rasterio.open(&quot;head_20010101_l1.tif&quot;)</span>
+<span class="sd">    &gt;&gt;&gt; head = imod.rasterio.open("head_20010101_l1.tif")</span>
 
 <span class="sd">    Open multiple files, in this case files for the year 2001 for all</span>
 <span class="sd">    layers, again relying on default conventions for naming:</span>
 
-<span class="sd">    &gt;&gt;&gt; head = imod.rasterio.open(&quot;head_2001*_l*.tif&quot;)</span>
+<span class="sd">    &gt;&gt;&gt; head = imod.rasterio.open("head_2001*_l*.tif")</span>
 
 <span class="sd">    The same, this time explicitly specifying ``name``, ``time``, and ``layer``:</span>
 
-<span class="sd">    &gt;&gt;&gt; head = imod.rasterio.open(&quot;head_2001*_l*.tif&quot;, pattern=&quot;{name}_{time}_l{layer}&quot;)</span>
+<span class="sd">    &gt;&gt;&gt; head = imod.rasterio.open("head_2001*_l*.tif", pattern="{name}_{time}_l{layer}")</span>
 
 <span class="sd">    The format string pattern will only work on tidy paths, where variables are</span>
 <span class="sd">    separated by underscores. You can also pass a compiled regex pattern.</span>
 <span class="sd">    Make sure to include the ``re.IGNORECASE`` flag since all paths are lowered.</span>
 
 <span class="sd">    &gt;&gt;&gt; import re</span>
-<span class="sd">    &gt;&gt;&gt; pattern = re.compile(r&quot;(?P&lt;name&gt;[\w]+)L(?P&lt;layer&gt;[\d+]*)&quot;, re.IGNORECASE)</span>
-<span class="sd">    &gt;&gt;&gt; head = imod.idf.open(&quot;headL11&quot;, pattern=pattern)</span>
+<span class="sd">    &gt;&gt;&gt; pattern = re.compile(r"(?P&lt;name&gt;[\w]+)L(?P&lt;layer&gt;[\d+]*)", re.IGNORECASE)</span>
+<span class="sd">    &gt;&gt;&gt; head = imod.idf.open("headL11", pattern=pattern)</span>
 
 <span class="sd">    However, this requires constructing regular expressions, which is</span>
 <span class="sd">    generally a fiddly process. Regex notation is also impossible to</span>
 <span class="sd">    remember. The website https://regex101.com is a nice help. Alternatively,</span>
 <span class="sd">    the most pragmatic solution may be to just rename your files.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="k">return</span> <span class="n">array_io</span><span class="o">.</span><span class="n">reading</span><span class="o">.</span><span class="n">_open</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="n">use_cftime</span><span class="p">,</span> <span class="n">pattern</span><span class="p">,</span> <span class="n">header</span><span class="p">,</span> <span class="n">_read</span><span class="p">)</span></div>
 
 
 
-<span class="k">def</span><span class="w"> </span><span class="nf">write_aaigrid</span><span class="p">(</span><span class="n">path</span><span class="p">:</span> <span class="n">pathlib</span><span class="o">.</span><span class="n">Path</span><span class="p">,</span> <span class="n">a</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="n">profile</span><span class="p">:</span> <span class="n">Dict</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">write_aaigrid</span><span class="p">(</span><span class="n">path</span><span class="p">:</span> <span class="n">pathlib</span><span class="o">.</span><span class="n">Path</span><span class="p">,</span> <span class="n">a</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="n">profile</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">"""</span>
 <span class="sd">    Fall-back function to write ESRII ASCII grids even if rasterio is not</span>
 <span class="sd">    installed.</span>
 
@@ -707,54 +722,54 @@
 <span class="sd">        The raster data.</span>
 <span class="sd">    profile: dict</span>
 <span class="sd">        The rasterio profile metadata.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
-    <span class="n">dtype</span> <span class="o">=</span> <span class="n">profile</span><span class="p">[</span><span class="s2">&quot;dtype&quot;</span><span class="p">]</span>
-    <span class="n">nodata</span> <span class="o">=</span> <span class="n">profile</span><span class="p">[</span><span class="s2">&quot;nodata&quot;</span><span class="p">]</span>
+<span class="sd">    """</span>
+    <span class="n">dtype</span> <span class="o">=</span> <span class="n">profile</span><span class="p">[</span><span class="s2">"dtype"</span><span class="p">]</span>
+    <span class="n">nodata</span> <span class="o">=</span> <span class="n">profile</span><span class="p">[</span><span class="s2">"nodata"</span><span class="p">]</span>
     <span class="n">df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">a</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="n">dtype</span><span class="p">))</span>
-    <span class="c1"># GDAL writes white space before every line. pandas doesn&#39;t support this,</span>
+    <span class="c1"># GDAL writes white space before every line. pandas doesn't support this,</span>
     <span class="c1"># but it will write nodata values -- encoded as NaN -- as white space.</span>
     <span class="n">df</span><span class="o">.</span><span class="n">index</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">full</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">df</span><span class="p">),</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">)</span>
     <span class="k">if</span> <span class="n">np</span><span class="o">.</span><span class="n">issubdtype</span><span class="p">(</span><span class="n">dtype</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">integer</span><span class="p">):</span>
         <span class="n">is_float</span> <span class="o">=</span> <span class="kc">False</span>
-        <span class="n">space</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
-        <span class="n">fmt</span> <span class="o">=</span> <span class="s2">&quot;</span><span class="si">%d</span><span class="s2">&quot;</span>
-        <span class="n">str_nodata</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="nb">int</span><span class="p">(</span><span class="n">nodata</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span>
+        <span class="n">space</span> <span class="o">=</span> <span class="s2">""</span>
+        <span class="n">fmt</span> <span class="o">=</span> <span class="s2">"</span><span class="si">%d</span><span class="s2">"</span>
+        <span class="n">str_nodata</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="nb">int</span><span class="p">(</span><span class="n">nodata</span><span class="p">)</span><span class="si">}</span><span class="s2">"</span>
     <span class="k">elif</span> <span class="n">np</span><span class="o">.</span><span class="n">issubdtype</span><span class="p">(</span><span class="n">dtype</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">floating</span><span class="p">):</span>
         <span class="c1"># For some reason, GDAL inserts a space before the nodata value if</span>
         <span class="c1"># dtype is float.</span>
         <span class="n">is_float</span> <span class="o">=</span> <span class="kc">True</span>
-        <span class="n">space</span> <span class="o">=</span> <span class="s2">&quot; &quot;</span>
-        <span class="n">precision</span> <span class="o">=</span> <span class="n">profile</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;decimal_precision&quot;</span><span class="p">)</span>
-        <span class="n">digits</span> <span class="o">=</span> <span class="n">profile</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;significant_digits&quot;</span><span class="p">)</span>
+        <span class="n">space</span> <span class="o">=</span> <span class="s2">" "</span>
+        <span class="n">precision</span> <span class="o">=</span> <span class="n">profile</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"decimal_precision"</span><span class="p">)</span>
+        <span class="n">digits</span> <span class="o">=</span> <span class="n">profile</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"significant_digits"</span><span class="p">)</span>
         <span class="c1"># See: https://docs.python.org/3/library/string.html#formatspec</span>
         <span class="k">if</span> <span class="n">precision</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="n">fmt</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;%.</span><span class="si">{</span><span class="n">precision</span><span class="si">}</span><span class="s2">f&quot;</span>
-            <span class="n">str_nodata</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">nodata</span><span class="si">:</span><span class="s2">.</span><span class="si">{</span><span class="n">precision</span><span class="si">}</span><span class="s2">f</span><span class="si">}</span><span class="s2">&quot;</span>
+            <span class="n">fmt</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">"%.</span><span class="si">{</span><span class="n">precision</span><span class="si">}</span><span class="s2">f"</span>
+            <span class="n">str_nodata</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">nodata</span><span class="si">:</span><span class="s2">.</span><span class="si">{</span><span class="n">precision</span><span class="si">}</span><span class="s2">f</span><span class="si">}</span><span class="s2">"</span>
         <span class="k">elif</span> <span class="n">digits</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="n">fmt</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;%.</span><span class="si">{</span><span class="n">digits</span><span class="si">}</span><span class="s2">g&quot;</span>
-            <span class="n">str_nodata</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">nodata</span><span class="si">:</span><span class="s2">.</span><span class="si">{</span><span class="n">digits</span><span class="si">}</span><span class="s2">g</span><span class="si">}</span><span class="s2">&quot;</span>
+            <span class="n">fmt</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">"%.</span><span class="si">{</span><span class="n">digits</span><span class="si">}</span><span class="s2">g"</span>
+            <span class="n">str_nodata</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">nodata</span><span class="si">:</span><span class="s2">.</span><span class="si">{</span><span class="n">digits</span><span class="si">}</span><span class="s2">g</span><span class="si">}</span><span class="s2">"</span>
         <span class="k">else</span><span class="p">:</span>
-            <span class="n">fmt</span> <span class="o">=</span> <span class="s2">&quot;</span><span class="si">%.20g</span><span class="s2">&quot;</span>
-            <span class="n">str_nodata</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">nodata</span><span class="si">:</span><span class="s2">.20g</span><span class="si">}</span><span class="s2">&quot;</span>
+            <span class="n">fmt</span> <span class="o">=</span> <span class="s2">"</span><span class="si">%.20g</span><span class="s2">"</span>
+            <span class="n">str_nodata</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">nodata</span><span class="si">:</span><span class="s2">.20g</span><span class="si">}</span><span class="s2">"</span>
     <span class="k">else</span><span class="p">:</span>
-        <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;invalid dtype: </span><span class="si">{</span><span class="n">dtype</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="sa">f</span><span class="s2">"invalid dtype: </span><span class="si">{</span><span class="n">dtype</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
 
-    <span class="n">dx</span><span class="p">,</span> <span class="n">_</span><span class="p">,</span> <span class="n">xmin</span><span class="p">,</span> <span class="n">_</span><span class="p">,</span> <span class="n">dy</span><span class="p">,</span> <span class="n">ymax</span> <span class="o">=</span> <span class="n">profile</span><span class="p">[</span><span class="s2">&quot;transform&quot;</span><span class="p">][:</span><span class="mi">6</span><span class="p">]</span>
-    <span class="n">ymin</span> <span class="o">=</span> <span class="n">ymax</span> <span class="o">+</span> <span class="n">profile</span><span class="p">[</span><span class="s2">&quot;height&quot;</span><span class="p">]</span> <span class="o">*</span> <span class="n">dy</span>
+    <span class="n">dx</span><span class="p">,</span> <span class="n">_</span><span class="p">,</span> <span class="n">xmin</span><span class="p">,</span> <span class="n">_</span><span class="p">,</span> <span class="n">dy</span><span class="p">,</span> <span class="n">ymax</span> <span class="o">=</span> <span class="n">profile</span><span class="p">[</span><span class="s2">"transform"</span><span class="p">][:</span><span class="mi">6</span><span class="p">]</span>
+    <span class="n">ymin</span> <span class="o">=</span> <span class="n">ymax</span> <span class="o">+</span> <span class="n">profile</span><span class="p">[</span><span class="s2">"height"</span><span class="p">]</span> <span class="o">*</span> <span class="n">dy</span>
 
     <span class="n">header</span> <span class="o">=</span> <span class="p">(</span>
-        <span class="sa">f</span><span class="s2">&quot;ncols        </span><span class="si">{</span><span class="n">profile</span><span class="p">[</span><span class="s1">&#39;width&#39;</span><span class="p">]</span><span class="si">}</span><span class="se">\n</span><span class="s2">&quot;</span>
-        <span class="sa">f</span><span class="s2">&quot;nrows        </span><span class="si">{</span><span class="n">profile</span><span class="p">[</span><span class="s1">&#39;height&#39;</span><span class="p">]</span><span class="si">}</span><span class="se">\n</span><span class="s2">&quot;</span>
-        <span class="sa">f</span><span class="s2">&quot;xllcorner    </span><span class="si">{</span><span class="n">xmin</span><span class="si">:</span><span class="s2">.12f</span><span class="si">}</span><span class="se">\n</span><span class="s2">&quot;</span>
-        <span class="sa">f</span><span class="s2">&quot;yllcorner    </span><span class="si">{</span><span class="n">ymin</span><span class="si">:</span><span class="s2">.12f</span><span class="si">}</span><span class="se">\n</span><span class="s2">&quot;</span>
-        <span class="sa">f</span><span class="s2">&quot;cellsize     </span><span class="si">{</span><span class="n">dx</span><span class="si">:</span><span class="s2">.12f</span><span class="si">}</span><span class="se">\n</span><span class="s2">&quot;</span>
-        <span class="sa">f</span><span class="s2">&quot;NODATA_value </span><span class="si">{</span><span class="n">space</span><span class="si">}{</span><span class="n">str_nodata</span><span class="si">}</span><span class="se">\n</span><span class="s2">&quot;</span>
+        <span class="sa">f</span><span class="s2">"ncols        </span><span class="si">{</span><span class="n">profile</span><span class="p">[</span><span class="s1">'width'</span><span class="p">]</span><span class="si">}</span><span class="se">\n</span><span class="s2">"</span>
+        <span class="sa">f</span><span class="s2">"nrows        </span><span class="si">{</span><span class="n">profile</span><span class="p">[</span><span class="s1">'height'</span><span class="p">]</span><span class="si">}</span><span class="se">\n</span><span class="s2">"</span>
+        <span class="sa">f</span><span class="s2">"xllcorner    </span><span class="si">{</span><span class="n">xmin</span><span class="si">:</span><span class="s2">.12f</span><span class="si">}</span><span class="se">\n</span><span class="s2">"</span>
+        <span class="sa">f</span><span class="s2">"yllcorner    </span><span class="si">{</span><span class="n">ymin</span><span class="si">:</span><span class="s2">.12f</span><span class="si">}</span><span class="se">\n</span><span class="s2">"</span>
+        <span class="sa">f</span><span class="s2">"cellsize     </span><span class="si">{</span><span class="n">dx</span><span class="si">:</span><span class="s2">.12f</span><span class="si">}</span><span class="se">\n</span><span class="s2">"</span>
+        <span class="sa">f</span><span class="s2">"NODATA_value </span><span class="si">{</span><span class="n">space</span><span class="si">}{</span><span class="n">str_nodata</span><span class="si">}</span><span class="se">\n</span><span class="s2">"</span>
     <span class="p">)</span>
 
     <span class="c1"># GDAL writes only a linefeed, not a carriage return. By default, Python</span>
     <span class="c1"># adds a carriage return as well, on Windows. This is disabled by</span>
     <span class="c1"># explicitly setting the newline argument.</span>
-    <span class="k">with</span> <span class="n">f_open</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="s2">&quot;w&quot;</span><span class="p">,</span> <span class="n">newline</span><span class="o">=</span><span class="s2">&quot;&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+    <span class="k">with</span> <span class="n">f_open</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="s2">"w"</span><span class="p">,</span> <span class="n">newline</span><span class="o">=</span><span class="s2">""</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
         <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">header</span><span class="p">)</span>
 
         <span class="n">first</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span>
@@ -763,30 +778,36 @@
         <span class="c1"># (1.0).is_integer() -&gt; True</span>
         <span class="c1"># (1.1).is_integer() -&gt; False</span>
         <span class="k">if</span> <span class="n">is_float</span> <span class="ow">and</span> <span class="n">first</span><span class="o">.</span><span class="n">is_integer</span><span class="p">():</span>
-            <span class="c1"># GDAL uses the &quot;general&quot; float (g) format by default. However, if</span>
+            <span class="c1"># GDAL uses the "general" float (g) format by default. However, if</span>
             <span class="c1"># the first value is a float without decimals, it will write a</span>
             <span class="c1"># single trailing 0 for the first value, presumably to aid type</span>
             <span class="c1"># inference when reading values back in. All subsequent values are</span>
             <span class="c1"># written without decimals, however.</span>
-            <span class="n">precision</span> <span class="o">=</span> <span class="n">profile</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;decimal_precision&quot;</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+            <span class="n">precision</span> <span class="o">=</span> <span class="n">profile</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"decimal_precision"</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
             <span class="c1"># Write the first value, with trailing zero if needed.</span>
-            <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot; </span><span class="si">{</span><span class="n">first</span><span class="si">:</span><span class="s2">.</span><span class="si">{</span><span class="n">precision</span><span class="si">}</span><span class="s2">f</span><span class="si">}</span><span class="s2"> &quot;</span><span class="p">)</span>
-            <span class="c1"># Write remainder of first row. Since we&#39;ve already written the</span>
+            <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="sa">f</span><span class="s2">" </span><span class="si">{</span><span class="n">first</span><span class="si">:</span><span class="s2">.</span><span class="si">{</span><span class="n">precision</span><span class="si">}</span><span class="s2">f</span><span class="si">}</span><span class="s2"> "</span><span class="p">)</span>
+            <span class="c1"># Write remainder of first row. Since we've already written the</span>
             <span class="c1"># first value with a space in front of it, we skip writing the NaN</span>
             <span class="c1"># index value here.</span>
             <span class="n">df</span><span class="o">.</span><span class="n">iloc</span><span class="p">[[</span><span class="mi">0</span><span class="p">],</span> <span class="mi">1</span><span class="p">:]</span><span class="o">.</span><span class="n">to_csv</span><span class="p">(</span>
-                <span class="n">f</span><span class="p">,</span> <span class="n">index</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">header</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">sep</span><span class="o">=</span><span class="s2">&quot; &quot;</span><span class="p">,</span> <span class="n">float_format</span><span class="o">=</span><span class="n">fmt</span>
+                <span class="n">f</span><span class="p">,</span> <span class="n">index</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">header</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">sep</span><span class="o">=</span><span class="s2">" "</span><span class="p">,</span> <span class="n">float_format</span><span class="o">=</span><span class="n">fmt</span>
             <span class="p">)</span>
             <span class="c1"># Write all other rows.</span>
-            <span class="n">df</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="mi">1</span><span class="p">:]</span><span class="o">.</span><span class="n">to_csv</span><span class="p">(</span><span class="n">f</span><span class="p">,</span> <span class="n">index</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">header</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">sep</span><span class="o">=</span><span class="s2">&quot; &quot;</span><span class="p">,</span> <span class="n">float_format</span><span class="o">=</span><span class="n">fmt</span><span class="p">)</span>
+            <span class="n">df</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="mi">1</span><span class="p">:]</span><span class="o">.</span><span class="n">to_csv</span><span class="p">(</span><span class="n">f</span><span class="p">,</span> <span class="n">index</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">header</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">sep</span><span class="o">=</span><span class="s2">" "</span><span class="p">,</span> <span class="n">float_format</span><span class="o">=</span><span class="n">fmt</span><span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
-            <span class="n">df</span><span class="o">.</span><span class="n">to_csv</span><span class="p">(</span><span class="n">f</span><span class="p">,</span> <span class="n">index</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">header</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">sep</span><span class="o">=</span><span class="s2">&quot; &quot;</span><span class="p">,</span> <span class="n">float_format</span><span class="o">=</span><span class="n">fmt</span><span class="p">)</span>
+            <span class="n">df</span><span class="o">.</span><span class="n">to_csv</span><span class="p">(</span><span class="n">f</span><span class="p">,</span> <span class="n">index</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">header</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">sep</span><span class="o">=</span><span class="s2">" "</span><span class="p">,</span> <span class="n">float_format</span><span class="o">=</span><span class="n">fmt</span><span class="p">)</span>
 
     <span class="k">return</span>
 
 
-<span class="k">def</span><span class="w"> </span><span class="nf">write</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="n">da</span><span class="p">,</span> <span class="n">driver</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">nodata</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Write ``xarray.DataArray`` to GDAL supported geospatial rasters using ``rasterio``.</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">write</span><span class="p">(</span>
+    <span class="n">path</span><span class="p">:</span> <span class="n">pathlib</span><span class="o">.</span><span class="n">Path</span> <span class="o">|</span> <span class="nb">str</span><span class="p">,</span>
+    <span class="n">da</span><span class="p">:</span> <span class="n">xr</span><span class="o">.</span><span class="n">DataArray</span><span class="p">,</span>
+    <span class="n">driver</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">nodata</span><span class="p">:</span> <span class="nb">float</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">,</span>
+    <span class="n">dtype</span><span class="p">:</span> <span class="n">Any</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">"""Write ``xarray.DataArray`` to GDAL supported geospatial rasters using ``rasterio``.</span>
 
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
@@ -801,18 +822,21 @@
 <span class="sd">    nodata: float</span>
 <span class="sd">        Nodata value to use. Should be convertible to the DataArray and GDAL dtype.</span>
 <span class="sd">        Default value is np.nan</span>
+<span class="sd">    dtype: numpy.dtype; optional</span>
+<span class="sd">        The data type to cast the DataArray to before writing. If None, the</span>
+<span class="sd">        original dtype is used.</span>
 
 <span class="sd">    Examples</span>
 <span class="sd">    --------</span>
 <span class="sd">    Save ``xarray.DataArray`` in ASCII format:</span>
 
-<span class="sd">    &gt;&gt;&gt; imod.rasterio.write(&quot;example.asc&quot;, da)</span>
+<span class="sd">    &gt;&gt;&gt; imod.rasterio.write("example.asc", da)</span>
 
 <span class="sd">    Save ``xarray.DataArray`` in ASCII format, with 6 significant digits:</span>
 
-<span class="sd">    &gt;&gt;&gt; da.attrs[&#39;SIGNIFICANT_DIGITS&#39;] = 6</span>
-<span class="sd">    &gt;&gt;&gt; imod.rasterio.write(&quot;example.asc&quot;, da)</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    &gt;&gt;&gt; da.attrs['SIGNIFICANT_DIGITS'] = 6</span>
+<span class="sd">    &gt;&gt;&gt; imod.rasterio.write("example.asc", da)</span>
+<span class="sd">    """</span>
     <span class="c1"># Not directly related to iMOD, but provides a missing link, together</span>
     <span class="c1"># with xioxarray.</span>
     <span class="c1"># Note that this function can quickly become dstdated as</span>
@@ -825,18 +849,18 @@
         <span class="n">driver</span> <span class="o">=</span> <span class="n">_get_driver</span><span class="p">(</span><span class="n">path</span><span class="p">)</span>
 
     <span class="n">flip</span> <span class="o">=</span> <span class="nb">slice</span><span class="p">(</span><span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">)</span>
-    <span class="k">if</span> <span class="ow">not</span> <span class="n">da</span><span class="o">.</span><span class="n">indexes</span><span class="p">[</span><span class="s2">&quot;x&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">is_monotonic_increasing</span><span class="p">:</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">da</span><span class="o">.</span><span class="n">indexes</span><span class="p">[</span><span class="s2">"x"</span><span class="p">]</span><span class="o">.</span><span class="n">is_monotonic_increasing</span><span class="p">:</span>
         <span class="n">da</span> <span class="o">=</span> <span class="n">da</span><span class="o">.</span><span class="n">isel</span><span class="p">(</span><span class="n">x</span><span class="o">=</span><span class="n">flip</span><span class="p">)</span>
-    <span class="k">if</span> <span class="ow">not</span> <span class="n">da</span><span class="o">.</span><span class="n">indexes</span><span class="p">[</span><span class="s2">&quot;y&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">is_monotonic_decreasing</span><span class="p">:</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">da</span><span class="o">.</span><span class="n">indexes</span><span class="p">[</span><span class="s2">"y"</span><span class="p">]</span><span class="o">.</span><span class="n">is_monotonic_decreasing</span><span class="p">:</span>
         <span class="n">da</span> <span class="o">=</span> <span class="n">da</span><span class="o">.</span><span class="n">isel</span><span class="p">(</span><span class="n">y</span><span class="o">=</span><span class="n">flip</span><span class="p">)</span>
 
-    <span class="c1"># Only try to fill data that can contains nan&#39;s</span>
+    <span class="c1"># Only try to fill data that can contains nan's</span>
     <span class="c1"># Do this before casting to another type!</span>
     <span class="n">ignore_nodata</span> <span class="o">=</span> <span class="p">(</span><span class="n">nodata</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">)</span> <span class="ow">or</span> <span class="n">np</span><span class="o">.</span><span class="n">isnan</span><span class="p">(</span><span class="n">nodata</span><span class="p">)</span>
     <span class="k">if</span> <span class="ow">not</span> <span class="n">ignore_nodata</span><span class="p">:</span>
         <span class="k">if</span> <span class="p">(</span><span class="n">da</span><span class="o">.</span><span class="n">dtype</span> <span class="o">==</span> <span class="n">np</span><span class="o">.</span><span class="n">float32</span><span class="p">)</span> <span class="ow">or</span> <span class="p">(</span><span class="n">da</span><span class="o">.</span><span class="n">dtype</span> <span class="o">==</span> <span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">):</span>
             <span class="c1"># NaN is the default missing value in xarray</span>
-            <span class="c1"># None is different in that the raster won&#39;t have a nodata value</span>
+            <span class="c1"># None is different in that the raster won't have a nodata value</span>
             <span class="n">da</span> <span class="o">=</span> <span class="n">da</span><span class="o">.</span><span class="n">fillna</span><span class="p">(</span><span class="n">nodata</span><span class="p">)</span>
 
     <span class="c1"># Cast to dtype if dtype is given</span>
@@ -845,50 +869,57 @@
             <span class="n">da</span> <span class="o">=</span> <span class="n">da</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="n">dtype</span><span class="p">)</span>
 
     <span class="c1"># Cast to supported pcraster dtypes</span>
-    <span class="k">if</span> <span class="n">driver</span> <span class="o">==</span> <span class="s2">&quot;PCRaster&quot;</span><span class="p">:</span>
-        <span class="k">if</span> <span class="n">da</span><span class="o">.</span><span class="n">dtype</span> <span class="o">==</span> <span class="s2">&quot;float64&quot;</span><span class="p">:</span>
-            <span class="n">da</span> <span class="o">=</span> <span class="n">da</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="s2">&quot;float32&quot;</span><span class="p">)</span>
-        <span class="k">elif</span> <span class="n">da</span><span class="o">.</span><span class="n">dtype</span> <span class="o">==</span> <span class="s2">&quot;int64&quot;</span><span class="p">:</span>
-            <span class="n">da</span> <span class="o">=</span> <span class="n">da</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="s2">&quot;int32&quot;</span><span class="p">)</span>
-        <span class="k">elif</span> <span class="n">da</span><span class="o">.</span><span class="n">dtype</span> <span class="o">==</span> <span class="s2">&quot;bool&quot;</span><span class="p">:</span>
-            <span class="n">da</span> <span class="o">=</span> <span class="n">da</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="s2">&quot;uint8&quot;</span><span class="p">)</span>
-        <span class="k">if</span> <span class="s2">&quot;PCRASTER_VALUESCALE&quot;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">profile</span><span class="p">:</span>
-            <span class="k">if</span> <span class="n">da</span><span class="o">.</span><span class="n">dtype</span> <span class="o">==</span> <span class="s2">&quot;int32&quot;</span><span class="p">:</span>
-                <span class="n">profile</span><span class="p">[</span><span class="s2">&quot;PCRASTER_VALUESCALE&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;VS_NOMINAL&quot;</span>
-            <span class="k">elif</span> <span class="n">da</span><span class="o">.</span><span class="n">dtype</span> <span class="o">==</span> <span class="s2">&quot;uint8&quot;</span><span class="p">:</span>
-                <span class="n">profile</span><span class="p">[</span><span class="s2">&quot;PCRASTER_VALUESCALE&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;VS_BOOLEAN&quot;</span>
+    <span class="k">if</span> <span class="n">driver</span> <span class="o">==</span> <span class="s2">"PCRaster"</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">da</span><span class="o">.</span><span class="n">dtype</span> <span class="o">==</span> <span class="s2">"float64"</span><span class="p">:</span>
+            <span class="n">da</span> <span class="o">=</span> <span class="n">da</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="s2">"float32"</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="n">da</span><span class="o">.</span><span class="n">dtype</span> <span class="o">==</span> <span class="s2">"int64"</span><span class="p">:</span>
+            <span class="n">da</span> <span class="o">=</span> <span class="n">da</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="s2">"int32"</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="n">da</span><span class="o">.</span><span class="n">dtype</span> <span class="o">==</span> <span class="s2">"bool"</span><span class="p">:</span>
+            <span class="n">da</span> <span class="o">=</span> <span class="n">da</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="s2">"uint8"</span><span class="p">)</span>
+        <span class="k">if</span> <span class="s2">"PCRASTER_VALUESCALE"</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">profile</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">da</span><span class="o">.</span><span class="n">dtype</span> <span class="o">==</span> <span class="s2">"int32"</span><span class="p">:</span>
+                <span class="n">profile</span><span class="p">[</span><span class="s2">"PCRASTER_VALUESCALE"</span><span class="p">]</span> <span class="o">=</span> <span class="s2">"VS_NOMINAL"</span>
+            <span class="k">elif</span> <span class="n">da</span><span class="o">.</span><span class="n">dtype</span> <span class="o">==</span> <span class="s2">"uint8"</span><span class="p">:</span>
+                <span class="n">profile</span><span class="p">[</span><span class="s2">"PCRASTER_VALUESCALE"</span><span class="p">]</span> <span class="o">=</span> <span class="s2">"VS_BOOLEAN"</span>
             <span class="k">else</span><span class="p">:</span>
-                <span class="n">profile</span><span class="p">[</span><span class="s2">&quot;PCRASTER_VALUESCALE&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;VS_SCALAR&quot;</span>
+                <span class="n">profile</span><span class="p">[</span><span class="s2">"PCRASTER_VALUESCALE"</span><span class="p">]</span> <span class="o">=</span> <span class="s2">"VS_SCALAR"</span>
 
-    <span class="n">extradims</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="nb">filter</span><span class="p">(</span><span class="k">lambda</span> <span class="n">dim</span><span class="p">:</span> <span class="n">dim</span> <span class="ow">not</span> <span class="ow">in</span> <span class="p">(</span><span class="s2">&quot;y&quot;</span><span class="p">,</span> <span class="s2">&quot;x&quot;</span><span class="p">),</span> <span class="n">da</span><span class="o">.</span><span class="n">dims</span><span class="p">))</span>
+    <span class="n">extradims</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="nb">filter</span><span class="p">(</span><span class="k">lambda</span> <span class="n">dim</span><span class="p">:</span> <span class="n">dim</span> <span class="ow">not</span> <span class="ow">in</span> <span class="p">(</span><span class="s2">"y"</span><span class="p">,</span> <span class="s2">"x"</span><span class="p">),</span> <span class="n">da</span><span class="o">.</span><span class="n">dims</span><span class="p">))</span>
     <span class="c1"># TODO only equidistant IDFs are compatible with GDAL / rasterio</span>
     <span class="c1"># TODO try squeezing extradims here, such that 1 layer, 1 time, etc. is acccepted</span>
     <span class="k">if</span> <span class="n">extradims</span><span class="p">:</span>
-        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Only x and y dimensions supported, found </span><span class="si">{</span><span class="n">da</span><span class="o">.</span><span class="n">dims</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Only x and y dimensions supported, found </span><span class="si">{</span><span class="n">da</span><span class="o">.</span><span class="n">dims</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
     <span class="c1"># transform will be affine object in next xarray</span>
-    <span class="n">profile</span><span class="p">[</span><span class="s2">&quot;transform&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">imod</span><span class="o">.</span><span class="n">util</span><span class="o">.</span><span class="n">spatial</span><span class="o">.</span><span class="n">transform</span><span class="p">(</span><span class="n">da</span><span class="p">)</span>
-    <span class="n">profile</span><span class="p">[</span><span class="s2">&quot;driver&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">driver</span>
-    <span class="n">profile</span><span class="p">[</span><span class="s2">&quot;height&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">da</span><span class="o">.</span><span class="n">y</span><span class="o">.</span><span class="n">size</span>
-    <span class="n">profile</span><span class="p">[</span><span class="s2">&quot;width&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">da</span><span class="o">.</span><span class="n">x</span><span class="o">.</span><span class="n">size</span>
-    <span class="n">profile</span><span class="p">[</span><span class="s2">&quot;count&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">1</span>
-    <span class="n">profile</span><span class="p">[</span><span class="s2">&quot;dtype&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">da</span><span class="o">.</span><span class="n">dtype</span>
-    <span class="n">profile</span><span class="p">[</span><span class="s2">&quot;nodata&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">nodata</span>
+    <span class="n">profile</span><span class="p">[</span><span class="s2">"transform"</span><span class="p">]</span> <span class="o">=</span> <span class="n">imod</span><span class="o">.</span><span class="n">util</span><span class="o">.</span><span class="n">spatial</span><span class="o">.</span><span class="n">transform</span><span class="p">(</span><span class="n">da</span><span class="p">)</span>
+    <span class="n">profile</span><span class="p">[</span><span class="s2">"driver"</span><span class="p">]</span> <span class="o">=</span> <span class="n">driver</span>
+    <span class="n">profile</span><span class="p">[</span><span class="s2">"height"</span><span class="p">]</span> <span class="o">=</span> <span class="n">da</span><span class="o">.</span><span class="n">y</span><span class="o">.</span><span class="n">size</span>
+    <span class="n">profile</span><span class="p">[</span><span class="s2">"width"</span><span class="p">]</span> <span class="o">=</span> <span class="n">da</span><span class="o">.</span><span class="n">x</span><span class="o">.</span><span class="n">size</span>
+    <span class="n">profile</span><span class="p">[</span><span class="s2">"count"</span><span class="p">]</span> <span class="o">=</span> <span class="mi">1</span>
+    <span class="n">profile</span><span class="p">[</span><span class="s2">"dtype"</span><span class="p">]</span> <span class="o">=</span> <span class="n">da</span><span class="o">.</span><span class="n">dtype</span>
+    <span class="n">profile</span><span class="p">[</span><span class="s2">"nodata"</span><span class="p">]</span> <span class="o">=</span> <span class="n">nodata</span>
 
-    <span class="c1"># Allow writing ASCII grids even if rasterio isn&#39;t installed. This is</span>
+    <span class="c1"># Allow writing ASCII grids even if rasterio isn't installed. This is</span>
     <span class="c1"># useful for e.g. MetaSWAP input.</span>
-    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">rasterio</span><span class="p">,</span> <span class="n">MissingOptionalModule</span><span class="p">)</span> <span class="ow">and</span> <span class="n">driver</span> <span class="o">==</span> <span class="s2">&quot;AAIGrid&quot;</span><span class="p">:</span>
+    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">rasterio</span><span class="p">,</span> <span class="n">MissingOptionalModule</span><span class="p">)</span> <span class="ow">and</span> <span class="n">driver</span> <span class="o">==</span> <span class="s2">"AAIGrid"</span><span class="p">:</span>
         <span class="n">write_aaigrid</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="n">da</span><span class="o">.</span><span class="n">values</span><span class="p">,</span> <span class="n">profile</span><span class="p">)</span>
     <span class="k">else</span><span class="p">:</span>
         <span class="k">with</span> <span class="n">rasterio</span><span class="o">.</span><span class="n">Env</span><span class="p">():</span>
-            <span class="k">with</span> <span class="n">rasterio</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="s2">&quot;w&quot;</span><span class="p">,</span> <span class="o">**</span><span class="n">profile</span><span class="p">)</span> <span class="k">as</span> <span class="n">ds</span><span class="p">:</span>
+            <span class="k">with</span> <span class="n">rasterio</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="s2">"w"</span><span class="p">,</span> <span class="o">**</span><span class="n">profile</span><span class="p">)</span> <span class="k">as</span> <span class="n">ds</span><span class="p">:</span>
                 <span class="n">ds</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">da</span><span class="o">.</span><span class="n">values</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
     <span class="k">return</span>
 
 
 <div class="viewcode-block" id="save">
 <a class="viewcode-back" href="../../../api/generated/io/imod.formats.rasterio.save.html#imod.formats.rasterio.save">[docs]</a>
-<span class="k">def</span><span class="w"> </span><span class="nf">save</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="n">a</span><span class="p">,</span> <span class="n">driver</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">nodata</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">,</span> <span class="n">pattern</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">save</span><span class="p">(</span>
+    <span class="n">path</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="n">pathlib</span><span class="o">.</span><span class="n">Path</span><span class="p">,</span>
+    <span class="n">a</span><span class="p">:</span> <span class="n">xr</span><span class="o">.</span><span class="n">DataArray</span><span class="p">,</span>
+    <span class="n">driver</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">nodata</span><span class="p">:</span> <span class="nb">float</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">,</span>
+    <span class="n">pattern</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">dtype</span><span class="p">:</span> <span class="n">Any</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">"""</span>
 <span class="sd">    Write a xarray.DataArray to one or more rasterio supported files</span>
 
 <span class="sd">    If the DataArray only has ``y`` and ``x`` dimensions, a single raster file is</span>
@@ -904,7 +935,7 @@
 <span class="sd">        actual filename(s) using conventions, so it only takes the directory and</span>
 <span class="sd">        name from this parameter.</span>
 <span class="sd">    a : xarray.DataArray</span>
-<span class="sd">        DataArray to be written. It needs to have dimensions (&#39;y&#39;, &#39;x&#39;), and</span>
+<span class="sd">        DataArray to be written. It needs to have dimensions ('y', 'x'), and</span>
 <span class="sd">        optionally ``layer`` and ``time``.</span>
 <span class="sd">    driver: str, optional</span>
 <span class="sd">        Which GDAL format driver to use. The complete list is at</span>
@@ -917,45 +948,50 @@
 
 <span class="sd">    Example</span>
 <span class="sd">    -------</span>
-<span class="sd">    Consider a DataArray ``da`` that has dimensions &#39;layer&#39;, &#39;y&#39; and &#39;x&#39;, with the</span>
-<span class="sd">    &#39;layer&#39; dimension consisting of layer 1 and 2::</span>
+<span class="sd">    Consider a DataArray ``da`` that has dimensions 'layer', 'y' and 'x', with the</span>
+<span class="sd">    'layer' dimension consisting of layer 1 and 2::</span>
 
-<span class="sd">        save(&#39;path/to/head&#39;, da)</span>
+<span class="sd">        save('path/to/head', da)</span>
 
-<span class="sd">    This writes the following two tif files: &#39;path/to/head_l1.tif&#39; and</span>
-<span class="sd">    &#39;path/to/head_l2.tif&#39;.</span>
+<span class="sd">    This writes the following two tif files: 'path/to/head_l1.tif' and</span>
+<span class="sd">    'path/to/head_l2.tif'.</span>
 
 
 <span class="sd">    It is possible to generate custom filenames using a format string. The</span>
 <span class="sd">    default filenames would be generated by the following format string:</span>
 
-<span class="sd">        save(&quot;example&quot;, pattern=&quot;{name}_l{layer}{extension}&quot;)</span>
+<span class="sd">        save("example", pattern="{name}_l{layer}{extension}")</span>
 
 <span class="sd">    If you desire zero-padded numbers that show up neatly sorted in a</span>
 <span class="sd">    file manager, you may specify:</span>
 
-<span class="sd">        save(&quot;example&quot;, pattern=&quot;{name}_l{layer:02d}{extension}&quot;)</span>
+<span class="sd">        save("example", pattern="{name}_l{layer:02d}{extension}")</span>
 
-<span class="sd">    In this case, a 0 will be padded for single digit numbers (&#39;1&#39; will become</span>
-<span class="sd">    &#39;01&#39;).</span>
+<span class="sd">    In this case, a 0 will be padded for single digit numbers ('1' will become</span>
+<span class="sd">    '01').</span>
 
 <span class="sd">    To get a date with dashes, use the following pattern:</span>
 
-<span class="sd">        &quot;{name}_{time:%Y-%m-%d}_l{layer}{extension}&quot;</span>
+<span class="sd">        "{name}_{time:%Y-%m-%d}_l{layer}{extension}"</span>
 
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="n">path</span> <span class="o">=</span> <span class="n">pathlib</span><span class="o">.</span><span class="n">Path</span><span class="p">(</span><span class="n">path</span><span class="p">)</span>
     <span class="c1"># defaults to geotiff</span>
     <span class="k">if</span> <span class="n">driver</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-        <span class="k">if</span> <span class="n">path</span><span class="o">.</span><span class="n">suffix</span> <span class="o">==</span> <span class="s2">&quot;&quot;</span><span class="p">:</span>
-            <span class="n">path</span> <span class="o">=</span> <span class="n">path</span><span class="o">.</span><span class="n">with_suffix</span><span class="p">(</span><span class="s2">&quot;.tif&quot;</span><span class="p">)</span>
-            <span class="n">driver</span> <span class="o">=</span> <span class="s2">&quot;GTiff&quot;</span>
+        <span class="k">if</span> <span class="n">path</span><span class="o">.</span><span class="n">suffix</span> <span class="o">==</span> <span class="s2">""</span><span class="p">:</span>
+            <span class="n">path</span> <span class="o">=</span> <span class="n">path</span><span class="o">.</span><span class="n">with_suffix</span><span class="p">(</span><span class="s2">".tif"</span><span class="p">)</span>
+            <span class="n">driver</span> <span class="o">=</span> <span class="s2">"GTiff"</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="n">driver</span> <span class="o">=</span> <span class="n">_get_driver</span><span class="p">(</span><span class="n">path</span><span class="p">)</span>
 
     <span class="c1"># Use a closure to skip the driver argument</span>
     <span class="c1"># so it takes the same arguments as the idf write</span>
-    <span class="k">def</span><span class="w"> </span><span class="nf">_write</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="n">a</span><span class="p">,</span> <span class="n">nodata</span><span class="p">,</span> <span class="n">dtype</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_write</span><span class="p">(</span>
+        <span class="n">path</span><span class="p">:</span> <span class="n">pathlib</span><span class="o">.</span><span class="n">Path</span><span class="p">,</span>
+        <span class="n">a</span><span class="p">:</span> <span class="n">xr</span><span class="o">.</span><span class="n">DataArray</span><span class="p">,</span>
+        <span class="n">nodata</span><span class="p">:</span> <span class="nb">float</span> <span class="o">|</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">dtype</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
         <span class="k">return</span> <span class="n">write</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="n">a</span><span class="p">,</span> <span class="n">driver</span><span class="p">,</span> <span class="n">nodata</span><span class="p">,</span> <span class="n">dtype</span><span class="p">)</span>
 
     <span class="n">array_io</span><span class="o">.</span><span class="n">writing</span><span class="o">.</span><span class="n">_save</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="n">a</span><span class="p">,</span> <span class="n">nodata</span><span class="p">,</span> <span class="n">pattern</span><span class="p">,</span> <span class="n">dtype</span><span class="p">,</span> <span class="n">_write</span><span class="p">)</span></div>
@@ -989,8 +1025,8 @@
   </div>
   
   <!-- Scripts loaded after <body> so the DOM is not blocked -->
-  <script defer src="../../../_static/scripts/bootstrap.js?digest=90905a2f556bf617f1a9"></script>
-<script defer src="../../../_static/scripts/pydata-sphinx-theme.js?digest=90905a2f556bf617f1a9"></script>
+  <script defer src="../../../_static/scripts/bootstrap.js?digest=75c7c72ae941e8b558d8"></script>
+<script defer src="../../../_static/scripts/pydata-sphinx-theme.js?digest=75c7c72ae941e8b558d8"></script>
 
   <footer class="bd-footer">
 <div class="bd-footer__inner bd-page-width">
@@ -1010,8 +1046,7 @@
         <div class="footer-item">
 
   <p class="sphinx-version">
-    Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 9.1.0.
-    <br/>
+    Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 9.2.0.
   </p>
 </div>
       
@@ -1024,7 +1059,7 @@
         <div class="footer-item">
 <p class="theme-version">
   <!-- # L10n: Setting the PST URL as an argument as this does not need to be localized -->
-  Built with the <a href="https://pydata-sphinx-theme.readthedocs.io/en/stable/index.html">PyData Sphinx Theme</a> 0.20.0.
+  Built with the <a href="https://pydata-sphinx-theme.readthedocs.io/en/stable/index.html">PyData Sphinx Theme</a> 0.24.0.
 </p></div>
       
     </div>

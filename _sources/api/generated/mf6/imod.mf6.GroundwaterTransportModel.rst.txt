@@ -27,6 +27,7 @@
       ~GroundwaterTransportModel.items
       ~GroundwaterTransportModel.keys
       ~GroundwaterTransportModel.mask_all_packages
+      ~GroundwaterTransportModel.mask_packages
       ~GroundwaterTransportModel.pop
       ~GroundwaterTransportModel.popitem
       ~GroundwaterTransportModel.prepare_wel_for_mf6

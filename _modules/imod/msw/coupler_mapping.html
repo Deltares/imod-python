@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 
 
@@ -7,7 +6,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>imod.msw.coupler_mapping &#8212; iMOD Python 1.1.0 documentation</title>
+    <title>imod.msw.coupler_mapping &#8212; iMOD Python 1.2.0 documentation</title>
   
   
   
@@ -26,22 +25,22 @@
   </noscript>
   
   <!-- Loaded before other Sphinx assets -->
-  <link href="../../../_static/styles/theme.css?digest=90905a2f556bf617f1a9" rel="stylesheet" />
-<link href="../../../_static/styles/pydata-sphinx-theme.css?digest=90905a2f556bf617f1a9" rel="stylesheet" />
+  <link href="../../../_static/styles/theme.css?digest=75c7c72ae941e8b558d8" rel="stylesheet" />
+<link href="../../../_static/styles/pydata-sphinx-theme.css?digest=75c7c72ae941e8b558d8" rel="stylesheet" />
 
     <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=03e43079" />
-    <link rel="stylesheet" type="text/css" href="../../../_static/sg_gallery.css?v=fd6457a4" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/sg_gallery.css?v=c83e6b79" />
     <link rel="stylesheet" type="text/css" href="../../../_static/sg_gallery-binder.css?v=f4aeca0c" />
     <link rel="stylesheet" type="text/css" href="../../../_static/sg_gallery-dataframe.css?v=2082cf3c" />
     <link rel="stylesheet" type="text/css" href="../../../_static/sg_gallery-rendered-html.css?v=1277b6f3" />
   
   <!-- So that users can add custom icons -->
-  <script defer src="../../../_static/scripts/fontawesome.js?digest=90905a2f556bf617f1a9"></script>
+  <script defer src="../../../_static/scripts/fontawesome.js?digest=75c7c72ae941e8b558d8"></script>
   <!-- Pre-loaded scripts that we'll load fully later -->
-  <link rel="preload" as="script" href="../../../_static/scripts/bootstrap.js?digest=90905a2f556bf617f1a9" />
-<link rel="preload" as="script" href="../../../_static/scripts/pydata-sphinx-theme.js?digest=90905a2f556bf617f1a9" />
+  <link rel="preload" as="script" href="../../../_static/scripts/bootstrap.js?digest=75c7c72ae941e8b558d8" />
+<link rel="preload" as="script" href="../../../_static/scripts/pydata-sphinx-theme.js?digest=75c7c72ae941e8b558d8" />
 
-    <script src="../../../_static/documentation_options.js?v=fc837d61"></script>
+    <script src="../../../_static/documentation_options.js?v=6efca38a"></script>
     <script src="../../../_static/doctools.js?v=fd6eb6e6"></script>
     <script src="../../../_static/sphinx_highlight.js?v=6ffebe34"></script>
     <script src="../../../_static/sg-tags.js?v=d80f6fa4"></script>
@@ -51,8 +50,9 @@
     <link rel="index" title="Index" href="../../../genindex.html" />
     <link rel="search" title="Search" href="../../../search.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <meta name="color-scheme" content="light dark"/>
   <meta name="docsearch:language" content="en"/>
-  <meta name="docsearch:version" content="1.1.0.dev" />
+  <meta name="docsearch:version" content="1.2.0.dev" />
   
     
     <script src="../../../_static/searchtools.js"></script>
@@ -100,7 +100,7 @@
   
     <header id="pst-header" class="bd-header navbar navbar-expand-lg bd-navbar d-print-none">
 <div class="bd-header__inner bd-page-width">
-  <button class="pst-navbar-icon sidebar-toggle primary-toggle" aria-label="Site navigation">
+  <button type="button" class="pst-navbar-icon sidebar-toggle primary-toggle" aria-label="Site navigation" aria-expanded="false" aria-controls="pst-primary-sidebar-modal">
     <span class="fa-solid fa-bars"></span>
   </button>
   
@@ -122,8 +122,8 @@
     
     
     
-    <img src="../../../_static/imod-python-logo-light.svg" class="logo__image only-light" alt="iMOD Python 1.1.0 documentation - Home"/>
-    <img src="../../../_static/imod-python-logo-dark.svg" class="logo__image only-dark pst-js-only" alt="iMOD Python 1.1.0 documentation - Home"/>
+    <img src="../../../_static/imod-python-logo-light.svg" class="logo__image only-light" alt="iMOD Python 1.2.0 documentation - Home"/>
+    <img src="../../../_static/imod-python-logo-dark.svg" class="logo__image only-dark pst-js-only" alt="iMOD Python 1.2.0 documentation - Home"/>
   
   
 </a></div>
@@ -190,7 +190,7 @@
         <div class="navbar-item navbar-persistent--container">
           
 
-<button class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+<button type="button" class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
  <i class="fa-solid fa-magnifying-glass"></i>
  <span class="search-button__default-text">Search</span>
  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
@@ -201,15 +201,15 @@
         <div class="navbar-item">
 
 <div class="theme-switch-container dropdown pst-js-only" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Color mode">
-  <button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button dropdown-toggle" aria-label="Color mode" data-bs-toggle="dropdown">
-    <i class="theme-switch fa-solid fa-sun fa-lg fa-fw" data-mode="light" title="Light"></i>
-    <i class="theme-switch fa-solid fa-moon fa-lg fa-fw" data-mode="dark" title="Dark"></i>
-    <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg fa-fw" data-mode="auto" title="System Settings"></i>
+  <button type="button" class="btn btn-sm nav-link pst-navbar-icon theme-switch-button dropdown-toggle" aria-label="Color mode" data-bs-toggle="dropdown">
+    <i class="theme-switch fa-solid fa-sun fa-lg" data-mode="light" title="Light"></i>
+    <i class="theme-switch fa-solid fa-moon fa-lg" data-mode="dark" title="Dark"></i>
+    <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg" data-mode="auto" title="System Settings"></i>
   </button>
   <ul class="dropdown-menu dropdown-menu-end">
-    <li><button class="dropdown-item d-flex align-items-center theme-change-button" data-mode="auto"><i class="fa-solid fa-circle-half-stroke fa-lg fa-fw me-1"></i>System Settings</button></li>
-    <li><button class="dropdown-item d-flex align-items-center theme-change-button" data-mode="light"><i class="fa-solid fa-sun fa-lg fa-fw me-1"></i>Light</button></li>
-    <li><button class="dropdown-item d-flex align-items-center theme-change-button" data-mode="dark"><i class="fa-solid fa-moon fa-lg fa-fw me-1"></i>Dark</button></li>
+    <li><button type="button" class="dropdown-item d-flex align-items-center theme-change-button" data-mode="auto"><i class="fa-solid fa-circle-half-stroke fa-lg me-1"></i>System Settings</button></li>
+    <li><button type="button" class="dropdown-item d-flex align-items-center theme-change-button" data-mode="light"><i class="fa-solid fa-sun fa-lg me-1"></i>Light</button></li>
+    <li><button type="button" class="dropdown-item d-flex align-items-center theme-change-button" data-mode="dark"><i class="fa-solid fa-moon fa-lg me-1"></i>Dark</button></li>
   </ul>
 </div></div>
       
@@ -246,7 +246,7 @@
   
     <div class="navbar-persistent--mobile">
 
-<button class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+<button type="button" class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
  <i class="fa-solid fa-magnifying-glass"></i>
  <span class="search-button__default-text">Search</span>
  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
@@ -267,7 +267,7 @@
       
         
       
-      <dialog id="pst-primary-sidebar-modal"></dialog>
+      <dialog id="pst-primary-sidebar-modal" tabindex="-1"></dialog>
       <div id="pst-primary-sidebar" class="bd-sidebar-primary bd-sidebar hide-on-wide">
         
 
@@ -337,15 +337,15 @@
           <div class="navbar-item">
 
 <div class="theme-switch-container dropdown pst-js-only" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Color mode">
-  <button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button dropdown-toggle" aria-label="Color mode" data-bs-toggle="dropdown">
-    <i class="theme-switch fa-solid fa-sun fa-lg fa-fw" data-mode="light" title="Light"></i>
-    <i class="theme-switch fa-solid fa-moon fa-lg fa-fw" data-mode="dark" title="Dark"></i>
-    <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg fa-fw" data-mode="auto" title="System Settings"></i>
+  <button type="button" class="btn btn-sm nav-link pst-navbar-icon theme-switch-button dropdown-toggle" aria-label="Color mode" data-bs-toggle="dropdown">
+    <i class="theme-switch fa-solid fa-sun fa-lg" data-mode="light" title="Light"></i>
+    <i class="theme-switch fa-solid fa-moon fa-lg" data-mode="dark" title="Dark"></i>
+    <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg" data-mode="auto" title="System Settings"></i>
   </button>
   <ul class="dropdown-menu dropdown-menu-end">
-    <li><button class="dropdown-item d-flex align-items-center theme-change-button" data-mode="auto"><i class="fa-solid fa-circle-half-stroke fa-lg fa-fw me-1"></i>System Settings</button></li>
-    <li><button class="dropdown-item d-flex align-items-center theme-change-button" data-mode="light"><i class="fa-solid fa-sun fa-lg fa-fw me-1"></i>Light</button></li>
-    <li><button class="dropdown-item d-flex align-items-center theme-change-button" data-mode="dark"><i class="fa-solid fa-moon fa-lg fa-fw me-1"></i>Dark</button></li>
+    <li><button type="button" class="dropdown-item d-flex align-items-center theme-change-button" data-mode="auto"><i class="fa-solid fa-circle-half-stroke fa-lg me-1"></i>System Settings</button></li>
+    <li><button type="button" class="dropdown-item d-flex align-items-center theme-change-button" data-mode="light"><i class="fa-solid fa-sun fa-lg me-1"></i>Light</button></li>
+    <li><button type="button" class="dropdown-item d-flex align-items-center theme-change-button" data-mode="dark"><i class="fa-solid fa-moon fa-lg me-1"></i>Dark</button></li>
   </ul>
 </div></div>
         
@@ -411,7 +411,7 @@
     
     <li class="breadcrumb-item breadcrumb-home">
       <a href="../../../index.html" class="nav-link" aria-label="Home">
-        <i class="fa-solid fa-home"></i>
+        <i class="fa-solid fa-house"></i>
       </a>
     </li>
     
@@ -453,43 +453,43 @@
 <div class="viewcode-block" id="CouplerMapping">
 <a class="viewcode-back" href="../../../api/generated/msw/imod.msw.CouplerMapping.html#imod.msw.CouplerMapping">[docs]</a>
 <span class="k">class</span><span class="w"> </span><span class="nc">CouplerMapping</span><span class="p">(</span><span class="n">MetaSwapPackage</span><span class="p">,</span> <span class="n">IPackageBase</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">"""</span>
 <span class="sd">    This contains the data to connect MODFLOW 6 cells to MetaSWAP svats.</span>
 
 <span class="sd">    This class is responsible for the file `mod2svat.inp`. It also includes</span>
 <span class="sd">    connection to wells.</span>
 
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
 
-    <span class="n">_file_name</span> <span class="o">=</span> <span class="s2">&quot;mod2svat.inp&quot;</span>
+    <span class="n">_file_name</span> <span class="o">=</span> <span class="s2">"mod2svat.inp"</span>
     <span class="n">_metadata_dict</span> <span class="o">=</span> <span class="p">{</span>
-        <span class="s2">&quot;mod_id&quot;</span><span class="p">:</span> <span class="n">VariableMetaData</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="nb">int</span><span class="p">),</span>
-        <span class="s2">&quot;free&quot;</span><span class="p">:</span> <span class="n">VariableMetaData</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="nb">str</span><span class="p">),</span>
-        <span class="s2">&quot;svat&quot;</span><span class="p">:</span> <span class="n">VariableMetaData</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">9999999</span><span class="p">,</span> <span class="nb">int</span><span class="p">),</span>
-        <span class="s2">&quot;layer&quot;</span><span class="p">:</span> <span class="n">VariableMetaData</span><span class="p">(</span><span class="mi">5</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">9999</span><span class="p">,</span> <span class="nb">int</span><span class="p">),</span>
+        <span class="s2">"mod_id"</span><span class="p">:</span> <span class="n">VariableMetaData</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="nb">int</span><span class="p">),</span>
+        <span class="s2">"free"</span><span class="p">:</span> <span class="n">VariableMetaData</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="nb">str</span><span class="p">),</span>
+        <span class="s2">"svat"</span><span class="p">:</span> <span class="n">VariableMetaData</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">9999999</span><span class="p">,</span> <span class="nb">int</span><span class="p">),</span>
+        <span class="s2">"layer"</span><span class="p">:</span> <span class="n">VariableMetaData</span><span class="p">(</span><span class="mi">5</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">9999</span><span class="p">,</span> <span class="nb">int</span><span class="p">),</span>
     <span class="p">}</span>
 
     <span class="n">_with_subunit</span> <span class="o">=</span> <span class="p">()</span>
     <span class="n">_without_subunit</span> <span class="o">=</span> <span class="p">()</span>
-    <span class="n">_to_fill</span> <span class="o">=</span> <span class="p">(</span><span class="s2">&quot;free&quot;</span><span class="p">,)</span>
+    <span class="n">_to_fill</span> <span class="o">=</span> <span class="p">(</span><span class="s2">"free"</span><span class="p">,)</span>
 
 <div class="viewcode-block" id="CouplerMapping.__init__">
 <a class="viewcode-back" href="../../../api/generated/msw/imod.msw.CouplerMapping.html#imod.msw.CouplerMapping.__init__">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
-    <span class="p">):</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span></div>
 
 
     <span class="k">def</span><span class="w"> </span><span class="nf">_create_mod_id_rch</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span> <span class="n">svat</span><span class="p">:</span> <span class="n">xr</span><span class="o">.</span><span class="n">DataArray</span><span class="p">,</span> <span class="n">idomain_top_active</span><span class="p">:</span> <span class="n">xr</span><span class="o">.</span><span class="n">DataArray</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">xr</span><span class="o">.</span><span class="n">DataArray</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">"""</span>
 <span class="sd">        Create modflow indices for the recharge layer, which is where</span>
 <span class="sd">        infiltration will take place.</span>
-<span class="sd">        &quot;&quot;&quot;</span>
+<span class="sd">        """</span>
         <span class="n">mod_id</span> <span class="o">=</span> <span class="n">xr</span><span class="o">.</span><span class="n">full_like</span><span class="p">(</span><span class="n">svat</span><span class="p">,</span> <span class="n">fill_value</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">int64</span><span class="p">)</span>
-        <span class="n">n_subunit</span> <span class="o">=</span> <span class="n">svat</span><span class="p">[</span><span class="s2">&quot;subunit&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">size</span>
+        <span class="n">n_subunit</span> <span class="o">=</span> <span class="n">svat</span><span class="p">[</span><span class="s2">"subunit"</span><span class="p">]</span><span class="o">.</span><span class="n">size</span>
         <span class="c1"># Sum active cells and convert to int for MyPy. This is the number of</span>
         <span class="c1"># modflow cells in the top layer.</span>
         <span class="n">n_mod_top</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">enforce_scalar</span><span class="p">(</span><span class="n">idomain_top_active</span><span class="o">.</span><span class="n">sum</span><span class="p">()))</span>
@@ -508,13 +508,13 @@
         <span class="n">mf6_dis</span><span class="p">:</span> <span class="n">StructuredDiscretization</span><span class="p">,</span>
         <span class="n">mf6_well</span><span class="p">:</span> <span class="n">Mf6Wel</span><span class="p">,</span>
         <span class="o">*</span><span class="n">args</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span>
-    <span class="p">):</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
         <span class="k">if</span> <span class="n">mf6_well</span> <span class="ow">and</span> <span class="p">(</span><span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">mf6_well</span><span class="p">,</span> <span class="n">Mf6Wel</span><span class="p">)):</span>
-            <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="sa">rf</span><span class="s2">&quot;mf6_well not of type &#39;Mf6Wel&#39;, got &#39;</span><span class="si">{</span><span class="nb">type</span><span class="p">(</span><span class="n">mf6_well</span><span class="p">)</span><span class="si">}</span><span class="s2">&#39;&quot;</span><span class="p">)</span>
-        <span class="c1"># Test if equal or larger than 1, to ignore idomain == -1 as well. Don&#39;t</span>
+            <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="sa">rf</span><span class="s2">"mf6_well not of type 'Mf6Wel', got '</span><span class="si">{</span><span class="nb">type</span><span class="p">(</span><span class="n">mf6_well</span><span class="p">)</span><span class="si">}</span><span class="s2">'"</span><span class="p">)</span>
+        <span class="c1"># Test if equal or larger than 1, to ignore idomain == -1 as well. Don't</span>
         <span class="c1"># assign to self.dataset, as grid extent might differ from svat when</span>
         <span class="c1"># MetaSWAP only covers part of the Modflow grid domain.</span>
-        <span class="n">idomain_active</span> <span class="o">=</span> <span class="n">mf6_dis</span><span class="p">[</span><span class="s2">&quot;idomain&quot;</span><span class="p">]</span> <span class="o">&gt;=</span> <span class="mi">1</span>
+        <span class="n">idomain_active</span> <span class="o">=</span> <span class="n">mf6_dis</span><span class="p">[</span><span class="s2">"idomain"</span><span class="p">]</span> <span class="o">&gt;=</span> <span class="mi">1</span>
         <span class="c1"># Load into memory to avoid dask issue</span>
         <span class="c1"># https://github.com/dask/dask/issues/11753</span>
         <span class="c1"># Otherwise fancy indexing in ``_create_mod_id_rch`` and</span>
@@ -526,9 +526,9 @@
 
         <span class="bp">self</span><span class="o">.</span><span class="n">_pkgcheck</span><span class="p">()</span>
 
-        <span class="n">data_dict</span><span class="p">:</span> <span class="n">DataDictType</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;svat&quot;</span><span class="p">:</span> <span class="n">svat</span><span class="o">.</span><span class="n">values</span><span class="o">.</span><span class="n">ravel</span><span class="p">()[</span><span class="n">index</span><span class="p">]}</span>
-        <span class="n">data_dict</span><span class="p">[</span><span class="s2">&quot;layer&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">full_like</span><span class="p">(</span><span class="n">data_dict</span><span class="p">[</span><span class="s2">&quot;svat&quot;</span><span class="p">],</span> <span class="mi">1</span><span class="p">)</span>
-        <span class="n">data_dict</span><span class="p">[</span><span class="s2">&quot;mod_id&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_index_da</span><span class="p">(</span><span class="n">mod_id</span><span class="p">,</span> <span class="n">index</span><span class="p">)</span>
+        <span class="n">data_dict</span><span class="p">:</span> <span class="n">DataDictType</span> <span class="o">=</span> <span class="p">{</span><span class="s2">"svat"</span><span class="p">:</span> <span class="n">svat</span><span class="o">.</span><span class="n">values</span><span class="o">.</span><span class="n">ravel</span><span class="p">()[</span><span class="n">index</span><span class="p">]}</span>
+        <span class="n">data_dict</span><span class="p">[</span><span class="s2">"layer"</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">full_like</span><span class="p">(</span><span class="n">data_dict</span><span class="p">[</span><span class="s2">"svat"</span><span class="p">],</span> <span class="mi">1</span><span class="p">)</span>
+        <span class="n">data_dict</span><span class="p">[</span><span class="s2">"mod_id"</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_index_da</span><span class="p">(</span><span class="n">mod_id</span><span class="p">,</span> <span class="n">index</span><span class="p">)</span>
 
         <span class="c1"># Get well values</span>
         <span class="k">if</span> <span class="n">mf6_well</span><span class="p">:</span>
@@ -537,14 +537,14 @@
                 <span class="n">data_dict</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">well_data_dict</span><span class="p">[</span><span class="n">key</span><span class="p">],</span> <span class="n">data_dict</span><span class="p">[</span><span class="n">key</span><span class="p">])</span>
 
         <span class="k">for</span> <span class="n">var</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_to_fill</span><span class="p">:</span>
-            <span class="n">data_dict</span><span class="p">[</span><span class="n">var</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
+            <span class="n">data_dict</span><span class="p">[</span><span class="n">var</span><span class="p">]</span> <span class="o">=</span> <span class="s2">""</span>
 
         <span class="n">dataframe</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span>
             <span class="n">data</span><span class="o">=</span><span class="n">data_dict</span><span class="p">,</span> <span class="n">columns</span><span class="o">=</span><span class="nb">list</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_metadata_dict</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span>
         <span class="p">)</span>
         <span class="c1"># Drop duplicates, MetaSWAP does not support duplicate connections</span>
         <span class="n">dataframe</span> <span class="o">=</span> <span class="n">dataframe</span><span class="o">.</span><span class="n">drop_duplicates</span><span class="p">(</span>
-            <span class="n">subset</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;mod_id&quot;</span><span class="p">,</span> <span class="s2">&quot;svat&quot;</span><span class="p">,</span> <span class="s2">&quot;layer&quot;</span><span class="p">],</span> <span class="n">keep</span><span class="o">=</span><span class="s2">&quot;first&quot;</span>
+            <span class="n">subset</span><span class="o">=</span><span class="p">[</span><span class="s2">"mod_id"</span><span class="p">,</span> <span class="s2">"svat"</span><span class="p">,</span> <span class="s2">"layer"</span><span class="p">],</span> <span class="n">keep</span><span class="o">=</span><span class="s2">"first"</span>
         <span class="p">)</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">_check_range</span><span class="p">(</span><span class="n">dataframe</span><span class="p">)</span>
@@ -557,18 +557,18 @@
         <span class="n">idomain_active</span><span class="p">:</span> <span class="n">xr</span><span class="o">.</span><span class="n">DataArray</span><span class="p">,</span>
         <span class="n">mf6_well</span><span class="p">:</span> <span class="n">Mf6Wel</span><span class="p">,</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">DataDictType</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">"""</span>
 <span class="sd">        Get modflow indices, svats, and layer number for the wells</span>
-<span class="sd">        &quot;&quot;&quot;</span>
-        <span class="n">n_subunit</span> <span class="o">=</span> <span class="n">svat</span><span class="p">[</span><span class="s2">&quot;subunit&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">size</span>
+<span class="sd">        """</span>
+        <span class="n">n_subunit</span> <span class="o">=</span> <span class="n">svat</span><span class="p">[</span><span class="s2">"subunit"</span><span class="p">]</span><span class="o">.</span><span class="n">size</span>
 
-        <span class="n">well_cellid</span> <span class="o">=</span> <span class="n">mf6_well</span><span class="o">.</span><span class="n">dataset</span><span class="p">[</span><span class="s2">&quot;cellid&quot;</span><span class="p">]</span>
-        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">well_cellid</span><span class="o">.</span><span class="n">coords</span><span class="p">[</span><span class="s2">&quot;dim_cellid&quot;</span><span class="p">])</span> <span class="o">!=</span> <span class="mi">3</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">&quot;Coupling to unstructured grids is not supported.&quot;</span><span class="p">)</span>
+        <span class="n">well_cellid</span> <span class="o">=</span> <span class="n">mf6_well</span><span class="o">.</span><span class="n">dataset</span><span class="p">[</span><span class="s2">"cellid"</span><span class="p">]</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">well_cellid</span><span class="o">.</span><span class="n">coords</span><span class="p">[</span><span class="s2">"dim_cellid"</span><span class="p">])</span> <span class="o">!=</span> <span class="mi">3</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">"Coupling to unstructured grids is not supported."</span><span class="p">)</span>
 
-        <span class="n">well_layer</span> <span class="o">=</span> <span class="n">well_cellid</span><span class="o">.</span><span class="n">sel</span><span class="p">(</span><span class="n">dim_cellid</span><span class="o">=</span><span class="s2">&quot;layer&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">data</span>
-        <span class="n">well_row</span> <span class="o">=</span> <span class="n">well_cellid</span><span class="o">.</span><span class="n">sel</span><span class="p">(</span><span class="n">dim_cellid</span><span class="o">=</span><span class="s2">&quot;row&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">data</span> <span class="o">-</span> <span class="mi">1</span>
-        <span class="n">well_column</span> <span class="o">=</span> <span class="n">well_cellid</span><span class="o">.</span><span class="n">sel</span><span class="p">(</span><span class="n">dim_cellid</span><span class="o">=</span><span class="s2">&quot;column&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">data</span> <span class="o">-</span> <span class="mi">1</span>
+        <span class="n">well_layer</span> <span class="o">=</span> <span class="n">well_cellid</span><span class="o">.</span><span class="n">sel</span><span class="p">(</span><span class="n">dim_cellid</span><span class="o">=</span><span class="s2">"layer"</span><span class="p">)</span><span class="o">.</span><span class="n">data</span>
+        <span class="n">well_row</span> <span class="o">=</span> <span class="n">well_cellid</span><span class="o">.</span><span class="n">sel</span><span class="p">(</span><span class="n">dim_cellid</span><span class="o">=</span><span class="s2">"row"</span><span class="p">)</span><span class="o">.</span><span class="n">data</span> <span class="o">-</span> <span class="mi">1</span>
+        <span class="n">well_column</span> <span class="o">=</span> <span class="n">well_cellid</span><span class="o">.</span><span class="n">sel</span><span class="p">(</span><span class="n">dim_cellid</span><span class="o">=</span><span class="s2">"column"</span><span class="p">)</span><span class="o">.</span><span class="n">data</span> <span class="o">-</span> <span class="mi">1</span>
         <span class="c1"># Sum active cells and convert to int for MyPy. This is the number of</span>
         <span class="c1"># modflow cells in the top layer.</span>
         <span class="n">n_mod</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">enforce_scalar</span><span class="p">(</span><span class="n">idomain_active</span><span class="o">.</span><span class="n">sum</span><span class="p">()))</span>
@@ -589,7 +589,7 @@
         <span class="n">layer</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">tile</span><span class="p">(</span><span class="n">well_layer</span><span class="p">,</span> <span class="p">(</span><span class="n">n_subunit</span><span class="p">,</span> <span class="mi">1</span><span class="p">))</span>
         <span class="n">layer_1d</span> <span class="o">=</span> <span class="n">layer</span><span class="p">[</span><span class="n">well_active</span><span class="p">]</span>
 
-        <span class="k">return</span> <span class="p">{</span><span class="s2">&quot;mod_id&quot;</span><span class="p">:</span> <span class="n">well_mod_id_1d</span><span class="p">,</span> <span class="s2">&quot;svat&quot;</span><span class="p">:</span> <span class="n">well_svat_1d</span><span class="p">,</span> <span class="s2">&quot;layer&quot;</span><span class="p">:</span> <span class="n">layer_1d</span><span class="p">}</span>
+        <span class="k">return</span> <span class="p">{</span><span class="s2">"mod_id"</span><span class="p">:</span> <span class="n">well_mod_id_1d</span><span class="p">,</span> <span class="s2">"svat"</span><span class="p">:</span> <span class="n">well_svat_1d</span><span class="p">,</span> <span class="s2">"layer"</span><span class="p">:</span> <span class="n">layer_1d</span><span class="p">}</span>
 
     <span class="k">def</span><span class="w"> </span><span class="nf">_is_regridding_supported</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
         <span class="k">return</span> <span class="kc">False</span></div>
@@ -623,8 +623,8 @@
   </div>
   
   <!-- Scripts loaded after <body> so the DOM is not blocked -->
-  <script defer src="../../../_static/scripts/bootstrap.js?digest=90905a2f556bf617f1a9"></script>
-<script defer src="../../../_static/scripts/pydata-sphinx-theme.js?digest=90905a2f556bf617f1a9"></script>
+  <script defer src="../../../_static/scripts/bootstrap.js?digest=75c7c72ae941e8b558d8"></script>
+<script defer src="../../../_static/scripts/pydata-sphinx-theme.js?digest=75c7c72ae941e8b558d8"></script>
 
   <footer class="bd-footer">
 <div class="bd-footer__inner bd-page-width">
@@ -644,8 +644,7 @@
         <div class="footer-item">
 
   <p class="sphinx-version">
-    Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 9.1.0.
-    <br/>
+    Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 9.2.0.
   </p>
 </div>
       
@@ -658,7 +657,7 @@
         <div class="footer-item">
 <p class="theme-version">
   <!-- # L10n: Setting the PST URL as an argument as this does not need to be localized -->
-  Built with the <a href="https://pydata-sphinx-theme.readthedocs.io/en/stable/index.html">PyData Sphinx Theme</a> 0.20.0.
+  Built with the <a href="https://pydata-sphinx-theme.readthedocs.io/en/stable/index.html">PyData Sphinx Theme</a> 0.24.0.
 </p></div>
       
     </div>

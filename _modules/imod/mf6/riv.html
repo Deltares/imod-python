@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 
 
@@ -7,7 +6,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>imod.mf6.riv &#8212; iMOD Python 1.1.0 documentation</title>
+    <title>imod.mf6.riv &#8212; iMOD Python 1.2.0 documentation</title>
   
   
   
@@ -26,22 +25,22 @@
   </noscript>
   
   <!-- Loaded before other Sphinx assets -->
-  <link href="../../../_static/styles/theme.css?digest=90905a2f556bf617f1a9" rel="stylesheet" />
-<link href="../../../_static/styles/pydata-sphinx-theme.css?digest=90905a2f556bf617f1a9" rel="stylesheet" />
+  <link href="../../../_static/styles/theme.css?digest=75c7c72ae941e8b558d8" rel="stylesheet" />
+<link href="../../../_static/styles/pydata-sphinx-theme.css?digest=75c7c72ae941e8b558d8" rel="stylesheet" />
 
     <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=03e43079" />
-    <link rel="stylesheet" type="text/css" href="../../../_static/sg_gallery.css?v=fd6457a4" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/sg_gallery.css?v=c83e6b79" />
     <link rel="stylesheet" type="text/css" href="../../../_static/sg_gallery-binder.css?v=f4aeca0c" />
     <link rel="stylesheet" type="text/css" href="../../../_static/sg_gallery-dataframe.css?v=2082cf3c" />
     <link rel="stylesheet" type="text/css" href="../../../_static/sg_gallery-rendered-html.css?v=1277b6f3" />
   
   <!-- So that users can add custom icons -->
-  <script defer src="../../../_static/scripts/fontawesome.js?digest=90905a2f556bf617f1a9"></script>
+  <script defer src="../../../_static/scripts/fontawesome.js?digest=75c7c72ae941e8b558d8"></script>
   <!-- Pre-loaded scripts that we'll load fully later -->
-  <link rel="preload" as="script" href="../../../_static/scripts/bootstrap.js?digest=90905a2f556bf617f1a9" />
-<link rel="preload" as="script" href="../../../_static/scripts/pydata-sphinx-theme.js?digest=90905a2f556bf617f1a9" />
+  <link rel="preload" as="script" href="../../../_static/scripts/bootstrap.js?digest=75c7c72ae941e8b558d8" />
+<link rel="preload" as="script" href="../../../_static/scripts/pydata-sphinx-theme.js?digest=75c7c72ae941e8b558d8" />
 
-    <script src="../../../_static/documentation_options.js?v=fc837d61"></script>
+    <script src="../../../_static/documentation_options.js?v=6efca38a"></script>
     <script src="../../../_static/doctools.js?v=fd6eb6e6"></script>
     <script src="../../../_static/sphinx_highlight.js?v=6ffebe34"></script>
     <script src="../../../_static/sg-tags.js?v=d80f6fa4"></script>
@@ -51,8 +50,9 @@
     <link rel="index" title="Index" href="../../../genindex.html" />
     <link rel="search" title="Search" href="../../../search.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <meta name="color-scheme" content="light dark"/>
   <meta name="docsearch:language" content="en"/>
-  <meta name="docsearch:version" content="1.1.0.dev" />
+  <meta name="docsearch:version" content="1.2.0.dev" />
   
     
     <script src="../../../_static/searchtools.js"></script>
@@ -100,7 +100,7 @@
   
     <header id="pst-header" class="bd-header navbar navbar-expand-lg bd-navbar d-print-none">
 <div class="bd-header__inner bd-page-width">
-  <button class="pst-navbar-icon sidebar-toggle primary-toggle" aria-label="Site navigation">
+  <button type="button" class="pst-navbar-icon sidebar-toggle primary-toggle" aria-label="Site navigation" aria-expanded="false" aria-controls="pst-primary-sidebar-modal">
     <span class="fa-solid fa-bars"></span>
   </button>
   
@@ -122,8 +122,8 @@
     
     
     
-    <img src="../../../_static/imod-python-logo-light.svg" class="logo__image only-light" alt="iMOD Python 1.1.0 documentation - Home"/>
-    <img src="../../../_static/imod-python-logo-dark.svg" class="logo__image only-dark pst-js-only" alt="iMOD Python 1.1.0 documentation - Home"/>
+    <img src="../../../_static/imod-python-logo-light.svg" class="logo__image only-light" alt="iMOD Python 1.2.0 documentation - Home"/>
+    <img src="../../../_static/imod-python-logo-dark.svg" class="logo__image only-dark pst-js-only" alt="iMOD Python 1.2.0 documentation - Home"/>
   
   
 </a></div>
@@ -190,7 +190,7 @@
         <div class="navbar-item navbar-persistent--container">
           
 
-<button class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+<button type="button" class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
  <i class="fa-solid fa-magnifying-glass"></i>
  <span class="search-button__default-text">Search</span>
  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
@@ -201,15 +201,15 @@
         <div class="navbar-item">
 
 <div class="theme-switch-container dropdown pst-js-only" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Color mode">
-  <button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button dropdown-toggle" aria-label="Color mode" data-bs-toggle="dropdown">
-    <i class="theme-switch fa-solid fa-sun fa-lg fa-fw" data-mode="light" title="Light"></i>
-    <i class="theme-switch fa-solid fa-moon fa-lg fa-fw" data-mode="dark" title="Dark"></i>
-    <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg fa-fw" data-mode="auto" title="System Settings"></i>
+  <button type="button" class="btn btn-sm nav-link pst-navbar-icon theme-switch-button dropdown-toggle" aria-label="Color mode" data-bs-toggle="dropdown">
+    <i class="theme-switch fa-solid fa-sun fa-lg" data-mode="light" title="Light"></i>
+    <i class="theme-switch fa-solid fa-moon fa-lg" data-mode="dark" title="Dark"></i>
+    <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg" data-mode="auto" title="System Settings"></i>
   </button>
   <ul class="dropdown-menu dropdown-menu-end">
-    <li><button class="dropdown-item d-flex align-items-center theme-change-button" data-mode="auto"><i class="fa-solid fa-circle-half-stroke fa-lg fa-fw me-1"></i>System Settings</button></li>
-    <li><button class="dropdown-item d-flex align-items-center theme-change-button" data-mode="light"><i class="fa-solid fa-sun fa-lg fa-fw me-1"></i>Light</button></li>
-    <li><button class="dropdown-item d-flex align-items-center theme-change-button" data-mode="dark"><i class="fa-solid fa-moon fa-lg fa-fw me-1"></i>Dark</button></li>
+    <li><button type="button" class="dropdown-item d-flex align-items-center theme-change-button" data-mode="auto"><i class="fa-solid fa-circle-half-stroke fa-lg me-1"></i>System Settings</button></li>
+    <li><button type="button" class="dropdown-item d-flex align-items-center theme-change-button" data-mode="light"><i class="fa-solid fa-sun fa-lg me-1"></i>Light</button></li>
+    <li><button type="button" class="dropdown-item d-flex align-items-center theme-change-button" data-mode="dark"><i class="fa-solid fa-moon fa-lg me-1"></i>Dark</button></li>
   </ul>
 </div></div>
       
@@ -246,7 +246,7 @@
   
     <div class="navbar-persistent--mobile">
 
-<button class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+<button type="button" class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
  <i class="fa-solid fa-magnifying-glass"></i>
  <span class="search-button__default-text">Search</span>
  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
@@ -267,7 +267,7 @@
       
         
       
-      <dialog id="pst-primary-sidebar-modal"></dialog>
+      <dialog id="pst-primary-sidebar-modal" tabindex="-1"></dialog>
       <div id="pst-primary-sidebar" class="bd-sidebar-primary bd-sidebar hide-on-wide">
         
 
@@ -337,15 +337,15 @@
           <div class="navbar-item">
 
 <div class="theme-switch-container dropdown pst-js-only" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Color mode">
-  <button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button dropdown-toggle" aria-label="Color mode" data-bs-toggle="dropdown">
-    <i class="theme-switch fa-solid fa-sun fa-lg fa-fw" data-mode="light" title="Light"></i>
-    <i class="theme-switch fa-solid fa-moon fa-lg fa-fw" data-mode="dark" title="Dark"></i>
-    <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg fa-fw" data-mode="auto" title="System Settings"></i>
+  <button type="button" class="btn btn-sm nav-link pst-navbar-icon theme-switch-button dropdown-toggle" aria-label="Color mode" data-bs-toggle="dropdown">
+    <i class="theme-switch fa-solid fa-sun fa-lg" data-mode="light" title="Light"></i>
+    <i class="theme-switch fa-solid fa-moon fa-lg" data-mode="dark" title="Dark"></i>
+    <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg" data-mode="auto" title="System Settings"></i>
   </button>
   <ul class="dropdown-menu dropdown-menu-end">
-    <li><button class="dropdown-item d-flex align-items-center theme-change-button" data-mode="auto"><i class="fa-solid fa-circle-half-stroke fa-lg fa-fw me-1"></i>System Settings</button></li>
-    <li><button class="dropdown-item d-flex align-items-center theme-change-button" data-mode="light"><i class="fa-solid fa-sun fa-lg fa-fw me-1"></i>Light</button></li>
-    <li><button class="dropdown-item d-flex align-items-center theme-change-button" data-mode="dark"><i class="fa-solid fa-moon fa-lg fa-fw me-1"></i>Dark</button></li>
+    <li><button type="button" class="dropdown-item d-flex align-items-center theme-change-button" data-mode="auto"><i class="fa-solid fa-circle-half-stroke fa-lg me-1"></i>System Settings</button></li>
+    <li><button type="button" class="dropdown-item d-flex align-items-center theme-change-button" data-mode="light"><i class="fa-solid fa-sun fa-lg me-1"></i>Light</button></li>
+    <li><button type="button" class="dropdown-item d-flex align-items-center theme-change-button" data-mode="dark"><i class="fa-solid fa-moon fa-lg me-1"></i>Dark</button></li>
   </ul>
 </div></div>
         
@@ -411,7 +411,7 @@
     
     <li class="breadcrumb-item breadcrumb-home">
       <a href="../../../index.html" class="nav-link" aria-label="Home">
-        <i class="fa-solid fa-home"></i>
+        <i class="fa-solid fa-house"></i>
       </a>
     </li>
     
@@ -436,9 +436,10 @@
                   
   <h1>Source code for imod.mf6.riv</h1><div class="highlight"><pre>
 <span></span><span class="kn">from</span><span class="w"> </span><span class="nn">datetime</span><span class="w"> </span><span class="kn">import</span> <span class="n">datetime</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">Tuple</span><span class="p">,</span> <span class="n">cast</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Any</span><span class="p">,</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">cast</span>
 
 <span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">xarray</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">xr</span>
 
 <span class="kn">from</span><span class="w"> </span><span class="nn">imod</span><span class="w"> </span><span class="kn">import</span> <span class="n">logging</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">imod.common.interfaces.iregridpackage</span><span class="w"> </span><span class="kn">import</span> <span class="n">IRegridPackage</span>
@@ -456,7 +457,11 @@
 <span class="kn">from</span><span class="w"> </span><span class="nn">imod.mf6.utilities.package</span><span class="w"> </span><span class="kn">import</span> <span class="n">set_repeat_stress_if_available</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">imod.mf6.validation</span><span class="w"> </span><span class="kn">import</span> <span class="n">BOUNDARY_DIMS_SCHEMA</span><span class="p">,</span> <span class="n">CONC_DIMS_SCHEMA</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">imod.prepare.cleanup</span><span class="w"> </span><span class="kn">import</span> <span class="n">AlignLevelsMode</span><span class="p">,</span> <span class="n">align_interface_levels</span><span class="p">,</span> <span class="n">cleanup_riv</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">imod.prepare.topsystem.allocation</span><span class="w"> </span><span class="kn">import</span> <span class="n">ALLOCATION_OPTION</span><span class="p">,</span> <span class="n">allocate_riv_cells</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">imod.prepare.topsystem.allocation</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
+    <span class="n">ALLOCATION_OPTION</span><span class="p">,</span>
+    <span class="n">allocate_riv_cells</span><span class="p">,</span>
+    <span class="n">drop_empty_layers_from_dict</span><span class="p">,</span>
+<span class="p">)</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">imod.prepare.topsystem.conductance</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
     <span class="n">DISTRIBUTING_OPTION</span><span class="p">,</span>
     <span class="n">distribute_drn_conductance</span><span class="p">,</span>
@@ -474,6 +479,7 @@
     <span class="n">IdentityNoDataSchema</span><span class="p">,</span>
     <span class="n">IndexesSchema</span><span class="p">,</span>
     <span class="n">OtherCoordsSchema</span><span class="p">,</span>
+    <span class="n">ValidationError</span><span class="p">,</span>
 <span class="p">)</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">imod.typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">GridDataArray</span><span class="p">,</span> <span class="n">GridDataDict</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">imod.typing.grid</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
@@ -489,21 +495,21 @@
 
 <span class="k">def</span><span class="w"> </span><span class="nf">mask_package__drop_if_empty</span><span class="p">(</span>
     <span class="n">package</span><span class="p">:</span> <span class="n">TopSystemBoundaryCondition</span><span class="p">,</span>
-<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Optional</span><span class="p">[</span><span class="n">TopSystemBoundaryCondition</span><span class="p">]:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot; &quot;</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">TopSystemBoundaryCondition</span> <span class="o">|</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">""" "</span>
 <span class="sd">    Create an optional package from a package if it has data. Return None if</span>
 <span class="sd">    package is inactive everywhere.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="c1"># remove River package if its mask is False everywhere</span>
-    <span class="n">mask</span> <span class="o">=</span> <span class="o">~</span><span class="n">np</span><span class="o">.</span><span class="n">isnan</span><span class="p">(</span><span class="n">package</span><span class="p">[</span><span class="s2">&quot;conductance&quot;</span><span class="p">])</span>
+    <span class="n">mask</span> <span class="o">=</span> <span class="o">~</span><span class="n">np</span><span class="o">.</span><span class="n">isnan</span><span class="p">(</span><span class="n">package</span><span class="p">[</span><span class="s2">"conductance"</span><span class="p">])</span>
     <span class="k">return</span> <span class="n">package</span><span class="o">.</span><span class="n">mask</span><span class="p">(</span><span class="n">mask</span><span class="p">)</span> <span class="k">if</span> <span class="n">np</span><span class="o">.</span><span class="n">any</span><span class="p">(</span><span class="n">mask</span><span class="p">)</span> <span class="k">else</span> <span class="kc">None</span>
 
 
 <span class="k">def</span><span class="w"> </span><span class="nf">clip_time_if_package</span><span class="p">(</span>
-    <span class="n">package</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">TopSystemBoundaryCondition</span><span class="p">],</span>
+    <span class="n">package</span><span class="p">:</span> <span class="n">TopSystemBoundaryCondition</span> <span class="o">|</span> <span class="kc">None</span><span class="p">,</span>
     <span class="n">time_min</span><span class="p">:</span> <span class="n">datetime</span><span class="p">,</span>
     <span class="n">time_max</span><span class="p">:</span> <span class="n">datetime</span><span class="p">,</span>
-<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Optional</span><span class="p">[</span><span class="n">TopSystemBoundaryCondition</span><span class="p">]:</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">TopSystemBoundaryCondition</span> <span class="o">|</span> <span class="kc">None</span><span class="p">:</span>
     <span class="k">if</span> <span class="n">package</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
         <span class="n">package</span> <span class="o">=</span> <span class="n">package</span><span class="o">.</span><span class="n">clip_box</span><span class="p">(</span><span class="n">time_min</span><span class="o">=</span><span class="n">time_min</span><span class="p">,</span> <span class="n">time_max</span><span class="o">=</span><span class="n">time_max</span><span class="p">)</span>
     <span class="k">return</span> <span class="n">package</span>
@@ -512,16 +518,16 @@
 <span class="k">def</span><span class="w"> </span><span class="nf">rise_bottom_elevation_if_needed</span><span class="p">(</span>
     <span class="n">bottom_elevation</span><span class="p">:</span> <span class="n">GridDataArray</span><span class="p">,</span> <span class="n">bottom</span><span class="p">:</span> <span class="n">GridDataArray</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">GridDataArray</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">"""</span>
 <span class="sd">    Due to regridding, the bottom_elevation could be less than the</span>
-<span class="sd">    layer bottom, so here we overwrite it with bottom if that&#39;s</span>
+<span class="sd">    layer bottom, so here we overwrite it with bottom if that's</span>
 <span class="sd">    the case.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="n">is_layer_bottom_above_bottom_elevation</span> <span class="o">=</span> <span class="p">(</span><span class="n">bottom</span> <span class="o">&gt;</span> <span class="n">bottom_elevation</span><span class="p">)</span><span class="o">.</span><span class="n">any</span><span class="p">()</span>
 
     <span class="k">if</span> <span class="n">is_layer_bottom_above_bottom_elevation</span><span class="p">:</span>
         <span class="n">logging</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span>
-            <span class="s2">&quot;Note: riv bottom was detected below model bottom. Updated the riv&#39;s bottom.&quot;</span>
+            <span class="s2">"Note: riv bottom was detected below model bottom. Updated the riv's bottom."</span>
         <span class="p">)</span>
         <span class="n">bottom_elevation</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">align_interface_levels</span><span class="p">(</span>
             <span class="n">bottom_elevation</span><span class="p">,</span> <span class="n">bottom</span><span class="p">,</span> <span class="n">AlignLevelsMode</span><span class="o">.</span><span class="n">BOTTOMUP</span>
@@ -532,22 +538,22 @@
 <span class="k">def</span><span class="w"> </span><span class="nf">_separate_infiltration_data</span><span class="p">(</span>
     <span class="n">riv_pkg_data</span><span class="p">:</span> <span class="n">GridDataDict</span><span class="p">,</span> <span class="n">infiltration_factor</span><span class="p">:</span> <span class="n">GridDataArray</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">tuple</span><span class="p">[</span><span class="n">GridDataDict</span><span class="p">,</span> <span class="n">GridDataDict</span><span class="p">]:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">"""</span>
 <span class="sd">    Account for the infiltration factor in the river package data. This function</span>
 <span class="sd">    updates the riv_pkg_data with an infiltration conductance. The extra</span>
 <span class="sd">    exfiltration conductance is separated into a data dict for drainage</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="c1"># update the conductance of the river package to account for the</span>
     <span class="c1"># infiltration factor</span>
     <span class="n">drain_conductance</span><span class="p">,</span> <span class="n">river_conductance</span> <span class="o">=</span> <span class="n">split_conductance_with_infiltration_factor</span><span class="p">(</span>
-        <span class="n">riv_pkg_data</span><span class="p">[</span><span class="s2">&quot;conductance&quot;</span><span class="p">],</span> <span class="n">infiltration_factor</span>
+        <span class="n">riv_pkg_data</span><span class="p">[</span><span class="s2">"conductance"</span><span class="p">],</span> <span class="n">infiltration_factor</span>
     <span class="p">)</span>
-    <span class="n">riv_pkg_data</span><span class="p">[</span><span class="s2">&quot;conductance&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">river_conductance</span>
+    <span class="n">riv_pkg_data</span><span class="p">[</span><span class="s2">"conductance"</span><span class="p">]</span> <span class="o">=</span> <span class="n">river_conductance</span>
     <span class="c1"># create a drainage package with the conductance we computed from the</span>
     <span class="c1"># infiltration factor</span>
     <span class="n">drn_pkg_data</span> <span class="o">=</span> <span class="p">{</span>
-        <span class="s2">&quot;elevation&quot;</span><span class="p">:</span> <span class="n">riv_pkg_data</span><span class="p">[</span><span class="s2">&quot;stage&quot;</span><span class="p">],</span>
-        <span class="s2">&quot;conductance&quot;</span><span class="p">:</span> <span class="n">drain_conductance</span><span class="p">,</span>
+        <span class="s2">"elevation"</span><span class="p">:</span> <span class="n">riv_pkg_data</span><span class="p">[</span><span class="s2">"stage"</span><span class="p">],</span>
+        <span class="s2">"conductance"</span><span class="p">:</span> <span class="n">drain_conductance</span><span class="p">,</span>
     <span class="p">}</span>
     <span class="k">return</span> <span class="n">riv_pkg_data</span><span class="p">,</span> <span class="n">drn_pkg_data</span>
 
@@ -556,7 +562,7 @@
     <span class="n">allocation_drn_data</span><span class="p">:</span> <span class="n">GridDataDict</span><span class="p">,</span>
     <span class="n">infiltration_drn_data</span><span class="p">:</span> <span class="n">GridDataDict</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Drainage</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">"""</span>
 <span class="sd">    Create a drainage package from leftover imod5 river package data,</span>
 <span class="sd">    stemming from:</span>
 
@@ -566,15 +572,15 @@
 <span class="sd">        * Infiltration factor. This factor is optional in imod5, but it</span>
 <span class="sd">            does not exist in MF6, so we mimic its effect with a Drainage</span>
 <span class="sd">            boundary. This data is stored in ``infiltration_drn_data``.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
 
     <span class="k">if</span> <span class="n">allocation_drn_data</span><span class="p">:</span>
         <span class="n">drain_leftover_data</span><span class="p">:</span> <span class="n">GridDataDict</span> <span class="o">=</span> <span class="p">{}</span>
         <span class="k">for</span> <span class="n">key</span><span class="p">,</span> <span class="n">allocation_grid</span> <span class="ow">in</span> <span class="n">allocation_drn_data</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
             <span class="n">concatenated</span> <span class="o">=</span> <span class="n">concat</span><span class="p">(</span>
-                <span class="p">[</span><span class="n">allocation_grid</span><span class="p">,</span> <span class="n">infiltration_drn_data</span><span class="p">[</span><span class="n">key</span><span class="p">]],</span> <span class="n">dim</span><span class="o">=</span><span class="s2">&quot;leftover&quot;</span>
+                <span class="p">[</span><span class="n">allocation_grid</span><span class="p">,</span> <span class="n">infiltration_drn_data</span><span class="p">[</span><span class="n">key</span><span class="p">]],</span> <span class="n">dim</span><span class="o">=</span><span class="s2">"leftover"</span>
             <span class="p">)</span>
-            <span class="n">drain_leftover_data</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="n">concatenated</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">dim</span><span class="o">=</span><span class="s2">&quot;leftover&quot;</span><span class="p">)</span>
+            <span class="n">drain_leftover_data</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="n">concatenated</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">dim</span><span class="o">=</span><span class="s2">"leftover"</span><span class="p">)</span>
     <span class="k">else</span><span class="p">:</span>
         <span class="n">drain_leftover_data</span> <span class="o">=</span> <span class="n">infiltration_drn_data</span>
 
@@ -584,7 +590,7 @@
 <div class="viewcode-block" id="River">
 <a class="viewcode-back" href="../../../api/generated/mf6/imod.mf6.River.html#imod.mf6.River">[docs]</a>
 <span class="k">class</span><span class="w"> </span><span class="nc">River</span><span class="p">(</span><span class="n">TopSystemBoundaryCondition</span><span class="p">,</span> <span class="n">IRegridPackage</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">"""</span>
 <span class="sd">    River package.</span>
 <span class="sd">    Any number of RIV Packages can be specified for a single groundwater flow</span>
 <span class="sd">    model.</span>
@@ -601,7 +607,7 @@
 <span class="sd">    concentration: array of floats (xr.DataArray, optional)</span>
 <span class="sd">        if this flow package is used in simulations also involving transport, then this array is used</span>
 <span class="sd">        as the  concentration for inflow over this boundary.</span>
-<span class="sd">    concentration_boundary_type: ({&quot;AUX&quot;, &quot;AUXMIXED&quot;}, optional)</span>
+<span class="sd">    concentration_boundary_type: ({"AUX", "AUXMIXED"}, optional)</span>
 <span class="sd">        if this flow package is used in simulations also involving transport, then this keyword specifies</span>
 <span class="sd">        how outflow over this boundary is computed.</span>
 <span class="sd">    print_input: ({True, False}, optional)</span>
@@ -609,13 +615,13 @@
 <span class="sd">        to the listing file immediately after it is read. Default is False.</span>
 <span class="sd">    print_flows: ({True, False}, optional)</span>
 <span class="sd">        Indicates that the list of river flow rates will be printed to the</span>
-<span class="sd">        listing file for every stress period time step in which &quot;BUDGET PRINT&quot;</span>
+<span class="sd">        listing file for every stress period time step in which "BUDGET PRINT"</span>
 <span class="sd">        is specified in Output Control. If there is no Output Control option and</span>
 <span class="sd">        PRINT FLOWS is specified, then flow rates are printed for the last time</span>
 <span class="sd">        step of each stress period. Default is False.</span>
 <span class="sd">    save_flows: ({True, False}, optional)</span>
 <span class="sd">        Indicates that river flow terms will be written to the file specified</span>
-<span class="sd">        with &quot;BUDGET FILEOUT&quot; in Output Control. Default is False.</span>
+<span class="sd">        with "BUDGET FILEOUT" in Output Control. Default is False.</span>
 <span class="sd">    observations: [Not yet supported.]</span>
 <span class="sd">        Default is None.</span>
 <span class="sd">    validate: {True, False}</span>
@@ -626,73 +632,73 @@
 <span class="sd">        Used to repeat data for e.g. repeating stress periods such as</span>
 <span class="sd">        seasonality without duplicating the values. If provided as dict, it</span>
 <span class="sd">        should map new dates to old dates present in the dataset.</span>
-<span class="sd">        ``{&quot;2001-04-01&quot;: &quot;2000-04-01&quot;, &quot;2001-10-01&quot;: &quot;2000-10-01&quot;}`` if provided</span>
-<span class="sd">        as DataArray, it should have dimensions ``(&quot;repeat&quot;, &quot;repeat_items&quot;)``.</span>
+<span class="sd">        ``{"2001-04-01": "2000-04-01", "2001-10-01": "2000-10-01"}`` if provided</span>
+<span class="sd">        as DataArray, it should have dimensions ``("repeat", "repeat_items")``.</span>
 <span class="sd">        The ``repeat_items`` dimension should have size 2: the first value is</span>
-<span class="sd">        the &quot;key&quot;, the second value is the &quot;value&quot;. For the &quot;key&quot; datetime, the</span>
-<span class="sd">        data of the &quot;value&quot; datetime will be used.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">        the "key", the second value is the "value". For the "key" datetime, the</span>
+<span class="sd">        data of the "value" datetime will be used.</span>
+<span class="sd">    """</span>
 
-    <span class="n">_pkg_id</span> <span class="o">=</span> <span class="s2">&quot;riv&quot;</span>
-    <span class="n">_period_data</span> <span class="o">=</span> <span class="p">(</span><span class="s2">&quot;stage&quot;</span><span class="p">,</span> <span class="s2">&quot;conductance&quot;</span><span class="p">,</span> <span class="s2">&quot;bottom_elevation&quot;</span><span class="p">)</span>
+    <span class="n">_pkg_id</span> <span class="o">=</span> <span class="s2">"riv"</span>
+    <span class="n">_period_data</span> <span class="o">=</span> <span class="p">(</span><span class="s2">"stage"</span><span class="p">,</span> <span class="s2">"conductance"</span><span class="p">,</span> <span class="s2">"bottom_elevation"</span><span class="p">)</span>
     <span class="n">_keyword_map</span> <span class="o">=</span> <span class="p">{}</span>
 
     <span class="n">_init_schemata</span> <span class="o">=</span> <span class="p">{</span>
-        <span class="s2">&quot;stage&quot;</span><span class="p">:</span> <span class="p">[</span>
+        <span class="s2">"stage"</span><span class="p">:</span> <span class="p">[</span>
             <span class="n">DTypeSchema</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">floating</span><span class="p">),</span>
             <span class="n">IndexesSchema</span><span class="p">(),</span>
-            <span class="n">CoordsSchema</span><span class="p">((</span><span class="s2">&quot;layer&quot;</span><span class="p">,)),</span>
+            <span class="n">CoordsSchema</span><span class="p">((</span><span class="s2">"layer"</span><span class="p">,)),</span>
             <span class="n">BOUNDARY_DIMS_SCHEMA</span><span class="p">,</span>
-            <span class="n">AllCoordsValueSchema</span><span class="p">(</span><span class="s2">&quot;layer&quot;</span><span class="p">,</span> <span class="s2">&quot;&gt;&quot;</span><span class="p">,</span> <span class="mi">0</span><span class="p">),</span>
+            <span class="n">AllCoordsValueSchema</span><span class="p">(</span><span class="s2">"layer"</span><span class="p">,</span> <span class="s2">"&gt;"</span><span class="p">,</span> <span class="mi">0</span><span class="p">),</span>
         <span class="p">],</span>
-        <span class="s2">&quot;conductance&quot;</span><span class="p">:</span> <span class="p">[</span>
+        <span class="s2">"conductance"</span><span class="p">:</span> <span class="p">[</span>
             <span class="n">DTypeSchema</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">floating</span><span class="p">),</span>
             <span class="n">IndexesSchema</span><span class="p">(),</span>
-            <span class="n">CoordsSchema</span><span class="p">((</span><span class="s2">&quot;layer&quot;</span><span class="p">,)),</span>
+            <span class="n">CoordsSchema</span><span class="p">((</span><span class="s2">"layer"</span><span class="p">,)),</span>
             <span class="n">BOUNDARY_DIMS_SCHEMA</span><span class="p">,</span>
-            <span class="n">AllCoordsValueSchema</span><span class="p">(</span><span class="s2">&quot;layer&quot;</span><span class="p">,</span> <span class="s2">&quot;&gt;&quot;</span><span class="p">,</span> <span class="mi">0</span><span class="p">),</span>
+            <span class="n">AllCoordsValueSchema</span><span class="p">(</span><span class="s2">"layer"</span><span class="p">,</span> <span class="s2">"&gt;"</span><span class="p">,</span> <span class="mi">0</span><span class="p">),</span>
         <span class="p">],</span>
-        <span class="s2">&quot;bottom_elevation&quot;</span><span class="p">:</span> <span class="p">[</span>
+        <span class="s2">"bottom_elevation"</span><span class="p">:</span> <span class="p">[</span>
             <span class="n">DTypeSchema</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">floating</span><span class="p">),</span>
             <span class="n">IndexesSchema</span><span class="p">(),</span>
-            <span class="n">CoordsSchema</span><span class="p">((</span><span class="s2">&quot;layer&quot;</span><span class="p">,)),</span>
+            <span class="n">CoordsSchema</span><span class="p">((</span><span class="s2">"layer"</span><span class="p">,)),</span>
             <span class="n">BOUNDARY_DIMS_SCHEMA</span><span class="p">,</span>
-            <span class="n">AllCoordsValueSchema</span><span class="p">(</span><span class="s2">&quot;layer&quot;</span><span class="p">,</span> <span class="s2">&quot;&gt;&quot;</span><span class="p">,</span> <span class="mi">0</span><span class="p">),</span>
+            <span class="n">AllCoordsValueSchema</span><span class="p">(</span><span class="s2">"layer"</span><span class="p">,</span> <span class="s2">"&gt;"</span><span class="p">,</span> <span class="mi">0</span><span class="p">),</span>
         <span class="p">],</span>
-        <span class="s2">&quot;concentration&quot;</span><span class="p">:</span> <span class="p">[</span>
+        <span class="s2">"concentration"</span><span class="p">:</span> <span class="p">[</span>
             <span class="n">DTypeSchema</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">floating</span><span class="p">),</span>
             <span class="n">IndexesSchema</span><span class="p">(),</span>
             <span class="n">CoordsSchema</span><span class="p">(</span>
                 <span class="p">(</span>
-                    <span class="s2">&quot;species&quot;</span><span class="p">,</span>
-                    <span class="s2">&quot;layer&quot;</span><span class="p">,</span>
+                    <span class="s2">"species"</span><span class="p">,</span>
+                    <span class="s2">"layer"</span><span class="p">,</span>
                 <span class="p">)</span>
             <span class="p">),</span>
             <span class="n">CONC_DIMS_SCHEMA</span><span class="p">,</span>
-            <span class="n">AllCoordsValueSchema</span><span class="p">(</span><span class="s2">&quot;layer&quot;</span><span class="p">,</span> <span class="s2">&quot;&gt;&quot;</span><span class="p">,</span> <span class="mi">0</span><span class="p">),</span>
+            <span class="n">AllCoordsValueSchema</span><span class="p">(</span><span class="s2">"layer"</span><span class="p">,</span> <span class="s2">"&gt;"</span><span class="p">,</span> <span class="mi">0</span><span class="p">),</span>
         <span class="p">],</span>
-        <span class="s2">&quot;print_input&quot;</span><span class="p">:</span> <span class="p">[</span><span class="n">DTypeSchema</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">bool_</span><span class="p">),</span> <span class="n">DimsSchema</span><span class="p">()],</span>
-        <span class="s2">&quot;print_flows&quot;</span><span class="p">:</span> <span class="p">[</span><span class="n">DTypeSchema</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">bool_</span><span class="p">),</span> <span class="n">DimsSchema</span><span class="p">()],</span>
-        <span class="s2">&quot;save_flows&quot;</span><span class="p">:</span> <span class="p">[</span><span class="n">DTypeSchema</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">bool_</span><span class="p">),</span> <span class="n">DimsSchema</span><span class="p">()],</span>
+        <span class="s2">"print_input"</span><span class="p">:</span> <span class="p">[</span><span class="n">DTypeSchema</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">bool_</span><span class="p">),</span> <span class="n">DimsSchema</span><span class="p">()],</span>
+        <span class="s2">"print_flows"</span><span class="p">:</span> <span class="p">[</span><span class="n">DTypeSchema</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">bool_</span><span class="p">),</span> <span class="n">DimsSchema</span><span class="p">()],</span>
+        <span class="s2">"save_flows"</span><span class="p">:</span> <span class="p">[</span><span class="n">DTypeSchema</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">bool_</span><span class="p">),</span> <span class="n">DimsSchema</span><span class="p">()],</span>
     <span class="p">}</span>
     <span class="n">_write_schemata</span> <span class="o">=</span> <span class="p">{</span>
-        <span class="s2">&quot;stage&quot;</span><span class="p">:</span> <span class="p">[</span>
-            <span class="n">AllValueSchema</span><span class="p">(</span><span class="s2">&quot;&gt;=&quot;</span><span class="p">,</span> <span class="s2">&quot;bottom_elevation&quot;</span><span class="p">),</span>
-            <span class="n">OtherCoordsSchema</span><span class="p">(</span><span class="s2">&quot;idomain&quot;</span><span class="p">),</span>
+        <span class="s2">"stage"</span><span class="p">:</span> <span class="p">[</span>
+            <span class="n">AllValueSchema</span><span class="p">(</span><span class="s2">"&gt;="</span><span class="p">,</span> <span class="s2">"bottom_elevation"</span><span class="p">),</span>
+            <span class="n">OtherCoordsSchema</span><span class="p">(</span><span class="s2">"idomain"</span><span class="p">),</span>
             <span class="n">AllNoDataSchema</span><span class="p">(),</span>  <span class="c1"># Check for all nan, can occur while clipping</span>
-            <span class="n">AllInsideNoDataSchema</span><span class="p">(</span><span class="n">other</span><span class="o">=</span><span class="s2">&quot;idomain&quot;</span><span class="p">,</span> <span class="n">is_other_notnull</span><span class="o">=</span><span class="p">(</span><span class="s2">&quot;&gt;&quot;</span><span class="p">,</span> <span class="mi">0</span><span class="p">)),</span>
+            <span class="n">AllInsideNoDataSchema</span><span class="p">(</span><span class="n">other</span><span class="o">=</span><span class="s2">"idomain"</span><span class="p">,</span> <span class="n">is_other_notnull</span><span class="o">=</span><span class="p">(</span><span class="s2">"&gt;"</span><span class="p">,</span> <span class="mi">0</span><span class="p">)),</span>
         <span class="p">],</span>
-        <span class="s2">&quot;conductance&quot;</span><span class="p">:</span> <span class="p">[</span><span class="n">IdentityNoDataSchema</span><span class="p">(</span><span class="s2">&quot;stage&quot;</span><span class="p">),</span> <span class="n">AllValueSchema</span><span class="p">(</span><span class="s2">&quot;&gt;&quot;</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">)],</span>
-        <span class="s2">&quot;bottom_elevation&quot;</span><span class="p">:</span> <span class="p">[</span>
-            <span class="n">IdentityNoDataSchema</span><span class="p">(</span><span class="s2">&quot;stage&quot;</span><span class="p">),</span>
+        <span class="s2">"conductance"</span><span class="p">:</span> <span class="p">[</span><span class="n">IdentityNoDataSchema</span><span class="p">(</span><span class="s2">"stage"</span><span class="p">),</span> <span class="n">AllValueSchema</span><span class="p">(</span><span class="s2">"&gt;"</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">)],</span>
+        <span class="s2">"bottom_elevation"</span><span class="p">:</span> <span class="p">[</span>
+            <span class="n">IdentityNoDataSchema</span><span class="p">(</span><span class="s2">"stage"</span><span class="p">),</span>
             <span class="c1"># Check river bottom above layer bottom, else Modflow throws error.</span>
-            <span class="n">AllValueSchema</span><span class="p">(</span><span class="s2">&quot;&gt;=&quot;</span><span class="p">,</span> <span class="s2">&quot;bottom&quot;</span><span class="p">,</span> <span class="n">ignore</span><span class="o">=</span><span class="p">(</span><span class="s2">&quot;icelltype&quot;</span><span class="p">,</span> <span class="s2">&quot;==&quot;</span><span class="p">,</span> <span class="mi">0</span><span class="p">)),</span>
+            <span class="n">AllValueSchema</span><span class="p">(</span><span class="s2">"&gt;="</span><span class="p">,</span> <span class="s2">"bottom"</span><span class="p">,</span> <span class="n">ignore</span><span class="o">=</span><span class="p">(</span><span class="s2">"icelltype"</span><span class="p">,</span> <span class="s2">"=="</span><span class="p">,</span> <span class="mi">0</span><span class="p">)),</span>
         <span class="p">],</span>
-        <span class="s2">&quot;concentration&quot;</span><span class="p">:</span> <span class="p">[</span><span class="n">IdentityNoDataSchema</span><span class="p">(</span><span class="s2">&quot;stage&quot;</span><span class="p">),</span> <span class="n">AllValueSchema</span><span class="p">(</span><span class="s2">&quot;&gt;=&quot;</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">)],</span>
+        <span class="s2">"concentration"</span><span class="p">:</span> <span class="p">[</span><span class="n">IdentityNoDataSchema</span><span class="p">(</span><span class="s2">"stage"</span><span class="p">),</span> <span class="n">AllValueSchema</span><span class="p">(</span><span class="s2">"&gt;="</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">)],</span>
     <span class="p">}</span>
 
     <span class="n">_template</span> <span class="o">=</span> <span class="n">TopSystemBoundaryCondition</span><span class="o">.</span><span class="n">_initialize_template</span><span class="p">(</span><span class="n">_pkg_id</span><span class="p">)</span>
-    <span class="n">_auxiliary_data</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;concentration&quot;</span><span class="p">:</span> <span class="s2">&quot;species&quot;</span><span class="p">}</span>
+    <span class="n">_auxiliary_data</span> <span class="o">=</span> <span class="p">{</span><span class="s2">"concentration"</span><span class="p">:</span> <span class="s2">"species"</span><span class="p">}</span>
     <span class="n">_regrid_method</span> <span class="o">=</span> <span class="n">RiverRegridMethod</span><span class="p">()</span>
     <span class="n">_aggregate_method</span><span class="p">:</span> <span class="n">DataclassType</span> <span class="o">=</span> <span class="n">RiverAggregationMethod</span><span class="p">()</span>
 
@@ -701,38 +707,40 @@
     <span class="nd">@init_log_decorator</span><span class="p">()</span>
     <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
-        <span class="n">stage</span><span class="p">,</span>
-        <span class="n">conductance</span><span class="p">,</span>
-        <span class="n">bottom_elevation</span><span class="p">,</span>
-        <span class="n">concentration</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
-        <span class="n">concentration_boundary_type</span><span class="o">=</span><span class="s2">&quot;aux&quot;</span><span class="p">,</span>
-        <span class="n">print_input</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
-        <span class="n">print_flows</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
-        <span class="n">save_flows</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
-        <span class="n">observations</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">stage</span><span class="p">:</span> <span class="n">GridDataArray</span><span class="p">,</span>
+        <span class="n">conductance</span><span class="p">:</span> <span class="n">GridDataArray</span><span class="p">,</span>
+        <span class="n">bottom_elevation</span><span class="p">:</span> <span class="n">GridDataArray</span><span class="p">,</span>
+        <span class="n">concentration</span><span class="p">:</span> <span class="n">GridDataArray</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">concentration_boundary_type</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">"aux"</span><span class="p">,</span>
+        <span class="n">print_input</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
+        <span class="n">print_flows</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
+        <span class="n">save_flows</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
+        <span class="n">observations</span><span class="p">:</span> <span class="n">Any</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
         <span class="n">validate</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
-        <span class="n">repeat_stress</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
-    <span class="p">):</span>
+        <span class="n">repeat_stress</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="n">Any</span><span class="p">,</span> <span class="n">Any</span><span class="p">]</span> <span class="o">|</span> <span class="n">xr</span><span class="o">.</span><span class="n">DataArray</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
         <span class="n">dict_dataset</span> <span class="o">=</span> <span class="p">{</span>
-            <span class="s2">&quot;stage&quot;</span><span class="p">:</span> <span class="n">stage</span><span class="p">,</span>
-            <span class="s2">&quot;conductance&quot;</span><span class="p">:</span> <span class="n">conductance</span><span class="p">,</span>
-            <span class="s2">&quot;bottom_elevation&quot;</span><span class="p">:</span> <span class="n">bottom_elevation</span><span class="p">,</span>
-            <span class="s2">&quot;concentration&quot;</span><span class="p">:</span> <span class="n">concentration</span><span class="p">,</span>
-            <span class="s2">&quot;concentration_boundary_type&quot;</span><span class="p">:</span> <span class="n">concentration_boundary_type</span><span class="p">,</span>
-            <span class="s2">&quot;print_input&quot;</span><span class="p">:</span> <span class="n">print_input</span><span class="p">,</span>
-            <span class="s2">&quot;print_flows&quot;</span><span class="p">:</span> <span class="n">print_flows</span><span class="p">,</span>
-            <span class="s2">&quot;save_flows&quot;</span><span class="p">:</span> <span class="n">save_flows</span><span class="p">,</span>
-            <span class="s2">&quot;observations&quot;</span><span class="p">:</span> <span class="n">observations</span><span class="p">,</span>
-            <span class="s2">&quot;repeat_stress&quot;</span><span class="p">:</span> <span class="n">repeat_stress</span><span class="p">,</span>
+            <span class="s2">"stage"</span><span class="p">:</span> <span class="n">stage</span><span class="p">,</span>
+            <span class="s2">"conductance"</span><span class="p">:</span> <span class="n">conductance</span><span class="p">,</span>
+            <span class="s2">"bottom_elevation"</span><span class="p">:</span> <span class="n">bottom_elevation</span><span class="p">,</span>
+            <span class="s2">"concentration"</span><span class="p">:</span> <span class="n">concentration</span><span class="p">,</span>
+            <span class="s2">"concentration_boundary_type"</span><span class="p">:</span> <span class="n">concentration_boundary_type</span><span class="p">,</span>
+            <span class="s2">"print_input"</span><span class="p">:</span> <span class="n">print_input</span><span class="p">,</span>
+            <span class="s2">"print_flows"</span><span class="p">:</span> <span class="n">print_flows</span><span class="p">,</span>
+            <span class="s2">"save_flows"</span><span class="p">:</span> <span class="n">save_flows</span><span class="p">,</span>
+            <span class="s2">"observations"</span><span class="p">:</span> <span class="n">observations</span><span class="p">,</span>
+            <span class="s2">"repeat_stress"</span><span class="p">:</span> <span class="n">repeat_stress</span><span class="p">,</span>
         <span class="p">}</span>
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">dict_dataset</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_validate_init_schemata</span><span class="p">(</span><span class="n">validate</span><span class="p">)</span></div>
 
 
-    <span class="k">def</span><span class="w"> </span><span class="nf">_validate</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">schemata</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_validate</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span> <span class="n">schemata</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">],</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">:</span> <span class="n">Any</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">list</span><span class="p">[</span><span class="n">ValidationError</span><span class="p">]]:</span>
         <span class="c1"># Insert additional kwargs</span>
-        <span class="n">kwargs</span><span class="p">[</span><span class="s2">&quot;stage&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="p">[</span><span class="s2">&quot;stage&quot;</span><span class="p">]</span>
-        <span class="n">kwargs</span><span class="p">[</span><span class="s2">&quot;bottom_elevation&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="p">[</span><span class="s2">&quot;bottom_elevation&quot;</span><span class="p">]</span>
+        <span class="n">kwargs</span><span class="p">[</span><span class="s2">"stage"</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="p">[</span><span class="s2">"stage"</span><span class="p">]</span>
+        <span class="n">kwargs</span><span class="p">[</span><span class="s2">"bottom_elevation"</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="p">[</span><span class="s2">"bottom_elevation"</span><span class="p">]</span>
         <span class="n">errors</span> <span class="o">=</span> <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">_validate</span><span class="p">(</span><span class="n">schemata</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
 
         <span class="k">return</span> <span class="n">errors</span>
@@ -741,15 +749,15 @@
 <a class="viewcode-back" href="../../../api/generated/mf6/imod.mf6.River.cleanup.html#imod.mf6.River.cleanup">[docs]</a>
     <span class="nd">@standard_log_decorator</span><span class="p">()</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">cleanup</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">dis</span><span class="p">:</span> <span class="n">StructuredDiscretization</span> <span class="o">|</span> <span class="n">VerticesDiscretization</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">"""</span>
 <span class="sd">        Clean up package inplace. This method calls</span>
 <span class="sd">        :func:`imod.prepare.cleanup_riv`, see documentation of that</span>
 <span class="sd">        function for details on cleanup.</span>
 
 <span class="sd">        dis: imod.mf6.StructuredDiscretization | imod.mf6.VerticesDiscretization</span>
 <span class="sd">            Model discretization package.</span>
-<span class="sd">        &quot;&quot;&quot;</span>
-        <span class="n">dis_dict</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;idomain&quot;</span><span class="p">:</span> <span class="n">dis</span><span class="o">.</span><span class="n">dataset</span><span class="p">[</span><span class="s2">&quot;idomain&quot;</span><span class="p">],</span> <span class="s2">&quot;bottom&quot;</span><span class="p">:</span> <span class="n">dis</span><span class="o">.</span><span class="n">dataset</span><span class="p">[</span><span class="s2">&quot;bottom&quot;</span><span class="p">]}</span>
+<span class="sd">        """</span>
+        <span class="n">dis_dict</span> <span class="o">=</span> <span class="p">{</span><span class="s2">"idomain"</span><span class="p">:</span> <span class="n">dis</span><span class="o">.</span><span class="n">dataset</span><span class="p">[</span><span class="s2">"idomain"</span><span class="p">],</span> <span class="s2">"bottom"</span><span class="p">:</span> <span class="n">dis</span><span class="o">.</span><span class="n">dataset</span><span class="p">[</span><span class="s2">"bottom"</span><span class="p">]}</span>
         <span class="n">cleaned_dict</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_call_func_on_grids</span><span class="p">(</span><span class="n">cleanup_riv</span><span class="p">,</span> <span class="n">dis_dict</span><span class="p">)</span>
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">cleaned_dict</span><span class="p">)</span></div>
 
@@ -762,8 +770,9 @@
         <span class="n">npf</span><span class="p">:</span> <span class="n">NodePropertyFlow</span><span class="p">,</span>
         <span class="n">allocation_option</span><span class="p">:</span> <span class="n">ALLOCATION_OPTION</span><span class="p">,</span>
         <span class="n">distributing_option</span><span class="p">:</span> <span class="n">DISTRIBUTING_OPTION</span><span class="p">,</span>
+        <span class="n">drop_empty_layers</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">tuple</span><span class="p">[</span><span class="n">GridDataDict</span><span class="p">,</span> <span class="n">GridDataDict</span><span class="p">]:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">"""</span>
 <span class="sd">        Allocate and distribute planar data for given discretization and npf</span>
 <span class="sd">        package. If layer number of ``planar_data`` is negative,</span>
 <span class="sd">        ``allocation_option`` is overrided and set to</span>
@@ -783,22 +792,29 @@
 <span class="sd">            ALLOCATION_OPTION.at_first_active.</span>
 <span class="sd">        distributing_option: DISTRIBUTING_OPTION</span>
 <span class="sd">            distributing option.</span>
+<span class="sd">        drop_empty_layers: bool, default True</span>
+<span class="sd">            If True, drop layers that contain no allocated cells anywhere in the</span>
+<span class="sd">            domain (or at any time), so the returned grids only span the layers that</span>
+<span class="sd">            are actually used. Reduces memory use and speeds up later operations such</span>
+<span class="sd">            as regridding, clipping and splitting. If no cells are allocated in any</span>
+<span class="sd">            layer, nothing is dropped and the full layer range is returned, as a layer</span>
+<span class="sd">            dimension of size 0 is not valid.</span>
 
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
 <span class="sd">        GridDataDict</span>
 <span class="sd">            Dictionary with layered grid data.</span>
-<span class="sd">        &quot;&quot;&quot;</span>
-        <span class="n">top</span> <span class="o">=</span> <span class="n">dis</span><span class="o">.</span><span class="n">dataset</span><span class="p">[</span><span class="s2">&quot;top&quot;</span><span class="p">]</span>
-        <span class="n">bottom</span> <span class="o">=</span> <span class="n">dis</span><span class="o">.</span><span class="n">dataset</span><span class="p">[</span><span class="s2">&quot;bottom&quot;</span><span class="p">]</span>
-        <span class="n">idomain</span> <span class="o">=</span> <span class="n">dis</span><span class="o">.</span><span class="n">dataset</span><span class="p">[</span><span class="s2">&quot;idomain&quot;</span><span class="p">]</span>
+<span class="sd">        """</span>
+        <span class="n">top</span> <span class="o">=</span> <span class="n">dis</span><span class="o">.</span><span class="n">dataset</span><span class="p">[</span><span class="s2">"top"</span><span class="p">]</span>
+        <span class="n">bottom</span> <span class="o">=</span> <span class="n">dis</span><span class="o">.</span><span class="n">dataset</span><span class="p">[</span><span class="s2">"bottom"</span><span class="p">]</span>
+        <span class="n">idomain</span> <span class="o">=</span> <span class="n">dis</span><span class="o">.</span><span class="n">dataset</span><span class="p">[</span><span class="s2">"idomain"</span><span class="p">]</span>
 
-        <span class="k">if</span> <span class="n">has_negative_layer</span><span class="p">(</span><span class="n">planar_data</span><span class="p">[</span><span class="s2">&quot;stage&quot;</span><span class="p">]):</span>
+        <span class="k">if</span> <span class="n">has_negative_layer</span><span class="p">(</span><span class="n">planar_data</span><span class="p">[</span><span class="s2">"stage"</span><span class="p">]):</span>
             <span class="n">allocation_option</span> <span class="o">=</span> <span class="n">ALLOCATION_OPTION</span><span class="o">.</span><span class="n">at_first_active</span>
 
         <span class="c1"># Enforce planar data, remove all layer dimension information</span>
         <span class="n">planar_data</span> <span class="o">=</span> <span class="p">{</span>
-            <span class="n">key</span><span class="p">:</span> <span class="n">grid</span><span class="o">.</span><span class="n">isel</span><span class="p">({</span><span class="s2">&quot;layer&quot;</span><span class="p">:</span> <span class="mi">0</span><span class="p">},</span> <span class="n">drop</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">missing_dims</span><span class="o">=</span><span class="s2">&quot;ignore&quot;</span><span class="p">)</span>
+            <span class="n">key</span><span class="p">:</span> <span class="n">grid</span><span class="o">.</span><span class="n">isel</span><span class="p">({</span><span class="s2">"layer"</span><span class="p">:</span> <span class="mi">0</span><span class="p">},</span> <span class="n">drop</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">missing_dims</span><span class="o">=</span><span class="s2">"ignore"</span><span class="p">)</span>
             <span class="k">for</span> <span class="n">key</span><span class="p">,</span> <span class="n">grid</span> <span class="ow">in</span> <span class="n">planar_data</span><span class="o">.</span><span class="n">items</span><span class="p">()</span>
         <span class="p">}</span>
         <span class="c1"># Allocation of cells</span>
@@ -807,8 +823,9 @@
             <span class="n">idomain</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">,</span>
             <span class="n">top</span><span class="p">,</span>
             <span class="n">bottom</span><span class="p">,</span>
-            <span class="n">planar_data</span><span class="p">[</span><span class="s2">&quot;stage&quot;</span><span class="p">],</span>
-            <span class="n">planar_data</span><span class="p">[</span><span class="s2">&quot;bottom_elevation&quot;</span><span class="p">],</span>
+            <span class="n">planar_data</span><span class="p">[</span><span class="s2">"stage"</span><span class="p">],</span>
+            <span class="n">planar_data</span><span class="p">[</span><span class="s2">"bottom_elevation"</span><span class="p">],</span>
+            <span class="n">drop_empty_layers</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>  <span class="c1"># Keep full layer range, drop empty layers below</span>
         <span class="p">)</span>
         <span class="n">drn_is_allocated</span> <span class="o">=</span> <span class="n">drn_allocated</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span>
         <span class="c1"># Distribution of conductances</span>
@@ -823,13 +840,13 @@
         <span class="n">distribute_args</span> <span class="o">=</span> <span class="p">(</span>
             <span class="n">distributing_option</span><span class="p">,</span>
             <span class="n">allocated_for_distribution</span><span class="p">,</span>
-            <span class="n">planar_data</span><span class="p">[</span><span class="s2">&quot;conductance&quot;</span><span class="p">],</span>
+            <span class="n">planar_data</span><span class="p">[</span><span class="s2">"conductance"</span><span class="p">],</span>
             <span class="n">top</span><span class="p">,</span>
             <span class="n">bottom</span><span class="p">,</span>
-            <span class="n">npf</span><span class="o">.</span><span class="n">dataset</span><span class="p">[</span><span class="s2">&quot;k&quot;</span><span class="p">],</span>
+            <span class="n">npf</span><span class="o">.</span><span class="n">dataset</span><span class="p">[</span><span class="s2">"k"</span><span class="p">],</span>
         <span class="p">)</span>
-        <span class="n">riv_distribute_grids</span> <span class="o">=</span> <span class="p">(</span><span class="n">planar_data</span><span class="p">[</span><span class="s2">&quot;stage&quot;</span><span class="p">],</span> <span class="n">planar_data</span><span class="p">[</span><span class="s2">&quot;bottom_elevation&quot;</span><span class="p">])</span>
-        <span class="n">drn_distribute_grids</span> <span class="o">=</span> <span class="p">(</span><span class="n">planar_data</span><span class="p">[</span><span class="s2">&quot;bottom_elevation&quot;</span><span class="p">],)</span>
+        <span class="n">riv_distribute_grids</span> <span class="o">=</span> <span class="p">(</span><span class="n">planar_data</span><span class="p">[</span><span class="s2">"stage"</span><span class="p">],</span> <span class="n">planar_data</span><span class="p">[</span><span class="s2">"bottom_elevation"</span><span class="p">])</span>
+        <span class="n">drn_distribute_grids</span> <span class="o">=</span> <span class="p">(</span><span class="n">planar_data</span><span class="p">[</span><span class="s2">"bottom_elevation"</span><span class="p">],)</span>
         <span class="n">bc_distribute_grids</span> <span class="o">=</span> <span class="p">(</span>
             <span class="n">drn_distribute_grids</span> <span class="k">if</span> <span class="n">drn_is_allocated</span> <span class="k">else</span> <span class="n">riv_distribute_grids</span>
         <span class="p">)</span>
@@ -837,22 +854,31 @@
         <span class="c1"># Create layered data dicts</span>
         <span class="n">layered_data_riv</span> <span class="o">=</span> <span class="p">{}</span>
         <span class="c1"># create layered arrays of stage and bottom elevation</span>
-        <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="p">[</span><span class="s2">&quot;stage&quot;</span><span class="p">,</span> <span class="s2">&quot;bottom_elevation&quot;</span><span class="p">]:</span>
+        <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="p">[</span><span class="s2">"stage"</span><span class="p">,</span> <span class="s2">"bottom_elevation"</span><span class="p">]:</span>
             <span class="n">layered_data_riv</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="n">enforce_dim_order</span><span class="p">(</span>
                 <span class="n">planar_data</span><span class="p">[</span><span class="n">key</span><span class="p">]</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">riv_allocated</span><span class="p">)</span>
             <span class="p">)</span>
-        <span class="n">layered_data_riv</span><span class="p">[</span><span class="s2">&quot;conductance&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">conductance</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">riv_allocated</span><span class="p">)</span>
+        <span class="n">layered_data_riv</span><span class="p">[</span><span class="s2">"conductance"</span><span class="p">]</span> <span class="o">=</span> <span class="n">conductance</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">riv_allocated</span><span class="p">)</span>
 
         <span class="n">layered_data_drn</span> <span class="o">=</span> <span class="p">{}</span>
         <span class="k">if</span> <span class="n">drn_allocated</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="n">layered_data_drn</span><span class="p">[</span><span class="s2">&quot;elevation&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">enforce_dim_order</span><span class="p">(</span>
-                <span class="n">planar_data</span><span class="p">[</span><span class="s2">&quot;stage&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">drn_allocated</span><span class="p">)</span>
+            <span class="n">layered_data_drn</span><span class="p">[</span><span class="s2">"elevation"</span><span class="p">]</span> <span class="o">=</span> <span class="n">enforce_dim_order</span><span class="p">(</span>
+                <span class="n">planar_data</span><span class="p">[</span><span class="s2">"stage"</span><span class="p">]</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">drn_allocated</span><span class="p">)</span>
             <span class="p">)</span>
-            <span class="n">layered_data_drn</span><span class="p">[</span><span class="s2">&quot;conductance&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">conductance</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">drn_allocated</span><span class="p">)</span>
+            <span class="n">layered_data_drn</span><span class="p">[</span><span class="s2">"conductance"</span><span class="p">]</span> <span class="o">=</span> <span class="n">conductance</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">drn_allocated</span><span class="p">)</span>
 
-        <span class="n">layered_data_riv</span><span class="p">[</span><span class="s2">&quot;bottom_elevation&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">rise_bottom_elevation_if_needed</span><span class="p">(</span>
-            <span class="n">layered_data_riv</span><span class="p">[</span><span class="s2">&quot;bottom_elevation&quot;</span><span class="p">],</span> <span class="n">bottom</span>
+        <span class="n">layered_data_riv</span><span class="p">[</span><span class="s2">"bottom_elevation"</span><span class="p">]</span> <span class="o">=</span> <span class="n">rise_bottom_elevation_if_needed</span><span class="p">(</span>
+            <span class="n">layered_data_riv</span><span class="p">[</span><span class="s2">"bottom_elevation"</span><span class="p">],</span> <span class="n">bottom</span>
         <span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">drop_empty_layers</span><span class="p">:</span>
+            <span class="n">layered_data_riv</span> <span class="o">=</span> <span class="n">drop_empty_layers_from_dict</span><span class="p">(</span>
+                <span class="n">layered_data_riv</span><span class="p">,</span> <span class="n">riv_allocated</span>
+            <span class="p">)</span>
+            <span class="k">if</span> <span class="n">drn_allocated</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="n">layered_data_drn</span> <span class="o">=</span> <span class="n">drop_empty_layers_from_dict</span><span class="p">(</span>
+                    <span class="n">layered_data_drn</span><span class="p">,</span> <span class="n">drn_allocated</span>
+                <span class="p">)</span>
 
         <span class="k">return</span> <span class="n">layered_data_riv</span><span class="p">,</span> <span class="n">layered_data_drn</span>
 
@@ -870,10 +896,10 @@
         <span class="n">time_max</span><span class="p">:</span> <span class="n">datetime</span><span class="p">,</span>
         <span class="n">allocation_option</span><span class="p">:</span> <span class="n">ALLOCATION_OPTION</span><span class="p">,</span>
         <span class="n">distributing_option</span><span class="p">:</span> <span class="n">DISTRIBUTING_OPTION</span><span class="p">,</span>
-        <span class="n">regridder_types</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">RiverRegridMethod</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">regridder_types</span><span class="p">:</span> <span class="n">RiverRegridMethod</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
         <span class="n">regrid_cache</span><span class="p">:</span> <span class="n">RegridderWeightsCache</span> <span class="o">=</span> <span class="n">RegridderWeightsCache</span><span class="p">(),</span>
-    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="n">Optional</span><span class="p">[</span><span class="s2">&quot;River&quot;</span><span class="p">],</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Drainage</span><span class="p">]]:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">tuple</span><span class="p">[</span><span class="n">Optional</span><span class="p">[</span><span class="s2">"River"</span><span class="p">],</span> <span class="n">Drainage</span> <span class="o">|</span> <span class="kc">None</span><span class="p">]:</span>
+<span class="w">        </span><span class="sd">"""</span>
 <span class="sd">        Construct a river-package from iMOD5 data, loaded with the</span>
 <span class="sd">        :func:`imod.formats.prj.open_projectfile_data` function.</span>
 
@@ -920,12 +946,12 @@
 <span class="sd">        river stage if ``ALLOCATION_OPTION.stage_to_riv_bot_drn_above`` is</span>
 <span class="sd">        chosen. Both the river package and the drainage package can be None,</span>
 <span class="sd">        this can happen if the infiltration factor is 0 or 1 everywhere.</span>
-<span class="sd">        &quot;&quot;&quot;</span>
+<span class="sd">        """</span>
         <span class="c1"># gather input data</span>
-        <span class="n">varnames</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;conductance&quot;</span><span class="p">,</span> <span class="s2">&quot;stage&quot;</span><span class="p">,</span> <span class="s2">&quot;bottom_elevation&quot;</span><span class="p">,</span> <span class="s2">&quot;infiltration_factor&quot;</span><span class="p">]</span>
+        <span class="n">varnames</span> <span class="o">=</span> <span class="p">[</span><span class="s2">"conductance"</span><span class="p">,</span> <span class="s2">"stage"</span><span class="p">,</span> <span class="s2">"bottom_elevation"</span><span class="p">,</span> <span class="s2">"infiltration_factor"</span><span class="p">]</span>
         <span class="n">data</span> <span class="o">=</span> <span class="p">{</span><span class="n">varname</span><span class="p">:</span> <span class="n">imod5_data</span><span class="p">[</span><span class="n">key</span><span class="p">][</span><span class="n">varname</span><span class="p">]</span> <span class="k">for</span> <span class="n">varname</span> <span class="ow">in</span> <span class="n">varnames</span><span class="p">}</span>
-        <span class="n">mask</span> <span class="o">=</span> <span class="n">data</span><span class="p">[</span><span class="s2">&quot;conductance&quot;</span><span class="p">]</span> <span class="o">&gt;</span> <span class="mi">0</span>
-        <span class="n">data</span><span class="p">[</span><span class="s2">&quot;conductance&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">data</span><span class="p">[</span><span class="s2">&quot;conductance&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">mask</span><span class="p">)</span>
+        <span class="n">mask</span> <span class="o">=</span> <span class="n">data</span><span class="p">[</span><span class="s2">"conductance"</span><span class="p">]</span> <span class="o">&gt;</span> <span class="mi">0</span>
+        <span class="n">data</span><span class="p">[</span><span class="s2">"conductance"</span><span class="p">]</span> <span class="o">=</span> <span class="n">data</span><span class="p">[</span><span class="s2">"conductance"</span><span class="p">]</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">mask</span><span class="p">)</span>
         <span class="c1"># Regrid the input data</span>
         <span class="n">regridded_riv_pkg_data</span> <span class="o">=</span> <span class="n">regrid_imod5_pkg_data</span><span class="p">(</span>
             <span class="bp">cls</span><span class="p">,</span> <span class="n">data</span><span class="p">,</span> <span class="n">target_dis</span><span class="p">,</span> <span class="n">regridder_types</span><span class="p">,</span> <span class="n">regrid_cache</span>
@@ -933,9 +959,9 @@
         <span class="n">regridded_riv_pkg_data</span> <span class="o">=</span> <span class="n">broadcast_and_mask_arrays</span><span class="p">(</span><span class="n">regridded_riv_pkg_data</span><span class="p">)</span>
         <span class="c1"># Pop infiltration_factor to avoid unnecessarily allocating and</span>
         <span class="c1"># distributing it.</span>
-        <span class="n">infiltration_factor</span> <span class="o">=</span> <span class="n">regridded_riv_pkg_data</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s2">&quot;infiltration_factor&quot;</span><span class="p">)</span>
+        <span class="n">infiltration_factor</span> <span class="o">=</span> <span class="n">regridded_riv_pkg_data</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s2">"infiltration_factor"</span><span class="p">)</span>
         <span class="c1"># Allocate and distribute planar data if the grid is planar</span>
-        <span class="n">is_planar_xy</span> <span class="o">=</span> <span class="n">is_planar_grid</span><span class="p">(</span><span class="n">regridded_riv_pkg_data</span><span class="p">[</span><span class="s2">&quot;conductance&quot;</span><span class="p">])</span>
+        <span class="n">is_planar_xy</span> <span class="o">=</span> <span class="n">is_planar_grid</span><span class="p">(</span><span class="n">regridded_riv_pkg_data</span><span class="p">[</span><span class="s2">"conductance"</span><span class="p">])</span>
         <span class="n">allocation_drn_data</span><span class="p">:</span> <span class="n">GridDataDict</span> <span class="o">=</span> <span class="p">{}</span>
         <span class="k">if</span> <span class="n">is_planar_xy</span><span class="p">:</span>
             <span class="c1"># allocate and distribute planar data</span>
@@ -950,16 +976,16 @@
             <span class="p">)</span>
             <span class="n">regridded_riv_pkg_data</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">allocation_riv_data</span><span class="p">)</span>
             <span class="n">infiltration_factor</span> <span class="o">=</span> <span class="n">infiltration_factor</span><span class="o">.</span><span class="n">isel</span><span class="p">(</span>
-                <span class="p">{</span><span class="s2">&quot;layer&quot;</span><span class="p">:</span> <span class="mi">0</span><span class="p">},</span> <span class="n">drop</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">missing_dims</span><span class="o">=</span><span class="s2">&quot;ignore&quot;</span>
+                <span class="p">{</span><span class="s2">"layer"</span><span class="p">:</span> <span class="mi">0</span><span class="p">},</span> <span class="n">drop</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">missing_dims</span><span class="o">=</span><span class="s2">"ignore"</span>
             <span class="p">)</span>
-        <span class="n">regridded_riv_pkg_data</span><span class="p">[</span><span class="s2">&quot;bottom_elevation&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">enforce_dim_order</span><span class="p">(</span>
-            <span class="n">regridded_riv_pkg_data</span><span class="p">[</span><span class="s2">&quot;bottom_elevation&quot;</span><span class="p">]</span>
+        <span class="n">regridded_riv_pkg_data</span><span class="p">[</span><span class="s2">"bottom_elevation"</span><span class="p">]</span> <span class="o">=</span> <span class="n">enforce_dim_order</span><span class="p">(</span>
+            <span class="n">regridded_riv_pkg_data</span><span class="p">[</span><span class="s2">"bottom_elevation"</span><span class="p">]</span>
         <span class="p">)</span>
         <span class="c1"># Create packages</span>
         <span class="n">regridded_riv_pkg_data</span><span class="p">,</span> <span class="n">infiltration_drn_data</span> <span class="o">=</span> <span class="n">_separate_infiltration_data</span><span class="p">(</span>
             <span class="n">regridded_riv_pkg_data</span><span class="p">,</span> <span class="n">infiltration_factor</span>
         <span class="p">)</span>
-        <span class="n">riv_pkg</span> <span class="o">=</span> <span class="bp">cls</span><span class="p">(</span><span class="o">**</span><span class="n">regridded_riv_pkg_data</span><span class="p">,</span> <span class="n">validate</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+        <span class="n">riv_pkg</span> <span class="o">=</span> <span class="bp">cls</span><span class="p">(</span><span class="o">**</span><span class="n">cast</span><span class="p">(</span><span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">],</span> <span class="n">regridded_riv_pkg_data</span><span class="p">),</span> <span class="n">validate</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
         <span class="n">drn_pkg</span> <span class="o">=</span> <span class="n">_create_drain_from_leftover_riv_imod5_data</span><span class="p">(</span>
             <span class="n">allocation_drn_data</span><span class="p">,</span>
             <span class="n">infiltration_drn_data</span><span class="p">,</span>
@@ -978,8 +1004,8 @@
         <span class="n">optional_drn_pkg</span> <span class="o">=</span> <span class="n">clip_time_if_package</span><span class="p">(</span><span class="n">optional_drn_pkg</span><span class="p">,</span> <span class="n">time_min</span><span class="p">,</span> <span class="n">time_max</span><span class="p">)</span>
 
         <span class="c1"># Cast for mypy checks</span>
-        <span class="n">optional_riv_pkg</span> <span class="o">=</span> <span class="n">cast</span><span class="p">(</span><span class="n">Optional</span><span class="p">[</span><span class="n">River</span><span class="p">],</span> <span class="n">optional_riv_pkg</span><span class="p">)</span>
-        <span class="n">optional_drn_pkg</span> <span class="o">=</span> <span class="n">cast</span><span class="p">(</span><span class="n">Optional</span><span class="p">[</span><span class="n">Drainage</span><span class="p">],</span> <span class="n">optional_drn_pkg</span><span class="p">)</span>
+        <span class="n">optional_riv_pkg</span> <span class="o">=</span> <span class="n">cast</span><span class="p">(</span><span class="n">River</span> <span class="o">|</span> <span class="kc">None</span><span class="p">,</span> <span class="n">optional_riv_pkg</span><span class="p">)</span>
+        <span class="n">optional_drn_pkg</span> <span class="o">=</span> <span class="n">cast</span><span class="p">(</span><span class="n">Drainage</span> <span class="o">|</span> <span class="kc">None</span><span class="p">,</span> <span class="n">optional_drn_pkg</span><span class="p">)</span>
 
         <span class="k">return</span> <span class="p">(</span><span class="n">optional_riv_pkg</span><span class="p">,</span> <span class="n">optional_drn_pkg</span><span class="p">)</span></div>
 </div>
@@ -1013,8 +1039,8 @@
   </div>
   
   <!-- Scripts loaded after <body> so the DOM is not blocked -->
-  <script defer src="../../../_static/scripts/bootstrap.js?digest=90905a2f556bf617f1a9"></script>
-<script defer src="../../../_static/scripts/pydata-sphinx-theme.js?digest=90905a2f556bf617f1a9"></script>
+  <script defer src="../../../_static/scripts/bootstrap.js?digest=75c7c72ae941e8b558d8"></script>
+<script defer src="../../../_static/scripts/pydata-sphinx-theme.js?digest=75c7c72ae941e8b558d8"></script>
 
   <footer class="bd-footer">
 <div class="bd-footer__inner bd-page-width">
@@ -1034,8 +1060,7 @@
         <div class="footer-item">
 
   <p class="sphinx-version">
-    Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 9.1.0.
-    <br/>
+    Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 9.2.0.
   </p>
 </div>
       
@@ -1048,7 +1073,7 @@
         <div class="footer-item">
 <p class="theme-version">
   <!-- # L10n: Setting the PST URL as an argument as this does not need to be localized -->
-  Built with the <a href="https://pydata-sphinx-theme.readthedocs.io/en/stable/index.html">PyData Sphinx Theme</a> 0.20.0.
+  Built with the <a href="https://pydata-sphinx-theme.readthedocs.io/en/stable/index.html">PyData Sphinx Theme</a> 0.24.0.
 </p></div>
       
     </div>

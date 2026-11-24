@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 
 
@@ -7,7 +6,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>imod.prepare.voxelize &#8212; iMOD Python 1.1.0 documentation</title>
+    <title>imod.prepare.voxelize &#8212; iMOD Python 1.2.0 documentation</title>
   
   
   
@@ -26,22 +25,22 @@
   </noscript>
   
   <!-- Loaded before other Sphinx assets -->
-  <link href="../../../_static/styles/theme.css?digest=90905a2f556bf617f1a9" rel="stylesheet" />
-<link href="../../../_static/styles/pydata-sphinx-theme.css?digest=90905a2f556bf617f1a9" rel="stylesheet" />
+  <link href="../../../_static/styles/theme.css?digest=75c7c72ae941e8b558d8" rel="stylesheet" />
+<link href="../../../_static/styles/pydata-sphinx-theme.css?digest=75c7c72ae941e8b558d8" rel="stylesheet" />
 
     <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=03e43079" />
-    <link rel="stylesheet" type="text/css" href="../../../_static/sg_gallery.css?v=fd6457a4" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/sg_gallery.css?v=c83e6b79" />
     <link rel="stylesheet" type="text/css" href="../../../_static/sg_gallery-binder.css?v=f4aeca0c" />
     <link rel="stylesheet" type="text/css" href="../../../_static/sg_gallery-dataframe.css?v=2082cf3c" />
     <link rel="stylesheet" type="text/css" href="../../../_static/sg_gallery-rendered-html.css?v=1277b6f3" />
   
   <!-- So that users can add custom icons -->
-  <script defer src="../../../_static/scripts/fontawesome.js?digest=90905a2f556bf617f1a9"></script>
+  <script defer src="../../../_static/scripts/fontawesome.js?digest=75c7c72ae941e8b558d8"></script>
   <!-- Pre-loaded scripts that we'll load fully later -->
-  <link rel="preload" as="script" href="../../../_static/scripts/bootstrap.js?digest=90905a2f556bf617f1a9" />
-<link rel="preload" as="script" href="../../../_static/scripts/pydata-sphinx-theme.js?digest=90905a2f556bf617f1a9" />
+  <link rel="preload" as="script" href="../../../_static/scripts/bootstrap.js?digest=75c7c72ae941e8b558d8" />
+<link rel="preload" as="script" href="../../../_static/scripts/pydata-sphinx-theme.js?digest=75c7c72ae941e8b558d8" />
 
-    <script src="../../../_static/documentation_options.js?v=fc837d61"></script>
+    <script src="../../../_static/documentation_options.js?v=6efca38a"></script>
     <script src="../../../_static/doctools.js?v=fd6eb6e6"></script>
     <script src="../../../_static/sphinx_highlight.js?v=6ffebe34"></script>
     <script src="../../../_static/sg-tags.js?v=d80f6fa4"></script>
@@ -51,8 +50,9 @@
     <link rel="index" title="Index" href="../../../genindex.html" />
     <link rel="search" title="Search" href="../../../search.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <meta name="color-scheme" content="light dark"/>
   <meta name="docsearch:language" content="en"/>
-  <meta name="docsearch:version" content="1.1.0.dev" />
+  <meta name="docsearch:version" content="1.2.0.dev" />
   
     
     <script src="../../../_static/searchtools.js"></script>
@@ -100,7 +100,7 @@
   
     <header id="pst-header" class="bd-header navbar navbar-expand-lg bd-navbar d-print-none">
 <div class="bd-header__inner bd-page-width">
-  <button class="pst-navbar-icon sidebar-toggle primary-toggle" aria-label="Site navigation">
+  <button type="button" class="pst-navbar-icon sidebar-toggle primary-toggle" aria-label="Site navigation" aria-expanded="false" aria-controls="pst-primary-sidebar-modal">
     <span class="fa-solid fa-bars"></span>
   </button>
   
@@ -122,8 +122,8 @@
     
     
     
-    <img src="../../../_static/imod-python-logo-light.svg" class="logo__image only-light" alt="iMOD Python 1.1.0 documentation - Home"/>
-    <img src="../../../_static/imod-python-logo-dark.svg" class="logo__image only-dark pst-js-only" alt="iMOD Python 1.1.0 documentation - Home"/>
+    <img src="../../../_static/imod-python-logo-light.svg" class="logo__image only-light" alt="iMOD Python 1.2.0 documentation - Home"/>
+    <img src="../../../_static/imod-python-logo-dark.svg" class="logo__image only-dark pst-js-only" alt="iMOD Python 1.2.0 documentation - Home"/>
   
   
 </a></div>
@@ -190,7 +190,7 @@
         <div class="navbar-item navbar-persistent--container">
           
 
-<button class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+<button type="button" class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
  <i class="fa-solid fa-magnifying-glass"></i>
  <span class="search-button__default-text">Search</span>
  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
@@ -201,15 +201,15 @@
         <div class="navbar-item">
 
 <div class="theme-switch-container dropdown pst-js-only" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Color mode">
-  <button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button dropdown-toggle" aria-label="Color mode" data-bs-toggle="dropdown">
-    <i class="theme-switch fa-solid fa-sun fa-lg fa-fw" data-mode="light" title="Light"></i>
-    <i class="theme-switch fa-solid fa-moon fa-lg fa-fw" data-mode="dark" title="Dark"></i>
-    <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg fa-fw" data-mode="auto" title="System Settings"></i>
+  <button type="button" class="btn btn-sm nav-link pst-navbar-icon theme-switch-button dropdown-toggle" aria-label="Color mode" data-bs-toggle="dropdown">
+    <i class="theme-switch fa-solid fa-sun fa-lg" data-mode="light" title="Light"></i>
+    <i class="theme-switch fa-solid fa-moon fa-lg" data-mode="dark" title="Dark"></i>
+    <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg" data-mode="auto" title="System Settings"></i>
   </button>
   <ul class="dropdown-menu dropdown-menu-end">
-    <li><button class="dropdown-item d-flex align-items-center theme-change-button" data-mode="auto"><i class="fa-solid fa-circle-half-stroke fa-lg fa-fw me-1"></i>System Settings</button></li>
-    <li><button class="dropdown-item d-flex align-items-center theme-change-button" data-mode="light"><i class="fa-solid fa-sun fa-lg fa-fw me-1"></i>Light</button></li>
-    <li><button class="dropdown-item d-flex align-items-center theme-change-button" data-mode="dark"><i class="fa-solid fa-moon fa-lg fa-fw me-1"></i>Dark</button></li>
+    <li><button type="button" class="dropdown-item d-flex align-items-center theme-change-button" data-mode="auto"><i class="fa-solid fa-circle-half-stroke fa-lg me-1"></i>System Settings</button></li>
+    <li><button type="button" class="dropdown-item d-flex align-items-center theme-change-button" data-mode="light"><i class="fa-solid fa-sun fa-lg me-1"></i>Light</button></li>
+    <li><button type="button" class="dropdown-item d-flex align-items-center theme-change-button" data-mode="dark"><i class="fa-solid fa-moon fa-lg me-1"></i>Dark</button></li>
   </ul>
 </div></div>
       
@@ -246,7 +246,7 @@
   
     <div class="navbar-persistent--mobile">
 
-<button class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+<button type="button" class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
  <i class="fa-solid fa-magnifying-glass"></i>
  <span class="search-button__default-text">Search</span>
  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
@@ -267,7 +267,7 @@
       
         
       
-      <dialog id="pst-primary-sidebar-modal"></dialog>
+      <dialog id="pst-primary-sidebar-modal" tabindex="-1"></dialog>
       <div id="pst-primary-sidebar" class="bd-sidebar-primary bd-sidebar hide-on-wide">
         
 
@@ -337,15 +337,15 @@
           <div class="navbar-item">
 
 <div class="theme-switch-container dropdown pst-js-only" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Color mode">
-  <button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button dropdown-toggle" aria-label="Color mode" data-bs-toggle="dropdown">
-    <i class="theme-switch fa-solid fa-sun fa-lg fa-fw" data-mode="light" title="Light"></i>
-    <i class="theme-switch fa-solid fa-moon fa-lg fa-fw" data-mode="dark" title="Dark"></i>
-    <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg fa-fw" data-mode="auto" title="System Settings"></i>
+  <button type="button" class="btn btn-sm nav-link pst-navbar-icon theme-switch-button dropdown-toggle" aria-label="Color mode" data-bs-toggle="dropdown">
+    <i class="theme-switch fa-solid fa-sun fa-lg" data-mode="light" title="Light"></i>
+    <i class="theme-switch fa-solid fa-moon fa-lg" data-mode="dark" title="Dark"></i>
+    <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg" data-mode="auto" title="System Settings"></i>
   </button>
   <ul class="dropdown-menu dropdown-menu-end">
-    <li><button class="dropdown-item d-flex align-items-center theme-change-button" data-mode="auto"><i class="fa-solid fa-circle-half-stroke fa-lg fa-fw me-1"></i>System Settings</button></li>
-    <li><button class="dropdown-item d-flex align-items-center theme-change-button" data-mode="light"><i class="fa-solid fa-sun fa-lg fa-fw me-1"></i>Light</button></li>
-    <li><button class="dropdown-item d-flex align-items-center theme-change-button" data-mode="dark"><i class="fa-solid fa-moon fa-lg fa-fw me-1"></i>Dark</button></li>
+    <li><button type="button" class="dropdown-item d-flex align-items-center theme-change-button" data-mode="auto"><i class="fa-solid fa-circle-half-stroke fa-lg me-1"></i>System Settings</button></li>
+    <li><button type="button" class="dropdown-item d-flex align-items-center theme-change-button" data-mode="light"><i class="fa-solid fa-sun fa-lg me-1"></i>Light</button></li>
+    <li><button type="button" class="dropdown-item d-flex align-items-center theme-change-button" data-mode="dark"><i class="fa-solid fa-moon fa-lg me-1"></i>Dark</button></li>
   </ul>
 </div></div>
         
@@ -411,7 +411,7 @@
     
     <li class="breadcrumb-item breadcrumb-home">
       <a href="../../../index.html" class="nav-link" aria-label="Home">
-        <i class="fa-solid fa-home"></i>
+        <i class="fa-solid fa-house"></i>
       </a>
     </li>
     
@@ -435,23 +435,32 @@
                 <article class="bd-article">
                   
   <h1>Source code for imod.prepare.voxelize</h1><div class="highlight"><pre>
-<span></span><span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Any</span>
+<span></span><span class="kn">from</span><span class="w"> </span><span class="nn">collections.abc</span><span class="w"> </span><span class="kn">import</span> <span class="n">Callable</span><span class="p">,</span> <span class="n">Hashable</span><span class="p">,</span> <span class="n">Iterable</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Any</span>
 
 <span class="kn">import</span><span class="w"> </span><span class="nn">numba</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">xarray</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">xr</span>
 
 <span class="kn">from</span><span class="w"> </span><span class="nn">imod.prepare</span><span class="w"> </span><span class="kn">import</span> <span class="n">common</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">imod.typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">FloatArray</span>
 
 <span class="c1"># Voxelize does not support conductance method, nearest, or linear</span>
 <span class="n">METHODS</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]</span> <span class="o">=</span> <span class="n">common</span><span class="o">.</span><span class="n">METHODS</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
-<span class="n">METHODS</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s2">&quot;conductance&quot;</span><span class="p">)</span>
-<span class="n">METHODS</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s2">&quot;nearest&quot;</span><span class="p">)</span>
-<span class="n">METHODS</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s2">&quot;multilinear&quot;</span><span class="p">)</span>
+<span class="n">METHODS</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s2">"conductance"</span><span class="p">)</span>
+<span class="n">METHODS</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s2">"nearest"</span><span class="p">)</span>
+<span class="n">METHODS</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s2">"multilinear"</span><span class="p">)</span>
 
 
 <span class="nd">@numba</span><span class="o">.</span><span class="n">njit</span><span class="p">(</span><span class="n">cache</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-<span class="k">def</span><span class="w"> </span><span class="nf">_voxelize</span><span class="p">(</span><span class="n">src</span><span class="p">,</span> <span class="n">dst</span><span class="p">,</span> <span class="n">src_top</span><span class="p">,</span> <span class="n">src_bot</span><span class="p">,</span> <span class="n">dst_z</span><span class="p">,</span> <span class="n">method</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">_voxelize</span><span class="p">(</span>
+    <span class="n">src</span><span class="p">:</span> <span class="n">FloatArray</span><span class="p">,</span>
+    <span class="n">dst</span><span class="p">:</span> <span class="n">FloatArray</span><span class="p">,</span>
+    <span class="n">src_top</span><span class="p">:</span> <span class="n">FloatArray</span><span class="p">,</span>
+    <span class="n">src_bot</span><span class="p">:</span> <span class="n">FloatArray</span><span class="p">,</span>
+    <span class="n">dst_z</span><span class="p">:</span> <span class="n">FloatArray</span><span class="p">,</span>
+    <span class="n">method</span><span class="p">:</span> <span class="n">Callable</span><span class="p">[[</span><span class="n">FloatArray</span><span class="p">,</span> <span class="n">FloatArray</span><span class="p">],</span> <span class="nb">float</span><span class="p">],</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">FloatArray</span><span class="p">:</span>
     <span class="n">nlayer</span><span class="p">,</span> <span class="n">nrow</span><span class="p">,</span> <span class="n">ncol</span> <span class="o">=</span> <span class="n">src</span><span class="o">.</span><span class="n">shape</span>
     <span class="n">nz</span> <span class="o">=</span> <span class="n">dst_z</span><span class="o">.</span><span class="n">size</span> <span class="o">-</span> <span class="mi">1</span>
     <span class="n">values</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">nlayer</span><span class="p">)</span>
@@ -499,7 +508,7 @@
 <div class="viewcode-block" id="Voxelizer">
 <a class="viewcode-back" href="../../../api/generated/prepare/imod.prepare.Voxelizer.html#imod.prepare.Voxelizer">[docs]</a>
 <span class="k">class</span><span class="w"> </span><span class="nc">Voxelizer</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">"""</span>
 <span class="sd">    Object to repeatedly voxelize similar objects. Compiles once on first call,</span>
 <span class="sd">    can then be repeatedly called without JIT compilation overhead.</span>
 
@@ -507,14 +516,14 @@
 <span class="sd">    ----------</span>
 <span class="sd">    method : str, function</span>
 <span class="sd">        The method to use for regridding. Default available methods are:</span>
-<span class="sd">        ``{&quot;mean&quot;, &quot;harmonic_mean&quot;, &quot;geometric_mean&quot;, &quot;sum&quot;, &quot;minimum&quot;,</span>
-<span class="sd">        &quot;maximum&quot;, &quot;mode&quot;, &quot;median&quot;, &quot;max_overlap&quot;}``</span>
+<span class="sd">        ``{"mean", "harmonic_mean", "geometric_mean", "sum", "minimum",</span>
+<span class="sd">        "maximum", "mode", "median", "max_overlap"}``</span>
 
 <span class="sd">    Examples</span>
 <span class="sd">    --------</span>
 <span class="sd">    Usage is similar to the regridding. Initialize the Voxelizer object:</span>
 
-<span class="sd">    &gt;&gt;&gt; mean_voxelizer = imod.prepare.Voxelizer(method=&quot;mean&quot;)</span>
+<span class="sd">    &gt;&gt;&gt; mean_voxelizer = imod.prepare.Voxelizer(method="mean")</span>
 
 <span class="sd">    Then call the ``voxelize`` method to transform a layered dataset into a</span>
 <span class="sd">    voxel based one. The vertical coordinates of the layers must be provided</span>
@@ -525,7 +534,7 @@
 <span class="sd">    If your data is already voxel based, i.e. the layers have tops and bottoms</span>
 <span class="sd">    that do not differ with x or y, you should use a ``Regridder`` instead.</span>
 
-<span class="sd">    It&#39;s possible to provide your own methods to the ``Regridder``, provided that</span>
+<span class="sd">    It's possible to provide your own methods to the ``Regridder``, provided that</span>
 <span class="sd">    numba can compile them. They need to take the arguments ``values`` and</span>
 <span class="sd">    ``weights``. Make sure they deal with ``nan`` values gracefully!</span>
 
@@ -540,30 +549,44 @@
 
 <span class="sd">    In general, however, the provided methods should be adequate for your</span>
 <span class="sd">    voxelizing needs.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
 
 <div class="viewcode-block" id="Voxelizer.__init__">
 <a class="viewcode-back" href="../../../api/generated/prepare/imod.prepare.Voxelizer.html#imod.prepare.Voxelizer.__init__">[docs]</a>
-    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">method</span><span class="p">,</span> <span class="n">use_relative_weights</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span> <span class="n">method</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="n">Callable</span><span class="p">[</span><span class="o">...</span><span class="p">,</span> <span class="n">Any</span><span class="p">],</span> <span class="n">use_relative_weights</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
         <span class="n">_method</span> <span class="o">=</span> <span class="n">common</span><span class="o">.</span><span class="n">_get_method</span><span class="p">(</span><span class="n">method</span><span class="p">,</span> <span class="n">METHODS</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">method</span> <span class="o">=</span> <span class="n">_method</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_first_call</span> <span class="o">=</span> <span class="kc">True</span></div>
 
 
-    <span class="k">def</span><span class="w"> </span><span class="nf">_make_voxelize</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_make_voxelize</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">"""</span>
 <span class="sd">        Use closure to avoid numba overhead</span>
-<span class="sd">        &quot;&quot;&quot;</span>
+<span class="sd">        """</span>
         <span class="n">jit_method</span> <span class="o">=</span> <span class="n">numba</span><span class="o">.</span><span class="n">njit</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">method</span><span class="p">)</span>
 
         <span class="nd">@numba</span><span class="o">.</span><span class="n">njit</span>
-        <span class="k">def</span><span class="w"> </span><span class="nf">voxelize</span><span class="p">(</span><span class="n">src</span><span class="p">,</span> <span class="n">dst</span><span class="p">,</span> <span class="n">src_top</span><span class="p">,</span> <span class="n">src_bot</span><span class="p">,</span> <span class="n">dst_z</span><span class="p">):</span>
+        <span class="k">def</span><span class="w"> </span><span class="nf">voxelize</span><span class="p">(</span>
+            <span class="n">src</span><span class="p">:</span> <span class="n">FloatArray</span><span class="p">,</span>
+            <span class="n">dst</span><span class="p">:</span> <span class="n">FloatArray</span><span class="p">,</span>
+            <span class="n">src_top</span><span class="p">:</span> <span class="n">FloatArray</span><span class="p">,</span>
+            <span class="n">src_bot</span><span class="p">:</span> <span class="n">FloatArray</span><span class="p">,</span>
+            <span class="n">dst_z</span><span class="p">:</span> <span class="n">FloatArray</span><span class="p">,</span>
+        <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">FloatArray</span><span class="p">:</span>
             <span class="k">return</span> <span class="n">_voxelize</span><span class="p">(</span><span class="n">src</span><span class="p">,</span> <span class="n">dst</span><span class="p">,</span> <span class="n">src_top</span><span class="p">,</span> <span class="n">src_bot</span><span class="p">,</span> <span class="n">dst_z</span><span class="p">,</span> <span class="n">jit_method</span><span class="p">)</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">_voxelize</span> <span class="o">=</span> <span class="n">voxelize</span>
 
-    <span class="k">def</span><span class="w"> </span><span class="nf">voxelize</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">source</span><span class="p">,</span> <span class="n">top</span><span class="p">,</span> <span class="n">bottom</span><span class="p">,</span> <span class="n">like</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">voxelize</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">source</span><span class="p">:</span> <span class="n">xr</span><span class="o">.</span><span class="n">DataArray</span><span class="p">,</span>
+        <span class="n">top</span><span class="p">:</span> <span class="n">xr</span><span class="o">.</span><span class="n">DataArray</span><span class="p">,</span>
+        <span class="n">bottom</span><span class="p">:</span> <span class="n">xr</span><span class="o">.</span><span class="n">DataArray</span><span class="p">,</span>
+        <span class="n">like</span><span class="p">:</span> <span class="n">xr</span><span class="o">.</span><span class="n">DataArray</span><span class="p">,</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">xr</span><span class="o">.</span><span class="n">DataArray</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">"""</span>
 
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
@@ -581,57 +604,57 @@
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
 <span class="sd">        voxelized : xr.DataArray</span>
-<span class="sd">        &quot;&quot;&quot;</span>
+<span class="sd">        """</span>
 
-        <span class="k">def</span><span class="w"> </span><span class="nf">dim_format</span><span class="p">(</span><span class="n">dims</span><span class="p">):</span>
-            <span class="k">return</span> <span class="s2">&quot;, &quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">dim</span> <span class="k">for</span> <span class="n">dim</span> <span class="ow">in</span> <span class="n">dims</span><span class="p">)</span>
+        <span class="k">def</span><span class="w"> </span><span class="nf">dim_format</span><span class="p">(</span><span class="n">dims</span><span class="p">:</span> <span class="n">Iterable</span><span class="p">[</span><span class="n">Hashable</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+            <span class="k">return</span> <span class="s2">", "</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">dim</span><span class="p">)</span> <span class="k">for</span> <span class="n">dim</span> <span class="ow">in</span> <span class="n">dims</span><span class="p">)</span>
 
         <span class="c1"># Checks on inputs</span>
-        <span class="k">if</span> <span class="s2">&quot;z&quot;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">like</span><span class="o">.</span><span class="n">dims</span><span class="p">:</span>
+        <span class="k">if</span> <span class="s2">"z"</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">like</span><span class="o">.</span><span class="n">dims</span><span class="p">:</span>
             <span class="c1"># might be a coordinate</span>
-            <span class="k">if</span> <span class="s2">&quot;layer&quot;</span> <span class="ow">in</span> <span class="n">like</span><span class="o">.</span><span class="n">dims</span><span class="p">:</span>
-                <span class="k">if</span> <span class="ow">not</span> <span class="n">like</span><span class="o">.</span><span class="n">coords</span><span class="p">[</span><span class="s2">&quot;z&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">dims</span> <span class="o">==</span> <span class="p">(</span><span class="s2">&quot;layer&quot;</span><span class="p">,):</span>
-                    <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;&quot;z&quot; has to be given in ``like`` coordinates&#39;</span><span class="p">)</span>
-        <span class="k">if</span> <span class="s2">&quot;dz&quot;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">like</span><span class="o">.</span><span class="n">coords</span><span class="p">:</span>
-            <span class="n">dzs</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">diff</span><span class="p">(</span><span class="n">like</span><span class="o">.</span><span class="n">coords</span><span class="p">[</span><span class="s2">&quot;z&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">values</span><span class="p">)</span>
+            <span class="k">if</span> <span class="s2">"layer"</span> <span class="ow">in</span> <span class="n">like</span><span class="o">.</span><span class="n">dims</span><span class="p">:</span>
+                <span class="k">if</span> <span class="ow">not</span> <span class="n">like</span><span class="o">.</span><span class="n">coords</span><span class="p">[</span><span class="s2">"z"</span><span class="p">]</span><span class="o">.</span><span class="n">dims</span> <span class="o">==</span> <span class="p">(</span><span class="s2">"layer"</span><span class="p">,):</span>
+                    <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">'"z" has to be given in ``like`` coordinates'</span><span class="p">)</span>
+        <span class="k">if</span> <span class="s2">"dz"</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">like</span><span class="o">.</span><span class="n">coords</span><span class="p">:</span>
+            <span class="n">dzs</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">diff</span><span class="p">(</span><span class="n">like</span><span class="o">.</span><span class="n">coords</span><span class="p">[</span><span class="s2">"z"</span><span class="p">]</span><span class="o">.</span><span class="n">values</span><span class="p">)</span>
             <span class="n">dz</span> <span class="o">=</span> <span class="n">dzs</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
             <span class="k">if</span> <span class="ow">not</span> <span class="n">np</span><span class="o">.</span><span class="n">allclose</span><span class="p">(</span><span class="n">dzs</span><span class="p">,</span> <span class="n">dz</span><span class="p">):</span>
                 <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
-                    <span class="s1">&#39;&quot;dz&quot; has to be given as a coordinate in case of&#39;</span>
-                    <span class="s1">&#39; non-equidistant &quot;z&quot; coordinate.&#39;</span>
+                    <span class="s1">'"dz" has to be given as a coordinate in case of'</span>
+                    <span class="s1">' non-equidistant "z" coordinate.'</span>
                 <span class="p">)</span>
-            <span class="n">like</span><span class="p">[</span><span class="s2">&quot;dz&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">dz</span>
+            <span class="n">like</span><span class="p">[</span><span class="s2">"dz"</span><span class="p">]</span> <span class="o">=</span> <span class="n">dz</span>
         <span class="k">for</span> <span class="n">da</span> <span class="ow">in</span> <span class="p">[</span><span class="n">top</span><span class="p">,</span> <span class="n">bottom</span><span class="p">,</span> <span class="n">source</span><span class="p">]:</span>
-            <span class="k">if</span> <span class="ow">not</span> <span class="n">da</span><span class="o">.</span><span class="n">dims</span> <span class="o">==</span> <span class="p">(</span><span class="s2">&quot;layer&quot;</span><span class="p">,</span> <span class="s2">&quot;y&quot;</span><span class="p">,</span> <span class="s2">&quot;x&quot;</span><span class="p">):</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">da</span><span class="o">.</span><span class="n">dims</span> <span class="o">==</span> <span class="p">(</span><span class="s2">"layer"</span><span class="p">,</span> <span class="s2">"y"</span><span class="p">,</span> <span class="s2">"x"</span><span class="p">):</span>
                 <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
-                    <span class="s2">&quot;Dimensions for top, bottom, and source have to be exactly&quot;</span>
-                    <span class="sa">f</span><span class="s1">&#39; (&quot;layer&quot;, &quot;y&quot;, &quot;x&quot;). Got instead </span><span class="si">{</span><span class="n">dim_format</span><span class="p">(</span><span class="n">da</span><span class="o">.</span><span class="n">dims</span><span class="p">)</span><span class="si">}</span><span class="s1">.&#39;</span>
+                    <span class="s2">"Dimensions for top, bottom, and source have to be exactly"</span>
+                    <span class="sa">f</span><span class="s1">' ("layer", "y", "x"). Got instead </span><span class="si">{</span><span class="n">dim_format</span><span class="p">(</span><span class="n">da</span><span class="o">.</span><span class="n">dims</span><span class="p">)</span><span class="si">}</span><span class="s1">.'</span>
                 <span class="p">)</span>
         <span class="k">for</span> <span class="n">da</span> <span class="ow">in</span> <span class="p">[</span><span class="n">bottom</span><span class="p">,</span> <span class="n">source</span><span class="p">]:</span>
-            <span class="k">for</span> <span class="n">dim</span> <span class="ow">in</span> <span class="p">[</span><span class="s2">&quot;layer&quot;</span><span class="p">,</span> <span class="s2">&quot;y&quot;</span><span class="p">,</span> <span class="s2">&quot;x&quot;</span><span class="p">]:</span>
+            <span class="k">for</span> <span class="n">dim</span> <span class="ow">in</span> <span class="p">[</span><span class="s2">"layer"</span><span class="p">,</span> <span class="s2">"y"</span><span class="p">,</span> <span class="s2">"x"</span><span class="p">]:</span>
                 <span class="k">if</span> <span class="ow">not</span> <span class="n">top</span><span class="p">[</span><span class="n">dim</span><span class="p">]</span><span class="o">.</span><span class="n">equals</span><span class="p">(</span><span class="n">da</span><span class="p">[</span><span class="n">dim</span><span class="p">]):</span>
-                    <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Input coordinates do not match along </span><span class="si">{</span><span class="n">dim</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+                    <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Input coordinates do not match along </span><span class="si">{</span><span class="n">dim</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
 
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_first_call</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_make_voxelize</span><span class="p">()</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_first_call</span> <span class="o">=</span> <span class="kc">False</span>
 
-        <span class="n">like_z</span> <span class="o">=</span> <span class="n">like</span><span class="p">[</span><span class="s2">&quot;z&quot;</span><span class="p">]</span>
-        <span class="k">if</span> <span class="ow">not</span> <span class="n">like_z</span><span class="o">.</span><span class="n">indexes</span><span class="p">[</span><span class="s2">&quot;z&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">is_monotonic_increasing</span><span class="p">:</span>
+        <span class="n">like_z</span> <span class="o">=</span> <span class="n">like</span><span class="p">[</span><span class="s2">"z"</span><span class="p">]</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">like_z</span><span class="o">.</span><span class="n">indexes</span><span class="p">[</span><span class="s2">"z"</span><span class="p">]</span><span class="o">.</span><span class="n">is_monotonic_increasing</span><span class="p">:</span>
             <span class="n">like_z</span> <span class="o">=</span> <span class="n">like_z</span><span class="o">.</span><span class="n">isel</span><span class="p">(</span><span class="n">z</span><span class="o">=</span><span class="nb">slice</span><span class="p">(</span><span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">))</span>
-            <span class="n">dst_z</span> <span class="o">=</span> <span class="n">common</span><span class="o">.</span><span class="n">_coord</span><span class="p">(</span><span class="n">like_z</span><span class="p">,</span> <span class="s2">&quot;z&quot;</span><span class="p">)[::</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+            <span class="n">dst_z</span> <span class="o">=</span> <span class="n">common</span><span class="o">.</span><span class="n">_coord</span><span class="p">(</span><span class="n">like_z</span><span class="p">,</span> <span class="s2">"z"</span><span class="p">)[::</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
         <span class="k">else</span><span class="p">:</span>
-            <span class="n">dst_z</span> <span class="o">=</span> <span class="n">common</span><span class="o">.</span><span class="n">_coord</span><span class="p">(</span><span class="n">like_z</span><span class="p">,</span> <span class="s2">&quot;z&quot;</span><span class="p">)</span>
+            <span class="n">dst_z</span> <span class="o">=</span> <span class="n">common</span><span class="o">.</span><span class="n">_coord</span><span class="p">(</span><span class="n">like_z</span><span class="p">,</span> <span class="s2">"z"</span><span class="p">)</span>
 
-        <span class="n">dst_nlayer</span> <span class="o">=</span> <span class="n">like</span><span class="p">[</span><span class="s2">&quot;z&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">size</span>
+        <span class="n">dst_nlayer</span> <span class="o">=</span> <span class="n">like</span><span class="p">[</span><span class="s2">"z"</span><span class="p">]</span><span class="o">.</span><span class="n">size</span>
         <span class="n">_</span><span class="p">,</span> <span class="n">nrow</span><span class="p">,</span> <span class="n">ncol</span> <span class="o">=</span> <span class="n">source</span><span class="o">.</span><span class="n">shape</span>
 
         <span class="n">dst_coords</span> <span class="o">=</span> <span class="p">{</span>
-            <span class="s2">&quot;z&quot;</span><span class="p">:</span> <span class="n">like</span><span class="o">.</span><span class="n">coords</span><span class="p">[</span><span class="s2">&quot;z&quot;</span><span class="p">],</span>
-            <span class="s2">&quot;y&quot;</span><span class="p">:</span> <span class="n">source</span><span class="o">.</span><span class="n">coords</span><span class="p">[</span><span class="s2">&quot;y&quot;</span><span class="p">],</span>
-            <span class="s2">&quot;x&quot;</span><span class="p">:</span> <span class="n">source</span><span class="o">.</span><span class="n">coords</span><span class="p">[</span><span class="s2">&quot;x&quot;</span><span class="p">],</span>
+            <span class="s2">"z"</span><span class="p">:</span> <span class="n">like</span><span class="o">.</span><span class="n">coords</span><span class="p">[</span><span class="s2">"z"</span><span class="p">],</span>
+            <span class="s2">"y"</span><span class="p">:</span> <span class="n">source</span><span class="o">.</span><span class="n">coords</span><span class="p">[</span><span class="s2">"y"</span><span class="p">],</span>
+            <span class="s2">"x"</span><span class="p">:</span> <span class="n">source</span><span class="o">.</span><span class="n">coords</span><span class="p">[</span><span class="s2">"x"</span><span class="p">],</span>
         <span class="p">}</span>
-        <span class="n">dst_dims</span> <span class="o">=</span> <span class="p">(</span><span class="s2">&quot;z&quot;</span><span class="p">,</span> <span class="s2">&quot;y&quot;</span><span class="p">,</span> <span class="s2">&quot;x&quot;</span><span class="p">)</span>
+        <span class="n">dst_dims</span> <span class="o">=</span> <span class="p">(</span><span class="s2">"z"</span><span class="p">,</span> <span class="s2">"y"</span><span class="p">,</span> <span class="s2">"x"</span><span class="p">)</span>
         <span class="n">dst_shape</span> <span class="o">=</span> <span class="p">(</span><span class="n">dst_nlayer</span><span class="p">,</span> <span class="n">nrow</span><span class="p">,</span> <span class="n">ncol</span><span class="p">)</span>
 
         <span class="n">dst</span> <span class="o">=</span> <span class="n">xr</span><span class="o">.</span><span class="n">DataArray</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">full</span><span class="p">(</span><span class="n">dst_shape</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">),</span> <span class="n">dst_coords</span><span class="p">,</span> <span class="n">dst_dims</span><span class="p">)</span>
@@ -670,8 +693,8 @@
   </div>
   
   <!-- Scripts loaded after <body> so the DOM is not blocked -->
-  <script defer src="../../../_static/scripts/bootstrap.js?digest=90905a2f556bf617f1a9"></script>
-<script defer src="../../../_static/scripts/pydata-sphinx-theme.js?digest=90905a2f556bf617f1a9"></script>
+  <script defer src="../../../_static/scripts/bootstrap.js?digest=75c7c72ae941e8b558d8"></script>
+<script defer src="../../../_static/scripts/pydata-sphinx-theme.js?digest=75c7c72ae941e8b558d8"></script>
 
   <footer class="bd-footer">
 <div class="bd-footer__inner bd-page-width">
@@ -691,8 +714,7 @@
         <div class="footer-item">
 
   <p class="sphinx-version">
-    Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 9.1.0.
-    <br/>
+    Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 9.2.0.
   </p>
 </div>
       
@@ -705,7 +727,7 @@
         <div class="footer-item">
 <p class="theme-version">
   <!-- # L10n: Setting the PST URL as an argument as this does not need to be localized -->
-  Built with the <a href="https://pydata-sphinx-theme.readthedocs.io/en/stable/index.html">PyData Sphinx Theme</a> 0.20.0.
+  Built with the <a href="https://pydata-sphinx-theme.readthedocs.io/en/stable/index.html">PyData Sphinx Theme</a> 0.24.0.
 </p></div>
       
     </div>

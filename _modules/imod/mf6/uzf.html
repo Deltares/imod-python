@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 
 
@@ -7,7 +6,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>imod.mf6.uzf &#8212; iMOD Python 1.1.0 documentation</title>
+    <title>imod.mf6.uzf &#8212; iMOD Python 1.2.0 documentation</title>
   
   
   
@@ -26,22 +25,22 @@
   </noscript>
   
   <!-- Loaded before other Sphinx assets -->
-  <link href="../../../_static/styles/theme.css?digest=90905a2f556bf617f1a9" rel="stylesheet" />
-<link href="../../../_static/styles/pydata-sphinx-theme.css?digest=90905a2f556bf617f1a9" rel="stylesheet" />
+  <link href="../../../_static/styles/theme.css?digest=75c7c72ae941e8b558d8" rel="stylesheet" />
+<link href="../../../_static/styles/pydata-sphinx-theme.css?digest=75c7c72ae941e8b558d8" rel="stylesheet" />
 
     <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=03e43079" />
-    <link rel="stylesheet" type="text/css" href="../../../_static/sg_gallery.css?v=fd6457a4" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/sg_gallery.css?v=c83e6b79" />
     <link rel="stylesheet" type="text/css" href="../../../_static/sg_gallery-binder.css?v=f4aeca0c" />
     <link rel="stylesheet" type="text/css" href="../../../_static/sg_gallery-dataframe.css?v=2082cf3c" />
     <link rel="stylesheet" type="text/css" href="../../../_static/sg_gallery-rendered-html.css?v=1277b6f3" />
   
   <!-- So that users can add custom icons -->
-  <script defer src="../../../_static/scripts/fontawesome.js?digest=90905a2f556bf617f1a9"></script>
+  <script defer src="../../../_static/scripts/fontawesome.js?digest=75c7c72ae941e8b558d8"></script>
   <!-- Pre-loaded scripts that we'll load fully later -->
-  <link rel="preload" as="script" href="../../../_static/scripts/bootstrap.js?digest=90905a2f556bf617f1a9" />
-<link rel="preload" as="script" href="../../../_static/scripts/pydata-sphinx-theme.js?digest=90905a2f556bf617f1a9" />
+  <link rel="preload" as="script" href="../../../_static/scripts/bootstrap.js?digest=75c7c72ae941e8b558d8" />
+<link rel="preload" as="script" href="../../../_static/scripts/pydata-sphinx-theme.js?digest=75c7c72ae941e8b558d8" />
 
-    <script src="../../../_static/documentation_options.js?v=fc837d61"></script>
+    <script src="../../../_static/documentation_options.js?v=6efca38a"></script>
     <script src="../../../_static/doctools.js?v=fd6eb6e6"></script>
     <script src="../../../_static/sphinx_highlight.js?v=6ffebe34"></script>
     <script src="../../../_static/sg-tags.js?v=d80f6fa4"></script>
@@ -51,8 +50,9 @@
     <link rel="index" title="Index" href="../../../genindex.html" />
     <link rel="search" title="Search" href="../../../search.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <meta name="color-scheme" content="light dark"/>
   <meta name="docsearch:language" content="en"/>
-  <meta name="docsearch:version" content="1.1.0.dev" />
+  <meta name="docsearch:version" content="1.2.0.dev" />
   
     
     <script src="../../../_static/searchtools.js"></script>
@@ -100,7 +100,7 @@
   
     <header id="pst-header" class="bd-header navbar navbar-expand-lg bd-navbar d-print-none">
 <div class="bd-header__inner bd-page-width">
-  <button class="pst-navbar-icon sidebar-toggle primary-toggle" aria-label="Site navigation">
+  <button type="button" class="pst-navbar-icon sidebar-toggle primary-toggle" aria-label="Site navigation" aria-expanded="false" aria-controls="pst-primary-sidebar-modal">
     <span class="fa-solid fa-bars"></span>
   </button>
   
@@ -122,8 +122,8 @@
     
     
     
-    <img src="../../../_static/imod-python-logo-light.svg" class="logo__image only-light" alt="iMOD Python 1.1.0 documentation - Home"/>
-    <img src="../../../_static/imod-python-logo-dark.svg" class="logo__image only-dark pst-js-only" alt="iMOD Python 1.1.0 documentation - Home"/>
+    <img src="../../../_static/imod-python-logo-light.svg" class="logo__image only-light" alt="iMOD Python 1.2.0 documentation - Home"/>
+    <img src="../../../_static/imod-python-logo-dark.svg" class="logo__image only-dark pst-js-only" alt="iMOD Python 1.2.0 documentation - Home"/>
   
   
 </a></div>
@@ -190,7 +190,7 @@
         <div class="navbar-item navbar-persistent--container">
           
 
-<button class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+<button type="button" class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
  <i class="fa-solid fa-magnifying-glass"></i>
  <span class="search-button__default-text">Search</span>
  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
@@ -201,15 +201,15 @@
         <div class="navbar-item">
 
 <div class="theme-switch-container dropdown pst-js-only" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Color mode">
-  <button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button dropdown-toggle" aria-label="Color mode" data-bs-toggle="dropdown">
-    <i class="theme-switch fa-solid fa-sun fa-lg fa-fw" data-mode="light" title="Light"></i>
-    <i class="theme-switch fa-solid fa-moon fa-lg fa-fw" data-mode="dark" title="Dark"></i>
-    <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg fa-fw" data-mode="auto" title="System Settings"></i>
+  <button type="button" class="btn btn-sm nav-link pst-navbar-icon theme-switch-button dropdown-toggle" aria-label="Color mode" data-bs-toggle="dropdown">
+    <i class="theme-switch fa-solid fa-sun fa-lg" data-mode="light" title="Light"></i>
+    <i class="theme-switch fa-solid fa-moon fa-lg" data-mode="dark" title="Dark"></i>
+    <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg" data-mode="auto" title="System Settings"></i>
   </button>
   <ul class="dropdown-menu dropdown-menu-end">
-    <li><button class="dropdown-item d-flex align-items-center theme-change-button" data-mode="auto"><i class="fa-solid fa-circle-half-stroke fa-lg fa-fw me-1"></i>System Settings</button></li>
-    <li><button class="dropdown-item d-flex align-items-center theme-change-button" data-mode="light"><i class="fa-solid fa-sun fa-lg fa-fw me-1"></i>Light</button></li>
-    <li><button class="dropdown-item d-flex align-items-center theme-change-button" data-mode="dark"><i class="fa-solid fa-moon fa-lg fa-fw me-1"></i>Dark</button></li>
+    <li><button type="button" class="dropdown-item d-flex align-items-center theme-change-button" data-mode="auto"><i class="fa-solid fa-circle-half-stroke fa-lg me-1"></i>System Settings</button></li>
+    <li><button type="button" class="dropdown-item d-flex align-items-center theme-change-button" data-mode="light"><i class="fa-solid fa-sun fa-lg me-1"></i>Light</button></li>
+    <li><button type="button" class="dropdown-item d-flex align-items-center theme-change-button" data-mode="dark"><i class="fa-solid fa-moon fa-lg me-1"></i>Dark</button></li>
   </ul>
 </div></div>
       
@@ -246,7 +246,7 @@
   
     <div class="navbar-persistent--mobile">
 
-<button class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+<button type="button" class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
  <i class="fa-solid fa-magnifying-glass"></i>
  <span class="search-button__default-text">Search</span>
  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
@@ -267,7 +267,7 @@
       
         
       
-      <dialog id="pst-primary-sidebar-modal"></dialog>
+      <dialog id="pst-primary-sidebar-modal" tabindex="-1"></dialog>
       <div id="pst-primary-sidebar" class="bd-sidebar-primary bd-sidebar hide-on-wide">
         
 
@@ -337,15 +337,15 @@
           <div class="navbar-item">
 
 <div class="theme-switch-container dropdown pst-js-only" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Color mode">
-  <button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button dropdown-toggle" aria-label="Color mode" data-bs-toggle="dropdown">
-    <i class="theme-switch fa-solid fa-sun fa-lg fa-fw" data-mode="light" title="Light"></i>
-    <i class="theme-switch fa-solid fa-moon fa-lg fa-fw" data-mode="dark" title="Dark"></i>
-    <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg fa-fw" data-mode="auto" title="System Settings"></i>
+  <button type="button" class="btn btn-sm nav-link pst-navbar-icon theme-switch-button dropdown-toggle" aria-label="Color mode" data-bs-toggle="dropdown">
+    <i class="theme-switch fa-solid fa-sun fa-lg" data-mode="light" title="Light"></i>
+    <i class="theme-switch fa-solid fa-moon fa-lg" data-mode="dark" title="Dark"></i>
+    <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg" data-mode="auto" title="System Settings"></i>
   </button>
   <ul class="dropdown-menu dropdown-menu-end">
-    <li><button class="dropdown-item d-flex align-items-center theme-change-button" data-mode="auto"><i class="fa-solid fa-circle-half-stroke fa-lg fa-fw me-1"></i>System Settings</button></li>
-    <li><button class="dropdown-item d-flex align-items-center theme-change-button" data-mode="light"><i class="fa-solid fa-sun fa-lg fa-fw me-1"></i>Light</button></li>
-    <li><button class="dropdown-item d-flex align-items-center theme-change-button" data-mode="dark"><i class="fa-solid fa-moon fa-lg fa-fw me-1"></i>Dark</button></li>
+    <li><button type="button" class="dropdown-item d-flex align-items-center theme-change-button" data-mode="auto"><i class="fa-solid fa-circle-half-stroke fa-lg me-1"></i>System Settings</button></li>
+    <li><button type="button" class="dropdown-item d-flex align-items-center theme-change-button" data-mode="light"><i class="fa-solid fa-sun fa-lg me-1"></i>Light</button></li>
+    <li><button type="button" class="dropdown-item d-flex align-items-center theme-change-button" data-mode="dark"><i class="fa-solid fa-moon fa-lg me-1"></i>Dark</button></li>
   </ul>
 </div></div>
         
@@ -411,7 +411,7 @@
     
     <li class="breadcrumb-item breadcrumb-home">
       <a href="../../../index.html" class="nav-link" aria-label="Home">
-        <i class="fa-solid fa-home"></i>
+        <i class="fa-solid fa-house"></i>
       </a>
     </li>
     
@@ -435,7 +435,10 @@
                 <article class="bd-article">
                   
   <h1>Source code for imod.mf6.uzf</h1><div class="highlight"><pre>
-<span></span><span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+<span></span><span class="kn">from</span><span class="w"> </span><span class="nn">pathlib</span><span class="w"> </span><span class="kn">import</span> <span class="n">Path</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Any</span>
+
+<span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">xarray</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">xr</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">xugrid</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">xu</span>
 
@@ -453,14 +456,16 @@
     <span class="n">IdentityNoDataSchema</span><span class="p">,</span>
     <span class="n">IndexesSchema</span><span class="p">,</span>
     <span class="n">OtherCoordsSchema</span><span class="p">,</span>
+    <span class="n">ValidationError</span><span class="p">,</span>
 <span class="p">)</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">imod.select.layers</span><span class="w"> </span><span class="kn">import</span> <span class="n">get_upper_active_grid_cells</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">imod.typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">GridDataArray</span>
 
 
 <div class="viewcode-block" id="UnsaturatedZoneFlow">
 <a class="viewcode-back" href="../../../api/generated/mf6/imod.mf6.UnsaturatedZoneFlow.html#imod.mf6.UnsaturatedZoneFlow">[docs]</a>
 <span class="k">class</span><span class="w"> </span><span class="nc">UnsaturatedZoneFlow</span><span class="p">(</span><span class="n">AdvancedBoundaryCondition</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">"""</span>
 <span class="sd">    Unsaturated Zone Flow (UZF) package.</span>
 
 <span class="sd">    Parameters</span>
@@ -498,22 +503,22 @@
 <span class="sd">    air_entry_potential: array of floats (xr.DataArray, optional)</span>
 <span class="sd">        defines the air entry potential (head) of the UZF cell. If specified, ET will be</span>
 <span class="sd">        simulated using a capillary pressure based formulation.</span>
-<span class="sd">        Capillary pressure is calculated using the Brooks-Corey retention function (&quot;air_entry&quot;)</span>
+<span class="sd">        Capillary pressure is calculated using the Brooks-Corey retention function ("air_entry")</span>
 <span class="sd">    root_potential: array of floats (xr.DataArray, optional)</span>
 <span class="sd">        defines the root potential (head) of the UZF cell. If specified, ET will be</span>
 <span class="sd">        simulated using a capillary pressure based formulation.</span>
-<span class="sd">        Capillary pressure is calculated using the Brooks-Corey retention function (&quot;air_entry&quot;</span>
+<span class="sd">        Capillary pressure is calculated using the Brooks-Corey retention function ("air_entry"</span>
 <span class="sd">    root_activity: array of floats (xr.DataArray, optional)</span>
 <span class="sd">        defines the root activity function of the UZF cell. ROOTACT is</span>
 <span class="sd">        the length of roots in a given volume of soil divided by that volume. Values range from 0 to about 3</span>
 <span class="sd">        cm-2, depending on the plant community and its stage of development. If specified, ET will be</span>
 <span class="sd">        simulated using a capillary pressure based formulation.</span>
-<span class="sd">        Capillary pressure is calculated using the Brooks-Corey retention function (&quot;air_entry&quot;</span>
-<span class="sd">    groundwater_ET_function: ({&quot;linear&quot;, &quot;square&quot;}, optional)</span>
+<span class="sd">        Capillary pressure is calculated using the Brooks-Corey retention function ("air_entry"</span>
+<span class="sd">    groundwater_ET_function: ({"linear", "square"}, optional)</span>
 <span class="sd">        keyword specifying that groundwater evapotranspiration will be simulated using either</span>
-<span class="sd">        the original ET formulation of MODFLOW-2005 (&quot;linear&quot;). Or by assuming a constant ET</span>
+<span class="sd">        the original ET formulation of MODFLOW-2005 ("linear"). Or by assuming a constant ET</span>
 <span class="sd">        rate for groundwater levels between land surface (TOP) and land surface minus the ET extinction</span>
-<span class="sd">        depth (TOP-EXTDP) (&quot;square&quot;). In the latter case, groundwater ET is smoothly reduced</span>
+<span class="sd">        depth (TOP-EXTDP) ("square"). In the latter case, groundwater ET is smoothly reduced</span>
 <span class="sd">        from the PET rate to zero over a nominal interval at TOP-EXTDP.</span>
 <span class="sd">    simulate_seepage: ({True, False}, optional)</span>
 <span class="sd">        keyword specifying that groundwater discharge (GWSEEP) to land surface will be</span>
@@ -524,19 +529,19 @@
 <span class="sd">        Default is False.</span>
 <span class="sd">    print_flows: ({True, False}, optional)</span>
 <span class="sd">        keyword to indicate that the list of UZF flow rates will be printed to the listing file for</span>
-<span class="sd">        every stress period time step in which &quot;BUDGET PRINT&quot; is specified in Output Control. If there is</span>
-<span class="sd">        no Output Control option and &quot;PRINT FLOWS&quot; is specified, then flow rates are printed for the last</span>
+<span class="sd">        every stress period time step in which "BUDGET PRINT" is specified in Output Control. If there is</span>
+<span class="sd">        no Output Control option and "PRINT FLOWS" is specified, then flow rates are printed for the last</span>
 <span class="sd">        time step of each stress period.</span>
 <span class="sd">        Default is False.</span>
 <span class="sd">    save_flows: ({True, False}, optional)</span>
-<span class="sd">        keyword to indicate that UZF flow terms will be written to the file specified with &quot;BUDGET</span>
-<span class="sd">        FILEOUT&quot; in Output Control.</span>
+<span class="sd">        keyword to indicate that UZF flow terms will be written to the file specified with "BUDGET</span>
+<span class="sd">        FILEOUT" in Output Control.</span>
 <span class="sd">        Default is False.</span>
-<span class="sd">    budget_fileout: ({&quot;str&quot;}, optional)</span>
+<span class="sd">    budget_fileout: ({"str"}, optional)</span>
 <span class="sd">        path to output cbc-file for UZF budgets</span>
-<span class="sd">    budgetcsv_fileout: ({&quot;str&quot;}, optional)</span>
+<span class="sd">    budgetcsv_fileout: ({"str"}, optional)</span>
 <span class="sd">        path to output csv-file for summed budgets</span>
-<span class="sd">    water_content_file: ({&quot;str&quot;}, optional)</span>
+<span class="sd">    water_content_file: ({"str"}, optional)</span>
 <span class="sd">        path to output file for unsaturated zone water content</span>
 <span class="sd">    observations: [Not yet supported.]</span>
 <span class="sd">        Default is None.</span>
@@ -551,113 +556,113 @@
 <span class="sd">        Flag to indicate whether the package should be validated upon</span>
 <span class="sd">        initialization. This raises a ValidationError if package input is</span>
 <span class="sd">        provided in the wrong manner. Defaults to True.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
 
     <span class="n">_period_data</span> <span class="o">=</span> <span class="p">(</span>
-        <span class="s2">&quot;infiltration_rate&quot;</span><span class="p">,</span>
-        <span class="s2">&quot;et_pot&quot;</span><span class="p">,</span>
-        <span class="s2">&quot;extinction_depth&quot;</span><span class="p">,</span>
-        <span class="s2">&quot;extinction_theta&quot;</span><span class="p">,</span>
-        <span class="s2">&quot;air_entry_potential&quot;</span><span class="p">,</span>
-        <span class="s2">&quot;root_potential&quot;</span><span class="p">,</span>
-        <span class="s2">&quot;root_activity&quot;</span><span class="p">,</span>
+        <span class="s2">"infiltration_rate"</span><span class="p">,</span>
+        <span class="s2">"et_pot"</span><span class="p">,</span>
+        <span class="s2">"extinction_depth"</span><span class="p">,</span>
+        <span class="s2">"extinction_theta"</span><span class="p">,</span>
+        <span class="s2">"air_entry_potential"</span><span class="p">,</span>
+        <span class="s2">"root_potential"</span><span class="p">,</span>
+        <span class="s2">"root_activity"</span><span class="p">,</span>
     <span class="p">)</span>
 
     <span class="n">_init_schemata</span> <span class="o">=</span> <span class="p">{</span>
-        <span class="s2">&quot;surface_depression_depth&quot;</span><span class="p">:</span> <span class="p">[</span>
+        <span class="s2">"surface_depression_depth"</span><span class="p">:</span> <span class="p">[</span>
             <span class="n">DTypeSchema</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">floating</span><span class="p">),</span>
             <span class="n">BOUNDARY_DIMS_SCHEMA</span><span class="p">,</span>
-            <span class="n">AllCoordsValueSchema</span><span class="p">(</span><span class="s2">&quot;layer&quot;</span><span class="p">,</span> <span class="s2">&quot;&gt;&quot;</span><span class="p">,</span> <span class="mi">0</span><span class="p">),</span>
+            <span class="n">AllCoordsValueSchema</span><span class="p">(</span><span class="s2">"layer"</span><span class="p">,</span> <span class="s2">"&gt;"</span><span class="p">,</span> <span class="mi">0</span><span class="p">),</span>
         <span class="p">],</span>
-        <span class="s2">&quot;kv_sat&quot;</span><span class="p">:</span> <span class="p">[</span>
+        <span class="s2">"kv_sat"</span><span class="p">:</span> <span class="p">[</span>
             <span class="n">DTypeSchema</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">floating</span><span class="p">),</span>
             <span class="n">IndexesSchema</span><span class="p">(),</span>
-            <span class="n">CoordsSchema</span><span class="p">((</span><span class="s2">&quot;layer&quot;</span><span class="p">,)),</span>
+            <span class="n">CoordsSchema</span><span class="p">((</span><span class="s2">"layer"</span><span class="p">,)),</span>
             <span class="n">BOUNDARY_DIMS_SCHEMA</span><span class="p">,</span>
-            <span class="n">AllCoordsValueSchema</span><span class="p">(</span><span class="s2">&quot;layer&quot;</span><span class="p">,</span> <span class="s2">&quot;&gt;&quot;</span><span class="p">,</span> <span class="mi">0</span><span class="p">),</span>
+            <span class="n">AllCoordsValueSchema</span><span class="p">(</span><span class="s2">"layer"</span><span class="p">,</span> <span class="s2">"&gt;"</span><span class="p">,</span> <span class="mi">0</span><span class="p">),</span>
         <span class="p">],</span>
-        <span class="s2">&quot;theta_res&quot;</span><span class="p">:</span> <span class="p">[</span>
+        <span class="s2">"theta_res"</span><span class="p">:</span> <span class="p">[</span>
             <span class="n">DTypeSchema</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">floating</span><span class="p">),</span>
             <span class="n">BOUNDARY_DIMS_SCHEMA</span><span class="p">,</span>
-            <span class="n">AllCoordsValueSchema</span><span class="p">(</span><span class="s2">&quot;layer&quot;</span><span class="p">,</span> <span class="s2">&quot;&gt;&quot;</span><span class="p">,</span> <span class="mi">0</span><span class="p">),</span>
+            <span class="n">AllCoordsValueSchema</span><span class="p">(</span><span class="s2">"layer"</span><span class="p">,</span> <span class="s2">"&gt;"</span><span class="p">,</span> <span class="mi">0</span><span class="p">),</span>
         <span class="p">],</span>
-        <span class="s2">&quot;theta_sat&quot;</span><span class="p">:</span> <span class="p">[</span>
+        <span class="s2">"theta_sat"</span><span class="p">:</span> <span class="p">[</span>
             <span class="n">DTypeSchema</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">floating</span><span class="p">),</span>
             <span class="n">BOUNDARY_DIMS_SCHEMA</span><span class="p">,</span>
-            <span class="n">AllCoordsValueSchema</span><span class="p">(</span><span class="s2">&quot;layer&quot;</span><span class="p">,</span> <span class="s2">&quot;&gt;&quot;</span><span class="p">,</span> <span class="mi">0</span><span class="p">),</span>
+            <span class="n">AllCoordsValueSchema</span><span class="p">(</span><span class="s2">"layer"</span><span class="p">,</span> <span class="s2">"&gt;"</span><span class="p">,</span> <span class="mi">0</span><span class="p">),</span>
         <span class="p">],</span>
-        <span class="s2">&quot;theta_init&quot;</span><span class="p">:</span> <span class="p">[</span>
+        <span class="s2">"theta_init"</span><span class="p">:</span> <span class="p">[</span>
             <span class="n">DTypeSchema</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">floating</span><span class="p">),</span>
             <span class="n">BOUNDARY_DIMS_SCHEMA</span><span class="p">,</span>
-            <span class="n">AllCoordsValueSchema</span><span class="p">(</span><span class="s2">&quot;layer&quot;</span><span class="p">,</span> <span class="s2">&quot;&gt;&quot;</span><span class="p">,</span> <span class="mi">0</span><span class="p">),</span>
+            <span class="n">AllCoordsValueSchema</span><span class="p">(</span><span class="s2">"layer"</span><span class="p">,</span> <span class="s2">"&gt;"</span><span class="p">,</span> <span class="mi">0</span><span class="p">),</span>
         <span class="p">],</span>
-        <span class="s2">&quot;epsilon&quot;</span><span class="p">:</span> <span class="p">[</span>
+        <span class="s2">"epsilon"</span><span class="p">:</span> <span class="p">[</span>
             <span class="n">DTypeSchema</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">floating</span><span class="p">),</span>
             <span class="n">BOUNDARY_DIMS_SCHEMA</span><span class="p">,</span>
-            <span class="n">AllCoordsValueSchema</span><span class="p">(</span><span class="s2">&quot;layer&quot;</span><span class="p">,</span> <span class="s2">&quot;&gt;&quot;</span><span class="p">,</span> <span class="mi">0</span><span class="p">),</span>
+            <span class="n">AllCoordsValueSchema</span><span class="p">(</span><span class="s2">"layer"</span><span class="p">,</span> <span class="s2">"&gt;"</span><span class="p">,</span> <span class="mi">0</span><span class="p">),</span>
         <span class="p">],</span>
-        <span class="s2">&quot;infiltration_rate&quot;</span><span class="p">:</span> <span class="p">[</span>
+        <span class="s2">"infiltration_rate"</span><span class="p">:</span> <span class="p">[</span>
             <span class="n">DTypeSchema</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">floating</span><span class="p">),</span>
             <span class="n">BOUNDARY_DIMS_SCHEMA</span><span class="p">,</span>
-            <span class="n">AllCoordsValueSchema</span><span class="p">(</span><span class="s2">&quot;layer&quot;</span><span class="p">,</span> <span class="s2">&quot;&gt;&quot;</span><span class="p">,</span> <span class="mi">0</span><span class="p">),</span>
+            <span class="n">AllCoordsValueSchema</span><span class="p">(</span><span class="s2">"layer"</span><span class="p">,</span> <span class="s2">"&gt;"</span><span class="p">,</span> <span class="mi">0</span><span class="p">),</span>
         <span class="p">],</span>
-        <span class="s2">&quot;et_pot&quot;</span><span class="p">:</span> <span class="p">[</span>
+        <span class="s2">"et_pot"</span><span class="p">:</span> <span class="p">[</span>
             <span class="n">DTypeSchema</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">floating</span><span class="p">),</span>
             <span class="n">BOUNDARY_DIMS_SCHEMA</span> <span class="o">|</span> <span class="n">DimsSchema</span><span class="p">(),</span>  <span class="c1"># optional var</span>
-            <span class="n">AllCoordsValueSchema</span><span class="p">(</span><span class="s2">&quot;layer&quot;</span><span class="p">,</span> <span class="s2">&quot;&gt;&quot;</span><span class="p">,</span> <span class="mi">0</span><span class="p">),</span>
+            <span class="n">AllCoordsValueSchema</span><span class="p">(</span><span class="s2">"layer"</span><span class="p">,</span> <span class="s2">"&gt;"</span><span class="p">,</span> <span class="mi">0</span><span class="p">),</span>
         <span class="p">],</span>
-        <span class="s2">&quot;extinction_depth&quot;</span><span class="p">:</span> <span class="p">[</span>
+        <span class="s2">"extinction_depth"</span><span class="p">:</span> <span class="p">[</span>
             <span class="n">DTypeSchema</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">floating</span><span class="p">),</span>
             <span class="n">BOUNDARY_DIMS_SCHEMA</span> <span class="o">|</span> <span class="n">DimsSchema</span><span class="p">(),</span>  <span class="c1"># optional var</span>
-            <span class="n">AllCoordsValueSchema</span><span class="p">(</span><span class="s2">&quot;layer&quot;</span><span class="p">,</span> <span class="s2">&quot;&gt;&quot;</span><span class="p">,</span> <span class="mi">0</span><span class="p">),</span>
+            <span class="n">AllCoordsValueSchema</span><span class="p">(</span><span class="s2">"layer"</span><span class="p">,</span> <span class="s2">"&gt;"</span><span class="p">,</span> <span class="mi">0</span><span class="p">),</span>
         <span class="p">],</span>
-        <span class="s2">&quot;extinction_theta&quot;</span><span class="p">:</span> <span class="p">[</span>
+        <span class="s2">"extinction_theta"</span><span class="p">:</span> <span class="p">[</span>
             <span class="n">DTypeSchema</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">floating</span><span class="p">),</span>
             <span class="n">BOUNDARY_DIMS_SCHEMA</span> <span class="o">|</span> <span class="n">DimsSchema</span><span class="p">(),</span>  <span class="c1"># optional var</span>
-            <span class="n">AllCoordsValueSchema</span><span class="p">(</span><span class="s2">&quot;layer&quot;</span><span class="p">,</span> <span class="s2">&quot;&gt;&quot;</span><span class="p">,</span> <span class="mi">0</span><span class="p">),</span>
+            <span class="n">AllCoordsValueSchema</span><span class="p">(</span><span class="s2">"layer"</span><span class="p">,</span> <span class="s2">"&gt;"</span><span class="p">,</span> <span class="mi">0</span><span class="p">),</span>
         <span class="p">],</span>
-        <span class="s2">&quot;root_potential&quot;</span><span class="p">:</span> <span class="p">[</span>
+        <span class="s2">"root_potential"</span><span class="p">:</span> <span class="p">[</span>
             <span class="n">DTypeSchema</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">floating</span><span class="p">),</span>
             <span class="n">BOUNDARY_DIMS_SCHEMA</span> <span class="o">|</span> <span class="n">DimsSchema</span><span class="p">(),</span>  <span class="c1"># optional var</span>
-            <span class="n">AllCoordsValueSchema</span><span class="p">(</span><span class="s2">&quot;layer&quot;</span><span class="p">,</span> <span class="s2">&quot;&gt;&quot;</span><span class="p">,</span> <span class="mi">0</span><span class="p">),</span>
+            <span class="n">AllCoordsValueSchema</span><span class="p">(</span><span class="s2">"layer"</span><span class="p">,</span> <span class="s2">"&gt;"</span><span class="p">,</span> <span class="mi">0</span><span class="p">),</span>
         <span class="p">],</span>
-        <span class="s2">&quot;root_activity&quot;</span><span class="p">:</span> <span class="p">[</span>
+        <span class="s2">"root_activity"</span><span class="p">:</span> <span class="p">[</span>
             <span class="n">DTypeSchema</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">floating</span><span class="p">),</span>
             <span class="n">BOUNDARY_DIMS_SCHEMA</span> <span class="o">|</span> <span class="n">DimsSchema</span><span class="p">(),</span>  <span class="c1"># optional var</span>
-            <span class="n">AllCoordsValueSchema</span><span class="p">(</span><span class="s2">&quot;layer&quot;</span><span class="p">,</span> <span class="s2">&quot;&gt;&quot;</span><span class="p">,</span> <span class="mi">0</span><span class="p">),</span>
+            <span class="n">AllCoordsValueSchema</span><span class="p">(</span><span class="s2">"layer"</span><span class="p">,</span> <span class="s2">"&gt;"</span><span class="p">,</span> <span class="mi">0</span><span class="p">),</span>
         <span class="p">],</span>
-        <span class="s2">&quot;print_flows&quot;</span><span class="p">:</span> <span class="p">[</span><span class="n">DTypeSchema</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">bool_</span><span class="p">),</span> <span class="n">DimsSchema</span><span class="p">()],</span>
-        <span class="s2">&quot;save_flows&quot;</span><span class="p">:</span> <span class="p">[</span><span class="n">DTypeSchema</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">bool_</span><span class="p">),</span> <span class="n">DimsSchema</span><span class="p">()],</span>
+        <span class="s2">"print_flows"</span><span class="p">:</span> <span class="p">[</span><span class="n">DTypeSchema</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">bool_</span><span class="p">),</span> <span class="n">DimsSchema</span><span class="p">()],</span>
+        <span class="s2">"save_flows"</span><span class="p">:</span> <span class="p">[</span><span class="n">DTypeSchema</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">bool_</span><span class="p">),</span> <span class="n">DimsSchema</span><span class="p">()],</span>
     <span class="p">}</span>
     <span class="n">_write_schemata</span> <span class="o">=</span> <span class="p">{</span>
-        <span class="s2">&quot;kv_sat&quot;</span><span class="p">:</span> <span class="p">[</span>
-            <span class="n">AllValueSchema</span><span class="p">(</span><span class="s2">&quot;&gt;&quot;</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">),</span>
-            <span class="n">OtherCoordsSchema</span><span class="p">(</span><span class="s2">&quot;idomain&quot;</span><span class="p">),</span>
+        <span class="s2">"kv_sat"</span><span class="p">:</span> <span class="p">[</span>
+            <span class="n">AllValueSchema</span><span class="p">(</span><span class="s2">"&gt;"</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">),</span>
+            <span class="n">OtherCoordsSchema</span><span class="p">(</span><span class="s2">"idomain"</span><span class="p">),</span>
             <span class="n">AllNoDataSchema</span><span class="p">(),</span>  <span class="c1"># Check for all nan, can occur while clipping</span>
-            <span class="n">AllInsideNoDataSchema</span><span class="p">(</span><span class="n">other</span><span class="o">=</span><span class="s2">&quot;idomain&quot;</span><span class="p">,</span> <span class="n">is_other_notnull</span><span class="o">=</span><span class="p">(</span><span class="s2">&quot;&gt;&quot;</span><span class="p">,</span> <span class="mi">0</span><span class="p">)),</span>
+            <span class="n">AllInsideNoDataSchema</span><span class="p">(</span><span class="n">other</span><span class="o">=</span><span class="s2">"idomain"</span><span class="p">,</span> <span class="n">is_other_notnull</span><span class="o">=</span><span class="p">(</span><span class="s2">"&gt;"</span><span class="p">,</span> <span class="mi">0</span><span class="p">)),</span>
         <span class="p">],</span>
-        <span class="s2">&quot;surface_depression_depth&quot;</span><span class="p">:</span> <span class="p">[</span><span class="n">IdentityNoDataSchema</span><span class="p">(</span><span class="s2">&quot;kv_sat&quot;</span><span class="p">)],</span>
-        <span class="s2">&quot;theta_res&quot;</span><span class="p">:</span> <span class="p">[</span><span class="n">IdentityNoDataSchema</span><span class="p">(</span><span class="s2">&quot;kv_sat&quot;</span><span class="p">),</span> <span class="n">AllValueSchema</span><span class="p">(</span><span class="s2">&quot;&gt;=&quot;</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">)],</span>
-        <span class="s2">&quot;theta_sat&quot;</span><span class="p">:</span> <span class="p">[</span><span class="n">IdentityNoDataSchema</span><span class="p">(</span><span class="s2">&quot;kv_sat&quot;</span><span class="p">),</span> <span class="n">AllValueSchema</span><span class="p">(</span><span class="s2">&quot;&gt;=&quot;</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">)],</span>
-        <span class="s2">&quot;theta_init&quot;</span><span class="p">:</span> <span class="p">[</span><span class="n">IdentityNoDataSchema</span><span class="p">(</span><span class="s2">&quot;kv_sat&quot;</span><span class="p">),</span> <span class="n">AllValueSchema</span><span class="p">(</span><span class="s2">&quot;&gt;=&quot;</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">)],</span>
-        <span class="s2">&quot;epsilon&quot;</span><span class="p">:</span> <span class="p">[</span><span class="n">IdentityNoDataSchema</span><span class="p">(</span><span class="s2">&quot;kv_sat&quot;</span><span class="p">)],</span>
-        <span class="s2">&quot;infiltration_rate&quot;</span><span class="p">:</span> <span class="p">[</span><span class="n">IdentityNoDataSchema</span><span class="p">(</span><span class="s2">&quot;stress_period_active&quot;</span><span class="p">)],</span>
-        <span class="s2">&quot;et_pot&quot;</span><span class="p">:</span> <span class="p">[</span><span class="n">IdentityNoDataSchema</span><span class="p">(</span><span class="s2">&quot;stress_period_active&quot;</span><span class="p">)],</span>
-        <span class="s2">&quot;extinction_depth&quot;</span><span class="p">:</span> <span class="p">[</span><span class="n">IdentityNoDataSchema</span><span class="p">(</span><span class="s2">&quot;stress_period_active&quot;</span><span class="p">)],</span>
-        <span class="s2">&quot;extinction_theta&quot;</span><span class="p">:</span> <span class="p">[</span><span class="n">IdentityNoDataSchema</span><span class="p">(</span><span class="s2">&quot;stress_period_active&quot;</span><span class="p">)],</span>
-        <span class="s2">&quot;root_potential&quot;</span><span class="p">:</span> <span class="p">[</span><span class="n">IdentityNoDataSchema</span><span class="p">(</span><span class="s2">&quot;stress_period_active&quot;</span><span class="p">)],</span>
-        <span class="s2">&quot;root_activity&quot;</span><span class="p">:</span> <span class="p">[</span><span class="n">IdentityNoDataSchema</span><span class="p">(</span><span class="s2">&quot;stress_period_active&quot;</span><span class="p">)],</span>
+        <span class="s2">"surface_depression_depth"</span><span class="p">:</span> <span class="p">[</span><span class="n">IdentityNoDataSchema</span><span class="p">(</span><span class="s2">"kv_sat"</span><span class="p">)],</span>
+        <span class="s2">"theta_res"</span><span class="p">:</span> <span class="p">[</span><span class="n">IdentityNoDataSchema</span><span class="p">(</span><span class="s2">"kv_sat"</span><span class="p">),</span> <span class="n">AllValueSchema</span><span class="p">(</span><span class="s2">"&gt;="</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">)],</span>
+        <span class="s2">"theta_sat"</span><span class="p">:</span> <span class="p">[</span><span class="n">IdentityNoDataSchema</span><span class="p">(</span><span class="s2">"kv_sat"</span><span class="p">),</span> <span class="n">AllValueSchema</span><span class="p">(</span><span class="s2">"&gt;="</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">)],</span>
+        <span class="s2">"theta_init"</span><span class="p">:</span> <span class="p">[</span><span class="n">IdentityNoDataSchema</span><span class="p">(</span><span class="s2">"kv_sat"</span><span class="p">),</span> <span class="n">AllValueSchema</span><span class="p">(</span><span class="s2">"&gt;="</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">)],</span>
+        <span class="s2">"epsilon"</span><span class="p">:</span> <span class="p">[</span><span class="n">IdentityNoDataSchema</span><span class="p">(</span><span class="s2">"kv_sat"</span><span class="p">)],</span>
+        <span class="s2">"infiltration_rate"</span><span class="p">:</span> <span class="p">[</span><span class="n">IdentityNoDataSchema</span><span class="p">(</span><span class="s2">"stress_period_active"</span><span class="p">)],</span>
+        <span class="s2">"et_pot"</span><span class="p">:</span> <span class="p">[</span><span class="n">IdentityNoDataSchema</span><span class="p">(</span><span class="s2">"stress_period_active"</span><span class="p">)],</span>
+        <span class="s2">"extinction_depth"</span><span class="p">:</span> <span class="p">[</span><span class="n">IdentityNoDataSchema</span><span class="p">(</span><span class="s2">"stress_period_active"</span><span class="p">)],</span>
+        <span class="s2">"extinction_theta"</span><span class="p">:</span> <span class="p">[</span><span class="n">IdentityNoDataSchema</span><span class="p">(</span><span class="s2">"stress_period_active"</span><span class="p">)],</span>
+        <span class="s2">"root_potential"</span><span class="p">:</span> <span class="p">[</span><span class="n">IdentityNoDataSchema</span><span class="p">(</span><span class="s2">"stress_period_active"</span><span class="p">)],</span>
+        <span class="s2">"root_activity"</span><span class="p">:</span> <span class="p">[</span><span class="n">IdentityNoDataSchema</span><span class="p">(</span><span class="s2">"stress_period_active"</span><span class="p">)],</span>
     <span class="p">}</span>
 
     <span class="n">_package_data</span> <span class="o">=</span> <span class="p">(</span>
-        <span class="s2">&quot;surface_depression_depth&quot;</span><span class="p">,</span>
-        <span class="s2">&quot;kv_sat&quot;</span><span class="p">,</span>
-        <span class="s2">&quot;theta_res&quot;</span><span class="p">,</span>
-        <span class="s2">&quot;theta_sat&quot;</span><span class="p">,</span>
-        <span class="s2">&quot;theta_init&quot;</span><span class="p">,</span>
-        <span class="s2">&quot;epsilon&quot;</span><span class="p">,</span>
+        <span class="s2">"surface_depression_depth"</span><span class="p">,</span>
+        <span class="s2">"kv_sat"</span><span class="p">,</span>
+        <span class="s2">"theta_res"</span><span class="p">,</span>
+        <span class="s2">"theta_sat"</span><span class="p">,</span>
+        <span class="s2">"theta_init"</span><span class="p">,</span>
+        <span class="s2">"epsilon"</span><span class="p">,</span>
     <span class="p">)</span>
-    <span class="n">_pkg_id</span> <span class="o">=</span> <span class="s2">&quot;uzf&quot;</span>
+    <span class="n">_pkg_id</span> <span class="o">=</span> <span class="s2">"uzf"</span>
 
     <span class="n">_template</span> <span class="o">=</span> <span class="n">BoundaryCondition</span><span class="o">.</span><span class="n">_initialize_template</span><span class="p">(</span><span class="n">_pkg_id</span><span class="p">)</span>
 
@@ -666,34 +671,34 @@
     <span class="nd">@init_log_decorator</span><span class="p">()</span>
     <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
-        <span class="n">surface_depression_depth</span><span class="p">,</span>
-        <span class="n">kv_sat</span><span class="p">,</span>
-        <span class="n">theta_res</span><span class="p">,</span>
-        <span class="n">theta_sat</span><span class="p">,</span>
-        <span class="n">theta_init</span><span class="p">,</span>
-        <span class="n">epsilon</span><span class="p">,</span>
-        <span class="n">infiltration_rate</span><span class="p">,</span>
-        <span class="n">et_pot</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
-        <span class="n">extinction_depth</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
-        <span class="n">extinction_theta</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
-        <span class="n">air_entry_potential</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
-        <span class="n">root_potential</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
-        <span class="n">root_activity</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
-        <span class="n">ntrailwaves</span><span class="o">=</span><span class="mi">7</span><span class="p">,</span>  <span class="c1"># Recommended in manual</span>
-        <span class="n">nwavesets</span><span class="o">=</span><span class="mi">40</span><span class="p">,</span>
-        <span class="n">groundwater_ET_function</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
-        <span class="n">simulate_groundwater_seepage</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
-        <span class="n">print_input</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
-        <span class="n">print_flows</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
-        <span class="n">save_flows</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
-        <span class="n">budget_fileout</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
-        <span class="n">budgetcsv_fileout</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
-        <span class="n">water_content_file</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
-        <span class="n">observations</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
-        <span class="n">water_mover</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
-        <span class="n">timeseries</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">surface_depression_depth</span><span class="p">:</span> <span class="n">GridDataArray</span><span class="p">,</span>
+        <span class="n">kv_sat</span><span class="p">:</span> <span class="n">GridDataArray</span><span class="p">,</span>
+        <span class="n">theta_res</span><span class="p">:</span> <span class="n">GridDataArray</span><span class="p">,</span>
+        <span class="n">theta_sat</span><span class="p">:</span> <span class="n">GridDataArray</span><span class="p">,</span>
+        <span class="n">theta_init</span><span class="p">:</span> <span class="n">GridDataArray</span><span class="p">,</span>
+        <span class="n">epsilon</span><span class="p">:</span> <span class="n">GridDataArray</span><span class="p">,</span>
+        <span class="n">infiltration_rate</span><span class="p">:</span> <span class="n">GridDataArray</span><span class="p">,</span>
+        <span class="n">et_pot</span><span class="p">:</span> <span class="n">GridDataArray</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">extinction_depth</span><span class="p">:</span> <span class="n">GridDataArray</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">extinction_theta</span><span class="p">:</span> <span class="n">GridDataArray</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">air_entry_potential</span><span class="p">:</span> <span class="n">GridDataArray</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">root_potential</span><span class="p">:</span> <span class="n">GridDataArray</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">root_activity</span><span class="p">:</span> <span class="n">GridDataArray</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">ntrailwaves</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">7</span><span class="p">,</span>  <span class="c1"># Recommended in manual</span>
+        <span class="n">nwavesets</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">40</span><span class="p">,</span>
+        <span class="n">groundwater_ET_function</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">simulate_groundwater_seepage</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
+        <span class="n">print_input</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
+        <span class="n">print_flows</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
+        <span class="n">save_flows</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
+        <span class="n">budget_fileout</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">budgetcsv_fileout</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">water_content_file</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">observations</span><span class="p">:</span> <span class="n">Any</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">water_mover</span><span class="p">:</span> <span class="n">Any</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">timeseries</span><span class="p">:</span> <span class="n">Any</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
         <span class="n">validate</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
-    <span class="p">):</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
         <span class="n">landflag</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_determine_landflag</span><span class="p">(</span><span class="n">kv_sat</span><span class="p">)</span>
         <span class="n">iuzno</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_create_uzf_numbers</span><span class="p">(</span><span class="n">landflag</span><span class="p">)</span>
         <span class="n">ivertcon</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_determine_vertical_connection</span><span class="p">(</span><span class="n">iuzno</span><span class="p">)</span>
@@ -701,43 +706,43 @@
 
         <span class="n">dict_dataset</span> <span class="o">=</span> <span class="p">{</span>
             <span class="c1"># Package data</span>
-            <span class="s2">&quot;surface_depression_depth&quot;</span><span class="p">:</span> <span class="n">surface_depression_depth</span><span class="p">,</span>
-            <span class="s2">&quot;kv_sat&quot;</span><span class="p">:</span> <span class="n">kv_sat</span><span class="p">,</span>
-            <span class="s2">&quot;theta_res&quot;</span><span class="p">:</span> <span class="n">theta_res</span><span class="p">,</span>
-            <span class="s2">&quot;theta_sat&quot;</span><span class="p">:</span> <span class="n">theta_sat</span><span class="p">,</span>
-            <span class="s2">&quot;theta_init&quot;</span><span class="p">:</span> <span class="n">theta_init</span><span class="p">,</span>
-            <span class="s2">&quot;epsilon&quot;</span><span class="p">:</span> <span class="n">epsilon</span><span class="p">,</span>
+            <span class="s2">"surface_depression_depth"</span><span class="p">:</span> <span class="n">surface_depression_depth</span><span class="p">,</span>
+            <span class="s2">"kv_sat"</span><span class="p">:</span> <span class="n">kv_sat</span><span class="p">,</span>
+            <span class="s2">"theta_res"</span><span class="p">:</span> <span class="n">theta_res</span><span class="p">,</span>
+            <span class="s2">"theta_sat"</span><span class="p">:</span> <span class="n">theta_sat</span><span class="p">,</span>
+            <span class="s2">"theta_init"</span><span class="p">:</span> <span class="n">theta_init</span><span class="p">,</span>
+            <span class="s2">"epsilon"</span><span class="p">:</span> <span class="n">epsilon</span><span class="p">,</span>
             <span class="c1"># Stress period data</span>
-            <span class="s2">&quot;stress_period_active&quot;</span><span class="p">:</span> <span class="n">stress_period_active</span><span class="p">,</span>
-            <span class="s2">&quot;infiltration_rate&quot;</span><span class="p">:</span> <span class="n">infiltration_rate</span><span class="p">,</span>
-            <span class="s2">&quot;et_pot&quot;</span><span class="p">:</span> <span class="n">et_pot</span><span class="p">,</span>
-            <span class="s2">&quot;extinction_depth&quot;</span><span class="p">:</span> <span class="n">extinction_depth</span><span class="p">,</span>
-            <span class="s2">&quot;extinction_theta&quot;</span><span class="p">:</span> <span class="n">extinction_theta</span><span class="p">,</span>
-            <span class="s2">&quot;air_entry_potential&quot;</span><span class="p">:</span> <span class="n">air_entry_potential</span><span class="p">,</span>
-            <span class="s2">&quot;root_potential&quot;</span><span class="p">:</span> <span class="n">root_potential</span><span class="p">,</span>
-            <span class="s2">&quot;root_activity&quot;</span><span class="p">:</span> <span class="n">root_activity</span><span class="p">,</span>
+            <span class="s2">"stress_period_active"</span><span class="p">:</span> <span class="n">stress_period_active</span><span class="p">,</span>
+            <span class="s2">"infiltration_rate"</span><span class="p">:</span> <span class="n">infiltration_rate</span><span class="p">,</span>
+            <span class="s2">"et_pot"</span><span class="p">:</span> <span class="n">et_pot</span><span class="p">,</span>
+            <span class="s2">"extinction_depth"</span><span class="p">:</span> <span class="n">extinction_depth</span><span class="p">,</span>
+            <span class="s2">"extinction_theta"</span><span class="p">:</span> <span class="n">extinction_theta</span><span class="p">,</span>
+            <span class="s2">"air_entry_potential"</span><span class="p">:</span> <span class="n">air_entry_potential</span><span class="p">,</span>
+            <span class="s2">"root_potential"</span><span class="p">:</span> <span class="n">root_potential</span><span class="p">,</span>
+            <span class="s2">"root_activity"</span><span class="p">:</span> <span class="n">root_activity</span><span class="p">,</span>
             <span class="c1"># Dimensions</span>
-            <span class="s2">&quot;ntrailwaves&quot;</span><span class="p">:</span> <span class="n">ntrailwaves</span><span class="p">,</span>
-            <span class="s2">&quot;nwavesets&quot;</span><span class="p">:</span> <span class="n">nwavesets</span><span class="p">,</span>
+            <span class="s2">"ntrailwaves"</span><span class="p">:</span> <span class="n">ntrailwaves</span><span class="p">,</span>
+            <span class="s2">"nwavesets"</span><span class="p">:</span> <span class="n">nwavesets</span><span class="p">,</span>
             <span class="c1"># Options</span>
-            <span class="s2">&quot;groundwater_ET_function&quot;</span><span class="p">:</span> <span class="n">groundwater_ET_function</span><span class="p">,</span>
-            <span class="s2">&quot;simulate_gwseep&quot;</span><span class="p">:</span> <span class="n">simulate_groundwater_seepage</span><span class="p">,</span>
-            <span class="s2">&quot;print_input&quot;</span><span class="p">:</span> <span class="n">print_input</span><span class="p">,</span>
-            <span class="s2">&quot;print_flows&quot;</span><span class="p">:</span> <span class="n">print_flows</span><span class="p">,</span>
-            <span class="s2">&quot;save_flows&quot;</span><span class="p">:</span> <span class="n">save_flows</span><span class="p">,</span>
-            <span class="s2">&quot;budget_fileout&quot;</span><span class="p">:</span> <span class="n">budget_fileout</span><span class="p">,</span>
-            <span class="s2">&quot;budgetcsv_fileout&quot;</span><span class="p">:</span> <span class="n">budgetcsv_fileout</span><span class="p">,</span>
-            <span class="s2">&quot;water_content_file&quot;</span><span class="p">:</span> <span class="n">water_content_file</span><span class="p">,</span>
-            <span class="s2">&quot;observations&quot;</span><span class="p">:</span> <span class="n">observations</span><span class="p">,</span>
-            <span class="s2">&quot;water_mover&quot;</span><span class="p">:</span> <span class="n">water_mover</span><span class="p">,</span>
-            <span class="s2">&quot;timeseries&quot;</span><span class="p">:</span> <span class="n">timeseries</span><span class="p">,</span>
+            <span class="s2">"groundwater_ET_function"</span><span class="p">:</span> <span class="n">groundwater_ET_function</span><span class="p">,</span>
+            <span class="s2">"simulate_gwseep"</span><span class="p">:</span> <span class="n">simulate_groundwater_seepage</span><span class="p">,</span>
+            <span class="s2">"print_input"</span><span class="p">:</span> <span class="n">print_input</span><span class="p">,</span>
+            <span class="s2">"print_flows"</span><span class="p">:</span> <span class="n">print_flows</span><span class="p">,</span>
+            <span class="s2">"save_flows"</span><span class="p">:</span> <span class="n">save_flows</span><span class="p">,</span>
+            <span class="s2">"budget_fileout"</span><span class="p">:</span> <span class="n">budget_fileout</span><span class="p">,</span>
+            <span class="s2">"budgetcsv_fileout"</span><span class="p">:</span> <span class="n">budgetcsv_fileout</span><span class="p">,</span>
+            <span class="s2">"water_content_file"</span><span class="p">:</span> <span class="n">water_content_file</span><span class="p">,</span>
+            <span class="s2">"observations"</span><span class="p">:</span> <span class="n">observations</span><span class="p">,</span>
+            <span class="s2">"water_mover"</span><span class="p">:</span> <span class="n">water_mover</span><span class="p">,</span>
+            <span class="s2">"timeseries"</span><span class="p">:</span> <span class="n">timeseries</span><span class="p">,</span>
             <span class="c1"># Additonal indices for Packagedata</span>
-            <span class="s2">&quot;landflag&quot;</span><span class="p">:</span> <span class="n">landflag</span><span class="p">,</span>
-            <span class="s2">&quot;iuzno&quot;</span><span class="p">:</span> <span class="n">iuzno</span><span class="p">,</span>
-            <span class="s2">&quot;ivertcon&quot;</span><span class="p">:</span> <span class="n">ivertcon</span><span class="p">,</span>
+            <span class="s2">"landflag"</span><span class="p">:</span> <span class="n">landflag</span><span class="p">,</span>
+            <span class="s2">"iuzno"</span><span class="p">:</span> <span class="n">iuzno</span><span class="p">,</span>
+            <span class="s2">"ivertcon"</span><span class="p">:</span> <span class="n">ivertcon</span><span class="p">,</span>
         <span class="p">}</span>
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">dict_dataset</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">dataset</span><span class="p">[</span><span class="s2">&quot;iuzno&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="s2">&quot;uzf_number&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">dataset</span><span class="p">[</span><span class="s2">"iuzno"</span><span class="p">]</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="s2">"uzf_number"</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_check_options</span><span class="p">(</span>
             <span class="n">groundwater_ET_function</span><span class="p">,</span>
             <span class="n">et_pot</span><span class="p">,</span>
@@ -750,91 +755,93 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">_validate_init_schemata</span><span class="p">(</span><span class="n">validate</span><span class="p">)</span></div>
 
 
-    <span class="k">def</span><span class="w"> </span><span class="nf">_fill_stress_perioddata</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Modflow6 requires something to be filled in the stress perioddata,</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_fill_stress_perioddata</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">"""Modflow6 requires something to be filled in the stress perioddata,</span>
 <span class="sd">        even though the data is not used in the current configuration.</span>
 <span class="sd">        Only an infiltration rate is required,</span>
 <span class="sd">        the rest can be filled with dummy values if not provided.</span>
-<span class="sd">        &quot;&quot;&quot;</span>
+<span class="sd">        """</span>
         <span class="k">for</span> <span class="n">var</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_period_data</span><span class="p">:</span>
             <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">dataset</span><span class="p">[</span><span class="n">var</span><span class="p">]</span><span class="o">.</span><span class="n">size</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>  <span class="c1"># Prevent loading large arrays in memory</span>
                 <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">dataset</span><span class="p">[</span><span class="n">var</span><span class="p">]</span><span class="o">.</span><span class="n">values</span><span class="p">[()]</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-                    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="bp">self</span><span class="p">[</span><span class="s2">&quot;infiltration_rate&quot;</span><span class="p">],</span> <span class="n">xu</span><span class="o">.</span><span class="n">UgridDataArray</span><span class="p">):</span>
-                        <span class="bp">self</span><span class="o">.</span><span class="n">dataset</span><span class="p">[</span><span class="n">var</span><span class="p">]</span> <span class="o">=</span> <span class="n">xu</span><span class="o">.</span><span class="n">full_like</span><span class="p">(</span><span class="bp">self</span><span class="p">[</span><span class="s2">&quot;infiltration_rate&quot;</span><span class="p">],</span> <span class="mi">0</span><span class="p">)</span>
+                    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="bp">self</span><span class="p">[</span><span class="s2">"infiltration_rate"</span><span class="p">],</span> <span class="n">xu</span><span class="o">.</span><span class="n">UgridDataArray</span><span class="p">):</span>
+                        <span class="bp">self</span><span class="o">.</span><span class="n">dataset</span><span class="p">[</span><span class="n">var</span><span class="p">]</span> <span class="o">=</span> <span class="n">xu</span><span class="o">.</span><span class="n">full_like</span><span class="p">(</span><span class="bp">self</span><span class="p">[</span><span class="s2">"infiltration_rate"</span><span class="p">],</span> <span class="mi">0</span><span class="p">)</span>
                     <span class="k">else</span><span class="p">:</span>
-                        <span class="bp">self</span><span class="o">.</span><span class="n">dataset</span><span class="p">[</span><span class="n">var</span><span class="p">]</span> <span class="o">=</span> <span class="n">xr</span><span class="o">.</span><span class="n">full_like</span><span class="p">(</span><span class="bp">self</span><span class="p">[</span><span class="s2">&quot;infiltration_rate&quot;</span><span class="p">],</span> <span class="mf">0.0</span><span class="p">)</span>
+                        <span class="bp">self</span><span class="o">.</span><span class="n">dataset</span><span class="p">[</span><span class="n">var</span><span class="p">]</span> <span class="o">=</span> <span class="n">xr</span><span class="o">.</span><span class="n">full_like</span><span class="p">(</span><span class="bp">self</span><span class="p">[</span><span class="s2">"infiltration_rate"</span><span class="p">],</span> <span class="mf">0.0</span><span class="p">)</span>
                 <span class="k">else</span><span class="p">:</span>
-                    <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;</span><span class="si">{}</span><span class="s2"> cannot be a scalar&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">var</span><span class="p">))</span>
+                    <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">"</span><span class="si">{}</span><span class="s2"> cannot be a scalar"</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">var</span><span class="p">))</span>
 
     <span class="k">def</span><span class="w"> </span><span class="nf">_check_options</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
-        <span class="n">groundwater_ET_function</span><span class="p">,</span>
-        <span class="n">et_pot</span><span class="p">,</span>
-        <span class="n">extinction_depth</span><span class="p">,</span>
-        <span class="n">extinction_theta</span><span class="p">,</span>
-        <span class="n">air_entry_potential</span><span class="p">,</span>
-        <span class="n">root_potential</span><span class="p">,</span>
-        <span class="n">root_activity</span><span class="p">,</span>
-    <span class="p">):</span>
+        <span class="n">groundwater_ET_function</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">et_pot</span><span class="p">:</span> <span class="n">GridDataArray</span> <span class="o">|</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">extinction_depth</span><span class="p">:</span> <span class="n">GridDataArray</span> <span class="o">|</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">extinction_theta</span><span class="p">:</span> <span class="n">GridDataArray</span> <span class="o">|</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">air_entry_potential</span><span class="p">:</span> <span class="n">GridDataArray</span> <span class="o">|</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">root_potential</span><span class="p">:</span> <span class="n">GridDataArray</span> <span class="o">|</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">root_activity</span><span class="p">:</span> <span class="n">GridDataArray</span> <span class="o">|</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
         <span class="n">simulate_et</span> <span class="o">=</span> <span class="p">[</span><span class="n">x</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="p">[</span><span class="n">et_pot</span><span class="p">,</span> <span class="n">extinction_depth</span><span class="p">]]</span>
         <span class="n">unsat_etae</span> <span class="o">=</span> <span class="p">[</span>
             <span class="n">x</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="p">[</span><span class="n">air_entry_potential</span><span class="p">,</span> <span class="n">root_potential</span><span class="p">,</span> <span class="n">root_activity</span><span class="p">]</span>
         <span class="p">]</span>
 
         <span class="k">if</span> <span class="nb">all</span><span class="p">(</span><span class="n">simulate_et</span><span class="p">):</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">dataset</span><span class="p">[</span><span class="s2">&quot;simulate_et&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="kc">True</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">dataset</span><span class="p">[</span><span class="s2">"simulate_et"</span><span class="p">]</span> <span class="o">=</span> <span class="kc">True</span>
         <span class="k">elif</span> <span class="nb">any</span><span class="p">(</span><span class="n">simulate_et</span><span class="p">):</span>
-            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;To simulate ET, set both et_pot and extinction_depth&quot;</span><span class="p">)</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">"To simulate ET, set both et_pot and extinction_depth"</span><span class="p">)</span>
 
         <span class="k">if</span> <span class="n">extinction_theta</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">dataset</span><span class="p">[</span><span class="s2">&quot;unsat_etwc&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="kc">True</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">dataset</span><span class="p">[</span><span class="s2">"unsat_etwc"</span><span class="p">]</span> <span class="o">=</span> <span class="kc">True</span>
 
         <span class="k">if</span> <span class="nb">all</span><span class="p">(</span><span class="n">unsat_etae</span><span class="p">):</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">dataset</span><span class="p">[</span><span class="s2">&quot;unsat_etae&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="kc">True</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">dataset</span><span class="p">[</span><span class="s2">"unsat_etae"</span><span class="p">]</span> <span class="o">=</span> <span class="kc">True</span>
         <span class="k">elif</span> <span class="nb">any</span><span class="p">(</span><span class="n">unsat_etae</span><span class="p">):</span>
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
-                <span class="s2">&quot;To simulate ET with a capillary based formulation, set air_entry_potential, root_potential, and root_activity&quot;</span>
+                <span class="s2">"To simulate ET with a capillary based formulation, set air_entry_potential, root_potential, and root_activity"</span>
             <span class="p">)</span>
 
         <span class="k">if</span> <span class="nb">all</span><span class="p">(</span><span class="n">unsat_etae</span><span class="p">)</span> <span class="ow">and</span> <span class="p">(</span><span class="n">extinction_theta</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">):</span>
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
-<span class="w">                </span><span class="sd">&quot;&quot;&quot;Both capillary based formulation and water content based formulation set based on provided input data.</span>
-<span class="sd">                Please provide either only extinction_theta or (air_entry_potential, root_potential, and root_activity)&quot;&quot;&quot;</span>
+<span class="w">                </span><span class="sd">"""Both capillary based formulation and water content based formulation set based on provided input data.</span>
+<span class="sd">                Please provide either only extinction_theta or (air_entry_potential, root_potential, and root_activity)"""</span>
             <span class="p">)</span>
 
-        <span class="k">if</span> <span class="n">groundwater_ET_function</span> <span class="o">==</span> <span class="s2">&quot;linear&quot;</span><span class="p">:</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">dataset</span><span class="p">[</span><span class="s2">&quot;linear_gwet&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="kc">True</span>
-        <span class="k">elif</span> <span class="n">groundwater_ET_function</span> <span class="o">==</span> <span class="s2">&quot;square&quot;</span><span class="p">:</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">dataset</span><span class="p">[</span><span class="s2">&quot;square_gwet&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="kc">True</span>
+        <span class="k">if</span> <span class="n">groundwater_ET_function</span> <span class="o">==</span> <span class="s2">"linear"</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">dataset</span><span class="p">[</span><span class="s2">"linear_gwet"</span><span class="p">]</span> <span class="o">=</span> <span class="kc">True</span>
+        <span class="k">elif</span> <span class="n">groundwater_ET_function</span> <span class="o">==</span> <span class="s2">"square"</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">dataset</span><span class="p">[</span><span class="s2">"square_gwet"</span><span class="p">]</span> <span class="o">=</span> <span class="kc">True</span>
         <span class="k">elif</span> <span class="n">groundwater_ET_function</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="k">pass</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
-                <span class="s2">&quot;Groundwater ET function should be either &#39;linear&#39;,&#39;square&#39; or None&quot;</span>
+                <span class="s2">"Groundwater ET function should be either 'linear','square' or None"</span>
             <span class="p">)</span>
 
-    <span class="k">def</span><span class="w"> </span><span class="nf">_create_uzf_numbers</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">landflag</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Create unique UZF ID&#39;s. Inactive cells equal 0&quot;&quot;&quot;</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_create_uzf_numbers</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">landflag</span><span class="p">:</span> <span class="n">GridDataArray</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">GridDataArray</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">"""Create unique UZF ID's. Inactive cells equal 0"""</span>
         <span class="n">active_nodes</span> <span class="o">=</span> <span class="n">landflag</span><span class="o">.</span><span class="n">notnull</span><span class="p">()</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">int8</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">nancumsum</span><span class="p">(</span><span class="n">active_nodes</span><span class="p">)</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="n">landflag</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span> <span class="o">*</span> <span class="n">active_nodes</span>
 
-    <span class="k">def</span><span class="w"> </span><span class="nf">_determine_landflag</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">kv_sat</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;returns the landflag for uzf-model. Landflag == 1 for top active UZF-nodes&quot;&quot;&quot;</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_determine_landflag</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">kv_sat</span><span class="p">:</span> <span class="n">GridDataArray</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">GridDataArray</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">"""returns the landflag for uzf-model. Landflag == 1 for top active UZF-nodes"""</span>
         <span class="n">land_nodes</span> <span class="o">=</span> <span class="n">get_upper_active_grid_cells</span><span class="p">(</span><span class="n">kv_sat</span><span class="p">)</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">int32</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">land_nodes</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">kv_sat</span><span class="o">.</span><span class="n">notnull</span><span class="p">())</span>
 
-    <span class="k">def</span><span class="w"> </span><span class="nf">_determine_vertical_connection</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">uzf_number</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_determine_vertical_connection</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span> <span class="n">uzf_number</span><span class="p">:</span> <span class="n">GridDataArray</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">GridDataArray</span><span class="p">:</span>
         <span class="k">return</span> <span class="n">uzf_number</span><span class="o">.</span><span class="n">shift</span><span class="p">(</span><span class="n">layer</span><span class="o">=-</span><span class="mi">1</span><span class="p">,</span> <span class="n">fill_value</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
 
-    <span class="k">def</span><span class="w"> </span><span class="nf">_package_data_to_sparse</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="n">notnull</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">dataset</span><span class="p">[</span><span class="s2">&quot;landflag&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">notnull</span><span class="p">()</span><span class="o">.</span><span class="n">to_numpy</span><span class="p">()</span>
-        <span class="n">iuzno</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">dataset</span><span class="p">[</span><span class="s2">&quot;iuzno&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">values</span><span class="p">[</span><span class="n">notnull</span><span class="p">]</span>
-        <span class="n">landflag</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">dataset</span><span class="p">[</span><span class="s2">&quot;landflag&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">values</span><span class="p">[</span><span class="n">notnull</span><span class="p">]</span>
-        <span class="n">ivertcon</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">dataset</span><span class="p">[</span><span class="s2">&quot;ivertcon&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">values</span><span class="p">[</span><span class="n">notnull</span><span class="p">]</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_package_data_to_sparse</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">:</span>
+        <span class="n">notnull</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">dataset</span><span class="p">[</span><span class="s2">"landflag"</span><span class="p">]</span><span class="o">.</span><span class="n">notnull</span><span class="p">()</span><span class="o">.</span><span class="n">to_numpy</span><span class="p">()</span>
+        <span class="n">iuzno</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">dataset</span><span class="p">[</span><span class="s2">"iuzno"</span><span class="p">]</span><span class="o">.</span><span class="n">values</span><span class="p">[</span><span class="n">notnull</span><span class="p">]</span>
+        <span class="n">landflag</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">dataset</span><span class="p">[</span><span class="s2">"landflag"</span><span class="p">]</span><span class="o">.</span><span class="n">values</span><span class="p">[</span><span class="n">notnull</span><span class="p">]</span>
+        <span class="n">ivertcon</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">dataset</span><span class="p">[</span><span class="s2">"ivertcon"</span><span class="p">]</span><span class="o">.</span><span class="n">values</span><span class="p">[</span><span class="n">notnull</span><span class="p">]</span>
 
         <span class="n">ds</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">dataset</span><span class="p">[</span><span class="nb">list</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_package_data</span><span class="p">)]</span>
 
-        <span class="n">layer</span> <span class="o">=</span> <span class="n">ds</span><span class="p">[</span><span class="s2">&quot;layer&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">values</span>
+        <span class="n">layer</span> <span class="o">=</span> <span class="n">ds</span><span class="p">[</span><span class="s2">"layer"</span><span class="p">]</span><span class="o">.</span><span class="n">values</span>
         <span class="n">arrdict</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_ds_to_arrdict</span><span class="p">(</span><span class="n">ds</span><span class="p">)</span>
         <span class="n">recarr</span> <span class="o">=</span> <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">_to_struct_array</span><span class="p">(</span><span class="n">arrdict</span><span class="p">,</span> <span class="n">layer</span><span class="p">)</span>
 
@@ -843,57 +850,65 @@
         <span class="n">n</span> <span class="o">=</span> <span class="mi">3</span>
         <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">dataset</span><span class="p">,</span> <span class="n">xu</span><span class="o">.</span><span class="n">UgridDataset</span><span class="p">):</span>
             <span class="n">n</span> <span class="o">=</span> <span class="mi">2</span>
-        <span class="n">index_spec</span> <span class="o">=</span> <span class="p">[(</span><span class="s2">&quot;iuzno&quot;</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">int32</span><span class="p">)]</span> <span class="o">+</span> <span class="n">field_spec</span><span class="p">[:</span><span class="n">n</span><span class="p">]</span>
+        <span class="n">index_spec</span> <span class="o">=</span> <span class="p">[(</span><span class="s2">"iuzno"</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">int32</span><span class="p">)]</span> <span class="o">+</span> <span class="n">field_spec</span><span class="p">[:</span><span class="n">n</span><span class="p">]</span>
         <span class="n">field_spec</span> <span class="o">=</span> <span class="p">(</span>
-            <span class="p">[(</span><span class="s2">&quot;landflag&quot;</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">int32</span><span class="p">)]</span> <span class="o">+</span> <span class="p">[(</span><span class="s2">&quot;ivertcon&quot;</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">int32</span><span class="p">)]</span> <span class="o">+</span> <span class="n">field_spec</span><span class="p">[</span><span class="n">n</span><span class="p">:]</span>
+            <span class="p">[(</span><span class="s2">"landflag"</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">int32</span><span class="p">)]</span> <span class="o">+</span> <span class="p">[(</span><span class="s2">"ivertcon"</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">int32</span><span class="p">)]</span> <span class="o">+</span> <span class="n">field_spec</span><span class="p">[</span><span class="n">n</span><span class="p">:]</span>
         <span class="p">)</span>
         <span class="n">sparse_dtype</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">dtype</span><span class="p">(</span><span class="n">index_spec</span> <span class="o">+</span> <span class="n">field_spec</span><span class="p">)</span>
 
         <span class="n">recarr_new</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">empty</span><span class="p">(</span><span class="n">recarr</span><span class="o">.</span><span class="n">shape</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">sparse_dtype</span><span class="p">)</span>
-        <span class="n">recarr_new</span><span class="p">[</span><span class="s2">&quot;iuzno&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">iuzno</span>
-        <span class="n">recarr_new</span><span class="p">[</span><span class="s2">&quot;landflag&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">landflag</span>
-        <span class="n">recarr_new</span><span class="p">[</span><span class="s2">&quot;ivertcon&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">ivertcon</span>
+        <span class="n">recarr_new</span><span class="p">[</span><span class="s2">"iuzno"</span><span class="p">]</span> <span class="o">=</span> <span class="n">iuzno</span>
+        <span class="n">recarr_new</span><span class="p">[</span><span class="s2">"landflag"</span><span class="p">]</span> <span class="o">=</span> <span class="n">landflag</span>
+        <span class="n">recarr_new</span><span class="p">[</span><span class="s2">"ivertcon"</span><span class="p">]</span> <span class="o">=</span> <span class="n">ivertcon</span>
         <span class="n">recarr_new</span><span class="p">[</span><span class="n">field_names</span><span class="p">]</span> <span class="o">=</span> <span class="n">recarr</span>
 
         <span class="k">return</span> <span class="n">recarr_new</span>
 
-    <span class="k">def</span><span class="w"> </span><span class="nf">_render</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">directory</span><span class="p">,</span> <span class="n">pkgname</span><span class="p">,</span> <span class="n">globaltimes</span><span class="p">,</span> <span class="n">binary</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Render fills in the template only, doesn&#39;t write binary data&quot;&quot;&quot;</span>
-        <span class="n">d</span> <span class="o">=</span> <span class="p">{}</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_render</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">directory</span><span class="p">:</span> <span class="n">Path</span> <span class="o">|</span> <span class="nb">str</span><span class="p">,</span>
+        <span class="n">pkgname</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+        <span class="n">globaltimes</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">datetime64</span><span class="p">]</span> <span class="o">|</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span>
+        <span class="n">binary</span><span class="p">:</span> <span class="nb">bool</span><span class="p">,</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">"""Render fills in the template only, doesn't write binary data"""</span>
+        <span class="n">d</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]</span> <span class="o">=</span> <span class="p">{}</span>
         <span class="n">bin_ds</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">dataset</span><span class="p">[</span><span class="nb">list</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_period_data</span><span class="p">)]</span>
-        <span class="n">d</span><span class="p">[</span><span class="s2">&quot;periods&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_period_paths</span><span class="p">(</span>
+        <span class="n">d</span><span class="p">[</span><span class="s2">"periods"</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_period_paths</span><span class="p">(</span>
             <span class="n">directory</span><span class="p">,</span> <span class="n">pkgname</span><span class="p">,</span> <span class="n">globaltimes</span><span class="p">,</span> <span class="n">bin_ds</span><span class="p">,</span> <span class="n">binary</span><span class="o">=</span><span class="kc">False</span>
         <span class="p">)</span>
         <span class="c1"># List variables that are not in the period data or package data, but</span>
         <span class="c1"># are needed for rendering the template and are not options.</span>
-        <span class="n">vars_from_init</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;iuzno&quot;</span><span class="p">,</span> <span class="s2">&quot;ivertcon&quot;</span><span class="p">,</span> <span class="s2">&quot;landflag&quot;</span><span class="p">,</span> <span class="s2">&quot;stress_period_active&quot;</span><span class="p">]</span>
+        <span class="n">vars_from_init</span> <span class="o">=</span> <span class="p">[</span><span class="s2">"iuzno"</span><span class="p">,</span> <span class="s2">"ivertcon"</span><span class="p">,</span> <span class="s2">"landflag"</span><span class="p">,</span> <span class="s2">"stress_period_active"</span><span class="p">]</span>
         <span class="n">not_options</span> <span class="o">=</span> <span class="p">(</span>
             <span class="nb">list</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_period_data</span><span class="p">)</span> <span class="o">+</span> <span class="nb">list</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_package_data</span><span class="p">)</span> <span class="o">+</span> <span class="n">vars_from_init</span>
         <span class="p">)</span>
         <span class="n">d</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_pkg_options</span><span class="p">(</span><span class="n">d</span><span class="p">,</span> <span class="n">not_options</span><span class="o">=</span><span class="n">not_options</span><span class="p">)</span>
-        <span class="n">path</span> <span class="o">=</span> <span class="n">directory</span> <span class="o">/</span> <span class="n">pkgname</span> <span class="o">/</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">_pkg_id</span><span class="si">}</span><span class="s2">-pkgdata.dat&quot;</span>
-        <span class="n">d</span><span class="p">[</span><span class="s2">&quot;packagedata&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">path</span><span class="o">.</span><span class="n">as_posix</span><span class="p">()</span>
+        <span class="n">path</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="n">directory</span><span class="p">)</span> <span class="o">/</span> <span class="n">pkgname</span> <span class="o">/</span> <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">_pkg_id</span><span class="si">}</span><span class="s2">-pkgdata.dat"</span>
+        <span class="n">d</span><span class="p">[</span><span class="s2">"packagedata"</span><span class="p">]</span> <span class="o">=</span> <span class="n">path</span><span class="o">.</span><span class="n">as_posix</span><span class="p">()</span>
         <span class="c1"># max uzf-cells for which time period data will be supplied</span>
-        <span class="n">d</span><span class="p">[</span><span class="s2">&quot;nuzfcells&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">count_nonzero</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">isfinite</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">dataset</span><span class="p">[</span><span class="s2">&quot;landflag&quot;</span><span class="p">]))</span>
+        <span class="n">d</span><span class="p">[</span><span class="s2">"nuzfcells"</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">count_nonzero</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">isfinite</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">dataset</span><span class="p">[</span><span class="s2">"landflag"</span><span class="p">]))</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_template</span><span class="o">.</span><span class="n">render</span><span class="p">(</span><span class="n">d</span><span class="p">)</span>
 
-    <span class="k">def</span><span class="w"> </span><span class="nf">_to_struct_array</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">arrdict</span><span class="p">,</span> <span class="n">layer</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Convert from dense arrays to list based input,</span>
-<span class="sd">        since the perioddata does not require cellids but iuzno, we hgave to override&quot;&quot;&quot;</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_to_struct_array</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span> <span class="n">arrdict</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">],</span> <span class="n">layer</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span> <span class="o">|</span> <span class="kc">None</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">"""Convert from dense arrays to list based input,</span>
+<span class="sd">        since the perioddata does not require cellids but iuzno, we hgave to override"""</span>
         <span class="c1"># TODO add pkgcheck that period table aligns</span>
         <span class="c1"># Get the number of valid values</span>
-        <span class="n">notnull</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">dataset</span><span class="p">[</span><span class="s2">&quot;landflag&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">values</span> <span class="o">==</span> <span class="mi">1</span>
-        <span class="n">iuzno</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">dataset</span><span class="p">[</span><span class="s2">&quot;iuzno&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">values</span>
+        <span class="n">notnull</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">dataset</span><span class="p">[</span><span class="s2">"landflag"</span><span class="p">]</span><span class="o">.</span><span class="n">values</span> <span class="o">==</span> <span class="mi">1</span>
+        <span class="n">iuzno</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">dataset</span><span class="p">[</span><span class="s2">"iuzno"</span><span class="p">]</span><span class="o">.</span><span class="n">values</span>
         <span class="n">nrow</span> <span class="o">=</span> <span class="n">notnull</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span>
         <span class="c1"># Define the numpy structured array dtype</span>
-        <span class="n">index_spec</span> <span class="o">=</span> <span class="p">[(</span><span class="s2">&quot;iuzno&quot;</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">int32</span><span class="p">)]</span>
+        <span class="n">index_spec</span> <span class="o">=</span> <span class="p">[(</span><span class="s2">"iuzno"</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">int32</span><span class="p">)]</span>
         <span class="n">field_spec</span> <span class="o">=</span> <span class="p">[(</span><span class="n">key</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">)</span> <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">arrdict</span><span class="p">]</span>
         <span class="n">sparse_dtype</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">dtype</span><span class="p">(</span><span class="n">index_spec</span> <span class="o">+</span> <span class="n">field_spec</span><span class="p">)</span>
 
         <span class="c1"># Initialize the structured array</span>
         <span class="n">recarr</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">empty</span><span class="p">(</span><span class="n">nrow</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">sparse_dtype</span><span class="p">)</span>
         <span class="c1"># Fill in the indices</span>
-        <span class="n">recarr</span><span class="p">[</span><span class="s2">&quot;iuzno&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">iuzno</span><span class="p">[</span><span class="n">notnull</span><span class="p">]</span>
+        <span class="n">recarr</span><span class="p">[</span><span class="s2">"iuzno"</span><span class="p">]</span> <span class="o">=</span> <span class="n">iuzno</span><span class="p">[</span><span class="n">notnull</span><span class="p">]</span>
 
         <span class="c1"># Fill in the data</span>
         <span class="k">for</span> <span class="n">key</span><span class="p">,</span> <span class="n">arr</span> <span class="ow">in</span> <span class="n">arrdict</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
@@ -901,10 +916,12 @@
 
         <span class="k">return</span> <span class="n">recarr</span>
 
-    <span class="k">def</span><span class="w"> </span><span class="nf">_validate</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">schemata</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_validate</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span> <span class="n">schemata</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">],</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">:</span> <span class="n">Any</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">list</span><span class="p">[</span><span class="n">ValidationError</span><span class="p">]]:</span>
         <span class="c1"># Insert additional kwargs</span>
-        <span class="n">kwargs</span><span class="p">[</span><span class="s2">&quot;kv_sat&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="p">[</span><span class="s2">&quot;kv_sat&quot;</span><span class="p">]</span>
-        <span class="n">kwargs</span><span class="p">[</span><span class="s2">&quot;stress_period_active&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="p">[</span><span class="s2">&quot;stress_period_active&quot;</span><span class="p">]</span>
+        <span class="n">kwargs</span><span class="p">[</span><span class="s2">"kv_sat"</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="p">[</span><span class="s2">"kv_sat"</span><span class="p">]</span>
+        <span class="n">kwargs</span><span class="p">[</span><span class="s2">"stress_period_active"</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="p">[</span><span class="s2">"stress_period_active"</span><span class="p">]</span>
         <span class="n">errors</span> <span class="o">=</span> <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">_validate</span><span class="p">(</span><span class="n">schemata</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
 
         <span class="k">return</span> <span class="n">errors</span></div>
@@ -938,8 +955,8 @@
   </div>
   
   <!-- Scripts loaded after <body> so the DOM is not blocked -->
-  <script defer src="../../../_static/scripts/bootstrap.js?digest=90905a2f556bf617f1a9"></script>
-<script defer src="../../../_static/scripts/pydata-sphinx-theme.js?digest=90905a2f556bf617f1a9"></script>
+  <script defer src="../../../_static/scripts/bootstrap.js?digest=75c7c72ae941e8b558d8"></script>
+<script defer src="../../../_static/scripts/pydata-sphinx-theme.js?digest=75c7c72ae941e8b558d8"></script>
 
   <footer class="bd-footer">
 <div class="bd-footer__inner bd-page-width">
@@ -959,8 +976,7 @@
         <div class="footer-item">
 
   <p class="sphinx-version">
-    Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 9.1.0.
-    <br/>
+    Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 9.2.0.
   </p>
 </div>
       
@@ -973,7 +989,7 @@
         <div class="footer-item">
 <p class="theme-version">
   <!-- # L10n: Setting the PST URL as an argument as this does not need to be localized -->
-  Built with the <a href="https://pydata-sphinx-theme.readthedocs.io/en/stable/index.html">PyData Sphinx Theme</a> 0.20.0.
+  Built with the <a href="https://pydata-sphinx-theme.readthedocs.io/en/stable/index.html">PyData Sphinx Theme</a> 0.24.0.
 </p></div>
       
     </div>

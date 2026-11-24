@@ -1,6 +1,0 @@
-﻿imod.msw.Sprinkling.clip\_box
-=============================
-
-.. currentmodule:: imod.msw
-
-.. automethod:: Sprinkling.clip_box

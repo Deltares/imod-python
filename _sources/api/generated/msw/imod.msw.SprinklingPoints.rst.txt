@@ -1,0 +1,37 @@
+﻿imod.msw.SprinklingPoints
+=========================
+
+.. currentmodule:: imod.msw
+
+.. autoclass:: SprinklingPoints
+
+   
+   .. automethod:: __init__
+
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      ~SprinklingPoints.__init__
+      ~SprinklingPoints.clip_box
+      ~SprinklingPoints.from_file
+      ~SprinklingPoints.from_imod5_data
+      ~SprinklingPoints.get_regrid_methods
+      ~SprinklingPoints.regrid_like
+      ~SprinklingPoints.to_file
+      ~SprinklingPoints.write
+   
+   
+
+   
+   
+   .. rubric:: Attributes
+
+   .. autosummary::
+   
+      ~SprinklingPoints.auxiliary_data_fields
+      ~SprinklingPoints.dataset
+      ~SprinklingPoints.pkg_id
+   
+   

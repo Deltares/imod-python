@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 
 
@@ -7,7 +6,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>imod.util.spatial &#8212; iMOD Python 1.1.0 documentation</title>
+    <title>imod.util.spatial &#8212; iMOD Python 1.2.0 documentation</title>
   
   
   
@@ -26,22 +25,22 @@
   </noscript>
   
   <!-- Loaded before other Sphinx assets -->
-  <link href="../../../_static/styles/theme.css?digest=90905a2f556bf617f1a9" rel="stylesheet" />
-<link href="../../../_static/styles/pydata-sphinx-theme.css?digest=90905a2f556bf617f1a9" rel="stylesheet" />
+  <link href="../../../_static/styles/theme.css?digest=75c7c72ae941e8b558d8" rel="stylesheet" />
+<link href="../../../_static/styles/pydata-sphinx-theme.css?digest=75c7c72ae941e8b558d8" rel="stylesheet" />
 
     <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=03e43079" />
-    <link rel="stylesheet" type="text/css" href="../../../_static/sg_gallery.css?v=fd6457a4" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/sg_gallery.css?v=c83e6b79" />
     <link rel="stylesheet" type="text/css" href="../../../_static/sg_gallery-binder.css?v=f4aeca0c" />
     <link rel="stylesheet" type="text/css" href="../../../_static/sg_gallery-dataframe.css?v=2082cf3c" />
     <link rel="stylesheet" type="text/css" href="../../../_static/sg_gallery-rendered-html.css?v=1277b6f3" />
   
   <!-- So that users can add custom icons -->
-  <script defer src="../../../_static/scripts/fontawesome.js?digest=90905a2f556bf617f1a9"></script>
+  <script defer src="../../../_static/scripts/fontawesome.js?digest=75c7c72ae941e8b558d8"></script>
   <!-- Pre-loaded scripts that we'll load fully later -->
-  <link rel="preload" as="script" href="../../../_static/scripts/bootstrap.js?digest=90905a2f556bf617f1a9" />
-<link rel="preload" as="script" href="../../../_static/scripts/pydata-sphinx-theme.js?digest=90905a2f556bf617f1a9" />
+  <link rel="preload" as="script" href="../../../_static/scripts/bootstrap.js?digest=75c7c72ae941e8b558d8" />
+<link rel="preload" as="script" href="../../../_static/scripts/pydata-sphinx-theme.js?digest=75c7c72ae941e8b558d8" />
 
-    <script src="../../../_static/documentation_options.js?v=fc837d61"></script>
+    <script src="../../../_static/documentation_options.js?v=6efca38a"></script>
     <script src="../../../_static/doctools.js?v=fd6eb6e6"></script>
     <script src="../../../_static/sphinx_highlight.js?v=6ffebe34"></script>
     <script src="../../../_static/sg-tags.js?v=d80f6fa4"></script>
@@ -51,8 +50,9 @@
     <link rel="index" title="Index" href="../../../genindex.html" />
     <link rel="search" title="Search" href="../../../search.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <meta name="color-scheme" content="light dark"/>
   <meta name="docsearch:language" content="en"/>
-  <meta name="docsearch:version" content="1.1.0.dev" />
+  <meta name="docsearch:version" content="1.2.0.dev" />
   
     
     <script src="../../../_static/searchtools.js"></script>
@@ -100,7 +100,7 @@
   
     <header id="pst-header" class="bd-header navbar navbar-expand-lg bd-navbar d-print-none">
 <div class="bd-header__inner bd-page-width">
-  <button class="pst-navbar-icon sidebar-toggle primary-toggle" aria-label="Site navigation">
+  <button type="button" class="pst-navbar-icon sidebar-toggle primary-toggle" aria-label="Site navigation" aria-expanded="false" aria-controls="pst-primary-sidebar-modal">
     <span class="fa-solid fa-bars"></span>
   </button>
   
@@ -122,8 +122,8 @@
     
     
     
-    <img src="../../../_static/imod-python-logo-light.svg" class="logo__image only-light" alt="iMOD Python 1.1.0 documentation - Home"/>
-    <img src="../../../_static/imod-python-logo-dark.svg" class="logo__image only-dark pst-js-only" alt="iMOD Python 1.1.0 documentation - Home"/>
+    <img src="../../../_static/imod-python-logo-light.svg" class="logo__image only-light" alt="iMOD Python 1.2.0 documentation - Home"/>
+    <img src="../../../_static/imod-python-logo-dark.svg" class="logo__image only-dark pst-js-only" alt="iMOD Python 1.2.0 documentation - Home"/>
   
   
 </a></div>
@@ -190,7 +190,7 @@
         <div class="navbar-item navbar-persistent--container">
           
 
-<button class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+<button type="button" class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
  <i class="fa-solid fa-magnifying-glass"></i>
  <span class="search-button__default-text">Search</span>
  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
@@ -201,15 +201,15 @@
         <div class="navbar-item">
 
 <div class="theme-switch-container dropdown pst-js-only" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Color mode">
-  <button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button dropdown-toggle" aria-label="Color mode" data-bs-toggle="dropdown">
-    <i class="theme-switch fa-solid fa-sun fa-lg fa-fw" data-mode="light" title="Light"></i>
-    <i class="theme-switch fa-solid fa-moon fa-lg fa-fw" data-mode="dark" title="Dark"></i>
-    <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg fa-fw" data-mode="auto" title="System Settings"></i>
+  <button type="button" class="btn btn-sm nav-link pst-navbar-icon theme-switch-button dropdown-toggle" aria-label="Color mode" data-bs-toggle="dropdown">
+    <i class="theme-switch fa-solid fa-sun fa-lg" data-mode="light" title="Light"></i>
+    <i class="theme-switch fa-solid fa-moon fa-lg" data-mode="dark" title="Dark"></i>
+    <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg" data-mode="auto" title="System Settings"></i>
   </button>
   <ul class="dropdown-menu dropdown-menu-end">
-    <li><button class="dropdown-item d-flex align-items-center theme-change-button" data-mode="auto"><i class="fa-solid fa-circle-half-stroke fa-lg fa-fw me-1"></i>System Settings</button></li>
-    <li><button class="dropdown-item d-flex align-items-center theme-change-button" data-mode="light"><i class="fa-solid fa-sun fa-lg fa-fw me-1"></i>Light</button></li>
-    <li><button class="dropdown-item d-flex align-items-center theme-change-button" data-mode="dark"><i class="fa-solid fa-moon fa-lg fa-fw me-1"></i>Dark</button></li>
+    <li><button type="button" class="dropdown-item d-flex align-items-center theme-change-button" data-mode="auto"><i class="fa-solid fa-circle-half-stroke fa-lg me-1"></i>System Settings</button></li>
+    <li><button type="button" class="dropdown-item d-flex align-items-center theme-change-button" data-mode="light"><i class="fa-solid fa-sun fa-lg me-1"></i>Light</button></li>
+    <li><button type="button" class="dropdown-item d-flex align-items-center theme-change-button" data-mode="dark"><i class="fa-solid fa-moon fa-lg me-1"></i>Dark</button></li>
   </ul>
 </div></div>
       
@@ -246,7 +246,7 @@
   
     <div class="navbar-persistent--mobile">
 
-<button class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+<button type="button" class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
  <i class="fa-solid fa-magnifying-glass"></i>
  <span class="search-button__default-text">Search</span>
  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
@@ -267,7 +267,7 @@
       
         
       
-      <dialog id="pst-primary-sidebar-modal"></dialog>
+      <dialog id="pst-primary-sidebar-modal" tabindex="-1"></dialog>
       <div id="pst-primary-sidebar" class="bd-sidebar-primary bd-sidebar hide-on-wide">
         
 
@@ -337,15 +337,15 @@
           <div class="navbar-item">
 
 <div class="theme-switch-container dropdown pst-js-only" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Color mode">
-  <button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button dropdown-toggle" aria-label="Color mode" data-bs-toggle="dropdown">
-    <i class="theme-switch fa-solid fa-sun fa-lg fa-fw" data-mode="light" title="Light"></i>
-    <i class="theme-switch fa-solid fa-moon fa-lg fa-fw" data-mode="dark" title="Dark"></i>
-    <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg fa-fw" data-mode="auto" title="System Settings"></i>
+  <button type="button" class="btn btn-sm nav-link pst-navbar-icon theme-switch-button dropdown-toggle" aria-label="Color mode" data-bs-toggle="dropdown">
+    <i class="theme-switch fa-solid fa-sun fa-lg" data-mode="light" title="Light"></i>
+    <i class="theme-switch fa-solid fa-moon fa-lg" data-mode="dark" title="Dark"></i>
+    <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg" data-mode="auto" title="System Settings"></i>
   </button>
   <ul class="dropdown-menu dropdown-menu-end">
-    <li><button class="dropdown-item d-flex align-items-center theme-change-button" data-mode="auto"><i class="fa-solid fa-circle-half-stroke fa-lg fa-fw me-1"></i>System Settings</button></li>
-    <li><button class="dropdown-item d-flex align-items-center theme-change-button" data-mode="light"><i class="fa-solid fa-sun fa-lg fa-fw me-1"></i>Light</button></li>
-    <li><button class="dropdown-item d-flex align-items-center theme-change-button" data-mode="dark"><i class="fa-solid fa-moon fa-lg fa-fw me-1"></i>Dark</button></li>
+    <li><button type="button" class="dropdown-item d-flex align-items-center theme-change-button" data-mode="auto"><i class="fa-solid fa-circle-half-stroke fa-lg me-1"></i>System Settings</button></li>
+    <li><button type="button" class="dropdown-item d-flex align-items-center theme-change-button" data-mode="light"><i class="fa-solid fa-sun fa-lg me-1"></i>Light</button></li>
+    <li><button type="button" class="dropdown-item d-flex align-items-center theme-change-button" data-mode="dark"><i class="fa-solid fa-moon fa-lg me-1"></i>Dark</button></li>
   </ul>
 </div></div>
         
@@ -411,7 +411,7 @@
     
     <li class="breadcrumb-item breadcrumb-home">
       <a href="../../../index.html" class="nav-link" aria-label="Home">
-        <i class="fa-solid fa-home"></i>
+        <i class="fa-solid fa-house"></i>
       </a>
     </li>
     
@@ -435,16 +435,17 @@
                 <article class="bd-article">
                   
   <h1>Source code for imod.util.spatial</h1><div class="highlight"><pre>
-<span></span><span class="sd">&quot;&quot;&quot;</span>
+<span></span><span class="sd">"""</span>
 <span class="sd">Utility functions for dealing with the spatial</span>
 <span class="sd">location of rasters: :func:`imod.util.spatial.coord_reference`,</span>
 <span class="sd">:func:`imod.util.spatial_reference` and :func:`imod.util.transform`. These are</span>
 <span class="sd">used internally, but are not private since they may be useful to users as well.</span>
-<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">"""</span>
 
 <span class="kn">import</span><span class="w"> </span><span class="nn">collections</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">re</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">TYPE_CHECKING</span><span class="p">,</span> <span class="n">Any</span><span class="p">,</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">Sequence</span><span class="p">,</span> <span class="n">Tuple</span><span class="p">,</span> <span class="n">Union</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">collections.abc</span><span class="w"> </span><span class="kn">import</span> <span class="n">Sequence</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">TYPE_CHECKING</span><span class="p">,</span> <span class="n">Any</span>
 
 <span class="kn">import</span><span class="w"> </span><span class="nn">affine</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
@@ -461,12 +462,12 @@
 <span class="k">try</span><span class="p">:</span>
     <span class="kn">import</span><span class="w"> </span><span class="nn">rasterio</span>
 <span class="k">except</span> <span class="ne">ImportError</span><span class="p">:</span>
-    <span class="n">rasterio</span> <span class="o">=</span> <span class="n">MissingOptionalModule</span><span class="p">(</span><span class="s2">&quot;rasterio&quot;</span><span class="p">)</span>
+    <span class="n">rasterio</span> <span class="o">=</span> <span class="n">MissingOptionalModule</span><span class="p">(</span><span class="s2">"rasterio"</span><span class="p">)</span>
 
 <span class="k">try</span><span class="p">:</span>
     <span class="kn">import</span><span class="w"> </span><span class="nn">shapely</span>
 <span class="k">except</span> <span class="ne">ImportError</span><span class="p">:</span>
-    <span class="n">shapely</span> <span class="o">=</span> <span class="n">MissingOptionalModule</span><span class="p">(</span><span class="s2">&quot;shapely&quot;</span><span class="p">)</span>
+    <span class="n">shapely</span> <span class="o">=</span> <span class="n">MissingOptionalModule</span><span class="p">(</span><span class="s2">"shapely"</span><span class="p">)</span>
 
 <span class="k">if</span> <span class="n">TYPE_CHECKING</span><span class="p">:</span>
     <span class="kn">import</span><span class="w"> </span><span class="nn">geopandas</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">gpd</span>
@@ -474,45 +475,47 @@
     <span class="k">try</span><span class="p">:</span>
         <span class="kn">import</span><span class="w"> </span><span class="nn">geopandas</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">gpd</span>
     <span class="k">except</span> <span class="ne">ImportError</span><span class="p">:</span>
-        <span class="n">gpd</span> <span class="o">=</span> <span class="n">MissingOptionalModule</span><span class="p">(</span><span class="s2">&quot;geopandas&quot;</span><span class="p">)</span>
+        <span class="n">gpd</span> <span class="o">=</span> <span class="n">MissingOptionalModule</span><span class="p">(</span><span class="s2">"geopandas"</span><span class="p">)</span>
 
 <span class="k">try</span><span class="p">:</span>
     <span class="kn">import</span><span class="w"> </span><span class="nn">rioxarray</span>
 <span class="k">except</span> <span class="ne">ImportError</span><span class="p">:</span>
-    <span class="n">rasterio</span> <span class="o">=</span> <span class="n">MissingOptionalModule</span><span class="p">(</span><span class="s2">&quot;rioxarray&quot;</span><span class="p">)</span>
+    <span class="n">rasterio</span> <span class="o">=</span> <span class="n">MissingOptionalModule</span><span class="p">(</span><span class="s2">"rioxarray"</span><span class="p">)</span>
 
 
-<span class="k">def</span><span class="w"> </span><span class="nf">_xycoords</span><span class="p">(</span><span class="n">bounds</span><span class="p">,</span> <span class="n">cellsizes</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Based on bounds and cellsizes, construct coords with spatial information&quot;&quot;&quot;</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">_xycoords</span><span class="p">(</span>
+    <span class="n">bounds</span><span class="p">:</span> <span class="nb">tuple</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="nb">float</span><span class="p">,</span> <span class="nb">float</span><span class="p">,</span> <span class="nb">float</span><span class="p">],</span> <span class="n">cellsizes</span><span class="p">:</span> <span class="nb">tuple</span><span class="p">[</span><span class="n">Any</span><span class="p">,</span> <span class="n">Any</span><span class="p">]</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]:</span>
+<span class="w">    </span><span class="sd">"""Based on bounds and cellsizes, construct coords with spatial information"""</span>
     <span class="c1"># unpack tuples</span>
     <span class="n">xmin</span><span class="p">,</span> <span class="n">xmax</span><span class="p">,</span> <span class="n">ymin</span><span class="p">,</span> <span class="n">ymax</span> <span class="o">=</span> <span class="n">bounds</span>
     <span class="n">dx</span><span class="p">,</span> <span class="n">dy</span> <span class="o">=</span> <span class="n">cellsizes</span>
     <span class="n">coords</span><span class="p">:</span> <span class="n">collections</span><span class="o">.</span><span class="n">OrderedDict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]</span> <span class="o">=</span> <span class="n">collections</span><span class="o">.</span><span class="n">OrderedDict</span><span class="p">()</span>
     <span class="c1"># from cell size to x and y coordinates</span>
     <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">dx</span><span class="p">,</span> <span class="p">(</span><span class="nb">int</span><span class="p">,</span> <span class="nb">float</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">int_</span><span class="p">)):</span>  <span class="c1"># equidistant</span>
-        <span class="n">coords</span><span class="p">[</span><span class="s2">&quot;x&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="n">xmin</span> <span class="o">+</span> <span class="n">dx</span> <span class="o">/</span> <span class="mf">2.0</span><span class="p">,</span> <span class="n">xmax</span><span class="p">,</span> <span class="n">dx</span><span class="p">)</span>
-        <span class="n">coords</span><span class="p">[</span><span class="s2">&quot;y&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="n">ymax</span> <span class="o">+</span> <span class="n">dy</span> <span class="o">/</span> <span class="mf">2.0</span><span class="p">,</span> <span class="n">ymin</span><span class="p">,</span> <span class="n">dy</span><span class="p">)</span>
-        <span class="n">coords</span><span class="p">[</span><span class="s2">&quot;dx&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="nb">float</span><span class="p">(</span><span class="n">dx</span><span class="p">))</span>
-        <span class="n">coords</span><span class="p">[</span><span class="s2">&quot;dy&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="nb">float</span><span class="p">(</span><span class="n">dy</span><span class="p">))</span>
+        <span class="n">coords</span><span class="p">[</span><span class="s2">"x"</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="n">xmin</span> <span class="o">+</span> <span class="n">dx</span> <span class="o">/</span> <span class="mf">2.0</span><span class="p">,</span> <span class="n">xmax</span><span class="p">,</span> <span class="n">dx</span><span class="p">)</span>
+        <span class="n">coords</span><span class="p">[</span><span class="s2">"y"</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="n">ymax</span> <span class="o">+</span> <span class="n">dy</span> <span class="o">/</span> <span class="mf">2.0</span><span class="p">,</span> <span class="n">ymin</span><span class="p">,</span> <span class="n">dy</span><span class="p">)</span>
+        <span class="n">coords</span><span class="p">[</span><span class="s2">"dx"</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="nb">float</span><span class="p">(</span><span class="n">dx</span><span class="p">))</span>
+        <span class="n">coords</span><span class="p">[</span><span class="s2">"dy"</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="nb">float</span><span class="p">(</span><span class="n">dy</span><span class="p">))</span>
     <span class="k">else</span><span class="p">:</span>  <span class="c1"># nonequidistant</span>
         <span class="c1"># even though IDF may store them as float32, we always convert them to float64</span>
         <span class="n">dx</span> <span class="o">=</span> <span class="n">dx</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">)</span>
         <span class="n">dy</span> <span class="o">=</span> <span class="n">dy</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">)</span>
-        <span class="n">coords</span><span class="p">[</span><span class="s2">&quot;x&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">xmin</span> <span class="o">+</span> <span class="n">np</span><span class="o">.</span><span class="n">cumsum</span><span class="p">(</span><span class="n">dx</span><span class="p">)</span> <span class="o">-</span> <span class="mf">0.5</span> <span class="o">*</span> <span class="n">dx</span>
-        <span class="n">coords</span><span class="p">[</span><span class="s2">&quot;y&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">ymax</span> <span class="o">+</span> <span class="n">np</span><span class="o">.</span><span class="n">cumsum</span><span class="p">(</span><span class="n">dy</span><span class="p">)</span> <span class="o">-</span> <span class="mf">0.5</span> <span class="o">*</span> <span class="n">dy</span>
+        <span class="n">coords</span><span class="p">[</span><span class="s2">"x"</span><span class="p">]</span> <span class="o">=</span> <span class="n">xmin</span> <span class="o">+</span> <span class="n">np</span><span class="o">.</span><span class="n">cumsum</span><span class="p">(</span><span class="n">dx</span><span class="p">)</span> <span class="o">-</span> <span class="mf">0.5</span> <span class="o">*</span> <span class="n">dx</span>
+        <span class="n">coords</span><span class="p">[</span><span class="s2">"y"</span><span class="p">]</span> <span class="o">=</span> <span class="n">ymax</span> <span class="o">+</span> <span class="n">np</span><span class="o">.</span><span class="n">cumsum</span><span class="p">(</span><span class="n">dy</span><span class="p">)</span> <span class="o">-</span> <span class="mf">0.5</span> <span class="o">*</span> <span class="n">dy</span>
         <span class="k">if</span> <span class="n">np</span><span class="o">.</span><span class="n">allclose</span><span class="p">(</span><span class="n">dx</span><span class="p">,</span> <span class="n">dx</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span> <span class="ow">and</span> <span class="n">np</span><span class="o">.</span><span class="n">allclose</span><span class="p">(</span><span class="n">dy</span><span class="p">,</span> <span class="n">dy</span><span class="p">[</span><span class="mi">0</span><span class="p">]):</span>
-            <span class="n">coords</span><span class="p">[</span><span class="s2">&quot;dx&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="nb">float</span><span class="p">(</span><span class="n">dx</span><span class="p">[</span><span class="mi">0</span><span class="p">]))</span>
-            <span class="n">coords</span><span class="p">[</span><span class="s2">&quot;dy&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="nb">float</span><span class="p">(</span><span class="n">dy</span><span class="p">[</span><span class="mi">0</span><span class="p">]))</span>
+            <span class="n">coords</span><span class="p">[</span><span class="s2">"dx"</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="nb">float</span><span class="p">(</span><span class="n">dx</span><span class="p">[</span><span class="mi">0</span><span class="p">]))</span>
+            <span class="n">coords</span><span class="p">[</span><span class="s2">"dy"</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="nb">float</span><span class="p">(</span><span class="n">dy</span><span class="p">[</span><span class="mi">0</span><span class="p">]))</span>
         <span class="k">else</span><span class="p">:</span>
-            <span class="n">coords</span><span class="p">[</span><span class="s2">&quot;dx&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="s2">&quot;x&quot;</span><span class="p">,</span> <span class="n">dx</span><span class="p">)</span>
-            <span class="n">coords</span><span class="p">[</span><span class="s2">&quot;dy&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="s2">&quot;y&quot;</span><span class="p">,</span> <span class="n">dy</span><span class="p">)</span>
+            <span class="n">coords</span><span class="p">[</span><span class="s2">"dx"</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="s2">"x"</span><span class="p">,</span> <span class="n">dx</span><span class="p">)</span>
+            <span class="n">coords</span><span class="p">[</span><span class="s2">"dy"</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="s2">"y"</span><span class="p">,</span> <span class="n">dy</span><span class="p">)</span>
     <span class="k">return</span> <span class="n">coords</span>
 
 
 <div class="viewcode-block" id="coord_reference">
 <a class="viewcode-back" href="../../../api/generated/util/imod.util.coord_reference.html#imod.util.coord_reference">[docs]</a>
-<span class="k">def</span><span class="w"> </span><span class="nf">coord_reference</span><span class="p">(</span><span class="n">da_coord</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="nb">float</span><span class="p">,</span> <span class="nb">float</span><span class="p">]:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">coord_reference</span><span class="p">(</span><span class="n">da_coord</span><span class="p">:</span> <span class="n">xr</span><span class="o">.</span><span class="n">DataArray</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">tuple</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="nb">float</span><span class="p">,</span> <span class="nb">float</span><span class="p">]:</span>
+<span class="w">    </span><span class="sd">"""</span>
 <span class="sd">    Extracts dx, xmin, xmax for a coordinate DataArray, where x is any coordinate.</span>
 
 <span class="sd">    If the DataArray coordinates are nonequidistant, dx will be returned as</span>
@@ -526,11 +529,11 @@
 <span class="sd">    --------------</span>
 <span class="sd">    tuple</span>
 <span class="sd">        (dx, xmin, xmax) for a coordinate x</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="n">x</span> <span class="o">=</span> <span class="n">da_coord</span><span class="o">.</span><span class="n">values</span>
 
     <span class="c1"># Possibly non-equidistant</span>
-    <span class="n">dx_string</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;d</span><span class="si">{</span><span class="n">da_coord</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2">&quot;</span>
+    <span class="n">dx_string</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">"d</span><span class="si">{</span><span class="n">da_coord</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2">"</span>
     <span class="k">if</span> <span class="n">dx_string</span> <span class="ow">in</span> <span class="n">da_coord</span><span class="o">.</span><span class="n">coords</span><span class="p">:</span>
         <span class="n">dx</span> <span class="o">=</span> <span class="n">da_coord</span><span class="o">.</span><span class="n">coords</span><span class="p">[</span><span class="n">dx_string</span><span class="p">]</span>
         <span class="k">if</span> <span class="p">(</span><span class="n">dx</span><span class="o">.</span><span class="n">shape</span> <span class="o">==</span> <span class="n">x</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span> <span class="ow">and</span> <span class="p">(</span><span class="n">dx</span><span class="o">.</span><span class="n">size</span> <span class="o">!=</span> <span class="mi">1</span><span class="p">):</span>
@@ -553,8 +556,8 @@
             <span class="n">xmax</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">x</span><span class="o">.</span><span class="n">max</span><span class="p">())</span> <span class="o">+</span> <span class="mf">0.5</span> <span class="o">*</span> <span class="nb">abs</span><span class="p">(</span><span class="n">dx</span><span class="p">)</span>
     <span class="k">elif</span> <span class="n">x</span><span class="o">.</span><span class="n">size</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
         <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
-            <span class="sa">f</span><span class="s2">&quot;DataArray has size 1 along </span><span class="si">{</span><span class="n">da_coord</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2">, so cellsize must be provided&quot;</span>
-            <span class="sa">f</span><span class="s2">&quot; as a coordinate named d</span><span class="si">{</span><span class="n">da_coord</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2">.&quot;</span>
+            <span class="sa">f</span><span class="s2">"DataArray has size 1 along </span><span class="si">{</span><span class="n">da_coord</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2">, so cellsize must be provided"</span>
+            <span class="sa">f</span><span class="s2">" as a coordinate named d</span><span class="si">{</span><span class="n">da_coord</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2">."</span>
         <span class="p">)</span>
     <span class="k">else</span><span class="p">:</span>  <span class="c1"># Equidistant</span>
         <span class="c1"># TODO: decide on decent criterium for what equidistant means</span>
@@ -565,8 +568,8 @@
         <span class="n">atolx</span> <span class="o">=</span> <span class="nb">abs</span><span class="p">(</span><span class="mf">1.0e-4</span> <span class="o">*</span> <span class="n">dx</span><span class="p">)</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="n">np</span><span class="o">.</span><span class="n">allclose</span><span class="p">(</span><span class="n">dxs</span><span class="p">,</span> <span class="n">dx</span><span class="p">,</span> <span class="n">atolx</span><span class="p">):</span>
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
-                <span class="sa">f</span><span class="s2">&quot;DataArray has to be equidistant along </span><span class="si">{</span><span class="n">da_coord</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2">, or cellsizes&quot;</span>
-                <span class="sa">f</span><span class="s2">&quot; must be provided as a coordinate named d</span><span class="si">{</span><span class="n">da_coord</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2">.&quot;</span>
+                <span class="sa">f</span><span class="s2">"DataArray has to be equidistant along </span><span class="si">{</span><span class="n">da_coord</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2">, or cellsizes"</span>
+                <span class="sa">f</span><span class="s2">" must be provided as a coordinate named d</span><span class="si">{</span><span class="n">da_coord</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2">."</span>
             <span class="p">)</span>
 
         <span class="c1"># as xarray uses midpoint coordinates</span>
@@ -580,26 +583,26 @@
 <div class="viewcode-block" id="spatial_reference">
 <a class="viewcode-back" href="../../../api/generated/util/imod.util.spatial_reference.html#imod.util.spatial_reference">[docs]</a>
 <span class="k">def</span><span class="w"> </span><span class="nf">spatial_reference</span><span class="p">(</span>
-    <span class="n">a</span><span class="p">:</span> <span class="n">xr</span><span class="o">.</span><span class="n">DataArray</span><span class="p">,</span>
-<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="nb">float</span><span class="p">,</span> <span class="nb">float</span><span class="p">,</span> <span class="nb">float</span><span class="p">,</span> <span class="nb">float</span><span class="p">,</span> <span class="nb">float</span><span class="p">]:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Extracts spatial reference from DataArray.</span>
+    <span class="n">a</span><span class="p">:</span> <span class="n">xr</span><span class="o">.</span><span class="n">DataArray</span> <span class="o">|</span> <span class="n">xr</span><span class="o">.</span><span class="n">Dataset</span><span class="p">,</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">tuple</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="nb">float</span><span class="p">,</span> <span class="nb">float</span><span class="p">,</span> <span class="nb">float</span><span class="p">,</span> <span class="nb">float</span><span class="p">,</span> <span class="nb">float</span><span class="p">]:</span>
+<span class="w">    </span><span class="sd">"""</span>
+<span class="sd">    Extracts spatial reference from DataArray or Dataset.</span>
 
 <span class="sd">    If the DataArray coordinates are nonequidistant, dx and dy will be returned</span>
 <span class="sd">    as 1D ndarray instead of float.</span>
 
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
-<span class="sd">    a : xarray.DataArray</span>
+<span class="sd">    a : xarray.DataArray or xarray.Dataset</span>
 
 <span class="sd">    Returns</span>
 <span class="sd">    --------------</span>
 <span class="sd">    tuple</span>
 <span class="sd">        (dx, xmin, xmax, dy, ymin, ymax)</span>
 
-<span class="sd">    &quot;&quot;&quot;</span>
-    <span class="n">dx</span><span class="p">,</span> <span class="n">xmin</span><span class="p">,</span> <span class="n">xmax</span> <span class="o">=</span> <span class="n">coord_reference</span><span class="p">(</span><span class="n">a</span><span class="p">[</span><span class="s2">&quot;x&quot;</span><span class="p">])</span>
-    <span class="n">dy</span><span class="p">,</span> <span class="n">ymin</span><span class="p">,</span> <span class="n">ymax</span> <span class="o">=</span> <span class="n">coord_reference</span><span class="p">(</span><span class="n">a</span><span class="p">[</span><span class="s2">&quot;y&quot;</span><span class="p">])</span>
+<span class="sd">    """</span>
+    <span class="n">dx</span><span class="p">,</span> <span class="n">xmin</span><span class="p">,</span> <span class="n">xmax</span> <span class="o">=</span> <span class="n">coord_reference</span><span class="p">(</span><span class="n">a</span><span class="p">[</span><span class="s2">"x"</span><span class="p">])</span>
+    <span class="n">dy</span><span class="p">,</span> <span class="n">ymin</span><span class="p">,</span> <span class="n">ymax</span> <span class="o">=</span> <span class="n">coord_reference</span><span class="p">(</span><span class="n">a</span><span class="p">[</span><span class="s2">"y"</span><span class="p">])</span>
     <span class="k">return</span> <span class="n">dx</span><span class="p">,</span> <span class="n">xmin</span><span class="p">,</span> <span class="n">xmax</span><span class="p">,</span> <span class="n">dy</span><span class="p">,</span> <span class="n">ymin</span><span class="p">,</span> <span class="n">ymax</span></div>
 
 
@@ -607,7 +610,7 @@
 <div class="viewcode-block" id="transform">
 <a class="viewcode-back" href="../../../api/generated/util/imod.util.transform.html#imod.util.transform">[docs]</a>
 <span class="k">def</span><span class="w"> </span><span class="nf">transform</span><span class="p">(</span><span class="n">a</span><span class="p">:</span> <span class="n">xr</span><span class="o">.</span><span class="n">DataArray</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">affine</span><span class="o">.</span><span class="n">Affine</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">"""</span>
 <span class="sd">    Extract the spatial reference information from the DataArray coordinates,</span>
 <span class="sd">    into an affine.Affine object for writing to e.g. rasterio supported formats.</span>
 
@@ -619,31 +622,31 @@
 <span class="sd">    -------</span>
 <span class="sd">    affine.Affine</span>
 
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="n">dx</span><span class="p">,</span> <span class="n">xmin</span><span class="p">,</span> <span class="n">_</span><span class="p">,</span> <span class="n">dy</span><span class="p">,</span> <span class="n">_</span><span class="p">,</span> <span class="n">ymax</span> <span class="o">=</span> <span class="n">spatial_reference</span><span class="p">(</span><span class="n">a</span><span class="p">)</span>
 
-    <span class="k">def</span><span class="w"> </span><span class="nf">equidistant</span><span class="p">(</span><span class="n">dx</span><span class="p">,</span> <span class="n">name</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">equidistant</span><span class="p">(</span><span class="n">dx</span><span class="p">:</span> <span class="nb">float</span> <span class="o">|</span> <span class="n">FloatArray</span><span class="p">,</span> <span class="n">name</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
         <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">dx</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">):</span>
             <span class="k">if</span> <span class="n">np</span><span class="o">.</span><span class="n">unique</span><span class="p">(</span><span class="n">dx</span><span class="p">)</span><span class="o">.</span><span class="n">size</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
                 <span class="k">return</span> <span class="n">dx</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
             <span class="k">else</span><span class="p">:</span>
-                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;DataArray is not equidistant along </span><span class="si">{</span><span class="n">name</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">"DataArray is not equidistant along </span><span class="si">{</span><span class="n">name</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="k">return</span> <span class="n">dx</span>
 
-    <span class="n">dx</span> <span class="o">=</span> <span class="n">equidistant</span><span class="p">(</span><span class="n">dx</span><span class="p">,</span> <span class="s2">&quot;x&quot;</span><span class="p">)</span>
-    <span class="n">dy</span> <span class="o">=</span> <span class="n">equidistant</span><span class="p">(</span><span class="n">dy</span><span class="p">,</span> <span class="s2">&quot;y&quot;</span><span class="p">)</span>
+    <span class="n">dx</span> <span class="o">=</span> <span class="n">equidistant</span><span class="p">(</span><span class="n">dx</span><span class="p">,</span> <span class="s2">"x"</span><span class="p">)</span>
+    <span class="n">dy</span> <span class="o">=</span> <span class="n">equidistant</span><span class="p">(</span><span class="n">dy</span><span class="p">,</span> <span class="s2">"y"</span><span class="p">)</span>
 
     <span class="k">if</span> <span class="n">dx</span> <span class="o">&lt;</span> <span class="mf">0.0</span><span class="p">:</span>
-        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;dx must be positive&quot;</span><span class="p">)</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">"dx must be positive"</span><span class="p">)</span>
     <span class="k">if</span> <span class="n">dy</span> <span class="o">&gt;</span> <span class="mf">0.0</span><span class="p">:</span>
-        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;dy must be negative&quot;</span><span class="p">)</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">"dy must be negative"</span><span class="p">)</span>
     <span class="k">return</span> <span class="n">affine</span><span class="o">.</span><span class="n">Affine</span><span class="p">(</span><span class="n">dx</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">,</span> <span class="n">xmin</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">,</span> <span class="n">dy</span><span class="p">,</span> <span class="n">ymax</span><span class="p">)</span></div>
 
 
 
 <span class="k">def</span><span class="w"> </span><span class="nf">ugrid2d_data</span><span class="p">(</span><span class="n">da</span><span class="p">:</span> <span class="n">xr</span><span class="o">.</span><span class="n">DataArray</span><span class="p">,</span> <span class="n">face_dim</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">xr</span><span class="o">.</span><span class="n">DataArray</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">"""</span>
 <span class="sd">    Reshape a structured (x, y) DataArray into unstructured (face) form.</span>
 <span class="sd">    Extra dimensions are maintained:</span>
 <span class="sd">    e.g. (time, layer, x, y) becomes (time, layer, face).</span>
@@ -651,14 +654,14 @@
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
 <span class="sd">    da: xr.DataArray</span>
-<span class="sd">        Structured DataArray with last two dimensions (&quot;y&quot;, &quot;x&quot;).</span>
+<span class="sd">        Structured DataArray with last two dimensions ("y", "x").</span>
 
 <span class="sd">    Returns</span>
 <span class="sd">    -------</span>
-<span class="sd">    Unstructured DataArray with dimensions (&quot;y&quot;, &quot;x&quot;) replaced by (&quot;face&quot;,).</span>
-<span class="sd">    &quot;&quot;&quot;</span>
-    <span class="k">if</span> <span class="n">da</span><span class="o">.</span><span class="n">dims</span><span class="p">[</span><span class="o">-</span><span class="mi">2</span><span class="p">:]</span> <span class="o">!=</span> <span class="p">(</span><span class="s2">&quot;y&quot;</span><span class="p">,</span> <span class="s2">&quot;x&quot;</span><span class="p">):</span>
-        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;Last two dimensions of da must be (&quot;y&quot;, &quot;x&quot;)&#39;</span><span class="p">)</span>
+<span class="sd">    Unstructured DataArray with dimensions ("y", "x") replaced by ("face",).</span>
+<span class="sd">    """</span>
+    <span class="k">if</span> <span class="n">da</span><span class="o">.</span><span class="n">dims</span><span class="p">[</span><span class="o">-</span><span class="mi">2</span><span class="p">:]</span> <span class="o">!=</span> <span class="p">(</span><span class="s2">"y"</span><span class="p">,</span> <span class="s2">"x"</span><span class="p">):</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">'Last two dimensions of da must be ("y", "x")'</span><span class="p">)</span>
     <span class="n">dims</span> <span class="o">=</span> <span class="n">da</span><span class="o">.</span><span class="n">dims</span><span class="p">[:</span><span class="o">-</span><span class="mi">2</span><span class="p">]</span>
     <span class="n">coords</span> <span class="o">=</span> <span class="p">{</span><span class="n">k</span><span class="p">:</span> <span class="n">da</span><span class="o">.</span><span class="n">coords</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">dims</span><span class="p">}</span>
     <span class="k">return</span> <span class="n">xr</span><span class="o">.</span><span class="n">DataArray</span><span class="p">(</span>
@@ -670,9 +673,9 @@
 
 
 <span class="k">def</span><span class="w"> </span><span class="nf">unstack_dim_into_variable</span><span class="p">(</span><span class="n">dataset</span><span class="p">:</span> <span class="n">GridDataset</span><span class="p">,</span> <span class="n">dim</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">GridDataset</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">"""</span>
 <span class="sd">    Unstack each variable containing ``dim`` into separate variables.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="n">unstacked</span> <span class="o">=</span> <span class="n">dataset</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
 
     <span class="n">variables_containing_dim</span> <span class="o">=</span> <span class="p">[</span>
@@ -683,7 +686,7 @@
         <span class="n">stacked</span> <span class="o">=</span> <span class="n">unstacked</span><span class="p">[</span><span class="n">variable</span><span class="p">]</span>
         <span class="n">unstacked</span> <span class="o">=</span> <span class="n">unstacked</span><span class="o">.</span><span class="n">drop_vars</span><span class="p">(</span><span class="n">variable</span><span class="p">)</span>  <span class="c1"># type: ignore</span>
         <span class="k">for</span> <span class="n">index</span> <span class="ow">in</span> <span class="n">stacked</span><span class="p">[</span><span class="n">dim</span><span class="p">]</span><span class="o">.</span><span class="n">values</span><span class="p">:</span>
-            <span class="n">unstacked</span><span class="p">[</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">variable</span><span class="si">}</span><span class="s2">_</span><span class="si">{</span><span class="n">dim</span><span class="si">}</span><span class="s2">_</span><span class="si">{</span><span class="n">index</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">stacked</span><span class="o">.</span><span class="n">sel</span><span class="p">(</span>
+            <span class="n">unstacked</span><span class="p">[</span><span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">variable</span><span class="si">}</span><span class="s2">_</span><span class="si">{</span><span class="n">dim</span><span class="si">}</span><span class="s2">_</span><span class="si">{</span><span class="n">index</span><span class="si">}</span><span class="s2">"</span><span class="p">]</span> <span class="o">=</span> <span class="n">stacked</span><span class="o">.</span><span class="n">sel</span><span class="p">(</span>
                 <span class="n">indexers</span><span class="o">=</span><span class="p">{</span><span class="n">dim</span><span class="p">:</span> <span class="n">index</span><span class="p">},</span> <span class="n">drop</span><span class="o">=</span><span class="kc">True</span>
             <span class="p">)</span>
     <span class="k">if</span> <span class="n">dim</span> <span class="ow">in</span> <span class="n">unstacked</span><span class="o">.</span><span class="n">coords</span><span class="p">:</span>
@@ -693,10 +696,8 @@
 
 <div class="viewcode-block" id="mdal_compliant_ugrid2d">
 <a class="viewcode-back" href="../../../api/generated/util/imod.util.mdal_compliant_ugrid2d.html#imod.util.mdal_compliant_ugrid2d">[docs]</a>
-<span class="k">def</span><span class="w"> </span><span class="nf">mdal_compliant_ugrid2d</span><span class="p">(</span>
-    <span class="n">dataset</span><span class="p">:</span> <span class="n">xr</span><span class="o">.</span><span class="n">Dataset</span><span class="p">,</span> <span class="n">crs</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Any</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
-<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">xr</span><span class="o">.</span><span class="n">Dataset</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">mdal_compliant_ugrid2d</span><span class="p">(</span><span class="n">dataset</span><span class="p">:</span> <span class="n">xr</span><span class="o">.</span><span class="n">Dataset</span><span class="p">,</span> <span class="n">crs</span><span class="p">:</span> <span class="n">Any</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">xr</span><span class="o">.</span><span class="n">Dataset</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">"""</span>
 <span class="sd">    Ensures the xarray Dataset will be written to a UGRID netCDF that will be</span>
 <span class="sd">    accepted by MDAL.</span>
 
@@ -716,30 +717,30 @@
 <span class="sd">    -------</span>
 <span class="sd">    unstacked: xr.Dataset</span>
 
-<span class="sd">    &quot;&quot;&quot;</span>
-    <span class="n">ds</span> <span class="o">=</span> <span class="n">unstack_dim_into_variable</span><span class="p">(</span><span class="n">dataset</span><span class="p">,</span> <span class="s2">&quot;layer&quot;</span><span class="p">)</span>
+<span class="sd">    """</span>
+    <span class="n">ds</span> <span class="o">=</span> <span class="n">unstack_dim_into_variable</span><span class="p">(</span><span class="n">dataset</span><span class="p">,</span> <span class="s2">"layer"</span><span class="p">)</span>
 
     <span class="c1"># Find topology variables</span>
     <span class="k">for</span> <span class="n">variable</span> <span class="ow">in</span> <span class="n">ds</span><span class="o">.</span><span class="n">data_vars</span><span class="p">:</span>
         <span class="n">attrs</span> <span class="o">=</span> <span class="n">ds</span><span class="p">[</span><span class="n">variable</span><span class="p">]</span><span class="o">.</span><span class="n">attrs</span>
-        <span class="k">if</span> <span class="n">attrs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;cf_role&quot;</span><span class="p">)</span> <span class="o">==</span> <span class="s2">&quot;mesh_topology&quot;</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">attrs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"cf_role"</span><span class="p">)</span> <span class="o">==</span> <span class="s2">"mesh_topology"</span><span class="p">:</span>
             <span class="c1"># Possible attributes:</span>
             <span class="c1">#</span>
-            <span class="c1"># &quot;cf_role&quot;</span>
-            <span class="c1"># &quot;long_name&quot;</span>
-            <span class="c1"># &quot;topology_dimension&quot;</span>
-            <span class="c1"># &quot;node_dimension&quot;: required</span>
-            <span class="c1"># &quot;node_coordinates&quot;: required</span>
-            <span class="c1"># &quot;edge_dimension&quot;: optional</span>
-            <span class="c1"># &quot;edge_node_connectivity&quot;: optional</span>
-            <span class="c1"># &quot;face_dimension&quot;: required</span>
-            <span class="c1"># &quot;face_node_connectivity&quot;: required</span>
-            <span class="c1"># &quot;max_face_nodes_dimension&quot;: required</span>
-            <span class="c1"># &quot;face_coordinates&quot;: optional</span>
+            <span class="c1"># "cf_role"</span>
+            <span class="c1"># "long_name"</span>
+            <span class="c1"># "topology_dimension"</span>
+            <span class="c1"># "node_dimension": required</span>
+            <span class="c1"># "node_coordinates": required</span>
+            <span class="c1"># "edge_dimension": optional</span>
+            <span class="c1"># "edge_node_connectivity": optional</span>
+            <span class="c1"># "face_dimension": required</span>
+            <span class="c1"># "face_node_connectivity": required</span>
+            <span class="c1"># "max_face_nodes_dimension": required</span>
+            <span class="c1"># "face_coordinates": optional</span>
 
-            <span class="n">node_dim</span> <span class="o">=</span> <span class="n">attrs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;node_dimension&quot;</span><span class="p">)</span>
-            <span class="n">edge_dim</span> <span class="o">=</span> <span class="n">attrs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;edge_dimension&quot;</span><span class="p">)</span>
-            <span class="n">face_dim</span> <span class="o">=</span> <span class="n">attrs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;face_dimension&quot;</span><span class="p">)</span>
+            <span class="n">node_dim</span> <span class="o">=</span> <span class="n">attrs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"node_dimension"</span><span class="p">)</span>
+            <span class="n">edge_dim</span> <span class="o">=</span> <span class="n">attrs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"edge_dimension"</span><span class="p">)</span>
+            <span class="n">face_dim</span> <span class="o">=</span> <span class="n">attrs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"face_dimension"</span><span class="p">)</span>
 
             <span class="c1"># Drop the coordinates on the UGRID dimensions</span>
             <span class="n">to_drop</span> <span class="o">=</span> <span class="p">[]</span>
@@ -749,26 +750,26 @@
             <span class="n">ds</span> <span class="o">=</span> <span class="n">ds</span><span class="o">.</span><span class="n">drop_vars</span><span class="p">(</span><span class="n">to_drop</span><span class="p">)</span>
 
             <span class="k">if</span> <span class="n">edge_dim</span> <span class="ow">and</span> <span class="n">edge_dim</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">ds</span><span class="o">.</span><span class="n">dims</span><span class="p">:</span>
-                <span class="n">attrs</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s2">&quot;edge_dimension&quot;</span><span class="p">)</span>
+                <span class="n">attrs</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s2">"edge_dimension"</span><span class="p">)</span>
 
-            <span class="n">face_coords</span> <span class="o">=</span> <span class="n">attrs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;face_coordinates&quot;</span><span class="p">)</span>
+            <span class="n">face_coords</span> <span class="o">=</span> <span class="n">attrs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"face_coordinates"</span><span class="p">)</span>
             <span class="k">if</span> <span class="n">face_coords</span> <span class="ow">and</span> <span class="n">face_coords</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">ds</span><span class="o">.</span><span class="n">coords</span><span class="p">:</span>
-                <span class="n">attrs</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s2">&quot;face_coordinates&quot;</span><span class="p">)</span>
+                <span class="n">attrs</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s2">"face_coordinates"</span><span class="p">)</span>
 
-            <span class="n">edge_nodes</span> <span class="o">=</span> <span class="n">attrs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;edge_node_connectivity&quot;</span><span class="p">)</span>
+            <span class="n">edge_nodes</span> <span class="o">=</span> <span class="n">attrs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"edge_node_connectivity"</span><span class="p">)</span>
             <span class="k">if</span> <span class="n">edge_nodes</span> <span class="ow">and</span> <span class="n">edge_nodes</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">ds</span><span class="p">:</span>
-                <span class="n">attrs</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s2">&quot;edge_node_connectivity&quot;</span><span class="p">)</span>
+                <span class="n">attrs</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s2">"edge_node_connectivity"</span><span class="p">)</span>
 
     <span class="k">if</span> <span class="n">crs</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
         <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">rioxarray</span><span class="p">,</span> <span class="n">MissingOptionalModule</span><span class="p">):</span>
-            <span class="k">raise</span> <span class="ne">ModuleNotFoundError</span><span class="p">(</span><span class="s2">&quot;rioxarray is required for this functionality&quot;</span><span class="p">)</span>
+            <span class="k">raise</span> <span class="ne">ModuleNotFoundError</span><span class="p">(</span><span class="s2">"rioxarray is required for this functionality"</span><span class="p">)</span>
         <span class="n">ds</span><span class="o">.</span><span class="n">rio</span><span class="o">.</span><span class="n">write_crs</span><span class="p">(</span><span class="n">crs</span><span class="p">,</span> <span class="n">inplace</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 
     <span class="c1"># Make sure time is encoded as a float for MDAL</span>
     <span class="c1"># TODO: MDAL requires all data variables to be float (this excludes the UGRID topology data)</span>
     <span class="k">for</span> <span class="n">var</span> <span class="ow">in</span> <span class="n">ds</span><span class="o">.</span><span class="n">coords</span><span class="p">:</span>
         <span class="k">if</span> <span class="n">np</span><span class="o">.</span><span class="n">issubdtype</span><span class="p">(</span><span class="n">ds</span><span class="p">[</span><span class="n">var</span><span class="p">]</span><span class="o">.</span><span class="n">dtype</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">datetime64</span><span class="p">):</span>
-            <span class="n">ds</span><span class="p">[</span><span class="n">var</span><span class="p">]</span><span class="o">.</span><span class="n">encoding</span><span class="p">[</span><span class="s2">&quot;dtype&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">float64</span>
+            <span class="n">ds</span><span class="p">[</span><span class="n">var</span><span class="p">]</span><span class="o">.</span><span class="n">encoding</span><span class="p">[</span><span class="s2">"dtype"</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">float64</span>
 
     <span class="k">return</span> <span class="n">ds</span></div>
 
@@ -777,7 +778,7 @@
 <div class="viewcode-block" id="from_mdal_compliant_ugrid2d">
 <a class="viewcode-back" href="../../../api/generated/util/imod.util.from_mdal_compliant_ugrid2d.html#imod.util.from_mdal_compliant_ugrid2d">[docs]</a>
 <span class="k">def</span><span class="w"> </span><span class="nf">from_mdal_compliant_ugrid2d</span><span class="p">(</span><span class="n">dataset</span><span class="p">:</span> <span class="n">xu</span><span class="o">.</span><span class="n">UgridDataset</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">xu</span><span class="o">.</span><span class="n">UgridDataset</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">"""</span>
 <span class="sd">    Undo some of the changes of ``mdal_compliant_ugrid2d``: re-stack the</span>
 <span class="sd">    layers.</span>
 
@@ -789,9 +790,9 @@
 <span class="sd">    -------</span>
 <span class="sd">    restacked: xugrid.UgridDataset</span>
 
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="n">ds</span> <span class="o">=</span> <span class="n">dataset</span><span class="o">.</span><span class="n">ugrid</span><span class="o">.</span><span class="n">obj</span>
-    <span class="n">pattern</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">compile</span><span class="p">(</span><span class="sa">r</span><span class="s2">&quot;(\w+)_layer_(\d+)&quot;</span><span class="p">)</span>
+    <span class="n">pattern</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">compile</span><span class="p">(</span><span class="sa">r</span><span class="s2">"(\w+)_layer_(\d+)"</span><span class="p">)</span>
     <span class="n">matches</span> <span class="o">=</span> <span class="p">[(</span><span class="n">variable</span><span class="p">,</span> <span class="n">pattern</span><span class="o">.</span><span class="n">search</span><span class="p">(</span><span class="n">variable</span><span class="p">))</span> <span class="k">for</span> <span class="n">variable</span> <span class="ow">in</span> <span class="n">ds</span><span class="o">.</span><span class="n">data_vars</span><span class="p">]</span>
     <span class="n">matches</span> <span class="o">=</span> <span class="p">[(</span><span class="n">variable</span><span class="p">,</span> <span class="n">match</span><span class="p">)</span> <span class="k">for</span> <span class="p">(</span><span class="n">variable</span><span class="p">,</span> <span class="n">match</span><span class="p">)</span> <span class="ow">in</span> <span class="n">matches</span> <span class="k">if</span> <span class="n">match</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">]</span>
     <span class="k">if</span> <span class="ow">not</span> <span class="n">matches</span><span class="p">:</span>
@@ -811,15 +812,15 @@
     <span class="c1"># Concatenate, and make sure the dimension order is natural.</span>
     <span class="n">ugrid_dims</span> <span class="o">=</span> <span class="p">{</span><span class="n">dim</span> <span class="k">for</span> <span class="n">grid</span> <span class="ow">in</span> <span class="n">dataset</span><span class="o">.</span><span class="n">ugrid</span><span class="o">.</span><span class="n">grids</span> <span class="k">for</span> <span class="n">dim</span> <span class="ow">in</span> <span class="n">grid</span><span class="o">.</span><span class="n">sizes</span><span class="o">.</span><span class="n">keys</span><span class="p">()}</span>
     <span class="k">for</span> <span class="n">variable</span><span class="p">,</span> <span class="n">das</span> <span class="ow">in</span> <span class="n">grouped</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
-        <span class="n">da</span> <span class="o">=</span> <span class="n">xr</span><span class="o">.</span><span class="n">concat</span><span class="p">(</span><span class="nb">sorted</span><span class="p">(</span><span class="n">das</span><span class="p">,</span> <span class="n">key</span><span class="o">=</span><span class="k">lambda</span> <span class="n">da</span><span class="p">:</span> <span class="n">da</span><span class="p">[</span><span class="s2">&quot;layer&quot;</span><span class="p">]),</span> <span class="n">dim</span><span class="o">=</span><span class="s2">&quot;layer&quot;</span><span class="p">)</span>
+        <span class="n">da</span> <span class="o">=</span> <span class="n">xr</span><span class="o">.</span><span class="n">concat</span><span class="p">(</span><span class="nb">sorted</span><span class="p">(</span><span class="n">das</span><span class="p">,</span> <span class="n">key</span><span class="o">=</span><span class="k">lambda</span> <span class="n">da</span><span class="p">:</span> <span class="n">da</span><span class="p">[</span><span class="s2">"layer"</span><span class="p">]),</span> <span class="n">dim</span><span class="o">=</span><span class="s2">"layer"</span><span class="p">)</span>
         <span class="n">newdims</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">da</span><span class="o">.</span><span class="n">dims</span><span class="p">)</span>
-        <span class="n">newdims</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="s2">&quot;layer&quot;</span><span class="p">)</span>
-        <span class="c1"># If it&#39;s a spatial dataset, the layer should be second last.</span>
+        <span class="n">newdims</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="s2">"layer"</span><span class="p">)</span>
+        <span class="c1"># If it's a spatial dataset, the layer should be second last.</span>
         <span class="k">if</span> <span class="n">ugrid_dims</span><span class="o">.</span><span class="n">intersection</span><span class="p">(</span><span class="n">newdims</span><span class="p">):</span>
-            <span class="n">newdims</span><span class="o">.</span><span class="n">insert</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="s2">&quot;layer&quot;</span><span class="p">)</span>
+            <span class="n">newdims</span><span class="o">.</span><span class="n">insert</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="s2">"layer"</span><span class="p">)</span>
         <span class="c1"># If not, the layer should be last.</span>
         <span class="k">else</span><span class="p">:</span>
-            <span class="n">newdims</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s2">&quot;layer&quot;</span><span class="p">)</span>
+            <span class="n">newdims</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s2">"layer"</span><span class="p">)</span>
         <span class="k">if</span> <span class="nb">tuple</span><span class="p">(</span><span class="n">newdims</span><span class="p">)</span> <span class="o">!=</span> <span class="n">da</span><span class="o">.</span><span class="n">dims</span><span class="p">:</span>
             <span class="n">da</span> <span class="o">=</span> <span class="n">da</span><span class="o">.</span><span class="n">transpose</span><span class="p">(</span><span class="o">*</span><span class="n">newdims</span><span class="p">)</span>
 
@@ -831,8 +832,8 @@
 
 <div class="viewcode-block" id="to_ugrid2d">
 <a class="viewcode-back" href="../../../api/generated/util/imod.util.to_ugrid2d.html#imod.util.to_ugrid2d">[docs]</a>
-<span class="k">def</span><span class="w"> </span><span class="nf">to_ugrid2d</span><span class="p">(</span><span class="n">data</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">xr</span><span class="o">.</span><span class="n">DataArray</span><span class="p">,</span> <span class="n">xr</span><span class="o">.</span><span class="n">Dataset</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">xr</span><span class="o">.</span><span class="n">Dataset</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">to_ugrid2d</span><span class="p">(</span><span class="n">data</span><span class="p">:</span> <span class="n">xr</span><span class="o">.</span><span class="n">DataArray</span> <span class="o">|</span> <span class="n">xr</span><span class="o">.</span><span class="n">Dataset</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">xr</span><span class="o">.</span><span class="n">Dataset</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">"""</span>
 <span class="sd">    Convert a structured DataArray or Dataset into its UGRID-2D quadrilateral</span>
 <span class="sd">    equivalent.</span>
 
@@ -842,19 +843,19 @@
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
 <span class="sd">    data: Union[xr.DataArray, xr.Dataset]</span>
-<span class="sd">        Dataset or DataArray with last two dimensions (&quot;y&quot;, &quot;x&quot;).</span>
+<span class="sd">        Dataset or DataArray with last two dimensions ("y", "x").</span>
 <span class="sd">        In case of a Dataset, the 2D topology is defined once and variables are</span>
 <span class="sd">        added one by one.</span>
 <span class="sd">        In case of a DataArray, a name is required; a name can be set with:</span>
-<span class="sd">        ``da.name = &quot;...&quot;``&#39;</span>
+<span class="sd">        ``da.name = "..."``'</span>
 
 <span class="sd">    Returns</span>
 <span class="sd">    -------</span>
 <span class="sd">    ugrid2d_dataset: xr.Dataset</span>
 <span class="sd">        The equivalent data, in UGRID-2D quadrilateral form.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="p">(</span><span class="n">xr</span><span class="o">.</span><span class="n">DataArray</span><span class="p">,</span> <span class="n">xr</span><span class="o">.</span><span class="n">Dataset</span><span class="p">)):</span>
-        <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">&quot;data must be xarray.DataArray or xr.Dataset&quot;</span><span class="p">)</span>
+        <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">"data must be xarray.DataArray or xr.Dataset"</span><span class="p">)</span>
 
     <span class="n">grid</span> <span class="o">=</span> <span class="n">xu</span><span class="o">.</span><span class="n">Ugrid2d</span><span class="o">.</span><span class="n">from_structured</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
     <span class="n">ds</span> <span class="o">=</span> <span class="n">grid</span><span class="o">.</span><span class="n">to_dataset</span><span class="p">()</span>
@@ -865,7 +866,7 @@
     <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">xr</span><span class="o">.</span><span class="n">DataArray</span><span class="p">):</span>
         <span class="k">if</span> <span class="n">data</span><span class="o">.</span><span class="n">name</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
-                <span class="s1">&#39;A name is required for the DataArray. It can be set with ``da.name = &quot;...&quot;`&#39;</span>
+                <span class="s1">'A name is required for the DataArray. It can be set with ``da.name = "..."`'</span>
             <span class="p">)</span>
         <span class="n">ds</span><span class="p">[</span><span class="n">data</span><span class="o">.</span><span class="n">name</span><span class="p">]</span> <span class="o">=</span> <span class="n">ugrid2d_data</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">grid</span><span class="o">.</span><span class="n">face_dimension</span><span class="p">)</span>
     <span class="k">return</span> <span class="n">mdal_compliant_ugrid2d</span><span class="p">(</span><span class="n">ds</span><span class="p">)</span></div>
@@ -873,10 +874,10 @@
 
 
 <span class="k">def</span><span class="w"> </span><span class="nf">gdal_compliant_grid</span><span class="p">(</span>
-    <span class="n">data</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">xr</span><span class="o">.</span><span class="n">DataArray</span><span class="p">,</span> <span class="n">xr</span><span class="o">.</span><span class="n">Dataset</span><span class="p">],</span>
-    <span class="n">crs</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Any</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Union</span><span class="p">[</span><span class="n">xr</span><span class="o">.</span><span class="n">DataArray</span><span class="p">,</span> <span class="n">xr</span><span class="o">.</span><span class="n">Dataset</span><span class="p">]:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+    <span class="n">data</span><span class="p">:</span> <span class="n">xr</span><span class="o">.</span><span class="n">DataArray</span> <span class="o">|</span> <span class="n">xr</span><span class="o">.</span><span class="n">Dataset</span><span class="p">,</span>
+    <span class="n">crs</span><span class="p">:</span> <span class="n">Any</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">xr</span><span class="o">.</span><span class="n">DataArray</span> <span class="o">|</span> <span class="n">xr</span><span class="o">.</span><span class="n">Dataset</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">"""</span>
 <span class="sd">    Assign attributes to x,y coordinates to make data accepted by GDAL.</span>
 
 <span class="sd">    Parameters</span>
@@ -890,39 +891,39 @@
 <span class="sd">    Returns</span>
 <span class="sd">    -------</span>
 <span class="sd">    data with attributes to be accepted by GDAL.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="n">x_attrs</span> <span class="o">=</span> <span class="p">{</span>
-        <span class="s2">&quot;axis&quot;</span><span class="p">:</span> <span class="s2">&quot;X&quot;</span><span class="p">,</span>
-        <span class="s2">&quot;long_name&quot;</span><span class="p">:</span> <span class="s2">&quot;x coordinate of projection&quot;</span><span class="p">,</span>
-        <span class="s2">&quot;standard_name&quot;</span><span class="p">:</span> <span class="s2">&quot;projection_x_coordinate&quot;</span><span class="p">,</span>
+        <span class="s2">"axis"</span><span class="p">:</span> <span class="s2">"X"</span><span class="p">,</span>
+        <span class="s2">"long_name"</span><span class="p">:</span> <span class="s2">"x coordinate of projection"</span><span class="p">,</span>
+        <span class="s2">"standard_name"</span><span class="p">:</span> <span class="s2">"projection_x_coordinate"</span><span class="p">,</span>
     <span class="p">}</span>
     <span class="n">y_attrs</span> <span class="o">=</span> <span class="p">{</span>
-        <span class="s2">&quot;axis&quot;</span><span class="p">:</span> <span class="s2">&quot;Y&quot;</span><span class="p">,</span>
-        <span class="s2">&quot;long_name&quot;</span><span class="p">:</span> <span class="s2">&quot;y coordinate of projection&quot;</span><span class="p">,</span>
-        <span class="s2">&quot;standard_name&quot;</span><span class="p">:</span> <span class="s2">&quot;projection_y_coordinate&quot;</span><span class="p">,</span>
+        <span class="s2">"axis"</span><span class="p">:</span> <span class="s2">"Y"</span><span class="p">,</span>
+        <span class="s2">"long_name"</span><span class="p">:</span> <span class="s2">"y coordinate of projection"</span><span class="p">,</span>
+        <span class="s2">"standard_name"</span><span class="p">:</span> <span class="s2">"projection_y_coordinate"</span><span class="p">,</span>
     <span class="p">}</span>
 
     <span class="c1"># Use of ``dims`` in xarray currently inconsistent between DataArray and</span>
     <span class="c1"># Dataset, therefore use .sizes.keys() to force getting the same thing.</span>
     <span class="c1"># FUTURE: change this to set(data.dims) when made consistent.</span>
     <span class="n">dims</span> <span class="o">=</span> <span class="p">{</span><span class="nb">str</span><span class="p">(</span><span class="n">k</span><span class="p">)</span> <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">data</span><span class="o">.</span><span class="n">sizes</span><span class="o">.</span><span class="n">keys</span><span class="p">()}</span>
-    <span class="n">missing_dims</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;x&quot;</span><span class="p">,</span> <span class="s2">&quot;y&quot;</span><span class="p">}</span> <span class="o">-</span> <span class="n">dims</span>
+    <span class="n">missing_dims</span> <span class="o">=</span> <span class="p">{</span><span class="s2">"x"</span><span class="p">,</span> <span class="s2">"y"</span><span class="p">}</span> <span class="o">-</span> <span class="n">dims</span>
 
     <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">missing_dims</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
-        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Missing dimensions: </span><span class="si">{</span><span class="n">missing_dims</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Missing dimensions: </span><span class="si">{</span><span class="n">missing_dims</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
 
-    <span class="n">x_coord_attrs</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">coords</span><span class="p">[</span><span class="s2">&quot;x&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">assign_attrs</span><span class="p">(</span><span class="n">x_attrs</span><span class="p">)</span>
-    <span class="n">y_coord_attrs</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">coords</span><span class="p">[</span><span class="s2">&quot;y&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">assign_attrs</span><span class="p">(</span><span class="n">y_attrs</span><span class="p">)</span>
+    <span class="n">x_coord_attrs</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">coords</span><span class="p">[</span><span class="s2">"x"</span><span class="p">]</span><span class="o">.</span><span class="n">assign_attrs</span><span class="p">(</span><span class="n">x_attrs</span><span class="p">)</span>
+    <span class="n">y_coord_attrs</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">coords</span><span class="p">[</span><span class="s2">"y"</span><span class="p">]</span><span class="o">.</span><span class="n">assign_attrs</span><span class="p">(</span><span class="n">y_attrs</span><span class="p">)</span>
 
     <span class="n">data_gdal</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">assign_coords</span><span class="p">(</span><span class="n">x</span><span class="o">=</span><span class="n">x_coord_attrs</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="n">y_coord_attrs</span><span class="p">)</span>
 
     <span class="k">if</span> <span class="n">crs</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
         <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">rioxarray</span><span class="p">,</span> <span class="n">MissingOptionalModule</span><span class="p">):</span>
-            <span class="k">raise</span> <span class="ne">ModuleNotFoundError</span><span class="p">(</span><span class="s2">&quot;rioxarray is required for this functionality&quot;</span><span class="p">)</span>
+            <span class="k">raise</span> <span class="ne">ModuleNotFoundError</span><span class="p">(</span><span class="s2">"rioxarray is required for this functionality"</span><span class="p">)</span>
         <span class="k">elif</span> <span class="p">(</span><span class="n">data_gdal</span><span class="o">.</span><span class="n">rio</span><span class="o">.</span><span class="n">crs</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">)</span> <span class="ow">and</span> <span class="p">(</span><span class="n">data_gdal</span><span class="o">.</span><span class="n">rio</span><span class="o">.</span><span class="n">crs</span> <span class="o">!=</span> <span class="n">crs</span><span class="p">):</span>
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
-                <span class="s2">&quot;Grid already has CRS different then provided CRS. &quot;</span>
-                <span class="sa">f</span><span class="s2">&quot;Grid has </span><span class="si">{</span><span class="n">data_gdal</span><span class="o">.</span><span class="n">rio</span><span class="o">.</span><span class="n">crs</span><span class="si">}</span><span class="s2">, got </span><span class="si">{</span><span class="n">crs</span><span class="si">}</span><span class="s2">.&quot;</span>
+                <span class="s2">"Grid already has CRS different then provided CRS. "</span>
+                <span class="sa">f</span><span class="s2">"Grid has </span><span class="si">{</span><span class="n">data_gdal</span><span class="o">.</span><span class="n">rio</span><span class="o">.</span><span class="n">crs</span><span class="si">}</span><span class="s2">, got </span><span class="si">{</span><span class="n">crs</span><span class="si">}</span><span class="s2">."</span>
             <span class="p">)</span>
 
         <span class="n">data_gdal</span><span class="o">.</span><span class="n">rio</span><span class="o">.</span><span class="n">write_crs</span><span class="p">(</span><span class="n">crs</span><span class="p">,</span> <span class="n">inplace</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
@@ -933,14 +934,14 @@
 <div class="viewcode-block" id="empty_2d">
 <a class="viewcode-back" href="../../../api/generated/util/imod.util.empty_2d.html#imod.util.empty_2d">[docs]</a>
 <span class="k">def</span><span class="w"> </span><span class="nf">empty_2d</span><span class="p">(</span>
-    <span class="n">dx</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="n">FloatArray</span><span class="p">],</span>
+    <span class="n">dx</span><span class="p">:</span> <span class="nb">float</span> <span class="o">|</span> <span class="n">FloatArray</span><span class="p">,</span>
     <span class="n">xmin</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
     <span class="n">xmax</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
-    <span class="n">dy</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="n">FloatArray</span><span class="p">],</span>
+    <span class="n">dy</span><span class="p">:</span> <span class="nb">float</span> <span class="o">|</span> <span class="n">FloatArray</span><span class="p">,</span>
     <span class="n">ymin</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
     <span class="n">ymax</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">xr</span><span class="o">.</span><span class="n">DataArray</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">"""</span>
 <span class="sd">    Create an empty 2D (x, y) DataArray.</span>
 
 <span class="sd">    ``dx`` and ``dy`` may be provided as:</span>
@@ -966,14 +967,14 @@
 <span class="sd">    -------</span>
 <span class="sd">    empty: xr.DataArray</span>
 <span class="sd">        Filled with NaN.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="n">bounds</span> <span class="o">=</span> <span class="p">(</span><span class="n">xmin</span><span class="p">,</span> <span class="n">xmax</span><span class="p">,</span> <span class="n">ymin</span><span class="p">,</span> <span class="n">ymax</span><span class="p">)</span>
     <span class="n">cellsizes</span> <span class="o">=</span> <span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="n">dx</span><span class="p">),</span> <span class="o">-</span><span class="n">np</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="n">dy</span><span class="p">))</span>
     <span class="n">coords</span> <span class="o">=</span> <span class="n">_xycoords</span><span class="p">(</span><span class="n">bounds</span><span class="p">,</span> <span class="n">cellsizes</span><span class="p">)</span>
-    <span class="n">nrow</span> <span class="o">=</span> <span class="n">coords</span><span class="p">[</span><span class="s2">&quot;y&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">size</span>
-    <span class="n">ncol</span> <span class="o">=</span> <span class="n">coords</span><span class="p">[</span><span class="s2">&quot;x&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">size</span>
+    <span class="n">nrow</span> <span class="o">=</span> <span class="n">coords</span><span class="p">[</span><span class="s2">"y"</span><span class="p">]</span><span class="o">.</span><span class="n">size</span>
+    <span class="n">ncol</span> <span class="o">=</span> <span class="n">coords</span><span class="p">[</span><span class="s2">"x"</span><span class="p">]</span><span class="o">.</span><span class="n">size</span>
     <span class="k">return</span> <span class="n">xr</span><span class="o">.</span><span class="n">DataArray</span><span class="p">(</span>
-        <span class="n">data</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">full</span><span class="p">((</span><span class="n">nrow</span><span class="p">,</span> <span class="n">ncol</span><span class="p">),</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">),</span> <span class="n">coords</span><span class="o">=</span><span class="n">coords</span><span class="p">,</span> <span class="n">dims</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;y&quot;</span><span class="p">,</span> <span class="s2">&quot;x&quot;</span><span class="p">]</span>
+        <span class="n">data</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">full</span><span class="p">((</span><span class="n">nrow</span><span class="p">,</span> <span class="n">ncol</span><span class="p">),</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">),</span> <span class="n">coords</span><span class="o">=</span><span class="n">coords</span><span class="p">,</span> <span class="n">dims</span><span class="o">=</span><span class="p">[</span><span class="s2">"y"</span><span class="p">,</span> <span class="s2">"x"</span><span class="p">]</span>
     <span class="p">)</span></div>
 
 
@@ -981,15 +982,15 @@
 <div class="viewcode-block" id="empty_3d">
 <a class="viewcode-back" href="../../../api/generated/util/imod.util.empty_3d.html#imod.util.empty_3d">[docs]</a>
 <span class="k">def</span><span class="w"> </span><span class="nf">empty_3d</span><span class="p">(</span>
-    <span class="n">dx</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="n">FloatArray</span><span class="p">],</span>
+    <span class="n">dx</span><span class="p">:</span> <span class="nb">float</span> <span class="o">|</span> <span class="n">FloatArray</span><span class="p">,</span>
     <span class="n">xmin</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
     <span class="n">xmax</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
-    <span class="n">dy</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="n">FloatArray</span><span class="p">],</span>
+    <span class="n">dy</span><span class="p">:</span> <span class="nb">float</span> <span class="o">|</span> <span class="n">FloatArray</span><span class="p">,</span>
     <span class="n">ymin</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
     <span class="n">ymax</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
-    <span class="n">layer</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="n">Sequence</span><span class="p">[</span><span class="nb">int</span><span class="p">],</span> <span class="n">IntArray</span><span class="p">],</span>
+    <span class="n">layer</span><span class="p">:</span> <span class="nb">int</span> <span class="o">|</span> <span class="n">Sequence</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">|</span> <span class="n">IntArray</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">xr</span><span class="o">.</span><span class="n">DataArray</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">"""</span>
 <span class="sd">    Create an empty 2D (x, y) DataArray.</span>
 
 <span class="sd">    ``dx`` and ``dy`` may be provided as:</span>
@@ -1016,19 +1017,19 @@
 <span class="sd">    -------</span>
 <span class="sd">    empty: xr.DataArray</span>
 <span class="sd">        Filled with NaN.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="n">bounds</span> <span class="o">=</span> <span class="p">(</span><span class="n">xmin</span><span class="p">,</span> <span class="n">xmax</span><span class="p">,</span> <span class="n">ymin</span><span class="p">,</span> <span class="n">ymax</span><span class="p">)</span>
     <span class="n">cellsizes</span> <span class="o">=</span> <span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="n">dx</span><span class="p">),</span> <span class="o">-</span><span class="n">np</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="n">dy</span><span class="p">))</span>
     <span class="n">coords</span> <span class="o">=</span> <span class="n">_xycoords</span><span class="p">(</span><span class="n">bounds</span><span class="p">,</span> <span class="n">cellsizes</span><span class="p">)</span>
-    <span class="n">nrow</span> <span class="o">=</span> <span class="n">coords</span><span class="p">[</span><span class="s2">&quot;y&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">size</span>
-    <span class="n">ncol</span> <span class="o">=</span> <span class="n">coords</span><span class="p">[</span><span class="s2">&quot;x&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">size</span>
+    <span class="n">nrow</span> <span class="o">=</span> <span class="n">coords</span><span class="p">[</span><span class="s2">"y"</span><span class="p">]</span><span class="o">.</span><span class="n">size</span>
+    <span class="n">ncol</span> <span class="o">=</span> <span class="n">coords</span><span class="p">[</span><span class="s2">"x"</span><span class="p">]</span><span class="o">.</span><span class="n">size</span>
     <span class="n">layer</span> <span class="o">=</span> <span class="n">_layer</span><span class="p">(</span><span class="n">layer</span><span class="p">)</span>
-    <span class="n">coords</span><span class="p">[</span><span class="s2">&quot;layer&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">layer</span>
+    <span class="n">coords</span><span class="p">[</span><span class="s2">"layer"</span><span class="p">]</span> <span class="o">=</span> <span class="n">layer</span>
 
     <span class="k">return</span> <span class="n">xr</span><span class="o">.</span><span class="n">DataArray</span><span class="p">(</span>
         <span class="n">data</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">full</span><span class="p">((</span><span class="n">layer</span><span class="o">.</span><span class="n">size</span><span class="p">,</span> <span class="n">nrow</span><span class="p">,</span> <span class="n">ncol</span><span class="p">),</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">),</span>
         <span class="n">coords</span><span class="o">=</span><span class="n">coords</span><span class="p">,</span>
-        <span class="n">dims</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;layer&quot;</span><span class="p">,</span> <span class="s2">&quot;y&quot;</span><span class="p">,</span> <span class="s2">&quot;x&quot;</span><span class="p">],</span>
+        <span class="n">dims</span><span class="o">=</span><span class="p">[</span><span class="s2">"layer"</span><span class="p">,</span> <span class="s2">"y"</span><span class="p">,</span> <span class="s2">"x"</span><span class="p">],</span>
     <span class="p">)</span></div>
 
 
@@ -1036,15 +1037,15 @@
 <div class="viewcode-block" id="empty_2d_transient">
 <a class="viewcode-back" href="../../../api/generated/util/imod.util.empty_2d_transient.html#imod.util.empty_2d_transient">[docs]</a>
 <span class="k">def</span><span class="w"> </span><span class="nf">empty_2d_transient</span><span class="p">(</span>
-    <span class="n">dx</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="n">FloatArray</span><span class="p">],</span>
+    <span class="n">dx</span><span class="p">:</span> <span class="nb">float</span> <span class="o">|</span> <span class="n">FloatArray</span><span class="p">,</span>
     <span class="n">xmin</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
     <span class="n">xmax</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
-    <span class="n">dy</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="n">FloatArray</span><span class="p">],</span>
+    <span class="n">dy</span><span class="p">:</span> <span class="nb">float</span> <span class="o">|</span> <span class="n">FloatArray</span><span class="p">,</span>
     <span class="n">ymin</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
     <span class="n">ymax</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
     <span class="n">time</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">xr</span><span class="o">.</span><span class="n">DataArray</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">"""</span>
 <span class="sd">    Create an empty transient 2D (time, x, y) DataArray.</span>
 
 <span class="sd">    ``dx`` and ``dy`` may be provided as:</span>
@@ -1072,18 +1073,18 @@
 <span class="sd">    -------</span>
 <span class="sd">    empty: xr.DataArray</span>
 <span class="sd">        Filled with NaN.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="n">bounds</span> <span class="o">=</span> <span class="p">(</span><span class="n">xmin</span><span class="p">,</span> <span class="n">xmax</span><span class="p">,</span> <span class="n">ymin</span><span class="p">,</span> <span class="n">ymax</span><span class="p">)</span>
     <span class="n">cellsizes</span> <span class="o">=</span> <span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="n">dx</span><span class="p">),</span> <span class="o">-</span><span class="n">np</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="n">dy</span><span class="p">))</span>
     <span class="n">coords</span> <span class="o">=</span> <span class="n">_xycoords</span><span class="p">(</span><span class="n">bounds</span><span class="p">,</span> <span class="n">cellsizes</span><span class="p">)</span>
-    <span class="n">nrow</span> <span class="o">=</span> <span class="n">coords</span><span class="p">[</span><span class="s2">&quot;y&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">size</span>
-    <span class="n">ncol</span> <span class="o">=</span> <span class="n">coords</span><span class="p">[</span><span class="s2">&quot;x&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">size</span>
+    <span class="n">nrow</span> <span class="o">=</span> <span class="n">coords</span><span class="p">[</span><span class="s2">"y"</span><span class="p">]</span><span class="o">.</span><span class="n">size</span>
+    <span class="n">ncol</span> <span class="o">=</span> <span class="n">coords</span><span class="p">[</span><span class="s2">"x"</span><span class="p">]</span><span class="o">.</span><span class="n">size</span>
     <span class="n">time</span> <span class="o">=</span> <span class="n">_time</span><span class="p">(</span><span class="n">time</span><span class="p">)</span>
-    <span class="n">coords</span><span class="p">[</span><span class="s2">&quot;time&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">time</span>
+    <span class="n">coords</span><span class="p">[</span><span class="s2">"time"</span><span class="p">]</span> <span class="o">=</span> <span class="n">time</span>
     <span class="k">return</span> <span class="n">xr</span><span class="o">.</span><span class="n">DataArray</span><span class="p">(</span>
         <span class="n">data</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">full</span><span class="p">((</span><span class="n">time</span><span class="o">.</span><span class="n">size</span><span class="p">,</span> <span class="n">nrow</span><span class="p">,</span> <span class="n">ncol</span><span class="p">),</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">),</span>
         <span class="n">coords</span><span class="o">=</span><span class="n">coords</span><span class="p">,</span>
-        <span class="n">dims</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;time&quot;</span><span class="p">,</span> <span class="s2">&quot;y&quot;</span><span class="p">,</span> <span class="s2">&quot;x&quot;</span><span class="p">],</span>
+        <span class="n">dims</span><span class="o">=</span><span class="p">[</span><span class="s2">"time"</span><span class="p">,</span> <span class="s2">"y"</span><span class="p">,</span> <span class="s2">"x"</span><span class="p">],</span>
     <span class="p">)</span></div>
 
 
@@ -1091,16 +1092,16 @@
 <div class="viewcode-block" id="empty_3d_transient">
 <a class="viewcode-back" href="../../../api/generated/util/imod.util.empty_3d_transient.html#imod.util.empty_3d_transient">[docs]</a>
 <span class="k">def</span><span class="w"> </span><span class="nf">empty_3d_transient</span><span class="p">(</span>
-    <span class="n">dx</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="n">FloatArray</span><span class="p">],</span>
+    <span class="n">dx</span><span class="p">:</span> <span class="nb">float</span> <span class="o">|</span> <span class="n">FloatArray</span><span class="p">,</span>
     <span class="n">xmin</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
     <span class="n">xmax</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
-    <span class="n">dy</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="n">FloatArray</span><span class="p">],</span>
+    <span class="n">dy</span><span class="p">:</span> <span class="nb">float</span> <span class="o">|</span> <span class="n">FloatArray</span><span class="p">,</span>
     <span class="n">ymin</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
     <span class="n">ymax</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
-    <span class="n">layer</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="n">Sequence</span><span class="p">[</span><span class="nb">int</span><span class="p">],</span> <span class="n">IntArray</span><span class="p">],</span>
+    <span class="n">layer</span><span class="p">:</span> <span class="nb">int</span> <span class="o">|</span> <span class="n">Sequence</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">|</span> <span class="n">IntArray</span><span class="p">,</span>
     <span class="n">time</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">xr</span><span class="o">.</span><span class="n">DataArray</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">"""</span>
 <span class="sd">    Create an empty transient 3D (time, layer, x, y) DataArray.</span>
 
 <span class="sd">    ``dx`` and ``dy`` may be provided as:</span>
@@ -1129,40 +1130,40 @@
 <span class="sd">    -------</span>
 <span class="sd">    empty: xr.DataArray</span>
 <span class="sd">        Filled with NaN.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="n">bounds</span> <span class="o">=</span> <span class="p">(</span><span class="n">xmin</span><span class="p">,</span> <span class="n">xmax</span><span class="p">,</span> <span class="n">ymin</span><span class="p">,</span> <span class="n">ymax</span><span class="p">)</span>
     <span class="n">cellsizes</span> <span class="o">=</span> <span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="n">dx</span><span class="p">),</span> <span class="o">-</span><span class="n">np</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="n">dy</span><span class="p">))</span>
     <span class="n">coords</span> <span class="o">=</span> <span class="n">_xycoords</span><span class="p">(</span><span class="n">bounds</span><span class="p">,</span> <span class="n">cellsizes</span><span class="p">)</span>
-    <span class="n">nrow</span> <span class="o">=</span> <span class="n">coords</span><span class="p">[</span><span class="s2">&quot;y&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">size</span>
-    <span class="n">ncol</span> <span class="o">=</span> <span class="n">coords</span><span class="p">[</span><span class="s2">&quot;x&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">size</span>
+    <span class="n">nrow</span> <span class="o">=</span> <span class="n">coords</span><span class="p">[</span><span class="s2">"y"</span><span class="p">]</span><span class="o">.</span><span class="n">size</span>
+    <span class="n">ncol</span> <span class="o">=</span> <span class="n">coords</span><span class="p">[</span><span class="s2">"x"</span><span class="p">]</span><span class="o">.</span><span class="n">size</span>
     <span class="n">layer</span> <span class="o">=</span> <span class="n">_layer</span><span class="p">(</span><span class="n">layer</span><span class="p">)</span>
-    <span class="n">coords</span><span class="p">[</span><span class="s2">&quot;layer&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">layer</span>
+    <span class="n">coords</span><span class="p">[</span><span class="s2">"layer"</span><span class="p">]</span> <span class="o">=</span> <span class="n">layer</span>
     <span class="n">time</span> <span class="o">=</span> <span class="n">_time</span><span class="p">(</span><span class="n">time</span><span class="p">)</span>
-    <span class="n">coords</span><span class="p">[</span><span class="s2">&quot;time&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">time</span>
+    <span class="n">coords</span><span class="p">[</span><span class="s2">"time"</span><span class="p">]</span> <span class="o">=</span> <span class="n">time</span>
     <span class="k">return</span> <span class="n">xr</span><span class="o">.</span><span class="n">DataArray</span><span class="p">(</span>
         <span class="n">data</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">full</span><span class="p">((</span><span class="n">time</span><span class="o">.</span><span class="n">size</span><span class="p">,</span> <span class="n">layer</span><span class="o">.</span><span class="n">size</span><span class="p">,</span> <span class="n">nrow</span><span class="p">,</span> <span class="n">ncol</span><span class="p">),</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">),</span>
         <span class="n">coords</span><span class="o">=</span><span class="n">coords</span><span class="p">,</span>
-        <span class="n">dims</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;time&quot;</span><span class="p">,</span> <span class="s2">&quot;layer&quot;</span><span class="p">,</span> <span class="s2">&quot;y&quot;</span><span class="p">,</span> <span class="s2">&quot;x&quot;</span><span class="p">],</span>
+        <span class="n">dims</span><span class="o">=</span><span class="p">[</span><span class="s2">"time"</span><span class="p">,</span> <span class="s2">"layer"</span><span class="p">,</span> <span class="s2">"y"</span><span class="p">,</span> <span class="s2">"x"</span><span class="p">],</span>
     <span class="p">)</span></div>
 
 
 
-<span class="k">def</span><span class="w"> </span><span class="nf">_layer</span><span class="p">(</span><span class="n">layer</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="n">Sequence</span><span class="p">[</span><span class="nb">int</span><span class="p">],</span> <span class="n">IntArray</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">IntArray</span><span class="p">:</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">_layer</span><span class="p">(</span><span class="n">layer</span><span class="p">:</span> <span class="nb">int</span> <span class="o">|</span> <span class="n">Sequence</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">|</span> <span class="n">IntArray</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">IntArray</span><span class="p">:</span>
     <span class="n">layer</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">atleast_1d</span><span class="p">(</span><span class="n">layer</span><span class="p">)</span>
     <span class="k">if</span> <span class="n">layer</span><span class="o">.</span><span class="n">ndim</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">:</span>
-        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;layer must be 1d&quot;</span><span class="p">)</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">"layer must be 1d"</span><span class="p">)</span>
     <span class="k">return</span> <span class="n">layer</span>
 
 
 <span class="k">def</span><span class="w"> </span><span class="nf">_time</span><span class="p">(</span><span class="n">time</span><span class="p">:</span> <span class="n">Any</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Any</span><span class="p">:</span>
     <span class="n">time</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">atleast_1d</span><span class="p">(</span><span class="n">time</span><span class="p">)</span>
     <span class="k">if</span> <span class="n">time</span><span class="o">.</span><span class="n">ndim</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">:</span>
-        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;time must be 1d&quot;</span><span class="p">)</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">"time must be 1d"</span><span class="p">)</span>
     <span class="k">return</span> <span class="n">pd</span><span class="o">.</span><span class="n">to_datetime</span><span class="p">(</span><span class="n">time</span><span class="p">)</span>
 
 
-<span class="k">def</span><span class="w"> </span><span class="nf">is_divisor</span><span class="p">(</span><span class="n">numerator</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="n">FloatArray</span><span class="p">],</span> <span class="n">denominator</span><span class="p">:</span> <span class="nb">float</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">is_divisor</span><span class="p">(</span><span class="n">numerator</span><span class="p">:</span> <span class="nb">float</span> <span class="o">|</span> <span class="n">FloatArray</span><span class="p">,</span> <span class="n">denominator</span><span class="p">:</span> <span class="nb">float</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">"""</span>
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
 <span class="sd">    numerator: np.array of floats or float</span>
@@ -1171,21 +1172,21 @@
 <span class="sd">    Returns</span>
 <span class="sd">    -------</span>
 <span class="sd">    is_divisor: bool</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="n">denominator</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="n">denominator</span><span class="p">)</span>
     <span class="n">remainder</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="n">numerator</span><span class="p">)</span> <span class="o">%</span> <span class="n">denominator</span>
     <span class="k">return</span> <span class="nb">bool</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">all</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">isclose</span><span class="p">(</span><span class="n">remainder</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">)</span> <span class="o">|</span> <span class="n">np</span><span class="o">.</span><span class="n">isclose</span><span class="p">(</span><span class="n">remainder</span><span class="p">,</span> <span class="n">denominator</span><span class="p">)))</span>
 
 
-<span class="k">def</span><span class="w"> </span><span class="nf">_polygonize</span><span class="p">(</span><span class="n">da</span><span class="p">:</span> <span class="n">xr</span><span class="o">.</span><span class="n">DataArray</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="s2">&quot;gpd.GeoDataFrame&quot;</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">_polygonize</span><span class="p">(</span><span class="n">da</span><span class="p">:</span> <span class="n">xr</span><span class="o">.</span><span class="n">DataArray</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="s2">"gpd.GeoDataFrame"</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">"""</span>
 <span class="sd">    Polygonize a 2D-DataArray into a GeoDataFrame of polygons.</span>
 
 <span class="sd">    Private method located in util.spatial to work around circular imports.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
 
-    <span class="k">if</span> <span class="n">da</span><span class="o">.</span><span class="n">dims</span> <span class="o">!=</span> <span class="p">(</span><span class="s2">&quot;y&quot;</span><span class="p">,</span> <span class="s2">&quot;x&quot;</span><span class="p">):</span>
-        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;Dimensions must be (&quot;y&quot;, &quot;x&quot;)&#39;</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">da</span><span class="o">.</span><span class="n">dims</span> <span class="o">!=</span> <span class="p">(</span><span class="s2">"y"</span><span class="p">,</span> <span class="s2">"x"</span><span class="p">):</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">'Dimensions must be ("y", "x")'</span><span class="p">)</span>
 
     <span class="n">values</span> <span class="o">=</span> <span class="n">da</span><span class="o">.</span><span class="n">values</span>
     <span class="k">if</span> <span class="n">values</span><span class="o">.</span><span class="n">dtype</span> <span class="o">==</span> <span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">:</span>
@@ -1197,7 +1198,7 @@
     <span class="n">geometries</span> <span class="o">=</span> <span class="p">[]</span>
     <span class="n">colvalues</span> <span class="o">=</span> <span class="p">[]</span>
     <span class="k">for</span> <span class="n">geom</span><span class="p">,</span> <span class="n">colval</span> <span class="ow">in</span> <span class="n">shapes</span><span class="p">:</span>
-        <span class="n">coordinates</span> <span class="o">=</span> <span class="n">geom</span><span class="p">[</span><span class="s2">&quot;coordinates&quot;</span><span class="p">]</span>
+        <span class="n">coordinates</span> <span class="o">=</span> <span class="n">geom</span><span class="p">[</span><span class="s2">"coordinates"</span><span class="p">]</span>
         <span class="n">exterior</span> <span class="o">=</span> <span class="n">coordinates</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
         <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">coordinates</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">:</span>
             <span class="n">interiors</span> <span class="o">=</span> <span class="n">coordinates</span><span class="p">[</span><span class="mi">1</span><span class="p">:]</span>
@@ -1206,19 +1207,19 @@
         <span class="n">geometries</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">shapely</span><span class="o">.</span><span class="n">geometry</span><span class="o">.</span><span class="n">Polygon</span><span class="p">(</span><span class="n">exterior</span><span class="p">,</span> <span class="n">interiors</span><span class="p">))</span>
         <span class="n">colvalues</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">colval</span><span class="p">)</span>
 
-    <span class="n">gdf</span> <span class="o">=</span> <span class="n">gpd</span><span class="o">.</span><span class="n">GeoDataFrame</span><span class="p">({</span><span class="s2">&quot;value&quot;</span><span class="p">:</span> <span class="n">colvalues</span><span class="p">,</span> <span class="s2">&quot;geometry&quot;</span><span class="p">:</span> <span class="n">geometries</span><span class="p">})</span>
-    <span class="n">gdf</span><span class="o">.</span><span class="n">crs</span> <span class="o">=</span> <span class="n">da</span><span class="o">.</span><span class="n">attrs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;crs&quot;</span><span class="p">)</span>
+    <span class="n">gdf</span> <span class="o">=</span> <span class="n">gpd</span><span class="o">.</span><span class="n">GeoDataFrame</span><span class="p">({</span><span class="s2">"value"</span><span class="p">:</span> <span class="n">colvalues</span><span class="p">,</span> <span class="s2">"geometry"</span><span class="p">:</span> <span class="n">geometries</span><span class="p">})</span>
+    <span class="n">gdf</span><span class="o">.</span><span class="n">crs</span> <span class="o">=</span> <span class="n">da</span><span class="o">.</span><span class="n">attrs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"crs"</span><span class="p">)</span>
     <span class="k">return</span> <span class="n">gdf</span>
 
 
 <span class="k">def</span><span class="w"> </span><span class="nf">get_total_grid_area</span><span class="p">(</span><span class="n">array</span><span class="p">:</span> <span class="n">xr</span><span class="o">.</span><span class="n">DataArray</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">"""</span>
 <span class="sd">    Returns the total area of all cells summed together in a 2d grid with x and</span>
 <span class="sd">    y coordinates</span>
-<span class="sd">    &quot;&quot;&quot;</span>
-    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="nb">set</span><span class="p">(</span><span class="n">array</span><span class="o">.</span><span class="n">coords</span><span class="p">)</span> <span class="o">-</span> <span class="p">{</span><span class="s2">&quot;dy&quot;</span><span class="p">,</span> <span class="s2">&quot;y&quot;</span><span class="p">,</span> <span class="s2">&quot;dx&quot;</span><span class="p">,</span> <span class="s2">&quot;x&quot;</span><span class="p">})</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">:</span>
+<span class="sd">    """</span>
+    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="nb">set</span><span class="p">(</span><span class="n">array</span><span class="o">.</span><span class="n">coords</span><span class="p">)</span> <span class="o">-</span> <span class="p">{</span><span class="s2">"dy"</span><span class="p">,</span> <span class="s2">"y"</span><span class="p">,</span> <span class="s2">"dx"</span><span class="p">,</span> <span class="s2">"x"</span><span class="p">})</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">:</span>
         <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
-            <span class="s2">&quot;area calculation is only implemented for grids with x, y, dx and dy coordinates&quot;</span>
+            <span class="s2">"area calculation is only implemented for grids with x, y, dx and dy coordinates"</span>
         <span class="p">)</span>
     <span class="n">cell_area</span> <span class="o">=</span> <span class="n">get_cell_area</span><span class="p">(</span><span class="n">array</span><span class="p">)</span>
     <span class="n">grid_area</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">cell_area</span><span class="o">.</span><span class="n">values</span><span class="p">)</span>
@@ -1226,16 +1227,16 @@
 
 
 <span class="k">def</span><span class="w"> </span><span class="nf">get_cell_area</span><span class="p">(</span><span class="n">array</span><span class="p">:</span> <span class="n">xr</span><span class="o">.</span><span class="n">DataArray</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">xr</span><span class="o">.</span><span class="n">DataArray</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">"""</span>
 <span class="sd">    Returns a grid with in each cell the area of that cell. Implemented for 2d</span>
 <span class="sd">    grids (x, y, dx and dy coordinates)</span>
-<span class="sd">    &quot;&quot;&quot;</span>
-    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="nb">set</span><span class="p">(</span><span class="n">array</span><span class="o">.</span><span class="n">coords</span><span class="p">)</span> <span class="o">-</span> <span class="p">{</span><span class="s2">&quot;dy&quot;</span><span class="p">,</span> <span class="s2">&quot;y&quot;</span><span class="p">,</span> <span class="s2">&quot;dx&quot;</span><span class="p">,</span> <span class="s2">&quot;x&quot;</span><span class="p">})</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">:</span>
+<span class="sd">    """</span>
+    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="nb">set</span><span class="p">(</span><span class="n">array</span><span class="o">.</span><span class="n">coords</span><span class="p">)</span> <span class="o">-</span> <span class="p">{</span><span class="s2">"dy"</span><span class="p">,</span> <span class="s2">"y"</span><span class="p">,</span> <span class="s2">"dx"</span><span class="p">,</span> <span class="s2">"x"</span><span class="p">})</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">:</span>
         <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
-            <span class="s2">&quot;area calculation is only implemented for grids with x, y, dx and dy coordinates&quot;</span>
+            <span class="s2">"area calculation is only implemented for grids with x, y, dx and dy coordinates"</span>
         <span class="p">)</span>
-    <span class="n">x</span> <span class="o">=</span> <span class="n">array</span><span class="o">.</span><span class="n">coords</span><span class="p">[</span><span class="s2">&quot;x&quot;</span><span class="p">]</span>
-    <span class="n">y</span> <span class="o">=</span> <span class="n">array</span><span class="o">.</span><span class="n">coords</span><span class="p">[</span><span class="s2">&quot;y&quot;</span><span class="p">]</span>
+    <span class="n">x</span> <span class="o">=</span> <span class="n">array</span><span class="o">.</span><span class="n">coords</span><span class="p">[</span><span class="s2">"x"</span><span class="p">]</span>
+    <span class="n">y</span> <span class="o">=</span> <span class="n">array</span><span class="o">.</span><span class="n">coords</span><span class="p">[</span><span class="s2">"y"</span><span class="p">]</span>
     <span class="n">dx</span><span class="p">,</span> <span class="n">_</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">coord_reference</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
     <span class="n">dy</span><span class="p">,</span> <span class="n">_</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">coord_reference</span><span class="p">(</span><span class="n">y</span><span class="p">)</span>
 
@@ -1244,13 +1245,13 @@
     <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">dx</span><span class="p">,</span> <span class="nb">float</span><span class="p">):</span>
         <span class="n">area</span> <span class="o">=</span> <span class="n">area</span> <span class="o">*</span> <span class="nb">abs</span><span class="p">(</span><span class="n">dx</span><span class="p">)</span>
     <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">dx</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">):</span>
-        <span class="n">dx_xarray</span> <span class="o">=</span> <span class="n">xr</span><span class="o">.</span><span class="n">DataArray</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="n">dx</span><span class="p">),</span> <span class="n">coords</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;x&quot;</span><span class="p">:</span> <span class="n">x</span><span class="p">})</span>
+        <span class="n">dx_xarray</span> <span class="o">=</span> <span class="n">xr</span><span class="o">.</span><span class="n">DataArray</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="n">dx</span><span class="p">),</span> <span class="n">coords</span><span class="o">=</span><span class="p">{</span><span class="s2">"x"</span><span class="p">:</span> <span class="n">x</span><span class="p">})</span>
         <span class="n">area</span> <span class="o">=</span> <span class="n">area</span> <span class="o">*</span> <span class="n">dx_xarray</span>
 
     <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">dy</span><span class="p">,</span> <span class="nb">float</span><span class="p">):</span>
         <span class="n">area</span> <span class="o">=</span> <span class="n">area</span> <span class="o">*</span> <span class="nb">abs</span><span class="p">(</span><span class="n">dy</span><span class="p">)</span>
     <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">dy</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">):</span>
-        <span class="n">dy_xarray</span> <span class="o">=</span> <span class="n">xr</span><span class="o">.</span><span class="n">DataArray</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="n">dy</span><span class="p">),</span> <span class="n">coords</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;y&quot;</span><span class="p">:</span> <span class="n">y</span><span class="p">})</span>
+        <span class="n">dy_xarray</span> <span class="o">=</span> <span class="n">xr</span><span class="o">.</span><span class="n">DataArray</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="n">dy</span><span class="p">),</span> <span class="n">coords</span><span class="o">=</span><span class="p">{</span><span class="s2">"y"</span><span class="p">:</span> <span class="n">y</span><span class="p">})</span>
         <span class="n">area</span> <span class="o">=</span> <span class="n">area</span> <span class="o">*</span> <span class="n">dy_xarray</span>
 
     <span class="k">return</span> <span class="n">area</span>
@@ -1283,8 +1284,8 @@
   </div>
   
   <!-- Scripts loaded after <body> so the DOM is not blocked -->
-  <script defer src="../../../_static/scripts/bootstrap.js?digest=90905a2f556bf617f1a9"></script>
-<script defer src="../../../_static/scripts/pydata-sphinx-theme.js?digest=90905a2f556bf617f1a9"></script>
+  <script defer src="../../../_static/scripts/bootstrap.js?digest=75c7c72ae941e8b558d8"></script>
+<script defer src="../../../_static/scripts/pydata-sphinx-theme.js?digest=75c7c72ae941e8b558d8"></script>
 
   <footer class="bd-footer">
 <div class="bd-footer__inner bd-page-width">
@@ -1304,8 +1305,7 @@
         <div class="footer-item">
 
   <p class="sphinx-version">
-    Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 9.1.0.
-    <br/>
+    Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 9.2.0.
   </p>
 </div>
       
@@ -1318,7 +1318,7 @@
         <div class="footer-item">
 <p class="theme-version">
   <!-- # L10n: Setting the PST URL as an argument as this does not need to be localized -->
-  Built with the <a href="https://pydata-sphinx-theme.readthedocs.io/en/stable/index.html">PyData Sphinx Theme</a> 0.20.0.
+  Built with the <a href="https://pydata-sphinx-theme.readthedocs.io/en/stable/index.html">PyData Sphinx Theme</a> 0.24.0.
 </p></div>
       
     </div>

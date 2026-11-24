@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 
 
@@ -7,7 +6,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>imod.mf6.ats &#8212; iMOD Python 1.1.0 documentation</title>
+    <title>imod.mf6.ats &#8212; iMOD Python 1.2.0 documentation</title>
   
   
   
@@ -26,22 +25,22 @@
   </noscript>
   
   <!-- Loaded before other Sphinx assets -->
-  <link href="../../../_static/styles/theme.css?digest=90905a2f556bf617f1a9" rel="stylesheet" />
-<link href="../../../_static/styles/pydata-sphinx-theme.css?digest=90905a2f556bf617f1a9" rel="stylesheet" />
+  <link href="../../../_static/styles/theme.css?digest=75c7c72ae941e8b558d8" rel="stylesheet" />
+<link href="../../../_static/styles/pydata-sphinx-theme.css?digest=75c7c72ae941e8b558d8" rel="stylesheet" />
 
     <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=03e43079" />
-    <link rel="stylesheet" type="text/css" href="../../../_static/sg_gallery.css?v=fd6457a4" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/sg_gallery.css?v=c83e6b79" />
     <link rel="stylesheet" type="text/css" href="../../../_static/sg_gallery-binder.css?v=f4aeca0c" />
     <link rel="stylesheet" type="text/css" href="../../../_static/sg_gallery-dataframe.css?v=2082cf3c" />
     <link rel="stylesheet" type="text/css" href="../../../_static/sg_gallery-rendered-html.css?v=1277b6f3" />
   
   <!-- So that users can add custom icons -->
-  <script defer src="../../../_static/scripts/fontawesome.js?digest=90905a2f556bf617f1a9"></script>
+  <script defer src="../../../_static/scripts/fontawesome.js?digest=75c7c72ae941e8b558d8"></script>
   <!-- Pre-loaded scripts that we'll load fully later -->
-  <link rel="preload" as="script" href="../../../_static/scripts/bootstrap.js?digest=90905a2f556bf617f1a9" />
-<link rel="preload" as="script" href="../../../_static/scripts/pydata-sphinx-theme.js?digest=90905a2f556bf617f1a9" />
+  <link rel="preload" as="script" href="../../../_static/scripts/bootstrap.js?digest=75c7c72ae941e8b558d8" />
+<link rel="preload" as="script" href="../../../_static/scripts/pydata-sphinx-theme.js?digest=75c7c72ae941e8b558d8" />
 
-    <script src="../../../_static/documentation_options.js?v=fc837d61"></script>
+    <script src="../../../_static/documentation_options.js?v=6efca38a"></script>
     <script src="../../../_static/doctools.js?v=fd6eb6e6"></script>
     <script src="../../../_static/sphinx_highlight.js?v=6ffebe34"></script>
     <script src="../../../_static/sg-tags.js?v=d80f6fa4"></script>
@@ -51,8 +50,9 @@
     <link rel="index" title="Index" href="../../../genindex.html" />
     <link rel="search" title="Search" href="../../../search.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <meta name="color-scheme" content="light dark"/>
   <meta name="docsearch:language" content="en"/>
-  <meta name="docsearch:version" content="1.1.0.dev" />
+  <meta name="docsearch:version" content="1.2.0.dev" />
   
     
     <script src="../../../_static/searchtools.js"></script>
@@ -100,7 +100,7 @@
   
     <header id="pst-header" class="bd-header navbar navbar-expand-lg bd-navbar d-print-none">
 <div class="bd-header__inner bd-page-width">
-  <button class="pst-navbar-icon sidebar-toggle primary-toggle" aria-label="Site navigation">
+  <button type="button" class="pst-navbar-icon sidebar-toggle primary-toggle" aria-label="Site navigation" aria-expanded="false" aria-controls="pst-primary-sidebar-modal">
     <span class="fa-solid fa-bars"></span>
   </button>
   
@@ -122,8 +122,8 @@
     
     
     
-    <img src="../../../_static/imod-python-logo-light.svg" class="logo__image only-light" alt="iMOD Python 1.1.0 documentation - Home"/>
-    <img src="../../../_static/imod-python-logo-dark.svg" class="logo__image only-dark pst-js-only" alt="iMOD Python 1.1.0 documentation - Home"/>
+    <img src="../../../_static/imod-python-logo-light.svg" class="logo__image only-light" alt="iMOD Python 1.2.0 documentation - Home"/>
+    <img src="../../../_static/imod-python-logo-dark.svg" class="logo__image only-dark pst-js-only" alt="iMOD Python 1.2.0 documentation - Home"/>
   
   
 </a></div>
@@ -190,7 +190,7 @@
         <div class="navbar-item navbar-persistent--container">
           
 
-<button class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+<button type="button" class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
  <i class="fa-solid fa-magnifying-glass"></i>
  <span class="search-button__default-text">Search</span>
  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
@@ -201,15 +201,15 @@
         <div class="navbar-item">
 
 <div class="theme-switch-container dropdown pst-js-only" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Color mode">
-  <button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button dropdown-toggle" aria-label="Color mode" data-bs-toggle="dropdown">
-    <i class="theme-switch fa-solid fa-sun fa-lg fa-fw" data-mode="light" title="Light"></i>
-    <i class="theme-switch fa-solid fa-moon fa-lg fa-fw" data-mode="dark" title="Dark"></i>
-    <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg fa-fw" data-mode="auto" title="System Settings"></i>
+  <button type="button" class="btn btn-sm nav-link pst-navbar-icon theme-switch-button dropdown-toggle" aria-label="Color mode" data-bs-toggle="dropdown">
+    <i class="theme-switch fa-solid fa-sun fa-lg" data-mode="light" title="Light"></i>
+    <i class="theme-switch fa-solid fa-moon fa-lg" data-mode="dark" title="Dark"></i>
+    <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg" data-mode="auto" title="System Settings"></i>
   </button>
   <ul class="dropdown-menu dropdown-menu-end">
-    <li><button class="dropdown-item d-flex align-items-center theme-change-button" data-mode="auto"><i class="fa-solid fa-circle-half-stroke fa-lg fa-fw me-1"></i>System Settings</button></li>
-    <li><button class="dropdown-item d-flex align-items-center theme-change-button" data-mode="light"><i class="fa-solid fa-sun fa-lg fa-fw me-1"></i>Light</button></li>
-    <li><button class="dropdown-item d-flex align-items-center theme-change-button" data-mode="dark"><i class="fa-solid fa-moon fa-lg fa-fw me-1"></i>Dark</button></li>
+    <li><button type="button" class="dropdown-item d-flex align-items-center theme-change-button" data-mode="auto"><i class="fa-solid fa-circle-half-stroke fa-lg me-1"></i>System Settings</button></li>
+    <li><button type="button" class="dropdown-item d-flex align-items-center theme-change-button" data-mode="light"><i class="fa-solid fa-sun fa-lg me-1"></i>Light</button></li>
+    <li><button type="button" class="dropdown-item d-flex align-items-center theme-change-button" data-mode="dark"><i class="fa-solid fa-moon fa-lg me-1"></i>Dark</button></li>
   </ul>
 </div></div>
       
@@ -246,7 +246,7 @@
   
     <div class="navbar-persistent--mobile">
 
-<button class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+<button type="button" class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
  <i class="fa-solid fa-magnifying-glass"></i>
  <span class="search-button__default-text">Search</span>
  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
@@ -267,7 +267,7 @@
       
         
       
-      <dialog id="pst-primary-sidebar-modal"></dialog>
+      <dialog id="pst-primary-sidebar-modal" tabindex="-1"></dialog>
       <div id="pst-primary-sidebar" class="bd-sidebar-primary bd-sidebar hide-on-wide">
         
 
@@ -337,15 +337,15 @@
           <div class="navbar-item">
 
 <div class="theme-switch-container dropdown pst-js-only" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Color mode">
-  <button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button dropdown-toggle" aria-label="Color mode" data-bs-toggle="dropdown">
-    <i class="theme-switch fa-solid fa-sun fa-lg fa-fw" data-mode="light" title="Light"></i>
-    <i class="theme-switch fa-solid fa-moon fa-lg fa-fw" data-mode="dark" title="Dark"></i>
-    <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg fa-fw" data-mode="auto" title="System Settings"></i>
+  <button type="button" class="btn btn-sm nav-link pst-navbar-icon theme-switch-button dropdown-toggle" aria-label="Color mode" data-bs-toggle="dropdown">
+    <i class="theme-switch fa-solid fa-sun fa-lg" data-mode="light" title="Light"></i>
+    <i class="theme-switch fa-solid fa-moon fa-lg" data-mode="dark" title="Dark"></i>
+    <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg" data-mode="auto" title="System Settings"></i>
   </button>
   <ul class="dropdown-menu dropdown-menu-end">
-    <li><button class="dropdown-item d-flex align-items-center theme-change-button" data-mode="auto"><i class="fa-solid fa-circle-half-stroke fa-lg fa-fw me-1"></i>System Settings</button></li>
-    <li><button class="dropdown-item d-flex align-items-center theme-change-button" data-mode="light"><i class="fa-solid fa-sun fa-lg fa-fw me-1"></i>Light</button></li>
-    <li><button class="dropdown-item d-flex align-items-center theme-change-button" data-mode="dark"><i class="fa-solid fa-moon fa-lg fa-fw me-1"></i>Dark</button></li>
+    <li><button type="button" class="dropdown-item d-flex align-items-center theme-change-button" data-mode="auto"><i class="fa-solid fa-circle-half-stroke fa-lg me-1"></i>System Settings</button></li>
+    <li><button type="button" class="dropdown-item d-flex align-items-center theme-change-button" data-mode="light"><i class="fa-solid fa-sun fa-lg me-1"></i>Light</button></li>
+    <li><button type="button" class="dropdown-item d-flex align-items-center theme-change-button" data-mode="dark"><i class="fa-solid fa-moon fa-lg me-1"></i>Dark</button></li>
   </ul>
 </div></div>
         
@@ -411,7 +411,7 @@
     
     <li class="breadcrumb-item breadcrumb-home">
       <a href="../../../index.html" class="nav-link" aria-label="Home">
-        <i class="fa-solid fa-home"></i>
+        <i class="fa-solid fa-house"></i>
       </a>
     </li>
     
@@ -436,13 +436,14 @@
                   
   <h1>Source code for imod.mf6.ats</h1><div class="highlight"><pre>
 <span></span><span class="kn">import</span><span class="w"> </span><span class="nn">pathlib</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Any</span><span class="p">,</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">TypeAlias</span><span class="p">,</span> <span class="n">Union</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Any</span><span class="p">,</span> <span class="n">TypeAlias</span>
 
 <span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">xarray</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">xr</span>
 
 <span class="kn">from</span><span class="w"> </span><span class="nn">imod.mf6.package</span><span class="w"> </span><span class="kn">import</span> <span class="n">Package</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">imod.mf6.write_context</span><span class="w"> </span><span class="kn">import</span> <span class="n">WriteContext</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">imod.schemata</span><span class="w"> </span><span class="kn">import</span> <span class="n">AllValueSchema</span><span class="p">,</span> <span class="n">DimsSchema</span><span class="p">,</span> <span class="n">DTypeSchema</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">imod.schemata</span><span class="w"> </span><span class="kn">import</span> <span class="n">AllValueSchema</span><span class="p">,</span> <span class="n">DimsSchema</span><span class="p">,</span> <span class="n">DTypeSchema</span><span class="p">,</span> <span class="n">ValidationError</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">imod.typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">GridDataset</span>
 
 <span class="n">_PeriodDataType</span><span class="p">:</span> <span class="n">TypeAlias</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">int64</span><span class="p">,</span> <span class="nb">list</span><span class="p">[</span><span class="n">Any</span><span class="p">]]</span>
@@ -455,16 +456,16 @@
     <span class="n">start</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">int64</span><span class="p">,</span>
     <span class="n">data</span><span class="p">:</span> <span class="n">GridDataset</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Assign data from a dataset to a perioddata. Modifies perioddata in place.&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">"""Assign data from a dataset to a perioddata. Modifies perioddata in place."""</span>
     <span class="k">if</span> <span class="n">start</span> <span class="ow">in</span> <span class="n">perioddata</span><span class="p">:</span>
-        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Duplicate start time </span><span class="si">{</span><span class="n">start</span><span class="si">}</span><span class="s2"> in perioddata.&quot;</span><span class="p">)</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Duplicate start time </span><span class="si">{</span><span class="n">start</span><span class="si">}</span><span class="s2"> in perioddata."</span><span class="p">)</span>
     <span class="n">perioddata</span><span class="p">[</span><span class="n">start</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="n">data</span><span class="p">[</span><span class="n">var</span><span class="p">]</span><span class="o">.</span><span class="n">values</span><span class="p">[()]</span> <span class="k">for</span> <span class="n">var</span> <span class="ow">in</span> <span class="n">varnames</span><span class="p">]</span>
 
 
 <div class="viewcode-block" id="AdaptiveTimeStepping">
 <a class="viewcode-back" href="../../../api/generated/mf6/imod.mf6.AdaptiveTimeStepping.html#imod.mf6.AdaptiveTimeStepping">[docs]</a>
 <span class="k">class</span><span class="w"> </span><span class="nc">AdaptiveTimeStepping</span><span class="p">(</span><span class="n">Package</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">"""</span>
 <span class="sd">    Adaptive Time Stepping (ATS) Package for MODFLOW 6.</span>
 
 <span class="sd">    This package allows for adaptive time stepping in the simulation, adjusting</span>
@@ -530,7 +531,7 @@
 <span class="sd">    Assign this to a simulation:</span>
 
 <span class="sd">    &gt;&gt;&gt; simulation = imod.mf6.Modflow6Simulation()</span>
-<span class="sd">    &gt;&gt;&gt; simulation[&quot;ats&quot;] = ats</span>
+<span class="sd">    &gt;&gt;&gt; simulation["ats"] = ats</span>
 
 <span class="sd">    Create an Adaptive Time Stepping package with different settings for</span>
 <span class="sd">    ``dt_init`` two times. The time discretization created by</span>
@@ -539,10 +540,10 @@
 
 <span class="sd">    &gt;&gt;&gt; dt_init = xr.DataArray(</span>
 <span class="sd">    ...     [0.1, 0.5],</span>
-<span class="sd">    ...     dims=[&quot;time&quot;],</span>
-<span class="sd">    ...     coords={&quot;time&quot;: [np.datetime64(&quot;2024-01-01&quot;), np.datetime64(&quot;2024-01-02&quot;)]}</span>
+<span class="sd">    ...     dims=["time"],</span>
+<span class="sd">    ...     coords={"time": [np.datetime64("2024-01-01"), np.datetime64("2024-01-02")]}</span>
 <span class="sd">    ... )</span>
-<span class="sd">    &gt;&gt;&gt; simulation[&quot;ats&quot;] = imod.mf6.AdaptiveTimeStepping(</span>
+<span class="sd">    &gt;&gt;&gt; simulation["ats"] = imod.mf6.AdaptiveTimeStepping(</span>
 <span class="sd">    ...     dt_init=dt_init,</span>
 <span class="sd">    ...     dt_min=0.1,</span>
 <span class="sd">    ...     dt_max=10.0,</span>
@@ -555,61 +556,61 @@
 <span class="sd">    to adapt the time step based on the maximum fraction of a cell that a solute</span>
 <span class="sd">    parcel is allowed to travel:</span>
 
-<span class="sd">    &gt;&gt;&gt; simulation[&quot;transport_model&quot;][&quot;adv&quot;] = imod.mf6.AdvectionTVD(</span>
+<span class="sd">    &gt;&gt;&gt; simulation["transport_model"]["adv"] = imod.mf6.AdvectionTVD(</span>
 <span class="sd">    ...     ats_percel=0.95,</span>
 <span class="sd">    ... )</span>
 
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
 
-    <span class="n">_pkg_id</span> <span class="o">=</span> <span class="s2">&quot;ats&quot;</span>
+    <span class="n">_pkg_id</span> <span class="o">=</span> <span class="s2">"ats"</span>
     <span class="n">_keyword_map</span> <span class="o">=</span> <span class="p">{}</span>
     <span class="n">_template</span> <span class="o">=</span> <span class="n">Package</span><span class="o">.</span><span class="n">_initialize_template</span><span class="p">(</span><span class="n">_pkg_id</span><span class="p">)</span>
 
     <span class="n">_period_data</span><span class="p">:</span> <span class="n">_PeriodDataVarNames</span> <span class="o">=</span> <span class="p">(</span>
-        <span class="s2">&quot;dt_init&quot;</span><span class="p">,</span>
-        <span class="s2">&quot;dt_min&quot;</span><span class="p">,</span>
-        <span class="s2">&quot;dt_max&quot;</span><span class="p">,</span>
-        <span class="s2">&quot;dt_multiplier&quot;</span><span class="p">,</span>
-        <span class="s2">&quot;dt_fail_divisor&quot;</span><span class="p">,</span>
+        <span class="s2">"dt_init"</span><span class="p">,</span>
+        <span class="s2">"dt_min"</span><span class="p">,</span>
+        <span class="s2">"dt_max"</span><span class="p">,</span>
+        <span class="s2">"dt_multiplier"</span><span class="p">,</span>
+        <span class="s2">"dt_fail_divisor"</span><span class="p">,</span>
     <span class="p">)</span>
     <span class="n">_init_schemata</span> <span class="o">=</span> <span class="p">{</span>
-        <span class="s2">&quot;dt_init&quot;</span><span class="p">:</span> <span class="p">[</span><span class="n">DimsSchema</span><span class="p">(</span><span class="s2">&quot;time&quot;</span><span class="p">)</span> <span class="o">|</span> <span class="n">DimsSchema</span><span class="p">(),</span> <span class="n">DTypeSchema</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">floating</span><span class="p">)],</span>
-        <span class="s2">&quot;dt_min&quot;</span><span class="p">:</span> <span class="p">[</span><span class="n">DimsSchema</span><span class="p">(</span><span class="s2">&quot;time&quot;</span><span class="p">)</span> <span class="o">|</span> <span class="n">DimsSchema</span><span class="p">(),</span> <span class="n">DTypeSchema</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">floating</span><span class="p">)],</span>
-        <span class="s2">&quot;dt_max&quot;</span><span class="p">:</span> <span class="p">[</span><span class="n">DimsSchema</span><span class="p">(</span><span class="s2">&quot;time&quot;</span><span class="p">)</span> <span class="o">|</span> <span class="n">DimsSchema</span><span class="p">(),</span> <span class="n">DTypeSchema</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">floating</span><span class="p">)],</span>
-        <span class="s2">&quot;dt_multiplier&quot;</span><span class="p">:</span> <span class="p">[</span>
-            <span class="n">DimsSchema</span><span class="p">(</span><span class="s2">&quot;time&quot;</span><span class="p">)</span> <span class="o">|</span> <span class="n">DimsSchema</span><span class="p">(),</span>
+        <span class="s2">"dt_init"</span><span class="p">:</span> <span class="p">[</span><span class="n">DimsSchema</span><span class="p">(</span><span class="s2">"time"</span><span class="p">)</span> <span class="o">|</span> <span class="n">DimsSchema</span><span class="p">(),</span> <span class="n">DTypeSchema</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">floating</span><span class="p">)],</span>
+        <span class="s2">"dt_min"</span><span class="p">:</span> <span class="p">[</span><span class="n">DimsSchema</span><span class="p">(</span><span class="s2">"time"</span><span class="p">)</span> <span class="o">|</span> <span class="n">DimsSchema</span><span class="p">(),</span> <span class="n">DTypeSchema</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">floating</span><span class="p">)],</span>
+        <span class="s2">"dt_max"</span><span class="p">:</span> <span class="p">[</span><span class="n">DimsSchema</span><span class="p">(</span><span class="s2">"time"</span><span class="p">)</span> <span class="o">|</span> <span class="n">DimsSchema</span><span class="p">(),</span> <span class="n">DTypeSchema</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">floating</span><span class="p">)],</span>
+        <span class="s2">"dt_multiplier"</span><span class="p">:</span> <span class="p">[</span>
+            <span class="n">DimsSchema</span><span class="p">(</span><span class="s2">"time"</span><span class="p">)</span> <span class="o">|</span> <span class="n">DimsSchema</span><span class="p">(),</span>
             <span class="n">DTypeSchema</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">floating</span><span class="p">),</span>
         <span class="p">],</span>
-        <span class="s2">&quot;dt_fail_divisor&quot;</span><span class="p">:</span> <span class="p">[</span>
-            <span class="n">DimsSchema</span><span class="p">(</span><span class="s2">&quot;time&quot;</span><span class="p">)</span> <span class="o">|</span> <span class="n">DimsSchema</span><span class="p">(),</span>
+        <span class="s2">"dt_fail_divisor"</span><span class="p">:</span> <span class="p">[</span>
+            <span class="n">DimsSchema</span><span class="p">(</span><span class="s2">"time"</span><span class="p">)</span> <span class="o">|</span> <span class="n">DimsSchema</span><span class="p">(),</span>
             <span class="n">DTypeSchema</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">floating</span><span class="p">),</span>
         <span class="p">],</span>
     <span class="p">}</span>
 
     <span class="n">_write_schemata</span> <span class="o">=</span> <span class="p">{</span>
-        <span class="s2">&quot;dt_init&quot;</span><span class="p">:</span> <span class="p">[</span><span class="n">AllValueSchema</span><span class="p">(</span><span class="s2">&quot;&gt;=&quot;</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">)],</span>
-        <span class="s2">&quot;dt_min&quot;</span><span class="p">:</span> <span class="p">[</span><span class="n">AllValueSchema</span><span class="p">(</span><span class="s2">&quot;&lt;&quot;</span><span class="p">,</span> <span class="s2">&quot;dt_max&quot;</span><span class="p">),</span> <span class="n">AllValueSchema</span><span class="p">(</span><span class="s2">&quot;&gt;&quot;</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">)],</span>
-        <span class="s2">&quot;dt_multiplier&quot;</span><span class="p">:</span> <span class="p">[</span><span class="n">AllValueSchema</span><span class="p">(</span><span class="s2">&quot;==&quot;</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">)</span> <span class="o">|</span> <span class="n">AllValueSchema</span><span class="p">(</span><span class="s2">&quot;&gt;=&quot;</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">)],</span>
-        <span class="s2">&quot;dt_fail_divisor&quot;</span><span class="p">:</span> <span class="p">[</span><span class="n">AllValueSchema</span><span class="p">(</span><span class="s2">&quot;==&quot;</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">)</span> <span class="o">|</span> <span class="n">AllValueSchema</span><span class="p">(</span><span class="s2">&quot;&gt;=&quot;</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">)],</span>
+        <span class="s2">"dt_init"</span><span class="p">:</span> <span class="p">[</span><span class="n">AllValueSchema</span><span class="p">(</span><span class="s2">"&gt;="</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">)],</span>
+        <span class="s2">"dt_min"</span><span class="p">:</span> <span class="p">[</span><span class="n">AllValueSchema</span><span class="p">(</span><span class="s2">"&lt;"</span><span class="p">,</span> <span class="s2">"dt_max"</span><span class="p">),</span> <span class="n">AllValueSchema</span><span class="p">(</span><span class="s2">"&gt;"</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">)],</span>
+        <span class="s2">"dt_multiplier"</span><span class="p">:</span> <span class="p">[</span><span class="n">AllValueSchema</span><span class="p">(</span><span class="s2">"=="</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">)</span> <span class="o">|</span> <span class="n">AllValueSchema</span><span class="p">(</span><span class="s2">"&gt;="</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">)],</span>
+        <span class="s2">"dt_fail_divisor"</span><span class="p">:</span> <span class="p">[</span><span class="n">AllValueSchema</span><span class="p">(</span><span class="s2">"=="</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">)</span> <span class="o">|</span> <span class="n">AllValueSchema</span><span class="p">(</span><span class="s2">"&gt;="</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">)],</span>
     <span class="p">}</span>
 
 <div class="viewcode-block" id="AdaptiveTimeStepping.__init__">
 <a class="viewcode-back" href="../../../api/generated/mf6/imod.mf6.AdaptiveTimeStepping.html#imod.mf6.AdaptiveTimeStepping.__init__">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
-        <span class="n">dt_init</span><span class="p">,</span>
-        <span class="n">dt_min</span><span class="p">,</span>
-        <span class="n">dt_max</span><span class="p">,</span>
-        <span class="n">dt_multiplier</span><span class="o">=</span><span class="mf">0.0</span><span class="p">,</span>
-        <span class="n">dt_fail_divisor</span><span class="o">=</span><span class="mf">0.0</span><span class="p">,</span>
-        <span class="n">validate</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
-    <span class="p">):</span>
+        <span class="n">dt_init</span><span class="p">:</span> <span class="n">xr</span><span class="o">.</span><span class="n">DataArray</span> <span class="o">|</span> <span class="nb">float</span><span class="p">,</span>
+        <span class="n">dt_min</span><span class="p">:</span> <span class="n">xr</span><span class="o">.</span><span class="n">DataArray</span> <span class="o">|</span> <span class="nb">float</span><span class="p">,</span>
+        <span class="n">dt_max</span><span class="p">:</span> <span class="n">xr</span><span class="o">.</span><span class="n">DataArray</span> <span class="o">|</span> <span class="nb">float</span><span class="p">,</span>
+        <span class="n">dt_multiplier</span><span class="p">:</span> <span class="n">xr</span><span class="o">.</span><span class="n">DataArray</span> <span class="o">|</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.0</span><span class="p">,</span>
+        <span class="n">dt_fail_divisor</span><span class="p">:</span> <span class="n">xr</span><span class="o">.</span><span class="n">DataArray</span> <span class="o">|</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.0</span><span class="p">,</span>
+        <span class="n">validate</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
         <span class="n">dict_dataset</span> <span class="o">=</span> <span class="p">{</span>
-            <span class="s2">&quot;dt_init&quot;</span><span class="p">:</span> <span class="n">dt_init</span><span class="p">,</span>
-            <span class="s2">&quot;dt_min&quot;</span><span class="p">:</span> <span class="n">dt_min</span><span class="p">,</span>
-            <span class="s2">&quot;dt_max&quot;</span><span class="p">:</span> <span class="n">dt_max</span><span class="p">,</span>
-            <span class="s2">&quot;dt_multiplier&quot;</span><span class="p">:</span> <span class="n">dt_multiplier</span><span class="p">,</span>
-            <span class="s2">&quot;dt_fail_divisor&quot;</span><span class="p">:</span> <span class="n">dt_fail_divisor</span><span class="p">,</span>
+            <span class="s2">"dt_init"</span><span class="p">:</span> <span class="n">dt_init</span><span class="p">,</span>
+            <span class="s2">"dt_min"</span><span class="p">:</span> <span class="n">dt_min</span><span class="p">,</span>
+            <span class="s2">"dt_max"</span><span class="p">:</span> <span class="n">dt_max</span><span class="p">,</span>
+            <span class="s2">"dt_multiplier"</span><span class="p">:</span> <span class="n">dt_multiplier</span><span class="p">,</span>
+            <span class="s2">"dt_fail_divisor"</span><span class="p">:</span> <span class="n">dt_fail_divisor</span><span class="p">,</span>
         <span class="p">}</span>
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">dict_dataset</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_validate_init_schemata</span><span class="p">(</span><span class="n">validate</span><span class="p">)</span></div>
@@ -619,23 +620,23 @@
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">directory</span><span class="p">:</span> <span class="n">pathlib</span><span class="o">.</span><span class="n">Path</span><span class="p">,</span>
         <span class="n">pkgname</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
-        <span class="n">globaltimes</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">list</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">datetime64</span><span class="p">],</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">],</span>
+        <span class="n">globaltimes</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">datetime64</span><span class="p">]</span> <span class="o">|</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span>
         <span class="n">binary</span><span class="p">:</span> <span class="nb">bool</span><span class="p">,</span>
-    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]:</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]:</span>
         <span class="n">perioddata</span><span class="p">:</span> <span class="n">_PeriodDataType</span> <span class="o">=</span> <span class="p">{}</span>
         <span class="c1"># Force to np.int64 for mypy and numpy &gt;= 2.2.4</span>
         <span class="n">one</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">int64</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
-        <span class="c1"># MODLFLOW 6 doesn&#39;t automatically forward fill stress period data so we</span>
-        <span class="c1"># need to assign data for each stress period, apply xarray&#39;s forward</span>
+        <span class="c1"># MODLFLOW 6 doesn't automatically forward fill stress period data so we</span>
+        <span class="c1"># need to assign data for each stress period, apply xarray's forward</span>
         <span class="c1"># filling functionality for this.</span>
-        <span class="k">if</span> <span class="s2">&quot;time&quot;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">dataset</span><span class="p">:</span>
-            <span class="n">ds_to_reindex</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">dataset</span><span class="o">.</span><span class="n">expand_dims</span><span class="p">(</span><span class="s2">&quot;time&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">assign_coords</span><span class="p">(</span>
+        <span class="k">if</span> <span class="s2">"time"</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">dataset</span><span class="p">:</span>
+            <span class="n">ds_to_reindex</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">dataset</span><span class="o">.</span><span class="n">expand_dims</span><span class="p">(</span><span class="s2">"time"</span><span class="p">)</span><span class="o">.</span><span class="n">assign_coords</span><span class="p">(</span>
                 <span class="n">time</span><span class="o">=</span><span class="n">globaltimes</span><span class="p">[:</span><span class="mi">1</span><span class="p">]</span>
             <span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="n">ds_to_reindex</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">dataset</span>
-        <span class="n">dataset_full</span> <span class="o">=</span> <span class="n">ds_to_reindex</span><span class="o">.</span><span class="n">reindex</span><span class="p">(</span><span class="n">time</span><span class="o">=</span><span class="n">globaltimes</span><span class="p">,</span> <span class="n">method</span><span class="o">=</span><span class="s2">&quot;ffill&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">bfill</span><span class="p">(</span>
-            <span class="s2">&quot;time&quot;</span>
+        <span class="n">dataset_full</span> <span class="o">=</span> <span class="n">ds_to_reindex</span><span class="o">.</span><span class="n">reindex</span><span class="p">(</span><span class="n">time</span><span class="o">=</span><span class="n">globaltimes</span><span class="p">,</span> <span class="n">method</span><span class="o">=</span><span class="s2">"ffill"</span><span class="p">)</span><span class="o">.</span><span class="n">bfill</span><span class="p">(</span>
+            <span class="s2">"time"</span>
         <span class="p">)</span>  <span class="c1"># bfill in case first value is NaN</span>
         <span class="n">maxats</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">globaltimes</span><span class="p">)</span>
         <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">time</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">globaltimes</span><span class="p">):</span>
@@ -646,13 +647,15 @@
             <span class="p">)</span>
 
         <span class="n">d</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">int</span> <span class="o">|</span> <span class="n">_PeriodDataType</span><span class="p">]</span> <span class="o">=</span> <span class="p">{}</span>
-        <span class="n">d</span><span class="p">[</span><span class="s2">&quot;maxats&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">maxats</span>
-        <span class="n">d</span><span class="p">[</span><span class="s2">&quot;perioddata&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">perioddata</span>
+        <span class="n">d</span><span class="p">[</span><span class="s2">"maxats"</span><span class="p">]</span> <span class="o">=</span> <span class="n">maxats</span>
+        <span class="n">d</span><span class="p">[</span><span class="s2">"perioddata"</span><span class="p">]</span> <span class="o">=</span> <span class="n">perioddata</span>
         <span class="k">return</span> <span class="n">d</span>
 
-    <span class="k">def</span><span class="w"> </span><span class="nf">_validate</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">schemata</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">],</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_validate</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span> <span class="n">schemata</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">],</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">:</span> <span class="n">Any</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">list</span><span class="p">[</span><span class="n">ValidationError</span><span class="p">]]:</span>
         <span class="c1"># Insert additional kwargs</span>
-        <span class="n">kwargs</span><span class="p">[</span><span class="s2">&quot;dt_max&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="p">[</span><span class="s2">&quot;dt_max&quot;</span><span class="p">]</span>
+        <span class="n">kwargs</span><span class="p">[</span><span class="s2">"dt_max"</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="p">[</span><span class="s2">"dt_max"</span><span class="p">]</span>
         <span class="n">errors</span> <span class="o">=</span> <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">_validate</span><span class="p">(</span><span class="n">schemata</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
 
         <span class="k">return</span> <span class="n">errors</span>
@@ -660,7 +663,7 @@
     <span class="k">def</span><span class="w"> </span><span class="nf">_write</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">pkgname</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
-        <span class="n">globaltimes</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">list</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">datetime64</span><span class="p">],</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">],</span>
+        <span class="n">globaltimes</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">datetime64</span><span class="p">]</span> <span class="o">|</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span>
         <span class="n">write_context</span><span class="p">:</span> <span class="n">WriteContext</span><span class="p">,</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
         <span class="n">ats_content</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_render</span><span class="p">(</span>
@@ -669,8 +672,8 @@
             <span class="n">globaltimes</span><span class="p">,</span>
             <span class="n">write_context</span><span class="o">.</span><span class="n">use_binary</span><span class="p">,</span>
         <span class="p">)</span>
-        <span class="n">timedis_path</span> <span class="o">=</span> <span class="n">write_context</span><span class="o">.</span><span class="n">write_directory</span> <span class="o">/</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">pkgname</span><span class="si">}</span><span class="s2">.ats&quot;</span>
-        <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">timedis_path</span><span class="p">,</span> <span class="s2">&quot;w&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+        <span class="n">timedis_path</span> <span class="o">=</span> <span class="n">write_context</span><span class="o">.</span><span class="n">write_directory</span> <span class="o">/</span> <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">pkgname</span><span class="si">}</span><span class="s2">.ats"</span>
+        <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">timedis_path</span><span class="p">,</span> <span class="s2">"w"</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
             <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">ats_content</span><span class="p">)</span></div>
 
 </pre></div>
@@ -702,8 +705,8 @@
   </div>
   
   <!-- Scripts loaded after <body> so the DOM is not blocked -->
-  <script defer src="../../../_static/scripts/bootstrap.js?digest=90905a2f556bf617f1a9"></script>
-<script defer src="../../../_static/scripts/pydata-sphinx-theme.js?digest=90905a2f556bf617f1a9"></script>
+  <script defer src="../../../_static/scripts/bootstrap.js?digest=75c7c72ae941e8b558d8"></script>
+<script defer src="../../../_static/scripts/pydata-sphinx-theme.js?digest=75c7c72ae941e8b558d8"></script>
 
   <footer class="bd-footer">
 <div class="bd-footer__inner bd-page-width">
@@ -723,8 +726,7 @@
         <div class="footer-item">
 
   <p class="sphinx-version">
-    Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 9.1.0.
-    <br/>
+    Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 9.2.0.
   </p>
 </div>
       
@@ -737,7 +739,7 @@
         <div class="footer-item">
 <p class="theme-version">
   <!-- # L10n: Setting the PST URL as an argument as this does not need to be localized -->
-  Built with the <a href="https://pydata-sphinx-theme.readthedocs.io/en/stable/index.html">PyData Sphinx Theme</a> 0.20.0.
+  Built with the <a href="https://pydata-sphinx-theme.readthedocs.io/en/stable/index.html">PyData Sphinx Theme</a> 0.24.0.
 </p></div>
       
     </div>

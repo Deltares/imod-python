@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 
 
@@ -7,7 +6,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>imod.formats.idf &#8212; iMOD Python 1.1.0 documentation</title>
+    <title>imod.formats.idf &#8212; iMOD Python 1.2.0 documentation</title>
   
   
   
@@ -26,22 +25,22 @@
   </noscript>
   
   <!-- Loaded before other Sphinx assets -->
-  <link href="../../../_static/styles/theme.css?digest=90905a2f556bf617f1a9" rel="stylesheet" />
-<link href="../../../_static/styles/pydata-sphinx-theme.css?digest=90905a2f556bf617f1a9" rel="stylesheet" />
+  <link href="../../../_static/styles/theme.css?digest=75c7c72ae941e8b558d8" rel="stylesheet" />
+<link href="../../../_static/styles/pydata-sphinx-theme.css?digest=75c7c72ae941e8b558d8" rel="stylesheet" />
 
     <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=03e43079" />
-    <link rel="stylesheet" type="text/css" href="../../../_static/sg_gallery.css?v=fd6457a4" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/sg_gallery.css?v=c83e6b79" />
     <link rel="stylesheet" type="text/css" href="../../../_static/sg_gallery-binder.css?v=f4aeca0c" />
     <link rel="stylesheet" type="text/css" href="../../../_static/sg_gallery-dataframe.css?v=2082cf3c" />
     <link rel="stylesheet" type="text/css" href="../../../_static/sg_gallery-rendered-html.css?v=1277b6f3" />
   
   <!-- So that users can add custom icons -->
-  <script defer src="../../../_static/scripts/fontawesome.js?digest=90905a2f556bf617f1a9"></script>
+  <script defer src="../../../_static/scripts/fontawesome.js?digest=75c7c72ae941e8b558d8"></script>
   <!-- Pre-loaded scripts that we'll load fully later -->
-  <link rel="preload" as="script" href="../../../_static/scripts/bootstrap.js?digest=90905a2f556bf617f1a9" />
-<link rel="preload" as="script" href="../../../_static/scripts/pydata-sphinx-theme.js?digest=90905a2f556bf617f1a9" />
+  <link rel="preload" as="script" href="../../../_static/scripts/bootstrap.js?digest=75c7c72ae941e8b558d8" />
+<link rel="preload" as="script" href="../../../_static/scripts/pydata-sphinx-theme.js?digest=75c7c72ae941e8b558d8" />
 
-    <script src="../../../_static/documentation_options.js?v=fc837d61"></script>
+    <script src="../../../_static/documentation_options.js?v=6efca38a"></script>
     <script src="../../../_static/doctools.js?v=fd6eb6e6"></script>
     <script src="../../../_static/sphinx_highlight.js?v=6ffebe34"></script>
     <script src="../../../_static/sg-tags.js?v=d80f6fa4"></script>
@@ -51,8 +50,9 @@
     <link rel="index" title="Index" href="../../../genindex.html" />
     <link rel="search" title="Search" href="../../../search.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <meta name="color-scheme" content="light dark"/>
   <meta name="docsearch:language" content="en"/>
-  <meta name="docsearch:version" content="1.1.0.dev" />
+  <meta name="docsearch:version" content="1.2.0.dev" />
   
     
     <script src="../../../_static/searchtools.js"></script>
@@ -100,7 +100,7 @@
   
     <header id="pst-header" class="bd-header navbar navbar-expand-lg bd-navbar d-print-none">
 <div class="bd-header__inner bd-page-width">
-  <button class="pst-navbar-icon sidebar-toggle primary-toggle" aria-label="Site navigation">
+  <button type="button" class="pst-navbar-icon sidebar-toggle primary-toggle" aria-label="Site navigation" aria-expanded="false" aria-controls="pst-primary-sidebar-modal">
     <span class="fa-solid fa-bars"></span>
   </button>
   
@@ -122,8 +122,8 @@
     
     
     
-    <img src="../../../_static/imod-python-logo-light.svg" class="logo__image only-light" alt="iMOD Python 1.1.0 documentation - Home"/>
-    <img src="../../../_static/imod-python-logo-dark.svg" class="logo__image only-dark pst-js-only" alt="iMOD Python 1.1.0 documentation - Home"/>
+    <img src="../../../_static/imod-python-logo-light.svg" class="logo__image only-light" alt="iMOD Python 1.2.0 documentation - Home"/>
+    <img src="../../../_static/imod-python-logo-dark.svg" class="logo__image only-dark pst-js-only" alt="iMOD Python 1.2.0 documentation - Home"/>
   
   
 </a></div>
@@ -190,7 +190,7 @@
         <div class="navbar-item navbar-persistent--container">
           
 
-<button class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+<button type="button" class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
  <i class="fa-solid fa-magnifying-glass"></i>
  <span class="search-button__default-text">Search</span>
  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
@@ -201,15 +201,15 @@
         <div class="navbar-item">
 
 <div class="theme-switch-container dropdown pst-js-only" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Color mode">
-  <button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button dropdown-toggle" aria-label="Color mode" data-bs-toggle="dropdown">
-    <i class="theme-switch fa-solid fa-sun fa-lg fa-fw" data-mode="light" title="Light"></i>
-    <i class="theme-switch fa-solid fa-moon fa-lg fa-fw" data-mode="dark" title="Dark"></i>
-    <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg fa-fw" data-mode="auto" title="System Settings"></i>
+  <button type="button" class="btn btn-sm nav-link pst-navbar-icon theme-switch-button dropdown-toggle" aria-label="Color mode" data-bs-toggle="dropdown">
+    <i class="theme-switch fa-solid fa-sun fa-lg" data-mode="light" title="Light"></i>
+    <i class="theme-switch fa-solid fa-moon fa-lg" data-mode="dark" title="Dark"></i>
+    <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg" data-mode="auto" title="System Settings"></i>
   </button>
   <ul class="dropdown-menu dropdown-menu-end">
-    <li><button class="dropdown-item d-flex align-items-center theme-change-button" data-mode="auto"><i class="fa-solid fa-circle-half-stroke fa-lg fa-fw me-1"></i>System Settings</button></li>
-    <li><button class="dropdown-item d-flex align-items-center theme-change-button" data-mode="light"><i class="fa-solid fa-sun fa-lg fa-fw me-1"></i>Light</button></li>
-    <li><button class="dropdown-item d-flex align-items-center theme-change-button" data-mode="dark"><i class="fa-solid fa-moon fa-lg fa-fw me-1"></i>Dark</button></li>
+    <li><button type="button" class="dropdown-item d-flex align-items-center theme-change-button" data-mode="auto"><i class="fa-solid fa-circle-half-stroke fa-lg me-1"></i>System Settings</button></li>
+    <li><button type="button" class="dropdown-item d-flex align-items-center theme-change-button" data-mode="light"><i class="fa-solid fa-sun fa-lg me-1"></i>Light</button></li>
+    <li><button type="button" class="dropdown-item d-flex align-items-center theme-change-button" data-mode="dark"><i class="fa-solid fa-moon fa-lg me-1"></i>Dark</button></li>
   </ul>
 </div></div>
       
@@ -246,7 +246,7 @@
   
     <div class="navbar-persistent--mobile">
 
-<button class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+<button type="button" class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
  <i class="fa-solid fa-magnifying-glass"></i>
  <span class="search-button__default-text">Search</span>
  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
@@ -267,7 +267,7 @@
       
         
       
-      <dialog id="pst-primary-sidebar-modal"></dialog>
+      <dialog id="pst-primary-sidebar-modal" tabindex="-1"></dialog>
       <div id="pst-primary-sidebar" class="bd-sidebar-primary bd-sidebar hide-on-wide">
         
 
@@ -337,15 +337,15 @@
           <div class="navbar-item">
 
 <div class="theme-switch-container dropdown pst-js-only" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Color mode">
-  <button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button dropdown-toggle" aria-label="Color mode" data-bs-toggle="dropdown">
-    <i class="theme-switch fa-solid fa-sun fa-lg fa-fw" data-mode="light" title="Light"></i>
-    <i class="theme-switch fa-solid fa-moon fa-lg fa-fw" data-mode="dark" title="Dark"></i>
-    <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg fa-fw" data-mode="auto" title="System Settings"></i>
+  <button type="button" class="btn btn-sm nav-link pst-navbar-icon theme-switch-button dropdown-toggle" aria-label="Color mode" data-bs-toggle="dropdown">
+    <i class="theme-switch fa-solid fa-sun fa-lg" data-mode="light" title="Light"></i>
+    <i class="theme-switch fa-solid fa-moon fa-lg" data-mode="dark" title="Dark"></i>
+    <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg" data-mode="auto" title="System Settings"></i>
   </button>
   <ul class="dropdown-menu dropdown-menu-end">
-    <li><button class="dropdown-item d-flex align-items-center theme-change-button" data-mode="auto"><i class="fa-solid fa-circle-half-stroke fa-lg fa-fw me-1"></i>System Settings</button></li>
-    <li><button class="dropdown-item d-flex align-items-center theme-change-button" data-mode="light"><i class="fa-solid fa-sun fa-lg fa-fw me-1"></i>Light</button></li>
-    <li><button class="dropdown-item d-flex align-items-center theme-change-button" data-mode="dark"><i class="fa-solid fa-moon fa-lg fa-fw me-1"></i>Dark</button></li>
+    <li><button type="button" class="dropdown-item d-flex align-items-center theme-change-button" data-mode="auto"><i class="fa-solid fa-circle-half-stroke fa-lg me-1"></i>System Settings</button></li>
+    <li><button type="button" class="dropdown-item d-flex align-items-center theme-change-button" data-mode="light"><i class="fa-solid fa-sun fa-lg me-1"></i>Light</button></li>
+    <li><button type="button" class="dropdown-item d-flex align-items-center theme-change-button" data-mode="dark"><i class="fa-solid fa-moon fa-lg me-1"></i>Dark</button></li>
   </ul>
 </div></div>
         
@@ -411,7 +411,7 @@
     
     <li class="breadcrumb-item breadcrumb-home">
       <a href="../../../index.html" class="nav-link" aria-label="Home">
-        <i class="fa-solid fa-home"></i>
+        <i class="fa-solid fa-house"></i>
       </a>
     </li>
     
@@ -435,29 +435,30 @@
                 <article class="bd-article">
                   
   <h1>Source code for imod.formats.idf</h1><div class="highlight"><pre>
-<span></span><span class="sd">&quot;&quot;&quot;</span>
+<span></span><span class="sd">"""</span>
 <span class="sd">Functions for reading and writing iMOD Data Files (IDFs) to ``xarray`` objects.</span>
 
 <span class="sd">The primary functions to use are :func:`imod.idf.open` and</span>
 <span class="sd">:func:`imod.idf.save`, though lower level functions are also available.</span>
-<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">"""</span>
 
 <span class="kn">import</span><span class="w"> </span><span class="nn">glob</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">pathlib</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">struct</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">collections</span><span class="w"> </span><span class="kn">import</span> <span class="n">defaultdict</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">collections.abc</span><span class="w"> </span><span class="kn">import</span> <span class="n">Iterable</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">pathlib</span><span class="w"> </span><span class="kn">import</span> <span class="n">Path</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">re</span><span class="w"> </span><span class="kn">import</span> <span class="n">Pattern</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Any</span><span class="p">,</span> <span class="n">DefaultDict</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">collections.abc</span><span class="w"> </span><span class="kn">import</span> <span class="n">Callable</span><span class="p">,</span> <span class="n">Iterable</span><span class="p">,</span> <span class="n">Sequence</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Any</span><span class="p">,</span> <span class="n">Literal</span>
 
 <span class="kn">import</span><span class="w"> </span><span class="nn">dask</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">dask.array</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">xarray</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">xr</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">numpy.typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">DTypeLike</span>
 
 <span class="kn">import</span><span class="w"> </span><span class="nn">imod</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">imod.formats</span><span class="w"> </span><span class="kn">import</span> <span class="n">array_io</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">imod.formats.array_io.reading</span><span class="w"> </span><span class="kn">import</span> <span class="n">PathType</span><span class="p">,</span> <span class="n">PatternType</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">imod.typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">DataArrayComponents</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">imod.typing.structured</span><span class="w"> </span><span class="kn">import</span> <span class="n">merge_partitions_as_da_components</span>
 
 <span class="c1"># Make sure we can still use the built-in function...</span>
@@ -466,31 +467,31 @@
 
 <div class="viewcode-block" id="header">
 <a class="viewcode-back" href="../../../api/generated/io/imod.formats.idf.header.html#imod.formats.idf.header">[docs]</a>
-<span class="k">def</span><span class="w"> </span><span class="nf">header</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="n">pattern</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Read the IDF header information into a dictionary&quot;&quot;&quot;</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">header</span><span class="p">(</span><span class="n">path</span><span class="p">:</span> <span class="n">PathType</span><span class="p">,</span> <span class="n">pattern</span><span class="p">:</span> <span class="n">PatternType</span> <span class="o">|</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]:</span>
+<span class="w">    </span><span class="sd">"""Read the IDF header information into a dictionary"""</span>
     <span class="n">attrs</span> <span class="o">=</span> <span class="n">imod</span><span class="o">.</span><span class="n">util</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">decompose</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="n">pattern</span><span class="p">)</span>
-    <span class="k">with</span> <span class="n">f_open</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="s2">&quot;rb&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
-        <span class="n">reclen_id</span> <span class="o">=</span> <span class="n">struct</span><span class="o">.</span><span class="n">unpack</span><span class="p">(</span><span class="s2">&quot;i&quot;</span><span class="p">,</span> <span class="n">f</span><span class="o">.</span><span class="n">read</span><span class="p">(</span><span class="mi">4</span><span class="p">))[</span><span class="mi">0</span><span class="p">]</span>  <span class="c1"># Lahey RecordLength Ident.</span>
+    <span class="k">with</span> <span class="n">f_open</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="s2">"rb"</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+        <span class="n">reclen_id</span> <span class="o">=</span> <span class="n">struct</span><span class="o">.</span><span class="n">unpack</span><span class="p">(</span><span class="s2">"i"</span><span class="p">,</span> <span class="n">f</span><span class="o">.</span><span class="n">read</span><span class="p">(</span><span class="mi">4</span><span class="p">))[</span><span class="mi">0</span><span class="p">]</span>  <span class="c1"># Lahey RecordLength Ident.</span>
         <span class="k">if</span> <span class="n">reclen_id</span> <span class="o">==</span> <span class="mi">1271</span><span class="p">:</span>
             <span class="n">floatsize</span> <span class="o">=</span> <span class="n">intsize</span> <span class="o">=</span> <span class="mi">4</span>
-            <span class="n">floatformat</span> <span class="o">=</span> <span class="s2">&quot;f&quot;</span>
-            <span class="n">intformat</span> <span class="o">=</span> <span class="s2">&quot;i&quot;</span>
-            <span class="n">dtype</span> <span class="o">=</span> <span class="s2">&quot;float32&quot;</span>
+            <span class="n">floatformat</span> <span class="o">=</span> <span class="s2">"f"</span>
+            <span class="n">intformat</span> <span class="o">=</span> <span class="s2">"i"</span>
+            <span class="n">dtype</span> <span class="o">=</span> <span class="s2">"float32"</span>
             <span class="n">doubleprecision</span> <span class="o">=</span> <span class="kc">False</span>
         <span class="c1"># 2296 was a typo in the iMOD manual. Keep 2296 around in case some IDFs</span>
         <span class="c1"># were written with this identifier to avoid possible incompatibility</span>
         <span class="c1"># issues.</span>
         <span class="k">elif</span> <span class="n">reclen_id</span> <span class="o">==</span> <span class="mi">2295</span> <span class="ow">or</span> <span class="n">reclen_id</span> <span class="o">==</span> <span class="mi">2296</span><span class="p">:</span>
             <span class="n">floatsize</span> <span class="o">=</span> <span class="n">intsize</span> <span class="o">=</span> <span class="mi">8</span>
-            <span class="n">floatformat</span> <span class="o">=</span> <span class="s2">&quot;d&quot;</span>
-            <span class="n">intformat</span> <span class="o">=</span> <span class="s2">&quot;q&quot;</span>
-            <span class="n">dtype</span> <span class="o">=</span> <span class="s2">&quot;float64&quot;</span>
+            <span class="n">floatformat</span> <span class="o">=</span> <span class="s2">"d"</span>
+            <span class="n">intformat</span> <span class="o">=</span> <span class="s2">"q"</span>
+            <span class="n">dtype</span> <span class="o">=</span> <span class="s2">"float64"</span>
             <span class="n">doubleprecision</span> <span class="o">=</span> <span class="kc">True</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
-                <span class="sa">f</span><span class="s2">&quot;Not a supported IDF file: </span><span class="si">{</span><span class="n">path</span><span class="si">}</span><span class="se">\n</span><span class="s2">&quot;</span>
-                <span class="s2">&quot;Record length identifier should be 1271 or 2295, &quot;</span>
-                <span class="sa">f</span><span class="s2">&quot;received </span><span class="si">{</span><span class="n">reclen_id</span><span class="si">}</span><span class="s2"> instead.&quot;</span>
+                <span class="sa">f</span><span class="s2">"Not a supported IDF file: </span><span class="si">{</span><span class="n">path</span><span class="si">}</span><span class="se">\n</span><span class="s2">"</span>
+                <span class="s2">"Record length identifier should be 1271 or 2295, "</span>
+                <span class="sa">f</span><span class="s2">"received </span><span class="si">{</span><span class="n">reclen_id</span><span class="si">}</span><span class="s2"> instead."</span>
             <span class="p">)</span>
 
         <span class="c1"># Header is fully doubled in size in case of double precision ...</span>
@@ -501,19 +502,19 @@
 
         <span class="n">ncol</span> <span class="o">=</span> <span class="n">struct</span><span class="o">.</span><span class="n">unpack</span><span class="p">(</span><span class="n">intformat</span><span class="p">,</span> <span class="n">f</span><span class="o">.</span><span class="n">read</span><span class="p">(</span><span class="n">intsize</span><span class="p">))[</span><span class="mi">0</span><span class="p">]</span>
         <span class="n">nrow</span> <span class="o">=</span> <span class="n">struct</span><span class="o">.</span><span class="n">unpack</span><span class="p">(</span><span class="n">intformat</span><span class="p">,</span> <span class="n">f</span><span class="o">.</span><span class="n">read</span><span class="p">(</span><span class="n">intsize</span><span class="p">))[</span><span class="mi">0</span><span class="p">]</span>
-        <span class="n">attrs</span><span class="p">[</span><span class="s2">&quot;xmin&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">struct</span><span class="o">.</span><span class="n">unpack</span><span class="p">(</span><span class="n">floatformat</span><span class="p">,</span> <span class="n">f</span><span class="o">.</span><span class="n">read</span><span class="p">(</span><span class="n">floatsize</span><span class="p">))[</span><span class="mi">0</span><span class="p">]</span>
-        <span class="n">attrs</span><span class="p">[</span><span class="s2">&quot;xmax&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">struct</span><span class="o">.</span><span class="n">unpack</span><span class="p">(</span><span class="n">floatformat</span><span class="p">,</span> <span class="n">f</span><span class="o">.</span><span class="n">read</span><span class="p">(</span><span class="n">floatsize</span><span class="p">))[</span><span class="mi">0</span><span class="p">]</span>
-        <span class="n">attrs</span><span class="p">[</span><span class="s2">&quot;ymin&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">struct</span><span class="o">.</span><span class="n">unpack</span><span class="p">(</span><span class="n">floatformat</span><span class="p">,</span> <span class="n">f</span><span class="o">.</span><span class="n">read</span><span class="p">(</span><span class="n">floatsize</span><span class="p">))[</span><span class="mi">0</span><span class="p">]</span>
-        <span class="n">attrs</span><span class="p">[</span><span class="s2">&quot;ymax&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">struct</span><span class="o">.</span><span class="n">unpack</span><span class="p">(</span><span class="n">floatformat</span><span class="p">,</span> <span class="n">f</span><span class="o">.</span><span class="n">read</span><span class="p">(</span><span class="n">floatsize</span><span class="p">))[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="n">attrs</span><span class="p">[</span><span class="s2">"xmin"</span><span class="p">]</span> <span class="o">=</span> <span class="n">struct</span><span class="o">.</span><span class="n">unpack</span><span class="p">(</span><span class="n">floatformat</span><span class="p">,</span> <span class="n">f</span><span class="o">.</span><span class="n">read</span><span class="p">(</span><span class="n">floatsize</span><span class="p">))[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="n">attrs</span><span class="p">[</span><span class="s2">"xmax"</span><span class="p">]</span> <span class="o">=</span> <span class="n">struct</span><span class="o">.</span><span class="n">unpack</span><span class="p">(</span><span class="n">floatformat</span><span class="p">,</span> <span class="n">f</span><span class="o">.</span><span class="n">read</span><span class="p">(</span><span class="n">floatsize</span><span class="p">))[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="n">attrs</span><span class="p">[</span><span class="s2">"ymin"</span><span class="p">]</span> <span class="o">=</span> <span class="n">struct</span><span class="o">.</span><span class="n">unpack</span><span class="p">(</span><span class="n">floatformat</span><span class="p">,</span> <span class="n">f</span><span class="o">.</span><span class="n">read</span><span class="p">(</span><span class="n">floatsize</span><span class="p">))[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="n">attrs</span><span class="p">[</span><span class="s2">"ymax"</span><span class="p">]</span> <span class="o">=</span> <span class="n">struct</span><span class="o">.</span><span class="n">unpack</span><span class="p">(</span><span class="n">floatformat</span><span class="p">,</span> <span class="n">f</span><span class="o">.</span><span class="n">read</span><span class="p">(</span><span class="n">floatsize</span><span class="p">))[</span><span class="mi">0</span><span class="p">]</span>
         <span class="c1"># dmin and dmax are recomputed during writing</span>
         <span class="n">f</span><span class="o">.</span><span class="n">read</span><span class="p">(</span><span class="n">floatsize</span><span class="p">)</span>  <span class="c1"># dmin, minimum data value present</span>
         <span class="n">f</span><span class="o">.</span><span class="n">read</span><span class="p">(</span><span class="n">floatsize</span><span class="p">)</span>  <span class="c1"># dmax, maximum data value present</span>
         <span class="n">nodata</span> <span class="o">=</span> <span class="n">struct</span><span class="o">.</span><span class="n">unpack</span><span class="p">(</span><span class="n">floatformat</span><span class="p">,</span> <span class="n">f</span><span class="o">.</span><span class="n">read</span><span class="p">(</span><span class="n">floatsize</span><span class="p">))[</span><span class="mi">0</span><span class="p">]</span>
-        <span class="n">attrs</span><span class="p">[</span><span class="s2">&quot;nodata&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">nodata</span>
+        <span class="n">attrs</span><span class="p">[</span><span class="s2">"nodata"</span><span class="p">]</span> <span class="o">=</span> <span class="n">nodata</span>
         <span class="c1"># flip definition here such that True means equidistant</span>
         <span class="c1"># equidistant IDFs</span>
-        <span class="n">ieq</span> <span class="o">=</span> <span class="ow">not</span> <span class="n">struct</span><span class="o">.</span><span class="n">unpack</span><span class="p">(</span><span class="s2">&quot;?&quot;</span><span class="p">,</span> <span class="n">f</span><span class="o">.</span><span class="n">read</span><span class="p">(</span><span class="mi">1</span><span class="p">))[</span><span class="mi">0</span><span class="p">]</span>
-        <span class="n">itb</span> <span class="o">=</span> <span class="n">struct</span><span class="o">.</span><span class="n">unpack</span><span class="p">(</span><span class="s2">&quot;?&quot;</span><span class="p">,</span> <span class="n">f</span><span class="o">.</span><span class="n">read</span><span class="p">(</span><span class="mi">1</span><span class="p">))[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="n">ieq</span> <span class="o">=</span> <span class="ow">not</span> <span class="n">struct</span><span class="o">.</span><span class="n">unpack</span><span class="p">(</span><span class="s2">"?"</span><span class="p">,</span> <span class="n">f</span><span class="o">.</span><span class="n">read</span><span class="p">(</span><span class="mi">1</span><span class="p">))[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="n">itb</span> <span class="o">=</span> <span class="n">struct</span><span class="o">.</span><span class="n">unpack</span><span class="p">(</span><span class="s2">"?"</span><span class="p">,</span> <span class="n">f</span><span class="o">.</span><span class="n">read</span><span class="p">(</span><span class="mi">1</span><span class="p">))[</span><span class="mi">0</span><span class="p">]</span>
 
         <span class="n">f</span><span class="o">.</span><span class="n">read</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span>  <span class="c1"># not used</span>
         <span class="k">if</span> <span class="n">doubleprecision</span><span class="p">:</span>
@@ -522,31 +523,38 @@
         <span class="k">if</span> <span class="n">ieq</span><span class="p">:</span>
             <span class="c1"># dx and dy are stored positively in the IDF</span>
             <span class="c1"># dy is made negative here to be consistent with the nonequidistant case</span>
-            <span class="n">attrs</span><span class="p">[</span><span class="s2">&quot;dx&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">struct</span><span class="o">.</span><span class="n">unpack</span><span class="p">(</span><span class="n">floatformat</span><span class="p">,</span> <span class="n">f</span><span class="o">.</span><span class="n">read</span><span class="p">(</span><span class="n">floatsize</span><span class="p">))[</span><span class="mi">0</span><span class="p">]</span>
-            <span class="n">attrs</span><span class="p">[</span><span class="s2">&quot;dy&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="o">-</span><span class="n">struct</span><span class="o">.</span><span class="n">unpack</span><span class="p">(</span><span class="n">floatformat</span><span class="p">,</span> <span class="n">f</span><span class="o">.</span><span class="n">read</span><span class="p">(</span><span class="n">floatsize</span><span class="p">))[</span><span class="mi">0</span><span class="p">]</span>
+            <span class="n">attrs</span><span class="p">[</span><span class="s2">"dx"</span><span class="p">]</span> <span class="o">=</span> <span class="n">struct</span><span class="o">.</span><span class="n">unpack</span><span class="p">(</span><span class="n">floatformat</span><span class="p">,</span> <span class="n">f</span><span class="o">.</span><span class="n">read</span><span class="p">(</span><span class="n">floatsize</span><span class="p">))[</span><span class="mi">0</span><span class="p">]</span>
+            <span class="n">attrs</span><span class="p">[</span><span class="s2">"dy"</span><span class="p">]</span> <span class="o">=</span> <span class="o">-</span><span class="n">struct</span><span class="o">.</span><span class="n">unpack</span><span class="p">(</span><span class="n">floatformat</span><span class="p">,</span> <span class="n">f</span><span class="o">.</span><span class="n">read</span><span class="p">(</span><span class="n">floatsize</span><span class="p">))[</span><span class="mi">0</span><span class="p">]</span>
 
         <span class="k">if</span> <span class="n">itb</span><span class="p">:</span>
-            <span class="n">attrs</span><span class="p">[</span><span class="s2">&quot;top&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">struct</span><span class="o">.</span><span class="n">unpack</span><span class="p">(</span><span class="n">floatformat</span><span class="p">,</span> <span class="n">f</span><span class="o">.</span><span class="n">read</span><span class="p">(</span><span class="n">floatsize</span><span class="p">))[</span><span class="mi">0</span><span class="p">]</span>
-            <span class="n">attrs</span><span class="p">[</span><span class="s2">&quot;bot&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">struct</span><span class="o">.</span><span class="n">unpack</span><span class="p">(</span><span class="n">floatformat</span><span class="p">,</span> <span class="n">f</span><span class="o">.</span><span class="n">read</span><span class="p">(</span><span class="n">floatsize</span><span class="p">))[</span><span class="mi">0</span><span class="p">]</span>
+            <span class="n">attrs</span><span class="p">[</span><span class="s2">"top"</span><span class="p">]</span> <span class="o">=</span> <span class="n">struct</span><span class="o">.</span><span class="n">unpack</span><span class="p">(</span><span class="n">floatformat</span><span class="p">,</span> <span class="n">f</span><span class="o">.</span><span class="n">read</span><span class="p">(</span><span class="n">floatsize</span><span class="p">))[</span><span class="mi">0</span><span class="p">]</span>
+            <span class="n">attrs</span><span class="p">[</span><span class="s2">"bot"</span><span class="p">]</span> <span class="o">=</span> <span class="n">struct</span><span class="o">.</span><span class="n">unpack</span><span class="p">(</span><span class="n">floatformat</span><span class="p">,</span> <span class="n">f</span><span class="o">.</span><span class="n">read</span><span class="p">(</span><span class="n">floatsize</span><span class="p">))[</span><span class="mi">0</span><span class="p">]</span>
 
         <span class="k">if</span> <span class="ow">not</span> <span class="n">ieq</span><span class="p">:</span>
             <span class="c1"># dx and dy are stored positive in the IDF, but since the difference between</span>
             <span class="c1"># successive y coordinates is negative, it is made negative here</span>
-            <span class="n">attrs</span><span class="p">[</span><span class="s2">&quot;dx&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">fromfile</span><span class="p">(</span><span class="n">f</span><span class="p">,</span> <span class="n">dtype</span><span class="p">,</span> <span class="n">ncol</span><span class="p">)</span>
-            <span class="n">attrs</span><span class="p">[</span><span class="s2">&quot;dy&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="o">-</span><span class="n">np</span><span class="o">.</span><span class="n">fromfile</span><span class="p">(</span><span class="n">f</span><span class="p">,</span> <span class="n">dtype</span><span class="p">,</span> <span class="n">nrow</span><span class="p">)</span>
+            <span class="n">attrs</span><span class="p">[</span><span class="s2">"dx"</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">fromfile</span><span class="p">(</span><span class="n">f</span><span class="p">,</span> <span class="n">dtype</span><span class="p">,</span> <span class="n">ncol</span><span class="p">)</span>
+            <span class="n">attrs</span><span class="p">[</span><span class="s2">"dy"</span><span class="p">]</span> <span class="o">=</span> <span class="o">-</span><span class="n">np</span><span class="o">.</span><span class="n">fromfile</span><span class="p">(</span><span class="n">f</span><span class="p">,</span> <span class="n">dtype</span><span class="p">,</span> <span class="n">nrow</span><span class="p">)</span>
 
         <span class="c1"># These are derived, remove after using them downstream</span>
-        <span class="n">attrs</span><span class="p">[</span><span class="s2">&quot;headersize&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">f</span><span class="o">.</span><span class="n">tell</span><span class="p">()</span>
-        <span class="n">attrs</span><span class="p">[</span><span class="s2">&quot;ncol&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">ncol</span>
-        <span class="n">attrs</span><span class="p">[</span><span class="s2">&quot;nrow&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">nrow</span>
-        <span class="n">attrs</span><span class="p">[</span><span class="s2">&quot;dtype&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">dtype</span>
+        <span class="n">attrs</span><span class="p">[</span><span class="s2">"headersize"</span><span class="p">]</span> <span class="o">=</span> <span class="n">f</span><span class="o">.</span><span class="n">tell</span><span class="p">()</span>
+        <span class="n">attrs</span><span class="p">[</span><span class="s2">"ncol"</span><span class="p">]</span> <span class="o">=</span> <span class="n">ncol</span>
+        <span class="n">attrs</span><span class="p">[</span><span class="s2">"nrow"</span><span class="p">]</span> <span class="o">=</span> <span class="n">nrow</span>
+        <span class="n">attrs</span><span class="p">[</span><span class="s2">"dtype"</span><span class="p">]</span> <span class="o">=</span> <span class="n">dtype</span>
 
     <span class="k">return</span> <span class="n">attrs</span></div>
 
 
 
-<span class="k">def</span><span class="w"> </span><span class="nf">_read</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="n">headersize</span><span class="p">,</span> <span class="n">nrow</span><span class="p">,</span> <span class="n">ncol</span><span class="p">,</span> <span class="n">nodata</span><span class="p">,</span> <span class="n">dtype</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">_read</span><span class="p">(</span>
+    <span class="n">path</span><span class="p">:</span> <span class="n">PathType</span><span class="p">,</span>
+    <span class="n">headersize</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+    <span class="n">nrow</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+    <span class="n">ncol</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+    <span class="n">nodata</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
+    <span class="n">dtype</span><span class="p">:</span> <span class="n">DTypeLike</span><span class="p">,</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">"""</span>
 <span class="sd">    Read a single IDF file to a numpy.ndarray</span>
 
 <span class="sd">    Parameters</span>
@@ -565,21 +573,25 @@
 <span class="sd">        A float numpy.ndarray with shape (nrow, ncol) of the values</span>
 <span class="sd">        in the IDF file. On opening all nodata values are changed</span>
 <span class="sd">        to NaN in the numpy.ndarray.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
-    <span class="k">with</span> <span class="n">f_open</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="s2">&quot;rb&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+<span class="sd">    """</span>
+    <span class="k">with</span> <span class="n">f_open</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="s2">"rb"</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
         <span class="n">f</span><span class="o">.</span><span class="n">seek</span><span class="p">(</span><span class="n">headersize</span><span class="p">)</span>
         <span class="n">a</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">fromfile</span><span class="p">(</span><span class="n">f</span><span class="p">,</span> <span class="n">dtype</span><span class="p">,</span> <span class="n">nrow</span> <span class="o">*</span> <span class="n">ncol</span><span class="p">),</span> <span class="p">(</span><span class="n">nrow</span><span class="p">,</span> <span class="n">ncol</span><span class="p">))</span>
     <span class="k">return</span> <span class="n">array_io</span><span class="o">.</span><span class="n">reading</span><span class="o">.</span><span class="n">_to_nan</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="n">nodata</span><span class="p">)</span>
 
 
-<span class="c1"># Open IDFs for multiple times and/or layers into one DataArray</span>
 <div class="viewcode-block" id="open">
 <a class="viewcode-back" href="../../../api/generated/io/imod.formats.idf.open.html#imod.formats.idf.open">[docs]</a>
-<span class="k">def</span><span class="w"> </span><span class="nf">open</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="n">use_cftime</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">pattern</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
-<span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">open</span><span class="p">(</span>
+    <span class="n">path</span><span class="p">:</span> <span class="n">PathType</span> <span class="o">|</span> <span class="nb">list</span><span class="p">[</span><span class="n">PathType</span><span class="p">],</span>
+    <span class="n">use_cftime</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
+    <span class="n">pattern</span><span class="p">:</span> <span class="n">PatternType</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">chunk_layout</span><span class="p">:</span> <span class="n">Literal</span><span class="p">[</span><span class="s2">"per_idf"</span><span class="p">,</span> <span class="s2">"per_timestep"</span><span class="p">]</span> <span class="o">=</span> <span class="s2">"per_idf"</span><span class="p">,</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">xr</span><span class="o">.</span><span class="n">DataArray</span><span class="p">:</span>
+<span class="w">    </span><span class="sa">r</span><span class="sd">"""</span>
 <span class="sd">    Open one or more IDF files as an xarray.DataArray.</span>
 
-<span class="sd">    In accordance with xarray&#39;s design, ``open`` loads the data of IDF files</span>
+<span class="sd">    In accordance with xarray's design, ``open`` loads the data of IDF files</span>
 <span class="sd">    lazily. This means the data of the IDFs are not loaded into memory until the</span>
 <span class="sd">    data is needed. This allows for easier handling of large datasets, and</span>
 <span class="sd">    more efficient computations.</span>
@@ -587,8 +599,8 @@
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
 <span class="sd">    path : str, Path or list</span>
-<span class="sd">        This can be a single file, &#39;head_l1.idf&#39;, a glob pattern expansion,</span>
-<span class="sd">        &#39;head_l*.idf&#39;, or a list of files, [&#39;head_l1.idf&#39;, &#39;head_l2.idf&#39;].</span>
+<span class="sd">        This can be a single file, 'head_l1.idf', a glob pattern expansion,</span>
+<span class="sd">        'head_l*.idf', or a list of files, ['head_l1.idf', 'head_l2.idf'].</span>
 <span class="sd">        Note that each file needs to be of the same name (part before the</span>
 <span class="sd">        first underscore) but have a different layer and/or timestamp,</span>
 <span class="sd">        such that they can be combined in a single xarray.DataArray.</span>
@@ -605,6 +617,12 @@
 <span class="sd">        {name}_{time}_l{layer}, a custom pattern can be defined here either</span>
 <span class="sd">        as a string, or as a compiled regular expression pattern. See the</span>
 <span class="sd">        examples below.</span>
+<span class="sd">    chunk_layout : {"per_idf", "per_timestep"}, optional</span>
+<span class="sd">        Determines how the data should be chunked when loaded into memory.</span>
+<span class="sd">        ``"per_idf"`` chunks by individual IDF files, while</span>
+<span class="sd">        ``"per_timestep"`` chunks by timestep, grouping all layers within a</span>
+<span class="sd">        timestep into one chunk. This can help optimize memory usage and</span>
+<span class="sd">        computational efficiency. The default is ``"per_idf"``.</span>
 
 <span class="sd">    Returns</span>
 <span class="sd">    -------</span>
@@ -617,91 +635,142 @@
 <span class="sd">    --------</span>
 <span class="sd">    Open an IDF file:</span>
 
-<span class="sd">    &gt;&gt;&gt; da = imod.idf.open(&quot;example.idf&quot;)</span>
+<span class="sd">    &gt;&gt;&gt; da = imod.idf.open("example.idf")</span>
 
 <span class="sd">    Open an IDF file, relying on default naming conventions to identify</span>
 <span class="sd">    layer:</span>
 
-<span class="sd">    &gt;&gt;&gt; da = imod.idf.open(&quot;example_l1.idf&quot;)</span>
+<span class="sd">    &gt;&gt;&gt; da = imod.idf.open("example_l1.idf")</span>
 
 <span class="sd">    Open an IDF file, relying on default naming conventions to identify layer</span>
 <span class="sd">    and time:</span>
 
-<span class="sd">    &gt;&gt;&gt; head = imod.idf.open(&quot;head_20010101_l1.idf&quot;)</span>
+<span class="sd">    &gt;&gt;&gt; head = imod.idf.open("head_20010101_l1.idf")</span>
 
-<span class="sd">    To ignore the naming conventions, specify ``pattern=&quot;{name}&quot;``. This will</span>
+<span class="sd">    To ignore the naming conventions, specify ``pattern="{name}"``. This will</span>
 <span class="sd">    disable parsing of the filename into xarray coordinates.</span>
 
-<span class="sd">    &gt;&gt;&gt; head = imod.idf.open(&quot;head_20010101_l1.idf&quot;, pattern=&quot;{name}&quot;)</span>
+<span class="sd">    &gt;&gt;&gt; head = imod.idf.open("head_20010101_l1.idf", pattern="{name}")</span>
 
 <span class="sd">    Open multiple IDF files, in this case files for the year 2001 for all</span>
 <span class="sd">    layers, again relying on default conventions for naming:</span>
 
-<span class="sd">    &gt;&gt;&gt; head = imod.idf.open(&quot;head_2001*_l*.idf&quot;)</span>
+<span class="sd">    &gt;&gt;&gt; head = imod.idf.open("head_2001*_l*.idf")</span>
 
 <span class="sd">    The same, this time explicitly specifying ``name``, ``time``, and ``layer``:</span>
 
-<span class="sd">    &gt;&gt;&gt; head = imod.idf.open(&quot;head_2001*_l*.idf&quot;, pattern=&quot;{name}_{time}_l{layer}&quot;)</span>
+<span class="sd">    &gt;&gt;&gt; head = imod.idf.open("head_2001*_l*.idf", pattern="{name}_{time}_l{layer}")</span>
 
 <span class="sd">    The format string pattern will only work on tidy paths, where variables are</span>
 <span class="sd">    separated by underscores. You can also pass a compiled regex pattern.</span>
 <span class="sd">    Make sure to include the ``re.IGNORECASE`` flag since all paths are lowered.</span>
 
 <span class="sd">    &gt;&gt;&gt; import re</span>
-<span class="sd">    &gt;&gt;&gt; pattern = re.compile(r&quot;(?P&lt;name&gt;[\w]+)L(?P&lt;layer&gt;[\d+]*)&quot;, re.IGNORECASE)</span>
-<span class="sd">    &gt;&gt;&gt; head = imod.idf.open(&quot;headL11&quot;, pattern=pattern)</span>
+<span class="sd">    &gt;&gt;&gt; pattern = re.compile(r"(?P&lt;name&gt;[\w]+)L(?P&lt;layer&gt;[\d+]*)", re.IGNORECASE)</span>
+<span class="sd">    &gt;&gt;&gt; head = imod.idf.open("headL11", pattern=pattern)</span>
 
 <span class="sd">    However, this requires constructing regular expressions, which is</span>
 <span class="sd">    generally a fiddly process. Regex notation is also impossible to</span>
 <span class="sd">    remember. The website https://regex101.com is a nice help. Alternatively,</span>
 <span class="sd">    the most pragmatic solution may be to just rename your files.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
-    <span class="k">return</span> <span class="n">array_io</span><span class="o">.</span><span class="n">reading</span><span class="o">.</span><span class="n">_open</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="n">use_cftime</span><span class="p">,</span> <span class="n">pattern</span><span class="p">,</span> <span class="n">header</span><span class="p">,</span> <span class="n">_read</span><span class="p">)</span></div>
+
+<span class="sd">    To increase performance when opening multiple IDF files, consider setting</span>
+<span class="sd">    the ``chunk_layout`` parameter to ``"per_timestep"`` to control how the</span>
+<span class="sd">    data is chunked in</span>
+<span class="sd">    memory. Data will be chunked along the time dimension, instead of per idf</span>
+<span class="sd">    file (so most often per time, per layer), which is the default.</span>
+
+<span class="sd">    &gt;&gt;&gt; head = imod.idf.open("head_2001*_l*.idf", chunk_layout="per_timestep")</span>
+
+<span class="sd">    """</span>
+
+    <span class="k">if</span> <span class="n">chunk_layout</span> <span class="o">==</span> <span class="s2">"per_idf"</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">_open</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="n">use_cftime</span><span class="o">=</span><span class="n">use_cftime</span><span class="p">,</span> <span class="n">pattern</span><span class="o">=</span><span class="n">pattern</span><span class="p">)</span>
+    <span class="k">elif</span> <span class="n">chunk_layout</span> <span class="o">==</span> <span class="s2">"per_timestep"</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">open_chunked_per_timestep</span><span class="p">(</span>
+            <span class="n">path</span><span class="p">,</span> <span class="n">use_cftime</span><span class="o">=</span><span class="n">use_cftime</span><span class="p">,</span> <span class="n">pattern</span><span class="o">=</span><span class="n">pattern</span><span class="p">,</span> <span class="n">headers</span><span class="o">=</span><span class="kc">None</span>
+        <span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+            <span class="s2">"Unsupported chunk_layout value: "</span>
+            <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">chunk_layout</span><span class="si">}</span><span class="s2">, supported are 'per_idf' or 'per_timestep'"</span>
+        <span class="p">)</span></div>
 
 
 
-<span class="k">def</span><span class="w"> </span><span class="nf">_more_than_one_unique_value</span><span class="p">(</span><span class="n">values</span><span class="p">:</span> <span class="n">Iterable</span><span class="p">[</span><span class="n">Any</span><span class="p">]):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Returns if more than one unique value in list&quot;&quot;&quot;</span>
+<span class="c1"># Open IDFs for multiple times and/or layers into one DataArray</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">_open</span><span class="p">(</span>
+    <span class="n">path</span><span class="p">:</span> <span class="n">PathType</span> <span class="o">|</span> <span class="nb">list</span><span class="p">[</span><span class="n">PathType</span><span class="p">],</span>
+    <span class="n">use_cftime</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
+    <span class="n">pattern</span><span class="p">:</span> <span class="n">PatternType</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">xr</span><span class="o">.</span><span class="n">DataArray</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">"""</span>
+<span class="sd">    Open an IDF file or list of IDF files and return as an xarray DataArray.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    path : PathType | list[PathType]</span>
+<span class="sd">        Path or list of paths to IDF files.</span>
+<span class="sd">    use_cftime : bool, optional</span>
+<span class="sd">        Whether to use cftime for datetime objects. Default is False.</span>
+<span class="sd">    pattern : PatternType | None, optional</span>
+<span class="sd">        Pattern to parse the filename into xarray coordinates. Default is None.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    xr.DataArray</span>
+<span class="sd">        The opened IDF data as an xarray DataArray.</span>
+<span class="sd">    """</span>
+    <span class="k">return</span> <span class="n">array_io</span><span class="o">.</span><span class="n">reading</span><span class="o">.</span><span class="n">_open</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="n">use_cftime</span><span class="p">,</span> <span class="n">pattern</span><span class="p">,</span> <span class="n">header</span><span class="p">,</span> <span class="n">_read</span><span class="p">)</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">_more_than_one_unique_value</span><span class="p">(</span><span class="n">values</span><span class="p">:</span> <span class="n">Iterable</span><span class="p">[</span><span class="n">Any</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">"""Returns if more than one unique value in list"""</span>
     <span class="k">return</span> <span class="nb">len</span><span class="p">(</span><span class="nb">set</span><span class="p">(</span><span class="n">values</span><span class="p">))</span> <span class="o">!=</span> <span class="mi">1</span>
 
 
 <span class="k">def</span><span class="w"> </span><span class="nf">_merge_subdomains</span><span class="p">(</span>
-    <span class="n">paths_per_subdomain</span><span class="p">:</span> <span class="n">DefaultDict</span><span class="p">[</span><span class="n">Any</span><span class="p">,</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]],</span>
+    <span class="n">paths_per_subdomain</span><span class="p">:</span> <span class="n">defaultdict</span><span class="p">[</span><span class="n">Any</span><span class="p">,</span> <span class="nb">list</span><span class="p">[</span><span class="n">PathType</span><span class="p">]],</span>
     <span class="n">use_cftime</span><span class="p">:</span> <span class="nb">bool</span><span class="p">,</span>
-    <span class="n">pattern</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="n">Pattern</span><span class="p">,</span>
-<span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+    <span class="n">pattern</span><span class="p">:</span> <span class="n">PatternType</span> <span class="o">|</span> <span class="kc">None</span><span class="p">,</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">DataArrayComponents</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">"""</span>
 <span class="sd">    Open and spatially merge all subdomain IDF files for one timestep.</span>
 <span class="sd">    Returns an ``xr.DataArray`` with all coordinates computed by</span>
 <span class="sd">    ``merge_partitions``.  Called directly (eagerly) once to obtain a</span>
 <span class="sd">    coordinate template, and indirectly via ``_merge_subdomains_values``</span>
 <span class="sd">    inside ``dask.delayed`` for actual computation.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="n">das</span> <span class="o">=</span> <span class="p">[]</span>
     <span class="k">for</span> <span class="n">pathlist</span> <span class="ow">in</span> <span class="n">paths_per_subdomain</span><span class="o">.</span><span class="n">values</span><span class="p">():</span>
-        <span class="n">da</span> <span class="o">=</span> <span class="nb">open</span><span class="p">(</span><span class="n">pathlist</span><span class="p">,</span> <span class="n">use_cftime</span><span class="o">=</span><span class="n">use_cftime</span><span class="p">,</span> <span class="n">pattern</span><span class="o">=</span><span class="n">pattern</span><span class="p">)</span>
-        <span class="k">if</span> <span class="s2">&quot;subdomain&quot;</span> <span class="ow">in</span> <span class="n">da</span><span class="o">.</span><span class="n">dims</span><span class="p">:</span>
+        <span class="n">da</span> <span class="o">=</span> <span class="n">_open</span><span class="p">(</span><span class="n">pathlist</span><span class="p">,</span> <span class="n">use_cftime</span><span class="o">=</span><span class="n">use_cftime</span><span class="p">,</span> <span class="n">pattern</span><span class="o">=</span><span class="n">pattern</span><span class="p">)</span>
+        <span class="k">if</span> <span class="s2">"subdomain"</span> <span class="ow">in</span> <span class="n">da</span><span class="o">.</span><span class="n">dims</span><span class="p">:</span>
             <span class="n">da</span> <span class="o">=</span> <span class="n">da</span><span class="o">.</span><span class="n">isel</span><span class="p">(</span><span class="n">subdomain</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">drop</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
         <span class="n">das</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">da</span><span class="p">)</span>
     <span class="k">return</span> <span class="n">merge_partitions_as_da_components</span><span class="p">(</span><span class="n">das</span><span class="p">)</span>
 
 
 <span class="k">def</span><span class="w"> </span><span class="nf">_merge_subdomains_values</span><span class="p">(</span>
-    <span class="n">paths_per_subdomain</span><span class="p">:</span> <span class="n">DefaultDict</span><span class="p">[</span><span class="n">Any</span><span class="p">,</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]],</span>
+    <span class="n">paths_per_subdomain</span><span class="p">:</span> <span class="n">defaultdict</span><span class="p">[</span><span class="n">Any</span><span class="p">,</span> <span class="nb">list</span><span class="p">[</span><span class="n">PathType</span><span class="p">]],</span>
     <span class="n">use_cftime</span><span class="p">:</span> <span class="nb">bool</span><span class="p">,</span>
-    <span class="n">pattern</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="n">Pattern</span><span class="p">,</span>
-<span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Wraps ``_merge_subdomains`` to return just a numpy array for ``dask.array.from_delayed``.&quot;&quot;&quot;</span>
+    <span class="n">pattern</span><span class="p">:</span> <span class="n">PatternType</span><span class="p">,</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">"""Wraps ``_merge_subdomains`` to return just a numpy array for ``dask.array.from_delayed``."""</span>
     <span class="n">data</span><span class="p">,</span> <span class="n">_</span><span class="p">,</span> <span class="n">_</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">_merge_subdomains</span><span class="p">(</span><span class="n">paths_per_subdomain</span><span class="p">,</span> <span class="n">use_cftime</span><span class="p">,</span> <span class="n">pattern</span><span class="p">)</span>
+    <span class="c1"># ``from_delayed`` expects each task to resolve to a concrete ndarray chunk.</span>
+    <span class="c1"># Returning a dask array here creates nested lazy arrays, which can leak</span>
+    <span class="c1"># ``dask.array.Array`` values into downstream numba-compiled code paths.</span>
+    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">dask</span><span class="o">.</span><span class="n">array</span><span class="o">.</span><span class="n">Array</span><span class="p">):</span>
+        <span class="n">data</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">compute</span><span class="p">()</span>
     <span class="k">return</span> <span class="n">data</span>
 
 
 <span class="k">def</span><span class="w"> </span><span class="nf">_merge_subdomains_to_dataarray</span><span class="p">(</span>
-    <span class="n">paths_per_subdomain</span><span class="p">:</span> <span class="n">DefaultDict</span><span class="p">[</span><span class="n">Any</span><span class="p">,</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]],</span>
+    <span class="n">paths_per_subdomain</span><span class="p">:</span> <span class="n">defaultdict</span><span class="p">[</span><span class="n">Any</span><span class="p">,</span> <span class="nb">list</span><span class="p">[</span><span class="n">PathType</span><span class="p">]],</span>
     <span class="n">use_cftime</span><span class="p">:</span> <span class="nb">bool</span><span class="p">,</span>
-    <span class="n">pattern</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="n">Pattern</span><span class="p">,</span>
+    <span class="n">pattern</span><span class="p">:</span> <span class="n">PatternType</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">xr</span><span class="o">.</span><span class="n">DataArray</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Wraps ``_merge_subdomains`` to return a DataArray for coordinate template.&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">"""Wraps ``_merge_subdomains`` to return a DataArray for coordinate template."""</span>
     <span class="n">data</span><span class="p">,</span> <span class="n">coords</span><span class="p">,</span> <span class="n">dims</span><span class="p">,</span> <span class="n">name</span> <span class="o">=</span> <span class="n">_merge_subdomains</span><span class="p">(</span>
         <span class="n">paths_per_subdomain</span><span class="p">,</span> <span class="n">use_cftime</span><span class="p">,</span> <span class="n">pattern</span>
     <span class="p">)</span>
@@ -714,15 +783,15 @@
 
 
 <span class="k">def</span><span class="w"> </span><span class="nf">check_subdomain_consistency</span><span class="p">(</span>
-    <span class="n">parsed</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]],</span> <span class="n">paths</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span> <span class="n">pattern</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="n">Pattern</span>
-<span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Check that each subdomain has the same number of IDF files.&quot;&quot;&quot;</span>
+    <span class="n">parsed</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]],</span> <span class="n">paths</span><span class="p">:</span> <span class="n">Sequence</span><span class="p">[</span><span class="n">PathType</span><span class="p">],</span> <span class="n">pattern</span><span class="p">:</span> <span class="n">PatternType</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">"""Check that each subdomain has the same number of IDF files."""</span>
     <span class="n">grouped</span> <span class="o">=</span> <span class="n">defaultdict</span><span class="p">(</span><span class="nb">list</span><span class="p">)</span>
     <span class="k">for</span> <span class="n">match</span><span class="p">,</span> <span class="n">p</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">parsed</span><span class="p">,</span> <span class="n">paths</span><span class="p">):</span>
         <span class="k">try</span><span class="p">:</span>
-            <span class="n">key</span> <span class="o">=</span> <span class="n">match</span><span class="p">[</span><span class="s2">&quot;subdomain&quot;</span><span class="p">]</span>
+            <span class="n">key</span> <span class="o">=</span> <span class="n">match</span><span class="p">[</span><span class="s2">"subdomain"</span><span class="p">]</span>
         <span class="k">except</span> <span class="ne">KeyError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="ne">KeyError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2"> in path: </span><span class="si">{</span><span class="n">p</span><span class="si">}</span><span class="s2"> with pattern: </span><span class="si">{</span><span class="n">pattern</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+            <span class="k">raise</span> <span class="ne">KeyError</span><span class="p">(</span><span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2"> in path: </span><span class="si">{</span><span class="n">p</span><span class="si">}</span><span class="s2"> with pattern: </span><span class="si">{</span><span class="n">pattern</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
         <span class="n">grouped</span><span class="p">[</span><span class="n">key</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">p</span><span class="p">)</span>
 
     <span class="n">n_idf_per_subdomain</span> <span class="o">=</span> <span class="p">{</span>
@@ -730,69 +799,85 @@
     <span class="p">}</span>
     <span class="k">if</span> <span class="n">_more_than_one_unique_value</span><span class="p">(</span><span class="n">n_idf_per_subdomain</span><span class="o">.</span><span class="n">values</span><span class="p">()):</span>
         <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
-            <span class="sa">f</span><span class="s2">&quot;Each subdomain must have the same number of IDF files, found: </span><span class="si">{</span><span class="n">n_idf_per_subdomain</span><span class="si">}</span><span class="s2">&quot;</span>
+            <span class="sa">f</span><span class="s2">"Each subdomain must have the same number of IDF files, found: </span><span class="si">{</span><span class="n">n_idf_per_subdomain</span><span class="si">}</span><span class="s2">"</span>
         <span class="p">)</span>
 
 
-<div class="viewcode-block" id="open_subdomains">
-<a class="viewcode-back" href="../../../api/generated/io/imod.formats.idf.open_subdomains.html#imod.formats.idf.open_subdomains">[docs]</a>
-<span class="k">def</span><span class="w"> </span><span class="nf">open_subdomains</span><span class="p">(</span>
-    <span class="n">path</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="n">Path</span><span class="p">,</span> <span class="n">use_cftime</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span> <span class="n">pattern</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="n">Pattern</span> <span class="o">=</span> <span class="kc">None</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">_open_idf_data_from_group</span><span class="p">(</span>
+    <span class="n">group</span><span class="p">:</span> <span class="nb">tuple</span><span class="p">[</span><span class="nb">list</span><span class="p">[</span><span class="n">PathType</span><span class="p">],</span> <span class="nb">list</span><span class="p">[</span><span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]]],</span>
+    <span class="n">use_cftime</span><span class="p">:</span> <span class="nb">bool</span><span class="p">,</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">"""Open IDF files from a group and return as numpy array."""</span>
+    <span class="n">group_paths</span><span class="p">,</span> <span class="n">group_headers</span> <span class="o">=</span> <span class="n">group</span>
+    <span class="c1"># load_as_components mutates header dictionaries while preparing lazy reads.</span>
+    <span class="c1"># Copy to keep repeated/template reads safe.</span>
+    <span class="n">headers</span> <span class="o">=</span> <span class="p">[</span><span class="n">h</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span> <span class="k">for</span> <span class="n">h</span> <span class="ow">in</span> <span class="n">group_headers</span><span class="p">]</span>
+    <span class="n">data</span><span class="p">,</span> <span class="n">_</span><span class="p">,</span> <span class="n">_</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">array_io</span><span class="o">.</span><span class="n">reading</span><span class="o">.</span><span class="n">load_as_components</span><span class="p">(</span>
+        <span class="n">group_paths</span><span class="p">,</span> <span class="n">use_cftime</span><span class="o">=</span><span class="n">use_cftime</span><span class="p">,</span> <span class="n">_read</span><span class="o">=</span><span class="n">_read</span><span class="p">,</span> <span class="n">headers</span><span class="o">=</span><span class="n">headers</span>
+    <span class="p">)</span>
+    <span class="c1"># ``from_delayed`` expects each task to resolve to a concrete ndarray chunk.</span>
+    <span class="c1"># Returning a dask array here creates nested lazy arrays, which can leak</span>
+    <span class="c1"># ``dask.array.Array`` values into downstream numba-compiled code paths.</span>
+    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">dask</span><span class="o">.</span><span class="n">array</span><span class="o">.</span><span class="n">Array</span><span class="p">):</span>
+        <span class="n">data</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">compute</span><span class="p">()</span>
+    <span class="k">return</span> <span class="n">data</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">_open_idf_from_group</span><span class="p">(</span>
+    <span class="n">group</span><span class="p">:</span> <span class="nb">tuple</span><span class="p">[</span><span class="nb">list</span><span class="p">[</span><span class="n">PathType</span><span class="p">],</span> <span class="nb">list</span><span class="p">[</span><span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]]],</span>
+    <span class="n">use_cftime</span><span class="p">:</span> <span class="nb">bool</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">xr</span><span class="o">.</span><span class="n">DataArray</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Combine IDF files of multiple subdomains.</span>
+<span class="w">    </span><span class="sd">"""Open IDF files and return a DataArray template with header-derived dims/coords."""</span>
+    <span class="c1"># load_as_components mutates header dictionaries while preparing lazy reads.</span>
+    <span class="n">group_paths</span><span class="p">,</span> <span class="n">group_headers</span> <span class="o">=</span> <span class="n">group</span>
+    <span class="n">group_headers</span> <span class="o">=</span> <span class="p">[</span><span class="n">h</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span> <span class="k">for</span> <span class="n">h</span> <span class="ow">in</span> <span class="n">group_headers</span><span class="p">]</span>
+    <span class="n">data</span><span class="p">,</span> <span class="n">coords</span><span class="p">,</span> <span class="n">dims</span><span class="p">,</span> <span class="n">name</span> <span class="o">=</span> <span class="n">array_io</span><span class="o">.</span><span class="n">reading</span><span class="o">.</span><span class="n">load_as_components</span><span class="p">(</span>
+        <span class="n">group_paths</span><span class="p">,</span> <span class="n">use_cftime</span><span class="o">=</span><span class="n">use_cftime</span><span class="p">,</span> <span class="n">_read</span><span class="o">=</span><span class="n">_read</span><span class="p">,</span> <span class="n">headers</span><span class="o">=</span><span class="n">group_headers</span>
+    <span class="p">)</span>
+    <span class="k">return</span> <span class="n">xr</span><span class="o">.</span><span class="n">DataArray</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">coords</span><span class="p">,</span> <span class="n">dims</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="n">name</span><span class="p">)</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">_open_idf_chunked_per_timestep</span><span class="p">(</span>
+    <span class="n">open_func</span><span class="p">:</span> <span class="n">Callable</span><span class="p">[</span><span class="o">...</span><span class="p">,</span> <span class="n">Any</span><span class="p">],</span>
+    <span class="n">grouped_by_time</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="n">Any</span><span class="p">,</span> <span class="n">Any</span><span class="p">],</span>
+    <span class="n">template</span><span class="p">:</span> <span class="n">xr</span><span class="o">.</span><span class="n">DataArray</span><span class="p">,</span>
+    <span class="n">has_time</span><span class="p">:</span> <span class="nb">bool</span><span class="p">,</span>
+    <span class="n">use_cftime</span><span class="p">:</span> <span class="nb">bool</span><span class="p">,</span>
+    <span class="o">*</span><span class="n">args</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">xr</span><span class="o">.</span><span class="n">DataArray</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">"""</span>
+<span class="sd">    Open IDF files chunked per timestep using a template DataArray.</span>
 
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
-<span class="sd">    path : str or Path</span>
-<span class="sd">        Global path.</span>
-<span class="sd">    use_cftime : bool, optional</span>
-<span class="sd">    pattern : str, regex pattern, optional</span>
-<span class="sd">        If no pattern is provided, the function will first try:</span>
-<span class="sd">        &quot;{name}_c{species}_{time}_l{layer}_p{subdomain}&quot;</span>
-<span class="sd">        and if that fails:</span>
-<span class="sd">        &quot;{name}_{time}_l{layer}_p{subdomain}&quot;</span>
-<span class="sd">        Following the iMOD5/iMOD-WQ filename conventions.</span>
+<span class="sd">    open_func : Callable</span>
+<span class="sd">        Function to open individual IDF files. Needs to have group, use_cftime,</span>
+<span class="sd">        pattern as arguments. Needs to return dask array as data.</span>
+<span class="sd">    grouped_by_time : dict[Any, Any]</span>
+<span class="sd">        Dictionary grouping file paths by time.</span>
+<span class="sd">    template : xr.DataArray</span>
+<span class="sd">        Template DataArray to define the shape, dims, and coords.</span>
+<span class="sd">    has_time : bool</span>
+<span class="sd">        Whether the data has a time dimension.</span>
+<span class="sd">    use_cftime : bool</span>
+<span class="sd">        Whether to use cftime for time coordinates.</span>
+<span class="sd">    *args : tuple</span>
+<span class="sd">        Additional arguments to pass to the open_func.</span>
 
 <span class="sd">    Returns</span>
 <span class="sd">    -------</span>
-<span class="sd">    xarray.DataArray</span>
+<span class="sd">    xr.DataArray</span>
+<span class="sd">        Combined DataArray with data from all subdomains, chunked per timestep.</span>
 
-<span class="sd">    &quot;&quot;&quot;</span>
-    <span class="c1"># This function is a wrapper around open() that groups by subdomain and</span>
-    <span class="c1"># merges the subdomains into one DataArray, in a delayed manner, chunked per</span>
-    <span class="c1"># timestep. A lot of logic in this function is about grouping the files by</span>
-    <span class="c1"># subdomain and time, and setting the right time coordinate again.</span>
 
-    <span class="n">paths</span> <span class="o">=</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">glob</span><span class="o">.</span><span class="n">glob</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">path</span><span class="p">)))</span>
-
-    <span class="k">if</span> <span class="n">pattern</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-        <span class="c1"># If no pattern provided test if</span>
-        <span class="n">pattern</span> <span class="o">=</span> <span class="s2">&quot;</span><span class="si">{name}</span><span class="s2">_c</span><span class="si">{species}</span><span class="s2">_</span><span class="si">{time}</span><span class="s2">_l</span><span class="si">{layer}</span><span class="s2">_p</span><span class="si">{subdomain}</span><span class="s2">&quot;</span>
-        <span class="n">re_pattern_species</span> <span class="o">=</span> <span class="n">imod</span><span class="o">.</span><span class="n">util</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">_custom_pattern_to_regex_pattern</span><span class="p">(</span><span class="n">pattern</span><span class="p">)</span>
-        <span class="n">has_species</span> <span class="o">=</span> <span class="n">re_pattern_species</span><span class="o">.</span><span class="n">search</span><span class="p">(</span><span class="n">paths</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
-        <span class="k">if</span> <span class="ow">not</span> <span class="n">has_species</span><span class="p">:</span>
-            <span class="n">pattern</span> <span class="o">=</span> <span class="s2">&quot;</span><span class="si">{name}</span><span class="s2">_</span><span class="si">{time}</span><span class="s2">_l</span><span class="si">{layer}</span><span class="s2">_p</span><span class="si">{subdomain}</span><span class="s2">&quot;</span>
-
-    <span class="n">parsed</span> <span class="o">=</span> <span class="p">[</span><span class="n">imod</span><span class="o">.</span><span class="n">util</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">decompose</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="n">pattern</span><span class="p">)</span> <span class="k">for</span> <span class="n">path</span> <span class="ow">in</span> <span class="n">paths</span><span class="p">]</span>
-    <span class="n">check_subdomain_consistency</span><span class="p">(</span><span class="n">parsed</span><span class="p">,</span> <span class="n">paths</span><span class="p">,</span> <span class="n">pattern</span><span class="p">)</span>
-
-    <span class="n">has_time</span> <span class="o">=</span> <span class="s2">&quot;time&quot;</span> <span class="ow">in</span> <span class="n">parsed</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
-
-    <span class="c1"># Group by time (datetime.datetime from decompose), then by subdomain.</span>
-    <span class="c1"># Each delayed task processes one timestep, keeping the outer graph at O(n_time).</span>
-    <span class="n">grouped_by_time</span><span class="p">:</span> <span class="n">DefaultDict</span><span class="p">[</span><span class="n">Any</span><span class="p">,</span> <span class="n">DefaultDict</span><span class="p">[</span><span class="n">Any</span><span class="p">,</span> <span class="nb">list</span><span class="p">]]</span> <span class="o">=</span> <span class="n">defaultdict</span><span class="p">(</span>
-        <span class="k">lambda</span><span class="p">:</span> <span class="n">defaultdict</span><span class="p">(</span><span class="nb">list</span><span class="p">)</span>
-    <span class="p">)</span>
-
-    <span class="k">for</span> <span class="n">match</span><span class="p">,</span> <span class="n">p</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">parsed</span><span class="p">,</span> <span class="n">paths</span><span class="p">):</span>
-        <span class="k">if</span> <span class="n">has_time</span><span class="p">:</span>
-            <span class="n">time_key</span> <span class="o">=</span> <span class="n">match</span><span class="p">[</span><span class="s2">&quot;time&quot;</span><span class="p">]</span>
-        <span class="k">else</span><span class="p">:</span>
-            <span class="c1"># Work around for files without time dimension</span>
-            <span class="c1"># (imod.util.time._convert_datetimes special-cases this string)</span>
-            <span class="n">time_key</span> <span class="o">=</span> <span class="s2">&quot;steady-state&quot;</span>
-        <span class="n">grouped_by_time</span><span class="p">[</span><span class="n">time_key</span><span class="p">][</span><span class="n">match</span><span class="p">[</span><span class="s2">&quot;subdomain&quot;</span><span class="p">]]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">p</span><span class="p">)</span>
+<span class="sd">    """</span>
+    <span class="n">shape</span> <span class="o">=</span> <span class="n">template</span><span class="o">.</span><span class="n">shape</span>  <span class="c1"># e.g. (1, nlayer, nrow, ncol)</span>
+    <span class="n">dims</span> <span class="o">=</span> <span class="n">template</span><span class="o">.</span><span class="n">dims</span>  <span class="c1"># e.g. ("time", "layer", "y", "x")</span>
+    <span class="n">dtype</span> <span class="o">=</span> <span class="n">template</span><span class="o">.</span><span class="n">dtype</span>
+    <span class="k">if</span> <span class="n">has_time</span><span class="p">:</span>
+        <span class="n">time_axis</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">dims</span><span class="p">)</span><span class="o">.</span><span class="n">index</span><span class="p">(</span><span class="s2">"time"</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">time_axis</span> <span class="o">=</span> <span class="o">-</span><span class="mi">1</span>  <span class="c1"># steady-state, no time dimension</span>
 
     <span class="c1"># Sort and convert times before calling _merge_subdomains so that</span>
     <span class="c1"># use_cftime is already correct when the template is built.</span>
@@ -801,6 +886,171 @@
         <span class="n">raw_times_sorted</span><span class="p">,</span> <span class="n">use_cftime</span>
     <span class="p">)</span>
 
+    <span class="c1"># Delayed tasks for each timestep, which will be concatenated into a single</span>
+    <span class="c1"># dask array. One delayed task per timestep → outer graph depth 3, O(n_time)</span>
+    <span class="c1"># tasks</span>
+    <span class="n">dask_arrays</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">for</span> <span class="n">time_key</span> <span class="ow">in</span> <span class="n">raw_times_sorted</span><span class="p">:</span>
+        <span class="n">group</span> <span class="o">=</span> <span class="n">grouped_by_time</span><span class="p">[</span><span class="n">time_key</span><span class="p">]</span>
+        <span class="n">timestep_data</span> <span class="o">=</span> <span class="n">dask</span><span class="o">.</span><span class="n">delayed</span><span class="p">(</span><span class="n">open_func</span><span class="p">)(</span><span class="n">group</span><span class="p">,</span> <span class="n">use_cftime</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">)</span>
+        <span class="n">dask_arrays</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
+            <span class="n">dask</span><span class="o">.</span><span class="n">array</span><span class="o">.</span><span class="n">from_delayed</span><span class="p">(</span><span class="n">timestep_data</span><span class="p">,</span> <span class="n">shape</span><span class="o">=</span><span class="n">shape</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">dtype</span><span class="p">)</span>
+        <span class="p">)</span>
+    <span class="n">data</span> <span class="o">=</span> <span class="n">dask</span><span class="o">.</span><span class="n">array</span><span class="o">.</span><span class="n">concatenate</span><span class="p">(</span><span class="n">dask_arrays</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="n">time_axis</span><span class="p">)</span>
+
+    <span class="c1"># Build the full time coordinate</span>
+    <span class="n">coords</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="n">template</span><span class="o">.</span><span class="n">coords</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">has_time</span><span class="p">:</span>
+        <span class="n">time_coord</span><span class="p">:</span> <span class="n">xr</span><span class="o">.</span><span class="n">CFTimeIndex</span> <span class="o">|</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span>
+        <span class="k">if</span> <span class="n">use_cftime</span><span class="p">:</span>
+            <span class="n">time_coord</span> <span class="o">=</span> <span class="n">xr</span><span class="o">.</span><span class="n">CFTimeIndex</span><span class="p">(</span><span class="n">converted_times</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">time_coord</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">converted_times</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="s2">"datetime64[ns]"</span><span class="p">)</span>
+        <span class="n">coords</span><span class="p">[</span><span class="s2">"time"</span><span class="p">]</span> <span class="o">=</span> <span class="n">time_coord</span>
+
+    <span class="k">return</span> <span class="n">xr</span><span class="o">.</span><span class="n">DataArray</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">coords</span><span class="p">,</span> <span class="n">dims</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="n">template</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="n">attrs</span><span class="o">=</span><span class="n">template</span><span class="o">.</span><span class="n">attrs</span><span class="p">)</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">open_chunked_per_timestep</span><span class="p">(</span>
+    <span class="n">path</span><span class="p">:</span> <span class="n">PathType</span> <span class="o">|</span> <span class="nb">list</span><span class="p">[</span><span class="n">PathType</span><span class="p">],</span>
+    <span class="n">use_cftime</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
+    <span class="n">pattern</span><span class="p">:</span> <span class="n">PatternType</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">headers</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">xr</span><span class="o">.</span><span class="n">DataArray</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">"""</span>
+<span class="sd">    Open IDF files chunked per timestep.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    path : str or Path or list of str or Path</span>
+<span class="sd">        Global path(s).</span>
+<span class="sd">    use_cftime : bool, optional</span>
+<span class="sd">        Whether to use cftime for time coordinates.</span>
+<span class="sd">    pattern : str, regex pattern, optional</span>
+<span class="sd">        If the filenames do match default naming conventions of</span>
+<span class="sd">        {name}_{time}_l{layer}, a custom pattern can be defined here either</span>
+<span class="sd">        as a string, or as a compiled regular expression pattern. See the</span>
+<span class="sd">        examples below.</span>
+<span class="sd">    headers:  list, optional</span>
+<span class="sd">        List of headers. Can be provided to avoid re-reading headers from the</span>
+<span class="sd">        files.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    xarray.DataArray</span>
+
+<span class="sd">    """</span>
+    <span class="n">paths</span> <span class="o">=</span> <span class="n">array_io</span><span class="o">.</span><span class="n">reading</span><span class="o">.</span><span class="n">handle_path</span><span class="p">(</span><span class="n">path</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">headers</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">headers</span> <span class="o">=</span> <span class="p">[</span><span class="n">header</span><span class="p">(</span><span class="n">p</span><span class="p">,</span> <span class="n">pattern</span><span class="p">)</span> <span class="k">for</span> <span class="n">p</span> <span class="ow">in</span> <span class="n">paths</span><span class="p">]</span>
+
+    <span class="c1"># If headers were supplied by the caller, they may already contain</span>
+    <span class="c1"># dimensions like time/layer that are absent in the filename itself.</span>
+    <span class="c1"># Prefer header metadata for grouping and template construction.</span>
+    <span class="n">has_time</span> <span class="o">=</span> <span class="s2">"time"</span> <span class="ow">in</span> <span class="n">headers</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"dims"</span><span class="p">,</span> <span class="p">[])</span>
+
+    <span class="n">grouped_paths_by_time</span><span class="p">:</span> <span class="n">defaultdict</span><span class="p">[</span><span class="n">Any</span><span class="p">,</span> <span class="nb">list</span><span class="p">[</span><span class="n">PathType</span><span class="p">]]</span> <span class="o">=</span> <span class="n">defaultdict</span><span class="p">(</span><span class="nb">list</span><span class="p">)</span>
+    <span class="n">grouped_headers_by_time</span><span class="p">:</span> <span class="n">defaultdict</span><span class="p">[</span><span class="n">Any</span><span class="p">,</span> <span class="nb">list</span><span class="p">[</span><span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]]]</span> <span class="o">=</span> <span class="n">defaultdict</span><span class="p">(</span><span class="nb">list</span><span class="p">)</span>
+    <span class="k">for</span> <span class="n">p</span><span class="p">,</span> <span class="n">h</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">paths</span><span class="p">,</span> <span class="n">headers</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">has_time</span><span class="p">:</span>
+            <span class="n">time_key</span> <span class="o">=</span> <span class="n">h</span><span class="p">[</span><span class="s2">"time"</span><span class="p">]</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="c1"># Work around for files without time dimension</span>
+            <span class="c1"># (imod.util.time._convert_datetimes special-cases this string)</span>
+            <span class="n">time_key</span> <span class="o">=</span> <span class="s2">"steady-state"</span>
+        <span class="n">grouped_paths_by_time</span><span class="p">[</span><span class="n">time_key</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">p</span><span class="p">)</span>
+        <span class="n">grouped_headers_by_time</span><span class="p">[</span><span class="n">time_key</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">h</span><span class="p">)</span>
+
+    <span class="n">raw_times_sorted</span> <span class="o">=</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">grouped_paths_by_time</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span>
+
+    <span class="n">grouped_by_time</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span>
+        <span class="n">Any</span><span class="p">,</span>
+        <span class="nb">tuple</span><span class="p">[</span><span class="nb">list</span><span class="p">[</span><span class="n">PathType</span><span class="p">],</span> <span class="nb">list</span><span class="p">[</span><span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]]],</span>
+    <span class="p">]</span> <span class="o">=</span> <span class="p">{</span>
+        <span class="n">key</span><span class="p">:</span> <span class="p">(</span><span class="n">grouped_paths_by_time</span><span class="p">[</span><span class="n">key</span><span class="p">],</span> <span class="n">grouped_headers_by_time</span><span class="p">[</span><span class="n">key</span><span class="p">])</span>
+        <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">raw_times_sorted</span>
+    <span class="p">}</span>
+
+    <span class="n">first_time_key</span> <span class="o">=</span> <span class="n">raw_times_sorted</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+    <span class="n">template</span> <span class="o">=</span> <span class="n">_open_idf_from_group</span><span class="p">(</span>
+        <span class="n">grouped_by_time</span><span class="p">[</span><span class="n">first_time_key</span><span class="p">],</span>
+        <span class="n">use_cftime</span><span class="o">=</span><span class="n">use_cftime</span><span class="p">,</span>
+    <span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">_open_idf_chunked_per_timestep</span><span class="p">(</span>
+        <span class="n">_open_idf_data_from_group</span><span class="p">,</span>
+        <span class="n">grouped_by_time</span><span class="p">,</span>
+        <span class="n">template</span><span class="p">,</span>
+        <span class="n">has_time</span><span class="p">,</span>
+        <span class="n">use_cftime</span><span class="p">,</span>
+    <span class="p">)</span>
+
+
+<div class="viewcode-block" id="open_subdomains">
+<a class="viewcode-back" href="../../../api/generated/io/imod.formats.idf.open_subdomains.html#imod.formats.idf.open_subdomains">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">open_subdomains</span><span class="p">(</span>
+    <span class="n">path</span><span class="p">:</span> <span class="n">PathType</span> <span class="o">|</span> <span class="nb">list</span><span class="p">[</span><span class="n">PathType</span><span class="p">],</span>
+    <span class="n">use_cftime</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
+    <span class="n">pattern</span><span class="p">:</span> <span class="n">PatternType</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">xr</span><span class="o">.</span><span class="n">DataArray</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">"""</span>
+<span class="sd">    Combine IDF files of multiple subdomains.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    path : PathType or list of PathType</span>
+<span class="sd">        Global path or list of paths to open.</span>
+<span class="sd">    use_cftime : bool, optional</span>
+<span class="sd">    pattern : str, regex pattern, optional</span>
+<span class="sd">        If no pattern is provided, the function will first try:</span>
+<span class="sd">        "{name}_c{species}_{time}_l{layer}_p{subdomain}"</span>
+<span class="sd">        and if that fails:</span>
+<span class="sd">        "{name}_{time}_l{layer}_p{subdomain}"</span>
+<span class="sd">        Following the iMOD5/iMOD-WQ filename conventions.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    xarray.DataArray</span>
+
+<span class="sd">    """</span>
+    <span class="c1"># This function is a wrapper around open() that groups by subdomain and</span>
+    <span class="c1"># merges the subdomains into one DataArray, in a delayed manner, chunked per</span>
+    <span class="c1"># timestep. A lot of logic in this function is about grouping the files by</span>
+    <span class="c1"># subdomain and time, and setting the right time coordinate again.</span>
+    <span class="n">paths</span> <span class="o">=</span> <span class="n">array_io</span><span class="o">.</span><span class="n">reading</span><span class="o">.</span><span class="n">handle_path</span><span class="p">(</span><span class="n">path</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">pattern</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="c1"># If no pattern provided test if</span>
+        <span class="n">pattern</span> <span class="o">=</span> <span class="s2">"</span><span class="si">{name}</span><span class="s2">_c</span><span class="si">{species}</span><span class="s2">_</span><span class="si">{time}</span><span class="s2">_l</span><span class="si">{layer}</span><span class="s2">_p</span><span class="si">{subdomain}</span><span class="s2">"</span>
+        <span class="n">re_pattern_species</span> <span class="o">=</span> <span class="n">imod</span><span class="o">.</span><span class="n">util</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">_custom_pattern_to_regex_pattern</span><span class="p">(</span><span class="n">pattern</span><span class="p">)</span>
+        <span class="n">has_species</span> <span class="o">=</span> <span class="n">re_pattern_species</span><span class="o">.</span><span class="n">search</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">paths</span><span class="p">[</span><span class="mi">0</span><span class="p">]))</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">has_species</span><span class="p">:</span>
+            <span class="n">pattern</span> <span class="o">=</span> <span class="s2">"</span><span class="si">{name}</span><span class="s2">_</span><span class="si">{time}</span><span class="s2">_l</span><span class="si">{layer}</span><span class="s2">_p</span><span class="si">{subdomain}</span><span class="s2">"</span>
+
+    <span class="n">parsed</span> <span class="o">=</span> <span class="p">[</span><span class="n">imod</span><span class="o">.</span><span class="n">util</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">decompose</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="n">pattern</span><span class="p">)</span> <span class="k">for</span> <span class="n">path</span> <span class="ow">in</span> <span class="n">paths</span><span class="p">]</span>
+    <span class="n">check_subdomain_consistency</span><span class="p">(</span><span class="n">parsed</span><span class="p">,</span> <span class="n">paths</span><span class="p">,</span> <span class="n">pattern</span><span class="p">)</span>
+
+    <span class="n">has_time</span> <span class="o">=</span> <span class="s2">"time"</span> <span class="ow">in</span> <span class="n">parsed</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+
+    <span class="c1"># Group by time (datetime.datetime from decompose), then by subdomain.</span>
+    <span class="c1"># Each delayed task processes one timestep, keeping the outer graph at O(n_time).</span>
+    <span class="n">grouped_by_time</span><span class="p">:</span> <span class="n">defaultdict</span><span class="p">[</span><span class="n">Any</span><span class="p">,</span> <span class="n">defaultdict</span><span class="p">[</span><span class="n">Any</span><span class="p">,</span> <span class="nb">list</span><span class="p">[</span><span class="n">PathType</span><span class="p">]]]</span> <span class="o">=</span> <span class="n">defaultdict</span><span class="p">(</span>
+        <span class="k">lambda</span><span class="p">:</span> <span class="n">defaultdict</span><span class="p">(</span><span class="nb">list</span><span class="p">)</span>
+    <span class="p">)</span>
+
+    <span class="k">for</span> <span class="n">match</span><span class="p">,</span> <span class="n">p</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">parsed</span><span class="p">,</span> <span class="n">paths</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">has_time</span><span class="p">:</span>
+            <span class="n">time_key</span> <span class="o">=</span> <span class="n">match</span><span class="p">[</span><span class="s2">"time"</span><span class="p">]</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="c1"># Work around for files without time dimension</span>
+            <span class="c1"># (imod.util.time._convert_datetimes special-cases this string)</span>
+            <span class="n">time_key</span> <span class="o">=</span> <span class="s2">"steady-state"</span>
+        <span class="n">grouped_by_time</span><span class="p">[</span><span class="n">time_key</span><span class="p">][</span><span class="n">match</span><span class="p">[</span><span class="s2">"subdomain"</span><span class="p">]]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">p</span><span class="p">)</span>
+
+    <span class="c1"># Sort and convert times before calling _merge_subdomains so that</span>
+    <span class="c1"># use_cftime is already correct when the template is built.</span>
+    <span class="n">raw_times_sorted</span> <span class="o">=</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">grouped_by_time</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span>
+
     <span class="c1"># Call _merge_subdomains eagerly for the first timestep to obtain a</span>
     <span class="c1"># coordinate template. No data is computed — only the coordinate arrays</span>
     <span class="c1"># (which are numpy) are used; the dask data array is discarded.</span>
@@ -808,44 +1058,28 @@
     <span class="n">template</span> <span class="o">=</span> <span class="n">_merge_subdomains_to_dataarray</span><span class="p">(</span>
         <span class="n">grouped_by_time</span><span class="p">[</span><span class="n">first_time_key</span><span class="p">],</span> <span class="n">use_cftime</span><span class="p">,</span> <span class="n">pattern</span>
     <span class="p">)</span>
+    <span class="c1"># Collect additional arguments to pass to the open function.</span>
+    <span class="n">args_for_func</span> <span class="o">=</span> <span class="p">(</span><span class="n">pattern</span><span class="p">,)</span>
 
-    <span class="n">shape</span> <span class="o">=</span> <span class="n">template</span><span class="o">.</span><span class="n">shape</span>  <span class="c1"># e.g. (1, nlayer, nrow, ncol)</span>
-    <span class="n">dims</span> <span class="o">=</span> <span class="n">template</span><span class="o">.</span><span class="n">dims</span>  <span class="c1"># e.g. (&quot;time&quot;, &quot;layer&quot;, &quot;y&quot;, &quot;x&quot;)</span>
-    <span class="n">dtype</span> <span class="o">=</span> <span class="n">template</span><span class="o">.</span><span class="n">dtype</span>
-    <span class="k">if</span> <span class="n">has_time</span><span class="p">:</span>
-        <span class="n">time_axis</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">dims</span><span class="p">)</span><span class="o">.</span><span class="n">index</span><span class="p">(</span><span class="s2">&quot;time&quot;</span><span class="p">)</span>
-    <span class="k">else</span><span class="p">:</span>
-        <span class="n">time_axis</span> <span class="o">=</span> <span class="o">-</span><span class="mi">1</span>  <span class="c1"># steady-state, no time dimension</span>
-
-    <span class="c1"># Delayed tasks for each timestep, which will be concatenated into a single</span>
-    <span class="c1"># dask array. One delayed task per timestep → outer graph depth 3, O(n_time)</span>
-    <span class="c1"># tasks</span>
-    <span class="n">merged</span> <span class="o">=</span> <span class="p">[]</span>
-    <span class="k">for</span> <span class="n">time_key</span> <span class="ow">in</span> <span class="n">raw_times_sorted</span><span class="p">:</span>
-        <span class="n">group</span> <span class="o">=</span> <span class="n">grouped_by_time</span><span class="p">[</span><span class="n">time_key</span><span class="p">]</span>
-        <span class="n">timestep_data</span> <span class="o">=</span> <span class="n">dask</span><span class="o">.</span><span class="n">delayed</span><span class="p">(</span><span class="n">_merge_subdomains_values</span><span class="p">)(</span>
-            <span class="n">group</span><span class="p">,</span> <span class="n">use_cftime</span><span class="p">,</span> <span class="n">pattern</span>
-        <span class="p">)</span>
-        <span class="n">merged</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">dask</span><span class="o">.</span><span class="n">array</span><span class="o">.</span><span class="n">from_delayed</span><span class="p">(</span><span class="n">timestep_data</span><span class="p">,</span> <span class="n">shape</span><span class="o">=</span><span class="n">shape</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">dtype</span><span class="p">))</span>
-    <span class="n">data</span> <span class="o">=</span> <span class="n">dask</span><span class="o">.</span><span class="n">array</span><span class="o">.</span><span class="n">concatenate</span><span class="p">(</span><span class="n">merged</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="n">time_axis</span><span class="p">)</span>
-
-    <span class="c1"># Build the full time coordinate</span>
-    <span class="n">coords</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="n">template</span><span class="o">.</span><span class="n">coords</span><span class="p">)</span>
-    <span class="k">if</span> <span class="n">has_time</span><span class="p">:</span>
-        <span class="k">if</span> <span class="n">use_cftime</span><span class="p">:</span>
-            <span class="n">time_coord</span> <span class="o">=</span> <span class="n">xr</span><span class="o">.</span><span class="n">CFTimeIndex</span><span class="p">(</span><span class="n">converted_times</span><span class="p">)</span>
-        <span class="k">else</span><span class="p">:</span>
-            <span class="n">time_coord</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">converted_times</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="s2">&quot;datetime64[ns]&quot;</span><span class="p">)</span>
-        <span class="n">coords</span><span class="p">[</span><span class="s2">&quot;time&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">time_coord</span>
-
-    <span class="k">return</span> <span class="n">xr</span><span class="o">.</span><span class="n">DataArray</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">coords</span><span class="p">,</span> <span class="n">dims</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="n">template</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="n">attrs</span><span class="o">=</span><span class="n">template</span><span class="o">.</span><span class="n">attrs</span><span class="p">)</span></div>
+    <span class="k">return</span> <span class="n">_open_idf_chunked_per_timestep</span><span class="p">(</span>
+        <span class="n">_merge_subdomains_values</span><span class="p">,</span>
+        <span class="n">grouped_by_time</span><span class="p">,</span>
+        <span class="n">template</span><span class="p">,</span>
+        <span class="n">has_time</span><span class="p">,</span>
+        <span class="n">use_cftime</span><span class="p">,</span>
+        <span class="o">*</span><span class="n">args_for_func</span><span class="p">,</span>
+    <span class="p">)</span></div>
 
 
 
 <div class="viewcode-block" id="open_dataset">
 <a class="viewcode-back" href="../../../api/generated/io/imod.formats.idf.open_dataset.html#imod.formats.idf.open_dataset">[docs]</a>
-<span class="k">def</span><span class="w"> </span><span class="nf">open_dataset</span><span class="p">(</span><span class="n">globpath</span><span class="p">,</span> <span class="n">use_cftime</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">pattern</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">open_dataset</span><span class="p">(</span>
+    <span class="n">globpath</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="n">pathlib</span><span class="o">.</span><span class="n">Path</span><span class="p">,</span>
+    <span class="n">use_cftime</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
+    <span class="n">pattern</span><span class="p">:</span> <span class="n">PatternType</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">xr</span><span class="o">.</span><span class="n">DataArray</span><span class="p">]:</span>
+<span class="w">    </span><span class="sd">"""</span>
 <span class="sd">    Open a set of IDFs to a dict of xarray.DataArrays.</span>
 
 <span class="sd">    Compared to imod.idf.open, this function lets you open multiple parameters</span>
@@ -856,7 +1090,7 @@
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
 <span class="sd">    globpath : str or Path</span>
-<span class="sd">        A glob pattern expansion such as ``&#39;model/**/*.idf&#39;``, which recursively</span>
+<span class="sd">        A glob pattern expansion such as ``'model/**/*.idf'``, which recursively</span>
 <span class="sd">        finds all IDF files under the model directory. Note that files with</span>
 <span class="sd">        the same name (part before the first underscore) wil be combined into</span>
 <span class="sd">        a single xarray.DataArray.</span>
@@ -880,7 +1114,7 @@
 <span class="sd">        Dictionary of str (parameter name) to xarray.DataArray.</span>
 <span class="sd">        All metadata needed for writing the file to IDF or other formats</span>
 <span class="sd">        using imod.rasterio are included in the xarray.DataArray.attrs.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
 
     <span class="c1"># convert since for Path.glob non-relative patterns are unsupported</span>
     <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">globpath</span><span class="p">,</span> <span class="n">pathlib</span><span class="o">.</span><span class="n">Path</span><span class="p">):</span>
@@ -889,11 +1123,11 @@
     <span class="n">paths</span> <span class="o">=</span> <span class="p">[</span><span class="n">pathlib</span><span class="o">.</span><span class="n">Path</span><span class="p">(</span><span class="n">p</span><span class="p">)</span> <span class="k">for</span> <span class="n">p</span> <span class="ow">in</span> <span class="n">glob</span><span class="o">.</span><span class="n">glob</span><span class="p">(</span><span class="n">globpath</span><span class="p">,</span> <span class="n">recursive</span><span class="o">=</span><span class="kc">True</span><span class="p">)]</span>
 
     <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">paths</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
-        <span class="k">raise</span> <span class="ne">FileNotFoundError</span><span class="p">(</span><span class="s2">&quot;Could not find any files matching </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">globpath</span><span class="p">))</span>
+        <span class="k">raise</span> <span class="ne">FileNotFoundError</span><span class="p">(</span><span class="s2">"Could not find any files matching </span><span class="si">{}</span><span class="s2">"</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">globpath</span><span class="p">))</span>
     <span class="c1"># group the DataArrays together using their name</span>
     <span class="c1"># note that directory names are ignored, and in case of duplicates, the last one wins</span>
-    <span class="n">names</span> <span class="o">=</span> <span class="p">[</span><span class="n">imod</span><span class="o">.</span><span class="n">util</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">decompose</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="n">pattern</span><span class="p">)[</span><span class="s2">&quot;name&quot;</span><span class="p">]</span> <span class="k">for</span> <span class="n">path</span> <span class="ow">in</span> <span class="n">paths</span><span class="p">]</span>
-    <span class="n">paths_by_name</span> <span class="o">=</span> <span class="p">{</span><span class="n">name</span><span class="p">:</span> <span class="p">[]</span> <span class="k">for</span> <span class="n">name</span> <span class="ow">in</span> <span class="n">np</span><span class="o">.</span><span class="n">unique</span><span class="p">(</span><span class="n">names</span><span class="p">)}</span>
+    <span class="n">names</span> <span class="o">=</span> <span class="p">[</span><span class="n">imod</span><span class="o">.</span><span class="n">util</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">decompose</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="n">pattern</span><span class="p">)[</span><span class="s2">"name"</span><span class="p">]</span> <span class="k">for</span> <span class="n">path</span> <span class="ow">in</span> <span class="n">paths</span><span class="p">]</span>
+    <span class="n">paths_by_name</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">list</span><span class="p">[</span><span class="n">PathType</span><span class="p">]]</span> <span class="o">=</span> <span class="p">{</span><span class="n">name</span><span class="p">:</span> <span class="p">[]</span> <span class="k">for</span> <span class="n">name</span> <span class="ow">in</span> <span class="n">np</span><span class="o">.</span><span class="n">unique</span><span class="p">(</span><span class="n">names</span><span class="p">)}</span>
     <span class="k">for</span> <span class="n">path</span><span class="p">,</span> <span class="n">name</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">paths</span><span class="p">,</span> <span class="n">names</span><span class="p">,</span> <span class="n">strict</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
         <span class="n">paths_by_name</span><span class="p">[</span><span class="n">name</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">path</span><span class="p">)</span>
     <span class="c1"># load each group into a DataArray</span>
@@ -908,19 +1142,24 @@
     <span class="p">]</span>
 
     <span class="c1"># store each DataArray under its own name in a dictionary</span>
-    <span class="n">dataset_dict</span> <span class="o">=</span> <span class="p">{</span><span class="n">da</span><span class="o">.</span><span class="n">name</span><span class="p">:</span> <span class="n">da</span> <span class="k">for</span> <span class="n">da</span> <span class="ow">in</span> <span class="n">dataarrays</span><span class="p">}</span>
+    <span class="n">dataset_dict</span> <span class="o">=</span> <span class="p">{</span><span class="nb">str</span><span class="p">(</span><span class="n">da</span><span class="o">.</span><span class="n">name</span><span class="p">):</span> <span class="n">da</span> <span class="k">for</span> <span class="n">da</span> <span class="ow">in</span> <span class="n">dataarrays</span><span class="p">}</span>
     <span class="c1"># Initially I wanted to return a xarray Dataset here,</span>
     <span class="c1"># but then realised that it is not always aligned, and therefore not possible, see</span>
     <span class="c1"># https://github.com/pydata/xarray/issues/1471#issuecomment-313719395</span>
     <span class="c1"># It is not aligned when some parameters only have a non empty subset of a dimension,</span>
     <span class="c1"># such as L2 + L3. This dict provides a similar interface anyway. If a Dataset is constructed</span>
-    <span class="c1"># from unaligned DataArrays it will make copies of the data, which we don&#39;t want.</span>
+    <span class="c1"># from unaligned DataArrays it will make copies of the data, which we don't want.</span>
     <span class="k">return</span> <span class="n">dataset_dict</span></div>
 
 
 
-<span class="k">def</span><span class="w"> </span><span class="nf">write</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="n">a</span><span class="p">,</span> <span class="n">nodata</span><span class="o">=</span><span class="mf">1.0e20</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">float32</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">write</span><span class="p">(</span>
+    <span class="n">path</span><span class="p">:</span> <span class="n">PathType</span><span class="p">,</span>
+    <span class="n">a</span><span class="p">:</span> <span class="n">xr</span><span class="o">.</span><span class="n">DataArray</span><span class="p">,</span>
+    <span class="n">nodata</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">1.0e20</span><span class="p">,</span>
+    <span class="n">dtype</span><span class="p">:</span> <span class="n">DTypeLike</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">float32</span><span class="p">,</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">"""</span>
 <span class="sd">    Write a 2D xarray.DataArray to a IDF file</span>
 
 <span class="sd">    Parameters</span>
@@ -928,7 +1167,7 @@
 <span class="sd">    path : str or Path</span>
 <span class="sd">        Path to the IDF file to be written</span>
 <span class="sd">    a : xarray.DataArray</span>
-<span class="sd">        DataArray to be written. It needs to have exactly a.dims == (&#39;y&#39;, &#39;x&#39;).</span>
+<span class="sd">        DataArray to be written. It needs to have exactly a.dims == ('y', 'x').</span>
 <span class="sd">    nodata : float, optional</span>
 <span class="sd">        Nodata value in the saved IDF files. Xarray uses nan values to represent</span>
 <span class="sd">        nodata, but these tend to work unreliably in iMOD(FLOW).</span>
@@ -936,18 +1175,18 @@
 <span class="sd">    dtype : type, ``{np.float32, np.float64}``, default is ``np.float32``.</span>
 <span class="sd">        Whether to write single precision (``np.float32``) or double precision</span>
 <span class="sd">        (``np.float64``) IDF files.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="n">xr</span><span class="o">.</span><span class="n">DataArray</span><span class="p">):</span>
-        <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">&quot;Data to write must be an xarray.DataArray&quot;</span><span class="p">)</span>
-    <span class="k">if</span> <span class="ow">not</span> <span class="n">a</span><span class="o">.</span><span class="n">dims</span> <span class="o">==</span> <span class="p">(</span><span class="s2">&quot;y&quot;</span><span class="p">,</span> <span class="s2">&quot;x&quot;</span><span class="p">):</span>
+        <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">"Data to write must be an xarray.DataArray"</span><span class="p">)</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">a</span><span class="o">.</span><span class="n">dims</span> <span class="o">==</span> <span class="p">(</span><span class="s2">"y"</span><span class="p">,</span> <span class="s2">"x"</span><span class="p">):</span>
         <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
-            <span class="sa">f</span><span class="s2">&quot;Dimensions must be exactly (&#39;y&#39;, &#39;x&#39;). Received </span><span class="si">{</span><span class="n">a</span><span class="o">.</span><span class="n">dims</span><span class="si">}</span><span class="s2"> instead.&quot;</span>
+            <span class="sa">f</span><span class="s2">"Dimensions must be exactly ('y', 'x'). Received </span><span class="si">{</span><span class="n">a</span><span class="o">.</span><span class="n">dims</span><span class="si">}</span><span class="s2"> instead."</span>
         <span class="p">)</span>
 
     <span class="n">flip</span> <span class="o">=</span> <span class="nb">slice</span><span class="p">(</span><span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">)</span>
-    <span class="k">if</span> <span class="ow">not</span> <span class="n">a</span><span class="o">.</span><span class="n">indexes</span><span class="p">[</span><span class="s2">&quot;x&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">is_monotonic_increasing</span><span class="p">:</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">a</span><span class="o">.</span><span class="n">indexes</span><span class="p">[</span><span class="s2">"x"</span><span class="p">]</span><span class="o">.</span><span class="n">is_monotonic_increasing</span><span class="p">:</span>
         <span class="n">a</span> <span class="o">=</span> <span class="n">a</span><span class="o">.</span><span class="n">isel</span><span class="p">(</span><span class="n">x</span><span class="o">=</span><span class="n">flip</span><span class="p">)</span>
-    <span class="k">if</span> <span class="ow">not</span> <span class="n">a</span><span class="o">.</span><span class="n">indexes</span><span class="p">[</span><span class="s2">&quot;y&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">is_monotonic_decreasing</span><span class="p">:</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">a</span><span class="o">.</span><span class="n">indexes</span><span class="p">[</span><span class="s2">"y"</span><span class="p">]</span><span class="o">.</span><span class="n">is_monotonic_decreasing</span><span class="p">:</span>
         <span class="n">a</span> <span class="o">=</span> <span class="n">a</span><span class="o">.</span><span class="n">isel</span><span class="p">(</span><span class="n">y</span><span class="o">=</span><span class="n">flip</span><span class="p">)</span>
     <span class="c1"># TODO: check is_monotonic, but also for single col/row idfs...</span>
 
@@ -959,27 +1198,27 @@
         <span class="k">if</span> <span class="n">data_dtype</span> <span class="o">!=</span> <span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">:</span>
             <span class="n">a</span> <span class="o">=</span> <span class="n">a</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">)</span>
         <span class="n">reclenid</span> <span class="o">=</span> <span class="mi">2295</span>
-        <span class="n">floatformat</span> <span class="o">=</span> <span class="s2">&quot;d&quot;</span>
-        <span class="n">intformat</span> <span class="o">=</span> <span class="s2">&quot;q&quot;</span>
+        <span class="n">floatformat</span> <span class="o">=</span> <span class="s2">"d"</span>
+        <span class="n">intformat</span> <span class="o">=</span> <span class="s2">"q"</span>
         <span class="n">doubleprecision</span> <span class="o">=</span> <span class="kc">True</span>
     <span class="k">elif</span> <span class="n">dtype</span> <span class="o">==</span> <span class="n">np</span><span class="o">.</span><span class="n">float32</span><span class="p">:</span>
         <span class="n">reclenid</span> <span class="o">=</span> <span class="mi">1271</span>
-        <span class="n">floatformat</span> <span class="o">=</span> <span class="s2">&quot;f&quot;</span>
-        <span class="n">intformat</span> <span class="o">=</span> <span class="s2">&quot;i&quot;</span>
+        <span class="n">floatformat</span> <span class="o">=</span> <span class="s2">"f"</span>
+        <span class="n">intformat</span> <span class="o">=</span> <span class="s2">"i"</span>
         <span class="n">doubleprecision</span> <span class="o">=</span> <span class="kc">False</span>
         <span class="k">if</span> <span class="n">data_dtype</span> <span class="o">!=</span> <span class="n">np</span><span class="o">.</span><span class="n">float32</span><span class="p">:</span>
             <span class="n">a</span> <span class="o">=</span> <span class="n">a</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">float32</span><span class="p">)</span>
     <span class="k">else</span><span class="p">:</span>
-        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Invalid dtype, IDF allows only np.float32 and np.float64&quot;</span><span class="p">)</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">"Invalid dtype, IDF allows only np.float32 and np.float64"</span><span class="p">)</span>
 
     <span class="c1"># Only fillna if data can contain na values</span>
     <span class="k">if</span> <span class="p">(</span><span class="n">data_dtype</span> <span class="o">==</span> <span class="n">np</span><span class="o">.</span><span class="n">float32</span><span class="p">)</span> <span class="ow">or</span> <span class="p">(</span><span class="n">data_dtype</span> <span class="o">==</span> <span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">):</span>
         <span class="n">a</span> <span class="o">=</span> <span class="n">a</span><span class="o">.</span><span class="n">fillna</span><span class="p">(</span><span class="n">nodata</span><span class="p">)</span>
 
-    <span class="k">with</span> <span class="n">f_open</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="s2">&quot;wb&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
-        <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">struct</span><span class="o">.</span><span class="n">pack</span><span class="p">(</span><span class="s2">&quot;i&quot;</span><span class="p">,</span> <span class="n">reclenid</span><span class="p">))</span>  <span class="c1"># Lahey RecordLength Ident.</span>
+    <span class="k">with</span> <span class="n">f_open</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="s2">"wb"</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+        <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">struct</span><span class="o">.</span><span class="n">pack</span><span class="p">(</span><span class="s2">"i"</span><span class="p">,</span> <span class="n">reclenid</span><span class="p">))</span>  <span class="c1"># Lahey RecordLength Ident.</span>
         <span class="k">if</span> <span class="n">doubleprecision</span><span class="p">:</span>
-            <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">struct</span><span class="o">.</span><span class="n">pack</span><span class="p">(</span><span class="s2">&quot;i&quot;</span><span class="p">,</span> <span class="n">reclenid</span><span class="p">))</span>
+            <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">struct</span><span class="o">.</span><span class="n">pack</span><span class="p">(</span><span class="s2">"i"</span><span class="p">,</span> <span class="n">reclenid</span><span class="p">))</span>
         <span class="n">nrow</span> <span class="o">=</span> <span class="n">a</span><span class="o">.</span><span class="n">y</span><span class="o">.</span><span class="n">size</span>
         <span class="n">ncol</span> <span class="o">=</span> <span class="n">a</span><span class="o">.</span><span class="n">x</span><span class="o">.</span><span class="n">size</span>
         <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">struct</span><span class="o">.</span><span class="n">pack</span><span class="p">(</span><span class="n">intformat</span><span class="p">,</span> <span class="n">ncol</span><span class="p">))</span>
@@ -999,12 +1238,12 @@
             <span class="n">ieq</span> <span class="o">=</span> <span class="kc">True</span>  <span class="c1"># equidistant</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="n">ieq</span> <span class="o">=</span> <span class="kc">False</span>  <span class="c1"># nonequidistant</span>
-        <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">struct</span><span class="o">.</span><span class="n">pack</span><span class="p">(</span><span class="s2">&quot;?&quot;</span><span class="p">,</span> <span class="ow">not</span> <span class="n">ieq</span><span class="p">))</span>  <span class="c1"># ieq</span>
+        <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">struct</span><span class="o">.</span><span class="n">pack</span><span class="p">(</span><span class="s2">"?"</span><span class="p">,</span> <span class="ow">not</span> <span class="n">ieq</span><span class="p">))</span>  <span class="c1"># ieq</span>
 
         <span class="n">itb</span> <span class="o">=</span> <span class="kc">False</span>
-        <span class="k">if</span> <span class="s2">&quot;z&quot;</span> <span class="ow">in</span> <span class="n">a</span><span class="o">.</span><span class="n">coords</span> <span class="ow">and</span> <span class="s2">&quot;dz&quot;</span> <span class="ow">in</span> <span class="n">a</span><span class="o">.</span><span class="n">coords</span><span class="p">:</span>
-            <span class="n">z</span> <span class="o">=</span> <span class="n">a</span><span class="o">.</span><span class="n">coords</span><span class="p">[</span><span class="s2">&quot;z&quot;</span><span class="p">]</span>
-            <span class="n">dz</span> <span class="o">=</span> <span class="nb">abs</span><span class="p">(</span><span class="n">a</span><span class="o">.</span><span class="n">coords</span><span class="p">[</span><span class="s2">&quot;dz&quot;</span><span class="p">])</span>
+        <span class="k">if</span> <span class="s2">"z"</span> <span class="ow">in</span> <span class="n">a</span><span class="o">.</span><span class="n">coords</span> <span class="ow">and</span> <span class="s2">"dz"</span> <span class="ow">in</span> <span class="n">a</span><span class="o">.</span><span class="n">coords</span><span class="p">:</span>
+            <span class="n">z</span> <span class="o">=</span> <span class="n">a</span><span class="o">.</span><span class="n">coords</span><span class="p">[</span><span class="s2">"z"</span><span class="p">]</span>
+            <span class="n">dz</span> <span class="o">=</span> <span class="nb">abs</span><span class="p">(</span><span class="n">a</span><span class="o">.</span><span class="n">coords</span><span class="p">[</span><span class="s2">"dz"</span><span class="p">])</span>
             <span class="k">try</span><span class="p">:</span>
                 <span class="n">top</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">z</span> <span class="o">+</span> <span class="mf">0.5</span> <span class="o">*</span> <span class="n">dz</span><span class="p">)</span>
                 <span class="n">bot</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">z</span> <span class="o">-</span> <span class="mf">0.5</span> <span class="o">*</span> <span class="n">dz</span><span class="p">)</span>
@@ -1012,10 +1251,10 @@
             <span class="k">except</span> <span class="ne">TypeError</span><span class="p">:</span>  <span class="c1"># not a scalar value</span>
                 <span class="k">pass</span>
 
-        <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">struct</span><span class="o">.</span><span class="n">pack</span><span class="p">(</span><span class="s2">&quot;?&quot;</span><span class="p">,</span> <span class="n">itb</span><span class="p">))</span>
-        <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">struct</span><span class="o">.</span><span class="n">pack</span><span class="p">(</span><span class="s2">&quot;xx&quot;</span><span class="p">))</span>  <span class="c1"># not used</span>
+        <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">struct</span><span class="o">.</span><span class="n">pack</span><span class="p">(</span><span class="s2">"?"</span><span class="p">,</span> <span class="n">itb</span><span class="p">))</span>
+        <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">struct</span><span class="o">.</span><span class="n">pack</span><span class="p">(</span><span class="s2">"xx"</span><span class="p">))</span>  <span class="c1"># not used</span>
         <span class="k">if</span> <span class="n">doubleprecision</span><span class="p">:</span>
-            <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">struct</span><span class="o">.</span><span class="n">pack</span><span class="p">(</span><span class="s2">&quot;xxxx&quot;</span><span class="p">))</span>  <span class="c1"># not used</span>
+            <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">struct</span><span class="o">.</span><span class="n">pack</span><span class="p">(</span><span class="s2">"xxxx"</span><span class="p">))</span>  <span class="c1"># not used</span>
 
         <span class="k">if</span> <span class="n">ieq</span><span class="p">:</span>
             <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">struct</span><span class="o">.</span><span class="n">pack</span><span class="p">(</span><span class="n">floatformat</span><span class="p">,</span> <span class="nb">abs</span><span class="p">(</span><span class="n">dx</span><span class="p">)))</span>
@@ -1024,15 +1263,15 @@
             <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">struct</span><span class="o">.</span><span class="n">pack</span><span class="p">(</span><span class="n">floatformat</span><span class="p">,</span> <span class="n">top</span><span class="p">))</span>
             <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">struct</span><span class="o">.</span><span class="n">pack</span><span class="p">(</span><span class="n">floatformat</span><span class="p">,</span> <span class="n">bot</span><span class="p">))</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="n">ieq</span><span class="p">:</span>
-            <span class="n">np</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="n">a</span><span class="o">.</span><span class="n">coords</span><span class="p">[</span><span class="s2">&quot;dx&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">values</span><span class="p">)</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="n">a</span><span class="o">.</span><span class="n">dtype</span><span class="p">)</span><span class="o">.</span><span class="n">tofile</span><span class="p">(</span><span class="n">f</span><span class="p">)</span>
-            <span class="n">np</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="n">a</span><span class="o">.</span><span class="n">coords</span><span class="p">[</span><span class="s2">&quot;dy&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">values</span><span class="p">)</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="n">a</span><span class="o">.</span><span class="n">dtype</span><span class="p">)</span><span class="o">.</span><span class="n">tofile</span><span class="p">(</span><span class="n">f</span><span class="p">)</span>
+            <span class="n">np</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="n">a</span><span class="o">.</span><span class="n">coords</span><span class="p">[</span><span class="s2">"dx"</span><span class="p">]</span><span class="o">.</span><span class="n">values</span><span class="p">)</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="n">a</span><span class="o">.</span><span class="n">dtype</span><span class="p">)</span><span class="o">.</span><span class="n">tofile</span><span class="p">(</span><span class="n">f</span><span class="p">)</span>
+            <span class="n">np</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="n">a</span><span class="o">.</span><span class="n">coords</span><span class="p">[</span><span class="s2">"dy"</span><span class="p">]</span><span class="o">.</span><span class="n">values</span><span class="p">)</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="n">a</span><span class="o">.</span><span class="n">dtype</span><span class="p">)</span><span class="o">.</span><span class="n">tofile</span><span class="p">(</span><span class="n">f</span><span class="p">)</span>
         <span class="n">a</span><span class="o">.</span><span class="n">values</span><span class="o">.</span><span class="n">tofile</span><span class="p">(</span><span class="n">f</span><span class="p">)</span>
 
 
-<span class="k">def</span><span class="w"> </span><span class="nf">_as_voxeldata</span><span class="p">(</span><span class="n">a</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    If &quot;z&quot; is present as a dimension, generate layer if necessary. Ensure that</span>
-<span class="sd">    layer is the dimension (via swap_dims). Infer &quot;dz&quot; if necessary, and if</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">_as_voxeldata</span><span class="p">(</span><span class="n">a</span><span class="p">:</span> <span class="n">xr</span><span class="o">.</span><span class="n">DataArray</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">xr</span><span class="o">.</span><span class="n">DataArray</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">"""</span>
+<span class="sd">    If "z" is present as a dimension, generate layer if necessary. Ensure that</span>
+<span class="sd">    layer is the dimension (via swap_dims). Infer "dz" if necessary, and if</span>
 <span class="sd">    possible.</span>
 
 <span class="sd">    Parameters</span>
@@ -1043,43 +1282,49 @@
 <span class="sd">    -------</span>
 <span class="sd">    a : xr.DataArray</span>
 <span class="sd">        copy of input a, with swapped dims and dz added, if necessary.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="c1"># Avoid side-effects</span>
     <span class="n">a</span> <span class="o">=</span> <span class="n">a</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
 
-    <span class="k">if</span> <span class="s2">&quot;z&quot;</span> <span class="ow">in</span> <span class="n">a</span><span class="o">.</span><span class="n">coords</span><span class="p">:</span>
-        <span class="k">if</span> <span class="s2">&quot;z&quot;</span> <span class="ow">in</span> <span class="n">a</span><span class="o">.</span><span class="n">dims</span><span class="p">:</span>  <span class="c1"># it&#39;s definitely 1D</span>
+    <span class="k">if</span> <span class="s2">"z"</span> <span class="ow">in</span> <span class="n">a</span><span class="o">.</span><span class="n">coords</span><span class="p">:</span>
+        <span class="k">if</span> <span class="s2">"z"</span> <span class="ow">in</span> <span class="n">a</span><span class="o">.</span><span class="n">dims</span><span class="p">:</span>  <span class="c1"># it's definitely 1D</span>
             <span class="c1"># have to swap it with layer in this case</span>
-            <span class="k">if</span> <span class="s2">&quot;layer&quot;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">a</span><span class="o">.</span><span class="n">coords</span><span class="p">:</span>
-                <span class="n">a</span> <span class="o">=</span> <span class="n">a</span><span class="o">.</span><span class="n">assign_coords</span><span class="p">(</span><span class="n">layer</span><span class="o">=</span><span class="p">(</span><span class="s2">&quot;z&quot;</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">a</span><span class="p">[</span><span class="s2">&quot;z&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">size</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)))</span>
-            <span class="n">a</span> <span class="o">=</span> <span class="n">a</span><span class="o">.</span><span class="n">swap_dims</span><span class="p">({</span><span class="s2">&quot;z&quot;</span><span class="p">:</span> <span class="s2">&quot;layer&quot;</span><span class="p">})</span>
+            <span class="k">if</span> <span class="s2">"layer"</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">a</span><span class="o">.</span><span class="n">coords</span><span class="p">:</span>
+                <span class="n">a</span> <span class="o">=</span> <span class="n">a</span><span class="o">.</span><span class="n">assign_coords</span><span class="p">(</span><span class="n">layer</span><span class="o">=</span><span class="p">(</span><span class="s2">"z"</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">a</span><span class="p">[</span><span class="s2">"z"</span><span class="p">]</span><span class="o">.</span><span class="n">size</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)))</span>
+            <span class="n">a</span> <span class="o">=</span> <span class="n">a</span><span class="o">.</span><span class="n">swap_dims</span><span class="p">({</span><span class="s2">"z"</span><span class="p">:</span> <span class="s2">"layer"</span><span class="p">})</span>
 
-            <span class="c1"># It&#39;ll raise an Error if it cannot infer dz</span>
-            <span class="k">if</span> <span class="s2">&quot;dz&quot;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">a</span><span class="o">.</span><span class="n">coords</span><span class="p">:</span>
-                <span class="n">dz</span><span class="p">,</span> <span class="n">_</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">imod</span><span class="o">.</span><span class="n">util</span><span class="o">.</span><span class="n">spatial</span><span class="o">.</span><span class="n">coord_reference</span><span class="p">(</span><span class="n">a</span><span class="p">[</span><span class="s2">&quot;z&quot;</span><span class="p">])</span>
+            <span class="c1"># It'll raise an Error if it cannot infer dz</span>
+            <span class="k">if</span> <span class="s2">"dz"</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">a</span><span class="o">.</span><span class="n">coords</span><span class="p">:</span>
+                <span class="n">dz</span><span class="p">,</span> <span class="n">_</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">imod</span><span class="o">.</span><span class="n">util</span><span class="o">.</span><span class="n">spatial</span><span class="o">.</span><span class="n">coord_reference</span><span class="p">(</span><span class="n">a</span><span class="p">[</span><span class="s2">"z"</span><span class="p">])</span>
                 <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">dz</span><span class="p">,</span> <span class="nb">float</span><span class="p">):</span>
                     <span class="n">a</span> <span class="o">=</span> <span class="n">a</span><span class="o">.</span><span class="n">assign_coords</span><span class="p">(</span><span class="n">dz</span><span class="o">=</span><span class="n">dz</span><span class="p">)</span>
                 <span class="k">else</span><span class="p">:</span>
-                    <span class="n">a</span> <span class="o">=</span> <span class="n">a</span><span class="o">.</span><span class="n">assign_coords</span><span class="p">(</span><span class="n">dz</span><span class="o">=</span><span class="p">(</span><span class="s2">&quot;layer&quot;</span><span class="p">,</span> <span class="n">dz</span><span class="p">))</span>
+                    <span class="n">a</span> <span class="o">=</span> <span class="n">a</span><span class="o">.</span><span class="n">assign_coords</span><span class="p">(</span><span class="n">dz</span><span class="o">=</span><span class="p">(</span><span class="s2">"layer"</span><span class="p">,</span> <span class="n">dz</span><span class="p">))</span>
 
-        <span class="k">elif</span> <span class="nb">len</span><span class="p">(</span><span class="n">a</span><span class="p">[</span><span class="s2">&quot;z&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>  <span class="c1"># one dimensional</span>
-            <span class="k">if</span> <span class="s2">&quot;layer&quot;</span> <span class="ow">in</span> <span class="n">a</span><span class="o">.</span><span class="n">coords</span><span class="p">:</span>
+        <span class="k">elif</span> <span class="nb">len</span><span class="p">(</span><span class="n">a</span><span class="p">[</span><span class="s2">"z"</span><span class="p">]</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>  <span class="c1"># one dimensional</span>
+            <span class="k">if</span> <span class="s2">"layer"</span> <span class="ow">in</span> <span class="n">a</span><span class="o">.</span><span class="n">coords</span><span class="p">:</span>
                 <span class="c1"># Check if z depends only on layer</span>
-                <span class="k">if</span> <span class="nb">tuple</span><span class="p">(</span><span class="n">a</span><span class="p">[</span><span class="s2">&quot;z&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">indexes</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span> <span class="o">==</span> <span class="p">(</span><span class="s2">&quot;layer&quot;</span><span class="p">,):</span>
-                    <span class="k">if</span> <span class="s2">&quot;dz&quot;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">a</span><span class="o">.</span><span class="n">coords</span><span class="p">:</span>
-                        <span class="c1"># It&#39;ll raise an Error if it cannot infer dz</span>
-                        <span class="n">dz</span><span class="p">,</span> <span class="n">_</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">imod</span><span class="o">.</span><span class="n">util</span><span class="o">.</span><span class="n">spatial</span><span class="o">.</span><span class="n">coord_reference</span><span class="p">(</span><span class="n">a</span><span class="p">[</span><span class="s2">&quot;z&quot;</span><span class="p">])</span>
+                <span class="k">if</span> <span class="nb">tuple</span><span class="p">(</span><span class="n">a</span><span class="p">[</span><span class="s2">"z"</span><span class="p">]</span><span class="o">.</span><span class="n">indexes</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span> <span class="o">==</span> <span class="p">(</span><span class="s2">"layer"</span><span class="p">,):</span>
+                    <span class="k">if</span> <span class="s2">"dz"</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">a</span><span class="o">.</span><span class="n">coords</span><span class="p">:</span>
+                        <span class="c1"># It'll raise an Error if it cannot infer dz</span>
+                        <span class="n">dz</span><span class="p">,</span> <span class="n">_</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">imod</span><span class="o">.</span><span class="n">util</span><span class="o">.</span><span class="n">spatial</span><span class="o">.</span><span class="n">coord_reference</span><span class="p">(</span><span class="n">a</span><span class="p">[</span><span class="s2">"z"</span><span class="p">])</span>
                         <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">dz</span><span class="p">,</span> <span class="nb">float</span><span class="p">):</span>
                             <span class="n">a</span> <span class="o">=</span> <span class="n">a</span><span class="o">.</span><span class="n">assign_coords</span><span class="p">(</span><span class="n">dz</span><span class="o">=</span><span class="n">dz</span><span class="p">)</span>
                         <span class="k">else</span><span class="p">:</span>
-                            <span class="n">a</span> <span class="o">=</span> <span class="n">a</span><span class="o">.</span><span class="n">assign_coords</span><span class="p">(</span><span class="n">dz</span><span class="o">=</span><span class="p">(</span><span class="s2">&quot;layer&quot;</span><span class="p">,</span> <span class="n">dz</span><span class="p">))</span>
+                            <span class="n">a</span> <span class="o">=</span> <span class="n">a</span><span class="o">.</span><span class="n">assign_coords</span><span class="p">(</span><span class="n">dz</span><span class="o">=</span><span class="p">(</span><span class="s2">"layer"</span><span class="p">,</span> <span class="n">dz</span><span class="p">))</span>
     <span class="k">return</span> <span class="n">a</span>
 
 
 <div class="viewcode-block" id="save">
 <a class="viewcode-back" href="../../../api/generated/io/imod.formats.idf.save.html#imod.formats.idf.save">[docs]</a>
-<span class="k">def</span><span class="w"> </span><span class="nf">save</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="n">a</span><span class="p">,</span> <span class="n">nodata</span><span class="o">=</span><span class="mf">1.0e20</span><span class="p">,</span> <span class="n">pattern</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">float32</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">save</span><span class="p">(</span>
+    <span class="n">path</span><span class="p">:</span> <span class="n">PathType</span><span class="p">,</span>
+    <span class="n">a</span><span class="p">:</span> <span class="n">xr</span><span class="o">.</span><span class="n">DataArray</span><span class="p">,</span>
+    <span class="n">nodata</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">1.0e20</span><span class="p">,</span>
+    <span class="n">pattern</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">dtype</span><span class="p">:</span> <span class="n">DTypeLike</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">float32</span><span class="p">,</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">"""</span>
 <span class="sd">    Write a xarray.DataArray to one or more IDF files</span>
 
 <span class="sd">    If the DataArray only has ``y`` and ``x`` dimensions, a single IDF file is</span>
@@ -1094,7 +1339,7 @@
 <span class="sd">        Path to the IDF file to be written. This function decides on the</span>
 <span class="sd">        actual filename(s) using conventions.</span>
 <span class="sd">    a : xarray.DataArray</span>
-<span class="sd">        DataArray to be written. It needs to have dimensions (&#39;y&#39;, &#39;x&#39;), and</span>
+<span class="sd">        DataArray to be written. It needs to have dimensions ('y', 'x'), and</span>
 <span class="sd">        optionally ``layer`` and ``time``.</span>
 <span class="sd">    nodata : float, optional</span>
 <span class="sd">        Nodata value in the saved IDF files. Xarray uses nan values to represent</span>
@@ -1108,51 +1353,51 @@
 
 <span class="sd">    Example</span>
 <span class="sd">    -------</span>
-<span class="sd">    Consider a DataArray ``da`` that has dimensions ``(&#39;layer&#39;, &#39;y&#39;, &#39;x&#39;)``, with the</span>
+<span class="sd">    Consider a DataArray ``da`` that has dimensions ``('layer', 'y', 'x')``, with the</span>
 <span class="sd">    layer dimension consisting of layer 1 and 2:</span>
 
-<span class="sd">    &gt;&gt;&gt; imod.idf.save(&#39;path/to/head&#39;, da)</span>
+<span class="sd">    &gt;&gt;&gt; imod.idf.save('path/to/head', da)</span>
 
 <span class="sd">    This writes the following two IDF files: ``path/to/head_l1.idf`` and</span>
 <span class="sd">    ``path/to/head_l2.idf``.</span>
 
-<span class="sd">    To disable adding coordinates to the files, specify ``pattern=&quot;{name}&quot;``:</span>
+<span class="sd">    To disable adding coordinates to the files, specify ``pattern="{name}"``:</span>
 
-<span class="sd">    &gt;&gt;&gt; imod.idf.save(&#39;path/to/head&#39;, da, pattern=&quot;{name}&quot;)</span>
+<span class="sd">    &gt;&gt;&gt; imod.idf.save('path/to/head', da, pattern="{name}")</span>
 
-<span class="sd">    The &quot;.idf&quot; extension will always be added automatically.</span>
+<span class="sd">    The ".idf" extension will always be added automatically.</span>
 
 <span class="sd">    It is possible to generate custom filenames using a format string. The</span>
 <span class="sd">    default filenames would be generated by the following format string:</span>
 
-<span class="sd">    &gt;&gt;&gt; imod.idf.save(&quot;example&quot;, pattern=&quot;{name}_l{layer}{extension}&quot;)</span>
+<span class="sd">    &gt;&gt;&gt; imod.idf.save("example", pattern="{name}_l{layer}{extension}")</span>
 
 <span class="sd">    If you desire zero-padded numbers that show up neatly sorted in a</span>
 <span class="sd">    file manager, you may specify:</span>
 
-<span class="sd">    &gt;&gt;&gt; imod.idf.save(&quot;example&quot;, pattern=&quot;{name}_l{layer:02d}{extension}&quot;)</span>
+<span class="sd">    &gt;&gt;&gt; imod.idf.save("example", pattern="{name}_l{layer:02d}{extension}")</span>
 
-<span class="sd">    In this case, a 0 will be padded for single digit numbers (&#39;1&#39; will become</span>
-<span class="sd">    &#39;01&#39;).</span>
+<span class="sd">    In this case, a 0 will be padded for single digit numbers ('1' will become</span>
+<span class="sd">    '01').</span>
 
 <span class="sd">    To get a date with dashes, use the following pattern:</span>
 
-<span class="sd">    &gt;&gt;&gt; pattern=&quot;{name}_{time:%Y-%m-%d}_l{layer}{extension}&quot;</span>
+<span class="sd">    &gt;&gt;&gt; pattern="{name}_{time:%Y-%m-%d}_l{layer}{extension}"</span>
 
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
 
     <span class="c1"># Cast datatype if necessary</span>
     <span class="k">if</span> <span class="n">dtype</span> <span class="ow">not</span> <span class="ow">in</span> <span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">float32</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">):</span>
-        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Invalid dtype, IDF allows only np.float32 and np.float64&quot;</span><span class="p">)</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">"Invalid dtype, IDF allows only np.float32 and np.float64"</span><span class="p">)</span>
 
-    <span class="c1"># Swap coordinates if possible, add &quot;dz&quot; if possible.</span>
+    <span class="c1"># Swap coordinates if possible, add "dz" if possible.</span>
     <span class="n">a</span> <span class="o">=</span> <span class="n">_as_voxeldata</span><span class="p">(</span><span class="n">a</span><span class="p">)</span>
 
     <span class="c1"># Deal with path</span>
     <span class="n">path</span> <span class="o">=</span> <span class="n">pathlib</span><span class="o">.</span><span class="n">Path</span><span class="p">(</span><span class="n">path</span><span class="p">)</span>
 
-    <span class="k">if</span> <span class="n">path</span><span class="o">.</span><span class="n">suffix</span> <span class="o">==</span> <span class="s2">&quot;&quot;</span><span class="p">:</span>
-        <span class="n">path</span> <span class="o">=</span> <span class="n">path</span><span class="o">.</span><span class="n">with_suffix</span><span class="p">(</span><span class="s2">&quot;.idf&quot;</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">path</span><span class="o">.</span><span class="n">suffix</span> <span class="o">==</span> <span class="s2">""</span><span class="p">:</span>
+        <span class="n">path</span> <span class="o">=</span> <span class="n">path</span><span class="o">.</span><span class="n">with_suffix</span><span class="p">(</span><span class="s2">".idf"</span><span class="p">)</span>
 
     <span class="n">array_io</span><span class="o">.</span><span class="n">writing</span><span class="o">.</span><span class="n">_save</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="n">a</span><span class="p">,</span> <span class="n">nodata</span><span class="p">,</span> <span class="n">pattern</span><span class="p">,</span> <span class="n">dtype</span><span class="p">,</span> <span class="n">write</span><span class="p">)</span></div>
 
@@ -1185,8 +1430,8 @@
   </div>
   
   <!-- Scripts loaded after <body> so the DOM is not blocked -->
-  <script defer src="../../../_static/scripts/bootstrap.js?digest=90905a2f556bf617f1a9"></script>
-<script defer src="../../../_static/scripts/pydata-sphinx-theme.js?digest=90905a2f556bf617f1a9"></script>
+  <script defer src="../../../_static/scripts/bootstrap.js?digest=75c7c72ae941e8b558d8"></script>
+<script defer src="../../../_static/scripts/pydata-sphinx-theme.js?digest=75c7c72ae941e8b558d8"></script>
 
   <footer class="bd-footer">
 <div class="bd-footer__inner bd-page-width">
@@ -1206,8 +1451,7 @@
         <div class="footer-item">
 
   <p class="sphinx-version">
-    Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 9.1.0.
-    <br/>
+    Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 9.2.0.
   </p>
 </div>
       
@@ -1220,7 +1464,7 @@
         <div class="footer-item">
 <p class="theme-version">
   <!-- # L10n: Setting the PST URL as an argument as this does not need to be localized -->
-  Built with the <a href="https://pydata-sphinx-theme.readthedocs.io/en/stable/index.html">PyData Sphinx Theme</a> 0.20.0.
+  Built with the <a href="https://pydata-sphinx-theme.readthedocs.io/en/stable/index.html">PyData Sphinx Theme</a> 0.24.0.
 </p></div>
       
     </div>

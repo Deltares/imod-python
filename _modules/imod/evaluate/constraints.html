@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 
 
@@ -7,7 +6,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>imod.evaluate.constraints &#8212; iMOD Python 1.1.0 documentation</title>
+    <title>imod.evaluate.constraints &#8212; iMOD Python 1.2.0 documentation</title>
   
   
   
@@ -26,22 +25,22 @@
   </noscript>
   
   <!-- Loaded before other Sphinx assets -->
-  <link href="../../../_static/styles/theme.css?digest=90905a2f556bf617f1a9" rel="stylesheet" />
-<link href="../../../_static/styles/pydata-sphinx-theme.css?digest=90905a2f556bf617f1a9" rel="stylesheet" />
+  <link href="../../../_static/styles/theme.css?digest=75c7c72ae941e8b558d8" rel="stylesheet" />
+<link href="../../../_static/styles/pydata-sphinx-theme.css?digest=75c7c72ae941e8b558d8" rel="stylesheet" />
 
     <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=03e43079" />
-    <link rel="stylesheet" type="text/css" href="../../../_static/sg_gallery.css?v=fd6457a4" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/sg_gallery.css?v=c83e6b79" />
     <link rel="stylesheet" type="text/css" href="../../../_static/sg_gallery-binder.css?v=f4aeca0c" />
     <link rel="stylesheet" type="text/css" href="../../../_static/sg_gallery-dataframe.css?v=2082cf3c" />
     <link rel="stylesheet" type="text/css" href="../../../_static/sg_gallery-rendered-html.css?v=1277b6f3" />
   
   <!-- So that users can add custom icons -->
-  <script defer src="../../../_static/scripts/fontawesome.js?digest=90905a2f556bf617f1a9"></script>
+  <script defer src="../../../_static/scripts/fontawesome.js?digest=75c7c72ae941e8b558d8"></script>
   <!-- Pre-loaded scripts that we'll load fully later -->
-  <link rel="preload" as="script" href="../../../_static/scripts/bootstrap.js?digest=90905a2f556bf617f1a9" />
-<link rel="preload" as="script" href="../../../_static/scripts/pydata-sphinx-theme.js?digest=90905a2f556bf617f1a9" />
+  <link rel="preload" as="script" href="../../../_static/scripts/bootstrap.js?digest=75c7c72ae941e8b558d8" />
+<link rel="preload" as="script" href="../../../_static/scripts/pydata-sphinx-theme.js?digest=75c7c72ae941e8b558d8" />
 
-    <script src="../../../_static/documentation_options.js?v=fc837d61"></script>
+    <script src="../../../_static/documentation_options.js?v=6efca38a"></script>
     <script src="../../../_static/doctools.js?v=fd6eb6e6"></script>
     <script src="../../../_static/sphinx_highlight.js?v=6ffebe34"></script>
     <script src="../../../_static/sg-tags.js?v=d80f6fa4"></script>
@@ -51,8 +50,9 @@
     <link rel="index" title="Index" href="../../../genindex.html" />
     <link rel="search" title="Search" href="../../../search.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <meta name="color-scheme" content="light dark"/>
   <meta name="docsearch:language" content="en"/>
-  <meta name="docsearch:version" content="1.1.0.dev" />
+  <meta name="docsearch:version" content="1.2.0.dev" />
   
     
     <script src="../../../_static/searchtools.js"></script>
@@ -100,7 +100,7 @@
   
     <header id="pst-header" class="bd-header navbar navbar-expand-lg bd-navbar d-print-none">
 <div class="bd-header__inner bd-page-width">
-  <button class="pst-navbar-icon sidebar-toggle primary-toggle" aria-label="Site navigation">
+  <button type="button" class="pst-navbar-icon sidebar-toggle primary-toggle" aria-label="Site navigation" aria-expanded="false" aria-controls="pst-primary-sidebar-modal">
     <span class="fa-solid fa-bars"></span>
   </button>
   
@@ -122,8 +122,8 @@
     
     
     
-    <img src="../../../_static/imod-python-logo-light.svg" class="logo__image only-light" alt="iMOD Python 1.1.0 documentation - Home"/>
-    <img src="../../../_static/imod-python-logo-dark.svg" class="logo__image only-dark pst-js-only" alt="iMOD Python 1.1.0 documentation - Home"/>
+    <img src="../../../_static/imod-python-logo-light.svg" class="logo__image only-light" alt="iMOD Python 1.2.0 documentation - Home"/>
+    <img src="../../../_static/imod-python-logo-dark.svg" class="logo__image only-dark pst-js-only" alt="iMOD Python 1.2.0 documentation - Home"/>
   
   
 </a></div>
@@ -190,7 +190,7 @@
         <div class="navbar-item navbar-persistent--container">
           
 
-<button class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+<button type="button" class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
  <i class="fa-solid fa-magnifying-glass"></i>
  <span class="search-button__default-text">Search</span>
  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
@@ -201,15 +201,15 @@
         <div class="navbar-item">
 
 <div class="theme-switch-container dropdown pst-js-only" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Color mode">
-  <button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button dropdown-toggle" aria-label="Color mode" data-bs-toggle="dropdown">
-    <i class="theme-switch fa-solid fa-sun fa-lg fa-fw" data-mode="light" title="Light"></i>
-    <i class="theme-switch fa-solid fa-moon fa-lg fa-fw" data-mode="dark" title="Dark"></i>
-    <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg fa-fw" data-mode="auto" title="System Settings"></i>
+  <button type="button" class="btn btn-sm nav-link pst-navbar-icon theme-switch-button dropdown-toggle" aria-label="Color mode" data-bs-toggle="dropdown">
+    <i class="theme-switch fa-solid fa-sun fa-lg" data-mode="light" title="Light"></i>
+    <i class="theme-switch fa-solid fa-moon fa-lg" data-mode="dark" title="Dark"></i>
+    <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg" data-mode="auto" title="System Settings"></i>
   </button>
   <ul class="dropdown-menu dropdown-menu-end">
-    <li><button class="dropdown-item d-flex align-items-center theme-change-button" data-mode="auto"><i class="fa-solid fa-circle-half-stroke fa-lg fa-fw me-1"></i>System Settings</button></li>
-    <li><button class="dropdown-item d-flex align-items-center theme-change-button" data-mode="light"><i class="fa-solid fa-sun fa-lg fa-fw me-1"></i>Light</button></li>
-    <li><button class="dropdown-item d-flex align-items-center theme-change-button" data-mode="dark"><i class="fa-solid fa-moon fa-lg fa-fw me-1"></i>Dark</button></li>
+    <li><button type="button" class="dropdown-item d-flex align-items-center theme-change-button" data-mode="auto"><i class="fa-solid fa-circle-half-stroke fa-lg me-1"></i>System Settings</button></li>
+    <li><button type="button" class="dropdown-item d-flex align-items-center theme-change-button" data-mode="light"><i class="fa-solid fa-sun fa-lg me-1"></i>Light</button></li>
+    <li><button type="button" class="dropdown-item d-flex align-items-center theme-change-button" data-mode="dark"><i class="fa-solid fa-moon fa-lg me-1"></i>Dark</button></li>
   </ul>
 </div></div>
       
@@ -246,7 +246,7 @@
   
     <div class="navbar-persistent--mobile">
 
-<button class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+<button type="button" class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
  <i class="fa-solid fa-magnifying-glass"></i>
  <span class="search-button__default-text">Search</span>
  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
@@ -267,7 +267,7 @@
       
         
       
-      <dialog id="pst-primary-sidebar-modal"></dialog>
+      <dialog id="pst-primary-sidebar-modal" tabindex="-1"></dialog>
       <div id="pst-primary-sidebar" class="bd-sidebar-primary bd-sidebar hide-on-wide">
         
 
@@ -337,15 +337,15 @@
           <div class="navbar-item">
 
 <div class="theme-switch-container dropdown pst-js-only" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Color mode">
-  <button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button dropdown-toggle" aria-label="Color mode" data-bs-toggle="dropdown">
-    <i class="theme-switch fa-solid fa-sun fa-lg fa-fw" data-mode="light" title="Light"></i>
-    <i class="theme-switch fa-solid fa-moon fa-lg fa-fw" data-mode="dark" title="Dark"></i>
-    <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg fa-fw" data-mode="auto" title="System Settings"></i>
+  <button type="button" class="btn btn-sm nav-link pst-navbar-icon theme-switch-button dropdown-toggle" aria-label="Color mode" data-bs-toggle="dropdown">
+    <i class="theme-switch fa-solid fa-sun fa-lg" data-mode="light" title="Light"></i>
+    <i class="theme-switch fa-solid fa-moon fa-lg" data-mode="dark" title="Dark"></i>
+    <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg" data-mode="auto" title="System Settings"></i>
   </button>
   <ul class="dropdown-menu dropdown-menu-end">
-    <li><button class="dropdown-item d-flex align-items-center theme-change-button" data-mode="auto"><i class="fa-solid fa-circle-half-stroke fa-lg fa-fw me-1"></i>System Settings</button></li>
-    <li><button class="dropdown-item d-flex align-items-center theme-change-button" data-mode="light"><i class="fa-solid fa-sun fa-lg fa-fw me-1"></i>Light</button></li>
-    <li><button class="dropdown-item d-flex align-items-center theme-change-button" data-mode="dark"><i class="fa-solid fa-moon fa-lg fa-fw me-1"></i>Dark</button></li>
+    <li><button type="button" class="dropdown-item d-flex align-items-center theme-change-button" data-mode="auto"><i class="fa-solid fa-circle-half-stroke fa-lg me-1"></i>System Settings</button></li>
+    <li><button type="button" class="dropdown-item d-flex align-items-center theme-change-button" data-mode="light"><i class="fa-solid fa-sun fa-lg me-1"></i>Light</button></li>
+    <li><button type="button" class="dropdown-item d-flex align-items-center theme-change-button" data-mode="dark"><i class="fa-solid fa-moon fa-lg me-1"></i>Dark</button></li>
   </ul>
 </div></div>
         
@@ -411,7 +411,7 @@
     
     <li class="breadcrumb-item breadcrumb-home">
       <a href="../../../index.html" class="nav-link" aria-label="Home">
-        <i class="fa-solid fa-home"></i>
+        <i class="fa-solid fa-house"></i>
       </a>
     </li>
     
@@ -435,7 +435,9 @@
                 <article class="bd-article">
                   
   <h1>Source code for imod.evaluate.constraints</h1><div class="highlight"><pre>
-<span></span><span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+<span></span><span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Any</span><span class="p">,</span> <span class="n">cast</span>
+
+<span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">pandas</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">pd</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">xarray</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">xr</span>
 
@@ -444,8 +446,13 @@
 
 <div class="viewcode-block" id="stability_constraint_wel">
 <a class="viewcode-back" href="../../../api/generated/evaluate/imod.evaluate.stability_constraint_wel.html#imod.evaluate.stability_constraint_wel">[docs]</a>
-<span class="k">def</span><span class="w"> </span><span class="nf">stability_constraint_wel</span><span class="p">(</span><span class="n">wel</span><span class="p">,</span> <span class="n">top_bot</span><span class="p">,</span> <span class="n">porosity</span><span class="o">=</span><span class="mf">0.3</span><span class="p">,</span> <span class="n">R</span><span class="o">=</span><span class="mf">1.0</span><span class="p">):</span>
-<span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">stability_constraint_wel</span><span class="p">(</span>
+    <span class="n">wel</span><span class="p">:</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">,</span>
+    <span class="n">top_bot</span><span class="p">:</span> <span class="n">xr</span><span class="o">.</span><span class="n">Dataset</span><span class="p">,</span>
+    <span class="n">porosity</span><span class="p">:</span> <span class="nb">float</span> <span class="o">|</span> <span class="n">xr</span><span class="o">.</span><span class="n">DataArray</span> <span class="o">=</span> <span class="mf">0.3</span><span class="p">,</span>
+    <span class="n">R</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">1.0</span><span class="p">,</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">:</span>
+<span class="w">    </span><span class="sa">r</span><span class="sd">"""</span>
 <span class="sd">    Computes sink/source stability constraint as applied in MT3D for adaptive</span>
 <span class="sd">    timestepping (Zheng &amp; Wang, 1999 p54).</span>
 
@@ -463,11 +470,11 @@
 <span class="sd">    wel: pd.DataFrame</span>
 <span class="sd">        pd.DataFrame that defines a WEL package. Minimally includes</span>
 <span class="sd">        x, y, layer and Q column.</span>
-<span class="sd">    top_bot: xr.Dataset of floats, containing &#39;top&#39;, &#39;bot&#39; and optionally</span>
-<span class="sd">        &#39;dz&#39; of layers.</span>
-<span class="sd">        Dimensions must be exactly ``(&quot;layer&quot;, &quot;y&quot;, &quot;x&quot;)``.</span>
+<span class="sd">    top_bot: xr.Dataset of floats, containing 'top', 'bot' and optionally</span>
+<span class="sd">        'dz' of layers.</span>
+<span class="sd">        Dimensions must be exactly ``("layer", "y", "x")``.</span>
 <span class="sd">    porosity: float or xr.DataArray of floats, optional (default 0.3)</span>
-<span class="sd">        If xr.DataArray, dimensions must be exactly ``(&quot;layer&quot;, &quot;y&quot;, &quot;x&quot;)``.</span>
+<span class="sd">        If xr.DataArray, dimensions must be exactly ``("layer", "y", "x")``.</span>
 <span class="sd">    R: Retardation factor, optional (default)</span>
 <span class="sd">        Only when sorption is a factor.</span>
 
@@ -475,21 +482,21 @@
 <span class="sd">    -------</span>
 <span class="sd">    wel: pd.DataFrame containing addition qs (specific discharge) and</span>
 <span class="sd">        dt (minimum timestep) columns</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
 
     <span class="n">b</span> <span class="o">=</span> <span class="n">imod</span><span class="o">.</span><span class="n">select</span><span class="o">.</span><span class="n">points_in_bounds</span><span class="p">(</span>
-        <span class="n">top_bot</span><span class="p">,</span> <span class="n">x</span><span class="o">=</span><span class="n">wel</span><span class="p">[</span><span class="s2">&quot;x&quot;</span><span class="p">],</span> <span class="n">y</span><span class="o">=</span><span class="n">wel</span><span class="p">[</span><span class="s2">&quot;y&quot;</span><span class="p">],</span> <span class="n">layer</span><span class="o">=</span><span class="n">wel</span><span class="p">[</span><span class="s2">&quot;layer&quot;</span><span class="p">]</span>
+        <span class="n">top_bot</span><span class="p">,</span> <span class="n">x</span><span class="o">=</span><span class="n">wel</span><span class="p">[</span><span class="s2">"x"</span><span class="p">],</span> <span class="n">y</span><span class="o">=</span><span class="n">wel</span><span class="p">[</span><span class="s2">"y"</span><span class="p">],</span> <span class="n">layer</span><span class="o">=</span><span class="n">wel</span><span class="p">[</span><span class="s2">"layer"</span><span class="p">]</span>
     <span class="p">)</span>
     <span class="n">indices</span> <span class="o">=</span> <span class="n">imod</span><span class="o">.</span><span class="n">select</span><span class="o">.</span><span class="n">points_indices</span><span class="p">(</span>
-        <span class="n">top_bot</span><span class="p">,</span> <span class="n">x</span><span class="o">=</span><span class="n">wel</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">b</span><span class="p">,</span> <span class="s2">&quot;x&quot;</span><span class="p">],</span> <span class="n">y</span><span class="o">=</span><span class="n">wel</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">b</span><span class="p">,</span> <span class="s2">&quot;y&quot;</span><span class="p">],</span> <span class="n">layer</span><span class="o">=</span><span class="n">wel</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">b</span><span class="p">,</span> <span class="s2">&quot;layer&quot;</span><span class="p">]</span>
+        <span class="n">top_bot</span><span class="p">,</span> <span class="n">x</span><span class="o">=</span><span class="n">wel</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">b</span><span class="p">,</span> <span class="s2">"x"</span><span class="p">],</span> <span class="n">y</span><span class="o">=</span><span class="n">wel</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">b</span><span class="p">,</span> <span class="s2">"y"</span><span class="p">],</span> <span class="n">layer</span><span class="o">=</span><span class="n">wel</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">b</span><span class="p">,</span> <span class="s2">"layer"</span><span class="p">]</span>
     <span class="p">)</span>
 
-    <span class="k">if</span> <span class="s2">&quot;dz&quot;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">top_bot</span><span class="p">:</span>  <span class="c1"># create if not present</span>
-        <span class="n">top_bot</span><span class="p">[</span><span class="s2">&quot;dz&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">top_bot</span><span class="p">[</span><span class="s2">&quot;top&quot;</span><span class="p">]</span> <span class="o">-</span> <span class="n">top_bot</span><span class="p">[</span><span class="s2">&quot;bot&quot;</span><span class="p">]</span>
-    <span class="n">top_bot</span><span class="p">[</span><span class="s2">&quot;volume&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="n">top_bot</span><span class="p">[</span><span class="s2">&quot;dz&quot;</span><span class="p">]</span> <span class="o">*</span> <span class="n">top_bot</span><span class="o">.</span><span class="n">dx</span> <span class="o">*</span> <span class="n">top_bot</span><span class="o">.</span><span class="n">dy</span><span class="p">)</span>
+    <span class="k">if</span> <span class="s2">"dz"</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">top_bot</span><span class="p">:</span>  <span class="c1"># create if not present</span>
+        <span class="n">top_bot</span><span class="p">[</span><span class="s2">"dz"</span><span class="p">]</span> <span class="o">=</span> <span class="n">top_bot</span><span class="p">[</span><span class="s2">"top"</span><span class="p">]</span> <span class="o">-</span> <span class="n">top_bot</span><span class="p">[</span><span class="s2">"bot"</span><span class="p">]</span>
+    <span class="n">top_bot</span><span class="p">[</span><span class="s2">"volume"</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="n">top_bot</span><span class="p">[</span><span class="s2">"dz"</span><span class="p">]</span> <span class="o">*</span> <span class="n">top_bot</span><span class="o">.</span><span class="n">dx</span> <span class="o">*</span> <span class="n">top_bot</span><span class="o">.</span><span class="n">dy</span><span class="p">)</span>
 
-    <span class="n">wel</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">b</span><span class="p">,</span> <span class="s2">&quot;qs&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">wel</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">b</span><span class="p">,</span> <span class="s2">&quot;Q&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">abs</span><span class="p">()</span> <span class="o">/</span> <span class="n">top_bot</span><span class="p">[</span><span class="s2">&quot;volume&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">isel</span><span class="p">(</span><span class="n">indices</span><span class="p">)</span><span class="o">.</span><span class="n">values</span>
-    <span class="n">wel</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">b</span><span class="p">,</span> <span class="s2">&quot;dt&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">R</span> <span class="o">*</span> <span class="n">porosity</span> <span class="o">/</span> <span class="n">wel</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">b</span><span class="p">,</span> <span class="s2">&quot;qs&quot;</span><span class="p">]</span>
+    <span class="n">wel</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">b</span><span class="p">,</span> <span class="s2">"qs"</span><span class="p">]</span> <span class="o">=</span> <span class="n">wel</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">b</span><span class="p">,</span> <span class="s2">"Q"</span><span class="p">]</span><span class="o">.</span><span class="n">abs</span><span class="p">()</span> <span class="o">/</span> <span class="n">top_bot</span><span class="p">[</span><span class="s2">"volume"</span><span class="p">]</span><span class="o">.</span><span class="n">isel</span><span class="p">(</span><span class="n">indices</span><span class="p">)</span><span class="o">.</span><span class="n">values</span>
+    <span class="n">wel</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">b</span><span class="p">,</span> <span class="s2">"dt"</span><span class="p">]</span> <span class="o">=</span> <span class="n">R</span> <span class="o">*</span> <span class="n">porosity</span> <span class="o">/</span> <span class="n">wel</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">b</span><span class="p">,</span> <span class="s2">"qs"</span><span class="p">]</span>
 
     <span class="k">return</span> <span class="n">wel</span></div>
 
@@ -497,8 +504,15 @@
 
 <div class="viewcode-block" id="stability_constraint_advection">
 <a class="viewcode-back" href="../../../api/generated/evaluate/imod.evaluate.stability_constraint_advection.html#imod.evaluate.stability_constraint_advection">[docs]</a>
-<span class="k">def</span><span class="w"> </span><span class="nf">stability_constraint_advection</span><span class="p">(</span><span class="n">front</span><span class="p">,</span> <span class="n">lower</span><span class="p">,</span> <span class="n">right</span><span class="p">,</span> <span class="n">top_bot</span><span class="p">,</span> <span class="n">porosity</span><span class="o">=</span><span class="mf">0.3</span><span class="p">,</span> <span class="n">R</span><span class="o">=</span><span class="mf">1.0</span><span class="p">):</span>
-<span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">stability_constraint_advection</span><span class="p">(</span>
+    <span class="n">front</span><span class="p">:</span> <span class="n">xr</span><span class="o">.</span><span class="n">DataArray</span><span class="p">,</span>
+    <span class="n">lower</span><span class="p">:</span> <span class="n">xr</span><span class="o">.</span><span class="n">DataArray</span><span class="p">,</span>
+    <span class="n">right</span><span class="p">:</span> <span class="n">xr</span><span class="o">.</span><span class="n">DataArray</span><span class="p">,</span>
+    <span class="n">top_bot</span><span class="p">:</span> <span class="n">xr</span><span class="o">.</span><span class="n">Dataset</span><span class="p">,</span>
+    <span class="n">porosity</span><span class="p">:</span> <span class="nb">float</span> <span class="o">|</span> <span class="n">xr</span><span class="o">.</span><span class="n">DataArray</span> <span class="o">=</span> <span class="mf">0.3</span><span class="p">,</span>
+    <span class="n">R</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">1.0</span><span class="p">,</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">tuple</span><span class="p">[</span><span class="n">xr</span><span class="o">.</span><span class="n">DataArray</span><span class="p">,</span> <span class="n">xr</span><span class="o">.</span><span class="n">DataArray</span><span class="p">]:</span>
+<span class="w">    </span><span class="sa">r</span><span class="sd">"""</span>
 <span class="sd">    Computes advection stability constraint as applied in MT3D for adaptive</span>
 <span class="sd">    timestepping (Zheng &amp; Wang, 1999 p54):</span>
 
@@ -522,16 +536,16 @@
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
 <span class="sd">    front: xr.DataArray of floats, optional</span>
-<span class="sd">        Dimensions must be exactly ``(&quot;layer&quot;, &quot;y&quot;, &quot;x&quot;)``.</span>
+<span class="sd">        Dimensions must be exactly ``("layer", "y", "x")``.</span>
 <span class="sd">    lower: xr.DataArray of floats, optional</span>
-<span class="sd">        Dimensions must be exactly ``(&quot;layer&quot;, &quot;y&quot;, &quot;x&quot;)``.</span>
+<span class="sd">        Dimensions must be exactly ``("layer", "y", "x")``.</span>
 <span class="sd">    right: xr.DataArray of floats, optional</span>
-<span class="sd">        Dimensions must be exactly ``(&quot;layer&quot;, &quot;y&quot;, &quot;x&quot;)``.</span>
-<span class="sd">    top_bot: xr.Dataset of floats, containing &#39;top&#39;, &#39;bot&#39; and optionally</span>
-<span class="sd">        &#39;dz&#39; of layers.</span>
-<span class="sd">        Dimensions must be exactly ``(&quot;layer&quot;, &quot;y&quot;, &quot;x&quot;)``.</span>
+<span class="sd">        Dimensions must be exactly ``("layer", "y", "x")``.</span>
+<span class="sd">    top_bot: xr.Dataset of floats, containing 'top', 'bot' and optionally</span>
+<span class="sd">        'dz' of layers.</span>
+<span class="sd">        Dimensions must be exactly ``("layer", "y", "x")``.</span>
 <span class="sd">    porosity: float or xr.DataArray of floats, optional (default 0.3)</span>
-<span class="sd">        If xr.DataArray, dimensions must be exactly ``(&quot;layer&quot;, &quot;y&quot;, &quot;x&quot;)``.</span>
+<span class="sd">        If xr.DataArray, dimensions must be exactly ``("layer", "y", "x")``.</span>
 <span class="sd">    R: Retardation factor, optional (default)</span>
 <span class="sd">        Only when sorption is a factor.</span>
 
@@ -539,7 +553,7 @@
 <span class="sd">    -------</span>
 <span class="sd">    dt: xr.DataArray of floats</span>
 <span class="sd">    dt_xyz: xr.Dataset of floats</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
 
     <span class="c1"># top_bot reselect to bdg bounds</span>
     <span class="n">top_bot</span> <span class="o">=</span> <span class="n">top_bot</span><span class="o">.</span><span class="n">sel</span><span class="p">(</span><span class="n">x</span><span class="o">=</span><span class="n">right</span><span class="o">.</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="n">right</span><span class="o">.</span><span class="n">y</span><span class="p">,</span> <span class="n">layer</span><span class="o">=</span><span class="n">right</span><span class="o">.</span><span class="n">layer</span><span class="p">)</span>
@@ -547,17 +561,17 @@
     <span class="c1"># Compute flow velocities</span>
     <span class="n">v_x</span><span class="p">,</span> <span class="n">v_y</span><span class="p">,</span> <span class="n">v_z</span> <span class="o">=</span> <span class="n">imod</span><span class="o">.</span><span class="n">evaluate</span><span class="o">.</span><span class="n">flow_velocity</span><span class="p">(</span><span class="n">front</span><span class="p">,</span> <span class="n">lower</span><span class="p">,</span> <span class="n">right</span><span class="p">,</span> <span class="n">top_bot</span><span class="p">,</span> <span class="n">porosity</span><span class="p">)</span>
 
-    <span class="k">if</span> <span class="s2">&quot;dz&quot;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">top_bot</span><span class="p">:</span>
-        <span class="n">top_bot</span><span class="p">[</span><span class="s2">&quot;dz&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">top_bot</span><span class="p">[</span><span class="s2">&quot;top&quot;</span><span class="p">]</span> <span class="o">-</span> <span class="n">top_bot</span><span class="p">[</span><span class="s2">&quot;bot&quot;</span><span class="p">]</span>
+    <span class="k">if</span> <span class="s2">"dz"</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">top_bot</span><span class="p">:</span>
+        <span class="n">top_bot</span><span class="p">[</span><span class="s2">"dz"</span><span class="p">]</span> <span class="o">=</span> <span class="n">top_bot</span><span class="p">[</span><span class="s2">"top"</span><span class="p">]</span> <span class="o">-</span> <span class="n">top_bot</span><span class="p">[</span><span class="s2">"bot"</span><span class="p">]</span>
 
     <span class="c1"># assert all dz positive - Issue #140</span>
-    <span class="k">if</span> <span class="ow">not</span> <span class="n">np</span><span class="o">.</span><span class="n">all</span><span class="p">(</span><span class="n">top_bot</span><span class="p">[</span><span class="s2">&quot;dz&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">values</span><span class="p">[</span><span class="o">~</span><span class="n">np</span><span class="o">.</span><span class="n">isnan</span><span class="p">(</span><span class="n">top_bot</span><span class="p">[</span><span class="s2">&quot;dz&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">values</span><span class="p">)]</span> <span class="o">&gt;=</span> <span class="mi">0</span><span class="p">):</span>
-        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;All dz values should be positive&quot;</span><span class="p">)</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">np</span><span class="o">.</span><span class="n">all</span><span class="p">(</span><span class="n">top_bot</span><span class="p">[</span><span class="s2">"dz"</span><span class="p">]</span><span class="o">.</span><span class="n">values</span><span class="p">[</span><span class="o">~</span><span class="n">np</span><span class="o">.</span><span class="n">isnan</span><span class="p">(</span><span class="n">top_bot</span><span class="p">[</span><span class="s2">"dz"</span><span class="p">]</span><span class="o">.</span><span class="n">values</span><span class="p">)]</span> <span class="o">&gt;=</span> <span class="mi">0</span><span class="p">):</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">"All dz values should be positive"</span><span class="p">)</span>
 
     <span class="c1"># absolute velocities (m/d)</span>
-    <span class="n">abs_v_x</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="n">v_x</span><span class="p">)</span>
-    <span class="n">abs_v_y</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="n">v_y</span><span class="p">)</span>
-    <span class="n">abs_v_z</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="n">v_z</span><span class="p">)</span>
+    <span class="n">abs_v_x</span> <span class="o">=</span> <span class="n">cast</span><span class="p">(</span><span class="n">xr</span><span class="o">.</span><span class="n">DataArray</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="n">v_x</span><span class="p">))</span>
+    <span class="n">abs_v_y</span> <span class="o">=</span> <span class="n">cast</span><span class="p">(</span><span class="n">xr</span><span class="o">.</span><span class="n">DataArray</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="n">v_y</span><span class="p">))</span>
+    <span class="n">abs_v_z</span> <span class="o">=</span> <span class="n">cast</span><span class="p">(</span><span class="n">xr</span><span class="o">.</span><span class="n">DataArray</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="n">v_z</span><span class="p">))</span>
 
     <span class="c1"># dt of constituents (d), set zero velocities to nans</span>
     <span class="n">dt_x</span> <span class="o">=</span> <span class="n">R</span> <span class="o">/</span> <span class="p">(</span><span class="n">abs_v_x</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">abs_v_x</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">)</span> <span class="o">/</span> <span class="n">top_bot</span><span class="o">.</span><span class="n">dx</span><span class="p">)</span>
@@ -569,20 +583,24 @@
 
     <span class="n">dt_xyz</span> <span class="o">=</span> <span class="n">xr</span><span class="o">.</span><span class="n">concat</span><span class="p">(</span>
         <span class="p">(</span><span class="n">dt_x</span><span class="p">,</span> <span class="n">dt_y</span><span class="p">,</span> <span class="n">dt_z</span><span class="p">),</span>
-        <span class="n">dim</span><span class="o">=</span><span class="n">pd</span><span class="o">.</span><span class="n">Index</span><span class="p">([</span><span class="s2">&quot;x&quot;</span><span class="p">,</span> <span class="s2">&quot;y&quot;</span><span class="p">,</span> <span class="s2">&quot;z&quot;</span><span class="p">],</span> <span class="n">name</span><span class="o">=</span><span class="s2">&quot;direction&quot;</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="s2">&quot;object&quot;</span><span class="p">),</span>
+        <span class="n">dim</span><span class="o">=</span><span class="n">pd</span><span class="o">.</span><span class="n">Index</span><span class="p">([</span><span class="s2">"x"</span><span class="p">,</span> <span class="s2">"y"</span><span class="p">,</span> <span class="s2">"z"</span><span class="p">],</span> <span class="n">name</span><span class="o">=</span><span class="s2">"direction"</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="s2">"object"</span><span class="p">),</span>
     <span class="p">)</span>
     <span class="k">return</span> <span class="n">dt</span><span class="p">,</span> <span class="n">dt_xyz</span></div>
 
 
 
 <span class="k">def</span><span class="w"> </span><span class="nf">_calculate_intra_cell_dt</span><span class="p">(</span>
-    <span class="n">source_stage</span><span class="p">,</span> <span class="n">source_cond</span><span class="p">,</span> <span class="n">sink_stage</span><span class="p">,</span> <span class="n">sink_cond</span><span class="p">,</span> <span class="n">eff_volume</span>
-<span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Calculate intra-cell dt by assuming a flux from a higher source_stage to a lower sink_stage,</span>
+    <span class="n">source_stage</span><span class="p">:</span> <span class="n">xr</span><span class="o">.</span><span class="n">DataArray</span><span class="p">,</span>
+    <span class="n">source_cond</span><span class="p">:</span> <span class="n">xr</span><span class="o">.</span><span class="n">DataArray</span><span class="p">,</span>
+    <span class="n">sink_stage</span><span class="p">:</span> <span class="n">xr</span><span class="o">.</span><span class="n">DataArray</span><span class="p">,</span>
+    <span class="n">sink_cond</span><span class="p">:</span> <span class="n">xr</span><span class="o">.</span><span class="n">DataArray</span><span class="p">,</span>
+    <span class="n">eff_volume</span><span class="p">:</span> <span class="n">xr</span><span class="o">.</span><span class="n">DataArray</span><span class="p">,</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">xr</span><span class="o">.</span><span class="n">DataArray</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">"""Calculate intra-cell dt by assuming a flux from a higher source_stage to a lower sink_stage,</span>
 <span class="sd">    ignoring other head influences. Use limiting (lowest) conductance. eff_volume is the effective</span>
-<span class="sd">    volume per cell (cell volume * effective porosity)&quot;&quot;&quot;</span>
-    <span class="n">source_cond</span><span class="p">,</span> <span class="n">sink_cond</span> <span class="o">=</span> <span class="n">xr</span><span class="o">.</span><span class="n">align</span><span class="p">(</span><span class="n">source_cond</span><span class="p">,</span> <span class="n">sink_cond</span><span class="p">,</span> <span class="n">join</span><span class="o">=</span><span class="s2">&quot;inner&quot;</span><span class="p">,</span> <span class="n">copy</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
-    <span class="n">cond</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">minimum</span><span class="p">(</span><span class="n">source_cond</span><span class="p">,</span> <span class="n">sink_cond</span><span class="p">)</span>
+<span class="sd">    volume per cell (cell volume * effective porosity)"""</span>
+    <span class="n">source_cond</span><span class="p">,</span> <span class="n">sink_cond</span> <span class="o">=</span> <span class="n">xr</span><span class="o">.</span><span class="n">align</span><span class="p">(</span><span class="n">source_cond</span><span class="p">,</span> <span class="n">sink_cond</span><span class="p">,</span> <span class="n">join</span><span class="o">=</span><span class="s2">"inner"</span><span class="p">,</span> <span class="n">copy</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+    <span class="n">cond</span> <span class="o">=</span> <span class="n">cast</span><span class="p">(</span><span class="n">xr</span><span class="o">.</span><span class="n">DataArray</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">minimum</span><span class="p">(</span><span class="n">source_cond</span><span class="p">,</span> <span class="n">sink_cond</span><span class="p">))</span>
     <span class="n">Q</span> <span class="o">=</span> <span class="n">cond</span> <span class="o">*</span> <span class="p">(</span><span class="n">source_stage</span> <span class="o">-</span> <span class="n">sink_stage</span><span class="p">)</span>
     <span class="n">Q</span> <span class="o">=</span> <span class="n">Q</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">source_stage</span> <span class="o">&gt;</span> <span class="n">sink_stage</span><span class="p">)</span>
 
@@ -592,15 +610,20 @@
 <div class="viewcode-block" id="intra_cell_boundary_conditions">
 <a class="viewcode-back" href="../../../api/generated/evaluate/imod.evaluate.intra_cell_boundary_conditions.html#imod.evaluate.intra_cell_boundary_conditions">[docs]</a>
 <span class="k">def</span><span class="w"> </span><span class="nf">intra_cell_boundary_conditions</span><span class="p">(</span>
-    <span class="n">top_bot</span><span class="p">,</span> <span class="n">porosity</span><span class="o">=</span><span class="mf">0.3</span><span class="p">,</span> <span class="n">riv</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">ghb</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">drn</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">drop_allnan</span><span class="o">=</span><span class="kc">True</span>
-<span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Function to pre-check boundary-conditions against one another for large intra-cell fluxes.</span>
+    <span class="n">top_bot</span><span class="p">:</span> <span class="n">xr</span><span class="o">.</span><span class="n">Dataset</span><span class="p">,</span>
+    <span class="n">porosity</span><span class="p">:</span> <span class="nb">float</span> <span class="o">|</span> <span class="n">xr</span><span class="o">.</span><span class="n">DataArray</span> <span class="o">=</span> <span class="mf">0.3</span><span class="p">,</span>
+    <span class="n">riv</span><span class="p">:</span> <span class="n">Any</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">ghb</span><span class="p">:</span> <span class="n">Any</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">drn</span><span class="p">:</span> <span class="n">Any</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">drop_allnan</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">tuple</span><span class="p">[</span><span class="n">xr</span><span class="o">.</span><span class="n">DataArray</span><span class="p">,</span> <span class="n">xr</span><span class="o">.</span><span class="n">DataArray</span><span class="p">]:</span>
+<span class="w">    </span><span class="sd">"""Function to pre-check boundary-conditions against one another for large intra-cell fluxes.</span>
 <span class="sd">    ghb and river can function as source and sink, drn only as sink.</span>
 
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
 <span class="sd">    top_bot : xr.Dataset of floats</span>
-<span class="sd">        &#39;top_bot&#39; should at least contain `top` and `bot` data_vars</span>
+<span class="sd">        'top_bot' should at least contain `top` and `bot` data_vars</span>
 <span class="sd">    porosity : float or xr.DataArray of floats, optional</span>
 <span class="sd">        Effective porosity of model cells</span>
 <span class="sd">    riv : (dict or list of) imod.wq.River, optional</span>
@@ -615,10 +638,10 @@
 <span class="sd">        `dt_min` is the minimum calculated timestep over all combinations of boundary conditions</span>
 <span class="sd">    dt_all: xr.DataArray of floats</span>
 <span class="sd">        `dt_all` is the calculated timestep for all combinations of boundary conditions</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="k">if</span> <span class="n">riv</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">ghb</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
         <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
-            <span class="s2">&quot;At least one source boundary condition must be supplied through riv or ghb.&quot;</span>
+            <span class="s2">"At least one source boundary condition must be supplied through riv or ghb."</span>
         <span class="p">)</span>
 
     <span class="c1"># convert all inputs to dictionaries of packages</span>
@@ -627,53 +650,55 @@
     <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">riv</span><span class="p">,</span> <span class="nb">dict</span><span class="p">):</span>
         <span class="k">pass</span>
     <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">riv</span><span class="p">,</span> <span class="p">(</span><span class="nb">list</span><span class="p">,</span> <span class="nb">tuple</span><span class="p">)):</span>
-        <span class="n">riv</span> <span class="o">=</span> <span class="p">{</span><span class="sa">f</span><span class="s2">&quot;riv_</span><span class="si">{</span><span class="n">i</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">:</span> <span class="n">single_riv</span> <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">single_riv</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">riv</span><span class="p">)}</span>
+        <span class="n">riv</span> <span class="o">=</span> <span class="p">{</span><span class="sa">f</span><span class="s2">"riv_</span><span class="si">{</span><span class="n">i</span><span class="si">}</span><span class="s2">"</span><span class="p">:</span> <span class="n">single_riv</span> <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">single_riv</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">riv</span><span class="p">)}</span>
     <span class="k">else</span><span class="p">:</span>
-        <span class="n">riv</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;riv&quot;</span><span class="p">:</span> <span class="n">riv</span><span class="p">}</span>
+        <span class="n">riv</span> <span class="o">=</span> <span class="p">{</span><span class="s2">"riv"</span><span class="p">:</span> <span class="n">riv</span><span class="p">}</span>
 
     <span class="k">if</span> <span class="n">ghb</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
         <span class="n">ghb</span> <span class="o">=</span> <span class="p">{}</span>
     <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">ghb</span><span class="p">,</span> <span class="nb">dict</span><span class="p">):</span>
         <span class="k">pass</span>
     <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">ghb</span><span class="p">,</span> <span class="p">(</span><span class="nb">list</span><span class="p">,</span> <span class="nb">tuple</span><span class="p">)):</span>
-        <span class="n">ghb</span> <span class="o">=</span> <span class="p">{</span><span class="sa">f</span><span class="s2">&quot;ghb_</span><span class="si">{</span><span class="n">i</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">:</span> <span class="n">single_riv</span> <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">single_riv</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">ghb</span><span class="p">)}</span>
+        <span class="n">ghb</span> <span class="o">=</span> <span class="p">{</span><span class="sa">f</span><span class="s2">"ghb_</span><span class="si">{</span><span class="n">i</span><span class="si">}</span><span class="s2">"</span><span class="p">:</span> <span class="n">single_riv</span> <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">single_riv</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">ghb</span><span class="p">)}</span>
     <span class="k">else</span><span class="p">:</span>
-        <span class="n">ghb</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;ghb&quot;</span><span class="p">:</span> <span class="n">ghb</span><span class="p">}</span>
+        <span class="n">ghb</span> <span class="o">=</span> <span class="p">{</span><span class="s2">"ghb"</span><span class="p">:</span> <span class="n">ghb</span><span class="p">}</span>
 
     <span class="k">if</span> <span class="n">drn</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
         <span class="n">drn</span> <span class="o">=</span> <span class="p">{}</span>
     <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">drn</span><span class="p">,</span> <span class="nb">dict</span><span class="p">):</span>
         <span class="k">pass</span>
     <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">drn</span><span class="p">,</span> <span class="p">(</span><span class="nb">list</span><span class="p">,</span> <span class="nb">tuple</span><span class="p">)):</span>
-        <span class="n">drn</span> <span class="o">=</span> <span class="p">{</span><span class="sa">f</span><span class="s2">&quot;drn_</span><span class="si">{</span><span class="n">i</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">:</span> <span class="n">single_riv</span> <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">single_riv</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">drn</span><span class="p">)}</span>
+        <span class="n">drn</span> <span class="o">=</span> <span class="p">{</span><span class="sa">f</span><span class="s2">"drn_</span><span class="si">{</span><span class="n">i</span><span class="si">}</span><span class="s2">"</span><span class="p">:</span> <span class="n">single_riv</span> <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">single_riv</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">drn</span><span class="p">)}</span>
     <span class="k">else</span><span class="p">:</span>
-        <span class="n">drn</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;drn&quot;</span><span class="p">:</span> <span class="n">drn</span><span class="p">}</span>
+        <span class="n">drn</span> <span class="o">=</span> <span class="p">{</span><span class="s2">"drn"</span><span class="p">:</span> <span class="n">drn</span><span class="p">}</span>
 
     <span class="c1"># get sources and sinks:</span>
-    <span class="n">sources</span> <span class="o">=</span> <span class="p">{}</span>
+    <span class="n">sources</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]</span> <span class="o">=</span> <span class="p">{}</span>
     <span class="n">sources</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">ghb</span><span class="p">)</span>
     <span class="n">sources</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">riv</span><span class="p">)</span>
-    <span class="n">sinks</span> <span class="o">=</span> <span class="p">{}</span>
+    <span class="n">sinks</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]</span> <span class="o">=</span> <span class="p">{}</span>
     <span class="n">sinks</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">ghb</span><span class="p">)</span>
     <span class="n">sinks</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">riv</span><span class="p">)</span>
     <span class="n">sinks</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">drn</span><span class="p">)</span>
 
     <span class="c1"># determine effective volume</span>
-    <span class="k">if</span> <span class="s2">&quot;dz&quot;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">top_bot</span><span class="p">:</span>
-        <span class="n">top_bot</span><span class="p">[</span><span class="s2">&quot;dz&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">top_bot</span><span class="p">[</span><span class="s2">&quot;top&quot;</span><span class="p">]</span> <span class="o">-</span> <span class="n">top_bot</span><span class="p">[</span><span class="s2">&quot;bot&quot;</span><span class="p">]</span>
+    <span class="k">if</span> <span class="s2">"dz"</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">top_bot</span><span class="p">:</span>
+        <span class="n">top_bot</span><span class="p">[</span><span class="s2">"dz"</span><span class="p">]</span> <span class="o">=</span> <span class="n">top_bot</span><span class="p">[</span><span class="s2">"top"</span><span class="p">]</span> <span class="o">-</span> <span class="n">top_bot</span><span class="p">[</span><span class="s2">"bot"</span><span class="p">]</span>
 
-    <span class="k">if</span> <span class="p">(</span><span class="n">top_bot</span><span class="p">[</span><span class="s2">&quot;dz&quot;</span><span class="p">]</span> <span class="o">&lt;=</span> <span class="mf">0.0</span><span class="p">)</span><span class="o">.</span><span class="n">any</span><span class="p">():</span>
-        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Cells with thickness &lt;= 0 present in top_bot Dataset.&quot;</span><span class="p">)</span>
+    <span class="k">if</span> <span class="p">(</span><span class="n">top_bot</span><span class="p">[</span><span class="s2">"dz"</span><span class="p">]</span> <span class="o">&lt;=</span> <span class="mf">0.0</span><span class="p">)</span><span class="o">.</span><span class="n">any</span><span class="p">():</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">"Cells with thickness &lt;= 0 present in top_bot Dataset."</span><span class="p">)</span>
 
-    <span class="n">eff_volume</span> <span class="o">=</span> <span class="n">top_bot</span><span class="p">[</span><span class="s2">&quot;dz&quot;</span><span class="p">]</span> <span class="o">*</span> <span class="n">top_bot</span><span class="o">.</span><span class="n">dx</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="n">top_bot</span><span class="o">.</span><span class="n">dy</span><span class="p">)</span> <span class="o">*</span> <span class="n">porosity</span>
+    <span class="n">eff_volume</span> <span class="o">=</span> <span class="n">top_bot</span><span class="p">[</span><span class="s2">"dz"</span><span class="p">]</span> <span class="o">*</span> <span class="n">top_bot</span><span class="o">.</span><span class="n">dx</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="n">top_bot</span><span class="o">.</span><span class="n">dy</span><span class="p">)</span> <span class="o">*</span> <span class="n">porosity</span>
 
-    <span class="k">def</span><span class="w"> </span><span class="nf">_get_stage_name</span><span class="p">(</span><span class="n">sid</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_get_stage_name</span><span class="p">(</span><span class="n">sid</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
         <span class="k">if</span> <span class="n">sid</span> <span class="ow">in</span> <span class="n">riv</span><span class="p">:</span>
-            <span class="k">return</span> <span class="s2">&quot;stage&quot;</span>
+            <span class="k">return</span> <span class="s2">"stage"</span>
         <span class="k">elif</span> <span class="n">sid</span> <span class="ow">in</span> <span class="n">ghb</span><span class="p">:</span>
-            <span class="k">return</span> <span class="s2">&quot;head&quot;</span>
+            <span class="k">return</span> <span class="s2">"head"</span>
         <span class="k">elif</span> <span class="n">sid</span> <span class="ow">in</span> <span class="n">drn</span><span class="p">:</span>
-            <span class="k">return</span> <span class="s2">&quot;elevation&quot;</span>
+            <span class="k">return</span> <span class="s2">"elevation"</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Unknown boundary condition id: </span><span class="si">{</span><span class="n">sid</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
 
     <span class="c1"># for all possible combinations: determine dt</span>
     <span class="n">resultids</span> <span class="o">=</span> <span class="p">[]</span>
@@ -682,18 +707,18 @@
         <span class="k">for</span> <span class="n">sinkid</span><span class="p">,</span> <span class="n">sink</span> <span class="ow">in</span> <span class="n">sinks</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
             <span class="k">if</span> <span class="n">sourceid</span> <span class="o">==</span> <span class="n">sinkid</span><span class="p">:</span>
                 <span class="k">continue</span>
-            <span class="n">comb</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">sourceid</span><span class="si">}</span><span class="s2">-</span><span class="si">{</span><span class="n">sinkid</span><span class="si">}</span><span class="s2">&quot;</span>
+            <span class="n">comb</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">sourceid</span><span class="si">}</span><span class="s2">-</span><span class="si">{</span><span class="n">sinkid</span><span class="si">}</span><span class="s2">"</span>
 
             <span class="k">if</span> <span class="n">comb</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">resultids</span><span class="p">:</span>
                 <span class="c1"># source in riv: only where stage &gt; bottom elev</span>
                 <span class="k">if</span> <span class="n">sourceid</span> <span class="ow">in</span> <span class="n">riv</span><span class="p">:</span>
-                    <span class="n">source</span> <span class="o">=</span> <span class="n">source</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">source</span><span class="p">[</span><span class="s2">&quot;stage&quot;</span><span class="p">]</span> <span class="o">&gt;</span> <span class="n">source</span><span class="p">[</span><span class="s2">&quot;bottom_elevation&quot;</span><span class="p">])</span>
+                    <span class="n">source</span> <span class="o">=</span> <span class="n">source</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">source</span><span class="p">[</span><span class="s2">"stage"</span><span class="p">]</span> <span class="o">&gt;</span> <span class="n">source</span><span class="p">[</span><span class="s2">"bottom_elevation"</span><span class="p">])</span>
 
                 <span class="n">dt</span> <span class="o">=</span> <span class="n">_calculate_intra_cell_dt</span><span class="p">(</span>
                     <span class="n">source_stage</span><span class="o">=</span><span class="n">source</span><span class="p">[</span><span class="n">_get_stage_name</span><span class="p">(</span><span class="n">sourceid</span><span class="p">)],</span>
-                    <span class="n">source_cond</span><span class="o">=</span><span class="n">source</span><span class="p">[</span><span class="s2">&quot;conductance&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">load</span><span class="p">(),</span>
+                    <span class="n">source_cond</span><span class="o">=</span><span class="n">source</span><span class="p">[</span><span class="s2">"conductance"</span><span class="p">]</span><span class="o">.</span><span class="n">load</span><span class="p">(),</span>
                     <span class="n">sink_stage</span><span class="o">=</span><span class="n">sink</span><span class="p">[</span><span class="n">_get_stage_name</span><span class="p">(</span><span class="n">sinkid</span><span class="p">)],</span>
-                    <span class="n">sink_cond</span><span class="o">=</span><span class="n">sink</span><span class="p">[</span><span class="s2">&quot;conductance&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">load</span><span class="p">(),</span>
+                    <span class="n">sink_cond</span><span class="o">=</span><span class="n">sink</span><span class="p">[</span><span class="s2">"conductance"</span><span class="p">]</span><span class="o">.</span><span class="n">load</span><span class="p">(),</span>
                     <span class="n">eff_volume</span><span class="o">=</span><span class="n">eff_volume</span><span class="p">,</span>
                 <span class="p">)</span>
 
@@ -703,11 +728,11 @@
     <span class="c1"># Set index to object dtype to work around xarray concat issue where</span>
     <span class="c1"># StringDtype could not be interpreted as a data type with pandas 3.0 (as</span>
     <span class="c1"># np.dtype is called.)</span>
-    <span class="n">id_index</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">Index</span><span class="p">(</span><span class="n">resultids</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s2">&quot;combination&quot;</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="s2">&quot;object&quot;</span><span class="p">)</span>
-    <span class="n">dt_all</span> <span class="o">=</span> <span class="n">xr</span><span class="o">.</span><span class="n">concat</span><span class="p">(</span><span class="n">results</span><span class="p">,</span> <span class="n">id_index</span><span class="p">,</span> <span class="n">coords</span><span class="o">=</span><span class="s2">&quot;minimal&quot;</span><span class="p">)</span>
+    <span class="n">id_index</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">Index</span><span class="p">(</span><span class="n">resultids</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s2">"combination"</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="s2">"object"</span><span class="p">)</span>
+    <span class="n">dt_all</span> <span class="o">=</span> <span class="n">xr</span><span class="o">.</span><span class="n">concat</span><span class="p">(</span><span class="n">results</span><span class="p">,</span> <span class="n">id_index</span><span class="p">,</span> <span class="n">coords</span><span class="o">=</span><span class="s2">"minimal"</span><span class="p">)</span>
 
     <span class="c1"># overall dt</span>
-    <span class="n">dt_min</span> <span class="o">=</span> <span class="n">dt_all</span><span class="o">.</span><span class="n">min</span><span class="p">(</span><span class="n">dim</span><span class="o">=</span><span class="s2">&quot;combination&quot;</span><span class="p">)</span>
+    <span class="n">dt_min</span> <span class="o">=</span> <span class="n">dt_all</span><span class="o">.</span><span class="n">min</span><span class="p">(</span><span class="n">dim</span><span class="o">=</span><span class="s2">"combination"</span><span class="p">)</span>
 
     <span class="k">return</span> <span class="n">dt_min</span><span class="p">,</span> <span class="n">dt_all</span></div>
 
@@ -740,8 +765,8 @@
   </div>
   
   <!-- Scripts loaded after <body> so the DOM is not blocked -->
-  <script defer src="../../../_static/scripts/bootstrap.js?digest=90905a2f556bf617f1a9"></script>
-<script defer src="../../../_static/scripts/pydata-sphinx-theme.js?digest=90905a2f556bf617f1a9"></script>
+  <script defer src="../../../_static/scripts/bootstrap.js?digest=75c7c72ae941e8b558d8"></script>
+<script defer src="../../../_static/scripts/pydata-sphinx-theme.js?digest=75c7c72ae941e8b558d8"></script>
 
   <footer class="bd-footer">
 <div class="bd-footer__inner bd-page-width">
@@ -761,8 +786,7 @@
         <div class="footer-item">
 
   <p class="sphinx-version">
-    Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 9.1.0.
-    <br/>
+    Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 9.2.0.
   </p>
 </div>
       
@@ -775,7 +799,7 @@
         <div class="footer-item">
 <p class="theme-version">
   <!-- # L10n: Setting the PST URL as an argument as this does not need to be localized -->
-  Built with the <a href="https://pydata-sphinx-theme.readthedocs.io/en/stable/index.html">PyData Sphinx Theme</a> 0.20.0.
+  Built with the <a href="https://pydata-sphinx-theme.readthedocs.io/en/stable/index.html">PyData Sphinx Theme</a> 0.24.0.
 </p></div>
       
     </div>

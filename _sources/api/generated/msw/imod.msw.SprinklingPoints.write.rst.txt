@@ -1,0 +1,6 @@
+﻿imod.msw.SprinklingPoints.write
+===============================
+
+.. currentmodule:: imod.msw
+
+.. automethod:: SprinklingPoints.write

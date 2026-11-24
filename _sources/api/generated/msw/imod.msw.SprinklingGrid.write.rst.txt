@@ -1,0 +1,6 @@
+﻿imod.msw.SprinklingGrid.write
+=============================
+
+.. currentmodule:: imod.msw
+
+.. automethod:: SprinklingGrid.write

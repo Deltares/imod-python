@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 
 
@@ -7,7 +6,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>imod.prepare.topsystem.allocation &#8212; iMOD Python 1.1.0 documentation</title>
+    <title>imod.prepare.topsystem.allocation &#8212; iMOD Python 1.2.0 documentation</title>
   
   
   
@@ -26,22 +25,22 @@
   </noscript>
   
   <!-- Loaded before other Sphinx assets -->
-  <link href="../../../../_static/styles/theme.css?digest=90905a2f556bf617f1a9" rel="stylesheet" />
-<link href="../../../../_static/styles/pydata-sphinx-theme.css?digest=90905a2f556bf617f1a9" rel="stylesheet" />
+  <link href="../../../../_static/styles/theme.css?digest=75c7c72ae941e8b558d8" rel="stylesheet" />
+<link href="../../../../_static/styles/pydata-sphinx-theme.css?digest=75c7c72ae941e8b558d8" rel="stylesheet" />
 
     <link rel="stylesheet" type="text/css" href="../../../../_static/pygments.css?v=03e43079" />
-    <link rel="stylesheet" type="text/css" href="../../../../_static/sg_gallery.css?v=fd6457a4" />
+    <link rel="stylesheet" type="text/css" href="../../../../_static/sg_gallery.css?v=c83e6b79" />
     <link rel="stylesheet" type="text/css" href="../../../../_static/sg_gallery-binder.css?v=f4aeca0c" />
     <link rel="stylesheet" type="text/css" href="../../../../_static/sg_gallery-dataframe.css?v=2082cf3c" />
     <link rel="stylesheet" type="text/css" href="../../../../_static/sg_gallery-rendered-html.css?v=1277b6f3" />
   
   <!-- So that users can add custom icons -->
-  <script defer src="../../../../_static/scripts/fontawesome.js?digest=90905a2f556bf617f1a9"></script>
+  <script defer src="../../../../_static/scripts/fontawesome.js?digest=75c7c72ae941e8b558d8"></script>
   <!-- Pre-loaded scripts that we'll load fully later -->
-  <link rel="preload" as="script" href="../../../../_static/scripts/bootstrap.js?digest=90905a2f556bf617f1a9" />
-<link rel="preload" as="script" href="../../../../_static/scripts/pydata-sphinx-theme.js?digest=90905a2f556bf617f1a9" />
+  <link rel="preload" as="script" href="../../../../_static/scripts/bootstrap.js?digest=75c7c72ae941e8b558d8" />
+<link rel="preload" as="script" href="../../../../_static/scripts/pydata-sphinx-theme.js?digest=75c7c72ae941e8b558d8" />
 
-    <script src="../../../../_static/documentation_options.js?v=fc837d61"></script>
+    <script src="../../../../_static/documentation_options.js?v=6efca38a"></script>
     <script src="../../../../_static/doctools.js?v=fd6eb6e6"></script>
     <script src="../../../../_static/sphinx_highlight.js?v=6ffebe34"></script>
     <script src="../../../../_static/sg-tags.js?v=d80f6fa4"></script>
@@ -51,8 +50,9 @@
     <link rel="index" title="Index" href="../../../../genindex.html" />
     <link rel="search" title="Search" href="../../../../search.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <meta name="color-scheme" content="light dark"/>
   <meta name="docsearch:language" content="en"/>
-  <meta name="docsearch:version" content="1.1.0.dev" />
+  <meta name="docsearch:version" content="1.2.0.dev" />
   
     
     <script src="../../../../_static/searchtools.js"></script>
@@ -100,7 +100,7 @@
   
     <header id="pst-header" class="bd-header navbar navbar-expand-lg bd-navbar d-print-none">
 <div class="bd-header__inner bd-page-width">
-  <button class="pst-navbar-icon sidebar-toggle primary-toggle" aria-label="Site navigation">
+  <button type="button" class="pst-navbar-icon sidebar-toggle primary-toggle" aria-label="Site navigation" aria-expanded="false" aria-controls="pst-primary-sidebar-modal">
     <span class="fa-solid fa-bars"></span>
   </button>
   
@@ -122,8 +122,8 @@
     
     
     
-    <img src="../../../../_static/imod-python-logo-light.svg" class="logo__image only-light" alt="iMOD Python 1.1.0 documentation - Home"/>
-    <img src="../../../../_static/imod-python-logo-dark.svg" class="logo__image only-dark pst-js-only" alt="iMOD Python 1.1.0 documentation - Home"/>
+    <img src="../../../../_static/imod-python-logo-light.svg" class="logo__image only-light" alt="iMOD Python 1.2.0 documentation - Home"/>
+    <img src="../../../../_static/imod-python-logo-dark.svg" class="logo__image only-dark pst-js-only" alt="iMOD Python 1.2.0 documentation - Home"/>
   
   
 </a></div>
@@ -190,7 +190,7 @@
         <div class="navbar-item navbar-persistent--container">
           
 
-<button class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+<button type="button" class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
  <i class="fa-solid fa-magnifying-glass"></i>
  <span class="search-button__default-text">Search</span>
  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
@@ -201,15 +201,15 @@
         <div class="navbar-item">
 
 <div class="theme-switch-container dropdown pst-js-only" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Color mode">
-  <button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button dropdown-toggle" aria-label="Color mode" data-bs-toggle="dropdown">
-    <i class="theme-switch fa-solid fa-sun fa-lg fa-fw" data-mode="light" title="Light"></i>
-    <i class="theme-switch fa-solid fa-moon fa-lg fa-fw" data-mode="dark" title="Dark"></i>
-    <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg fa-fw" data-mode="auto" title="System Settings"></i>
+  <button type="button" class="btn btn-sm nav-link pst-navbar-icon theme-switch-button dropdown-toggle" aria-label="Color mode" data-bs-toggle="dropdown">
+    <i class="theme-switch fa-solid fa-sun fa-lg" data-mode="light" title="Light"></i>
+    <i class="theme-switch fa-solid fa-moon fa-lg" data-mode="dark" title="Dark"></i>
+    <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg" data-mode="auto" title="System Settings"></i>
   </button>
   <ul class="dropdown-menu dropdown-menu-end">
-    <li><button class="dropdown-item d-flex align-items-center theme-change-button" data-mode="auto"><i class="fa-solid fa-circle-half-stroke fa-lg fa-fw me-1"></i>System Settings</button></li>
-    <li><button class="dropdown-item d-flex align-items-center theme-change-button" data-mode="light"><i class="fa-solid fa-sun fa-lg fa-fw me-1"></i>Light</button></li>
-    <li><button class="dropdown-item d-flex align-items-center theme-change-button" data-mode="dark"><i class="fa-solid fa-moon fa-lg fa-fw me-1"></i>Dark</button></li>
+    <li><button type="button" class="dropdown-item d-flex align-items-center theme-change-button" data-mode="auto"><i class="fa-solid fa-circle-half-stroke fa-lg me-1"></i>System Settings</button></li>
+    <li><button type="button" class="dropdown-item d-flex align-items-center theme-change-button" data-mode="light"><i class="fa-solid fa-sun fa-lg me-1"></i>Light</button></li>
+    <li><button type="button" class="dropdown-item d-flex align-items-center theme-change-button" data-mode="dark"><i class="fa-solid fa-moon fa-lg me-1"></i>Dark</button></li>
   </ul>
 </div></div>
       
@@ -246,7 +246,7 @@
   
     <div class="navbar-persistent--mobile">
 
-<button class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+<button type="button" class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
  <i class="fa-solid fa-magnifying-glass"></i>
  <span class="search-button__default-text">Search</span>
  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
@@ -267,7 +267,7 @@
       
         
       
-      <dialog id="pst-primary-sidebar-modal"></dialog>
+      <dialog id="pst-primary-sidebar-modal" tabindex="-1"></dialog>
       <div id="pst-primary-sidebar" class="bd-sidebar-primary bd-sidebar hide-on-wide">
         
 
@@ -337,15 +337,15 @@
           <div class="navbar-item">
 
 <div class="theme-switch-container dropdown pst-js-only" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Color mode">
-  <button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button dropdown-toggle" aria-label="Color mode" data-bs-toggle="dropdown">
-    <i class="theme-switch fa-solid fa-sun fa-lg fa-fw" data-mode="light" title="Light"></i>
-    <i class="theme-switch fa-solid fa-moon fa-lg fa-fw" data-mode="dark" title="Dark"></i>
-    <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg fa-fw" data-mode="auto" title="System Settings"></i>
+  <button type="button" class="btn btn-sm nav-link pst-navbar-icon theme-switch-button dropdown-toggle" aria-label="Color mode" data-bs-toggle="dropdown">
+    <i class="theme-switch fa-solid fa-sun fa-lg" data-mode="light" title="Light"></i>
+    <i class="theme-switch fa-solid fa-moon fa-lg" data-mode="dark" title="Dark"></i>
+    <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg" data-mode="auto" title="System Settings"></i>
   </button>
   <ul class="dropdown-menu dropdown-menu-end">
-    <li><button class="dropdown-item d-flex align-items-center theme-change-button" data-mode="auto"><i class="fa-solid fa-circle-half-stroke fa-lg fa-fw me-1"></i>System Settings</button></li>
-    <li><button class="dropdown-item d-flex align-items-center theme-change-button" data-mode="light"><i class="fa-solid fa-sun fa-lg fa-fw me-1"></i>Light</button></li>
-    <li><button class="dropdown-item d-flex align-items-center theme-change-button" data-mode="dark"><i class="fa-solid fa-moon fa-lg fa-fw me-1"></i>Dark</button></li>
+    <li><button type="button" class="dropdown-item d-flex align-items-center theme-change-button" data-mode="auto"><i class="fa-solid fa-circle-half-stroke fa-lg me-1"></i>System Settings</button></li>
+    <li><button type="button" class="dropdown-item d-flex align-items-center theme-change-button" data-mode="light"><i class="fa-solid fa-sun fa-lg me-1"></i>Light</button></li>
+    <li><button type="button" class="dropdown-item d-flex align-items-center theme-change-button" data-mode="dark"><i class="fa-solid fa-moon fa-lg me-1"></i>Dark</button></li>
   </ul>
 </div></div>
         
@@ -411,7 +411,7 @@
     
     <li class="breadcrumb-item breadcrumb-home">
       <a href="../../../../index.html" class="nav-link" aria-label="Home">
-        <i class="fa-solid fa-home"></i>
+        <i class="fa-solid fa-house"></i>
       </a>
     </li>
     
@@ -435,29 +435,29 @@
                 <article class="bd-article">
                   
   <h1>Source code for imod.prepare.topsystem.allocation</h1><div class="highlight"><pre>
-<span></span><span class="sd">&quot;&quot;&quot;</span>
+<span></span><span class="sd">"""</span>
 <span class="sd">This module contains all kinds of utilities to prepare rivers</span>
-<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">"""</span>
 
 <span class="kn">from</span><span class="w"> </span><span class="nn">enum</span><span class="w"> </span><span class="kn">import</span> <span class="n">Enum</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Optional</span>
 
 <span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
 
 <span class="kn">from</span><span class="w"> </span><span class="nn">imod.common.utilities.layer</span><span class="w"> </span><span class="kn">import</span> <span class="n">create_layered_top</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">imod.logging</span><span class="w"> </span><span class="kn">import</span> <span class="n">logger</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">imod.schemata</span><span class="w"> </span><span class="kn">import</span> <span class="n">DimsSchema</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">imod.select.layers</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
     <span class="n">get_upper_active_grid_cells</span><span class="p">,</span>
     <span class="n">get_upper_active_layer_number</span><span class="p">,</span>
 <span class="p">)</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">imod.typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">GridDataArray</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">imod.typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">GridDataArray</span><span class="p">,</span> <span class="n">GridDataDict</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">imod.util.dims</span><span class="w"> </span><span class="kn">import</span> <span class="n">enforced_dim_order</span>
 
 
 <div class="viewcode-block" id="ALLOCATION_OPTION">
 <a class="viewcode-back" href="../../../../api/generated/prepare/imod.prepare.ALLOCATION_OPTION.html#imod.prepare.ALLOCATION_OPTION">[docs]</a>
 <span class="k">class</span><span class="w"> </span><span class="nc">ALLOCATION_OPTION</span><span class="p">(</span><span class="n">Enum</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">"""</span>
 <span class="sd">    Enumerator for settings to allocate planar grid with RIV, DRN, GHB, or RCH</span>
 <span class="sd">    cells over the vertical layer dimensions. Numbers match the IDEFLAYER</span>
 <span class="sd">    options in iMOD 5.6.</span>
@@ -486,7 +486,7 @@
 <span class="sd">    &gt;&gt;&gt; from imod.prepare.topsystem import ALLOCATION_OPTION</span>
 <span class="sd">    &gt;&gt;&gt; setting = ALLOCATION_OPTION.at_first_active</span>
 <span class="sd">    &gt;&gt;&gt; allocated = allocate_rch_cells(setting, active, rate)</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
 
     <span class="n">stage_to_riv_bot</span> <span class="o">=</span> <span class="mi">0</span>
     <span class="n">first_active_to_elevation</span> <span class="o">=</span> <span class="o">-</span><span class="mi">1</span>
@@ -496,11 +496,24 @@
 
 
 
+<span class="k">class</span><span class="w"> </span><span class="nc">LAYERS_USED</span><span class="p">(</span><span class="n">Enum</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">"""</span>
+<span class="sd">    What this result represents. It can be either:</span>
+<span class="sd">    - ALL: nothing to trim (all layers used)</span>
+<span class="sd">    - SOME: some layers used, some empty</span>
+<span class="sd">    - NONE: nothing to keep (no layer has any allocated cell)</span>
+<span class="sd">    """</span>
+
+    <span class="n">ALL</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="n">SOME</span> <span class="o">=</span> <span class="mi">1</span>
+    <span class="n">NONE</span> <span class="o">=</span> <span class="mi">2</span>
+
+
 <span class="n">PLANAR_GRID</span> <span class="o">=</span> <span class="p">(</span>
-    <span class="n">DimsSchema</span><span class="p">(</span><span class="s2">&quot;time&quot;</span><span class="p">,</span> <span class="s2">&quot;y&quot;</span><span class="p">,</span> <span class="s2">&quot;x&quot;</span><span class="p">)</span>
-    <span class="o">|</span> <span class="n">DimsSchema</span><span class="p">(</span><span class="s2">&quot;y&quot;</span><span class="p">,</span> <span class="s2">&quot;x&quot;</span><span class="p">)</span>
-    <span class="o">|</span> <span class="n">DimsSchema</span><span class="p">(</span><span class="s2">&quot;time&quot;</span><span class="p">,</span> <span class="s2">&quot;</span><span class="si">{face_dim}</span><span class="s2">&quot;</span><span class="p">)</span>
-    <span class="o">|</span> <span class="n">DimsSchema</span><span class="p">(</span><span class="s2">&quot;</span><span class="si">{face_dim}</span><span class="s2">&quot;</span><span class="p">)</span>
+    <span class="n">DimsSchema</span><span class="p">(</span><span class="s2">"time"</span><span class="p">,</span> <span class="s2">"y"</span><span class="p">,</span> <span class="s2">"x"</span><span class="p">)</span>
+    <span class="o">|</span> <span class="n">DimsSchema</span><span class="p">(</span><span class="s2">"y"</span><span class="p">,</span> <span class="s2">"x"</span><span class="p">)</span>
+    <span class="o">|</span> <span class="n">DimsSchema</span><span class="p">(</span><span class="s2">"time"</span><span class="p">,</span> <span class="s2">"</span><span class="si">{face_dim}</span><span class="s2">"</span><span class="p">)</span>
+    <span class="o">|</span> <span class="n">DimsSchema</span><span class="p">(</span><span class="s2">"</span><span class="si">{face_dim}</span><span class="s2">"</span><span class="p">)</span>
 <span class="p">)</span>
 
 
@@ -513,8 +526,9 @@
     <span class="n">bottom</span><span class="p">:</span> <span class="n">GridDataArray</span><span class="p">,</span>
     <span class="n">stage</span><span class="p">:</span> <span class="n">GridDataArray</span><span class="p">,</span>
     <span class="n">bottom_elevation</span><span class="p">:</span> <span class="n">GridDataArray</span><span class="p">,</span>
-<span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">tuple</span><span class="p">[</span><span class="n">GridDataArray</span><span class="p">,</span> <span class="n">Optional</span><span class="p">[</span><span class="n">GridDataArray</span><span class="p">]]:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+    <span class="n">drop_empty_layers</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">tuple</span><span class="p">[</span><span class="n">GridDataArray</span><span class="p">,</span> <span class="n">GridDataArray</span> <span class="o">|</span> <span class="kc">None</span><span class="p">]:</span>
+<span class="w">    </span><span class="sd">"""</span>
 <span class="sd">    Allocate river cells from a planar grid across the vertical dimension.</span>
 <span class="sd">    Multiple options are available, which can be selected in ALLOCATION_OPTION.</span>
 
@@ -538,6 +552,15 @@
 <span class="sd">    bottom_elevation: DataArray | UgridDatarray</span>
 <span class="sd">        Planar grid containing river bottom elevations. Is not allowed to have a</span>
 <span class="sd">        layer dimension.</span>
+<span class="sd">    drop_empty_layers: bool, default True</span>
+<span class="sd">        If True, drop layers that contain no allocated cells anywhere in the</span>
+<span class="sd">        domain (or at any time), so the returned grids only span the layers that</span>
+<span class="sd">        are actually used. Reduces memory use and speeds up later operations such</span>
+<span class="sd">        as regridding, clipping and splitting. If no cells are allocated in any</span>
+<span class="sd">        layer, nothing is dropped and the full layer range is returned, as a layer</span>
+<span class="sd">        dimension of size 0 is not valid. Note that allocation and conductance</span>
+<span class="sd">        distribution are always computed over the full layer range first, so</span>
+<span class="sd">        dropping layers does not change the computed values.</span>
 
 <span class="sd">    Returns</span>
 <span class="sd">    -------</span>
@@ -550,34 +573,45 @@
 <span class="sd">    &gt;&gt;&gt; from imod.prepare.topsystem import ALLOCATION_OPTION, allocate_riv_cells</span>
 <span class="sd">    &gt;&gt;&gt; setting = ALLOCATION_OPTION.stage_to_riv_bot</span>
 <span class="sd">    &gt;&gt;&gt; allocated = allocate_riv_cells(setting, active, top, bottom, stage, bottom_elevation)</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="k">match</span> <span class="n">allocation_option</span><span class="p">:</span>
         <span class="k">case</span> <span class="n">ALLOCATION_OPTION</span><span class="o">.</span><span class="n">stage_to_riv_bot</span><span class="p">:</span>
-            <span class="k">return</span> <span class="n">_allocate_cells__stage_to_riv_bot</span><span class="p">(</span>
+            <span class="n">riv_cells</span><span class="p">,</span> <span class="n">drn_cells</span> <span class="o">=</span> <span class="n">_allocate_cells__stage_to_riv_bot</span><span class="p">(</span>
                 <span class="n">top</span><span class="p">,</span> <span class="n">bottom</span><span class="p">,</span> <span class="n">stage</span><span class="p">,</span> <span class="n">bottom_elevation</span>
             <span class="p">)</span>
         <span class="k">case</span> <span class="n">ALLOCATION_OPTION</span><span class="o">.</span><span class="n">first_active_to_elevation</span><span class="p">:</span>
-            <span class="k">return</span> <span class="n">_allocate_cells__first_active_to_elevation</span><span class="p">(</span>
+            <span class="n">riv_cells</span><span class="p">,</span> <span class="n">drn_cells</span> <span class="o">=</span> <span class="n">_allocate_cells__first_active_to_elevation</span><span class="p">(</span>
                 <span class="n">active</span><span class="p">,</span> <span class="n">top</span><span class="p">,</span> <span class="n">bottom</span><span class="p">,</span> <span class="n">bottom_elevation</span>
             <span class="p">)</span>
         <span class="k">case</span> <span class="n">ALLOCATION_OPTION</span><span class="o">.</span><span class="n">stage_to_riv_bot_drn_above</span><span class="p">:</span>
-            <span class="k">return</span> <span class="n">_allocate_cells__stage_to_riv_bot_drn_above</span><span class="p">(</span>
+            <span class="n">riv_cells</span><span class="p">,</span> <span class="n">drn_cells</span> <span class="o">=</span> <span class="n">_allocate_cells__stage_to_riv_bot_drn_above</span><span class="p">(</span>
                 <span class="n">active</span><span class="p">,</span> <span class="n">top</span><span class="p">,</span> <span class="n">bottom</span><span class="p">,</span> <span class="n">stage</span><span class="p">,</span> <span class="n">bottom_elevation</span>
             <span class="p">)</span>
         <span class="k">case</span> <span class="n">ALLOCATION_OPTION</span><span class="o">.</span><span class="n">at_elevation</span><span class="p">:</span>
-            <span class="k">return</span> <span class="n">_allocate_cells__at_elevation</span><span class="p">(</span><span class="n">top</span><span class="p">,</span> <span class="n">bottom</span><span class="p">,</span> <span class="n">bottom_elevation</span><span class="p">)</span>
+            <span class="n">riv_cells</span><span class="p">,</span> <span class="n">drn_cells</span> <span class="o">=</span> <span class="n">_allocate_cells__at_elevation</span><span class="p">(</span>
+                <span class="n">top</span><span class="p">,</span> <span class="n">bottom</span><span class="p">,</span> <span class="n">bottom_elevation</span>
+            <span class="p">)</span>
         <span class="k">case</span> <span class="n">ALLOCATION_OPTION</span><span class="o">.</span><span class="n">at_first_active</span><span class="p">:</span>
-            <span class="k">return</span> <span class="n">_allocate_cells__at_first_active</span><span class="p">(</span><span class="n">active</span><span class="p">,</span> <span class="n">bottom_elevation</span><span class="p">)</span>
+            <span class="n">riv_cells</span><span class="p">,</span> <span class="n">drn_cells</span> <span class="o">=</span> <span class="n">_allocate_cells__at_first_active</span><span class="p">(</span>
+                <span class="n">active</span><span class="p">,</span> <span class="n">bottom_elevation</span>
+            <span class="p">)</span>
         <span class="k">case</span><span class="w"> </span><span class="k">_</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
-                <span class="s2">&quot;Received incompatible setting for rivers, only&quot;</span>
-                <span class="sa">f</span><span class="s2">&quot;&#39;</span><span class="si">{</span><span class="n">ALLOCATION_OPTION</span><span class="o">.</span><span class="n">stage_to_riv_bot</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2">&#39; and&quot;</span>
-                <span class="sa">f</span><span class="s2">&quot;&#39;</span><span class="si">{</span><span class="n">ALLOCATION_OPTION</span><span class="o">.</span><span class="n">first_active_to_elevation</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2">&#39; and&quot;</span>
-                <span class="sa">f</span><span class="s2">&quot;&#39;</span><span class="si">{</span><span class="n">ALLOCATION_OPTION</span><span class="o">.</span><span class="n">stage_to_riv_bot_drn_above</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2">&#39; and&quot;</span>
-                <span class="sa">f</span><span class="s2">&quot;&#39;</span><span class="si">{</span><span class="n">ALLOCATION_OPTION</span><span class="o">.</span><span class="n">at_elevation</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2">&#39; and&quot;</span>
-                <span class="sa">f</span><span class="s2">&quot;&#39;</span><span class="si">{</span><span class="n">ALLOCATION_OPTION</span><span class="o">.</span><span class="n">at_first_active</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2">&#39; supported.&quot;</span>
-                <span class="sa">f</span><span class="s2">&quot;got: &#39;</span><span class="si">{</span><span class="n">allocation_option</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2">&#39;&quot;</span>
-            <span class="p">)</span></div>
+                <span class="s2">"Received incompatible setting for rivers, only"</span>
+                <span class="sa">f</span><span class="s2">"'</span><span class="si">{</span><span class="n">ALLOCATION_OPTION</span><span class="o">.</span><span class="n">stage_to_riv_bot</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2">' and"</span>
+                <span class="sa">f</span><span class="s2">"'</span><span class="si">{</span><span class="n">ALLOCATION_OPTION</span><span class="o">.</span><span class="n">first_active_to_elevation</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2">' and"</span>
+                <span class="sa">f</span><span class="s2">"'</span><span class="si">{</span><span class="n">ALLOCATION_OPTION</span><span class="o">.</span><span class="n">stage_to_riv_bot_drn_above</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2">' and"</span>
+                <span class="sa">f</span><span class="s2">"'</span><span class="si">{</span><span class="n">ALLOCATION_OPTION</span><span class="o">.</span><span class="n">at_elevation</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2">' and"</span>
+                <span class="sa">f</span><span class="s2">"'</span><span class="si">{</span><span class="n">ALLOCATION_OPTION</span><span class="o">.</span><span class="n">at_first_active</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2">' supported."</span>
+                <span class="sa">f</span><span class="s2">"got: '</span><span class="si">{</span><span class="n">allocation_option</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2">'"</span>
+            <span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">drop_empty_layers</span><span class="p">:</span>
+        <span class="n">riv_cells</span> <span class="o">=</span> <span class="n">_drop_empty_layers</span><span class="p">(</span><span class="n">riv_cells</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">drn_cells</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">drn_cells</span> <span class="o">=</span> <span class="n">_drop_empty_layers</span><span class="p">(</span><span class="n">drn_cells</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">riv_cells</span><span class="p">,</span> <span class="n">drn_cells</span></div>
 
 
 
@@ -589,8 +623,9 @@
     <span class="n">top</span><span class="p">:</span> <span class="n">GridDataArray</span><span class="p">,</span>
     <span class="n">bottom</span><span class="p">:</span> <span class="n">GridDataArray</span><span class="p">,</span>
     <span class="n">elevation</span><span class="p">:</span> <span class="n">GridDataArray</span><span class="p">,</span>
+    <span class="n">drop_empty_layers</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">GridDataArray</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">"""</span>
 <span class="sd">    Allocate drain cells from a planar grid across the vertical dimension.</span>
 <span class="sd">    Multiple options are available, which can be selected in ALLOCATION_OPTION.</span>
 
@@ -611,6 +646,15 @@
 <span class="sd">    elevation: DataArray | UgridDatarray</span>
 <span class="sd">        Planar grid containing drain elevation. Is not allowed to have a layer</span>
 <span class="sd">        dimension.</span>
+<span class="sd">    drop_empty_layers: bool, default True</span>
+<span class="sd">        If True, drop layers that contain no allocated cells anywhere in the</span>
+<span class="sd">        domain (or at any time), so the returned grids only span the layers that</span>
+<span class="sd">        are actually used. Reduces memory use and speeds up later operations such</span>
+<span class="sd">        as regridding, clipping and splitting. If no cells are allocated in any</span>
+<span class="sd">        layer, nothing is dropped and the full layer range is returned, as a layer</span>
+<span class="sd">        dimension of size 0 is not valid. Note that allocation and conductance</span>
+<span class="sd">        distribution are always computed over the full layer range first, so</span>
+<span class="sd">        dropping layers does not change the computed values.</span>
 
 <span class="sd">    Returns</span>
 <span class="sd">    -------</span>
@@ -623,24 +667,26 @@
 <span class="sd">    &gt;&gt;&gt; from imod.prepare.topsystem import ALLOCATION_OPTION, allocate_drn_cells</span>
 <span class="sd">    &gt;&gt;&gt; setting = ALLOCATION_OPTION.at_elevation</span>
 <span class="sd">    &gt;&gt;&gt; allocated = allocate_drn_cells(setting, active, top, bottom, stage, drain_elevation)</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="k">match</span> <span class="n">allocation_option</span><span class="p">:</span>
         <span class="k">case</span> <span class="n">ALLOCATION_OPTION</span><span class="o">.</span><span class="n">first_active_to_elevation</span><span class="p">:</span>
-            <span class="k">return</span> <span class="n">_allocate_cells__first_active_to_elevation</span><span class="p">(</span>
+            <span class="n">result</span> <span class="o">=</span> <span class="n">_allocate_cells__first_active_to_elevation</span><span class="p">(</span>
                 <span class="n">active</span><span class="p">,</span> <span class="n">top</span><span class="p">,</span> <span class="n">bottom</span><span class="p">,</span> <span class="n">elevation</span>
             <span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
         <span class="k">case</span> <span class="n">ALLOCATION_OPTION</span><span class="o">.</span><span class="n">at_elevation</span><span class="p">:</span>
-            <span class="k">return</span> <span class="n">_allocate_cells__at_elevation</span><span class="p">(</span><span class="n">top</span><span class="p">,</span> <span class="n">bottom</span><span class="p">,</span> <span class="n">elevation</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
+            <span class="n">result</span> <span class="o">=</span> <span class="n">_allocate_cells__at_elevation</span><span class="p">(</span><span class="n">top</span><span class="p">,</span> <span class="n">bottom</span><span class="p">,</span> <span class="n">elevation</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
         <span class="k">case</span> <span class="n">ALLOCATION_OPTION</span><span class="o">.</span><span class="n">at_first_active</span><span class="p">:</span>
-            <span class="k">return</span> <span class="n">_allocate_cells__at_first_active</span><span class="p">(</span><span class="n">active</span><span class="p">,</span> <span class="n">elevation</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
+            <span class="n">result</span> <span class="o">=</span> <span class="n">_allocate_cells__at_first_active</span><span class="p">(</span><span class="n">active</span><span class="p">,</span> <span class="n">elevation</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
         <span class="k">case</span><span class="w"> </span><span class="k">_</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
-                <span class="s2">&quot;Received incompatible setting for drains, only&quot;</span>
-                <span class="sa">f</span><span class="s2">&quot;&#39;</span><span class="si">{</span><span class="n">ALLOCATION_OPTION</span><span class="o">.</span><span class="n">first_active_to_elevation</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2">&#39;, &quot;</span>
-                <span class="sa">f</span><span class="s2">&quot;&#39;</span><span class="si">{</span><span class="n">ALLOCATION_OPTION</span><span class="o">.</span><span class="n">at_elevation</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2">&#39; and&quot;</span>
-                <span class="sa">f</span><span class="s2">&quot;&#39;</span><span class="si">{</span><span class="n">ALLOCATION_OPTION</span><span class="o">.</span><span class="n">at_first_active</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2">&#39; supported.&quot;</span>
-                <span class="sa">f</span><span class="s2">&quot;got: &#39;</span><span class="si">{</span><span class="n">allocation_option</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2">&#39;&quot;</span>
-            <span class="p">)</span></div>
+                <span class="s2">"Received incompatible setting for drains, only"</span>
+                <span class="sa">f</span><span class="s2">"'</span><span class="si">{</span><span class="n">ALLOCATION_OPTION</span><span class="o">.</span><span class="n">first_active_to_elevation</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2">', "</span>
+                <span class="sa">f</span><span class="s2">"'</span><span class="si">{</span><span class="n">ALLOCATION_OPTION</span><span class="o">.</span><span class="n">at_elevation</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2">' and"</span>
+                <span class="sa">f</span><span class="s2">"'</span><span class="si">{</span><span class="n">ALLOCATION_OPTION</span><span class="o">.</span><span class="n">at_first_active</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2">' supported."</span>
+                <span class="sa">f</span><span class="s2">"got: '</span><span class="si">{</span><span class="n">allocation_option</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2">'"</span>
+            <span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">_drop_empty_layers</span><span class="p">(</span><span class="n">result</span><span class="p">)</span> <span class="k">if</span> <span class="n">drop_empty_layers</span> <span class="k">else</span> <span class="n">result</span></div>
 
 
 
@@ -652,8 +698,9 @@
     <span class="n">top</span><span class="p">:</span> <span class="n">GridDataArray</span><span class="p">,</span>
     <span class="n">bottom</span><span class="p">:</span> <span class="n">GridDataArray</span><span class="p">,</span>
     <span class="n">head</span><span class="p">:</span> <span class="n">GridDataArray</span><span class="p">,</span>
+    <span class="n">drop_empty_layers</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">GridDataArray</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">"""</span>
 <span class="sd">    Allocate general head boundary (GHB) cells from a planar grid across the</span>
 <span class="sd">    vertical dimension. Multiple options are available, which can be selected in</span>
 <span class="sd">    ALLOCATION_OPTION.</span>
@@ -673,8 +720,17 @@
 <span class="sd">    bottom: DataArray | UgridDatarray</span>
 <span class="sd">        Grid containing bottoms of model layers.</span>
 <span class="sd">    head: DataArray | UgridDatarray</span>
-<span class="sd">        Planar grid containing general head boundary&#39;s head. Is not allowed to</span>
+<span class="sd">        Planar grid containing general head boundary's head. Is not allowed to</span>
 <span class="sd">        have a layer dimension.</span>
+<span class="sd">    drop_empty_layers: bool, default True</span>
+<span class="sd">        If True, drop layers that contain no allocated cells anywhere in the</span>
+<span class="sd">        domain (or at any time), so the returned grids only span the layers that</span>
+<span class="sd">        are actually used. Reduces memory use and speeds up later operations such</span>
+<span class="sd">        as regridding, clipping and splitting. If no cells are allocated in any</span>
+<span class="sd">        layer, nothing is dropped and the full layer range is returned, as a layer</span>
+<span class="sd">        dimension of size 0 is not valid. Note that allocation and conductance</span>
+<span class="sd">        distribution are always computed over the full layer range first, so</span>
+<span class="sd">        dropping layers does not change the computed values.</span>
 
 <span class="sd">    Returns</span>
 <span class="sd">    -------</span>
@@ -687,24 +743,26 @@
 <span class="sd">    &gt;&gt;&gt; from imod.prepare.topsystem import ALLOCATION_OPTION, allocate_ghb_cells</span>
 <span class="sd">    &gt;&gt;&gt; setting = ALLOCATION_OPTION.at_elevation</span>
 <span class="sd">    &gt;&gt;&gt; allocated = allocate_ghb_cells(setting, active, top, bottom, head)</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="k">match</span> <span class="n">allocation_option</span><span class="p">:</span>
         <span class="k">case</span> <span class="n">ALLOCATION_OPTION</span><span class="o">.</span><span class="n">first_active_to_elevation</span><span class="p">:</span>
-            <span class="k">return</span> <span class="n">_allocate_cells__first_active_to_elevation</span><span class="p">(</span>
+            <span class="n">result</span> <span class="o">=</span> <span class="n">_allocate_cells__first_active_to_elevation</span><span class="p">(</span>
                 <span class="n">active</span><span class="p">,</span> <span class="n">top</span><span class="p">,</span> <span class="n">bottom</span><span class="p">,</span> <span class="n">head</span>
             <span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
         <span class="k">case</span> <span class="n">ALLOCATION_OPTION</span><span class="o">.</span><span class="n">at_elevation</span><span class="p">:</span>
-            <span class="k">return</span> <span class="n">_allocate_cells__at_elevation</span><span class="p">(</span><span class="n">top</span><span class="p">,</span> <span class="n">bottom</span><span class="p">,</span> <span class="n">head</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
+            <span class="n">result</span> <span class="o">=</span> <span class="n">_allocate_cells__at_elevation</span><span class="p">(</span><span class="n">top</span><span class="p">,</span> <span class="n">bottom</span><span class="p">,</span> <span class="n">head</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
         <span class="k">case</span> <span class="n">ALLOCATION_OPTION</span><span class="o">.</span><span class="n">at_first_active</span><span class="p">:</span>
-            <span class="k">return</span> <span class="n">_allocate_cells__at_first_active</span><span class="p">(</span><span class="n">active</span><span class="p">,</span> <span class="n">head</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
+            <span class="n">result</span> <span class="o">=</span> <span class="n">_allocate_cells__at_first_active</span><span class="p">(</span><span class="n">active</span><span class="p">,</span> <span class="n">head</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
         <span class="k">case</span><span class="w"> </span><span class="k">_</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
-                <span class="s2">&quot;Received incompatible setting for general head boundary, only&quot;</span>
-                <span class="sa">f</span><span class="s2">&quot;&#39;</span><span class="si">{</span><span class="n">ALLOCATION_OPTION</span><span class="o">.</span><span class="n">first_active_to_elevation</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2">&#39;, &quot;</span>
-                <span class="sa">f</span><span class="s2">&quot;&#39;</span><span class="si">{</span><span class="n">ALLOCATION_OPTION</span><span class="o">.</span><span class="n">at_elevation</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2">&#39; and&quot;</span>
-                <span class="sa">f</span><span class="s2">&quot;&#39;</span><span class="si">{</span><span class="n">ALLOCATION_OPTION</span><span class="o">.</span><span class="n">at_first_active</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2">&#39; supported.&quot;</span>
-                <span class="sa">f</span><span class="s2">&quot;got: &#39;</span><span class="si">{</span><span class="n">allocation_option</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2">&#39;&quot;</span>
-            <span class="p">)</span></div>
+                <span class="s2">"Received incompatible setting for general head boundary, only"</span>
+                <span class="sa">f</span><span class="s2">"'</span><span class="si">{</span><span class="n">ALLOCATION_OPTION</span><span class="o">.</span><span class="n">first_active_to_elevation</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2">', "</span>
+                <span class="sa">f</span><span class="s2">"'</span><span class="si">{</span><span class="n">ALLOCATION_OPTION</span><span class="o">.</span><span class="n">at_elevation</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2">' and"</span>
+                <span class="sa">f</span><span class="s2">"'</span><span class="si">{</span><span class="n">ALLOCATION_OPTION</span><span class="o">.</span><span class="n">at_first_active</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2">' supported."</span>
+                <span class="sa">f</span><span class="s2">"got: '</span><span class="si">{</span><span class="n">allocation_option</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2">'"</span>
+            <span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">_drop_empty_layers</span><span class="p">(</span><span class="n">result</span><span class="p">)</span> <span class="k">if</span> <span class="n">drop_empty_layers</span> <span class="k">else</span> <span class="n">result</span></div>
 
 
 
@@ -714,8 +772,9 @@
     <span class="n">allocation_option</span><span class="p">:</span> <span class="n">ALLOCATION_OPTION</span><span class="p">,</span>
     <span class="n">active</span><span class="p">:</span> <span class="n">GridDataArray</span><span class="p">,</span>
     <span class="n">rate</span><span class="p">:</span> <span class="n">GridDataArray</span><span class="p">,</span>
+    <span class="n">drop_empty_layers</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">GridDataArray</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">"""</span>
 <span class="sd">    Allocate recharge cells from a planar grid across the vertical dimension.</span>
 <span class="sd">    Multiple options are available, which can be selected in ALLOCATION_OPTION.</span>
 
@@ -730,6 +789,15 @@
 <span class="sd">    rate: DataArray | UgridDataArray</span>
 <span class="sd">        Array with recharge rates. This will only be used to infer where</span>
 <span class="sd">        recharge cells are defined.</span>
+<span class="sd">    drop_empty_layers: bool, default True</span>
+<span class="sd">        If True, drop layers that contain no allocated cells anywhere in the</span>
+<span class="sd">        domain (or at any time), so the returned grids only span the layers that</span>
+<span class="sd">        are actually used. Reduces memory use and speeds up later operations such</span>
+<span class="sd">        as regridding, clipping and splitting. If no cells are allocated in any</span>
+<span class="sd">        layer, nothing is dropped and the full layer range is returned, as a layer</span>
+<span class="sd">        dimension of size 0 is not valid. Note that allocation and conductance</span>
+<span class="sd">        distribution are always computed over the full layer range first, so</span>
+<span class="sd">        dropping layers does not change the computed values.</span>
 
 <span class="sd">    Returns</span>
 <span class="sd">    -------</span>
@@ -742,37 +810,41 @@
 <span class="sd">    &gt;&gt;&gt; from imod.prepare.topsystem import ALLOCATION_OPTION, allocate_rch_cells</span>
 <span class="sd">    &gt;&gt;&gt; setting = ALLOCATION_OPTION.at_first_active</span>
 <span class="sd">    &gt;&gt;&gt; allocated = allocate_rch_cells(setting, active, rate)</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="k">match</span> <span class="n">allocation_option</span><span class="p">:</span>
         <span class="k">case</span> <span class="n">ALLOCATION_OPTION</span><span class="o">.</span><span class="n">at_first_active</span><span class="p">:</span>
-            <span class="k">return</span> <span class="n">_allocate_cells__at_first_active</span><span class="p">(</span><span class="n">active</span><span class="p">,</span> <span class="n">rate</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
+            <span class="n">result</span> <span class="o">=</span> <span class="n">_allocate_cells__at_first_active</span><span class="p">(</span><span class="n">active</span><span class="p">,</span> <span class="n">rate</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
         <span class="k">case</span><span class="w"> </span><span class="k">_</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
-                <span class="s2">&quot;Received incompatible setting for recharge, only&quot;</span>
-                <span class="sa">f</span><span class="s2">&quot;&#39;</span><span class="si">{</span><span class="n">ALLOCATION_OPTION</span><span class="o">.</span><span class="n">at_first_active</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2">&#39; supported.&quot;</span>
-                <span class="sa">f</span><span class="s2">&quot;got: &#39;</span><span class="si">{</span><span class="n">allocation_option</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2">&#39;&quot;</span>
-            <span class="p">)</span></div>
+                <span class="s2">"Received incompatible setting for recharge, only"</span>
+                <span class="sa">f</span><span class="s2">"'</span><span class="si">{</span><span class="n">ALLOCATION_OPTION</span><span class="o">.</span><span class="n">at_first_active</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2">' supported."</span>
+                <span class="sa">f</span><span class="s2">"got: '</span><span class="si">{</span><span class="n">allocation_option</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2">'"</span>
+            <span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">_drop_empty_layers</span><span class="p">(</span><span class="n">result</span><span class="p">)</span> <span class="k">if</span> <span class="n">drop_empty_layers</span> <span class="k">else</span> <span class="n">result</span></div>
 
 
 
-<span class="k">def</span><span class="w"> </span><span class="nf">_is_layered</span><span class="p">(</span><span class="n">grid</span><span class="p">:</span> <span class="n">GridDataArray</span><span class="p">):</span>
-    <span class="k">return</span> <span class="s2">&quot;layer&quot;</span> <span class="ow">in</span> <span class="n">grid</span><span class="o">.</span><span class="n">sizes</span> <span class="ow">and</span> <span class="n">grid</span><span class="o">.</span><span class="n">sizes</span><span class="p">[</span><span class="s2">&quot;layer&quot;</span><span class="p">]</span> <span class="o">&gt;</span> <span class="mi">1</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">_is_layered</span><span class="p">(</span><span class="n">grid</span><span class="p">:</span> <span class="n">GridDataArray</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+    <span class="k">return</span> <span class="s2">"layer"</span> <span class="ow">in</span> <span class="n">grid</span><span class="o">.</span><span class="n">sizes</span> <span class="ow">and</span> <span class="n">grid</span><span class="o">.</span><span class="n">sizes</span><span class="p">[</span><span class="s2">"layer"</span><span class="p">]</span> <span class="o">&gt;</span> <span class="mi">1</span>
 
 
-<span class="k">def</span><span class="w"> </span><span class="nf">_enforce_layered_top</span><span class="p">(</span><span class="n">top</span><span class="p">:</span> <span class="n">GridDataArray</span><span class="p">,</span> <span class="n">bottom</span><span class="p">:</span> <span class="n">GridDataArray</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">_enforce_layered_top</span><span class="p">(</span><span class="n">top</span><span class="p">:</span> <span class="n">GridDataArray</span><span class="p">,</span> <span class="n">bottom</span><span class="p">:</span> <span class="n">GridDataArray</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">GridDataArray</span><span class="p">:</span>
     <span class="k">if</span> <span class="n">_is_layered</span><span class="p">(</span><span class="n">top</span><span class="p">):</span>
         <span class="k">return</span> <span class="n">top</span>
     <span class="k">else</span><span class="p">:</span>
         <span class="k">return</span> <span class="n">create_layered_top</span><span class="p">(</span><span class="n">bottom</span><span class="p">,</span> <span class="n">top</span><span class="p">)</span>
 
 
-<span class="k">def</span><span class="w"> </span><span class="nf">get_above_lower_bound</span><span class="p">(</span><span class="n">bottom_elevation</span><span class="p">:</span> <span class="n">GridDataArray</span><span class="p">,</span> <span class="n">top_layered</span><span class="p">:</span> <span class="n">GridDataArray</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">get_above_lower_bound</span><span class="p">(</span>
+    <span class="n">bottom_elevation</span><span class="p">:</span> <span class="n">GridDataArray</span><span class="p">,</span> <span class="n">top_layered</span><span class="p">:</span> <span class="n">GridDataArray</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">GridDataArray</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">"""</span>
 <span class="sd">    Returns boolean array that indicates cells are above the lower vertical</span>
 <span class="sd">    limit of the topsystem. These are the cells located above the</span>
 <span class="sd">    bottom_elevation grid or in the first layer.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
-    <span class="n">top_layer_label</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;layer&quot;</span><span class="p">:</span> <span class="nb">min</span><span class="p">(</span><span class="n">top_layered</span><span class="o">.</span><span class="n">coords</span><span class="p">[</span><span class="s2">&quot;layer&quot;</span><span class="p">])}</span>
+<span class="sd">    """</span>
+    <span class="n">top_layer_label</span> <span class="o">=</span> <span class="p">{</span><span class="s2">"layer"</span><span class="p">:</span> <span class="nb">min</span><span class="p">(</span><span class="n">top_layered</span><span class="o">.</span><span class="n">coords</span><span class="p">[</span><span class="s2">"layer"</span><span class="p">])}</span>
     <span class="n">is_above_lower_bound</span> <span class="o">=</span> <span class="n">bottom_elevation</span> <span class="o">&lt;</span> <span class="n">top_layered</span>
     <span class="c1"># Bottom elevation above top surface is allowed, so these are set to True</span>
     <span class="c1"># regardless.</span>
@@ -787,7 +859,7 @@
     <span class="n">stage</span><span class="p">:</span> <span class="n">GridDataArray</span><span class="p">,</span>
     <span class="n">bottom_elevation</span><span class="p">:</span> <span class="n">GridDataArray</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">tuple</span><span class="p">[</span><span class="n">GridDataArray</span><span class="p">,</span> <span class="kc">None</span><span class="p">]:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">"""</span>
 <span class="sd">    Allocate cells inbetween river stage and river bottom_elevation. Compared to</span>
 <span class="sd">    iMOD5.6, this is similar to setting IDEFFLAYER=0 in the RUNFILE function.</span>
 
@@ -811,7 +883,7 @@
 <span class="sd">    -------</span>
 <span class="sd">    GridDataArray</span>
 <span class="sd">        River cells</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="n">PLANAR_GRID</span><span class="o">.</span><span class="n">validate</span><span class="p">(</span><span class="n">stage</span><span class="p">)</span>
     <span class="n">PLANAR_GRID</span><span class="o">.</span><span class="n">validate</span><span class="p">(</span><span class="n">bottom_elevation</span><span class="p">)</span>
 
@@ -831,7 +903,7 @@
     <span class="n">bottom</span><span class="p">:</span> <span class="n">GridDataArray</span><span class="p">,</span>
     <span class="n">bottom_elevation</span><span class="p">:</span> <span class="n">GridDataArray</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">tuple</span><span class="p">[</span><span class="n">GridDataArray</span><span class="p">,</span> <span class="kc">None</span><span class="p">]:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">"""</span>
 <span class="sd">    Allocate cells inbetween first active layer and river bottom elevation.</span>
 <span class="sd">    Compared to iMOD5.6, this is similar to setting IDEFFLAYER=-1 in the RUNFILE</span>
 <span class="sd">    function.</span>
@@ -854,11 +926,11 @@
 <span class="sd">    -------</span>
 <span class="sd">    GridDataArray</span>
 <span class="sd">        River cells</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="n">PLANAR_GRID</span><span class="o">.</span><span class="n">validate</span><span class="p">(</span><span class="n">bottom_elevation</span><span class="p">)</span>
 
     <span class="n">upper_active_layer</span> <span class="o">=</span> <span class="n">get_upper_active_layer_number</span><span class="p">(</span><span class="n">active</span><span class="p">)</span>
-    <span class="n">layer</span> <span class="o">=</span> <span class="n">active</span><span class="o">.</span><span class="n">coords</span><span class="p">[</span><span class="s2">&quot;layer&quot;</span><span class="p">]</span>
+    <span class="n">layer</span> <span class="o">=</span> <span class="n">active</span><span class="o">.</span><span class="n">coords</span><span class="p">[</span><span class="s2">"layer"</span><span class="p">]</span>
 
     <span class="n">top_layered</span> <span class="o">=</span> <span class="n">_enforce_layered_top</span><span class="p">(</span><span class="n">top</span><span class="p">,</span> <span class="n">bottom</span><span class="p">)</span>
 
@@ -877,7 +949,7 @@
     <span class="n">stage</span><span class="p">:</span> <span class="n">GridDataArray</span><span class="p">,</span>
     <span class="n">bottom_elevation</span><span class="p">:</span> <span class="n">GridDataArray</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">tuple</span><span class="p">[</span><span class="n">GridDataArray</span><span class="p">,</span> <span class="n">GridDataArray</span><span class="p">]:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">"""</span>
 <span class="sd">    Allocate cells inbetween first active layer and river bottom elevation.</span>
 <span class="sd">    Cells above river stage are deactivated and returned as drn cells. Compared</span>
 <span class="sd">    to iMOD5.6, this is similar to setting IDEFFLAYER=1 in the RUNFILE function.</span>
@@ -906,7 +978,7 @@
 <span class="sd">        River cells (below stage)</span>
 <span class="sd">    drn_cells: GridDataArray</span>
 <span class="sd">        Drainage cells (above stage)</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
 
     <span class="n">PLANAR_GRID</span><span class="o">.</span><span class="n">validate</span><span class="p">(</span><span class="n">stage</span><span class="p">)</span>
     <span class="n">PLANAR_GRID</span><span class="o">.</span><span class="n">validate</span><span class="p">(</span><span class="n">bottom_elevation</span><span class="p">)</span>
@@ -914,7 +986,7 @@
     <span class="n">top_layered</span> <span class="o">=</span> <span class="n">_enforce_layered_top</span><span class="p">(</span><span class="n">top</span><span class="p">,</span> <span class="n">bottom</span><span class="p">)</span>
     <span class="n">is_above_lower_bound</span> <span class="o">=</span> <span class="n">get_above_lower_bound</span><span class="p">(</span><span class="n">bottom_elevation</span><span class="p">,</span> <span class="n">top_layered</span><span class="p">)</span>
     <span class="n">upper_active_layer</span> <span class="o">=</span> <span class="n">get_upper_active_layer_number</span><span class="p">(</span><span class="n">active</span><span class="p">)</span>
-    <span class="n">layer</span> <span class="o">=</span> <span class="n">active</span><span class="o">.</span><span class="n">coords</span><span class="p">[</span><span class="s2">&quot;layer&quot;</span><span class="p">]</span>
+    <span class="n">layer</span> <span class="o">=</span> <span class="n">active</span><span class="o">.</span><span class="n">coords</span><span class="p">[</span><span class="s2">"layer"</span><span class="p">]</span>
     <span class="n">is_below_upper_bound</span> <span class="o">=</span> <span class="n">upper_active_layer</span> <span class="o">&lt;=</span> <span class="n">layer</span>
     <span class="n">is_below_upper_bound_and_active</span> <span class="o">=</span> <span class="n">is_below_upper_bound</span> <span class="o">&amp;</span> <span class="n">active</span>
     <span class="n">drn_cells</span> <span class="o">=</span> <span class="n">is_below_upper_bound_and_active</span> <span class="o">&amp;</span> <span class="p">(</span><span class="n">bottom</span> <span class="o">&gt;</span> <span class="n">stage</span><span class="p">)</span>
@@ -927,7 +999,7 @@
 <span class="k">def</span><span class="w"> </span><span class="nf">_allocate_cells__at_elevation</span><span class="p">(</span>
     <span class="n">top</span><span class="p">:</span> <span class="n">GridDataArray</span><span class="p">,</span> <span class="n">bottom</span><span class="p">:</span> <span class="n">GridDataArray</span><span class="p">,</span> <span class="n">elevation</span><span class="p">:</span> <span class="n">GridDataArray</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">tuple</span><span class="p">[</span><span class="n">GridDataArray</span><span class="p">,</span> <span class="kc">None</span><span class="p">]:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">"""</span>
 <span class="sd">    Allocate cells in river bottom elevation layer. Compared to iMOD5.6, this is</span>
 <span class="sd">    similar to setting IDEFFLAYER=2 in the RUNFILE function.</span>
 
@@ -947,7 +1019,7 @@
 <span class="sd">    -------</span>
 <span class="sd">    GridDataArray</span>
 <span class="sd">        Topsystem cells</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
 
     <span class="n">PLANAR_GRID</span><span class="o">.</span><span class="n">validate</span><span class="p">(</span><span class="n">elevation</span><span class="p">)</span>
 
@@ -964,7 +1036,7 @@
     <span class="n">active</span><span class="p">:</span> <span class="n">GridDataArray</span><span class="p">,</span>
     <span class="n">planar_topsystem_grid</span><span class="p">:</span> <span class="n">GridDataArray</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">tuple</span><span class="p">[</span><span class="n">GridDataArray</span><span class="p">,</span> <span class="kc">None</span><span class="p">]:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">"""</span>
 <span class="sd">    Allocate cells inbetween first active layer and river bottom elevation.</span>
 <span class="sd">    Compared to iMOD5.6, this is similar to setting IDEFFLAYER=-1 in the RUNFILE</span>
 <span class="sd">    function.</span>
@@ -982,13 +1054,156 @@
 <span class="sd">    -------</span>
 <span class="sd">    GridDataArray</span>
 <span class="sd">        Topsystem cells</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="n">PLANAR_GRID</span><span class="o">.</span><span class="n">validate</span><span class="p">(</span><span class="n">planar_topsystem_grid</span><span class="p">)</span>
 
     <span class="n">upper_active</span> <span class="o">=</span> <span class="n">get_upper_active_grid_cells</span><span class="p">(</span><span class="n">active</span><span class="p">)</span>
     <span class="n">topsystem_upper_active</span> <span class="o">=</span> <span class="n">upper_active</span> <span class="o">&amp;</span> <span class="o">~</span><span class="n">np</span><span class="o">.</span><span class="n">isnan</span><span class="p">(</span><span class="n">planar_topsystem_grid</span><span class="p">)</span>
 
     <span class="k">return</span> <span class="n">topsystem_upper_active</span><span class="p">,</span> <span class="kc">None</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">_used_layers</span><span class="p">(</span><span class="n">mask</span><span class="p">:</span> <span class="n">GridDataArray</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">tuple</span><span class="p">[</span><span class="n">GridDataArray</span> <span class="o">|</span> <span class="kc">None</span><span class="p">,</span> <span class="n">LAYERS_USED</span><span class="p">]:</span>
+<span class="w">    </span><span class="sd">"""</span>
+<span class="sd">    Return the layer coordinate values of ``mask`` that contain at least one</span>
+<span class="sd">    True value anywhere in the domain (and, if present, at any timestep), or</span>
+<span class="sd">    None if there is nothing to trim (no layer dimension, or every layer has</span>
+<span class="sd">    data).</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    mask: GridDataArray</span>
+<span class="sd">        Boolean array with a "layer" dimension, typically one of the</span>
+<span class="sd">        ``allocated`` grids returned by an ``_allocate_cells__*`` function.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    GridDataArray</span>
+<span class="sd">        Layer coordinate values with data. If all or none of the layers have</span>
+<span class="sd">        data, this will be None. In the latter case, do not return an empty</span>
+<span class="sd">        layer coordinate: a layer dimension of size 0 fails package validation</span>
+<span class="sd">        and breaks downstream operations. Keep the full layer range instead, so</span>
+<span class="sd">        empty packages can be removed by callers, e.g.</span>
+<span class="sd">        ``mask_package__drop_if_empty``.</span>
+<span class="sd">    LAYERS_USED</span>
+<span class="sd">        Enumerator indicating whether all, none, or some layers are used.</span>
+<span class="sd">    """</span>
+    <span class="k">if</span> <span class="s2">"layer"</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">mask</span><span class="o">.</span><span class="n">dims</span><span class="p">:</span>
+        <span class="k">return</span> <span class="kc">None</span><span class="p">,</span> <span class="n">LAYERS_USED</span><span class="o">.</span><span class="n">ALL</span>
+
+    <span class="k">if</span> <span class="n">mask</span><span class="o">.</span><span class="n">dtype</span> <span class="o">!=</span> <span class="nb">bool</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+            <span class="sa">f</span><span class="s2">"Expected a boolean grid to drop empty layers from, got: </span><span class="si">{</span><span class="n">mask</span><span class="o">.</span><span class="n">dtype</span><span class="si">}</span><span class="s2">"</span>
+        <span class="p">)</span>
+
+    <span class="c1"># Reduce the mask to the first time step if a time dimension exists for</span>
+    <span class="c1"># performance reasons</span>
+    <span class="n">mask</span> <span class="o">=</span> <span class="n">mask</span><span class="o">.</span><span class="n">isel</span><span class="p">(</span><span class="n">time</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">drop</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">missing_dims</span><span class="o">=</span><span class="s2">"ignore"</span><span class="p">)</span>
+    <span class="n">reduce_dims</span> <span class="o">=</span> <span class="p">[</span><span class="n">d</span> <span class="k">for</span> <span class="n">d</span> <span class="ow">in</span> <span class="n">mask</span><span class="o">.</span><span class="n">dims</span> <span class="k">if</span> <span class="n">d</span> <span class="o">!=</span> <span class="s2">"layer"</span><span class="p">]</span>
+    <span class="n">has_data_per_layer</span> <span class="o">=</span> <span class="n">mask</span><span class="o">.</span><span class="n">any</span><span class="p">(</span><span class="n">dim</span><span class="o">=</span><span class="n">reduce_dims</span><span class="p">)</span>
+
+    <span class="c1"># Force to plain numpy/bool to avoid triggering a dask compute deep</span>
+    <span class="c1"># inside indexing logic more than once.</span>
+    <span class="n">has_data_per_layer</span> <span class="o">=</span> <span class="n">has_data_per_layer</span><span class="o">.</span><span class="n">compute</span><span class="p">()</span>
+
+    <span class="c1"># Never return an empty layer coordinate: keep the full range and</span>
+    <span class="c1"># let callers (e.g. # mask_package__drop_if_empty) remove empty packages.</span>
+    <span class="k">if</span> <span class="nb">bool</span><span class="p">(</span><span class="n">has_data_per_layer</span><span class="o">.</span><span class="n">all</span><span class="p">()):</span>
+        <span class="k">return</span> <span class="kc">None</span><span class="p">,</span> <span class="n">LAYERS_USED</span><span class="o">.</span><span class="n">ALL</span>
+    <span class="k">elif</span> <span class="ow">not</span> <span class="nb">bool</span><span class="p">(</span><span class="n">has_data_per_layer</span><span class="o">.</span><span class="n">any</span><span class="p">()):</span>
+        <span class="k">return</span> <span class="kc">None</span><span class="p">,</span> <span class="n">LAYERS_USED</span><span class="o">.</span><span class="n">NONE</span>
+
+    <span class="k">return</span> <span class="n">mask</span><span class="p">[</span><span class="s2">"layer"</span><span class="p">]</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">has_data_per_layer</span><span class="p">,</span> <span class="n">drop</span><span class="o">=</span><span class="kc">True</span><span class="p">),</span> <span class="n">LAYERS_USED</span><span class="o">.</span><span class="n">SOME</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">_drop_empty_layers</span><span class="p">(</span><span class="n">grid</span><span class="p">:</span> <span class="n">GridDataArray</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">GridDataArray</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">"""</span>
+<span class="sd">    Drop layers that contain no True values in any spatial cell (and, if</span>
+<span class="sd">    present, at any timestep). Keeps the `layer` coordinate but only for</span>
+<span class="sd">    layers that actually contain data - this is what lets downstream</span>
+<span class="sd">    regridding/clipping/masking/splitting operate over a much smaller layer</span>
+<span class="sd">    range when the topsystem package only spans a handful of the model's</span>
+<span class="sd">    total layers.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    grid: GridDataArray</span>
+<span class="sd">        Boolean array with a "layer" dimension, typically the output of one</span>
+<span class="sd">        of the ``_allocate_cells__*`` functions.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    GridDataArray</span>
+<span class="sd">        Same array, subset to layers with data.</span>
+<span class="sd">    """</span>
+    <span class="n">used_layers</span><span class="p">,</span> <span class="n">layers_used_option</span> <span class="o">=</span> <span class="n">_used_layers</span><span class="p">(</span><span class="n">grid</span><span class="p">)</span>
+    <span class="n">name</span> <span class="o">=</span> <span class="n">grid</span><span class="o">.</span><span class="n">name</span> <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">grid</span><span class="p">,</span> <span class="s2">"name"</span><span class="p">)</span> <span class="k">else</span> <span class="s2">"&lt;unnamed grid&gt;"</span>
+    <span class="k">match</span> <span class="n">layers_used_option</span><span class="p">:</span>
+        <span class="k">case</span> <span class="n">LAYERS_USED</span><span class="o">.</span><span class="n">NONE</span><span class="p">:</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span>
+                <span class="sa">f</span><span class="s2">"No layers have data in grid '</span><span class="si">{</span><span class="n">name</span><span class="si">}</span><span class="s2">', the package should be removed by the caller."</span>
+            <span class="p">)</span>
+            <span class="k">return</span> <span class="n">grid</span>
+        <span class="k">case</span> <span class="n">LAYERS_USED</span><span class="o">.</span><span class="n">ALL</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">grid</span>
+        <span class="k">case</span> <span class="n">LAYERS_USED</span><span class="o">.</span><span class="n">SOME</span><span class="p">:</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span>
+                <span class="sa">f</span><span class="s2">"Dropping empty layers from grid '</span><span class="si">{</span><span class="n">name</span><span class="si">}</span><span class="s2">', keeping only used layers."</span>
+            <span class="p">)</span>
+            <span class="k">return</span> <span class="n">grid</span><span class="o">.</span><span class="n">sel</span><span class="p">(</span><span class="n">layer</span><span class="o">=</span><span class="n">used_layers</span><span class="p">)</span>
+        <span class="k">case</span><span class="w"> </span><span class="k">_</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+                <span class="sa">f</span><span class="s2">"Unexpected value for layers_used_option: </span><span class="si">{</span><span class="n">layers_used_option</span><span class="si">}</span><span class="s2">"</span>
+            <span class="p">)</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">drop_empty_layers_from_dict</span><span class="p">(</span>
+    <span class="n">data</span><span class="p">:</span> <span class="n">GridDataDict</span><span class="p">,</span> <span class="n">mask</span><span class="p">:</span> <span class="n">GridDataArray</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">GridDataDict</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">"""</span>
+<span class="sd">    Trim every layered grid in ``data`` down to the layers that contain data</span>
+<span class="sd">    in ``mask``. Unlike :func:`_drop_empty_layers`, this can be applied to</span>
+<span class="sd">    grids (such as distributed conductances) that are not themselves</span>
+<span class="sd">    boolean, as long as a boolean ``mask`` with the same (full) layer range</span>
+<span class="sd">    is available to decide which layers to keep.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    data: GridDataDict</span>
+<span class="sd">        Dictionary of grids, e.g. the layered package data returned by</span>
+<span class="sd">        ``_allocate_and_distribute_planar_data``. Grids without a "layer"</span>
+<span class="sd">        dimension are returned unchanged.</span>
+<span class="sd">    mask: GridDataArray</span>
+<span class="sd">        Boolean array with a "layer" dimension, e.g. the ``allocated`` grid</span>
+<span class="sd">        that was used to build the grids in ``data``.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    GridDataDict</span>
+<span class="sd">        Same dictionary, with every layered grid subset to layers with data.</span>
+<span class="sd">        If mask has no True values, data is returned unchanged.</span>
+<span class="sd">        To fully remove empty empty packages, additional logic outside this function is required.</span>
+<span class="sd">    """</span>
+    <span class="n">used_layers</span><span class="p">,</span> <span class="n">layers_used</span> <span class="o">=</span> <span class="n">_used_layers</span><span class="p">(</span><span class="n">mask</span><span class="p">)</span>
+    <span class="n">names</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">data</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span>
+    <span class="k">match</span> <span class="n">layers_used</span><span class="p">:</span>
+        <span class="k">case</span> <span class="n">LAYERS_USED</span><span class="o">.</span><span class="n">NONE</span><span class="p">:</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span>
+                <span class="sa">f</span><span class="s2">"No layers have data in grid '</span><span class="si">{</span><span class="n">names</span><span class="si">}</span><span class="s2">', the package should be removed by the caller."</span>
+            <span class="p">)</span>
+            <span class="k">return</span> <span class="n">data</span>
+        <span class="k">case</span> <span class="n">LAYERS_USED</span><span class="o">.</span><span class="n">ALL</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">data</span>  <span class="c1"># return as-is, let caller handle what to do with LAYERS_USED.NONE or LAYERS_USED.ALL</span>
+        <span class="k">case</span> <span class="n">LAYERS_USED</span><span class="o">.</span><span class="n">SOME</span><span class="p">:</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span>
+                <span class="sa">f</span><span class="s2">"Dropping empty layers from grid '</span><span class="si">{</span><span class="n">names</span><span class="si">}</span><span class="s2">', keeping only used layers."</span>
+            <span class="p">)</span>
+            <span class="k">return</span> <span class="p">{</span>
+                <span class="n">key</span><span class="p">:</span> <span class="n">grid</span><span class="o">.</span><span class="n">sel</span><span class="p">(</span><span class="n">layer</span><span class="o">=</span><span class="n">used_layers</span><span class="p">)</span> <span class="k">if</span> <span class="s2">"layer"</span> <span class="ow">in</span> <span class="n">grid</span><span class="o">.</span><span class="n">dims</span> <span class="k">else</span> <span class="n">grid</span>
+                <span class="k">for</span> <span class="n">key</span><span class="p">,</span> <span class="n">grid</span> <span class="ow">in</span> <span class="n">data</span><span class="o">.</span><span class="n">items</span><span class="p">()</span>
+            <span class="p">}</span>
+        <span class="k">case</span><span class="w"> </span><span class="k">_</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Unexpected value for layers_used: </span><span class="si">{</span><span class="n">layers_used</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
 </pre></div>
 
                 </article>
@@ -1018,8 +1233,8 @@
   </div>
   
   <!-- Scripts loaded after <body> so the DOM is not blocked -->
-  <script defer src="../../../../_static/scripts/bootstrap.js?digest=90905a2f556bf617f1a9"></script>
-<script defer src="../../../../_static/scripts/pydata-sphinx-theme.js?digest=90905a2f556bf617f1a9"></script>
+  <script defer src="../../../../_static/scripts/bootstrap.js?digest=75c7c72ae941e8b558d8"></script>
+<script defer src="../../../../_static/scripts/pydata-sphinx-theme.js?digest=75c7c72ae941e8b558d8"></script>
 
   <footer class="bd-footer">
 <div class="bd-footer__inner bd-page-width">
@@ -1039,8 +1254,7 @@
         <div class="footer-item">
 
   <p class="sphinx-version">
-    Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 9.1.0.
-    <br/>
+    Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 9.2.0.
   </p>
 </div>
       
@@ -1053,7 +1267,7 @@
         <div class="footer-item">
 <p class="theme-version">
   <!-- # L10n: Setting the PST URL as an argument as this does not need to be localized -->
-  Built with the <a href="https://pydata-sphinx-theme.readthedocs.io/en/stable/index.html">PyData Sphinx Theme</a> 0.20.0.
+  Built with the <a href="https://pydata-sphinx-theme.readthedocs.io/en/stable/index.html">PyData Sphinx Theme</a> 0.24.0.
 </p></div>
       
     </div>

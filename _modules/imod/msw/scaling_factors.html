@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 
 
@@ -7,7 +6,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>imod.msw.scaling_factors &#8212; iMOD Python 1.1.0 documentation</title>
+    <title>imod.msw.scaling_factors &#8212; iMOD Python 1.2.0 documentation</title>
   
   
   
@@ -26,22 +25,22 @@
   </noscript>
   
   <!-- Loaded before other Sphinx assets -->
-  <link href="../../../_static/styles/theme.css?digest=90905a2f556bf617f1a9" rel="stylesheet" />
-<link href="../../../_static/styles/pydata-sphinx-theme.css?digest=90905a2f556bf617f1a9" rel="stylesheet" />
+  <link href="../../../_static/styles/theme.css?digest=75c7c72ae941e8b558d8" rel="stylesheet" />
+<link href="../../../_static/styles/pydata-sphinx-theme.css?digest=75c7c72ae941e8b558d8" rel="stylesheet" />
 
     <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=03e43079" />
-    <link rel="stylesheet" type="text/css" href="../../../_static/sg_gallery.css?v=fd6457a4" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/sg_gallery.css?v=c83e6b79" />
     <link rel="stylesheet" type="text/css" href="../../../_static/sg_gallery-binder.css?v=f4aeca0c" />
     <link rel="stylesheet" type="text/css" href="../../../_static/sg_gallery-dataframe.css?v=2082cf3c" />
     <link rel="stylesheet" type="text/css" href="../../../_static/sg_gallery-rendered-html.css?v=1277b6f3" />
   
   <!-- So that users can add custom icons -->
-  <script defer src="../../../_static/scripts/fontawesome.js?digest=90905a2f556bf617f1a9"></script>
+  <script defer src="../../../_static/scripts/fontawesome.js?digest=75c7c72ae941e8b558d8"></script>
   <!-- Pre-loaded scripts that we'll load fully later -->
-  <link rel="preload" as="script" href="../../../_static/scripts/bootstrap.js?digest=90905a2f556bf617f1a9" />
-<link rel="preload" as="script" href="../../../_static/scripts/pydata-sphinx-theme.js?digest=90905a2f556bf617f1a9" />
+  <link rel="preload" as="script" href="../../../_static/scripts/bootstrap.js?digest=75c7c72ae941e8b558d8" />
+<link rel="preload" as="script" href="../../../_static/scripts/pydata-sphinx-theme.js?digest=75c7c72ae941e8b558d8" />
 
-    <script src="../../../_static/documentation_options.js?v=fc837d61"></script>
+    <script src="../../../_static/documentation_options.js?v=6efca38a"></script>
     <script src="../../../_static/doctools.js?v=fd6eb6e6"></script>
     <script src="../../../_static/sphinx_highlight.js?v=6ffebe34"></script>
     <script src="../../../_static/sg-tags.js?v=d80f6fa4"></script>
@@ -51,8 +50,9 @@
     <link rel="index" title="Index" href="../../../genindex.html" />
     <link rel="search" title="Search" href="../../../search.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <meta name="color-scheme" content="light dark"/>
   <meta name="docsearch:language" content="en"/>
-  <meta name="docsearch:version" content="1.1.0.dev" />
+  <meta name="docsearch:version" content="1.2.0.dev" />
   
     
     <script src="../../../_static/searchtools.js"></script>
@@ -100,7 +100,7 @@
   
     <header id="pst-header" class="bd-header navbar navbar-expand-lg bd-navbar d-print-none">
 <div class="bd-header__inner bd-page-width">
-  <button class="pst-navbar-icon sidebar-toggle primary-toggle" aria-label="Site navigation">
+  <button type="button" class="pst-navbar-icon sidebar-toggle primary-toggle" aria-label="Site navigation" aria-expanded="false" aria-controls="pst-primary-sidebar-modal">
     <span class="fa-solid fa-bars"></span>
   </button>
   
@@ -122,8 +122,8 @@
     
     
     
-    <img src="../../../_static/imod-python-logo-light.svg" class="logo__image only-light" alt="iMOD Python 1.1.0 documentation - Home"/>
-    <img src="../../../_static/imod-python-logo-dark.svg" class="logo__image only-dark pst-js-only" alt="iMOD Python 1.1.0 documentation - Home"/>
+    <img src="../../../_static/imod-python-logo-light.svg" class="logo__image only-light" alt="iMOD Python 1.2.0 documentation - Home"/>
+    <img src="../../../_static/imod-python-logo-dark.svg" class="logo__image only-dark pst-js-only" alt="iMOD Python 1.2.0 documentation - Home"/>
   
   
 </a></div>
@@ -190,7 +190,7 @@
         <div class="navbar-item navbar-persistent--container">
           
 
-<button class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+<button type="button" class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
  <i class="fa-solid fa-magnifying-glass"></i>
  <span class="search-button__default-text">Search</span>
  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
@@ -201,15 +201,15 @@
         <div class="navbar-item">
 
 <div class="theme-switch-container dropdown pst-js-only" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Color mode">
-  <button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button dropdown-toggle" aria-label="Color mode" data-bs-toggle="dropdown">
-    <i class="theme-switch fa-solid fa-sun fa-lg fa-fw" data-mode="light" title="Light"></i>
-    <i class="theme-switch fa-solid fa-moon fa-lg fa-fw" data-mode="dark" title="Dark"></i>
-    <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg fa-fw" data-mode="auto" title="System Settings"></i>
+  <button type="button" class="btn btn-sm nav-link pst-navbar-icon theme-switch-button dropdown-toggle" aria-label="Color mode" data-bs-toggle="dropdown">
+    <i class="theme-switch fa-solid fa-sun fa-lg" data-mode="light" title="Light"></i>
+    <i class="theme-switch fa-solid fa-moon fa-lg" data-mode="dark" title="Dark"></i>
+    <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg" data-mode="auto" title="System Settings"></i>
   </button>
   <ul class="dropdown-menu dropdown-menu-end">
-    <li><button class="dropdown-item d-flex align-items-center theme-change-button" data-mode="auto"><i class="fa-solid fa-circle-half-stroke fa-lg fa-fw me-1"></i>System Settings</button></li>
-    <li><button class="dropdown-item d-flex align-items-center theme-change-button" data-mode="light"><i class="fa-solid fa-sun fa-lg fa-fw me-1"></i>Light</button></li>
-    <li><button class="dropdown-item d-flex align-items-center theme-change-button" data-mode="dark"><i class="fa-solid fa-moon fa-lg fa-fw me-1"></i>Dark</button></li>
+    <li><button type="button" class="dropdown-item d-flex align-items-center theme-change-button" data-mode="auto"><i class="fa-solid fa-circle-half-stroke fa-lg me-1"></i>System Settings</button></li>
+    <li><button type="button" class="dropdown-item d-flex align-items-center theme-change-button" data-mode="light"><i class="fa-solid fa-sun fa-lg me-1"></i>Light</button></li>
+    <li><button type="button" class="dropdown-item d-flex align-items-center theme-change-button" data-mode="dark"><i class="fa-solid fa-moon fa-lg me-1"></i>Dark</button></li>
   </ul>
 </div></div>
       
@@ -246,7 +246,7 @@
   
     <div class="navbar-persistent--mobile">
 
-<button class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+<button type="button" class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
  <i class="fa-solid fa-magnifying-glass"></i>
  <span class="search-button__default-text">Search</span>
  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
@@ -267,7 +267,7 @@
       
         
       
-      <dialog id="pst-primary-sidebar-modal"></dialog>
+      <dialog id="pst-primary-sidebar-modal" tabindex="-1"></dialog>
       <div id="pst-primary-sidebar" class="bd-sidebar-primary bd-sidebar hide-on-wide">
         
 
@@ -337,15 +337,15 @@
           <div class="navbar-item">
 
 <div class="theme-switch-container dropdown pst-js-only" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Color mode">
-  <button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button dropdown-toggle" aria-label="Color mode" data-bs-toggle="dropdown">
-    <i class="theme-switch fa-solid fa-sun fa-lg fa-fw" data-mode="light" title="Light"></i>
-    <i class="theme-switch fa-solid fa-moon fa-lg fa-fw" data-mode="dark" title="Dark"></i>
-    <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg fa-fw" data-mode="auto" title="System Settings"></i>
+  <button type="button" class="btn btn-sm nav-link pst-navbar-icon theme-switch-button dropdown-toggle" aria-label="Color mode" data-bs-toggle="dropdown">
+    <i class="theme-switch fa-solid fa-sun fa-lg" data-mode="light" title="Light"></i>
+    <i class="theme-switch fa-solid fa-moon fa-lg" data-mode="dark" title="Dark"></i>
+    <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg" data-mode="auto" title="System Settings"></i>
   </button>
   <ul class="dropdown-menu dropdown-menu-end">
-    <li><button class="dropdown-item d-flex align-items-center theme-change-button" data-mode="auto"><i class="fa-solid fa-circle-half-stroke fa-lg fa-fw me-1"></i>System Settings</button></li>
-    <li><button class="dropdown-item d-flex align-items-center theme-change-button" data-mode="light"><i class="fa-solid fa-sun fa-lg fa-fw me-1"></i>Light</button></li>
-    <li><button class="dropdown-item d-flex align-items-center theme-change-button" data-mode="dark"><i class="fa-solid fa-moon fa-lg fa-fw me-1"></i>Dark</button></li>
+    <li><button type="button" class="dropdown-item d-flex align-items-center theme-change-button" data-mode="auto"><i class="fa-solid fa-circle-half-stroke fa-lg me-1"></i>System Settings</button></li>
+    <li><button type="button" class="dropdown-item d-flex align-items-center theme-change-button" data-mode="light"><i class="fa-solid fa-sun fa-lg me-1"></i>Light</button></li>
+    <li><button type="button" class="dropdown-item d-flex align-items-center theme-change-button" data-mode="dark"><i class="fa-solid fa-moon fa-lg me-1"></i>Dark</button></li>
   </ul>
 </div></div>
         
@@ -411,7 +411,7 @@
     
     <li class="breadcrumb-item breadcrumb-home">
       <a href="../../../index.html" class="nav-link" aria-label="Home">
-        <i class="fa-solid fa-home"></i>
+        <i class="fa-solid fa-house"></i>
       </a>
     </li>
     
@@ -435,11 +435,16 @@
                 <article class="bd-article">
                   
   <h1>Source code for imod.msw.scaling_factors</h1><div class="highlight"><pre>
-<span></span><span class="kn">from</span><span class="w"> </span><span class="nn">imod.common.interfaces.iregridpackage</span><span class="w"> </span><span class="kn">import</span> <span class="n">IRegridPackage</span>
+<span></span><span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Self</span>
+
+<span class="kn">import</span><span class="w"> </span><span class="nn">xarray</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">xr</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">imod.common.constants</span><span class="w"> </span><span class="kn">import</span> <span class="n">MaskValues</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">imod.common.interfaces.iregridpackage</span><span class="w"> </span><span class="kn">import</span> <span class="n">IRegridPackage</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">imod.msw.fixed_format</span><span class="w"> </span><span class="kn">import</span> <span class="n">VariableMetaData</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">imod.msw.pkgbase</span><span class="w"> </span><span class="kn">import</span> <span class="n">MetaSwapPackage</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">imod.msw.regrid.regrid_schemes</span><span class="w"> </span><span class="kn">import</span> <span class="n">ScalingRegridMethod</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">imod.msw.utilities.common</span><span class="w"> </span><span class="kn">import</span> <span class="n">concat_imod5</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">imod.msw.utilities.common</span><span class="w"> </span><span class="kn">import</span> <span class="n">concat_imod5</span><span class="p">,</span> <span class="n">is_scalar_and_equal</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">imod.typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Imod5DataDict</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">imod.typing.grid</span><span class="w"> </span><span class="kn">import</span> <span class="n">ones_like</span>
 
@@ -447,7 +452,7 @@
 <div class="viewcode-block" id="ScalingFactors">
 <a class="viewcode-back" href="../../../api/generated/msw/imod.msw.ScalingFactors.html#imod.msw.ScalingFactors">[docs]</a>
 <span class="k">class</span><span class="w"> </span><span class="nc">ScalingFactors</span><span class="p">(</span><span class="n">MetaSwapPackage</span><span class="p">,</span> <span class="n">IRegridPackage</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">"""</span>
 <span class="sd">    This package allows you to do three things:</span>
 <span class="sd">        1. Set scaling factors for some inputs in the soil physical database,</span>
 <span class="sd">           namely the soil moisture content and the saturated hydraulic</span>
@@ -475,7 +480,7 @@
 <span class="sd">        Scaling factor which adjusts the pressure head applied to the pressure</span>
 <span class="sd">        parameters defined in LUSE_SVAT.INP. This array must have a subunit coordinate to describe</span>
 <span class="sd">        different landuses.</span>
-<span class="sd">    depth_perched_water_table: array of floats (xr.DataArray)</span>
+<span class="sd">    depth_perched_water_table: array of floats (xr.DataArray), optional</span>
 <span class="sd">        Sets the depth of the perched watertable base. If the groundwater depth</span>
 <span class="sd">        exeeds this depth, the capillary rise is set to zero. This option has</span>
 <span class="sd">        been included in the model on the request of a specific project (MIPWA),</span>
@@ -483,23 +488,26 @@
 <span class="sd">        presences of loam causing a perched watertable, it is advised to</span>
 <span class="sd">        generate a new soil physical unit. This array must not have a subunit</span>
 <span class="sd">        coordinate.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
 
-    <span class="n">_file_name</span> <span class="o">=</span> <span class="s2">&quot;uscl_svat.inp&quot;</span>
+    <span class="n">_file_name</span> <span class="o">=</span> <span class="s2">"uscl_svat.inp"</span>
     <span class="n">_metadata_dict</span> <span class="o">=</span> <span class="p">{</span>
-        <span class="s2">&quot;svat&quot;</span><span class="p">:</span> <span class="n">VariableMetaData</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">99999999</span><span class="p">,</span> <span class="nb">int</span><span class="p">),</span>
-        <span class="s2">&quot;scale_soil_moisture&quot;</span><span class="p">:</span> <span class="n">VariableMetaData</span><span class="p">(</span><span class="mi">8</span><span class="p">,</span> <span class="mf">0.1</span><span class="p">,</span> <span class="mf">10.0</span><span class="p">,</span> <span class="nb">float</span><span class="p">),</span>
-        <span class="s2">&quot;scale_hydraulic_conductivity&quot;</span><span class="p">:</span> <span class="n">VariableMetaData</span><span class="p">(</span><span class="mi">8</span><span class="p">,</span> <span class="mf">0.1</span><span class="p">,</span> <span class="mf">10.0</span><span class="p">,</span> <span class="nb">float</span><span class="p">),</span>
-        <span class="s2">&quot;scale_pressure_head&quot;</span><span class="p">:</span> <span class="n">VariableMetaData</span><span class="p">(</span><span class="mi">8</span><span class="p">,</span> <span class="mf">0.1</span><span class="p">,</span> <span class="mf">10.0</span><span class="p">,</span> <span class="nb">float</span><span class="p">),</span>
-        <span class="s2">&quot;depth_perched_water_table&quot;</span><span class="p">:</span> <span class="n">VariableMetaData</span><span class="p">(</span><span class="mi">8</span><span class="p">,</span> <span class="mf">0.1</span><span class="p">,</span> <span class="mf">10.0</span><span class="p">,</span> <span class="nb">float</span><span class="p">),</span>
+        <span class="s2">"svat"</span><span class="p">:</span> <span class="n">VariableMetaData</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">99999999</span><span class="p">,</span> <span class="nb">int</span><span class="p">),</span>
+        <span class="s2">"scale_soil_moisture"</span><span class="p">:</span> <span class="n">VariableMetaData</span><span class="p">(</span><span class="mi">8</span><span class="p">,</span> <span class="mf">0.1</span><span class="p">,</span> <span class="mf">10.0</span><span class="p">,</span> <span class="nb">float</span><span class="p">),</span>
+        <span class="s2">"scale_hydraulic_conductivity"</span><span class="p">:</span> <span class="n">VariableMetaData</span><span class="p">(</span><span class="mi">8</span><span class="p">,</span> <span class="mf">0.1</span><span class="p">,</span> <span class="mf">10.0</span><span class="p">,</span> <span class="nb">float</span><span class="p">),</span>
+        <span class="s2">"scale_pressure_head"</span><span class="p">:</span> <span class="n">VariableMetaData</span><span class="p">(</span><span class="mi">8</span><span class="p">,</span> <span class="mf">0.1</span><span class="p">,</span> <span class="mf">10.0</span><span class="p">,</span> <span class="nb">float</span><span class="p">),</span>
+        <span class="s2">"depth_perched_water_table"</span><span class="p">:</span> <span class="n">VariableMetaData</span><span class="p">(</span>
+            <span class="mi">8</span><span class="p">,</span> <span class="mf">0.1</span><span class="p">,</span> <span class="mf">10.0</span><span class="p">,</span> <span class="nb">float</span><span class="p">,</span> <span class="n">optional</span><span class="o">=</span><span class="kc">True</span>
+        <span class="p">),</span>
     <span class="p">}</span>
+    <span class="n">_optional_imod5_variables</span> <span class="o">=</span> <span class="p">[</span><span class="s2">"perched_water_table_level"</span><span class="p">]</span>
 
     <span class="n">_with_subunit</span> <span class="o">=</span> <span class="p">(</span>
-        <span class="s2">&quot;scale_soil_moisture&quot;</span><span class="p">,</span>
-        <span class="s2">&quot;scale_hydraulic_conductivity&quot;</span><span class="p">,</span>
-        <span class="s2">&quot;scale_pressure_head&quot;</span><span class="p">,</span>
+        <span class="s2">"scale_soil_moisture"</span><span class="p">,</span>
+        <span class="s2">"scale_hydraulic_conductivity"</span><span class="p">,</span>
+        <span class="s2">"scale_pressure_head"</span><span class="p">,</span>
     <span class="p">)</span>
-    <span class="n">_without_subunit</span> <span class="o">=</span> <span class="p">(</span><span class="s2">&quot;depth_perched_water_table&quot;</span><span class="p">,)</span>
+    <span class="n">_without_subunit</span> <span class="o">=</span> <span class="p">(</span><span class="s2">"depth_perched_water_table"</span><span class="p">,)</span>
     <span class="n">_to_fill</span> <span class="o">=</span> <span class="p">()</span>
 
     <span class="n">_regrid_method</span> <span class="o">=</span> <span class="n">ScalingRegridMethod</span><span class="p">()</span>
@@ -508,16 +516,16 @@
 <a class="viewcode-back" href="../../../api/generated/msw/imod.msw.ScalingFactors.html#imod.msw.ScalingFactors.__init__">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
-        <span class="n">scale_soil_moisture</span><span class="p">,</span>
-        <span class="n">scale_hydraulic_conductivity</span><span class="p">,</span>
-        <span class="n">scale_pressure_head</span><span class="p">,</span>
-        <span class="n">depth_perched_water_table</span><span class="p">,</span>
-    <span class="p">):</span>
+        <span class="n">scale_soil_moisture</span><span class="p">:</span> <span class="n">xr</span><span class="o">.</span><span class="n">DataArray</span><span class="p">,</span>
+        <span class="n">scale_hydraulic_conductivity</span><span class="p">:</span> <span class="n">xr</span><span class="o">.</span><span class="n">DataArray</span><span class="p">,</span>
+        <span class="n">scale_pressure_head</span><span class="p">:</span> <span class="n">xr</span><span class="o">.</span><span class="n">DataArray</span><span class="p">,</span>
+        <span class="n">depth_perched_water_table</span><span class="p">:</span> <span class="n">xr</span><span class="o">.</span><span class="n">DataArray</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">dataset</span><span class="p">[</span><span class="s2">&quot;scale_soil_moisture&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">scale_soil_moisture</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">dataset</span><span class="p">[</span><span class="s2">&quot;scale_hydraulic_conductivity&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">scale_hydraulic_conductivity</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">dataset</span><span class="p">[</span><span class="s2">&quot;scale_pressure_head&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">scale_pressure_head</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">dataset</span><span class="p">[</span><span class="s2">&quot;depth_perched_water_table&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">depth_perched_water_table</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">dataset</span><span class="p">[</span><span class="s2">"scale_soil_moisture"</span><span class="p">]</span> <span class="o">=</span> <span class="n">scale_soil_moisture</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">dataset</span><span class="p">[</span><span class="s2">"scale_hydraulic_conductivity"</span><span class="p">]</span> <span class="o">=</span> <span class="n">scale_hydraulic_conductivity</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">dataset</span><span class="p">[</span><span class="s2">"scale_pressure_head"</span><span class="p">]</span> <span class="o">=</span> <span class="n">scale_pressure_head</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">dataset</span><span class="p">[</span><span class="s2">"depth_perched_water_table"</span><span class="p">]</span> <span class="o">=</span> <span class="n">depth_perched_water_table</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">_pkgcheck</span><span class="p">()</span></div>
 
@@ -525,8 +533,8 @@
 <div class="viewcode-block" id="ScalingFactors.from_imod5_data">
 <a class="viewcode-back" href="../../../api/generated/msw/imod.msw.ScalingFactors.from_imod5_data.html#imod.msw.ScalingFactors.from_imod5_data">[docs]</a>
     <span class="nd">@classmethod</span>
-    <span class="k">def</span><span class="w"> </span><span class="nf">from_imod5_data</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">imod5_data</span><span class="p">:</span> <span class="n">Imod5DataDict</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="s2">&quot;ScalingFactors&quot;</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">from_imod5_data</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">imod5_data</span><span class="p">:</span> <span class="n">Imod5DataDict</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Self</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">"""</span>
 <span class="sd">        Construct a MetaSWAP Ponding package from iMOD5 data in the CAP</span>
 <span class="sd">        package, loaded with the :func:`imod.formats.prj.open_projectfile_data`</span>
 <span class="sd">        function.</span>
@@ -544,19 +552,23 @@
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
 <span class="sd">        imod.msw.ScalingFactors</span>
-<span class="sd">        &quot;&quot;&quot;</span>
-        <span class="n">cap_data</span> <span class="o">=</span> <span class="n">imod5_data</span><span class="p">[</span><span class="s2">&quot;cap&quot;</span><span class="p">]</span>
-        <span class="n">grid_ones</span> <span class="o">=</span> <span class="n">ones_like</span><span class="p">(</span><span class="n">cap_data</span><span class="p">[</span><span class="s2">&quot;boundary&quot;</span><span class="p">])</span>
+<span class="sd">        """</span>
+        <span class="n">cap_data</span> <span class="o">=</span> <span class="n">imod5_data</span><span class="p">[</span><span class="s2">"cap"</span><span class="p">]</span>
+        <span class="n">grid_ones</span> <span class="o">=</span> <span class="n">ones_like</span><span class="p">(</span><span class="n">cap_data</span><span class="p">[</span><span class="s2">"boundary"</span><span class="p">])</span>
 
         <span class="n">data</span> <span class="o">=</span> <span class="p">{}</span>
-        <span class="n">data</span><span class="p">[</span><span class="s2">&quot;scale_soil_moisture&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">concat_imod5</span><span class="p">(</span>
-            <span class="n">cap_data</span><span class="p">[</span><span class="s2">&quot;soil_moisture_fraction&quot;</span><span class="p">],</span> <span class="n">grid_ones</span>
+        <span class="n">data</span><span class="p">[</span><span class="s2">"scale_soil_moisture"</span><span class="p">]</span> <span class="o">=</span> <span class="n">concat_imod5</span><span class="p">(</span>
+            <span class="n">cap_data</span><span class="p">[</span><span class="s2">"soil_moisture_fraction"</span><span class="p">],</span> <span class="n">grid_ones</span>
         <span class="p">)</span>
-        <span class="n">data</span><span class="p">[</span><span class="s2">&quot;scale_hydraulic_conductivity&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">concat_imod5</span><span class="p">(</span>
-            <span class="n">cap_data</span><span class="p">[</span><span class="s2">&quot;conductivity_factor&quot;</span><span class="p">],</span> <span class="n">grid_ones</span>
+        <span class="n">data</span><span class="p">[</span><span class="s2">"scale_hydraulic_conductivity"</span><span class="p">]</span> <span class="o">=</span> <span class="n">concat_imod5</span><span class="p">(</span>
+            <span class="n">cap_data</span><span class="p">[</span><span class="s2">"conductivity_factor"</span><span class="p">],</span> <span class="n">grid_ones</span>
         <span class="p">)</span>
-        <span class="n">data</span><span class="p">[</span><span class="s2">&quot;scale_pressure_head&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">concat_imod5</span><span class="p">(</span><span class="n">grid_ones</span><span class="p">,</span> <span class="n">grid_ones</span><span class="p">)</span>
-        <span class="n">data</span><span class="p">[</span><span class="s2">&quot;depth_perched_water_table&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">cap_data</span><span class="p">[</span><span class="s2">&quot;perched_water_table_level&quot;</span><span class="p">]</span>
+        <span class="n">data</span><span class="p">[</span><span class="s2">"scale_pressure_head"</span><span class="p">]</span> <span class="o">=</span> <span class="n">concat_imod5</span><span class="p">(</span><span class="n">grid_ones</span><span class="p">,</span> <span class="n">grid_ones</span><span class="p">)</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">is_scalar_and_equal</span><span class="p">(</span>
+            <span class="n">cap_data</span><span class="p">[</span><span class="s2">"perched_water_table_level"</span><span class="p">],</span>
+            <span class="n">MaskValues</span><span class="o">.</span><span class="n">msw_default</span><span class="p">,</span>
+        <span class="p">):</span>
+            <span class="n">data</span><span class="p">[</span><span class="s2">"depth_perched_water_table"</span><span class="p">]</span> <span class="o">=</span> <span class="n">cap_data</span><span class="p">[</span><span class="s2">"perched_water_table_level"</span><span class="p">]</span>
 
         <span class="k">return</span> <span class="bp">cls</span><span class="p">(</span><span class="o">**</span><span class="n">data</span><span class="p">)</span></div>
 </div>
@@ -590,8 +602,8 @@
   </div>
   
   <!-- Scripts loaded after <body> so the DOM is not blocked -->
-  <script defer src="../../../_static/scripts/bootstrap.js?digest=90905a2f556bf617f1a9"></script>
-<script defer src="../../../_static/scripts/pydata-sphinx-theme.js?digest=90905a2f556bf617f1a9"></script>
+  <script defer src="../../../_static/scripts/bootstrap.js?digest=75c7c72ae941e8b558d8"></script>
+<script defer src="../../../_static/scripts/pydata-sphinx-theme.js?digest=75c7c72ae941e8b558d8"></script>
 
   <footer class="bd-footer">
 <div class="bd-footer__inner bd-page-width">
@@ -611,8 +623,7 @@
         <div class="footer-item">
 
   <p class="sphinx-version">
-    Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 9.1.0.
-    <br/>
+    Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 9.2.0.
   </p>
 </div>
       
@@ -625,7 +636,7 @@
         <div class="footer-item">
 <p class="theme-version">
   <!-- # L10n: Setting the PST URL as an argument as this does not need to be localized -->
-  Built with the <a href="https://pydata-sphinx-theme.readthedocs.io/en/stable/index.html">PyData Sphinx Theme</a> 0.20.0.
+  Built with the <a href="https://pydata-sphinx-theme.readthedocs.io/en/stable/index.html">PyData Sphinx Theme</a> 0.24.0.
 </p></div>
       
     </div>

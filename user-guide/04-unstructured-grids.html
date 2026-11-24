@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 
 
@@ -8,7 +7,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>Unstructured Grids &#8212; iMOD Python 1.1.0 documentation</title>
+    <title>Unstructured Grids &#8212; iMOD Python 1.2.0 documentation</title>
   
   
   
@@ -27,22 +26,22 @@
   </noscript>
   
   <!-- Loaded before other Sphinx assets -->
-  <link href="../_static/styles/theme.css?digest=90905a2f556bf617f1a9" rel="stylesheet" />
-<link href="../_static/styles/pydata-sphinx-theme.css?digest=90905a2f556bf617f1a9" rel="stylesheet" />
+  <link href="../_static/styles/theme.css?digest=75c7c72ae941e8b558d8" rel="stylesheet" />
+<link href="../_static/styles/pydata-sphinx-theme.css?digest=75c7c72ae941e8b558d8" rel="stylesheet" />
 
     <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=03e43079" />
-    <link rel="stylesheet" type="text/css" href="../_static/sg_gallery.css?v=fd6457a4" />
+    <link rel="stylesheet" type="text/css" href="../_static/sg_gallery.css?v=c83e6b79" />
     <link rel="stylesheet" type="text/css" href="../_static/sg_gallery-binder.css?v=f4aeca0c" />
     <link rel="stylesheet" type="text/css" href="../_static/sg_gallery-dataframe.css?v=2082cf3c" />
     <link rel="stylesheet" type="text/css" href="../_static/sg_gallery-rendered-html.css?v=1277b6f3" />
   
   <!-- So that users can add custom icons -->
-  <script defer src="../_static/scripts/fontawesome.js?digest=90905a2f556bf617f1a9"></script>
+  <script defer src="../_static/scripts/fontawesome.js?digest=75c7c72ae941e8b558d8"></script>
   <!-- Pre-loaded scripts that we'll load fully later -->
-  <link rel="preload" as="script" href="../_static/scripts/bootstrap.js?digest=90905a2f556bf617f1a9" />
-<link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=90905a2f556bf617f1a9" />
+  <link rel="preload" as="script" href="../_static/scripts/bootstrap.js?digest=75c7c72ae941e8b558d8" />
+<link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=75c7c72ae941e8b558d8" />
 
-    <script src="../_static/documentation_options.js?v=fc837d61"></script>
+    <script src="../_static/documentation_options.js?v=6efca38a"></script>
     <script src="../_static/doctools.js?v=fd6eb6e6"></script>
     <script src="../_static/sphinx_highlight.js?v=6ffebe34"></script>
     <script src="../_static/sg-tags.js?v=d80f6fa4"></script>
@@ -54,8 +53,9 @@
     <link rel="next" title="Lazy evaluation" href="05-lazy-evaluation.html" />
     <link rel="prev" title="Time series data and Pandas" href="03-timeseries-data.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <meta name="color-scheme" content="light dark"/>
   <meta name="docsearch:language" content="en"/>
-  <meta name="docsearch:version" content="1.1.0.dev" />
+  <meta name="docsearch:version" content="1.2.0.dev" />
   
     
     <script src="../_static/searchtools.js"></script>
@@ -103,7 +103,7 @@
   
     <header id="pst-header" class="bd-header navbar navbar-expand-lg bd-navbar d-print-none">
 <div class="bd-header__inner bd-page-width">
-  <button class="pst-navbar-icon sidebar-toggle primary-toggle" aria-label="Site navigation">
+  <button type="button" class="pst-navbar-icon sidebar-toggle primary-toggle" aria-label="Site navigation" aria-expanded="false" aria-controls="pst-primary-sidebar-modal">
     <span class="fa-solid fa-bars"></span>
   </button>
   
@@ -125,8 +125,8 @@
     
     
     
-    <img src="../_static/imod-python-logo-light.svg" class="logo__image only-light" alt="iMOD Python 1.1.0 documentation - Home"/>
-    <img src="../_static/imod-python-logo-dark.svg" class="logo__image only-dark pst-js-only" alt="iMOD Python 1.1.0 documentation - Home"/>
+    <img src="../_static/imod-python-logo-light.svg" class="logo__image only-light" alt="iMOD Python 1.2.0 documentation - Home"/>
+    <img src="../_static/imod-python-logo-dark.svg" class="logo__image only-dark pst-js-only" alt="iMOD Python 1.2.0 documentation - Home"/>
   
   
 </a></div>
@@ -193,7 +193,7 @@
         <div class="navbar-item navbar-persistent--container">
           
 
-<button class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+<button type="button" class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
  <i class="fa-solid fa-magnifying-glass"></i>
  <span class="search-button__default-text">Search</span>
  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
@@ -204,15 +204,15 @@
         <div class="navbar-item">
 
 <div class="theme-switch-container dropdown pst-js-only" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Color mode">
-  <button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button dropdown-toggle" aria-label="Color mode" data-bs-toggle="dropdown">
-    <i class="theme-switch fa-solid fa-sun fa-lg fa-fw" data-mode="light" title="Light"></i>
-    <i class="theme-switch fa-solid fa-moon fa-lg fa-fw" data-mode="dark" title="Dark"></i>
-    <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg fa-fw" data-mode="auto" title="System Settings"></i>
+  <button type="button" class="btn btn-sm nav-link pst-navbar-icon theme-switch-button dropdown-toggle" aria-label="Color mode" data-bs-toggle="dropdown">
+    <i class="theme-switch fa-solid fa-sun fa-lg" data-mode="light" title="Light"></i>
+    <i class="theme-switch fa-solid fa-moon fa-lg" data-mode="dark" title="Dark"></i>
+    <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg" data-mode="auto" title="System Settings"></i>
   </button>
   <ul class="dropdown-menu dropdown-menu-end">
-    <li><button class="dropdown-item d-flex align-items-center theme-change-button" data-mode="auto"><i class="fa-solid fa-circle-half-stroke fa-lg fa-fw me-1"></i>System Settings</button></li>
-    <li><button class="dropdown-item d-flex align-items-center theme-change-button" data-mode="light"><i class="fa-solid fa-sun fa-lg fa-fw me-1"></i>Light</button></li>
-    <li><button class="dropdown-item d-flex align-items-center theme-change-button" data-mode="dark"><i class="fa-solid fa-moon fa-lg fa-fw me-1"></i>Dark</button></li>
+    <li><button type="button" class="dropdown-item d-flex align-items-center theme-change-button" data-mode="auto"><i class="fa-solid fa-circle-half-stroke fa-lg me-1"></i>System Settings</button></li>
+    <li><button type="button" class="dropdown-item d-flex align-items-center theme-change-button" data-mode="light"><i class="fa-solid fa-sun fa-lg me-1"></i>Light</button></li>
+    <li><button type="button" class="dropdown-item d-flex align-items-center theme-change-button" data-mode="dark"><i class="fa-solid fa-moon fa-lg me-1"></i>Dark</button></li>
   </ul>
 </div></div>
       
@@ -249,7 +249,7 @@
   
     <div class="navbar-persistent--mobile">
 
-<button class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+<button type="button" class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
  <i class="fa-solid fa-magnifying-glass"></i>
  <span class="search-button__default-text">Search</span>
  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
@@ -258,7 +258,7 @@
   
 
   
-    <button class="pst-navbar-icon sidebar-toggle secondary-toggle" aria-label="On this page">
+    <button type="button" class="pst-navbar-icon sidebar-toggle secondary-toggle" aria-label="On this page" aria-expanded="false" aria-controls="pst-secondary-sidebar-modal">
       <span class="fa-solid fa-outdent"></span>
     </button>
   
@@ -272,7 +272,7 @@
       
       
       
-      <dialog id="pst-primary-sidebar-modal"></dialog>
+      <dialog id="pst-primary-sidebar-modal" tabindex="-1"></dialog>
       <div id="pst-primary-sidebar" class="bd-sidebar-primary bd-sidebar">
         
 
@@ -342,15 +342,15 @@
           <div class="navbar-item">
 
 <div class="theme-switch-container dropdown pst-js-only" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Color mode">
-  <button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button dropdown-toggle" aria-label="Color mode" data-bs-toggle="dropdown">
-    <i class="theme-switch fa-solid fa-sun fa-lg fa-fw" data-mode="light" title="Light"></i>
-    <i class="theme-switch fa-solid fa-moon fa-lg fa-fw" data-mode="dark" title="Dark"></i>
-    <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg fa-fw" data-mode="auto" title="System Settings"></i>
+  <button type="button" class="btn btn-sm nav-link pst-navbar-icon theme-switch-button dropdown-toggle" aria-label="Color mode" data-bs-toggle="dropdown">
+    <i class="theme-switch fa-solid fa-sun fa-lg" data-mode="light" title="Light"></i>
+    <i class="theme-switch fa-solid fa-moon fa-lg" data-mode="dark" title="Dark"></i>
+    <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg" data-mode="auto" title="System Settings"></i>
   </button>
   <ul class="dropdown-menu dropdown-menu-end">
-    <li><button class="dropdown-item d-flex align-items-center theme-change-button" data-mode="auto"><i class="fa-solid fa-circle-half-stroke fa-lg fa-fw me-1"></i>System Settings</button></li>
-    <li><button class="dropdown-item d-flex align-items-center theme-change-button" data-mode="light"><i class="fa-solid fa-sun fa-lg fa-fw me-1"></i>Light</button></li>
-    <li><button class="dropdown-item d-flex align-items-center theme-change-button" data-mode="dark"><i class="fa-solid fa-moon fa-lg fa-fw me-1"></i>Dark</button></li>
+    <li><button type="button" class="dropdown-item d-flex align-items-center theme-change-button" data-mode="auto"><i class="fa-solid fa-circle-half-stroke fa-lg me-1"></i>System Settings</button></li>
+    <li><button type="button" class="dropdown-item d-flex align-items-center theme-change-button" data-mode="light"><i class="fa-solid fa-sun fa-lg me-1"></i>Light</button></li>
+    <li><button type="button" class="dropdown-item d-flex align-items-center theme-change-button" data-mode="dark"><i class="fa-solid fa-moon fa-lg me-1"></i>Dark</button></li>
   </ul>
 </div></div>
         
@@ -385,7 +385,7 @@
   </div>
   
     <div class="sidebar-primary-items__start sidebar-primary__section">
-        <div class="sidebar-primary-item pst-sidebar-collapse"><button id="pst-collapse-sidebar-button" aria-expanded="true" aria-controls="pst-primary-sidebar">
+        <div class="sidebar-primary-item pst-sidebar-collapse"><button type="button" id="pst-collapse-sidebar-button" aria-expanded="true" aria-controls="pst-primary-sidebar">
   <svg class="pst-icon" role="img" aria-hidden="true" focusable="false" viewBox="0 0 16 16" xmlns="http://www.w3.org/2000/svg">
     <path fill="currentColor" d="M3 15.5C2.36232 15.5 1.74874 15.2564 1.28478 14.8189C0.820828 14.3815 0.541576 13.7832 0.504167 13.1467L0.5 13L0.5 3C0.499965 2.36232 0.743605 1.74874 1.18107 1.28478C1.61854 0.820828 2.21676 0.541576 2.85333 0.504167L3 0.5L13 0.5C13.6377 0.499965 14.2513 0.743605 14.7152 1.18107C15.1792 1.61854 15.4584 2.21676 15.4958 2.85333L15.5 3L15.5 13C15.5 13.6377 15.2564 14.2513 14.8189 14.7152C14.3815 15.1792 13.7832 15.4584 13.1467 15.4958L13 15.5L3 15.5ZM3 13.8333L10.5 13.8333L10.5 2.16667L3 2.16667C2.79589 2.16669 2.59889 2.24163 2.44636 2.37726C2.29383 2.5129 2.19638 2.69979 2.1725 2.9025L2.16667 3L2.16667 13C2.16669 13.2041 2.24163 13.4011 2.37726 13.5536C2.5129 13.7062 2.69979 13.8036 2.9025 13.8275L3 13.8333ZM6.65583 10.325L6.5775 10.2558L4.91083 8.58917C4.76735 8.44567 4.68116 8.25476 4.66843 8.05223C4.65569 7.84971 4.71729 7.6495 4.84167 7.48917L4.91083 7.41083L6.5775 5.74417C6.72747 5.59471 6.9287 5.50794 7.14032 5.50148C7.35194 5.49502 7.55809 5.56935 7.7169 5.70937C7.8757 5.8494 7.97525 6.04463 7.99533 6.25539C8.01541 6.46616 7.95451 6.67667 7.825 6.84417L7.75583 6.9225L6.67917 8L7.75583 9.0775C7.89931 9.22099 7.98551 9.41191 7.99824 9.61443C8.01097 9.81695 7.94938 10.0172 7.825 10.1775L7.75583 10.2558C7.61234 10.3993 7.42142 10.4855 7.2189 10.4982C7.01638 10.511 6.81617 10.4494 6.65583 10.325Z"/>
   </svg>
@@ -402,7 +402,7 @@
 <li class="toctree-l1"><a class="reference internal" href="01-raster-data.html">Raster data and xarray</a></li>
 <li class="toctree-l1"><a class="reference internal" href="02-vector-data.html">Vector data and Geopandas</a></li>
 <li class="toctree-l1"><a class="reference internal" href="03-timeseries-data.html">Time series data and Pandas</a></li>
-<li class="toctree-l1 current active"><a class="current reference internal" href="#">Unstructured Grids</a></li>
+<li class="toctree-l1 current active"><a aria-current="page" class="current reference internal" href="#">Unstructured Grids</a></li>
 <li class="toctree-l1"><a class="reference internal" href="05-lazy-evaluation.html">Lazy evaluation</a></li>
 <li class="toctree-l1"><a class="reference internal" href="06-time-discretization.html">Model time discretization</a></li>
 <li class="toctree-l1"><a class="reference internal" href="07-regridding.html">Regridding</a></li>
@@ -449,7 +449,7 @@
     
     <li class="breadcrumb-item breadcrumb-home">
       <a href="../index.html" class="nav-link" aria-label="Home">
-        <i class="fa-solid fa-home"></i>
+        <i class="fa-solid fa-house"></i>
       </a>
     </li>
     
@@ -490,13 +490,12 @@ these grids. It is built on top of <cite>xarray
 you would handle raster data in xarray, with some differences.</p>
 <p>Let’s first load some sample data from xugrid.data module. The example data
 is a triangular grid of the elevation of the Netherlands.</p>
-<div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">xugrid</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">xu</span>
-
-<span class="n">elevation</span> <span class="o">=</span> <span class="n">xu</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">elevation_nl</span><span class="p">()</span>
-
-<span class="n">elevation</span>
-</pre></div>
-</div>
+<div class="highlight-Python notranslate"><div class="highlight"><pre><span class="kn">import</span><span class="w"> </span><span class="nn">xugrid</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">xu</span><span class="w">
+</span><span class="w">
+</span><span class="n">elevation</span> <span class="o">=</span> <span class="n">xu</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">elevation_nl</span><span class="p">(</span><span class="p">)</span><span class="w">
+</span><span class="w">
+</span><span class="n">elevation</span><span class="w">
+</span></pre></div></div>
 <div class="output_subarea output_html rendered_html output_result">
 <div><svg style="position: absolute; width: 0; height: 0; overflow: hidden">
 <defs>
@@ -1047,7 +1046,7 @@ Coordinates:
     mesh2d_face_x  (mesh2d_nFaces) float64 42kB ...
     mesh2d_face_y  (mesh2d_nFaces) float64 42kB ...
 Attributes:
-    unit:     m NAP</pre><div class='xr-wrap' style='display:none'><div class='xr-header'><div class='xr-obj-type'>xarray.DataArray</div><div class='xr-obj-name'>&#x27;elevation&#x27;</div><ul class='xr-dim-list'><li><span class='xr-has-index'>mesh2d_nFaces</span>: 5248</li></ul></div><ul class='xr-sections'><li class='xr-section-item'><div class='xr-array-wrap'><input id='section-9e760763-f4bf-4917-9e84-12b75925ea1c' class='xr-array-in' type='checkbox' checked><label for='section-9e760763-f4bf-4917-9e84-12b75925ea1c' title='Show/hide data repr'><svg class='icon xr-icon-database'><use xlink:href='#icon-database'></use></svg></label><div class='xr-array-preview xr-preview'><span>...</span></div><div class='xr-array-data'><pre>[5248 values with dtype=float32]</pre></div></div></li><li class='xr-section-item'><input id='section-8276baf7-dc5b-4c40-bb9e-ca48fd883f0c' class='xr-section-summary-in' type='checkbox' checked /><label for='section-8276baf7-dc5b-4c40-bb9e-ca48fd883f0c' class='xr-section-summary' title='Expand/collapse section'>Coordinates: <span>(3)</span></label><div class='xr-section-inline-details'></div><div class='xr-section-details'><ul class='xr-var-list'><li class='xr-var-item'><div class='xr-var-name'><span class='xr-has-index'>mesh2d_nFaces</span></div><div class='xr-var-dims'>(mesh2d_nFaces)</div><div class='xr-var-dtype'>int64</div><div class='xr-var-preview xr-preview'>0 1 2 3 4 ... 5244 5245 5246 5247</div><input id='attrs-dec184f9-cb22-40c8-a411-18d6c10a1247' class='xr-var-attrs-in' type='checkbox' disabled><label for='attrs-dec184f9-cb22-40c8-a411-18d6c10a1247' title='Show/Hide attributes'><svg class='icon xr-icon-file-text2'><use xlink:href='#icon-file-text2'></use></svg></label><input id='data-c199d1c0-ee37-447f-874a-eadb97104890' class='xr-var-data-in' type='checkbox'><label for='data-c199d1c0-ee37-447f-874a-eadb97104890' title='Show/Hide data repr'><svg class='icon xr-icon-database'><use xlink:href='#icon-database'></use></svg></label><div class='xr-var-attrs'><dl class='xr-attrs'></dl></div><div class='xr-var-data'><pre>[5248 values with dtype=int64]</pre></div></li><li class='xr-var-item'><div class='xr-var-name'><span>mesh2d_face_x</span></div><div class='xr-var-dims'>(mesh2d_nFaces)</div><div class='xr-var-dtype'>float64</div><div class='xr-var-preview xr-preview'>...</div><input id='attrs-be712395-a07c-4123-a74e-19a0ca009f36' class='xr-var-attrs-in' type='checkbox' ><label for='attrs-be712395-a07c-4123-a74e-19a0ca009f36' title='Show/Hide attributes'><svg class='icon xr-icon-file-text2'><use xlink:href='#icon-file-text2'></use></svg></label><input id='data-262796a8-34af-4ff7-9308-0c2b4b2e6bec' class='xr-var-data-in' type='checkbox'><label for='data-262796a8-34af-4ff7-9308-0c2b4b2e6bec' title='Show/Hide data repr'><svg class='icon xr-icon-database'><use xlink:href='#icon-database'></use></svg></label><div class='xr-var-attrs'><dl class='xr-attrs'><dt><span>standard_name :</span></dt><dd>projection_x_coordinate</dd></dl></div><div class='xr-var-data'><pre>[5248 values with dtype=float64]</pre></div></li><li class='xr-var-item'><div class='xr-var-name'><span>mesh2d_face_y</span></div><div class='xr-var-dims'>(mesh2d_nFaces)</div><div class='xr-var-dtype'>float64</div><div class='xr-var-preview xr-preview'>...</div><input id='attrs-d8b0258a-46ae-4fd3-becb-bcd8bffbc691' class='xr-var-attrs-in' type='checkbox' ><label for='attrs-d8b0258a-46ae-4fd3-becb-bcd8bffbc691' title='Show/Hide attributes'><svg class='icon xr-icon-file-text2'><use xlink:href='#icon-file-text2'></use></svg></label><input id='data-3445370b-8a27-4089-b082-448bc498a56a' class='xr-var-data-in' type='checkbox'><label for='data-3445370b-8a27-4089-b082-448bc498a56a' title='Show/Hide data repr'><svg class='icon xr-icon-database'><use xlink:href='#icon-database'></use></svg></label><div class='xr-var-attrs'><dl class='xr-attrs'><dt><span>standard_name :</span></dt><dd>projection_y_coordinate</dd></dl></div><div class='xr-var-data'><pre>[5248 values with dtype=float64]</pre></div></li></ul></div></li><li class='xr-section-item'><input id='section-72d83ab8-2ae6-4b51-a671-8ee3e9157f5a' class='xr-section-summary-in' type='checkbox' checked /><label for='section-72d83ab8-2ae6-4b51-a671-8ee3e9157f5a' class='xr-section-summary' title='Expand/collapse section'>Attributes: <span>(1)</span></label><div class='xr-section-inline-details'></div><div class='xr-section-details'><dl class='xr-attrs'><dt><span>unit :</span></dt><dd>m NAP</dd></dl></div></li></ul></div></div>
+    unit:     m NAP</pre><div class='xr-wrap' style='display:none'><div class='xr-header'><div class='xr-obj-type'>xarray.DataArray</div><div class='xr-obj-name'>&#x27;elevation&#x27;</div><ul class='xr-dim-list'><li><span class='xr-has-index'>mesh2d_nFaces</span>: 5248</li></ul></div><ul class='xr-sections'><li class='xr-section-item'><div class='xr-array-wrap'><input id='section-4789ecff-9645-4099-830e-04101795d26d' class='xr-array-in' type='checkbox' checked><label for='section-4789ecff-9645-4099-830e-04101795d26d' title='Show/hide data repr'><svg class='icon xr-icon-database'><use xlink:href='#icon-database'></use></svg></label><div class='xr-array-preview xr-preview'><span>...</span></div><div class='xr-array-data'><pre>[5248 values with dtype=float32]</pre></div></div></li><li class='xr-section-item'><input id='section-625fc8be-eae9-42ef-87f2-a5d9a813ea93' class='xr-section-summary-in' type='checkbox' checked /><label for='section-625fc8be-eae9-42ef-87f2-a5d9a813ea93' class='xr-section-summary' title='Expand/collapse section'>Coordinates: <span>(3)</span></label><div class='xr-section-inline-details'></div><div class='xr-section-details'><ul class='xr-var-list'><li class='xr-var-item'><div class='xr-var-name'><span class='xr-has-index'>mesh2d_nFaces</span></div><div class='xr-var-dims'>(mesh2d_nFaces)</div><div class='xr-var-dtype'>int64</div><div class='xr-var-preview xr-preview'>0 1 2 3 4 ... 5244 5245 5246 5247</div><input id='attrs-af92675c-876a-4e70-be79-28e2e48bd060' class='xr-var-attrs-in' type='checkbox' disabled><label for='attrs-af92675c-876a-4e70-be79-28e2e48bd060' title='Show/Hide attributes'><svg class='icon xr-icon-file-text2'><use xlink:href='#icon-file-text2'></use></svg></label><input id='data-baa30c03-31ea-4156-acf8-8ad27b608b7b' class='xr-var-data-in' type='checkbox'><label for='data-baa30c03-31ea-4156-acf8-8ad27b608b7b' title='Show/Hide data repr'><svg class='icon xr-icon-database'><use xlink:href='#icon-database'></use></svg></label><div class='xr-var-attrs'><dl class='xr-attrs'></dl></div><div class='xr-var-data'><pre>[5248 values with dtype=int64]</pre></div></li><li class='xr-var-item'><div class='xr-var-name'><span>mesh2d_face_x</span></div><div class='xr-var-dims'>(mesh2d_nFaces)</div><div class='xr-var-dtype'>float64</div><div class='xr-var-preview xr-preview'>...</div><input id='attrs-dc69c6c7-c7ce-4f33-bc52-547a9d1a30b4' class='xr-var-attrs-in' type='checkbox' ><label for='attrs-dc69c6c7-c7ce-4f33-bc52-547a9d1a30b4' title='Show/Hide attributes'><svg class='icon xr-icon-file-text2'><use xlink:href='#icon-file-text2'></use></svg></label><input id='data-46e49a8a-6bc8-4e3c-9ca3-09e59a884610' class='xr-var-data-in' type='checkbox'><label for='data-46e49a8a-6bc8-4e3c-9ca3-09e59a884610' title='Show/Hide data repr'><svg class='icon xr-icon-database'><use xlink:href='#icon-database'></use></svg></label><div class='xr-var-attrs'><dl class='xr-attrs'><dt><span>standard_name :</span></dt><dd>projection_x_coordinate</dd></dl></div><div class='xr-var-data'><pre>[5248 values with dtype=float64]</pre></div></li><li class='xr-var-item'><div class='xr-var-name'><span>mesh2d_face_y</span></div><div class='xr-var-dims'>(mesh2d_nFaces)</div><div class='xr-var-dtype'>float64</div><div class='xr-var-preview xr-preview'>...</div><input id='attrs-20afbdf1-7fa0-4580-ac3c-f992915f8ce6' class='xr-var-attrs-in' type='checkbox' ><label for='attrs-20afbdf1-7fa0-4580-ac3c-f992915f8ce6' title='Show/Hide attributes'><svg class='icon xr-icon-file-text2'><use xlink:href='#icon-file-text2'></use></svg></label><input id='data-08cbf500-db65-4f90-9a98-aeeac8a0e329' class='xr-var-data-in' type='checkbox'><label for='data-08cbf500-db65-4f90-9a98-aeeac8a0e329' title='Show/Hide data repr'><svg class='icon xr-icon-database'><use xlink:href='#icon-database'></use></svg></label><div class='xr-var-attrs'><dl class='xr-attrs'><dt><span>standard_name :</span></dt><dd>projection_y_coordinate</dd></dl></div><div class='xr-var-data'><pre>[5248 values with dtype=float64]</pre></div></li></ul></div></li><li class='xr-section-item'><input id='section-b2a4c704-ecd3-40c2-93b2-f3127d3cdc40' class='xr-section-summary-in' type='checkbox' checked /><label for='section-b2a4c704-ecd3-40c2-93b2-f3127d3cdc40' class='xr-section-summary' title='Expand/collapse section'>Attributes: <span>(1)</span></label><div class='xr-section-inline-details'></div><div class='xr-section-details'><dl class='xr-attrs'><dt><span>unit :</span></dt><dd>m NAP</dd></dl></div></li></ul></div></div>
 </div>
 <br />
 <br /><p>Note that this data is stored differently than a raster dataset. We don’t see
@@ -1055,10 +1054,9 @@ an x- and a y-dimension here. So where is this spatial information?
 It’s in this <code class="docutils literal notranslate"><span class="pre">grid</span></code> attribute, which is accesses via the <code class="docutils literal notranslate"><span class="pre">ugrid</span></code> accessor.
 This is a special accessor that provides access to the unstructured grid
 properties of the dataset.</p>
-<div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="n">grid</span> <span class="o">=</span> <span class="n">elevation</span><span class="o">.</span><span class="n">ugrid</span><span class="o">.</span><span class="n">grid</span>
-<span class="n">grid</span>
-</pre></div>
-</div>
+<div class="highlight-Python notranslate"><div class="highlight"><pre><span class="n">grid</span> <span class="o">=</span> <span class="n">elevation</span><span class="o">.</span><span class="n">ugrid</span><span class="o">.</span><span class="n">grid</span><span class="w">
+</span><span class="n">grid</span><span class="w">
+</span></pre></div></div>
 <div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>&lt;xarray.Dataset&gt; Size: 255kB
 Dimensions:            (mesh2d_nFaces: 5248, nmax_face: 3, mesh2d_nNodes: 2790)
 Coordinates:
@@ -1081,9 +1079,8 @@ cells are connected to each other. This is different from structured grids,
 where you don’t need to specify this as there connectivity follows from the
 rows and columns. Let’s take a look at the connectivity of this unstructured
 grid:</p>
-<div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="n">grid</span><span class="o">.</span><span class="n">format_connectivity_as_dense</span><span class="p">(</span><span class="n">grid</span><span class="o">.</span><span class="n">face_face_connectivity</span><span class="p">)</span>
-</pre></div>
-</div>
+<div class="highlight-Python notranslate"><div class="highlight"><pre><span class="n">grid</span><span class="o">.</span><span class="n">format_connectivity_as_dense</span><span class="p">(</span><span class="n">grid</span><span class="o">.</span><span class="n">face_face_connectivity</span><span class="p">)</span><span class="w">
+</span></pre></div></div>
 <div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>array([[  89,   -1,   -1],
        [ 244,  362,  367],
        [  15,  279,  335],
@@ -1102,17 +1099,15 @@ cell is only connected to one cell.</p>
 need to provide quite some information to the plotting function. Fortunately,
 the xugrid package provides a convenient way to plot unstructured grids. Let’s
 plot the grid:</p>
-<div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="n">grid</span><span class="o">.</span><span class="n">plot</span><span class="p">()</span>
-</pre></div>
-</div>
-<img src="../_images/sphx_glr_04-unstructured-grids_001.png" srcset="../_images/sphx_glr_04-unstructured-grids_001.png" alt="04 unstructured grids" class = "sphx-glr-single-img"/><div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>&lt;matplotlib.collections.LineCollection object at 0x0000014665444A50&gt;
+<div class="highlight-Python notranslate"><div class="highlight"><pre><span class="n">grid</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="p">)</span><span class="w">
+</span></pre></div></div>
+<img src="../_images/sphx_glr_04-unstructured-grids_001.png" srcset="../_images/sphx_glr_04-unstructured-grids_001.png" alt="04 unstructured grids" class = "sphx-glr-single-img"/><div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>&lt;matplotlib.collections.LineCollection object at 0x000001F569BC91D0&gt;
 </pre></div>
 </div>
 <p>We can plot the grid with the data values as well:</p>
-<div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="n">elevation</span><span class="o">.</span><span class="n">ugrid</span><span class="o">.</span><span class="n">plot</span><span class="p">()</span>
-</pre></div>
-</div>
-<img src="../_images/sphx_glr_04-unstructured-grids_002.png" srcset="../_images/sphx_glr_04-unstructured-grids_002.png" alt="04 unstructured grids" class = "sphx-glr-single-img"/><div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>&lt;matplotlib.collections.PolyCollection object at 0x00000146617D5E80&gt;
+<div class="highlight-Python notranslate"><div class="highlight"><pre><span class="n">elevation</span><span class="o">.</span><span class="n">ugrid</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="p">)</span><span class="w">
+</span></pre></div></div>
+<img src="../_images/sphx_glr_04-unstructured-grids_002.png" srcset="../_images/sphx_glr_04-unstructured-grids_002.png" alt="04 unstructured grids" class = "sphx-glr-single-img"/><div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>&lt;matplotlib.collections.PolyCollection object at 0x000001F5684481A0&gt;
 </pre></div>
 </div>
 <p>Note that we need to call the <code class="docutils literal notranslate"><span class="pre">ugrid</span></code> accessor to plot the data. This is
@@ -1121,10 +1116,9 @@ to tell python that xugrid needs to be used for plotting, and not the regular
 xarray plotting methods.</p>
 <p>We can make calculations just like we would do with raster data. For example,
 we can calculate the mean elevation of the Netherlands:</p>
-<div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="n">mean_elevation</span> <span class="o">=</span> <span class="n">elevation</span><span class="o">.</span><span class="n">mean</span><span class="p">()</span>
-<span class="n">mean_elevation</span>
-</pre></div>
-</div>
+<div class="highlight-Python notranslate"><div class="highlight"><pre><span class="n">mean_elevation</span> <span class="o">=</span> <span class="n">elevation</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="p">)</span><span class="w">
+</span><span class="n">mean_elevation</span><span class="w">
+</span></pre></div></div>
 <div class="output_subarea output_html rendered_html output_result">
 <div><svg style="position: absolute; width: 0; height: 0; overflow: hidden">
 <defs>
@@ -1668,53 +1662,48 @@ dl.xr-attrs {
   filter: drop-shadow(1px 1px 5px var(--xr-font-color2));
   stroke-width: 0.8px;
 }
-</style><pre class='xr-text-repr-fallback'>&lt;xarray.DataArray &#x27;elevation&#x27; ()&gt; Size: 8B
-array(7.61234045)
+</style><pre class='xr-text-repr-fallback'>&lt;xarray.DataArray &#x27;elevation&#x27; ()&gt; Size: 4B
+array(7.612356, dtype=float32)
 Attributes:
-    unit:     m NAP</pre><div class='xr-wrap' style='display:none'><div class='xr-header'><div class='xr-obj-type'>xarray.DataArray</div><div class='xr-obj-name'>&#x27;elevation&#x27;</div></div><ul class='xr-sections'><li class='xr-section-item'><div class='xr-array-wrap'><input id='section-5800bd85-8309-41ec-ab6f-881ba6ce4e8b' class='xr-array-in' type='checkbox' checked><label for='section-5800bd85-8309-41ec-ab6f-881ba6ce4e8b' title='Show/hide data repr'><svg class='icon xr-icon-database'><use xlink:href='#icon-database'></use></svg></label><div class='xr-array-preview xr-preview'><span>7.612</span></div><div class='xr-array-data'><pre>array(7.61234045)</pre></div></div></li><li class='xr-section-item'><input id='section-895c9732-4b86-47e5-b3c1-5277a77341dd' class='xr-section-summary-in' type='checkbox' checked /><label for='section-895c9732-4b86-47e5-b3c1-5277a77341dd' class='xr-section-summary' title='Expand/collapse section'>Attributes: <span>(1)</span></label><div class='xr-section-inline-details'></div><div class='xr-section-details'><dl class='xr-attrs'><dt><span>unit :</span></dt><dd>m NAP</dd></dl></div></li></ul></div></div>
+    unit:     m NAP</pre><div class='xr-wrap' style='display:none'><div class='xr-header'><div class='xr-obj-type'>xarray.DataArray</div><div class='xr-obj-name'>&#x27;elevation&#x27;</div></div><ul class='xr-sections'><li class='xr-section-item'><div class='xr-array-wrap'><input id='section-4c40ba02-45d8-4d3e-a934-18edf918b43f' class='xr-array-in' type='checkbox' checked><label for='section-4c40ba02-45d8-4d3e-a934-18edf918b43f' title='Show/hide data repr'><svg class='icon xr-icon-database'><use xlink:href='#icon-database'></use></svg></label><div class='xr-array-preview xr-preview'><span>7.612</span></div><div class='xr-array-data'><pre>array(7.612356, dtype=float32)</pre></div></div></li><li class='xr-section-item'><input id='section-fe488764-3b33-45a9-9106-2da6be542e48' class='xr-section-summary-in' type='checkbox' checked /><label for='section-fe488764-3b33-45a9-9106-2da6be542e48' class='xr-section-summary' title='Expand/collapse section'>Attributes: <span>(1)</span></label><div class='xr-section-inline-details'></div><div class='xr-section-details'><dl class='xr-attrs'><dt><span>unit :</span></dt><dd>m NAP</dd></dl></div></li></ul></div></div>
 </div>
 <br />
 <br /><p>Or if we want to compute a grid of the elevation 100 meters below the surface:</p>
-<div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="n">elevation_100m_below</span> <span class="o">=</span> <span class="n">elevation</span> <span class="o">-</span> <span class="mi">100</span>
-<span class="n">elevation_100m_below</span><span class="o">.</span><span class="n">ugrid</span><span class="o">.</span><span class="n">plot</span><span class="p">()</span>
-</pre></div>
-</div>
-<img src="../_images/sphx_glr_04-unstructured-grids_003.png" srcset="../_images/sphx_glr_04-unstructured-grids_003.png" alt="04 unstructured grids" class = "sphx-glr-single-img"/><div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>&lt;matplotlib.collections.PolyCollection object at 0x000001466996D590&gt;
+<div class="highlight-Python notranslate"><div class="highlight"><pre><span class="n">elevation_100m_below</span> <span class="o">=</span> <span class="n">elevation</span> <span class="o">-</span> <span class="mi">100</span><span class="w">
+</span><span class="n">elevation_100m_below</span><span class="o">.</span><span class="n">ugrid</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="p">)</span><span class="w">
+</span></pre></div></div>
+<img src="../_images/sphx_glr_04-unstructured-grids_003.png" srcset="../_images/sphx_glr_04-unstructured-grids_003.png" alt="04 unstructured grids" class = "sphx-glr-single-img"/><div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>&lt;matplotlib.collections.PolyCollection object at 0x000001F567FCF9D0&gt;
 </pre></div>
 </div>
 <p>We can use this data to be the bottom elevation of a MODFLOW 6 layered
 unstructured discretization (DISV). For that we need to assign a layer
 coordinate as iMOD Python requires a layer dimension to be present on the
 bottom and idomain variables.</p>
-<div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="n">bottom</span> <span class="o">=</span> <span class="n">elevation_100m_below</span><span class="o">.</span><span class="n">expand_dims</span><span class="p">(</span><span class="s2">&quot;layer&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">assign_coords</span><span class="p">(</span><span class="n">layer</span><span class="o">=</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
-</pre></div>
-</div>
+<div class="highlight-Python notranslate"><div class="highlight"><pre><span class="n">bottom</span> <span class="o">=</span> <span class="n">elevation_100m_below</span><span class="o">.</span><span class="n">expand_dims</span><span class="p">(</span><span class="s2">&quot;</span><span class="s2">layer</span><span class="s2">&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">assign_coords</span><span class="p">(</span><span class="n">layer</span><span class="o">=</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="p">)</span><span class="w">
+</span></pre></div></div>
 <p>Finally we need to create an idomain variable that indicates which cells are
 active. For this example we will assume all cells are active, so we can just
 create an idomain variable with all ones. We can do this with the <cite>xu.ones_like</cite>
 function.</p>
-<div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="n">idomain</span> <span class="o">=</span> <span class="n">xu</span><span class="o">.</span><span class="n">ones_like</span><span class="p">(</span><span class="n">bottom</span><span class="p">)</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">int</span><span class="p">)</span>
-</pre></div>
-</div>
+<div class="highlight-Python notranslate"><div class="highlight"><pre><span class="n">idomain</span> <span class="o">=</span> <span class="n">xu</span><span class="o">.</span><span class="n">ones_like</span><span class="p">(</span><span class="n">bottom</span><span class="p">)</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">int</span><span class="p">)</span><span class="w">
+</span></pre></div></div>
 <p>Now we can create a MODFLOW 6 unstructured discretization (DISV) object using
 the <a class="reference internal" href="../api/generated/mf6/imod.mf6.VerticesDiscretization.html#imod.mf6.VerticesDiscretization" title="imod.mf6.VerticesDiscretization"><code class="xref py py-class docutils literal notranslate"><span class="pre">imod.mf6.VerticesDiscretization</span></code></a> class. We will create a
 discretization with one model layer.</p>
-<div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">imod.mf6</span><span class="w"> </span><span class="kn">import</span> <span class="n">VerticesDiscretization</span>
-
-<span class="n">disv</span> <span class="o">=</span> <span class="n">VerticesDiscretization</span><span class="p">(</span><span class="n">top</span><span class="o">=</span><span class="n">elevation</span><span class="p">,</span> <span class="n">bottom</span><span class="o">=</span><span class="n">bottom</span><span class="p">,</span> <span class="n">idomain</span><span class="o">=</span><span class="n">idomain</span><span class="p">)</span>
-</pre></div>
-</div>
+<div class="highlight-Python notranslate"><div class="highlight"><pre><span class="kn">from</span><span class="w"> </span><span class="nn">imod</span><span class="nn">.</span><span class="nn">mf6</span><span class="w"> </span><span class="kn">import</span> <a class="sphx-glr-backref-module-imod-mf6 sphx-glr-backref-type-py-class reference internal" href="../api/generated/mf6/imod.mf6.VerticesDiscretization.html#imod.mf6.VerticesDiscretization" title="imod.mf6.VerticesDiscretization"><span class="n">VerticesDiscretization</span></a><span class="w">
+</span><span class="w">
+</span><a class="sphx-glr-backref-module-imod-mf6 sphx-glr-backref-type-py-class sphx-glr-backref-instance reference internal" href="../api/generated/mf6/imod.mf6.VerticesDiscretization.html#imod.mf6.VerticesDiscretization" title="imod.mf6.VerticesDiscretization"><span class="n">disv</span></a> <span class="o">=</span> <a class="sphx-glr-backref-module-imod-mf6 sphx-glr-backref-type-py-class reference internal" href="../api/generated/mf6/imod.mf6.VerticesDiscretization.html#imod.mf6.VerticesDiscretization" title="imod.mf6.VerticesDiscretization"><span class="n">VerticesDiscretization</span></a><span class="p">(</span><span class="n">top</span><span class="o">=</span><span class="n">elevation</span><span class="p">,</span> <span class="n">bottom</span><span class="o">=</span><span class="n">bottom</span><span class="p">,</span> <span class="n">idomain</span><span class="o">=</span><span class="n">idomain</span><span class="p">)</span><span class="w">
+</span></pre></div></div>
 <p>Note: we just created a model discretization on a triangular grid. This means
 that a line connecting two cell centers is rarely perfectly orthogonal to the
 cell edge. This causes mass balance errors. A voronoi grid would be a better
 choice for a model discretization, as it ensures that the cell centers are
 perfectly orthogonal to the cell edges. Luckily for us, xugrid has
 functionality to tesselate a grid into voronoi cells.</p>
-<div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="n">voronoi_grid</span> <span class="o">=</span> <span class="n">grid</span><span class="o">.</span><span class="n">tesselate_centroidal_voronoi</span><span class="p">()</span>
-<span class="n">voronoi_grid</span><span class="o">.</span><span class="n">plot</span><span class="p">()</span>
-</pre></div>
-</div>
-<img src="../_images/sphx_glr_04-unstructured-grids_004.png" srcset="../_images/sphx_glr_04-unstructured-grids_004.png" alt="04 unstructured grids" class = "sphx-glr-single-img"/><div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>&lt;matplotlib.collections.LineCollection object at 0x000001466D4E5BD0&gt;
+<div class="highlight-Python notranslate"><div class="highlight"><pre><span class="n">voronoi_grid</span> <span class="o">=</span> <span class="n">grid</span><span class="o">.</span><span class="n">tesselate_centroidal_voronoi</span><span class="p">(</span><span class="p">)</span><span class="w">
+</span><span class="n">voronoi_grid</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="p">)</span><span class="w">
+</span></pre></div></div>
+<img src="../_images/sphx_glr_04-unstructured-grids_004.png" srcset="../_images/sphx_glr_04-unstructured-grids_004.png" alt="04 unstructured grids" class = "sphx-glr-single-img"/><div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>&lt;matplotlib.collections.LineCollection object at 0x000001F56EDC4410&gt;
 </pre></div>
 </div>
 <p>We can use this voronoi grid to create a new MODFLOW 6 unstructured
@@ -1722,14 +1711,13 @@ discretization (DISV) object. iMOD Python has regridding functionality to
 regrid the top, bottom and idomain variables to the new grid.</p>
 <p>For that, iMOD Python regridding functionality requires a UgridDataArray
 instead of a Ugrid2d, so we create a UgridDataArray with the voronoi grid.</p>
-<div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">imod.util</span><span class="w"> </span><span class="kn">import</span> <span class="n">RegridderWeightsCache</span><span class="p">,</span> <span class="n">ones_like_ugrid</span>
-
-<span class="n">voronoi_uda</span> <span class="o">=</span> <span class="n">ones_like_ugrid</span><span class="p">(</span><span class="n">voronoi_grid</span><span class="p">)</span>
-
-<span class="n">disv_voronoi</span> <span class="o">=</span> <span class="n">disv</span><span class="o">.</span><span class="n">regrid_like</span><span class="p">(</span><span class="n">voronoi_uda</span><span class="p">,</span> <span class="n">RegridderWeightsCache</span><span class="p">())</span>
-<span class="n">disv_voronoi</span>
-</pre></div>
-</div>
+<div class="highlight-Python notranslate"><div class="highlight"><pre><span class="kn">from</span><span class="w"> </span><span class="nn">imod</span><span class="nn">.</span><span class="nn">util</span><span class="w"> </span><span class="kn">import</span> <a class="sphx-glr-backref-module-imod-util sphx-glr-backref-type-py-class reference internal" href="../api/generated/util/imod.util.RegridderWeightsCache.html#imod.util.RegridderWeightsCache" title="imod.util.RegridderWeightsCache"><span class="n">RegridderWeightsCache</span></a><span class="p">,</span> <a class="sphx-glr-backref-module-imod-util sphx-glr-backref-type-py-function reference internal" href="../api/generated/util/imod.util.ones_like_ugrid.html#imod.util.ones_like_ugrid" title="imod.util.ones_like_ugrid"><span class="n">ones_like_ugrid</span></a><span class="w">
+</span><span class="w">
+</span><span class="n">voronoi_uda</span> <span class="o">=</span> <a class="sphx-glr-backref-module-imod-util sphx-glr-backref-type-py-function reference internal" href="../api/generated/util/imod.util.ones_like_ugrid.html#imod.util.ones_like_ugrid" title="imod.util.ones_like_ugrid"><span class="n">ones_like_ugrid</span></a><span class="p">(</span><span class="n">voronoi_grid</span><span class="p">)</span><span class="w">
+</span><span class="w">
+</span><a class="sphx-glr-backref-module-imod-mf6 sphx-glr-backref-type-py-class sphx-glr-backref-instance reference internal" href="../api/generated/mf6/imod.mf6.VerticesDiscretization.html#imod.mf6.VerticesDiscretization" title="imod.mf6.VerticesDiscretization"><span class="n">disv_voronoi</span></a> <span class="o">=</span> <a class="sphx-glr-backref-module-imod-mf6 sphx-glr-backref-type-py-method reference internal" href="../api/generated/mf6/imod.mf6.VerticesDiscretization.regrid_like.html#imod.mf6.VerticesDiscretization.regrid_like" title="imod.mf6.VerticesDiscretization.regrid_like"><span class="n">disv</span><span class="o">.</span><span class="n">regrid_like</span></a><span class="p">(</span><span class="n">voronoi_uda</span><span class="p">,</span> <a class="sphx-glr-backref-module-imod-util sphx-glr-backref-type-py-class reference internal" href="../api/generated/util/imod.util.RegridderWeightsCache.html#imod.util.RegridderWeightsCache" title="imod.util.RegridderWeightsCache"><span class="n">RegridderWeightsCache</span></a><span class="p">(</span><span class="p">)</span><span class="p">)</span><span class="w">
+</span><a class="sphx-glr-backref-module-imod-mf6 sphx-glr-backref-type-py-class sphx-glr-backref-instance reference internal" href="../api/generated/mf6/imod.mf6.VerticesDiscretization.html#imod.mf6.VerticesDiscretization" title="imod.mf6.VerticesDiscretization"><span class="n">disv_voronoi</span></a><span class="w">
+</span></pre></div></div>
 <div class="output_subarea output_html rendered_html output_result">
 <div>VerticesDiscretization</div><div><svg style="position: absolute; width: 0; height: 0; overflow: hidden">
 <defs>
@@ -2283,19 +2271,18 @@ Data variables:
     top            (mesh2d_nFaces) float32 11kB 21.15 64.51 ... -0.1434 37.68
     bottom         (layer, mesh2d_nFaces) float32 11kB -78.85 -35.49 ... -62.32
 Attributes:
-    unit:     m NAP</pre><div class='xr-wrap' style='display:none'><div class='xr-header'><div class='xr-obj-type'>xarray.Dataset</div></div><ul class='xr-sections'><li class='xr-section-item'><input id='section-c5f58065-a0bd-4a91-b11a-dcb31d1f64d6' class='xr-section-summary-in' type='checkbox' disabled /><label for='section-c5f58065-a0bd-4a91-b11a-dcb31d1f64d6' class='xr-section-summary'>Dimensions:</label><div class='xr-section-inline-details'><ul class='xr-dim-list'><li><span class='xr-has-index'>layer</span>: 1</li><li><span class='xr-has-index'>mesh2d_nFaces</span>: 2790</li></ul></div></li><li class='xr-section-item'><input id='section-7ee8cd44-adc1-4a08-ba9d-f2145fb949ac' class='xr-section-summary-in' type='checkbox' checked /><label for='section-7ee8cd44-adc1-4a08-ba9d-f2145fb949ac' class='xr-section-summary' title='Expand/collapse section'>Coordinates: <span>(2)</span></label><div class='xr-section-inline-details'></div><div class='xr-section-details'><ul class='xr-var-list'><li class='xr-var-item'><div class='xr-var-name'><span class='xr-has-index'>layer</span></div><div class='xr-var-dims'>(layer)</div><div class='xr-var-dtype'>int64</div><div class='xr-var-preview xr-preview'>1</div><input id='attrs-850e1fb9-c637-426d-87c4-fdff0aa95f59' class='xr-var-attrs-in' type='checkbox' disabled><label for='attrs-850e1fb9-c637-426d-87c4-fdff0aa95f59' title='Show/Hide attributes'><svg class='icon xr-icon-file-text2'><use xlink:href='#icon-file-text2'></use></svg></label><input id='data-a6181673-44dd-40b2-97ca-1b4793cc1f3d' class='xr-var-data-in' type='checkbox'><label for='data-a6181673-44dd-40b2-97ca-1b4793cc1f3d' title='Show/Hide data repr'><svg class='icon xr-icon-database'><use xlink:href='#icon-database'></use></svg></label><div class='xr-var-attrs'><dl class='xr-attrs'></dl></div><div class='xr-var-data'><pre>array([1])</pre></div></li><li class='xr-var-item'><div class='xr-var-name'><span class='xr-has-index'>mesh2d_nFaces</span></div><div class='xr-var-dims'>(mesh2d_nFaces)</div><div class='xr-var-dtype'>int64</div><div class='xr-var-preview xr-preview'>0 1 2 3 4 ... 2786 2787 2788 2789</div><input id='attrs-cf373488-0047-4414-81fd-61d6dcc98a6e' class='xr-var-attrs-in' type='checkbox' disabled><label for='attrs-cf373488-0047-4414-81fd-61d6dcc98a6e' title='Show/Hide attributes'><svg class='icon xr-icon-file-text2'><use xlink:href='#icon-file-text2'></use></svg></label><input id='data-7d00788a-aa5b-4efb-ac79-c900eca8db41' class='xr-var-data-in' type='checkbox'><label for='data-7d00788a-aa5b-4efb-ac79-c900eca8db41' title='Show/Hide data repr'><svg class='icon xr-icon-database'><use xlink:href='#icon-database'></use></svg></label><div class='xr-var-attrs'><dl class='xr-attrs'></dl></div><div class='xr-var-data'><pre>[2790 values with dtype=int64]</pre></div></li></ul></div></li><li class='xr-section-item'><input id='section-e1fb78bf-239b-4fc8-93fd-a830ea175ee6' class='xr-section-summary-in' type='checkbox' checked /><label for='section-e1fb78bf-239b-4fc8-93fd-a830ea175ee6' class='xr-section-summary' title='Expand/collapse section'>Data variables: <span>(3)</span></label><div class='xr-section-inline-details'></div><div class='xr-section-details'><ul class='xr-var-list'><li class='xr-var-item'><div class='xr-var-name'><span>idomain</span></div><div class='xr-var-dims'>(layer, mesh2d_nFaces)</div><div class='xr-var-dtype'>int64</div><div class='xr-var-preview xr-preview'>1 1 1 1 1 1 1 1 ... 1 1 1 1 1 1 1 1</div><input id='attrs-5b0cbaa5-0539-45a6-b19d-d70e2440e370' class='xr-var-attrs-in' type='checkbox' ><label for='attrs-5b0cbaa5-0539-45a6-b19d-d70e2440e370' title='Show/Hide attributes'><svg class='icon xr-icon-file-text2'><use xlink:href='#icon-file-text2'></use></svg></label><input id='data-931ab5cb-3eb7-4615-a2e5-e7185af658fd' class='xr-var-data-in' type='checkbox'><label for='data-931ab5cb-3eb7-4615-a2e5-e7185af658fd' title='Show/Hide data repr'><svg class='icon xr-icon-database'><use xlink:href='#icon-database'></use></svg></label><div class='xr-var-attrs'><dl class='xr-attrs'><dt><span>unit :</span></dt><dd>m NAP</dd></dl></div><div class='xr-var-data'><pre>array([[1, 1, 1, ..., 1, 1, 1]], shape=(1, 2790))</pre></div></li><li class='xr-var-item'><div class='xr-var-name'><span>top</span></div><div class='xr-var-dims'>(mesh2d_nFaces)</div><div class='xr-var-dtype'>float32</div><div class='xr-var-preview xr-preview'>21.15 64.51 43.33 ... -0.1434 37.68</div><input id='attrs-3883581e-c85d-43b4-95da-2424ae533143' class='xr-var-attrs-in' type='checkbox' ><label for='attrs-3883581e-c85d-43b4-95da-2424ae533143' title='Show/Hide attributes'><svg class='icon xr-icon-file-text2'><use xlink:href='#icon-file-text2'></use></svg></label><input id='data-cc4ce21f-281e-465b-9935-2304f8ea58b8' class='xr-var-data-in' type='checkbox'><label for='data-cc4ce21f-281e-465b-9935-2304f8ea58b8' title='Show/Hide data repr'><svg class='icon xr-icon-database'><use xlink:href='#icon-database'></use></svg></label><div class='xr-var-attrs'><dl class='xr-attrs'><dt><span>unit :</span></dt><dd>m NAP</dd></dl></div><div class='xr-var-data'><pre>array([21.14808   , 64.50981   , 43.331017  , ...,  4.8425164 ,
-       -0.14340343, 37.675953  ], shape=(2790,), dtype=float32)</pre></div></li><li class='xr-var-item'><div class='xr-var-name'><span>bottom</span></div><div class='xr-var-dims'>(layer, mesh2d_nFaces)</div><div class='xr-var-dtype'>float32</div><div class='xr-var-preview xr-preview'>-78.85 -35.49 ... -100.1 -62.32</div><input id='attrs-8c53c543-b783-44ff-8935-26229576ec97' class='xr-var-attrs-in' type='checkbox' ><label for='attrs-8c53c543-b783-44ff-8935-26229576ec97' title='Show/Hide attributes'><svg class='icon xr-icon-file-text2'><use xlink:href='#icon-file-text2'></use></svg></label><input id='data-1980df23-5131-4895-b5a1-e383cf86fcb2' class='xr-var-data-in' type='checkbox'><label for='data-1980df23-5131-4895-b5a1-e383cf86fcb2' title='Show/Hide data repr'><svg class='icon xr-icon-database'><use xlink:href='#icon-database'></use></svg></label><div class='xr-var-attrs'><dl class='xr-attrs'><dt><span>unit :</span></dt><dd>m NAP</dd></dl></div><div class='xr-var-data'><pre>array([[ -78.85192 ,  -35.49019 ,  -56.668983, ...,  -95.157486,
-        -100.1434  ,  -62.324043]], shape=(1, 2790), dtype=float32)</pre></div></li></ul></div></li><li class='xr-section-item'><input id='section-8ed46381-0af8-4ad3-b713-ad7d321af1cb' class='xr-section-summary-in' type='checkbox' checked /><label for='section-8ed46381-0af8-4ad3-b713-ad7d321af1cb' class='xr-section-summary' title='Expand/collapse section'>Attributes: <span>(1)</span></label><div class='xr-section-inline-details'></div><div class='xr-section-details'><dl class='xr-attrs'><dt><span>unit :</span></dt><dd>m NAP</dd></dl></div></li></ul></div></div>
+    unit:     m NAP</pre><div class='xr-wrap' style='display:none'><div class='xr-header'><div class='xr-obj-type'>xarray.Dataset</div></div><ul class='xr-sections'><li class='xr-section-item'><input id='section-28e92d89-f6af-4dc5-a9c8-884cc0b3e2d3' class='xr-section-summary-in' type='checkbox' disabled /><label for='section-28e92d89-f6af-4dc5-a9c8-884cc0b3e2d3' class='xr-section-summary'>Dimensions:</label><div class='xr-section-inline-details'><ul class='xr-dim-list'><li><span class='xr-has-index'>layer</span>: 1</li><li><span class='xr-has-index'>mesh2d_nFaces</span>: 2790</li></ul></div></li><li class='xr-section-item'><input id='section-8a267503-1ced-4ea6-b527-00007ef6ac52' class='xr-section-summary-in' type='checkbox' checked /><label for='section-8a267503-1ced-4ea6-b527-00007ef6ac52' class='xr-section-summary' title='Expand/collapse section'>Coordinates: <span>(2)</span></label><div class='xr-section-inline-details'></div><div class='xr-section-details'><ul class='xr-var-list'><li class='xr-var-item'><div class='xr-var-name'><span class='xr-has-index'>layer</span></div><div class='xr-var-dims'>(layer)</div><div class='xr-var-dtype'>int64</div><div class='xr-var-preview xr-preview'>1</div><input id='attrs-a5899d25-44ac-4742-b1f3-349d25b93a97' class='xr-var-attrs-in' type='checkbox' disabled><label for='attrs-a5899d25-44ac-4742-b1f3-349d25b93a97' title='Show/Hide attributes'><svg class='icon xr-icon-file-text2'><use xlink:href='#icon-file-text2'></use></svg></label><input id='data-4e72b94d-381b-4ae5-96b4-d1feef4705c1' class='xr-var-data-in' type='checkbox'><label for='data-4e72b94d-381b-4ae5-96b4-d1feef4705c1' title='Show/Hide data repr'><svg class='icon xr-icon-database'><use xlink:href='#icon-database'></use></svg></label><div class='xr-var-attrs'><dl class='xr-attrs'></dl></div><div class='xr-var-data'><pre>array([1])</pre></div></li><li class='xr-var-item'><div class='xr-var-name'><span class='xr-has-index'>mesh2d_nFaces</span></div><div class='xr-var-dims'>(mesh2d_nFaces)</div><div class='xr-var-dtype'>int64</div><div class='xr-var-preview xr-preview'>0 1 2 3 4 ... 2786 2787 2788 2789</div><input id='attrs-52130638-7174-4a72-9450-01eb4833679f' class='xr-var-attrs-in' type='checkbox' disabled><label for='attrs-52130638-7174-4a72-9450-01eb4833679f' title='Show/Hide attributes'><svg class='icon xr-icon-file-text2'><use xlink:href='#icon-file-text2'></use></svg></label><input id='data-0632c69f-75eb-4532-bd68-18cad8f0bfb7' class='xr-var-data-in' type='checkbox'><label for='data-0632c69f-75eb-4532-bd68-18cad8f0bfb7' title='Show/Hide data repr'><svg class='icon xr-icon-database'><use xlink:href='#icon-database'></use></svg></label><div class='xr-var-attrs'><dl class='xr-attrs'></dl></div><div class='xr-var-data'><pre>[2790 values with dtype=int64]</pre></div></li></ul></div></li><li class='xr-section-item'><input id='section-bb5e7eae-b381-4b1e-afec-432965001073' class='xr-section-summary-in' type='checkbox' checked /><label for='section-bb5e7eae-b381-4b1e-afec-432965001073' class='xr-section-summary' title='Expand/collapse section'>Data variables: <span>(3)</span></label><div class='xr-section-inline-details'></div><div class='xr-section-details'><ul class='xr-var-list'><li class='xr-var-item'><div class='xr-var-name'><span>idomain</span></div><div class='xr-var-dims'>(layer, mesh2d_nFaces)</div><div class='xr-var-dtype'>int64</div><div class='xr-var-preview xr-preview'>1 1 1 1 1 1 1 1 ... 1 1 1 1 1 1 1 1</div><input id='attrs-8597974f-53e2-48ca-bac7-90dce8eaebbc' class='xr-var-attrs-in' type='checkbox' ><label for='attrs-8597974f-53e2-48ca-bac7-90dce8eaebbc' title='Show/Hide attributes'><svg class='icon xr-icon-file-text2'><use xlink:href='#icon-file-text2'></use></svg></label><input id='data-97e30984-216b-462d-8254-d410531a1fd8' class='xr-var-data-in' type='checkbox'><label for='data-97e30984-216b-462d-8254-d410531a1fd8' title='Show/Hide data repr'><svg class='icon xr-icon-database'><use xlink:href='#icon-database'></use></svg></label><div class='xr-var-attrs'><dl class='xr-attrs'><dt><span>unit :</span></dt><dd>m NAP</dd></dl></div><div class='xr-var-data'><pre>array([[1, 1, 1, ..., 1, 1, 1]], shape=(1, 2790))</pre></div></li><li class='xr-var-item'><div class='xr-var-name'><span>top</span></div><div class='xr-var-dims'>(mesh2d_nFaces)</div><div class='xr-var-dtype'>float32</div><div class='xr-var-preview xr-preview'>21.15 64.51 43.33 ... -0.1434 37.68</div><input id='attrs-e0ed08bb-3b2b-41b7-b7a2-49b0fbf03e83' class='xr-var-attrs-in' type='checkbox' ><label for='attrs-e0ed08bb-3b2b-41b7-b7a2-49b0fbf03e83' title='Show/Hide attributes'><svg class='icon xr-icon-file-text2'><use xlink:href='#icon-file-text2'></use></svg></label><input id='data-f51b85c7-849e-4512-8468-45801c173e1e' class='xr-var-data-in' type='checkbox'><label for='data-f51b85c7-849e-4512-8468-45801c173e1e' title='Show/Hide data repr'><svg class='icon xr-icon-database'><use xlink:href='#icon-database'></use></svg></label><div class='xr-var-attrs'><dl class='xr-attrs'><dt><span>unit :</span></dt><dd>m NAP</dd></dl></div><div class='xr-var-data'><pre>array([21.14808   , 64.50981   , 43.331017  , ...,  4.8425164 ,
+       -0.14340343, 37.675953  ], shape=(2790,), dtype=float32)</pre></div></li><li class='xr-var-item'><div class='xr-var-name'><span>bottom</span></div><div class='xr-var-dims'>(layer, mesh2d_nFaces)</div><div class='xr-var-dtype'>float32</div><div class='xr-var-preview xr-preview'>-78.85 -35.49 ... -100.1 -62.32</div><input id='attrs-56adf7d2-f67f-4269-9dd7-a0be46debbbe' class='xr-var-attrs-in' type='checkbox' ><label for='attrs-56adf7d2-f67f-4269-9dd7-a0be46debbbe' title='Show/Hide attributes'><svg class='icon xr-icon-file-text2'><use xlink:href='#icon-file-text2'></use></svg></label><input id='data-6bb47dcd-5801-40b9-8563-77867b1da0cf' class='xr-var-data-in' type='checkbox'><label for='data-6bb47dcd-5801-40b9-8563-77867b1da0cf' title='Show/Hide data repr'><svg class='icon xr-icon-database'><use xlink:href='#icon-database'></use></svg></label><div class='xr-var-attrs'><dl class='xr-attrs'><dt><span>unit :</span></dt><dd>m NAP</dd></dl></div><div class='xr-var-data'><pre>array([[ -78.85192 ,  -35.49019 ,  -56.668983, ...,  -95.157486,
+        -100.1434  ,  -62.324043]], shape=(1, 2790), dtype=float32)</pre></div></li></ul></div></li><li class='xr-section-item'><input id='section-5c486522-9cf2-4f21-917e-9f9411e07853' class='xr-section-summary-in' type='checkbox' checked /><label for='section-5c486522-9cf2-4f21-917e-9f9411e07853' class='xr-section-summary' title='Expand/collapse section'>Attributes: <span>(1)</span></label><div class='xr-section-inline-details'></div><div class='xr-section-details'><dl class='xr-attrs'><dt><span>unit :</span></dt><dd>m NAP</dd></dl></div></li></ul></div></div>
 </div>
 <br />
 <br /><p>Other packages like the <a class="reference internal" href="../api/generated/mf6/imod.mf6.Drainage.html#imod.mf6.Drainage" title="imod.mf6.Drainage"><code class="xref py py-class docutils literal notranslate"><span class="pre">imod.mf6.Drainage</span></code></a> package, accept both structured and
 unstructured grids.</p>
 <p>The drain elevation requires a layer dimension. We can use the <cite>idomain</cite>
 to broadcast the data to include the layer dimension.</p>
-<div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="n">drain_elevation</span> <span class="o">=</span> <span class="n">disv_voronoi</span><span class="p">[</span><span class="s2">&quot;idomain&quot;</span><span class="p">]</span> <span class="o">*</span> <span class="n">disv_voronoi</span><span class="p">[</span><span class="s2">&quot;top&quot;</span><span class="p">]</span>
-<span class="n">drain_elevation</span>
-</pre></div>
-</div>
+<div class="highlight-Python notranslate"><div class="highlight"><pre><span class="n">drain_elevation</span> <span class="o">=</span> <a class="sphx-glr-backref-module-imod-mf6 sphx-glr-backref-type-py-class sphx-glr-backref-instance reference internal" href="../api/generated/mf6/imod.mf6.VerticesDiscretization.html#imod.mf6.VerticesDiscretization" title="imod.mf6.VerticesDiscretization"><span class="n">disv_voronoi</span></a><span class="p">[</span><span class="s2">&quot;</span><span class="s2">idomain</span><span class="s2">&quot;</span><span class="p">]</span> <span class="o">*</span> <a class="sphx-glr-backref-module-imod-mf6 sphx-glr-backref-type-py-class sphx-glr-backref-instance reference internal" href="../api/generated/mf6/imod.mf6.VerticesDiscretization.html#imod.mf6.VerticesDiscretization" title="imod.mf6.VerticesDiscretization"><span class="n">disv_voronoi</span></a><span class="p">[</span><span class="s2">&quot;</span><span class="s2">top</span><span class="s2">&quot;</span><span class="p">]</span><span class="w">
+</span><span class="n">drain_elevation</span><span class="w">
+</span></pre></div></div>
 <div class="output_subarea output_html rendered_html output_result">
 <div><svg style="position: absolute; width: 0; height: 0; overflow: hidden">
 <defs>
@@ -2846,28 +2833,26 @@ Coordinates:
   * layer          (layer) int64 8B 1
   * mesh2d_nFaces  (mesh2d_nFaces) int64 22kB 0 1 2 3 4 ... 2786 2787 2788 2789
 Attributes:
-    unit:     m NAP</pre><div class='xr-wrap' style='display:none'><div class='xr-header'><div class='xr-obj-type'>xarray.DataArray</div><div class='xr-obj-name'></div><ul class='xr-dim-list'><li><span class='xr-has-index'>layer</span>: 1</li><li><span class='xr-has-index'>mesh2d_nFaces</span>: 2790</li></ul></div><ul class='xr-sections'><li class='xr-section-item'><div class='xr-array-wrap'><input id='section-55798d05-3749-42f2-a93c-9e5661ea5b4b' class='xr-array-in' type='checkbox' checked><label for='section-55798d05-3749-42f2-a93c-9e5661ea5b4b' title='Show/hide data repr'><svg class='icon xr-icon-database'><use xlink:href='#icon-database'></use></svg></label><div class='xr-array-preview xr-preview'><span>21.15 64.51 43.33 182.7 21.39 4.288 ... 9.23 5.781 4.843 -0.1434 37.68</span></div><div class='xr-array-data'><pre>array([[21.14808083, 64.5098114 , 43.33101654, ...,  4.84251642,
-        -0.14340343, 37.67595291]], shape=(1, 2790))</pre></div></div></li><li class='xr-section-item'><input id='section-b3430407-e633-42a0-8559-e6f37b7363ad' class='xr-section-summary-in' type='checkbox' checked /><label for='section-b3430407-e633-42a0-8559-e6f37b7363ad' class='xr-section-summary' title='Expand/collapse section'>Coordinates: <span>(2)</span></label><div class='xr-section-inline-details'></div><div class='xr-section-details'><ul class='xr-var-list'><li class='xr-var-item'><div class='xr-var-name'><span class='xr-has-index'>layer</span></div><div class='xr-var-dims'>(layer)</div><div class='xr-var-dtype'>int64</div><div class='xr-var-preview xr-preview'>1</div><input id='attrs-d881d18c-b99a-48b5-8251-9e2628f27321' class='xr-var-attrs-in' type='checkbox' disabled><label for='attrs-d881d18c-b99a-48b5-8251-9e2628f27321' title='Show/Hide attributes'><svg class='icon xr-icon-file-text2'><use xlink:href='#icon-file-text2'></use></svg></label><input id='data-83117882-1b16-475f-a820-9dad6a99b838' class='xr-var-data-in' type='checkbox'><label for='data-83117882-1b16-475f-a820-9dad6a99b838' title='Show/Hide data repr'><svg class='icon xr-icon-database'><use xlink:href='#icon-database'></use></svg></label><div class='xr-var-attrs'><dl class='xr-attrs'></dl></div><div class='xr-var-data'><pre>array([1])</pre></div></li><li class='xr-var-item'><div class='xr-var-name'><span class='xr-has-index'>mesh2d_nFaces</span></div><div class='xr-var-dims'>(mesh2d_nFaces)</div><div class='xr-var-dtype'>int64</div><div class='xr-var-preview xr-preview'>0 1 2 3 4 ... 2786 2787 2788 2789</div><input id='attrs-022ca639-811b-4aeb-b96f-4076f2335b27' class='xr-var-attrs-in' type='checkbox' disabled><label for='attrs-022ca639-811b-4aeb-b96f-4076f2335b27' title='Show/Hide attributes'><svg class='icon xr-icon-file-text2'><use xlink:href='#icon-file-text2'></use></svg></label><input id='data-c980a369-8fad-4c84-bcfa-b1dd25a3fce0' class='xr-var-data-in' type='checkbox'><label for='data-c980a369-8fad-4c84-bcfa-b1dd25a3fce0' title='Show/Hide data repr'><svg class='icon xr-icon-database'><use xlink:href='#icon-database'></use></svg></label><div class='xr-var-attrs'><dl class='xr-attrs'></dl></div><div class='xr-var-data'><pre>[2790 values with dtype=int64]</pre></div></li></ul></div></li><li class='xr-section-item'><input id='section-11e0d7f3-07fb-4a00-adab-fcfdb232f12b' class='xr-section-summary-in' type='checkbox' checked /><label for='section-11e0d7f3-07fb-4a00-adab-fcfdb232f12b' class='xr-section-summary' title='Expand/collapse section'>Attributes: <span>(1)</span></label><div class='xr-section-inline-details'></div><div class='xr-section-details'><dl class='xr-attrs'><dt><span>unit :</span></dt><dd>m NAP</dd></dl></div></li></ul></div></div>
+    unit:     m NAP</pre><div class='xr-wrap' style='display:none'><div class='xr-header'><div class='xr-obj-type'>xarray.DataArray</div><div class='xr-obj-name'></div><ul class='xr-dim-list'><li><span class='xr-has-index'>layer</span>: 1</li><li><span class='xr-has-index'>mesh2d_nFaces</span>: 2790</li></ul></div><ul class='xr-sections'><li class='xr-section-item'><div class='xr-array-wrap'><input id='section-7df40b26-73f1-45c8-af09-5b9573036123' class='xr-array-in' type='checkbox' checked><label for='section-7df40b26-73f1-45c8-af09-5b9573036123' title='Show/hide data repr'><svg class='icon xr-icon-database'><use xlink:href='#icon-database'></use></svg></label><div class='xr-array-preview xr-preview'><span>21.15 64.51 43.33 182.7 21.39 4.288 ... 9.23 5.781 4.843 -0.1434 37.68</span></div><div class='xr-array-data'><pre>array([[21.14808083, 64.5098114 , 43.33101654, ...,  4.84251642,
+        -0.14340343, 37.67595291]], shape=(1, 2790))</pre></div></div></li><li class='xr-section-item'><input id='section-de6e1cc1-afcb-43cd-a694-afaa04b618f4' class='xr-section-summary-in' type='checkbox' checked /><label for='section-de6e1cc1-afcb-43cd-a694-afaa04b618f4' class='xr-section-summary' title='Expand/collapse section'>Coordinates: <span>(2)</span></label><div class='xr-section-inline-details'></div><div class='xr-section-details'><ul class='xr-var-list'><li class='xr-var-item'><div class='xr-var-name'><span class='xr-has-index'>layer</span></div><div class='xr-var-dims'>(layer)</div><div class='xr-var-dtype'>int64</div><div class='xr-var-preview xr-preview'>1</div><input id='attrs-4e3c5b26-800f-471c-ac13-8dd6a4f571f0' class='xr-var-attrs-in' type='checkbox' disabled><label for='attrs-4e3c5b26-800f-471c-ac13-8dd6a4f571f0' title='Show/Hide attributes'><svg class='icon xr-icon-file-text2'><use xlink:href='#icon-file-text2'></use></svg></label><input id='data-d4b11813-06d4-4e7c-8b91-18aad4c8d7d6' class='xr-var-data-in' type='checkbox'><label for='data-d4b11813-06d4-4e7c-8b91-18aad4c8d7d6' title='Show/Hide data repr'><svg class='icon xr-icon-database'><use xlink:href='#icon-database'></use></svg></label><div class='xr-var-attrs'><dl class='xr-attrs'></dl></div><div class='xr-var-data'><pre>array([1])</pre></div></li><li class='xr-var-item'><div class='xr-var-name'><span class='xr-has-index'>mesh2d_nFaces</span></div><div class='xr-var-dims'>(mesh2d_nFaces)</div><div class='xr-var-dtype'>int64</div><div class='xr-var-preview xr-preview'>0 1 2 3 4 ... 2786 2787 2788 2789</div><input id='attrs-c40d0900-8996-4950-82ab-5167ac591821' class='xr-var-attrs-in' type='checkbox' disabled><label for='attrs-c40d0900-8996-4950-82ab-5167ac591821' title='Show/Hide attributes'><svg class='icon xr-icon-file-text2'><use xlink:href='#icon-file-text2'></use></svg></label><input id='data-f5d450b4-8cb2-4364-b57d-979ee41a620a' class='xr-var-data-in' type='checkbox'><label for='data-f5d450b4-8cb2-4364-b57d-979ee41a620a' title='Show/Hide data repr'><svg class='icon xr-icon-database'><use xlink:href='#icon-database'></use></svg></label><div class='xr-var-attrs'><dl class='xr-attrs'></dl></div><div class='xr-var-data'><pre>[2790 values with dtype=int64]</pre></div></li></ul></div></li><li class='xr-section-item'><input id='section-0790736a-8d55-4a15-af3b-a5da0a436d1f' class='xr-section-summary-in' type='checkbox' checked /><label for='section-0790736a-8d55-4a15-af3b-a5da0a436d1f' class='xr-section-summary' title='Expand/collapse section'>Attributes: <span>(1)</span></label><div class='xr-section-inline-details'></div><div class='xr-section-details'><dl class='xr-attrs'><dt><span>unit :</span></dt><dd>m NAP</dd></dl></div></li></ul></div></div>
 </div>
 <br />
 <br /><p>We also need to create a conductance variable for the
 <a class="reference internal" href="../api/generated/mf6/imod.mf6.Drainage.html#imod.mf6.Drainage" title="imod.mf6.Drainage"><code class="xref py py-class docutils literal notranslate"><span class="pre">imod.mf6.Drainage</span></code></a> package. The conductance variable is a measure of
 how much water can flow through a cell. The areas of the cells are used to
 calculate the conductance, and can be be obtained from its grid.</p>
-<div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="n">resistance</span> <span class="o">=</span> <span class="mi">1</span>  <span class="c1"># Example resistance value in days</span>
-<span class="n">conductance</span> <span class="o">=</span> <span class="n">disv_voronoi</span><span class="p">[</span><span class="s2">&quot;idomain&quot;</span><span class="p">]</span> <span class="o">*</span> <span class="n">voronoi_grid</span><span class="o">.</span><span class="n">area</span> <span class="o">/</span> <span class="n">resistance</span>
-</pre></div>
-</div>
+<div class="highlight-Python notranslate"><div class="highlight"><pre><span class="n">resistance</span> <span class="o">=</span> <span class="mi">1</span>  <span class="c1"># Example resistance value in days</span><span class="w">
+</span><span class="n">conductance</span> <span class="o">=</span> <a class="sphx-glr-backref-module-imod-mf6 sphx-glr-backref-type-py-class sphx-glr-backref-instance reference internal" href="../api/generated/mf6/imod.mf6.VerticesDiscretization.html#imod.mf6.VerticesDiscretization" title="imod.mf6.VerticesDiscretization"><span class="n">disv_voronoi</span></a><span class="p">[</span><span class="s2">&quot;</span><span class="s2">idomain</span><span class="s2">&quot;</span><span class="p">]</span> <span class="o">*</span> <span class="n">voronoi_grid</span><span class="o">.</span><span class="n">area</span> <span class="o">/</span> <span class="n">resistance</span><span class="w">
+</span></pre></div></div>
 <p>We can now use these variables to create a <a class="reference internal" href="../api/generated/mf6/imod.mf6.Drainage.html#imod.mf6.Drainage" title="imod.mf6.Drainage"><code class="xref py py-class docutils literal notranslate"><span class="pre">imod.mf6.Drainage</span></code></a> package object.</p>
-<div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">imod.mf6</span><span class="w"> </span><span class="kn">import</span> <span class="n">Drainage</span>
-
-<span class="n">drainage</span> <span class="o">=</span> <span class="n">Drainage</span><span class="p">(</span>
-    <span class="n">elevation</span><span class="o">=</span><span class="n">drain_elevation</span><span class="p">,</span>
-    <span class="n">conductance</span><span class="o">=</span><span class="n">conductance</span><span class="p">,</span>
-<span class="p">)</span>
-<span class="n">drainage</span>
-</pre></div>
-</div>
+<div class="highlight-Python notranslate"><div class="highlight"><pre><span class="kn">from</span><span class="w"> </span><span class="nn">imod</span><span class="nn">.</span><span class="nn">mf6</span><span class="w"> </span><span class="kn">import</span> <a class="sphx-glr-backref-module-imod-mf6 sphx-glr-backref-type-py-class reference internal" href="../api/generated/mf6/imod.mf6.Drainage.html#imod.mf6.Drainage" title="imod.mf6.Drainage"><span class="n">Drainage</span></a><span class="w">
+</span><span class="w">
+</span><a class="sphx-glr-backref-module-imod-mf6 sphx-glr-backref-type-py-class sphx-glr-backref-instance reference internal" href="../api/generated/mf6/imod.mf6.Drainage.html#imod.mf6.Drainage" title="imod.mf6.Drainage"><span class="n">drainage</span></a> <span class="o">=</span> <a class="sphx-glr-backref-module-imod-mf6 sphx-glr-backref-type-py-class reference internal" href="../api/generated/mf6/imod.mf6.Drainage.html#imod.mf6.Drainage" title="imod.mf6.Drainage"><span class="n">Drainage</span></a><span class="p">(</span><span class="w">
+</span>    <span class="n">elevation</span><span class="o">=</span><span class="n">drain_elevation</span><span class="p">,</span><span class="w">
+</span>    <span class="n">conductance</span><span class="o">=</span><span class="n">conductance</span><span class="p">,</span><span class="w">
+</span><span class="p">)</span><span class="w">
+</span><a class="sphx-glr-backref-module-imod-mf6 sphx-glr-backref-type-py-class sphx-glr-backref-instance reference internal" href="../api/generated/mf6/imod.mf6.Drainage.html#imod.mf6.Drainage" title="imod.mf6.Drainage"><span class="n">drainage</span></a><span class="w">
+</span></pre></div></div>
 <div class="output_subarea output_html rendered_html output_result">
 <div>Drainage</div><div><svg style="position: absolute; width: 0; height: 0; overflow: hidden">
 <defs>
@@ -3425,16 +3410,16 @@ Data variables:
     observations   object 8B None
     repeat_stress  object 8B None
 Attributes:
-    unit:     m NAP</pre><div class='xr-wrap' style='display:none'><div class='xr-header'><div class='xr-obj-type'>xarray.Dataset</div></div><ul class='xr-sections'><li class='xr-section-item'><input id='section-88c6096e-edb6-43a5-baf1-15afaa92614f' class='xr-section-summary-in' type='checkbox' disabled /><label for='section-88c6096e-edb6-43a5-baf1-15afaa92614f' class='xr-section-summary'>Dimensions:</label><div class='xr-section-inline-details'><ul class='xr-dim-list'><li><span class='xr-has-index'>layer</span>: 1</li><li><span class='xr-has-index'>mesh2d_nFaces</span>: 2790</li></ul></div></li><li class='xr-section-item'><input id='section-2ad1c261-892f-4283-91a0-4b8cbdccb788' class='xr-section-summary-in' type='checkbox' checked /><label for='section-2ad1c261-892f-4283-91a0-4b8cbdccb788' class='xr-section-summary' title='Expand/collapse section'>Coordinates: <span>(2)</span></label><div class='xr-section-inline-details'></div><div class='xr-section-details'><ul class='xr-var-list'><li class='xr-var-item'><div class='xr-var-name'><span class='xr-has-index'>layer</span></div><div class='xr-var-dims'>(layer)</div><div class='xr-var-dtype'>int64</div><div class='xr-var-preview xr-preview'>1</div><input id='attrs-1b1697f3-d033-466d-b19b-d65f31294ef3' class='xr-var-attrs-in' type='checkbox' disabled><label for='attrs-1b1697f3-d033-466d-b19b-d65f31294ef3' title='Show/Hide attributes'><svg class='icon xr-icon-file-text2'><use xlink:href='#icon-file-text2'></use></svg></label><input id='data-5a630ec7-489d-41f7-8c0d-8c31c70a9a4c' class='xr-var-data-in' type='checkbox'><label for='data-5a630ec7-489d-41f7-8c0d-8c31c70a9a4c' title='Show/Hide data repr'><svg class='icon xr-icon-database'><use xlink:href='#icon-database'></use></svg></label><div class='xr-var-attrs'><dl class='xr-attrs'></dl></div><div class='xr-var-data'><pre>array([1])</pre></div></li><li class='xr-var-item'><div class='xr-var-name'><span class='xr-has-index'>mesh2d_nFaces</span></div><div class='xr-var-dims'>(mesh2d_nFaces)</div><div class='xr-var-dtype'>int64</div><div class='xr-var-preview xr-preview'>0 1 2 3 4 ... 2786 2787 2788 2789</div><input id='attrs-1dda0a22-72c7-4961-b228-b8a6dfe0d12f' class='xr-var-attrs-in' type='checkbox' disabled><label for='attrs-1dda0a22-72c7-4961-b228-b8a6dfe0d12f' title='Show/Hide attributes'><svg class='icon xr-icon-file-text2'><use xlink:href='#icon-file-text2'></use></svg></label><input id='data-7e7e5ccb-d12b-49bd-8477-79db827d2901' class='xr-var-data-in' type='checkbox'><label for='data-7e7e5ccb-d12b-49bd-8477-79db827d2901' title='Show/Hide data repr'><svg class='icon xr-icon-database'><use xlink:href='#icon-database'></use></svg></label><div class='xr-var-attrs'><dl class='xr-attrs'></dl></div><div class='xr-var-data'><pre>[2790 values with dtype=int64]</pre></div></li></ul></div></li><li class='xr-section-item'><input id='section-c1a5e440-7a89-4694-b5ec-416079844a74' class='xr-section-summary-in' type='checkbox' checked /><label for='section-c1a5e440-7a89-4694-b5ec-416079844a74' class='xr-section-summary' title='Expand/collapse section'>Data variables: <span>(7)</span></label><div class='xr-section-inline-details'></div><div class='xr-section-details'><ul class='xr-var-list'><li class='xr-var-item'><div class='xr-var-name'><span>elevation</span></div><div class='xr-var-dims'>(layer, mesh2d_nFaces)</div><div class='xr-var-dtype'>float64</div><div class='xr-var-preview xr-preview'>21.15 64.51 43.33 ... -0.1434 37.68</div><input id='attrs-2cdb6897-a906-41e3-9424-0732503c0294' class='xr-var-attrs-in' type='checkbox' ><label for='attrs-2cdb6897-a906-41e3-9424-0732503c0294' title='Show/Hide attributes'><svg class='icon xr-icon-file-text2'><use xlink:href='#icon-file-text2'></use></svg></label><input id='data-9c421369-66fd-4cfb-8b20-75e5b48f866a' class='xr-var-data-in' type='checkbox'><label for='data-9c421369-66fd-4cfb-8b20-75e5b48f866a' title='Show/Hide data repr'><svg class='icon xr-icon-database'><use xlink:href='#icon-database'></use></svg></label><div class='xr-var-attrs'><dl class='xr-attrs'><dt><span>unit :</span></dt><dd>m NAP</dd></dl></div><div class='xr-var-data'><pre>array([[21.14808083, 64.5098114 , 43.33101654, ...,  4.84251642,
-        -0.14340343, 37.67595291]], shape=(1, 2790))</pre></div></li><li class='xr-var-item'><div class='xr-var-name'><span>conductance</span></div><div class='xr-var-dims'>(layer, mesh2d_nFaces)</div><div class='xr-var-dtype'>float64</div><div class='xr-var-preview xr-preview'>1.34e+07 1.946e+07 ... 1.044e+07</div><input id='attrs-cc72166b-9802-4721-963f-f75e6299ceba' class='xr-var-attrs-in' type='checkbox' ><label for='attrs-cc72166b-9802-4721-963f-f75e6299ceba' title='Show/Hide attributes'><svg class='icon xr-icon-file-text2'><use xlink:href='#icon-file-text2'></use></svg></label><input id='data-e2e89f23-cef2-46a8-994c-bc31c59f2b6b' class='xr-var-data-in' type='checkbox'><label for='data-e2e89f23-cef2-46a8-994c-bc31c59f2b6b' title='Show/Hide data repr'><svg class='icon xr-icon-database'><use xlink:href='#icon-database'></use></svg></label><div class='xr-var-attrs'><dl class='xr-attrs'><dt><span>unit :</span></dt><dd>m NAP</dd></dl></div><div class='xr-var-data'><pre>array([[13399941.82645187, 19455727.79080786, 16309249.99846802, ...,
+    unit:     m NAP</pre><div class='xr-wrap' style='display:none'><div class='xr-header'><div class='xr-obj-type'>xarray.Dataset</div></div><ul class='xr-sections'><li class='xr-section-item'><input id='section-59e8a219-bac2-4fd3-ae52-adc349b15d1e' class='xr-section-summary-in' type='checkbox' disabled /><label for='section-59e8a219-bac2-4fd3-ae52-adc349b15d1e' class='xr-section-summary'>Dimensions:</label><div class='xr-section-inline-details'><ul class='xr-dim-list'><li><span class='xr-has-index'>layer</span>: 1</li><li><span class='xr-has-index'>mesh2d_nFaces</span>: 2790</li></ul></div></li><li class='xr-section-item'><input id='section-274c4244-6c7c-480a-8a05-87c5ad46c4c2' class='xr-section-summary-in' type='checkbox' checked /><label for='section-274c4244-6c7c-480a-8a05-87c5ad46c4c2' class='xr-section-summary' title='Expand/collapse section'>Coordinates: <span>(2)</span></label><div class='xr-section-inline-details'></div><div class='xr-section-details'><ul class='xr-var-list'><li class='xr-var-item'><div class='xr-var-name'><span class='xr-has-index'>layer</span></div><div class='xr-var-dims'>(layer)</div><div class='xr-var-dtype'>int64</div><div class='xr-var-preview xr-preview'>1</div><input id='attrs-1a1cc243-bfca-4142-b7c4-309232520de8' class='xr-var-attrs-in' type='checkbox' disabled><label for='attrs-1a1cc243-bfca-4142-b7c4-309232520de8' title='Show/Hide attributes'><svg class='icon xr-icon-file-text2'><use xlink:href='#icon-file-text2'></use></svg></label><input id='data-f37404b8-be53-4785-9c09-fea6e482438e' class='xr-var-data-in' type='checkbox'><label for='data-f37404b8-be53-4785-9c09-fea6e482438e' title='Show/Hide data repr'><svg class='icon xr-icon-database'><use xlink:href='#icon-database'></use></svg></label><div class='xr-var-attrs'><dl class='xr-attrs'></dl></div><div class='xr-var-data'><pre>array([1])</pre></div></li><li class='xr-var-item'><div class='xr-var-name'><span class='xr-has-index'>mesh2d_nFaces</span></div><div class='xr-var-dims'>(mesh2d_nFaces)</div><div class='xr-var-dtype'>int64</div><div class='xr-var-preview xr-preview'>0 1 2 3 4 ... 2786 2787 2788 2789</div><input id='attrs-7abf0aa4-48dc-417f-9434-e037cd68423a' class='xr-var-attrs-in' type='checkbox' disabled><label for='attrs-7abf0aa4-48dc-417f-9434-e037cd68423a' title='Show/Hide attributes'><svg class='icon xr-icon-file-text2'><use xlink:href='#icon-file-text2'></use></svg></label><input id='data-abc108b6-722e-4135-9d65-11d91f3e9e95' class='xr-var-data-in' type='checkbox'><label for='data-abc108b6-722e-4135-9d65-11d91f3e9e95' title='Show/Hide data repr'><svg class='icon xr-icon-database'><use xlink:href='#icon-database'></use></svg></label><div class='xr-var-attrs'><dl class='xr-attrs'></dl></div><div class='xr-var-data'><pre>[2790 values with dtype=int64]</pre></div></li></ul></div></li><li class='xr-section-item'><input id='section-b7796cf1-5051-4dfc-983d-889a2b56c354' class='xr-section-summary-in' type='checkbox' checked /><label for='section-b7796cf1-5051-4dfc-983d-889a2b56c354' class='xr-section-summary' title='Expand/collapse section'>Data variables: <span>(7)</span></label><div class='xr-section-inline-details'></div><div class='xr-section-details'><ul class='xr-var-list'><li class='xr-var-item'><div class='xr-var-name'><span>elevation</span></div><div class='xr-var-dims'>(layer, mesh2d_nFaces)</div><div class='xr-var-dtype'>float64</div><div class='xr-var-preview xr-preview'>21.15 64.51 43.33 ... -0.1434 37.68</div><input id='attrs-a5f7122c-a28a-4b9f-8e3c-b5534db9ae3b' class='xr-var-attrs-in' type='checkbox' ><label for='attrs-a5f7122c-a28a-4b9f-8e3c-b5534db9ae3b' title='Show/Hide attributes'><svg class='icon xr-icon-file-text2'><use xlink:href='#icon-file-text2'></use></svg></label><input id='data-d232ab20-f91f-4882-b564-da72a6afe998' class='xr-var-data-in' type='checkbox'><label for='data-d232ab20-f91f-4882-b564-da72a6afe998' title='Show/Hide data repr'><svg class='icon xr-icon-database'><use xlink:href='#icon-database'></use></svg></label><div class='xr-var-attrs'><dl class='xr-attrs'><dt><span>unit :</span></dt><dd>m NAP</dd></dl></div><div class='xr-var-data'><pre>array([[21.14808083, 64.5098114 , 43.33101654, ...,  4.84251642,
+        -0.14340343, 37.67595291]], shape=(1, 2790))</pre></div></li><li class='xr-var-item'><div class='xr-var-name'><span>conductance</span></div><div class='xr-var-dims'>(layer, mesh2d_nFaces)</div><div class='xr-var-dtype'>float64</div><div class='xr-var-preview xr-preview'>1.34e+07 1.946e+07 ... 1.044e+07</div><input id='attrs-5071e268-35e2-4099-907f-1a3b07fb1f07' class='xr-var-attrs-in' type='checkbox' ><label for='attrs-5071e268-35e2-4099-907f-1a3b07fb1f07' title='Show/Hide attributes'><svg class='icon xr-icon-file-text2'><use xlink:href='#icon-file-text2'></use></svg></label><input id='data-75148a4f-0fbf-4ab1-9b41-506944bfc4ef' class='xr-var-data-in' type='checkbox'><label for='data-75148a4f-0fbf-4ab1-9b41-506944bfc4ef' title='Show/Hide data repr'><svg class='icon xr-icon-database'><use xlink:href='#icon-database'></use></svg></label><div class='xr-var-attrs'><dl class='xr-attrs'><dt><span>unit :</span></dt><dd>m NAP</dd></dl></div><div class='xr-var-data'><pre>array([[13399941.82645187, 19455727.79080786, 16309249.99846802, ...,
          7970138.38326237,  6182539.70209495, 10437455.38383284]],
-      shape=(1, 2790))</pre></div></li><li class='xr-var-item'><div class='xr-var-name'><span>print_input</span></div><div class='xr-var-dims'>()</div><div class='xr-var-dtype'>bool</div><div class='xr-var-preview xr-preview'>False</div><input id='attrs-79b7ed18-e056-4d0f-ba70-5f6fda563539' class='xr-var-attrs-in' type='checkbox' disabled><label for='attrs-79b7ed18-e056-4d0f-ba70-5f6fda563539' title='Show/Hide attributes'><svg class='icon xr-icon-file-text2'><use xlink:href='#icon-file-text2'></use></svg></label><input id='data-50b213c2-89a5-462b-aaf1-bbe0d0216863' class='xr-var-data-in' type='checkbox'><label for='data-50b213c2-89a5-462b-aaf1-bbe0d0216863' title='Show/Hide data repr'><svg class='icon xr-icon-database'><use xlink:href='#icon-database'></use></svg></label><div class='xr-var-attrs'><dl class='xr-attrs'></dl></div><div class='xr-var-data'><pre>array(False)</pre></div></li><li class='xr-var-item'><div class='xr-var-name'><span>print_flows</span></div><div class='xr-var-dims'>()</div><div class='xr-var-dtype'>bool</div><div class='xr-var-preview xr-preview'>False</div><input id='attrs-ab4b0db6-105d-4a9a-a91e-b1fe47664e8e' class='xr-var-attrs-in' type='checkbox' disabled><label for='attrs-ab4b0db6-105d-4a9a-a91e-b1fe47664e8e' title='Show/Hide attributes'><svg class='icon xr-icon-file-text2'><use xlink:href='#icon-file-text2'></use></svg></label><input id='data-12ca97ab-8153-43f1-98de-e56499002199' class='xr-var-data-in' type='checkbox'><label for='data-12ca97ab-8153-43f1-98de-e56499002199' title='Show/Hide data repr'><svg class='icon xr-icon-database'><use xlink:href='#icon-database'></use></svg></label><div class='xr-var-attrs'><dl class='xr-attrs'></dl></div><div class='xr-var-data'><pre>array(False)</pre></div></li><li class='xr-var-item'><div class='xr-var-name'><span>save_flows</span></div><div class='xr-var-dims'>()</div><div class='xr-var-dtype'>bool</div><div class='xr-var-preview xr-preview'>False</div><input id='attrs-04a873b3-6009-4ab1-a684-44945c9fd351' class='xr-var-attrs-in' type='checkbox' disabled><label for='attrs-04a873b3-6009-4ab1-a684-44945c9fd351' title='Show/Hide attributes'><svg class='icon xr-icon-file-text2'><use xlink:href='#icon-file-text2'></use></svg></label><input id='data-830777ae-872a-442c-9c33-45a63bee06d6' class='xr-var-data-in' type='checkbox'><label for='data-830777ae-872a-442c-9c33-45a63bee06d6' title='Show/Hide data repr'><svg class='icon xr-icon-database'><use xlink:href='#icon-database'></use></svg></label><div class='xr-var-attrs'><dl class='xr-attrs'></dl></div><div class='xr-var-data'><pre>array(False)</pre></div></li><li class='xr-var-item'><div class='xr-var-name'><span>observations</span></div><div class='xr-var-dims'>()</div><div class='xr-var-dtype'>object</div><div class='xr-var-preview xr-preview'>None</div><input id='attrs-06cd0478-e68e-49f5-bbb6-be30f86a4ade' class='xr-var-attrs-in' type='checkbox' disabled><label for='attrs-06cd0478-e68e-49f5-bbb6-be30f86a4ade' title='Show/Hide attributes'><svg class='icon xr-icon-file-text2'><use xlink:href='#icon-file-text2'></use></svg></label><input id='data-bd18aa95-865d-4622-b93c-0f23f0bfc81d' class='xr-var-data-in' type='checkbox'><label for='data-bd18aa95-865d-4622-b93c-0f23f0bfc81d' title='Show/Hide data repr'><svg class='icon xr-icon-database'><use xlink:href='#icon-database'></use></svg></label><div class='xr-var-attrs'><dl class='xr-attrs'></dl></div><div class='xr-var-data'><pre>array(None, dtype=object)</pre></div></li><li class='xr-var-item'><div class='xr-var-name'><span>repeat_stress</span></div><div class='xr-var-dims'>()</div><div class='xr-var-dtype'>object</div><div class='xr-var-preview xr-preview'>None</div><input id='attrs-778fc111-ac7a-4972-98d7-75f936bb0440' class='xr-var-attrs-in' type='checkbox' disabled><label for='attrs-778fc111-ac7a-4972-98d7-75f936bb0440' title='Show/Hide attributes'><svg class='icon xr-icon-file-text2'><use xlink:href='#icon-file-text2'></use></svg></label><input id='data-683accdf-06e7-4c5f-92b5-156ba0fbda06' class='xr-var-data-in' type='checkbox'><label for='data-683accdf-06e7-4c5f-92b5-156ba0fbda06' title='Show/Hide data repr'><svg class='icon xr-icon-database'><use xlink:href='#icon-database'></use></svg></label><div class='xr-var-attrs'><dl class='xr-attrs'></dl></div><div class='xr-var-data'><pre>array(None, dtype=object)</pre></div></li></ul></div></li><li class='xr-section-item'><input id='section-a51c07c2-5f0d-4adc-b100-2620c195944e' class='xr-section-summary-in' type='checkbox' checked /><label for='section-a51c07c2-5f0d-4adc-b100-2620c195944e' class='xr-section-summary' title='Expand/collapse section'>Attributes: <span>(1)</span></label><div class='xr-section-inline-details'></div><div class='xr-section-details'><dl class='xr-attrs'><dt><span>unit :</span></dt><dd>m NAP</dd></dl></div></li></ul></div></div>
+      shape=(1, 2790))</pre></div></li><li class='xr-var-item'><div class='xr-var-name'><span>print_input</span></div><div class='xr-var-dims'>()</div><div class='xr-var-dtype'>bool</div><div class='xr-var-preview xr-preview'>False</div><input id='attrs-34ece424-a32c-48d5-a607-ea1e820a6044' class='xr-var-attrs-in' type='checkbox' disabled><label for='attrs-34ece424-a32c-48d5-a607-ea1e820a6044' title='Show/Hide attributes'><svg class='icon xr-icon-file-text2'><use xlink:href='#icon-file-text2'></use></svg></label><input id='data-9601bad5-e4c5-4aa3-8c35-76ae09455d3f' class='xr-var-data-in' type='checkbox'><label for='data-9601bad5-e4c5-4aa3-8c35-76ae09455d3f' title='Show/Hide data repr'><svg class='icon xr-icon-database'><use xlink:href='#icon-database'></use></svg></label><div class='xr-var-attrs'><dl class='xr-attrs'></dl></div><div class='xr-var-data'><pre>array(False)</pre></div></li><li class='xr-var-item'><div class='xr-var-name'><span>print_flows</span></div><div class='xr-var-dims'>()</div><div class='xr-var-dtype'>bool</div><div class='xr-var-preview xr-preview'>False</div><input id='attrs-95ed357d-49dd-4896-bba0-23f38878589d' class='xr-var-attrs-in' type='checkbox' disabled><label for='attrs-95ed357d-49dd-4896-bba0-23f38878589d' title='Show/Hide attributes'><svg class='icon xr-icon-file-text2'><use xlink:href='#icon-file-text2'></use></svg></label><input id='data-4c76d40e-d76c-49a4-80df-bfb011873845' class='xr-var-data-in' type='checkbox'><label for='data-4c76d40e-d76c-49a4-80df-bfb011873845' title='Show/Hide data repr'><svg class='icon xr-icon-database'><use xlink:href='#icon-database'></use></svg></label><div class='xr-var-attrs'><dl class='xr-attrs'></dl></div><div class='xr-var-data'><pre>array(False)</pre></div></li><li class='xr-var-item'><div class='xr-var-name'><span>save_flows</span></div><div class='xr-var-dims'>()</div><div class='xr-var-dtype'>bool</div><div class='xr-var-preview xr-preview'>False</div><input id='attrs-f6d7fc08-5387-4295-8fb1-dc542b70c031' class='xr-var-attrs-in' type='checkbox' disabled><label for='attrs-f6d7fc08-5387-4295-8fb1-dc542b70c031' title='Show/Hide attributes'><svg class='icon xr-icon-file-text2'><use xlink:href='#icon-file-text2'></use></svg></label><input id='data-15e69ac5-aeef-4f6b-8101-b00ed3520e83' class='xr-var-data-in' type='checkbox'><label for='data-15e69ac5-aeef-4f6b-8101-b00ed3520e83' title='Show/Hide data repr'><svg class='icon xr-icon-database'><use xlink:href='#icon-database'></use></svg></label><div class='xr-var-attrs'><dl class='xr-attrs'></dl></div><div class='xr-var-data'><pre>array(False)</pre></div></li><li class='xr-var-item'><div class='xr-var-name'><span>observations</span></div><div class='xr-var-dims'>()</div><div class='xr-var-dtype'>object</div><div class='xr-var-preview xr-preview'>None</div><input id='attrs-255a7f31-c1cb-4587-9c1c-50a2f2d792fb' class='xr-var-attrs-in' type='checkbox' disabled><label for='attrs-255a7f31-c1cb-4587-9c1c-50a2f2d792fb' title='Show/Hide attributes'><svg class='icon xr-icon-file-text2'><use xlink:href='#icon-file-text2'></use></svg></label><input id='data-7731b651-e4da-4c01-87e5-58032129894a' class='xr-var-data-in' type='checkbox'><label for='data-7731b651-e4da-4c01-87e5-58032129894a' title='Show/Hide data repr'><svg class='icon xr-icon-database'><use xlink:href='#icon-database'></use></svg></label><div class='xr-var-attrs'><dl class='xr-attrs'></dl></div><div class='xr-var-data'><pre>array(None, dtype=object)</pre></div></li><li class='xr-var-item'><div class='xr-var-name'><span>repeat_stress</span></div><div class='xr-var-dims'>()</div><div class='xr-var-dtype'>object</div><div class='xr-var-preview xr-preview'>None</div><input id='attrs-dd0875a0-0c44-45a7-b777-c91b2fbc145a' class='xr-var-attrs-in' type='checkbox' disabled><label for='attrs-dd0875a0-0c44-45a7-b777-c91b2fbc145a' title='Show/Hide attributes'><svg class='icon xr-icon-file-text2'><use xlink:href='#icon-file-text2'></use></svg></label><input id='data-2ef48db0-592e-491f-bbe8-00e258b98cfd' class='xr-var-data-in' type='checkbox'><label for='data-2ef48db0-592e-491f-bbe8-00e258b98cfd' title='Show/Hide data repr'><svg class='icon xr-icon-database'><use xlink:href='#icon-database'></use></svg></label><div class='xr-var-attrs'><dl class='xr-attrs'></dl></div><div class='xr-var-data'><pre>array(None, dtype=object)</pre></div></li></ul></div></li><li class='xr-section-item'><input id='section-f2f25312-6266-4fec-9192-07ca92a6082d' class='xr-section-summary-in' type='checkbox' checked /><label for='section-f2f25312-6266-4fec-9192-07ca92a6082d' class='xr-section-summary' title='Expand/collapse section'>Attributes: <span>(1)</span></label><div class='xr-section-inline-details'></div><div class='xr-section-details'><dl class='xr-attrs'><dt><span>unit :</span></dt><dd>m NAP</dd></dl></div></li></ul></div></div>
 </div>
 <br />
 <br /><p>That wraps up the example of how to use unstructured grids in iMOD Python. For
 more information on how to manipulate unstructured grids and how to make
 selections, please refer to the <a class="reference external" href="https://deltares.github.io/xugrid/">xugrid documentation</a>.</p>
-<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> (0 minutes 4.590 seconds)</p>
+<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> (0 minutes 5.472 seconds)</p>
 <div class="sphx-glr-footer sphx-glr-footer-example docutils container" id="sphx-glr-download-user-guide-04-unstructured-grids-py">
 <div class="sphx-glr-download sphx-glr-download-jupyter docutils container">
 <p><a class="reference download internal" download="" href="../_downloads/87a4bf862c145d22ed10f09ae6e7c631/04-unstructured-grids.ipynb"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Jupyter</span> <span class="pre">notebook:</span> <span class="pre">04-unstructured-grids.ipynb</span></code></a></p>
@@ -3484,7 +3469,7 @@ selections, please refer to the <a class="reference external" href="https://delt
             
             
               
-                <dialog id="pst-secondary-sidebar-modal"></dialog>
+                <dialog id="pst-secondary-sidebar-modal" tabindex="-1"></dialog>
                 <div id="pst-secondary-sidebar" class="bd-sidebar-secondary bd-toc"><div class="sidebar-secondary-items sidebar-secondary__inner">
 
 
@@ -3510,8 +3495,8 @@ selections, please refer to the <a class="reference external" href="https://delt
   </div>
   
   <!-- Scripts loaded after <body> so the DOM is not blocked -->
-  <script defer src="../_static/scripts/bootstrap.js?digest=90905a2f556bf617f1a9"></script>
-<script defer src="../_static/scripts/pydata-sphinx-theme.js?digest=90905a2f556bf617f1a9"></script>
+  <script defer src="../_static/scripts/bootstrap.js?digest=75c7c72ae941e8b558d8"></script>
+<script defer src="../_static/scripts/pydata-sphinx-theme.js?digest=75c7c72ae941e8b558d8"></script>
 
   <footer class="bd-footer">
 <div class="bd-footer__inner bd-page-width">
@@ -3531,8 +3516,7 @@ selections, please refer to the <a class="reference external" href="https://delt
         <div class="footer-item">
 
   <p class="sphinx-version">
-    Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 9.1.0.
-    <br/>
+    Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 9.2.0.
   </p>
 </div>
       
@@ -3545,7 +3529,7 @@ selections, please refer to the <a class="reference external" href="https://delt
         <div class="footer-item">
 <p class="theme-version">
   <!-- # L10n: Setting the PST URL as an argument as this does not need to be localized -->
-  Built with the <a href="https://pydata-sphinx-theme.readthedocs.io/en/stable/index.html">PyData Sphinx Theme</a> 0.20.0.
+  Built with the <a href="https://pydata-sphinx-theme.readthedocs.io/en/stable/index.html">PyData Sphinx Theme</a> 0.24.0.
 </p></div>
       
     </div>

@@ -1,0 +1,6 @@
+﻿imod.mf6.AdvectionUTVD.is\_empty
+================================
+
+.. currentmodule:: imod.mf6
+
+.. automethod:: AdvectionUTVD.is_empty

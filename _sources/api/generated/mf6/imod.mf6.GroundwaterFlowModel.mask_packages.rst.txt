@@ -1,0 +1,6 @@
+﻿imod.mf6.GroundwaterFlowModel.mask\_packages
+============================================
+
+.. currentmodule:: imod.mf6
+
+.. automethod:: GroundwaterFlowModel.mask_packages

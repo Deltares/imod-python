@@ -1,0 +1,6 @@
+﻿imod.mf6.AdvectionUTVD.copy
+===========================
+
+.. currentmodule:: imod.mf6
+
+.. automethod:: AdvectionUTVD.copy

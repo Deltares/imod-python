@@ -1,16 +1,29 @@
 iMOD Python: make massive MODFLOW models
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+.. image:: https://img.shields.io/endpoint?url=https://raw.githubusercontent.com/Deltares/imod-python/master/docs/_static/badge.json
+   :target: https://github.com/Deltares/imod-python
+.. image:: https://img.shields.io/endpoint?url=https://raw.githubusercontent.com/Deltares/imod-python/master/docs/_static/badge_deltares.json
+   :target: https://www.deltares.nl/en
 .. image:: https://dpcbuild.deltares.nl/app/rest/builds/buildType:id:iMOD6_IMODPython_Windows_Tests/statusIcon.svg
    :target: https://github.com/Deltares/imod-python/commits/master/
 .. image:: https://img.shields.io/pypi/l/imod
    :target: https://choosealicense.com/licenses/mit/
+.. image:: https://img.shields.io/pypi/v/imod.svg
+   :target: https://pypi.org/pypi/imod/
 .. image:: https://img.shields.io/conda/vn/conda-forge/imod.svg
    :target: https://github.com/conda-forge/imod-feedstock
-.. image:: https://img.shields.io/endpoint?url=https://raw.githubusercontent.com/prefix-dev/pixi/main/assets/badge/v0.json
-   :target: https://pixi.sh
+.. image:: https://img.shields.io/badge/Supported%20Python-3.12%20|%203.13%20|%203.14-blue
+   :target: https://www.python.org/downloads/
 .. image:: https://img.shields.io/badge/SPEC-0-green?labelColor=%23004811&color=%235CA038
    :target: https://scientific-python.org/specs/spec-0000/
+.. image:: https://img.shields.io/endpoint?url=https://raw.githubusercontent.com/prefix-dev/pixi/main/assets/badge/v0.json
+   :target: https://pixi.sh
+.. image:: http://www.mypy-lang.org/static/mypy_badge.svg
+   :target: http://mypy-lang.org/
+.. image:: https://img.shields.io/endpoint?url=https://raw.githubusercontent.com/astral-sh/ruff/main/assets/badge/v2.json
+   :target: https://github.com/astral-sh/ruff
+
 
 The ``imod`` Python package is an open source project to make working with
 MODFLOW groundwater models in Python easier. It builds on top of popular

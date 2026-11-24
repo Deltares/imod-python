@@ -1,0 +1,6 @@
+﻿imod.mf6.AdvectionUTVD.from\_file
+=================================
+
+.. currentmodule:: imod.mf6
+
+.. automethod:: AdvectionUTVD.from_file

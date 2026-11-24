@@ -1,6 +1,0 @@
-﻿imod.msw.Sprinkling.get\_regrid\_methods
-========================================
-
-.. currentmodule:: imod.msw
-
-.. automethod:: Sprinkling.get_regrid_methods

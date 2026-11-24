@@ -1,0 +1,37 @@
+﻿imod.msw.SprinklingGrid
+=======================
+
+.. currentmodule:: imod.msw
+
+.. autoclass:: SprinklingGrid
+
+   
+   .. automethod:: __init__
+
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      ~SprinklingGrid.__init__
+      ~SprinklingGrid.clip_box
+      ~SprinklingGrid.from_file
+      ~SprinklingGrid.from_imod5_data
+      ~SprinklingGrid.get_regrid_methods
+      ~SprinklingGrid.regrid_like
+      ~SprinklingGrid.to_file
+      ~SprinklingGrid.write
+   
+   
+
+   
+   
+   .. rubric:: Attributes
+
+   .. autosummary::
+   
+      ~SprinklingGrid.auxiliary_data_fields
+      ~SprinklingGrid.dataset
+      ~SprinklingGrid.pkg_id
+   
+   

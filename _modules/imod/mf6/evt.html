@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 
 
@@ -7,7 +6,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>imod.mf6.evt &#8212; iMOD Python 1.1.0 documentation</title>
+    <title>imod.mf6.evt &#8212; iMOD Python 1.2.0 documentation</title>
   
   
   
@@ -26,22 +25,22 @@
   </noscript>
   
   <!-- Loaded before other Sphinx assets -->
-  <link href="../../../_static/styles/theme.css?digest=90905a2f556bf617f1a9" rel="stylesheet" />
-<link href="../../../_static/styles/pydata-sphinx-theme.css?digest=90905a2f556bf617f1a9" rel="stylesheet" />
+  <link href="../../../_static/styles/theme.css?digest=75c7c72ae941e8b558d8" rel="stylesheet" />
+<link href="../../../_static/styles/pydata-sphinx-theme.css?digest=75c7c72ae941e8b558d8" rel="stylesheet" />
 
     <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=03e43079" />
-    <link rel="stylesheet" type="text/css" href="../../../_static/sg_gallery.css?v=fd6457a4" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/sg_gallery.css?v=c83e6b79" />
     <link rel="stylesheet" type="text/css" href="../../../_static/sg_gallery-binder.css?v=f4aeca0c" />
     <link rel="stylesheet" type="text/css" href="../../../_static/sg_gallery-dataframe.css?v=2082cf3c" />
     <link rel="stylesheet" type="text/css" href="../../../_static/sg_gallery-rendered-html.css?v=1277b6f3" />
   
   <!-- So that users can add custom icons -->
-  <script defer src="../../../_static/scripts/fontawesome.js?digest=90905a2f556bf617f1a9"></script>
+  <script defer src="../../../_static/scripts/fontawesome.js?digest=75c7c72ae941e8b558d8"></script>
   <!-- Pre-loaded scripts that we'll load fully later -->
-  <link rel="preload" as="script" href="../../../_static/scripts/bootstrap.js?digest=90905a2f556bf617f1a9" />
-<link rel="preload" as="script" href="../../../_static/scripts/pydata-sphinx-theme.js?digest=90905a2f556bf617f1a9" />
+  <link rel="preload" as="script" href="../../../_static/scripts/bootstrap.js?digest=75c7c72ae941e8b558d8" />
+<link rel="preload" as="script" href="../../../_static/scripts/pydata-sphinx-theme.js?digest=75c7c72ae941e8b558d8" />
 
-    <script src="../../../_static/documentation_options.js?v=fc837d61"></script>
+    <script src="../../../_static/documentation_options.js?v=6efca38a"></script>
     <script src="../../../_static/doctools.js?v=fd6eb6e6"></script>
     <script src="../../../_static/sphinx_highlight.js?v=6ffebe34"></script>
     <script src="../../../_static/sg-tags.js?v=d80f6fa4"></script>
@@ -51,8 +50,9 @@
     <link rel="index" title="Index" href="../../../genindex.html" />
     <link rel="search" title="Search" href="../../../search.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <meta name="color-scheme" content="light dark"/>
   <meta name="docsearch:language" content="en"/>
-  <meta name="docsearch:version" content="1.1.0.dev" />
+  <meta name="docsearch:version" content="1.2.0.dev" />
   
     
     <script src="../../../_static/searchtools.js"></script>
@@ -100,7 +100,7 @@
   
     <header id="pst-header" class="bd-header navbar navbar-expand-lg bd-navbar d-print-none">
 <div class="bd-header__inner bd-page-width">
-  <button class="pst-navbar-icon sidebar-toggle primary-toggle" aria-label="Site navigation">
+  <button type="button" class="pst-navbar-icon sidebar-toggle primary-toggle" aria-label="Site navigation" aria-expanded="false" aria-controls="pst-primary-sidebar-modal">
     <span class="fa-solid fa-bars"></span>
   </button>
   
@@ -122,8 +122,8 @@
     
     
     
-    <img src="../../../_static/imod-python-logo-light.svg" class="logo__image only-light" alt="iMOD Python 1.1.0 documentation - Home"/>
-    <img src="../../../_static/imod-python-logo-dark.svg" class="logo__image only-dark pst-js-only" alt="iMOD Python 1.1.0 documentation - Home"/>
+    <img src="../../../_static/imod-python-logo-light.svg" class="logo__image only-light" alt="iMOD Python 1.2.0 documentation - Home"/>
+    <img src="../../../_static/imod-python-logo-dark.svg" class="logo__image only-dark pst-js-only" alt="iMOD Python 1.2.0 documentation - Home"/>
   
   
 </a></div>
@@ -190,7 +190,7 @@
         <div class="navbar-item navbar-persistent--container">
           
 
-<button class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+<button type="button" class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
  <i class="fa-solid fa-magnifying-glass"></i>
  <span class="search-button__default-text">Search</span>
  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
@@ -201,15 +201,15 @@
         <div class="navbar-item">
 
 <div class="theme-switch-container dropdown pst-js-only" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Color mode">
-  <button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button dropdown-toggle" aria-label="Color mode" data-bs-toggle="dropdown">
-    <i class="theme-switch fa-solid fa-sun fa-lg fa-fw" data-mode="light" title="Light"></i>
-    <i class="theme-switch fa-solid fa-moon fa-lg fa-fw" data-mode="dark" title="Dark"></i>
-    <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg fa-fw" data-mode="auto" title="System Settings"></i>
+  <button type="button" class="btn btn-sm nav-link pst-navbar-icon theme-switch-button dropdown-toggle" aria-label="Color mode" data-bs-toggle="dropdown">
+    <i class="theme-switch fa-solid fa-sun fa-lg" data-mode="light" title="Light"></i>
+    <i class="theme-switch fa-solid fa-moon fa-lg" data-mode="dark" title="Dark"></i>
+    <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg" data-mode="auto" title="System Settings"></i>
   </button>
   <ul class="dropdown-menu dropdown-menu-end">
-    <li><button class="dropdown-item d-flex align-items-center theme-change-button" data-mode="auto"><i class="fa-solid fa-circle-half-stroke fa-lg fa-fw me-1"></i>System Settings</button></li>
-    <li><button class="dropdown-item d-flex align-items-center theme-change-button" data-mode="light"><i class="fa-solid fa-sun fa-lg fa-fw me-1"></i>Light</button></li>
-    <li><button class="dropdown-item d-flex align-items-center theme-change-button" data-mode="dark"><i class="fa-solid fa-moon fa-lg fa-fw me-1"></i>Dark</button></li>
+    <li><button type="button" class="dropdown-item d-flex align-items-center theme-change-button" data-mode="auto"><i class="fa-solid fa-circle-half-stroke fa-lg me-1"></i>System Settings</button></li>
+    <li><button type="button" class="dropdown-item d-flex align-items-center theme-change-button" data-mode="light"><i class="fa-solid fa-sun fa-lg me-1"></i>Light</button></li>
+    <li><button type="button" class="dropdown-item d-flex align-items-center theme-change-button" data-mode="dark"><i class="fa-solid fa-moon fa-lg me-1"></i>Dark</button></li>
   </ul>
 </div></div>
       
@@ -246,7 +246,7 @@
   
     <div class="navbar-persistent--mobile">
 
-<button class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+<button type="button" class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
  <i class="fa-solid fa-magnifying-glass"></i>
  <span class="search-button__default-text">Search</span>
  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
@@ -267,7 +267,7 @@
       
         
       
-      <dialog id="pst-primary-sidebar-modal"></dialog>
+      <dialog id="pst-primary-sidebar-modal" tabindex="-1"></dialog>
       <div id="pst-primary-sidebar" class="bd-sidebar-primary bd-sidebar hide-on-wide">
         
 
@@ -337,15 +337,15 @@
           <div class="navbar-item">
 
 <div class="theme-switch-container dropdown pst-js-only" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Color mode">
-  <button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button dropdown-toggle" aria-label="Color mode" data-bs-toggle="dropdown">
-    <i class="theme-switch fa-solid fa-sun fa-lg fa-fw" data-mode="light" title="Light"></i>
-    <i class="theme-switch fa-solid fa-moon fa-lg fa-fw" data-mode="dark" title="Dark"></i>
-    <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg fa-fw" data-mode="auto" title="System Settings"></i>
+  <button type="button" class="btn btn-sm nav-link pst-navbar-icon theme-switch-button dropdown-toggle" aria-label="Color mode" data-bs-toggle="dropdown">
+    <i class="theme-switch fa-solid fa-sun fa-lg" data-mode="light" title="Light"></i>
+    <i class="theme-switch fa-solid fa-moon fa-lg" data-mode="dark" title="Dark"></i>
+    <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg" data-mode="auto" title="System Settings"></i>
   </button>
   <ul class="dropdown-menu dropdown-menu-end">
-    <li><button class="dropdown-item d-flex align-items-center theme-change-button" data-mode="auto"><i class="fa-solid fa-circle-half-stroke fa-lg fa-fw me-1"></i>System Settings</button></li>
-    <li><button class="dropdown-item d-flex align-items-center theme-change-button" data-mode="light"><i class="fa-solid fa-sun fa-lg fa-fw me-1"></i>Light</button></li>
-    <li><button class="dropdown-item d-flex align-items-center theme-change-button" data-mode="dark"><i class="fa-solid fa-moon fa-lg fa-fw me-1"></i>Dark</button></li>
+    <li><button type="button" class="dropdown-item d-flex align-items-center theme-change-button" data-mode="auto"><i class="fa-solid fa-circle-half-stroke fa-lg me-1"></i>System Settings</button></li>
+    <li><button type="button" class="dropdown-item d-flex align-items-center theme-change-button" data-mode="light"><i class="fa-solid fa-sun fa-lg me-1"></i>Light</button></li>
+    <li><button type="button" class="dropdown-item d-flex align-items-center theme-change-button" data-mode="dark"><i class="fa-solid fa-moon fa-lg me-1"></i>Dark</button></li>
   </ul>
 </div></div>
         
@@ -411,7 +411,7 @@
     
     <li class="breadcrumb-item breadcrumb-home">
       <a href="../../../index.html" class="nav-link" aria-label="Home">
-        <i class="fa-solid fa-home"></i>
+        <i class="fa-solid fa-house"></i>
       </a>
     </li>
     
@@ -435,9 +435,10 @@
                 <article class="bd-article">
                   
   <h1>Source code for imod.mf6.evt</h1><div class="highlight"><pre>
-<span></span><span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Any</span><span class="p">,</span> <span class="n">Optional</span>
+<span></span><span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Any</span>
 
 <span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">xarray</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">xr</span>
 
 <span class="kn">from</span><span class="w"> </span><span class="nn">imod.common.interfaces.iregridpackage</span><span class="w"> </span><span class="kn">import</span> <span class="n">IRegridPackage</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">imod.logging</span><span class="w"> </span><span class="kn">import</span> <span class="n">init_log_decorator</span>
@@ -455,26 +456,28 @@
     <span class="n">IdentityNoDataSchema</span><span class="p">,</span>
     <span class="n">IndexesSchema</span><span class="p">,</span>
     <span class="n">OtherCoordsSchema</span><span class="p">,</span>
+    <span class="n">ValidationError</span><span class="p">,</span>
 <span class="p">)</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">imod.typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">GridDataArray</span><span class="p">,</span> <span class="n">GridDataset</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">imod.util.spatial</span><span class="w"> </span><span class="kn">import</span> <span class="n">unstack_dim_into_variable</span>
 
 <span class="n">SEGMENT_BOUNDARY_DIMS_SCHEMA</span> <span class="o">=</span> <span class="p">(</span>
-    <span class="n">DimsSchema</span><span class="p">(</span><span class="s2">&quot;segment&quot;</span><span class="p">,</span> <span class="s2">&quot;time&quot;</span><span class="p">,</span> <span class="s2">&quot;layer&quot;</span><span class="p">,</span> <span class="s2">&quot;y&quot;</span><span class="p">,</span> <span class="s2">&quot;x&quot;</span><span class="p">)</span>
-    <span class="o">|</span> <span class="n">DimsSchema</span><span class="p">(</span><span class="s2">&quot;segment&quot;</span><span class="p">,</span> <span class="s2">&quot;layer&quot;</span><span class="p">,</span> <span class="s2">&quot;y&quot;</span><span class="p">,</span> <span class="s2">&quot;x&quot;</span><span class="p">)</span>
-    <span class="o">|</span> <span class="n">DimsSchema</span><span class="p">(</span><span class="s2">&quot;segment&quot;</span><span class="p">,</span> <span class="s2">&quot;time&quot;</span><span class="p">,</span> <span class="s2">&quot;layer&quot;</span><span class="p">,</span> <span class="s2">&quot;</span><span class="si">{face_dim}</span><span class="s2">&quot;</span><span class="p">)</span>
-    <span class="o">|</span> <span class="n">DimsSchema</span><span class="p">(</span><span class="s2">&quot;segment&quot;</span><span class="p">,</span> <span class="s2">&quot;layer&quot;</span><span class="p">,</span> <span class="s2">&quot;</span><span class="si">{face_dim}</span><span class="s2">&quot;</span><span class="p">)</span>
+    <span class="n">DimsSchema</span><span class="p">(</span><span class="s2">"segment"</span><span class="p">,</span> <span class="s2">"time"</span><span class="p">,</span> <span class="s2">"layer"</span><span class="p">,</span> <span class="s2">"y"</span><span class="p">,</span> <span class="s2">"x"</span><span class="p">)</span>
+    <span class="o">|</span> <span class="n">DimsSchema</span><span class="p">(</span><span class="s2">"segment"</span><span class="p">,</span> <span class="s2">"layer"</span><span class="p">,</span> <span class="s2">"y"</span><span class="p">,</span> <span class="s2">"x"</span><span class="p">)</span>
+    <span class="o">|</span> <span class="n">DimsSchema</span><span class="p">(</span><span class="s2">"segment"</span><span class="p">,</span> <span class="s2">"time"</span><span class="p">,</span> <span class="s2">"layer"</span><span class="p">,</span> <span class="s2">"</span><span class="si">{face_dim}</span><span class="s2">"</span><span class="p">)</span>
+    <span class="o">|</span> <span class="n">DimsSchema</span><span class="p">(</span><span class="s2">"segment"</span><span class="p">,</span> <span class="s2">"layer"</span><span class="p">,</span> <span class="s2">"</span><span class="si">{face_dim}</span><span class="s2">"</span><span class="p">)</span>
     <span class="c1"># Layer dim not necessary, as long as there is a layer coordinate present.</span>
-    <span class="o">|</span> <span class="n">DimsSchema</span><span class="p">(</span><span class="s2">&quot;segment&quot;</span><span class="p">,</span> <span class="s2">&quot;time&quot;</span><span class="p">,</span> <span class="s2">&quot;y&quot;</span><span class="p">,</span> <span class="s2">&quot;x&quot;</span><span class="p">)</span>
-    <span class="o">|</span> <span class="n">DimsSchema</span><span class="p">(</span><span class="s2">&quot;segment&quot;</span><span class="p">,</span> <span class="s2">&quot;y&quot;</span><span class="p">,</span> <span class="s2">&quot;x&quot;</span><span class="p">)</span>
-    <span class="o">|</span> <span class="n">DimsSchema</span><span class="p">(</span><span class="s2">&quot;segment&quot;</span><span class="p">,</span> <span class="s2">&quot;time&quot;</span><span class="p">,</span> <span class="s2">&quot;</span><span class="si">{face_dim}</span><span class="s2">&quot;</span><span class="p">)</span>
-    <span class="o">|</span> <span class="n">DimsSchema</span><span class="p">(</span><span class="s2">&quot;segment&quot;</span><span class="p">,</span> <span class="s2">&quot;</span><span class="si">{face_dim}</span><span class="s2">&quot;</span><span class="p">)</span>
+    <span class="o">|</span> <span class="n">DimsSchema</span><span class="p">(</span><span class="s2">"segment"</span><span class="p">,</span> <span class="s2">"time"</span><span class="p">,</span> <span class="s2">"y"</span><span class="p">,</span> <span class="s2">"x"</span><span class="p">)</span>
+    <span class="o">|</span> <span class="n">DimsSchema</span><span class="p">(</span><span class="s2">"segment"</span><span class="p">,</span> <span class="s2">"y"</span><span class="p">,</span> <span class="s2">"x"</span><span class="p">)</span>
+    <span class="o">|</span> <span class="n">DimsSchema</span><span class="p">(</span><span class="s2">"segment"</span><span class="p">,</span> <span class="s2">"time"</span><span class="p">,</span> <span class="s2">"</span><span class="si">{face_dim}</span><span class="s2">"</span><span class="p">)</span>
+    <span class="o">|</span> <span class="n">DimsSchema</span><span class="p">(</span><span class="s2">"segment"</span><span class="p">,</span> <span class="s2">"</span><span class="si">{face_dim}</span><span class="s2">"</span><span class="p">)</span>
 <span class="p">)</span>
 
 
 <div class="viewcode-block" id="Evapotranspiration">
 <a class="viewcode-back" href="../../../api/generated/mf6/imod.mf6.Evapotranspiration.html#imod.mf6.Evapotranspiration">[docs]</a>
 <span class="k">class</span><span class="w"> </span><span class="nc">Evapotranspiration</span><span class="p">(</span><span class="n">BoundaryCondition</span><span class="p">,</span> <span class="n">IRegridPackage</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">"""</span>
 <span class="sd">    Evapotranspiration (EVT) Package.</span>
 <span class="sd">    Any number of EVT Packages can be specified for a single groundwater flow</span>
 <span class="sd">    model. All single-valued variables are free format.</span>
@@ -490,14 +493,14 @@
 <span class="sd">        Is the ET extinction depth (L).</span>
 <span class="sd">    proportion_rate: array of floats (xr.DataArray, optional)</span>
 <span class="sd">        Is the proportion of the maximum ET flux rate at the bottom of a segment</span>
-<span class="sd">        (dimensionless). &quot;petm&quot; in MODFLOW 6. Requires a &quot;segment&quot; dimension.</span>
+<span class="sd">        (dimensionless). "petm" in MODFLOW 6. Requires a "segment" dimension.</span>
 <span class="sd">    proportion_depth: array of floats (xr.DataArray, optional)</span>
 <span class="sd">        Is the proportion of the ET extinction depth at the bottom of a segment</span>
-<span class="sd">        (dimensionless). &quot;pxdp&quot; in MODFLOW 6. Requires a &quot;segment&quot; dimension</span>
+<span class="sd">        (dimensionless). "pxdp" in MODFLOW 6. Requires a "segment" dimension</span>
 <span class="sd">    concentration: array of floats (xr.DataArray, optional)</span>
 <span class="sd">        if this flow package is used in simulations also involving transport, then this array is used</span>
 <span class="sd">        as the  concentration for inflow over this boundary.</span>
-<span class="sd">    concentration_boundary_type: ({&quot;AUX&quot;, &quot;AUXMIXED&quot;}, optional)</span>
+<span class="sd">    concentration_boundary_type: ({"AUX", "AUXMIXED"}, optional)</span>
 <span class="sd">        if this flow package is used in simulations also involving transport, then this keyword specifies</span>
 <span class="sd">        how outflow over this boundary is computed.</span>
 <span class="sd">    fixed_cell: array of floats (xr.DataArray)</span>
@@ -510,14 +513,14 @@
 <span class="sd">        Default is False.</span>
 <span class="sd">    print_flows: ({True, False}, optional)</span>
 <span class="sd">        Indicates that the list of evapotranspiration flow rates will be printed</span>
-<span class="sd">        to the listing file for every stress period time step in which &quot;BUDGET</span>
-<span class="sd">        PRINT&quot; is specified in Output Control. If there is no Output Control</span>
+<span class="sd">        to the listing file for every stress period time step in which "BUDGET</span>
+<span class="sd">        PRINT" is specified in Output Control. If there is no Output Control</span>
 <span class="sd">        option and PRINT FLOWS is specified, then flow rates are printed for the</span>
 <span class="sd">        last time step of each stress period.</span>
 <span class="sd">        Default is False.</span>
 <span class="sd">    save_flows: ({True, False}, optional)</span>
 <span class="sd">        Indicates that evapotranspiration flow terms will be written to the file</span>
-<span class="sd">        specified with &quot;BUDGET FILEOUT&quot; in Output Control.</span>
+<span class="sd">        specified with "BUDGET FILEOUT" in Output Control.</span>
 <span class="sd">        Default is False.</span>
 <span class="sd">    observations: [Not yet supported.]</span>
 <span class="sd">        Default is None.</span>
@@ -529,11 +532,11 @@
 <span class="sd">        Used to repeat data for e.g. repeating stress periods such as</span>
 <span class="sd">        seasonality without duplicating the values. If provided as dict, it</span>
 <span class="sd">        should map new dates to old dates present in the dataset.</span>
-<span class="sd">        ``{&quot;2001-04-01&quot;: &quot;2000-04-01&quot;, &quot;2001-10-01&quot;: &quot;2000-10-01&quot;}`` if provided</span>
-<span class="sd">        as DataArray, it should have dimensions ``(&quot;repeat&quot;, &quot;repeat_items&quot;)``.</span>
+<span class="sd">        ``{"2001-04-01": "2000-04-01", "2001-10-01": "2000-10-01"}`` if provided</span>
+<span class="sd">        as DataArray, it should have dimensions ``("repeat", "repeat_items")``.</span>
 <span class="sd">        The ``repeat_items`` dimension should have size 2: the first value is</span>
-<span class="sd">        the &quot;key&quot;, the second value is the &quot;value&quot;. For the &quot;key&quot; datetime, the</span>
-<span class="sd">        data of the &quot;value&quot; datetime will be used.</span>
+<span class="sd">        the "key", the second value is the "value". For the "key" datetime, the</span>
+<span class="sd">        data of the "value" datetime will be used.</span>
 
 <span class="sd">    Examples</span>
 <span class="sd">    --------</span>
@@ -545,7 +548,7 @@
 <span class="sd">    With ET extinction depth and segments:</span>
 
 <span class="sd">    &gt;&gt;&gt; segments = xr.DataArray(</span>
-<span class="sd">    ...     data=[1, 2, 3], coords={&quot;segment&quot;: [1, 2, 3]}, dims=(&quot;segment&quot;,)</span>
+<span class="sd">    ...     data=[1, 2, 3], coords={"segment": [1, 2, 3]}, dims=("segment",)</span>
 <span class="sd">    ... )</span>
 <span class="sd">    &gt;&gt;&gt; segments_reversed = segments.copy()</span>
 <span class="sd">    &gt;&gt;&gt; segments_reversed.values = [3, 2, 1]</span>
@@ -559,81 +562,81 @@
 <span class="sd">    ...     proportion_rate=proportion_rate,</span>
 <span class="sd">    ...     proportion_depth=proportion_depth,</span>
 <span class="sd">    ... )</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
 
-    <span class="n">_pkg_id</span> <span class="o">=</span> <span class="s2">&quot;evt&quot;</span>
+    <span class="n">_pkg_id</span> <span class="o">=</span> <span class="s2">"evt"</span>
     <span class="n">_init_schemata</span> <span class="o">=</span> <span class="p">{</span>
-        <span class="s2">&quot;surface&quot;</span><span class="p">:</span> <span class="p">[</span>
+        <span class="s2">"surface"</span><span class="p">:</span> <span class="p">[</span>
             <span class="n">DTypeSchema</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">floating</span><span class="p">),</span>
             <span class="n">IndexesSchema</span><span class="p">(),</span>
-            <span class="n">CoordsSchema</span><span class="p">((</span><span class="s2">&quot;layer&quot;</span><span class="p">,)),</span>
+            <span class="n">CoordsSchema</span><span class="p">((</span><span class="s2">"layer"</span><span class="p">,)),</span>
             <span class="n">BOUNDARY_DIMS_SCHEMA</span><span class="p">,</span>
-            <span class="n">AllCoordsValueSchema</span><span class="p">(</span><span class="s2">&quot;layer&quot;</span><span class="p">,</span> <span class="s2">&quot;&gt;&quot;</span><span class="p">,</span> <span class="mi">0</span><span class="p">),</span>
+            <span class="n">AllCoordsValueSchema</span><span class="p">(</span><span class="s2">"layer"</span><span class="p">,</span> <span class="s2">"&gt;"</span><span class="p">,</span> <span class="mi">0</span><span class="p">),</span>
         <span class="p">],</span>
-        <span class="s2">&quot;rate&quot;</span><span class="p">:</span> <span class="p">[</span>
+        <span class="s2">"rate"</span><span class="p">:</span> <span class="p">[</span>
             <span class="n">DTypeSchema</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">floating</span><span class="p">),</span>
             <span class="n">IndexesSchema</span><span class="p">(),</span>
-            <span class="n">CoordsSchema</span><span class="p">((</span><span class="s2">&quot;layer&quot;</span><span class="p">,)),</span>
+            <span class="n">CoordsSchema</span><span class="p">((</span><span class="s2">"layer"</span><span class="p">,)),</span>
             <span class="n">BOUNDARY_DIMS_SCHEMA</span><span class="p">,</span>
-            <span class="n">AllCoordsValueSchema</span><span class="p">(</span><span class="s2">&quot;layer&quot;</span><span class="p">,</span> <span class="s2">&quot;&gt;&quot;</span><span class="p">,</span> <span class="mi">0</span><span class="p">),</span>
+            <span class="n">AllCoordsValueSchema</span><span class="p">(</span><span class="s2">"layer"</span><span class="p">,</span> <span class="s2">"&gt;"</span><span class="p">,</span> <span class="mi">0</span><span class="p">),</span>
         <span class="p">],</span>
-        <span class="s2">&quot;depth&quot;</span><span class="p">:</span> <span class="p">[</span>
+        <span class="s2">"depth"</span><span class="p">:</span> <span class="p">[</span>
             <span class="n">DTypeSchema</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">floating</span><span class="p">),</span>
             <span class="n">IndexesSchema</span><span class="p">(),</span>
-            <span class="n">CoordsSchema</span><span class="p">((</span><span class="s2">&quot;layer&quot;</span><span class="p">,)),</span>
+            <span class="n">CoordsSchema</span><span class="p">((</span><span class="s2">"layer"</span><span class="p">,)),</span>
             <span class="n">BOUNDARY_DIMS_SCHEMA</span><span class="p">,</span>
-            <span class="n">AllCoordsValueSchema</span><span class="p">(</span><span class="s2">&quot;layer&quot;</span><span class="p">,</span> <span class="s2">&quot;&gt;&quot;</span><span class="p">,</span> <span class="mi">0</span><span class="p">),</span>
+            <span class="n">AllCoordsValueSchema</span><span class="p">(</span><span class="s2">"layer"</span><span class="p">,</span> <span class="s2">"&gt;"</span><span class="p">,</span> <span class="mi">0</span><span class="p">),</span>
         <span class="p">],</span>
-        <span class="s2">&quot;proportion_rate&quot;</span><span class="p">:</span> <span class="p">[</span>
+        <span class="s2">"proportion_rate"</span><span class="p">:</span> <span class="p">[</span>
             <span class="n">DTypeSchema</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">floating</span><span class="p">),</span>
             <span class="n">IndexesSchema</span><span class="p">(),</span>
-            <span class="n">CoordsSchema</span><span class="p">((</span><span class="s2">&quot;layer&quot;</span><span class="p">,)),</span>
+            <span class="n">CoordsSchema</span><span class="p">((</span><span class="s2">"layer"</span><span class="p">,)),</span>
             <span class="n">SEGMENT_BOUNDARY_DIMS_SCHEMA</span><span class="p">,</span>
-            <span class="n">AllCoordsValueSchema</span><span class="p">(</span><span class="s2">&quot;layer&quot;</span><span class="p">,</span> <span class="s2">&quot;&gt;&quot;</span><span class="p">,</span> <span class="mi">0</span><span class="p">),</span>
+            <span class="n">AllCoordsValueSchema</span><span class="p">(</span><span class="s2">"layer"</span><span class="p">,</span> <span class="s2">"&gt;"</span><span class="p">,</span> <span class="mi">0</span><span class="p">),</span>
         <span class="p">],</span>
-        <span class="s2">&quot;proportion_depth&quot;</span><span class="p">:</span> <span class="p">[</span>
+        <span class="s2">"proportion_depth"</span><span class="p">:</span> <span class="p">[</span>
             <span class="n">DTypeSchema</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">floating</span><span class="p">),</span>
             <span class="n">IndexesSchema</span><span class="p">(),</span>
-            <span class="n">CoordsSchema</span><span class="p">((</span><span class="s2">&quot;layer&quot;</span><span class="p">,)),</span>
+            <span class="n">CoordsSchema</span><span class="p">((</span><span class="s2">"layer"</span><span class="p">,)),</span>
             <span class="n">SEGMENT_BOUNDARY_DIMS_SCHEMA</span><span class="p">,</span>
-            <span class="n">AllCoordsValueSchema</span><span class="p">(</span><span class="s2">&quot;layer&quot;</span><span class="p">,</span> <span class="s2">&quot;&gt;&quot;</span><span class="p">,</span> <span class="mi">0</span><span class="p">),</span>
+            <span class="n">AllCoordsValueSchema</span><span class="p">(</span><span class="s2">"layer"</span><span class="p">,</span> <span class="s2">"&gt;"</span><span class="p">,</span> <span class="mi">0</span><span class="p">),</span>
         <span class="p">],</span>
-        <span class="s2">&quot;concentration&quot;</span><span class="p">:</span> <span class="p">[</span>
+        <span class="s2">"concentration"</span><span class="p">:</span> <span class="p">[</span>
             <span class="n">DTypeSchema</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">floating</span><span class="p">),</span>
             <span class="n">IndexesSchema</span><span class="p">(),</span>
             <span class="n">CoordsSchema</span><span class="p">(</span>
                 <span class="p">(</span>
-                    <span class="s2">&quot;species&quot;</span><span class="p">,</span>
-                    <span class="s2">&quot;layer&quot;</span><span class="p">,</span>
+                    <span class="s2">"species"</span><span class="p">,</span>
+                    <span class="s2">"layer"</span><span class="p">,</span>
                 <span class="p">)</span>
             <span class="p">),</span>
             <span class="n">CONC_DIMS_SCHEMA</span><span class="p">,</span>
         <span class="p">],</span>
-        <span class="s2">&quot;print_flows&quot;</span><span class="p">:</span> <span class="p">[</span><span class="n">DTypeSchema</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">bool_</span><span class="p">),</span> <span class="n">DimsSchema</span><span class="p">()],</span>
-        <span class="s2">&quot;save_flows&quot;</span><span class="p">:</span> <span class="p">[</span><span class="n">DTypeSchema</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">bool_</span><span class="p">),</span> <span class="n">DimsSchema</span><span class="p">()],</span>
+        <span class="s2">"print_flows"</span><span class="p">:</span> <span class="p">[</span><span class="n">DTypeSchema</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">bool_</span><span class="p">),</span> <span class="n">DimsSchema</span><span class="p">()],</span>
+        <span class="s2">"save_flows"</span><span class="p">:</span> <span class="p">[</span><span class="n">DTypeSchema</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">bool_</span><span class="p">),</span> <span class="n">DimsSchema</span><span class="p">()],</span>
     <span class="p">}</span>
     <span class="n">_write_schemata</span> <span class="o">=</span> <span class="p">{</span>
-        <span class="s2">&quot;surface&quot;</span><span class="p">:</span> <span class="p">[</span>
-            <span class="n">OtherCoordsSchema</span><span class="p">(</span><span class="s2">&quot;idomain&quot;</span><span class="p">),</span>
+        <span class="s2">"surface"</span><span class="p">:</span> <span class="p">[</span>
+            <span class="n">OtherCoordsSchema</span><span class="p">(</span><span class="s2">"idomain"</span><span class="p">),</span>
             <span class="n">AllNoDataSchema</span><span class="p">(),</span>  <span class="c1"># Check for all nan, can occur while clipping</span>
-            <span class="n">AllInsideNoDataSchema</span><span class="p">(</span><span class="n">other</span><span class="o">=</span><span class="s2">&quot;idomain&quot;</span><span class="p">,</span> <span class="n">is_other_notnull</span><span class="o">=</span><span class="p">(</span><span class="s2">&quot;&gt;&quot;</span><span class="p">,</span> <span class="mi">0</span><span class="p">)),</span>
+            <span class="n">AllInsideNoDataSchema</span><span class="p">(</span><span class="n">other</span><span class="o">=</span><span class="s2">"idomain"</span><span class="p">,</span> <span class="n">is_other_notnull</span><span class="o">=</span><span class="p">(</span><span class="s2">"&gt;"</span><span class="p">,</span> <span class="mi">0</span><span class="p">)),</span>
         <span class="p">],</span>
-        <span class="s2">&quot;rate&quot;</span><span class="p">:</span> <span class="p">[</span><span class="n">IdentityNoDataSchema</span><span class="p">(</span><span class="s2">&quot;surface&quot;</span><span class="p">)],</span>
-        <span class="s2">&quot;depth&quot;</span><span class="p">:</span> <span class="p">[</span><span class="n">IdentityNoDataSchema</span><span class="p">(</span><span class="s2">&quot;surface&quot;</span><span class="p">)],</span>
-        <span class="s2">&quot;proportion_rate&quot;</span><span class="p">:</span> <span class="p">[</span><span class="n">IdentityNoDataSchema</span><span class="p">(</span><span class="s2">&quot;surface&quot;</span><span class="p">)],</span>
-        <span class="s2">&quot;proportion_depth&quot;</span><span class="p">:</span> <span class="p">[</span>
-            <span class="n">IdentityNoDataSchema</span><span class="p">(</span><span class="s2">&quot;surface&quot;</span><span class="p">),</span>
-            <span class="n">AllValueSchema</span><span class="p">(</span><span class="s2">&quot;&gt;=&quot;</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">),</span>
-            <span class="n">AllValueSchema</span><span class="p">(</span><span class="s2">&quot;&lt;=&quot;</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">),</span>
+        <span class="s2">"rate"</span><span class="p">:</span> <span class="p">[</span><span class="n">IdentityNoDataSchema</span><span class="p">(</span><span class="s2">"surface"</span><span class="p">)],</span>
+        <span class="s2">"depth"</span><span class="p">:</span> <span class="p">[</span><span class="n">IdentityNoDataSchema</span><span class="p">(</span><span class="s2">"surface"</span><span class="p">)],</span>
+        <span class="s2">"proportion_rate"</span><span class="p">:</span> <span class="p">[</span><span class="n">IdentityNoDataSchema</span><span class="p">(</span><span class="s2">"surface"</span><span class="p">)],</span>
+        <span class="s2">"proportion_depth"</span><span class="p">:</span> <span class="p">[</span>
+            <span class="n">IdentityNoDataSchema</span><span class="p">(</span><span class="s2">"surface"</span><span class="p">),</span>
+            <span class="n">AllValueSchema</span><span class="p">(</span><span class="s2">"&gt;="</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">),</span>
+            <span class="n">AllValueSchema</span><span class="p">(</span><span class="s2">"&lt;="</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">),</span>
         <span class="p">],</span>
-        <span class="s2">&quot;concentration&quot;</span><span class="p">:</span> <span class="p">[</span><span class="n">IdentityNoDataSchema</span><span class="p">(</span><span class="s2">&quot;surface&quot;</span><span class="p">),</span> <span class="n">AllValueSchema</span><span class="p">(</span><span class="s2">&quot;&gt;=&quot;</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">)],</span>
+        <span class="s2">"concentration"</span><span class="p">:</span> <span class="p">[</span><span class="n">IdentityNoDataSchema</span><span class="p">(</span><span class="s2">"surface"</span><span class="p">),</span> <span class="n">AllValueSchema</span><span class="p">(</span><span class="s2">"&gt;="</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">)],</span>
     <span class="p">}</span>
 
-    <span class="n">_period_data</span> <span class="o">=</span> <span class="p">(</span><span class="s2">&quot;surface&quot;</span><span class="p">,</span> <span class="s2">&quot;rate&quot;</span><span class="p">,</span> <span class="s2">&quot;depth&quot;</span><span class="p">)</span>
-    <span class="n">_optional_data</span> <span class="o">=</span> <span class="p">(</span><span class="s2">&quot;proportion_depth&quot;</span><span class="p">,</span> <span class="s2">&quot;proportion_rate&quot;</span><span class="p">)</span>
+    <span class="n">_period_data</span> <span class="o">=</span> <span class="p">(</span><span class="s2">"surface"</span><span class="p">,</span> <span class="s2">"rate"</span><span class="p">,</span> <span class="s2">"depth"</span><span class="p">)</span>
+    <span class="n">_optional_data</span> <span class="o">=</span> <span class="p">(</span><span class="s2">"proportion_depth"</span><span class="p">,</span> <span class="s2">"proportion_rate"</span><span class="p">)</span>
     <span class="n">_keyword_map</span> <span class="o">=</span> <span class="p">{}</span>
     <span class="n">_template</span> <span class="o">=</span> <span class="n">BoundaryCondition</span><span class="o">.</span><span class="n">_initialize_template</span><span class="p">(</span><span class="n">_pkg_id</span><span class="p">)</span>
-    <span class="n">_auxiliary_data</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;concentration&quot;</span><span class="p">:</span> <span class="s2">&quot;species&quot;</span><span class="p">}</span>
+    <span class="n">_auxiliary_data</span> <span class="o">=</span> <span class="p">{</span><span class="s2">"concentration"</span><span class="p">:</span> <span class="s2">"species"</span><span class="p">}</span>
     <span class="n">_regrid_method</span> <span class="o">=</span> <span class="n">EvapotranspirationRegridMethod</span><span class="p">()</span>
 
 <div class="viewcode-block" id="Evapotranspiration.__init__">
@@ -641,40 +644,40 @@
     <span class="nd">@init_log_decorator</span><span class="p">()</span>
     <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
-        <span class="n">surface</span><span class="p">,</span>
-        <span class="n">rate</span><span class="p">,</span>
-        <span class="n">depth</span><span class="p">,</span>
-        <span class="n">proportion_rate</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
-        <span class="n">proportion_depth</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
-        <span class="n">concentration</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
-        <span class="n">concentration_boundary_type</span><span class="o">=</span><span class="s2">&quot;auxmixed&quot;</span><span class="p">,</span>
-        <span class="n">fixed_cell</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
-        <span class="n">print_input</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
-        <span class="n">print_flows</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
-        <span class="n">save_flows</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
-        <span class="n">observations</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">surface</span><span class="p">:</span> <span class="n">GridDataArray</span><span class="p">,</span>
+        <span class="n">rate</span><span class="p">:</span> <span class="n">GridDataArray</span><span class="p">,</span>
+        <span class="n">depth</span><span class="p">:</span> <span class="n">GridDataArray</span><span class="p">,</span>
+        <span class="n">proportion_rate</span><span class="p">:</span> <span class="n">GridDataArray</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">proportion_depth</span><span class="p">:</span> <span class="n">GridDataArray</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">concentration</span><span class="p">:</span> <span class="n">GridDataArray</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">concentration_boundary_type</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">"auxmixed"</span><span class="p">,</span>
+        <span class="n">fixed_cell</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">|</span> <span class="n">GridDataArray</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
+        <span class="n">print_input</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
+        <span class="n">print_flows</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
+        <span class="n">save_flows</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
+        <span class="n">observations</span><span class="p">:</span> <span class="n">Any</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
         <span class="n">validate</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
-        <span class="n">repeat_stress</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
-    <span class="p">):</span>
+        <span class="n">repeat_stress</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="n">Any</span><span class="p">,</span> <span class="n">Any</span><span class="p">]</span> <span class="o">|</span> <span class="n">xr</span><span class="o">.</span><span class="n">DataArray</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
         <span class="k">if</span> <span class="p">(</span><span class="n">proportion_rate</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">)</span> <span class="o">^</span> <span class="p">(</span><span class="n">proportion_depth</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">):</span>
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
-                <span class="s2">&quot;Both &#39;proportion_rate&#39; and &#39;proportion_depth&#39; must both be provided,&quot;</span>
-                <span class="s2">&quot; or neither of them.&quot;</span>
+                <span class="s2">"Both 'proportion_rate' and 'proportion_depth' must both be provided,"</span>
+                <span class="s2">" or neither of them."</span>
             <span class="p">)</span>
-        <span class="n">dict_dataset</span> <span class="o">=</span> <span class="p">{</span>
-            <span class="s2">&quot;surface&quot;</span><span class="p">:</span> <span class="n">surface</span><span class="p">,</span>
-            <span class="s2">&quot;rate&quot;</span><span class="p">:</span> <span class="n">rate</span><span class="p">,</span>
-            <span class="s2">&quot;depth&quot;</span><span class="p">:</span> <span class="n">depth</span><span class="p">,</span>
-            <span class="s2">&quot;proportion_rate&quot;</span><span class="p">:</span> <span class="n">proportion_rate</span><span class="p">,</span>
-            <span class="s2">&quot;proportion_depth&quot;</span><span class="p">:</span> <span class="n">proportion_depth</span><span class="p">,</span>
-            <span class="s2">&quot;concentration&quot;</span><span class="p">:</span> <span class="n">concentration</span><span class="p">,</span>
-            <span class="s2">&quot;concentration_boundary_type&quot;</span><span class="p">:</span> <span class="n">concentration_boundary_type</span><span class="p">,</span>
-            <span class="s2">&quot;fixed_cell&quot;</span><span class="p">:</span> <span class="n">fixed_cell</span><span class="p">,</span>
-            <span class="s2">&quot;print_input&quot;</span><span class="p">:</span> <span class="n">print_input</span><span class="p">,</span>
-            <span class="s2">&quot;print_flows&quot;</span><span class="p">:</span> <span class="n">print_flows</span><span class="p">,</span>
-            <span class="s2">&quot;save_flows&quot;</span><span class="p">:</span> <span class="n">save_flows</span><span class="p">,</span>
-            <span class="s2">&quot;observations&quot;</span><span class="p">:</span> <span class="n">observations</span><span class="p">,</span>
-            <span class="s2">&quot;repeat_stress&quot;</span><span class="p">:</span> <span class="n">repeat_stress</span><span class="p">,</span>
+        <span class="n">dict_dataset</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="s2">"surface"</span><span class="p">:</span> <span class="n">surface</span><span class="p">,</span>
+            <span class="s2">"rate"</span><span class="p">:</span> <span class="n">rate</span><span class="p">,</span>
+            <span class="s2">"depth"</span><span class="p">:</span> <span class="n">depth</span><span class="p">,</span>
+            <span class="s2">"proportion_rate"</span><span class="p">:</span> <span class="n">proportion_rate</span><span class="p">,</span>
+            <span class="s2">"proportion_depth"</span><span class="p">:</span> <span class="n">proportion_depth</span><span class="p">,</span>
+            <span class="s2">"concentration"</span><span class="p">:</span> <span class="n">concentration</span><span class="p">,</span>
+            <span class="s2">"concentration_boundary_type"</span><span class="p">:</span> <span class="n">concentration_boundary_type</span><span class="p">,</span>
+            <span class="s2">"fixed_cell"</span><span class="p">:</span> <span class="n">fixed_cell</span><span class="p">,</span>
+            <span class="s2">"print_input"</span><span class="p">:</span> <span class="n">print_input</span><span class="p">,</span>
+            <span class="s2">"print_flows"</span><span class="p">:</span> <span class="n">print_flows</span><span class="p">,</span>
+            <span class="s2">"save_flows"</span><span class="p">:</span> <span class="n">save_flows</span><span class="p">,</span>
+            <span class="s2">"observations"</span><span class="p">:</span> <span class="n">observations</span><span class="p">,</span>
+            <span class="s2">"repeat_stress"</span><span class="p">:</span> <span class="n">repeat_stress</span><span class="p">,</span>
         <span class="p">}</span>
         <span class="c1"># Remove optional data if None</span>
         <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_optional_data</span><span class="p">:</span>
@@ -684,9 +687,11 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">_validate_init_schemata</span><span class="p">(</span><span class="n">validate</span><span class="p">)</span></div>
 
 
-    <span class="k">def</span><span class="w"> </span><span class="nf">_validate</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">schemata</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_validate</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span> <span class="n">schemata</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">],</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">:</span> <span class="n">Any</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">list</span><span class="p">[</span><span class="n">ValidationError</span><span class="p">]]:</span>
         <span class="c1"># Insert additional kwargs</span>
-        <span class="n">kwargs</span><span class="p">[</span><span class="s2">&quot;surface&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="p">[</span><span class="s2">&quot;surface&quot;</span><span class="p">]</span>
+        <span class="n">kwargs</span><span class="p">[</span><span class="s2">"surface"</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="p">[</span><span class="s2">"surface"</span><span class="p">]</span>
         <span class="n">errors</span> <span class="o">=</span> <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">_validate</span><span class="p">(</span><span class="n">schemata</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
 
         <span class="k">return</span> <span class="n">errors</span>
@@ -694,21 +699,21 @@
     <span class="k">def</span><span class="w"> </span><span class="nf">_get_pkg_options</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">predefined_options</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">],</span>
-        <span class="n">not_options</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-    <span class="p">):</span>
+        <span class="n">not_options</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]:</span>
         <span class="n">options</span> <span class="o">=</span> <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">_get_pkg_options</span><span class="p">(</span><span class="n">predefined_options</span><span class="p">,</span> <span class="n">not_options</span><span class="o">=</span><span class="n">not_options</span><span class="p">)</span>
         <span class="c1"># Add amount of segments</span>
-        <span class="k">if</span> <span class="s2">&quot;segment&quot;</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">dataset</span><span class="o">.</span><span class="n">dims</span><span class="p">:</span>
-            <span class="n">options</span><span class="p">[</span><span class="s2">&quot;nseg&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">dataset</span><span class="o">.</span><span class="n">sizes</span><span class="p">[</span><span class="s2">&quot;segment&quot;</span><span class="p">]</span> <span class="o">+</span> <span class="mi">1</span>
+        <span class="k">if</span> <span class="s2">"segment"</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">dataset</span><span class="o">.</span><span class="n">dims</span><span class="p">:</span>
+            <span class="n">options</span><span class="p">[</span><span class="s2">"nseg"</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">dataset</span><span class="o">.</span><span class="n">sizes</span><span class="p">[</span><span class="s2">"segment"</span><span class="p">]</span> <span class="o">+</span> <span class="mi">1</span>
         <span class="k">else</span><span class="p">:</span>
-            <span class="n">options</span><span class="p">[</span><span class="s2">&quot;nseg&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">1</span>
+            <span class="n">options</span><span class="p">[</span><span class="s2">"nseg"</span><span class="p">]</span> <span class="o">=</span> <span class="mi">1</span>
         <span class="k">return</span> <span class="n">options</span>
 
-    <span class="k">def</span><span class="w"> </span><span class="nf">_get_bin_ds</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_get_bin_ds</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">GridDataset</span><span class="p">:</span>
         <span class="n">bin_ds</span> <span class="o">=</span> <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">_get_bin_ds</span><span class="p">()</span>
 
-        <span class="c1"># Unstack &quot;segment&quot; dimension into different variables</span>
-        <span class="n">bin_ds</span> <span class="o">=</span> <span class="n">unstack_dim_into_variable</span><span class="p">(</span><span class="n">bin_ds</span><span class="p">,</span> <span class="s2">&quot;segment&quot;</span><span class="p">)</span>
+        <span class="c1"># Unstack "segment" dimension into different variables</span>
+        <span class="n">bin_ds</span> <span class="o">=</span> <span class="n">unstack_dim_into_variable</span><span class="p">(</span><span class="n">bin_ds</span><span class="p">,</span> <span class="s2">"segment"</span><span class="p">)</span>
 
         <span class="k">return</span> <span class="n">bin_ds</span></div>
 
@@ -741,8 +746,8 @@
   </div>
   
   <!-- Scripts loaded after <body> so the DOM is not blocked -->
-  <script defer src="../../../_static/scripts/bootstrap.js?digest=90905a2f556bf617f1a9"></script>
-<script defer src="../../../_static/scripts/pydata-sphinx-theme.js?digest=90905a2f556bf617f1a9"></script>
+  <script defer src="../../../_static/scripts/bootstrap.js?digest=75c7c72ae941e8b558d8"></script>
+<script defer src="../../../_static/scripts/pydata-sphinx-theme.js?digest=75c7c72ae941e8b558d8"></script>
 
   <footer class="bd-footer">
 <div class="bd-footer__inner bd-page-width">
@@ -762,8 +767,7 @@
         <div class="footer-item">
 
   <p class="sphinx-version">
-    Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 9.1.0.
-    <br/>
+    Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 9.2.0.
   </p>
 </div>
       
@@ -776,7 +780,7 @@
         <div class="footer-item">
 <p class="theme-version">
   <!-- # L10n: Setting the PST URL as an argument as this does not need to be localized -->
-  Built with the <a href="https://pydata-sphinx-theme.readthedocs.io/en/stable/index.html">PyData Sphinx Theme</a> 0.20.0.
+  Built with the <a href="https://pydata-sphinx-theme.readthedocs.io/en/stable/index.html">PyData Sphinx Theme</a> 0.24.0.
 </p></div>
       
     </div>

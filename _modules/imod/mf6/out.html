@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 
 
@@ -7,7 +6,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>imod.mf6.out &#8212; iMOD Python 1.1.0 documentation</title>
+    <title>imod.mf6.out &#8212; iMOD Python 1.2.0 documentation</title>
   
   
   
@@ -26,22 +25,22 @@
   </noscript>
   
   <!-- Loaded before other Sphinx assets -->
-  <link href="../../../_static/styles/theme.css?digest=90905a2f556bf617f1a9" rel="stylesheet" />
-<link href="../../../_static/styles/pydata-sphinx-theme.css?digest=90905a2f556bf617f1a9" rel="stylesheet" />
+  <link href="../../../_static/styles/theme.css?digest=75c7c72ae941e8b558d8" rel="stylesheet" />
+<link href="../../../_static/styles/pydata-sphinx-theme.css?digest=75c7c72ae941e8b558d8" rel="stylesheet" />
 
     <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=03e43079" />
-    <link rel="stylesheet" type="text/css" href="../../../_static/sg_gallery.css?v=fd6457a4" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/sg_gallery.css?v=c83e6b79" />
     <link rel="stylesheet" type="text/css" href="../../../_static/sg_gallery-binder.css?v=f4aeca0c" />
     <link rel="stylesheet" type="text/css" href="../../../_static/sg_gallery-dataframe.css?v=2082cf3c" />
     <link rel="stylesheet" type="text/css" href="../../../_static/sg_gallery-rendered-html.css?v=1277b6f3" />
   
   <!-- So that users can add custom icons -->
-  <script defer src="../../../_static/scripts/fontawesome.js?digest=90905a2f556bf617f1a9"></script>
+  <script defer src="../../../_static/scripts/fontawesome.js?digest=75c7c72ae941e8b558d8"></script>
   <!-- Pre-loaded scripts that we'll load fully later -->
-  <link rel="preload" as="script" href="../../../_static/scripts/bootstrap.js?digest=90905a2f556bf617f1a9" />
-<link rel="preload" as="script" href="../../../_static/scripts/pydata-sphinx-theme.js?digest=90905a2f556bf617f1a9" />
+  <link rel="preload" as="script" href="../../../_static/scripts/bootstrap.js?digest=75c7c72ae941e8b558d8" />
+<link rel="preload" as="script" href="../../../_static/scripts/pydata-sphinx-theme.js?digest=75c7c72ae941e8b558d8" />
 
-    <script src="../../../_static/documentation_options.js?v=fc837d61"></script>
+    <script src="../../../_static/documentation_options.js?v=6efca38a"></script>
     <script src="../../../_static/doctools.js?v=fd6eb6e6"></script>
     <script src="../../../_static/sphinx_highlight.js?v=6ffebe34"></script>
     <script src="../../../_static/sg-tags.js?v=d80f6fa4"></script>
@@ -51,8 +50,9 @@
     <link rel="index" title="Index" href="../../../genindex.html" />
     <link rel="search" title="Search" href="../../../search.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <meta name="color-scheme" content="light dark"/>
   <meta name="docsearch:language" content="en"/>
-  <meta name="docsearch:version" content="1.1.0.dev" />
+  <meta name="docsearch:version" content="1.2.0.dev" />
   
     
     <script src="../../../_static/searchtools.js"></script>
@@ -100,7 +100,7 @@
   
     <header id="pst-header" class="bd-header navbar navbar-expand-lg bd-navbar d-print-none">
 <div class="bd-header__inner bd-page-width">
-  <button class="pst-navbar-icon sidebar-toggle primary-toggle" aria-label="Site navigation">
+  <button type="button" class="pst-navbar-icon sidebar-toggle primary-toggle" aria-label="Site navigation" aria-expanded="false" aria-controls="pst-primary-sidebar-modal">
     <span class="fa-solid fa-bars"></span>
   </button>
   
@@ -122,8 +122,8 @@
     
     
     
-    <img src="../../../_static/imod-python-logo-light.svg" class="logo__image only-light" alt="iMOD Python 1.1.0 documentation - Home"/>
-    <img src="../../../_static/imod-python-logo-dark.svg" class="logo__image only-dark pst-js-only" alt="iMOD Python 1.1.0 documentation - Home"/>
+    <img src="../../../_static/imod-python-logo-light.svg" class="logo__image only-light" alt="iMOD Python 1.2.0 documentation - Home"/>
+    <img src="../../../_static/imod-python-logo-dark.svg" class="logo__image only-dark pst-js-only" alt="iMOD Python 1.2.0 documentation - Home"/>
   
   
 </a></div>
@@ -190,7 +190,7 @@
         <div class="navbar-item navbar-persistent--container">
           
 
-<button class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+<button type="button" class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
  <i class="fa-solid fa-magnifying-glass"></i>
  <span class="search-button__default-text">Search</span>
  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
@@ -201,15 +201,15 @@
         <div class="navbar-item">
 
 <div class="theme-switch-container dropdown pst-js-only" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Color mode">
-  <button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button dropdown-toggle" aria-label="Color mode" data-bs-toggle="dropdown">
-    <i class="theme-switch fa-solid fa-sun fa-lg fa-fw" data-mode="light" title="Light"></i>
-    <i class="theme-switch fa-solid fa-moon fa-lg fa-fw" data-mode="dark" title="Dark"></i>
-    <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg fa-fw" data-mode="auto" title="System Settings"></i>
+  <button type="button" class="btn btn-sm nav-link pst-navbar-icon theme-switch-button dropdown-toggle" aria-label="Color mode" data-bs-toggle="dropdown">
+    <i class="theme-switch fa-solid fa-sun fa-lg" data-mode="light" title="Light"></i>
+    <i class="theme-switch fa-solid fa-moon fa-lg" data-mode="dark" title="Dark"></i>
+    <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg" data-mode="auto" title="System Settings"></i>
   </button>
   <ul class="dropdown-menu dropdown-menu-end">
-    <li><button class="dropdown-item d-flex align-items-center theme-change-button" data-mode="auto"><i class="fa-solid fa-circle-half-stroke fa-lg fa-fw me-1"></i>System Settings</button></li>
-    <li><button class="dropdown-item d-flex align-items-center theme-change-button" data-mode="light"><i class="fa-solid fa-sun fa-lg fa-fw me-1"></i>Light</button></li>
-    <li><button class="dropdown-item d-flex align-items-center theme-change-button" data-mode="dark"><i class="fa-solid fa-moon fa-lg fa-fw me-1"></i>Dark</button></li>
+    <li><button type="button" class="dropdown-item d-flex align-items-center theme-change-button" data-mode="auto"><i class="fa-solid fa-circle-half-stroke fa-lg me-1"></i>System Settings</button></li>
+    <li><button type="button" class="dropdown-item d-flex align-items-center theme-change-button" data-mode="light"><i class="fa-solid fa-sun fa-lg me-1"></i>Light</button></li>
+    <li><button type="button" class="dropdown-item d-flex align-items-center theme-change-button" data-mode="dark"><i class="fa-solid fa-moon fa-lg me-1"></i>Dark</button></li>
   </ul>
 </div></div>
       
@@ -246,7 +246,7 @@
   
     <div class="navbar-persistent--mobile">
 
-<button class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+<button type="button" class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
  <i class="fa-solid fa-magnifying-glass"></i>
  <span class="search-button__default-text">Search</span>
  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
@@ -267,7 +267,7 @@
       
         
       
-      <dialog id="pst-primary-sidebar-modal"></dialog>
+      <dialog id="pst-primary-sidebar-modal" tabindex="-1"></dialog>
       <div id="pst-primary-sidebar" class="bd-sidebar-primary bd-sidebar hide-on-wide">
         
 
@@ -337,15 +337,15 @@
           <div class="navbar-item">
 
 <div class="theme-switch-container dropdown pst-js-only" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Color mode">
-  <button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button dropdown-toggle" aria-label="Color mode" data-bs-toggle="dropdown">
-    <i class="theme-switch fa-solid fa-sun fa-lg fa-fw" data-mode="light" title="Light"></i>
-    <i class="theme-switch fa-solid fa-moon fa-lg fa-fw" data-mode="dark" title="Dark"></i>
-    <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg fa-fw" data-mode="auto" title="System Settings"></i>
+  <button type="button" class="btn btn-sm nav-link pst-navbar-icon theme-switch-button dropdown-toggle" aria-label="Color mode" data-bs-toggle="dropdown">
+    <i class="theme-switch fa-solid fa-sun fa-lg" data-mode="light" title="Light"></i>
+    <i class="theme-switch fa-solid fa-moon fa-lg" data-mode="dark" title="Dark"></i>
+    <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg" data-mode="auto" title="System Settings"></i>
   </button>
   <ul class="dropdown-menu dropdown-menu-end">
-    <li><button class="dropdown-item d-flex align-items-center theme-change-button" data-mode="auto"><i class="fa-solid fa-circle-half-stroke fa-lg fa-fw me-1"></i>System Settings</button></li>
-    <li><button class="dropdown-item d-flex align-items-center theme-change-button" data-mode="light"><i class="fa-solid fa-sun fa-lg fa-fw me-1"></i>Light</button></li>
-    <li><button class="dropdown-item d-flex align-items-center theme-change-button" data-mode="dark"><i class="fa-solid fa-moon fa-lg fa-fw me-1"></i>Dark</button></li>
+    <li><button type="button" class="dropdown-item d-flex align-items-center theme-change-button" data-mode="auto"><i class="fa-solid fa-circle-half-stroke fa-lg me-1"></i>System Settings</button></li>
+    <li><button type="button" class="dropdown-item d-flex align-items-center theme-change-button" data-mode="light"><i class="fa-solid fa-sun fa-lg me-1"></i>Light</button></li>
+    <li><button type="button" class="dropdown-item d-flex align-items-center theme-change-button" data-mode="dark"><i class="fa-solid fa-moon fa-lg me-1"></i>Dark</button></li>
   </ul>
 </div></div>
         
@@ -411,7 +411,7 @@
     
     <li class="breadcrumb-item breadcrumb-home">
       <a href="../../../index.html" class="nav-link" aria-label="Home">
-        <i class="fa-solid fa-home"></i>
+        <i class="fa-solid fa-house"></i>
       </a>
     </li>
     
@@ -435,7 +435,7 @@
                 <article class="bd-article">
                   
   <h1>Source code for imod.mf6.out</h1><div class="highlight"><pre>
-<span></span><span class="sd">&quot;&quot;&quot;</span>
+<span></span><span class="sd">"""</span>
 <span class="sd">Read MODFLOW6 output</span>
 
 <span class="sd">The dis, disv, disu modules implement the following functions:</span>
@@ -456,12 +456,12 @@
 <span class="sd">    return</span>
 
 <span class="sd">def open_imeth1_budgets(</span>
-<span class="sd">    cbc_path: FilePath, grb_content: dict, header_list: List[&quot;Imeth1Header&quot;]</span>
+<span class="sd">    cbc_path: FilePath, grb_content: dict, header_list: List["Imeth1Header"]</span>
 <span class="sd">) -&gt; Darray:</span>
 <span class="sd">    return</span>
 
 <span class="sd">def open_imeth6_budgets(</span>
-<span class="sd">    cbc_path: FilePath, grb_content: dict, header_list: List[&quot;Imeth6Header&quot;]</span>
+<span class="sd">    cbc_path: FilePath, grb_content: dict, header_list: List["Imeth6Header"]</span>
 <span class="sd">) -&gt; Darray:</span>
 <span class="sd">    return</span>
 
@@ -473,9 +473,10 @@
 
 <span class="sd">(These could be implemented via Reader classes, but why bother with mutable</span>
 <span class="sd">state or a class with exclusively staticmethods?)</span>
-<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">"""</span>
 
-<span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Any</span><span class="p">,</span> <span class="n">Callable</span><span class="p">,</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">Union</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">collections.abc</span><span class="w"> </span><span class="kn">import</span> <span class="n">Callable</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Any</span>
 
 <span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">xarray</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">xr</span>
@@ -489,43 +490,43 @@
 <span class="kn">from</span><span class="w"> </span><span class="nn">.common</span><span class="w"> </span><span class="kn">import</span> <span class="n">FilePath</span><span class="p">,</span> <span class="n">_grb_text</span>
 
 <span class="n">_READ_GRB</span> <span class="o">=</span> <span class="p">{</span>
-    <span class="s2">&quot;grid dis&quot;</span><span class="p">:</span> <span class="n">dis</span><span class="o">.</span><span class="n">read_grb</span><span class="p">,</span>
-    <span class="s2">&quot;grid disv&quot;</span><span class="p">:</span> <span class="n">disv</span><span class="o">.</span><span class="n">read_grb</span><span class="p">,</span>
-    <span class="s2">&quot;grid disu&quot;</span><span class="p">:</span> <span class="n">disu</span><span class="o">.</span><span class="n">read_grb</span><span class="p">,</span>
+    <span class="s2">"grid dis"</span><span class="p">:</span> <span class="n">dis</span><span class="o">.</span><span class="n">read_grb</span><span class="p">,</span>
+    <span class="s2">"grid disv"</span><span class="p">:</span> <span class="n">disv</span><span class="o">.</span><span class="n">read_grb</span><span class="p">,</span>
+    <span class="s2">"grid disu"</span><span class="p">:</span> <span class="n">disu</span><span class="o">.</span><span class="n">read_grb</span><span class="p">,</span>
 <span class="p">}</span>
 
 <span class="n">_OPEN_HDS</span> <span class="o">=</span> <span class="p">{</span>
-    <span class="s2">&quot;dis&quot;</span><span class="p">:</span> <span class="n">dis</span><span class="o">.</span><span class="n">open_hds</span><span class="p">,</span>
-    <span class="s2">&quot;disv&quot;</span><span class="p">:</span> <span class="n">disv</span><span class="o">.</span><span class="n">open_hds</span><span class="p">,</span>
-    <span class="s2">&quot;disu&quot;</span><span class="p">:</span> <span class="n">disu</span><span class="o">.</span><span class="n">open_hds</span><span class="p">,</span>
+    <span class="s2">"dis"</span><span class="p">:</span> <span class="n">dis</span><span class="o">.</span><span class="n">open_hds</span><span class="p">,</span>
+    <span class="s2">"disv"</span><span class="p">:</span> <span class="n">disv</span><span class="o">.</span><span class="n">open_hds</span><span class="p">,</span>
+    <span class="s2">"disu"</span><span class="p">:</span> <span class="n">disu</span><span class="o">.</span><span class="n">open_hds</span><span class="p">,</span>
 <span class="p">}</span>
 
-<span class="n">_OPEN_CBC</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Callable</span><span class="p">[</span><span class="o">...</span><span class="p">,</span> <span class="n">Any</span><span class="p">]]</span> <span class="o">=</span> <span class="p">{</span>
-    <span class="s2">&quot;dis&quot;</span><span class="p">:</span> <span class="n">dis</span><span class="o">.</span><span class="n">open_cbc</span><span class="p">,</span>
-    <span class="s2">&quot;disv&quot;</span><span class="p">:</span> <span class="n">disv</span><span class="o">.</span><span class="n">open_cbc</span><span class="p">,</span>
-    <span class="s2">&quot;disu&quot;</span><span class="p">:</span> <span class="n">disu</span><span class="o">.</span><span class="n">open_cbc</span><span class="p">,</span>
+<span class="n">_OPEN_CBC</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Callable</span><span class="p">[</span><span class="o">...</span><span class="p">,</span> <span class="n">Any</span><span class="p">]]</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="s2">"dis"</span><span class="p">:</span> <span class="n">dis</span><span class="o">.</span><span class="n">open_cbc</span><span class="p">,</span>
+    <span class="s2">"disv"</span><span class="p">:</span> <span class="n">disv</span><span class="o">.</span><span class="n">open_cbc</span><span class="p">,</span>
+    <span class="s2">"disu"</span><span class="p">:</span> <span class="n">disu</span><span class="o">.</span><span class="n">open_cbc</span><span class="p">,</span>
 <span class="p">}</span>
 
 <span class="n">_OPEN_DVS</span> <span class="o">=</span> <span class="p">{</span>
-    <span class="s2">&quot;dis&quot;</span><span class="p">:</span> <span class="n">dis</span><span class="o">.</span><span class="n">open_dvs</span><span class="p">,</span>
-    <span class="s2">&quot;disv&quot;</span><span class="p">:</span> <span class="n">disv</span><span class="o">.</span><span class="n">open_dvs</span><span class="p">,</span>
-    <span class="s2">&quot;disu&quot;</span><span class="p">:</span> <span class="n">disu</span><span class="o">.</span><span class="n">open_dvs</span><span class="p">,</span>
+    <span class="s2">"dis"</span><span class="p">:</span> <span class="n">dis</span><span class="o">.</span><span class="n">open_dvs</span><span class="p">,</span>
+    <span class="s2">"disv"</span><span class="p">:</span> <span class="n">disv</span><span class="o">.</span><span class="n">open_dvs</span><span class="p">,</span>
+    <span class="s2">"disu"</span><span class="p">:</span> <span class="n">disu</span><span class="o">.</span><span class="n">open_dvs</span><span class="p">,</span>
 <span class="p">}</span>
 
 
-<span class="k">def</span><span class="w"> </span><span class="nf">_get_function</span><span class="p">(</span><span class="n">d</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Callable</span><span class="p">[</span><span class="o">...</span><span class="p">,</span> <span class="n">Any</span><span class="p">]],</span> <span class="n">key</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Callable</span><span class="p">[</span><span class="o">...</span><span class="p">,</span> <span class="n">Any</span><span class="p">]:</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">_get_function</span><span class="p">(</span><span class="n">d</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Callable</span><span class="p">[</span><span class="o">...</span><span class="p">,</span> <span class="n">Any</span><span class="p">]],</span> <span class="n">key</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Callable</span><span class="p">[</span><span class="o">...</span><span class="p">,</span> <span class="n">Any</span><span class="p">]:</span>
     <span class="k">try</span><span class="p">:</span>
         <span class="n">func</span> <span class="o">=</span> <span class="n">d</span><span class="p">[</span><span class="n">key</span><span class="p">]</span>
     <span class="k">except</span> <span class="ne">KeyError</span><span class="p">:</span>
-        <span class="n">valid_options</span> <span class="o">=</span> <span class="s2">&quot;, &quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">d</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span>
-        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Expected one of </span><span class="si">{</span><span class="n">valid_options</span><span class="si">}</span><span class="s2">, got: </span><span class="si">{</span><span class="n">key</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="n">valid_options</span> <span class="o">=</span> <span class="s2">", "</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">d</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Expected one of </span><span class="si">{</span><span class="n">valid_options</span><span class="si">}</span><span class="s2">, got: </span><span class="si">{</span><span class="n">key</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
     <span class="k">return</span> <span class="n">func</span>
 
 
 <div class="viewcode-block" id="read_grb">
 <a class="viewcode-back" href="../../../api/generated/mf6/imod.mf6.read_grb.html#imod.mf6.read_grb">[docs]</a>
-<span class="k">def</span><span class="w"> </span><span class="nf">read_grb</span><span class="p">(</span><span class="n">path</span><span class="p">:</span> <span class="n">FilePath</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">read_grb</span><span class="p">(</span><span class="n">path</span><span class="p">:</span> <span class="n">FilePath</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]:</span>
+<span class="w">    </span><span class="sd">"""</span>
 <span class="sd">    Read the data in a MODFLOW6 binary grid (.grb) file.</span>
 
 <span class="sd">    Parameters</span>
@@ -540,14 +541,14 @@
 <span class="sd">    --------</span>
 <span class="sd">    Read the grb file:</span>
 
-<span class="sd">    &gt;&gt;&gt; grb_content = imod.mf6.read_grb(&quot;my-model.grb&quot;)</span>
-<span class="sd">    &quot;&quot;&quot;</span>
-    <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="s2">&quot;rb&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+<span class="sd">    &gt;&gt;&gt; grb_content = imod.mf6.read_grb("my-model.grb")</span>
+<span class="sd">    """</span>
+    <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="s2">"rb"</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
         <span class="n">h1</span> <span class="o">=</span> <span class="n">_grb_text</span><span class="p">(</span><span class="n">f</span><span class="p">)</span>
         <span class="n">_read</span> <span class="o">=</span> <span class="n">_get_function</span><span class="p">(</span><span class="n">_READ_GRB</span><span class="p">,</span> <span class="n">h1</span><span class="p">)</span>
         <span class="n">h2</span> <span class="o">=</span> <span class="n">_grb_text</span><span class="p">(</span><span class="n">f</span><span class="p">)</span>
-        <span class="k">if</span> <span class="n">h2</span> <span class="o">!=</span> <span class="s2">&quot;version 1&quot;</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Only version 1 supported, got </span><span class="si">{</span><span class="n">h2</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">h2</span> <span class="o">!=</span> <span class="s2">"version 1"</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Only version 1 supported, got </span><span class="si">{</span><span class="n">h2</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
         <span class="n">ntxt</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">_grb_text</span><span class="p">(</span><span class="n">f</span><span class="p">)</span><span class="o">.</span><span class="n">split</span><span class="p">()[</span><span class="mi">1</span><span class="p">])</span>
         <span class="n">lentxt</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">_grb_text</span><span class="p">(</span><span class="n">f</span><span class="p">)</span><span class="o">.</span><span class="n">split</span><span class="p">()[</span><span class="mi">1</span><span class="p">])</span>
         <span class="n">d</span> <span class="o">=</span> <span class="n">_read</span><span class="p">(</span><span class="n">f</span><span class="p">,</span> <span class="n">ntxt</span><span class="p">,</span> <span class="n">lentxt</span><span class="p">)</span>
@@ -561,10 +562,10 @@
     <span class="n">hds_path</span><span class="p">:</span> <span class="n">FilePath</span><span class="p">,</span>
     <span class="n">grb_path</span><span class="p">:</span> <span class="n">FilePath</span><span class="p">,</span>
     <span class="n">dry_nan</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
-    <span class="n">simulation_start_time</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">datetime64</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-    <span class="n">time_unit</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;d&quot;</span><span class="p">,</span>
+    <span class="n">simulation_start_time</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">datetime64</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">time_unit</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="s2">"d"</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">GridDataArray</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">"""</span>
 <span class="sd">    Open modflow6 heads (.hds) file.</span>
 
 <span class="sd">    The data is lazily read per timestep and automatically converted into</span>
@@ -594,7 +595,7 @@
 <span class="sd">        h -&gt; hour</span>
 <span class="sd">        d -&gt; day</span>
 <span class="sd">        w -&gt; week</span>
-<span class="sd">        Units &quot;month&quot; or &quot;year&quot; are not supported, as they do not represent unambiguous timedelta values durations.</span>
+<span class="sd">        Units "month" or "year" are not supported, as they do not represent unambiguous timedelta values durations.</span>
 
 <span class="sd">    Returns</span>
 <span class="sd">    -------</span>
@@ -604,26 +605,26 @@
 <span class="sd">    --------</span>
 <span class="sd">    When you completed MODFLOW6 simulation, you can open the head file:</span>
 
-<span class="sd">    &gt;&gt;&gt; head = imod.mf6.open_hds(&quot;my-model.hds&quot;, &quot;my-model.grb&quot;)</span>
+<span class="sd">    &gt;&gt;&gt; head = imod.mf6.open_hds("my-model.hds", "my-model.grb")</span>
 
 <span class="sd">    This will return a DataArray with the head values for each cell in the</span>
-<span class="sd">    model, with dimensions (&quot;time&quot;, &quot;layer&quot;, &quot;y&quot;, &quot;x&quot;). The time coordinate will</span>
+<span class="sd">    model, with dimensions ("time", "layer", "y", "x"). The time coordinate will</span>
 <span class="sd">    only be the incremental time steps (1.0, 2.0, ...), unless you provide the</span>
 <span class="sd">    ``simulation_start_time`` and ``time_unit`` arguments. This will convert the</span>
 <span class="sd">    time coordinate to calendar time, starting from the provided simulation</span>
 <span class="sd">    start time:</span>
 
 <span class="sd">    &gt;&gt;&gt; head = imod.mf6.open_hds(</span>
-<span class="sd">    ...     &quot;my-model.hds&quot;,</span>
-<span class="sd">    ...     &quot;my-model.grb&quot;,</span>
-<span class="sd">    ...     simulation_start_time=np.datetime64(&quot;2023-01-01T00:00:00&quot;),</span>
-<span class="sd">    ...     time_unit=&quot;d&quot;,</span>
+<span class="sd">    ...     "my-model.hds",</span>
+<span class="sd">    ...     "my-model.grb",</span>
+<span class="sd">    ...     simulation_start_time=np.datetime64("2023-01-01T00:00:00"),</span>
+<span class="sd">    ...     time_unit="d",</span>
 <span class="sd">    ... )</span>
 
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="n">grb_content</span> <span class="o">=</span> <span class="n">read_grb</span><span class="p">(</span><span class="n">grb_path</span><span class="p">)</span>
-    <span class="n">grb_content</span><span class="p">[</span><span class="s2">&quot;name&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;head&quot;</span>
-    <span class="n">distype</span> <span class="o">=</span> <span class="n">grb_content</span><span class="p">[</span><span class="s2">&quot;distype&quot;</span><span class="p">]</span>
+    <span class="n">grb_content</span><span class="p">[</span><span class="s2">"name"</span><span class="p">]</span> <span class="o">=</span> <span class="s2">"head"</span>
+    <span class="n">distype</span> <span class="o">=</span> <span class="n">grb_content</span><span class="p">[</span><span class="s2">"distype"</span><span class="p">]</span>
     <span class="n">_open</span> <span class="o">=</span> <span class="n">_get_function</span><span class="p">(</span><span class="n">_OPEN_HDS</span><span class="p">,</span> <span class="n">distype</span><span class="p">)</span>
     <span class="k">return</span> <span class="n">_open</span><span class="p">(</span><span class="n">hds_path</span><span class="p">,</span> <span class="n">grb_content</span><span class="p">,</span> <span class="n">dry_nan</span><span class="p">,</span> <span class="n">simulation_start_time</span><span class="p">,</span> <span class="n">time_unit</span><span class="p">)</span></div>
 
@@ -635,10 +636,10 @@
     <span class="n">dvs_path</span><span class="p">:</span> <span class="n">FilePath</span><span class="p">,</span>
     <span class="n">grb_path</span><span class="p">:</span> <span class="n">FilePath</span><span class="p">,</span>
     <span class="n">indices</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span>
-    <span class="n">simulation_start_time</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">datetime64</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-    <span class="n">time_unit</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;d&quot;</span><span class="p">,</span>
+    <span class="n">simulation_start_time</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">datetime64</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">time_unit</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="s2">"d"</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">GridDataArray</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">"""</span>
 <span class="sd">    Open modflow6 dependent variable output for complex packages (like the watercontent file for the UZF-package).</span>
 
 <span class="sd">    The data is lazily read per timestep and automatically converted into</span>
@@ -668,7 +669,7 @@
 <span class="sd">        h -&gt; hour</span>
 <span class="sd">        d -&gt; day</span>
 <span class="sd">        w -&gt; week</span>
-<span class="sd">        Units &quot;month&quot; or &quot;year&quot; are not supported, as they do not represent unambiguous timedelta values durations.</span>
+<span class="sd">        Units "month" or "year" are not supported, as they do not represent unambiguous timedelta values durations.</span>
 
 <span class="sd">    Returns</span>
 <span class="sd">    -------</span>
@@ -678,25 +679,25 @@
 <span class="sd">    --------</span>
 <span class="sd">    When you completed MODFLOW6 simulation, you can open the dvs file:</span>
 
-<span class="sd">    &gt;&gt;&gt; dvs = imod.mf6.open_dvs(&quot;my-model.dvs&quot;, &quot;my-model.grb&quot;)</span>
+<span class="sd">    &gt;&gt;&gt; dvs = imod.mf6.open_dvs("my-model.dvs", "my-model.grb")</span>
 
 <span class="sd">    This will return a DataArray with the dvs values for each cell in the</span>
-<span class="sd">    model, with dimensions (&quot;time&quot;, &quot;layer&quot;, &quot;y&quot;, &quot;x&quot;). The time coordinate will</span>
+<span class="sd">    model, with dimensions ("time", "layer", "y", "x"). The time coordinate will</span>
 <span class="sd">    only be the incremental time steps (1.0, 2.0, ...), unless you provide the</span>
 <span class="sd">    ``simulation_start_time`` and ``time_unit`` arguments. This will convert the</span>
 <span class="sd">    time coordinate to calendar time, starting from the provided simulation</span>
 <span class="sd">    start time:</span>
 
 <span class="sd">    &gt;&gt;&gt; dvs = imod.mf6.open_dvs(</span>
-<span class="sd">    ...     &quot;my-model.dvs&quot;,</span>
-<span class="sd">    ...     &quot;my-model.grb&quot;,</span>
-<span class="sd">    ...     simulation_start_time=np.datetime64(&quot;2023-01-01T00:00:00&quot;),</span>
-<span class="sd">    ...     time_unit=&quot;d&quot;,</span>
+<span class="sd">    ...     "my-model.dvs",</span>
+<span class="sd">    ...     "my-model.grb",</span>
+<span class="sd">    ...     simulation_start_time=np.datetime64("2023-01-01T00:00:00"),</span>
+<span class="sd">    ...     time_unit="d",</span>
 <span class="sd">    ... )</span>
 
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="n">grb_content</span> <span class="o">=</span> <span class="n">read_grb</span><span class="p">(</span><span class="n">grb_path</span><span class="p">)</span>
-    <span class="n">distype</span> <span class="o">=</span> <span class="n">grb_content</span><span class="p">[</span><span class="s2">&quot;distype&quot;</span><span class="p">]</span>
+    <span class="n">distype</span> <span class="o">=</span> <span class="n">grb_content</span><span class="p">[</span><span class="s2">"distype"</span><span class="p">]</span>
     <span class="n">_open</span> <span class="o">=</span> <span class="n">_get_function</span><span class="p">(</span><span class="n">_OPEN_DVS</span><span class="p">,</span> <span class="n">distype</span><span class="p">)</span>
     <span class="k">return</span> <span class="n">_open</span><span class="p">(</span><span class="n">dvs_path</span><span class="p">,</span> <span class="n">grb_content</span><span class="p">,</span> <span class="n">indices</span><span class="p">,</span> <span class="n">simulation_start_time</span><span class="p">,</span> <span class="n">time_unit</span><span class="p">)</span></div>
 
@@ -708,11 +709,11 @@
     <span class="n">ucn_path</span><span class="p">:</span> <span class="n">FilePath</span><span class="p">,</span>
     <span class="n">grb_path</span><span class="p">:</span> <span class="n">FilePath</span><span class="p">,</span>
     <span class="n">dry_nan</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
-    <span class="n">simulation_start_time</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">datetime64</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-    <span class="n">time_unit</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;d&quot;</span><span class="p">,</span>
+    <span class="n">simulation_start_time</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">datetime64</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">time_unit</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="s2">"d"</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">GridDataArray</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Open Modflow6 &quot;Unformatted Concentration&quot; (.ucn) file.</span>
+<span class="w">    </span><span class="sd">"""</span>
+<span class="sd">    Open Modflow6 "Unformatted Concentration" (.ucn) file.</span>
 
 <span class="sd">    The data is lazily read per timestep and automatically converted into</span>
 <span class="sd">    (dense) xr.DataArrays or xu.UgridDataArrays, for DIS and DISV respectively.</span>
@@ -740,7 +741,7 @@
 <span class="sd">        h -&gt; hour</span>
 <span class="sd">        d -&gt; day</span>
 <span class="sd">        w -&gt; week</span>
-<span class="sd">        Units &quot;month&quot; or &quot;year&quot; are not supported, as they do not represent unambiguous timedelta values durations.</span>
+<span class="sd">        Units "month" or "year" are not supported, as they do not represent unambiguous timedelta values durations.</span>
 
 <span class="sd">    Returns</span>
 <span class="sd">    -------</span>
@@ -750,26 +751,26 @@
 <span class="sd">    --------</span>
 <span class="sd">    When you completed MODFLOW6 simulation, you can open the ucn file:</span>
 
-<span class="sd">    &gt;&gt;&gt; concentration = imod.mf6.open_conc(&quot;my-model.ucn&quot;, &quot;my-model.grb&quot;)</span>
+<span class="sd">    &gt;&gt;&gt; concentration = imod.mf6.open_conc("my-model.ucn", "my-model.grb")</span>
 
 <span class="sd">    This will return a DataArray with the concentration values for each cell in</span>
-<span class="sd">    the model, with dimensions (&quot;time&quot;, &quot;layer&quot;, &quot;y&quot;, &quot;x&quot;). The time coordinate</span>
+<span class="sd">    the model, with dimensions ("time", "layer", "y", "x"). The time coordinate</span>
 <span class="sd">    will only be the incremental time steps (1.0, 2.0, ...), unless you provide</span>
 <span class="sd">    the ``simulation_start_time`` and ``time_unit`` arguments. This will convert</span>
 <span class="sd">    the time coordinate to calendar time, starting from the provided simulation</span>
 <span class="sd">    start time:</span>
 
 <span class="sd">    &gt;&gt;&gt; concentration = imod.mf6.open_conc(</span>
-<span class="sd">    ...     &quot;my-model.ucn&quot;,</span>
-<span class="sd">    ...     &quot;my-model.grb&quot;,</span>
-<span class="sd">    ...     simulation_start_time=np.datetime64(&quot;2023-01-01T00:00:00&quot;),</span>
-<span class="sd">    ...     time_unit=&quot;d&quot;,</span>
+<span class="sd">    ...     "my-model.ucn",</span>
+<span class="sd">    ...     "my-model.grb",</span>
+<span class="sd">    ...     simulation_start_time=np.datetime64("2023-01-01T00:00:00"),</span>
+<span class="sd">    ...     time_unit="d",</span>
 <span class="sd">    ... )</span>
 
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="n">grb_content</span> <span class="o">=</span> <span class="n">read_grb</span><span class="p">(</span><span class="n">grb_path</span><span class="p">)</span>
-    <span class="n">grb_content</span><span class="p">[</span><span class="s2">&quot;name&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;concentration&quot;</span>
-    <span class="n">distype</span> <span class="o">=</span> <span class="n">grb_content</span><span class="p">[</span><span class="s2">&quot;distype&quot;</span><span class="p">]</span>
+    <span class="n">grb_content</span><span class="p">[</span><span class="s2">"name"</span><span class="p">]</span> <span class="o">=</span> <span class="s2">"concentration"</span>
+    <span class="n">distype</span> <span class="o">=</span> <span class="n">grb_content</span><span class="p">[</span><span class="s2">"distype"</span><span class="p">]</span>
     <span class="n">_open</span> <span class="o">=</span> <span class="n">_get_function</span><span class="p">(</span><span class="n">_OPEN_HDS</span><span class="p">,</span> <span class="n">distype</span><span class="p">)</span>
     <span class="k">return</span> <span class="n">_open</span><span class="p">(</span><span class="n">ucn_path</span><span class="p">,</span> <span class="n">grb_content</span><span class="p">,</span> <span class="n">dry_nan</span><span class="p">,</span> <span class="n">simulation_start_time</span><span class="p">,</span> <span class="n">time_unit</span><span class="p">)</span></div>
 
@@ -777,10 +778,10 @@
 
 <span class="k">def</span><span class="w"> </span><span class="nf">open_hds_like</span><span class="p">(</span>
     <span class="n">path</span><span class="p">:</span> <span class="n">FilePath</span><span class="p">,</span>
-    <span class="n">like</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">xr</span><span class="o">.</span><span class="n">DataArray</span><span class="p">,</span> <span class="n">xu</span><span class="o">.</span><span class="n">UgridDataArray</span><span class="p">],</span>
+    <span class="n">like</span><span class="p">:</span> <span class="n">xr</span><span class="o">.</span><span class="n">DataArray</span> <span class="o">|</span> <span class="n">xu</span><span class="o">.</span><span class="n">UgridDataArray</span><span class="p">,</span>
     <span class="n">dry_nan</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">GridDataArray</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">"""</span>
 <span class="sd">    Open modflow6 heads (.hds) file.</span>
 
 <span class="sd">    The data is lazily read per timestep and automatically converted into</span>
@@ -796,7 +797,7 @@
 <span class="sd">    Returns</span>
 <span class="sd">    -------</span>
 <span class="sd">    head: Union[xr.DataArray, xu.UgridDataArray]</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="c1"># TODO: check shape with hds metadata.</span>
     <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">like</span><span class="p">,</span> <span class="n">xr</span><span class="o">.</span><span class="n">DataArray</span><span class="p">):</span>
         <span class="n">d</span> <span class="o">=</span> <span class="n">dis</span><span class="o">.</span><span class="n">grid_info</span><span class="p">(</span><span class="n">like</span><span class="p">)</span>
@@ -808,8 +809,8 @@
 
     <span class="k">else</span><span class="p">:</span>
         <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span>
-            <span class="s2">&quot;like should be a DataArray or UgridDataArray, &quot;</span>
-            <span class="sa">f</span><span class="s2">&quot;received instead </span><span class="si">{</span><span class="nb">type</span><span class="p">(</span><span class="n">like</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span>
+            <span class="s2">"like should be a DataArray or UgridDataArray, "</span>
+            <span class="sa">f</span><span class="s2">"received instead </span><span class="si">{</span><span class="nb">type</span><span class="p">(</span><span class="n">like</span><span class="p">)</span><span class="si">}</span><span class="s2">"</span>
         <span class="p">)</span>
 
 
@@ -819,11 +820,11 @@
     <span class="n">cbc_path</span><span class="p">:</span> <span class="n">FilePath</span><span class="p">,</span>
     <span class="n">grb_path</span><span class="p">:</span> <span class="n">FilePath</span><span class="p">,</span>
     <span class="n">flowja</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
-    <span class="n">simulation_start_time</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">datetime64</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-    <span class="n">time_unit</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;d&quot;</span><span class="p">,</span>
+    <span class="n">simulation_start_time</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">datetime64</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">time_unit</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="s2">"d"</span><span class="p">,</span>
     <span class="n">merge_to_dataset</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
-<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">GridDataset</span> <span class="o">|</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">GridDataArray</span><span class="p">]:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">GridDataset</span> <span class="o">|</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">GridDataArray</span><span class="p">]:</span>
+<span class="w">    </span><span class="sd">"""</span>
 <span class="sd">    Open modflow6 cell-by-cell (.cbc) file.</span>
 
 <span class="sd">    The data is lazily read per timestep and automatically converted into</span>
@@ -832,8 +833,8 @@
 <span class="sd">    (GRB).</span>
 
 <span class="sd">    The ``flowja`` argument controls whether the flow-ja-face array (if present)</span>
-<span class="sd">    is returned in grid form as &quot;as is&quot;. By default ``flowja=False`` and the</span>
-<span class="sd">    array is returned in &quot;grid form&quot;, meaning:</span>
+<span class="sd">    is returned in grid form as "as is". By default ``flowja=False`` and the</span>
+<span class="sd">    array is returned in "grid form", meaning:</span>
 
 <span class="sd">        * DIS: in right, front, and lower face flow. All flows are placed in</span>
 <span class="sd">          the cell.</span>
@@ -852,7 +853,7 @@
 <span class="sd">    grb_path: str, pathlib.Path</span>
 <span class="sd">        Path to the binary grid file</span>
 <span class="sd">    flowja: bool, default value: False</span>
-<span class="sd">        Whether to return the flow-ja-face values &quot;as is&quot; (``True``) or in a</span>
+<span class="sd">        Whether to return the flow-ja-face values "as is" (``True``) or in a</span>
 <span class="sd">        grid form (``False``).</span>
 <span class="sd">    simulation_start_time : Optional datetime</span>
 <span class="sd">        The time and date correpsonding to the beginning of the simulation.</span>
@@ -869,15 +870,15 @@
 <span class="sd">        h -&gt; hour</span>
 <span class="sd">        d -&gt; day</span>
 <span class="sd">        w -&gt; week</span>
-<span class="sd">        Units &quot;month&quot; or &quot;year&quot; are not supported, as they do not represent unambiguous timedelta values durations.</span>
+<span class="sd">        Units "month" or "year" are not supported, as they do not represent unambiguous timedelta values durations.</span>
 <span class="sd">    merge_to_dataset: bool, default value: False</span>
 <span class="sd">        Merge output to dataset.</span>
 
 <span class="sd">    Returns</span>
 <span class="sd">    -------</span>
 <span class="sd">    cbc_content: xr.Dataset | Dict[str, xr.DataArray]</span>
-<span class="sd">        DataArray contains float64 data of the budgets, with dimensions (&quot;time&quot;,</span>
-<span class="sd">        &quot;layer&quot;, &quot;y&quot;, &quot;x&quot;).</span>
+<span class="sd">        DataArray contains float64 data of the budgets, with dimensions ("time",</span>
+<span class="sd">        "layer", "y", "x").</span>
 
 <span class="sd">    Examples</span>
 <span class="sd">    --------</span>
@@ -885,7 +886,7 @@
 <span class="sd">    Open a cbc file:</span>
 
 <span class="sd">    &gt;&gt;&gt; import imod</span>
-<span class="sd">    &gt;&gt;&gt; cbc_content = imod.mf6.open_cbc(&quot;budgets.cbc&quot;, &quot;my-model.grb&quot;)</span>
+<span class="sd">    &gt;&gt;&gt; cbc_content = imod.mf6.open_cbc("budgets.cbc", "my-model.grb")</span>
 
 <span class="sd">    Check the contents:</span>
 
@@ -893,25 +894,25 @@
 
 <span class="sd">    Get the drainage budget, compute a time mean for the first layer:</span>
 
-<span class="sd">    &gt;&gt;&gt; drn_budget = cbc_content[&quot;drn]</span>
-<span class="sd">    &gt;&gt;&gt; mean = drn_budget.sel(layer=1).mean(&quot;time&quot;)</span>
+<span class="sd">    &gt;&gt;&gt; drn_budget = cbc_content["drn]</span>
+<span class="sd">    &gt;&gt;&gt; mean = drn_budget.sel(layer=1).mean("time")</span>
 
 <span class="sd">    This will return a DataArray with the drain budget values for each cell in the</span>
-<span class="sd">    model, with dimensions (&quot;time&quot;, &quot;layer&quot;, &quot;y&quot;, &quot;x&quot;). The time coordinate will</span>
+<span class="sd">    model, with dimensions ("time", "layer", "y", "x"). The time coordinate will</span>
 <span class="sd">    only be the incremental time steps (1.0, 2.0, ...), unless you provide the</span>
 <span class="sd">    ``simulation_start_time`` and ``time_unit`` arguments. This will convert the</span>
 <span class="sd">    time coordinate to calendar time, starting from the provided simulation</span>
 <span class="sd">    start time:</span>
 
 <span class="sd">    &gt;&gt;&gt; cbc_content = imod.mf6.open_cbc(</span>
-<span class="sd">    ...     &quot;my-model.cbc&quot;,</span>
-<span class="sd">    ...     &quot;my-model.grb&quot;,</span>
-<span class="sd">    ...     simulation_start_time=np.datetime64(&quot;2023-01-01T00:00:00&quot;),</span>
-<span class="sd">    ...     time_unit=&quot;d&quot;,</span>
+<span class="sd">    ...     "my-model.cbc",</span>
+<span class="sd">    ...     "my-model.grb",</span>
+<span class="sd">    ...     simulation_start_time=np.datetime64("2023-01-01T00:00:00"),</span>
+<span class="sd">    ...     time_unit="d",</span>
 <span class="sd">    ... )</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="n">grb_content</span> <span class="o">=</span> <span class="n">read_grb</span><span class="p">(</span><span class="n">grb_path</span><span class="p">)</span>
-    <span class="n">distype</span> <span class="o">=</span> <span class="n">grb_content</span><span class="p">[</span><span class="s2">&quot;distype&quot;</span><span class="p">]</span>
+    <span class="n">distype</span> <span class="o">=</span> <span class="n">grb_content</span><span class="p">[</span><span class="s2">"distype"</span><span class="p">]</span>
     <span class="n">_open</span> <span class="o">=</span> <span class="n">_get_function</span><span class="p">(</span><span class="n">_OPEN_CBC</span><span class="p">,</span> <span class="n">distype</span><span class="p">)</span>
     <span class="n">cbc</span> <span class="o">=</span> <span class="n">_open</span><span class="p">(</span><span class="n">cbc_path</span><span class="p">,</span> <span class="n">grb_content</span><span class="p">,</span> <span class="n">flowja</span><span class="p">,</span> <span class="n">simulation_start_time</span><span class="p">,</span> <span class="n">time_unit</span><span class="p">)</span>
     <span class="k">if</span> <span class="n">merge_to_dataset</span><span class="p">:</span>
@@ -947,8 +948,8 @@
   </div>
   
   <!-- Scripts loaded after <body> so the DOM is not blocked -->
-  <script defer src="../../../_static/scripts/bootstrap.js?digest=90905a2f556bf617f1a9"></script>
-<script defer src="../../../_static/scripts/pydata-sphinx-theme.js?digest=90905a2f556bf617f1a9"></script>
+  <script defer src="../../../_static/scripts/bootstrap.js?digest=75c7c72ae941e8b558d8"></script>
+<script defer src="../../../_static/scripts/pydata-sphinx-theme.js?digest=75c7c72ae941e8b558d8"></script>
 
   <footer class="bd-footer">
 <div class="bd-footer__inner bd-page-width">
@@ -968,8 +969,7 @@
         <div class="footer-item">
 
   <p class="sphinx-version">
-    Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 9.1.0.
-    <br/>
+    Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 9.2.0.
   </p>
 </div>
       
@@ -982,7 +982,7 @@
         <div class="footer-item">
 <p class="theme-version">
   <!-- # L10n: Setting the PST URL as an argument as this does not need to be localized -->
-  Built with the <a href="https://pydata-sphinx-theme.readthedocs.io/en/stable/index.html">PyData Sphinx Theme</a> 0.20.0.
+  Built with the <a href="https://pydata-sphinx-theme.readthedocs.io/en/stable/index.html">PyData Sphinx Theme</a> 0.24.0.
 </p></div>
       
     </div>

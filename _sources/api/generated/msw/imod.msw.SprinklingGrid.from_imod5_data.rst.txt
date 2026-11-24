@@ -1,0 +1,6 @@
+﻿imod.msw.SprinklingGrid.from\_imod5\_data
+=========================================
+
+.. currentmodule:: imod.msw
+
+.. automethod:: SprinklingGrid.from_imod5_data

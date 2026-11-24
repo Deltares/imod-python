@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 
 
@@ -7,7 +6,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>imod.evaluate.streamfunction &#8212; iMOD Python 1.1.0 documentation</title>
+    <title>imod.evaluate.streamfunction &#8212; iMOD Python 1.2.0 documentation</title>
   
   
   
@@ -26,22 +25,22 @@
   </noscript>
   
   <!-- Loaded before other Sphinx assets -->
-  <link href="../../../_static/styles/theme.css?digest=90905a2f556bf617f1a9" rel="stylesheet" />
-<link href="../../../_static/styles/pydata-sphinx-theme.css?digest=90905a2f556bf617f1a9" rel="stylesheet" />
+  <link href="../../../_static/styles/theme.css?digest=75c7c72ae941e8b558d8" rel="stylesheet" />
+<link href="../../../_static/styles/pydata-sphinx-theme.css?digest=75c7c72ae941e8b558d8" rel="stylesheet" />
 
     <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=03e43079" />
-    <link rel="stylesheet" type="text/css" href="../../../_static/sg_gallery.css?v=fd6457a4" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/sg_gallery.css?v=c83e6b79" />
     <link rel="stylesheet" type="text/css" href="../../../_static/sg_gallery-binder.css?v=f4aeca0c" />
     <link rel="stylesheet" type="text/css" href="../../../_static/sg_gallery-dataframe.css?v=2082cf3c" />
     <link rel="stylesheet" type="text/css" href="../../../_static/sg_gallery-rendered-html.css?v=1277b6f3" />
   
   <!-- So that users can add custom icons -->
-  <script defer src="../../../_static/scripts/fontawesome.js?digest=90905a2f556bf617f1a9"></script>
+  <script defer src="../../../_static/scripts/fontawesome.js?digest=75c7c72ae941e8b558d8"></script>
   <!-- Pre-loaded scripts that we'll load fully later -->
-  <link rel="preload" as="script" href="../../../_static/scripts/bootstrap.js?digest=90905a2f556bf617f1a9" />
-<link rel="preload" as="script" href="../../../_static/scripts/pydata-sphinx-theme.js?digest=90905a2f556bf617f1a9" />
+  <link rel="preload" as="script" href="../../../_static/scripts/bootstrap.js?digest=75c7c72ae941e8b558d8" />
+<link rel="preload" as="script" href="../../../_static/scripts/pydata-sphinx-theme.js?digest=75c7c72ae941e8b558d8" />
 
-    <script src="../../../_static/documentation_options.js?v=fc837d61"></script>
+    <script src="../../../_static/documentation_options.js?v=6efca38a"></script>
     <script src="../../../_static/doctools.js?v=fd6eb6e6"></script>
     <script src="../../../_static/sphinx_highlight.js?v=6ffebe34"></script>
     <script src="../../../_static/sg-tags.js?v=d80f6fa4"></script>
@@ -51,8 +50,9 @@
     <link rel="index" title="Index" href="../../../genindex.html" />
     <link rel="search" title="Search" href="../../../search.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <meta name="color-scheme" content="light dark"/>
   <meta name="docsearch:language" content="en"/>
-  <meta name="docsearch:version" content="1.1.0.dev" />
+  <meta name="docsearch:version" content="1.2.0.dev" />
   
     
     <script src="../../../_static/searchtools.js"></script>
@@ -100,7 +100,7 @@
   
     <header id="pst-header" class="bd-header navbar navbar-expand-lg bd-navbar d-print-none">
 <div class="bd-header__inner bd-page-width">
-  <button class="pst-navbar-icon sidebar-toggle primary-toggle" aria-label="Site navigation">
+  <button type="button" class="pst-navbar-icon sidebar-toggle primary-toggle" aria-label="Site navigation" aria-expanded="false" aria-controls="pst-primary-sidebar-modal">
     <span class="fa-solid fa-bars"></span>
   </button>
   
@@ -122,8 +122,8 @@
     
     
     
-    <img src="../../../_static/imod-python-logo-light.svg" class="logo__image only-light" alt="iMOD Python 1.1.0 documentation - Home"/>
-    <img src="../../../_static/imod-python-logo-dark.svg" class="logo__image only-dark pst-js-only" alt="iMOD Python 1.1.0 documentation - Home"/>
+    <img src="../../../_static/imod-python-logo-light.svg" class="logo__image only-light" alt="iMOD Python 1.2.0 documentation - Home"/>
+    <img src="../../../_static/imod-python-logo-dark.svg" class="logo__image only-dark pst-js-only" alt="iMOD Python 1.2.0 documentation - Home"/>
   
   
 </a></div>
@@ -190,7 +190,7 @@
         <div class="navbar-item navbar-persistent--container">
           
 
-<button class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+<button type="button" class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
  <i class="fa-solid fa-magnifying-glass"></i>
  <span class="search-button__default-text">Search</span>
  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
@@ -201,15 +201,15 @@
         <div class="navbar-item">
 
 <div class="theme-switch-container dropdown pst-js-only" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Color mode">
-  <button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button dropdown-toggle" aria-label="Color mode" data-bs-toggle="dropdown">
-    <i class="theme-switch fa-solid fa-sun fa-lg fa-fw" data-mode="light" title="Light"></i>
-    <i class="theme-switch fa-solid fa-moon fa-lg fa-fw" data-mode="dark" title="Dark"></i>
-    <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg fa-fw" data-mode="auto" title="System Settings"></i>
+  <button type="button" class="btn btn-sm nav-link pst-navbar-icon theme-switch-button dropdown-toggle" aria-label="Color mode" data-bs-toggle="dropdown">
+    <i class="theme-switch fa-solid fa-sun fa-lg" data-mode="light" title="Light"></i>
+    <i class="theme-switch fa-solid fa-moon fa-lg" data-mode="dark" title="Dark"></i>
+    <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg" data-mode="auto" title="System Settings"></i>
   </button>
   <ul class="dropdown-menu dropdown-menu-end">
-    <li><button class="dropdown-item d-flex align-items-center theme-change-button" data-mode="auto"><i class="fa-solid fa-circle-half-stroke fa-lg fa-fw me-1"></i>System Settings</button></li>
-    <li><button class="dropdown-item d-flex align-items-center theme-change-button" data-mode="light"><i class="fa-solid fa-sun fa-lg fa-fw me-1"></i>Light</button></li>
-    <li><button class="dropdown-item d-flex align-items-center theme-change-button" data-mode="dark"><i class="fa-solid fa-moon fa-lg fa-fw me-1"></i>Dark</button></li>
+    <li><button type="button" class="dropdown-item d-flex align-items-center theme-change-button" data-mode="auto"><i class="fa-solid fa-circle-half-stroke fa-lg me-1"></i>System Settings</button></li>
+    <li><button type="button" class="dropdown-item d-flex align-items-center theme-change-button" data-mode="light"><i class="fa-solid fa-sun fa-lg me-1"></i>Light</button></li>
+    <li><button type="button" class="dropdown-item d-flex align-items-center theme-change-button" data-mode="dark"><i class="fa-solid fa-moon fa-lg me-1"></i>Dark</button></li>
   </ul>
 </div></div>
       
@@ -246,7 +246,7 @@
   
     <div class="navbar-persistent--mobile">
 
-<button class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+<button type="button" class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
  <i class="fa-solid fa-magnifying-glass"></i>
  <span class="search-button__default-text">Search</span>
  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
@@ -267,7 +267,7 @@
       
         
       
-      <dialog id="pst-primary-sidebar-modal"></dialog>
+      <dialog id="pst-primary-sidebar-modal" tabindex="-1"></dialog>
       <div id="pst-primary-sidebar" class="bd-sidebar-primary bd-sidebar hide-on-wide">
         
 
@@ -337,15 +337,15 @@
           <div class="navbar-item">
 
 <div class="theme-switch-container dropdown pst-js-only" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Color mode">
-  <button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button dropdown-toggle" aria-label="Color mode" data-bs-toggle="dropdown">
-    <i class="theme-switch fa-solid fa-sun fa-lg fa-fw" data-mode="light" title="Light"></i>
-    <i class="theme-switch fa-solid fa-moon fa-lg fa-fw" data-mode="dark" title="Dark"></i>
-    <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg fa-fw" data-mode="auto" title="System Settings"></i>
+  <button type="button" class="btn btn-sm nav-link pst-navbar-icon theme-switch-button dropdown-toggle" aria-label="Color mode" data-bs-toggle="dropdown">
+    <i class="theme-switch fa-solid fa-sun fa-lg" data-mode="light" title="Light"></i>
+    <i class="theme-switch fa-solid fa-moon fa-lg" data-mode="dark" title="Dark"></i>
+    <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg" data-mode="auto" title="System Settings"></i>
   </button>
   <ul class="dropdown-menu dropdown-menu-end">
-    <li><button class="dropdown-item d-flex align-items-center theme-change-button" data-mode="auto"><i class="fa-solid fa-circle-half-stroke fa-lg fa-fw me-1"></i>System Settings</button></li>
-    <li><button class="dropdown-item d-flex align-items-center theme-change-button" data-mode="light"><i class="fa-solid fa-sun fa-lg fa-fw me-1"></i>Light</button></li>
-    <li><button class="dropdown-item d-flex align-items-center theme-change-button" data-mode="dark"><i class="fa-solid fa-moon fa-lg fa-fw me-1"></i>Dark</button></li>
+    <li><button type="button" class="dropdown-item d-flex align-items-center theme-change-button" data-mode="auto"><i class="fa-solid fa-circle-half-stroke fa-lg me-1"></i>System Settings</button></li>
+    <li><button type="button" class="dropdown-item d-flex align-items-center theme-change-button" data-mode="light"><i class="fa-solid fa-sun fa-lg me-1"></i>Light</button></li>
+    <li><button type="button" class="dropdown-item d-flex align-items-center theme-change-button" data-mode="dark"><i class="fa-solid fa-moon fa-lg me-1"></i>Dark</button></li>
   </ul>
 </div></div>
         
@@ -411,7 +411,7 @@
     
     <li class="breadcrumb-item breadcrumb-home">
       <a href="../../../index.html" class="nav-link" aria-label="Home">
-        <i class="fa-solid fa-home"></i>
+        <i class="fa-solid fa-house"></i>
       </a>
     </li>
     
@@ -435,10 +435,18 @@
                 <article class="bd-article">
                   
   <h1>Source code for imod.evaluate.streamfunction</h1><div class="highlight"><pre>
-<span></span><span class="kn">import</span><span class="w"> </span><span class="nn">imod</span>
+<span></span><span class="kn">from</span><span class="w"> </span><span class="nn">collections.abc</span><span class="w"> </span><span class="kn">import</span> <span class="n">Sequence</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Any</span>
+
+<span class="kn">import</span><span class="w"> </span><span class="nn">xarray</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">xr</span>
+
+<span class="kn">import</span><span class="w"> </span><span class="nn">imod</span>
 
 
-<span class="k">def</span><span class="w"> </span><span class="nf">_streamfunction</span><span class="p">(</span><span class="n">sfrf</span><span class="p">,</span> <span class="n">sfff</span><span class="p">,</span> <span class="n">dx</span><span class="p">,</span> <span class="n">dy</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">_streamfunction</span><span class="p">(</span>
+    <span class="n">sfrf</span><span class="p">:</span> <span class="n">xr</span><span class="o">.</span><span class="n">DataArray</span><span class="p">,</span>
+    <span class="n">sfff</span><span class="p">:</span> <span class="n">xr</span><span class="o">.</span><span class="n">DataArray</span><span class="p">,</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">xr</span><span class="o">.</span><span class="n">DataArray</span><span class="p">:</span>
     <span class="c1"># Scale total flux to length of cell traversed</span>
     <span class="c1"># --&gt; no, this gives really akward patterns</span>
     <span class="n">scale_factor</span> <span class="o">=</span> <span class="p">(</span>
@@ -458,7 +466,7 @@
     <span class="n">layindex</span> <span class="o">=</span> <span class="n">Fi_proj</span><span class="o">.</span><span class="n">layer</span><span class="o">.</span><span class="n">values</span>
     <span class="n">Fi_proj</span> <span class="o">=</span> <span class="p">(</span>
         <span class="n">Fi_proj</span><span class="o">.</span><span class="n">reindex</span><span class="p">(</span><span class="n">layer</span><span class="o">=</span><span class="n">layindex</span><span class="p">[::</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span>
-        <span class="o">.</span><span class="n">cumsum</span><span class="p">(</span><span class="n">dim</span><span class="o">=</span><span class="s2">&quot;layer&quot;</span><span class="p">)</span>
+        <span class="o">.</span><span class="n">cumsum</span><span class="p">(</span><span class="n">dim</span><span class="o">=</span><span class="s2">"layer"</span><span class="p">)</span>
         <span class="o">.</span><span class="n">reindex</span><span class="p">(</span><span class="n">layer</span><span class="o">=</span><span class="n">layindex</span><span class="p">)</span>
     <span class="p">)</span>
     <span class="k">return</span> <span class="n">Fi_proj</span>
@@ -466,8 +474,13 @@
 
 <div class="viewcode-block" id="streamfunction_line">
 <a class="viewcode-back" href="../../../api/generated/evaluate/imod.evaluate.streamfunction_line.html#imod.evaluate.streamfunction_line">[docs]</a>
-<span class="k">def</span><span class="w"> </span><span class="nf">streamfunction_line</span><span class="p">(</span><span class="n">frf</span><span class="p">,</span> <span class="n">fff</span><span class="p">,</span> <span class="n">start</span><span class="p">,</span> <span class="n">end</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Obtain the streamfunction for a line cross section through</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">streamfunction_line</span><span class="p">(</span>
+    <span class="n">frf</span><span class="p">:</span> <span class="n">xr</span><span class="o">.</span><span class="n">DataArray</span><span class="p">,</span>
+    <span class="n">fff</span><span class="p">:</span> <span class="n">xr</span><span class="o">.</span><span class="n">DataArray</span><span class="p">,</span>
+    <span class="n">start</span><span class="p">:</span> <span class="n">Sequence</span><span class="p">[</span><span class="nb">float</span><span class="p">],</span>
+    <span class="n">end</span><span class="p">:</span> <span class="n">Sequence</span><span class="p">[</span><span class="nb">float</span><span class="p">],</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">xr</span><span class="o">.</span><span class="n">DataArray</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">"""Obtain the streamfunction for a line cross section through</span>
 <span class="sd">    a three-dimensional flow field. The streamfunction is obtained</span>
 <span class="sd">    by first projecting the horizontal flow components onto the provided</span>
 <span class="sd">    cross-section. The streamfunction can be contoured to visualize stream lines.</span>
@@ -498,23 +511,25 @@
 <span class="sd">    -------</span>
 <span class="sd">    `xarray.DataArray`</span>
 <span class="sd">        The streamfunction projected on the cross-section between start and end coordinate,</span>
-<span class="sd">        with new dimension &quot;s&quot; along the cross-section. The cellsizes along &quot;s&quot; are given in</span>
-<span class="sd">        the &quot;ds&quot; coordinate.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">        with new dimension "s" along the cross-section. The cellsizes along "s" are given in</span>
+<span class="sd">        the "ds" coordinate.</span>
+<span class="sd">    """</span>
     <span class="c1"># interpolate frf and fff to cell center</span>
-    <span class="n">frf</span> <span class="o">=</span> <span class="mf">0.5</span> <span class="o">*</span> <span class="n">frf</span> <span class="o">+</span> <span class="mf">0.5</span> <span class="o">*</span> <span class="n">frf</span><span class="o">.</span><span class="n">shift</span><span class="p">({</span><span class="s2">&quot;x&quot;</span><span class="p">:</span> <span class="o">-</span><span class="mi">1</span><span class="p">})</span>
-    <span class="n">fff</span> <span class="o">=</span> <span class="mf">0.5</span> <span class="o">*</span> <span class="n">fff</span> <span class="o">+</span> <span class="mf">0.5</span> <span class="o">*</span> <span class="n">fff</span><span class="o">.</span><span class="n">shift</span><span class="p">({</span><span class="s2">&quot;y&quot;</span><span class="p">:</span> <span class="o">-</span><span class="mi">1</span><span class="p">})</span>
+    <span class="n">frf</span> <span class="o">=</span> <span class="mf">0.5</span> <span class="o">*</span> <span class="n">frf</span> <span class="o">+</span> <span class="mf">0.5</span> <span class="o">*</span> <span class="n">frf</span><span class="o">.</span><span class="n">shift</span><span class="p">({</span><span class="s2">"x"</span><span class="p">:</span> <span class="o">-</span><span class="mi">1</span><span class="p">})</span>
+    <span class="n">fff</span> <span class="o">=</span> <span class="mf">0.5</span> <span class="o">*</span> <span class="n">fff</span> <span class="o">+</span> <span class="mf">0.5</span> <span class="o">*</span> <span class="n">fff</span><span class="o">.</span><span class="n">shift</span><span class="p">({</span><span class="s2">"y"</span><span class="p">:</span> <span class="o">-</span><span class="mi">1</span><span class="p">})</span>
     <span class="c1"># get cross section of frf and fff</span>
     <span class="n">sfrf</span> <span class="o">=</span> <span class="n">imod</span><span class="o">.</span><span class="n">select</span><span class="o">.</span><span class="n">cross_section_line</span><span class="p">(</span><span class="n">frf</span><span class="p">,</span> <span class="n">start</span><span class="p">,</span> <span class="n">end</span><span class="p">)</span>
     <span class="n">sfff</span> <span class="o">=</span> <span class="n">imod</span><span class="o">.</span><span class="n">select</span><span class="o">.</span><span class="n">cross_section_line</span><span class="p">(</span><span class="n">fff</span><span class="p">,</span> <span class="n">start</span><span class="p">,</span> <span class="n">end</span><span class="p">)</span>
-    <span class="k">return</span> <span class="n">_streamfunction</span><span class="p">(</span><span class="n">sfrf</span><span class="p">,</span> <span class="n">sfff</span><span class="p">,</span> <span class="n">frf</span><span class="o">.</span><span class="n">dx</span><span class="p">,</span> <span class="n">fff</span><span class="o">.</span><span class="n">dy</span><span class="p">)</span></div>
+    <span class="k">return</span> <span class="n">_streamfunction</span><span class="p">(</span><span class="n">sfrf</span><span class="p">,</span> <span class="n">sfff</span><span class="p">)</span></div>
 
 
 
 <div class="viewcode-block" id="streamfunction_linestring">
 <a class="viewcode-back" href="../../../api/generated/evaluate/imod.evaluate.streamfunction_linestring.html#imod.evaluate.streamfunction_linestring">[docs]</a>
-<span class="k">def</span><span class="w"> </span><span class="nf">streamfunction_linestring</span><span class="p">(</span><span class="n">frf</span><span class="p">,</span> <span class="n">fff</span><span class="p">,</span> <span class="n">linestring</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Obtain the streamfunction for a linestring cross section through</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">streamfunction_linestring</span><span class="p">(</span>
+    <span class="n">frf</span><span class="p">:</span> <span class="n">xr</span><span class="o">.</span><span class="n">DataArray</span><span class="p">,</span> <span class="n">fff</span><span class="p">:</span> <span class="n">xr</span><span class="o">.</span><span class="n">DataArray</span><span class="p">,</span> <span class="n">linestring</span><span class="p">:</span> <span class="n">Any</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">xr</span><span class="o">.</span><span class="n">DataArray</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">"""Obtain the streamfunction for a linestring cross section through</span>
 <span class="sd">    a three-dimensional flow field. The streamfunction is obtained</span>
 <span class="sd">    by first projecting the horizontal flow components onto the provided</span>
 <span class="sd">    cross-section. The streamfunction can be contoured to visualize stream lines.</span>
@@ -543,21 +558,23 @@
 <span class="sd">    -------</span>
 <span class="sd">    `xarray.DataArray`</span>
 <span class="sd">        The streamfunction projected on the cross-section defined by provided linestring,</span>
-<span class="sd">        with new dimension &quot;s&quot; along the cross-section. The cellsizes along &quot;s&quot; are given in</span>
-<span class="sd">        the &quot;ds&quot; coordinate.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">        with new dimension "s" along the cross-section. The cellsizes along "s" are given in</span>
+<span class="sd">        the "ds" coordinate.</span>
+<span class="sd">    """</span>
 
     <span class="c1"># interpolate frf and fff to cell center</span>
-    <span class="n">frf</span> <span class="o">=</span> <span class="mf">0.5</span> <span class="o">*</span> <span class="n">frf</span> <span class="o">+</span> <span class="mf">0.5</span> <span class="o">*</span> <span class="n">frf</span><span class="o">.</span><span class="n">shift</span><span class="p">({</span><span class="s2">&quot;x&quot;</span><span class="p">:</span> <span class="o">-</span><span class="mi">1</span><span class="p">})</span>
-    <span class="n">fff</span> <span class="o">=</span> <span class="mf">0.5</span> <span class="o">*</span> <span class="n">fff</span> <span class="o">+</span> <span class="mf">0.5</span> <span class="o">*</span> <span class="n">fff</span><span class="o">.</span><span class="n">shift</span><span class="p">({</span><span class="s2">&quot;y&quot;</span><span class="p">:</span> <span class="o">-</span><span class="mi">1</span><span class="p">})</span>
+    <span class="n">frf</span> <span class="o">=</span> <span class="mf">0.5</span> <span class="o">*</span> <span class="n">frf</span> <span class="o">+</span> <span class="mf">0.5</span> <span class="o">*</span> <span class="n">frf</span><span class="o">.</span><span class="n">shift</span><span class="p">({</span><span class="s2">"x"</span><span class="p">:</span> <span class="o">-</span><span class="mi">1</span><span class="p">})</span>
+    <span class="n">fff</span> <span class="o">=</span> <span class="mf">0.5</span> <span class="o">*</span> <span class="n">fff</span> <span class="o">+</span> <span class="mf">0.5</span> <span class="o">*</span> <span class="n">fff</span><span class="o">.</span><span class="n">shift</span><span class="p">({</span><span class="s2">"y"</span><span class="p">:</span> <span class="o">-</span><span class="mi">1</span><span class="p">})</span>
     <span class="c1"># get cross section of frf and fff</span>
     <span class="n">sfrf</span> <span class="o">=</span> <span class="n">imod</span><span class="o">.</span><span class="n">select</span><span class="o">.</span><span class="n">cross_section_linestring</span><span class="p">(</span><span class="n">frf</span><span class="p">,</span> <span class="n">linestring</span><span class="p">)</span>
     <span class="n">sfff</span> <span class="o">=</span> <span class="n">imod</span><span class="o">.</span><span class="n">select</span><span class="o">.</span><span class="n">cross_section_linestring</span><span class="p">(</span><span class="n">fff</span><span class="p">,</span> <span class="n">linestring</span><span class="p">)</span>
-    <span class="k">return</span> <span class="n">_streamfunction</span><span class="p">(</span><span class="n">sfrf</span><span class="p">,</span> <span class="n">sfff</span><span class="p">,</span> <span class="n">frf</span><span class="o">.</span><span class="n">dx</span><span class="p">,</span> <span class="n">fff</span><span class="o">.</span><span class="n">dy</span><span class="p">)</span></div>
+    <span class="k">return</span> <span class="n">_streamfunction</span><span class="p">(</span><span class="n">sfrf</span><span class="p">,</span> <span class="n">sfff</span><span class="p">)</span></div>
 
 
 
-<span class="k">def</span><span class="w"> </span><span class="nf">_quiver</span><span class="p">(</span><span class="n">sfrf</span><span class="p">,</span> <span class="n">sfff</span><span class="p">,</span> <span class="n">sflf</span><span class="p">):</span>  <span class="c1"># , dx, dy, dz):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">_quiver</span><span class="p">(</span>
+    <span class="n">sfrf</span><span class="p">:</span> <span class="n">xr</span><span class="o">.</span><span class="n">DataArray</span><span class="p">,</span> <span class="n">sfff</span><span class="p">:</span> <span class="n">xr</span><span class="o">.</span><span class="n">DataArray</span><span class="p">,</span> <span class="n">sflf</span><span class="p">:</span> <span class="n">xr</span><span class="o">.</span><span class="n">DataArray</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">tuple</span><span class="p">[</span><span class="n">xr</span><span class="o">.</span><span class="n">DataArray</span><span class="p">,</span> <span class="n">xr</span><span class="o">.</span><span class="n">DataArray</span><span class="p">]:</span>  <span class="c1"># , dx, dy, dz):</span>
     <span class="c1"># Scale total flux to length of cell traversed</span>
     <span class="c1"># --&gt; no, this gives really akward patterns -&gt; also for quivers? here it might seem like a good idea</span>
     <span class="n">scale_factor</span> <span class="o">=</span> <span class="p">(</span>
@@ -581,8 +598,14 @@
 
 <div class="viewcode-block" id="quiver_line">
 <a class="viewcode-back" href="../../../api/generated/evaluate/imod.evaluate.quiver_line.html#imod.evaluate.quiver_line">[docs]</a>
-<span class="k">def</span><span class="w"> </span><span class="nf">quiver_line</span><span class="p">(</span><span class="n">frf</span><span class="p">,</span> <span class="n">fff</span><span class="p">,</span> <span class="n">flf</span><span class="p">,</span> <span class="n">start</span><span class="p">,</span> <span class="n">end</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Obtain the u and v components for quiver plots for a line cross section</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">quiver_line</span><span class="p">(</span>
+    <span class="n">frf</span><span class="p">:</span> <span class="n">xr</span><span class="o">.</span><span class="n">DataArray</span><span class="p">,</span>
+    <span class="n">fff</span><span class="p">:</span> <span class="n">xr</span><span class="o">.</span><span class="n">DataArray</span><span class="p">,</span>
+    <span class="n">flf</span><span class="p">:</span> <span class="n">xr</span><span class="o">.</span><span class="n">DataArray</span><span class="p">,</span>
+    <span class="n">start</span><span class="p">:</span> <span class="n">Sequence</span><span class="p">[</span><span class="nb">float</span><span class="p">],</span>
+    <span class="n">end</span><span class="p">:</span> <span class="n">Sequence</span><span class="p">[</span><span class="nb">float</span><span class="p">],</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">tuple</span><span class="p">[</span><span class="n">xr</span><span class="o">.</span><span class="n">DataArray</span><span class="p">,</span> <span class="n">xr</span><span class="o">.</span><span class="n">DataArray</span><span class="p">]:</span>
+<span class="w">    </span><span class="sd">"""Obtain the u and v components for quiver plots for a line cross section</span>
 <span class="sd">    through a three-dimensional flux field. The u and v components are obtained</span>
 <span class="sd">    by first projecting the threedimensional flux components onto the provided</span>
 <span class="sd">    cross-section.</span>
@@ -606,22 +629,22 @@
 <span class="sd">    -------</span>
 <span class="sd">    u: `xarray.DataArray`</span>
 <span class="sd">        The u component (x-component) of the flow projection on the cross-section between start and end coordinate,</span>
-<span class="sd">        with new dimension &quot;s&quot; along the cross-section. The cellsizes along &quot;s&quot; are given in</span>
-<span class="sd">        the &quot;ds&quot; coordinate.</span>
+<span class="sd">        with new dimension "s" along the cross-section. The cellsizes along "s" are given in</span>
+<span class="sd">        the "ds" coordinate.</span>
 <span class="sd">    v: `xarray.DataArray`</span>
 <span class="sd">        The v component (y-component) of the flow projection on the cross-section between start and end coordinate,</span>
-<span class="sd">        with new dimension &quot;s&quot; along the cross-section. The cellsizes along &quot;s&quot; are given in</span>
-<span class="sd">        the &quot;ds&quot; coordinate.</span>
+<span class="sd">        with new dimension "s" along the cross-section. The cellsizes along "s" are given in</span>
+<span class="sd">        the "ds" coordinate.</span>
 
 <span class="sd">    Notes</span>
 <span class="sd">    -----</span>
 <span class="sd">    Use imod.evaluate.flow_velocity() first to obtain groundwater velocities</span>
 <span class="sd">    as input for this function. Velocity in x direction is, however, inverted and must</span>
 <span class="sd">    be re-inverted before using as input here.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="c1"># interpolate frf and fff to cell center</span>
-    <span class="n">frf</span> <span class="o">=</span> <span class="mf">0.5</span> <span class="o">*</span> <span class="n">frf</span> <span class="o">+</span> <span class="mf">0.5</span> <span class="o">*</span> <span class="n">frf</span><span class="o">.</span><span class="n">shift</span><span class="p">({</span><span class="s2">&quot;x&quot;</span><span class="p">:</span> <span class="o">-</span><span class="mi">1</span><span class="p">})</span>
-    <span class="n">fff</span> <span class="o">=</span> <span class="mf">0.5</span> <span class="o">*</span> <span class="n">fff</span> <span class="o">+</span> <span class="mf">0.5</span> <span class="o">*</span> <span class="n">fff</span><span class="o">.</span><span class="n">shift</span><span class="p">({</span><span class="s2">&quot;y&quot;</span><span class="p">:</span> <span class="o">-</span><span class="mi">1</span><span class="p">})</span>
+    <span class="n">frf</span> <span class="o">=</span> <span class="mf">0.5</span> <span class="o">*</span> <span class="n">frf</span> <span class="o">+</span> <span class="mf">0.5</span> <span class="o">*</span> <span class="n">frf</span><span class="o">.</span><span class="n">shift</span><span class="p">({</span><span class="s2">"x"</span><span class="p">:</span> <span class="o">-</span><span class="mi">1</span><span class="p">})</span>
+    <span class="n">fff</span> <span class="o">=</span> <span class="mf">0.5</span> <span class="o">*</span> <span class="n">fff</span> <span class="o">+</span> <span class="mf">0.5</span> <span class="o">*</span> <span class="n">fff</span><span class="o">.</span><span class="n">shift</span><span class="p">({</span><span class="s2">"y"</span><span class="p">:</span> <span class="o">-</span><span class="mi">1</span><span class="p">})</span>
     <span class="c1"># get cross section of frf, fff and flf</span>
     <span class="n">sfrf</span> <span class="o">=</span> <span class="n">imod</span><span class="o">.</span><span class="n">select</span><span class="o">.</span><span class="n">cross_section_line</span><span class="p">(</span><span class="n">frf</span><span class="p">,</span> <span class="n">start</span><span class="p">,</span> <span class="n">end</span><span class="p">)</span>
     <span class="n">sfff</span> <span class="o">=</span> <span class="n">imod</span><span class="o">.</span><span class="n">select</span><span class="o">.</span><span class="n">cross_section_line</span><span class="p">(</span><span class="n">fff</span><span class="p">,</span> <span class="n">start</span><span class="p">,</span> <span class="n">end</span><span class="p">)</span>
@@ -632,8 +655,10 @@
 
 <div class="viewcode-block" id="quiver_linestring">
 <a class="viewcode-back" href="../../../api/generated/evaluate/imod.evaluate.quiver_linestring.html#imod.evaluate.quiver_linestring">[docs]</a>
-<span class="k">def</span><span class="w"> </span><span class="nf">quiver_linestring</span><span class="p">(</span><span class="n">frf</span><span class="p">,</span> <span class="n">fff</span><span class="p">,</span> <span class="n">flf</span><span class="p">,</span> <span class="n">linestring</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Obtain the u and v components for quiver plots for a linestring cross section</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">quiver_linestring</span><span class="p">(</span>
+    <span class="n">frf</span><span class="p">:</span> <span class="n">xr</span><span class="o">.</span><span class="n">DataArray</span><span class="p">,</span> <span class="n">fff</span><span class="p">:</span> <span class="n">xr</span><span class="o">.</span><span class="n">DataArray</span><span class="p">,</span> <span class="n">flf</span><span class="p">:</span> <span class="n">xr</span><span class="o">.</span><span class="n">DataArray</span><span class="p">,</span> <span class="n">linestring</span><span class="p">:</span> <span class="n">Any</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">tuple</span><span class="p">[</span><span class="n">xr</span><span class="o">.</span><span class="n">DataArray</span><span class="p">,</span> <span class="n">xr</span><span class="o">.</span><span class="n">DataArray</span><span class="p">]:</span>
+<span class="w">    </span><span class="sd">"""Obtain the u and v components for quiver plots for a linestring cross section</span>
 <span class="sd">    through a three-dimensional flow field. The u and v components are obtained</span>
 <span class="sd">    by first projecting the threedimensional flow components onto the provided</span>
 <span class="sd">    cross-section.</span>
@@ -654,22 +679,22 @@
 <span class="sd">    -------</span>
 <span class="sd">    u: `xarray.DataArray`</span>
 <span class="sd">        The u component (x-component) of the flow projection on the cross-section between start and end coordinate,</span>
-<span class="sd">        with new dimension &quot;s&quot; along the cross-section. The cellsizes along &quot;s&quot; are given in</span>
-<span class="sd">        the &quot;ds&quot; coordinate.</span>
+<span class="sd">        with new dimension "s" along the cross-section. The cellsizes along "s" are given in</span>
+<span class="sd">        the "ds" coordinate.</span>
 <span class="sd">    v: `xarray.DataArray`</span>
 <span class="sd">        The v component (y-component) of the flow projection on the cross-section between start and end coordinate,</span>
-<span class="sd">        with new dimension &quot;s&quot; along the cross-section. The cellsizes along &quot;s&quot; are given in</span>
-<span class="sd">        the &quot;ds&quot; coordinate.</span>
+<span class="sd">        with new dimension "s" along the cross-section. The cellsizes along "s" are given in</span>
+<span class="sd">        the "ds" coordinate.</span>
 
 <span class="sd">    Notes</span>
 <span class="sd">    -----</span>
 <span class="sd">    Use imod.evaluate.flow_velocity() first to obtain groundwater velocities</span>
 <span class="sd">    as input for this function. Velocity in x direction is, however, inverted and must</span>
 <span class="sd">    be re-inverted before using as input here.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="c1"># interpolate frf and fff to cell center</span>
-    <span class="n">frf</span> <span class="o">=</span> <span class="mf">0.5</span> <span class="o">*</span> <span class="n">frf</span> <span class="o">+</span> <span class="mf">0.5</span> <span class="o">*</span> <span class="n">frf</span><span class="o">.</span><span class="n">shift</span><span class="p">({</span><span class="s2">&quot;x&quot;</span><span class="p">:</span> <span class="o">-</span><span class="mi">1</span><span class="p">})</span>
-    <span class="n">fff</span> <span class="o">=</span> <span class="mf">0.5</span> <span class="o">*</span> <span class="n">fff</span> <span class="o">+</span> <span class="mf">0.5</span> <span class="o">*</span> <span class="n">fff</span><span class="o">.</span><span class="n">shift</span><span class="p">({</span><span class="s2">&quot;y&quot;</span><span class="p">:</span> <span class="o">-</span><span class="mi">1</span><span class="p">})</span>
+    <span class="n">frf</span> <span class="o">=</span> <span class="mf">0.5</span> <span class="o">*</span> <span class="n">frf</span> <span class="o">+</span> <span class="mf">0.5</span> <span class="o">*</span> <span class="n">frf</span><span class="o">.</span><span class="n">shift</span><span class="p">({</span><span class="s2">"x"</span><span class="p">:</span> <span class="o">-</span><span class="mi">1</span><span class="p">})</span>
+    <span class="n">fff</span> <span class="o">=</span> <span class="mf">0.5</span> <span class="o">*</span> <span class="n">fff</span> <span class="o">+</span> <span class="mf">0.5</span> <span class="o">*</span> <span class="n">fff</span><span class="o">.</span><span class="n">shift</span><span class="p">({</span><span class="s2">"y"</span><span class="p">:</span> <span class="o">-</span><span class="mi">1</span><span class="p">})</span>
     <span class="c1"># get cross section of frf, fff and flf</span>
     <span class="n">sfrf</span> <span class="o">=</span> <span class="n">imod</span><span class="o">.</span><span class="n">select</span><span class="o">.</span><span class="n">cross_section_linestring</span><span class="p">(</span><span class="n">frf</span><span class="p">,</span> <span class="n">linestring</span><span class="p">)</span>
     <span class="n">sfff</span> <span class="o">=</span> <span class="n">imod</span><span class="o">.</span><span class="n">select</span><span class="o">.</span><span class="n">cross_section_linestring</span><span class="p">(</span><span class="n">fff</span><span class="p">,</span> <span class="n">linestring</span><span class="p">)</span>
@@ -705,8 +730,8 @@
   </div>
   
   <!-- Scripts loaded after <body> so the DOM is not blocked -->
-  <script defer src="../../../_static/scripts/bootstrap.js?digest=90905a2f556bf617f1a9"></script>
-<script defer src="../../../_static/scripts/pydata-sphinx-theme.js?digest=90905a2f556bf617f1a9"></script>
+  <script defer src="../../../_static/scripts/bootstrap.js?digest=75c7c72ae941e8b558d8"></script>
+<script defer src="../../../_static/scripts/pydata-sphinx-theme.js?digest=75c7c72ae941e8b558d8"></script>
 
   <footer class="bd-footer">
 <div class="bd-footer__inner bd-page-width">
@@ -726,8 +751,7 @@
         <div class="footer-item">
 
   <p class="sphinx-version">
-    Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 9.1.0.
-    <br/>
+    Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 9.2.0.
   </p>
 </div>
       
@@ -740,7 +764,7 @@
         <div class="footer-item">
 <p class="theme-version">
   <!-- # L10n: Setting the PST URL as an argument as this does not need to be localized -->
-  Built with the <a href="https://pydata-sphinx-theme.readthedocs.io/en/stable/index.html">PyData Sphinx Theme</a> 0.20.0.
+  Built with the <a href="https://pydata-sphinx-theme.readthedocs.io/en/stable/index.html">PyData Sphinx Theme</a> 0.24.0.
 </p></div>
       
     </div>

@@ -1,0 +1,6 @@
+﻿imod.mf6.GroundwaterTransportModel.mask\_packages
+=================================================
+
+.. currentmodule:: imod.mf6
+
+.. automethod:: GroundwaterTransportModel.mask_packages

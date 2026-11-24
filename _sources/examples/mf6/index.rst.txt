@@ -230,6 +230,23 @@ These examples demonstrate how to use imod to build MODFLOW 6 models.
 
 .. raw:: html
 
+    <div class="sphx-glr-thumbcontainer" tooltip="This example rebuilds the &quot;Synthetic Valley&quot; problem (also known as the McDonald Valley problem) with imod-python. The problem was introduced in the FloPy paper by Hughes and others (2023) and is used in the MODFLOW 6 example suite as ex-gwt-synthetic-valley, and in the USGS MODFLOW and FloPy workshops. It is a useful test case because it combines a lot of features that practitioners use every day.">
+
+.. only:: html
+
+  .. image:: /examples/mf6/images/thumb/sphx_glr_synthetic_valley_thumb.png
+    :alt:
+
+  :doc:`/examples/mf6/synthetic_valley`
+
+.. raw:: html
+
+      <div class="sphx-glr-thumbnail-title">Synthetic valley</div>
+    </div>
+
+
+.. raw:: html
+
     <div class="sphx-glr-thumbcontainer" tooltip="The simulation shown here comes from the  1999 MT3DMS report, p 138: Two-Dimensional Transport in a Uniform Flow of solute injected continuously from a point source in a steady-state uniform flow field.">
 
 .. only:: html
@@ -266,6 +283,7 @@ These examples demonstrate how to use imod to build MODFLOW 6 models.
    /examples/mf6/hondsrug
    /examples/mf6/hondsrug_partitioning
    /examples/mf6/lake
+   /examples/mf6/synthetic_valley
    /examples/mf6/transport_2d
 
 

@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 
 
@@ -8,7 +7,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>Vector data and Geopandas &#8212; iMOD Python 1.1.0 documentation</title>
+    <title>Vector data and Geopandas &#8212; iMOD Python 1.2.0 documentation</title>
   
   
   
@@ -27,22 +26,22 @@
   </noscript>
   
   <!-- Loaded before other Sphinx assets -->
-  <link href="../_static/styles/theme.css?digest=90905a2f556bf617f1a9" rel="stylesheet" />
-<link href="../_static/styles/pydata-sphinx-theme.css?digest=90905a2f556bf617f1a9" rel="stylesheet" />
+  <link href="../_static/styles/theme.css?digest=75c7c72ae941e8b558d8" rel="stylesheet" />
+<link href="../_static/styles/pydata-sphinx-theme.css?digest=75c7c72ae941e8b558d8" rel="stylesheet" />
 
     <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=03e43079" />
-    <link rel="stylesheet" type="text/css" href="../_static/sg_gallery.css?v=fd6457a4" />
+    <link rel="stylesheet" type="text/css" href="../_static/sg_gallery.css?v=c83e6b79" />
     <link rel="stylesheet" type="text/css" href="../_static/sg_gallery-binder.css?v=f4aeca0c" />
     <link rel="stylesheet" type="text/css" href="../_static/sg_gallery-dataframe.css?v=2082cf3c" />
     <link rel="stylesheet" type="text/css" href="../_static/sg_gallery-rendered-html.css?v=1277b6f3" />
   
   <!-- So that users can add custom icons -->
-  <script defer src="../_static/scripts/fontawesome.js?digest=90905a2f556bf617f1a9"></script>
+  <script defer src="../_static/scripts/fontawesome.js?digest=75c7c72ae941e8b558d8"></script>
   <!-- Pre-loaded scripts that we'll load fully later -->
-  <link rel="preload" as="script" href="../_static/scripts/bootstrap.js?digest=90905a2f556bf617f1a9" />
-<link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=90905a2f556bf617f1a9" />
+  <link rel="preload" as="script" href="../_static/scripts/bootstrap.js?digest=75c7c72ae941e8b558d8" />
+<link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=75c7c72ae941e8b558d8" />
 
-    <script src="../_static/documentation_options.js?v=fc837d61"></script>
+    <script src="../_static/documentation_options.js?v=6efca38a"></script>
     <script src="../_static/doctools.js?v=fd6eb6e6"></script>
     <script src="../_static/sphinx_highlight.js?v=6ffebe34"></script>
     <script src="../_static/sg-tags.js?v=d80f6fa4"></script>
@@ -54,8 +53,9 @@
     <link rel="next" title="Time series data and Pandas" href="03-timeseries-data.html" />
     <link rel="prev" title="Raster data and xarray" href="01-raster-data.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <meta name="color-scheme" content="light dark"/>
   <meta name="docsearch:language" content="en"/>
-  <meta name="docsearch:version" content="1.1.0.dev" />
+  <meta name="docsearch:version" content="1.2.0.dev" />
   
     
     <script src="../_static/searchtools.js"></script>
@@ -103,7 +103,7 @@
   
     <header id="pst-header" class="bd-header navbar navbar-expand-lg bd-navbar d-print-none">
 <div class="bd-header__inner bd-page-width">
-  <button class="pst-navbar-icon sidebar-toggle primary-toggle" aria-label="Site navigation">
+  <button type="button" class="pst-navbar-icon sidebar-toggle primary-toggle" aria-label="Site navigation" aria-expanded="false" aria-controls="pst-primary-sidebar-modal">
     <span class="fa-solid fa-bars"></span>
   </button>
   
@@ -125,8 +125,8 @@
     
     
     
-    <img src="../_static/imod-python-logo-light.svg" class="logo__image only-light" alt="iMOD Python 1.1.0 documentation - Home"/>
-    <img src="../_static/imod-python-logo-dark.svg" class="logo__image only-dark pst-js-only" alt="iMOD Python 1.1.0 documentation - Home"/>
+    <img src="../_static/imod-python-logo-light.svg" class="logo__image only-light" alt="iMOD Python 1.2.0 documentation - Home"/>
+    <img src="../_static/imod-python-logo-dark.svg" class="logo__image only-dark pst-js-only" alt="iMOD Python 1.2.0 documentation - Home"/>
   
   
 </a></div>
@@ -193,7 +193,7 @@
         <div class="navbar-item navbar-persistent--container">
           
 
-<button class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+<button type="button" class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
  <i class="fa-solid fa-magnifying-glass"></i>
  <span class="search-button__default-text">Search</span>
  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
@@ -204,15 +204,15 @@
         <div class="navbar-item">
 
 <div class="theme-switch-container dropdown pst-js-only" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Color mode">
-  <button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button dropdown-toggle" aria-label="Color mode" data-bs-toggle="dropdown">
-    <i class="theme-switch fa-solid fa-sun fa-lg fa-fw" data-mode="light" title="Light"></i>
-    <i class="theme-switch fa-solid fa-moon fa-lg fa-fw" data-mode="dark" title="Dark"></i>
-    <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg fa-fw" data-mode="auto" title="System Settings"></i>
+  <button type="button" class="btn btn-sm nav-link pst-navbar-icon theme-switch-button dropdown-toggle" aria-label="Color mode" data-bs-toggle="dropdown">
+    <i class="theme-switch fa-solid fa-sun fa-lg" data-mode="light" title="Light"></i>
+    <i class="theme-switch fa-solid fa-moon fa-lg" data-mode="dark" title="Dark"></i>
+    <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg" data-mode="auto" title="System Settings"></i>
   </button>
   <ul class="dropdown-menu dropdown-menu-end">
-    <li><button class="dropdown-item d-flex align-items-center theme-change-button" data-mode="auto"><i class="fa-solid fa-circle-half-stroke fa-lg fa-fw me-1"></i>System Settings</button></li>
-    <li><button class="dropdown-item d-flex align-items-center theme-change-button" data-mode="light"><i class="fa-solid fa-sun fa-lg fa-fw me-1"></i>Light</button></li>
-    <li><button class="dropdown-item d-flex align-items-center theme-change-button" data-mode="dark"><i class="fa-solid fa-moon fa-lg fa-fw me-1"></i>Dark</button></li>
+    <li><button type="button" class="dropdown-item d-flex align-items-center theme-change-button" data-mode="auto"><i class="fa-solid fa-circle-half-stroke fa-lg me-1"></i>System Settings</button></li>
+    <li><button type="button" class="dropdown-item d-flex align-items-center theme-change-button" data-mode="light"><i class="fa-solid fa-sun fa-lg me-1"></i>Light</button></li>
+    <li><button type="button" class="dropdown-item d-flex align-items-center theme-change-button" data-mode="dark"><i class="fa-solid fa-moon fa-lg me-1"></i>Dark</button></li>
   </ul>
 </div></div>
       
@@ -249,7 +249,7 @@
   
     <div class="navbar-persistent--mobile">
 
-<button class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+<button type="button" class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
  <i class="fa-solid fa-magnifying-glass"></i>
  <span class="search-button__default-text">Search</span>
  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
@@ -258,7 +258,7 @@
   
 
   
-    <button class="pst-navbar-icon sidebar-toggle secondary-toggle" aria-label="On this page">
+    <button type="button" class="pst-navbar-icon sidebar-toggle secondary-toggle" aria-label="On this page" aria-expanded="false" aria-controls="pst-secondary-sidebar-modal">
       <span class="fa-solid fa-outdent"></span>
     </button>
   
@@ -272,7 +272,7 @@
       
       
       
-      <dialog id="pst-primary-sidebar-modal"></dialog>
+      <dialog id="pst-primary-sidebar-modal" tabindex="-1"></dialog>
       <div id="pst-primary-sidebar" class="bd-sidebar-primary bd-sidebar">
         
 
@@ -342,15 +342,15 @@
           <div class="navbar-item">
 
 <div class="theme-switch-container dropdown pst-js-only" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Color mode">
-  <button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button dropdown-toggle" aria-label="Color mode" data-bs-toggle="dropdown">
-    <i class="theme-switch fa-solid fa-sun fa-lg fa-fw" data-mode="light" title="Light"></i>
-    <i class="theme-switch fa-solid fa-moon fa-lg fa-fw" data-mode="dark" title="Dark"></i>
-    <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg fa-fw" data-mode="auto" title="System Settings"></i>
+  <button type="button" class="btn btn-sm nav-link pst-navbar-icon theme-switch-button dropdown-toggle" aria-label="Color mode" data-bs-toggle="dropdown">
+    <i class="theme-switch fa-solid fa-sun fa-lg" data-mode="light" title="Light"></i>
+    <i class="theme-switch fa-solid fa-moon fa-lg" data-mode="dark" title="Dark"></i>
+    <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg" data-mode="auto" title="System Settings"></i>
   </button>
   <ul class="dropdown-menu dropdown-menu-end">
-    <li><button class="dropdown-item d-flex align-items-center theme-change-button" data-mode="auto"><i class="fa-solid fa-circle-half-stroke fa-lg fa-fw me-1"></i>System Settings</button></li>
-    <li><button class="dropdown-item d-flex align-items-center theme-change-button" data-mode="light"><i class="fa-solid fa-sun fa-lg fa-fw me-1"></i>Light</button></li>
-    <li><button class="dropdown-item d-flex align-items-center theme-change-button" data-mode="dark"><i class="fa-solid fa-moon fa-lg fa-fw me-1"></i>Dark</button></li>
+    <li><button type="button" class="dropdown-item d-flex align-items-center theme-change-button" data-mode="auto"><i class="fa-solid fa-circle-half-stroke fa-lg me-1"></i>System Settings</button></li>
+    <li><button type="button" class="dropdown-item d-flex align-items-center theme-change-button" data-mode="light"><i class="fa-solid fa-sun fa-lg me-1"></i>Light</button></li>
+    <li><button type="button" class="dropdown-item d-flex align-items-center theme-change-button" data-mode="dark"><i class="fa-solid fa-moon fa-lg me-1"></i>Dark</button></li>
   </ul>
 </div></div>
         
@@ -385,7 +385,7 @@
   </div>
   
     <div class="sidebar-primary-items__start sidebar-primary__section">
-        <div class="sidebar-primary-item pst-sidebar-collapse"><button id="pst-collapse-sidebar-button" aria-expanded="true" aria-controls="pst-primary-sidebar">
+        <div class="sidebar-primary-item pst-sidebar-collapse"><button type="button" id="pst-collapse-sidebar-button" aria-expanded="true" aria-controls="pst-primary-sidebar">
   <svg class="pst-icon" role="img" aria-hidden="true" focusable="false" viewBox="0 0 16 16" xmlns="http://www.w3.org/2000/svg">
     <path fill="currentColor" d="M3 15.5C2.36232 15.5 1.74874 15.2564 1.28478 14.8189C0.820828 14.3815 0.541576 13.7832 0.504167 13.1467L0.5 13L0.5 3C0.499965 2.36232 0.743605 1.74874 1.18107 1.28478C1.61854 0.820828 2.21676 0.541576 2.85333 0.504167L3 0.5L13 0.5C13.6377 0.499965 14.2513 0.743605 14.7152 1.18107C15.1792 1.61854 15.4584 2.21676 15.4958 2.85333L15.5 3L15.5 13C15.5 13.6377 15.2564 14.2513 14.8189 14.7152C14.3815 15.1792 13.7832 15.4584 13.1467 15.4958L13 15.5L3 15.5ZM3 13.8333L10.5 13.8333L10.5 2.16667L3 2.16667C2.79589 2.16669 2.59889 2.24163 2.44636 2.37726C2.29383 2.5129 2.19638 2.69979 2.1725 2.9025L2.16667 3L2.16667 13C2.16669 13.2041 2.24163 13.4011 2.37726 13.5536C2.5129 13.7062 2.69979 13.8036 2.9025 13.8275L3 13.8333ZM6.65583 10.325L6.5775 10.2558L4.91083 8.58917C4.76735 8.44567 4.68116 8.25476 4.66843 8.05223C4.65569 7.84971 4.71729 7.6495 4.84167 7.48917L4.91083 7.41083L6.5775 5.74417C6.72747 5.59471 6.9287 5.50794 7.14032 5.50148C7.35194 5.49502 7.55809 5.56935 7.7169 5.70937C7.8757 5.8494 7.97525 6.04463 7.99533 6.25539C8.01541 6.46616 7.95451 6.67667 7.825 6.84417L7.75583 6.9225L6.67917 8L7.75583 9.0775C7.89931 9.22099 7.98551 9.41191 7.99824 9.61443C8.01097 9.81695 7.94938 10.0172 7.825 10.1775L7.75583 10.2558C7.61234 10.3993 7.42142 10.4855 7.2189 10.4982C7.01638 10.511 6.81617 10.4494 6.65583 10.325Z"/>
   </svg>
@@ -400,7 +400,7 @@
   <div class="bd-toc-item navbar-nav"><ul class="current nav bd-sidenav">
 <li class="toctree-l1"><a class="reference internal" href="00-index-examples.html">Quick start</a></li>
 <li class="toctree-l1"><a class="reference internal" href="01-raster-data.html">Raster data and xarray</a></li>
-<li class="toctree-l1 current active"><a class="current reference internal" href="#">Vector data and Geopandas</a></li>
+<li class="toctree-l1 current active"><a aria-current="page" class="current reference internal" href="#">Vector data and Geopandas</a></li>
 <li class="toctree-l1"><a class="reference internal" href="03-timeseries-data.html">Time series data and Pandas</a></li>
 <li class="toctree-l1"><a class="reference internal" href="04-unstructured-grids.html">Unstructured Grids</a></li>
 <li class="toctree-l1"><a class="reference internal" href="05-lazy-evaluation.html">Lazy evaluation</a></li>
@@ -449,7 +449,7 @@
     
     <li class="breadcrumb-item breadcrumb-home">
       <a href="../index.html" class="nav-link" aria-label="Home">
-        <i class="fa-solid fa-home"></i>
+        <i class="fa-solid fa-house"></i>
       </a>
     </li>
     
@@ -509,16 +509,15 @@ attribute table.</p>
 <code class="xref py py-class docutils literal notranslate"><span class="pre">geopandas.GeoDataFrame</span></code>. Essentially, geopandas is a pandas
 DataFrame to store tabular data (the attribute table), and adds a geometry
 column to store the geospatial coordinates.</p>
-<div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">geopandas</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">gpd</span>
-<span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
-
-<span class="kn">import</span><span class="w"> </span><span class="nn">imod</span>
-
-<span class="n">tempdir</span> <span class="o">=</span> <span class="n">imod</span><span class="o">.</span><span class="n">util</span><span class="o">.</span><span class="n">temporary_directory</span><span class="p">()</span>
-<span class="n">gdf</span> <span class="o">=</span> <span class="n">imod</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">lakes_shp</span><span class="p">(</span><span class="n">tempdir</span> <span class="o">/</span> <span class="s2">&quot;lake&quot;</span><span class="p">)</span>
-<span class="n">gdf</span><span class="o">.</span><span class="n">iloc</span><span class="p">[:</span><span class="mi">5</span><span class="p">,</span> <span class="o">-</span><span class="mi">3</span><span class="p">:]</span>  <span class="c1"># first 5 rows, last 3 columns</span>
-</pre></div>
-</div>
+<div class="highlight-Python notranslate"><div class="highlight"><pre><span class="kn">import</span><span class="w"> </span><span class="nn">geopandas</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">gpd</span><span class="w">
+</span><span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span><span class="w">
+</span><span class="w">
+</span><span class="kn">import</span><span class="w"> </span><span class="nn">imod</span><span class="w">
+</span><span class="w">
+</span><span class="n">tempdir</span> <span class="o">=</span> <span class="n">imod</span><span class="o">.</span><span class="n">util</span><span class="o">.</span><span class="n">temporary_directory</span><span class="p">(</span><span class="p">)</span><span class="w">
+</span><span class="n">gdf</span> <span class="o">=</span> <span class="n">imod</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">lakes_shp</span><span class="p">(</span><span class="n">tempdir</span> <span class="o">/</span> <span class="s2">&quot;</span><span class="s2">lake</span><span class="s2">&quot;</span><span class="p">)</span><span class="w">
+</span><span class="n">gdf</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="p">:</span><span class="mi">5</span><span class="p">,</span> <span class="o">-</span><span class="mi">3</span><span class="p">:</span><span class="p">]</span>  <span class="c1"># first 5 rows, last 3 columns</span><span class="w">
+</span></pre></div></div>
 <div class="output_subarea output_html rendered_html output_result">
 <div>
 <style scoped>
@@ -581,30 +580,27 @@ column to store the geospatial coordinates.</p>
 <br />
 <br /><p>This geodataframe contains all the data from the shapefile. Note the geometry
 column. The geometry can be plotted:</p>
-<div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="n">gdf</span><span class="o">.</span><span class="n">plot</span><span class="p">()</span>
-</pre></div>
-</div>
-<img src="../_images/sphx_glr_02-vector-data_001.png" srcset="../_images/sphx_glr_02-vector-data_001.png" alt="02 vector data" class = "sphx-glr-single-img"/><div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>&lt;Axes: &gt;
+<div class="highlight-Python notranslate"><div class="highlight"><pre><span class="n">gdf</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="p">)</span><span class="w">
+</span></pre></div></div>
+<img src="../_images/sphx_glr_02-vector-data_001.png" srcset="../_images/sphx_glr_02-vector-data_001.png" alt="02 vector data" class = "sphx-glr-single-img"/><div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>&lt;Axes: xlabel='Easting [metre]', ylabel='Northing [metre]'&gt;
 </pre></div>
 </div>
 <p>A GeoDataFrame of points can also be easily generated from pairs of x and y
 coordinates.</p>
-<div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="n">x</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="mf">90_000.0</span><span class="p">,</span> <span class="mf">120_000.0</span><span class="p">,</span> <span class="mf">1000.0</span><span class="p">)</span>
-<span class="n">y</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="mf">450_000.0</span><span class="p">,</span> <span class="mf">480_000.0</span><span class="p">,</span> <span class="mf">1000.0</span><span class="p">)</span>
-
-<span class="n">geometry</span> <span class="o">=</span> <span class="n">gpd</span><span class="o">.</span><span class="n">points_from_xy</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">)</span>
-<span class="n">points_gdf</span> <span class="o">=</span> <span class="n">gpd</span><span class="o">.</span><span class="n">GeoDataFrame</span><span class="p">(</span><span class="n">geometry</span><span class="o">=</span><span class="n">geometry</span><span class="p">)</span>
-
-<span class="n">points_gdf</span><span class="o">.</span><span class="n">plot</span><span class="p">()</span>
-</pre></div>
-</div>
-<img src="../_images/sphx_glr_02-vector-data_002.png" srcset="../_images/sphx_glr_02-vector-data_002.png" alt="02 vector data" class = "sphx-glr-single-img"/><div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>&lt;Axes: &gt;
+<div class="highlight-Python notranslate"><div class="highlight"><pre><span class="n">x</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="mf">90_000.0</span><span class="p">,</span> <span class="mf">120_000.0</span><span class="p">,</span> <span class="mf">1000.0</span><span class="p">)</span><span class="w">
+</span><span class="n">y</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="mf">450_000.0</span><span class="p">,</span> <span class="mf">480_000.0</span><span class="p">,</span> <span class="mf">1000.0</span><span class="p">)</span><span class="w">
+</span><span class="w">
+</span><span class="n">geometry</span> <span class="o">=</span> <span class="n">gpd</span><span class="o">.</span><span class="n">points_from_xy</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">)</span><span class="w">
+</span><span class="n">points_gdf</span> <span class="o">=</span> <span class="n">gpd</span><span class="o">.</span><span class="n">GeoDataFrame</span><span class="p">(</span><span class="n">geometry</span><span class="o">=</span><span class="n">geometry</span><span class="p">)</span><span class="w">
+</span><span class="w">
+</span><span class="n">points_gdf</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="p">)</span><span class="w">
+</span></pre></div></div>
+<img src="../_images/sphx_glr_02-vector-data_002.png" srcset="../_images/sphx_glr_02-vector-data_002.png" alt="02 vector data" class = "sphx-glr-single-img"/><div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>&lt;Axes: xlabel='x', ylabel='y'&gt;
 </pre></div>
 </div>
 <p>An important feature of every geometry is its geometry type:</p>
-<div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="n">gdf</span><span class="o">.</span><span class="n">geom_type</span>
-</pre></div>
-</div>
+<div class="highlight-Python notranslate"><div class="highlight"><pre><span class="n">gdf</span><span class="o">.</span><span class="n">geom_type</span><span class="w">
+</span></pre></div></div>
 <div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>0     Polygon
 1     Polygon
 2     Polygon
@@ -620,9 +616,8 @@ Length: 77, dtype: str
 </pre></div>
 </div>
 <p>As expected, the points are of the type … Point:</p>
-<div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="n">points_gdf</span><span class="o">.</span><span class="n">geom_type</span>
-</pre></div>
-</div>
+<div class="highlight-Python notranslate"><div class="highlight"><pre><span class="n">points_gdf</span><span class="o">.</span><span class="n">geom_type</span><span class="w">
+</span></pre></div></div>
 <div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>0     Point
 1     Point
 2     Point
@@ -661,10 +656,9 @@ dtype: str
 <p>Geopandas supports many vector file formats. It wraps <a class="reference external" href="https://fiona.readthedocs.io/en/latest/manual.html">fiona</a>, which in turns
 wraps <a class="reference external" href="https://gdal.org/faq.html#what-is-this-ogr-stuff">OGR</a>, which is a part of <a class="reference external" href="https://gdal.org/">GDAL</a>. For example, the lake polygons above
 are loaded from an ESRI Shapefile:</p>
-<div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="n">filenames</span> <span class="o">=</span> <span class="p">[</span><span class="n">path</span><span class="o">.</span><span class="n">name</span> <span class="k">for</span> <span class="n">path</span> <span class="ow">in</span> <span class="p">(</span><span class="n">tempdir</span> <span class="o">/</span> <span class="s2">&quot;lake&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">iterdir</span><span class="p">()]</span>
-<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">filenames</span><span class="p">))</span>
-</pre></div>
-</div>
+<div class="highlight-Python notranslate"><div class="highlight"><pre><span class="n">filenames</span> <span class="o">=</span> <span class="p">[</span><span class="n">path</span><span class="o">.</span><span class="n">name</span> <span class="k">for</span> <span class="n">path</span> <span class="ow">in</span> <span class="p">(</span><span class="n">tempdir</span> <span class="o">/</span> <span class="s2">&quot;</span><span class="s2">lake</span><span class="s2">&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">iterdir</span><span class="p">(</span><span class="p">)</span><span class="p">]</span><span class="w">
+</span><span class="nb">print</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">filenames</span><span class="p">)</span><span class="p">)</span><span class="w">
+</span></pre></div></div>
 <div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>lakes.cpg
 lakes.dbf
 lakes.prj
@@ -674,22 +668,20 @@ lakes.shx
 </div>
 <p>They can be easily stored into more modern formats as well, such as
 <a class="reference external" href="https://www.geopackage.org/">GeoPackage</a>:</p>
-<div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="n">points_gdf</span><span class="o">.</span><span class="n">to_file</span><span class="p">(</span><span class="n">tempdir</span> <span class="o">/</span> <span class="s2">&quot;points.gpkg&quot;</span><span class="p">)</span>
-<span class="n">filenames</span> <span class="o">=</span> <span class="p">[</span><span class="n">path</span><span class="o">.</span><span class="n">name</span> <span class="k">for</span> <span class="n">path</span> <span class="ow">in</span> <span class="n">tempdir</span><span class="o">.</span><span class="n">iterdir</span><span class="p">()]</span>
-<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">filenames</span><span class="p">))</span>
-</pre></div>
-</div>
-<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>C:\pixi_envs\imod-python-1825887385235446013\envs\default\Lib\site-packages\pyogrio\geopandas.py:662: UserWarning: &#39;crs&#39; was not provided.  The output dataset will not have projection information defined and may not be usable in other systems.
+<div class="highlight-Python notranslate"><div class="highlight"><pre><span class="n">points_gdf</span><span class="o">.</span><span class="n">to_file</span><span class="p">(</span><span class="n">tempdir</span> <span class="o">/</span> <span class="s2">&quot;</span><span class="s2">points.gpkg</span><span class="s2">&quot;</span><span class="p">)</span><span class="w">
+</span><span class="n">filenames</span> <span class="o">=</span> <span class="p">[</span><span class="n">path</span><span class="o">.</span><span class="n">name</span> <span class="k">for</span> <span class="n">path</span> <span class="ow">in</span> <span class="n">tempdir</span><span class="o">.</span><span class="n">iterdir</span><span class="p">(</span><span class="p">)</span><span class="p">]</span><span class="w">
+</span><span class="nb">print</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">filenames</span><span class="p">)</span><span class="p">)</span><span class="w">
+</span></pre></div></div>
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>C:\pixi_envs\imod-python-3999283135534880650\envs\default\Lib\site-packages\pyogrio\geopandas.py:662: UserWarning: 'crs' was not provided.  The output dataset will not have projection information defined and may not be usable in other systems.
   write(
 lake
 points.gpkg
 </pre></div>
 </div>
 <p>… and back:</p>
-<div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="n">back</span> <span class="o">=</span> <span class="n">gpd</span><span class="o">.</span><span class="n">read_file</span><span class="p">(</span><span class="n">tempdir</span> <span class="o">/</span> <span class="s2">&quot;points.gpkg&quot;</span><span class="p">)</span>
-<span class="n">back</span>
-</pre></div>
-</div>
+<div class="highlight-Python notranslate"><div class="highlight"><pre><span class="n">back</span> <span class="o">=</span> <span class="n">gpd</span><span class="o">.</span><span class="n">read_file</span><span class="p">(</span><span class="n">tempdir</span> <span class="o">/</span> <span class="s2">&quot;</span><span class="s2">points.gpkg</span><span class="s2">&quot;</span><span class="p">)</span><span class="w">
+</span><span class="n">back</span><span class="w">
+</span></pre></div></div>
 <div class="output_subarea output_html rendered_html output_result">
 <div>
 <style scoped>
@@ -856,23 +848,22 @@ flow barrier packages (HFB). The simplest form of such a package is to add a
 HFB package for a single layer. For that we have to create some linestrings
 first with shapely. Next, we need to assign data to the linestrings: a layer
 number and a resistance value.</p>
-<div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">shapely</span><span class="w"> </span><span class="kn">import</span> <span class="n">linestrings</span>
-
-<span class="kn">from</span><span class="w"> </span><span class="nn">imod.mf6</span><span class="w"> </span><span class="kn">import</span> <span class="n">SingleLayerHorizontalFlowBarrierResistance</span>
-
-<span class="n">barrier_linestrings</span> <span class="o">=</span> <span class="n">linestrings</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">)</span>
-<span class="n">geometry</span> <span class="o">=</span> <span class="n">gpd</span><span class="o">.</span><span class="n">GeoDataFrame</span><span class="p">(</span>
-    <span class="n">geometry</span><span class="o">=</span><span class="p">[</span><span class="n">barrier_linestrings</span><span class="p">],</span>
-    <span class="n">data</span><span class="o">=</span><span class="p">{</span>
-        <span class="s2">&quot;resistance&quot;</span><span class="p">:</span> <span class="p">[</span><span class="mf">100.0</span><span class="p">],</span>
-        <span class="s2">&quot;layer&quot;</span><span class="p">:</span> <span class="p">[</span><span class="mi">1</span><span class="p">],</span>
-    <span class="p">},</span>
-<span class="p">)</span>
-
-<span class="n">hfb</span> <span class="o">=</span> <span class="n">SingleLayerHorizontalFlowBarrierResistance</span><span class="p">(</span><span class="n">geometry</span><span class="p">)</span>
-<span class="n">hfb</span>
-</pre></div>
-</div>
+<div class="highlight-Python notranslate"><div class="highlight"><pre><span class="kn">from</span><span class="w"> </span><span class="nn">shapely</span><span class="w"> </span><span class="kn">import</span> <span class="n">linestrings</span><span class="w">
+</span><span class="w">
+</span><span class="kn">from</span><span class="w"> </span><span class="nn">imod</span><span class="nn">.</span><span class="nn">mf6</span><span class="w"> </span><span class="kn">import</span> <a class="sphx-glr-backref-module-imod-mf6 sphx-glr-backref-type-py-class reference internal" href="../api/generated/mf6/imod.mf6.SingleLayerHorizontalFlowBarrierResistance.html#imod.mf6.SingleLayerHorizontalFlowBarrierResistance" title="imod.mf6.SingleLayerHorizontalFlowBarrierResistance"><span class="n">SingleLayerHorizontalFlowBarrierResistance</span></a><span class="w">
+</span><span class="w">
+</span><span class="n">barrier_linestrings</span> <span class="o">=</span> <span class="n">linestrings</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">)</span><span class="w">
+</span><span class="n">geometry</span> <span class="o">=</span> <span class="n">gpd</span><span class="o">.</span><span class="n">GeoDataFrame</span><span class="p">(</span><span class="w">
+</span>    <span class="n">geometry</span><span class="o">=</span><span class="p">[</span><span class="n">barrier_linestrings</span><span class="p">]</span><span class="p">,</span><span class="w">
+</span>    <span class="n">data</span><span class="o">=</span><span class="p">{</span><span class="w">
+</span>        <span class="s2">&quot;</span><span class="s2">resistance</span><span class="s2">&quot;</span><span class="p">:</span> <span class="p">[</span><span class="mf">100.0</span><span class="p">]</span><span class="p">,</span><span class="w">
+</span>        <span class="s2">&quot;</span><span class="s2">layer</span><span class="s2">&quot;</span><span class="p">:</span> <span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="p">,</span><span class="w">
+</span>    <span class="p">}</span><span class="p">,</span><span class="w">
+</span><span class="p">)</span><span class="w">
+</span><span class="w">
+</span><a class="sphx-glr-backref-module-imod-mf6 sphx-glr-backref-type-py-class sphx-glr-backref-instance reference internal" href="../api/generated/mf6/imod.mf6.SingleLayerHorizontalFlowBarrierResistance.html#imod.mf6.SingleLayerHorizontalFlowBarrierResistance" title="imod.mf6.SingleLayerHorizontalFlowBarrierResistance"><span class="n">hfb</span></a> <span class="o">=</span> <a class="sphx-glr-backref-module-imod-mf6 sphx-glr-backref-type-py-class reference internal" href="../api/generated/mf6/imod.mf6.SingleLayerHorizontalFlowBarrierResistance.html#imod.mf6.SingleLayerHorizontalFlowBarrierResistance" title="imod.mf6.SingleLayerHorizontalFlowBarrierResistance"><span class="n">SingleLayerHorizontalFlowBarrierResistance</span></a><span class="p">(</span><span class="n">geometry</span><span class="p">)</span><span class="w">
+</span><a class="sphx-glr-backref-module-imod-mf6 sphx-glr-backref-type-py-class sphx-glr-backref-instance reference internal" href="../api/generated/mf6/imod.mf6.SingleLayerHorizontalFlowBarrierResistance.html#imod.mf6.SingleLayerHorizontalFlowBarrierResistance" title="imod.mf6.SingleLayerHorizontalFlowBarrierResistance"><span class="n">hfb</span></a><span class="w">
+</span></pre></div></div>
 <div class="output_subarea output_html rendered_html output_result">
 <div>SingleLayerHorizontalFlowBarrierResistance</div><div><svg style="position: absolute; width: 0; height: 0; overflow: hidden">
 <defs>
@@ -1424,16 +1415,15 @@ Data variables:
     print_input  bool 1B False
     resistance   (index) float64 8B 100.0
     layer        (index) int64 8B 1
-    geometry     (index) geometry 8B LINESTRING (90000 450000, 91000 451000, ...</pre><div class='xr-wrap' style='display:none'><div class='xr-header'><div class='xr-obj-type'>xarray.Dataset</div></div><ul class='xr-sections'><li class='xr-section-item'><input id='section-a68a6ec7-62ee-4f73-bd45-d17632fe5f20' class='xr-section-summary-in' type='checkbox' disabled /><label for='section-a68a6ec7-62ee-4f73-bd45-d17632fe5f20' class='xr-section-summary'>Dimensions:</label><div class='xr-section-inline-details'><ul class='xr-dim-list'><li><span class='xr-has-index'>index</span>: 1</li></ul></div></li><li class='xr-section-item'><input id='section-b9955e52-0381-498f-ac41-3f99a2f4dd6d' class='xr-section-summary-in' type='checkbox' checked /><label for='section-b9955e52-0381-498f-ac41-3f99a2f4dd6d' class='xr-section-summary' title='Expand/collapse section'>Coordinates: <span>(1)</span></label><div class='xr-section-inline-details'></div><div class='xr-section-details'><ul class='xr-var-list'><li class='xr-var-item'><div class='xr-var-name'><span class='xr-has-index'>index</span></div><div class='xr-var-dims'>(index)</div><div class='xr-var-dtype'>int64</div><div class='xr-var-preview xr-preview'>0</div><input id='attrs-24647a6f-dee2-4029-a157-473784591cfb' class='xr-var-attrs-in' type='checkbox' disabled><label for='attrs-24647a6f-dee2-4029-a157-473784591cfb' title='Show/Hide attributes'><svg class='icon xr-icon-file-text2'><use xlink:href='#icon-file-text2'></use></svg></label><input id='data-51db33b6-2fd2-43ea-b90c-b608d29a77b8' class='xr-var-data-in' type='checkbox'><label for='data-51db33b6-2fd2-43ea-b90c-b608d29a77b8' title='Show/Hide data repr'><svg class='icon xr-icon-database'><use xlink:href='#icon-database'></use></svg></label><div class='xr-var-attrs'><dl class='xr-attrs'></dl></div><div class='xr-var-data'><pre>[1 values with dtype=int64]</pre></div></li></ul></div></li><li class='xr-section-item'><input id='section-27ffc338-d412-4795-bcd5-e0e4982f11ec' class='xr-section-summary-in' type='checkbox' checked /><label for='section-27ffc338-d412-4795-bcd5-e0e4982f11ec' class='xr-section-summary' title='Expand/collapse section'>Data variables: <span>(4)</span></label><div class='xr-section-inline-details'></div><div class='xr-section-details'><ul class='xr-var-list'><li class='xr-var-item'><div class='xr-var-name'><span>print_input</span></div><div class='xr-var-dims'>()</div><div class='xr-var-dtype'>bool</div><div class='xr-var-preview xr-preview'>False</div><input id='attrs-2543fbd1-fce0-42b3-b83a-2c93dcfd42fe' class='xr-var-attrs-in' type='checkbox' disabled><label for='attrs-2543fbd1-fce0-42b3-b83a-2c93dcfd42fe' title='Show/Hide attributes'><svg class='icon xr-icon-file-text2'><use xlink:href='#icon-file-text2'></use></svg></label><input id='data-0e6b9c35-8424-4830-b09f-7e19af30b445' class='xr-var-data-in' type='checkbox'><label for='data-0e6b9c35-8424-4830-b09f-7e19af30b445' title='Show/Hide data repr'><svg class='icon xr-icon-database'><use xlink:href='#icon-database'></use></svg></label><div class='xr-var-attrs'><dl class='xr-attrs'></dl></div><div class='xr-var-data'><pre>array(False)</pre></div></li><li class='xr-var-item'><div class='xr-var-name'><span>resistance</span></div><div class='xr-var-dims'>(index)</div><div class='xr-var-dtype'>float64</div><div class='xr-var-preview xr-preview'>100.0</div><input id='attrs-a05d6468-fdb4-4a04-bcaf-c1fb7e4590a6' class='xr-var-attrs-in' type='checkbox' disabled><label for='attrs-a05d6468-fdb4-4a04-bcaf-c1fb7e4590a6' title='Show/Hide attributes'><svg class='icon xr-icon-file-text2'><use xlink:href='#icon-file-text2'></use></svg></label><input id='data-5a4a908d-d444-44d4-bc16-67e06eee4a02' class='xr-var-data-in' type='checkbox'><label for='data-5a4a908d-d444-44d4-bc16-67e06eee4a02' title='Show/Hide data repr'><svg class='icon xr-icon-database'><use xlink:href='#icon-database'></use></svg></label><div class='xr-var-attrs'><dl class='xr-attrs'></dl></div><div class='xr-var-data'><pre>array([100.])</pre></div></li><li class='xr-var-item'><div class='xr-var-name'><span>layer</span></div><div class='xr-var-dims'>(index)</div><div class='xr-var-dtype'>int64</div><div class='xr-var-preview xr-preview'>1</div><input id='attrs-8baf60c2-71ad-46f0-8dc1-03d25957293e' class='xr-var-attrs-in' type='checkbox' disabled><label for='attrs-8baf60c2-71ad-46f0-8dc1-03d25957293e' title='Show/Hide attributes'><svg class='icon xr-icon-file-text2'><use xlink:href='#icon-file-text2'></use></svg></label><input id='data-021bc0a5-af74-4da2-a7b3-9f15a57369fb' class='xr-var-data-in' type='checkbox'><label for='data-021bc0a5-af74-4da2-a7b3-9f15a57369fb' title='Show/Hide data repr'><svg class='icon xr-icon-database'><use xlink:href='#icon-database'></use></svg></label><div class='xr-var-attrs'><dl class='xr-attrs'></dl></div><div class='xr-var-data'><pre>array([1])</pre></div></li><li class='xr-var-item'><div class='xr-var-name'><span>geometry</span></div><div class='xr-var-dims'>(index)</div><div class='xr-var-dtype'>geometry</div><div class='xr-var-preview xr-preview'>LINESTRING (90000 450000, 91000 ...</div><input id='attrs-dce5a798-796f-46b2-8a2c-674a3841bce5' class='xr-var-attrs-in' type='checkbox' disabled><label for='attrs-dce5a798-796f-46b2-8a2c-674a3841bce5' title='Show/Hide attributes'><svg class='icon xr-icon-file-text2'><use xlink:href='#icon-file-text2'></use></svg></label><input id='data-f1fd8924-832a-4935-978b-49652b7f5207' class='xr-var-data-in' type='checkbox'><label for='data-f1fd8924-832a-4935-978b-49652b7f5207' title='Show/Hide data repr'><svg class='icon xr-icon-database'><use xlink:href='#icon-database'></use></svg></label><div class='xr-var-attrs'><dl class='xr-attrs'></dl></div><div class='xr-var-data'><pre>&lt;GeometryArray&gt;
+    geometry     (index) geometry 8B LINESTRING (90000 450000, 91000 451000, ...</pre><div class='xr-wrap' style='display:none'><div class='xr-header'><div class='xr-obj-type'>xarray.Dataset</div></div><ul class='xr-sections'><li class='xr-section-item'><input id='section-c27f739e-a864-488c-a1b3-7d9fc677df15' class='xr-section-summary-in' type='checkbox' disabled /><label for='section-c27f739e-a864-488c-a1b3-7d9fc677df15' class='xr-section-summary'>Dimensions:</label><div class='xr-section-inline-details'><ul class='xr-dim-list'><li><span class='xr-has-index'>index</span>: 1</li></ul></div></li><li class='xr-section-item'><input id='section-5ba0ff38-2173-4338-bab3-87739e83276e' class='xr-section-summary-in' type='checkbox' checked /><label for='section-5ba0ff38-2173-4338-bab3-87739e83276e' class='xr-section-summary' title='Expand/collapse section'>Coordinates: <span>(1)</span></label><div class='xr-section-inline-details'></div><div class='xr-section-details'><ul class='xr-var-list'><li class='xr-var-item'><div class='xr-var-name'><span class='xr-has-index'>index</span></div><div class='xr-var-dims'>(index)</div><div class='xr-var-dtype'>int64</div><div class='xr-var-preview xr-preview'>0</div><input id='attrs-d5cecb3e-cb10-45ab-8eee-06ec6e0f44bf' class='xr-var-attrs-in' type='checkbox' disabled><label for='attrs-d5cecb3e-cb10-45ab-8eee-06ec6e0f44bf' title='Show/Hide attributes'><svg class='icon xr-icon-file-text2'><use xlink:href='#icon-file-text2'></use></svg></label><input id='data-b35d86e7-858e-41fa-bef0-a2ac1b081b62' class='xr-var-data-in' type='checkbox'><label for='data-b35d86e7-858e-41fa-bef0-a2ac1b081b62' title='Show/Hide data repr'><svg class='icon xr-icon-database'><use xlink:href='#icon-database'></use></svg></label><div class='xr-var-attrs'><dl class='xr-attrs'></dl></div><div class='xr-var-data'><pre>[1 values with dtype=int64]</pre></div></li></ul></div></li><li class='xr-section-item'><input id='section-6db4d2a3-1ee7-48ad-9a24-493e06ec9dcb' class='xr-section-summary-in' type='checkbox' checked /><label for='section-6db4d2a3-1ee7-48ad-9a24-493e06ec9dcb' class='xr-section-summary' title='Expand/collapse section'>Data variables: <span>(4)</span></label><div class='xr-section-inline-details'></div><div class='xr-section-details'><ul class='xr-var-list'><li class='xr-var-item'><div class='xr-var-name'><span>print_input</span></div><div class='xr-var-dims'>()</div><div class='xr-var-dtype'>bool</div><div class='xr-var-preview xr-preview'>False</div><input id='attrs-0a31e5ce-0338-4f4f-b92c-3b906e3412d0' class='xr-var-attrs-in' type='checkbox' disabled><label for='attrs-0a31e5ce-0338-4f4f-b92c-3b906e3412d0' title='Show/Hide attributes'><svg class='icon xr-icon-file-text2'><use xlink:href='#icon-file-text2'></use></svg></label><input id='data-afe774dc-6ece-4293-b0ca-34f1fc8d9df3' class='xr-var-data-in' type='checkbox'><label for='data-afe774dc-6ece-4293-b0ca-34f1fc8d9df3' title='Show/Hide data repr'><svg class='icon xr-icon-database'><use xlink:href='#icon-database'></use></svg></label><div class='xr-var-attrs'><dl class='xr-attrs'></dl></div><div class='xr-var-data'><pre>array(False)</pre></div></li><li class='xr-var-item'><div class='xr-var-name'><span>resistance</span></div><div class='xr-var-dims'>(index)</div><div class='xr-var-dtype'>float64</div><div class='xr-var-preview xr-preview'>100.0</div><input id='attrs-ca3474cf-4b25-497a-a2b8-08994103e81a' class='xr-var-attrs-in' type='checkbox' disabled><label for='attrs-ca3474cf-4b25-497a-a2b8-08994103e81a' title='Show/Hide attributes'><svg class='icon xr-icon-file-text2'><use xlink:href='#icon-file-text2'></use></svg></label><input id='data-42183925-482b-4837-807f-e5e6c1940779' class='xr-var-data-in' type='checkbox'><label for='data-42183925-482b-4837-807f-e5e6c1940779' title='Show/Hide data repr'><svg class='icon xr-icon-database'><use xlink:href='#icon-database'></use></svg></label><div class='xr-var-attrs'><dl class='xr-attrs'></dl></div><div class='xr-var-data'><pre>array([100.])</pre></div></li><li class='xr-var-item'><div class='xr-var-name'><span>layer</span></div><div class='xr-var-dims'>(index)</div><div class='xr-var-dtype'>int64</div><div class='xr-var-preview xr-preview'>1</div><input id='attrs-a9961b27-b88c-4054-b5b5-67b980273208' class='xr-var-attrs-in' type='checkbox' disabled><label for='attrs-a9961b27-b88c-4054-b5b5-67b980273208' title='Show/Hide attributes'><svg class='icon xr-icon-file-text2'><use xlink:href='#icon-file-text2'></use></svg></label><input id='data-51ed44b8-5213-4977-a4b8-d0088ff81f8d' class='xr-var-data-in' type='checkbox'><label for='data-51ed44b8-5213-4977-a4b8-d0088ff81f8d' title='Show/Hide data repr'><svg class='icon xr-icon-database'><use xlink:href='#icon-database'></use></svg></label><div class='xr-var-attrs'><dl class='xr-attrs'></dl></div><div class='xr-var-data'><pre>array([1])</pre></div></li><li class='xr-var-item'><div class='xr-var-name'><span>geometry</span></div><div class='xr-var-dims'>(index)</div><div class='xr-var-dtype'>geometry</div><div class='xr-var-preview xr-preview'>LINESTRING (90000 450000, 91000 ...</div><input id='attrs-aeb11784-b4de-491f-823d-ba8d48aa82ac' class='xr-var-attrs-in' type='checkbox' disabled><label for='attrs-aeb11784-b4de-491f-823d-ba8d48aa82ac' title='Show/Hide attributes'><svg class='icon xr-icon-file-text2'><use xlink:href='#icon-file-text2'></use></svg></label><input id='data-bb46bd9c-9e7a-457a-a86e-334688f75414' class='xr-var-data-in' type='checkbox'><label for='data-bb46bd9c-9e7a-457a-a86e-334688f75414' title='Show/Hide data repr'><svg class='icon xr-icon-database'><use xlink:href='#icon-database'></use></svg></label><div class='xr-var-attrs'><dl class='xr-attrs'></dl></div><div class='xr-var-data'><pre>&lt;GeometryArray&gt;
 [&lt;LINESTRING (90000 450000, 91000 451000, 92000 452000, 93000 453000, 94000 4...&gt;]
 Length: 1, dtype: geometry</pre></div></li></ul></div></li></ul></div></div>
 </div>
 <br />
 <br /><p>You can see the GeoDataFrame has been converted to an xr.Dataset. To access
 the data as a geodataframe again use the line_data property:</p>
-<div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="n">hfb</span><span class="o">.</span><span class="n">line_data</span>
-</pre></div>
-</div>
+<div class="highlight-Python notranslate"><div class="highlight"><pre><a class="sphx-glr-backref-module-imod-mf6 sphx-glr-backref-type-py-class sphx-glr-backref-instance reference internal" href="../api/generated/mf6/imod.mf6.SingleLayerHorizontalFlowBarrierResistance.html#imod.mf6.SingleLayerHorizontalFlowBarrierResistance" title="imod.mf6.SingleLayerHorizontalFlowBarrierResistance"><span class="n">hfb</span></a><span class="o">.</span><span class="n">line_data</span><span class="w">
+</span></pre></div></div>
 <div class="output_subarea output_html rendered_html output_result">
 <div>
 <style scoped>
@@ -1476,7 +1466,7 @@ the data as a geodataframe again use the line_data property:</p>
 </div>
 </div>
 <br />
-<br /><p class="sphx-glr-timing"><strong>Total running time of the script:</strong> (0 minutes 1.291 seconds)</p>
+<br /><p class="sphx-glr-timing"><strong>Total running time of the script:</strong> (0 minutes 1.842 seconds)</p>
 <div class="sphx-glr-footer sphx-glr-footer-example docutils container" id="sphx-glr-download-user-guide-02-vector-data-py">
 <div class="sphx-glr-download sphx-glr-download-jupyter docutils container">
 <p><a class="reference download internal" download="" href="../_downloads/c5285c4c8db8c3bfdc970b48d3f5250f/02-vector-data.ipynb"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Jupyter</span> <span class="pre">notebook:</span> <span class="pre">02-vector-data.ipynb</span></code></a></p>
@@ -1527,7 +1517,7 @@ the data as a geodataframe again use the line_data property:</p>
             
             
               
-                <dialog id="pst-secondary-sidebar-modal"></dialog>
+                <dialog id="pst-secondary-sidebar-modal" tabindex="-1"></dialog>
                 <div id="pst-secondary-sidebar" class="bd-sidebar-secondary bd-toc"><div class="sidebar-secondary-items sidebar-secondary__inner">
 
 
@@ -1567,8 +1557,8 @@ the data as a geodataframe again use the line_data property:</p>
   </div>
   
   <!-- Scripts loaded after <body> so the DOM is not blocked -->
-  <script defer src="../_static/scripts/bootstrap.js?digest=90905a2f556bf617f1a9"></script>
-<script defer src="../_static/scripts/pydata-sphinx-theme.js?digest=90905a2f556bf617f1a9"></script>
+  <script defer src="../_static/scripts/bootstrap.js?digest=75c7c72ae941e8b558d8"></script>
+<script defer src="../_static/scripts/pydata-sphinx-theme.js?digest=75c7c72ae941e8b558d8"></script>
 
   <footer class="bd-footer">
 <div class="bd-footer__inner bd-page-width">
@@ -1588,8 +1578,7 @@ the data as a geodataframe again use the line_data property:</p>
         <div class="footer-item">
 
   <p class="sphinx-version">
-    Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 9.1.0.
-    <br/>
+    Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 9.2.0.
   </p>
 </div>
       
@@ -1602,7 +1591,7 @@ the data as a geodataframe again use the line_data property:</p>
         <div class="footer-item">
 <p class="theme-version">
   <!-- # L10n: Setting the PST URL as an argument as this does not need to be localized -->
-  Built with the <a href="https://pydata-sphinx-theme.readthedocs.io/en/stable/index.html">PyData Sphinx Theme</a> 0.20.0.
+  Built with the <a href="https://pydata-sphinx-theme.readthedocs.io/en/stable/index.html">PyData Sphinx Theme</a> 0.24.0.
 </p></div>
       
     </div>
