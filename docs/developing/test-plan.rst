@@ -189,15 +189,19 @@ QGIS export
 3. Open QGIS.
 4. Set the coordinate reference system (CRS) of the project to EPSG:28992, the
    same CRS as the exported files.
-5. Click ``"Layers" > "Add Layer" > "Add mesh"``. Insert the path printed in the
-   terminal in the text box. ``{path_printed_in_terminal}/hondsrug_MDAL/riv.nc``
-   This will import the mesh. You need to do this as well for structured grids.
+5. Add the layer:
+
+   - **For the unstructured grid:** Click ``"Layers" > "Add Layer" > "Add mesh"``.
+     Insert the path printed in the terminal in the text box.
+     ``{path_printed_in_terminal}/hondsrug_MDAL/riv.nc`` This will import the
+     mesh.
+   - **For the structured grid:** Click ``"Layers" > "Add Layer" > "Add
+     raster"``. Insert the path printed in the terminal in the text box. This will
+     import the raster.
+
 6. Verify if the mesh is rendered in two dimensions, and not as a single
    line of cells. If not, `open an issue on GitHub
    <https://github.com/Deltares/imod-python/issues>`_ . 
-7. The structured grid has a slight shift in location compared to the
-   unstructured grid, this is expected. Verify if the shift is small (less than
-   1 cell size).
 
 Tutorial
 ^^^^^^^^
