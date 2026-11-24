@@ -71,7 +71,6 @@ object BuildPages : BuildType({
     artifactRules = """imod-python\docs\_build\html => documentation.zip"""
 
     vcs {
-        root(AbsoluteId("iMOD6_IMODPython_MetaSwapLookupTable"), ". => lookup_table")
         root(AbsoluteId("iMOD6_IMODPython_ImodPython"), "+:. => imod-python")
 
         cleanCheckout = true
