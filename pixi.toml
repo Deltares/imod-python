@@ -1,7 +1,7 @@
 [workspace]
 name = "imod-python"
 # exclude-newer = "7d"
-version = "1.2.0"
+version = "1.2.1.dev0"
 description = "Make massive MODFLOW models"
 authors = ["Deltares <imod.info@deltares.nl>"]
 channels = ["conda-forge"]
