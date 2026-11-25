@@ -29,7 +29,7 @@ Use Pixi to run project commands from the repository root:
 | Type-check | `pixi run mypy_lint` |
 | Unit tests (JIT-disabled and JIT-specific) | `pixi run unittests` |
 | Unit tests and examples | `pixi run tests` |
-| Documentation build | `pixi run docs` |
+| Documentation build | On Windows: `pixi run docs`; on Unix: `cd docs && make html` |
 
 For a focused test, run `pixi run pytest imod/tests/<path> -k <expression>`.
 Use the full Pixi task when checking the corresponding full suite. The test
