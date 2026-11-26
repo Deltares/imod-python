@@ -25,6 +25,7 @@ from imod.common.utilities.value_filters import is_scalar_nan
 from imod.mf6.dis import StructuredDiscretization
 from imod.mf6.mf6_wel_adapter import Mf6Wel
 from imod.msw.fixed_format import format_fixed_width
+from imod.schemata import scalar_None
 from imod.typing import IntArray
 from imod.typing.grid import GridDataArray, GridDataset
 from imod.util.imports import MissingOptionalModule
@@ -56,6 +57,7 @@ class MetaSwapPackage(IPackageBase, abc.ABC):
     _without_subunit: tuple[Any, ...] = ()
     _to_fill: tuple[Any, ...] = ()
     _metadata_dict: dict[str, Any] = {}
+    _optional_imod5_variables: list[str] = []
 
     def __init__(self) -> None:
         self.dataset = xr.Dataset()
@@ -121,8 +123,18 @@ class MetaSwapPackage(IPackageBase, abc.ABC):
         are specified in the ``self._metadata_dict`` for each variable.
         """
         for varname in dataframe:
-            min_value = self._metadata_dict[varname].min_value
-            max_value = self._metadata_dict[varname].max_value
+            metadata = self._metadata_dict[varname]
+            if metadata.dtype in (int, float):
+                n_nan = int(dataframe[varname].isna().sum())
+                if n_nan > 0:
+                    raise ValueError(
+                        f"{varname}: found {n_nan} NaN (NoData) value(s) in "
+                        "active cells, which cannot be written to MetaSWAP "
+                        "input. Provide valid values for all active cells, "
+                        "or deactivate these cells."
+                    )
+            min_value = metadata.min_value
+            max_value = metadata.max_value
             if (dataframe[varname] < min_value).any() or (
                 dataframe[varname] > max_value
             ).any():
@@ -135,7 +147,8 @@ class MetaSwapPackage(IPackageBase, abc.ABC):
     ) -> None:
         """Write dataframe to fixed format file."""
         for row in dataframe.itertuples():
-            for index, metadata in enumerate(self._metadata_dict.values()):
+            for index, column in enumerate(dataframe.columns):
+                metadata = self._metadata_dict[column]
                 content = format_fixed_width(row[index + 1], metadata)
                 file.write(content)
             file.write("\n")
@@ -156,7 +169,7 @@ class MetaSwapPackage(IPackageBase, abc.ABC):
         mf6_well: Mf6Wel,
     ) -> None:
         """
-        Collect to be written data in a DataFrame and call
+        Collect data in metadata column order in a DataFrame and call
         ``self.write_dataframe_fixed_width``
         """
         data_dict: DataDictType = {"svat": svat.values.ravel()[index]}
@@ -164,18 +177,24 @@ class MetaSwapPackage(IPackageBase, abc.ABC):
         subunit = svat.coords["subunit"]
 
         for var in self._with_subunit:
-            data_dict[var] = self._index_da(self.dataset[var], index)
+            da = self.dataset[var]
+            if self._metadata_dict[var].optional and scalar_None(da):
+                continue
+            data_dict[var] = self._index_da(da, index)
 
         for var in self._without_subunit:
-            da = self.dataset[var].expand_dims(subunit=subunit)
-            data_dict[var] = self._index_da(da, index)
+            da = self.dataset[var]
+            if self._metadata_dict[var].optional and scalar_None(da):
+                continue
+            da_expanded = da.expand_dims(subunit=subunit)
+            data_dict[var] = self._index_da(da_expanded, index)
 
         for var in self._to_fill:
             data_dict[var] = ""
 
-        dataframe = pd.DataFrame(
-            data=data_dict, columns=list(self._metadata_dict.keys())
-        )
+        columns = [name for name in self._metadata_dict if name in data_dict]
+
+        dataframe = pd.DataFrame(data=data_dict, columns=columns)
 
         self._check_range(dataframe)
 

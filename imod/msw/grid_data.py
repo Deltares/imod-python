@@ -13,6 +13,8 @@ from imod.msw.utilities.imod5_converter import (
     get_landuse_from_imod5_data,
     get_rootzone_depth_from_imod5_data,
     is_msw_active_cell,
+    validate_no_nodata_in_active_cells,
+    warn_nodata_in_area,
 )
 from imod.msw.utilities.mask import MetaSwapActive, mask_and_broadcast_pkg_data
 from imod.typing import Imod5DataDict
@@ -207,12 +209,16 @@ class GridData(MetaSwapPackage, IRegridPackage):
 
         data = {}
         data["area"] = get_cell_area_from_imod5_data(imod5_cap)
+        warn_nodata_in_area(target_dis, imod5_cap, imod5_bnd)
+        msw_active = is_msw_active_cell(target_dis, imod5_cap, data["area"], imod5_bnd)
+        # Validate before converting to integers, as NoData is lost then.
+        validate_no_nodata_in_active_cells(imod5_cap, msw_active)
+
         data["landuse"] = get_landuse_from_imod5_data(imod5_cap)
         data["rootzone_depth"] = get_rootzone_depth_from_imod5_data(imod5_cap)
         data["surface_elevation"] = imod5_cap["surface_elevation"]
         data["soil_physical_unit"] = imod5_cap["soil_physical_unit"].astype(int)
 
-        msw_active = is_msw_active_cell(target_dis, imod5_cap, data["area"], imod5_bnd)
         data_active = mask_and_broadcast_pkg_data(cls, data, msw_active)
         data_active["active"] = msw_active.all
         return cls(**data_active), msw_active

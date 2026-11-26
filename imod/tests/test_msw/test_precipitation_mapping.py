@@ -9,10 +9,11 @@ from numpy.testing import assert_equal
 from pytest_cases import parametrize_with_cases
 
 from imod import msw
+from imod.msw.fixed_format import fixed_format_parser
 
 
-@pytest.fixture(scope="function")
-def svat_index() -> xr.DataArray:
+@pytest.fixture
+def svat_index() -> tuple[xr.DataArray, np.ndarray]:
     x_svat = [1.0, 2.0, 3.0]
     y_svat = [1.0, 2.0, 3.0]
     subunit_svat = [0, 1]
@@ -60,7 +61,7 @@ def create_meteo_grid(x, y, subunit, dx, dy):
     # fmt: on
 
 
-def test_precipitation_mapping_simple(fixed_format_parser, svat_index):
+def test_precipitation_mapping_simple(svat_index):
     svat, index = svat_index
 
     x = [-0.5, 1.5, 3.5]
@@ -86,7 +87,7 @@ def test_precipitation_mapping_simple(fixed_format_parser, svat_index):
     assert_equal(results["column"], np.array([2, 2, 2, 2, 2, 3]))
 
 
-def test_precipitation_mapping_negative_dy_meteo(fixed_format_parser, svat_index):
+def test_precipitation_mapping_negative_dy_meteo(svat_index):
     svat, index = svat_index
 
     x = [-0.5, 1.5, 3.5]
@@ -112,7 +113,7 @@ def test_precipitation_mapping_negative_dy_meteo(fixed_format_parser, svat_index
     assert_equal(results["column"], np.array([2, 2, 2, 2, 2, 3]))
 
 
-def test_precipitation_mapping_negative_dy_meteo_svat(fixed_format_parser, svat_index):
+def test_precipitation_mapping_negative_dy_meteo_svat(svat_index):
     svat, index = svat_index
     svat = svat.assign_coords(y=[3.0, 2.0, 1.0], dy=-1.0)
 
@@ -171,7 +172,7 @@ def test_precipitation_mapping_clip():
     precipitation_mapping = msw.PrecipitationMapping(precipitation)
     clipped = precipitation_mapping.clip_box(x_max=x_max, y_max=y_max)
     # Assert
-    actual_meteo = clipped.meteo
+    actual_meteo = clipped.dataset["meteo"]
     assert actual_meteo.x.max().values[()] <= x_max
     assert actual_meteo.y.max().values[()] <= y_max
 
@@ -233,8 +234,26 @@ def test_precipitation_from_imod5(tmpdir_factory, replace_string, request):
 
     else:
         precipitation_mapping = msw.PrecipitationMapping.from_imod5_data(imod5_data)
-        actual = precipitation_mapping.meteo
+        actual = precipitation_mapping.dataset["meteo"]
 
         # Assert
         assert len(actual.coords["time"]) == 1
         xr.testing.assert_equal(precipitation, actual.isel(time=0, drop=True))
+
+
+def test_precipitation_mapping_netcdf_roundtrip(tmp_path):
+    # Arrange
+    x = [-0.5, 1.5, 3.5]
+    y = [4.5, 2.5, 0.5]
+    precipitation = create_meteo_grid(x, y, [0, 1], 2.0, -2.0)
+    precipitation_mapping = msw.PrecipitationMapping(precipitation)
+
+    # Act
+    path = precipitation_mapping.to_file(tmp_path, "prec_mapping")
+    with xr.open_dataset(path) as ds:
+        assert "meteo" in ds  # the file must not be empty
+
+    reloaded = msw.PrecipitationMapping.from_file(path)
+
+    # Assert
+    xr.testing.assert_equal(reloaded.dataset["meteo"], precipitation)

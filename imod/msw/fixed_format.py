@@ -1,4 +1,4 @@
-import warnings
+from collections import defaultdict
 from dataclasses import dataclass
 from pathlib import Path
 from typing import Any
@@ -12,6 +12,7 @@ class VariableMetaData:
     min_value: int | float | None
     max_value: int | float | None
     dtype: type
+    optional: bool = False
 
 
 def format_fixed_width(value: Any, metadata: VariableMetaData) -> str:
@@ -44,16 +45,14 @@ def fixed_format_parser(
         Dictionary with the VariableMetaData. Access this dictionary in a
         package by calling <pkg>._metadata_dict
     """
-    results: dict[str, list[Any]] = {}
-    for key in metadata_dict:
-        results[key] = []
+    results: dict[str, list[Any]] = defaultdict(list)
 
     with open(file) as f:
         lines = f.readlines()
+        troublesome = set()
         for line in lines:
             if line == "\n":
                 continue
-            troublesome = set()
             for varname, metadata in metadata_dict.items():
                 # Take first part of line
                 value = line[: metadata.column_width]
@@ -61,15 +60,14 @@ def fixed_format_parser(
                 try:
                     converted_value = metadata.dtype(value)
                 except ValueError:
-                    troublesome.add(varname)
-                    converted_value = np.nan
+                    if not metadata.optional:
+                        troublesome.add(varname)
+                    converted_value = None if metadata.optional else np.nan
                 # Add to results
-                results[varname].append(converted_value)
+                if converted_value is not None:
+                    results[varname].append(converted_value)
                 # Truncate line
                 line = line[metadata.column_width :]
         if len(troublesome) > 0:
-            warnings.warn(
-                f"Had trouble reading the variables: {troublesome}",
-                UserWarning,
-            )
+            raise ValueError(f"Had trouble reading the variables: {troublesome}")
     return results

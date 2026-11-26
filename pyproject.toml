@@ -63,6 +63,7 @@ all = [
     "contextily >=1",
     "cytoolz",
     "geopandas",
+    "pandamesh",
     "pyvista",
     "rasterio >=1",
     "rioxarray",

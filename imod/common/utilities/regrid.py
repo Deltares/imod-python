@@ -24,7 +24,6 @@ from imod.typing import Imod5DataDict
 from imod.typing.grid import (
     GridDataArray,
     GridDataset,
-    is_unstructured,
     ones_like,
 )
 from imod.util.dims import drop_layer_dim_cap_and_bnd_data, enforced_dim_order
@@ -315,12 +314,6 @@ def _regrid_like(
         raise ValueError(
             f"regridding this model cannot be done due to the presence of package {error_with_object_name}"
         )
-    diskey = model.get_diskey()
-    dis = model[diskey]
-    if is_unstructured(dis["idomain"]) and not is_unstructured(target_grid):
-        raise NotImplementedError(
-            "Regridding unstructured model to a structured grid not supported."
-        )
 
     new_model = model.__class__()
     if regrid_cache is None:
@@ -334,6 +327,7 @@ def _regrid_like(
             )
 
     methods = _get_unique_regridder_types(model)
+    diskey = model.get_diskey()
     regridded_domain = new_model[diskey]["idomain"]
     output_domain = _get_regridding_domain(
         model, target_grid, regridded_domain, regrid_cache, methods
@@ -494,6 +488,12 @@ def regrid_imod5_cap_and_bnd_data(
     cap_data_regridded = _regrid_package_data(
         imod5_no_layer["cap"], target_grid, regridder_types, regrid_cache
     )
+    # Regridding drops attrs, restore the source paths for informative error
+    # messages downstream.
+    for key, da in cap_data_regridded.items():
+        sources = getattr(imod5_data["cap"].get(key), "attrs", {}).get("source_paths")
+        if sources is not None and hasattr(da, "attrs"):
+            da.attrs["source_paths"] = sources
     bnd_data_regridded = _regrid_package_data(
         imod5_no_layer["bnd"], target_grid, regridder_types, regrid_cache
     )

@@ -9,6 +9,17 @@ The format is based on `Keep a Changelog`_, and this project adheres to
 [Unreleased]
 ------------
 
+- Added :func:`imod.formats.isg.read` to read iMOD segment river files (ISG and
+  its associated binary files, single and double precision), including segment
+  geometry, cross-sections and plots.
+- :func:`imod.data.isg_tutorials` to load example ISG data from the iMOD5
+  tutorials.
+
+=======
+
+[1.2.0] - 2026-11-24
+--------------------
+
 Added
 ~~~~~
 
@@ -22,6 +33,11 @@ Added
   :meth:`imod.mf6.GroundwaterTransportModel.mask_packages` to mask specific
   packages of a groundwater flow model and a groundwater transport model
   respectively.
+- The all-layer MODFLOW 6 HFB packages now accept 2D ``LinearRing`` barriers,
+  spanning from model top to bottom. Existing Z-enabled ``Polygon`` barriers
+  retain their previous behavior. Rings can be combined with Z polygons in one
+  package, and clipped with ``clip_box`` or ``cleanup``, which turns them into
+  2D ``LineString`` geometries that are also accepted.
 - Added ``drop_empty_layers: bool = True`` to various cell allocation functions 
   in :mod:`imod.prepare.topsystem.allocation` to remove fully empty layers from the grids.
   Strips the empty layers before they are passed along to 
@@ -46,15 +62,36 @@ Added
 - Added :class:`imod.mf6.AdvectionUTVD` to the transport packages. This is the
   most accurate advection scheme in most cases, and is recommended for when
   sharp fronts need to be preserved or when computing on an unstructured grid.
-- Added :func:`imod.formats.isg.read` to read iMOD segment river files (ISG and
-  its associated binary files, single and double precision), including segment
-  geometry, cross-sections and plots.
-- :func:`imod.data.isg_tutorials` to load example ISG data from the iMOD5
-  tutorials.
+- Added ``skipna: bool = False`` to :meth:`imod.mf6.Well.from_imod5_data` and
+  :meth:`imod.mf6.LayeredWell.from_imod5_data`. NaN rates in the timeseries of
+  associated wells are forward filled by default, as before. With
+  ``skipna=True`` they are instead left out of the time weighted mean when
+  resampling to the simulation times. The last stress period now also gets the
+  last valid rate instead of NaN when the last rate is NaN, or zero if there
+  are no valid rates.
+- Added the ``synthetic_valley`` example, which sets up the MODFLOW 6 "Synthetic
+  Valley" (McDonald Valley) flow model on a Voronoi grid with imod-python.
+- :class:`imod.mf6.SingleLayerHorizontalFlowBarrierResistance`,
+  :class:`imod.mf6.SingleLayerHorizontalFlowBarrierMultiplier` and
+  :class:`imod.mf6.SingleLayerHorizontalFlowBarrierHydraulicCharacteristic` now
+  also accept ``LinearRing`` geometries, for example to simulate building pits.
+- :meth:`imod.mf6.Modflow6Simulation.run` now also reads the path to the
+  Modflow 6 executable from the ``MODFLOW6_EXECUTABLE`` environment variable, if
+  ``mf6path`` is not provided. If the executable is not found, is a directory,
+  or is not executable, a descriptive error is raised before running.
+- Support for :meth:`imod.mf6.Modflow6Simulation.regrid_like` to regrid
+  unstructured grids to structured grids.
+- :meth:`imod.mf6.VerticesDiscretization.regrid_like` now returns a
+  :class:`imod.mf6.StructuredDiscretization` object when called with a
+  structured target grid.
 
 Fixed
 ~~~~~
 
+- :func:`imod.formats.prj.open_projectfile_data` failed with ``ValueError: year
+  0 is out of range`` for project files with year 0000 in the Periods block.
+  Since the year of a repeating period is not used, such dates are now accepted
+  and their year is set to 1899, like other periods.
 - :func:`imod.idf.open_subdomains` returned different results for overlapping
   subdomains depending on the filesystem's file listing order (e.g. on macOS
   and Linux). Globbed paths are now sorted.
@@ -87,10 +124,60 @@ Fixed
   parse the CAP package if it had 21 entries.
 - Fixed bug in :func:`imod.visualize.pyvista.velocity_field` where an error was
   raised incorrectly when the ``z`` coordinate array is three-dimensional.
+- Fixed issue where :class:`imod.msw.ScalingFactors` did not correctly handle
+  the absence of perched water table data.
+  :meth:`imod.msw.ScalingFactors.from_imod5_data` now ignores the perched water
+  table if it is set to -9999.0 in the iMOD5 projectfile.
+- Fixed :meth:`imod.mf6.Well.from_imod5_data` and
+  :meth:`imod.mf6.LayeredWell.from_imod5_data` giving each stress period the
+  rate of the previous period, when the well timeseries has records before the
+  start of the simulation.
+- :func:`imod.gen.read` (ASCII GEN files) can now read files that contain both
+  linestrings and closed rings. Closed rings are read as polygons, features keep
+  their order in the file.
+- Fixed :class:`imod.msw.PrecipitationMapping` and
+  :class:`imod.msw.EvapotranspirationMapping` losing their ``meteo`` attribute
+  after :meth:`imod.msw.MetaSwapModel.dump` followed by
+  :meth:`imod.msw.MetaSwapModel.from_file`. The meteo grid is now stored in the
+  package dataset, so it is written to file and restored when the model is
+  reloaded.
+- :meth:`imod.mf6.LayeredWell.from_imod5_cap_data` now raises a clear error if
+  the iMOD5 sprinkling data contains NoData in ``artificial_recharge`` where the
+  CAP boundary is active (cells without sprinkling should be 0) or where a layer 
+  is required in ``artificial_recharge_layer``, mentioning the cell locations and 
+  IDF file(s) the data was read from, instead of failing with an obscure ``IndexError``.
+- :meth:`imod.msw.GridData.from_imod5_data` (and therefore
+  :meth:`imod.msw.MetaSwapModel.from_imod5_data`) now raises a clear error if
+  ``landuse``, ``soil_physical_unit``, ``rootzone_thickness`` or
+  ``surface_elevation`` contain NoData in cells where MetaSWAP is active,
+  mentioning the cell locations and IDF file(s) the data was read from.
+  Previously, NoData in ``landuse`` and ``soil_physical_unit`` was silently 
+  converted to an arbitrary integer. It also logs a warning for cells that are 
+  active in MODFLOW6 and the iMOD5 boundary, but have NoData in ``wetted_area`` 
+  or ``urban_area``, as these cells become inactive in MetaSWAP.
+- Writing MetaSWAP packages now raises an error mentioning the variable name
+  if it contains NaN values in active cells, instead of ``cannot convert float
+  NaN to integer``.
 
 Changed
 ~~~~~~~
 
+- :meth:`imod.mf6.SingleLayerHorizontalFlowBarrierResistance.from_imod5_data`
+  and :meth:`imod.mf6.HorizontalFlowBarrierResistance.from_imod5_data` convert
+  closed rings (read as 2D polygons from GEN files) to ``LinearRing``
+  geometries. Polygons with interior rings, for example a circular barrier with
+  an outer and an inner wall, become one ``LinearRing`` for each ring.
+  Z polygons with interior rings are not supported by the all-layer HFB
+  packages and raise a validation error.
+- The ``mf6path`` argument of :meth:`imod.mf6.Modflow6Simulation.run` now
+  defaults to ``None`` instead of ``"mf6"``. ``None`` resolves to the
+  ``MODFLOW6_EXECUTABLE`` environment variable, and otherwise to ``mf6`` on the
+  PATH, so the previous behavior is kept. The executable is looked up in the
+  simulation directory, so relative paths are relative to that directory. A
+  missing executable now raises a ``RuntimeError`` instead of a
+  ``FileNotFoundError``, and arguments can no longer be passed as part of
+  ``mf6path``. Error messages for a failed run now contain both stdout and
+  stderr.
 - Deprecated :class:`imod.msw.Sprinkling` in favor of
   :class:`imod.msw.SprinklingGrid`. Call :class:`imod.msw.SprinklingGrid` to get
   the same behavior as you were used to.

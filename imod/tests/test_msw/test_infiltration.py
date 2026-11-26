@@ -12,7 +12,7 @@ from numpy.testing import assert_almost_equal, assert_equal
 from pytest_cases import case, parametrize_with_cases
 
 from imod.msw import Infiltration
-from imod.msw.fixed_format import format_fixed_width
+from imod.msw.fixed_format import fixed_format_parser, format_fixed_width
 from imod.typing import GridDataDict
 from imod.util.regrid import (
     RegridderWeightsCache,
@@ -135,7 +135,6 @@ def case_high_resistance(setup_infiltration_data: GridDataDict) -> GridDataDict:
 )
 @settings(deadline=None)
 def test_write(
-    fixed_format_parser,
     infiltration_capacity,
     downward_resistance,
     upward_resistance,
@@ -212,7 +211,7 @@ def test_write(
 
 
 @parametrize_with_cases("infiltration_data", cases=".", has_tag="r_low")
-def test_simple_model(fixed_format_parser, svat_index, infiltration_data):
+def test_simple_model(svat_index, infiltration_data):
     svat, index = svat_index
     infiltration = Infiltration(**infiltration_data)
 

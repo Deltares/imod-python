@@ -335,3 +335,18 @@ def isg_tutorials(path: Path | str) -> Path:
         _ = REGISTRY.fetch(filename, processor=Unzip(extract_dir=path))
 
     return path
+
+
+def synth_valley_flopy_data() -> xr.Dataset:
+    """
+    Load the synthetic valley Flopy data in SI units as an xarray Dataset.
+    """
+    import xarray as xr
+
+    filename = "synth_valley_flopy_data_SI.nc"
+    lock = FileLock(REGISTRY.path / f"{filename}.lock")
+    with lock:
+        fname = REGISTRY.fetch(filename)
+        ds = xr.open_dataset(fname)
+
+    return ds

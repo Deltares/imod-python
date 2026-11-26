@@ -16,7 +16,6 @@ object ExamplesTemplate : Template({
 
     vcs {
         root(DslContext.settingsRoot, "+:. => imod-python")
-        root(AbsoluteId("iMOD6_IMODPython_MetaSwapLookupTable"), ". => lookup_table")
 
         cleanCheckout = true
     }

@@ -24,6 +24,10 @@ object AcceptanceTestsTemplate : Template({
         password("env.secret_access_key", "credentialsJSON:409a55c0-b2e7-438c-98dd-f0404b83cabb")
     }
 
+    failureConditions {
+        executionTimeoutMin = 75
+    }
+
     steps {
         script {
             name = "Run acceptance tests"
