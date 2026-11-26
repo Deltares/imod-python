@@ -323,6 +323,20 @@ def tutorial_03(path: Path | str) -> Path:
     return path / "tutorial_03" / "GWF_model_Hondsrug.prj"
 
 
+def isg_tutorials(path: Path | str) -> Path:
+    """
+    Example ISG data from the iMOD5 tutorials: unzips the directories TUT_SFR
+    and TUT_LAK to ``path`` and returns ``path``.
+    """
+    path = Path(path)
+    filename = "isg_tutorials.zip"
+    lock = FileLock(REGISTRY.path / f"{filename}.lock")
+    with lock:
+        _ = REGISTRY.fetch(filename, processor=Unzip(extract_dir=path))
+
+    return path
+
+
 def synth_valley_flopy_data() -> xr.Dataset:
     """
     Load the synthetic valley Flopy data in SI units as an xarray Dataset.

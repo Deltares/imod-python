@@ -228,13 +228,52 @@ imod.gen.write(
 # 1D Network (ISG)
 # ----------------
 #
-# iMOD5 stores store 1D networks in ISG files, which is a binary format
-# primarily for surface water datasets. It supports all kinds of extra features
-# such as associated bathymetries and weirs.
+# iMOD5 stores 1D networks in ISG files, primarily for surface water datasets.
+# An ISG file is a text file of segments, with eight associated binary files
+# for the nodes of the segments, calculation points with timeseries of water
+# levels, cross-sections, weirs and Q-width/depth relations. The `imod.isg`
+# module reads ISG files with the ``imod.isg.read`` function.
 #
-# Given its complexity, ISG is not yet supported in iMOD Python. The workaround
-# is to rasterize the ISGfiles to IDF files using the iMOD5 BATCH function
-# ISGGRID.
+# Let's load the ISG files of the iMOD5 tutorials.
+
+isg_dir = imod.data.isg_tutorials(tmpdir / "isg")
+isg = imod.isg.read(isg_dir / "TUT_SFR" / "DBASE" / "SFR.ISG")
+isg.dataframe()
+
+# %%
+#
+# Each row is a segment, which references its records in the associated files
+# by the first record number and number of records. The associated files are
+# available as attributes, for example the calculation points in ``isd1`` and
+# their timeseries in ``isd2``.
+
+isg.isd2.dataframe()
+
+# %%
+#
+# We can get the segments as a GeoDataFrame of LineStrings, and plot them with
+# the calculation points (circles), cross-sections (bars) and Q-width/depth
+# relations (triangles) along them.
+
+isg.plot()
+
+# %%
+#
+# We can plot the water and bottom levels of a calculation point over time.
+
+isg.isd1.split(isg.isd2)[0].plot()
+
+# %%
+#
+# And the profile of a cross-section.
+
+isg.cross_sections()[0].plot()
+
+# %%
+#
+# iMOD Python does not yet convert ISG files to MODFLOW 6 packages. The
+# workaround is to rasterize the ISG files to IDF files using the iMOD5 BATCH
+# function ISGGRID.
 #
 # Legend files (LEG)
 # ------------------

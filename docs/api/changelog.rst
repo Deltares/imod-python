@@ -9,6 +9,13 @@ The format is based on `Keep a Changelog`_, and this project adheres to
 [Unreleased]
 ------------
 
+- Added :func:`imod.formats.isg.read` to read iMOD segment river files (ISG and
+  its associated binary files, single and double precision), including segment
+  geometry, cross-sections and plots.
+- :func:`imod.data.isg_tutorials` to load example ISG data from the iMOD5
+  tutorials.
+
+=======
 
 [1.2.0] - 2026-11-24
 --------------------
@@ -64,7 +71,6 @@ Added
   are no valid rates.
 - Added the ``synthetic_valley`` example, which sets up the MODFLOW 6 "Synthetic
   Valley" (McDonald Valley) flow model on a Voronoi grid with imod-python.
-
 - :class:`imod.mf6.SingleLayerHorizontalFlowBarrierResistance`,
   :class:`imod.mf6.SingleLayerHorizontalFlowBarrierMultiplier` and
   :class:`imod.mf6.SingleLayerHorizontalFlowBarrierHydraulicCharacteristic` now
@@ -186,6 +192,10 @@ Changed
   working with large datasets.
 - Reduced the character limit for package keys to 16 characters again in
   :class:`imod.mf6.GroundwaterFlowModel` and :class:`imod.mf6.TransportModel`.
+- :func:`imod.formats.prj.open_projectfile_data` now reads the ISG files of
+  ``(ISG)`` and ``(SFR)`` blocks, under the keys ``isg-1``, ``isg-2``, etc.,
+  instead of failing. :meth:`imod.mf6.GroundwaterFlowModel.from_imod5_data` does
+  not convert them yet, and logs a warning.
 
 [1.1.0] - 2026-08-03
 --------------------
