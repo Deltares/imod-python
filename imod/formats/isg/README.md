@@ -6,9 +6,10 @@ of segments with eight associated binary files, related by record numbers.
 Examples:
 ```python
 import numpy as np
+import imod
 from imod.formats.isg import ISG
 
-isg = ISG.read("DBASE/SFR.ISG")  # precision from the ISP-file
+isg = imod.isg.read("DBASE/SFR.ISG")  # precision from the ISP-file
 isg = ISG[np.float32]("DBASE/SFR.ISG")  # or explicit
 isg.dataframe()  # segments
 isg.geodataframe()  # segments as LineStrings
@@ -35,8 +36,8 @@ nothing. Reals are 4 bytes (single precision) or 8 bytes (double precision).
 - **FK**: first record number of a range in the associated file.
 - **index**: the \*1-files only point into their \*2-file, with a name and a
   distance along the segment.
-- **geometry**: coordinates, exposed through `geometry()`, `geodataframe()`
-  and `__geo_interface__`.
+- **geometry**: coordinates, exposed through `geometry()` and
+  `geodataframe()`.
 
 ```mermaid
 erDiagram
@@ -54,7 +55,7 @@ erDiagram
         int header_NSEG "header: number of segments"
         int header_ASFR "header: 0 RIV, 1 SFR; selects the ISD2 layout"
         str header_LABELS "header: labels of the ISD2 attributes"
-        str LABEL "name of the segment, max 52 characters"
+        str LABEL "name of the segment, max 50 characters"
         int ISEG FK "first node in ISP"
         int NSEG "number of nodes"
         int ICLC FK "first calculation point in ISD1"
@@ -162,7 +163,6 @@ classDiagram
         geometry() shapely array
         geodataframe() GeoDataFrame
         plot(ax) Axes
-        #95;#95;geo_interface#95;#95;() dict
     }
     class BinaryFile {
         record(real) dtype

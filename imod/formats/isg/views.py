@@ -31,37 +31,36 @@ class CrossSection1D(SpatialTable, Generic[FloatT]):
 
     Attributes for each record in an ISC2-file, whenever N>0.
 
-    Geometry: a LineString Z perpendicular to the segment at the cross-section,
-    with BOTTOM as z; ``plot()`` draws BOTTOM against DISTANCE.
+    Geometry: a Point Z per record, perpendicular to the segment at the
+    cross-section, with BOTTOM as z; ``plot()`` draws BOTTOM against DISTANCE.
+
+    Parameters
+    ----------
+    x: float, optional
+        X-coordinate of the cross-section at DIST along its segment (meter); set
+        by ``ISG.cross_sections()``.
+    y: float, optional
+        Y-coordinate of the cross-section at DIST along its segment (meter); set
+        by ``ISG.cross_sections()``.
+    angle: float, optional
+        Direction of the segment at the cross-section (radians from the
+        x-axis); set by ``ISG.cross_sections()``.
+    distance: array of floats
+        Distance of the cross-section measured from the centre of the riverbed
+        (minus to the left en positive to the right).
+    bottom: array of floats
+        Bottom level of the riverbed (meter), whereby zero will be assigned to
+        the lowest riverbed level.
+    mrc: array of floats
+        Manning's roughness coefficient (-).
     """
 
     x: float = np.nan
-    """
-    X-coordinate of the cross-section at DIST along its segment (meter); set by
-    ``ISG.cross_sections()``.
-    """
     y: float = np.nan
-    """
-    Y-coordinate of the cross-section at DIST along its segment (meter); set by
-    ``ISG.cross_sections()``.
-    """
     angle: float = np.nan
-    """
-    Direction of the segment at the cross-section (radians from the x-axis);
-    set by ``ISG.cross_sections()``.
-    """
     distance: Vector[FloatT]
-    """
-    Distance of the cross-section measured from the centre of the riverbed
-    (minus to the left en positive to the right).
-    """
     bottom: Vector[FloatT]
-    """
-    Bottom level of the riverbed (meter), whereby zero will be assigned to the
-    lowest riverbed level.
-    """
     mrc: Vector[FloatT]
-    """Manning's roughness coefficient (-)."""
 
     @classmethod
     def view(cls, isc2: "ISC2[Any]", rows: slice) -> Self:
@@ -76,10 +75,6 @@ class CrossSection1D(SpatialTable, Generic[FloatT]):
 
     def geometry(self) -> NDArray[np.object_]:
         return shapely.points(*self.coordinates(), self.bottom)
-
-    @property
-    def __geo_interface__(self) -> dict[str, Any]:
-        return shapely.linestrings(*self.coordinates(), self.bottom).__geo_interface__
 
     def plot(self, ax: "Axes | None" = None, **kwargs: Any) -> "Axes":
         """Plot BOTTOM against DISTANCE."""
@@ -97,38 +92,41 @@ class BaseCrossSection2D(SpatialTable, Generic[FloatT]):
 
     Geometry: a box of ‖DX‖ by ‖DY‖ per "pixel"; ``plot()`` colours them by
     bottom level.
+
+    Parameters
+    ----------
+    dx: float
+        Width DX in meters of the rectangular raster that follows. Negative if
+        the bottom levels are packed with a reference height, see
+        :class:`CrossSection2DReferenceHeight`; the width is ‖DX‖.
+    dy: float
+        Height DY in meters of the rectangular raster that follows. Negative if
+        the bottom levels are packed with a reference height; the height is
+        ‖DY‖.
+    href: float
+        Reference Height in meters, this is used whenever specified (DX < 0.0
+        and DY < 0.0). A pointer value Zp causes the whether a area is inundated
+        once the HREF is exceeded as well as the bottom elevation (Zm + Zc). In
+        this case the attribute Z (specified below) is organized differently as
+        a combination of Zm, Zc and Zp.
+    x: array of floats
+        X coordinate (meter) for a riverbed "pixel", these coordinates need to
+        be on a rectangular network with spatial distance of ‖DX‖ measured at
+        the centre of the "pixel".
+    y: array of floats
+        Y coordinate (meter) for a riverbed "pixel", these coordinates need to
+        be on a rectangular network with spatial distance of ‖DY‖ measured at
+        the centre of the "pixel".
     """
 
+    # The manual describes DX and DY as absolute values; the files store the
+    # sign, which marks packed bottom levels.
+
     dx: float
-    """
-    Absolute width ‖DX‖ in meters of the rectangular raster that follows.
-    Implementation note: the signed value is stored.
-    """
     dy: float
-    """
-    Absolute height ‖DY‖ in meters of the rectangular raster that follows.
-    Implementation note: the signed value is stored.
-    """
     href: float
-    """
-    Reference Height in meters, this is used whenever specified (DX < 0.0 and
-    DY < 0.0). A pointer value Zp causes the whether a area is inundated once
-    the HREF is exceeded as well as the bottom elevation (Zm + Zc). In this
-    case the attribute Z (specified below) is organized differently as a
-    combination of Zm, Zc and Zp.
-    """
     x: Vector[FloatT]
-    """
-    X coordinate (meter) for a riverbed "pixel", these coordinates need to be
-    on a rectangular network with spatial distance of ‖DX‖ measured at the
-    centre of the "pixel".
-    """
     y: Vector[FloatT]
-    """
-    Y coordinate (meter) for a riverbed "pixel", these coordinates need to be
-    on a rectangular network with spatial distance of ‖DY‖ measured at the
-    centre of the "pixel".
-    """
 
     @classmethod
     def view(cls, isc2: "ISC2[Any]", rows: slice) -> Self:
@@ -171,13 +169,20 @@ class CrossSection2D(BaseCrossSection2D[FloatT]):
     """
     2-D cross-section with bottom levels Z.
 
-    Following record is valid whenever DX > 0.0 and DY > 0.0
+    Following record is valid unless DX < 0.0 and DY < 0.0.
 
-    Implementation note: like iMOD, used unless DX < 0.0 and DY < 0.0.
+    Parameters
+    ----------
+    dx, dy, href, x, y
+        See :class:`BaseCrossSection2D`.
+    z: array of floats
+        Bottom level of the riverbed (meter).
     """
 
+    # The manual says DX > 0.0 and DY > 0.0; iMOD reads Z as a real for any
+    # other combination of signs too.
+
     z: Vector[FloatT]
-    """Bottom level of the riverbed (meter)."""
 
     @classmethod
     def unpack(cls, c: NDArray[np.floating]) -> dict[str, NDArray[Any]]:
@@ -192,29 +197,37 @@ class CrossSection2DReferenceHeight(BaseCrossSection2D[FloatT]):
     2-D cross-section with a reference height HREF: packed bottom levels (Zm,
     Zc) and pointers (Zp) to inundate above HREF.
 
-    Following record is valid whenever DX < 0.0 and DY < 0.0
+    Following record is valid whenever DX < 0.0 and DY < 0.0. Zm and Zc both
+    carry the sign of the bottom level, which is Zm + Zc / 100.
+
+    Parameters
+    ----------
+    dx, dy, href, x, y
+        See :class:`BaseCrossSection2D`.
+    zm: array of ints
+        Integer value of bottom level of the riverbed (integer of meters), e.g.
+        bottom level is -23.43, Zm =-23.
+    zc: array of ints
+        Integer value of remaining digits of bottom level of the riverbed
+        (remaining centimeter), e.g. bottom level is -23.43, Zc =-43
+        centimeters.
+    zp: array of ints
+        Integer value of area affected by HREF, e.g. areas with Zp < 0 will be
+        inundated only whenever the current river stage is higher than the
+        Reference Height (HREF) and the river stage is higher than the
+        corresponding riverbed Zm +Zc. Areas with Zp > 0, will be inundated
+        whenever the river stage is higher than the current riverbed. The
+        absolute value of Zp is used as a multiplication factor for the river
+        bed resistances for the attribute RESIS in the ISD2-file.
     """
 
+    # The manual's example gives Zc=43 for -23.43. iMOD truncates both parts
+    # towards zero, so Zc=-43 (ISGSAVEIT), and reads Zm + Zc / 100 (ISGREADISC),
+    # in imod_isg_utl.f90.
+
     zm: Vector[np.int16]
-    """
-    Integer value of bottom level of the riverbed (integer of meters), e.g.
-    bottom level is -23.43, Zm =-23.
-    """
     zc: Vector[np.int8]
-    """
-    Integer value of remaining digits of bottom level of the riverbed
-    (remaining centimeter), e.g. bottom level is -23.43, Zc =43 centimeters.
-    """
     zp: Vector[np.int8]
-    """
-    Integer value of area affected by HREF, e.g. areas with Zp < 0 will be
-    inundated only whenever the current river stage is higher than the
-    Reference Height (HREF) and the river stage is higher than the corresponding
-    riverbed Zm +Zc. Areas with Zp > 0, will be inundated whenever the river
-    stage is higher than the current riverbed. The absolute value of Zp is used
-    as a multiplication factor for the river bed resistances for the attribute
-    RESIS in the ISD2-file.
-    """
 
     @classmethod
     def unpack(cls, c: NDArray[np.floating]) -> dict[str, NDArray[Any]]:
@@ -223,10 +236,7 @@ class CrossSection2DReferenceHeight(BaseCrossSection2D[FloatT]):
         return {name: packed[name] for name in PACKED["names"]}
 
     def bottom(self) -> NDArray[np.floating]:
-        """
-        Zm + Zc / 100. Implementation note: Zc carries the sign, e.g. -23.43 is
-        stored as Zm=-23, Zc=-43.
-        """
+        """Bottom level of the riverbed (meter): Zm + Zc / 100."""
         return self.zm + self.zc / 100.0
 
 

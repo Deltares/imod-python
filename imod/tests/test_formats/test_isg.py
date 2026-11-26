@@ -10,7 +10,7 @@ import shapely
 import imod
 from imod.formats import isg
 from imod.formats.isg.common import BinaryFile
-from imod.formats.isg.utils import to_datetime
+from imod.formats.isg.utils import idate_to_datetime
 from imod.formats.isg.views import PACKED
 
 SFR, RIV = isg.SurfaceFlowRouting.SFR, isg.SurfaceFlowRouting.RIV
@@ -122,7 +122,7 @@ def examples(tmp_path_factory) -> Path:
     ],
 )
 def test_read(examples, path, real, asfr, nseg, kind):
-    model = isg.ISG.read(examples / path)
+    model = imod.isg.read(examples / path)
     assert isinstance(model, isg.ISG[real])
     assert model.asfr == model.isd2.asfr == asfr
     assert len(model) == nseg
@@ -152,11 +152,11 @@ def test_read_values(examples):
     length = sfr.geodataframe().length.to_numpy()
     assert np.allclose(length, sfr.isd1.dist[1::2], rtol=1e-5)
 
-    lak = isg.ISG.read(examples / "TUT_LAK/DBASE/SFR.ISG")
+    lak = isg.read(examples / "TUT_LAK/DBASE/SFR.ISG")
     # Segment 1 discharges into lake 1, segment 2 flows out of it.
     assert (lak.isd2.idownseg[1], lak.isd2.iupseg[2]) == (-1, -1)
 
-    riv = isg.ISG.read(examples / "RIV/single/RIV.ISG")
+    riv = isg.read(examples / "RIV/single/RIV.ISG")
     assert riv.isd2.ctime is None
     assert riv.isd2.idate[0] == 19800101
     assert len(riv.isc2) == np.abs(riv.isc1.n).sum()
@@ -174,8 +174,8 @@ def test_read_values(examples):
 
 
 def test_double_matches_single(examples):
-    single = isg.ISG.read(examples / "RIV/single/RIV.ISG")
-    double = isg.ISG.read(examples / "RIV/double/RIV.ISG")
+    single = isg.read(examples / "RIV/single/RIV.ISG")
+    double = isg.read(examples / "RIV/double/RIV.ISG")
     assert np.array_equal(double.isp.x, single.isp.x)
     assert np.array_equal(double.isd2.wlvl, single.isd2.wlvl)
     assert double.isd2.ctime[0] == "00:00:00"
@@ -222,15 +222,15 @@ def test_read_list_directed(examples, tmp_path):
         "'extra' 1 1 0 0 0 0 0 0 0 0",
     ]
     (tmp_path / source.name).write_text("\n".join(text))
-    model = isg.ISG.read(tmp_path / source.name)
-    expected = isg.ISG.read(source)
+    model = isg.read(tmp_path / source.name)
+    expected = isg.read(source)
     assert (model.asfr, model.labels) == (RIV, ())
     assert model.label.tolist() == expected.label.tolist()
     assert np.array_equal(model.nseg, expected.nseg)
 
 
 def test_invalid_reference(examples):
-    model = isg.ISG.read(examples / "TUT_SFR/DBASE/SFR.ISG")
+    model = isg.read(examples / "TUT_SFR/DBASE/SFR.ISG")
     data = {**dict(model), "iseg": np.array([1, 3, 10], dtype=np.int32)}
     with pytest.raises(ValueError, match="ISG.ISEG: records \\[3\\]"):
         isg.ISG[np.float32].model_validate(data)
@@ -244,28 +244,25 @@ def test_record_length_mismatch(tmp_path):
 
 
 def test_geometry(examples):
-    sfr = isg.ISG.read(examples / "TUT_SFR/DBASE/SFR2.ISG")
+    sfr = isg.read(examples / "TUT_SFR/DBASE/SFR2.ISG")
     # Calculation points lie on the first and last node of their segment.
     located = sfr.locate("isd1")
     ends = sfr.isp.geometry()[[0, 1, 2, 5, 6, 9]]
     assert shapely.distance(located.geometry.to_numpy(), ends).max() < 1e-3
     assert located["segment"].tolist() == [1, 1, 2, 2, 3, 3]
     profile = sfr.cross_sections()[0]
-    assert sfr.__geo_interface__["type"] == "MultiLineString"
-    assert profile.__geo_interface__["type"] == "LineString"
     # Segment 1 runs along the x-axis, so its profile runs along the y-axis.
     assert np.allclose(profile.coordinates()[0], profile.x)
 
-    riv = isg.ISG.read(examples / "RIV/single/RIV.ISG")
+    riv = isg.read(examples / "RIV/single/RIV.ISG")
     raster = riv.cross_sections()[0]
-    assert raster.__geo_interface__["type"] == "MultiPolygon"
     assert raster.geodataframe().area.iloc[0] == 625.0
     assert raster.bottom()[0] == pytest.approx(3.88)
 
 
 def test_plot(examples):
-    sfr = isg.ISG.read(examples / "TUT_SFR/DBASE/SFR2.ISG")
-    riv = isg.ISG.read(examples / "RIV/single/RIV.ISG")
+    sfr = isg.read(examples / "TUT_SFR/DBASE/SFR2.ISG")
+    riv = isg.read(examples / "RIV/single/RIV.ISG")
     maps = (sfr, sfr.isp, sfr.cross_sections()[0], riv, riv.cross_sections()[0])
     for model in maps:
         model.plot()
@@ -278,7 +275,7 @@ def test_plot(examples):
     assert len(ax.get_lines()) == len(riv.isd1)
     plt.close("all")
     # A blank CTIME is midnight.
-    time = to_datetime(np.array([20161112]), np.array(["        "]))
+    time = idate_to_datetime(np.array([20161112]), np.array(["        "]))
     assert time[0] == pd.Timestamp("2016-11-12")
 
 

@@ -46,12 +46,11 @@ Added
 - Added :class:`imod.mf6.AdvectionUTVD` to the transport packages. This is the
   most accurate advection scheme in most cases, and is recommended for when
   sharp fronts need to be preserved or when computing on an unstructured grid.
-- Added :mod:`imod.formats.isg` to read iMOD segment river files (ISG and its
-  associated binary files, single and double precision) with
-  :meth:`imod.formats.isg.ISG.read`, including segment geometry, cross-sections
-  and plots.
-- :func:`imod.data.isg_tutorials` to load the SFR and LAK tutorials of the iMOD
-  User Manual, with ISG-files.
+- Added :func:`imod.formats.isg.read` to read iMOD segment river files (ISG and
+  its associated binary files, single and double precision), including segment
+  geometry, cross-sections and plots.
+- :func:`imod.data.isg_tutorials` to load example ISG data from the iMOD5
+  tutorials.
 
 Fixed
 ~~~~~

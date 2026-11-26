@@ -15,6 +15,7 @@ from imod.formats.isg.isg import (
     IST2,
     RivISD2,
     SfrISD2,
+    read,
 )
 from imod.formats.isg.views import (
     CrossSection1D,

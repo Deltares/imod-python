@@ -30,17 +30,4 @@ Input/output
     prj.open_projectfile_data
     prj.read_timfile
 
-    isg.ISG
-    isg.ISP
-    isg.ISD1
-    isg.RivISD2
-    isg.SfrISD2
-    isg.ISC1
-    isg.ISC2
-    isg.IST1
-    isg.IST2
-    isg.ISQ1
-    isg.ISQ2
-    isg.CrossSection1D
-    isg.CrossSection2D
-    isg.CrossSection2DReferenceHeight
+    isg.read

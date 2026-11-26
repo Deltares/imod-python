@@ -64,7 +64,9 @@ def record_index(first: np.ndarray, count: np.ndarray) -> np.ndarray:
     return start + offset
 
 
-def to_datetime(idate: np.ndarray, ctime: np.ndarray | None = None) -> pd.DatetimeIndex:
+def idate_to_datetime(
+    idate: np.ndarray, ctime: np.ndarray | None = None
+) -> pd.DatetimeIndex:
     """
     Datetimes from IDATE (yyyymmdd) and CTIME (hh:mm:ss); a missing or blank
     CTIME is midnight, an invalid date is NaT.

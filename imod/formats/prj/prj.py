@@ -21,6 +21,7 @@ import xarray as xr
 import imod
 import imod.logging
 from imod.formats.isg import ISG
+from imod.formats.isg import read as read_isg
 from imod.logging.loglevel import LogLevel
 
 FilePath: TypeAlias = Union[str, "PathLike[str]"]
@@ -965,8 +966,8 @@ def _read_package_isg(
         times = []
         for entry in system_entries:
             if entry["path"] not in models:
-                models[entry["path"]] = _try_read_with_func(ISG.read, entry["path"])
-            time, repeats = _process_ipf_time(entry, periods, repeats)
+                models[entry["path"]] = _try_read_with_func(read_isg, entry["path"])
+            time, repeats = _process_entry_time(entry, periods, repeats)
             times.append(time)
         out.append(
             {
@@ -978,9 +979,13 @@ def _read_package_isg(
     return out, sorted(set(repeats))
 
 
-def _process_ipf_time(
+def _process_entry_time(
     entry: dict[str, Any], periods: dict[str, datetime], repeats: list[datetime]
 ) -> tuple[datetime | None, list[datetime]]:
+    """
+    Time of an IPF or ISG entry; a repeating period is resolved with
+    ``periods`` and added to ``repeats``.
+    """
     timestring = entry["time"]
     time = periods.get(timestring)
     if time is None:
@@ -1055,7 +1060,7 @@ def _read_package_ipf(
     imported_wells: dict[tuple[Any, ...], int] = {}
 
     for entry in block_content["ipf"]:
-        time, repeats = _process_ipf_time(entry, periods, repeats)
+        time, repeats = _process_entry_time(entry, periods, repeats)
         layer = entry["layer"]
         factor = entry["factor"]
         addition = entry["addition"]

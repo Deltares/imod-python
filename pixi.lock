@@ -33676,7 +33676,7 @@ packages:
   - pandas
   - plum-dispatch
   - pooch
-  - pydantic>=2.7
+  - pydantic
   - scipy
   - tomli-w
   - tomli>=1.1.0

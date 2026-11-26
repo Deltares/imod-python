@@ -325,8 +325,8 @@ def tutorial_03(path: Path | str) -> Path:
 
 def isg_tutorials(path: Path | str) -> Path:
     """
-    The SFR and LAK tutorials of the iMOD User Manual, with ISG-files: unzips
-    the directories TUT_SFR and TUT_LAK to ``path`` and returns ``path``.
+    Example ISG data from the iMOD5 tutorials: unzips the directories TUT_SFR
+    and TUT_LAK to ``path`` and returns ``path``.
     """
     path = Path(path)
     filename = "isg_tutorials.zip"

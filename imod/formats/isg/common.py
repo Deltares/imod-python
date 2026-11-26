@@ -24,11 +24,11 @@ from pydantic_core import core_schema
 
 from imod.formats.isg.utils import (
     decode,
+    idate_to_datetime,
     read_records,
     record_length,
     scalar_type,
     sibling_path,
-    to_datetime,
 )
 from imod.formats.isg.validators import to_vector
 from imod.util.imports import MissingOptionalModule
@@ -69,18 +69,24 @@ class References:
     Marks a vector of first record numbers in the associated file ``file``; the
     number of records is stored in the vector ``count``. A first record of 0
     with a count of 0 references nothing.
+
+    Parameters
+    ----------
+    file: str
+        Name of the associated file.
+    count: str
+        Name of the vector with the number of records.
+    absolute: bool, default False
+        Use the absolute value of ``count``, as its sign carries a meaning.
     """
 
     file: str
     count: str
     absolute: bool = False
-    """Use the absolute value of ``count``, as its sign carries a meaning."""
 
 
 class IsgBaseModel(BaseModel):
-    model_config = ConfigDict(
-        extra="forbid", frozen=True, use_attribute_docstrings=True
-    )
+    model_config = ConfigDict(extra="forbid", frozen=True)
 
 
 class Table(IsgBaseModel):
@@ -123,11 +129,11 @@ class Table(IsgBaseModel):
 class TimeSeries(Table):
     """A table of records at a date (IDATE) and time (CTIME)."""
 
+    # Columns plotted by default.
     levels: ClassVar[tuple[str, ...]]
-    """Columns plotted by default."""
 
     def time(self) -> pd.DatetimeIndex:
-        return to_datetime(getattr(self, "idate"), getattr(self, "ctime", None))
+        return idate_to_datetime(getattr(self, "idate"), getattr(self, "ctime", None))
 
     def plot(
         self, ax: "Axes | None" = None, y: str | list[str] | None = None, **kwargs: Any
@@ -151,19 +157,6 @@ class SpatialTable(Table):
     def plot(self, ax: "Axes | None" = None, **kwargs: Any) -> "Axes":
         """Plot the geometries on a map; ``kwargs`` go to ``GeoDataFrame.plot``."""
         return self.geodataframe().plot(ax=ax, **kwargs)
-
-    @property
-    def __geo_interface__(self) -> dict[str, Any]:
-        """All geometries as one multi-geometry."""
-        geometries = self.geometry()
-        types = set(shapely.get_type_id(geometries).tolist())
-        multi = {
-            0: shapely.multipoints,
-            1: shapely.multilinestrings,
-            3: shapely.multipolygons,
-        }
-        collect = multi.get(types.pop()) if len(types) == 1 else None
-        return (collect or shapely.geometrycollections)(geometries).__geo_interface__
 
 
 class FileModel(IsgBaseModel):
