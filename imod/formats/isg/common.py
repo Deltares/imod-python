@@ -52,6 +52,7 @@ TableT = TypeVar("TableT", bound="Table")
 NAME = (np.bytes_, 32)
 
 
+# A read-only one-dimensional numpy array: one column of a table.
 Vector = Annotated[
     NDArray[ScalarT],
     GetPydanticSchema(
@@ -60,7 +61,6 @@ Vector = Annotated[
         )
     ),
 ]
-"""A read-only one-dimensional numpy array: one column of a table."""
 
 
 @dataclass(frozen=True)
@@ -166,6 +166,13 @@ class FileModel(IsgBaseModel):
     Missing fields are read from ``filepath``, with the extension replaced by
     the extension of the class: an associated file only needs the path of its
     ISG-file.
+
+    Parameters
+    ----------
+    filepath: str or PathLike, optional
+        Path of the file, or of any of its associated files.
+    **data
+        Fields of the model; given fields are not read from the file.
     """
 
     filepath: Path | None = Field(default=None, exclude=True, repr=False)
@@ -262,12 +269,18 @@ class IndexFile(BinaryFile[FloatT]):
     """
     The ISD1-, ISC1-, IST1- and ISQ1-files share their layout: N, IREF, DIST
     and CNAME, referencing N records from IREF in the associated \\*2-file.
+
+    Parameters
+    ----------
+    n: array of ints
+        Number of data records in the associated \\*2-file.
+    iref: array of ints
+        Record number within the associated \\*2-file for the first data
+        record.
     """
 
     n: Vector[np.int32]
-    """Number of data records in the associated \\*2-file."""
     iref: Vector[np.int32]
-    """Record number within the associated \\*2-file for the first data record."""
 
     @classmethod
     def record(cls, real: type[np.floating]) -> np.dtype:
