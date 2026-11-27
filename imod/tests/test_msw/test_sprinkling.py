@@ -584,6 +584,46 @@ def test_grid_simple_model_1_subunit(
     assert_equal(results["svat_groundwater"], expected_data.svat_gw[:2])
 
 
+@parametrize_with_cases("case_data, expected_data", cases=SprinklingGridCases)
+def test_grid_simple_model__dask(
+    sprinkling_svat_index: tuple[xr.DataArray, np.ndarray],
+    case_data: SprinklingGridCaseData,
+    expected_data: ExpectedCaseData,
+):
+    svat, index = sprinkling_svat_index
+
+    # Well
+    well_layer = [3, 2, 1]
+    well_y = [3.0, 2.0, 1.0]
+    well_x = [2.0, 2.0, 2.0]
+    well_rate = xr.DataArray([-5.0] * 3, dims=("ncellid",))
+    well_id = xr.DataArray(["0", "1", "2"], dims=("ncellid",))
+    cellids = derive_cellid_from_points(svat, well_x, well_y, well_layer)
+    well = Mf6Wel(cellids, well_rate, well_id)
+
+    def write_and_read(sprinkling: msw.SprinklingGrid) -> str:
+        with tempfile.TemporaryDirectory() as output_dir:
+            output_dir = Path(output_dir)
+            sprinkling.write(output_dir, index, svat, None, well)
+            return (output_dir / msw.SprinklingGrid._file_name).read_text()
+
+    expected = write_and_read(
+        msw.SprinklingGrid(
+            case_data.max_abstraction_groundwater,
+            case_data.max_abstraction_surfacewater,
+        )
+    )
+    actual = write_and_read(
+        msw.SprinklingGrid(
+            case_data.max_abstraction_groundwater.chunk(),
+            case_data.max_abstraction_surfacewater.chunk(),
+        )
+    )
+
+    assert len(expected.splitlines()) == expected_data.svat.size
+    assert actual == expected
+
+
 @parametrize_with_cases("case_data, expected_data", cases=SprinklingPointsCases)
 def test_points_simple_model(
     sprinkling_svat_index: tuple[xr.DataArray, np.ndarray],
