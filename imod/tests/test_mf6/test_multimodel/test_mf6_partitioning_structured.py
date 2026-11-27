@@ -677,3 +677,46 @@ def test_partitioning_structured__disconnected_models(
     np.testing.assert_allclose(
         head["head"].values, original_head.values, rtol=1e-4, atol=1e-4
     )
+
+
+def test_partitioning_structured__filter_inactive_after_empty_exchange(
+    transient_twri_model: Modflow6Simulation,
+):
+    """
+    Test that all exchanges are filtered for inactive cells, also when a
+    preceding exchange becomes empty and is removed.
+    """
+    simulation = transient_twri_model
+    idomain_top = simulation["GWF_1"].domain.isel(layer=0)
+    # Three vertical strips of five columns each.
+    partition_array = zeros_like(idomain_top)
+    partition_array.values[:, 5:10] = 1
+    partition_array.values[:, 10:] = 2
+
+    new_idomain = simulation["GWF_1"]["dis"].dataset["idomain"].copy()
+    # The last column of partition 0 is inactive in all layers: the exchange
+    # between partition 0 and 1 becomes empty.
+    new_idomain[:, :, 4] = 0
+    # The first column of partition 2 is inactive in the first layer only: the
+    # exchange between partition 1 and 2 loses connections.
+    new_idomain[0, :, 10] = 0
+    simulation.mask_all_models(new_idomain)
+
+    split_simulation = simulation.split(partition_array)
+
+    exchanges = split_simulation["split_exchanges"]
+    modelnames = [
+        [exch[f"model_name_{i}"].item() for i in [1, 2]] for exch in exchanges
+    ]
+    assert modelnames == [["GWF_1_1", "GWF_1_2"]]
+    for exchange in exchanges:
+        for i in [1, 2]:
+            domain = split_simulation[exchange[f"model_name_{i}"].item()].domain
+            cell_id = exchange.dataset[f"cell_id{i}"] - 1
+            exchange_domain = domain.isel(
+                layer=exchange.dataset["layer"] - 1,
+                y=cell_id.sel({f"cell_dims{i}": f"row_{i}"}),
+                x=cell_id.sel({f"cell_dims{i}": f"column_{i}"}),
+            )
+            assert (exchange_domain > 0).all()
+    assert exchanges[0].dataset.sizes["index"] == 30
