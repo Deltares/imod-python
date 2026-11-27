@@ -998,9 +998,11 @@ class Well(GridAgnosticWell):
         time_max: optional
             End time to select.
         layer_min: optional, int
-            Ignored.
+            Minimum layer to select. Well screens are clipped to the top of
+            this layer. Requires ``top`` and ``bottom``.
         layer_max: optional, int
-            Ignored.
+            Maximum layer to select. Well screens are clipped to the bottom of
+            this layer. Requires ``top`` and ``bottom``.
         x_min: optional, float
             Minimum x-coordinate to select.
         x_max: optional, float
@@ -1059,8 +1061,8 @@ class Well(GridAgnosticWell):
 
         ds = new.dataset
 
-        z_max, in_bounds_z_max = self._find_well_value_at_layer(ds, top, layer_max)
-        z_min, in_bounds_z_min = self._find_well_value_at_layer(ds, bottom, layer_min)
+        z_max, in_bounds_z_max = self._find_well_value_at_layer(ds, top, layer_min)
+        z_min, in_bounds_z_min = self._find_well_value_at_layer(ds, bottom, layer_max)
 
         # Prior to the actual clipping of z_max/z_min, replace the dataset in case a
         # spatial selection needs to be done when a spatial grid is present (top/bottom).
@@ -1090,7 +1092,7 @@ class Well(GridAgnosticWell):
     def _find_well_value_at_layer(
         well_dataset: xr.Dataset, grid: GridDataArray, layer: int | None
     ) -> tuple[GridDataArray | None, npt.NDArray[np.bool_]]:
-        value = None if layer is None else grid.isel(layer=layer)
+        value = None if layer is None else grid.sel(layer=layer)
 
         # if value is a grid select the values at the well locations and drop the dimensions
         if (value is not None) and is_spatial_grid(value):
