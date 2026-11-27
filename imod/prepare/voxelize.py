@@ -60,7 +60,7 @@ def _voxelize(
                     count += 1
                 else:
                     if has_value:
-                        dst[ii, i, j] = method(values, weights)
+                        dst[ii, i, j] = method(values[:count], weights[:count])
                         # Reset
                         values[:count] = 0
                         weights[:count] = 0

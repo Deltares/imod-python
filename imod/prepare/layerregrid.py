@@ -91,7 +91,7 @@ def _regrid_layers(
                     count += 1
 
                 if has_value:
-                    dst[ii, i, j] = method(values, weights)
+                    dst[ii, i, j] = method(values[:count], weights[:count])
                     values[:count] = 0
                     weights[:count] = 0
 
