@@ -46,12 +46,12 @@ def test_mf6_laketable_reference(naardermeer, ijsselmeer, tmp_path):
         end packagedata
 
         begin connectiondata
-        1 1 1 2 2 horizontal 0.2 0.4 0.3 0.6 0.5
-        1 2 1 2 3 horizontal 0.2 0.4 0.3 0.6 0.5
-        1 3 1 3 3 horizontal 0.2 0.4 0.3 0.6 0.5
-        2 1 1 5 5 horizontal 0.2 0.4 0.3 0.6 0.5
-        2 2 1 5 6 horizontal 0.2 0.4 0.3 0.6 0.5
-        2 3 1 6 6 horizontal 0.2 0.4 0.3 0.6 0.5
+        1 1 1 2 2 horizontal 0.2 0.4 0.3 0.5 0.6
+        1 2 1 2 3 horizontal 0.2 0.4 0.3 0.5 0.6
+        1 3 1 3 3 horizontal 0.2 0.4 0.3 0.5 0.6
+        2 1 1 5 5 horizontal 0.2 0.4 0.3 0.5 0.6
+        2 2 1 5 6 horizontal 0.2 0.4 0.3 0.5 0.6
+        2 3 1 6 6 horizontal 0.2 0.4 0.3 0.5 0.6
         end connectiondata
 
         begin tables

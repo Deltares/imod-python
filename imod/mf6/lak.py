@@ -992,8 +992,8 @@ class Lake(BoundaryCondition):
             "connection_bed_leak",
             "connection_bottom_elevation",
             "connection_top_elevation",
-            "connection_width",
             "connection_length",
+            "connection_width",
         ]
         data_df = self.dataset[connection_vars].to_dataframe()
         lake_numbers_per_connection = self.dataset["connection_lake_number"].values
@@ -1013,11 +1013,12 @@ class Lake(BoundaryCondition):
             "outlet_lakeout",
             "outlet_couttype",
             "outlet_invert",
-            "outlet_roughness",
             "outlet_width",
+            "outlet_roughness",
             "outlet_slope",
         ]
         df = self.dataset[outlet_vars].to_dataframe()
+        df.insert(0, "outletno", np.arange(1, len(df) + 1))
         return df
 
     def _write_blockfile(
