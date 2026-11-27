@@ -127,3 +127,24 @@ def test_cross_section(test_da):
     actual["s"] = actual["s"].round(3)
     actual["ds"] = actual["ds"].round(3)
     assert actual.identical(expected)
+
+
+def test_cross_section__nonequidistant(test_da_nonequidistant):
+    da = test_da_nonequidistant
+    # Horizontal line through the bottom row
+    actual = imod.select.cross_section_line(da, (0.0, 0.5), (4.0, 0.5))
+    assert np.array_equal(actual.values, [8, 9, 10, 11])
+    assert np.allclose(actual["ds"], [0.9, 1.1, 0.8, 1.2])
+
+    # Vertical line through the first column
+    actual = imod.select.cross_section_line(da, (0.5, 0.0), (0.5, 3.0))
+    assert np.array_equal(actual.values, [8, 4, 0])
+    assert np.allclose(actual["ds"], [1.0, 0.5, 1.5])
+
+    # Diagonal line: compare with the values at the segment midpoints
+    actual = imod.select.cross_section_line(da, (0.0, 0.0), (4.0, 3.0))
+    assert np.isclose(actual["ds"].sum(), 5.0)
+    x = actual["s"].values * 4.0 / 5.0
+    y = actual["s"].values * 3.0 / 5.0
+    expected = imod.select.points_values(da, x=x, y=y)
+    assert np.array_equal(actual.values, expected.values)
