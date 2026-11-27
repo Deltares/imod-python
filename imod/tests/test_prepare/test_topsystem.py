@@ -1,4 +1,5 @@
 import numpy as np
+import pytest
 import xarray as xr
 from pytest_cases import parametrize_with_cases
 
@@ -8,6 +9,8 @@ from imod.prepare.topsystem import (
     allocate_ghb_cells,
     allocate_rch_cells,
     allocate_riv_cells,
+    c_leakage,
+    c_radial,
     distribute_drn_conductance,
     distribute_ghb_conductance,
     distribute_riv_conductance,
@@ -764,3 +767,48 @@ def test_distribute_ghb_conductance__above_surface_level(
     actual = take_nth_layer_column(actual_da, 0)
 
     np.testing.assert_equal(actual, expected)
+
+
+@pytest.mark.parametrize("kh, kv", [(10.0, 1.0), (5.0, 5.0)])
+def test_c_leakage(kh, kv):
+    D = 5.0
+    c0 = 2.0
+    c1 = 100.0
+    B = 2.0
+    length = 50.0
+    dx = 100.0
+    dy = -100.0
+
+    # Compute the expected value by hand.
+    def f(x):
+        return x / np.tanh(x)
+
+    cell_area = abs(dx * dy)
+    fraction_wetted = length * B / cell_area
+    L = (cell_area - length * B) / length
+    c1_prime = c1 + D / kv
+    labda_B = np.sqrt((kh * D * c1_prime * c0) / (c1_prime + c0))
+    labda_L = np.sqrt(c1_prime * kh * D)
+    x_B = B / (2.0 * labda_B)
+    x_L = L / (2.0 * labda_L)
+    c_rad = (
+        L
+        / (np.pi * np.sqrt(kh * kv))
+        * np.log((4.0 * D) / (np.pi * B) * np.sqrt(kh / kv))
+    )
+    c_L = (c0 + c1_prime) * f(x_L) + (c0 * L / B) * f(x_B)
+    c_B = (c1_prime + c0) / (c_L - c0 * L / B) * c_L
+    c_total = 1.0 / (fraction_wetted / c_B + (1.0 - fraction_wetted) / c_L) + c_rad
+    expected = c_total - c1_prime
+
+    def da(value):
+        return xr.DataArray([[value]], coords={"y": [0.5], "x": [0.5]}, dims=("y", "x"))
+
+    actual = c_leakage(
+        da(kh), da(kv), da(D), da(c0), da(c1), da(B), da(length), da(dx), da(dy)
+    )
+    np.testing.assert_allclose(actual.values, [[expected]])
+
+    # Check the radial resistance separately as well.
+    actual_rad = c_radial(da(L), da(kh), da(kv), da(B), da(D))
+    np.testing.assert_allclose(actual_rad.values, [[c_rad]])
