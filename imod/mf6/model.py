@@ -734,8 +734,8 @@ class Modflow6Model(collections.UserDict[str, Package], IModel, abc.ABC):
             mask_topsystem_where_bc(
                 clipped, clipped_boundary_condition, ignore_time_purge_empty
             )
-        else:
-            clipped.purge_empty_packages(ignore_time=ignore_time_purge_empty)
+
+        clipped.purge_empty_packages(ignore_time=ignore_time_purge_empty)
 
         return clipped
 
