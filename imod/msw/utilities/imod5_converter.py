@@ -60,7 +60,7 @@ def get_cell_area_from_imod5_data(
             message="found urban area > than (cel-area - wetted area). Urban area was set to 0",
             additional_depth=0,
         )
-        urban_area = urban_area.where(rural_area > 0.0, other=0.0)
+        urban_area = urban_area.where(rural_area >= 0.0, other=0.0)
     rural_area = mf6_area - (wetted_area + urban_area)
     return concat_imod5(rural_area, urban_area)
 
