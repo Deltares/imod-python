@@ -1,5 +1,5 @@
 import pathlib
-from collections.abc import Callable
+from collections.abc import Callable, Hashable
 from typing import Any, cast
 
 import xarray as xr
@@ -32,13 +32,19 @@ def _write_chunks(
     and the number of dimensions may vary as well. The naive solution to this
     is a variable number of for loops, writting explicitly beforehand. Instead,
     this function uses recursion, selecting one chunk per dimension per time.
-    The base case is one where only a single chunks remains, and then the write
-    occurs (ignoring chunks in x and y).
+    The base case is one where no dimension other than x and y has more than
+    one chunk, and then the write occurs (ignoring chunks in x and y).
     """
-    dim = a.dims[0]
-    dim_is_xy = (dim == "x") or (dim == "y")
-    nochunks = a.chunks is None or max(map(len, a.chunks)) == 1
-    if nochunks or dim_is_xy:  # Base case
+    chunk_dim: Hashable | None = None
+    chunksizes: tuple[int, ...] = ()
+    if a.chunks is not None:
+        for dim, dim_chunksizes in zip(a.dims, a.chunks):
+            if dim not in ("y", "x") and len(dim_chunksizes) > 1:
+                chunk_dim = dim
+                chunksizes = dim_chunksizes
+                break
+
+    if chunk_dim is None:  # Base case
         a = a.compute()
         extradims = cast(
             list[str], list(filter(lambda dim: dim not in ("y", "x"), a.dims))
@@ -57,15 +63,10 @@ def _write_chunks(
             fn = imod.util.path.compose(d, pattern)
             write(fn, a, nodata, dtype)
     else:  # recursive case
-        if a.chunks is None:
-            raise ValueError("DataArray has no chunks, but reached recursive case.")
-        for dim, chunksizes in zip(a.dims, a.chunks):
-            if len(chunksizes) > 1:
-                break
         start = 0
         for chunksize in chunksizes:
             end = start + chunksize
-            b = a.isel({dim: slice(start, end)})
+            b = a.isel({chunk_dim: slice(start, end)})
             # Recurse
             _write_chunks(b, pattern, d, nodata, dtype, write)
             start = end

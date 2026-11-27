@@ -245,7 +245,7 @@ class ImmobileStorageTransfer(Package):
             "first_order_decay": first_order_decay,
             "zero_order_decay": zero_order_decay,
             "cimfile": cimfile,
-            "columns ": columns,
+            "columns": columns,
             "width": width,
             "digits": digits,
             "format": format,

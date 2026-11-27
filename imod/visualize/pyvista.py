@@ -454,7 +454,7 @@ def grid_3d(
         da = da.transpose("layer", "y", "x", transpose_coords=True)
         ztop = da.coords["top"]
         zbot = da.coords["bottom"]
-        z3d = np.vstack([np.expand_dims(ztop.isel(layer=1).values, 0), zbot.values])
+        z3d = np.vstack([np.expand_dims(ztop.isel(layer=0).values, 0), zbot.values])
 
         if exterior_only:
             da = da.where(exterior(da, exterior_depth))
@@ -609,6 +609,15 @@ class GridAnimation3D:
     >>> animation = imod.visualize.GridAnimation3D(concentration, mesh_kwargs=dict(stitle="Concentration on {timestamp:%Y-%m-%d}"))
     """
 
+    def _add_mesh(self, da: xr.DataArray) -> None:
+        mesh_kwargs = self.mesh_kwargs.copy()
+        if "stitle" in mesh_kwargs and "{timestamp" in mesh_kwargs["stitle"]:
+            mesh_kwargs["stitle"] = mesh_kwargs["stitle"].format(
+                timestamp=pd.Timestamp(da.time.values)
+            )
+
+        self.mesh_actor = self.plotter.add_mesh(self.mesh, **mesh_kwargs)
+
     def _initialize(self, da: xr.DataArray) -> None:
         self.mesh = cast(
             "pv.UnstructuredGrid",
@@ -618,13 +627,7 @@ class GridAnimation3D:
                 return_index=False,
             ),
         )
-        mesh_kwargs = self.mesh_kwargs.copy()
-        if "stitle" in mesh_kwargs and "{timestamp" in mesh_kwargs["stitle"]:
-            mesh_kwargs["stitle"] = mesh_kwargs["stitle"].format(
-                timestamp=pd.Timestamp(da.time.values)
-            )
-
-        self.mesh_actor = self.plotter.add_mesh(self.mesh, **mesh_kwargs)
+        self._add_mesh(da)
 
     def _update(self, da: xr.DataArray) -> None:
         self.plotter.remove_actor(self.mesh_actor)
@@ -657,7 +660,7 @@ class GridAnimation3D:
         Reset the plotter to its base state.
         """
         self.plotter = pv.Plotter(**self.plotter_kwargs)
-        self._update(self.da.isel(time=0))
+        self._initialize(self.da.isel(time=0))
 
     def write(self, filename: str | Path, framerate: int = 24) -> None:
         """
@@ -710,6 +713,7 @@ class StaticGridAnimation3D(GridAnimation3D):
         )
         self.mesh = mesh
         self.indices = indices
+        self._add_mesh(da)
 
     def _update(self, da: xr.DataArray) -> None:
         self.mesh.cell_data["values"] = da.values.ravel()[self.indices]
@@ -753,13 +757,13 @@ def velocity_field(
         if not z_values.shape == vx.shape:
             raise ValueError("Shape of `z` does not match velocity components.")
         _, yy, xx = np.meshgrid(
-            np.arange(z_values.shape[0]), vx["x"].values, vy["y"].values, indexing="ij"
+            np.arange(z_values.shape[0]), vx["y"].values, vx["x"].values, indexing="ij"
         )
         zz = z_values
     else:
         raise ValueError("z should be one or three dimensional.")
 
-    zz *= vertical_exaggeration
+    zz = zz * vertical_exaggeration
     cellcenters = pv.PolyData(np.stack([np.ravel(x) for x in (xx, yy, zz)], axis=1))
     # Add the velocity components in x, y, z order
     cellcenters["velocity"] = np.stack([x.data.ravel() for x in (vx, vy, vz)], axis=1)

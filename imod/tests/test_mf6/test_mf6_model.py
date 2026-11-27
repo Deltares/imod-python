@@ -451,6 +451,29 @@ def test_purge_empty_package__ignore_time(
     assert (original_nr_packages - 1) == len(unstructured_flow_model.items())
 
 
+@pytest.mark.parametrize("ignore_time_purge_empty", [False, True])
+def test_clip_box_with_state_for_boundary__purges_empty_packages(
+    structured_flow_model: GroundwaterFlowModel, ignore_time_purge_empty: bool
+):
+    # Arrange
+    # Constant head only in the first column, which is outside the clip box.
+    head = structured_flow_model["chd"].dataset["head"]
+    structured_flow_model["chd"].dataset["head"] = head.where(head["x"] == 0.0)
+    state_for_boundary = xr.full_like(head, 0.5)
+
+    # Act
+    clipped = structured_flow_model.clip_box(
+        x_min=3.0,
+        state_for_boundary=state_for_boundary,
+        ignore_time_purge_empty=ignore_time_purge_empty,
+    )
+
+    # Assert
+    assert "chd" not in clipped
+    assert "chd_clipped" in clipped
+    assert not clipped.validate("flow").has_errors()
+
+
 def test_deepcopy(
     unstructured_flow_model: GroundwaterFlowModel,
 ):

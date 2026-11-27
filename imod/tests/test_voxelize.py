@@ -127,3 +127,30 @@ def test_voxelize__max_overlap_2(test_da):
         dims,
     )
     assert actual.identical(expected)
+
+
+@pytest.mark.parametrize(
+    "method, expected",
+    [
+        ("minimum", [5.0, 6.0]),
+        ("maximum", [5.0, 7.0]),
+        ("mean", [5.0, 6.5]),
+        ("median", [5.0, 6.5]),
+    ],
+)
+def test_voxelize__reduction_partial_overlap(method, expected):
+    # Voxels overlap fewer layers than the source has: the reduction must only
+    # consider the overlapping layers.
+    voxelizer = imod.prepare.Voxelizer(method=method)
+    dims = ("layer", "y", "x")
+    coords = {"layer": [1, 2, 3], "y": [0.5], "x": [0.5]}
+    source = xr.DataArray(np.array([5.0, 6.0, 7.0]).reshape(3, 1, 1), coords, dims)
+    top = xr.DataArray(np.array([3.0, 2.0, 1.0]).reshape(3, 1, 1), coords, dims)
+    bottom = top - 1.0
+
+    z = [2.5, 1.0]
+    dz = [-1.0, -2.0]
+    like = xr.DataArray(np.arange(2), {"z": z, "dz": ("z", dz)}, ["z"])
+
+    actual = voxelizer.voxelize(source, top, bottom, like)
+    assert np.allclose(actual.values.ravel(), expected)

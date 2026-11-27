@@ -9,11 +9,75 @@ The format is based on `Keep a Changelog`_, and this project adheres to
 [Unreleased]
 ------------
 
+Added
+~~~~~
+
 - Added :func:`imod.formats.isg.read` to read iMOD segment river files (ISG and
   its associated binary files, single and double precision), including segment
   geometry, cross-sections and plots.
 - :func:`imod.data.isg_tutorials` to load example ISG data from the iMOD5
   tutorials.
+
+Fixed
+~~~~~
+
+- :class:`imod.mf6.Evapotranspiration` wrote all options on one line, so
+  MODFLOW 6 read only the first option. For example, ``save_flows`` had no
+  effect. Each option is now on its own line.
+- :class:`imod.mf6.Lake` wrote the connection width before the connection
+  length. The connection data now has ``connlen`` before ``connwidth``, as
+  MODFLOW 6 expects.
+- :class:`imod.mf6.Lake` wrote an outlets block that MODFLOW 6 could not read.
+  The block now starts with the outlet number and has the width before the
+  roughness.
+- :class:`imod.mf6.ImmobileStorageTransfer` wrote an empty ``COLUMNS`` value
+  and no ``CIM`` prefix in the print format line of the options block.
+- :class:`imod.mf6.InitialConditions` with one constant start value per layer
+  did not write the ``layered`` keyword, so MODFLOW 6 could not read the file.
+- :meth:`imod.mf6.Well.clip_box` with ``layer_min`` or ``layer_max`` clipped
+  the well screens to the wrong layers. This also affected ``clip_box`` of
+  models and simulations.
+- :meth:`imod.mf6.Modflow6Simulation.split` did not remove connections to
+  inactive cells from an exchange that came after an exchange that became
+  empty.
+- :meth:`imod.mf6.GroundwaterFlowModel.clip_box` with ``state_for_boundary``
+  kept packages that became empty after clipping. The clipped model then failed
+  validation.
+- :meth:`imod.mf6.GroundwaterFlowModel.regrid_like` and
+  :meth:`imod.mf6.Modflow6Simulation.regrid_like` dropped model options, such as
+  ``newton`` and ``save_flows``.
+- :func:`imod.mf6.open_cbc` returned the vertical flow as ``flow-front-face``,
+  and zeros as ``flow-lower-face``, for models with one row.
+- :func:`imod.mf6.open_cbc` assigned the horizontal face flows of DISV models
+  to the wrong edges when IDOMAIN had values larger than 1.
+- :func:`imod.select.cross_section_line` and
+  :func:`imod.select.cross_section_linestring` failed on non-equidistant grids.
+- :class:`imod.prepare.LayerRegridder` and :class:`imod.prepare.Voxelizer`
+  included zeros in the ``minimum``, ``maximum`` and ``median`` methods when a
+  target layer overlapped fewer source layers than the source had.
+- :func:`imod.prepare.c_leakage` swapped the horizontal and vertical
+  conductivity in the radial resistance.
+- :func:`imod.prepare.linestring_to_trapezoid_zpolygons` swapped the bottom
+  elevations of the two vertices of each polygon. Clipped barriers made from
+  these polygons got a wrong bottom.
+- :func:`imod.idf.save` and :func:`imod.rasterio.save` kept only the last chunk
+  of an array that was chunked along x or y.
+- :func:`imod.idf.open` and :func:`imod.rasterio.open` returned only the first
+  file when the names of several files did not give separate dimensions. They
+  now raise a ``ValueError``.
+- :class:`imod.msw.SprinklingGrid` wrote an empty ``scap_svat.inp`` for lazily
+  loaded (dask) data, for example after :meth:`imod.msw.MetaSwapModel.from_file`.
+- :meth:`imod.msw.MetaSwapModel.from_imod5_data` and
+  :meth:`imod.mf6.Recharge.from_imod5_cap_data` changed fully urban cells into
+  rural cells when another cell had more urban and wetted area than its cell
+  area.
+- :func:`imod.visualize.grid_3d` used the top of the second layer as the top of
+  the model.
+- :func:`imod.visualize.cross_section` plotted cells at the wrong positions
+  when the cell widths varied, and failed for some decimal cell sizes.
+- :func:`imod.visualize.pyvista.velocity_field` swapped x and y for a 3D ``z``,
+  and changed the ``z`` array of the caller.
+- :class:`imod.visualize.StaticGridAnimation3D` did not show the mesh.
 
 =======
 

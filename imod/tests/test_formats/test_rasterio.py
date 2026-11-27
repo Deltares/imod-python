@@ -128,3 +128,16 @@ def test_rasterio_ascii(test_da, tmp_path, value, nodata, dtype, precision, digi
     imod.rasterio.write_aaigrid(path_b, da.values, profile)
 
     assert_equal_content(path_a, path_b)
+
+
+def test_saveopen__xy_chunked(tmp_path):
+    nlayer, nrow, ncol = 2, 3, 4
+    coords = imod.util.spatial._xycoords((0.0, 4.0, 0.0, 3.0), (1.0, -1.0))
+    coords["layer"] = [1, 2]
+    data = np.arange(nlayer * nrow * ncol, dtype=np.float32).reshape(
+        (nlayer, nrow, ncol)
+    )
+    da = xr.DataArray(data, coords=coords, dims=("layer", "y", "x"), name="test")
+    imod.rasterio.save(tmp_path / "chunked.tif", da.chunk({"x": 2}))
+    daback = imod.rasterio.open(tmp_path / "chunked_l*.tif")
+    np.testing.assert_array_equal(daback.values, data)

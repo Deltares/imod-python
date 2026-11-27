@@ -172,3 +172,30 @@ def test_layerregridder_topbot_nan():
         np.array([np.nan, np.nan, 1.0, np.nan]).reshape(shape), coords, dims
     )
     assert actual.identical(expected)
+
+
+@pytest.mark.parametrize(
+    "method, expected",
+    [
+        ("minimum", [5.0, 6.0]),
+        ("maximum", [5.0, 7.0]),
+        ("mean", [5.0, 6.5]),
+        ("median", [5.0, 6.5]),
+    ],
+)
+def test_layerregridder__reduction_partial_overlap(method, expected):
+    # Destination layers overlap fewer source layers than the source has: the
+    # reduction must only consider the overlapping source layers.
+    layerregridder = imod.prepare.LayerRegridder(method=method)
+    dims = ("layer", "y", "x")
+    coords = {"layer": [1, 2, 3], "y": [0.5], "x": [0.5]}
+    source = xr.DataArray(np.array([5.0, 6.0, 7.0]).reshape(3, 1, 1), coords, dims)
+    top_src = xr.DataArray(np.array([3.0, 2.0, 1.0]).reshape(3, 1, 1), coords, dims)
+    bottom_src = top_src - 1.0
+
+    coords_dst = {"layer": [1, 2], "y": [0.5], "x": [0.5]}
+    top_dst = xr.DataArray(np.array([3.0, 2.0]).reshape(2, 1, 1), coords_dst, dims)
+    bottom_dst = xr.DataArray(np.array([2.0, 0.0]).reshape(2, 1, 1), coords_dst, dims)
+
+    actual = layerregridder.regrid(source, top_src, bottom_src, top_dst, bottom_dst)
+    assert np.allclose(actual.values.ravel(), expected)

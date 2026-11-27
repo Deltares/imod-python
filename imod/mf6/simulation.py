@@ -1669,7 +1669,8 @@ class Modflow6Simulation(collections.UserDict[str, Any], ISimulation):
                 )
 
     def _filter_inactive_cells_from_exchanges(self) -> None:
-        for ex in self["split_exchanges"]:
+        # Iterate over a copy, as empty exchanges are removed from the list.
+        for ex in list(self["split_exchanges"]):
             for i in [1, 2]:
                 self._filter_inactive_cells_exchange_domain(ex, i)
 

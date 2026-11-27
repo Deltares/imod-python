@@ -445,6 +445,37 @@ def test_saveopen_layer_chunking(test_layerda, chunk_layout, tmp_path):
         assert actual.chunks[0] == (actual.sizes["layer"],)
 
 
+@parametrize("chunks", [{"x": 2}, {"layer": 2, "x": 2}, {"layer": 2, "y": 1}])
+def test_saveopen_xy_chunked(test_layerda, chunks, tmp_path):
+    da = test_layerda.copy(
+        data=np.arange(test_layerda.size, dtype=np.float32).reshape(test_layerda.shape)
+    )
+    idf.save(tmp_path / "layer", da.chunk(chunks))
+    actual = idf.open(tmp_path / "layer_l*.idf")
+    np.testing.assert_array_equal(actual.values, da.values)
+
+
+@parametrize("chunk_layout", ["per_idf", "per_timestep"])
+def test_open__undecomposable_filenames(test_da, chunk_layout, tmp_path):
+    for layer in (1, 2, 3):
+        idf.write(tmp_path / f"kh.v2_l{layer}.idf", test_da * layer)
+
+    with pytest.raises(ValueError, match="pattern"):
+        idf.open(tmp_path / "kh.v2_l*.idf", chunk_layout=chunk_layout)
+
+    # A single file can still be opened.
+    actual = idf.open(tmp_path / "kh.v2_l2.idf", chunk_layout=chunk_layout)
+    assert actual.dims == ("y", "x")
+    np.testing.assert_allclose(actual.values, test_da.values * 2)
+
+    # Providing a pattern resolves the dimensions.
+    actual = idf.open(
+        tmp_path / "kh.v2_l*.idf", pattern="{name}_l{layer}", chunk_layout=chunk_layout
+    )
+    assert actual.dims == ("layer", "y", "x")
+    np.testing.assert_allclose(actual.values[:, 0, 0], [1.0, 2.0, 3.0])
+
+
 def test_save_topbot__layers(test_layerda, tmp_path):
     da = test_layerda
     da = da.assign_coords(z=("layer", np.arange(1.0, 6.0) - 0.5))

@@ -643,7 +643,7 @@ class ClipBoxCases:
 
         expected_dims = {
             "layered": {"index": 6, "species": 2},
-            "nonlayered": {"index": 2, "species": 2},
+            "nonlayered": {"index": 6, "species": 2},
         }
         return clip_arguments, expected_dims, does_not_raise(), does_not_raise()
 
@@ -656,7 +656,7 @@ class ClipBoxCases:
 
         expected_dims = {
             "layered": {"index": 6, "species": 2},
-            "nonlayered": {"index": 2, "species": 2},
+            "nonlayered": {"index": 6, "species": 2},
         }
         return clip_arguments, expected_dims, does_not_raise(), does_not_raise()
 
@@ -673,7 +673,7 @@ class ClipBoxCases:
 
         expected_dims = {
             "layered": {"index": 6, "species": 2},
-            "nonlayered": {"index": 2, "species": 2},
+            "nonlayered": {"index": 6, "species": 2},
         }
         return clip_arguments, expected_dims, does_not_raise(), does_not_raise()
 
@@ -688,7 +688,7 @@ class ClipBoxCases:
 
         expected_dims = {
             "layered": {"index": 6, "species": 2},
-            "nonlayered": {"index": 2, "species": 2},
+            "nonlayered": {"index": 6, "species": 2},
         }
         return clip_arguments, expected_dims, does_not_raise(), does_not_raise()
 
@@ -790,6 +790,41 @@ def test_clip_box__layered_well_stationary(
 
         # Assert
         assert dict(ds.sizes) == expected_dims["layered"]
+
+
+@pytest.mark.parametrize(
+    ("clip_layers", "expected_screen_top", "expected_screen_bottom"),
+    [
+        ({"layer_min": 3, "layer_max": 5}, -2.0, -5.0),
+        ({"layer_max": 5}, 0.0, -5.0),
+        ({"layer_min": 3}, -2.0, -10.0),
+    ],
+)
+def test_clip_box__well_screen_by_layer(
+    clip_layers, expected_screen_top, expected_screen_bottom
+):
+    # Arrange: 10 layers of 1 m thickness, well screen spans all layers.
+    layer = np.arange(1, 11)
+    top_layer = xr.DataArray(-(layer - 1.0), coords={"layer": layer}, dims=("layer",))
+    bottom_layer = xr.DataArray(
+        -layer.astype(float), coords={"layer": layer}, dims=("layer",)
+    )
+    planar = xr.DataArray(
+        np.ones((2, 2)), coords={"y": [1.5, 0.5], "x": [0.5, 1.5]}, dims=("y", "x")
+    )
+    top = top_layer * planar
+    bottom = bottom_layer * planar
+    wel = imod.mf6.Well(
+        x=[0.5], y=[0.5], screen_top=[0.0], screen_bottom=[-10.0], rate=[1.0]
+    )
+
+    # Act
+    ds = wel.clip_box(top=top, bottom=bottom, **clip_layers).dataset
+
+    # Assert
+    assert ds.sizes["index"] == 1
+    np.testing.assert_allclose(ds["screen_top"].values, [expected_screen_top])
+    np.testing.assert_allclose(ds["screen_bottom"].values, [expected_screen_bottom])
 
 
 @pytest.mark.parametrize(

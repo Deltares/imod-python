@@ -270,7 +270,9 @@ class SprinklingGrid(SprinklingBase):
             self.dataset["max_abstraction_groundwater"]
             + self.dataset["max_abstraction_surfacewater"]
         )
-        max_rate_per_svat = max_rate.where(svat > 0)
+        # Compute, so that the in-place assignment below is not lost on a
+        # temporary copy of dask-backed data.
+        max_rate_per_svat = max_rate.where(svat > 0).compute()
         well_layer_per_svat = xr.full_like(max_rate_per_svat, np.nan)
         well_layer_per_svat.values[:, well_row, well_column] = well_layer
 

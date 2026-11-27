@@ -113,7 +113,7 @@ def c_leakage(
     x_L = L / (2.0 * labda_L)
 
     # Compute feeding resistance
-    c_rad = c_radial(L, kv, kh, B, D)
+    c_rad = c_radial(L, kh, kv, B, D)
     c_L = (c0 + c1_prime) * f(x_L) + (c0 * L / B) * f(x_B)
     c_B = (c1_prime + c0) / (c_L - c0 * L / B) * c_L
     # total feeding resistance equals the harmonic mean of resistances below

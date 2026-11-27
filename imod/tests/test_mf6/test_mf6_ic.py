@@ -3,6 +3,7 @@ import textwrap
 from copy import deepcopy
 
 import pytest
+import xarray as xr
 
 import imod
 from imod.schemata import ValidationError
@@ -24,6 +25,27 @@ def test_render():
         """
     )
     assert actual_start == expected
+
+
+def test_render_layered_constant():
+    start = xr.DataArray([1.0, 2.0, 3.0], coords={"layer": [1, 2, 3]}, dims=("layer",))
+    ic = imod.mf6.InitialConditions(start=start)
+    directory = pathlib.Path("mymodel")
+    actual = ic._render(directory, "ic", None, False)
+    expected = textwrap.dedent(
+        """\
+        begin options
+        end options
+
+        begin griddata
+          strt layered
+            constant 1.0
+            constant 2.0
+            constant 3.0
+        end griddata
+        """
+    )
+    assert actual == expected
 
 
 def test_wrong_dtype():

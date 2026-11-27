@@ -85,7 +85,7 @@ class InitialConditions(Package, IRegridPackage):
         d: dict[str, Any] = {}
 
         icdirectory = pathlib.Path(directory) / pkgname
-        d["layered"], d["strt"] = self._compose_values(
+        d["strt_layered"], d["strt"] = self._compose_values(
             self["start"], icdirectory, "strt", binary=binary
         )
         return self._template.render(d)

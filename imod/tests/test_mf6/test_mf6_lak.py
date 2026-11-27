@@ -95,8 +95,8 @@ def test_lake_connection_dataframe(lake_package):
         "connection_bed_leak",
         "connection_bottom_elevation",
         "connection_top_elevation",
-        "connection_width",
         "connection_length",
+        "connection_width",
     ]
     assert actual == expected
 
@@ -106,12 +106,13 @@ def test_lake_outlet_dataframe(lake_package):
     assert isinstance(df, pd.DataFrame)
     actual = list(df.columns)
     expected = [
+        "outletno",
         "outlet_lakein",
         "outlet_lakeout",
         "outlet_couttype",
         "outlet_invert",
-        "outlet_roughness",
         "outlet_width",
+        "outlet_roughness",
         "outlet_slope",
     ]
     assert actual == expected
@@ -142,21 +143,79 @@ def test_lake_write(tmp_path, naardermeer, ijsselmeer):
         end packagedata
 
         begin connectiondata
-        1 1 1 2 2 horizontal 0.2 0.4 0.3 0.6 0.5
-        1 2 1 2 3 horizontal 0.2 0.4 0.3 0.6 0.5
-        1 3 1 3 3 horizontal 0.2 0.4 0.3 0.6 0.5
-        2 1 1 5 5 horizontal 0.2 0.4 0.3 0.6 0.5
-        2 2 1 5 6 horizontal 0.2 0.4 0.3 0.6 0.5
-        2 3 1 6 6 horizontal 0.2 0.4 0.3 0.6 0.5
+        1 1 1 2 2 horizontal 0.2 0.4 0.3 0.5 0.6
+        1 2 1 2 3 horizontal 0.2 0.4 0.3 0.5 0.6
+        1 3 1 3 3 horizontal 0.2 0.4 0.3 0.5 0.6
+        2 1 1 5 5 horizontal 0.2 0.4 0.3 0.5 0.6
+        2 2 1 5 6 horizontal 0.2 0.4 0.3 0.5 0.6
+        2 3 1 6 6 horizontal 0.2 0.4 0.3 0.5 0.6
         end connectiondata
 
         begin outlets
-        1 2 manning 23.0 25.0 24.0 26.0
-        2 1 manning 27.0 29.0 28.0 30.0
+        1 1 2 manning 23.0 24.0 25.0 26.0
+        2 2 1 manning 27.0 28.0 29.0 30.0
         end outlets
         """
     )
     assert actual == expected
+
+
+def test_lake_write__connectiondata_column_order(tmp_path):
+    connection_like = xr.DataArray([1.0], dims=(CONNECTION_DIM,))
+    lake = Lake(
+        lake_number=xr.DataArray([1], dims=(LAKE_DIM,)),
+        lake_starting_stage=xr.DataArray([1.0], dims=(LAKE_DIM,)),
+        lake_boundname=xr.DataArray(["lake"], dims=(LAKE_DIM,)),
+        connection_lake_number=xr.DataArray([1], dims=(CONNECTION_DIM,)),
+        connection_cell_id=xr.DataArray(
+            data=[[1, 2, 3]],
+            coords={"celldim": ["layer", "y", "x"]},
+            dims=(CONNECTION_DIM, "celldim"),
+        ),
+        connection_type=xr.DataArray(["horizontal"], dims=(CONNECTION_DIM,)),
+        connection_bed_leak=connection_like.copy(data=[0.1]),
+        connection_bottom_elevation=connection_like.copy(data=[-2.0]),
+        connection_top_elevation=connection_like.copy(data=[-1.0]),
+        connection_width=connection_like.copy(data=[3.0]),
+        connection_length=connection_like.copy(data=[4.0]),
+    )
+
+    actual = mf_lake.write_and_read(lake, tmp_path, "lake-test")
+
+    # ifno iconn cellid claktype bedleak belev telev connlen connwidth
+    expected = textwrap.dedent(
+        """\
+        begin connectiondata
+        1 1 1 2 3 horizontal 0.1 -2.0 -1.0 4.0 3.0
+        end connectiondata
+        """
+    )
+    assert expected in actual
+
+
+def test_lake_write__outlets_column_order(tmp_path, naardermeer, ijsselmeer):
+    outlet1 = OutletManning(
+        "Naardermeer", "IJsselmeer", invert=23.0, width=24.0, roughness=25.0, slope=26.0
+    )
+    outlet2 = OutletManning(
+        "IJsselmeer", "Naardermeer", invert=27.0, width=28.0, roughness=29.0, slope=30.0
+    )
+    lake_package = Lake.from_lakes_and_outlets(
+        [naardermeer(), ijsselmeer()], [outlet1, outlet2]
+    )
+
+    actual = mf_lake.write_and_read(lake_package, tmp_path, "lake-test")
+
+    # outletno lakein lakeout couttype invert width rough slope
+    expected = textwrap.dedent(
+        """\
+        begin outlets
+        1 1 2 manning 23.0 24.0 25.0 26.0
+        2 2 1 manning 27.0 28.0 29.0 30.0
+        end outlets
+        """
+    )
+    assert expected in actual
 
 
 def test_lake_write_disv_three_lakes(tmp_path):
@@ -334,14 +393,14 @@ def test_lake_rendering_transient(basic_dis, tmp_path):
         end packagedata
 
         begin connectiondata
-        1 1 2 3 3 horizontal 0.2 0.4 0.3 0.6 0.5
-        1 2 2 3 4 horizontal 0.2 0.4 0.3 0.6 0.5
-        1 3 2 4 4 horizontal 0.2 0.4 0.3 0.6 0.5
-        2 1 2 5 5 horizontal 0.2 0.4 0.3 0.6 0.5
+        1 1 2 3 3 horizontal 0.2 0.4 0.3 0.5 0.6
+        1 2 2 3 4 horizontal 0.2 0.4 0.3 0.5 0.6
+        1 3 2 4 4 horizontal 0.2 0.4 0.3 0.5 0.6
+        2 1 2 5 5 horizontal 0.2 0.4 0.3 0.5 0.6
         end connectiondata
 
         begin outlets
-        1 2 manning 0.0 25.0 24.0 26.0
+        1 1 2 manning 0.0 24.0 25.0 26.0
         end outlets
 
 
@@ -485,16 +544,16 @@ def test_lake_rendering_transient_all_timeseries(basic_dis, tmp_path):
         end packagedata
 
         begin connectiondata
-        1 1 2 3 3 horizontal 0.2 0.4 0.3 0.6 0.5
-        1 2 2 3 4 horizontal 0.2 0.4 0.3 0.6 0.5
-        1 3 2 4 4 horizontal 0.2 0.4 0.3 0.6 0.5
-        2 1 2 5 5 horizontal 0.2 0.4 0.3 0.6 0.5
+        1 1 2 3 3 horizontal 0.2 0.4 0.3 0.5 0.6
+        1 2 2 3 4 horizontal 0.2 0.4 0.3 0.5 0.6
+        1 3 2 4 4 horizontal 0.2 0.4 0.3 0.5 0.6
+        2 1 2 5 5 horizontal 0.2 0.4 0.3 0.5 0.6
         end connectiondata
 
         begin outlets
-        1 2 manning 0.0 3.0 2.0 4.0
-        2 1 specified
-        2 1 weir 0.0  0.0
+        1 1 2 manning 0.0 2.0 3.0 4.0
+        2 2 1 specified
+        3 2 1 weir 0.0 0.0
         end outlets
 
 
@@ -636,8 +695,8 @@ def test_lake_rendering_unstructured(basic_unstructured_dis, tmp_path, lake_tabl
     end packagedata
 
     begin connectiondata
-    1 1 2 3 horizontal 0.2 0.4 0.3 0.6 0.5
-    1 2 2 4 horizontal 0.2 0.4 0.3 0.6 0.5
+    1 1 2 3 horizontal 0.2 0.4 0.3 0.5 0.6
+    1 2 2 4 horizontal 0.2 0.4 0.3 0.5 0.6
     end connectiondata
 
     begin tables
@@ -645,7 +704,7 @@ def test_lake_rendering_unstructured(basic_unstructured_dis, tmp_path, lake_tabl
     end tables
 
     begin outlets
-    1 0 manning 3.0 3.0 2.0 4.0
+    1 1 0 manning 3.0 2.0 3.0 4.0
     end outlets
 
 

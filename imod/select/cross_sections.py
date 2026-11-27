@@ -276,8 +276,12 @@ def _cross_section(data: DataT, linecoords: Any) -> DataT:
     dx, xmin, xmax, dy, ymin, ymax = imod.util.spatial.spatial_reference(data)
     if isinstance(dx, float):
         dx_a = np.full(data.x.size, dx)
+    else:
+        dx_a = np.asarray(dx)
     if isinstance(dy, float):
         dy_a = np.full(data.y.size, dy)
+    else:
+        dy_a = np.asarray(dy)
     x_decreasing = data.indexes["x"].is_monotonic_decreasing
     y_decreasing = data.indexes["y"].is_monotonic_decreasing
 

@@ -378,6 +378,13 @@ def load_as_components(
     ndim = len(groupbydims)
     groupby = _initialize_groupby(ndim)
     if ndim == 0:  # Single idf
+        if len(paths) > 1:
+            raise ValueError(
+                f"Could not decompose the file names of {len(paths)} files into "
+                "distinct dimensions (e.g. time, layer), so they cannot be "
+                "combined. Use the ``pattern`` argument to specify how to "
+                f"parse the file names. First file: {paths[0]}"
+            )
         dask_array, _ = _dask(paths[0], headers[0], _read=_read)
     else:
         for path, attrs in zip(paths, headers):
