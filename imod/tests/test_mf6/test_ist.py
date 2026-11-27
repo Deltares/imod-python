@@ -51,7 +51,7 @@ def test_ist_simple(grid_array):
         """\
         begin options
           CIM FILEOUT cim.dat
-          PRINT_FORMAT COLUMNS  WIDTH 10 DIGITS 7 EXPONENTIAL
+          CIM PRINT_FORMAT COLUMNS 7 WIDTH 10 DIGITS 7 EXPONENTIAL
         end options
 
         begin griddata
@@ -64,6 +64,36 @@ def test_ist_simple(grid_array):
         end griddata"""
     )
     assert actual == expected
+
+
+def test_ist_print_format(grid_array):
+    grid = grid_array
+    immobile_porosity = xr.full_like(grid, dtype=np.float64, fill_value=0.1)
+    mobile_immobile_mass_transfer_rate = xr.full_like(
+        grid, dtype=np.float64, fill_value=88.0
+    )
+    ist = imod.mf6.ImmobileStorageTransfer(
+        initial_immobile_concentration=0.0,
+        immobile_porosity=immobile_porosity,
+        mobile_immobile_mass_transfer_rate=mobile_immobile_mass_transfer_rate,
+        columns=5,
+        width=12,
+        digits=4,
+        format="FIXED",
+        validate=False,
+    )
+    directory = pathlib.Path("mymodel")
+    globaltimes = [np.datetime64("2000-01-01")]
+    actual = ist._render(directory, "ist", globaltimes, False)
+    expected = textwrap.dedent(
+        """\
+        begin options
+          CIM FILEOUT cim.dat
+          CIM PRINT_FORMAT COLUMNS 5 WIDTH 12 DIGITS 4 FIXED
+        end options
+        """
+    )
+    assert actual.startswith(expected)
 
 
 def test_ist_elaborate(grid_array):
@@ -108,7 +138,7 @@ def test_ist_elaborate(grid_array):
           sorption
           first_order_decay
           CIM FILEOUT cim.txt
-          PRINT_FORMAT COLUMNS  WIDTH 10 DIGITS 7 EXPONENTIAL
+          CIM PRINT_FORMAT COLUMNS 7 WIDTH 10 DIGITS 7 EXPONENTIAL
         end options
 
         begin griddata

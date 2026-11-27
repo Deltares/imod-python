@@ -12,7 +12,7 @@ begin options
 {%- if zero_order_decay is defined %}  zero_order_decay
 {% endif -%}
 {%- if cimfile is defined %}  CIM FILEOUT {{cimfile}}
-  PRINT_FORMAT COLUMNS {{columns}} WIDTH {{width}} DIGITS {{digits}} {{format}}
+  CIM PRINT_FORMAT COLUMNS {{columns}} WIDTH {{width}} DIGITS {{digits}} {{format}}
 {% endif -%}
 end options
 
