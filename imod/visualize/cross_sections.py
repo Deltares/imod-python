@@ -48,12 +48,13 @@ def _meshcoords(
     da = da.transpose(*dims, transpose_coords=True)
     data = da.values
     xcoord = da.dims[1]
+    nx = da[xcoord].size
     dx, xmin, xmax = imod.util.spatial.coord_reference(da[xcoord])
     if isinstance(dx, (int, float)):
         if dx < 0.0:
             dx = abs(dx)
             data = data[:, ::-1]
-        X = np.arange(xmin + dx, xmax, dx)
+        X = xmin + dx * np.arange(1, nx)
     else:  # assuming dx is an array, non-equidistant dx
         if (dx < 0.0).all():
             dx = abs(dx)
@@ -62,7 +63,7 @@ def _meshcoords(
             pass
         else:
             raise ValueError(f"{xcoord} is not monotonic")
-        X = (xmin + dx[0]) + dx[1:].cumsum()
+        X = xmin + dx[:-1].cumsum()
 
     # if dimensions of top and bottom are 1D (voxels), promote to 2D
     if len(da["top"].dims) == 1 and len(da["bottom"].dims) == 1:
