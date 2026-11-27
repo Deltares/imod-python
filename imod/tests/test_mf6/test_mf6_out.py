@@ -216,6 +216,74 @@ def test_dis_indices__single_row_column():
     assert np.allclose(lower[:, 0], lower_expected)
 
 
+def test_dis_indices__single_row():
+    # Note: ia and ja use 1-based indexing as produced by modflow6!
+    # The diagonal is the first entry of every row, as in modflow6.
+    # Cell numbering, cross-section:
+    #
+    # +---+---+---+
+    # | 1 | 2 | 3 |
+    # +---+---+---+
+    # | 4 | 5 | 6 |
+    # +---+---+---+
+    ia = np.array([1, 4, 8, 11, 14, 18, 21])
+    # from       ([1, 1, 1, 2, 2, 2, 2, 3, 3, 3, 4, 4, 4, 5, 5, 5, 5, 6, 6, 6])
+    ja = np.array([1, 2, 4, 2, 1, 3, 5, 3, 2, 6, 4, 1, 5, 5, 2, 4, 6, 6, 3, 5])
+    # nja index    0  1  2  3  4  5  6  7  8  9 10 11 12 13 14 15 16 17 18 19
+    ncells = 6
+    nlayer = 2
+    nrow = 1
+    ncol = 3
+    right, front, lower = imod.mf6.out.dis.dis_indices(
+        ia, ja, ncells, nlayer, nrow, ncol
+    )
+    assert right.shape == front.shape == lower.shape == (nlayer, nrow, ncol)
+    assert (front == -1).all()  # No front connections
+    right_expected = np.array([[[1, 5, -1]], [[12, 16, -1]]])
+    np.testing.assert_array_equal(right, right_expected)
+    lower_expected = np.array([[[2, 6, 9]], [[-1, -1, -1]]])
+    np.testing.assert_array_equal(lower, lower_expected)
+
+
+def test_dis_indices__right_front_lower():
+    # Note: ia and ja use 1-based indexing as produced by modflow6!
+    # The diagonal is the first entry of every row, as in modflow6.
+    # Cell numbering, top-view per layer:
+    #
+    #   layer 1      layer 2
+    # +---+---+    +---+---+
+    # | 1 | 2 |    | 5 | 6 |
+    # +---+---+    +---+---+
+    # | 3 | 4 |    | 7 | 8 |
+    # +---+---+    +---+---+
+    ia = np.array([1, 5, 9, 13, 17, 21, 25, 29, 33])
+    ja = np.array(
+        [
+            *[1, 2, 3, 5],  # nja index 0 - 3
+            *[2, 1, 4, 6],  # nja index 4 - 7
+            *[3, 1, 4, 7],  # nja index 8 - 11
+            *[4, 2, 3, 8],  # nja index 12 - 15
+            *[5, 1, 6, 7],  # nja index 16 - 19
+            *[6, 2, 5, 8],  # nja index 20 - 23
+            *[7, 3, 5, 8],  # nja index 24 - 27
+            *[8, 4, 6, 7],  # nja index 28 - 31
+        ]
+    )
+    ncells = 8
+    nlayer = 2
+    nrow = 2
+    ncol = 2
+    right, front, lower = imod.mf6.out.dis.dis_indices(
+        ia, ja, ncells, nlayer, nrow, ncol
+    )
+    right_expected = np.array([[[1, -1], [10, -1]], [[18, -1], [27, -1]]])
+    np.testing.assert_array_equal(right, right_expected)
+    front_expected = np.array([[[2, 6], [-1, -1]], [[19, 23], [-1, -1]]])
+    np.testing.assert_array_equal(front, front_expected)
+    lower_expected = np.array([[[3, 7], [11, 15]], [[-1, -1], [-1, -1]]])
+    np.testing.assert_array_equal(lower, lower_expected)
+
+
 def test_dis_indices__idomain():
     # Note: ia and ja use 1-based indexing as produced by modflow6!
     # Cell numbering, cross-section:
@@ -346,6 +414,56 @@ def test_disv_indices():
     )
     np.testing.assert_array_equal(lower, expected_lower)
     np.testing.assert_array_equal(horizontal, expected_horizontal)
+
+
+def test_disv_indices__idomain_larger_than_one():
+    """
+    Same grid as test_disv_indices, but some active cells are marked by an
+    idomain value of 2. MODFLOW 6 treats all idomain values > 0 as active, so
+    the result should be identical to the result with all active cells marked
+    by 1.
+    """
+    nlayer = 3
+    nface = 3
+    shape = (nlayer, nface)
+    idomain_ones = np.zeros(shape, dtype=int)
+    idomain_ones[0, 1] = 1
+    idomain_ones[1, 1] = -1
+    idomain_ones[1, 2] = 1
+    idomain_ones[2, :] = 1
+    idomain_twos = idomain_ones.copy()
+    idomain_twos[0, 1] = 2
+    idomain_twos[1, 2] = 2
+    idomain_twos[2, :] = [2, 1, 2]
+
+    ia = np.array([0, 0, 1, 1, 1, 1, 2, 3, 4])
+    ja = np.array([8, 9, 8, 9])
+    edge_face_connectivity = np.array(
+        [
+            [0, -1],
+            [0, -1],
+            [0, 1],
+            [1, -1],
+            [1, -1],
+            [1, 2],
+            [2, -1],
+            [2, -1],
+        ]
+    )
+    n_edge = len(edge_face_connectivity)
+    expected_horizontal = np.full((nlayer, n_edge), -1)
+    expected_horizontal[2, 2] = 2
+    expected_horizontal[2, 5] = 3
+
+    lower_ones, horizontal_ones = imod.mf6.out.disv.disv_indices(
+        ia, ja, idomain_ones, edge_face_connectivity
+    )
+    lower_twos, horizontal_twos = imod.mf6.out.disv.disv_indices(
+        ia, ja, idomain_twos, edge_face_connectivity
+    )
+    np.testing.assert_array_equal(lower_twos, lower_ones)
+    np.testing.assert_array_equal(horizontal_twos, horizontal_ones)
+    np.testing.assert_array_equal(horizontal_twos, expected_horizontal)
 
 
 def test_open_cbc__dis(twri_result):

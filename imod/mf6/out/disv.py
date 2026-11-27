@@ -22,7 +22,6 @@ from .common import (
 )
 
 XUGRID_FILL_VALUE = -1
-IDOMAIN_ACTIVE = 1
 
 
 def _ugrid_iavert_javert(
@@ -409,7 +408,7 @@ def disv_indices(
     ja: IntArray of shape (nconnections + ncell,)
         MODFLOW 6 indices of CSR connectivity matrix. 1-based.
     idomain: IntArray of shape (nlayer, nface)
-        Active cells are marked by a value of 1 (IDOMAIN_ACTIVE).
+        Active cells are marked by a value larger than 0.
     edge_face_connectivity: IntArray of shape (nface, 2)
         External boundaries are marked by a second face value of -1
         (XUGRID_FILL_VALUE).
@@ -462,7 +461,7 @@ def disv_indices(
     )
 
     # Identify inactive faces and outer boundaries (second face == FILL).
-    is_active = idomain.ravel()[layered_edge_faces] == IDOMAIN_ACTIVE
+    is_active = idomain.ravel()[layered_edge_faces] > 0
     is_inner_edge = edge_face_connectivity[:, 1] != XUGRID_FILL_VALUE
     is_connection = (is_active.all(axis=2) & is_inner_edge[np.newaxis, :]).ravel()
 
