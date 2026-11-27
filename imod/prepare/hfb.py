@@ -133,9 +133,9 @@ def _line_to_trapezoid_zpolygon(
     return shapely.Polygon(
         (
             (x[0], y[0], zt[0]),
-            (x[0], y[0], zb[1]),
+            (x[0], y[0], zb[0]),
+            (x[1], y[1], zb[1]),
             (x[1], y[1], zt[1]),
-            (x[1], y[1], zb[0]),
         ),
     )
 
