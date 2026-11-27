@@ -57,6 +57,45 @@ def test_render_simple(rate_fc, elevation_fc, concentration_fc):
     assert actual == expected
 
 
+def test_render_options_on_separate_lines(rate_fc, elevation_fc, concentration_fc):
+    # Arrange
+    directory = pathlib.Path("mymodel")
+    globaltimes = np.array(
+        [
+            "2000-01-01",
+            "2000-01-02",
+            "2000-01-03",
+        ],
+        dtype="datetime64[ns]",
+    )
+
+    evt = imod.mf6.Evapotranspiration(
+        surface=elevation_fc,
+        rate=rate_fc,
+        depth=elevation_fc,
+        concentration=concentration_fc,
+        concentration_boundary_type="AUX",
+        print_input=True,
+        print_flows=True,
+        save_flows=True,
+    )
+    # Act
+    actual = evt._render(directory, "evt", globaltimes, False)
+
+    # Assert
+    expected_options = textwrap.dedent(
+        """\
+        begin options
+          auxiliary salinity temperature
+          print_input
+          print_flows
+          save_flows
+        end options
+        """
+    )
+    assert actual.startswith(expected_options)
+
+
 def test_get_options__no_segments(rate_fc, elevation_fc):
     """Test with no segments specified, this means there implicitly is 1 segment
     in the Modflow 6 input."""
