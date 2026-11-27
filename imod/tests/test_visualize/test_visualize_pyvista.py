@@ -1,9 +1,11 @@
 import numpy as np
+import pandas as pd
 import pytest
 import xarray as xr
 
 import imod
 from imod import util
+from imod.visualize.pyvista import velocity_field
 
 
 @pytest.fixture(scope="module")
@@ -76,6 +78,104 @@ def test_grid3d_z3d(tmp_path, test_3dzda):
     g = imod.visualize.grid_3d(da)
     assert g.bounds
     # g.plot(screenshot=tmp_path / "z3d.png", off_screen=True)
+
+
+def _layered_da(top, bottom):
+    shape = (len(top), 2, 3)
+    dims = ("layer", "y", "x")
+    coords = {
+        "layer": np.arange(1, len(top) + 1),
+        "y": np.array([102.5, 101.5]),
+        "x": np.array([0.5, 1.5, 2.5]),
+        "top": (dims, np.ones(shape) * np.reshape(top, (-1, 1, 1))),
+        "bottom": (dims, np.ones(shape) * np.reshape(bottom, (-1, 1, 1))),
+    }
+    return xr.DataArray(np.ones(shape), coords, dims)
+
+
+def test_grid3d_z3d_model_top():
+    da = _layered_da(top=[10.0, 5.0], bottom=[5.0, 0.0])
+    g = imod.visualize.grid_3d(da, vertical_exaggeration=1.0)
+    assert g.bounds[4] == 0.0
+    assert g.bounds[5] == 10.0
+
+
+def test_grid3d_z3d_single_layer():
+    da = _layered_da(top=[10.0], bottom=[0.0])
+    g = imod.visualize.grid_3d(da, vertical_exaggeration=1.0)
+    assert g.n_cells == 6
+    assert g.bounds[4] == 0.0
+    assert g.bounds[5] == 10.0
+
+
+def test_velocity_field_z3d():
+    # Non-square grid, with x and y in distinct ranges to detect a swap.
+    v = _layered_da(top=[0.0, -1.0], bottom=[-1.0, -2.0])
+    z = v.copy(data=np.stack([np.full((2, 3), -1.0), np.full((2, 3), -2.0)]))
+    z_before = z.values.copy()
+    glyphs = velocity_field(
+        v,
+        v,
+        v,
+        z=z,
+        vertical_exaggeration=30.0,
+        scale_by_magnitude=False,
+        factor=1.0e-3,
+    )
+    # With tiny arrows, the glyph bounds are the bounds of the arrow bases.
+    xmin, xmax, ymin, ymax, zmin, zmax = glyphs.bounds
+    np.testing.assert_allclose([xmin, xmax], [0.5, 2.5], atol=0.01)
+    np.testing.assert_allclose([ymin, ymax], [101.5, 102.5], atol=0.01)
+    np.testing.assert_allclose([zmin, zmax], [-60.0, -30.0], atol=0.01)
+    np.testing.assert_array_equal(z.values, z_before)
+
+
+def _transient_layered_da():
+    da = _layered_da(top=[0.0, -1.0], bottom=[-1.0, -2.0])
+    time = pd.date_range("2000-01-01", periods=2)
+    values = np.stack([np.full(da.shape, 1.0), np.full(da.shape, 2.0)])
+    return xr.DataArray(
+        values,
+        coords={"time": time, **da.coords},
+        dims=("time", "layer", "y", "x"),
+    )
+
+
+def _has_mesh_actor(animation):
+    return any(
+        getattr(getattr(actor, "mapper", None), "dataset", None) is animation.mesh
+        for actor in animation.plotter.renderer.actors.values()
+    )
+
+
+def test_static_grid_animation_3d_mesh_added():
+    da = _transient_layered_da()
+    animation = imod.visualize.StaticGridAnimation3D(
+        da, plotter_kwargs={"off_screen": True}
+    )
+    assert _has_mesh_actor(animation)
+    np.testing.assert_array_equal(animation.mesh.cell_data["values"], 1.0)
+
+    animation._update(da.isel(time=1))
+    np.testing.assert_array_equal(animation.mesh.cell_data["values"], 2.0)
+
+    animation.reset()
+    assert _has_mesh_actor(animation)
+    np.testing.assert_array_equal(animation.mesh.cell_data["values"], 1.0)
+    animation.plotter.close()
+
+
+def test_grid_animation_3d_reset():
+    da = _transient_layered_da()
+    animation = imod.visualize.GridAnimation3D(da, plotter_kwargs={"off_screen": True})
+    assert _has_mesh_actor(animation)
+    animation._update(da.isel(time=1))
+    assert _has_mesh_actor(animation)
+    np.testing.assert_array_equal(animation.mesh.cell_data["values"], 2.0)
+    animation.reset()
+    assert _has_mesh_actor(animation)
+    np.testing.assert_array_equal(animation.mesh.cell_data["values"], 1.0)
+    animation.plotter.close()
 
 
 @pytest.mark.skip(reason="CI isn't cooperating")
