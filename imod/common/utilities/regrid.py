@@ -315,7 +315,7 @@ def _regrid_like(
             f"regridding this model cannot be done due to the presence of package {error_with_object_name}"
         )
 
-    new_model = model.__class__()
+    new_model = model.__class__(**model.options)
     if regrid_cache is None:
         regrid_cache = RegridderWeightsCache()
     for pkg_name, pkg in model.items():

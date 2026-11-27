@@ -22,6 +22,22 @@ def test_regrid_structured_model_to_structured_model(
     assert not validation_result.has_errors()
 
 
+def test_regrid_model_preserves_options(
+    structured_flow_model: imod.mf6.GroundwaterFlowModel,
+):
+    gwf_model = imod.mf6.GroundwaterFlowModel(
+        print_input=True, save_flows=True, newton=True, under_relaxation=True
+    )
+    for key, package in structured_flow_model.items():
+        gwf_model[key] = package
+    finer_idomain = grid_data_structured(np.int32, 1, 0.4)
+
+    new_gwf_model = gwf_model.regrid_like(finer_idomain)
+
+    assert new_gwf_model.options == gwf_model.options
+    assert new_gwf_model.is_use_newton()
+
+
 def test_regrid_structured_model_with_wells_to_structured_model(
     structured_flow_model: imod.mf6.GroundwaterFlowModel,
 ):

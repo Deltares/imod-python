@@ -29,6 +29,22 @@ def test_regrid_structured_simulation_to_structured_simulation(
     assert_simulation_can_run(new_simulation, tmp_path)
 
 
+def test_regrid_simulation_preserves_model_options(
+    structured_flow_simulation: imod.mf6.Modflow6Simulation,
+):
+    flow_model = imod.mf6.GroundwaterFlowModel(save_flows=True, newton=True)
+    for key, package in structured_flow_simulation["flow"].items():
+        flow_model[key] = package
+    structured_flow_simulation["flow"] = flow_model
+    finer_idomain = grid_data_structured(np.int32, 1, 0.4)
+
+    new_simulation = structured_flow_simulation.regrid_like(
+        "regridded_simulation", finer_idomain
+    )
+
+    assert new_simulation["flow"].options == flow_model.options
+
+
 def test_regrid_unstructured_simulation_to_unstructured_simulation(
     tmp_path: Path,
     unstructured_flow_simulation: imod.mf6.Modflow6Simulation,
